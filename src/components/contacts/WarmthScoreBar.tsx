@@ -1,5 +1,6 @@
-import { getWarmthLabel, getWarmthGradient } from '@/lib/contacts/constants'
+import { getWarmthKey, getWarmthGradient } from '@/lib/contacts/constants'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 interface WarmthScoreBarProps {
   score: number
@@ -8,8 +9,9 @@ interface WarmthScoreBarProps {
 }
 
 export function WarmthScoreBar({ score, showLabel = true, className }: WarmthScoreBarProps) {
+  const { t } = useTranslation()
   const gradient = getWarmthGradient(score)
-  const label = getWarmthLabel(score)
+  const label = t(`contactWarmth.${getWarmthKey(score)}`)
 
   return (
     <div className={cn('space-y-1', className)}>

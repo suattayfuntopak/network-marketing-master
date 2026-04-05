@@ -41,7 +41,7 @@ export function Topbar() {
       console.log('signOut exception:', err)
     } finally {
       reset()
-      navigate(ROUTES.LOGIN, { replace: true })
+      navigate(ROUTES.HOME, { replace: true })
     }
   }
 
@@ -122,17 +122,17 @@ export function Topbar() {
 
             <DropdownMenuSeparator />
 
-            {/* Navigation items */}
+            {/* Navigation items — disabled until pages are built */}
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+              <DropdownMenuItem disabled>
                 <User className="w-4 h-4 mr-2" />
                 {t('profile.myProfile')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+              <DropdownMenuItem disabled>
                 <Settings className="w-4 h-4 mr-2" />
                 {t('profile.settings')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+              <DropdownMenuItem disabled>
                 <Bell className="w-4 h-4 mr-2" />
                 {t('profile.notifications')}
               </DropdownMenuItem>
@@ -151,13 +151,13 @@ export function Topbar() {
 
             <DropdownMenuSeparator />
 
-            {/* Help */}
+            {/* Help — disabled until pages are built */}
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+              <DropdownMenuItem disabled>
                 <HelpCircle className="w-4 h-4 mr-2" />
                 {t('profile.help')}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(ROUTES.SETTINGS)}>
+              <DropdownMenuItem disabled>
                 <MessageSquare className="w-4 h-4 mr-2" />
                 {t('profile.feedback')}
               </DropdownMenuItem>

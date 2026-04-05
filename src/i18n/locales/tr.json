@@ -232,6 +232,13 @@
       "errors": "Hata: {{count}} satır başarısız"
     }
   },
+  "contactWarmth": {
+    "veryHot": "Çok Sıcak",
+    "hot": "Sıcak",
+    "warm": "Ilık",
+    "cold": "Soğuk",
+    "veryCold": "Çok Soğuk"
+  },
   "contactStages": {
     "new": "Yeni",
     "contacted": "İletişim Kuruldu",
@@ -320,13 +327,12 @@
     },
     "hero": {
       "badge": "Distribütörün dijital komut merkezi",
-      "title1": "Network Marketing'i",
-      "title2": "Akıllıca",
-      "title3": "Yönet",
+      "title1": "Network Marketing'in",
+      "title2": "Efendisi",
+      "title3": "Ol!",
       "subtitle": "Kontakları yönet, AI ile mesaj üret, ekibini büyüt — hepsi tek yerde. Dağınık listeler ve kaçırılan takipler tarih oluyor.",
       "cta": "Ücretsiz Başla",
       "ctaSecondary": "Özellikleri Keşfet",
-      "trust1": "Kredi kartı gerekmez",
       "trust2": "Anında kurulum",
       "trust3": "İstediğin zaman iptal"
     },

@@ -232,6 +232,13 @@
       "errors": "Error: {{count}} rows failed"
     }
   },
+  "contactWarmth": {
+    "veryHot": "Very Hot",
+    "hot": "Hot",
+    "warm": "Warm",
+    "cold": "Cold",
+    "veryCold": "Very Cold"
+  },
   "contactStages": {
     "new": "New",
     "contacted": "Contacted",
@@ -320,13 +327,12 @@
     },
     "hero": {
       "badge": "Your distributor's digital command center",
-      "title1": "Manage Network",
-      "title2": "Marketing",
-      "title3": "Smartly",
+      "title1": "Master",
+      "title2": "Network",
+      "title3": "Marketing!",
       "subtitle": "Manage contacts, generate AI messages, grow your team — all in one place. Scattered lists and missed follow-ups are history.",
       "cta": "Start Free",
       "ctaSecondary": "Explore Features",
-      "trust1": "No credit card required",
       "trust2": "Instant setup",
       "trust3": "Cancel anytime"
     },

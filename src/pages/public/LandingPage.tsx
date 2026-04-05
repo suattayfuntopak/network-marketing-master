@@ -46,7 +46,7 @@ export function LandingPage() {
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
               <Zap className="w-4 h-4" />
             </div>
-            <span className="font-bold">NMM</span>
+            <span className="font-bold">Network Marketing Master</span>
           </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm text-muted-foreground">
             <a href="#features" className="hover:text-foreground transition-colors">{t('landing.nav.features')}</a>
@@ -124,10 +124,6 @@ export function LandingPage() {
             </a>
           </div>
           <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-primary" />
-              {t('landing.hero.trust1')}
-            </div>
             <div className="flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-primary" />
               {t('landing.hero.trust2')}
@@ -291,7 +287,7 @@ export function LandingPage() {
               <div className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-primary-foreground">
                 <Zap className="w-3.5 h-3.5" />
               </div>
-              <span className="font-bold text-sm">Network Marketing Master</span>
+              <span className="font-bold text-sm hidden sm:inline">Network Marketing Master</span>
             </div>
             <nav className="flex items-center gap-6 text-sm text-muted-foreground">
               <a href="#features" className="hover:text-foreground transition-colors">{t('landing.footer.features')}</a>

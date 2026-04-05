@@ -61,6 +61,14 @@ export const TAG_COLOR_CLASSES: Record<string, { bg: string; text: string; borde
   orange: { bg: 'bg-orange-100 dark:bg-orange-900/30', text: 'text-orange-700 dark:text-orange-400', border: 'border-orange-200 dark:border-orange-800' },
 }
 
+export function getWarmthKey(score: number): string {
+  if (score >= 80) return 'veryHot'
+  if (score >= 60) return 'hot'
+  if (score >= 40) return 'warm'
+  if (score >= 20) return 'cold'
+  return 'veryCold'
+}
+
 export function getWarmthLabel(score: number): string {
   if (score >= 80) return 'Çok Sıcak'
   if (score >= 60) return 'Sıcak'

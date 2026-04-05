@@ -1,6 +1,7 @@
-import { STAGE_LABELS, STAGE_COLORS } from '@/lib/contacts/constants'
+import { STAGE_COLORS } from '@/lib/contacts/constants'
 import type { Contact } from '@/types/database'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 const colorClasses: Record<string, string> = {
   gray: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
@@ -18,8 +19,8 @@ interface StageBadgeProps {
 }
 
 export function StageBadge({ stage, className }: StageBadgeProps) {
+  const { t } = useTranslation()
   const color = STAGE_COLORS[stage]
-  const label = STAGE_LABELS[stage]
 
   return (
     <span
@@ -29,7 +30,7 @@ export function StageBadge({ stage, className }: StageBadgeProps) {
         className
       )}
     >
-      {label}
+      {t(`contactStages.${stage}`)}
     </span>
   )
 }

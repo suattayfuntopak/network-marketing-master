@@ -1,5 +1,6 @@
-import { getWarmthLabel, getWarmthColor } from '@/lib/contacts/constants'
+import { getWarmthKey, getWarmthColor } from '@/lib/contacts/constants'
 import { cn } from '@/lib/utils'
+import { useTranslation } from 'react-i18next'
 
 const colorClasses: Record<string, string> = {
   red: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
@@ -15,8 +16,9 @@ interface WarmthScoreBadgeProps {
 }
 
 export function WarmthScoreBadge({ score, className }: WarmthScoreBadgeProps) {
+  const { t } = useTranslation()
   const color = getWarmthColor(score)
-  const label = getWarmthLabel(score)
+  const label = t(`contactWarmth.${getWarmthKey(score)}`)
 
   return (
     <span
