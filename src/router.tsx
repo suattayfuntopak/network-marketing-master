@@ -13,6 +13,8 @@ import { DashboardHome } from '@/pages/dashboard/DashboardHome'
 import { ContactsListPage } from '@/pages/dashboard/contacts/ContactsListPage'
 import { ContactFormPage } from '@/pages/dashboard/contacts/ContactFormPage'
 import { ContactDetailPage } from '@/pages/dashboard/contacts/ContactDetailPage'
+import { PipelinePage } from '@/pages/dashboard/pipeline/PipelinePage'
+import { DealDetailPage } from '@/pages/dashboard/pipeline/DealDetailPage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
 
 // Wrapper forces full remount of ContactDetailPage when ID changes,
@@ -52,8 +54,11 @@ export const router = createBrowserRouter([
           { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
           { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
 
+          // Pipeline
+          { path: ROUTES.PIPELINE, element: <PipelinePage /> },
+          { path: `${ROUTES.PIPELINE}/:dealId`, element: <DealDetailPage /> },
+
           // Placeholders
-          { path: ROUTES.PIPELINE, element: <div className="p-6"><h1 className="text-2xl font-bold">Pipeline</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.MESSAGES, element: <div className="p-6"><h1 className="text-2xl font-bold">Mesajlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.CALENDAR, element: <div className="p-6"><h1 className="text-2xl font-bold">Takvim</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.ACADEMY, element: <div className="p-6"><h1 className="text-2xl font-bold">Akademi</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },

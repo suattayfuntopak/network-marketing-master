@@ -161,6 +161,7 @@
     "deleteConfirm": "Are you sure you want to permanently delete this contact?",
     "bulkDeleteConfirm": "Are you sure you want to permanently delete {{count}} contacts?",
     "detail": {
+      "viewAll": "View All",
       "interactions": "Interaction History",
       "changeStage": "Change Stage",
       "about": "About",
@@ -276,6 +277,67 @@
     "stage_change": "Stage Change",
     "warmth_change": "Warmth Change",
     "system": "System"
+  },
+  "pipeline": {
+    "title": "Pipeline",
+    "newDeal": "New Deal",
+    "manageStages": "Manage Stages",
+    "emptyColumn": "No deals in this stage",
+    "totalValue": "Total Value",
+    "weightedValue": "Weighted Value",
+    "noDeals": "No deals yet",
+    "stageHistory": "Stage History",
+    "views": {
+      "kanban": "Kanban",
+      "table": "Table",
+      "forecast": "Forecast"
+    },
+    "deal": {
+      "title": "Title",
+      "titlePlaceholder": "John Smith - Product Sale",
+      "value": "Value",
+      "probability": "Probability",
+      "expectedClose": "Expected Close",
+      "actualClose": "Actual Close",
+      "stage": "Stage",
+      "type": "Type",
+      "notes": "Notes",
+      "wonBtn": "Won",
+      "lostBtn": "Lost",
+      "lostReason": "Lost Reason",
+      "lostReasonPlaceholder": "Why was it lost?",
+      "reopen": "Reopen",
+      "created": "Deal created",
+      "updated": "Deal updated",
+      "deleted": "Deal deleted",
+      "won": "Deal won 🎉",
+      "lost": "Deal lost",
+      "reopened": "Deal reopened"
+    },
+    "dealTypes": {
+      "prospect": "Prospect",
+      "product_sale": "Product Sale",
+      "recruitment": "Recruitment"
+    },
+    "status": {
+      "open": "Open",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "stage": {
+      "new": "New Stage",
+      "created": "Stage created",
+      "updated": "Stage updated",
+      "deleted": "Stage deleted",
+      "deleteConfirm": "Are you sure you want to delete this stage?",
+      "namePlaceholder": "Stage name...",
+      "color": "Color"
+    },
+    "forecast": {
+      "openDeals": "Open Deals",
+      "deal_one": "deal",
+      "deal_other": "deals"
+    }
   },
   "dashboard": {
     "welcome": "Welcome, {{name}} 👋",

@@ -1,5 +1,5 @@
 import { Users, TrendingUp, MessageSquare, Target, ArrowRight, Clock } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
@@ -11,6 +11,8 @@ import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactCount, useRecentContacts, usePendingFollowUps } from '@/hooks/useContacts'
+import { usePipelineStats } from '@/hooks/usePipeline'
+import { formatCurrency } from '@/lib/pipeline/constants'
 import { ROUTES } from '@/lib/constants'
 
 export function DashboardHome() {
@@ -24,6 +26,7 @@ export function DashboardHome() {
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
   const { data: pendingFollowUps = [] } = usePendingFollowUps(userId)
+  const { data: pipelineStats } = usePipelineStats(userId)
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -57,7 +60,10 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="cursor-pointer hover:border-primary/30 transition-colors"
+          onClick={() => navigate(ROUTES.PIPELINE)}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {t('dashboard.activePipeline')}
@@ -65,8 +71,14 @@ export function DashboardHome() {
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.noPipeline')}</p>
+            <div className="text-2xl font-bold">
+              {pipelineStats ? formatCurrency(pipelineStats.weightedValue, 'TRY', currentLang === 'en' ? 'en-US' : 'tr-TR') : '0'}
+            </div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {pipelineStats && pipelineStats.totalDeals > 0
+                ? `${pipelineStats.totalDeals} deal`
+                : t('dashboard.noPipeline')}
+            </p>
           </CardContent>
         </Card>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { format } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { formatDistanceToNow } from 'date-fns'
@@ -34,6 +34,9 @@ import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { STAGE_LABELS } from '@/lib/contacts/constants'
 import type { InteractionType } from '@/lib/contacts/types'
+import { useDealsByContact, usePipelineStages } from '@/hooks/usePipeline'
+import { STAGE_COLOR_CLASSES, DEAL_STATUS_COLORS, formatCurrency } from '@/lib/pipeline/constants'
+import i18n from '@/i18n'
 
 const INTERACTION_TYPE_KEYS: InteractionType[] = [
   'call', 'whatsapp', 'telegram', 'meeting', 'presentation', 'objection', 'email', 'sms', 'note',
@@ -56,6 +59,10 @@ export function ContactDetailPage() {
   const addInteractionMutation = useAddInteraction(id ?? '')
   const setTagsMutation = useSetContactTags(id ?? '')
   const createTagMutation = useCreateTag()
+
+  const { data: contactDeals = [] } = useDealsByContact(id ?? '', userId)
+  const { data: pipelineStages = [] } = usePipelineStages(userId)
+  const currLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
   const [showInteractionModal, setShowInteractionModal] = useState(false)
   const [interactionType, setInteractionType] = useState<InteractionType>('call')
@@ -409,6 +416,49 @@ export function ContactDetailPage() {
               </p>
             </div>
           )}
+
+          {/* Deals */}
+          <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('pipeline.title')}</p>
+              <Link
+                to={`${ROUTES.PIPELINE}?contact=${id}`}
+                className="text-xs text-primary hover:underline"
+              >
+                {t('contacts.detail.viewAll')}
+              </Link>
+            </div>
+            {contactDeals.length === 0 ? (
+              <p className="text-xs text-muted-foreground">{t('pipeline.noDeals')}</p>
+            ) : (
+              <div className="space-y-2">
+                {contactDeals.slice(0, 5).map((deal) => {
+                  const stage = pipelineStages.find((s) => s.id === deal.stage_id)
+                  const stageColors = stage ? STAGE_COLOR_CLASSES[stage.color] : STAGE_COLOR_CLASSES.gray
+                  return (
+                    <Link
+                      key={deal.id}
+                      to={`${ROUTES.PIPELINE}/${deal.id}`}
+                      className="flex items-center justify-between gap-2 hover:bg-muted/30 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-medium truncate group-hover:text-primary">{deal.title}</p>
+                        {stage && (
+                          <span className={`text-xs px-1.5 py-0 rounded-full ${stageColors.badge}`}>{stage.name}</span>
+                        )}
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="text-xs font-semibold">{formatCurrency(deal.value, deal.currency, currLocale)}</p>
+                        <span className={`text-xs px-1.5 rounded-full ${DEAL_STATUS_COLORS[deal.status]}`}>
+                          {t(`pipeline.status.${deal.status}`)}
+                        </span>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
 
           {/* AI Placeholder */}
           <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-2">

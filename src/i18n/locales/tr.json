@@ -161,6 +161,7 @@
     "deleteConfirm": "Bu kontağı kalıcı olarak silmek istediğinize emin misiniz?",
     "bulkDeleteConfirm": "{{count}} kontağı kalıcı olarak silmek istediğinize emin misiniz?",
     "detail": {
+      "viewAll": "Tümünü Gör",
       "interactions": "Etkileşim Geçmişi",
       "changeStage": "Aşama Değiştir",
       "about": "Hakkında",
@@ -276,6 +277,67 @@
     "stage_change": "Aşama Değişimi",
     "warmth_change": "Sıcaklık Değişimi",
     "system": "Sistem"
+  },
+  "pipeline": {
+    "title": "Süreç Takibi",
+    "newDeal": "Yeni Deal",
+    "manageStages": "Aşamaları Yönet",
+    "emptyColumn": "Bu aşamada deal yok",
+    "totalValue": "Toplam Değer",
+    "weightedValue": "Ağırlıklı Değer",
+    "noDeals": "Henüz deal yok",
+    "stageHistory": "Aşama Geçmişi",
+    "views": {
+      "kanban": "Kanban",
+      "table": "Tablo",
+      "forecast": "Tahmin"
+    },
+    "deal": {
+      "title": "Başlık",
+      "titlePlaceholder": "Ahmet Yılmaz - Ürün Satışı",
+      "value": "Değer",
+      "probability": "Olasılık",
+      "expectedClose": "Beklenen Kapanış",
+      "actualClose": "Gerçek Kapanış",
+      "stage": "Aşama",
+      "type": "Tip",
+      "notes": "Notlar",
+      "wonBtn": "Kazandı",
+      "lostBtn": "Kaybedildi",
+      "lostReason": "Kayıp Sebebi",
+      "lostReasonPlaceholder": "Neden kaybedildi?",
+      "reopen": "Yeniden Aç",
+      "created": "Deal oluşturuldu",
+      "updated": "Deal güncellendi",
+      "deleted": "Deal silindi",
+      "won": "Deal kazanıldı 🎉",
+      "lost": "Deal kaybedildi",
+      "reopened": "Deal yeniden açıldı"
+    },
+    "dealTypes": {
+      "prospect": "Aday",
+      "product_sale": "Ürün Satışı",
+      "recruitment": "Ekibe Katılım"
+    },
+    "status": {
+      "open": "Açık",
+      "won": "Kazanıldı",
+      "lost": "Kaybedildi"
+    },
+    "stage": {
+      "new": "Yeni Aşama",
+      "created": "Aşama oluşturuldu",
+      "updated": "Aşama güncellendi",
+      "deleted": "Aşama silindi",
+      "deleteConfirm": "Bu aşamayı silmek istediğinize emin misiniz?",
+      "namePlaceholder": "Aşama adı...",
+      "color": "Renk"
+    },
+    "forecast": {
+      "openDeals": "Açık Deallar",
+      "deal_one": "deal",
+      "deal_other": "deal"
+    }
   },
   "dashboard": {
     "welcome": "Hoş geldin, {{name}} 👋",
