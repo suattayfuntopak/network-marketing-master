@@ -7,4 +7,4 @@ export interface NavItem {
   roles?: string[]
 }
 
-export type Theme = 'light' | 'dark' | 'system'
+export type Theme = 'light' | 'dark'

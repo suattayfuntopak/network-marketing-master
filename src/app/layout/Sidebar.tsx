@@ -6,21 +6,30 @@ import {
   Zap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { NAV_ITEMS } from '@/lib/constants'
+import { ROUTES } from '@/lib/constants'
 import { useAuth } from '@/hooks/useAuth'
+import { useTranslation } from 'react-i18next'
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  LayoutDashboard, Users, GitMerge, MessageSquare, Calendar,
-  GraduationCap, Users2, BarChart2, Settings,
-}
+const navConfig = [
+  { key: 'dashboard', href: ROUTES.DASHBOARD, Icon: LayoutDashboard },
+  { key: 'contacts', href: ROUTES.CONTACTS, Icon: Users },
+  { key: 'pipeline', href: ROUTES.PIPELINE, Icon: GitMerge },
+  { key: 'messages', href: ROUTES.MESSAGES, Icon: MessageSquare },
+  { key: 'calendar', href: ROUTES.CALENDAR, Icon: Calendar },
+  { key: 'academy', href: ROUTES.ACADEMY, Icon: GraduationCap },
+  { key: 'team', href: ROUTES.TEAM, Icon: Users2, roles: ['leader', 'admin'] as string[] },
+  { key: 'analytics', href: ROUTES.ANALYTICS, Icon: BarChart2 },
+  { key: 'settings', href: ROUTES.SETTINGS, Icon: Settings },
+]
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const { profile } = useAuth()
+  const { t } = useTranslation()
 
-  const navItems = NAV_ITEMS.filter(item => {
-    if (!('roles' in item)) return true
-    return (item as { roles: readonly string[] }).roles.includes(profile?.role ?? 'distributor')
+  const navItems = navConfig.filter(item => {
+    if (!item.roles) return true
+    return item.roles.includes(profile?.role ?? 'distributor')
   })
 
   return (
@@ -48,30 +57,27 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2">
         <ul className="space-y-1">
-          {navItems.map((item) => {
-            const Icon = iconMap[item.icon]
-            return (
-              <li key={item.href}>
-                <NavLink
-                  to={item.href}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                      'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
-                      isActive
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                        : 'text-sidebar-foreground/70',
-                      collapsed && 'justify-center px-0 py-3'
-                    )
-                  }
-                  title={collapsed ? item.title : undefined}
-                >
-                  {Icon && <Icon className="w-5 h-5 shrink-0" />}
-                  {!collapsed && <span>{item.title}</span>}
-                </NavLink>
-              </li>
-            )
-          })}
+          {navItems.map(({ key, href, Icon }) => (
+            <li key={href}>
+              <NavLink
+                to={href}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                    'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                    isActive
+                      ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                      : 'text-sidebar-foreground/70',
+                    collapsed && 'justify-center px-0 py-3'
+                  )
+                }
+                title={collapsed ? t(`nav.${key}`) : undefined}
+              >
+                <Icon className="w-5 h-5 shrink-0" />
+                {!collapsed && <span>{t(`nav.${key}`)}</span>}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       </nav>
 
@@ -90,7 +96,7 @@ export function Sidebar() {
           ) : (
             <>
               <ChevronLeft className="w-4 h-4" />
-              <span>Daralt</span>
+              <span>{t('nav.collapse')}</span>
             </>
           )}
         </button>

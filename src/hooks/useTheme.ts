@@ -4,16 +4,12 @@ import type { Theme } from '@/types'
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
     const stored = localStorage.getItem('nmm-theme') as Theme | null
-    return stored ?? 'system'
+    // Only accept 'light' | 'dark'; default to 'dark'
+    return stored === 'light' ? 'light' : 'dark'
   })
 
   useEffect(() => {
-    const root = document.documentElement
-    const isDark =
-      theme === 'dark' ||
-      (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-
-    root.classList.toggle('dark', isDark)
+    document.documentElement.classList.toggle('dark', theme === 'dark')
   }, [theme])
 
   const setTheme = (newTheme: Theme) => {
@@ -21,5 +17,7 @@ export function useTheme() {
     setThemeState(newTheme)
   }
 
-  return { theme, setTheme }
+  const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
+
+  return { theme, setTheme, toggleTheme }
 }

@@ -27,6 +27,7 @@ import { InteractionTimeline } from '@/components/contacts/InteractionTimeline'
 import { QuickNoteInput } from '@/components/contacts/QuickNoteInput'
 import { TagSelector } from '@/components/contacts/TagSelector'
 import { useContact, useUpdateContactStage, useArchiveContact, useDeleteContact, useSetContactTags } from '@/hooks/useContact'
+import { useTranslation } from 'react-i18next'
 import { useInteractions, useAddInteraction } from '@/hooks/useInteractions'
 import { useTags, useCreateTag } from '@/hooks/useTags'
 import { useAuth } from '@/hooks/useAuth'
@@ -53,6 +54,7 @@ export function ContactDetailPage() {
   const userId = user?.id ?? ''
 
   const { data: contact, isLoading, isError, error } = useContact(id)
+  const { t } = useTranslation()
   const { data: interactions = [], isLoading: loadingInteractions } = useInteractions(id)
   const { data: allTags = [] } = useTags(userId)
 
@@ -70,18 +72,18 @@ export function ContactDetailPage() {
   const [interactionWarmth, setInteractionWarmth] = useState(0)
 
   if (isLoading) {
-    return <div className="p-6 text-center text-muted-foreground">Yükleniyor...</div>
+    return <div className="p-6 text-center text-muted-foreground">{t('common.loading')}</div>
   }
 
   if (isError) {
     console.error('[ContactDetail] Kontak yüklenemedi:', error)
     return (
       <div className="p-6 text-center space-y-3">
-        <p className="text-destructive font-medium">Kontak yüklenemedi.</p>
+        <p className="text-destructive font-medium">{t('contacts.loadError')}</p>
         <p className="text-sm text-muted-foreground">
-          {error instanceof Error ? error.message : 'Bilinmeyen hata'}
+          {error instanceof Error ? error.message : t('common.unknownError')}
         </p>
-        <Button onClick={() => navigate(ROUTES.CONTACTS)}>Geri Dön</Button>
+        <Button onClick={() => navigate(ROUTES.CONTACTS)}>{t('common.goBack')}</Button>
       </div>
     )
   }
@@ -89,8 +91,8 @@ export function ContactDetailPage() {
   if (!contact) {
     return (
       <div className="p-6 text-center space-y-3">
-        <p className="text-muted-foreground">Kontak bulunamadı.</p>
-        <Button onClick={() => navigate(ROUTES.CONTACTS)}>Geri Dön</Button>
+        <p className="text-muted-foreground">{t('contacts.notFound')}</p>
+        <Button onClick={() => navigate(ROUTES.CONTACTS)}>{t('common.goBack')}</Button>
       </div>
     )
   }
@@ -105,9 +107,9 @@ export function ContactDetailPage() {
   const handleStageChange = async (newStage: string) => {
     try {
       await updateStageMutation.mutateAsync({ newStage, oldStage: contact.stage })
-      toast.success('Aşama güncellendi')
+      toast.success(t('contacts.stage.changed'))
     } catch {
-      toast.error('Güncelleme başarısız')
+      toast.error(t('contacts.stage.changeError'))
     }
   }
 
@@ -118,7 +120,7 @@ export function ContactDetailPage() {
       type: 'note',
       content,
     })
-    toast.success('Not eklendi')
+    toast.success(t('contacts.quickNote.added'))
   }
 
   const handleInteractionSubmit = async () => {
@@ -132,35 +134,35 @@ export function ContactDetailPage() {
         content: interactionContent || undefined,
         warmthImpact: interactionWarmth,
       })
-      toast.success('Etkileşim eklendi')
+      toast.success(t('contacts.interaction.added'))
       setShowInteractionModal(false)
       setInteractionContent('')
       setInteractionSubject('')
       setInteractionWarmth(0)
     } catch {
-      toast.error('Eklenemedi')
+      toast.error(t('contacts.interaction.failed'))
     }
   }
 
   const handleArchive = async () => {
     await archiveMutation.mutateAsync({ id: id!, archived: !contact.is_archived })
-    toast.success(contact.is_archived ? 'Arşivden çıkarıldı' : 'Arşivlendi')
+    toast.success(contact.is_archived ? t('contacts.unarchived') : t('contacts.archived'))
   }
 
   const handleDelete = async () => {
-    if (!confirm('Bu kontağı kalıcı olarak silmek istediğinize emin misiniz?')) return
+    if (!confirm(t('contacts.deleteConfirm'))) return
     await deleteMutation.mutateAsync(id!)
-    toast.success('Kontak silindi')
+    toast.success(t('contacts.deleted'))
     navigate(ROUTES.CONTACTS)
   }
 
   const handleTagToggle = async (tagId: string) => {
-    const current = contact.tags.map((t) => t.id)
-    const next = current.includes(tagId) ? current.filter((id) => id !== tagId) : [...current, tagId]
+    const current = contact.tags.map((tg) => tg.id)
+    const next = current.includes(tagId) ? current.filter((tid) => tid !== tagId) : [...current, tagId]
     try {
       await setTagsMutation.mutateAsync(next)
     } catch {
-      toast.error('Etiket güncellenemedi')
+      toast.error(t('contacts.tag.error'))
     }
   }
 
@@ -255,7 +257,9 @@ export function ContactDetailPage() {
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Aşama Değiştir</p>
             <Select value={contact.stage} onValueChange={handleStageChange}>
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>
+                  {STAGE_LABELS[contact.stage as keyof typeof STAGE_LABELS] ?? contact.stage}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {Object.entries(STAGE_LABELS).map(([key, label]) => (
@@ -322,7 +326,7 @@ export function ContactDetailPage() {
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-card p-4 space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold">Etkileşim Geçmişi</p>
+              <p className="text-sm font-semibold">{t('contacts.detail.interactions')}</p>
               <Button
                 size="sm"
                 variant="outline"
@@ -330,7 +334,7 @@ export function ContactDetailPage() {
                 className="h-7 text-xs gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Ekle
+                {t('common.add')}
               </Button>
             </div>
 
@@ -426,14 +430,16 @@ export function ContactDetailPage() {
       <Dialog open={showInteractionModal} onOpenChange={setShowInteractionModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Etkileşim Ekle</DialogTitle>
+            <DialogTitle>{t('contacts.interaction.add')}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label>Tür</Label>
+              <Label>{t('contacts.interaction.type')}</Label>
               <Select value={interactionType} onValueChange={(v) => setInteractionType(v as InteractionType)}>
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {INTERACTION_TYPES.find(it => it.value === interactionType)?.label ?? interactionType}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {INTERACTION_TYPES.map(({ value, label }) => (
@@ -443,26 +449,26 @@ export function ContactDetailPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="subject">Başlık (opsiyonel)</Label>
+              <Label htmlFor="subject">{t('contacts.interaction.subject')}</Label>
               <Input
                 id="subject"
                 value={interactionSubject}
                 onChange={(e) => setInteractionSubject(e.target.value)}
-                placeholder="Kısa başlık..."
+                placeholder={t('contacts.interaction.subjectPlaceholder')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="content">İçerik</Label>
+              <Label htmlFor="content">{t('contacts.interaction.content')}</Label>
               <Textarea
                 id="content"
                 value={interactionContent}
                 onChange={(e) => setInteractionContent(e.target.value)}
-                placeholder="Notlarınız..."
+                placeholder={t('contacts.interaction.notesPlaceholder')}
                 rows={3}
               />
             </div>
             <div className="space-y-2">
-              <Label>Sıcaklık Etkisi: {interactionWarmth > 0 ? `+${interactionWarmth}` : interactionWarmth}</Label>
+              <Label>{t('contacts.interaction.warmthImpact', { value: interactionWarmth > 0 ? `+${interactionWarmth}` : interactionWarmth })}</Label>
               <input
                 type="range"
                 min={-20}
@@ -475,13 +481,13 @@ export function ContactDetailPage() {
             </div>
             <div className="flex gap-2 justify-end">
               <Button variant="outline" onClick={() => setShowInteractionModal(false)}>
-                İptal
+                {t('common.cancel')}
               </Button>
               <Button
                 onClick={handleInteractionSubmit}
                 disabled={addInteractionMutation.isPending}
               >
-                Ekle
+                {t('common.add')}
               </Button>
             </div>
           </div>

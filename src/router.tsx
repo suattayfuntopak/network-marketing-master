@@ -1,4 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/lib/constants'
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
 import { LandingPage } from '@/pages/public/LandingPage'
@@ -13,6 +14,19 @@ import { ContactsListPage } from '@/pages/dashboard/contacts/ContactsListPage'
 import { ContactFormPage } from '@/pages/dashboard/contacts/ContactFormPage'
 import { ContactDetailPage } from '@/pages/dashboard/contacts/ContactDetailPage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
+
+// Wrapper forces full remount of ContactDetailPage when ID changes,
+// preventing stale query state when navigating between contacts.
+function ContactDetailWrapper() {
+  const { id } = useParams<{ id: string }>()
+  return <ContactDetailPage key={id} />
+}
+
+// Same wrapper for edit form so it remounts when switching contacts
+function ContactFormWrapper() {
+  const { id } = useParams<{ id: string }>()
+  return <ContactFormPage key={id ?? 'new'} />
+}
 
 export const router = createBrowserRouter([
   // Public routes
@@ -34,9 +48,9 @@ export const router = createBrowserRouter([
 
           // Contacts
           { path: ROUTES.CONTACTS, element: <ContactsListPage /> },
-          { path: `${ROUTES.CONTACTS}/yeni`, element: <ContactFormPage /> },
-          { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailPage /> },
-          { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormPage /> },
+          { path: `${ROUTES.CONTACTS}/yeni`, element: <ContactFormPage key="new" /> },
+          { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
+          { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
 
           // Placeholders
           { path: ROUTES.PIPELINE, element: <div className="p-6"><h1 className="text-2xl font-bold">Pipeline</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },

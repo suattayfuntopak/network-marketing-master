@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Upload, Download, LayoutGrid, LayoutList, ChevronLeft, ChevronRight } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar'
 import { ContactFilters } from '@/components/contacts/ContactFilters'
@@ -28,6 +29,7 @@ export function ContactsListPage() {
   const { user } = useAuth()
   const userId = user?.id ?? ''
   const qc = useQueryClient()
+  const { t } = useTranslation()
 
   const { filters, sort, page, setFilters, setSort, setPage, resetFilters, hasActiveFilters } = useContactFilters()
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
@@ -111,7 +113,7 @@ export function ContactsListPage() {
         userId,
       })
       exportContactsToCSV(result.data)
-      toast.success(`${result.data.length} kontak dışa aktarıldı`)
+      toast.success(t('contacts.exportCount', { count: result.data.length }))
     } catch {
       toast.error('Dışa aktarma başarısız')
     } finally {
@@ -126,10 +128,10 @@ export function ContactsListPage() {
     try {
       await bulkUpdateStage(selectedIds, stage)
       await invalidate()
-      toast.success(`${selectedIds.length} kontak güncellendi`)
+      toast.success(t('contacts.bulk.stageChanged', { count: selectedIds.length }))
       setSelectedIds([])
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.bulk.error'))
     }
   }
 
@@ -137,22 +139,22 @@ export function ContactsListPage() {
     try {
       await bulkArchive(selectedIds, true)
       await invalidate()
-      toast.success(`${selectedIds.length} kontak arşivlendi`)
+      toast.success(t('contacts.bulk.archived', { count: selectedIds.length }))
       setSelectedIds([])
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.bulk.error'))
     }
   }
 
   const handleBulkDelete = async () => {
-    if (!confirm(`${selectedIds.length} kontağı kalıcı olarak silmek istediğinize emin misiniz?`)) return
+    if (!confirm(t('contacts.bulkDeleteConfirm', { count: selectedIds.length }))) return
     try {
       await bulkDelete(selectedIds)
       await invalidate()
-      toast.success(`${selectedIds.length} kontak silindi`)
+      toast.success(t('contacts.bulk.deleted', { count: selectedIds.length }))
       setSelectedIds([])
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.bulk.error'))
     }
   }
 
@@ -160,9 +162,9 @@ export function ContactsListPage() {
     try {
       await bulkAddTag(selectedIds, tagId)
       await invalidate()
-      toast.success('Etiket eklendi')
+      toast.success(t('contacts.tag.added'))
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.bulk.error'))
     }
   }
 
@@ -170,9 +172,9 @@ export function ContactsListPage() {
     try {
       await bulkRemoveTag(selectedIds, tagId)
       await invalidate()
-      toast.success('Etiket kaldırıldı')
+      toast.success(t('contacts.tag.removed'))
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.bulk.error'))
     }
   }
 
@@ -181,9 +183,9 @@ export function ContactsListPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Kontaklar</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('contacts.title')}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            {totalCount > 0 ? `${totalCount} kontak` : 'Henüz kontak yok'}
+            {totalCount > 0 ? t('contacts.total', { count: totalCount }) : t('contacts.noContacts')}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -195,7 +197,7 @@ export function ContactsListPage() {
             className="gap-1.5"
           >
             <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Dışa Aktar</span>
+            <span className="hidden sm:inline">{t('common.export')}</span>
           </Button>
           <Button
             variant="outline"
@@ -204,11 +206,11 @@ export function ContactsListPage() {
             className="gap-1.5"
           >
             <Upload className="w-4 h-4" />
-            <span className="hidden sm:inline">CSV İçe Aktar</span>
+            <span className="hidden sm:inline">{t('common.import')}</span>
           </Button>
           <Button onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)} className="gap-1.5">
             <Plus className="w-4 h-4" />
-            Yeni Kontak
+            {t('contacts.new')}
           </Button>
         </div>
       </div>
@@ -271,22 +273,22 @@ export function ContactsListPage() {
       {/* Content */}
       {isLoading ? (
         <div className="rounded-lg border border-border p-8 text-center text-muted-foreground text-sm">
-          Yükleniyor...
+          {t('common.loading')}
         </div>
       ) : contacts.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center">
           <p className="text-muted-foreground text-sm mb-3">
-            {hasActiveFilters ? 'Filtreyle eşleşen kontak bulunamadı.' : 'Henüz kontak eklenmemiş.'}
+            {hasActiveFilters ? t('contacts.noResults') : t('contacts.noContacts')}
           </p>
           {!hasActiveFilters && (
             <Button onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)} className="gap-1.5">
               <Plus className="w-4 h-4" />
-              İlk Kontağı Ekle
+              {t('contacts.addFirst')}
             </Button>
           )}
           {hasActiveFilters && (
             <Button variant="outline" onClick={resetFilters}>
-              Filtreleri Temizle
+              {t('contacts.clearFilters')}
             </Button>
           )}
         </div>
@@ -354,7 +356,7 @@ export function ContactsListPage() {
         userId={userId}
         onSuccess={() => {
           qc.invalidateQueries({ queryKey: contactKeys.all })
-          toast.success('Kontaklar başarıyla içe aktarıldı')
+          toast.success(t('contacts.importSuccess'))
         }}
       />
     </div>

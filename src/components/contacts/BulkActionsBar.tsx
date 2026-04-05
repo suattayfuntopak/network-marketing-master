@@ -4,12 +4,14 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuGroup,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { STAGE_LABELS } from '@/lib/contacts/constants'
 import type { Tag as TagType } from '@/types/database'
+import { useTranslation } from 'react-i18next'
 
 interface BulkActionsBarProps {
   count: number
@@ -32,6 +34,8 @@ export function BulkActionsBar({
   onArchive,
   onDelete,
 }: BulkActionsBarProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="flex items-center gap-3 rounded-lg border border-primary bg-primary/5 px-4 py-2.5">
       <button
@@ -41,7 +45,7 @@ export function BulkActionsBar({
       >
         <X className="w-4 h-4" />
       </button>
-      <span className="text-sm font-medium">{count} kontak seçildi</span>
+      <span className="text-sm font-medium">{t('contacts.selected', { count })}</span>
 
       <div className="flex items-center gap-2 ml-auto">
         {/* Tag menu */}
@@ -49,23 +53,29 @@ export function BulkActionsBar({
           <DropdownMenuTrigger>
             <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5">
               <Tag className="w-3.5 h-3.5" />
-              Etiket
+              {t('contacts.bulk.tag')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel className="text-xs">Etiket Ekle</DropdownMenuLabel>
-            {tags.map((tag) => (
-              <DropdownMenuItem key={`add-${tag.id}`} onClick={() => onAddTag(tag.id)}>
-                {tag.name}
-              </DropdownMenuItem>
-            ))}
+            {/* Add tags group */}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs">{t('contacts.tag.add')}</DropdownMenuLabel>
+              {tags.map((tag) => (
+                <DropdownMenuItem key={`add-${tag.id}`} onClick={() => onAddTag(tag.id)}>
+                  {tag.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
             {tags.length > 0 && <DropdownMenuSeparator />}
-            <DropdownMenuLabel className="text-xs">Etiket Kaldır</DropdownMenuLabel>
-            {tags.map((tag) => (
-              <DropdownMenuItem key={`rm-${tag.id}`} onClick={() => onRemoveTag(tag.id)}>
-                {tag.name}
-              </DropdownMenuItem>
-            ))}
+            {/* Remove tags group */}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs">{t('contacts.tag.remove')}</DropdownMenuLabel>
+              {tags.map((tag) => (
+                <DropdownMenuItem key={`rm-${tag.id}`} onClick={() => onRemoveTag(tag.id)}>
+                  {tag.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -74,16 +84,18 @@ export function BulkActionsBar({
           <DropdownMenuTrigger>
             <Button variant="outline" size="sm" className="h-7 text-xs gap-1.5">
               <LayoutList className="w-3.5 h-3.5" />
-              Aşama
+              {t('contacts.bulk.stage')}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
-            <DropdownMenuLabel className="text-xs">Aşamayı Değiştir</DropdownMenuLabel>
-            {Object.entries(STAGE_LABELS).map(([key, label]) => (
-              <DropdownMenuItem key={key} onClick={() => onChangeStage(key)}>
-                {label}
-              </DropdownMenuItem>
-            ))}
+            <DropdownMenuGroup>
+              <DropdownMenuLabel className="text-xs">{t('contacts.bulk.stageTitle')}</DropdownMenuLabel>
+              {Object.entries(STAGE_LABELS).map(([key, label]) => (
+                <DropdownMenuItem key={key} onClick={() => onChangeStage(key)}>
+                  {label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -94,7 +106,7 @@ export function BulkActionsBar({
           className="h-7 text-xs gap-1.5"
         >
           <Archive className="w-3.5 h-3.5" />
-          Arşivle
+          {t('contacts.bulk.archive')}
         </Button>
 
         <Button
@@ -104,7 +116,7 @@ export function BulkActionsBar({
           className="h-7 text-xs gap-1.5 text-destructive hover:text-destructive border-destructive/30 hover:border-destructive"
         >
           <Trash2 className="w-3.5 h-3.5" />
-          Sil
+          {t('contacts.bulk.delete')}
         </Button>
       </div>
     </div>

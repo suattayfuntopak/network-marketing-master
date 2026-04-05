@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/select'
 import { TagSelector } from '@/components/contacts/TagSelector'
 import { useContact, useCreateContact, useUpdateContact } from '@/hooks/useContact'
+import { useTranslation } from 'react-i18next'
 import { useTags, useCreateTag } from '@/hooks/useTags'
 import { useSetContactTags } from '@/hooks/useContact'
 import { useAuth } from '@/hooks/useAuth'
@@ -62,6 +63,7 @@ export function ContactFormPage() {
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
+  const { t } = useTranslation()
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -136,7 +138,7 @@ export function ContactFormPage() {
       if (isEdit && id) {
         await updateContact.mutateAsync(payload)
         await setTags.mutateAsync(selectedTagIds)
-        toast.success('Kontak güncellendi')
+        toast.success(t('contacts.updated'))
         navigate(`${ROUTES.CONTACTS}/${id}`, { replace: true })
       } else {
         const newId = await createContact.mutateAsync(payload)
@@ -144,13 +146,13 @@ export function ContactFormPage() {
           const setTagsForNew = (await import('@/lib/contacts/mutations')).setContactTags
           await setTagsForNew(newId, selectedTagIds)
         }
-        toast.success('Kontak eklendi')
+        toast.success(t('contacts.saved'))
         console.debug('[ContactForm] Yeni kontak kaydedildi, id:', newId)
         navigate(ROUTES.CONTACTS, { replace: true })
       }
     } catch (err) {
       console.error('[ContactForm] Kayıt hatası:', err)
-      toast.error('İşlem başarısız. Lütfen tekrar deneyin.')
+      toast.error(t('contacts.saveError'))
     } finally {
       setIsSaving(false)
     }
@@ -167,7 +169,7 @@ export function ContactFormPage() {
 
   if (isEdit && loadingContact) {
     return (
-      <div className="p-6 text-center text-muted-foreground">Yükleniyor...</div>
+      <div className="p-6 text-center text-muted-foreground">{t('common.loading')}</div>
     )
   }
 
@@ -180,7 +182,7 @@ export function ContactFormPage() {
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <h1 className="text-2xl font-bold tracking-tight">
-          {isEdit ? 'Kontak Düzenle' : 'Yeni Kontak'}
+          {isEdit ? t('contacts.edit') : t('contacts.new')}
         </h1>
       </div>
 
@@ -269,7 +271,9 @@ export function ContactFormPage() {
                   onValueChange={(v) => setValue('source', v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {SOURCE_LABELS[(watch('source') ?? 'manual') as keyof typeof SOURCE_LABELS] ?? 'Manuel'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(SOURCE_LABELS).map(([key, label]) => (
@@ -285,7 +289,9 @@ export function ContactFormPage() {
                   onValueChange={(v) => setValue('contact_type', v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {CONTACT_TYPE_LABELS[(watch('contact_type') ?? 'prospect') as keyof typeof CONTACT_TYPE_LABELS] ?? 'Aday'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(CONTACT_TYPE_LABELS).map(([key, label]) => (
@@ -301,7 +307,9 @@ export function ContactFormPage() {
                   onValueChange={(v) => setValue('stage', v)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue />
+                    <SelectValue>
+                      {STAGE_LABELS[(watch('stage') ?? 'new') as keyof typeof STAGE_LABELS] ?? 'Yeni'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {Object.entries(STAGE_LABELS).map(([key, label]) => (
@@ -381,11 +389,11 @@ export function ContactFormPage() {
 
         <div className="mt-6 flex gap-3 justify-end">
           <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-            İptal
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={isLoading} className="gap-1.5">
             <Save className="w-4 h-4" />
-            {isLoading ? 'Kaydediliyor...' : 'Kaydet'}
+            {isLoading ? t('common.saving') : t('common.save')}
           </Button>
         </div>
       </form>
