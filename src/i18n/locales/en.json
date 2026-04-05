@@ -289,5 +289,89 @@
     "tr": "Türkçe",
     "en": "English",
     "switchTo": "Switch Language"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log In",
+      "start": "Get Started"
+    },
+    "hero": {
+      "badge": "Your distributor's digital command center",
+      "title1": "Manage Network",
+      "title2": "Marketing",
+      "title3": "Smartly",
+      "subtitle": "Manage contacts, generate AI messages, grow your team — all in one place. Scattered lists and missed follow-ups are history.",
+      "cta": "Start Free",
+      "ctaSecondary": "Explore Features",
+      "trust1": "No credit card required",
+      "trust2": "Instant setup",
+      "trust3": "Cancel anytime"
+    },
+    "problems": {
+      "title": "Sound familiar?",
+      "subtitle": "Problems most distributors face",
+      "items": [
+        {"emoji": "📋", "title": "Scattered lists, lost follow-ups", "desc": "Notebooks, WhatsApp, Excel... Contacts are everywhere but nowhere organized."},
+        {"emoji": "😓", "title": "\"I'll think about it\" — then what?", "desc": "You presented, they showed interest. But when will you follow up? How many days later?"},
+        {"emoji": "🤷", "title": "Don't know who's active in the team", "desc": "As your downline grows, tracking becomes harder. Who needs support? You don't know."}
+      ]
+    },
+    "features": {
+      "title": "Everything in one platform",
+      "subtitle": "All the tools you need for network marketing success",
+      "items": [
+        {"title": "Smart Daily Task List", "desc": "AI tells you who to reach out to today. No guessing, just prioritized actions."},
+        {"title": "Lead Warmth Score", "desc": "Track each contact's readiness level in real-time. Reach the right person at the right time."},
+        {"title": "AI Message Generator", "desc": "Create personalized, natural and persuasive messages in seconds."},
+        {"title": "Pipeline Tracking", "desc": "Visually track every stage of your sales process. Never miss an opportunity."},
+        {"title": "Team Radar", "desc": "Monitor your team's activity in real-time. Who's active, who needs support?"},
+        {"title": "Objection Bank", "desc": "Ready answers to the most common objections. Respond instantly during presentations."}
+      ]
+    },
+    "howItWorks": {
+      "title": "How It Works",
+      "subtitle": "Reach success in 3 simple steps",
+      "steps": [
+        {"step": "1", "title": "Add Your Contacts", "desc": "Import your existing list or add one by one. WhatsApp, Telegram, phone — we support every channel."},
+        {"step": "2", "title": "Let AI Prioritize", "desc": "AI analyzes each contact, assigns a warmth score, and lists today's actions."},
+        {"step": "3", "title": "Reach the Right Person", "desc": "Send the prepared message, set follow-up timing, and track results."}
+      ]
+    },
+    "pricing": {
+      "title": "Simple Pricing",
+      "subtitle": "No surprises, no hidden fees",
+      "mostPopular": "Most Popular",
+      "plans": [
+        {"name": "Starter", "price": "Free", "period": "", "desc": "For individual distributors", "features": ["50 contacts", "Basic pipeline", "AI messages (5/day)", "Mobile app"], "cta": "Start Free"},
+        {"name": "Pro", "price": "$29", "period": "/mo", "desc": "For growth-focused distributors", "features": ["Unlimited contacts", "Advanced pipeline", "Unlimited AI messages", "Lead score", "Priority support"], "cta": "Start Pro"},
+        {"name": "Team", "price": "$79", "period": "/mo", "desc": "For leaders and team managers", "features": ["All Pro features", "Team radar", "20 team members", "Team analytics", "Custom training"], "cta": "Start Team"}
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "items": [
+        {"q": "What is NMM and who is it for?", "a": "Network Marketing Master (NMM) is a digital management tool for multi-level marketing (MLM) distributors. It offers contact tracking, AI-powered messaging, and team management in one platform."},
+        {"q": "Is the free plan enough?", "a": "Yes, to get started! You can begin with 50 contacts and basic features. As your team grows, upgrading to Pro or Team is easy."},
+        {"q": "Is my data secure?", "a": "Yes. All data is stored encrypted on Supabase (PostgreSQL). With Row Level Security, only you can access your data."},
+        {"q": "Which network marketing companies does it work with?", "a": "NMM is company-independent. It can be used with Amway, Herbalife, Oriflame, Avon and all MLM companies."},
+        {"q": "Is there a mobile app?", "a": "The web app works optimized on all mobile devices. Native iOS/Android apps are on our roadmap."},
+        {"q": "Can I cancel?", "a": "Yes, you can cancel anytime. Billing is on a monthly basis, cancellation takes effect at the end of the billing period."}
+      ]
+    },
+    "cta": {
+      "title": "Start today, make a difference",
+      "subtitle": "No credit card required. 2-minute setup. Cancel anytime.",
+      "button": "Create Free Account"
+    },
+    "footer": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "login": "Log In",
+      "copyright": "© {{year}} NMM. All rights reserved."
+    }
   }
 }

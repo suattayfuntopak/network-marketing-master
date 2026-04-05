@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Search, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
@@ -10,6 +11,7 @@ interface ContactSearchBarProps {
 }
 
 export function ContactSearchBar({ value, onChange, className }: ContactSearchBarProps) {
+  const { t } = useTranslation()
   const [local, setLocal] = useState(value)
 
   // Debounce
@@ -31,7 +33,7 @@ export function ContactSearchBar({ value, onChange, className }: ContactSearchBa
       <Input
         value={local}
         onChange={(e) => setLocal(e.target.value)}
-        placeholder="İsim, telefon veya email ara..."
+        placeholder={t('contacts.searchPlaceholder')}
         className="pl-9 pr-9"
       />
       {local && (

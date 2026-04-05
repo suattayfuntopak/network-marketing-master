@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
+import i18n from '@/i18n'
 
 const registerSchema = z.object({
   full_name: z.string().min(2, 'Ad soyad en az 2 karakter olmalı'),
@@ -32,6 +33,7 @@ export function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -77,6 +79,21 @@ export function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
+      {/* Language switcher */}
+      <div className="fixed top-4 right-4 flex items-center gap-0.5 rounded-lg border border-border p-0.5 z-10">
+        <button
+          onClick={() => i18n.changeLanguage('tr')}
+          className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${currentLang === 'tr' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          🇹🇷 TR
+        </button>
+        <button
+          onClick={() => i18n.changeLanguage('en')}
+          className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${currentLang === 'en' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          🇺🇸 EN
+        </button>
+      </div>
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center">

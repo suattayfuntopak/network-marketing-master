@@ -2,6 +2,9 @@ import { Users, TrendingUp, MessageSquare, Target, ArrowRight, Clock } from 'luc
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StageBadge } from '@/components/contacts/StageBadge'
@@ -14,6 +17,9 @@ export function DashboardHome() {
   const navigate = useNavigate()
   const { profile, user } = useAuth()
   const userId = user?.id ?? ''
+  const { t } = useTranslation()
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+  const dateLocale = currentLang === 'en' ? enUS : tr
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
@@ -24,10 +30,10 @@ export function DashboardHome() {
       {/* Welcome */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          Hoş geldin, {profile?.full_name?.split(' ')[0] ?? 'Distribütör'} 👋
+          {t('dashboard.welcome', { name: profile?.full_name?.split(' ')[0] ?? t('profile.user') })}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Network Marketing Master kontrol panelinize hoş geldiniz.
+          {t('dashboard.welcomeSubtitle')}
         </p>
       </div>
 
@@ -39,14 +45,14 @@ export function DashboardHome() {
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Toplam Kontak
+              {t('dashboard.totalContacts')}
             </CardTitle>
             <Users className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{contactCount}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              {contactCount === 0 ? 'Henüz kontak yok' : 'Aktif kontak'}
+              {contactCount === 0 ? t('dashboard.noContacts') : t('dashboard.activeContacts')}
             </p>
           </CardContent>
         </Card>
@@ -54,39 +60,39 @@ export function DashboardHome() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Aktif Pipeline
+              {t('dashboard.activePipeline')}
             </CardTitle>
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Henüz pipeline yok</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.noPipeline')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Bu Haftaki Mesaj
+              {t('dashboard.weeklyMessages')}
             </CardTitle>
             <MessageSquare className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Henüz mesaj yok</p>
+            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.noMessages')}</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Aylık Hedef
+              {t('dashboard.monthlyGoal')}
             </CardTitle>
             <Target className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">%0</div>
-            <p className="text-xs text-muted-foreground mt-1">Henüz hedef belirlenmedi</p>
+            <div className="text-2xl font-bold">{t('dashboard.noGoalPercent')}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.noGoal')}</p>
           </CardContent>
         </Card>
       </div>
@@ -95,27 +101,27 @@ export function DashboardHome() {
         {/* Recent contacts */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Son Eklenen Kontaklar</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.recentContacts')}</CardTitle>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => navigate(ROUTES.CONTACTS)}
               className="h-7 text-xs gap-1"
             >
-              Tümü
+              {t('common.all')}
               <ArrowRight className="w-3 h-3" />
             </Button>
           </CardHeader>
           <CardContent>
             {recentContacts.length === 0 ? (
               <div className="text-center py-6">
-                <p className="text-sm text-muted-foreground mb-3">Henüz kontak yok</p>
+                <p className="text-sm text-muted-foreground mb-3">{t('dashboard.noContacts')}</p>
                 <Button
                   size="sm"
                   onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)}
                   className="gap-1.5"
                 >
-                  İlk Kontağı Ekle
+                  {t('dashboard.addFirstContact')}
                 </Button>
               </div>
             ) : (
@@ -133,7 +139,7 @@ export function DashboardHome() {
                       <div className="min-w-0">
                         <p className="text-sm font-medium truncate">{contact.full_name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(contact.created_at), { addSuffix: true, locale: tr })}
+                          {formatDistanceToNow(new Date(contact.created_at), { addSuffix: true, locale: dateLocale })}
                         </p>
                       </div>
                     </div>
@@ -151,13 +157,13 @@ export function DashboardHome() {
         {/* Pending follow ups */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-base">Takip Bekleyenler</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.pendingFollowups')}</CardTitle>
             <Clock className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             {pendingFollowUps.length === 0 ? (
               <div className="text-center py-6">
-                <p className="text-sm text-muted-foreground">Bekleyen takip yok 🎉</p>
+                <p className="text-sm text-muted-foreground">{t('dashboard.noPendingFollowups')}</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -175,7 +181,7 @@ export function DashboardHome() {
                         <p className="text-sm font-medium truncate">{contact.full_name}</p>
                         <p className="text-xs text-amber-600 dark:text-amber-400">
                           {contact.next_follow_up_at &&
-                            formatDistanceToNow(new Date(contact.next_follow_up_at), { addSuffix: true, locale: tr })}
+                            formatDistanceToNow(new Date(contact.next_follow_up_at), { addSuffix: true, locale: dateLocale })}
                         </p>
                       </div>
                     </div>
@@ -197,16 +203,15 @@ export function DashboardHome() {
                 <Target className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="font-semibold">Başlamaya hazır mısın?</h3>
+                <h3 className="font-semibold">{t('dashboard.ctaTitle')}</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  İlk kontaklarını ekleyerek Network Marketing Master'ı kullanmaya başla.
-                  AI destekli araçlarla ekibini büyüt.
+                  {t('dashboard.ctaText')}
                 </p>
                 <Button
                   className="mt-3 gap-1.5"
                   onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)}
                 >
-                  İlk Kontağı Ekle
+                  {t('dashboard.addFirstContact')}
                 </Button>
               </div>
             </div>

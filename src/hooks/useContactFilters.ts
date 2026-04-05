@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import type { ContactFilters, ContactSort, SortField, SortOrder } from '@/lib/contacts/types'
 import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
@@ -71,6 +71,10 @@ export function useContactFilters() {
   const resetFilters = useCallback(() => {
     setSearchParams({}, { replace: true })
   }, [setSearchParams])
+
+  useEffect(() => {
+    console.debug('[useContactFilters] filters updated:', { stages: filters.stages, tagIds: filters.tagIds, warmthMin: filters.warmthMin, warmthMax: filters.warmthMax })
+  }, [filters])
 
   const hasActiveFilters = useMemo(() => {
     return (

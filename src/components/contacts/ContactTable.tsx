@@ -1,7 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
 import { tr } from 'date-fns/locale'
+import { enUS } from 'date-fns/locale'
 import { MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Edit, Archive, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Button } from '@/components/ui/button'
 import {
@@ -74,6 +77,9 @@ export function ContactTable({
   onDelete,
 }: ContactTableProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation()
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+  const dateLocale = currentLang === 'en' ? enUS : tr
   const allSelected = contacts.length > 0 && contacts.every((c) => selectedIds.includes(c.id))
   const someSelected = contacts.some((c) => selectedIds.includes(c.id))
 
@@ -98,16 +104,16 @@ export function ContactTable({
                 />
               </th>
               <th className="px-3 py-3 text-left text-muted-foreground">
-                <SortHeader field="full_name" sort={sort} onSort={handleSort}>İsim</SortHeader>
+                <SortHeader field="full_name" sort={sort} onSort={handleSort}>{t('contacts.columns.name')}</SortHeader>
               </th>
-              <th className="px-3 py-3 text-left text-muted-foreground">Kanallar</th>
-              <th className="px-3 py-3 text-left text-muted-foreground">Aşama</th>
+              <th className="px-3 py-3 text-left text-muted-foreground">{t('contacts.columns.channels')}</th>
+              <th className="px-3 py-3 text-left text-muted-foreground">{t('contacts.columns.stage')}</th>
               <th className="px-3 py-3 text-left text-muted-foreground min-w-32">
-                <SortHeader field="warmth_score" sort={sort} onSort={handleSort}>Sıcaklık</SortHeader>
+                <SortHeader field="warmth_score" sort={sort} onSort={handleSort}>{t('contacts.columns.warmth')}</SortHeader>
               </th>
-              <th className="px-3 py-3 text-left text-muted-foreground">Etiketler</th>
+              <th className="px-3 py-3 text-left text-muted-foreground">{t('contacts.columns.tags')}</th>
               <th className="px-3 py-3 text-left text-muted-foreground">
-                <SortHeader field="last_contact_at" sort={sort} onSort={handleSort}>Son Temas</SortHeader>
+                <SortHeader field="last_contact_at" sort={sort} onSort={handleSort}>{t('contacts.columns.lastContact')}</SortHeader>
               </th>
               <th className="w-10 px-3 py-3" />
             </tr>
@@ -165,7 +171,7 @@ export function ContactTable({
                   {contact.last_contact_at
                     ? formatDistanceToNow(new Date(contact.last_contact_at), {
                         addSuffix: true,
-                        locale: tr,
+                        locale: dateLocale,
                       })
                     : '—'}
                 </td>
@@ -177,13 +183,13 @@ export function ContactTable({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={() => onEdit(contact.id)}>
                         <Edit className="w-4 h-4 mr-2" />
-                        Düzenle
+                        {t('common.edit')}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => onArchive(contact.id, !contact.is_archived)}
                       >
                         <Archive className="w-4 h-4 mr-2" />
-                        {contact.is_archived ? 'Arşivden Çıkar' : 'Arşivle'}
+                        {contact.is_archived ? t('common.unarchive') : t('common.archive')}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
@@ -191,7 +197,7 @@ export function ContactTable({
                         className="text-destructive focus:text-destructive"
                       >
                         <Trash2 className="w-4 h-4 mr-2" />
-                        Sil
+                        {t('common.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

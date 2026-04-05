@@ -289,5 +289,89 @@
     "tr": "Türkçe",
     "en": "English",
     "switchTo": "Dil Değiştir"
+  },
+  "landing": {
+    "nav": {
+      "features": "Özellikler",
+      "pricing": "Fiyatlar",
+      "faq": "SSS",
+      "login": "Giriş",
+      "start": "Başla"
+    },
+    "hero": {
+      "badge": "Distribütörün dijital komut merkezi",
+      "title1": "Network Marketing'i",
+      "title2": "Akıllıca",
+      "title3": "Yönet",
+      "subtitle": "Kontakları yönet, AI ile mesaj üret, ekibini büyüt — hepsi tek yerde. Dağınık listeler ve kaçırılan takipler tarih oluyor.",
+      "cta": "Ücretsiz Başla",
+      "ctaSecondary": "Özellikleri Keşfet",
+      "trust1": "Kredi kartı gerekmez",
+      "trust2": "Anında kurulum",
+      "trust3": "İstediğin zaman iptal"
+    },
+    "problems": {
+      "title": "Tanıdık geliyor mu?",
+      "subtitle": "Çoğu distribütörün yaşadığı sorunlar",
+      "items": [
+        {"emoji": "📋", "title": "Listeler dağınık, takipler kayıp", "desc": "Not defteri, WhatsApp, Excel... Kontaklar her yerde ama hiçbir yerde değil."},
+        {"emoji": "😓", "title": "\"Düşüneceğim\" — sonra?", "desc": "Sunum yaptın, ilgi gösterdi. Ama ne zaman takip edeceksin? Kaç gün sonra?"},
+        {"emoji": "🤷", "title": "Ekipte kim aktif bilmiyorum", "desc": "Downline büyüdükçe takip zorlaşıyor. Kim destek bekliyor, bilmiyorsun."}
+      ]
+    },
+    "features": {
+      "title": "Her şey tek platformda",
+      "subtitle": "Network marketing başarısı için ihtiyacın olan tüm araçlar",
+      "items": [
+        {"title": "Akıllı Günlük Görev Listesi", "desc": "AI, bugün kime ulaşman gerektiğini söyler. Tahmin yok, öncelikli aksiyon var."},
+        {"title": "Lead Sıcaklık Skoru", "desc": "Her kontağın hazırlık seviyesini anlık takip et. Doğru kişiye doğru zamanda ulaş."},
+        {"title": "AI Mesaj Üretici", "desc": "Kontağa özel, doğal ve ikna edici mesajları saniyeler içinde oluştur."},
+        {"title": "Pipeline Takibi", "desc": "Satış sürecinin her aşamasını görsel olarak takip et. Hiçbir şans kaçırma."},
+        {"title": "Ekip Radar", "desc": "Ekibinin aktivitesini gerçek zamanlı izle. Kim aktif, kim desteğe ihtiyaç duyuyor?"},
+        {"title": "İtiraz Bankası", "desc": "En yaygın itirazlara hazır yanıtlar. Sunum sırasında anında cevap ver."}
+      ]
+    },
+    "howItWorks": {
+      "title": "Nasıl Çalışır?",
+      "subtitle": "3 basit adımda başarıya ulaş",
+      "steps": [
+        {"step": "1", "title": "Kontaklarını Ekle", "desc": "Mevcut listeni import et veya tek tek ekle. WhatsApp, Telegram, telefon — her kanalı destekliyoruz."},
+        {"step": "2", "title": "AI Önceliklendirsin", "desc": "Yapay zeka her kontağı analiz eder, sıcaklık skoru verir ve bugünkü aksiyonlarını listeler."},
+        {"step": "3", "title": "Doğru Kişiyle Ulaş", "desc": "Hazırladığı mesajı gönder, takip zamanlamasını ayarla ve sonuçları izle."}
+      ]
+    },
+    "pricing": {
+      "title": "Basit Fiyatlandırma",
+      "subtitle": "Sürpriz yok, gizli ücret yok",
+      "mostPopular": "En Popüler",
+      "plans": [
+        {"name": "Başlangıç", "price": "Ücretsiz", "period": "", "desc": "Bireysel distribütörler için", "features": ["50 kontak", "Temel pipeline", "AI mesaj (5/gün)", "Mobil uygulama"], "cta": "Ücretsiz Başla"},
+        {"name": "Pro", "price": "₺299", "period": "/ay", "desc": "Büyümeye odaklanmış distribütörler için", "features": ["Sınırsız kontak", "Gelişmiş pipeline", "Sınırsız AI mesaj", "Lead skoru", "Öncelikli destek"], "cta": "Pro Başla"},
+        {"name": "Ekip", "price": "₺799", "period": "/ay", "desc": "Liderler ve ekip yöneticileri için", "features": ["Pro özelliklerin hepsi", "Ekip radar", "20 takım üyesi", "Ekip analizleri", "Özel eğitim"], "cta": "Ekip Başla"}
+      ]
+    },
+    "faq": {
+      "title": "Sık Sorulan Sorular",
+      "items": [
+        {"q": "NMM nedir ve kime yönelik?", "a": "Network Marketing Master (NMM), multi-level marketing (MLM) distribütörlerine yönelik bir dijital yönetim aracıdır. Kontak takibi, AI destekli mesajlaşma ve ekip yönetimi özelliklerini tek platformda sunar."},
+        {"q": "Ücretsiz plan yeterli mi?", "a": "Başlangıç için evet! 50 kontak ve temel özelliklerle işe başlayabilirsin. Ekibin büyüdükçe Pro veya Ekip planına geçmek çok kolay."},
+        {"q": "Verilerim güvende mi?", "a": "Evet. Tüm veriler Supabase (PostgreSQL) üzerinde şifreli olarak saklanır. Row Level Security ile yalnızca kendi verilerine erişebilirsin."},
+        {"q": "Hangi network marketing şirketleriyle çalışır?", "a": "NMM şirketten bağımsızdır. Amway, Herbalife, Oriflame, Avon gibi tüm MLM şirketleriyle kullanılabilir."},
+        {"q": "Mobil uygulaması var mı?", "a": "Web uygulaması tüm mobil cihazlarda optimize çalışır. Native iOS/Android uygulamaları yol haritamızda."},
+        {"q": "İptal edebilir miyim?", "a": "Evet, istediğin zaman iptal edebilirsin. Ücretlendirme aylık dönemler halindedir, dönem sonunda iptal gerçekleşir."}
+      ]
+    },
+    "cta": {
+      "title": "Bugün başla, fark yarat",
+      "subtitle": "Kredi kartı gerektirmez. 2 dakikada kurulum. İstediğin zaman iptal.",
+      "button": "Ücretsiz Hesap Oluştur"
+    },
+    "footer": {
+      "features": "Özellikler",
+      "pricing": "Fiyatlar",
+      "faq": "SSS",
+      "login": "Giriş",
+      "copyright": "© {{year}} NMM. Tüm hakları saklıdır."
+    }
   }
 }

@@ -32,19 +32,11 @@ import { useInteractions, useAddInteraction } from '@/hooks/useInteractions'
 import { useTags, useCreateTag } from '@/hooks/useTags'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
-import { STAGE_LABELS, INTERACTION_TYPE_LABELS, SOURCE_LABELS, CONTACT_TYPE_LABELS } from '@/lib/contacts/constants'
+import { STAGE_LABELS } from '@/lib/contacts/constants'
 import type { InteractionType } from '@/lib/contacts/types'
 
-const INTERACTION_TYPES: { value: InteractionType; label: string }[] = [
-  { value: 'call', label: 'Telefon' },
-  { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'telegram', label: 'Telegram' },
-  { value: 'meeting', label: 'Görüşme' },
-  { value: 'presentation', label: 'Sunum' },
-  { value: 'objection', label: 'İtiraz' },
-  { value: 'email', label: 'Email' },
-  { value: 'sms', label: 'SMS' },
-  { value: 'note', label: 'Not' },
+const INTERACTION_TYPE_KEYS: InteractionType[] = [
+  'call', 'whatsapp', 'telegram', 'meeting', 'presentation', 'objection', 'email', 'sms', 'note',
 ]
 
 export function ContactDetailPage() {
@@ -130,7 +122,7 @@ export function ContactDetailPage() {
         contactId: id!,
         userId,
         type: interactionType,
-        subject: interactionSubject || INTERACTION_TYPE_LABELS[interactionType],
+        subject: interactionSubject || t(`interactionTypes.${interactionType}`),
         content: interactionContent || undefined,
         warmthImpact: interactionWarmth,
       })
@@ -192,7 +184,7 @@ export function ContactDetailPage() {
             className="gap-1.5"
           >
             <Edit className="w-3.5 h-3.5" />
-            Düzenle
+            {t('common.edit')}
           </Button>
           <Button
             variant="outline"
@@ -201,8 +193,8 @@ export function ContactDetailPage() {
             className="gap-1.5"
           >
             {contact.is_archived
-              ? <><ArchiveRestore className="w-3.5 h-3.5" />Arşivden Çıkar</>
-              : <><Archive className="w-3.5 h-3.5" />Arşivle</>}
+              ? <><ArchiveRestore className="w-3.5 h-3.5" />{t('common.unarchive')}</>
+              : <><Archive className="w-3.5 h-3.5" />{t('common.archive')}</>}
           </Button>
         </div>
       </div>
@@ -254,16 +246,16 @@ export function ContactDetailPage() {
 
           {/* Stage selector */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Aşama Değiştir</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.changeStage')}</p>
             <Select value={contact.stage} onValueChange={handleStageChange}>
               <SelectTrigger className="w-full">
                 <SelectValue>
-                  {STAGE_LABELS[contact.stage as keyof typeof STAGE_LABELS] ?? contact.stage}
+                  {t(`contactStages.${contact.stage}`, { defaultValue: contact.stage })}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(STAGE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                {Object.keys(STAGE_LABELS).map((key) => (
+                  <SelectItem key={key} value={key}>{t(`contactStages.${key}`)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -271,7 +263,7 @@ export function ContactDetailPage() {
 
           {/* Basic info */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Bilgiler</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.info')}</p>
             <div className="space-y-2 text-sm">
               {contact.city && (
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -305,7 +297,7 @@ export function ContactDetailPage() {
               )}
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                <span>{SOURCE_LABELS[contact.source]} · {CONTACT_TYPE_LABELS[contact.contact_type]}</span>
+                <span>{t(`contactSources.${contact.source}`)} · {t(`contactTypes.${contact.contact_type}`)}</span>
               </div>
             </div>
           </div>
@@ -318,7 +310,7 @@ export function ContactDetailPage() {
             className="w-full text-destructive hover:text-destructive border-destructive/30 gap-1.5"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            Kontağı Sil
+            {t('common.delete')}
           </Button>
         </div>
 
@@ -351,13 +343,13 @@ export function ContactDetailPage() {
           {/* About */}
           {(contact.interests?.length || contact.goals?.length || contact.pain_points?.length) && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Hakkında</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.about')}</p>
 
               {contact.interests && contact.interests.length > 0 && (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Heart className="w-3.5 h-3.5 text-pink-500" />
-                    İlgi Alanları
+                    {t('contacts.detail.interests')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.interests.map((item) => (
@@ -371,7 +363,7 @@ export function ContactDetailPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Target className="w-3.5 h-3.5 text-emerald-500" />
-                    Hedefler
+                    {t('contacts.detail.goals')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.goals.map((item) => (
@@ -385,7 +377,7 @@ export function ContactDetailPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Frown className="w-3.5 h-3.5 text-red-500" />
-                    Sıkıntılar
+                    {t('contacts.detail.painPoints')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.pain_points.map((item) => (
@@ -400,7 +392,7 @@ export function ContactDetailPage() {
           {/* Notes */}
           {contact.notes && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Notlar</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.notes')}</p>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">{contact.notes}</p>
             </div>
           )}
@@ -408,7 +400,7 @@ export function ContactDetailPage() {
           {/* Follow up */}
           {contact.next_follow_up_at && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Sonraki Takip</p>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.nextFollowup')}</p>
               <p className="text-sm font-medium">
                 {format(new Date(contact.next_follow_up_at), 'd MMMM yyyy', { locale: tr })}
               </p>
@@ -420,8 +412,8 @@ export function ContactDetailPage() {
 
           {/* AI Placeholder */}
           <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">AI Önerileri</p>
-            <p className="text-xs text-muted-foreground">Faz 4'te AI destekli öneriler burada görünecek.</p>
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.aiSuggestions')}</p>
+            <p className="text-xs text-muted-foreground">{t('contacts.detail.aiPlaceholder')}</p>
           </div>
         </div>
       </div>
@@ -438,12 +430,12 @@ export function ContactDetailPage() {
               <Select value={interactionType} onValueChange={(v) => setInteractionType(v as InteractionType)}>
                 <SelectTrigger className="w-full">
                   <SelectValue>
-                    {INTERACTION_TYPES.find(it => it.value === interactionType)?.label ?? interactionType}
+                    {t(`interactionTypes.${interactionType}`)}
                   </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  {INTERACTION_TYPES.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                  {INTERACTION_TYPE_KEYS.map((value) => (
+                    <SelectItem key={value} value={value}>{t(`interactionTypes.${value}`)}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

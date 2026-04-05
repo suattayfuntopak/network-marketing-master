@@ -4,6 +4,10 @@ import type { Tag, Interaction } from '@/types/database'
 
 export async function fetchContacts(params: ContactListParams): Promise<ContactListResult> {
   const { filters, sort, page, pageSize, userId } = params
+  console.debug('[fetchContacts] called with filters:', { stages: filters.stages, tagIds: filters.tagIds, search: filters.search, archived: filters.archived })
+
+  // Note: filters.archived is a boolean. Supabase .eq('is_archived', false) correctly
+  // filters for non-archived contacts. When archived=true, it shows archived ones.
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 

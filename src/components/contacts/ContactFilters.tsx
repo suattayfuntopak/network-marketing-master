@@ -1,4 +1,5 @@
 import { Filter, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -60,26 +61,38 @@ export function ContactFilters({
   hasActive,
   className,
 }: ContactFiltersProps) {
+  const { t } = useTranslation()
+
+  const translatedStageLabels = Object.fromEntries(
+    Object.keys(STAGE_LABELS).map(k => [k, t(`contactStages.${k}`)])
+  )
+  const translatedSourceLabels = Object.fromEntries(
+    Object.keys(SOURCE_LABELS).map(k => [k, t(`contactSources.${k}`)])
+  )
+  const translatedTypeLabels = Object.fromEntries(
+    Object.keys(CONTACT_TYPE_LABELS).map(k => [k, t(`contactTypes.${k}`)])
+  )
+
   return (
     <div className={cn('rounded-lg border border-border bg-card p-4 space-y-4', className)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Filter className="w-4 h-4" />
-          Filtreler
+          {t('contacts.filters.title')}
         </div>
         {hasActive && (
           <Button variant="ghost" size="sm" onClick={onReset} className="h-7 text-xs gap-1">
             <X className="w-3 h-3" />
-            Temizle
+            {t('common.reset')}
           </Button>
         )}
       </div>
 
       {/* Stage */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Aşama</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.filters.stage')}</p>
         <MultiToggle
-          options={STAGE_LABELS}
+          options={translatedStageLabels}
           values={filters.stages}
           onChange={(v) => onChange({ stages: v })}
         />
@@ -87,9 +100,9 @@ export function ContactFilters({
 
       {/* Contact type */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Kontak Türü</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.filters.contactType')}</p>
         <MultiToggle
-          options={CONTACT_TYPE_LABELS}
+          options={translatedTypeLabels}
           values={filters.contactTypes}
           onChange={(v) => onChange({ contactTypes: v })}
         />
@@ -97,9 +110,9 @@ export function ContactFilters({
 
       {/* Source */}
       <div className="space-y-2">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Kaynak</p>
+        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.filters.source')}</p>
         <MultiToggle
-          options={SOURCE_LABELS}
+          options={translatedSourceLabels}
           values={filters.sources}
           onChange={(v) => onChange({ sources: v })}
         />
@@ -108,7 +121,7 @@ export function ContactFilters({
       {/* Tags */}
       {tags.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Etiketler</p>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.filters.tags')}</p>
           <div className="flex flex-wrap gap-1.5">
             {tags.map((tag) => (
               <button
@@ -137,7 +150,7 @@ export function ContactFilters({
       {/* Warmth range */}
       <div className="space-y-2">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-          Sıcaklık: {filters.warmthMin} – {filters.warmthMax}
+          {t('contacts.filters.warmth', { min: filters.warmthMin, max: filters.warmthMax })}
         </p>
         <div className="flex items-center gap-2">
           <input
@@ -165,7 +178,7 @@ export function ContactFilters({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <Label htmlFor="followup-filter" className="text-xs font-medium cursor-pointer">
-            Takip bekleyenler
+            {t('contacts.filters.pendingFollowup')}
           </Label>
           <Switch
             id="followup-filter"
@@ -175,7 +188,7 @@ export function ContactFilters({
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="archived-filter" className="text-xs font-medium cursor-pointer">
-            Arşivlenenler
+            {t('contacts.filters.archived')}
           </Label>
           <Switch
             id="archived-filter"

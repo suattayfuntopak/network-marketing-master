@@ -189,48 +189,48 @@ export function ContactFormPage() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Tabs defaultValue="temel">
           <TabsList className="w-full">
-            <TabsTrigger value="temel" className="flex-1">Temel</TabsTrigger>
-            <TabsTrigger value="detay" className="flex-1">Detay</TabsTrigger>
+            <TabsTrigger value="temel" className="flex-1">{t('contacts.tabs.basic')}</TabsTrigger>
+            <TabsTrigger value="detay" className="flex-1">{t('contacts.tabs.detail')}</TabsTrigger>
             <TabsTrigger value="nm" className="flex-1">Network</TabsTrigger>
-            <TabsTrigger value="notlar" className="flex-1">Notlar</TabsTrigger>
+            <TabsTrigger value="notlar" className="flex-1">{t('contacts.tabs.notes')}</TabsTrigger>
           </TabsList>
 
           {/* Tab 1: Temel */}
           <TabsContent value="temel" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2 space-y-2">
-                <Label htmlFor="full_name">Ad Soyad *</Label>
-                <Input id="full_name" {...register('full_name')} placeholder="Ahmet Yılmaz" />
+                <Label htmlFor="full_name">{t('contacts.fields.fullName')} *</Label>
+                <Input id="full_name" {...register('full_name')} placeholder={t('contacts.placeholders.fullName')} />
                 {errors.full_name && (
                   <p className="text-xs text-destructive">{errors.full_name.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="nickname">Takma Ad</Label>
-                <Input id="nickname" {...register('nickname')} placeholder="Ahmet" />
+                <Label htmlFor="nickname">{t('contacts.fields.nickname')}</Label>
+                <Input id="nickname" {...register('nickname')} placeholder={t('contacts.placeholders.nickname')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefon</Label>
-                <Input id="phone" {...register('phone')} placeholder="+90 555 123 4567" />
+                <Label htmlFor="phone">{t('contacts.fields.phone')}</Label>
+                <Input id="phone" {...register('phone')} placeholder={t('contacts.placeholders.phone')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="whatsapp">WhatsApp</Label>
-                <Input id="whatsapp" {...register('whatsapp')} placeholder="+90 555 123 4567" />
+                <Label htmlFor="whatsapp">{t('contacts.fields.whatsapp')}</Label>
+                <Input id="whatsapp" {...register('whatsapp')} placeholder={t('contacts.placeholders.whatsapp')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...register('email')} placeholder="ahmet@email.com" />
+                <Label htmlFor="email">{t('contacts.fields.email')}</Label>
+                <Input id="email" type="email" {...register('email')} placeholder={t('contacts.placeholders.email')} />
                 {errors.email && (
                   <p className="text-xs text-destructive">{errors.email.message}</p>
                 )}
               </div>
               <div className="space-y-2">
-                <Label htmlFor="telegram">Telegram</Label>
-                <Input id="telegram" {...register('telegram')} placeholder="@username" />
+                <Label htmlFor="telegram">{t('contacts.fields.telegram')}</Label>
+                <Input id="telegram" {...register('telegram')} placeholder={t('contacts.placeholders.telegram')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="instagram">Instagram</Label>
-                <Input id="instagram" {...register('instagram')} placeholder="@username" />
+                <Label htmlFor="instagram">{t('contacts.fields.instagram')}</Label>
+                <Input id="instagram" {...register('instagram')} placeholder={t('contacts.placeholders.instagram')} />
               </div>
             </div>
           </TabsContent>
@@ -239,23 +239,23 @@ export function ContactFormPage() {
           <TabsContent value="detay" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city">Şehir</Label>
-                <Input id="city" {...register('city')} placeholder="İstanbul" />
+                <Label htmlFor="city">{t('contacts.fields.city')}</Label>
+                <Input id="city" {...register('city')} placeholder={t('contacts.placeholders.city')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="occupation">Meslek</Label>
-                <Input id="occupation" {...register('occupation')} placeholder="Mühendis" />
+                <Label htmlFor="occupation">{t('contacts.fields.occupation')}</Label>
+                <Input id="occupation" {...register('occupation')} placeholder={t('contacts.placeholders.occupation')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="relationship">İlişki Türü</Label>
-                <Input id="relationship" {...register('relationship')} placeholder="arkadaş, akraba..." />
+                <Label htmlFor="relationship">{t('contacts.fields.relationship')}</Label>
+                <Input id="relationship" {...register('relationship')} placeholder={t('contacts.placeholders.relationship')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="birthday">Doğum Günü</Label>
+                <Label htmlFor="birthday">{t('contacts.fields.birthday')}</Label>
                 <Input id="birthday" type="date" {...register('birthday')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="children_count">Çocuk Sayısı</Label>
+                <Label htmlFor="children_count">{t('contacts.fields.children')}</Label>
                 <Input id="children_count" type="number" min={0} {...register('children_count')} />
               </div>
             </div>
@@ -265,62 +265,62 @@ export function ContactFormPage() {
           <TabsContent value="nm" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Kaynak</Label>
+                <Label>{t('contacts.fields.source')}</Label>
                 <Select
                   value={watch('source') ?? 'manual'}
                   onValueChange={(v) => setValue('source', v)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
-                      {SOURCE_LABELS[(watch('source') ?? 'manual') as keyof typeof SOURCE_LABELS] ?? 'Manuel'}
+                      {t(`contactSources.${watch('source') ?? 'manual'}`)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(SOURCE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    {Object.keys(SOURCE_LABELS).map((key) => (
+                      <SelectItem key={key} value={key}>{t(`contactSources.${key}`)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Kontak Türü</Label>
+                <Label>{t('contacts.fields.contactType')}</Label>
                 <Select
                   value={watch('contact_type') ?? 'prospect'}
                   onValueChange={(v) => setValue('contact_type', v)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
-                      {CONTACT_TYPE_LABELS[(watch('contact_type') ?? 'prospect') as keyof typeof CONTACT_TYPE_LABELS] ?? 'Aday'}
+                      {t(`contactTypes.${watch('contact_type') ?? 'prospect'}`)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(CONTACT_TYPE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    {Object.keys(CONTACT_TYPE_LABELS).map((key) => (
+                      <SelectItem key={key} value={key}>{t(`contactTypes.${key}`)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Aşama</Label>
+                <Label>{t('contacts.fields.stage')}</Label>
                 <Select
                   value={watch('stage') ?? 'new'}
                   onValueChange={(v) => setValue('stage', v)}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
-                      {STAGE_LABELS[(watch('stage') ?? 'new') as keyof typeof STAGE_LABELS] ?? 'Yeni'}
+                      {t(`contactStages.${watch('stage') ?? 'new'}`)}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
-                    {Object.entries(STAGE_LABELS).map(([key, label]) => (
-                      <SelectItem key={key} value={key}>{label}</SelectItem>
+                    {Object.keys(STAGE_LABELS).map((key) => (
+                      <SelectItem key={key} value={key}>{t(`contactStages.${key}`)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="warmth_score">
-                  Sıcaklık Skoru: {watch('warmth_score') ?? 50}
+                  {t('contacts.fields.warmthScore', { score: watch('warmth_score') ?? 50 })}
                 </Label>
                 <input
                   type="range"
@@ -338,40 +338,40 @@ export function ContactFormPage() {
           {/* Tab 4: Notlar & Etiketler */}
           <TabsContent value="notlar" className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="notes">Notlar</Label>
+              <Label htmlFor="notes">{t('contacts.fields.notes')}</Label>
               <Textarea
                 id="notes"
                 {...register('notes')}
-                placeholder="Bu kontak hakkında notlarınız..."
+                placeholder={t('contacts.placeholders.notes')}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="interests">İlgi Alanları</Label>
+              <Label htmlFor="interests">{t('contacts.fields.interests')}</Label>
               <Input
                 id="interests"
                 {...register('interests')}
-                placeholder="spor, sağlık, teknoloji (virgülle ayır)"
+                placeholder={t('contacts.placeholders.interests')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="goals">Hedefler</Label>
+              <Label htmlFor="goals">{t('contacts.fields.goals')}</Label>
               <Input
                 id="goals"
                 {...register('goals')}
-                placeholder="para, özgürlük, zaman (virgülle ayır)"
+                placeholder={t('contacts.placeholders.goals')}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pain_points">Sıkıntılar</Label>
+              <Label htmlFor="pain_points">{t('contacts.fields.painPoints')}</Label>
               <Input
                 id="pain_points"
                 {...register('pain_points')}
-                placeholder="zaman yok, para yok (virgülle ayır)"
+                placeholder={t('contacts.placeholders.painPoints')}
               />
             </div>
             <div className="space-y-2">
-              <Label>Etiketler</Label>
+              <Label>{t('contacts.fields.tags')}</Label>
               <TagSelector
                 allTags={allTags}
                 selectedTagIds={selectedTagIds}
