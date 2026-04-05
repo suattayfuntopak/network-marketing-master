@@ -21,30 +21,37 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   })
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    })
+    setLoading(true)
 
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        setError('Email veya şifre hatalı.')
-      } else if (error.message.includes('Email not confirmed')) {
-        setError('Email adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.')
-      } else {
-        setError('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.')
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      })
+
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Email veya şifre hatalı.')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Email adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.')
+        } else {
+          setError('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.')
+        }
+        return
       }
-      return
-    }
 
-    navigate(ROUTES.DASHBOARD)
+      navigate(ROUTES.DASHBOARD, { replace: true })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -116,8 +123,8 @@ export function LoginPage() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
           </Button>
         </form>
 

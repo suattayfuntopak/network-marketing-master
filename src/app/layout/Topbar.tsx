@@ -11,13 +11,16 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '@/hooks/useAuth'
 import { useTheme } from '@/hooks/useTheme'
+import { useAuthStore } from '@/stores/authStore'
+import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
 import { useNavigate } from 'react-router-dom'
 
 export function Topbar() {
-  const { profile, signOut } = useAuth()
+  const { profile } = useAuth()
   const { theme, setTheme } = useTheme()
   const navigate = useNavigate()
+  const reset = useAuthStore(s => s.reset)
 
   const initials = profile?.full_name
     ?.split(' ')
@@ -32,6 +35,20 @@ export function Topbar() {
     system: Monitor,
   }
   const ThemeIcon = themeIcons[theme]
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) console.log('signOut error:', error.message)
+    } catch (err) {
+      console.log('signOut exception:', err)
+    } finally {
+      // Store'u her durumda temizle — onAuthStateChange da reset çağırır
+      // ama biz burada önce yapalım ki ProtectedRoute hemen redirect etsin
+      reset()
+      navigate(ROUTES.LOGIN, { replace: true })
+    }
+  }
 
   const cycleTheme = () => {
     const order: typeof theme[] = ['light', 'dark', 'system']
@@ -85,7 +102,7 @@ export function Topbar() {
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              onClick={signOut}
+              onClick={handleSignOut}
               className="text-destructive focus:text-destructive"
             >
               <LogOut className="w-4 h-4 mr-2" />

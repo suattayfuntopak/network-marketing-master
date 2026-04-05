@@ -9,34 +9,20 @@ import { ResetPasswordPage } from '@/pages/public/ResetPasswordPage'
 import { EmailConfirmPage } from '@/pages/public/EmailConfirmPage'
 import { DashboardLayout } from '@/app/layout/DashboardLayout'
 import { DashboardHome } from '@/pages/dashboard/DashboardHome'
+import { ContactsListPage } from '@/pages/dashboard/contacts/ContactsListPage'
+import { ContactFormPage } from '@/pages/dashboard/contacts/ContactFormPage'
+import { ContactDetailPage } from '@/pages/dashboard/contacts/ContactDetailPage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
 
 export const router = createBrowserRouter([
   // Public routes
-  {
-    path: ROUTES.HOME,
-    element: <LandingPage />,
-  },
-  {
-    path: ROUTES.LOGIN,
-    element: <LoginPage />,
-  },
-  {
-    path: ROUTES.REGISTER,
-    element: <RegisterPage />,
-  },
-  {
-    path: ROUTES.FORGOT_PASSWORD,
-    element: <ForgotPasswordPage />,
-  },
-  {
-    path: ROUTES.RESET_PASSWORD,
-    element: <ResetPasswordPage />,
-  },
-  {
-    path: ROUTES.EMAIL_CONFIRM,
-    element: <EmailConfirmPage />,
-  },
+  { path: ROUTES.HOME, element: <LandingPage /> },
+  { path: ROUTES.LOGIN, element: <LoginPage /> },
+  { path: ROUTES.REGISTER, element: <RegisterPage /> },
+  { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
+  { path: ROUTES.RESET_PASSWORD, element: <ResetPasswordPage /> },
+  { path: ROUTES.EMAIL_CONFIRM, element: <EmailConfirmPage /> },
+
   // Protected routes
   {
     element: <ProtectedRoute />,
@@ -45,7 +31,14 @@ export const router = createBrowserRouter([
         element: <DashboardLayout />,
         children: [
           { path: ROUTES.DASHBOARD, element: <DashboardHome /> },
-          { path: ROUTES.CONTACTS, element: <div className="p-6"><h1 className="text-2xl font-bold">Kontaklar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
+
+          // Contacts
+          { path: ROUTES.CONTACTS, element: <ContactsListPage /> },
+          { path: `${ROUTES.CONTACTS}/yeni`, element: <ContactFormPage /> },
+          { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailPage /> },
+          { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormPage /> },
+
+          // Placeholders
           { path: ROUTES.PIPELINE, element: <div className="p-6"><h1 className="text-2xl font-bold">Pipeline</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.MESSAGES, element: <div className="p-6"><h1 className="text-2xl font-bold">Mesajlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.CALENDAR, element: <div className="p-6"><h1 className="text-2xl font-bold">Takvim</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
@@ -57,9 +50,7 @@ export const router = createBrowserRouter([
       },
     ],
   },
+
   // 404
-  {
-    path: '*',
-    element: <NotFoundPage />,
-  },
+  { path: '*', element: <NotFoundPage /> },
 ])
