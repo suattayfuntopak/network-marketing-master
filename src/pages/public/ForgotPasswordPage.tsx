@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { Zap, ArrowLeft, CheckCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,37 +9,38 @@ import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
 import i18n from '@/i18n'
 
-const schema = z.object({
-  email: z.string().email('Geçerli bir email adresi girin'),
-})
-
-type FormData = z.infer<typeof schema>
-
 export function ForgotPasswordPage() {
+  const { t } = useTranslation()
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
 
-  const onSubmit = async (data: FormData) => {
     setError(null)
     setLoading(true)
+
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+      const formData = new FormData(e.target as HTMLFormElement)
+      const email = formData.get('email') as string
+
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}${ROUTES.RESET_PASSWORD}`,
       })
 
       if (error) {
-        setError('Email gönderilirken bir hata oluştu. Lütfen tekrar deneyin.')
+        setError(t('auth.sendError'))
+        setLoading(false)
         return
       }
 
       setSent(true)
-    } finally {
+    } catch (err: unknown) {
+      console.error('[ForgotPasswordPage] Error:', err)
+      setError(t('auth.sendError'))
       setLoading(false)
     }
   }
@@ -63,6 +62,7 @@ export function ForgotPasswordPage() {
           🇺🇸 EN
         </button>
       </div>
+
       <div className="w-full max-w-sm space-y-6">
         <div className="text-center">
           <Link to={ROUTES.HOME} className="inline-flex items-center gap-2">
@@ -71,10 +71,8 @@ export function ForgotPasswordPage() {
             </div>
             <span className="font-bold text-lg">NMM</span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Şifremi Unuttum</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Email adresini gir, sıfırlama linki gönderelim
-          </p>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t('auth.forgotPassword')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('auth.forgotPasswordSubtitle')}</p>
         </div>
 
         {sent ? (
@@ -83,21 +81,18 @@ export function ForgotPasswordPage() {
               <CheckCircle className="w-16 h-16 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold">Email Gönderildi</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                Şifre sıfırlama linki email adresinize gönderildi.
-                Gelen kutunuzu kontrol edin.
-              </p>
+              <h2 className="font-semibold">{t('auth.emailSent')}</h2>
+              <p className="text-sm text-muted-foreground mt-1">{t('auth.emailSentDesc')}</p>
             </div>
             <Link to={ROUTES.LOGIN}>
               <Button variant="outline" className="w-full">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Giriş Sayfasına Dön
+                {t('auth.backToLogin')}
               </Button>
             </Link>
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
               <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
                 {error}
@@ -105,27 +100,24 @@ export function ForgotPasswordPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.email')}</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
-                placeholder="ornek@email.com"
+                placeholder={t('auth.emailPlaceholder')}
                 autoComplete="email"
-                {...register('email')}
               />
-              {errors.email && (
-                <p className="text-xs text-destructive">{errors.email.message}</p>
-              )}
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Gönderiliyor...' : 'Sıfırlama Linki Gönder'}
+              {loading ? t('auth.sending') : t('auth.sendResetLink')}
             </Button>
 
             <Link to={ROUTES.LOGIN}>
               <Button variant="ghost" className="w-full">
                 <ArrowLeft className="w-4 h-4 mr-2" />
-                Giriş Sayfasına Dön
+                {t('auth.backToLogin')}
               </Button>
             </Link>
           </form>

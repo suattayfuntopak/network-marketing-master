@@ -191,7 +191,7 @@ export function ContactFormPage() {
           <TabsList className="w-full">
             <TabsTrigger value="temel" className="flex-1">{t('contacts.tabs.basic')}</TabsTrigger>
             <TabsTrigger value="detay" className="flex-1">{t('contacts.tabs.detail')}</TabsTrigger>
-            <TabsTrigger value="nm" className="flex-1">Network</TabsTrigger>
+            <TabsTrigger value="nm" className="flex-1">{t('contacts.tabs.network')}</TabsTrigger>
             <TabsTrigger value="notlar" className="flex-1">{t('contacts.tabs.notes')}</TabsTrigger>
           </TabsList>
 

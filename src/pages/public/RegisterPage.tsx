@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,68 +10,80 @@ import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
 import i18n from '@/i18n'
 
-const registerSchema = z.object({
-  full_name: z.string().min(2, 'Ad soyad en az 2 karakter olmalı'),
-  email: z.string().email('Geçerli bir email adresi girin'),
-  phone: z.string().optional(),
-  password: z
-    .string()
-    .min(8, 'Şifre en az 8 karakter olmalı')
-    .regex(/[A-Z]/, 'Şifre en az 1 büyük harf içermeli')
-    .regex(/[0-9]/, 'Şifre en az 1 rakam içermeli'),
-  password_confirm: z.string(),
-}).refine(data => data.password === data.password_confirm, {
-  message: 'Şifreler eşleşmiyor',
-  path: ['password_confirm'],
-})
-
-type RegisterFormData = z.infer<typeof registerSchema>
-
 export function RegisterPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
-  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
-  })
+  const validate = (data: {
+    full_name: string
+    email: string
+    password: string
+    password_confirm: string
+  }) => {
+    const errors: Record<string, string> = {}
+    if (data.full_name.length < 2) errors.full_name = 'Ad soyad en az 2 karakter olmalı'
+    if (!data.email.includes('@')) errors.email = 'Geçerli bir email adresi girin'
+    if (data.password.length < 8) errors.password = 'Şifre en az 8 karakter olmalı'
+    else if (!/[A-Z]/.test(data.password)) errors.password = 'Şifre en az 1 büyük harf içermeli'
+    else if (!/[0-9]/.test(data.password)) errors.password = 'Şifre en az 1 rakam içermeli'
+    if (data.password !== data.password_confirm) errors.password_confirm = 'Şifreler eşleşmiyor'
+    return errors
+  }
 
-  const onSubmit = async (data: RegisterFormData) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
+
     setError(null)
+    const formData = new FormData(e.target as HTMLFormElement)
+    const full_name = formData.get('full_name') as string
+    const email = formData.get('email') as string
+    const phone = formData.get('phone') as string
+    const password = formData.get('password') as string
+    const password_confirm = formData.get('password_confirm') as string
+
+    const errors = validate({ full_name, email, password, password_confirm })
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      return
+    }
+    setFieldErrors({})
     setLoading(true)
 
     try {
       const { data: authData, error } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
+        email,
+        password,
         options: {
-          data: {
-            full_name: data.full_name,
-            phone: data.phone,
-          },
+          data: { full_name, phone: phone || null },
           emailRedirectTo: `${window.location.origin}${ROUTES.EMAIL_CONFIRM}`,
         },
       })
 
       if (error) {
         if (error.message.includes('already registered')) {
-          setError('Bu email adresi zaten kayıtlı. Giriş yapmayı deneyin.')
+          setError(t('auth.emailAlreadyRegistered'))
         } else {
-          setError('Kayıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.')
+          setError(t('auth.registerError'))
         }
+        setLoading(false)
         return
       }
 
-      // session null → email onayı aktif → onay sayfasına yönlendir
-      // session mevcut → email onayı kapalı → direkt panoya gir
       if (authData.session) {
+        toast.success(t('auth.loginSuccess'))
         navigate(ROUTES.DASHBOARD, { replace: true })
       } else {
         navigate(ROUTES.EMAIL_CONFIRM, { replace: true })
       }
-    } finally {
+    } catch (err: unknown) {
+      console.error('[RegisterPage] Error:', err)
+      setError(t('auth.registerError'))
       setLoading(false)
     }
   }
@@ -94,6 +105,7 @@ export function RegisterPage() {
           🇺🇸 EN
         </button>
       </div>
+
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center">
@@ -103,13 +115,11 @@ export function RegisterPage() {
             </div>
             <span className="font-bold text-lg">NMM</span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Hesap Oluştur</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Ücretsiz başla, hemen kullanmaya başla
-          </p>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t('auth.createAccount')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('auth.registerSubtitle')}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
               {error}
@@ -117,55 +127,55 @@ export function RegisterPage() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="full_name">Ad Soyad</Label>
+            <Label htmlFor="full_name">{t('auth.fullName')}</Label>
             <Input
               id="full_name"
+              name="full_name"
               type="text"
-              placeholder="Ahmet Yılmaz"
+              placeholder={t('auth.namePlaceholder')}
               autoComplete="name"
-              {...register('full_name')}
             />
-            {errors.full_name && (
-              <p className="text-xs text-destructive">{errors.full_name.message}</p>
+            {fieldErrors.full_name && (
+              <p className="text-xs text-destructive">{fieldErrors.full_name}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
+              name="email"
               type="email"
-              placeholder="ornek@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               autoComplete="email"
-              {...register('email')}
             />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
+            {fieldErrors.email && (
+              <p className="text-xs text-destructive">{fieldErrors.email}</p>
             )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="phone">
-              Telefon <span className="text-muted-foreground text-xs">(opsiyonel)</span>
+              {t('auth.phone')} <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
             </Label>
             <Input
               id="phone"
+              name="phone"
               type="tel"
-              placeholder="+90 555 123 4567"
+              placeholder={t('auth.phonePlaceholder')}
               autoComplete="tel"
-              {...register('phone')}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password">Şifre</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <div className="relative">
               <Input
                 id="password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="En az 8 karakter"
+                placeholder={t('auth.passwordPlaceholder')}
                 autoComplete="new-password"
-                {...register('password')}
               />
               <button
                 type="button"
@@ -175,34 +185,34 @@ export function RegisterPage() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
+            {fieldErrors.password && (
+              <p className="text-xs text-destructive">{fieldErrors.password}</p>
             )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password_confirm">Şifre Tekrar</Label>
+            <Label htmlFor="password_confirm">{t('auth.passwordConfirm')}</Label>
             <Input
               id="password_confirm"
+              name="password_confirm"
               type={showPassword ? 'text' : 'password'}
-              placeholder="Şifreyi tekrar girin"
+              placeholder={t('auth.passwordConfirmPlaceholder')}
               autoComplete="new-password"
-              {...register('password_confirm')}
             />
-            {errors.password_confirm && (
-              <p className="text-xs text-destructive">{errors.password_confirm.message}</p>
+            {fieldErrors.password_confirm && (
+              <p className="text-xs text-destructive">{fieldErrors.password_confirm}</p>
             )}
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Hesap oluşturuluyor...' : 'Kayıt Ol'}
+            {loading ? t('auth.creatingAccount') : t('auth.register')}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          Zaten hesabın var mı?{' '}
+          {t('auth.alreadyHaveAccount')}{' '}
           <Link to={ROUTES.LOGIN} className="text-primary hover:underline font-medium">
-            Giriş Yap
+            {t('auth.login')}
           </Link>
         </p>
       </div>

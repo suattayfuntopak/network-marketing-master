@@ -24,7 +24,8 @@
     "unknownError": "Unknown error",
     "goBack": "Go Back",
     "all": "All",
-    "selected": "{{count}} items selected"
+    "selected": "{{count}} items selected",
+    "page": "Page {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -36,7 +37,8 @@
     "team": "Team",
     "analytics": "Analytics",
     "settings": "Settings",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "auth": {
     "login": "Log In",
@@ -60,7 +62,23 @@
     "phonePlaceholder": "+1 555 123 4567",
     "namePlaceholder": "John Doe",
     "passwordConfirm": "Confirm Password",
-    "passwordConfirmPlaceholder": "Re-enter your password"
+    "passwordConfirmPlaceholder": "Re-enter your password",
+    "forgotPasswordLink": "Forgot password",
+    "loginSubtitle": "Sign in to continue",
+    "loginSuccess": "Logged in successfully",
+    "loginError": "An error occurred while logging in. Please try again.",
+    "invalidCredentials": "Invalid email or password.",
+    "emailNotConfirmed": "Please verify your email address. Check your inbox.",
+    "registerSubtitle": "Start free, begin using right away",
+    "emailAlreadyRegistered": "This email is already registered. Try logging in.",
+    "registerError": "An error occurred while creating your account. Please try again.",
+    "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
+    "emailSent": "Email Sent",
+    "emailSentDesc": "A password reset link has been sent to your email. Check your inbox.",
+    "sendResetLink": "Send Reset Link",
+    "sending": "Sending...",
+    "sendError": "An error occurred while sending the email. Please try again.",
+    "backToLogin": "Back to Login"
   },
   "contacts": {
     "title": "Contacts",
@@ -73,6 +91,8 @@
     "total": "{{count}} contacts",
     "selected": "{{count}} contacts selected",
     "clearFilters": "Clear Filters",
+    "viewCard": "Card view",
+    "viewTable": "Table view",
     "exporting": "Exported",
     "exportCount": "{{count}} contacts exported",
     "importSuccess": "Contacts imported successfully",

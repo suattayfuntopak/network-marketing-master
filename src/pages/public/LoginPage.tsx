@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Eye, EyeOff } from 'lucide-react'
+import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,47 +10,46 @@ import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
 import i18n from '@/i18n'
 
-const loginSchema = z.object({
-  email: z.string().email('Geçerli bir email adresi girin'),
-  password: z.string().min(1, 'Şifre gerekli'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
-
 export function LoginPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-  })
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (loading) return
 
-  const onSubmit = async (data: LoginFormData) => {
     setError(null)
     setLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      })
+      const formData = new FormData(e.target as HTMLFormElement)
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          setError('Email veya şifre hatalı.')
+          setError(t('auth.invalidCredentials'))
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Email adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.')
+          setError(t('auth.emailNotConfirmed'))
         } else {
-          setError('Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.')
+          setError(t('auth.loginError'))
         }
+        setLoading(false)
         return
       }
 
+      toast.success(t('auth.loginSuccess'))
       navigate(ROUTES.DASHBOARD, { replace: true })
-    } finally {
+      // intentionally NOT calling setLoading(false) on success — component will unmount
+    } catch (err: unknown) {
+      console.error('[LoginPage] Error:', err)
+      setError(t('auth.loginError'))
       setLoading(false)
     }
   }
@@ -73,6 +71,7 @@ export function LoginPage() {
           🇺🇸 EN
         </button>
       </div>
+
       <div className="w-full max-w-sm space-y-6">
         {/* Logo */}
         <div className="text-center">
@@ -82,13 +81,11 @@ export function LoginPage() {
             </div>
             <span className="font-bold text-lg">NMM</span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Giriş Yap</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Hesabına giriş yaparak devam et
-          </p>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t('auth.login')}</h1>
+          <p className="text-sm text-muted-foreground mt-1">{t('auth.loginSubtitle')}</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
             <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
               {error}
@@ -96,36 +93,33 @@ export function LoginPage() {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
+              name="email"
               type="email"
-              placeholder="ornek@email.com"
+              placeholder={t('auth.emailPlaceholder')}
               autoComplete="email"
-              {...register('email')}
             />
-            {errors.email && (
-              <p className="text-xs text-destructive">{errors.email.message}</p>
-            )}
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password">Şifre</Label>
+              <Label htmlFor="password">{t('auth.password')}</Label>
               <Link
                 to={ROUTES.FORGOT_PASSWORD}
                 className="text-xs text-primary hover:underline"
               >
-                Şifremi unuttum
+                {t('auth.forgotPasswordLink')}
               </Link>
             </div>
             <div className="relative">
               <Input
                 id="password"
+                name="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 autoComplete="current-password"
-                {...register('password')}
               />
               <button
                 type="button"
@@ -135,20 +129,17 @@ export function LoginPage() {
                 {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-xs text-destructive">{errors.password.message}</p>
-            )}
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            {loading ? t('auth.loggingIn') : t('auth.login')}
           </Button>
         </form>
 
         <p className="text-center text-sm text-muted-foreground">
-          Hesabın yok mu?{' '}
+          {t('auth.noAccount')}{' '}
           <Link to={ROUTES.REGISTER} className="text-primary hover:underline font-medium">
-            Kayıt Ol
+            {t('auth.register')}
           </Link>
         </p>
       </div>

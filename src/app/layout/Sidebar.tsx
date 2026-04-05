@@ -39,9 +39,9 @@ export function Sidebar() {
         collapsed ? 'w-16' : 'w-60'
       )}
     >
-      {/* Logo */}
+      {/* Logo + collapse toggle */}
       <div className={cn(
-        'flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0',
+        'relative flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0',
         collapsed && 'justify-center px-0'
       )}>
         <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
@@ -52,6 +52,21 @@ export function Sidebar() {
             Network<br />Marketing Master
           </span>
         )}
+        {/* Collapse toggle — top-right corner of header */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? t('nav.expand') : t('nav.collapse')}
+          className={cn(
+            'absolute top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-md',
+            'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors',
+            collapsed ? 'right-2' : 'right-3'
+          )}
+        >
+          {collapsed
+            ? <ChevronRight className="w-4 h-4" />
+            : <ChevronLeft className="w-4 h-4" />
+          }
+        </button>
       </div>
 
       {/* Navigation */}
@@ -81,25 +96,14 @@ export function Sidebar() {
         </ul>
       </nav>
 
-      {/* Collapse button */}
-      <div className="p-2 border-t border-sidebar-border">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className={cn(
-            'flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-sidebar-foreground/60',
-            'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors',
-            collapsed && 'justify-center px-0'
-          )}
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <>
-              <ChevronLeft className="w-4 h-4" />
-              <span>{t('nav.collapse')}</span>
-            </>
-          )}
-        </button>
+      {/* Version footer */}
+      <div className="p-3 border-t border-sidebar-border">
+        <p className={cn(
+          'text-xs text-sidebar-foreground/40 text-center',
+          collapsed && 'opacity-0'
+        )}>
+          NMM v1.0
+        </p>
       </div>
     </aside>
   )

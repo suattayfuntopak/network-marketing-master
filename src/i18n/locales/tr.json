@@ -24,19 +24,21 @@
     "unknownError": "Bilinmeyen hata",
     "goBack": "Geri Dön",
     "all": "Tümü",
-    "selected": "{{count}} öğe seçildi"
+    "selected": "{{count}} öğe seçildi",
+    "page": "Sayfa {{page}} / {{total}}"
   },
   "nav": {
     "dashboard": "Pano",
     "contacts": "Kontaklar",
-    "pipeline": "Pipeline",
+    "pipeline": "Süreç Takibi",
     "messages": "Mesajlar",
     "calendar": "Takvim",
     "academy": "Akademi",
     "team": "Ekip",
     "analytics": "Analiz",
     "settings": "Ayarlar",
-    "collapse": "Daralt"
+    "collapse": "Daralt",
+    "expand": "Genişlet"
   },
   "auth": {
     "login": "Giriş Yap",
@@ -47,6 +49,7 @@
     "fullName": "Ad Soyad",
     "phone": "Telefon",
     "forgotPassword": "Şifremi Unuttum",
+    "forgotPasswordLink": "Şifremi unuttum",
     "resetPassword": "Şifre Sıfırla",
     "creatingAccount": "Hesap oluşturuluyor...",
     "alreadyHaveAccount": "Zaten hesabın var mı?",
@@ -60,7 +63,22 @@
     "phonePlaceholder": "+90 555 123 4567",
     "namePlaceholder": "Ahmet Yılmaz",
     "passwordConfirm": "Şifre Tekrar",
-    "passwordConfirmPlaceholder": "Şifreyi tekrar girin"
+    "passwordConfirmPlaceholder": "Şifreyi tekrar girin",
+    "loginSubtitle": "Hesabına giriş yaparak devam et",
+    "loginSuccess": "Giriş yapıldı",
+    "loginError": "Giriş yapılırken bir hata oluştu. Lütfen tekrar deneyin.",
+    "invalidCredentials": "Email veya şifre hatalı.",
+    "emailNotConfirmed": "Email adresinizi doğrulamanız gerekiyor. Gelen kutunuzu kontrol edin.",
+    "registerSubtitle": "Ücretsiz başla, hemen kullanmaya başla",
+    "emailAlreadyRegistered": "Bu email adresi zaten kayıtlı. Giriş yapmayı deneyin.",
+    "registerError": "Kayıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
+    "forgotPasswordSubtitle": "Email adresini gir, sıfırlama linki gönderelim",
+    "emailSent": "Email Gönderildi",
+    "emailSentDesc": "Şifre sıfırlama linki email adresinize gönderildi. Gelen kutunuzu kontrol edin.",
+    "sendResetLink": "Sıfırlama Linki Gönder",
+    "sending": "Gönderiliyor...",
+    "sendError": "Email gönderilirken bir hata oluştu. Lütfen tekrar deneyin.",
+    "backToLogin": "Giriş Sayfasına Dön"
   },
   "contacts": {
     "title": "Kontaklar",
@@ -73,6 +91,8 @@
     "total": "{{count}} kontak",
     "selected": "{{count}} kontak seçildi",
     "clearFilters": "Filtreleri Temizle",
+    "viewCard": "Kart görünümü",
+    "viewTable": "Tablo görünümü",
     "exporting": "Dışa aktarıldı",
     "exportCount": "{{count}} kontak dışa aktarıldı",
     "importSuccess": "Kontaklar başarıyla içe aktarıldı",

@@ -5,7 +5,7 @@ import type { ContactListParams } from '@/lib/contacts/types'
 export const contactKeys = {
   all: ['contacts'] as const,
   lists: () => [...contactKeys.all, 'list'] as const,
-  list: (params: Omit<ContactListParams, 'userId'>) => [...contactKeys.lists(), params] as const,
+  list: (params: ContactListParams) => [...contactKeys.lists(), params.userId, params.filters, params.sort, params.page, params.pageSize] as const,
   count: (userId: string) => [...contactKeys.all, 'count', userId] as const,
   recent: (userId: string) => [...contactKeys.all, 'recent', userId] as const,
   pending: (userId: string) => [...contactKeys.all, 'pending', userId] as const,
@@ -13,17 +13,15 @@ export const contactKeys = {
 
 export function useContacts(params: ContactListParams) {
   return useQuery({
-    queryKey: contactKeys.list({ filters: params.filters, sort: params.sort, page: params.page, pageSize: params.pageSize }),
+    queryKey: contactKeys.list(params),
     queryFn: async () => {
-      console.debug('[useContacts] Fetching contacts, userId:', params.userId)
+      console.debug('[useContacts] Fetching with filters:', JSON.stringify(params.filters))
       const result = await fetchContacts(params)
-      console.debug('[useContacts] Fetched count:', result.count)
+      console.debug('[useContacts] Result count:', result.count, 'data:', result.data.length)
       return result
     },
     enabled: !!params.userId,
-    placeholderData: (prev) => prev,
     staleTime: 0,
-    refetchOnMount: true,
   })
 }
 

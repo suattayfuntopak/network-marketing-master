@@ -84,20 +84,20 @@ export function ContactsListPage() {
   const handleArchive = async (id: string, archived: boolean) => {
     try {
       await archiveMutation.mutateAsync({ id, archived })
-      toast.success(archived ? 'Kontak arşivlendi' : 'Kontak arşivden çıkarıldı')
+      toast.success(archived ? t('contacts.archived') : t('contacts.unarchived'))
     } catch {
-      toast.error('İşlem başarısız')
+      toast.error(t('contacts.saveError'))
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bu kontağı kalıcı olarak silmek istediğinize emin misiniz?')) return
+    if (!confirm(t('contacts.deleteConfirm'))) return
     try {
       await deleteMutation.mutateAsync(id)
-      toast.success('Kontak silindi')
+      toast.success(t('contacts.deleted'))
       setSelectedIds((prev) => prev.filter((x) => x !== id))
     } catch {
-      toast.error('Silme işlemi başarısız')
+      toast.error(t('contacts.saveError'))
     }
   }
 
@@ -115,7 +115,7 @@ export function ContactsListPage() {
       exportContactsToCSV(result.data)
       toast.success(t('contacts.exportCount', { count: result.data.length }))
     } catch {
-      toast.error('Dışa aktarma başarısız')
+      toast.error(t('contacts.saveError'))
     } finally {
       setExporting(false)
     }
@@ -241,7 +241,7 @@ export function ContactsListPage() {
           size="icon"
           onClick={() => setShowFilters(!showFilters)}
           className={hasActiveFilters ? 'border-primary text-primary' : ''}
-          title="Filtreler"
+          title={t('common.filter')}
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4h18M7 8h10M10 12h4" />
@@ -251,7 +251,7 @@ export function ContactsListPage() {
           variant="outline"
           size="icon"
           onClick={() => setViewMode(viewMode === 'table' ? 'card' : 'table')}
-          title={viewMode === 'table' ? 'Kart görünümü' : 'Tablo görünümü'}
+          title={viewMode === 'table' ? t('contacts.viewCard') : t('contacts.viewTable')}
         >
           {viewMode === 'table'
             ? <LayoutGrid className="w-4 h-4" />
@@ -324,7 +324,7 @@ export function ContactsListPage() {
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm">
           <p className="text-muted-foreground">
-            Sayfa {page} / {totalPages}
+            {t('common.page', { page, total: totalPages })}
           </p>
           <div className="flex items-center gap-1">
             <Button
