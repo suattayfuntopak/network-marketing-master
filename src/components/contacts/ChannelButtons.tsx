@@ -1,4 +1,4 @@
-import { Phone, Mail, MessageCircle, Send, Instagram } from 'lucide-react'
+import { Phone, Mail, MessageCircle, Send, Camera } from 'lucide-react'
 import type { Contact } from '@/types/database'
 import { cn } from '@/lib/utils'
 
@@ -43,7 +43,7 @@ export function ChannelButtons({ contact, size = 'default', className }: Channel
     },
     {
       key: 'instagram',
-      icon: Instagram,
+      icon: Camera,
       href: contact.instagram
         ? `https://instagram.com/${contact.instagram.replace('@', '')}`
         : null,

@@ -14,9 +14,16 @@ export const contactKeys = {
 export function useContacts(params: ContactListParams) {
   return useQuery({
     queryKey: contactKeys.list({ filters: params.filters, sort: params.sort, page: params.page, pageSize: params.pageSize }),
-    queryFn: () => fetchContacts(params),
+    queryFn: async () => {
+      console.debug('[useContacts] Fetching contacts, userId:', params.userId)
+      const result = await fetchContacts(params)
+      console.debug('[useContacts] Fetched count:', result.count)
+      return result
+    },
     enabled: !!params.userId,
     placeholderData: (prev) => prev,
+    staleTime: 0,
+    refetchOnMount: true,
   })
 }
 

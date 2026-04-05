@@ -61,6 +61,7 @@ export function ContactFormPage() {
   const createTagMutation = useCreateTag()
 
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [isSaving, setIsSaving] = useState(false)
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -130,24 +131,28 @@ export function ContactFormPage() {
       pain_points: parseArray(data.pain_points),
     }
 
+    setIsSaving(true)
     try {
       if (isEdit && id) {
         await updateContact.mutateAsync(payload)
         await setTags.mutateAsync(selectedTagIds)
         toast.success('Kontak güncellendi')
-        navigate(`${ROUTES.CONTACTS}/${id}`)
+        navigate(`${ROUTES.CONTACTS}/${id}`, { replace: true })
       } else {
         const newId = await createContact.mutateAsync(payload)
-        // Set tags for new contact
         if (selectedTagIds.length > 0) {
           const setTagsForNew = (await import('@/lib/contacts/mutations')).setContactTags
           await setTagsForNew(newId, selectedTagIds)
         }
         toast.success('Kontak eklendi')
-        navigate(`${ROUTES.CONTACTS}/${newId}`)
+        console.debug('[ContactForm] Yeni kontak kaydedildi, id:', newId)
+        navigate(ROUTES.CONTACTS, { replace: true })
       }
     } catch (err) {
-      toast.error('İşlem başarısız')
+      console.error('[ContactForm] Kayıt hatası:', err)
+      toast.error('İşlem başarısız. Lütfen tekrar deneyin.')
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -166,7 +171,7 @@ export function ContactFormPage() {
     )
   }
 
-  const isLoading = createContact.isPending || updateContact.isPending
+  const isLoading = isSaving
 
   return (
     <div className="p-6 pb-20 lg:pb-6 max-w-2xl mx-auto space-y-6">

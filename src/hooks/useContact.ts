@@ -16,8 +16,15 @@ import { tagKeys } from './useTags'
 export function useContact(id: string | undefined) {
   return useQuery({
     queryKey: ['contact', id],
-    queryFn: () => fetchContact(id!),
+    queryFn: async () => {
+      console.debug('[useContact] Fetching contact:', id)
+      const result = await fetchContact(id!)
+      console.debug('[useContact] Fetched:', result?.full_name ?? 'null')
+      return result
+    },
     enabled: !!id,
+    retry: 1,
+    staleTime: 0,
   })
 }
 
@@ -25,8 +32,12 @@ export function useCreateContact() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (data: ContactInsert) => createContact(data),
-    onSuccess: () => {
+    onSuccess: (newId) => {
+      console.debug('[useCreateContact] onSuccess, invalidating contacts. newId:', newId)
       qc.invalidateQueries({ queryKey: contactKeys.all })
+    },
+    onError: (err) => {
+      console.error('[useCreateContact] Mutation error:', err)
     },
   })
 }

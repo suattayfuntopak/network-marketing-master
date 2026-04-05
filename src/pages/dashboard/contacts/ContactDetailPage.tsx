@@ -5,7 +5,7 @@ import { tr } from 'date-fns/locale'
 import { formatDistanceToNow } from 'date-fns'
 import {
   ArrowLeft, Edit, Archive, ArchiveRestore, Trash2, Calendar, Briefcase,
-  MapPin, Heart, Users, Target, Frown, Phone, Mail, MessageCircle, Send, Instagram,
+  MapPin, Heart, Users, Target, Frown, Phone, Mail, MessageCircle, Send, Camera,
   Plus,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -52,7 +52,7 @@ export function ContactDetailPage() {
   const { user } = useAuth()
   const userId = user?.id ?? ''
 
-  const { data: contact, isLoading } = useContact(id)
+  const { data: contact, isLoading, isError, error } = useContact(id)
   const { data: interactions = [], isLoading: loadingInteractions } = useInteractions(id)
   const { data: allTags = [] } = useTags(userId)
 
@@ -73,10 +73,23 @@ export function ContactDetailPage() {
     return <div className="p-6 text-center text-muted-foreground">Yükleniyor...</div>
   }
 
+  if (isError) {
+    console.error('[ContactDetail] Kontak yüklenemedi:', error)
+    return (
+      <div className="p-6 text-center space-y-3">
+        <p className="text-destructive font-medium">Kontak yüklenemedi.</p>
+        <p className="text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : 'Bilinmeyen hata'}
+        </p>
+        <Button onClick={() => navigate(ROUTES.CONTACTS)}>Geri Dön</Button>
+      </div>
+    )
+  }
+
   if (!contact) {
     return (
-      <div className="p-6 text-center">
-        <p className="text-muted-foreground mb-4">Kontak bulunamadı.</p>
+      <div className="p-6 text-center space-y-3">
+        <p className="text-muted-foreground">Kontak bulunamadı.</p>
         <Button onClick={() => navigate(ROUTES.CONTACTS)}>Geri Dön</Button>
       </div>
     )

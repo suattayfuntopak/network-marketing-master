@@ -73,13 +73,17 @@ export async function fetchContacts(params: ContactListParams): Promise<ContactL
 }
 
 export async function fetchContact(id: string): Promise<ContactWithTags | null> {
+  console.debug('[fetchContact] id:', id)
   const { data, error } = await supabase
     .from('nmm_contacts')
     .select('*, nmm_contact_tags(tag_id, nmm_tags(*))')
     .eq('id', id)
     .single()
 
-  if (error) throw error
+  if (error) {
+    console.error('[fetchContact] Supabase error:', error.code, error.message, error.details)
+    throw error
+  }
   if (!data) return null
 
   const tags: Tag[] = ((data.nmm_contact_tags as { nmm_tags: Tag }[]) ?? [])
