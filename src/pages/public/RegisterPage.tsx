@@ -31,35 +31,48 @@ export function RegisterPage() {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<RegisterFormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
   })
 
   const onSubmit = async (data: RegisterFormData) => {
     setError(null)
-    const { error } = await supabase.auth.signUp({
-      email: data.email,
-      password: data.password,
-      options: {
-        data: {
-          full_name: data.full_name,
-          phone: data.phone,
+    setLoading(true)
+
+    try {
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            full_name: data.full_name,
+            phone: data.phone,
+          },
+          emailRedirectTo: `${window.location.origin}${ROUTES.EMAIL_CONFIRM}`,
         },
-        emailRedirectTo: `${window.location.origin}${ROUTES.EMAIL_CONFIRM}`,
-      },
-    })
+      })
 
-    if (error) {
-      if (error.message.includes('already registered')) {
-        setError('Bu email adresi zaten kayıtlı. Giriş yapmayı deneyin.')
-      } else {
-        setError('Kayıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.')
+      if (error) {
+        if (error.message.includes('already registered')) {
+          setError('Bu email adresi zaten kayıtlı. Giriş yapmayı deneyin.')
+        } else {
+          setError('Kayıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.')
+        }
+        return
       }
-      return
-    }
 
-    navigate(ROUTES.EMAIL_CONFIRM)
+      // session null → email onayı aktif → onay sayfasına yönlendir
+      // session mevcut → email onayı kapalı → direkt panoya gir
+      if (authData.session) {
+        navigate(ROUTES.DASHBOARD, { replace: true })
+      } else {
+        navigate(ROUTES.EMAIL_CONFIRM, { replace: true })
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -164,8 +177,8 @@ export function RegisterPage() {
             )}
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? 'Hesap oluşturuluyor...' : 'Kayıt Ol'}
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? 'Hesap oluşturuluyor...' : 'Kayıt Ol'}
           </Button>
         </form>
 
