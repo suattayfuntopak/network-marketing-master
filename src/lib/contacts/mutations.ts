@@ -152,8 +152,8 @@ export async function updateContactStage(
     contactId,
     userId,
     type: 'stage_change',
-    subject: 'Aşama Değişimi',
-    content: `Aşama değişti: ${oldStage} → ${newStage}`,
+    subject: null,                      // rendered from i18n key in component
+    content: `${oldStage} → ${newStage}`,  // stage slugs, translated in component
     warmthImpact: 0,
   })
 }

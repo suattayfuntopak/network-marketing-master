@@ -1,10 +1,11 @@
 import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
+import { tr, enUS } from 'date-fns/locale'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/i18n'
 import {
   StickyNote, Phone, MessageCircle, Send, Mail, MessageSquare,
   Coffee, Presentation, AlertCircle, ArrowRight, Thermometer, Settings,
 } from 'lucide-react'
-import { INTERACTION_TYPE_LABELS } from '@/lib/contacts/constants'
 import type { Interaction } from '@/types/database'
 import { cn } from '@/lib/utils'
 
@@ -43,9 +44,27 @@ interface InteractionItemProps {
 }
 
 export function InteractionItem({ interaction }: InteractionItemProps) {
+  const { t } = useTranslation()
+  const locale = i18n.language?.startsWith('en') ? enUS : tr
+
   const Icon = ICONS[interaction.type] ?? StickyNote
   const colorClass = TYPE_COLORS[interaction.type] ?? TYPE_COLORS['note']
-  const label = INTERACTION_TYPE_LABELS[interaction.type]
+  const typeLabel = t(`interactionTypes.${interaction.type}`, { defaultValue: interaction.type })
+
+  // For stage_change, extract slug names from content and translate them
+  // Handles both "Aşama değişti: new → interested" and "new → interested" formats
+  const renderContent = () => {
+    if (!interaction.content) return null
+    if (interaction.type === 'stage_change') {
+      const match = interaction.content.match(/(\w+)\s*→\s*(\w+)/)
+      if (match) {
+        const from = t(`contactStages.${match[1]}`, { defaultValue: match[1] })
+        const to = t(`contactStages.${match[2]}`, { defaultValue: match[2] })
+        return `${from} → ${to}`
+      }
+    }
+    return interaction.content
+  }
 
   return (
     <div className="flex gap-3">
@@ -58,7 +77,11 @@ export function InteractionItem({ interaction }: InteractionItemProps) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-sm font-medium">
-            {interaction.subject || label}
+            {interaction.subject
+              ? interaction.type === 'stage_change'
+                ? typeLabel   // ignore stored Turkish subject, use translated type label
+                : interaction.subject
+              : typeLabel}
           </span>
           {interaction.warmth_impact !== 0 && (
             <span className={cn(
@@ -71,12 +94,12 @@ export function InteractionItem({ interaction }: InteractionItemProps) {
             </span>
           )}
           <time className="text-xs text-muted-foreground ml-auto">
-            {format(new Date(interaction.occurred_at), 'd MMM yyyy HH:mm', { locale: tr })}
+            {format(new Date(interaction.occurred_at), 'd MMM yyyy HH:mm', { locale })}
           </time>
         </div>
-        {interaction.content && (
+        {renderContent() && (
           <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
-            {interaction.content}
+            {renderContent()}
           </p>
         )}
       </div>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { InteractionItem } from './InteractionItem'
 import type { Interaction } from '@/types/database'
 
@@ -7,6 +8,8 @@ interface InteractionTimelineProps {
 }
 
 export function InteractionTimeline({ interactions, loading }: InteractionTimelineProps) {
+  const { t } = useTranslation()
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -25,10 +28,8 @@ export function InteractionTimeline({ interactions, loading }: InteractionTimeli
 
   if (interactions.length === 0) {
     return (
-      <div className="text-center py-8 text-sm text-muted-foreground">
-        Henüz etkileşim kaydı yok.
-        <br />
-        Not ekleyerek başla.
+      <div className="text-center py-8 text-sm text-muted-foreground whitespace-pre-line">
+        {t('contacts.interaction.empty')}
       </div>
     )
   }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Send } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -9,6 +10,7 @@ interface QuickNoteInputProps {
 }
 
 export function QuickNoteInput({ onSubmit, disabled }: QuickNoteInputProps) {
+  const { t } = useTranslation()
   const [value, setValue] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -30,7 +32,7 @@ export function QuickNoteInput({ onSubmit, disabled }: QuickNoteInputProps) {
       <Textarea
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Hızlı not ekle..."
+        placeholder={t('contacts.quickNote.placeholder')}
         rows={2}
         disabled={disabled || loading}
         onKeyDown={(e) => {

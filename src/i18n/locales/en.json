@@ -183,10 +183,11 @@
       "added": "Interaction added",
       "failed": "Failed to add",
       "notesPlaceholder": "Your notes...",
-      "subjectPlaceholder": "Short title..."
+      "subjectPlaceholder": "Short title...",
+      "empty": "No interactions yet.\nStart by adding a note."
     },
     "quickNote": {
-      "placeholder": "Quick note...",
+      "placeholder": "Add a quick note...",
       "added": "Note added"
     },
     "stage": {

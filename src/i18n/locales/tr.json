@@ -183,7 +183,8 @@
       "added": "Etkileşim eklendi",
       "failed": "Eklenemedi",
       "notesPlaceholder": "Notlarınız...",
-      "subjectPlaceholder": "Kısa başlık..."
+      "subjectPlaceholder": "Kısa başlık...",
+      "empty": "Henüz etkileşim kaydı yok.\nNot ekleyerek başla."
     },
     "quickNote": {
       "placeholder": "Hızlı not ekle...",
