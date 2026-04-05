@@ -19,23 +19,29 @@ type FormData = z.infer<typeof schema>
 export function ForgotPasswordPage() {
   const [sent, setSent] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
   const onSubmit = async (data: FormData) => {
     setError(null)
-    const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-      redirectTo: `${window.location.origin}${ROUTES.RESET_PASSWORD}`,
-    })
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
+        redirectTo: `${window.location.origin}${ROUTES.RESET_PASSWORD}`,
+      })
 
-    if (error) {
-      setError('Email gönderilirken bir hata oluştu. Lütfen tekrar deneyin.')
-      return
+      if (error) {
+        setError('Email gönderilirken bir hata oluştu. Lütfen tekrar deneyin.')
+        return
+      }
+
+      setSent(true)
+    } finally {
+      setLoading(false)
     }
-
-    setSent(true)
   }
 
   return (
@@ -95,8 +101,8 @@ export function ForgotPasswordPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Gönderiliyor...' : 'Sıfırlama Linki Gönder'}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Gönderiliyor...' : 'Sıfırlama Linki Gönder'}
             </Button>
 
             <Link to={ROUTES.LOGIN}>
