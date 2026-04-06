@@ -9,6 +9,16 @@
 - **Storage bucket:** `nmm-avatars`
 - **Brand:** "Network Marketing Master" (TR ve EN'de AYNI, asla çevirme)
 
+## 🪙 TOKEN EKONOMİSİ
+
+- CLAUDE.md ve docs/*.md dosyalarını seans başında BİR KEZ oku, tekrar okuma
+- "Tüm dosyaları kontrol et" türü geniş taramalar yapma
+- Sadece değiştirdiğin dosyalarla ilgili pattern'i hatırla
+- Self-test yaparken sadece ETKİLENEN dosyaları aç, full repo gezme
+- "Tamamlandı" özetini KISA tut (3-5 satır), tablo ve uzun raporlar yazma
+- grep/find komutlarını dar kapsamlı kullan (`src/components/calendar/` gibi)
+- Açtığın dosyada gereksiz değişiklik yapma — sadece istenen yer
+
 ## 🎯 SEANS BAŞLANGIÇ PROSEDÜRÜ
 
 Her yeni seansta ŞUNU YAP:
