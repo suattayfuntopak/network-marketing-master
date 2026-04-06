@@ -36,7 +36,6 @@ interface EditingStage {
   id: string | null // null = new
   name: string
   color: StageColor
-  win_probability: number
 }
 
 function SortableStageRow({
@@ -66,8 +65,9 @@ function SortableStageRow({
 
       <div className={cn('w-3 h-3 rounded-full shrink-0', colors.badge.replace('bg-', 'bg-').split(' ')[0])} />
 
-      <span className="flex-1 text-sm font-medium">{stage.name}</span>
-      <span className="text-xs text-muted-foreground shrink-0">{stage.win_probability}%</span>
+      <span className="flex-1 text-sm font-medium">
+        {t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })}
+      </span>
 
       <div className="flex gap-1 shrink-0">
         <button
@@ -125,12 +125,12 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
         slug: editing.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
         color: editing.color,
         position: localStages.length,
-        win_probability: editing.win_probability,
+        win_probability: 50,
       })
     } else {
       await updateStage.mutateAsync({
         id: editing.id,
-        data: { name: editing.name, color: editing.color, win_probability: editing.win_probability },
+        data: { name: editing.name, color: editing.color },
       })
     }
     setEditing(null)
@@ -158,7 +158,7 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
                     key={s.id}
                     stage={s}
                     userId={userId}
-                    onEdit={(st) => setEditing({ id: st.id, name: st.name, color: st.color, win_probability: st.win_probability })}
+                    onEdit={(st) => setEditing({ id: st.id, name: st.name, color: st.color })}
                     onDelete={handleDelete}
                   />
                 ))}
@@ -192,17 +192,6 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
                   ))}
                 </div>
               </div>
-              <div>
-                <label className="text-xs text-muted-foreground">{t('pipeline.deal.probability')} (%)</label>
-                <Input
-                  type="number"
-                  min={0}
-                  max={100}
-                  value={editing.win_probability}
-                  onChange={(e) => setEditing({ ...editing, win_probability: Number(e.target.value) })}
-                  className="mt-1"
-                />
-              </div>
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleSave} disabled={!editing.name.trim()}>
                   <Check className="w-3.5 h-3.5 mr-1" />
@@ -219,7 +208,7 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
               variant="outline"
               size="sm"
               className="w-full gap-1.5"
-              onClick={() => setEditing({ id: null, name: '', color: 'blue', win_probability: 50 })}
+              onClick={() => setEditing({ id: null, name: '', color: 'blue' })}
             >
               <Plus className="w-4 h-4" />
               {t('pipeline.stage.new')}
