@@ -424,7 +424,9 @@
       "meetingUrl": "Meeting URL",
       "description": "Description",
       "edit": "Edit Appointment",
-      "online": "Online"
+      "online": "Online",
+      "created": "Appointment created",
+      "updated": "Appointment updated"
     }
   },
   "followUps": {

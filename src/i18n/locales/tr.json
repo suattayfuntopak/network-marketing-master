@@ -424,7 +424,9 @@
       "meetingUrl": "Meeting URL",
       "description": "Açıklama",
       "edit": "Randevuyu Düzenle",
-      "online": "Online"
+      "online": "Online",
+      "created": "Randevu oluşturuldu",
+      "updated": "Randevu güncellendi"
     }
   },
   "followUps": {

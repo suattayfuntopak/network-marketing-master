@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { format, addHours } from 'date-fns'
-import { Search } from 'lucide-react'
+import { Search, Loader2 } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,9 +34,7 @@ interface Props {
 }
 
 function toLocalDateTime(iso: string) {
-  // Convert ISO to datetime-local input value
-  const d = new Date(iso)
-  return format(d, "yyyy-MM-dd'T'HH:mm")
+  return format(new Date(iso), "yyyy-MM-dd'T'HH:mm")
 }
 
 export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAppointment }: Props) {
@@ -46,7 +46,7 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
   const defaultStart = defaultDate ?? new Date()
   const defaultEnd   = addHours(defaultStart, 1)
 
-  const { register, handleSubmit, reset, watch, formState: { isSubmitting } } = useForm<FormValues>({
+  const { register, handleSubmit, reset, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       type: 'meeting',
       starts_at: format(defaultStart, "yyyy-MM-dd'T'HH:mm"),
@@ -55,13 +55,31 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
     },
   })
 
+  // ── Manual loading state (replaces isSubmitting) ──────────────
+  const [loading, setLoading] = useState(false)
+
+  // ── Contact search ────────────────────────────────────────────
   const [contactSearch, setContactSearch] = useState('')
-  const [contacts, setContacts] = useState<ContactOption[]>([])
   const [selectedContact, setSelectedContact] = useState<ContactOption | null>(null)
   const [showContactList, setShowContactList] = useState(false)
-  const allDay = watch('all_day')
 
-  // Populate on edit
+  const { data: contactResults = [], isFetching: searchFetching } = useQuery({
+    queryKey: ['contact-search', contactSearch],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('nmm_contacts')
+        .select('id, full_name, phone')
+        .eq('is_archived', false)
+        .ilike('full_name', `%${contactSearch}%`)
+        .limit(10)
+      if (error) console.error('[ContactSearch] Error:', error)
+      return (data ?? []) as ContactOption[]
+    },
+    enabled: open && contactSearch.length >= 2,
+    staleTime: 10_000,
+  })
+
+  // ── Populate on edit ──────────────────────────────────────────
   useEffect(() => {
     if (editAppointment && open) {
       reset({
@@ -74,53 +92,51 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
         all_day: editAppointment.all_day,
         description: editAppointment.description ?? '',
       })
-      setSelectedContact(editAppointment.contact ? { id: editAppointment.contact.id, full_name: editAppointment.contact.full_name, phone: editAppointment.contact.phone } : null)
+      if (editAppointment.contact) {
+        setSelectedContact({ id: editAppointment.contact.id, full_name: editAppointment.contact.full_name, phone: editAppointment.contact.phone })
+      }
     }
   }, [editAppointment, open, reset])
 
-  // Contact search
-  useEffect(() => {
-    if (!contactSearch.trim() || !open) { setContacts([]); return }
-    const timer = setTimeout(async () => {
-      const { data } = await supabase
-        .from('nmm_contacts')
-        .select('id, full_name, phone')
-        .eq('user_id', userId)
-        .eq('is_archived', false)
-        .ilike('full_name', `%${contactSearch}%`)
-        .limit(8)
-      setContacts((data as ContactOption[]) ?? [])
-    }, 250)
-    return () => clearTimeout(timer)
-  }, [contactSearch, userId, open])
+  const allDay = watch('all_day')
 
   const onSubmit = async (values: FormValues) => {
-    const data = {
-      user_id: userId,
-      contact_id: selectedContact?.id ?? null,
-      title: values.title,
-      type: values.type,
-      location: values.location || null,
-      meeting_url: values.meeting_url || null,
-      starts_at: new Date(values.starts_at).toISOString(),
-      ends_at: new Date(values.ends_at).toISOString(),
-      all_day: values.all_day,
-      description: values.description || null,
+    if (loading) return
+    setLoading(true)
+    try {
+      const data = {
+        user_id: userId,
+        contact_id: selectedContact?.id ?? null,
+        title: values.title,
+        type: values.type,
+        location: values.location || null,
+        meeting_url: values.meeting_url || null,
+        starts_at: new Date(values.starts_at).toISOString(),
+        ends_at: new Date(values.ends_at).toISOString(),
+        all_day: values.all_day,
+        description: values.description || null,
+      }
+      if (isEdit && editAppointment) {
+        await updateAppt.mutateAsync({ id: editAppointment.id, data })
+      } else {
+        await createAppt.mutateAsync(data)
+      }
+      toast.success(isEdit ? t('calendar.appointment.updated') : t('calendar.appointment.created'))
+      handleClose()
+    } catch (err: unknown) {
+      console.error('[NewAppointmentModal] Submit error:', err)
+      const msg = err instanceof Error ? err.message : t('common.unknownError')
+      toast.error(msg)
+    } finally {
+      setLoading(false)
     }
-
-    if (isEdit && editAppointment) {
-      await updateAppt.mutateAsync({ id: editAppointment.id, data })
-    } else {
-      await createAppt.mutateAsync(data)
-    }
-    handleClose()
   }
 
   const handleClose = () => {
     reset()
     setSelectedContact(null)
     setContactSearch('')
-    setContacts([])
+    setShowContactList(false)
     onClose()
   }
 
@@ -130,7 +146,9 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
     <Dialog open={open} onOpenChange={v => !v && handleClose()}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? t('calendar.appointment.edit') : t('calendar.newAppointment')}</DialogTitle>
+          <DialogTitle>
+            {isEdit ? t('calendar.appointment.edit') : t('calendar.newAppointment')}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-2">
@@ -150,19 +168,23 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
             </select>
           </div>
 
-          {/* Contact */}
+          {/* Contact — optional */}
           <div>
-            <label className="text-sm font-medium mb-1.5 block">{t('contacts.title')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></label>
+            <label className="text-sm font-medium mb-1.5 block">
+              {t('contacts.title')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span>
+            </label>
             {selectedContact ? (
               <div className="flex items-center justify-between border rounded-md px-3 py-2 bg-muted/30">
                 <span className="text-sm">{selectedContact.full_name}</span>
-                <button type="button" className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setSelectedContact(null)}>
+                <button type="button" className="text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => { setSelectedContact(null); setContactSearch('') }}>
                   {t('common.edit')}
                 </button>
               </div>
             ) : (
               <div className="relative">
                 <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-muted-foreground" />
+                {searchFetching && <Loader2 className="absolute right-2.5 top-2.5 w-4 h-4 text-muted-foreground animate-spin" />}
                 <Input
                   placeholder={t('contacts.searchPlaceholder')}
                   value={contactSearch}
@@ -170,9 +192,12 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
                   onFocus={() => setShowContactList(true)}
                   className="pl-8"
                 />
-                {showContactList && contacts.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 z-50 bg-popover border rounded-md shadow-md mt-1 max-h-40 overflow-y-auto">
-                    {contacts.map(c => (
+                {showContactList && contactSearch.length >= 2 && (
+                  <div className="absolute top-full left-0 right-0 z-50 bg-popover border rounded-md shadow-md mt-1 max-h-48 overflow-y-auto">
+                    {contactResults.length === 0 && !searchFetching && (
+                      <p className="px-3 py-2 text-sm text-muted-foreground">{t('contacts.notFound')}</p>
+                    )}
+                    {contactResults.map(c => (
                       <button key={c.id} type="button"
                         className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors"
                         onClick={() => { setSelectedContact(c); setShowContactList(false); setContactSearch('') }}>
@@ -225,13 +250,22 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
 
           {/* Description */}
           <div>
-            <label className="text-sm font-medium mb-1.5 block">{t('calendar.appointment.description')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span></label>
-            <textarea {...register('description')} rows={2} className="w-full border rounded-md px-3 py-2 text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring" />
+            <label className="text-sm font-medium mb-1.5 block">
+              {t('calendar.appointment.description')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span>
+            </label>
+            <textarea {...register('description')} rows={2}
+              className="w-full border rounded-md px-3 py-2 text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring" />
           </div>
 
           <div className="flex justify-end gap-2 pt-1">
-            <Button type="button" variant="ghost" onClick={handleClose}>{t('common.cancel')}</Button>
-            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? t('common.saving') : t('common.save')}</Button>
+            <Button type="button" variant="ghost" onClick={handleClose} disabled={loading}>
+              {t('common.cancel')}
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading
+                ? <><Loader2 className="w-4 h-4 mr-1.5 animate-spin" />{t('common.saving')}</>
+                : t('common.save')}
+            </Button>
           </div>
         </form>
       </DialogContent>
