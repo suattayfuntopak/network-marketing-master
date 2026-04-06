@@ -73,6 +73,13 @@ export async function completeFollowUp(id: string): Promise<void> {
   })
 }
 
+export async function uncompleteFollowUp(id: string): Promise<void> {
+  await updateFollowUp(id, {
+    status: 'pending',
+    completed_at: null,
+  })
+}
+
 export async function snoozeFollowUp(id: string, until: Date): Promise<void> {
   await updateFollowUp(id, {
     status: 'snoozed',

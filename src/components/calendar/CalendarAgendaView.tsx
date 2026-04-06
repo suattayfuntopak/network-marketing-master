@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { format, isSameDay, parseISO, addDays, eachDayOfInterval } from 'date-fns'
 import { MapPin, Video, Phone, Coffee, Users, Calendar, Bell, ExternalLink } from 'lucide-react'
@@ -6,7 +5,6 @@ import { cn } from '@/lib/utils'
 import { getLocale, fmtTime, relativeDay, isToday } from '@/lib/calendar/dateHelpers'
 import { APPOINTMENT_TYPE_COLORS, PRIORITY_COLORS } from '@/lib/calendar/constants'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
-import { ROUTES } from '@/lib/constants'
 
 const APT_ICONS = { meeting: Users, call: Phone, video_call: Video, presentation: Users, coffee: Coffee, event: Calendar, other: Calendar }
 
@@ -15,11 +13,11 @@ interface Props {
   appointments: AppointmentWithContact[]
   followUps: FollowUpWithContact[]
   onAddAppointment: () => void
+  onAppointmentClick?: (apt: AppointmentWithContact) => void
 }
 
-export function CalendarAgendaView({ currentDate, appointments, followUps, onAddAppointment }: Props) {
+export function CalendarAgendaView({ currentDate, appointments, followUps, onAddAppointment, onAppointmentClick }: Props) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const locale = getLocale()
 
   const days = eachDayOfInterval({ start: currentDate, end: addDays(currentDate, 29) })
@@ -68,7 +66,7 @@ export function CalendarAgendaView({ currentDate, appointments, followUps, onAdd
                 return (
                   <div
                     key={apt.id}
-                    onClick={() => navigate(`${ROUTES.CALENDAR}/${apt.id}`)}
+                    onClick={() => onAppointmentClick?.(apt)}
                     className="flex items-start gap-3 px-4 py-3 hover:bg-muted/30 cursor-pointer transition-colors"
                   >
                     <div className={cn('flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5', colors)}>
@@ -102,7 +100,7 @@ export function CalendarAgendaView({ currentDate, appointments, followUps, onAdd
               {dayFups.map(fu => (
                 <div
                   key={fu.id}
-                  onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}
+                  onClick={() => {}}
                   className="flex items-start gap-3 px-4 py-3 hover:bg-muted/30 cursor-pointer transition-colors"
                 >
                   <div className="flex items-center justify-center w-8 h-8 rounded-full shrink-0 mt-0.5 bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">

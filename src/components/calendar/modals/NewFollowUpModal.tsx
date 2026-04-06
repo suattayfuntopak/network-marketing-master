@@ -132,10 +132,10 @@ export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defa
       }
       if (isEdit && editFollowUp) {
         await updateFollowUp.mutateAsync({ id: editFollowUp.id, data })
-        toast.success(t('followUps.updated'))
+        // toast shown by mutation hook (useUpdateFollowUp)
       } else {
         await createFollowUp.mutateAsync(data)
-        toast.success(t('followUps.created'))
+        // toast shown by mutation hook (useCreateFollowUp)
       }
       handleClose()
     } catch (err: unknown) {

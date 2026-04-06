@@ -1,11 +1,9 @@
-import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MapPin, Video, Clock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import type { AppointmentWithContact } from '@/lib/calendar/types'
-import { ROUTES } from '@/lib/constants'
 
 interface Props {
   appointment: AppointmentWithContact
@@ -13,17 +11,17 @@ interface Props {
   compact?: boolean
   style?: React.CSSProperties
   className?: string
+  onClick?: (appointment: AppointmentWithContact) => void
 }
 
-export function AppointmentCard({ appointment, compact, style, className }: Props) {
+export function AppointmentCard({ appointment, compact, style, className, onClick }: Props) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const colors = APPOINTMENT_TYPE_COLORS[appointment.type] ?? APPOINTMENT_TYPE_COLORS.other
 
   if (compact) {
     return (
       <div
-        onClick={() => navigate(`${ROUTES.CALENDAR}/${appointment.id}`)}
+        onClick={() => onClick?.(appointment)}
         style={style}
         className={cn(
           'absolute left-0.5 right-0.5 rounded px-1.5 py-0.5 text-xs cursor-pointer overflow-hidden',
@@ -42,7 +40,7 @@ export function AppointmentCard({ appointment, compact, style, className }: Prop
 
   return (
     <div
-      onClick={() => navigate(`${ROUTES.CALENDAR}/${appointment.id}`)}
+      onClick={() => onClick?.(appointment)}
       className={cn(
         'rounded-lg border p-3 cursor-pointer hover:shadow-sm transition-shadow',
         colors,

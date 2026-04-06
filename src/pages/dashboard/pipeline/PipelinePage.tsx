@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutGrid, List, TrendingUp, Settings2, Plus } from 'lucide-react'
+import { LayoutGrid, List, Settings2, Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,11 +9,10 @@ import { usePipelineStages, useDeals } from '@/hooks/usePipeline'
 import type { StageWithDeals, DealFilters, DealType } from '@/lib/pipeline/types'
 import { KanbanBoard } from '@/components/pipeline/KanbanBoard'
 import { PipelineTableView } from './PipelineTableView'
-import { PipelineForecastView } from './PipelineForecastView'
 import { NewDealModal } from './modals/NewDealModal'
 import { ManageStagesModal } from './modals/ManageStagesModal'
 
-type ViewMode = 'kanban' | 'table' | 'forecast'
+type ViewMode = 'kanban' | 'table'
 
 export function PipelinePage() {
   const { t } = useTranslation()
@@ -79,7 +78,6 @@ export function PipelinePage() {
             {([
               { key: 'kanban', icon: LayoutGrid },
               { key: 'table', icon: List },
-              { key: 'forecast', icon: TrendingUp },
             ] as const).map(({ key, icon: Icon }) => (
               <button
                 key={key}
@@ -135,7 +133,6 @@ export function PipelinePage() {
             </div>
           )}
           {view === 'table' && <PipelineTableView deals={deals} stages={stages} />}
-          {view === 'forecast' && <PipelineForecastView deals={deals} />}
         </div>
       )}
 

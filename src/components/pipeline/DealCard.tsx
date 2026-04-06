@@ -2,13 +2,12 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { format, isPast, parseISO } from 'date-fns'
-import { tr, enUS } from 'date-fns/locale'
-import i18n from '@/i18n'
-import { Calendar, GripVertical, TrendingUp } from 'lucide-react'
+import { formatDistanceToNow, parseISO } from 'date-fns'
+import { GripVertical } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
-import { DEAL_TYPE_COLORS, formatCurrency } from '@/lib/pipeline/constants'
+import { DEAL_TYPE_COLORS } from '@/lib/pipeline/constants'
+import { getLocale } from '@/lib/calendar/dateHelpers'
 import type { DealWithContact } from '@/lib/pipeline/types'
 
 interface Props {
@@ -19,7 +18,7 @@ interface Props {
 export function DealCard({ deal, isDragging }: Props) {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const locale = i18n.language?.startsWith('en') ? enUS : tr
+  const locale = getLocale()
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: isSortableDragging } = useSortable({
     id: deal.id,
@@ -31,7 +30,6 @@ export function DealCard({ deal, isDragging }: Props) {
     transition,
   }
 
-  const isOverdue = deal.expected_close_date && isPast(parseISO(deal.expected_close_date))
   const initials = deal.contact.full_name
     .split(' ')
     .map((n) => n[0])
@@ -72,28 +70,14 @@ export function DealCard({ deal, isDragging }: Props) {
         </div>
       </div>
 
-      {/* Value + probability */}
+      {/* Footer: type badge + creation date */}
       <div className="flex items-center justify-between mt-2.5 gap-2">
-        <span className="text-sm font-semibold text-foreground">
-          {formatCurrency(deal.value, deal.currency, i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR')}
-        </span>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <TrendingUp className="w-3 h-3" />
-          <span className="text-xs">{deal.probability}%</span>
-        </div>
-      </div>
-
-      {/* Footer: type badge + date */}
-      <div className="flex items-center justify-between mt-2 gap-2">
         <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', DEAL_TYPE_COLORS[deal.deal_type])}>
           {t(`pipeline.dealTypes.${deal.deal_type}`)}
         </span>
-        {deal.expected_close_date && (
-          <div className={cn('flex items-center gap-1 text-xs', isOverdue ? 'text-red-500' : 'text-muted-foreground')}>
-            <Calendar className="w-3 h-3" />
-            <span>{format(parseISO(deal.expected_close_date), 'd MMM', { locale })}</span>
-          </div>
-        )}
+        <span className="text-xs text-muted-foreground">
+          {formatDistanceToNow(parseISO(deal.created_at), { addSuffix: true, locale })}
+        </span>
       </div>
     </div>
   )
@@ -120,8 +104,7 @@ export function DealCardOverlay({ deal }: { deal: DealWithContact }) {
           <p className="text-sm font-medium leading-tight truncate">{deal.title}</p>
         </div>
       </div>
-      <div className="flex items-center justify-between mt-2.5">
-        <span className="text-sm font-semibold">{formatCurrency(deal.value, deal.currency)}</span>
+      <div className="mt-2">
         <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium', DEAL_TYPE_COLORS[deal.deal_type])}>
           {t(`pipeline.dealTypes.${deal.deal_type}`)}
         </span>

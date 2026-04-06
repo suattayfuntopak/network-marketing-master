@@ -5,7 +5,7 @@ import { format, parseISO, formatDistanceToNow } from 'date-fns'
 import { tr, enUS } from 'date-fns/locale'
 import i18n from '@/i18n'
 import {
-  ArrowLeft, CheckCircle, XCircle, RotateCcw, Calendar, TrendingUp,
+  ArrowLeft, CheckCircle, XCircle, RotateCcw, Calendar,
   User, ExternalLink, Clock, ChevronRight
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { useDeal, useStageHistory, usePipelineStages, useCloseDeal, useReopenDeal, useUpdateDeal } from '@/hooks/usePipeline'
-import { STAGE_COLOR_CLASSES, DEAL_TYPE_COLORS, DEAL_STATUS_COLORS, formatCurrency } from '@/lib/pipeline/constants'
+import { STAGE_COLOR_CLASSES, DEAL_TYPE_COLORS, DEAL_STATUS_COLORS } from '@/lib/pipeline/constants'
 import type { DealStatus } from '@/lib/pipeline/types'
 
 export function DealDetailPage() {
@@ -24,7 +24,6 @@ export function DealDetailPage() {
   const { user } = useAuth()
   const userId = user?.id ?? ''
   const locale = i18n.language?.startsWith('en') ? enUS : tr
-  const currLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
   const [showLostReason, setShowLostReason] = useState(false)
   const [lostReason, setLostReason] = useState('')
@@ -99,7 +98,7 @@ export function DealDetailPage() {
             </span>
             {currentStage && (
               <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', stageColors.badge)}>
-                {currentStage.name}
+                {t(`pipelineStages.${currentStage.slug}`, { defaultValue: currentStage.name })}
               </span>
             )}
           </div>
@@ -146,51 +145,20 @@ export function DealDetailPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Left: Deal info */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Key metrics */}
-          <Card>
-            <CardContent className="pt-5">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('pipeline.deal.value')}</p>
-                  <p className="text-xl font-bold mt-0.5">{formatCurrency(deal.value, deal.currency, currLocale)}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('pipeline.deal.probability')}</p>
-                  <div className="flex items-center gap-1.5 mt-0.5">
-                    <TrendingUp className="w-4 h-4 text-primary" />
-                    <p className="text-xl font-bold">{deal.probability}%</p>
+          {/* Actual close date (shown only when deal is won/lost) */}
+          {deal.actual_close_date && (
+            <Card>
+              <CardContent className="pt-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">{t('pipeline.deal.actualClose')}</p>
+                    <p className="text-sm font-medium">{format(parseISO(deal.actual_close_date), 'd MMMM yyyy', { locale })}</p>
                   </div>
                 </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">{t('pipeline.weightedValue')}</p>
-                  <p className="text-xl font-bold mt-0.5 text-primary">
-                    {formatCurrency((deal.value * deal.probability) / 100, deal.currency, currLocale)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
-                {deal.expected_close_date && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('pipeline.deal.expectedClose')}</p>
-                      <p className="text-sm font-medium">{format(parseISO(deal.expected_close_date), 'd MMMM yyyy', { locale })}</p>
-                    </div>
-                  </div>
-                )}
-                {deal.actual_close_date && (
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <div>
-                      <p className="text-xs text-muted-foreground">{t('pipeline.deal.actualClose')}</p>
-                      <p className="text-sm font-medium">{format(parseISO(deal.actual_close_date), 'd MMMM yyyy', { locale })}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Stage selector */}
           {deal.status === 'open' && (
@@ -214,7 +182,7 @@ export function DealDetailPage() {
                             : 'text-muted-foreground border-border hover:border-muted-foreground'
                         )}
                       >
-                        {stage.name}
+                        {t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })}
                       </button>
                     )
                   })}

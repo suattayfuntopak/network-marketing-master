@@ -256,6 +256,15 @@
     "joined": "Katıldı",
     "lost": "Kaybedildi"
   },
+  "pipelineStages": {
+    "new": "Yeni Aday",
+    "contacted": "İletişim Kuruldu",
+    "interested": "İlgileniyor",
+    "presenting": "Sunum Yapıldı",
+    "thinking": "Düşünüyor",
+    "joined": "Katıldı",
+    "lost": "Kaybedildi"
+  },
   "contactSources": {
     "manual": "Manuel",
     "referral": "Tavsiye",
@@ -490,7 +499,9 @@
     "updated": "Takip güncellendi",
     "deleted": "Takip silindi",
     "completed": "Takip tamamlandı",
-    "snoozed": "Takip ertelendi"
+    "uncompleted": "Takip yeniden açıldı",
+    "snoozed": "Takip ertelendi",
+    "undoComplete": "Geri Al"
   },
   "landing": {
     "nav": {

@@ -74,6 +74,11 @@ export function CalendarPage() {
     }
   }, [permission, requestPermission])
 
+  const handleAppointmentClick = (apt: AppointmentWithContact) => {
+    setEditAppointment(apt)
+    setShowAppointmentModal(true)
+  }
+
   const handlePrev = () => {
     if (view === 'month' || view === 'agenda') setCurrentDate(prevMonth(currentDate))
     else if (view === 'week') setCurrentDate(prevWeek(currentDate))
@@ -177,6 +182,7 @@ export function CalendarPage() {
             followUps={followUps}
             onDayClick={handleDayClick}
             onAddClick={(date) => { setSelectedDate(date); setShowAppointmentModal(true) }}
+            onAppointmentClick={handleAppointmentClick}
           />
         )}
         {view === 'week' && (
@@ -185,6 +191,7 @@ export function CalendarPage() {
             appointments={appointments}
             followUps={followUps}
             onDayClick={handleDayClick}
+            onAppointmentClick={handleAppointmentClick}
           />
         )}
         {view === 'day' && (
@@ -194,6 +201,7 @@ export function CalendarPage() {
             followUps={followUps}
             userId={userId}
             onEditFollowUp={(fu) => { setEditFollowUp(fu); setShowFollowUpModal(true) }}
+            onAppointmentClick={handleAppointmentClick}
           />
         )}
         {view === 'agenda' && (
@@ -202,6 +210,7 @@ export function CalendarPage() {
             appointments={appointments}
             followUps={followUps}
             onAddAppointment={() => setShowAppointmentModal(true)}
+            onAppointmentClick={handleAppointmentClick}
           />
         )}
       </div>

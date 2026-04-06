@@ -16,6 +16,7 @@ interface Props {
   appointments: AppointmentWithContact[]
   followUps: FollowUpWithContact[]
   onDayClick: (date: Date) => void
+  onAppointmentClick?: (apt: AppointmentWithContact) => void
 }
 
 function aptTopPct(apt: AppointmentWithContact): number {
@@ -31,7 +32,7 @@ function aptHeightPx(apt: AppointmentWithContact): number {
   return Math.max(18, dur * HOUR_PX / 60)
 }
 
-export function CalendarWeekView({ currentDate, appointments, followUps, onDayClick }: Props) {
+export function CalendarWeekView({ currentDate, appointments, followUps, onDayClick, onAppointmentClick }: Props) {
   const { t } = useTranslation()
   const locale = getLocale()
   const days = buildWeekDays(currentDate)
@@ -132,6 +133,7 @@ export function CalendarWeekView({ currentDate, appointments, followUps, onDayCl
                     appointment={apt}
                     compact
                     style={{ top: aptTopPct(apt), height: aptHeightPx(apt) }}
+                    onClick={onAppointmentClick}
                   />
                 ))}
               </div>

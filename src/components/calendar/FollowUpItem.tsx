@@ -8,7 +8,7 @@ import {
 import { cn } from '@/lib/utils'
 import { getLocale } from '@/lib/calendar/dateHelpers'
 import { PRIORITY_COLORS, PRIORITY_DOT } from '@/lib/calendar/constants'
-import { useCompleteFollowUp, useSnoozeFollowUp, useDeleteFollowUp } from '@/hooks/useCalendar'
+import { useCompleteFollowUp, useUncompleteFollowUp, useSnoozeFollowUp, useDeleteFollowUp } from '@/hooks/useCalendar'
 import type { FollowUpWithContact } from '@/lib/calendar/types'
 
 const ACTION_ICONS = {
@@ -39,9 +39,10 @@ export function FollowUpItem({ followUp, userId, onEdit }: Props) {
   const locale = getLocale()
   const [showSnooze, setShowSnooze] = useState(false)
 
-  const completeFollowUp = useCompleteFollowUp(userId)
-  const snoozeFollowUp   = useSnoozeFollowUp(userId)
-  const deleteFollowUp   = useDeleteFollowUp(userId)
+  const completeFollowUp   = useCompleteFollowUp(userId)
+  const uncompleteFollowUp = useUncompleteFollowUp(userId)
+  const snoozeFollowUp     = useSnoozeFollowUp(userId)
+  const deleteFollowUp     = useDeleteFollowUp(userId)
 
   const Icon = ACTION_ICONS[followUp.action_type] ?? MoreHorizontal
   const isCompleted = followUp.status === 'completed'
@@ -83,6 +84,15 @@ export function FollowUpItem({ followUp, userId, onEdit }: Props) {
             <p className="text-xs text-muted-foreground truncate">{followUp.contact.full_name}</p>
           </div>
           {/* Actions */}
+          {isCompleted && (
+            <button
+              onClick={() => uncompleteFollowUp.mutate(followUp.id)}
+              disabled={uncompleteFollowUp.isPending}
+              className="text-xs px-2 py-1 rounded-md border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors shrink-0"
+            >
+              {t('followUps.undoComplete')}
+            </button>
+          )}
           {!isCompleted && (
             <div className="flex items-center gap-1 shrink-0">
               {/* Snooze */}

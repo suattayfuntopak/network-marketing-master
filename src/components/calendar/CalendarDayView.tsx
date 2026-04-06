@@ -26,9 +26,10 @@ interface Props {
   followUps: FollowUpWithContact[]
   userId: string
   onEditFollowUp: (fu: FollowUpWithContact) => void
+  onAppointmentClick?: (apt: AppointmentWithContact) => void
 }
 
-export function CalendarDayView({ currentDate, appointments, followUps, userId, onEditFollowUp }: Props) {
+export function CalendarDayView({ currentDate, appointments, followUps, userId, onEditFollowUp, onAppointmentClick }: Props) {
   const { t } = useTranslation()
   const dayApts = appointments.filter(a => isSameDay(parseISO(a.starts_at), currentDate))
   const dayFups = followUps.filter(f => isSameDay(parseISO(f.due_at), currentDate) && f.status === 'pending')
@@ -62,7 +63,7 @@ export function CalendarDayView({ currentDate, appointments, followUps, userId, 
       {allDayApts.length > 0 && (
         <div className="border-b px-4 py-2 shrink-0 space-y-1">
           {allDayApts.map(apt => (
-            <AppointmentCard key={apt.id} appointment={apt} />
+            <AppointmentCard key={apt.id} appointment={apt} onClick={onAppointmentClick} />
           ))}
         </div>
       )}
@@ -111,6 +112,7 @@ export function CalendarDayView({ currentDate, appointments, followUps, userId, 
                 appointment={apt}
                 compact
                 style={{ top: aptTop(apt), height: aptHeight(apt) }}
+                onClick={onAppointmentClick}
               />
             ))}
           </div>

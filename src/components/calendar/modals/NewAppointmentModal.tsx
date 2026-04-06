@@ -121,7 +121,7 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
       } else {
         await createAppt.mutateAsync(data)
       }
-      toast.success(isEdit ? t('calendar.appointment.updated') : t('calendar.appointment.created'))
+      // toast shown by mutation hook (useCreateAppointment / useUpdateAppointment)
       handleClose()
     } catch (err: unknown) {
       console.error('[NewAppointmentModal] Submit error:', err)

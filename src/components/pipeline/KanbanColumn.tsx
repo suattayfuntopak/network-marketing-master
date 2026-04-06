@@ -3,10 +3,9 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
 import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { STAGE_COLOR_CLASSES, formatCurrency } from '@/lib/pipeline/constants'
+import { STAGE_COLOR_CLASSES } from '@/lib/pipeline/constants'
 import type { StageWithDeals } from '@/lib/pipeline/types'
 import { DealCard } from './DealCard'
-import i18n from '@/i18n'
 
 interface Props {
   stage: StageWithDeals
@@ -17,7 +16,6 @@ interface Props {
 export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
   const { t } = useTranslation()
   const colors = STAGE_COLOR_CLASSES[stage.color]
-  const locale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
   const { setNodeRef } = useDroppable({ id: stage.id, data: { type: 'stage', stage } })
 
@@ -29,17 +27,14 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
       <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', colors.border, colors.bg)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            <h3 className={cn('text-sm font-semibold truncate', colors.text)}>{stage.name}</h3>
+            <h3 className={cn('text-sm font-semibold truncate', colors.text)}>
+              {t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })}
+            </h3>
             <span className={cn('text-xs px-1.5 py-0.5 rounded-full font-medium shrink-0', colors.badge)}>
               {stage.deals.length}
             </span>
           </div>
         </div>
-        {stage.totalValue > 0 && (
-          <p className="text-xs text-muted-foreground mt-0.5 font-normal">
-            {formatCurrency(stage.totalValue, 'TRY', locale)}
-          </p>
-        )}
       </div>
 
       {/* Drop area */}

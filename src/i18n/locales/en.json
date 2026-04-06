@@ -256,6 +256,15 @@
     "joined": "Joined",
     "lost": "Lost"
   },
+  "pipelineStages": {
+    "new": "New Prospect",
+    "contacted": "Contacted",
+    "interested": "Interested",
+    "presenting": "Presenting",
+    "thinking": "Thinking",
+    "joined": "Joined",
+    "lost": "Lost"
+  },
   "contactSources": {
     "manual": "Manual",
     "referral": "Referral",
@@ -490,7 +499,9 @@
     "updated": "Follow-up updated",
     "deleted": "Follow-up deleted",
     "completed": "Follow-up completed",
-    "snoozed": "Follow-up snoozed"
+    "uncompleted": "Follow-up reopened",
+    "snoozed": "Follow-up snoozed",
+    "undoComplete": "Undo"
   },
   "landing": {
     "nav": {

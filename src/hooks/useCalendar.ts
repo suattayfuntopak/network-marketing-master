@@ -10,7 +10,7 @@ import {
   createAppointment, updateAppointment, deleteAppointment,
   completeAppointment, cancelAppointment,
   createFollowUp, updateFollowUp, deleteFollowUp,
-  completeFollowUp, snoozeFollowUp,
+  completeFollowUp, uncompleteFollowUp, snoozeFollowUp,
 } from '@/lib/calendar/mutations'
 import type { AppointmentInsert, AppointmentUpdate, FollowUpInsert, FollowUpUpdate, FollowUpStatus } from '@/lib/calendar/types'
 
@@ -37,6 +37,7 @@ export function useAppointments(userId: string, from?: Date, to?: Date) {
     queryKey: calendarKeys.appointmentsRange(userId, from?.toISOString(), to?.toISOString()),
     queryFn: () => fetchAppointments(userId, from, to),
     enabled: !!userId,
+    staleTime: 30_000,
   })
 }
 
@@ -79,7 +80,8 @@ export function useFollowUpBuckets(userId: string) {
     queryKey: calendarKeys.followUpBuckets(userId),
     queryFn: () => fetchFollowUpBuckets(userId),
     enabled: !!userId,
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: 'always',
   })
 }
 
@@ -243,6 +245,22 @@ export function useCompleteFollowUp(userId: string) {
       qc.invalidateQueries({ queryKey: calendarKeys.todayFollowUpsCount(userId) })
       qc.invalidateQueries({ queryKey: calendarKeys.overdueCount(userId) })
       toast.success(t('followUps.actions.complete') + ' ✓')
+    },
+    onError: () => toast.error(t('common.unknownError')),
+  })
+}
+
+export function useUncompleteFollowUp(userId: string) {
+  const qc = useQueryClient()
+  const { t } = useTranslation()
+  return useMutation({
+    mutationFn: (id: string) => uncompleteFollowUp(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: calendarKeys.followUps(userId) })
+      qc.invalidateQueries({ queryKey: calendarKeys.followUpBuckets(userId) })
+      qc.invalidateQueries({ queryKey: calendarKeys.todayFollowUpsCount(userId) })
+      qc.invalidateQueries({ queryKey: calendarKeys.overdueCount(userId) })
+      toast.success(t('followUps.uncompleted'))
     },
     onError: () => toast.error(t('common.unknownError')),
   })
