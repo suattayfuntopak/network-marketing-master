@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Plus, Check, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { TagChip } from './TagChip'
@@ -25,6 +26,7 @@ export function TagSelector({
   onCreateTag,
   disabled,
 }: TagSelectorProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const [creating, setCreating] = useState(false)
@@ -33,9 +35,9 @@ export function TagSelector({
   const [loading, setLoading] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const selectedTags = allTags.filter((t) => selectedTagIds.includes(t.id))
-  const filtered = allTags.filter((t) =>
-    t.name.toLowerCase().includes(search.toLowerCase())
+  const selectedTags = allTags.filter((tg) => selectedTagIds.includes(tg.id))
+  const filtered = allTags.filter((tg) =>
+    tg.name.toLowerCase().includes(search.toLowerCase())
   )
 
   useEffect(() => {
@@ -81,7 +83,7 @@ export function TagSelector({
             className="inline-flex items-center gap-1 rounded-full border border-dashed border-muted-foreground/40 px-2 py-0.5 text-xs text-muted-foreground hover:border-primary hover:text-primary transition-colors"
           >
             <Plus className="w-3 h-3" />
-            Etiket ekle
+            {t('contacts.tag.add')}
           </button>
         )}
       </div>
@@ -91,7 +93,7 @@ export function TagSelector({
         <div className="relative z-50">
           <div className="absolute top-0 left-0 w-64 rounded-lg border border-border bg-popover shadow-md p-2 space-y-2">
             <Input
-              placeholder="Etiket ara..."
+              placeholder={t('contacts.tag.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="h-7 text-xs"
@@ -101,7 +103,7 @@ export function TagSelector({
             <div className="max-h-40 overflow-y-auto space-y-0.5">
               {filtered.length === 0 && (
                 <p className="text-xs text-muted-foreground px-2 py-1">
-                  {search ? 'Etiket bulunamadı' : 'Henüz etiket yok'}
+                  {search ? t('contacts.tag.notFound') : t('contacts.tag.empty')}
                 </p>
               )}
               {filtered.map((tag) => {
@@ -129,12 +131,12 @@ export function TagSelector({
                     className="flex items-center gap-1.5 text-xs text-primary hover:underline w-full px-2"
                   >
                     <Plus className="w-3 h-3" />
-                    Yeni etiket oluştur
+                    {t('contacts.tag.createNew')}
                   </button>
                 ) : (
                   <div className="space-y-2">
                     <Input
-                      placeholder="Etiket adı"
+                      placeholder={t('contacts.tag.namePlaceholder')}
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
                       className="h-7 text-xs"
@@ -166,7 +168,7 @@ export function TagSelector({
                         onClick={handleCreate}
                         disabled={!newName.trim() || loading}
                       >
-                        Oluştur
+                        {t('common.save')}
                       </Button>
                       <Button
                         type="button"

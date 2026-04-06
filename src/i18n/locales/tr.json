@@ -195,12 +195,17 @@
       "changeError": "Güncelleme başarısız"
     },
     "tag": {
-      "add": "Etiket Ekle",
+      "add": "Etiket ekle",
       "remove": "Etiket Kaldır",
       "updated": "Etiket güncellendi",
       "error": "Etiket güncellenemedi",
       "added": "Etiket eklendi",
-      "removed": "Etiket kaldırıldı"
+      "removed": "Etiket kaldırıldı",
+      "search": "Etiket ara...",
+      "notFound": "Etiket bulunamadı",
+      "empty": "Henüz etiket yok",
+      "createNew": "Yeni etiket oluştur",
+      "namePlaceholder": "Etiket adı"
     },
     "bulk": {
       "stage": "Aşama",
@@ -281,12 +286,12 @@
   },
   "pipeline": {
     "title": "Süreç Takibi",
-    "newDeal": "Yeni Deal",
+    "newDeal": "Yeni Fırsat",
     "manageStages": "Aşamaları Yönet",
-    "emptyColumn": "Bu aşamada deal yok",
+    "emptyColumn": "Bu aşamada fırsat yok",
     "totalValue": "Toplam Değer",
     "weightedValue": "Ağırlıklı Değer",
-    "noDeals": "Henüz deal yok",
+    "noDeals": "Henüz fırsat yok",
     "stageHistory": "Aşama Geçmişi",
     "views": {
       "kanban": "Kanban",
@@ -303,17 +308,17 @@
       "stage": "Aşama",
       "type": "Tip",
       "notes": "Notlar",
-      "wonBtn": "Kazandı",
+      "wonBtn": "Kazanıldı",
       "lostBtn": "Kaybedildi",
       "lostReason": "Kayıp Sebebi",
       "lostReasonPlaceholder": "Neden kaybedildi?",
       "reopen": "Yeniden Aç",
-      "created": "Deal oluşturuldu",
-      "updated": "Deal güncellendi",
-      "deleted": "Deal silindi",
-      "won": "Deal kazanıldı 🎉",
-      "lost": "Deal kaybedildi",
-      "reopened": "Deal yeniden açıldı"
+      "created": "Fırsat oluşturuldu",
+      "updated": "Fırsat güncellendi",
+      "deleted": "Fırsat silindi",
+      "won": "Fırsat kazanıldı 🎉",
+      "lost": "Fırsat kaybedildi",
+      "reopened": "Fırsat yeniden açıldı"
     },
     "dealTypes": {
       "prospect": "Aday",
@@ -335,9 +340,9 @@
       "color": "Renk"
     },
     "forecast": {
-      "openDeals": "Açık Deallar",
-      "deal_one": "deal",
-      "deal_other": "deal"
+      "openDeals": "Açık Fırsatlar",
+      "deal_one": "fırsat",
+      "deal_other": "fırsat"
     }
   },
   "dashboard": {

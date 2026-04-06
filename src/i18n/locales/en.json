@@ -195,12 +195,17 @@
       "changeError": "Update failed"
     },
     "tag": {
-      "add": "Add Tag",
+      "add": "Add tag",
       "remove": "Remove Tag",
       "updated": "Tag updated",
       "error": "Failed to update tag",
       "added": "Tag added",
-      "removed": "Tag removed"
+      "removed": "Tag removed",
+      "search": "Search tags...",
+      "notFound": "No tags found",
+      "empty": "No tags yet",
+      "createNew": "Create new tag",
+      "namePlaceholder": "Tag name"
     },
     "bulk": {
       "stage": "Stage",

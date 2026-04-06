@@ -35,14 +35,11 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
             </span>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mt-1 font-medium">
-          {formatCurrency(stage.totalValue, 'TRY', locale)}
-          {stage.weightedValue > 0 && stage.weightedValue !== stage.totalValue && (
-            <span className="ml-1 opacity-60">
-              ({formatCurrency(stage.weightedValue, 'TRY', locale)})
-            </span>
-          )}
-        </p>
+        {stage.totalValue > 0 && (
+          <p className="text-xs text-muted-foreground mt-0.5 font-normal">
+            {formatCurrency(stage.totalValue, 'TRY', locale)}
+          </p>
+        )}
       </div>
 
       {/* Drop area */}

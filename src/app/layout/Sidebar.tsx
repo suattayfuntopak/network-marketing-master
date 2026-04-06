@@ -40,33 +40,34 @@ export function Sidebar() {
       )}
     >
       {/* Logo + collapse toggle */}
-      <div className={cn(
-        'relative flex items-center gap-3 px-4 h-16 border-b border-sidebar-border shrink-0',
-        collapsed && 'justify-center px-0'
-      )}>
-        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
-          <Zap className="w-4 h-4" />
-        </div>
-        {!collapsed && (
-          <span className="font-bold text-sm leading-tight">
-            Network<br />Marketing Master
-          </span>
+      <div className="flex items-center h-16 border-b border-sidebar-border shrink-0 px-3 gap-2">
+        {collapsed ? (
+          /* Collapsed: only the toggle button, centered */
+          <button
+            onClick={() => setCollapsed(false)}
+            title={t('nav.expand')}
+            className="flex items-center justify-center w-8 h-8 rounded-md mx-auto text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        ) : (
+          /* Expanded: logo left, toggle right, no overlap */
+          <>
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
+              <Zap className="w-4 h-4" />
+            </div>
+            <span className="font-bold text-sm leading-tight flex-1 min-w-0 truncate">
+              Network Marketing Master
+            </span>
+            <button
+              onClick={() => setCollapsed(true)}
+              title={t('nav.collapse')}
+              className="flex items-center justify-center w-6 h-6 rounded-md shrink-0 text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </>
         )}
-        {/* Collapse toggle — top-right corner of header */}
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          title={collapsed ? t('nav.expand') : t('nav.collapse')}
-          className={cn(
-            'absolute top-1/2 -translate-y-1/2 flex items-center justify-center w-5 h-5 rounded-md',
-            'text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors',
-            collapsed ? 'right-2' : 'right-3'
-          )}
-        >
-          {collapsed
-            ? <ChevronRight className="w-4 h-4" />
-            : <ChevronLeft className="w-4 h-4" />
-          }
-        </button>
       </div>
 
       {/* Navigation */}
