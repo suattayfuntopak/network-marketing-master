@@ -15,6 +15,8 @@ import { ContactFormPage } from '@/pages/dashboard/contacts/ContactFormPage'
 import { ContactDetailPage } from '@/pages/dashboard/contacts/ContactDetailPage'
 import { PipelinePage } from '@/pages/dashboard/pipeline/PipelinePage'
 import { DealDetailPage } from '@/pages/dashboard/pipeline/DealDetailPage'
+import { CalendarPage } from '@/pages/dashboard/calendar/CalendarPage'
+import { FollowUpsPage } from '@/pages/dashboard/calendar/FollowUpsPage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
 
 // Wrapper forces full remount of ContactDetailPage when ID changes,
@@ -58,9 +60,12 @@ export const router = createBrowserRouter([
           { path: ROUTES.PIPELINE, element: <PipelinePage /> },
           { path: `${ROUTES.PIPELINE}/:dealId`, element: <DealDetailPage /> },
 
+          // Calendar
+          { path: ROUTES.CALENDAR, element: <CalendarPage /> },
+          { path: `${ROUTES.CALENDAR}/takipler`, element: <FollowUpsPage /> },
+
           // Placeholders
           { path: ROUTES.MESSAGES, element: <div className="p-6"><h1 className="text-2xl font-bold">Mesajlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
-          { path: ROUTES.CALENDAR, element: <div className="p-6"><h1 className="text-2xl font-bold">Takvim</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.ACADEMY, element: <div className="p-6"><h1 className="text-2xl font-bold">Akademi</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.TEAM, element: <div className="p-6"><h1 className="text-2xl font-bold">Ekip</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.ANALYTICS, element: <div className="p-6"><h1 className="text-2xl font-bold">Analiz</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },

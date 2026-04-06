@@ -24,6 +24,7 @@
     "unknownError": "Bilinmeyen hata",
     "goBack": "Geri Dön",
     "all": "Tümü",
+    "notes": "Notlar",
     "selected": "{{count}} öğe seçildi",
     "page": "Sayfa {{page}} / {{total}}"
   },
@@ -361,6 +362,11 @@
     "recentContacts": "Son Eklenen Kontaklar",
     "pendingFollowups": "Takip Bekleyenler",
     "noPendingFollowups": "Bekleyen takip yok 🎉",
+    "todayFollowUps": "Bugünün Takipleri",
+    "todayAppointments": "Bugünün Randevuları",
+    "noTodayAppointments": "Bugün randevu yok",
+    "overdueFollowUps": "{{count}} gecikmeli",
+    "noOverdueFollowUps": "Gecikmiş takip yok",
     "ctaTitle": "Başlamaya hazır mısın?",
     "ctaText": "İlk kontaklarını ekleyerek Network Marketing Master'ı kullanmaya başla. AI destekli araçlarla ekibini büyüt.",
     "addFirstContact": "İlk Kontağı Ekle"
@@ -384,6 +390,105 @@
     "tr": "Türkçe",
     "en": "English",
     "switchTo": "Dil Değiştir"
+  },
+  "calendar": {
+    "title": "Takvim",
+    "today": "Bugün",
+    "tomorrow": "Yarın",
+    "newAppointment": "Yeni Randevu",
+    "newFollowUp": "Yeni Takip",
+    "emptyAgenda": "Bu aralıkta etkinlik yok",
+    "views": {
+      "month": "Ay",
+      "week": "Hafta",
+      "day": "Gün",
+      "agenda": "Gündem"
+    },
+    "appointment": {
+      "title": "Başlık",
+      "titlePlaceholder": "Randevu başlığı...",
+      "type": "Tür",
+      "types": {
+        "meeting": "Toplantı",
+        "call": "Arama",
+        "video_call": "Video Görüşme",
+        "presentation": "Sunum",
+        "coffee": "Kahve",
+        "event": "Etkinlik",
+        "other": "Diğer"
+      },
+      "allDay": "Tüm gün",
+      "startsAt": "Başlangıç",
+      "endsAt": "Bitiş",
+      "location": "Konum",
+      "meetingUrl": "Meeting URL",
+      "description": "Açıklama",
+      "edit": "Randevuyu Düzenle",
+      "online": "Online"
+    }
+  },
+  "followUps": {
+    "pageTitle": "Takipler",
+    "new": "Yeni Takip",
+    "edit": "Takibi Düzenle",
+    "actionType": "Aksiyon Türü",
+    "actionTypes": {
+      "call": "Ara",
+      "message": "Mesaj At",
+      "email": "E-posta",
+      "visit": "Ziyaret Et",
+      "send_info": "Bilgi Gönder",
+      "check_in": "Kontrol Et",
+      "other": "Diğer"
+    },
+    "title": "Başlık",
+    "titlePlaceholder": "Takip başlığı...",
+    "dueDate": "Tarih",
+    "priority": {
+      "label": "Öncelik",
+      "low": "Düşük",
+      "medium": "Orta",
+      "high": "Yüksek",
+      "urgent": "Acil"
+    },
+    "quickAdd": {
+      "tomorrow": "Yarın",
+      "in3Days": "3 Gün",
+      "in1Week": "1 Hafta",
+      "in2Weeks": "2 Hafta",
+      "in1Month": "1 Ay"
+    },
+    "buckets": {
+      "today": "Bugün",
+      "tomorrow": "Yarın",
+      "thisWeek": "Bu Hafta",
+      "overdue": "Gecikmeli",
+      "completed": "Tamamlanan"
+    },
+    "actions": {
+      "complete": "Tamamlandı",
+      "snooze": "Ertele",
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    "snooze": {
+      "30min": "30 dakika",
+      "1hour": "1 saat",
+      "tomorrow": "Yarın",
+      "3days": "3 gün",
+      "1week": "1 hafta",
+      "custom": "Özel tarih"
+    },
+    "deleteConfirm": "Bu takibi silmek istediğinize emin misiniz?",
+    "empty": {
+      "default": "Bu aralıkta takip yok",
+      "overdue": "Harika! Gecikmeli takip yok."
+    },
+    "created": "Takip oluşturuldu",
+    "updated": "Takip güncellendi",
+    "deleted": "Takip silindi",
+    "completed": "Takip tamamlandı",
+    "snoozed": "Takip ertelendi"
   },
   "landing": {
     "nav": {

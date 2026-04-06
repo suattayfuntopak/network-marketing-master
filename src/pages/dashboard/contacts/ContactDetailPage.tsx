@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import {
   ArrowLeft, Edit, Archive, ArchiveRestore, Trash2, Calendar, Briefcase,
   MapPin, Heart, Users, Target, Frown, Phone, Mail, MessageCircle, Send, Camera,
-  Plus,
+  Plus, Bell, Clock,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -36,6 +36,11 @@ import { STAGE_LABELS } from '@/lib/contacts/constants'
 import type { InteractionType } from '@/lib/contacts/types'
 import { useDealsByContact, usePipelineStages } from '@/hooks/usePipeline'
 import { STAGE_COLOR_CLASSES, DEAL_STATUS_COLORS, formatCurrency } from '@/lib/pipeline/constants'
+import { useContactFollowUps, useContactAppointments, useCreateFollowUp } from '@/hooks/useCalendar'
+import { QUICK_FOLLOW_UP_OFFSETS } from '@/lib/calendar/constants'
+import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
+import { NewAppointmentModal } from '@/components/calendar/modals/NewAppointmentModal'
+import { addDays, format as fmtDate2 } from 'date-fns'
 import i18n from '@/i18n'
 
 const INTERACTION_TYPE_KEYS: InteractionType[] = [
@@ -64,6 +69,12 @@ export function ContactDetailPage() {
   const { data: pipelineStages = [] } = usePipelineStages(userId)
   const currLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
+  const { data: contactFollowUps = [] } = useContactFollowUps(id ?? '', userId)
+  const { data: contactAppointments = [] } = useContactAppointments(id ?? '', userId)
+  const createFollowUp = useCreateFollowUp(userId)
+
+  const [showFollowUpModal, setShowFollowUpModal] = useState(false)
+  const [showAppointmentModal, setShowAppointmentModal] = useState(false)
   const [showInteractionModal, setShowInteractionModal] = useState(false)
   const [interactionType, setInteractionType] = useState<InteractionType>('call')
   const [interactionContent, setInteractionContent] = useState('')
@@ -163,6 +174,22 @@ export function ContactDetailPage() {
     } catch {
       toast.error(t('contacts.tag.error'))
     }
+  }
+
+  const handleQuickFollowUp = async (days: number) => {
+    const due = addDays(new Date(), days)
+    due.setHours(9, 0, 0, 0)
+    const action = t('followUps.actionTypes.call')
+    await createFollowUp.mutateAsync({
+      user_id: userId,
+      contact_id: id!,
+      title: `${contact!.full_name} - ${action}`,
+      action_type: 'call',
+      priority: 'medium',
+      due_at: due.toISOString(),
+      notes: null,
+    })
+    toast.success(t('followUps.created'))
   }
 
   const handleCreateTag = async (name: string, color: string) => {
@@ -460,6 +487,67 @@ export function ContactDetailPage() {
             )}
           </div>
 
+          {/* Follow-ups */}
+          <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('followUps.pageTitle')}</p>
+              <button
+                onClick={() => setShowFollowUpModal(true)}
+                className="text-xs text-primary hover:underline flex items-center gap-1"
+              >
+                <Plus className="w-3 h-3" />
+                {t('followUps.new')}
+              </button>
+            </div>
+
+            {/* Quick follow-up buttons */}
+            <div className="flex flex-wrap gap-1.5">
+              {QUICK_FOLLOW_UP_OFFSETS.map(opt => (
+                <button
+                  key={opt.key}
+                  onClick={() => handleQuickFollowUp(opt.days)}
+                  disabled={createFollowUp.isPending}
+                  className="text-xs px-2.5 py-1 rounded-full border border-border hover:border-primary hover:text-primary transition-colors"
+                >
+                  {t(`followUps.quickAdd.${opt.key}`)}
+                </button>
+              ))}
+            </div>
+
+            {/* Follow-up list */}
+            {contactFollowUps.filter(f => f.status === 'pending').length === 0 ? (
+              <p className="text-xs text-muted-foreground">{t('followUps.empty.default')}</p>
+            ) : (
+              <div className="space-y-1.5">
+                {contactFollowUps.filter(f => f.status === 'pending').slice(0, 3).map(fu => (
+                  <div key={fu.id} className="flex items-center gap-2 text-xs py-1 border-b border-border/50 last:border-0">
+                    <Bell className="w-3 h-3 text-amber-500 shrink-0" />
+                    <span className="flex-1 truncate">{fu.title}</span>
+                    <span className="text-muted-foreground shrink-0">
+                      {fmtDate2(new Date(fu.due_at), 'd MMM')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Upcoming appointments */}
+            {contactAppointments.length > 0 && (
+              <div className="border-t border-border/50 pt-2 space-y-1.5">
+                <p className="text-xs text-muted-foreground font-medium">{t('calendar.title')}</p>
+                {contactAppointments.slice(0, 2).map(apt => (
+                  <div key={apt.id} className="flex items-center gap-2 text-xs">
+                    <Clock className="w-3 h-3 text-blue-500 shrink-0" />
+                    <span className="flex-1 truncate">{apt.title}</span>
+                    <span className="text-muted-foreground shrink-0">
+                      {fmtDate2(new Date(apt.starts_at), 'd MMM HH:mm')}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* AI Placeholder */}
           <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.aiSuggestions')}</p>
@@ -467,6 +555,20 @@ export function ContactDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Follow-up / Appointment Modals */}
+      <NewFollowUpModal
+        open={showFollowUpModal}
+        onClose={() => setShowFollowUpModal(false)}
+        userId={userId}
+        defaultContactId={id}
+        defaultContactName={contact?.full_name}
+      />
+      <NewAppointmentModal
+        open={showAppointmentModal}
+        onClose={() => setShowAppointmentModal(false)}
+        userId={userId}
+      />
 
       {/* Add Interaction Modal */}
       <Dialog open={showInteractionModal} onOpenChange={setShowInteractionModal}>

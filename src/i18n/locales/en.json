@@ -24,6 +24,7 @@
     "unknownError": "Unknown error",
     "goBack": "Go Back",
     "all": "All",
+    "notes": "Notes",
     "selected": "{{count}} items selected",
     "page": "Page {{page}} / {{total}}"
   },
@@ -361,6 +362,11 @@
     "recentContacts": "Recently Added Contacts",
     "pendingFollowups": "Pending Follow-ups",
     "noPendingFollowups": "No pending follow-ups 🎉",
+    "todayFollowUps": "Today's Follow-ups",
+    "todayAppointments": "Today's Appointments",
+    "noTodayAppointments": "No appointments today",
+    "overdueFollowUps": "{{count}} overdue",
+    "noOverdueFollowUps": "No overdue follow-ups",
     "ctaTitle": "Ready to get started?",
     "ctaText": "Start adding your first contacts to use Network Marketing Master. Grow your team with AI-powered tools.",
     "addFirstContact": "Add First Contact"
@@ -384,6 +390,105 @@
     "tr": "Türkçe",
     "en": "English",
     "switchTo": "Switch Language"
+  },
+  "calendar": {
+    "title": "Calendar",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "newAppointment": "New Appointment",
+    "newFollowUp": "New Follow-up",
+    "emptyAgenda": "No events in this range",
+    "views": {
+      "month": "Month",
+      "week": "Week",
+      "day": "Day",
+      "agenda": "Agenda"
+    },
+    "appointment": {
+      "title": "Title",
+      "titlePlaceholder": "Appointment title...",
+      "type": "Type",
+      "types": {
+        "meeting": "Meeting",
+        "call": "Call",
+        "video_call": "Video Call",
+        "presentation": "Presentation",
+        "coffee": "Coffee",
+        "event": "Event",
+        "other": "Other"
+      },
+      "allDay": "All day",
+      "startsAt": "Starts at",
+      "endsAt": "Ends at",
+      "location": "Location",
+      "meetingUrl": "Meeting URL",
+      "description": "Description",
+      "edit": "Edit Appointment",
+      "online": "Online"
+    }
+  },
+  "followUps": {
+    "pageTitle": "Follow-ups",
+    "new": "New Follow-up",
+    "edit": "Edit Follow-up",
+    "actionType": "Action Type",
+    "actionTypes": {
+      "call": "Call",
+      "message": "Message",
+      "email": "Email",
+      "visit": "Visit",
+      "send_info": "Send Info",
+      "check_in": "Check In",
+      "other": "Other"
+    },
+    "title": "Title",
+    "titlePlaceholder": "Follow-up title...",
+    "dueDate": "Due Date",
+    "priority": {
+      "label": "Priority",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "quickAdd": {
+      "tomorrow": "Tomorrow",
+      "in3Days": "3 Days",
+      "in1Week": "1 Week",
+      "in2Weeks": "2 Weeks",
+      "in1Month": "1 Month"
+    },
+    "buckets": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "thisWeek": "This Week",
+      "overdue": "Overdue",
+      "completed": "Completed"
+    },
+    "actions": {
+      "complete": "Complete",
+      "snooze": "Snooze",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "snooze": {
+      "30min": "30 minutes",
+      "1hour": "1 hour",
+      "tomorrow": "Tomorrow",
+      "3days": "3 days",
+      "1week": "1 week",
+      "custom": "Custom date"
+    },
+    "deleteConfirm": "Are you sure you want to delete this follow-up?",
+    "empty": {
+      "default": "No follow-ups in this range",
+      "overdue": "Great! No overdue follow-ups."
+    },
+    "created": "Follow-up created",
+    "updated": "Follow-up updated",
+    "deleted": "Follow-up deleted",
+    "completed": "Follow-up completed",
+    "snoozed": "Follow-up snoozed"
   },
   "landing": {
     "nav": {
