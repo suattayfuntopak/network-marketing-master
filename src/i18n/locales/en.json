@@ -380,6 +380,27 @@
     "ctaText": "Start adding your first contacts to use Network Marketing Master. Grow your team with AI-powered tools.",
     "addFirstContact": "Add First Contact"
   },
+  "analytics": {
+    "subtitle": "Track your activity and contact distribution",
+    "joinedCount": "Joined Contacts",
+    "overdue": "overdue",
+    "pipelineValue": "Pipeline Value",
+    "stageDistribution": "Stage Distribution",
+    "stageBreakdown": "Stage Breakdown",
+    "contacts": "contacts"
+  },
+  "settings": {
+    "subtitle": "Manage your account information and preferences",
+    "profile": "Profile",
+    "email": "Email",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your name",
+    "role": "Role",
+    "language": "Language",
+    "account": "Account",
+    "accountInfo": "For account deletion and security, please contact support.",
+    "saved": "Profile updated"
+  },
   "profile": {
     "myProfile": "My Profile",
     "settings": "Settings",
@@ -571,7 +592,11 @@
       "deleted": "Template deleted",
       "namePlaceholder": "Template name",
       "contentPlaceholder": "Message content. Use {name}, {occupation} for variables.",
-      "use": "Use Template"
+      "use": "Use Template",
+      "saveAs": "Save as Template",
+      "saved": "Saved",
+      "aiGenerate": "Generate with AI",
+      "aiPickVariant": "Pick a variant — it will fill the content field:"
     }
   },
   "academy": {

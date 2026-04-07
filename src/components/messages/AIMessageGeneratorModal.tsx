@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Copy, ExternalLink, ThumbsUp, ThumbsDown, RefreshCw, Check } from 'lucide-react'
+import { Sparkles, Copy, ExternalLink, RefreshCw, Check, BookmarkPlus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { useAIMessage } from '@/hooks/useAIMessage'
-import { useSaveAIMessage, useRateAIMessage } from '@/hooks/useTemplates'
+import { useSaveAIMessage, useRateAIMessage, useCreateTemplate } from '@/hooks/useTemplates'
 import { useAuth } from '@/hooks/useAuth'
 import type { MessageCategory, MessageChannel, MessageTone, AIMessageVariant } from '@/lib/messages/types'
 import type { ContactWithTags } from '@/lib/contacts/types'
@@ -42,6 +43,11 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
   const [savedMessageId, setSavedMessageId] = useState<string | null>(null)
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null)
   const [rated, setRated] = useState<'great' | 'good' | 'meh' | 'bad' | null>(null)
+  // Save as template state
+  const createTemplate = useCreateTemplate(user?.id ?? '')
+  const [savingTemplateIdx, setSavingTemplateIdx] = useState<number | null>(null)
+  const [templateName, setTemplateName] = useState('')
+  const [savedTemplateIdx, setSavedTemplateIdx] = useState<number | null>(null)
 
   const handleGenerate = async () => {
     const result = await generate({
@@ -109,11 +115,35 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
     setRated(feedback)
   }
 
+  const handleSaveAsTemplate = async (variant: AIMessageVariant, idx: number) => {
+    if (!templateName.trim() || !user?.id) return
+    try {
+      await createTemplate.mutateAsync({
+        user_id: user.id,
+        name: templateName.trim(),
+        content: variant.message,
+        category,
+        channel,
+        tone,
+        is_ai_generated: true,
+      })
+      setSavedTemplateIdx(idx)
+      setSavingTemplateIdx(null)
+      setTemplateName('')
+      setTimeout(() => setSavedTemplateIdx(null), 2000)
+    } catch (err) {
+      console.error('[AIMessageGeneratorModal] save template error:', err)
+    }
+  }
+
   const handleClose = () => {
     setVariants([])
     setUserInput('')
     setSavedMessageId(null)
     setRated(null)
+    setSavingTemplateIdx(null)
+    setTemplateName('')
+    setSavedTemplateIdx(null)
     onClose()
   }
 
@@ -272,7 +302,42 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
                         {t('messages.ai.openInWhatsapp')}
                       </Button>
                     )}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs gap-1 text-amber-600 border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-950"
+                      onClick={() => {
+                        setSavingTemplateIdx(savingTemplateIdx === idx ? null : idx)
+                        setTemplateName('')
+                      }}
+                    >
+                      {savedTemplateIdx === idx ? (
+                        <><Check className="w-3 h-3" /> {t('messages.template.saved')}</>
+                      ) : (
+                        <><BookmarkPlus className="w-3 h-3" /> {t('messages.template.saveAs')}</>
+                      )}
+                    </Button>
                   </div>
+                  {savingTemplateIdx === idx && (
+                    <div className="flex gap-2 pt-1">
+                      <Input
+                        value={templateName}
+                        onChange={(e) => setTemplateName(e.target.value)}
+                        placeholder={t('messages.template.namePlaceholder')}
+                        className="h-7 text-xs"
+                        onKeyDown={(e) => e.key === 'Enter' && handleSaveAsTemplate(v, idx)}
+                        autoFocus
+                      />
+                      <Button
+                        size="sm"
+                        className="h-7 text-xs px-2"
+                        disabled={!templateName.trim() || createTemplate.isPending}
+                        onClick={() => handleSaveAsTemplate(v, idx)}
+                      >
+                        {t('common.save')}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
 

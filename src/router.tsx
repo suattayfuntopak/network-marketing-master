@@ -22,6 +22,8 @@ import { MessagesPage } from '@/pages/dashboard/messages/MessagesPage'
 import { AcademyPage } from '@/pages/dashboard/academy/AcademyPage'
 import { AcademyContentDetailPage } from '@/pages/dashboard/academy/AcademyContentDetailPage'
 import { ObjectionsPage } from '@/pages/dashboard/academy/ObjectionsPage'
+import { AnalyticsPage } from '@/pages/dashboard/analytics/AnalyticsPage'
+import { SettingsPage } from '@/pages/dashboard/settings/SettingsPage'
 
 // Wrapper forces full remount of ContactDetailPage when ID changes,
 // preventing stale query state when navigating between contacts.
@@ -76,8 +78,8 @@ export const router = createBrowserRouter([
           { path: `${ROUTES.ACADEMY}/itirazlar`, element: <ObjectionsPage /> },
           { path: `${ROUTES.ACADEMY}/:id`, element: <AcademyContentDetailPage /> },
           { path: ROUTES.TEAM, element: <div className="p-6"><h1 className="text-2xl font-bold">Ekip</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
-          { path: ROUTES.ANALYTICS, element: <div className="p-6"><h1 className="text-2xl font-bold">Analiz</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
-          { path: ROUTES.SETTINGS, element: <div className="p-6"><h1 className="text-2xl font-bold">Ayarlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
+          { path: ROUTES.ANALYTICS, element: <AnalyticsPage /> },
+          { path: ROUTES.SETTINGS, element: <SettingsPage /> },
         ],
       },
     ],

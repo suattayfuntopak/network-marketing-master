@@ -380,6 +380,27 @@
     "ctaText": "İlk kontaklarını ekleyerek Network Marketing Master'ı kullanmaya başla. AI destekli araçlarla ekibini büyüt.",
     "addFirstContact": "İlk Kontağı Ekle"
   },
+  "analytics": {
+    "subtitle": "Aktivitelerinizi ve kontak dağılımınızı takip edin",
+    "joinedCount": "Katılan Kontak",
+    "overdue": "gecikmiş",
+    "pipelineValue": "Pipeline Değeri",
+    "stageDistribution": "Stage Dağılımı",
+    "stageBreakdown": "Stage Kırılımı",
+    "contacts": "kontak"
+  },
+  "settings": {
+    "subtitle": "Hesap bilgilerinizi ve tercihlerinizi yönetin",
+    "profile": "Profil Bilgileri",
+    "email": "E-posta",
+    "fullName": "Ad Soyad",
+    "fullNamePlaceholder": "Adınızı girin",
+    "role": "Rol",
+    "language": "Dil",
+    "account": "Hesap",
+    "accountInfo": "Hesap silme ve güvenlik işlemleri için destek ile iletişime geçin.",
+    "saved": "Profil güncellendi"
+  },
   "profile": {
     "myProfile": "Profilim",
     "settings": "Ayarlar",
@@ -571,7 +592,11 @@
       "deleted": "Şablon silindi",
       "namePlaceholder": "Şablon adı",
       "contentPlaceholder": "Mesaj içeriği. Değişkenler için {ad}, {meslek} kullanabilirsin.",
-      "use": "Şablonu Kullan"
+      "use": "Şablonu Kullan",
+      "saveAs": "Şablon Kaydet",
+      "saved": "Kaydedildi",
+      "aiGenerate": "AI ile İçerik Üret",
+      "aiPickVariant": "Bir versiyonu seç, içerik alanına kopyalanır:"
     }
   },
   "academy": {

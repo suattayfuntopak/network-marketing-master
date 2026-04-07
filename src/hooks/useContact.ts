@@ -74,6 +74,18 @@ export function useArchiveContact() {
   })
 }
 
+// Dynamic version — contactId passed in mutate call
+export function useUpdateContactStageById(userId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ contactId, newStage, oldStage }: { contactId: string; newStage: string; oldStage: string }) =>
+      updateContactStage(contactId, userId, newStage, oldStage),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: contactKeys.all })
+    },
+  })
+}
+
 export function useUpdateContactStage(contactId: string, userId: string) {
   const qc = useQueryClient()
   return useMutation({

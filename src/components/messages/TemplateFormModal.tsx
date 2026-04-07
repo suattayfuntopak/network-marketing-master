@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Check, X } from 'lucide-react'
+import { Check, X, Sparkles, RefreshCw, ChevronDown, ChevronUp } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import { useCreateTemplate, useUpdateTemplate } from '@/hooks/useTemplates'
+import { useAIMessage } from '@/hooks/useAIMessage'
 import type { MessageTemplate, MessageCategory, MessageChannel, MessageTone } from '@/lib/messages/types'
 
 const CATEGORIES: MessageCategory[] = [
@@ -28,6 +29,7 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
   const { t } = useTranslation()
   const createTemplate = useCreateTemplate(userId)
   const updateTemplate = useUpdateTemplate(userId)
+  const { generate, isGenerating } = useAIMessage()
 
   const [name, setName] = useState('')
   const [content, setContent] = useState('')
@@ -35,6 +37,11 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
   const [channel, setChannel] = useState<MessageChannel>('whatsapp')
   const [tone, setTone] = useState<MessageTone>('friendly')
   const [loading, setLoading] = useState(false)
+
+  // AI section
+  const [showAI, setShowAI] = useState(false)
+  const [aiContext, setAiContext] = useState('')
+  const [aiVariants, setAiVariants] = useState<{ message: string; approach: string }[]>([])
 
   useEffect(() => {
     if (template) {
@@ -50,6 +57,9 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
       setChannel('whatsapp')
       setTone('friendly')
     }
+    setShowAI(false)
+    setAiVariants([])
+    setAiContext('')
   }, [template, open])
 
   const handleSave = async () => {
@@ -67,6 +77,16 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleGenerate = async () => {
+    const result = await generate({
+      category,
+      channel,
+      tone,
+      userInput: aiContext.trim() || undefined,
+    })
+    if (result) setAiVariants(result)
   }
 
   return (
@@ -145,6 +165,66 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
                 ))}
               </div>
             </div>
+          </div>
+
+          {/* AI Generate section */}
+          <div className="border rounded-lg overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setShowAI(!showAI)}
+              className="w-full flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/30 transition-colors"
+            >
+              <Sparkles className="w-4 h-4" />
+              {t('messages.template.aiGenerate')}
+              {showAI ? <ChevronUp className="w-3.5 h-3.5 ml-auto" /> : <ChevronDown className="w-3.5 h-3.5 ml-auto" />}
+            </button>
+
+            {showAI && (
+              <div className="border-t px-3 py-3 space-y-3 bg-muted/20">
+                <Textarea
+                  value={aiContext}
+                  onChange={(e) => setAiContext(e.target.value)}
+                  placeholder={t('messages.ai.contextPlaceholder')}
+                  rows={2}
+                  className="resize-none text-sm"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleGenerate}
+                  disabled={isGenerating}
+                  className="gap-1.5 w-full"
+                >
+                  {isGenerating ? (
+                    <><RefreshCw className="w-3.5 h-3.5 animate-spin" /> {t('messages.ai.generating')}</>
+                  ) : (
+                    <><Sparkles className="w-3.5 h-3.5" /> {t('messages.ai.generate')}</>
+                  )}
+                </Button>
+
+                {aiVariants.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">{t('messages.template.aiPickVariant')}</p>
+                    {aiVariants.map((v, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setContent(v.message)}
+                        className={cn(
+                          'w-full text-left border rounded-md p-2.5 text-xs leading-relaxed transition-colors hover:border-primary',
+                          content === v.message ? 'border-primary bg-primary/5' : 'border-border'
+                        )}
+                      >
+                        <span className="font-medium text-primary block mb-1">
+                          {t('messages.ai.variant', { n: idx + 1 })} · {v.approach}
+                        </span>
+                        <span className="text-muted-foreground line-clamp-3">{v.message}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <Textarea
