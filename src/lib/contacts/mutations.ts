@@ -152,7 +152,7 @@ export async function updateContactStage(
     contactId,
     userId,
     type: 'stage_change',
-    subject: null,                      // rendered from i18n key in component
+    subject: undefined,                      // rendered from i18n key in component
     content: `${oldStage} → ${newStage}`,  // stage slugs, translated in component
     warmthImpact: 0,
   })

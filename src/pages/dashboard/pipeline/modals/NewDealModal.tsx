@@ -185,7 +185,7 @@ export function NewDealModal({ open, onClose, userId, stages, defaultStageId }: 
           {/* Deal type */}
           <div>
             <label className="text-sm font-medium mb-1.5 block">{t('pipeline.deal.type')}</label>
-            <select name="deal_type" {...register('deal_type')} className="w-full border rounded-md px-3 py-2 text-sm bg-background">
+            <select {...register('deal_type')} className="w-full border rounded-md px-3 py-2 text-sm bg-background">
               {(['prospect', 'product_sale', 'recruitment'] as DealType[]).map((type) => (
                 <option key={type} value={type}>{t(`pipeline.dealTypes.${type}`)}</option>
               ))}
@@ -195,13 +195,13 @@ export function NewDealModal({ open, onClose, userId, stages, defaultStageId }: 
           {/* Title */}
           <div>
             <label className="text-sm font-medium mb-1.5 block">{t('pipeline.deal.title')}</label>
-            <Input name="title" {...register('title', { required: true })} placeholder={t('pipeline.deal.titlePlaceholder')} />
+            <Input {...register('title', { required: true })} placeholder={t('pipeline.deal.titlePlaceholder')} />
           </div>
 
           {/* Stage */}
           <div>
             <label className="text-sm font-medium mb-1.5 block">{t('pipeline.deal.stage')}</label>
-            <select name="stage_id" {...register('stage_id')} className="w-full border rounded-md px-3 py-2 text-sm bg-background">
+            <select {...register('stage_id')} className="w-full border rounded-md px-3 py-2 text-sm bg-background">
               {stagesFiltered.map((s) => (
                 <option key={s.id} value={s.id}>
                   {t(`pipelineStages.${s.slug}`, { defaultValue: s.name })}
@@ -216,7 +216,6 @@ export function NewDealModal({ open, onClose, userId, stages, defaultStageId }: 
               {t('pipeline.deal.notes')} <span className="text-muted-foreground font-normal">({t('common.optional')})</span>
             </label>
             <textarea
-              name="notes"
               {...register('notes')}
               rows={2}
               className="w-full border rounded-md px-3 py-2 text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"

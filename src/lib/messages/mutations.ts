@@ -45,7 +45,7 @@ export async function incrementTemplateUseCount(id: string): Promise<void> {
 export async function saveAIMessage(data: AIMessageInsert): Promise<string> {
   const { data: row, error } = await supabase
     .from('nmm_ai_messages')
-    .insert(data)
+    .insert(data as any)
     .select('id')
     .single()
   if (error) throw error

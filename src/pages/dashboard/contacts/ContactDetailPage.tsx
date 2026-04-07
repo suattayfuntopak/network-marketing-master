@@ -116,7 +116,8 @@ export function ContactDetailPage() {
     .join('')
     .toUpperCase()
 
-  const handleStageChange = async (newStage: string) => {
+  const handleStageChange = async (newStage: string | null) => {
+    if (!newStage) return
     try {
       await updateStageMutation.mutateAsync({ newStage, oldStage: contact.stage })
       toast.success(t('contacts.stage.changed'))

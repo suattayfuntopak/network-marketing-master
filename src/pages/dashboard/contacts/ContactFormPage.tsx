@@ -66,7 +66,8 @@ export function ContactFormPage() {
   const { t } = useTranslation()
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<FormData>({
-    resolver: zodResolver(schema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       source: 'manual',
       contact_type: 'prospect',
@@ -268,7 +269,7 @@ export function ContactFormPage() {
                 <Label>{t('contacts.fields.source')}</Label>
                 <Select
                   value={watch('source') ?? 'manual'}
-                  onValueChange={(v) => setValue('source', v)}
+                  onValueChange={(v) => setValue('source', v ?? 'manual')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
@@ -286,7 +287,7 @@ export function ContactFormPage() {
                 <Label>{t('contacts.fields.contactType')}</Label>
                 <Select
                   value={watch('contact_type') ?? 'prospect'}
-                  onValueChange={(v) => setValue('contact_type', v)}
+                  onValueChange={(v) => setValue('contact_type', v ?? 'prospect')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>
@@ -304,7 +305,7 @@ export function ContactFormPage() {
                 <Label>{t('contacts.fields.stage')}</Label>
                 <Select
                   value={watch('stage') ?? 'new'}
-                  onValueChange={(v) => setValue('stage', v)}
+                  onValueChange={(v) => setValue('stage', v ?? 'new')}
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue>

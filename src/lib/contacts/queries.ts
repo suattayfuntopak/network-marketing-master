@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { ContactListParams, ContactListResult, ContactWithTags } from './types'
+import type { ContactListParams, ContactListResult, ContactWithTags, Contact } from './types'
 import type { Tag, Interaction } from '@/types/database'
 
 export async function fetchContacts(params: ContactListParams): Promise<ContactListResult> {
@@ -27,15 +27,15 @@ export async function fetchContacts(params: ContactListParams): Promise<ContactL
   }
 
   if (filters.stages.length > 0) {
-    query = query.in('stage', filters.stages)
+    query = query.in('stage', filters.stages as Contact['stage'][])
   }
 
   if (filters.sources.length > 0) {
-    query = query.in('source', filters.sources)
+    query = query.in('source', filters.sources as Contact['source'][])
   }
 
   if (filters.contactTypes.length > 0) {
-    query = query.in('contact_type', filters.contactTypes)
+    query = query.in('contact_type', filters.contactTypes as Contact['contact_type'][])
   }
 
   if (filters.warmthMin > 0 || filters.warmthMax < 100) {
@@ -57,7 +57,7 @@ export async function fetchContacts(params: ContactListParams): Promise<ContactL
       .filter(Boolean)
 
     const { nmm_contact_tags: _, ...contact } = row
-    return { ...(contact as ContactWithTags), tags }
+    return { ...(contact as unknown as ContactWithTags), tags }
   })
 
   // Filter by tagIds after fetch (Supabase doesn't support many-to-many filter well)
@@ -89,13 +89,15 @@ export async function fetchContact(id: string): Promise<ContactWithTags | null> 
     throw error
   }
   if (!data) return null
+  
+  const rawData = data as unknown as Record<string, unknown>
 
-  const tags: Tag[] = ((data.nmm_contact_tags as { nmm_tags: Tag }[]) ?? [])
+  const tags: Tag[] = ((rawData.nmm_contact_tags as { nmm_tags: Tag }[]) ?? [])
     .map((ct) => ct.nmm_tags)
     .filter(Boolean)
 
-  const { nmm_contact_tags: _, ...contact } = data
-  return { ...(contact as ContactWithTags), tags }
+  const { nmm_contact_tags: _, ...contact } = rawData
+  return { ...(contact as unknown as ContactWithTags), tags }
 }
 
 export async function fetchInteractions(contactId: string): Promise<Interaction[]> {
@@ -149,7 +151,7 @@ export async function fetchPendingFollowUps(userId: string): Promise<ContactWith
       .map((ct) => ct.nmm_tags)
       .filter(Boolean)
     const { nmm_contact_tags: _, ...contact } = row
-    return { ...(contact as ContactWithTags), tags }
+    return { ...(contact as unknown as ContactWithTags), tags }
   })
 }
 
@@ -169,7 +171,7 @@ export async function fetchRecentContacts(userId: string): Promise<ContactWithTa
       .map((ct) => ct.nmm_tags)
       .filter(Boolean)
     const { nmm_contact_tags: _, ...contact } = row
-    return { ...(contact as ContactWithTags), tags }
+    return { ...(contact as unknown as ContactWithTags), tags }
   })
 }
 
@@ -185,7 +187,7 @@ export async function fetchContactStageCounts(userId: string): Promise<StageCoun
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('is_archived', false)
-      .eq('stage', stage)
+      .eq('stage', stage as Contact['stage'])
     if (!error) results.push({ stage, count: count ?? 0 })
   }
   return results

@@ -166,7 +166,7 @@ export function ContactKanbanBoard({ contacts, userId }: Props) {
 
     // Optimistic update
     setOptimisticContacts(prev =>
-      prev.map(c => c.id === contactId ? { ...c, stage: newStage } : c)
+      prev.map(c => c.id === contactId ? { ...c, stage: newStage as Contact['stage'] } : c)
     )
 
     updateStage.mutate({ contactId, newStage, oldStage }, {

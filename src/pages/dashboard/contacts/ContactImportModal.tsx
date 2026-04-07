@@ -176,7 +176,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
                   <span className="text-sm w-1/2 truncate font-medium">{header}</span>
                   <Select
                     value={mapping[header] ?? 'skip'}
-                    onValueChange={(v) => setMapping((prev) => ({ ...prev, [header]: v }))}
+                    onValueChange={(v) => setMapping((prev) => ({ ...prev, [header]: v ?? 'skip' }))}
                   >
                     <SelectTrigger className="flex-1">
                       <SelectValue />

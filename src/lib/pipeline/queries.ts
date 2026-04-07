@@ -33,7 +33,7 @@ export async function fetchDeals(userId: string, filters?: DealFilters): Promise
 
   const { data, error } = await query
   if (error) throw error
-  return data as DealWithContact[]
+  return data as unknown as DealWithContact[]
 }
 
 export async function fetchDeal(dealId: string): Promise<DealWithContact | null> {
@@ -50,7 +50,7 @@ export async function fetchDeal(dealId: string): Promise<DealWithContact | null>
     if (error.code === 'PGRST116') return null
     throw error
   }
-  return data as DealWithContact
+  return data as unknown as DealWithContact
 }
 
 export async function fetchDealsByContact(contactId: string, userId: string): Promise<Deal[]> {
@@ -77,7 +77,7 @@ export async function fetchStageHistory(dealId: string): Promise<(StageHistory &
     .order('moved_at', { ascending: false })
 
   if (error) throw error
-  return data as (StageHistory & { from_stage: { name: string; color: string } | null; to_stage: { name: string; color: string } })[]
+  return data as unknown as (StageHistory & { from_stage: { name: string; color: string } | null; to_stage: { name: string; color: string } })[]
 }
 
 // ─── Pipeline stats ───────────────────────────────────────────
@@ -91,9 +91,10 @@ export async function fetchPipelineStats(userId: string): Promise<{ totalDeals: 
 
   if (error) throw error
 
-  const totalDeals = data.length
-  const totalValue = data.reduce((sum, d) => sum + (d.value ?? 0), 0)
-  const weightedValue = data.reduce((sum, d) => sum + ((d.value ?? 0) * (d.probability ?? 0)) / 100, 0)
+  const rows = data as unknown as Array<{ value: number; probability: number; status: string }>
+  const totalDeals = rows.length
+  const totalValue = rows.reduce((sum, d) => sum + (d.value ?? 0), 0)
+  const weightedValue = rows.reduce((sum, d) => sum + ((d.value ?? 0) * (d.probability ?? 0)) / 100, 0)
 
   return { totalDeals, totalValue, weightedValue }
 }

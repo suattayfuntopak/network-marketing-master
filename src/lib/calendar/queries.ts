@@ -16,7 +16,7 @@ export async function fetchAppointments(userId: string, from?: Date, to?: Date):
 
   const { data, error } = await query
   if (error) throw error
-  return data as AppointmentWithContact[]
+  return data as unknown as AppointmentWithContact[]
 }
 
 export async function fetchAppointment(id: string): Promise<AppointmentWithContact | null> {
@@ -27,7 +27,7 @@ export async function fetchAppointment(id: string): Promise<AppointmentWithConta
     .single()
 
   if (error) { if (error.code === 'PGRST116') return null; throw error }
-  return data as AppointmentWithContact
+  return data as unknown as AppointmentWithContact
 }
 
 export async function fetchAppointmentsByContact(contactId: string, userId: string): Promise<AppointmentWithContact[]> {
@@ -39,7 +39,7 @@ export async function fetchAppointmentsByContact(contactId: string, userId: stri
     .order('starts_at', { ascending: false })
 
   if (error) throw error
-  return data as AppointmentWithContact[]
+  return data as unknown as AppointmentWithContact[]
 }
 
 export async function fetchTodayAppointments(userId: string): Promise<AppointmentWithContact[]> {
@@ -63,7 +63,7 @@ export async function fetchFollowUps(userId: string, status?: FollowUpStatus | F
 
   const { data, error } = await query
   if (error) throw error
-  return data as FollowUpWithContact[]
+  return data as unknown as FollowUpWithContact[]
 }
 
 export async function fetchFollowUpsByContact(contactId: string, userId: string): Promise<FollowUpWithContact[]> {
@@ -75,7 +75,7 @@ export async function fetchFollowUpsByContact(contactId: string, userId: string)
     .order('due_at', { ascending: true })
 
   if (error) throw error
-  return data as FollowUpWithContact[]
+  return data as unknown as FollowUpWithContact[]
 }
 
 // Bucketed fetch for follow-up tabs
@@ -95,7 +95,7 @@ export async function fetchFollowUpBuckets(userId: string) {
 
   if (error) throw error
 
-  const items = all as FollowUpWithContact[]
+  const items = all as unknown as FollowUpWithContact[]
 
   return {
     today:     items.filter(f => f.status === 'pending' && f.due_at >= todayStart.toISOString() && f.due_at <= todayEnd.toISOString()),

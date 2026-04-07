@@ -40,11 +40,11 @@ export function MessagesPage() {
   const { data: contactsResult, isLoading: contactsLoading } = useContacts({
     userId: user?.id ?? '',
     filters: {
-      stage: null, warmthMin: null, warmthMax: null, source: null,
-      tags: null, showArchived: false,
-      search: bulkSearch.length >= 2 ? bulkSearch : null,
+      stages: [], warmthMin: 0, warmthMax: 100, sources: [],
+      tagIds: [], contactTypes: [], pendingFollowUp: false, archived: false,
+      search: bulkSearch.length >= 2 ? bulkSearch : '',
     },
-    sort: { field: 'warmth_score', direction: 'desc' },
+    sort: { field: 'warmth_score', order: 'desc' },
     page: 1,
     pageSize: 100,
   })

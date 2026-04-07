@@ -55,8 +55,8 @@ export function PipelinePage() {
 
   const { data: contactsResult, isLoading: contactsLoading } = useContacts({
     userId,
-    filters: { stage: null, warmthMin: null, warmthMax: null, source: null, tags: null, search: null, showArchived: false },
-    sort: { field: 'created_at', direction: 'desc' },
+    filters: { search: '', stages: [], tagIds: [], warmthMin: 0, warmthMax: 100, sources: [], contactTypes: [], pendingFollowUp: false, archived: false },
+    sort: { field: 'created_at', order: 'desc' },
     page: 1,
     pageSize: 200,
   })
