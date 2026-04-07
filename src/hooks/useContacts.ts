@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchContacts, fetchContactCount, fetchRecentContacts, fetchPendingFollowUps } from '@/lib/contacts/queries'
+import { fetchContacts, fetchContactCount, fetchRecentContacts, fetchPendingFollowUps, fetchContactStageCounts } from '@/lib/contacts/queries'
 import type { ContactListParams } from '@/lib/contacts/types'
 
 export const contactKeys = {
@@ -7,6 +7,7 @@ export const contactKeys = {
   lists: () => [...contactKeys.all, 'list'] as const,
   list: (params: ContactListParams) => [...contactKeys.lists(), params.userId, params.filters, params.sort, params.page, params.pageSize] as const,
   count: (userId: string) => [...contactKeys.all, 'count', userId] as const,
+  stageCounts: (userId: string) => [...contactKeys.all, 'stageCounts', userId] as const,
   recent: (userId: string) => [...contactKeys.all, 'recent', userId] as const,
   pending: (userId: string) => [...contactKeys.all, 'pending', userId] as const,
 }
@@ -46,5 +47,14 @@ export function usePendingFollowUps(userId: string) {
     queryKey: contactKeys.pending(userId),
     queryFn: () => fetchPendingFollowUps(userId),
     enabled: !!userId,
+  })
+}
+
+export function useContactStageCounts(userId: string) {
+  return useQuery({
+    queryKey: contactKeys.stageCounts(userId),
+    queryFn: () => fetchContactStageCounts(userId),
+    enabled: !!userId,
+    staleTime: 60_000,
   })
 }

@@ -1,4 +1,5 @@
-import { Phone, Mail, MessageCircle, Send, Camera } from 'lucide-react'
+import { Phone, Mail } from 'lucide-react'
+import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si'
 import type { Contact } from '@/types/database'
 import { cn } from '@/lib/utils'
 
@@ -15,7 +16,7 @@ export function ChannelButtons({ contact, size = 'default', className }: Channel
   const channels = [
     {
       key: 'whatsapp',
-      icon: MessageCircle,
+      icon: SiWhatsapp,
       href: contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/\D/g, '')}` : null,
       label: 'WhatsApp',
       color: 'hover:text-green-600 dark:hover:text-green-400',
@@ -36,14 +37,14 @@ export function ChannelButtons({ contact, size = 'default', className }: Channel
     },
     {
       key: 'telegram',
-      icon: Send,
+      icon: SiTelegram,
       href: contact.telegram ? `https://t.me/${contact.telegram.replace('@', '')}` : null,
       label: 'Telegram',
       color: 'hover:text-sky-600 dark:hover:text-sky-400',
     },
     {
       key: 'instagram',
-      icon: Camera,
+      icon: SiInstagram,
       href: contact.instagram
         ? `https://instagram.com/${contact.instagram.replace('@', '')}`
         : null,

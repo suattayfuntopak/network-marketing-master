@@ -22,7 +22,7 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
   const dealIds = stage.deals.map((d) => d.id)
 
   return (
-    <div className="flex flex-col w-72 shrink-0">
+    <div className="flex flex-col w-[200px] shrink-0">
       {/* Column header */}
       <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', colors.border, colors.bg)}>
         <div className="flex items-center justify-between">

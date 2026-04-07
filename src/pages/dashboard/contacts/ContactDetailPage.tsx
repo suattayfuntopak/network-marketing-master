@@ -290,7 +290,7 @@ export function ContactDetailPage() {
 
           {/* Stage selector */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.changeStage')}</p>
+            <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.changeStage')}</p>
             <Select value={contact.stage} onValueChange={handleStageChange}>
               <SelectTrigger className="w-full">
                 <SelectValue>
@@ -307,7 +307,7 @@ export function ContactDetailPage() {
 
           {/* Basic info */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.info')}</p>
+            <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.info')}</p>
             <div className="space-y-2 text-sm">
               {contact.city && (
                 <div className="flex items-center gap-2 text-muted-foreground">
@@ -387,7 +387,7 @@ export function ContactDetailPage() {
           {/* About */}
           {(contact.interests?.length || contact.goals?.length || contact.pain_points?.length) && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.about')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.about')}</p>
 
               {contact.interests && contact.interests.length > 0 && (
                 <div className="space-y-1.5">
@@ -436,7 +436,7 @@ export function ContactDetailPage() {
           {/* Notes */}
           {contact.notes && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.notes')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.notes')}</p>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">{contact.notes}</p>
             </div>
           )}
@@ -444,7 +444,7 @@ export function ContactDetailPage() {
           {/* Follow up */}
           {contact.next_follow_up_at && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.nextFollowup')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.nextFollowup')}</p>
               <p className="text-sm font-medium">
                 {format(new Date(contact.next_follow_up_at), 'd MMMM yyyy', { locale: tr })}
               </p>
@@ -457,7 +457,7 @@ export function ContactDetailPage() {
           {/* Deals */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('pipeline.title')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('pipeline.title')}</p>
               <Link
                 to={`${ROUTES.PIPELINE}?contact=${id}`}
                 className="text-xs text-primary hover:underline"
@@ -500,7 +500,7 @@ export function ContactDetailPage() {
           {/* Follow-ups */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('followUps.pageTitle')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('followUps.pageTitle')}</p>
               <button
                 onClick={() => setShowFollowUpModal(true)}
                 className="text-xs text-primary hover:underline flex items-center gap-1"
@@ -534,7 +534,7 @@ export function ContactDetailPage() {
                     <Bell className="w-3 h-3 text-amber-500 shrink-0" />
                     <span className="flex-1 truncate">{fu.title}</span>
                     <span className="text-muted-foreground shrink-0">
-                      {fmtDate2(new Date(fu.due_at), 'd MMM')}
+                      {fmtDate2(new Date(fu.due_at), 'd MMM', { locale: tr })}
                     </span>
                   </div>
                 ))}
@@ -550,7 +550,7 @@ export function ContactDetailPage() {
                     <Clock className="w-3 h-3 text-blue-500 shrink-0" />
                     <span className="flex-1 truncate">{apt.title}</span>
                     <span className="text-muted-foreground shrink-0">
-                      {fmtDate2(new Date(apt.starts_at), 'd MMM HH:mm')}
+                      {fmtDate2(new Date(apt.starts_at), 'd MMM HH:mm', { locale: tr })}
                     </span>
                   </div>
                 ))}
@@ -560,7 +560,7 @@ export function ContactDetailPage() {
 
           {/* AI Placeholder */}
           <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('contacts.detail.aiSuggestions')}</p>
+            <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.aiSuggestions')}</p>
             <p className="text-xs text-muted-foreground">{t('contacts.detail.aiPlaceholder')}</p>
           </div>
         </div>

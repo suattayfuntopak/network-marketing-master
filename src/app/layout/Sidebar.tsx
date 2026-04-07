@@ -14,8 +14,8 @@ const navConfig = [
   { key: 'dashboard', href: ROUTES.DASHBOARD, Icon: LayoutDashboard },
   { key: 'contacts', href: ROUTES.CONTACTS, Icon: Users },
   { key: 'pipeline', href: ROUTES.PIPELINE, Icon: GitMerge },
-  { key: 'messages', href: ROUTES.MESSAGES, Icon: MessageSquare },
   { key: 'calendar', href: ROUTES.CALENDAR, Icon: Calendar },
+  { key: 'messages', href: ROUTES.MESSAGES, Icon: MessageSquare },
   { key: 'academy', href: ROUTES.ACADEMY, Icon: GraduationCap },
   { key: 'team', href: ROUTES.TEAM, Icon: Users2, roles: ['leader', 'admin'] as string[] },
   { key: 'analytics', href: ROUTES.ANALYTICS, Icon: BarChart2 },
@@ -56,7 +56,7 @@ export function Sidebar() {
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
               <Zap className="w-4 h-4" />
             </div>
-            <span className="font-bold text-sm leading-tight flex-1 min-w-0 truncate">
+            <span className="font-bold text-xs leading-tight flex-1 min-w-0">
               Network Marketing Master
             </span>
             <button

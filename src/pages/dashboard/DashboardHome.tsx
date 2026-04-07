@@ -10,14 +10,22 @@ import { Button } from '@/components/ui/button'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useRecentContacts } from '@/hooks/useContacts'
-import { usePipelineStats } from '@/hooks/usePipeline'
+import { useContactCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useFollowUpBuckets, useTodayAppointments } from '@/hooks/useCalendar'
-import { formatCurrency } from '@/lib/pipeline/constants'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
 import type { FollowUpActionType } from '@/lib/calendar/types'
+
+const STAGE_DOT_COLORS: Record<string, string> = {
+  new: 'bg-gray-400',
+  contacted: 'bg-blue-500',
+  interested: 'bg-purple-500',
+  presenting: 'bg-amber-500',
+  thinking: 'bg-orange-500',
+  joined: 'bg-emerald-500',
+  lost: 'bg-red-500',
+}
 
 const ACTION_ICONS: Record<FollowUpActionType, React.ElementType> = {
   call: Phone, message: MessageCircle, email: Mail,
@@ -34,7 +42,7 @@ export function DashboardHome() {
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
-  const { data: pipelineStats } = usePipelineStats(userId)
+  const { data: stageCounts = [] } = useContactStageCounts(userId)
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
   const { data: todayAppointments = [] } = useTodayAppointments(userId)
@@ -81,15 +89,22 @@ export function DashboardHome() {
             </CardTitle>
             <TrendingUp className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {pipelineStats ? formatCurrency(pipelineStats.weightedValue, 'TRY', currentLang === 'en' ? 'en-US' : 'tr-TR') : '0'}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {pipelineStats && pipelineStats.totalDeals > 0
-                ? `${pipelineStats.totalDeals} deal`
-                : t('dashboard.noPipeline')}
-            </p>
+          <CardContent className="pt-0">
+            {stageCounts.length === 0 ? (
+              <p className="text-xs text-muted-foreground mt-2">{t('dashboard.noPipeline')}</p>
+            ) : (
+              <div className="space-y-1 mt-1">
+                {stageCounts.filter(s => s.count > 0).slice(0, 5).map(({ stage, count }) => (
+                  <div key={stage} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className={`w-2 h-2 rounded-full shrink-0 ${STAGE_DOT_COLORS[stage] ?? 'bg-gray-400'}`} />
+                      <span className="text-xs text-muted-foreground truncate">{t(`pipelineStages.${stage}`)}</span>
+                    </div>
+                    <span className="text-xs font-semibold tabular-nums">{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

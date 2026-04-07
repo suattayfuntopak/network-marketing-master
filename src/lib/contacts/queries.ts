@@ -172,3 +172,21 @@ export async function fetchRecentContacts(userId: string): Promise<ContactWithTa
     return { ...(contact as ContactWithTags), tags }
   })
 }
+
+
+export interface StageCount { stage: string; count: number }
+
+export async function fetchContactStageCounts(userId: string): Promise<StageCount[]> {
+  const STAGES = ['new', 'contacted', 'interested', 'presenting', 'thinking', 'joined', 'lost']
+  const results: StageCount[] = []
+  for (const stage of STAGES) {
+    const { count, error } = await supabase
+      .from('nmm_contacts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('is_archived', false)
+      .eq('stage', stage)
+    if (!error) results.push({ stage, count: count ?? 0 })
+  }
+  return results
+}

@@ -296,7 +296,7 @@
   },
   "pipeline": {
     "title": "Süreç Takibi",
-    "newDeal": "Yeni Fırsat",
+    "newDeal": "Yeni Aksiyon",
     "manageStages": "Aşamaları Yönet",
     "emptyColumn": "Bu aşamada fırsat yok",
     "totalValue": "Toplam Değer",
@@ -323,12 +323,12 @@
       "lostReason": "Kayıp Sebebi",
       "lostReasonPlaceholder": "Neden kaybedildi?",
       "reopen": "Yeniden Aç",
-      "created": "Fırsat oluşturuldu",
-      "updated": "Fırsat güncellendi",
-      "deleted": "Fırsat silindi",
-      "won": "Fırsat kazanıldı 🎉",
-      "lost": "Fırsat kaybedildi",
-      "reopened": "Fırsat yeniden açıldı"
+      "created": "Aksiyon oluşturuldu",
+      "updated": "Aksiyon güncellendi",
+      "deleted": "Aksiyon silindi",
+      "won": "Aksiyon kazanıldı 🎉",
+      "lost": "Aksiyon kaybedildi",
+      "reopened": "Aksiyon yeniden açıldı"
     },
     "dealTypes": {
       "prospect": "Aday",
@@ -350,7 +350,7 @@
       "color": "Renk"
     },
     "forecast": {
-      "openDeals": "Açık Fırsatlar",
+      "openDeals": "Açık Aksiyonlar",
       "deal_one": "fırsat",
       "deal_other": "fırsat"
     }
@@ -359,7 +359,7 @@
     "welcome": "Hoş geldin, {{name}} 👋",
     "welcomeSubtitle": "Network Marketing Master kontrol panelinize hoş geldiniz.",
     "totalContacts": "Toplam Kontak",
-    "activePipeline": "Aktif Pipeline",
+    "activePipeline": "Aktif Süreç Takibi",
     "weeklyMessages": "Bu Haftaki Mesaj",
     "monthlyGoal": "Aylık Hedef",
     "noContacts": "Henüz kontak yok",
