@@ -23,6 +23,7 @@ export function useContacts(params: ContactListParams) {
     },
     enabled: !!params.userId,
     staleTime: 0,
+    retry: false,
   })
 }
 

@@ -146,30 +146,46 @@ export function ContactKanbanBoard({ contacts, userId }: Props) {
     return CONTACT_STAGES.find(stage => grouped[stage]?.some(c => c.id === id))
   }, [grouped])
 
+  const [startStage, setStartStage] = useState<string | null>(null)
+
   const handleDragStart = ({ active }: DragStartEvent) => {
     setActiveId(active.id as string)
+    setStartStage(findStageForContact(active.id as string) ?? null)
   }
 
-  const handleDragEnd = ({ active, over }: DragEndEvent) => {
+  const handleDragOver = ({ active, over }: any) => {
+    if (!over) {
+      setOverStage(null)
+      return
+    }
+    const contactId = active.id as string
+    const overId = over.id as string
+
+    const currentStage = findStageForContact(contactId) ?? ''
+    const newStage = CONTACT_STAGES.includes(overId as any)
+      ? overId
+      : findStageForContact(overId) ?? currentStage
+
+    setOverStage(newStage)
+
+    if (newStage && newStage !== currentStage) {
+      setOptimisticContacts(prev =>
+        prev.map(c => c.id === contactId ? { ...c, stage: newStage as Contact['stage'] } : c)
+      )
+    }
+  }
+
+  const handleDragEnd = ({ active }: DragEndEvent) => {
     setActiveId(null)
     setOverStage(null)
-    if (!over) return
-
+    
     const contactId = active.id as string
-    const oldStage = findStageForContact(contactId) ?? ''
-    // `over.id` can be a contact id or a stage id (droppable)
-    const newStage = CONTACT_STAGES.includes(over.id as typeof CONTACT_STAGES[number])
-      ? over.id as string
-      : findStageForContact(over.id as string) ?? oldStage
+    const newStage = findStageForContact(contactId) ?? ''
+    const oldStage = startStage ?? ''
 
-    if (newStage === oldStage) return
+    if (!newStage || newStage === oldStage) return
 
-    // Optimistic update
-    setOptimisticContacts(prev =>
-      prev.map(c => c.id === contactId ? { ...c, stage: newStage as Contact['stage'] } : c)
-    )
-
-    updateStage.mutate({ contactId, newStage, oldStage }, {
+    updateStage.mutate({ contactId, newStage: newStage as Contact['stage'], oldStage: oldStage as Contact['stage'] }, {
       onError: () => {
         // Revert on error
         setOptimisticContacts(contacts)
@@ -182,9 +198,7 @@ export function ContactKanbanBoard({ contacts, userId }: Props) {
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragOver={({ over }) => setOverStage(
-        over ? (CONTACT_STAGES.includes(over.id as typeof CONTACT_STAGES[number]) ? over.id as string : findStageForContact(over.id as string) ?? null) : null
-      )}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <div className="flex gap-3 overflow-x-auto pb-4 min-h-0 h-full">

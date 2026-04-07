@@ -455,48 +455,7 @@ export function ContactDetailPage() {
             </div>
           )}
 
-          {/* Deals */}
-          <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('pipeline.title')}</p>
-              <Link
-                to={`${ROUTES.PIPELINE}?contact=${id}`}
-                className="text-xs text-primary hover:underline"
-              >
-                {t('contacts.detail.viewAll')}
-              </Link>
-            </div>
-            {contactDeals.length === 0 ? (
-              <p className="text-xs text-muted-foreground">{t('pipeline.noDeals')}</p>
-            ) : (
-              <div className="space-y-2">
-                {contactDeals.slice(0, 5).map((deal) => {
-                  const stage = pipelineStages.find((s) => s.id === deal.stage_id)
-                  const stageColors = stage ? STAGE_COLOR_CLASSES[stage.color] : STAGE_COLOR_CLASSES.gray
-                  return (
-                    <Link
-                      key={deal.id}
-                      to={`${ROUTES.PIPELINE}/${deal.id}`}
-                      className="flex items-center justify-between gap-2 hover:bg-muted/30 -mx-2 px-2 py-1.5 rounded-md transition-colors group"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-medium truncate group-hover:text-primary">{deal.title}</p>
-                        {stage && (
-                          <span className={`text-xs px-1.5 py-0 rounded-full ${stageColors.badge}`}>{stage.name}</span>
-                        )}
-                      </div>
-                      <div className="text-right shrink-0">
-                        <p className="text-xs font-semibold">{formatCurrency(deal.value, deal.currency, currLocale)}</p>
-                        <span className={`text-xs px-1.5 rounded-full ${DEAL_STATUS_COLORS[deal.status]}`}>
-                          {t(`pipeline.status.${deal.status}`)}
-                        </span>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+
 
           {/* Follow-ups */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-3">
@@ -559,10 +518,24 @@ export function ContactDetailPage() {
             )}
           </div>
 
-          {/* AI Placeholder */}
-          <div className="rounded-lg border border-dashed border-border bg-muted/20 p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.aiSuggestions')}</p>
-            <p className="text-xs text-muted-foreground">{t('contacts.detail.aiPlaceholder')}</p>
+          {/* AI Assistant */}
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+            <div className="flex items-center gap-2">
+               <Sparkles className="w-4 h-4 text-primary" />
+               <p className="text-sm font-semibold text-primary">{t('contacts.detail.aiSuggestions', { defaultValue: 'Yapay Zeka Önerisi' })}</p>
+            </div>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Bu kişinin profiline ve iletişim geçmişinize dayanarak, ne tür bir mesaj atmanız gerektiği veya bir sonraki adamın ne olması gerektiği konusunda Claude yapay zeka asistanından anında tavsiye alabilirsiniz.
+            </p>
+            <Button
+              size="sm"
+              onClick={() => setShowAIModal(true)}
+              className="w-full gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+              variant="outline"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Yapay Zeka Önerisi Al
+            </Button>
           </div>
         </div>
       </div>

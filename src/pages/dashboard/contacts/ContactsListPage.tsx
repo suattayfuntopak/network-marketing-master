@@ -38,7 +38,7 @@ export function ContactsListPage() {
   const [showImport, setShowImport] = useState(false)
   const [exporting, setExporting] = useState(false)
 
-  const { data, isLoading } = useContacts({
+  const { data, isLoading, isError } = useContacts({
     filters,
     sort,
     page,
@@ -274,6 +274,10 @@ export function ContactsListPage() {
       {isLoading ? (
         <div className="rounded-lg border border-border p-8 text-center text-muted-foreground text-sm">
           {t('common.loading')}
+        </div>
+      ) : isError ? (
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-8 text-center text-red-500 text-sm">
+          Bağlantı hatası oluştu, lütfen sayfayı yenileyiniz.
         </div>
       ) : contacts.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center">
