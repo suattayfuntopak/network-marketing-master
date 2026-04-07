@@ -99,7 +99,7 @@ export function ContactTable({
             <tr className="border-b border-border bg-muted/30">
               <th className="w-10 px-3 py-3 text-left">
                 <Checkbox
-                  checked={allSelected ? true : someSelected ? 'mixed' : false}
+                  checked={allSelected ? true : false}
                   onCheckedChange={onSelectAll}
                 />
               </th>

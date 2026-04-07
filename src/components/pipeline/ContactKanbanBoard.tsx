@@ -14,6 +14,7 @@ import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useUpdateContactStageById } from '@/hooks/useContact'
 import { ROUTES } from '@/lib/constants'
 import type { ContactWithTags } from '@/lib/contacts/types'
+import type { Contact } from '@/types/database'
 
 const CONTACT_STAGES = ['new', 'contacted', 'interested', 'presenting', 'thinking', 'joined', 'lost'] as const
 
@@ -84,7 +85,7 @@ function ContactKanbanColumn({ stage, contacts, isOver }: ColumnProps) {
     <div className="flex flex-col w-[200px] shrink-0">
       <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', STAGE_HEADER_COLORS[stage] ?? 'border-t-gray-400 bg-muted')}>
         <div className="flex items-center justify-between gap-2">
-          <StageBadge stage={stage} />
+          <StageBadge stage={stage as Contact['stage']} />
           <span className="text-xs font-semibold text-muted-foreground">{contacts.length}</span>
         </div>
       </div>

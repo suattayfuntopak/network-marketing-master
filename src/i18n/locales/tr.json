@@ -298,10 +298,12 @@
     "title": "Süreç Takibi",
     "newDeal": "Yeni Aksiyon",
     "manageStages": "Aşamaları Yönet",
-    "emptyColumn": "Bu aşamada fırsat yok",
+    "emptyColumn": "Bu aşamada kayıt yok",
     "totalValue": "Toplam Değer",
     "weightedValue": "Ağırlıklı Değer",
-    "noDeals": "Henüz fırsat yok",
+    "noDeals": "Henüz aksiyon yok",
+    "deals": "aksiyon",
+    "dealsMode": "Aksiyonlar",
     "stageHistory": "Aşama Geçmişi",
     "views": {
       "kanban": "Kanban",
@@ -532,6 +534,13 @@
     "generate": "✨ AI Mesaj Üret",
     "noTemplates": "Henüz şablon yok",
     "noAIMessages": "Henüz AI mesaj üretilmedi",
+    "bulk": {
+      "title": "Toplu Mesaj",
+      "subtitle": "Kontakları seç, her biri için AI mesaj üret",
+      "clearSelection": "Seçimi Temizle",
+      "generateFor": "{{count}} Kontak için Üret",
+      "selected": "seçildi"
+    },
     "categories": {
       "first_contact": "İlk Temas",
       "warm_up": "Bağ Kurma",
@@ -583,7 +592,8 @@
       "feedbackGreat": "Harika",
       "feedbackGood": "İyi",
       "feedbackMeh": "Orta",
-      "feedbackBad": "Kötü"
+      "feedbackBad": "Kötü",
+      "contactHint": "Kontak detay sayfasından da doğrudan kontağa özel mesaj üretebilirsin"
     },
     "template": {
       "new": "Yeni Şablon",

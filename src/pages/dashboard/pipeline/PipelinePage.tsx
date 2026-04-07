@@ -1,18 +1,22 @@
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutGrid, List, Settings2, Plus } from 'lucide-react'
+import { LayoutGrid, List, Settings2, Plus, Users, Briefcase } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { usePipelineStages, useDeals } from '@/hooks/usePipeline'
+import { useContacts } from '@/hooks/useContacts'
 import type { StageWithDeals, DealFilters, DealType } from '@/lib/pipeline/types'
 import { KanbanBoard } from '@/components/pipeline/KanbanBoard'
+import { ContactKanbanBoard } from '@/components/pipeline/ContactKanbanBoard'
 import { PipelineTableView } from './PipelineTableView'
+import { ContactTableView } from './ContactTableView'
 import { NewDealModal } from './modals/NewDealModal'
 import { ManageStagesModal } from './modals/ManageStagesModal'
 
 type ViewMode = 'kanban' | 'table'
+type DataMode = 'deals' | 'contacts'
 
 export function PipelinePage() {
   const { t } = useTranslation()
@@ -24,6 +28,13 @@ export function PipelinePage() {
   const setView = (v: ViewMode) => {
     const params = new URLSearchParams(searchParams)
     params.set('view', v)
+    setSearchParams(params)
+  }
+
+  const dataMode = (searchParams.get('mode') as DataMode) ?? 'contacts'
+  const setDataMode = (m: DataMode) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('mode', m)
     setSearchParams(params)
   }
 
@@ -42,9 +53,20 @@ export function PipelinePage() {
   const { data: stages = [], isLoading: stagesLoading } = usePipelineStages(userId)
   const { data: deals = [], isLoading: dealsLoading } = useDeals(userId, filters)
 
-  const isLoading = stagesLoading || dealsLoading
+  const { data: contactsResult, isLoading: contactsLoading } = useContacts({
+    userId,
+    filters: { stage: null, warmthMin: null, warmthMax: null, source: null, tags: null, search: null, showArchived: false },
+    sort: { field: 'created_at', direction: 'desc' },
+    page: 1,
+    pageSize: 200,
+  })
+  const contacts = contactsResult?.data ?? []
 
-  // Build StageWithDeals for Kanban
+  const isLoading = dataMode === 'deals'
+    ? (stagesLoading || dealsLoading)
+    : contactsLoading
+
+  // Build StageWithDeals for Kanban (deals mode)
   const stagesWithDeals: StageWithDeals[] = stages
     .filter((s) => !s.is_lost_stage || view !== 'kanban')
     .map((stage) => {
@@ -61,18 +83,48 @@ export function PipelinePage() {
     setShowNewDeal(true)
   }
 
+  const subtitle = dataMode === 'deals'
+    ? (deals.length > 0 ? `${deals.length} ${t('pipeline.deals')}` : t('pipeline.emptyColumn'))
+    : `${contacts.length} ${t('contacts.title').toLowerCase()}`
+
   return (
     <div className="flex flex-col h-full min-h-0 p-6 pb-20 lg:pb-6 space-y-4">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t('pipeline.title')}</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {deals.length > 0 ? `${deals.length} deal` : t('pipeline.emptyColumn')}
-          </p>
+          <p className="text-sm text-muted-foreground mt-0.5">{subtitle}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          {/* Data mode toggle */}
+          <div className="flex items-center border rounded-md overflow-hidden">
+            <button
+              onClick={() => setDataMode('contacts')}
+              className={cn(
+                'px-3 py-1.5 text-xs flex items-center gap-1.5 transition-colors',
+                dataMode === 'contacts'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              )}
+            >
+              <Users className="w-3.5 h-3.5" />
+              {t('contacts.title')}
+            </button>
+            <button
+              onClick={() => setDataMode('deals')}
+              className={cn(
+                'px-3 py-1.5 text-xs flex items-center gap-1.5 transition-colors',
+                dataMode === 'deals'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+              )}
+            >
+              <Briefcase className="w-3.5 h-3.5" />
+              {t('pipeline.dealsMode')}
+            </button>
+          </div>
+
           {/* View toggle */}
           <div className="flex items-center border rounded-md overflow-hidden">
             {([
@@ -95,24 +147,28 @@ export function PipelinePage() {
             ))}
           </div>
 
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5"
-            onClick={() => setShowManageStages(true)}
-          >
-            <Settings2 className="w-4 h-4" />
-            <span className="hidden sm:inline">{t('pipeline.manageStages')}</span>
-          </Button>
+          {dataMode === 'deals' && (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => setShowManageStages(true)}
+              >
+                <Settings2 className="w-4 h-4" />
+                <span className="hidden sm:inline">{t('pipeline.manageStages')}</span>
+              </Button>
 
-          <Button
-            size="sm"
-            className="gap-1.5"
-            onClick={() => { setNewDealStageId(undefined); setShowNewDeal(true) }}
-          >
-            <Plus className="w-4 h-4" />
-            {t('pipeline.newDeal')}
-          </Button>
+              <Button
+                size="sm"
+                className="gap-1.5"
+                onClick={() => { setNewDealStageId(undefined); setShowNewDeal(true) }}
+              >
+                <Plus className="w-4 h-4" />
+                {t('pipeline.newDeal')}
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
@@ -123,16 +179,22 @@ export function PipelinePage() {
         </div>
       ) : (
         <div className="flex-1 min-h-0 overflow-hidden">
-          {view === 'kanban' && (
+          {dataMode === 'contacts' && view === 'kanban' && (
             <div className="h-full overflow-x-auto">
-              <KanbanBoard
-                stages={stagesWithDeals}
-                userId={userId}
-                onAddDeal={handleAddDeal}
-              />
+              <ContactKanbanBoard contacts={contacts} userId={userId} />
             </div>
           )}
-          {view === 'table' && <PipelineTableView deals={deals} stages={stages} />}
+          {dataMode === 'contacts' && view === 'table' && (
+            <ContactTableView contacts={contacts} />
+          )}
+          {dataMode === 'deals' && view === 'kanban' && (
+            <div className="h-full overflow-x-auto">
+              <KanbanBoard stages={stagesWithDeals} userId={userId} onAddDeal={handleAddDeal} />
+            </div>
+          )}
+          {dataMode === 'deals' && view === 'table' && (
+            <PipelineTableView deals={deals} stages={stages} />
+          )}
         </div>
       )}
 

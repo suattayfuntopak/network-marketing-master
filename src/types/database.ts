@@ -56,6 +56,7 @@ export interface Database {
           updated_at?: string
         }
       }
+
       nmm_contacts: {
         Row: {
           id: string
@@ -145,6 +146,7 @@ export interface Database {
           updated_at?: string
         }
       }
+
       nmm_tags: {
         Row: {
           id: string
@@ -168,6 +170,7 @@ export interface Database {
           created_at?: string
         }
       }
+
       nmm_contact_tags: {
         Row: {
           contact_id: string
@@ -185,6 +188,7 @@ export interface Database {
           created_at?: string
         }
       }
+
       nmm_interactions: {
         Row: {
           id: string
@@ -226,7 +230,80 @@ export interface Database {
           created_at?: string
         }
       }
+
+      nmm_objections: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          content: string
+          category: string
+          is_favorite: boolean
+          use_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          content: string
+          category: string
+          is_favorite?: boolean
+          use_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          content?: string
+          category?: string
+          is_favorite?: boolean
+          use_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
+      nmm_academy_content: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          content: string
+          type: string
+          category: string
+          view_count: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          content: string
+          type: string
+          category: string
+          view_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          content?: string
+          type?: string
+          category?: string
+          view_count?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
+
     Views: Record<string, never>
     Functions: Record<string, never>
     Enums: {
@@ -248,3 +325,11 @@ export type TagInsert = Database['public']['Tables']['nmm_tags']['Insert']
 
 export type Interaction = Database['public']['Tables']['nmm_interactions']['Row']
 export type InteractionInsert = Database['public']['Tables']['nmm_interactions']['Insert']
+
+export type Objection = Database['public']['Tables']['nmm_objections']['Row']
+export type ObjectionInsert = Database['public']['Tables']['nmm_objections']['Insert']
+export type ObjectionUpdate = Database['public']['Tables']['nmm_objections']['Update']
+
+export type AcademyContent = Database['public']['Tables']['nmm_academy_content']['Row']
+export type AcademyContentInsert = Database['public']['Tables']['nmm_academy_content']['Insert']
+export type AcademyContentUpdate = Database['public']['Tables']['nmm_academy_content']['Update']

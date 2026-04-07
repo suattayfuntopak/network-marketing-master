@@ -54,7 +54,7 @@ export function CalendarAgendaView({ currentDate, appointments, followUps, onAdd
               'sticky top-0 flex items-center gap-3 px-4 py-2 text-sm font-semibold border-b bg-background/95 backdrop-blur-sm z-10',
               isToday(day) && 'text-primary'
             )}>
-              <span>{relativeDay(day, t)}</span>
+              <span>{relativeDay(day)}</span>
               {isToday(day) && <span className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-normal">{t('calendar.today')}</span>}
             </div>
 

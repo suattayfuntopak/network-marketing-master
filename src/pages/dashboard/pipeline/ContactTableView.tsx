@@ -18,18 +18,18 @@ export function ContactTableView({ contacts }: Props) {
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b bg-muted/30">
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.name')}</th>
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.stage')}</th>
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.warmth')}</th>
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.source')}</th>
-            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.tags')}</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.columns.name')}</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.columns.stage')}</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.columns.warmth')}</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.detail.info')}</th>
+            <th className="text-left px-4 py-3 font-medium text-muted-foreground">{t('contacts.columns.tags')}</th>
           </tr>
         </thead>
         <tbody>
           {contacts.length === 0 ? (
             <tr>
               <td colSpan={5} className="text-center py-12 text-muted-foreground">
-                {t('contacts.empty')}
+                {t('contacts.noContacts')}
               </td>
             </tr>
           ) : (

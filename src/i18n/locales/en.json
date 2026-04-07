@@ -302,6 +302,8 @@
     "totalValue": "Total Value",
     "weightedValue": "Weighted Value",
     "noDeals": "No deals yet",
+    "deals": "deals",
+    "dealsMode": "Deals",
     "stageHistory": "Stage History",
     "views": {
       "kanban": "Kanban",
@@ -532,6 +534,13 @@
     "generate": "✨ AI Message",
     "noTemplates": "No templates yet",
     "noAIMessages": "No AI messages generated yet",
+    "bulk": {
+      "title": "Bulk Message",
+      "subtitle": "Select contacts and generate AI messages for each",
+      "clearSelection": "Clear Selection",
+      "generateFor": "Generate for {{count}} Contacts",
+      "selected": "selected"
+    },
     "categories": {
       "first_contact": "First Contact",
       "warm_up": "Warm Up",
@@ -583,7 +592,8 @@
       "feedbackGreat": "Great",
       "feedbackGood": "Good",
       "feedbackMeh": "Okay",
-      "feedbackBad": "Bad"
+      "feedbackBad": "Bad",
+      "contactHint": "You can also generate contact-specific messages from the contact detail page"
     },
     "template": {
       "new": "New Template",
