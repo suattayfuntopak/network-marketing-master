@@ -1,10 +1,16 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Clock, Eye, Star } from 'lucide-react'
+import { ArrowLeft, Clock, Eye, Star, Pencil, Copy } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { useAcademyContent, useToggleAcademyFavorite } from '@/hooks/useAcademy'
+import { useAcademyContent, useToggleAcademyFavorite, useCreateAcademyContent, useUpdateAcademyContent } from '@/hooks/useAcademy'
+import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
+import type { ContentCategory, ContentLevel, ContentType } from '@/lib/academy/types'
 
 const LEVEL_COLORS = {
   beginner: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-950',
@@ -12,13 +18,99 @@ const LEVEL_COLORS = {
   advanced: 'text-red-600 bg-red-50 dark:bg-red-950',
 }
 
+const CATEGORIES: ContentCategory[] = [
+  'mindset', 'prospecting', 'inviting', 'presenting',
+  'closing', 'follow_up', 'team_building', 'leadership',
+  'social_media', 'product_knowledge', 'company_info', 'compliance',
+]
+const LEVELS: ContentLevel[] = ['beginner', 'intermediate', 'advanced']
+const TYPES: ContentType[] = ['lesson', 'script', 'article', 'cheat_sheet', 'success_story', 'role_play', 'video']
+
+interface EditForm {
+  title: string
+  summary: string
+  content: string
+  tags: string
+  category: ContentCategory
+  level: ContentLevel
+  type: ContentType
+}
+
 export function AcademyContentDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const { data: content, isLoading } = useAcademyContent(id ?? '')
   const toggleFavorite = useToggleAcademyFavorite()
+  const createContent = useCreateAcademyContent()
+  const updateContent = useUpdateAcademyContent()
+
+  const [showEdit, setShowEdit] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState<EditForm>({
+    title: '', summary: '', content: '', tags: '',
+    category: 'mindset', level: 'beginner', type: 'lesson',
+  })
+
+  useEffect(() => {
+    if (content && showEdit) {
+      setForm({
+        title: content.title,
+        summary: content.summary ?? '',
+        content: content.content ?? '',
+        tags: content.tags?.join(', ') ?? '',
+        category: content.category,
+        level: content.level,
+        type: content.type,
+      })
+    }
+  }, [content, showEdit])
+
+  const isOwn = !!content && !content.is_system && content.user_id === user?.id
+
+  const handleSave = async () => {
+    if (!form.title.trim() || loading || !user?.id) return
+    setLoading(true)
+    try {
+      const tags = form.tags.split(',').map((t) => t.trim()).filter(Boolean)
+      if (isOwn && content) {
+        // Direkt güncelle
+        await updateContent.mutateAsync({
+          id: content.id,
+          data: {
+            title: form.title,
+            summary: form.summary || null,
+            content: form.content || null,
+            tags,
+            category: form.category,
+            level: form.level,
+            type: form.type,
+          },
+        })
+        setShowEdit(false)
+      } else if (content) {
+        // Sistem içeriği — kopyasını oluştur ve yeni sayfaya git
+        await createContent.mutateAsync({
+          user_id: user.id,
+          title: form.title,
+          summary: form.summary || null,
+          content: form.content || null,
+          tags,
+          category: form.category,
+          level: form.level,
+          type: form.type,
+        })
+        setShowEdit(false)
+        navigate(ROUTES.ACADEMY)
+      }
+    } catch (err) {
+      console.error('[AcademyContentDetailPage] save error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (isLoading) {
     return <div className="p-6 text-muted-foreground">{t('common.loading')}</div>
@@ -37,15 +129,29 @@ export function AcademyContentDetailPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 max-w-3xl mx-auto space-y-6">
-      {/* Geri */}
-      <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.ACADEMY)} className="gap-2">
-        <ArrowLeft className="w-4 h-4" />
-        {t('academy.title')}
-      </Button>
+    <div className="p-6 pb-20 lg:pb-6 space-y-6">
+      {/* Geri + aksiyonlar */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.ACADEMY)} className="gap-2">
+          <ArrowLeft className="w-4 h-4" />
+          {t('academy.title')}
+        </Button>
+        <div className="flex-1" />
+        {isOwn ? (
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowEdit(true)}>
+            <Pencil className="w-3.5 h-3.5" />
+            {t('common.edit')}
+          </Button>
+        ) : (
+          <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowEdit(true)}>
+            <Copy className="w-3.5 h-3.5" />
+            Kopyala &amp; Düzenle
+          </Button>
+        )}
+      </div>
 
       {/* Meta */}
-      <div className="space-y-3">
+      <div className="space-y-3 max-w-3xl">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
             {t(`academy.categories.${content.category}`)}
@@ -56,6 +162,9 @@ export function AcademyContentDetailPage() {
           <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
             {t(`academy.types.${content.type}`)}
           </span>
+          {content.is_system && (
+            <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">Sistem</span>
+          )}
         </div>
 
         <div className="flex items-start justify-between gap-4">
@@ -95,7 +204,7 @@ export function AcademyContentDetailPage() {
 
       {/* Video */}
       {content.video_url && (
-        <div className="aspect-video rounded-lg overflow-hidden border">
+        <div className="aspect-video max-w-3xl rounded-lg overflow-hidden border">
           <iframe
             src={content.video_url}
             className="w-full h-full"
@@ -105,19 +214,12 @@ export function AcademyContentDetailPage() {
         </div>
       )}
 
-      {/* İçerik — markdown benzeri render */}
+      {/* İçerik */}
       {content.content && (
-        <div className="prose prose-sm dark:prose-invert max-w-none">
+        <div className="max-w-3xl space-y-1">
           {content.content.split('\n').map((line, i) => {
-            if (line.startsWith('## ')) {
-              return <h2 key={i} className="text-lg font-bold mt-6 mb-3">{line.slice(3)}</h2>
-            }
-            if (line.startsWith('### ')) {
-              return <h3 key={i} className="text-base font-semibold mt-4 mb-2">{line.slice(4)}</h3>
-            }
-            if (line.startsWith('**') && line.endsWith('**')) {
-              return <p key={i} className="font-semibold">{line.slice(2, -2)}</p>
-            }
+            if (line.startsWith('## ')) return <h2 key={i} className="text-lg font-bold mt-6 mb-3">{line.slice(3)}</h2>
+            if (line.startsWith('### ')) return <h3 key={i} className="text-base font-semibold mt-4 mb-2">{line.slice(4)}</h3>
             if (line.startsWith('- ')) {
               return (
                 <div key={i} className="flex gap-2 text-sm">
@@ -126,21 +228,12 @@ export function AcademyContentDetailPage() {
                 </div>
               )
             }
-            if (line.startsWith('❌ ') || line.startsWith('✅ ')) {
-              return <p key={i} className="text-sm">{line}</p>
-            }
-            if (line.startsWith('---')) {
-              return <hr key={i} className="my-4" />
-            }
-            if (line === '') {
-              return <div key={i} className="h-2" />
-            }
+            if (line.startsWith('❌ ') || line.startsWith('✅ ')) return <p key={i} className="text-sm">{line}</p>
+            if (line.startsWith('---')) return <hr key={i} className="my-4" />
+            if (line === '') return <div key={i} className="h-2" />
             return (
-              <p
-                key={i}
-                className="text-sm leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
-              />
+              <p key={i} className="text-sm leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
             )
           })}
         </div>
@@ -148,7 +241,7 @@ export function AcademyContentDetailPage() {
 
       {/* Etiketler */}
       {content.tags && content.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-2 border-t">
+        <div className="flex flex-wrap gap-1.5 pt-2 border-t max-w-3xl">
           {content.tags.map((tag) => (
             <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
               #{tag}
@@ -156,6 +249,98 @@ export function AcademyContentDetailPage() {
           ))}
         </div>
       )}
+
+      {/* Edit / Copy modal */}
+      <Dialog open={showEdit} onOpenChange={(v) => !v && setShowEdit(false)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {isOwn ? t('common.edit') : 'Kopyala & Düzenle'}
+            </DialogTitle>
+            {!isOwn && (
+              <p className="text-sm text-muted-foreground">Kendi kütüphanene eklenecek, orijinal değişmez.</p>
+            )}
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Başlık</p>
+              <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Kategori</p>
+                <select
+                  value={form.category}
+                  onChange={(e) => setForm({ ...form, category: e.target.value as ContentCategory })}
+                  className="w-full text-sm rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{t(`academy.categories.${c}`)}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Seviye</p>
+                <select
+                  value={form.level}
+                  onChange={(e) => setForm({ ...form, level: e.target.value as ContentLevel })}
+                  className="w-full text-sm rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {LEVELS.map((l) => <option key={l} value={l}>{t(`academy.${l}`)}</option>)}
+                </select>
+              </div>
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1">Tür</p>
+                <select
+                  value={form.type}
+                  onChange={(e) => setForm({ ...form, type: e.target.value as ContentType })}
+                  className="w-full text-sm rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+                >
+                  {TYPES.map((tp) => <option key={tp} value={tp}>{t(`academy.types.${tp}`)}</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Özet</p>
+              <Textarea
+                value={form.summary}
+                onChange={(e) => setForm({ ...form, summary: e.target.value })}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">İçerik (Markdown desteklenir)</p>
+              <Textarea
+                value={form.content}
+                onChange={(e) => setForm({ ...form, content: e.target.value })}
+                rows={10}
+                className="resize-y text-sm font-mono"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Etiketler (virgülle ayır)</p>
+              <Input
+                value={form.tags}
+                onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                placeholder="mindset, başlangıç, davet"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button onClick={handleSave} disabled={!form.title.trim() || loading}>
+                {loading ? t('common.saving') : t('common.save')}
+              </Button>
+              <Button variant="ghost" onClick={() => setShowEdit(false)}>{t('common.cancel')}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

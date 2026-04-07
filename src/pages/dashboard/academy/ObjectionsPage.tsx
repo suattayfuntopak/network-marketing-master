@@ -1,37 +1,57 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare } from 'lucide-react'
+import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Pencil, Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
-import { useObjections, useToggleObjectionFavorite, useIncrementObjectionUseCount } from '@/hooks/useObjections'
-import type { ObjectionCategory } from '@/lib/academy/types'
+import { useObjections, useToggleObjectionFavorite, useIncrementObjectionUseCount, useCreateObjection, useUpdateObjection } from '@/hooks/useObjections'
+import { useAuth } from '@/hooks/useAuth'
+import type { Objection, ObjectionCategory } from '@/lib/academy/types'
 
-const CATEGORIES: { value: ObjectionCategory | 'all'; label: string }[] = [
-  { value: 'all', label: 'Tümü' },
-  { value: 'money', label: '' },
-  { value: 'time', label: '' },
-  { value: 'pyramid', label: '' },
-  { value: 'trust', label: '' },
-  { value: 'family', label: '' },
-  { value: 'fear', label: '' },
-  { value: 'experience', label: '' },
-  { value: 'product', label: '' },
-  { value: 'company', label: '' },
-  { value: 'no_network', label: '' },
-  { value: 'introvert', label: '' },
-  { value: 'employed', label: '' },
-  { value: 'wait', label: '' },
-  { value: 'other', label: '' },
+const CATEGORIES: { value: ObjectionCategory | 'all' }[] = [
+  { value: 'all' },
+  { value: 'money' }, { value: 'time' }, { value: 'pyramid' }, { value: 'trust' },
+  { value: 'family' }, { value: 'fear' }, { value: 'experience' }, { value: 'product' },
+  { value: 'company' }, { value: 'no_network' }, { value: 'introvert' },
+  { value: 'employed' }, { value: 'wait' }, { value: 'other' },
 ]
+
+const OBJ_CATEGORIES: ObjectionCategory[] = [
+  'money', 'time', 'trust', 'family', 'fear', 'experience',
+  'product', 'company', 'pyramid', 'no_network', 'introvert', 'employed', 'wait', 'other',
+]
+
+interface EditForm {
+  objection_text: string
+  response_text: string
+  response_short: string
+  approach: string
+  example_dialog: string
+  category: ObjectionCategory
+}
+
+const EMPTY_FORM: EditForm = {
+  objection_text: '', response_text: '', response_short: '',
+  approach: '', example_dialog: '', category: 'other',
+}
 
 export function ObjectionsPage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<ObjectionCategory | 'all'>('all')
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [copiedShortId, setCopiedShortId] = useState<string | null>(null)
+
+  // Edit modal state
+  const [editTarget, setEditTarget] = useState<Objection | null>(null) // null = yeni
+  const [isCopyMode, setIsCopyMode] = useState(false) // sistem itirazı kopyası
+  const [showModal, setShowModal] = useState(false)
+  const [form, setForm] = useState<EditForm>(EMPTY_FORM)
+  const [saving, setSaving] = useState(false)
 
   const { data: objections = [], isLoading } = useObjections({
     category: category === 'all' ? undefined : category,
@@ -40,27 +60,78 @@ export function ObjectionsPage() {
 
   const toggleFavorite = useToggleObjectionFavorite()
   const incrementUse = useIncrementObjectionUseCount()
+  const createObjection = useCreateObjection()
+  const updateObjection = useUpdateObjection()
 
   const handleCopy = async (id: string, text: string, short = false) => {
     await navigator.clipboard.writeText(text)
-    if (short) {
-      setCopiedShortId(id)
-      setTimeout(() => setCopiedShortId(null), 2000)
-    } else {
-      setCopiedId(id)
-      setTimeout(() => setCopiedId(null), 2000)
-    }
+    if (short) { setCopiedShortId(id); setTimeout(() => setCopiedShortId(null), 2000) }
+    else { setCopiedId(id); setTimeout(() => setCopiedId(null), 2000) }
     incrementUse.mutate(id)
   }
 
+  const openEdit = (obj: Objection) => {
+    const isOwn = !obj.is_system && obj.user_id === user?.id
+    setEditTarget(obj)
+    setIsCopyMode(!isOwn)
+    setForm({
+      objection_text: obj.objection_text,
+      response_text: obj.response_text,
+      response_short: obj.response_short ?? '',
+      approach: obj.approach ?? '',
+      example_dialog: obj.example_dialog ?? '',
+      category: obj.category,
+    })
+    setShowModal(true)
+  }
+
+  const openNew = () => {
+    setEditTarget(null)
+    setIsCopyMode(false)
+    setForm(EMPTY_FORM)
+    setShowModal(true)
+  }
+
+  const handleSave = async () => {
+    if (!form.objection_text.trim() || !form.response_text.trim() || saving || !user?.id) return
+    setSaving(true)
+    try {
+      const payload = {
+        objection_text: form.objection_text,
+        response_text: form.response_text,
+        response_short: form.response_short || null,
+        approach: form.approach || null,
+        example_dialog: form.example_dialog || null,
+        category: form.category,
+      }
+
+      if (editTarget && !isCopyMode) {
+        // Kendi itirazını güncelle
+        await updateObjection.mutateAsync({ id: editTarget.id, data: payload })
+      } else {
+        // Yeni veya kopyadan oluştur
+        await createObjection.mutateAsync({ user_id: user.id, ...payload })
+      }
+      setShowModal(false)
+    } catch (err) {
+      console.error('[ObjectionsPage] save error:', err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
-    <div className="p-4 md:p-6 space-y-5 max-w-4xl mx-auto">
+    <div className="p-6 pb-20 lg:pb-6 space-y-4">
       {/* Başlık */}
-      <div>
-        <h1 className="text-2xl font-bold">{t('academy.objections')}</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          En yaygın itirazlara hazır, etkili cevaplar
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold">{t('academy.objections')}</h1>
+          <p className="text-muted-foreground text-sm mt-1">En yaygın itirazlara hazır, etkili cevaplar</p>
+        </div>
+        <Button size="sm" variant="outline" onClick={openNew} className="gap-1.5 shrink-0">
+          <Plus className="w-4 h-4" />
+          Yeni İtiraz
+        </Button>
       </div>
 
       {/* Arama */}
@@ -104,11 +175,9 @@ export function ObjectionsPage() {
         <div className="space-y-2">
           {objections.map((obj) => {
             const isExpanded = expandedId === obj.id
+            const isOwn = !obj.is_system && obj.user_id === user?.id
             return (
-              <div
-                key={obj.id}
-                className="border rounded-lg bg-card overflow-hidden"
-              >
+              <div key={obj.id} className="border rounded-lg bg-card overflow-hidden">
                 {/* Kart başlığı */}
                 <div
                   className="flex items-start gap-3 p-4 cursor-pointer hover:bg-muted/30 transition-colors"
@@ -125,36 +194,31 @@ export function ObjectionsPage() {
                     </div>
                     <p className="font-medium text-sm">{obj.objection_text}</p>
                     {!isExpanded && obj.response_short && (
-                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">
-                        {obj.response_short}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{obj.response_short}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
+                    {/* Düzenle / Kopyala & Düzenle */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        toggleFavorite.mutate({ id: obj.id, isFavorite: !obj.is_favorite })
-                      }}
-                      className={cn(
-                        'p-1.5 rounded transition-colors',
-                        obj.is_favorite ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500'
-                      )}
+                      onClick={(e) => { e.stopPropagation(); openEdit(obj) }}
+                      title={isOwn ? t('common.edit') : 'Kopyala & Düzenle'}
+                      className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {isOwn ? <Pencil className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleFavorite.mutate({ id: obj.id, isFavorite: !obj.is_favorite }) }}
+                      className={cn('p-1.5 rounded transition-colors', obj.is_favorite ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500')}
                     >
                       <Star className={cn('w-4 h-4', obj.is_favorite && 'fill-current')} />
                     </button>
-                    {isExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-muted-foreground" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                    )}
+                    {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                   </div>
                 </div>
 
                 {/* Genişletilmiş içerik */}
                 {isExpanded && (
                   <div className="border-t px-4 py-4 space-y-4 bg-muted/10">
-                    {/* Yaklaşım */}
                     {obj.approach && (
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
@@ -164,29 +228,21 @@ export function ObjectionsPage() {
                       </div>
                     )}
 
-                    {/* Kısa cevap */}
                     {obj.response_short && (
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
                           {t('academy.objection.shortResponse')}
                         </p>
                         <p className="text-sm bg-card border rounded-md p-3">{obj.response_short}</p>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-2 h-7 text-xs gap-1"
-                          onClick={() => handleCopy(obj.id + '-short', obj.response_short!, true)}
-                        >
-                          {copiedShortId === obj.id + '-short' ? (
-                            <><Check className="w-3 h-3" /> Kopyalandı</>
-                          ) : (
-                            <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponseShort')}</>
-                          )}
+                        <Button size="sm" variant="outline" className="mt-2 h-7 text-xs gap-1"
+                          onClick={() => handleCopy(obj.id + '-short', obj.response_short!, true)}>
+                          {copiedShortId === obj.id + '-short'
+                            ? <><Check className="w-3 h-3" /> Kopyalandı</>
+                            : <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponseShort')}</>}
                         </Button>
                       </div>
                     )}
 
-                    {/* Tam cevap */}
                     <div>
                       <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
                         {t('academy.objection.fullResponse')}
@@ -194,21 +250,14 @@ export function ObjectionsPage() {
                       <p className="text-sm whitespace-pre-wrap leading-relaxed bg-card border rounded-md p-3">
                         {obj.response_text}
                       </p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="mt-2 h-7 text-xs gap-1"
-                        onClick={() => handleCopy(obj.id, obj.response_text)}
-                      >
-                        {copiedId === obj.id ? (
-                          <><Check className="w-3 h-3" /> Kopyalandı</>
-                        ) : (
-                          <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponse')}</>
-                        )}
+                      <Button size="sm" variant="outline" className="mt-2 h-7 text-xs gap-1"
+                        onClick={() => handleCopy(obj.id, obj.response_text)}>
+                        {copiedId === obj.id
+                          ? <><Check className="w-3 h-3" /> Kopyalandı</>
+                          : <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponse')}</>}
                       </Button>
                     </div>
 
-                    {/* Örnek diyalog */}
                     {obj.example_dialog && (
                       <div>
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
@@ -226,6 +275,101 @@ export function ObjectionsPage() {
           })}
         </div>
       )}
+
+      {/* Edit / New / Copy modal */}
+      <Dialog open={showModal} onOpenChange={(v) => !v && setShowModal(false)}>
+        <DialogContent className="max-w-xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {editTarget && !isCopyMode
+                ? t('common.edit')
+                : isCopyMode
+                  ? 'Kopyala & Düzenle'
+                  : 'Yeni İtiraz'}
+            </DialogTitle>
+            {isCopyMode && (
+              <p className="text-sm text-muted-foreground">Kendi kütüphanene eklenecek, orijinal değişmez.</p>
+            )}
+          </DialogHeader>
+
+          <div className="space-y-4 mt-2">
+            {/* Kategori */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Kategori</p>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value as ObjectionCategory })}
+                className="w-full text-sm rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                {OBJ_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{t(`academy.objection.objCategories.${c}`)}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">İtiraz metni</p>
+              <Textarea
+                value={form.objection_text}
+                onChange={(e) => setForm({ ...form, objection_text: e.target.value })}
+                placeholder='"Bu Ponzi şeması mı?"'
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Yaklaşım stratejisi</p>
+              <Input
+                value={form.approach}
+                onChange={(e) => setForm({ ...form, approach: e.target.value })}
+                placeholder="Empati + net bilgi + baskısız çıkış"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Kısa cevap (1-2 cümle)</p>
+              <Textarea
+                value={form.response_short}
+                onChange={(e) => setForm({ ...form, response_short: e.target.value })}
+                rows={2}
+                className="resize-none text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Tam cevap</p>
+              <Textarea
+                value={form.response_text}
+                onChange={(e) => setForm({ ...form, response_text: e.target.value })}
+                rows={5}
+                className="resize-y text-sm"
+              />
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1">Örnek diyalog (opsiyonel)</p>
+              <Textarea
+                value={form.example_dialog}
+                onChange={(e) => setForm({ ...form, example_dialog: e.target.value })}
+                placeholder={"A: ...\nB: ..."}
+                rows={4}
+                className="resize-y text-sm font-mono"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                onClick={handleSave}
+                disabled={!form.objection_text.trim() || !form.response_text.trim() || saving}
+              >
+                {saving ? t('common.saving') : t('common.save')}
+              </Button>
+              <Button variant="ghost" onClick={() => setShowModal(false)}>{t('common.cancel')}</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

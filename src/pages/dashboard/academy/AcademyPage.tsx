@@ -50,7 +50,7 @@ export function AcademyPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 space-y-5 max-w-5xl mx-auto">
+    <div className="p-6 pb-20 lg:pb-6 space-y-4">
       {/* Başlık */}
       <div className="flex items-start justify-between gap-4">
         <div>

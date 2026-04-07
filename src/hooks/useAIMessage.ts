@@ -15,8 +15,12 @@ export function useAIMessage(): UseAIMessageReturn {
     if (isGenerating) return null
     setIsGenerating(true)
     try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData.session?.access_token
+
       const { data, error } = await supabase.functions.invoke('generate-message', {
         body: req,
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
       })
 
       if (error) throw error
