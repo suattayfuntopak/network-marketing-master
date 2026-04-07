@@ -18,6 +18,10 @@ import { DealDetailPage } from '@/pages/dashboard/pipeline/DealDetailPage'
 import { CalendarPage } from '@/pages/dashboard/calendar/CalendarPage'
 import { FollowUpsPage } from '@/pages/dashboard/calendar/FollowUpsPage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
+import { MessagesPage } from '@/pages/dashboard/messages/MessagesPage'
+import { AcademyPage } from '@/pages/dashboard/academy/AcademyPage'
+import { AcademyContentDetailPage } from '@/pages/dashboard/academy/AcademyContentDetailPage'
+import { ObjectionsPage } from '@/pages/dashboard/academy/ObjectionsPage'
 
 // Wrapper forces full remount of ContactDetailPage when ID changes,
 // preventing stale query state when navigating between contacts.
@@ -64,9 +68,13 @@ export const router = createBrowserRouter([
           { path: ROUTES.CALENDAR, element: <CalendarPage /> },
           { path: `${ROUTES.CALENDAR}/takipler`, element: <FollowUpsPage /> },
 
-          // Placeholders
-          { path: ROUTES.MESSAGES, element: <div className="p-6"><h1 className="text-2xl font-bold">Mesajlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
-          { path: ROUTES.ACADEMY, element: <div className="p-6"><h1 className="text-2xl font-bold">Akademi</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
+          // Messages
+          { path: ROUTES.MESSAGES, element: <MessagesPage /> },
+
+          // Academy
+          { path: ROUTES.ACADEMY, element: <AcademyPage /> },
+          { path: `${ROUTES.ACADEMY}/itirazlar`, element: <ObjectionsPage /> },
+          { path: `${ROUTES.ACADEMY}/:id`, element: <AcademyContentDetailPage /> },
           { path: ROUTES.TEAM, element: <div className="p-6"><h1 className="text-2xl font-bold">Ekip</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.ANALYTICS, element: <div className="p-6"><h1 className="text-2xl font-bold">Analiz</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
           { path: ROUTES.SETTINGS, element: <div className="p-6"><h1 className="text-2xl font-bold">Ayarlar</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },

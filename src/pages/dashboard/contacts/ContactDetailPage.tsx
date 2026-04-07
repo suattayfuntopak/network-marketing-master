@@ -6,7 +6,7 @@ import { formatDistanceToNow } from 'date-fns'
 import {
   ArrowLeft, Edit, Archive, ArchiveRestore, Trash2, Calendar, Briefcase,
   MapPin, Heart, Users, Target, Frown, Phone, Mail, MessageCircle, Send, Camera,
-  Plus, Bell, Clock,
+  Plus, Bell, Clock, Sparkles,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -40,6 +40,7 @@ import { useContactFollowUps, useContactAppointments, useCreateFollowUp } from '
 import { QUICK_FOLLOW_UP_OFFSETS } from '@/lib/calendar/constants'
 import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { NewAppointmentModal } from '@/components/calendar/modals/NewAppointmentModal'
+import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { addDays, format as fmtDate2 } from 'date-fns'
 import i18n from '@/i18n'
 
@@ -73,6 +74,7 @@ export function ContactDetailPage() {
   const { data: contactAppointments = [] } = useContactAppointments(id ?? '', userId)
   const createFollowUp = useCreateFollowUp(userId)
 
+  const [showAIModal, setShowAIModal] = useState(false)
   const [showFollowUpModal, setShowFollowUpModal] = useState(false)
   const [showAppointmentModal, setShowAppointmentModal] = useState(false)
   const [showInteractionModal, setShowInteractionModal] = useState(false)
@@ -211,6 +213,14 @@ export function ContactDetailPage() {
         </Button>
         <h1 className="text-xl font-bold truncate flex-1">{contact.full_name}</h1>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            onClick={() => setShowAIModal(true)}
+            className="gap-1.5 bg-amber-500 hover:bg-amber-600 text-white hidden sm:flex"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            {t('messages.generate')}
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -568,6 +578,13 @@ export function ContactDetailPage() {
         open={showAppointmentModal}
         onClose={() => setShowAppointmentModal(false)}
         userId={userId}
+      />
+
+      {/* AI Message Generator Modal */}
+      <AIMessageGeneratorModal
+        open={showAIModal}
+        onClose={() => setShowAIModal(false)}
+        contact={contact}
       />
 
       {/* Add Interaction Modal */}
