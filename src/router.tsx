@@ -105,6 +105,11 @@ const ObjectionsPage = lazy(async () => {
   return { default: module.ObjectionsPage }
 })
 
+const TeamPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/team/TeamPage')
+  return { default: module.TeamPage }
+})
+
 const AnalyticsPage = lazy(async () => {
   const module = await import('@/pages/dashboard/analytics/AnalyticsPage')
   return { default: module.AnalyticsPage }
@@ -183,7 +188,7 @@ export const router = createBrowserRouter([
           { path: ROUTES.ACADEMY, element: renderLazyRoute(<AcademyPage />) },
           { path: `${ROUTES.ACADEMY}/itirazlar`, element: renderLazyRoute(<ObjectionsPage />) },
           { path: `${ROUTES.ACADEMY}/:id`, element: renderLazyRoute(<AcademyContentDetailPage />) },
-          { path: ROUTES.TEAM, element: <div className="p-6"><h1 className="text-2xl font-bold">Ekip</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
+          { path: ROUTES.TEAM, element: renderLazyRoute(<TeamPage />) },
           { path: ROUTES.ANALYTICS, element: renderLazyRoute(<AnalyticsPage />) },
           { path: ROUTES.SETTINGS, element: renderLazyRoute(<SettingsPage />) },
         ],

@@ -126,11 +126,11 @@ export function ObjectionsPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold">{t('academy.objections')}</h1>
-          <p className="text-muted-foreground text-sm mt-1">En yaygın itirazlara hazır, etkili cevaplar</p>
+          <p className="text-muted-foreground text-sm mt-1">{t('academy.objection.subtitle')}</p>
         </div>
         <Button size="sm" variant="outline" onClick={openNew} className="gap-1.5 shrink-0">
           <Plus className="w-4 h-4" />
-          Yeni İtiraz
+          {t('academy.objection.new')}
         </Button>
       </div>
 
@@ -169,7 +169,14 @@ export function ObjectionsPage() {
       ) : objections.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <MessageSquare className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p>{t('academy.noResults')}</p>
+          <p className="font-medium text-foreground">
+            {search.length >= 2 || category !== 'all' ? t('academy.noResults') : t('academy.objection.emptyTitle')}
+          </p>
+          <p className="text-sm mt-2">
+            {search.length >= 2 || category !== 'all'
+              ? t('academy.noResultsDescription')
+              : t('academy.objection.emptyDescription')}
+          </p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -189,7 +196,7 @@ export function ObjectionsPage() {
                         {t(`academy.objection.objCategories.${obj.category}`)}
                       </span>
                       {obj.is_system && (
-                        <span className="text-xs text-muted-foreground">Sistem</span>
+                        <span className="text-xs text-muted-foreground">{t('academy.systemLabel')}</span>
                       )}
                     </div>
                     <p className="font-medium text-sm">{obj.objection_text}</p>
@@ -201,7 +208,7 @@ export function ObjectionsPage() {
                     {/* Düzenle / Kopyala & Düzenle */}
                     <button
                       onClick={(e) => { e.stopPropagation(); openEdit(obj) }}
-                      title={isOwn ? t('common.edit') : 'Kopyala & Düzenle'}
+                      title={isOwn ? t('common.edit') : t('academy.copyAndEdit')}
                       className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
                     >
                       {isOwn ? <Pencil className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
@@ -237,7 +244,7 @@ export function ObjectionsPage() {
                         <Button size="sm" variant="outline" className="mt-2 h-7 text-xs gap-1"
                           onClick={() => handleCopy(obj.id + '-short', obj.response_short!, true)}>
                           {copiedShortId === obj.id + '-short'
-                            ? <><Check className="w-3 h-3" /> Kopyalandı</>
+                            ? <><Check className="w-3 h-3" /> {t('messages.ai.copied')}</>
                             : <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponseShort')}</>}
                         </Button>
                       </div>
@@ -253,7 +260,7 @@ export function ObjectionsPage() {
                       <Button size="sm" variant="outline" className="mt-2 h-7 text-xs gap-1"
                         onClick={() => handleCopy(obj.id, obj.response_text)}>
                         {copiedId === obj.id
-                          ? <><Check className="w-3 h-3" /> Kopyalandı</>
+                          ? <><Check className="w-3 h-3" /> {t('messages.ai.copied')}</>
                           : <><Copy className="w-3 h-3" /> {t('academy.objection.copyResponse')}</>}
                       </Button>
                     </div>
@@ -284,18 +291,18 @@ export function ObjectionsPage() {
               {editTarget && !isCopyMode
                 ? t('common.edit')
                 : isCopyMode
-                  ? 'Kopyala & Düzenle'
-                  : 'Yeni İtiraz'}
+                  ? t('academy.copyAndEdit')
+                  : t('academy.objection.new')}
             </DialogTitle>
             {isCopyMode && (
-              <p className="text-sm text-muted-foreground">Kendi kütüphanene eklenecek, orijinal değişmez.</p>
+              <p className="text-sm text-muted-foreground">{t('academy.copyDescription')}</p>
             )}
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
             {/* Kategori */}
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Kategori</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.category')}</p>
               <select
                 value={form.category}
                 onChange={(e) => setForm({ ...form, category: e.target.value as ObjectionCategory })}
@@ -308,27 +315,27 @@ export function ObjectionsPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">İtiraz metni</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.objection.fields.text')}</p>
               <Textarea
                 value={form.objection_text}
                 onChange={(e) => setForm({ ...form, objection_text: e.target.value })}
-                placeholder='"Bu Ponzi şeması mı?"'
+                placeholder={t('academy.objection.placeholders.text')}
                 rows={2}
                 className="resize-none text-sm"
               />
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Yaklaşım stratejisi</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.objection.approach')}</p>
               <Input
                 value={form.approach}
                 onChange={(e) => setForm({ ...form, approach: e.target.value })}
-                placeholder="Empati + net bilgi + baskısız çıkış"
+                placeholder={t('academy.objection.placeholders.approach')}
               />
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Kısa cevap (1-2 cümle)</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.objection.shortResponse')}</p>
               <Textarea
                 value={form.response_short}
                 onChange={(e) => setForm({ ...form, response_short: e.target.value })}
@@ -338,7 +345,7 @@ export function ObjectionsPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Tam cevap</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.objection.fullResponse')}</p>
               <Textarea
                 value={form.response_text}
                 onChange={(e) => setForm({ ...form, response_text: e.target.value })}
@@ -348,11 +355,11 @@ export function ObjectionsPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Örnek diyalog (opsiyonel)</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.objection.fields.exampleDialog')}</p>
               <Textarea
                 value={form.example_dialog}
                 onChange={(e) => setForm({ ...form, example_dialog: e.target.value })}
-                placeholder={"A: ...\nB: ..."}
+                placeholder={t('academy.objection.placeholders.exampleDialog')}
                 rows={4}
                 className="resize-y text-sm font-mono"
               />

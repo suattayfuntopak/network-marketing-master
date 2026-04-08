@@ -97,6 +97,25 @@ Hedef canlı domain:
 
 - `https://networkmarketing.suattayfuntopak.com`
 
+## Production Smoke Checklist
+
+Canlı domaine bağlamadan veya yeni release aldıktan sonra şu akışları kontrol edin:
+
+1. Auth:
+   login, register, forgot password, reset password, email confirm
+2. Dashboard:
+   ilk açılış, route geçişleri, dil değişimi
+3. Contacts:
+   liste, filtre, yeni kayıt, detay, düzenleme, import
+4. Messages:
+   template oluşturma, AI modal açılışı, mesaj üretimi, history görünümü
+5. Academy:
+   içerik listesi, itiraz bankası, detay sayfası, kopyala/düzenle modalı
+6. Analytics ve Settings:
+   sayfa yüklenmesi, temel render, hata vermeden açılması
+7. SEO/share:
+   title, description, OG preview, favicon
+
 ## Dizin Yapısı
 
 ```text

@@ -23,9 +23,12 @@
     "success": "Başarılı",
     "unknownError": "Bilinmeyen hata",
     "goBack": "Geri Dön",
+    "returnHome": "Ana Sayfaya Dön",
     "all": "Tümü",
     "notes": "Notlar",
     "preparingPage": "Sayfa hazırlanıyor...",
+    "pageNotFound": "Sayfa Bulunamadı",
+    "pageNotFoundDescription": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
     "selected": "{{count}} öğe seçildi",
     "page": "Sayfa {{page}} / {{total}}"
   },
@@ -74,13 +77,29 @@
     "registerSubtitle": "Ücretsiz başla, hemen kullanmaya başla",
     "emailAlreadyRegistered": "Bu email adresi zaten kayıtlı. Giriş yapmayı deneyin.",
     "registerError": "Kayıt oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.",
+    "fullNameMinLength": "Ad soyad en az 2 karakter olmalı",
+    "invalidEmail": "Geçerli bir email adresi girin",
+    "passwordMinLength": "Şifre en az 8 karakter olmalı",
+    "passwordUppercase": "Şifre en az 1 büyük harf içermeli",
+    "passwordNumber": "Şifre en az 1 rakam içermeli",
+    "passwordMismatch": "Şifreler eşleşmiyor",
     "forgotPasswordSubtitle": "Email adresini gir, sıfırlama linki gönderelim",
     "emailSent": "Email Gönderildi",
     "emailSentDesc": "Şifre sıfırlama linki email adresinize gönderildi. Gelen kutunuzu kontrol edin.",
     "sendResetLink": "Sıfırlama Linki Gönder",
     "sending": "Gönderiliyor...",
     "sendError": "Email gönderilirken bir hata oluştu. Lütfen tekrar deneyin.",
-    "backToLogin": "Giriş Sayfasına Dön"
+    "backToLogin": "Giriş Sayfasına Dön",
+    "resetPasswordTitle": "Yeni Şifre Belirle",
+    "newPassword": "Yeni Şifre",
+    "updatePassword": "Şifreyi Güncelle",
+    "updatingPassword": "Güncelleniyor...",
+    "passwordUpdateError": "Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.",
+    "passwordUpdated": "Şifre Güncellendi",
+    "passwordUpdatedDesc": "Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...",
+    "emailConfirmTitle": "Email'ini Kontrol Et",
+    "emailConfirmDescription": "Hesabını aktifleştirmek için email adresine bir doğrulama linki gönderdik.",
+    "emailConfirmHint": "Email gelmedi mi? Spam klasörünü kontrol et."
   },
   "contacts": {
     "title": "Kontaklar",
@@ -159,6 +178,8 @@
     "unarchived": "Arşivden çıkarıldı",
     "saveError": "İşlem başarısız. Lütfen tekrar deneyin.",
     "loadError": "Kontak yüklenemedi.",
+    "connectionError": "Kontaklar şu anda yüklenemiyor.",
+    "connectionErrorHint": "Bağlantını kontrol edip sayfayı yenileyerek tekrar deneyebilirsin.",
     "notFound": "Kontak bulunamadı.",
     "deleteConfirm": "Bu kontağı kalıcı olarak silmek istediğinize emin misiniz?",
     "bulkDeleteConfirm": "{{count}} kontağı kalıcı olarak silmek istediğinize emin misiniz?",
@@ -558,7 +579,9 @@
     "history": "Geçmiş",
     "generate": "✨ AI Mesaj Üret",
     "noTemplates": "Henüz şablon yok",
+    "noTemplatesDescription": "Sık kullandığın mesajları şablon olarak kaydederek daha hızlı çalışabilirsin.",
     "noAIMessages": "Henüz AI mesaj üretilmedi",
+    "noAIMessagesDescription": "İlk AI mesajını ürettiğinde geçmişin burada görünür.",
     "bulk": {
       "title": "Toplu Mesaj",
       "subtitle": "Kontakları seç, her biri için AI mesaj üret",
@@ -611,9 +634,11 @@
       "selectChannel": "Kanal seç",
       "selectTone": "Ton seç",
       "variant": "Versiyon {{n}}",
+      "generatedCount": "{{count}} versiyon üretildi",
       "approach": "Yaklaşım",
       "noContact": "Kontak seçilmedi",
       "copied": "Kopyalandı!",
+      "feedbackPrompt": "Bu mesajları nasıl buldun?",
       "feedbackGreat": "Harika",
       "feedbackGood": "İyi",
       "feedbackMeh": "Orta",
@@ -648,12 +673,19 @@
   },
   "academy": {
     "title": "Akademi",
+    "subtitle": "Distribütörlük yolculuğunda ihtiyacın olan her şey",
     "objections": "İtiraz Bankası",
+    "systemLabel": "Sistem",
+    "copyAndEdit": "Kopyala & Düzenle",
+    "copyDescription": "Kendi kütüphanene eklenecek, orijinal değişmez.",
     "scripts": "Konuşma Scriptleri",
     "lessons": "Eğitimler",
     "successStories": "Başarı Hikayeleri",
     "searchPlaceholder": "İtiraz veya eğitim ara...",
     "noResults": "Sonuç bulunamadı",
+    "noResultsDescription": "Aramanı veya filtrelerini değiştirip tekrar deneyebilirsin.",
+    "emptyTitle": "Henüz akademi içeriği yok",
+    "emptyDescription": "İçerikler eklendikçe burada eğitimler ve scriptler görünecek.",
     "readMore": "Devamını Oku",
     "readingTime": "{{min}} dk okuma",
     "viewCount": "{{count}} görüntülenme",
@@ -683,7 +715,23 @@
       "company_info": "Şirket Bilgisi",
       "compliance": "Yasal Uyum"
     },
+    "fields": {
+      "title": "Başlık",
+      "category": "Kategori",
+      "level": "Seviye",
+      "type": "Tür",
+      "summary": "Özet",
+      "content": "İçerik (Markdown desteklenir)",
+      "tags": "Etiketler (virgülle ayır)"
+    },
+    "placeholders": {
+      "tags": "mindset, başlangıç, davet"
+    },
     "objection": {
+      "subtitle": "En yaygın itirazlara hazır, etkili cevaplar",
+      "new": "Yeni İtiraz",
+      "emptyTitle": "Henüz itiraz eklenmemiş",
+      "emptyDescription": "Kendi itiraz cevaplarını oluşturarak burada saklayabilirsin.",
       "created": "İtiraz eklendi",
       "updated": "İtiraz güncellendi",
       "deleted": "İtiraz silindi",
@@ -693,6 +741,15 @@
       "approach": "Yaklaşım Stratejisi",
       "fullResponse": "Tam Cevap",
       "shortResponse": "Kısa Cevap",
+      "fields": {
+        "text": "İtiraz metni",
+        "exampleDialog": "Örnek diyalog (opsiyonel)"
+      },
+      "placeholders": {
+        "text": "\"Bu Ponzi şeması mı?\"",
+        "approach": "Empati + net bilgi + baskısız çıkış",
+        "exampleDialog": "A: ...\nB: ..."
+      },
       "objCategories": {
         "money": "Para Yok",
         "time": "Zamanım Yok",
@@ -715,6 +772,13 @@
       "updated": "İçerik güncellendi",
       "deleted": "İçerik silindi"
     }
+  },
+  "team": {
+    "title": "Ekip",
+    "badge": "Yakında",
+    "description": "Ekip görünürlüğü, aktivite takibi ve destek akışları için hazırladığımız alan üzerinde çalışıyoruz.",
+    "hint": "Şimdilik kontaklar, mesajlar ve akademi modülleri üzerinden günlük akışı güvenle yönetebilirsin.",
+    "backToDashboard": "Panoya Dön"
   },
   "landing": {
     "nav": {

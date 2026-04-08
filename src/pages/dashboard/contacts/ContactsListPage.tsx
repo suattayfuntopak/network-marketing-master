@@ -276,8 +276,9 @@ export function ContactsListPage() {
           {t('common.loading')}
         </div>
       ) : isError ? (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-8 text-center text-red-500 text-sm">
-          Bağlantı hatası oluştu, lütfen sayfayı yenileyiniz.
+        <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-8 text-center text-sm">
+          <p className="font-medium text-red-600">{t('contacts.connectionError')}</p>
+          <p className="text-red-500/80 mt-2">{t('contacts.connectionErrorHint')}</p>
         </div>
       ) : contacts.length === 0 ? (
         <div className="rounded-lg border border-dashed border-border p-12 text-center">

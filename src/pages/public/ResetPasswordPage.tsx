@@ -4,33 +4,37 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link, useNavigate } from 'react-router-dom'
 import { Zap, Eye, EyeOff, CheckCircle } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
 
-const schema = z.object({
-  password: z
-    .string()
-    .min(8, 'Şifre en az 8 karakter olmalı')
-    .regex(/[A-Z]/, 'Şifre en az 1 büyük harf içermeli')
-    .regex(/[0-9]/, 'Şifre en az 1 rakam içermeli'),
-  password_confirm: z.string(),
-}).refine(data => data.password === data.password_confirm, {
-  message: 'Şifreler eşleşmiyor',
-  path: ['password_confirm'],
-})
-
-type FormData = z.infer<typeof schema>
+type FormData = {
+  password: string
+  password_confirm: string
+}
 
 export function ResetPasswordPage() {
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [showPassword, setShowPassword] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const redirectTimeoutRef = useRef<number | null>(null)
+  const schema = z.object({
+    password: z
+      .string()
+      .min(8, t('auth.passwordMinLength'))
+      .regex(/[A-Z]/, t('auth.passwordUppercase'))
+      .regex(/[0-9]/, t('auth.passwordNumber')),
+    password_confirm: z.string(),
+  }).refine(data => data.password === data.password_confirm, {
+    message: t('auth.passwordMismatch'),
+    path: ['password_confirm'],
+  })
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -63,7 +67,7 @@ export function ResetPasswordPage() {
       }, 2000)
     } catch (err) {
       console.error('[ResetPasswordPage] Error:', err)
-      setError('Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.')
+      setError(t('auth.passwordUpdateError'))
     } finally {
       setLoading(false)
     }
@@ -79,7 +83,7 @@ export function ResetPasswordPage() {
             </div>
             <span className="font-bold text-lg">NMM</span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">Yeni Şifre Belirle</h1>
+          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t('auth.resetPasswordTitle')}</h1>
         </div>
 
         {success ? (
@@ -88,9 +92,9 @@ export function ResetPasswordPage() {
               <CheckCircle className="w-16 h-16 text-primary" />
             </div>
             <div>
-              <h2 className="font-semibold">Şifre Güncellendi</h2>
+              <h2 className="font-semibold">{t('auth.passwordUpdated')}</h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...
+                {t('auth.passwordUpdatedDesc')}
               </p>
             </div>
           </div>
@@ -103,12 +107,12 @@ export function ResetPasswordPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="password">Yeni Şifre</Label>
+              <Label htmlFor="password">{t('auth.newPassword')}</Label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="En az 8 karakter"
+                  placeholder={t('auth.passwordPlaceholder')}
                   autoComplete="new-password"
                   {...register('password')}
                 />
@@ -126,11 +130,11 @@ export function ResetPasswordPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password_confirm">Şifre Tekrar</Label>
+              <Label htmlFor="password_confirm">{t('auth.passwordConfirm')}</Label>
               <Input
                 id="password_confirm"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Şifreyi tekrar girin"
+                placeholder={t('auth.passwordConfirmPlaceholder')}
                 autoComplete="new-password"
                 {...register('password_confirm')}
               />
@@ -140,7 +144,7 @@ export function ResetPasswordPage() {
             </div>
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
+              {loading ? t('auth.updatingPassword') : t('auth.updatePassword')}
             </Button>
           </form>
         )}

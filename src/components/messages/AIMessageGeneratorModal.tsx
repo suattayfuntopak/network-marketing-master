@@ -269,7 +269,9 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
           {/* Sonuçlar */}
           {variants.length > 0 && (
             <div className="space-y-3">
-              <p className="text-xs font-medium text-muted-foreground">{variants.length} versiyon üretildi</p>
+              <p className="text-xs font-medium text-muted-foreground">
+                {t('messages.ai.generatedCount', { count: variants.length })}
+              </p>
               {variants.map((v, idx) => (
                 <div key={idx} className="border rounded-lg p-3 space-y-2 bg-muted/20">
                   <div className="flex items-center justify-between">
@@ -343,7 +345,7 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
 
               {/* Feedback */}
               <div className="flex items-center gap-2 pt-1">
-                <span className="text-xs text-muted-foreground">Bu mesajları nasıl buldun?</span>
+                <span className="text-xs text-muted-foreground">{t('messages.ai.feedbackPrompt')}</span>
                 {(['great', 'good', 'meh', 'bad'] as const).map((f) => (
                   <button
                     key={f}

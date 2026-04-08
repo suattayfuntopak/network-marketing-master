@@ -56,7 +56,7 @@ export function AcademyPage() {
         <div>
           <h1 className="text-2xl font-bold">{t('academy.title')}</h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Distribütörlük yolculuğunda ihtiyacın olan her şey
+            {t('academy.subtitle')}
           </p>
         </div>
         <button
@@ -114,7 +114,14 @@ export function AcademyPage() {
       ) : contents.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           <GraduationCap className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p>{t('academy.noResults')}</p>
+          <p className="font-medium text-foreground">
+            {search.length >= 2 || category !== 'all' ? t('academy.noResults') : t('academy.emptyTitle')}
+          </p>
+          <p className="text-sm mt-2">
+            {search.length >= 2 || category !== 'all'
+              ? t('academy.noResultsDescription')
+              : t('academy.emptyDescription')}
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

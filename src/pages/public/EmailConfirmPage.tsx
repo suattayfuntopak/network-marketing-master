@@ -1,9 +1,12 @@
 import { Link } from 'react-router-dom'
 import { Zap, Mail } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { ROUTES } from '@/lib/constants'
 
 export function EmailConfirmPage() {
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm text-center space-y-6">
@@ -21,18 +24,18 @@ export function EmailConfirmPage() {
         </div>
 
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Email'ini Kontrol Et</h1>
+          <h1 className="text-2xl font-bold tracking-tight">{t('auth.emailConfirmTitle')}</h1>
           <p className="text-muted-foreground">
-            Hesabını aktifleştirmek için email adresine bir doğrulama linki gönderdik.
+            {t('auth.emailConfirmDescription')}
           </p>
           <p className="text-sm text-muted-foreground">
-            Email gelmedi mi? Spam klasörünü kontrol et.
+            {t('auth.emailConfirmHint')}
           </p>
         </div>
 
         <Link to={ROUTES.LOGIN}>
           <Button variant="outline" className="w-full">
-            Giriş Sayfasına Dön
+            {t('auth.backToLogin')}
           </Button>
         </Link>
       </div>

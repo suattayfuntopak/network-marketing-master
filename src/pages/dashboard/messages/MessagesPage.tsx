@@ -163,7 +163,8 @@ export function MessagesPage() {
           ) : templates.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p>{t('messages.noTemplates')}</p>
+              <p className="font-medium text-foreground">{t('messages.noTemplates')}</p>
+              <p className="text-sm mt-2">{t('messages.noTemplatesDescription')}</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -355,7 +356,8 @@ export function MessagesPage() {
           ) : aiMessages.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p>{t('messages.noAIMessages')}</p>
+              <p className="font-medium text-foreground">{t('messages.noAIMessages')}</p>
+              <p className="text-sm mt-2">{t('messages.noAIMessagesDescription')}</p>
             </div>
           ) : (
             aiMessages.map((msg) => (

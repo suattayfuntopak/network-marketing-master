@@ -23,9 +23,12 @@
     "success": "Success",
     "unknownError": "Unknown error",
     "goBack": "Go Back",
+    "returnHome": "Return to Home",
     "all": "All",
     "notes": "Notes",
     "preparingPage": "Preparing page...",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDescription": "The page you are looking for may not exist or may have been moved.",
     "selected": "{{count}} items selected",
     "page": "Page {{page}} / {{total}}"
   },
@@ -74,13 +77,29 @@
     "registerSubtitle": "Start free, begin using right away",
     "emailAlreadyRegistered": "This email is already registered. Try logging in.",
     "registerError": "An error occurred while creating your account. Please try again.",
+    "fullNameMinLength": "Full name must be at least 2 characters",
+    "invalidEmail": "Enter a valid email address",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordUppercase": "Password must contain at least 1 uppercase letter",
+    "passwordNumber": "Password must contain at least 1 number",
+    "passwordMismatch": "Passwords do not match",
     "forgotPasswordSubtitle": "Enter your email and we'll send you a reset link",
     "emailSent": "Email Sent",
     "emailSentDesc": "A password reset link has been sent to your email. Check your inbox.",
     "sendResetLink": "Send Reset Link",
     "sending": "Sending...",
     "sendError": "An error occurred while sending the email. Please try again.",
-    "backToLogin": "Back to Login"
+    "backToLogin": "Back to Login",
+    "resetPasswordTitle": "Set a New Password",
+    "newPassword": "New Password",
+    "updatePassword": "Update Password",
+    "updatingPassword": "Updating...",
+    "passwordUpdateError": "An error occurred while updating your password. Please try again.",
+    "passwordUpdated": "Password Updated",
+    "passwordUpdatedDesc": "Your password has been updated successfully. Redirecting you to the login page...",
+    "emailConfirmTitle": "Check Your Email",
+    "emailConfirmDescription": "We sent a verification link to your email address to activate your account.",
+    "emailConfirmHint": "Didn't receive the email? Check your spam folder."
   },
   "contacts": {
     "title": "Contacts",
@@ -159,6 +178,8 @@
     "unarchived": "Unarchived",
     "saveError": "Operation failed. Please try again.",
     "loadError": "Failed to load contact.",
+    "connectionError": "Contacts cannot be loaded right now.",
+    "connectionErrorHint": "Check your connection and refresh the page to try again.",
     "notFound": "Contact not found.",
     "deleteConfirm": "Are you sure you want to permanently delete this contact?",
     "bulkDeleteConfirm": "Are you sure you want to permanently delete {{count}} contacts?",
@@ -558,7 +579,9 @@
     "history": "History",
     "generate": "✨ AI Message",
     "noTemplates": "No templates yet",
+    "noTemplatesDescription": "Save frequently used messages as templates to work faster.",
     "noAIMessages": "No AI messages generated yet",
+    "noAIMessagesDescription": "Your history will appear here after you generate your first AI message.",
     "bulk": {
       "title": "Bulk Message",
       "subtitle": "Select contacts and generate AI messages for each",
@@ -611,9 +634,11 @@
       "selectChannel": "Select channel",
       "selectTone": "Select tone",
       "variant": "Version {{n}}",
+      "generatedCount": "{{count}} versions generated",
       "approach": "Approach",
       "noContact": "No contact selected",
       "copied": "Copied!",
+      "feedbackPrompt": "How did these messages feel?",
       "feedbackGreat": "Great",
       "feedbackGood": "Good",
       "feedbackMeh": "Okay",
@@ -648,12 +673,19 @@
   },
   "academy": {
     "title": "Academy",
+    "subtitle": "Everything you need on your distributor journey",
     "objections": "Objection Bank",
+    "systemLabel": "System",
+    "copyAndEdit": "Copy & Edit",
+    "copyDescription": "This will be added to your own library and will not change the original.",
     "scripts": "Scripts",
     "lessons": "Lessons",
     "successStories": "Success Stories",
     "searchPlaceholder": "Search objections or content...",
     "noResults": "No results found",
+    "noResultsDescription": "Try changing your search or filters and check again.",
+    "emptyTitle": "No academy content yet",
+    "emptyDescription": "Lessons and scripts will appear here as content is added.",
     "readMore": "Read More",
     "readingTime": "{{min}} min read",
     "viewCount": "{{count}} views",
@@ -683,7 +715,23 @@
       "company_info": "Company Info",
       "compliance": "Compliance"
     },
+    "fields": {
+      "title": "Title",
+      "category": "Category",
+      "level": "Level",
+      "type": "Type",
+      "summary": "Summary",
+      "content": "Content (Markdown supported)",
+      "tags": "Tags (comma separated)"
+    },
+    "placeholders": {
+      "tags": "mindset, beginner, invitation"
+    },
     "objection": {
+      "subtitle": "Ready, effective responses to the most common objections",
+      "new": "New Objection",
+      "emptyTitle": "No objections added yet",
+      "emptyDescription": "You can create and keep your own objection responses here.",
       "created": "Objection added",
       "updated": "Objection updated",
       "deleted": "Objection deleted",
@@ -693,6 +741,15 @@
       "approach": "Approach Strategy",
       "fullResponse": "Full Response",
       "shortResponse": "Short Response",
+      "fields": {
+        "text": "Objection text",
+        "exampleDialog": "Example dialog (optional)"
+      },
+      "placeholders": {
+        "text": "\"Is this a Ponzi scheme?\"",
+        "approach": "Empathy + clear info + pressure-free exit",
+        "exampleDialog": "A: ...\nB: ..."
+      },
       "objCategories": {
         "money": "No Money",
         "time": "No Time",
@@ -715,6 +772,13 @@
       "updated": "Content updated",
       "deleted": "Content deleted"
     }
+  },
+  "team": {
+    "title": "Team",
+    "badge": "Coming Soon",
+    "description": "We're actively building this area for team visibility, activity tracking, and support workflows.",
+    "hint": "For now, you can confidently manage your daily workflow through contacts, messages, and academy modules.",
+    "backToDashboard": "Back to Dashboard"
   },
   "landing": {
     "nav": {

@@ -26,12 +26,12 @@ export function RegisterPage() {
     password_confirm: string
   }) => {
     const errors: Record<string, string> = {}
-    if (data.full_name.length < 2) errors.full_name = 'Ad soyad en az 2 karakter olmalı'
-    if (!data.email.includes('@')) errors.email = 'Geçerli bir email adresi girin'
-    if (data.password.length < 8) errors.password = 'Şifre en az 8 karakter olmalı'
-    else if (!/[A-Z]/.test(data.password)) errors.password = 'Şifre en az 1 büyük harf içermeli'
-    else if (!/[0-9]/.test(data.password)) errors.password = 'Şifre en az 1 rakam içermeli'
-    if (data.password !== data.password_confirm) errors.password_confirm = 'Şifreler eşleşmiyor'
+    if (data.full_name.length < 2) errors.full_name = t('auth.fullNameMinLength')
+    if (!data.email.includes('@')) errors.email = t('auth.invalidEmail')
+    if (data.password.length < 8) errors.password = t('auth.passwordMinLength')
+    else if (!/[A-Z]/.test(data.password)) errors.password = t('auth.passwordUppercase')
+    else if (!/[0-9]/.test(data.password)) errors.password = t('auth.passwordNumber')
+    if (data.password !== data.password_confirm) errors.password_confirm = t('auth.passwordMismatch')
     return errors
   }
 

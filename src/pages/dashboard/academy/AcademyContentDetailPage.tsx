@@ -145,7 +145,7 @@ export function AcademyContentDetailPage() {
         ) : (
           <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setShowEdit(true)}>
             <Copy className="w-3.5 h-3.5" />
-            Kopyala &amp; Düzenle
+            {t('academy.copyAndEdit')}
           </Button>
         )}
       </div>
@@ -163,7 +163,7 @@ export function AcademyContentDetailPage() {
             {t(`academy.types.${content.type}`)}
           </span>
           {content.is_system && (
-            <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">Sistem</span>
+            <span className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">{t('academy.systemLabel')}</span>
           )}
         </div>
 
@@ -255,22 +255,22 @@ export function AcademyContentDetailPage() {
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {isOwn ? t('common.edit') : 'Kopyala & Düzenle'}
+              {isOwn ? t('common.edit') : t('academy.copyAndEdit')}
             </DialogTitle>
             {!isOwn && (
-              <p className="text-sm text-muted-foreground">Kendi kütüphanene eklenecek, orijinal değişmez.</p>
+              <p className="text-sm text-muted-foreground">{t('academy.copyDescription')}</p>
             )}
           </DialogHeader>
 
           <div className="space-y-4 mt-2">
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Başlık</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.title')}</p>
               <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
             </div>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Kategori</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.category')}</p>
                 <select
                   value={form.category}
                   onChange={(e) => setForm({ ...form, category: e.target.value as ContentCategory })}
@@ -282,7 +282,7 @@ export function AcademyContentDetailPage() {
                 </select>
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Seviye</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.level')}</p>
                 <select
                   value={form.level}
                   onChange={(e) => setForm({ ...form, level: e.target.value as ContentLevel })}
@@ -292,7 +292,7 @@ export function AcademyContentDetailPage() {
                 </select>
               </div>
               <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Tür</p>
+                <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.type')}</p>
                 <select
                   value={form.type}
                   onChange={(e) => setForm({ ...form, type: e.target.value as ContentType })}
@@ -304,7 +304,7 @@ export function AcademyContentDetailPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Özet</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.summary')}</p>
               <Textarea
                 value={form.summary}
                 onChange={(e) => setForm({ ...form, summary: e.target.value })}
@@ -314,7 +314,7 @@ export function AcademyContentDetailPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">İçerik (Markdown desteklenir)</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.content')}</p>
               <Textarea
                 value={form.content}
                 onChange={(e) => setForm({ ...form, content: e.target.value })}
@@ -324,11 +324,11 @@ export function AcademyContentDetailPage() {
             </div>
 
             <div>
-              <p className="text-xs font-medium text-muted-foreground mb-1">Etiketler (virgülle ayır)</p>
+              <p className="text-xs font-medium text-muted-foreground mb-1">{t('academy.fields.tags')}</p>
               <Input
                 value={form.tags}
                 onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                placeholder="mindset, başlangıç, davet"
+                placeholder={t('academy.placeholders.tags')}
               />
             </div>
 
