@@ -142,6 +142,22 @@ export interface GenerateMessageRequest {
   userInput?: string
 }
 
+export type AIMessageErrorCode =
+  | 'missing_config'
+  | 'network_error'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'rate_limit'
+  | 'invalid_request'
+  | 'function_runtime_error'
+  | 'unknown_error'
+
+export interface AIMessageErrorResponse {
+  code: AIMessageErrorCode
+  message: string
+  details?: string
+}
+
 export interface GenerateMessageResponse {
   variants: AIMessageVariant[]
   tokensUsed?: number

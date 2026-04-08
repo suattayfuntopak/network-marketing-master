@@ -4,6 +4,22 @@
 
 import Anthropic from 'npm:@anthropic-ai/sdk'
 
+type AIMessageErrorCode =
+  | 'missing_config'
+  | 'network_error'
+  | 'unauthorized'
+  | 'forbidden'
+  | 'rate_limit'
+  | 'invalid_request'
+  | 'function_runtime_error'
+  | 'unknown_error'
+
+interface ErrorResponseBody {
+  code: AIMessageErrorCode
+  message: string
+  details?: string
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -45,14 +61,87 @@ HER ZAMAN şunları yap:
 - Mesaj başına TEK bir aksiyon hedefle
 - WhatsApp için kısa tut (3-4 cümle max), email için daha uzun olabilir`
 
+const VALID_CATEGORIES = new Set(Object.keys(categoryDescriptions))
+const VALID_CHANNELS = new Set(['whatsapp', 'telegram', 'sms', 'email', 'instagram_dm', 'any'])
+const VALID_TONES = new Set(['friendly', 'professional', 'curious', 'empathetic', 'confident', 'humorous'])
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+}
+
+function errorResponse(status: number, code: AIMessageErrorCode, message: string, details?: string) {
+  const payload: ErrorResponseBody = { code, message }
+  if (details) payload.details = details
+  return jsonResponse(payload, status)
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string')
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
+  if (req.method !== 'POST') {
+    return errorResponse(405, 'invalid_request', 'Unsupported request method.', 'method_not_allowed')
+  }
+
   try {
-    const body = await req.json()
+    let body: unknown
+    try {
+      body = await req.json()
+    } catch {
+      return errorResponse(400, 'invalid_request', 'Request body is invalid.', 'invalid_json')
+    }
+
+    if (!isRecord(body)) {
+      return errorResponse(400, 'invalid_request', 'Request body is invalid.', 'body_must_be_object')
+    }
+
     const { contactSnapshot, category, channel, tone, userInput } = body
+
+    if (typeof category !== 'string' || !VALID_CATEGORIES.has(category)) {
+      return errorResponse(400, 'invalid_request', 'Message category is invalid.', 'invalid_category')
+    }
+
+    if (typeof channel !== 'string' || !VALID_CHANNELS.has(channel)) {
+      return errorResponse(400, 'invalid_request', 'Message channel is invalid.', 'invalid_channel')
+    }
+
+    if (typeof tone !== 'string' || !VALID_TONES.has(tone)) {
+      return errorResponse(400, 'invalid_request', 'Message tone is invalid.', 'invalid_tone')
+    }
+
+    if (userInput !== undefined && typeof userInput !== 'string') {
+      return errorResponse(400, 'invalid_request', 'Additional context is invalid.', 'invalid_user_input')
+    }
+
+    if (contactSnapshot !== undefined) {
+      if (!isRecord(contactSnapshot)) {
+        return errorResponse(400, 'invalid_request', 'Contact context is invalid.', 'invalid_contact_snapshot')
+      }
+
+      if (contactSnapshot.goals !== undefined && contactSnapshot.goals !== null && !isStringArray(contactSnapshot.goals)) {
+        return errorResponse(400, 'invalid_request', 'Contact goals are invalid.', 'invalid_contact_goals')
+      }
+
+      if (contactSnapshot.pain_points !== undefined && contactSnapshot.pain_points !== null && !isStringArray(contactSnapshot.pain_points)) {
+        return errorResponse(400, 'invalid_request', 'Contact pain points are invalid.', 'invalid_contact_pain_points')
+      }
+
+      if (contactSnapshot.interests !== undefined && contactSnapshot.interests !== null && !isStringArray(contactSnapshot.interests)) {
+        return errorResponse(400, 'invalid_request', 'Contact interests are invalid.', 'invalid_contact_interests')
+      }
+    }
 
     const contact = contactSnapshot ?? {}
 
@@ -95,18 +184,59 @@ SADECE şu JSON formatında yanıt ver, başka hiçbir şey yazma:
   ]
 }`
 
+    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')
+    if (!anthropicApiKey) {
+      console.error('[generate-message] Missing config: ANTHROPIC_API_KEY')
+      return errorResponse(503, 'missing_config', 'AI message generation is not configured.', 'missing_anthropic_api_key')
+    }
+
     const anthropic = new Anthropic({
-      apiKey: Deno.env.get('ANTHROPIC_API_KEY'),
+      apiKey: anthropicApiKey,
     })
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 1500,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userPrompt }],
-    })
+    let response
+    try {
+      response = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5',
+        max_tokens: 1500,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }],
+      })
+    } catch (err) {
+      const status = typeof err === 'object' && err !== null && 'status' in err
+        ? Number((err as { status?: number }).status)
+        : undefined
+      const providerMessage = err instanceof Error ? err.message : 'Unknown provider error'
+
+      if (status === 400 || status === 422) {
+        console.error('[generate-message] Invalid provider request:', { status, providerMessage })
+        return errorResponse(400, 'invalid_request', 'The AI request could not be processed.', 'provider_invalid_request')
+      }
+
+      if (status === 401) {
+        console.error('[generate-message] Provider unauthorized:', { status, providerMessage })
+        return errorResponse(502, 'unauthorized', 'AI service authorization failed.', 'provider_unauthorized')
+      }
+
+      if (status === 403) {
+        console.error('[generate-message] Provider forbidden:', { status, providerMessage })
+        return errorResponse(502, 'forbidden', 'AI service access is denied.', 'provider_forbidden')
+      }
+
+      if (status === 429) {
+        console.error('[generate-message] Provider rate limited:', { status, providerMessage })
+        return errorResponse(429, 'rate_limit', 'AI service is temporarily rate limited.', 'provider_rate_limited')
+      }
+
+      console.error('[generate-message] Provider runtime error:', { status, providerMessage })
+      return errorResponse(502, 'function_runtime_error', 'AI service is currently unavailable.', 'provider_runtime_error')
+    }
 
     const rawText = response.content[0].type === 'text' ? response.content[0].text : ''
+    if (!rawText.trim()) {
+      console.error('[generate-message] Empty model response')
+      return errorResponse(502, 'function_runtime_error', 'AI service returned an empty response.', 'empty_model_response')
+    }
 
     let parsed: { variants: Array<{ approach: string; message: string }> }
     try {
@@ -118,20 +248,17 @@ SADECE şu JSON formatında yanıt ver, başka hiçbir şey yazma:
       }
     }
 
-    return new Response(
-      JSON.stringify({
-        variants: parsed.variants,
-        tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    )
+    if (!Array.isArray(parsed.variants) || parsed.variants.length === 0) {
+      console.error('[generate-message] Invalid variants payload')
+      return errorResponse(502, 'function_runtime_error', 'AI service returned an invalid response.', 'invalid_variants_payload')
+    }
+
+    return jsonResponse({
+      variants: parsed.variants,
+      tokensUsed: response.usage.input_tokens + response.usage.output_tokens,
+    })
   } catch (err) {
-    console.error('[generate-message] error:', err)
-    return new Response(
-      JSON.stringify({ error: String(err) }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    console.error('[generate-message] unexpected error:', err)
+    return errorResponse(500, 'unknown_error', 'Unexpected error while generating AI message.', 'unexpected_runtime_error')
   }
 })

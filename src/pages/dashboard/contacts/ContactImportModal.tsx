@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import Papa from 'papaparse'
-import { Upload, X, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { Upload, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
@@ -12,21 +13,6 @@ import { importContacts } from '@/lib/contacts/mutations'
 import { CSV_COLUMN_MAP } from '@/lib/contacts/constants'
 import type { ContactInsert } from '@/types/database'
 
-const CONTACT_FIELDS: { value: string; label: string }[] = [
-  { value: 'skip', label: '— Atla —' },
-  { value: 'full_name', label: 'Ad Soyad' },
-  { value: 'phone', label: 'Telefon' },
-  { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'telegram', label: 'Telegram' },
-  { value: 'email', label: 'Email' },
-  { value: 'instagram', label: 'Instagram' },
-  { value: 'city', label: 'Şehir' },
-  { value: 'occupation', label: 'Meslek' },
-  { value: 'relationship', label: 'İlişki Türü' },
-  { value: 'notes', label: 'Notlar' },
-  { value: 'source', label: 'Kaynak' },
-]
-
 interface ContactImportModalProps {
   open: boolean
   onClose: () => void
@@ -37,6 +23,7 @@ interface ContactImportModalProps {
 type Step = 'upload' | 'map' | 'preview' | 'result'
 
 export function ContactImportModal({ open, onClose, userId, onSuccess }: ContactImportModalProps) {
+  const { t } = useTranslation()
   const [step, setStep] = useState<Step>('upload')
   const [headers, setHeaders] = useState<string[]>([])
   const [rows, setRows] = useState<string[][]>([])
@@ -45,6 +32,23 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
   const [loading, setLoading] = useState(false)
   const [dragOver, setDragOver] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const contactFields = [
+    'skip',
+    'full_name',
+    'phone',
+    'whatsapp',
+    'telegram',
+    'email',
+    'instagram',
+    'city',
+    'occupation',
+    'relationship',
+    'notes',
+    'source',
+  ] as const
+
+  const getFieldLabel = (value: (typeof contactFields)[number]) =>
+    t(`contacts.import.fields.${value}`)
 
   const reset = () => {
     setStep('upload')
@@ -97,7 +101,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
   const handleImport = async () => {
     const nameCol = Object.entries(mapping).find(([, v]) => v === 'full_name')?.[0]
     if (!nameCol) {
-      alert('"Ad Soyad" sütununu eşleştirmeniz gerekiyor.')
+      alert(t('contacts.import.requiredName'))
       return
     }
 
@@ -137,7 +141,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>CSV İçe Aktar</DialogTitle>
+          <DialogTitle>{t('contacts.import.title')}</DialogTitle>
         </DialogHeader>
 
         {step === 'upload' && (
@@ -151,9 +155,9 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
             }`}
           >
             <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
-            <p className="font-medium text-sm">CSV dosyasını buraya sürükle veya tıkla</p>
+            <p className="font-medium text-sm">{t('contacts.import.dropzone')}</p>
             <p className="text-xs text-muted-foreground mt-1">
-              İlk satır sütun başlıkları olmalı
+              {t('contacts.import.firstRowHint')}
             </p>
             <input
               ref={fileRef}
@@ -168,7 +172,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
         {step === 'map' && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              CSV sütunlarını uygulama alanlarıyla eşleştirin.
+              {t('contacts.import.mappingHelp')}
             </p>
             <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
               {headers.map((header) => (
@@ -182,8 +186,8 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CONTACT_FIELDS.map(({ value, label }) => (
-                        <SelectItem key={value} value={value}>{label}</SelectItem>
+                      {contactFields.map((value) => (
+                        <SelectItem key={value} value={value}>{getFieldLabel(value)}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -191,8 +195,10 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
               ))}
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setStep('upload')}>Geri</Button>
-              <Button onClick={() => setStep('preview')}>Önizle ({rows.length} satır)</Button>
+              <Button variant="outline" onClick={() => setStep('upload')}>{t('common.back')}</Button>
+              <Button onClick={() => setStep('preview')}>
+                {t('contacts.import.previewCta', { count: rows.length })}
+              </Button>
             </div>
           </div>
         )}
@@ -200,7 +206,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
         {step === 'preview' && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              İlk 5 satırın önizlemesi:
+              {t('contacts.import.previewIntro')}
             </p>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-xs">
@@ -210,7 +216,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
                       .filter((h) => mapping[h] && mapping[h] !== 'skip')
                       .map((h) => (
                         <th key={h} className="px-2 py-2 text-left font-medium whitespace-nowrap">
-                          {CONTACT_FIELDS.find((f) => f.value === mapping[h])?.label ?? mapping[h]}
+                          {getFieldLabel(mapping[h] as (typeof contactFields)[number])}
                         </th>
                       ))}
                   </tr>
@@ -231,9 +237,11 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
               </table>
             </div>
             <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setStep('map')}>Geri</Button>
+              <Button variant="outline" onClick={() => setStep('map')}>{t('common.back')}</Button>
               <Button onClick={handleImport} disabled={loading}>
-                {loading ? 'İçe aktarılıyor...' : `${rows.length} Kaydı İçe Aktar`}
+                {loading
+                  ? t('contacts.import.importing')
+                  : t('contacts.import.importCta', { count: rows.length })}
               </Button>
             </div>
           </div>
@@ -244,7 +252,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
             {result.inserted > 0 ? (
               <div className="flex items-center gap-3 p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400">
                 <CheckCircle2 className="w-5 h-5 shrink-0" />
-                <p className="font-medium">{result.inserted} kontak başarıyla içe aktarıldı!</p>
+                <p className="font-medium">{t('contacts.import.successDetailed', { count: result.inserted })}</p>
               </div>
             ) : null}
 
@@ -252,7 +260,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-destructive text-sm font-medium">
                   <AlertCircle className="w-4 h-4" />
-                  {result.errors.length} hata oluştu:
+                  {t('contacts.import.errorCount', { count: result.errors.length })}
                 </div>
                 <div className="max-h-40 overflow-y-auto space-y-1">
                   {result.errors.map((err, i) => (
@@ -263,7 +271,7 @@ export function ContactImportModal({ open, onClose, userId, onSuccess }: Contact
             )}
 
             <div className="flex justify-end">
-              <Button onClick={handleClose}>Kapat</Button>
+              <Button onClick={handleClose}>{t('common.close')}</Button>
             </div>
           </div>
         )}

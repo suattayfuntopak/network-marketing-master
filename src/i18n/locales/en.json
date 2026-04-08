@@ -25,6 +25,7 @@
     "goBack": "Go Back",
     "all": "All",
     "notes": "Notes",
+    "preparingPage": "Preparing page...",
     "selected": "{{count}} items selected",
     "page": "Page {{page}} / {{total}}"
   },
@@ -172,6 +173,8 @@
       "notes": "Notes",
       "nextFollowup": "Next Follow-up",
       "aiSuggestions": "AI Suggestions",
+      "aiDescription": "Based on this person's profile and your communication history, you can get instant guidance from the AI assistant on what kind of message to send or what your next step should be.",
+      "aiAction": "Get AI Suggestion",
       "aiPlaceholder": "AI-powered suggestions will appear here in Phase 4.",
       "info": "Info"
     },
@@ -232,12 +235,34 @@
     "import": {
       "title": "Import CSV",
       "dropzone": "Drag & drop CSV or click to select",
+      "firstRowHint": "The first row should contain column headers",
       "preview": "Preview (first {{count}} rows)",
       "mapping": "Column Mapping",
+      "mappingHelp": "Match the CSV columns to application fields.",
+      "previewCta": "Preview ({{count}} rows)",
+      "previewIntro": "Preview of the first 5 rows:",
       "importing": "Importing...",
+      "importCta": "Import {{count}} Records",
       "doImport": "Import",
       "success": "{{count}} contacts imported",
-      "errors": "Error: {{count}} rows failed"
+      "successDetailed": "{{count}} contacts were imported successfully!",
+      "errors": "Error: {{count}} rows failed",
+      "errorCount": "{{count}} errors occurred:",
+      "requiredName": "You need to map the \"Full Name\" column.",
+      "fields": {
+        "skip": "— Skip —",
+        "full_name": "Full Name",
+        "phone": "Phone",
+        "whatsapp": "WhatsApp",
+        "telegram": "Telegram",
+        "email": "Email",
+        "instagram": "Instagram",
+        "city": "City",
+        "occupation": "Occupation",
+        "relationship": "Relationship Type",
+        "notes": "Notes",
+        "source": "Source"
+      }
     }
   },
   "contactWarmth": {
@@ -593,13 +618,25 @@
       "feedbackGood": "Good",
       "feedbackMeh": "Okay",
       "feedbackBad": "Bad",
-      "contactHint": "You can also generate contact-specific messages from the contact detail page"
+      "contactHint": "You can also generate contact-specific messages from the contact detail page",
+      "errors": {
+        "missingConfig": "The AI message service is not configured yet.",
+        "network": "Connection failed. Check your internet and try again.",
+        "unauthorized": "The AI message service could not be authenticated right now.",
+        "forbidden": "The AI message service cannot be accessed right now.",
+        "rateLimit": "The AI service is busy right now. Please try again shortly.",
+        "invalidRequest": "The request could not be processed. Please review the fields and try again.",
+        "runtime": "The AI message could not be generated right now. Please try again.",
+        "unknown": "The AI message could not be generated. Please try again."
+      }
     },
     "template": {
       "new": "New Template",
       "created": "Template created",
       "updated": "Template updated",
       "deleted": "Template deleted",
+      "deleteConfirm": "Are you sure you want to delete this template?",
+      "copied": "Copied",
       "namePlaceholder": "Template name",
       "contentPlaceholder": "Message content. Use {name}, {occupation} for variables.",
       "use": "Use Template",

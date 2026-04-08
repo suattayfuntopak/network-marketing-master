@@ -1,4 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+import {
+  createClient,
+  FunctionsFetchError,
+  FunctionsHttpError,
+  FunctionsRelayError,
+} from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
@@ -15,3 +20,5 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true,
   },
 })
+
+export { FunctionsFetchError, FunctionsHttpError, FunctionsRelayError }

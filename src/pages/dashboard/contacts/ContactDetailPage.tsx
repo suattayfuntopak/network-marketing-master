@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { useNavigate, useParams, Link } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
-import { tr } from 'date-fns/locale'
+import { tr, enUS } from 'date-fns/locale'
 import { formatDistanceToNow } from 'date-fns'
 import {
   ArrowLeft, Edit, Archive, ArchiveRestore, Trash2, Calendar, Briefcase,
-  MapPin, Heart, Users, Target, Frown, Phone, Mail, MessageCircle, Send, Camera,
+  MapPin, Heart, Users, Target, Frown, Phone, Mail,
   Plus, Bell, Clock, Sparkles,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -34,15 +34,12 @@ import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { STAGE_LABELS } from '@/lib/contacts/constants'
 import type { InteractionType } from '@/lib/contacts/types'
-import { useDealsByContact, usePipelineStages } from '@/hooks/usePipeline'
-import { STAGE_COLOR_CLASSES, DEAL_STATUS_COLORS, formatCurrency } from '@/lib/pipeline/constants'
 import { useContactFollowUps, useContactAppointments, useCreateFollowUp } from '@/hooks/useCalendar'
 import { QUICK_FOLLOW_UP_OFFSETS } from '@/lib/calendar/constants'
 import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { NewAppointmentModal } from '@/components/calendar/modals/NewAppointmentModal'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { addDays, format as fmtDate2 } from 'date-fns'
-import i18n from '@/i18n'
 
 const INTERACTION_TYPE_KEYS: InteractionType[] = [
   'call', 'whatsapp', 'telegram', 'meeting', 'presentation', 'objection', 'email', 'sms', 'note',
@@ -55,7 +52,7 @@ export function ContactDetailPage() {
   const userId = user?.id ?? ''
 
   const { data: contact, isLoading, isError, error } = useContact(id)
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { data: interactions = [], isLoading: loadingInteractions } = useInteractions(id)
   const { data: allTags = [] } = useTags(userId)
 
@@ -65,10 +62,7 @@ export function ContactDetailPage() {
   const addInteractionMutation = useAddInteraction(id ?? '')
   const setTagsMutation = useSetContactTags(id ?? '')
   const createTagMutation = useCreateTag()
-
-  const { data: contactDeals = [] } = useDealsByContact(id ?? '', userId)
-  const { data: pipelineStages = [] } = usePipelineStages(userId)
-  const currLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
+  const dateLocale = i18n.language?.startsWith('en') ? enUS : tr
 
   const { data: contactFollowUps = [] } = useContactFollowUps(id ?? '', userId)
   const { data: contactAppointments = [] } = useContactAppointments(id ?? '', userId)
@@ -325,7 +319,7 @@ export function ContactDetailPage() {
               {contact.birthday && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5 shrink-0" />
-                  <span>{format(new Date(contact.birthday), 'd MMMM', { locale: tr })}</span>
+                  <span>{format(new Date(contact.birthday), 'd MMMM', { locale: dateLocale })}</span>
                 </div>
               )}
               {contact.email && (
@@ -447,10 +441,10 @@ export function ContactDetailPage() {
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
               <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.nextFollowup')}</p>
               <p className="text-sm font-medium">
-                {format(new Date(contact.next_follow_up_at), 'd MMMM yyyy', { locale: tr })}
+                {format(new Date(contact.next_follow_up_at), 'd MMMM yyyy', { locale: dateLocale })}
               </p>
               <p className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(contact.next_follow_up_at), { addSuffix: true, locale: tr })}
+                {formatDistanceToNow(new Date(contact.next_follow_up_at), { addSuffix: true, locale: dateLocale })}
               </p>
             </div>
           )}
@@ -494,7 +488,7 @@ export function ContactDetailPage() {
                     <Bell className="w-3 h-3 text-amber-500 shrink-0" />
                     <span className="flex-1 truncate">{fu.title}</span>
                     <span className="text-muted-foreground shrink-0">
-                      {fmtDate2(new Date(fu.due_at), 'd MMM', { locale: tr })}
+                      {fmtDate2(new Date(fu.due_at), 'd MMM', { locale: dateLocale })}
                     </span>
                   </div>
                 ))}
@@ -510,7 +504,7 @@ export function ContactDetailPage() {
                     <Clock className="w-3 h-3 text-blue-500 shrink-0" />
                     <span className="flex-1 truncate">{apt.title}</span>
                     <span className="text-muted-foreground shrink-0">
-                      {fmtDate2(new Date(apt.starts_at), 'd MMM HH:mm', { locale: tr })}
+                      {fmtDate2(new Date(apt.starts_at), 'd MMM HH:mm', { locale: dateLocale })}
                     </span>
                   </div>
                 ))}
@@ -522,10 +516,10 @@ export function ContactDetailPage() {
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
             <div className="flex items-center gap-2">
                <Sparkles className="w-4 h-4 text-primary" />
-               <p className="text-sm font-semibold text-primary">{t('contacts.detail.aiSuggestions', { defaultValue: 'Yapay Zeka Önerisi' })}</p>
+               <p className="text-sm font-semibold text-primary">{t('contacts.detail.aiSuggestions')}</p>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Bu kişinin profiline ve iletişim geçmişinize dayanarak, ne tür bir mesaj atmanız gerektiği veya bir sonraki adamın ne olması gerektiği konusunda Claude yapay zeka asistanından anında tavsiye alabilirsiniz.
+              {t('contacts.detail.aiDescription')}
             </p>
             <Button
               size="sm"
@@ -534,7 +528,7 @@ export function ContactDetailPage() {
               variant="outline"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Yapay Zeka Önerisi Al
+              {t('contacts.detail.aiAction')}
             </Button>
           </div>
         </div>

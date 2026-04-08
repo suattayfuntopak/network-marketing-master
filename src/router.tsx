@@ -1,90 +1,196 @@
+import { Suspense, lazy, type ReactNode } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/lib/constants'
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
-import { LandingPage } from '@/pages/public/LandingPage'
-import { LoginPage } from '@/pages/public/LoginPage'
-import { RegisterPage } from '@/pages/public/RegisterPage'
-import { ForgotPasswordPage } from '@/pages/public/ForgotPasswordPage'
-import { ResetPasswordPage } from '@/pages/public/ResetPasswordPage'
-import { EmailConfirmPage } from '@/pages/public/EmailConfirmPage'
-import { DashboardLayout } from '@/app/layout/DashboardLayout'
-import { DashboardHome } from '@/pages/dashboard/DashboardHome'
-import { ContactsListPage } from '@/pages/dashboard/contacts/ContactsListPage'
-import { ContactFormPage } from '@/pages/dashboard/contacts/ContactFormPage'
-import { ContactDetailPage } from '@/pages/dashboard/contacts/ContactDetailPage'
-import { PipelinePage } from '@/pages/dashboard/pipeline/PipelinePage'
-import { DealDetailPage } from '@/pages/dashboard/pipeline/DealDetailPage'
-import { CalendarPage } from '@/pages/dashboard/calendar/CalendarPage'
-import { FollowUpsPage } from '@/pages/dashboard/calendar/FollowUpsPage'
-import { NotFoundPage } from '@/pages/public/NotFoundPage'
-import { MessagesPage } from '@/pages/dashboard/messages/MessagesPage'
-import { AcademyPage } from '@/pages/dashboard/academy/AcademyPage'
-import { AcademyContentDetailPage } from '@/pages/dashboard/academy/AcademyContentDetailPage'
-import { ObjectionsPage } from '@/pages/dashboard/academy/ObjectionsPage'
-import { AnalyticsPage } from '@/pages/dashboard/analytics/AnalyticsPage'
-import { SettingsPage } from '@/pages/dashboard/settings/SettingsPage'
+import i18n from '@/i18n'
+
+const LandingPage = lazy(async () => {
+  const module = await import('@/pages/public/LandingPage')
+  return { default: module.LandingPage }
+})
+
+const LoginPage = lazy(async () => {
+  const module = await import('@/pages/public/LoginPage')
+  return { default: module.LoginPage }
+})
+
+const RegisterPage = lazy(async () => {
+  const module = await import('@/pages/public/RegisterPage')
+  return { default: module.RegisterPage }
+})
+
+const ForgotPasswordPage = lazy(async () => {
+  const module = await import('@/pages/public/ForgotPasswordPage')
+  return { default: module.ForgotPasswordPage }
+})
+
+const ResetPasswordPage = lazy(async () => {
+  const module = await import('@/pages/public/ResetPasswordPage')
+  return { default: module.ResetPasswordPage }
+})
+
+const EmailConfirmPage = lazy(async () => {
+  const module = await import('@/pages/public/EmailConfirmPage')
+  return { default: module.EmailConfirmPage }
+})
+
+const DashboardLayout = lazy(async () => {
+  const module = await import('@/app/layout/DashboardLayout')
+  return { default: module.DashboardLayout }
+})
+
+const DashboardHome = lazy(async () => {
+  const module = await import('@/pages/dashboard/DashboardHome')
+  return { default: module.DashboardHome }
+})
+
+const ContactsListPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/contacts/ContactsListPage')
+  return { default: module.ContactsListPage }
+})
+
+const ContactFormPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/contacts/ContactFormPage')
+  return { default: module.ContactFormPage }
+})
+
+const ContactDetailPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/contacts/ContactDetailPage')
+  return { default: module.ContactDetailPage }
+})
+
+const PipelinePage = lazy(async () => {
+  const module = await import('@/pages/dashboard/pipeline/PipelinePage')
+  return { default: module.PipelinePage }
+})
+
+const DealDetailPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/pipeline/DealDetailPage')
+  return { default: module.DealDetailPage }
+})
+
+const CalendarPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/calendar/CalendarPage')
+  return { default: module.CalendarPage }
+})
+
+const FollowUpsPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/calendar/FollowUpsPage')
+  return { default: module.FollowUpsPage }
+})
+
+const NotFoundPage = lazy(async () => {
+  const module = await import('@/pages/public/NotFoundPage')
+  return { default: module.NotFoundPage }
+})
+
+const MessagesPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/messages/MessagesPage')
+  return { default: module.MessagesPage }
+})
+
+const AcademyPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/academy/AcademyPage')
+  return { default: module.AcademyPage }
+})
+
+const AcademyContentDetailPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/academy/AcademyContentDetailPage')
+  return { default: module.AcademyContentDetailPage }
+})
+
+const ObjectionsPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/academy/ObjectionsPage')
+  return { default: module.ObjectionsPage }
+})
+
+const AnalyticsPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/analytics/AnalyticsPage')
+  return { default: module.AnalyticsPage }
+})
+
+const SettingsPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/settings/SettingsPage')
+  return { default: module.SettingsPage }
+})
+
+function RouteLoadingFallback() {
+  return (
+    <div className="p-6 text-center text-muted-foreground">
+      {i18n.t('common.preparingPage')}
+    </div>
+  )
+}
+
+function renderLazyRoute(element: ReactNode) {
+  return (
+    <Suspense fallback={<RouteLoadingFallback />}>
+      {element}
+    </Suspense>
+  )
+}
 
 // Wrapper forces full remount of ContactDetailPage when ID changes,
 // preventing stale query state when navigating between contacts.
 function ContactDetailWrapper() {
   const { id } = useParams<{ id: string }>()
-  return <ContactDetailPage key={id} />
+  return renderLazyRoute(<ContactDetailPage key={id} />)
 }
 
 // Same wrapper for edit form so it remounts when switching contacts
 function ContactFormWrapper() {
   const { id } = useParams<{ id: string }>()
-  return <ContactFormPage key={id ?? 'new'} />
+  return renderLazyRoute(<ContactFormPage key={id ?? 'new'} />)
 }
 
 export const router = createBrowserRouter([
   // Public routes
-  { path: ROUTES.HOME, element: <LandingPage /> },
-  { path: ROUTES.LOGIN, element: <LoginPage /> },
-  { path: ROUTES.REGISTER, element: <RegisterPage /> },
-  { path: ROUTES.FORGOT_PASSWORD, element: <ForgotPasswordPage /> },
-  { path: ROUTES.RESET_PASSWORD, element: <ResetPasswordPage /> },
-  { path: ROUTES.EMAIL_CONFIRM, element: <EmailConfirmPage /> },
+  { path: ROUTES.HOME, element: renderLazyRoute(<LandingPage />) },
+  { path: ROUTES.LOGIN, element: renderLazyRoute(<LoginPage />) },
+  { path: ROUTES.REGISTER, element: renderLazyRoute(<RegisterPage />) },
+  { path: ROUTES.FORGOT_PASSWORD, element: renderLazyRoute(<ForgotPasswordPage />) },
+  { path: ROUTES.RESET_PASSWORD, element: renderLazyRoute(<ResetPasswordPage />) },
+  { path: ROUTES.EMAIL_CONFIRM, element: renderLazyRoute(<EmailConfirmPage />) },
 
   // Protected routes
   {
     element: <ProtectedRoute />,
     children: [
       {
-        element: <DashboardLayout />,
+        element: renderLazyRoute(<DashboardLayout />),
         children: [
-          { path: ROUTES.DASHBOARD, element: <DashboardHome /> },
+          { path: ROUTES.DASHBOARD, element: renderLazyRoute(<DashboardHome />) },
 
           // Contacts
-          { path: ROUTES.CONTACTS, element: <ContactsListPage /> },
-          { path: `${ROUTES.CONTACTS}/yeni`, element: <ContactFormPage key="new" /> },
+          { path: ROUTES.CONTACTS, element: renderLazyRoute(<ContactsListPage />) },
+          { path: `${ROUTES.CONTACTS}/yeni`, element: renderLazyRoute(<ContactFormPage key="new" />) },
           { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
           { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
 
           // Pipeline
-          { path: ROUTES.PIPELINE, element: <PipelinePage /> },
-          { path: `${ROUTES.PIPELINE}/:dealId`, element: <DealDetailPage /> },
+          { path: ROUTES.PIPELINE, element: renderLazyRoute(<PipelinePage />) },
+          { path: `${ROUTES.PIPELINE}/:dealId`, element: renderLazyRoute(<DealDetailPage />) },
 
           // Calendar
-          { path: ROUTES.CALENDAR, element: <CalendarPage /> },
-          { path: `${ROUTES.CALENDAR}/takipler`, element: <FollowUpsPage /> },
+          { path: ROUTES.CALENDAR, element: renderLazyRoute(<CalendarPage />) },
+          { path: `${ROUTES.CALENDAR}/takipler`, element: renderLazyRoute(<FollowUpsPage />) },
 
           // Messages
-          { path: ROUTES.MESSAGES, element: <MessagesPage /> },
+          { path: ROUTES.MESSAGES, element: renderLazyRoute(<MessagesPage />) },
 
           // Academy
-          { path: ROUTES.ACADEMY, element: <AcademyPage /> },
-          { path: `${ROUTES.ACADEMY}/itirazlar`, element: <ObjectionsPage /> },
-          { path: `${ROUTES.ACADEMY}/:id`, element: <AcademyContentDetailPage /> },
+          { path: ROUTES.ACADEMY, element: renderLazyRoute(<AcademyPage />) },
+          { path: `${ROUTES.ACADEMY}/itirazlar`, element: renderLazyRoute(<ObjectionsPage />) },
+          { path: `${ROUTES.ACADEMY}/:id`, element: renderLazyRoute(<AcademyContentDetailPage />) },
           { path: ROUTES.TEAM, element: <div className="p-6"><h1 className="text-2xl font-bold">Ekip</h1><p className="text-muted-foreground mt-2">Yakında...</p></div> },
-          { path: ROUTES.ANALYTICS, element: <AnalyticsPage /> },
-          { path: ROUTES.SETTINGS, element: <SettingsPage /> },
+          { path: ROUTES.ANALYTICS, element: renderLazyRoute(<AnalyticsPage />) },
+          { path: ROUTES.SETTINGS, element: renderLazyRoute(<SettingsPage />) },
         ],
       },
     ],
   },
 
   // 404
-  { path: '*', element: <NotFoundPage /> },
+  { path: '*', element: renderLazyRoute(<NotFoundPage />) },
 ])

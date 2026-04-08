@@ -20,6 +20,7 @@ import { useTags, useCreateTag } from '@/hooks/useTags'
 import { useSetContactTags } from '@/hooks/useContact'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
+import { setContactTags } from '@/lib/contacts/mutations'
 import { STAGE_LABELS, SOURCE_LABELS, CONTACT_TYPE_LABELS } from '@/lib/contacts/constants'
 
 const schema = z.object({
@@ -144,8 +145,7 @@ export function ContactFormPage() {
       } else {
         const newId = await createContact.mutateAsync(payload)
         if (selectedTagIds.length > 0) {
-          const setTagsForNew = (await import('@/lib/contacts/mutations')).setContactTags
-          await setTagsForNew(newId, selectedTagIds)
+          await setContactTags(newId, selectedTagIds)
         }
         toast.success(t('contacts.saved'))
         console.debug('[ContactForm] Yeni kontak kaydedildi, id:', newId)

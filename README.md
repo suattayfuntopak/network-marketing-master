@@ -1,73 +1,127 @@
-# React + TypeScript + Vite
+# Network Marketing Master
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Network Marketing Master, network marketing ekipleri ve bireysel distribütörler için hazırlanmış bir React + Supabase uygulamasıdır. Kontak yönetimi, süreç takibi, takvim/follow-up planlama, AI mesaj üretimi, itiraz bankası ve eğitim içeriğini tek panelde toplar.
 
-Currently, two official plugins are available:
+## Özellikler
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Kontak yönetimi: filtreleme, etiketleme, sıcaklık skoru, ilişki geçmişi
+- Süreç takibi: pipeline, fırsat yönetimi, aşama bazlı görünüm
+- Takvim: takipler, randevular, hızlı aksiyon akışı
+- AI mesaj üretimi: kontağa ve bağlama göre mesaj varyantları
+- Akademi: itiraz bankası, eğitim içeriği, içerik detay sayfaları
+- Çok dil desteği: Türkçe varsayılan, İngilizce destekli
 
-## React Compiler
+## Teknoloji Yığını
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS v4
+- Supabase
+- TanStack Query
+- Zustand
+- react-i18next
 
-## Expanding the ESLint configuration
+## Gerekli Environment Değişkenleri
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Frontend için:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Supabase Edge Function için:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `ANTHROPIC_API_KEY`
+
+Eksik olursa:
+
+- `VITE_SUPABASE_URL` veya `VITE_SUPABASE_ANON_KEY` yoksa uygulama açılışta hata verir ve API/auth akışı çalışmaz.
+- `ANTHROPIC_API_KEY` yoksa AI mesaj üretimi çalışmaz; uygulamanın geri kalanı çalışmaya devam eder.
+
+## Local Çalıştırma
+
+1. Bağımlılıkları yükleyin:
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. `.env.local` dosyanıza frontend environment değişkenlerini ekleyin:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
 ```
+
+3. Geliştirme sunucusunu başlatın:
+
+```bash
+npm run dev
+```
+
+4. Production build kontrolü:
+
+```bash
+npm run build
+```
+
+## Supabase ve AI Kurulumu
+
+AI mesaj üretimi `supabase/functions/generate-message` edge function’ı üzerinden çalışır.
+
+Örnek deploy akışı:
+
+```bash
+supabase functions deploy generate-message
+supabase secrets set ANTHROPIC_API_KEY=...
+```
+
+Supabase şema değişiklikleri repo içindeki SQL dosyalarında tutulur. Gerekli migration/script dosyalarını manuel olarak çalıştırmanız gerekir.
+
+## Deploy
+
+Frontend Vercel üzerinde deploy edilebilir. SPA yönlendirmesi için `vercel.json` zaten repo içinde bulunur.
+
+Vercel’e deploy etmeden önce:
+
+1. Proje environment değişkenlerini tanımlayın:
+   `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`
+2. Supabase edge function’ın deploy edildiğinden ve `ANTHROPIC_API_KEY` secret’ının tanımlı olduğundan emin olun.
+3. Build kontrolü yapın:
+
+```bash
+npm run build
+```
+
+Hedef canlı domain:
+
+- `https://networkmarketing.suattayfuntopak.com`
+
+## Dizin Yapısı
+
+```text
+src/
+  app/
+  components/
+  hooks/
+  i18n/
+  lib/
+  pages/
+  stores/
+  styles/
+  types/
+
+supabase/
+  functions/
+
+docs/
+  FAZ_4.md
+  patterns.md
+  regressions.md
+```
+
+## Release Notları
+
+- Uygulama route-level lazy loading ile ilk yükleme için optimize edilmiştir.
+- AI mesaj üretimi daha ayrıştırılmış hata yönetimi ile çalışır.
+- Türkçe ve İngilizce modlarda temel i18n cleanup uygulanmıştır.

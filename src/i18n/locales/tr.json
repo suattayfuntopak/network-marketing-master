@@ -25,6 +25,7 @@
     "goBack": "Geri Dön",
     "all": "Tümü",
     "notes": "Notlar",
+    "preparingPage": "Sayfa hazırlanıyor...",
     "selected": "{{count}} öğe seçildi",
     "page": "Sayfa {{page}} / {{total}}"
   },
@@ -172,6 +173,8 @@
       "notes": "Notlar",
       "nextFollowup": "Sonraki Takip",
       "aiSuggestions": "AI Önerileri",
+      "aiDescription": "Bu kişinin profiline ve iletişim geçmişinize dayanarak, nasıl bir mesaj atmanız veya bir sonraki adımda ne yapmanız gerektiği konusunda AI asistanından anında tavsiye alabilirsiniz.",
+      "aiAction": "AI Önerisi Al",
       "aiPlaceholder": "Faz 4'te AI destekli öneriler burada görünecek.",
       "info": "Bilgiler"
     },
@@ -232,12 +235,34 @@
     "import": {
       "title": "CSV İçe Aktar",
       "dropzone": "CSV dosyasını sürükle & bırak veya tıkla",
+      "firstRowHint": "İlk satır sütun başlıkları olmalı",
       "preview": "Önizleme (ilk {{count}} satır)",
       "mapping": "Sütun Eşleştirme",
+      "mappingHelp": "CSV sütunlarını uygulama alanlarıyla eşleştirin.",
+      "previewCta": "Önizle ({{count}} satır)",
+      "previewIntro": "İlk 5 satırın önizlemesi:",
       "importing": "İçe aktarılıyor...",
+      "importCta": "{{count}} Kaydı İçe Aktar",
       "doImport": "İçe Aktar",
       "success": "{{count}} kontak içe aktarıldı",
-      "errors": "Hata: {{count}} satır başarısız"
+      "successDetailed": "{{count}} kontak başarıyla içe aktarıldı!",
+      "errors": "Hata: {{count}} satır başarısız",
+      "errorCount": "{{count}} hata oluştu:",
+      "requiredName": "\"Ad Soyad\" sütununu eşleştirmeniz gerekiyor.",
+      "fields": {
+        "skip": "— Atla —",
+        "full_name": "Ad Soyad",
+        "phone": "Telefon",
+        "whatsapp": "WhatsApp",
+        "telegram": "Telegram",
+        "email": "Email",
+        "instagram": "Instagram",
+        "city": "Şehir",
+        "occupation": "Meslek",
+        "relationship": "İlişki Türü",
+        "notes": "Notlar",
+        "source": "Kaynak"
+      }
     }
   },
   "contactWarmth": {
@@ -593,13 +618,25 @@
       "feedbackGood": "İyi",
       "feedbackMeh": "Orta",
       "feedbackBad": "Kötü",
-      "contactHint": "Kontak detay sayfasından da doğrudan kontağa özel mesaj üretebilirsin"
+      "contactHint": "Kontak detay sayfasından da doğrudan kontağa özel mesaj üretebilirsin",
+      "errors": {
+        "missingConfig": "AI mesaj servisi henüz yapılandırılmamış.",
+        "network": "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.",
+        "unauthorized": "AI mesaj servisi şu anda doğrulanamıyor.",
+        "forbidden": "AI mesaj servisine şu anda erişilemiyor.",
+        "rateLimit": "AI servisi şu anda yoğun. Kısa süre sonra tekrar dene.",
+        "invalidRequest": "İstek işlenemedi. Alanları kontrol edip tekrar dene.",
+        "runtime": "AI mesajı şu anda üretilemiyor. Lütfen tekrar dene.",
+        "unknown": "AI mesajı üretilemedi. Lütfen tekrar dene."
+      }
     },
     "template": {
       "new": "Yeni Şablon",
       "created": "Şablon oluşturuldu",
       "updated": "Şablon güncellendi",
       "deleted": "Şablon silindi",
+      "deleteConfirm": "Bu şablonu silmek istediğine emin misin?",
+      "copied": "Kopyalandı",
       "namePlaceholder": "Şablon adı",
       "contentPlaceholder": "Mesaj içeriği. Değişkenler için {ad}, {meslek} kullanabilirsin.",
       "use": "Şablonu Kullan",

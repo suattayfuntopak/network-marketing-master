@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -29,22 +29,44 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const redirectTimeoutRef = useRef<number | null>(null)
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = async (data: FormData) => {
-    setError(null)
-    const { error } = await supabase.auth.updateUser({ password: data.password })
-
-    if (error) {
-      setError('Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.')
-      return
+  useEffect(() => {
+    return () => {
+      if (redirectTimeoutRef.current) {
+        window.clearTimeout(redirectTimeoutRef.current)
+      }
     }
+  }, [])
 
-    setSuccess(true)
-    setTimeout(() => navigate(ROUTES.LOGIN), 2000)
+  const onSubmit = async (data: FormData) => {
+    if (loading) return
+
+    setError(null)
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password: data.password })
+
+      if (error) {
+        throw error
+      }
+
+      setSuccess(true)
+      redirectTimeoutRef.current = window.setTimeout(() => {
+        navigate(ROUTES.LOGIN)
+      }, 2000)
+    } catch (err) {
+      console.error('[ResetPasswordPage] Error:', err)
+      setError('Şifre güncellenirken bir hata oluştu. Lütfen tekrar deneyin.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -117,8 +139,8 @@ export function ResetPasswordPage() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Güncelleniyor...' : 'Şifreyi Güncelle'}
             </Button>
           </form>
         )}

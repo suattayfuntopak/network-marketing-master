@@ -16,7 +16,7 @@ import type { ContactWithTags } from '@/lib/contacts/types'
 type Tab = 'ai' | 'templates' | 'history' | 'bulk'
 
 export function MessagesPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [tab, setTab] = useState<Tab>('ai')
   const [showAIModal, setShowAIModal] = useState(false)
@@ -29,6 +29,7 @@ export function MessagesPage() {
   const [bulkSearch, setBulkSearch] = useState('')
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
   const [bulkContact, setBulkContact] = useState<ContactWithTags | null>(null)
+  const currentLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
   const { data: templates = [], isLoading: templatesLoading } = useTemplates(user?.id ?? '', {
     search: search.length >= 2 ? search : undefined,
@@ -204,7 +205,7 @@ export function MessagesPage() {
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm('Bu şablonu silmek istediğine emin misin?')) {
+                          if (confirm(t('messages.template.deleteConfirm'))) {
                             deleteTemplate.mutate(tmpl.id)
                           }
                         }}
@@ -226,7 +227,7 @@ export function MessagesPage() {
                     onClick={() => handleCopy(tmpl.content, tmpl.id)}
                   >
                     {copiedId === tmpl.id ? (
-                      <><Check className="w-3 h-3" /> Kopyalandı</>
+                      <><Check className="w-3 h-3" /> {t('messages.template.copied')}</>
                     ) : (
                       <><Copy className="w-3 h-3" /> {t('messages.ai.copyToClipboard')}</>
                     )}
@@ -295,8 +296,8 @@ export function MessagesPage() {
                   className="accent-primary"
                 />
                 <span className="text-xs font-medium text-muted-foreground">
-                  {bulkContacts.length} {t('contacts.title').toLowerCase()}
-                  {bulkSelected.size > 0 && ` · ${bulkSelected.size} ${t('contacts.selected')}`}
+                  {t('contacts.total', { count: bulkContacts.length })}
+                  {bulkSelected.size > 0 && ` · ${t('contacts.selected', { count: bulkSelected.size })}`}
                 </span>
               </div>
               <div className="divide-y max-h-[500px] overflow-y-auto">
@@ -367,7 +368,7 @@ export function MessagesPage() {
                     {t(`messages.channels.${msg.channel}`)}
                   </span>
                   <span className="text-xs text-muted-foreground ml-auto">
-                    {new Date(msg.created_at).toLocaleDateString('tr-TR')}
+                    {new Date(msg.created_at).toLocaleDateString(currentLocale)}
                   </span>
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-4 whitespace-pre-wrap">

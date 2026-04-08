@@ -25,7 +25,7 @@ Her yeni seansta ŞUNU YAP:
 1. Bu dosyayı (CLAUDE.md) oku
 2. `docs/PATTERNS.md` oku — ÇALIŞAN kod pattern'ları burada
 3. `docs/REGRESSIONS.md` oku — Daha önce yaşanan bug'lar
-4. O seansın faz dökümanını oku (örn: `docs/FAZ_3.md`)
+4. O seansın faz dökümanını oku (örn: `docs/FAZ_4.md`)
 5. `git log --oneline -20` ile son commit'leri gör
 
 ## ⛔ ASLA YAPMA (KIRMIZI ÇİZGİLER)
@@ -112,7 +112,7 @@ src/
 docs/
 ├── PATTERNS.md       (zorunlu pattern'lar)
 ├── REGRESSIONS.md    (yaşanan bug'lar)
-├── FAZ_3.md          (mevcut/sıradaki)
+├── FAZ_4.md          (mevcut/sıradaki)
 └── ...
 ```
 
@@ -142,4 +142,4 @@ docs/
 
 ---
 
-**Aktif faz:** `docs/FAZ_3.md` — Takvim & Akıllı Takip
+**Aktif faz:** `docs/FAZ_4.md` — AI Mesaj Üretici + Akademi & İtiraz Bankası

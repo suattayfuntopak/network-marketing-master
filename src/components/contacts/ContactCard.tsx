@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow } from 'date-fns'
-import { tr } from 'date-fns/locale'
+import { tr, enUS } from 'date-fns/locale'
 import { MoreHorizontal, Edit, Archive, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
   DropdownMenu,
@@ -36,6 +37,8 @@ export function ContactCard({
   onDelete,
 }: ContactCardProps) {
   const navigate = useNavigate()
+  const { t, i18n } = useTranslation()
+  const dateLocale = i18n.language?.startsWith('en') ? enUS : tr
 
   return (
     <div
@@ -69,11 +72,11 @@ export function ContactCard({
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={onEdit}>
                 <Edit className="w-4 h-4 mr-2" />
-                Düzenle
+                {t('common.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={onArchive}>
                 <Archive className="w-4 h-4 mr-2" />
-                {contact.is_archived ? 'Arşivden Çıkar' : 'Arşivle'}
+                {contact.is_archived ? t('common.unarchive') : t('common.archive')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -81,7 +84,7 @@ export function ContactCard({
                 className="text-destructive focus:text-destructive"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Sil
+                {t('common.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -92,7 +95,7 @@ export function ContactCard({
         <StageBadge stage={contact.stage} />
         {contact.last_contact_at && (
           <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(contact.last_contact_at), { addSuffix: true, locale: tr })}
+            {formatDistanceToNow(new Date(contact.last_contact_at), { addSuffix: true, locale: dateLocale })}
           </span>
         )}
       </div>
