@@ -15,15 +15,12 @@ export const contactKeys = {
 export function useContacts(params: ContactListParams) {
   return useQuery({
     queryKey: contactKeys.list(params),
-    queryFn: async () => {
-      console.debug('[useContacts] Fetching with filters:', JSON.stringify(params.filters))
-      const result = await fetchContacts(params)
-      console.debug('[useContacts] Result count:', result.count, 'data:', result.data.length)
-      return result
-    },
+    queryFn: () => fetchContacts(params),
     enabled: !!params.userId,
-    staleTime: 0,
-    retry: false,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
+    retry: 1,
   })
 }
 
@@ -32,6 +29,8 @@ export function useContactCount(userId: string) {
     queryKey: contactKeys.count(userId),
     queryFn: () => fetchContactCount(userId),
     enabled: !!userId,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -40,6 +39,8 @@ export function useRecentContacts(userId: string) {
     queryKey: contactKeys.recent(userId),
     queryFn: () => fetchRecentContacts(userId),
     enabled: !!userId,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -48,6 +49,8 @@ export function usePendingFollowUps(userId: string) {
     queryKey: contactKeys.pending(userId),
     queryFn: () => fetchPendingFollowUps(userId),
     enabled: !!userId,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -57,5 +60,6 @@ export function useContactStageCounts(userId: string) {
     queryFn: () => fetchContactStageCounts(userId),
     enabled: !!userId,
     staleTime: 60_000,
+    refetchOnWindowFocus: false,
   })
 }

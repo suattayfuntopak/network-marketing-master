@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils'
 import { useAcademyContent, useToggleAcademyFavorite, useCreateAcademyContent, useUpdateAcademyContent } from '@/hooks/useAcademy'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
+import { trackAcademyRead } from '@/lib/academy/progress'
 import type { ContentCategory, ContentLevel, ContentType } from '@/lib/academy/types'
 
 const LEVEL_COLORS = {
@@ -67,6 +68,12 @@ export function AcademyContentDetailPage() {
       })
     }
   }, [content, showEdit])
+
+  useEffect(() => {
+    if (content?.id) {
+      trackAcademyRead(content.id)
+    }
+  }, [content?.id])
 
   const isOwn = !!content && !content.is_system && content.user_id === user?.id
 

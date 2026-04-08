@@ -23,9 +23,10 @@ interface Props {
   onClose: () => void
   template: MessageTemplate | null
   userId: string
+  startWithAI?: boolean
 }
 
-export function TemplateFormModal({ open, onClose, template, userId }: Props) {
+export function TemplateFormModal({ open, onClose, template, userId, startWithAI = false }: Props) {
   const { t } = useTranslation()
   const createTemplate = useCreateTemplate(userId)
   const updateTemplate = useUpdateTemplate(userId)
@@ -43,6 +44,12 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
   const [aiContext, setAiContext] = useState('')
   const [aiVariants, setAiVariants] = useState<{ message: string; approach: string }[]>([])
 
+  const buildSuggestedName = () => {
+    const categoryLabel = t(`messages.categories.${category}`)
+    const channelLabel = t(`messages.channels.${channel}`)
+    return `${categoryLabel} · ${channelLabel}`
+  }
+
   useEffect(() => {
     if (template) {
       setName(template.name)
@@ -57,10 +64,10 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
       setChannel('whatsapp')
       setTone('friendly')
     }
-    setShowAI(false)
+    setShowAI(startWithAI && !template)
     setAiVariants([])
     setAiContext('')
-  }, [template, open])
+  }, [template, open, startWithAI])
 
   const handleSave = async () => {
     if (!name.trim() || !content.trim() || loading) return
@@ -86,7 +93,18 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
       tone,
       userInput: aiContext.trim() || undefined,
     })
-    if (result) setAiVariants(result)
+    if (!result || result.length === 0) return
+
+    setAiVariants(result)
+    setShowAI(true)
+
+    if (!content.trim()) {
+      setContent(result[0].message)
+    }
+
+    if (!name.trim()) {
+      setName(buildSuggestedName())
+    }
   }
 
   return (
@@ -209,7 +227,12 @@ export function TemplateFormModal({ open, onClose, template, userId }: Props) {
                       <button
                         key={idx}
                         type="button"
-                        onClick={() => setContent(v.message)}
+                        onClick={() => {
+                          setContent(v.message)
+                          if (!name.trim()) {
+                            setName(buildSuggestedName())
+                          }
+                        }}
                         className={cn(
                           'w-full text-left border rounded-md p-2.5 text-xs leading-relaxed transition-colors hover:border-primary',
                           content === v.message ? 'border-primary bg-primary/5' : 'border-border'

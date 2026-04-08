@@ -4,7 +4,6 @@ import type { Tag, Interaction } from '@/types/database'
 
 export async function fetchContacts(params: ContactListParams): Promise<ContactListResult> {
   const { filters, sort, page, pageSize, userId } = params
-  console.debug('[fetchContacts] called with filters:', { stages: filters.stages, tagIds: filters.tagIds, search: filters.search, archived: filters.archived })
 
   // Note: filters.archived is a boolean. Supabase .eq('is_archived', false) correctly
   // filters for non-archived contacts. When archived=true, it shows archived ones.
@@ -77,7 +76,6 @@ export async function fetchContacts(params: ContactListParams): Promise<ContactL
 }
 
 export async function fetchContact(id: string): Promise<ContactWithTags | null> {
-  console.debug('[fetchContact] id:', id)
   const { data, error } = await supabase
     .from('nmm_contacts')
     .select('*, nmm_contact_tags(tag_id, nmm_tags(*))')
@@ -85,7 +83,6 @@ export async function fetchContact(id: string): Promise<ContactWithTags | null> 
     .single()
 
   if (error) {
-    console.error('[fetchContact] Supabase error:', error.code, error.message, error.details)
     throw error
   }
   if (!data) return null
@@ -180,15 +177,19 @@ export interface StageCount { stage: string; count: number }
 
 export async function fetchContactStageCounts(userId: string): Promise<StageCount[]> {
   const STAGES = ['new', 'contacted', 'interested', 'presenting', 'thinking', 'joined', 'lost']
-  const results: StageCount[] = []
-  for (const stage of STAGES) {
-    const { count, error } = await supabase
-      .from('nmm_contacts')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('is_archived', false)
-      .eq('stage', stage as Contact['stage'])
-    if (!error) results.push({ stage, count: count ?? 0 })
+  const { data, error } = await supabase
+    .from('nmm_contacts')
+    .select('stage')
+    .eq('user_id', userId)
+    .eq('is_archived', false)
+
+  if (error) throw error
+
+  const counts = new Map<string, number>()
+  for (const row of data ?? []) {
+    const stage = row.stage as string
+    counts.set(stage, (counts.get(stage) ?? 0) + 1)
   }
-  return results
+
+  return STAGES.map((stage) => ({ stage, count: counts.get(stage) ?? 0 }))
 }

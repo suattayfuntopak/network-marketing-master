@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { MessageTemplateInsert, MessageTemplateUpdate, AIMessageInsert } from './types'
+import type { MessageTemplateInsert, MessageTemplateUpdate, AIMessageInsert, AIMessageUpdate } from './types'
 
 // ─── Templates ────────────────────────────────────────────────
 
@@ -68,6 +68,22 @@ export async function rateAIMessage(id: string, feedback: 'great' | 'good' | 'me
   const { error } = await supabase
     .from('nmm_ai_messages')
     .update({ feedback })
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function updateAIMessage(id: string, data: AIMessageUpdate): Promise<void> {
+  const { error } = await supabase
+    .from('nmm_ai_messages')
+    .update(data)
+    .eq('id', id)
+  if (error) throw error
+}
+
+export async function deleteAIMessage(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('nmm_ai_messages')
+    .delete()
     .eq('id', id)
   if (error) throw error
 }

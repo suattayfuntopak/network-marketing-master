@@ -13,7 +13,7 @@ import i18n from '@/i18n'
 
 export function SettingsPage() {
   const { t } = useTranslation()
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const setProfile = useAuthStore((s) => s.setProfile)
 
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
@@ -48,10 +48,12 @@ export function SettingsPage() {
   }
 
   const handleLogout = async () => {
-    await supabase.auth.signOut()
+    await signOut()
   }
 
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+  const roleKey = `settings.roles.${profile?.role ?? 'distributor'}`
+  const localizedRole = t(roleKey, { defaultValue: t('settings.roles.distributor') })
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6 max-w-2xl">
@@ -84,7 +86,7 @@ export function SettingsPage() {
           </div>
           <div className="space-y-1.5">
             <Label>{t('settings.role')}</Label>
-            <p className="text-sm text-muted-foreground capitalize">{profile?.role ?? 'distributor'}</p>
+            <p className="text-sm text-muted-foreground">{localizedRole}</p>
           </div>
           <Button onClick={handleSaveProfile} disabled={saving || !fullName.trim()}>
             {saving ? t('common.saving') : t('common.save')}

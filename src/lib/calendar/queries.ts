@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import { startOfDay, endOfDay, addDays, startOfWeek, endOfWeek } from 'date-fns'
-import type { AppointmentWithContact, FollowUpWithContact, FollowUpStatus } from './types'
+import type { AppointmentWithContact, FollowUpBuckets, FollowUpWithContact, FollowUpStatus } from './types'
 
 // ─── Appointments ─────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ export async function fetchTodayAppointments(userId: string): Promise<Appointmen
 export async function fetchFollowUps(userId: string, status?: FollowUpStatus | FollowUpStatus[]): Promise<FollowUpWithContact[]> {
   let query = supabase
     .from('nmm_follow_ups')
-    .select('*, contact:nmm_contacts(id, full_name, phone)')
+    .select('*, contact:nmm_contacts(id, full_name, phone, stage)')
     .eq('user_id', userId)
     .order('due_at', { ascending: true })
 
@@ -69,7 +69,7 @@ export async function fetchFollowUps(userId: string, status?: FollowUpStatus | F
 export async function fetchFollowUpsByContact(contactId: string, userId: string): Promise<FollowUpWithContact[]> {
   const { data, error } = await supabase
     .from('nmm_follow_ups')
-    .select('*, contact:nmm_contacts(id, full_name, phone)')
+    .select('*, contact:nmm_contacts(id, full_name, phone, stage)')
     .eq('contact_id', contactId)
     .eq('user_id', userId)
     .order('due_at', { ascending: true })
@@ -79,7 +79,7 @@ export async function fetchFollowUpsByContact(contactId: string, userId: string)
 }
 
 // Bucketed fetch for follow-up tabs
-export async function fetchFollowUpBuckets(userId: string) {
+export function categorizeFollowUps(items: FollowUpWithContact[]): FollowUpBuckets {
   const now = new Date()
   const todayStart = startOfDay(now)
   const todayEnd   = endOfDay(now)
@@ -87,23 +87,27 @@ export async function fetchFollowUpBuckets(userId: string) {
   const tomorrowEnd   = endOfDay(addDays(now, 1))
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
 
+  return {
+    all: items,
+    today: items.filter(f => f.status === 'pending' && f.due_at >= todayStart.toISOString() && f.due_at <= todayEnd.toISOString()),
+    tomorrow: items.filter(f => f.status === 'pending' && f.due_at >= tomorrowStart.toISOString() && f.due_at <= tomorrowEnd.toISOString()),
+    thisWeek: items.filter(f => f.status === 'pending' && f.due_at > todayEnd.toISOString() && f.due_at <= weekEnd.toISOString()),
+    overdue: items.filter(f => f.status === 'pending' && f.due_at < todayStart.toISOString()),
+    completed: items.filter(f => f.status === 'completed').slice(0, 50),
+  }
+}
+
+export async function fetchFollowUpBuckets(userId: string): Promise<FollowUpBuckets> {
   const { data: all, error } = await supabase
     .from('nmm_follow_ups')
-    .select('*, contact:nmm_contacts(id, full_name, phone)')
+    .select('*, contact:nmm_contacts(id, full_name, phone, stage)')
     .eq('user_id', userId)
     .order('due_at', { ascending: true })
 
   if (error) throw error
 
   const items = all as unknown as FollowUpWithContact[]
-
-  return {
-    today:     items.filter(f => f.status === 'pending' && f.due_at >= todayStart.toISOString() && f.due_at <= todayEnd.toISOString()),
-    tomorrow:  items.filter(f => f.status === 'pending' && f.due_at >= tomorrowStart.toISOString() && f.due_at <= tomorrowEnd.toISOString()),
-    thisWeek:  items.filter(f => f.status === 'pending' && f.due_at > todayEnd.toISOString() && f.due_at <= weekEnd.toISOString()),
-    overdue:   items.filter(f => f.status === 'pending' && f.due_at < todayStart.toISOString()),
-    completed: items.filter(f => f.status === 'completed').slice(0, 50),
-  }
+  return categorizeFollowUps(items)
 }
 
 export async function fetchTodayFollowUpsCount(userId: string): Promise<number> {

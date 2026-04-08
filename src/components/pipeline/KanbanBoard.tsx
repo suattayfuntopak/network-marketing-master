@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -6,16 +6,22 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  type DragStartEvent,
-  type DragOverEvent,
-  type DragEndEvent,
   closestCenter,
+  getFirstCollision,
+  pointerWithin,
+  rectIntersection,
+  type CollisionDetection,
+  type DragCancelEvent,
+  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
-import { arrayMove } from '@dnd-kit/sortable'
+import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { useQueryClient } from '@tanstack/react-query'
 import { pipelineKeys } from '@/hooks/usePipeline'
-import type { StageWithDeals, DealWithContact } from '@/lib/pipeline/types'
-import { moveDealToStage } from '@/lib/pipeline/mutations'
+import type { DealWithContact, StageWithDeals } from '@/lib/pipeline/types'
+import { syncDealsBoardState } from '@/lib/pipeline/mutations'
 import { KanbanColumn } from './KanbanColumn'
 import { DealCardOverlay } from './DealCard'
 
@@ -25,123 +31,192 @@ interface Props {
   onAddDeal: (stageId: string) => void
 }
 
+function recalculateStages(stages: StageWithDeals[]) {
+  return stages.map((stage) => {
+    const deals = stage.deals.map((deal, index) => ({
+      ...deal,
+      stage_id: stage.id,
+      position_in_stage: index,
+    }))
+
+    return {
+      ...stage,
+      deals,
+      totalValue: deals.reduce((sum, deal) => sum + (deal.value ?? 0), 0),
+      weightedValue: deals.reduce((sum, deal) => sum + ((deal.value ?? 0) * (deal.probability ?? 0)) / 100, 0),
+    }
+  })
+}
+
 export function KanbanBoard({ stages: initialStages, userId, onAddDeal }: Props) {
+  const { t } = useTranslation()
   const qc = useQueryClient()
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activeDeal, setActiveDeal] = useState<DealWithContact | null>(null)
   const [overStageId, setOverStageId] = useState<string | null>(null)
-
-  // Local optimistic state for stages
   const [optimisticStages, setOptimisticStages] = useState<StageWithDeals[]>(initialStages)
+  const snapshotRef = useRef<StageWithDeals[]>(initialStages)
+  const lastOverId = useRef<string | null>(null)
 
-  // Sync when props change (new data from query)
-  if (JSON.stringify(initialStages.map(s => s.id + s.deals.length)) !==
-      JSON.stringify(optimisticStages.map(s => s.id + s.deals.length)) &&
-      activeId === null) {
-    setOptimisticStages(initialStages)
-  }
+  useEffect(() => {
+    if (activeId === null) {
+      setOptimisticStages(initialStages)
+      snapshotRef.current = initialStages
+    }
+  }, [initialStages, activeId])
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 180, tolerance: 8 } })
   )
 
   const findStageForDeal = useCallback((dealId: string, stages: StageWithDeals[]) => {
-    return stages.find((s) => s.deals.some((d) => d.id === dealId))
+    return stages.find((stage) => stage.deals.some((deal) => deal.id === dealId))
   }, [])
 
-  const handleDragStart = useCallback(({ active }: DragStartEvent) => {
-    setActiveId(active.id as string)
-    const stage = findStageForDeal(active.id as string, optimisticStages)
-    const deal = stage?.deals.find((d) => d.id === active.id)
-    if (deal) setActiveDeal(deal)
-  }, [optimisticStages, findStageForDeal])
+  const moveDealInStages = useCallback((stages: StageWithDeals[], currentActiveId: string, overId: string) => {
+    const fromStage = findStageForDeal(currentActiveId, stages)
+    const toStage = stages.find((stage) => stage.id === overId) ?? findStageForDeal(overId, stages)
 
-  const handleDragOver = useCallback(({ over }: DragOverEvent) => {
-    if (!over) { setOverStageId(null); return }
-    // over can be a stage column or another deal
-    const overId = over.id as string
-    const overStage = optimisticStages.find((s) => s.id === overId)
-    if (overStage) {
-      setOverStageId(overId)
-    } else {
-      const stageForOver = findStageForDeal(overId, optimisticStages)
-      setOverStageId(stageForOver?.id ?? null)
+    if (!fromStage || !toStage) return stages
+
+    const clonedStages = stages.map((stage) => ({ ...stage, deals: [...stage.deals] }))
+    const fromStageIndex = clonedStages.findIndex((stage) => stage.id === fromStage.id)
+    const toStageIndex = clonedStages.findIndex((stage) => stage.id === toStage.id)
+    const activeIndex = clonedStages[fromStageIndex].deals.findIndex((deal) => deal.id === currentActiveId)
+
+    if (activeIndex < 0) return stages
+
+    const [movedDeal] = clonedStages[fromStageIndex].deals.splice(activeIndex, 1)
+    const overIsStage = clonedStages.some((stage) => stage.id === overId)
+    const overDealIndex = clonedStages[toStageIndex].deals.findIndex((deal) => deal.id === overId)
+    const rawInsertIndex = overIsStage ? clonedStages[toStageIndex].deals.length : Math.max(0, overDealIndex)
+    const insertIndex =
+      fromStage.id === toStage.id && !overIsStage && activeIndex < rawInsertIndex
+        ? rawInsertIndex - 1
+        : rawInsertIndex
+
+    clonedStages[toStageIndex].deals.splice(insertIndex, 0, {
+      ...movedDeal,
+      stage_id: toStage.id,
+    })
+
+    return recalculateStages(clonedStages)
+  }, [findStageForDeal])
+
+  const collisionDetectionStrategy = useCallback<CollisionDetection>((args) => {
+    const pointerIntersections = pointerWithin(args)
+    const intersections = pointerIntersections.length > 0 ? pointerIntersections : rectIntersection(args)
+    let overId = getFirstCollision(intersections, 'id') as string | null
+
+    if (overId) {
+      const stage = optimisticStages.find((item) => item.id === overId)
+      if (stage && stage.deals.length > 0) {
+        const dealIntersections = closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((container) =>
+            stage.deals.some((deal) => deal.id === container.id)
+          ),
+        })
+        overId = (dealIntersections[0]?.id as string | undefined) ?? overId
+      }
+
+      lastOverId.current = overId
+      return [{ id: overId }]
     }
-  }, [optimisticStages, findStageForDeal])
 
-  const handleDragEnd = useCallback(async ({ active, over }: DragEndEvent) => {
+    if (lastOverId.current) {
+      return [{ id: lastOverId.current }]
+    }
+
+    return []
+  }, [optimisticStages])
+
+  const resetDragState = useCallback((rollback = false) => {
+    if (rollback) {
+      setOptimisticStages(snapshotRef.current)
+    }
+
     setActiveId(null)
     setActiveDeal(null)
     setOverStageId(null)
+    lastOverId.current = null
+  }, [])
 
-    if (!over || !activeId) return
+  const handleDragStart = useCallback(({ active }: DragStartEvent) => {
+    const nextActiveId = active.id as string
+    setActiveId(nextActiveId)
+    snapshotRef.current = optimisticStages
+
+    const stage = findStageForDeal(nextActiveId, optimisticStages)
+    const deal = stage?.deals.find((item) => item.id === nextActiveId) ?? null
+    setActiveDeal(deal)
+  }, [optimisticStages, findStageForDeal])
+
+  const handleDragOver = useCallback(({ active, over }: DragOverEvent) => {
+    if (!over) {
+      setOverStageId(null)
+      return
+    }
 
     const overId = over.id as string
-    const fromStage = findStageForDeal(activeId, optimisticStages)
-    if (!fromStage) return
+    const nextStage = optimisticStages.find((stage) => stage.id === overId) ?? findStageForDeal(overId, optimisticStages)
+    setOverStageId(nextStage?.id ?? null)
 
-    // Determine target stage
-    const toStage = optimisticStages.find((s) => s.id === overId)
-      ?? findStageForDeal(overId, optimisticStages)
-    if (!toStage) return
+    if (active.id !== over.id) {
+      setOptimisticStages((current) => moveDealInStages(current, active.id as string, overId))
+    }
+  }, [findStageForDeal, moveDealInStages, optimisticStages])
 
-    const isSameStage = fromStage.id === toStage.id
+  const handleDragCancel = useCallback((_: DragCancelEvent) => {
+    resetDragState(true)
+  }, [resetDragState])
 
-    // Build new optimistic state
-    setOptimisticStages((prev) => {
-      const newStages = prev.map((s) => ({ ...s, deals: [...s.deals] }))
-      const fromIdx = newStages.findIndex((s) => s.id === fromStage.id)
-      const toIdx = newStages.findIndex((s) => s.id === toStage.id)
-      const dealIdx = newStages[fromIdx].deals.findIndex((d) => d.id === activeId)
-      const [movedDeal] = newStages[fromIdx].deals.splice(dealIdx, 1)
+  const handleDragEnd = useCallback(async ({ active, over }: DragEndEvent) => {
+    if (!over || !activeId) {
+      resetDragState(true)
+      return
+    }
 
-      if (isSameStage) {
-        const overDealIdx = newStages[toIdx].deals.findIndex((d) => d.id === overId)
-        if (overDealIdx >= 0) {
-          const oldIdx = newStages[fromIdx].deals.indexOf(movedDeal)
-          // arrayMove equivalent
-          newStages[fromIdx].deals = arrayMove(
-            [...newStages[fromIdx].deals, movedDeal],
-            newStages[fromIdx].deals.length,
-            overDealIdx
-          )
-        } else {
-          newStages[toIdx].deals.push({ ...movedDeal, stage_id: toStage.id })
-        }
-      } else {
-        const overDealIdx = newStages[toIdx].deals.findIndex((d) => d.id === overId)
-        const insertAt = overDealIdx >= 0 ? overDealIdx : newStages[toIdx].deals.length
-        newStages[toIdx].deals.splice(insertAt, 0, { ...movedDeal, stage_id: toStage.id })
-      }
-
-      // Recalculate totals
-      return newStages.map((s) => ({
-        ...s,
-        totalValue: s.deals.reduce((sum, d) => sum + (d.value ?? 0), 0),
-        weightedValue: s.deals.reduce((sum, d) => sum + ((d.value ?? 0) * (d.probability ?? 0)) / 100, 0),
-      }))
+    const finalStages = moveDealInStages(optimisticStages, active.id as string, over.id as string)
+    const changedStages = finalStages.filter((stage) => {
+      const previousStage = snapshotRef.current.find((item) => item.id === stage.id)
+      const currentSignature = stage.deals.map((deal) => `${deal.id}:${deal.position_in_stage}`).join('|')
+      const previousSignature = previousStage?.deals.map((deal) => `${deal.id}:${deal.position_in_stage}`).join('|') ?? ''
+      return currentSignature !== previousSignature
     })
 
-    // Persist to DB
     try {
-      const newPosition = toStage.deals.findIndex((d) => d.id === overId)
-      await moveDealToStage(activeId, toStage.id, newPosition >= 0 ? newPosition : toStage.deals.length)
+      if (changedStages.length > 0) {
+        await syncDealsBoardState(
+          changedStages.flatMap((stage) =>
+            stage.deals.map((deal) => ({
+              id: deal.id,
+              stage_id: stage.id,
+              position_in_stage: deal.position_in_stage,
+            }))
+          )
+        )
+      }
+
       qc.invalidateQueries({ queryKey: pipelineKeys.deals(userId) })
       qc.invalidateQueries({ queryKey: pipelineKeys.stats(userId) })
     } catch {
-      // Rollback on error
-      setOptimisticStages(initialStages)
+      setOptimisticStages(snapshotRef.current)
+      toast.error(t('pipeline.dragError'))
       qc.invalidateQueries({ queryKey: pipelineKeys.deals(userId) })
+    } finally {
+      resetDragState(false)
     }
-  }, [activeId, optimisticStages, findStageForDeal, userId, qc, initialStages])
+  }, [activeId, moveDealInStages, optimisticStages, qc, resetDragState, t, userId])
 
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={collisionDetectionStrategy}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
+      onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}
     >
       <div className="flex gap-4 overflow-x-auto pb-4 min-h-0">
@@ -156,7 +231,7 @@ export function KanbanBoard({ stages: initialStages, userId, onAddDeal }: Props)
       </div>
 
       <DragOverlay>
-        {activeDeal && <DealCardOverlay deal={activeDeal} />}
+        {activeDeal ? <DealCardOverlay deal={activeDeal} /> : null}
       </DragOverlay>
     </DndContext>
   )

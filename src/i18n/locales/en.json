@@ -42,6 +42,7 @@
     "team": "Team",
     "analytics": "Analytics",
     "settings": "Settings",
+    "logout": "Log Out",
     "collapse": "Collapse",
     "expand": "Expand"
   },
@@ -345,6 +346,9 @@
     "newDeal": "New Deal",
     "manageStages": "Manage Stages",
     "emptyColumn": "No deals in this stage",
+    "contactSingular": "Contact",
+    "contactPlural": "Contacts",
+    "dragError": "The card could not be moved to the new stage. Please try again.",
     "totalValue": "Total Value",
     "weightedValue": "Weighted Value",
     "noDeals": "No deals yet",
@@ -352,9 +356,20 @@
     "dealsMode": "Deals",
     "stageHistory": "Stage History",
     "views": {
+      "overview": "Overview",
       "kanban": "Kanban",
       "table": "Table",
       "forecast": "Forecast"
+    },
+    "overview": {
+      "activeContacts": "Active Contacts",
+      "activeDeals": "Open Cards",
+      "pipelineValue": "Pipeline Volume",
+      "weightedValue": "Weighted Volume",
+      "weightedShort": "Weighted",
+      "hottestStage": "Busiest Stage",
+      "stageSnapshot": "Stage Snapshot",
+      "cardCount": "{{count}} cards"
     },
     "deal": {
       "title": "Title",
@@ -364,6 +379,7 @@
       "expectedClose": "Expected Close",
       "actualClose": "Actual Close",
       "stage": "Stage",
+      "status": "Status",
       "type": "Type",
       "notes": "Notes",
       "wonBtn": "Won",
@@ -395,6 +411,8 @@
       "deleted": "Stage deleted",
       "deleteConfirm": "Are you sure you want to delete this stage?",
       "namePlaceholder": "Stage name...",
+      "trLabelPlaceholder": "Turkish label",
+      "enLabelPlaceholder": "English label",
       "color": "Color"
     },
     "forecast": {
@@ -432,9 +450,20 @@
     "subtitle": "Track your activity and contact distribution",
     "joinedCount": "Joined Contacts",
     "overdue": "overdue",
-    "pipelineValue": "Pipeline Value",
+    "academyToday": "Today's Academy Progress",
+    "academyHint": "How many academy contents you opened today",
     "stageDistribution": "Stage Distribution",
-    "stageBreakdown": "Stage Breakdown",
+    "stageBreakdown": "Stage Ratios",
+    "quickSummary": "Quick Summary",
+    "nextSevenDays": "Upcoming Follow-ups",
+    "nextSevenDaysHint": "Follow-ups scheduled in the next 7 days",
+    "busiestDay": "Most Active Day",
+    "busiestDayHint": "Leads with {{count}} follow-ups",
+    "followUpReadiness": "Follow-up Readiness",
+    "followUpReadinessValue": "{{count}} overdue follow-ups waiting",
+    "followUpReadinessHint": "{{count}} follow-ups are planned for today",
+    "noDataYet": "No data yet",
+    "noActivityHint": "As you schedule follow-ups, your rhythm will appear here.",
     "contacts": "contacts"
   },
   "settings": {
@@ -447,7 +476,12 @@
     "language": "Language",
     "account": "Account",
     "accountInfo": "For account deletion and security, please contact support.",
-    "saved": "Profile updated"
+    "saved": "Profile updated",
+    "roles": {
+      "distributor": "Distributor",
+      "leader": "Leader",
+      "admin": "Admin"
+    }
   },
   "profile": {
     "myProfile": "My Profile",
@@ -511,6 +545,7 @@
     "pageTitle": "Follow-ups",
     "new": "New Follow-up",
     "edit": "Edit Follow-up",
+    "summary": "{{count}} open follow-ups are waiting for you",
     "actionType": "Action Type",
     "actionTypes": {
       "call": "Call",
@@ -539,6 +574,7 @@
       "in1Month": "1 Month"
     },
     "buckets": {
+      "all": "All",
       "today": "Today",
       "tomorrow": "Tomorrow",
       "thisWeek": "This Week",
@@ -562,15 +598,32 @@
     "deleteConfirm": "Are you sure you want to delete this follow-up?",
     "empty": {
       "default": "No follow-ups in this range",
+      "hint": "Add a follow-up to keep your plan visible and easy to manage.",
       "overdue": "Great! No overdue follow-ups."
     },
+    "columns": {
+      "contact": "Contact",
+      "stage": "Stage",
+      "followUp": "Follow-up",
+      "dueAt": "Date & Time",
+      "notePreview": "Note",
+      "channel": "Channel",
+      "status": "Status"
+    },
+    "status": {
+      "pending": "Open",
+      "completed": "Completed",
+      "overdue": "Overdue"
+    },
+    "noNotes": "No note added",
     "created": "Follow-up created",
     "updated": "Follow-up updated",
     "deleted": "Follow-up deleted",
     "completed": "Follow-up completed",
     "uncompleted": "Follow-up reopened",
     "snoozed": "Follow-up snoozed",
-    "undoComplete": "Undo"
+    "undoComplete": "Undo",
+    "undoAction": "Undo"
   },
   "messages": {
     "title": "Messages",
@@ -657,11 +710,14 @@
     },
     "template": {
       "new": "New Template",
+      "newFromAI": "Start from AI",
       "created": "Template created",
       "updated": "Template updated",
       "deleted": "Template deleted",
       "deleteConfirm": "Are you sure you want to delete this template?",
       "copied": "Copied",
+      "favorite": "Add to favorites",
+      "regenerate": "Regenerate",
       "namePlaceholder": "Template name",
       "contentPlaceholder": "Message content. Use {name}, {occupation} for variables.",
       "use": "Use Template",
@@ -669,6 +725,14 @@
       "saved": "Saved",
       "aiGenerate": "Generate with AI",
       "aiPickVariant": "Pick a variant — it will fill the content field:"
+    },
+    "historyItem": {
+      "edited": "Edited",
+      "editTitle": "Edit History Message",
+      "contentPlaceholder": "Edit the message content here",
+      "updated": "History message updated",
+      "deleted": "History message deleted",
+      "deleteConfirm": "Are you sure you want to delete this history item?"
     }
   },
   "academy": {

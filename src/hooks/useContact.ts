@@ -16,15 +16,12 @@ import { tagKeys } from './useTags'
 export function useContact(id: string | undefined) {
   return useQuery({
     queryKey: ['contact', id],
-    queryFn: async () => {
-      console.debug('[useContact] Fetching contact:', id)
-      const result = await fetchContact(id!)
-      console.debug('[useContact] Fetched:', result?.full_name ?? 'null')
-      return result
-    },
+    queryFn: () => fetchContact(id!),
     enabled: !!id,
     retry: 1,
-    staleTime: 0,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 

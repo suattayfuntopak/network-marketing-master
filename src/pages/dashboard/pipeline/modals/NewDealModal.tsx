@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/lib/supabase'
 import { useCreateDeal } from '@/hooks/usePipeline'
+import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import type { PipelineStage, DealType } from '@/lib/pipeline/types'
 
 interface FormValues {
@@ -204,7 +205,7 @@ export function NewDealModal({ open, onClose, userId, stages, defaultStageId }: 
             <select {...register('stage_id')} className="w-full border rounded-md px-3 py-2 text-sm bg-background">
               {stagesFiltered.map((s) => (
                 <option key={s.id} value={s.id}>
-                  {t(`pipelineStages.${s.slug}`, { defaultValue: s.name })}
+                  {resolveStageLabel(s, t)}
                 </option>
               ))}
             </select>

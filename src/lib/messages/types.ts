@@ -120,6 +120,14 @@ export interface AIMessageInsert {
   model?: string
 }
 
+export interface AIMessageUpdate {
+  generated_content?: string
+  final_content?: string | null
+  was_edited?: boolean
+  was_used?: boolean
+  feedback?: AIFeedback | null
+}
+
 // ─── AI Generation request ────────────────────────────────────
 
 export interface GenerateMessageRequest {

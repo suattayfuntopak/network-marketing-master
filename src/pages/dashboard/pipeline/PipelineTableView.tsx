@@ -6,6 +6,7 @@ import i18n from '@/i18n'
 import { cn } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
 import { STAGE_COLOR_CLASSES, DEAL_TYPE_COLORS, DEAL_STATUS_COLORS, formatCurrency } from '@/lib/pipeline/constants'
+import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import type { DealWithContact, PipelineStage } from '@/lib/pipeline/types'
 
 interface Props {
@@ -59,7 +60,7 @@ export function PipelineTableView({ deals, stages }: Props) {
                   <td className="px-4 py-3">
                     {stage && (
                       <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', colors.badge)}>
-                        {stage.name}
+                        {resolveStageLabel(stage, t)}
                       </span>
                     )}
                   </td>

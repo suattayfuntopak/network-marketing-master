@@ -113,7 +113,16 @@ export interface FollowUpUpdate {
 }
 
 export interface FollowUpWithContact extends FollowUp {
-  contact: { id: string; full_name: string; phone: string | null }
+  contact: { id: string; full_name: string; phone: string | null; stage: string }
+}
+
+export interface FollowUpBuckets {
+  all: FollowUpWithContact[]
+  today: FollowUpWithContact[]
+  tomorrow: FollowUpWithContact[]
+  thisWeek: FollowUpWithContact[]
+  overdue: FollowUpWithContact[]
+  completed: FollowUpWithContact[]
 }
 
 // ─── Calendar view types ──────────────────────────────────────

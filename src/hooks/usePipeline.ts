@@ -21,7 +21,7 @@ import {
   closeDeal,
   reopenDeal,
 } from '@/lib/pipeline/mutations'
-import type { PipelineStageInsert, PipelineStageUpdate, DealInsert, DealUpdate, DealFilters } from '@/lib/pipeline/types'
+import type { PipelineStage, PipelineStageInsert, PipelineStageUpdate, DealInsert, DealUpdate, DealFilters } from '@/lib/pipeline/types'
 
 // ─── Query Keys ───────────────────────────────────────────────
 
@@ -43,6 +43,8 @@ export function usePipelineStages(userId: string) {
     queryFn: () => fetchPipelineStages(userId),
     enabled: !!userId,
     staleTime: 60_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -54,6 +56,8 @@ export function useDeals(userId: string, filters?: DealFilters) {
     queryFn: () => fetchDeals(userId, filters),
     enabled: !!userId,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -62,6 +66,9 @@ export function useDeal(dealId: string) {
     queryKey: pipelineKeys.deal(dealId),
     queryFn: () => fetchDeal(dealId),
     enabled: !!dealId,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -70,6 +77,9 @@ export function useDealsByContact(contactId: string, userId: string) {
     queryKey: pipelineKeys.contactDeals(contactId),
     queryFn: () => fetchDealsByContact(contactId, userId),
     enabled: !!contactId && !!userId,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -78,6 +88,9 @@ export function useStageHistory(dealId: string) {
     queryKey: pipelineKeys.stageHistory(dealId),
     queryFn: () => fetchStageHistory(dealId),
     enabled: !!dealId,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -86,6 +99,9 @@ export function usePipelineStats(userId: string) {
     queryKey: pipelineKeys.stats(userId),
     queryFn: () => fetchPipelineStats(userId),
     enabled: !!userId,
+    staleTime: 60_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -96,8 +112,10 @@ export function useCreateStage(userId: string) {
   const { t } = useTranslation()
   return useMutation({
     mutationFn: (data: PipelineStageInsert) => createStage(data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: pipelineKeys.stages(userId) })
+    onSuccess: (createdStage) => {
+      qc.setQueryData(pipelineKeys.stages(userId), (current: PipelineStage[] | undefined) =>
+        current ? [...current, createdStage].sort((a, b) => a.position - b.position) : [createdStage]
+      )
       toast.success(t('pipeline.stage.created'))
     },
     onError: () => toast.error(t('common.unknownError')),
@@ -109,8 +127,12 @@ export function useUpdateStage(userId: string) {
   const { t } = useTranslation()
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: PipelineStageUpdate }) => updateStage(id, data),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: pipelineKeys.stages(userId) })
+    onSuccess: (updatedStage) => {
+      qc.setQueryData(pipelineKeys.stages(userId), (current: PipelineStage[] | undefined) =>
+        current
+          ? current.map((stage) => (stage.id === updatedStage.id ? updatedStage : stage)).sort((a, b) => a.position - b.position)
+          : current
+      )
       toast.success(t('pipeline.stage.updated'))
     },
     onError: () => toast.error(t('common.unknownError')),

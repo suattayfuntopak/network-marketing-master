@@ -1,13 +1,13 @@
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, TrendingUp, Bell, Target } from 'lucide-react'
+import { Users, Bell, Target, GraduationCap, CalendarRange, Flame } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactCount, useContactStageCounts } from '@/hooks/useContacts'
-import { useTodayFollowUpsCount, useFollowUpBuckets } from '@/hooks/useCalendar'
-import { usePipelineStats } from '@/hooks/usePipeline'
+import { useTodayFollowUpsCount, useOverdueFollowUpsCount, useFollowUpBuckets } from '@/hooks/useCalendar'
+import { getTodayAcademyReadCount } from '@/lib/academy/progress'
 import i18n from '@/i18n'
-import { formatCurrency } from '@/lib/pipeline/constants'
 
 const STAGE_COLORS: Record<string, string> = {
   new: '#9ca3af',
@@ -23,21 +23,45 @@ export function AnalyticsPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
   const userId = user?.id ?? ''
-  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
+  const { data: overdueCount = 0 } = useOverdueFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
-  const { data: pipelineStats } = usePipelineStats(userId)
 
+  const academyTodayCount = getTodayAcademyReadCount()
   const chartData = stageCounts.map(({ stage, count }) => ({
     name: t(`pipelineStages.${stage}`),
     count,
     fill: STAGE_COLORS[stage] ?? '#9ca3af',
   }))
 
-  const overdueCount = followUpBuckets?.overdue?.length ?? 0
+  const activeSummary = useMemo(() => {
+    const pending = followUpBuckets?.all.filter((item) => item.status !== 'completed') ?? []
+    const nextSevenDays = pending.filter((item) => {
+      const dueTime = new Date(item.due_at).getTime()
+      const now = Date.now()
+      const sevenDaysFromNow = now + 7 * 24 * 60 * 60 * 1000
+      return dueTime >= now && dueTime <= sevenDaysFromNow
+    }).length
+
+    const dayCounts = pending.reduce<Record<string, number>>((acc, item) => {
+      const key = new Date(item.due_at).toLocaleDateString('sv-SE')
+      acc[key] = (acc[key] ?? 0) + 1
+      return acc
+    }, {})
+
+    const [busiestDayKey, busiestDayCount] = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0] ?? ['', 0]
+
+    return {
+      nextSevenDays,
+      busiestDayKey,
+      busiestDayCount,
+    }
+  }, [followUpBuckets])
+
+  const joinedCount = stageCounts.find((stage) => stage.stage === 'joined')?.count ?? 0
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -46,7 +70,6 @@ export function AnalyticsPage() {
         <p className="text-muted-foreground text-sm mt-1">{t('analytics.subtitle')}</p>
       </div>
 
-      {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -64,9 +87,7 @@ export function AnalyticsPage() {
             <Target className="w-4 h-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-600">
-              {stageCounts.find(s => s.stage === 'joined')?.count ?? 0}
-            </div>
+            <div className="text-2xl font-bold text-emerald-600">{joinedCount}</div>
           </CardContent>
         </Card>
 
@@ -85,50 +106,92 @@ export function AnalyticsPage() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-medium text-muted-foreground">{t('analytics.pipelineValue')}</CardTitle>
-            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            <CardTitle className="text-xs font-medium text-muted-foreground">{t('analytics.academyToday')}</CardTitle>
+            <GraduationCap className="w-4 h-4 text-amber-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {pipelineStats
-                ? formatCurrency(pipelineStats.weightedValue, 'TRY', currentLang === 'en' ? 'en-US' : 'tr-TR')
-                : '₺0'}
+            <div className="text-2xl font-bold">{academyTodayCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">{t('analytics.academyHint')}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t('analytics.stageDistribution')}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {contactCount === 0 ? (
+              <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
+                {t('dashboard.noContacts')}
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                  <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                    formatter={(value) => [value, t('analytics.contacts')]}
+                  />
+                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    {chartData.map((entry, index) => (
+                      <Cell key={index} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">{t('analytics.quickSummary')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <CalendarRange className="w-4 h-4 text-primary" />
+                {t('analytics.nextSevenDays')}
+              </div>
+              <p className="mt-2 text-2xl font-bold">{activeSummary.nextSevenDays}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('analytics.nextSevenDaysHint')}</p>
+            </div>
+
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Flame className="w-4 h-4 text-amber-500" />
+                {t('analytics.busiestDay')}
+              </div>
+              <p className="mt-2 text-base font-semibold">
+                {activeSummary.busiestDayKey
+                  ? new Date(`${activeSummary.busiestDayKey}T00:00:00`).toLocaleDateString(
+                      i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR',
+                      { weekday: 'long', day: 'numeric', month: 'short' }
+                    )
+                  : t('analytics.noDataYet')}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {activeSummary.busiestDayCount > 0
+                  ? t('analytics.busiestDayHint', { count: activeSummary.busiestDayCount })
+                  : t('analytics.noActivityHint')}
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-muted/20 px-4 py-3">
+              <div className="flex items-center gap-2 text-sm font-medium">
+                <Bell className="w-4 h-4 text-sky-500" />
+                {t('analytics.followUpReadiness')}
+              </div>
+              <p className="mt-2 text-base font-semibold">{t('analytics.followUpReadinessValue', { count: overdueCount })}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('analytics.followUpReadinessHint', { count: todayFollowUpsCount })}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Stage distribution chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">{t('analytics.stageDistribution')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {contactCount === 0 ? (
-            <div className="flex items-center justify-center h-40 text-sm text-muted-foreground">
-              {t('dashboard.noContacts')}
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData} margin={{ top: 4, right: 4, bottom: 4, left: -20 }}>
-                <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
-                <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
-                <Tooltip
-                  contentStyle={{ fontSize: 12, borderRadius: 8 }}
-                  formatter={(value) => [value, t('analytics.contacts')]}
-                />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                  {chartData.map((entry, index) => (
-                    <Cell key={index} fill={entry.fill} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Stage breakdown table */}
       <Card>
         <CardHeader>
           <CardTitle className="text-base">{t('analytics.stageBreakdown')}</CardTitle>

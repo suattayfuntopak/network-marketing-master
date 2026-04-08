@@ -1,16 +1,39 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, FileText, History, Plus, Star, Copy, Check, Trash2, Search, Send, Users } from 'lucide-react'
+import {
+  Sparkles,
+  FileText,
+  History,
+  Plus,
+  Star,
+  Copy,
+  Check,
+  Trash2,
+  Search,
+  Send,
+  Users,
+  Pencil,
+  RefreshCw,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
-import { useTemplates, useDeleteTemplate, useToggleTemplateFavorite, useAIMessages } from '@/hooks/useTemplates'
+import {
+  useTemplates,
+  useDeleteTemplate,
+  useToggleTemplateFavorite,
+  useAIMessages,
+  useUpdateAIMessage,
+  useDeleteAIMessage,
+} from '@/hooks/useTemplates'
 import { useContacts } from '@/hooks/useContacts'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { TemplateFormModal } from '@/components/messages/TemplateFormModal'
 import { StageBadge } from '@/components/contacts/StageBadge'
-import type { MessageTemplate } from '@/lib/messages/types'
+import type { AIMessage, MessageTemplate } from '@/lib/messages/types'
 import type { ContactWithTags } from '@/lib/contacts/types'
 
 type Tab = 'ai' | 'templates' | 'history' | 'bulk'
@@ -21,11 +44,13 @@ export function MessagesPage() {
   const [tab, setTab] = useState<Tab>('ai')
   const [showAIModal, setShowAIModal] = useState(false)
   const [showTemplateForm, setShowTemplateForm] = useState(false)
+  const [templateFormStartsWithAI, setTemplateFormStartsWithAI] = useState(false)
   const [editingTemplate, setEditingTemplate] = useState<MessageTemplate | null>(null)
   const [search, setSearch] = useState('')
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [editingHistoryItem, setEditingHistoryItem] = useState<AIMessage | null>(null)
+  const [historyDraft, setHistoryDraft] = useState('')
 
-  // Bulk tab state
   const [bulkSearch, setBulkSearch] = useState('')
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
   const [bulkContact, setBulkContact] = useState<ContactWithTags | null>(null)
@@ -37,6 +62,8 @@ export function MessagesPage() {
   const { data: aiMessages = [], isLoading: historyLoading } = useAIMessages(user?.id ?? '')
   const deleteTemplate = useDeleteTemplate(user?.id ?? '')
   const toggleFavorite = useToggleTemplateFavorite(user?.id ?? '')
+  const updateAIMessage = useUpdateAIMessage(user?.id ?? '')
+  const deleteAIMessage = useDeleteAIMessage(user?.id ?? '')
 
   const { data: contactsResult, isLoading: contactsLoading } = useContacts({
     userId: user?.id ?? '',
@@ -51,6 +78,15 @@ export function MessagesPage() {
   })
   const bulkContacts = contactsResult?.data ?? []
 
+  const historyItems = useMemo(
+    () =>
+      aiMessages.map((item) => ({
+        ...item,
+        displayContent: item.final_content?.trim() || item.generated_content,
+      })),
+    [aiMessages]
+  )
+
   const handleCopy = async (text: string, id: string) => {
     await navigator.clipboard.writeText(text)
     setCopiedId(id)
@@ -58,7 +94,7 @@ export function MessagesPage() {
   }
 
   const toggleBulkSelect = (id: string) => {
-    setBulkSelected(prev => {
+    setBulkSelected((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id)
       else next.add(id)
@@ -66,8 +102,39 @@ export function MessagesPage() {
     })
   }
 
-  const selectAll = () => setBulkSelected(new Set(bulkContacts.map(c => c.id)))
+  const selectAll = () => setBulkSelected(new Set(bulkContacts.map((c) => c.id)))
   const clearAll = () => setBulkSelected(new Set())
+
+  const openNewTemplate = (startWithAI = false) => {
+    setEditingTemplate(null)
+    setTemplateFormStartsWithAI(startWithAI)
+    setShowTemplateForm(true)
+  }
+
+  const openTemplateEditor = (template: MessageTemplate, startWithAI = false) => {
+    setEditingTemplate(template)
+    setTemplateFormStartsWithAI(startWithAI)
+    setShowTemplateForm(true)
+  }
+
+  const openHistoryEditor = (message: AIMessage) => {
+    setEditingHistoryItem(message)
+    setHistoryDraft(message.final_content?.trim() || message.generated_content)
+  }
+
+  const handleSaveHistory = async () => {
+    if (!editingHistoryItem || !historyDraft.trim()) return
+
+    await updateAIMessage.mutateAsync({
+      id: editingHistoryItem.id,
+      data: {
+        final_content: historyDraft.trim(),
+        was_edited: historyDraft.trim() !== editingHistoryItem.generated_content.trim(),
+      },
+    })
+    setEditingHistoryItem(null)
+    setHistoryDraft('')
+  }
 
   const TABS: { key: Tab; label: string; Icon: typeof Sparkles }[] = [
     { key: 'ai', label: t('messages.aiGenerator'), Icon: Sparkles },
@@ -78,7 +145,6 @@ export function MessagesPage() {
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-bold">{t('messages.title')}</h1>
         <div className="flex gap-2">
@@ -86,25 +152,20 @@ export function MessagesPage() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => { setEditingTemplate(null); setShowTemplateForm(true) }}
+              onClick={() => openNewTemplate()}
               className="gap-1.5"
             >
               <Plus className="w-4 h-4" />
               {t('messages.template.new')}
             </Button>
           )}
-          <Button
-            size="sm"
-            onClick={() => setShowAIModal(true)}
-            className="gap-1.5"
-          >
+          <Button size="sm" onClick={() => setShowAIModal(true)} className="gap-1.5">
             <Sparkles className="w-4 h-4" />
             {t('messages.generate')}
           </Button>
         </div>
       </div>
 
-      {/* Tab bar */}
       <div className="flex border-b gap-1 overflow-x-auto">
         {TABS.map(({ key, label, Icon }) => (
           <button
@@ -123,7 +184,6 @@ export function MessagesPage() {
         ))}
       </div>
 
-      {/* AI tab */}
       {tab === 'ai' && (
         <div className="flex flex-col items-center justify-center py-16 gap-6 text-center">
           <div className="w-16 h-16 rounded-2xl bg-amber-100 dark:bg-amber-950 flex items-center justify-center">
@@ -145,7 +205,6 @@ export function MessagesPage() {
         </div>
       )}
 
-      {/* Templates tab */}
       {tab === 'templates' && (
         <div className="space-y-3">
           <div className="relative">
@@ -165,22 +224,17 @@ export function MessagesPage() {
               <FileText className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p className="font-medium text-foreground">{t('messages.noTemplates')}</p>
               <p className="text-sm mt-2">{t('messages.noTemplatesDescription')}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                className="mt-4"
-                onClick={() => { setEditingTemplate(null); setShowTemplateForm(true) }}
-              >
-                <Plus className="w-4 h-4 mr-1" />
-                {t('messages.template.new')}
+              <Button variant="outline" size="sm" className="mt-4" onClick={() => openNewTemplate(true)}>
+                <Sparkles className="w-4 h-4 mr-1" />
+                {t('messages.template.newFromAI')}
               </Button>
             </div>
           ) : (
             <div className="space-y-2">
               {templates.map((tmpl) => (
-                <div key={tmpl.id} className="border rounded-lg bg-card p-4 space-y-2">
-                  <div className="flex items-start justify-between gap-2">
-                    <div>
+                <div key={tmpl.id} className="border rounded-lg bg-card p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-sm">{tmpl.name}</span>
                         <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
@@ -194,15 +248,27 @@ export function MessagesPage() {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => toggleFavorite.mutate({ id: tmpl.id, isFavorite: !tmpl.is_favorite })}
-                        className={cn('p-1 rounded', tmpl.is_favorite ? 'text-amber-500' : 'text-muted-foreground/40 hover:text-amber-500')}
+                        className={cn(
+                          'p-1 rounded transition-colors',
+                          tmpl.is_favorite ? 'text-amber-500' : 'text-muted-foreground/40 hover:text-amber-500'
+                        )}
+                        title={t('messages.template.favorite')}
                       >
                         <Star className={cn('w-3.5 h-3.5', tmpl.is_favorite && 'fill-current')} />
                       </button>
                       <button
-                        onClick={() => { setEditingTemplate(tmpl); setShowTemplateForm(true) }}
-                        className="p-1 rounded text-muted-foreground hover:text-foreground"
+                        onClick={() => openTemplateEditor(tmpl, true)}
+                        className="p-1 rounded text-muted-foreground hover:text-amber-500"
+                        title={t('messages.template.regenerate')}
                       >
-                        <FileText className="w-3.5 h-3.5" />
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openTemplateEditor(tmpl)}
+                        className="p-1 rounded text-muted-foreground hover:text-foreground"
+                        title={t('common.edit')}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => {
@@ -211,6 +277,7 @@ export function MessagesPage() {
                           }
                         }}
                         className="p-1 rounded text-muted-foreground hover:text-red-500"
+                        title={t('common.delete')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -221,18 +288,41 @@ export function MessagesPage() {
                     {tmpl.content}
                   </p>
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-7 text-xs gap-1"
-                    onClick={() => handleCopy(tmpl.content, tmpl.id)}
-                  >
-                    {copiedId === tmpl.id ? (
-                      <><Check className="w-3 h-3" /> {t('messages.template.copied')}</>
-                    ) : (
-                      <><Copy className="w-3 h-3" /> {t('messages.ai.copyToClipboard')}</>
-                    )}
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-7 text-xs gap-1"
+                      onClick={() => handleCopy(tmpl.content, tmpl.id)}
+                    >
+                      {copiedId === tmpl.id ? (
+                        <><Check className="w-3 h-3" /> {t('messages.template.copied')}</>
+                      ) : (
+                        <><Copy className="w-3 h-3" /> {t('messages.ai.copyToClipboard')}</>
+                      )}
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs gap-1" onClick={() => openTemplateEditor(tmpl, true)}>
+                      <RefreshCw className="w-3 h-3" />
+                      {t('messages.template.regenerate')}
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs gap-1" onClick={() => openTemplateEditor(tmpl)}>
+                      <Pencil className="w-3 h-3" />
+                      {t('common.edit')}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
+                      onClick={() => {
+                        if (confirm(t('messages.template.deleteConfirm'))) {
+                          deleteTemplate.mutate(tmpl.id)
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3" />
+                      {t('common.delete')}
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -240,7 +330,6 @@ export function MessagesPage() {
         </div>
       )}
 
-      {/* Bulk tab */}
       {tab === 'bulk' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -248,19 +337,14 @@ export function MessagesPage() {
             <div className="flex gap-2">
               {bulkSelected.size > 0 && (
                 <>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={clearAll}
-                    className="gap-1.5 text-xs"
-                  >
+                  <Button size="sm" variant="outline" onClick={clearAll} className="gap-1.5 text-xs">
                     {t('messages.bulk.clearSelection')} ({bulkSelected.size})
                   </Button>
                   <Button
                     size="sm"
                     className="gap-1.5 text-xs"
                     onClick={() => {
-                      const selected = bulkContacts.filter(c => bulkSelected.has(c.id))
+                      const selected = bulkContacts.filter((c) => bulkSelected.has(c.id))
                       if (selected.length > 0) {
                         setBulkContact(selected[0])
                         setShowAIModal(true)
@@ -293,7 +377,7 @@ export function MessagesPage() {
                 <input
                   type="checkbox"
                   checked={bulkSelected.size === bulkContacts.length && bulkContacts.length > 0}
-                  onChange={(e) => e.target.checked ? selectAll() : clearAll()}
+                  onChange={(e) => (e.target.checked ? selectAll() : clearAll())}
                   className="accent-primary"
                 />
                 <span className="text-xs font-medium text-muted-foreground">
@@ -303,12 +387,9 @@ export function MessagesPage() {
               </div>
               <div className="divide-y max-h-[500px] overflow-y-auto">
                 {bulkContacts.map((contact) => {
-                  const initials = contact.full_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+                  const initials = contact.full_name.split(' ').map((n) => n[0]).slice(0, 2).join('').toUpperCase()
                   return (
-                    <div
-                      key={contact.id}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/20 transition-colors"
-                    >
+                    <div key={contact.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/20 transition-colors">
                       <input
                         type="checkbox"
                         checked={bulkSelected.has(contact.id)}
@@ -348,52 +429,148 @@ export function MessagesPage() {
         </div>
       )}
 
-      {/* History tab */}
       {tab === 'history' && (
         <div className="space-y-2">
           {historyLoading ? (
             <div className="text-center py-12 text-muted-foreground">{t('common.loading')}</div>
-          ) : aiMessages.length === 0 ? (
+          ) : historyItems.length === 0 ? (
             <div className="text-center py-12 text-muted-foreground">
               <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
               <p className="font-medium text-foreground">{t('messages.noAIMessages')}</p>
               <p className="text-sm mt-2">{t('messages.noAIMessagesDescription')}</p>
             </div>
           ) : (
-            aiMessages.map((msg) => (
-              <div key={msg.id} className="border rounded-lg bg-card p-4 space-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                    {t(`messages.categories.${msg.category}`)}
-                  </span>
-                  <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                    {t(`messages.channels.${msg.channel}`)}
-                  </span>
-                  <span className="text-xs text-muted-foreground ml-auto">
+            historyItems.map((msg) => (
+              <div key={msg.id} className="border rounded-lg bg-card p-4 space-y-3">
+                <div className="flex items-start gap-3 justify-between">
+                  <div className="flex items-center gap-2 flex-wrap min-w-0">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                      {t(`messages.categories.${msg.category}`)}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      {t(`messages.channels.${msg.channel}`)}
+                    </span>
+                    {msg.was_edited && (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                        {t('messages.historyItem.edited')}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="hidden sm:inline text-xs text-muted-foreground mr-2">
+                      {new Date(msg.created_at).toLocaleDateString(currentLocale)}
+                    </span>
+                    <button
+                      onClick={() => openHistoryEditor(msg)}
+                      className="p-1 rounded text-muted-foreground hover:text-foreground"
+                      title={t('common.edit')}
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(t('messages.historyItem.deleteConfirm'))) {
+                          deleteAIMessage.mutate(msg.id)
+                        }
+                      }}
+                      className="p-1 rounded text-muted-foreground hover:text-red-500"
+                      title={t('common.delete')}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">
+                  {msg.displayContent}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(msg.created_at).toLocaleDateString(currentLocale)}
                   </span>
+                  <Button size="sm" variant="outline" className="h-7 text-xs gap-1" onClick={() => handleCopy(msg.displayContent, msg.id)}>
+                    {copiedId === msg.id ? (
+                      <><Check className="w-3 h-3" /> {t('messages.template.copied')}</>
+                    ) : (
+                      <><Copy className="w-3 h-3" /> {t('messages.ai.copyToClipboard')}</>
+                    )}
+                  </Button>
+                  <Button size="sm" variant="ghost" className="h-7 text-xs gap-1" onClick={() => openHistoryEditor(msg)}>
+                    <Pencil className="w-3 h-3" />
+                    {t('common.edit')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
+                    onClick={() => {
+                      if (confirm(t('messages.historyItem.deleteConfirm'))) {
+                        deleteAIMessage.mutate(msg.id)
+                      }
+                    }}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    {t('common.delete')}
+                  </Button>
                 </div>
-                <p className="text-sm text-muted-foreground line-clamp-4 whitespace-pre-wrap">
-                  {msg.generated_content}
-                </p>
               </div>
             ))
           )}
         </div>
       )}
 
-      {/* Modals */}
       <AIMessageGeneratorModal
         open={showAIModal}
-        onClose={() => { setShowAIModal(false); setBulkContact(null) }}
+        onClose={() => {
+          setShowAIModal(false)
+          setBulkContact(null)
+        }}
         contact={bulkContact}
       />
+
       <TemplateFormModal
         open={showTemplateForm}
-        onClose={() => { setShowTemplateForm(false); setEditingTemplate(null) }}
+        onClose={() => {
+          setShowTemplateForm(false)
+          setEditingTemplate(null)
+          setTemplateFormStartsWithAI(false)
+        }}
         template={editingTemplate}
         userId={user?.id ?? ''}
+        startWithAI={templateFormStartsWithAI}
       />
+
+      <Dialog open={!!editingHistoryItem} onOpenChange={(open) => !open && setEditingHistoryItem(null)}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{t('messages.historyItem.editTitle')}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              value={historyDraft}
+              onChange={(event) => setHistoryDraft(event.target.value)}
+              rows={8}
+              className="resize-none"
+              placeholder={t('messages.historyItem.contentPlaceholder')}
+            />
+            <div className="flex gap-2">
+              <Button onClick={handleSaveHistory} disabled={!historyDraft.trim() || updateAIMessage.isPending}>
+                {updateAIMessage.isPending ? t('common.saving') : t('common.save')}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setEditingHistoryItem(null)
+                  setHistoryDraft('')
+                }}
+              >
+                {t('common.cancel')}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

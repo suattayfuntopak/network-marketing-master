@@ -42,6 +42,7 @@
     "team": "Ekip",
     "analytics": "Analiz",
     "settings": "Ayarlar",
+    "logout": "Çıkış",
     "collapse": "Daralt",
     "expand": "Genişlet"
   },
@@ -345,6 +346,9 @@
     "newDeal": "Yeni Aksiyon",
     "manageStages": "Aşamaları Yönet",
     "emptyColumn": "Bu aşamada kayıt yok",
+    "contactSingular": "Kontak",
+    "contactPlural": "Kontak",
+    "dragError": "Kart yeni aşamaya taşınamadı. Lütfen tekrar dene.",
     "totalValue": "Toplam Değer",
     "weightedValue": "Ağırlıklı Değer",
     "noDeals": "Henüz aksiyon yok",
@@ -352,9 +356,20 @@
     "dealsMode": "Aksiyonlar",
     "stageHistory": "Aşama Geçmişi",
     "views": {
+      "overview": "Genel Bakış",
       "kanban": "Kanban",
       "table": "Tablo",
       "forecast": "Tahmin"
+    },
+    "overview": {
+      "activeContacts": "Aktif Kontak",
+      "activeDeals": "Açık Kart",
+      "pipelineValue": "Toplam Hacim",
+      "weightedValue": "Ağırlıklı Hacim",
+      "weightedShort": "Ağırlıklı",
+      "hottestStage": "En Yoğun Aşama",
+      "stageSnapshot": "Aşama Özeti",
+      "cardCount": "{{count}} kart"
     },
     "deal": {
       "title": "Başlık",
@@ -364,6 +379,7 @@
       "expectedClose": "Beklenen Kapanış",
       "actualClose": "Gerçek Kapanış",
       "stage": "Aşama",
+      "status": "Durum",
       "type": "Tip",
       "notes": "Notlar",
       "wonBtn": "Kazanıldı",
@@ -395,6 +411,8 @@
       "deleted": "Aşama silindi",
       "deleteConfirm": "Bu aşamayı silmek istediğinize emin misiniz?",
       "namePlaceholder": "Aşama adı...",
+      "trLabelPlaceholder": "Türkçe aşama adı",
+      "enLabelPlaceholder": "İngilizce aşama adı",
       "color": "Renk"
     },
     "forecast": {
@@ -432,9 +450,20 @@
     "subtitle": "Aktivitelerinizi ve kontak dağılımınızı takip edin",
     "joinedCount": "Katılan Kontak",
     "overdue": "gecikmiş",
-    "pipelineValue": "Pipeline Değeri",
-    "stageDistribution": "Stage Dağılımı",
-    "stageBreakdown": "Stage Kırılımı",
+    "academyToday": "Bugün Okunan İçerik",
+    "academyHint": "Akademide bugün açtığın içerik sayısı",
+    "stageDistribution": "Aşama Dağılımı",
+    "stageBreakdown": "Aşama Oranları",
+    "quickSummary": "Hızlı Özet",
+    "nextSevenDays": "Yaklaşan Takipler",
+    "nextSevenDaysHint": "Önümüzdeki 7 gün içinde planlanan takipler",
+    "busiestDay": "En Aktif Gün",
+    "busiestDayHint": "{{count}} takip ile öne çıkıyor",
+    "followUpReadiness": "Takip Hazırlığı",
+    "followUpReadinessValue": "{{count}} geciken takip var",
+    "followUpReadinessHint": "Bugün için {{count}} takip planlı görünüyor",
+    "noDataYet": "Henüz veri yok",
+    "noActivityHint": "Takip planlandıkça burada ritmini görebileceksin.",
     "contacts": "kontak"
   },
   "settings": {
@@ -447,7 +476,12 @@
     "language": "Dil",
     "account": "Hesap",
     "accountInfo": "Hesap silme ve güvenlik işlemleri için destek ile iletişime geçin.",
-    "saved": "Profil güncellendi"
+    "saved": "Profil güncellendi",
+    "roles": {
+      "distributor": "Distribütör",
+      "leader": "Lider",
+      "admin": "Yönetici"
+    }
   },
   "profile": {
     "myProfile": "Profilim",
@@ -511,6 +545,7 @@
     "pageTitle": "Takipler",
     "new": "Yeni Takip",
     "edit": "Takibi Düzenle",
+    "summary": "{{count}} açık takip seni bekliyor",
     "actionType": "Aksiyon Türü",
     "actionTypes": {
       "call": "Ara",
@@ -539,6 +574,7 @@
       "in1Month": "1 Ay"
     },
     "buckets": {
+      "all": "Tümü",
       "today": "Bugün",
       "tomorrow": "Yarın",
       "thisWeek": "Bu Hafta",
@@ -562,15 +598,32 @@
     "deleteConfirm": "Bu takibi silmek istediğinize emin misiniz?",
     "empty": {
       "default": "Bu aralıkta takip yok",
+      "hint": "Yeni bir takip ekleyerek planını görünür tutabilirsin.",
       "overdue": "Harika! Gecikmeli takip yok."
     },
+    "columns": {
+      "contact": "Kişi",
+      "stage": "Aşama",
+      "followUp": "Takip",
+      "dueAt": "Tarih-Saat",
+      "notePreview": "Not",
+      "channel": "Kanal",
+      "status": "Durum"
+    },
+    "status": {
+      "pending": "Açık",
+      "completed": "Tamamlandı",
+      "overdue": "Gecikti"
+    },
+    "noNotes": "Not eklenmedi",
     "created": "Takip oluşturuldu",
     "updated": "Takip güncellendi",
     "deleted": "Takip silindi",
     "completed": "Takip tamamlandı",
     "uncompleted": "Takip yeniden açıldı",
     "snoozed": "Takip ertelendi",
-    "undoComplete": "Geri Al"
+    "undoComplete": "Geri Al",
+    "undoAction": "Geri Al"
   },
   "messages": {
     "title": "Mesajlar",
@@ -657,11 +710,14 @@
     },
     "template": {
       "new": "Yeni Şablon",
+      "newFromAI": "AI ile Şablon Başlat",
       "created": "Şablon oluşturuldu",
       "updated": "Şablon güncellendi",
       "deleted": "Şablon silindi",
       "deleteConfirm": "Bu şablonu silmek istediğine emin misin?",
       "copied": "Kopyalandı",
+      "favorite": "Favoriye al",
+      "regenerate": "Yeniden Üret",
       "namePlaceholder": "Şablon adı",
       "contentPlaceholder": "Mesaj içeriği. Değişkenler için {ad}, {meslek} kullanabilirsin.",
       "use": "Şablonu Kullan",
@@ -669,6 +725,14 @@
       "saved": "Kaydedildi",
       "aiGenerate": "AI ile İçerik Üret",
       "aiPickVariant": "Bir versiyonu seç, içerik alanına kopyalanır:"
+    },
+    "historyItem": {
+      "edited": "Düzenlendi",
+      "editTitle": "Geçmiş Mesajını Düzenle",
+      "contentPlaceholder": "Mesaj içeriğini burada düzenle",
+      "updated": "Geçmiş mesaj güncellendi",
+      "deleted": "Geçmiş mesaj silindi",
+      "deleteConfirm": "Bu geçmiş kaydını silmek istediğine emin misin?"
     }
   },
   "academy": {

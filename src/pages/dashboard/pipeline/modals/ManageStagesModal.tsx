@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   DndContext,
   PointerSensor,
@@ -19,11 +19,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { STAGE_COLOR_CLASSES, type StageColor } from '@/lib/pipeline/constants'
+import { STAGE_COLOR_CLASSES, STAGE_COLOR_SEQUENCE, getRandomReadableStageColor, type StageColor } from '@/lib/pipeline/constants'
 import { useCreateStage, useUpdateStage, useDeleteStage, useReorderStages } from '@/hooks/usePipeline'
 import type { PipelineStage } from '@/lib/pipeline/types'
-
-const COLORS: StageColor[] = ['gray', 'blue', 'purple', 'amber', 'orange', 'emerald', 'red', 'pink']
+import { parseStageLabelConfig, resolveStageLabel, serializeStageLabelConfig, slugifyStageLabel } from '@/lib/pipeline/stageLabels'
 
 interface Props {
   open: boolean
@@ -33,8 +32,9 @@ interface Props {
 }
 
 interface EditingStage {
-  id: string | null // null = new
-  name: string
+  id: string | null
+  trLabel: string
+  enLabel: string
   color: StageColor
 }
 
@@ -42,12 +42,10 @@ function SortableStageRow({
   stage,
   onEdit,
   onDelete,
-  userId,
 }: {
   stage: PipelineStage
-  onEdit: (s: PipelineStage) => void
+  onEdit: (stage: PipelineStage) => void
   onDelete: (id: string) => void
-  userId: string
 }) {
   const { t } = useTranslation()
   const colors = STAGE_COLOR_CLASSES[stage.color]
@@ -63,10 +61,10 @@ function SortableStageRow({
         <GripVertical className="w-4 h-4" />
       </div>
 
-      <div className={cn('w-3 h-3 rounded-full shrink-0', colors.badge.replace('bg-', 'bg-').split(' ')[0])} />
+      <div className={cn('w-3 h-3 rounded-full shrink-0', colors.badge.split(' ')[0])} />
 
-      <span className="flex-1 text-sm font-medium">
-        {t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })}
+      <span className="flex-1 text-sm font-medium truncate">
+        {resolveStageLabel(stage, t)}
       </span>
 
       <div className="flex gap-1 shrink-0">
@@ -99,66 +97,99 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
   const [editing, setEditing] = useState<EditingStage | null>(null)
   const [localStages, setLocalStages] = useState(stages)
 
-  // Sync when stages prop changes (if not editing)
-  if (!editing && JSON.stringify(stages.map(s => s.id)) !== JSON.stringify(localStages.map(s => s.id))) {
-    setLocalStages(stages)
-  }
+  useEffect(() => {
+    if (!editing) {
+      setLocalStages(stages)
+    }
+  }, [stages, editing])
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }))
 
   const handleDragEnd = async ({ active, over }: DragEndEvent) => {
     if (!over || active.id === over.id) return
-    const oldIdx = localStages.findIndex((s) => s.id === active.id)
-    const newIdx = localStages.findIndex((s) => s.id === over.id)
-    const reordered = arrayMove(localStages, oldIdx, newIdx).map((s, i) => ({ ...s, position: i }))
+
+    const oldIndex = localStages.findIndex((stage) => stage.id === active.id)
+    const newIndex = localStages.findIndex((stage) => stage.id === over.id)
+    const reordered = arrayMove(localStages, oldIndex, newIndex).map((stage, index) => ({
+      ...stage,
+      position: index,
+    }))
+
     setLocalStages(reordered)
-    await reorderStages.mutateAsync(reordered.map((s) => ({ id: s.id, position: s.position })))
+    await reorderStages.mutateAsync(reordered.map((stage) => ({ id: stage.id, position: stage.position })))
+  }
+
+  const openEdit = (stage: PipelineStage) => {
+    const labels = parseStageLabelConfig(stage.description)
+    setEditing({
+      id: stage.id,
+      trLabel: labels.trLabel || stage.name,
+      enLabel: labels.enLabel || stage.name,
+      color: stage.color,
+    })
   }
 
   const handleSave = async () => {
-    if (!editing || !editing.name.trim()) return
+    if (!editing) return
+
+    const trLabel = editing.trLabel.trim()
+    const enLabel = editing.enLabel.trim()
+    const primaryLabel = trLabel || enLabel
+    if (!primaryLabel) return
+
+    const description = serializeStageLabelConfig({
+      trLabel: trLabel || primaryLabel,
+      enLabel: enLabel || primaryLabel,
+    })
+
     if (editing.id === null) {
-      // Create new
-      await createStage.mutateAsync({
+      const created = await createStage.mutateAsync({
         user_id: userId,
-        name: editing.name,
-        slug: editing.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
+        name: primaryLabel,
+        slug: slugifyStageLabel(enLabel || trLabel || primaryLabel),
+        description,
         color: editing.color,
         position: localStages.length,
         win_probability: 50,
       })
+      setLocalStages((current) => [...current, created].sort((a, b) => a.position - b.position))
     } else {
-      await updateStage.mutateAsync({
+      const updated = await updateStage.mutateAsync({
         id: editing.id,
-        data: { name: editing.name, color: editing.color },
+        data: {
+          name: primaryLabel,
+          description,
+          color: editing.color,
+        },
       })
+      setLocalStages((current) => current.map((stage) => (stage.id === updated.id ? updated : stage)).sort((a, b) => a.position - b.position))
     }
+
     setEditing(null)
   }
 
   const handleDelete = async (id: string) => {
     if (!confirm(t('pipeline.stage.deleteConfirm'))) return
     await deleteStage.mutateAsync(id)
+    setLocalStages((current) => current.filter((stage) => stage.id !== id))
   }
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>{t('pipeline.manageStages')}</DialogTitle>
         </DialogHeader>
 
         <div className="mt-2 space-y-3">
-          {/* Stage list */}
           <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            <SortableContext items={localStages.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext items={localStages.map((stage) => stage.id)} strategy={verticalListSortingStrategy}>
               <div className="space-y-1.5 max-h-64 overflow-y-auto pr-1">
-                {localStages.map((s) => (
+                {localStages.map((stage) => (
                   <SortableStageRow
-                    key={s.id}
-                    stage={s}
-                    userId={userId}
-                    onEdit={(st) => setEditing({ id: st.id, name: st.name, color: st.color })}
+                    key={stage.id}
+                    stage={stage}
+                    onEdit={openEdit}
                     onDelete={handleDelete}
                   />
                 ))}
@@ -166,34 +197,38 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
             </SortableContext>
           </DndContext>
 
-          {/* Edit / Create form */}
           {editing ? (
             <div className="border rounded-md p-3 space-y-3 bg-muted/30">
               <p className="text-sm font-medium">{editing.id ? t('common.edit') : t('pipeline.stage.new')}</p>
               <Input
-                value={editing.name}
-                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                placeholder={t('pipeline.stage.namePlaceholder')}
+                value={editing.trLabel}
+                onChange={(event) => setEditing({ ...editing, trLabel: event.target.value })}
+                placeholder={t('pipeline.stage.trLabelPlaceholder')}
+              />
+              <Input
+                value={editing.enLabel}
+                onChange={(event) => setEditing({ ...editing, enLabel: event.target.value })}
+                placeholder={t('pipeline.stage.enLabelPlaceholder')}
               />
               <div>
                 <p className="text-xs text-muted-foreground mb-2">{t('pipeline.stage.color')}</p>
                 <div className="flex gap-2 flex-wrap">
-                  {COLORS.map((c) => (
+                  {STAGE_COLOR_SEQUENCE.map((color) => (
                     <button
-                      key={c}
+                      key={color}
                       type="button"
-                      onClick={() => setEditing({ ...editing, color: c })}
+                      onClick={() => setEditing({ ...editing, color })}
                       className={cn(
                         'w-6 h-6 rounded-full border-2 transition-all',
-                        STAGE_COLOR_CLASSES[c].badge.split(' ')[0],
-                        editing.color === c ? 'border-foreground scale-110' : 'border-transparent'
+                        STAGE_COLOR_CLASSES[color].badge.split(' ')[0],
+                        editing.color === color ? 'border-foreground scale-110' : 'border-transparent'
                       )}
                     />
                   ))}
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" onClick={handleSave} disabled={!editing.name.trim()}>
+                <Button size="sm" onClick={handleSave} disabled={!editing.trLabel.trim() && !editing.enLabel.trim()}>
                   <Check className="w-3.5 h-3.5 mr-1" />
                   {t('common.save')}
                 </Button>
@@ -208,7 +243,12 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
               variant="outline"
               size="sm"
               className="w-full gap-1.5"
-              onClick={() => setEditing({ id: null, name: '', color: 'blue' })}
+              onClick={() => setEditing({
+                id: null,
+                trLabel: '',
+                enLabel: '',
+                color: getRandomReadableStageColor(localStages.length),
+              })}
             >
               <Plus className="w-4 h-4" />
               {t('pipeline.stage.new')}

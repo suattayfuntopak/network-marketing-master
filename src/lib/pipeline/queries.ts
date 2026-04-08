@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { PipelineStage, Deal, DealWithContact, StageHistory, DealFilters } from './types'
+import type { PipelineStage, Deal, DealWithContact, StageHistory, DealFilters, StageReference } from './types'
 
 // ─── Pipeline Stages ──────────────────────────────────────────
 
@@ -65,19 +65,19 @@ export async function fetchDealsByContact(contactId: string, userId: string): Pr
   return data as Deal[]
 }
 
-export async function fetchStageHistory(dealId: string): Promise<(StageHistory & { from_stage: { name: string; color: string } | null; to_stage: { name: string; color: string } })[]> {
+export async function fetchStageHistory(dealId: string): Promise<(StageHistory & { from_stage: StageReference | null; to_stage: StageReference })[]> {
   const { data, error } = await supabase
     .from('nmm_stage_history')
     .select(`
       *,
-      from_stage:nmm_pipeline_stages!from_stage_id(name, color),
-      to_stage:nmm_pipeline_stages!to_stage_id(name, color)
+      from_stage:nmm_pipeline_stages!from_stage_id(name, slug, description, color),
+      to_stage:nmm_pipeline_stages!to_stage_id(name, slug, description, color)
     `)
     .eq('deal_id', dealId)
     .order('moved_at', { ascending: false })
 
   if (error) throw error
-  return data as unknown as (StageHistory & { from_stage: { name: string; color: string } | null; to_stage: { name: string; color: string } })[]
+  return data as unknown as (StageHistory & { from_stage: StageReference | null; to_stage: StageReference })[]
 }
 
 // ─── Pipeline stats ───────────────────────────────────────────

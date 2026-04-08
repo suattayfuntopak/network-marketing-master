@@ -5,8 +5,15 @@ import { fetchTemplates, fetchTemplate, fetchAIMessages } from '@/lib/messages/q
 import {
   createTemplate, updateTemplate, deleteTemplate,
   toggleTemplateFavorite, saveAIMessage, markAIMessageUsed, rateAIMessage,
+  updateAIMessage, deleteAIMessage,
 } from '@/lib/messages/mutations'
-import type { MessageTemplateInsert, MessageTemplateUpdate, AIMessageInsert, TemplateFilters } from '@/lib/messages/types'
+import type {
+  MessageTemplateInsert,
+  MessageTemplateUpdate,
+  AIMessageInsert,
+  AIMessageUpdate,
+  TemplateFilters,
+} from '@/lib/messages/types'
 
 export const templateKeys = {
   all: ['templates'] as const,
@@ -23,6 +30,8 @@ export function useTemplates(userId: string, filters?: TemplateFilters) {
     queryFn: () => fetchTemplates(userId, filters),
     enabled: !!userId,
     staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -31,6 +40,9 @@ export function useTemplate(id: string) {
     queryKey: templateKeys.detail(id),
     queryFn: () => fetchTemplate(id),
     enabled: !!id,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -39,7 +51,9 @@ export function useAIMessages(userId: string, contactId?: string) {
     queryKey: templateKeys.aiMessages(userId, contactId),
     queryFn: () => fetchAIMessages(userId, contactId),
     enabled: !!userId,
-    staleTime: 0,
+    staleTime: 30_000,
+    placeholderData: (previousData) => previousData,
+    refetchOnWindowFocus: false,
   })
 }
 
@@ -123,5 +137,31 @@ export function useRateAIMessage() {
   return useMutation({
     mutationFn: ({ id, feedback }: { id: string; feedback: 'great' | 'good' | 'meh' | 'bad' }) =>
       rateAIMessage(id, feedback),
+  })
+}
+
+export function useUpdateAIMessage(userId: string) {
+  const qc = useQueryClient()
+  const { t } = useTranslation()
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: AIMessageUpdate }) => updateAIMessage(id, data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: templateKeys.aiMessages(userId) })
+      toast.success(t('messages.historyItem.updated'))
+    },
+    onError: () => toast.error(t('common.unknownError')),
+  })
+}
+
+export function useDeleteAIMessage(userId: string) {
+  const qc = useQueryClient()
+  const { t } = useTranslation()
+  return useMutation({
+    mutationFn: (id: string) => deleteAIMessage(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: templateKeys.aiMessages(userId) })
+      toast.success(t('messages.historyItem.deleted'))
+    },
+    onError: () => toast.error(t('common.unknownError')),
   })
 }

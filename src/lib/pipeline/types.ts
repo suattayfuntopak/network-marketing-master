@@ -111,6 +111,13 @@ export interface StageHistory {
   moved_at: string
 }
 
+export interface StageReference {
+  name: string
+  slug: string
+  description: string | null
+  color: string
+}
+
 // ─── Enriched / view types ────────────────────────────────────
 
 export interface DealContact {

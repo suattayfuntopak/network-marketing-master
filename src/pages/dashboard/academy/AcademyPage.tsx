@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useAcademyContents, useToggleAcademyFavorite, useIncrementContentView } from '@/hooks/useAcademy'
 import { ROUTES } from '@/lib/constants'
+import { trackAcademyRead } from '@/lib/academy/progress'
 import type { ContentCategory, ContentType } from '@/lib/academy/types'
 
 const CATEGORIES: ContentCategory[] = [
@@ -46,6 +47,7 @@ export function AcademyPage() {
 
   const handleOpen = (id: string) => {
     incrementView.mutate(id)
+    trackAcademyRead(id)
     navigate(`${ROUTES.ACADEMY}/${id}`)
   }
 

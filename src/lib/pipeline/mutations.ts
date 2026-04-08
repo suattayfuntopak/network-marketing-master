@@ -1,26 +1,29 @@
 import { supabase } from '@/lib/supabase'
-import type { PipelineStageInsert, PipelineStageUpdate, DealInsert, DealUpdate } from './types'
+import type { PipelineStage, PipelineStageInsert, PipelineStageUpdate, DealInsert, DealUpdate } from './types'
 
 // ─── Pipeline Stages ──────────────────────────────────────────
 
-export async function createStage(data: PipelineStageInsert): Promise<string> {
+export async function createStage(data: PipelineStageInsert): Promise<PipelineStage> {
   const { data: result, error } = await supabase
     .from('nmm_pipeline_stages')
     .insert(data)
-    .select('id')
+    .select('*')
     .single()
 
   if (error) throw error
-  return result.id
+  return result as PipelineStage
 }
 
-export async function updateStage(id: string, data: PipelineStageUpdate): Promise<void> {
-  const { error } = await supabase
+export async function updateStage(id: string, data: PipelineStageUpdate): Promise<PipelineStage> {
+  const { data: result, error } = await supabase
     .from('nmm_pipeline_stages')
     .update({ ...data, updated_at: new Date().toISOString() })
     .eq('id', id)
+    .select('*')
+    .single()
 
   if (error) throw error
+  return result as PipelineStage
 }
 
 export async function deleteStage(id: string): Promise<void> {
@@ -39,6 +42,23 @@ export async function reorderStages(stages: Array<{ id: string; position: number
       supabase
         .from('nmm_pipeline_stages')
         .update({ position, updated_at: new Date().toISOString() })
+        .eq('id', id)
+    )
+  )
+}
+
+export async function syncDealsBoardState(
+  updates: Array<{ id: string; stage_id: string; position_in_stage: number }>
+): Promise<void> {
+  await Promise.all(
+    updates.map(({ id, stage_id, position_in_stage }) =>
+      supabase
+        .from('nmm_deals')
+        .update({
+          stage_id,
+          position_in_stage,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', id)
     )
   )

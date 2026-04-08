@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { useDeal, useStageHistory, usePipelineStages, useCloseDeal, useReopenDeal, useUpdateDeal } from '@/hooks/usePipeline'
 import { STAGE_COLOR_CLASSES, DEAL_TYPE_COLORS, DEAL_STATUS_COLORS } from '@/lib/pipeline/constants'
+import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import type { DealStatus } from '@/lib/pipeline/types'
 
 export function DealDetailPage() {
@@ -98,7 +99,7 @@ export function DealDetailPage() {
             </span>
             {currentStage && (
               <span className={cn('text-xs px-2 py-0.5 rounded-full font-medium', stageColors.badge)}>
-                {t(`pipelineStages.${currentStage.slug}`, { defaultValue: currentStage.name })}
+                {resolveStageLabel(currentStage, t)}
               </span>
             )}
           </div>
@@ -182,7 +183,7 @@ export function DealDetailPage() {
                             : 'text-muted-foreground border-border hover:border-muted-foreground'
                         )}
                       >
-                        {t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })}
+                        {resolveStageLabel(stage, t)}
                       </button>
                     )
                   })}
@@ -219,12 +220,12 @@ export function DealDetailPage() {
                         <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                         <div className="flex items-center gap-1.5 flex-wrap flex-1 min-w-0">
                           {h.from_stage ? (
-                            <span className={cn('text-xs px-1.5 py-0.5 rounded-full', fromColors?.badge)}>{h.from_stage.name}</span>
+                            <span className={cn('text-xs px-1.5 py-0.5 rounded-full', fromColors?.badge)}>{resolveStageLabel(h.from_stage, t)}</span>
                           ) : (
                             <span className="text-xs text-muted-foreground">—</span>
                           )}
                           <ChevronRight className="w-3 h-3 text-muted-foreground shrink-0" />
-                          <span className={cn('text-xs px-1.5 py-0.5 rounded-full', toColors.badge)}>{h.to_stage.name}</span>
+                          <span className={cn('text-xs px-1.5 py-0.5 rounded-full', toColors.badge)}>{resolveStageLabel(h.to_stage, t)}</span>
                         </div>
                         <span className="text-xs text-muted-foreground shrink-0">
                           {formatDistanceToNow(new Date(h.moved_at), { addSuffix: true, locale })}
