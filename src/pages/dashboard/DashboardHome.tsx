@@ -1,4 +1,4 @@
-import { Users, TrendingUp, Target, ArrowRight, Clock, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal } from 'lucide-react'
+import { Users, TrendingUp, UserPlus, ArrowRight, Clock, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 import { tr } from 'date-fns/locale'
@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
+import { useContactCount, useContactsCreatedThisWeekCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useFollowUpBuckets, useTodayAppointments } from '@/hooks/useCalendar'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
@@ -41,6 +41,7 @@ export function DashboardHome() {
   const dateLocale = currentLang === 'en' ? enUS : tr
 
   const { data: contactCount = 0 } = useContactCount(userId)
+  const { data: contactsCreatedThisWeekCount = 0 } = useContactsCreatedThisWeekCount(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
@@ -128,16 +129,23 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card
+          className="cursor-pointer hover:border-primary/30 transition-colors"
+          onClick={() => navigate(ROUTES.CONTACTS)}
+        >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.monthlyGoal')}
+              {t('dashboard.addedThisWeek')}
             </CardTitle>
-            <Target className="w-4 h-4 text-muted-foreground" />
+            <UserPlus className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{t('dashboard.noGoalPercent')}</div>
-            <p className="text-xs text-muted-foreground mt-1">{t('dashboard.noGoal')}</p>
+            <div className="text-2xl font-bold">{contactsCreatedThisWeekCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {contactsCreatedThisWeekCount > 0
+                ? t('dashboard.candidatesAddedThisWeek', { count: contactsCreatedThisWeekCount })
+                : t('dashboard.noCandidatesAddedThisWeek')}
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -278,7 +286,7 @@ export function DashboardHome() {
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
               <div className="p-3 rounded-xl bg-primary/10">
-                <Target className="w-6 h-6 text-primary" />
+                <UserPlus className="w-6 h-6 text-primary" />
               </div>
               <div>
                 <h3 className="font-semibold">{t('dashboard.ctaTitle')}</h3>

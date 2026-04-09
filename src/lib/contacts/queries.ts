@@ -1,3 +1,4 @@
+import { endOfWeek, startOfWeek } from 'date-fns'
 import { supabase } from '@/lib/supabase'
 import type { ContactListParams, ContactListResult, ContactWithTags, Contact } from './types'
 import type { Tag, Interaction } from '@/types/database'
@@ -125,6 +126,23 @@ export async function fetchContactCount(userId: string): Promise<number> {
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .eq('is_archived', false)
+
+  if (error) throw error
+  return count ?? 0
+}
+
+export async function fetchContactsCreatedThisWeekCount(userId: string): Promise<number> {
+  const now = new Date()
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 })
+  const weekEnd = endOfWeek(now, { weekStartsOn: 1 })
+
+  const { count, error } = await supabase
+    .from('nmm_contacts')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_archived', false)
+    .gte('created_at', weekStart.toISOString())
+    .lte('created_at', weekEnd.toISOString())
 
   if (error) throw error
   return count ?? 0
