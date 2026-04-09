@@ -1,6 +1,7 @@
-import { Users, TrendingUp, UserPlus, ArrowRight, Clock, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal } from 'lucide-react'
+import { useMemo } from 'react'
+import { format, formatDistanceToNow } from 'date-fns'
+import { Users, TrendingUp, UserPlus, ArrowRight, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal, GraduationCap } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-import { formatDistanceToNow, parseISO } from 'date-fns'
 import { tr } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
 import { useTranslation } from 'react-i18next'
@@ -10,12 +11,16 @@ import { Button } from '@/components/ui/button'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useContactsCreatedThisWeekCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
+import { useAcademyContents } from '@/hooks/useAcademy'
+import { useObjections } from '@/hooks/useObjections'
+import { useContactCount, useContactsCreatedThisWeekCount, useContactsWithBirthdayToday, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useFollowUpBuckets, useTodayAppointments } from '@/hooks/useCalendar'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
 import type { FollowUpActionType } from '@/lib/calendar/types'
+import type { AcademyContent, Objection } from '@/lib/academy/types'
+import type { BirthdayContact } from '@/lib/contacts/queries'
 
 const STAGE_DOT_COLORS: Record<string, string> = {
   new: 'bg-gray-400',
@@ -32,6 +37,28 @@ const ACTION_ICONS: Record<FollowUpActionType, React.ElementType> = {
   visit: MoreHorizontal, send_info: MoreHorizontal, check_in: MoreHorizontal, other: MoreHorizontal,
 }
 
+const truncateText = (value: string | null | undefined, maxLength: number) => {
+  if (!value) return ''
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= maxLength) return normalized
+  return `${normalized.slice(0, maxLength).trimEnd()}...`
+}
+
+const getBirthdayAge = (birthday: string) => {
+  const birthDate = new Date(birthday)
+  if (Number.isNaN(birthDate.getTime())) return null
+  return new Date().getFullYear() - birthDate.getFullYear()
+}
+
+interface AcademySpotlightItem {
+  kind: 'academy' | 'objection'
+  title: string
+  summary: string
+  eyebrow: string
+  ctaLabel: string
+  href: string
+}
+
 export function DashboardHome() {
   const navigate = useNavigate()
   const { profile, user } = useAuth()
@@ -42,11 +69,40 @@ export function DashboardHome() {
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: contactsCreatedThisWeekCount = 0 } = useContactsCreatedThisWeekCount(userId)
+  const { data: birthdaysToday = [] } = useContactsWithBirthdayToday(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
   const { data: todayAppointments = [] } = useTodayAppointments(userId)
+  const { data: academyContents = [] } = useAcademyContents()
+  const { data: objections = [] } = useObjections()
+  const visitSeed = useMemo(() => Date.now(), [])
+
+  const academySpotlight = useMemo<AcademySpotlightItem | null>(() => {
+    const localizedAcademy = academyContents.filter((item) => item.language === currentLang)
+    const localizedObjections = objections.filter((item) => item.language === currentLang)
+    const academyPool = (localizedAcademy.length > 0 ? localizedAcademy : academyContents).map<AcademySpotlightItem>((item: AcademyContent) => ({
+      kind: 'academy',
+      title: item.title,
+      summary: truncateText(item.summary || item.content, 170),
+      eyebrow: t('dashboard.academyLesson'),
+      ctaLabel: t('dashboard.openAcademy'),
+      href: `${ROUTES.ACADEMY}/${item.id}`,
+    }))
+    const objectionPool = (localizedObjections.length > 0 ? localizedObjections : objections).map<AcademySpotlightItem>((item: Objection) => ({
+      kind: 'objection',
+      title: item.short_label || truncateText(item.objection_text, 70),
+      summary: `${t('dashboard.suggestedResponse')}: ${truncateText(item.response_short || item.response_text, 150)}`,
+      eyebrow: t('dashboard.objectionBankNote'),
+      ctaLabel: t('dashboard.openObjections'),
+      href: `${ROUTES.ACADEMY}/itirazlar`,
+    }))
+    const pool = [...academyPool, ...objectionPool]
+
+    if (pool.length === 0) return null
+    return pool[visitSeed % pool.length]
+  }, [academyContents, currentLang, objections, t, visitSeed])
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -270,6 +326,95 @@ export function DashboardHome() {
                           <Icon className="w-3 h-3" />
                           {t(`followUps.actionTypes.${fu.action_type}`)}
                         </p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <Card className="overflow-hidden border-emerald-200/70 bg-gradient-to-br from-emerald-50/80 via-background to-amber-50/40">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
+            <div>
+              <CardTitle className="text-base">{t('dashboard.academyNotes')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.academyNotesHint')}</p>
+            </div>
+            <GraduationCap className="w-5 h-5 text-emerald-600" />
+          </CardHeader>
+          <CardContent className="flex min-h-[220px] flex-col justify-between gap-5">
+            {academySpotlight ? (
+              <>
+                <div className="space-y-3">
+                  <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                    {academySpotlight.eyebrow}
+                  </span>
+                  <div>
+                    <h3 className="text-lg font-semibold leading-snug">{academySpotlight.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{academySpotlight.summary}</p>
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  className="w-full justify-between border-emerald-200 bg-white/80 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
+                  onClick={() => navigate(academySpotlight.href)}
+                >
+                  {academySpotlight.ctaLabel}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </>
+            ) : (
+              <div className="flex min-h-[180px] items-center justify-center text-center text-sm text-muted-foreground">
+                {t('dashboard.noAcademyNotes')}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden border-rose-200/70 bg-gradient-to-br from-rose-50/80 via-background to-orange-50/50">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
+            <div>
+              <CardTitle className="text-base">{t('dashboard.todayBirthdays')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.todayBirthdaysHint')}</p>
+            </div>
+            <CalendarDays className="w-5 h-5 text-rose-500" />
+          </CardHeader>
+          <CardContent className="min-h-[220px]">
+            {birthdaysToday.length === 0 ? (
+              <div className="flex min-h-[180px] items-center justify-center text-center text-sm text-muted-foreground">
+                {t('dashboard.noBirthdaysToday')}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {birthdaysToday.slice(0, 4).map((contact: BirthdayContact) => {
+                  const age = getBirthdayAge(contact.birthday)
+                  return (
+                    <div
+                      key={contact.id}
+                      onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-white/70 bg-white/85 px-3 py-3 shadow-sm transition-colors hover:bg-white cursor-pointer"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-semibold text-rose-700">
+                          {contact.full_name.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-semibold">{contact.full_name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {format(new Date(contact.birthday), 'd MMMM', { locale: dateLocale })}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {age !== null && (
+                          <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
+                            {t('dashboard.turnsAge', { age })}
+                          </span>
+                        )}
+                        <StageBadge stage={contact.stage} />
                       </div>
                     </div>
                   )

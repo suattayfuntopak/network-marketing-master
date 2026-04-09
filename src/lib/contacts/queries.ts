@@ -3,6 +3,13 @@ import { supabase } from '@/lib/supabase'
 import type { ContactListParams, ContactListResult, ContactWithTags, Contact } from './types'
 import type { Tag, Interaction } from '@/types/database'
 
+export interface BirthdayContact {
+  id: string
+  full_name: string
+  birthday: string
+  stage: Contact['stage']
+}
+
 export async function fetchContacts(params: ContactListParams): Promise<ContactListResult> {
   const { filters, sort, page, pageSize, userId } = params
 
@@ -146,6 +153,31 @@ export async function fetchContactsCreatedThisWeekCount(userId: string): Promise
 
   if (error) throw error
   return count ?? 0
+}
+
+export async function fetchContactsWithBirthdayToday(userId: string): Promise<BirthdayContact[]> {
+  const today = new Date()
+  const todayMonth = today.getMonth()
+  const todayDate = today.getDate()
+
+  const { data, error } = await supabase
+    .from('nmm_contacts')
+    .select('id, full_name, birthday, stage')
+    .eq('user_id', userId)
+    .eq('is_archived', false)
+    .not('birthday', 'is', null)
+    .order('full_name', { ascending: true })
+
+  if (error) throw error
+
+  return (data ?? []).filter((contact) => {
+    if (!contact.birthday) return false
+    const birthday = new Date(contact.birthday)
+
+    return !Number.isNaN(birthday.getTime())
+      && birthday.getMonth() === todayMonth
+      && birthday.getDate() === todayDate
+  }) as BirthdayContact[]
 }
 
 export async function fetchPendingFollowUps(userId: string): Promise<ContactWithTags[]> {

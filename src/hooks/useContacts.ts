@@ -3,6 +3,7 @@ import {
   fetchContacts,
   fetchContactCount,
   fetchContactsCreatedThisWeekCount,
+  fetchContactsWithBirthdayToday,
   fetchRecentContacts,
   fetchPendingFollowUps,
   fetchContactStageCounts,
@@ -15,6 +16,7 @@ export const contactKeys = {
   list: (params: ContactListParams) => [...contactKeys.lists(), params.userId, params.filters, params.sort, params.page, params.pageSize] as const,
   count: (userId: string) => [...contactKeys.all, 'count', userId] as const,
   createdThisWeek: (userId: string) => [...contactKeys.all, 'createdThisWeek', userId] as const,
+  birthdaysToday: (userId: string) => [...contactKeys.all, 'birthdaysToday', userId] as const,
   stageCounts: (userId: string) => [...contactKeys.all, 'stageCounts', userId] as const,
   recent: (userId: string) => [...contactKeys.all, 'recent', userId] as const,
   pending: (userId: string) => [...contactKeys.all, 'pending', userId] as const,
@@ -46,6 +48,16 @@ export function useContactsCreatedThisWeekCount(userId: string) {
   return useQuery({
     queryKey: contactKeys.createdThisWeek(userId),
     queryFn: () => fetchContactsCreatedThisWeekCount(userId),
+    enabled: !!userId,
+    staleTime: 60_000,
+    refetchOnWindowFocus: false,
+  })
+}
+
+export function useContactsWithBirthdayToday(userId: string) {
+  return useQuery({
+    queryKey: contactKeys.birthdaysToday(userId),
+    queryFn: () => fetchContactsWithBirthdayToday(userId),
     enabled: !!userId,
     staleTime: 60_000,
     refetchOnWindowFocus: false,

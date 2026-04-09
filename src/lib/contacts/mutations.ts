@@ -147,6 +147,8 @@ export async function updateContactStage(
   newStage: string,
   oldStage: string
 ): Promise<void> {
+  if (newStage === oldStage) return
+
   await updateContact(contactId, { stage: newStage as ContactUpdate['stage'] })
   await addInteraction({
     contactId,
