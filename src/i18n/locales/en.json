@@ -439,6 +439,7 @@
     "pendingFollowups": "Pending Follow-ups",
     "noPendingFollowups": "No pending follow-ups 🎉",
     "todayFollowUps": "Today's Follow-ups",
+    "todayFollowUpsCount": "Today's Follow-up Count",
     "todayAppointments": "Today's Appointments",
     "noTodayAppointments": "No appointments today",
     "overdueFollowUps": "{{count}} overdue",

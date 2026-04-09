@@ -439,6 +439,7 @@
     "pendingFollowups": "Takip Bekleyenler",
     "noPendingFollowups": "Bekleyen takip yok 🎉",
     "todayFollowUps": "Bugünün Takipleri",
+    "todayFollowUpsCount": "Bugünün Takip Sayısı",
     "todayAppointments": "Bugünün Randevuları",
     "noTodayAppointments": "Bugün randevu yok",
     "overdueFollowUps": "{{count}} gecikmeli",

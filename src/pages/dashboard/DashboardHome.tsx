@@ -82,6 +82,26 @@ export function DashboardHome() {
 
         <Card
           className="cursor-pointer hover:border-primary/30 transition-colors"
+          onClick={() => navigate(ROUTES.CONTACTS)}
+        >
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              {t('dashboard.addedThisWeek')}
+            </CardTitle>
+            <UserPlus className="w-4 h-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{contactsCreatedThisWeekCount}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+              {contactsCreatedThisWeekCount > 0
+                ? t('dashboard.candidatesAddedThisWeek', { count: contactsCreatedThisWeekCount })
+                : t('dashboard.noCandidatesAddedThisWeek')}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:border-primary/30 transition-colors"
           onClick={() => navigate(ROUTES.PIPELINE)}
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -115,7 +135,7 @@ export function DashboardHome() {
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.todayFollowUps')}
+              {t('dashboard.todayFollowUpsCount')}
             </CardTitle>
             <Bell className="w-4 h-4 text-muted-foreground" />
           </CardHeader>
@@ -125,26 +145,6 @@ export function DashboardHome() {
               {(followUpBuckets?.overdue?.length ?? 0) > 0
                 ? t('dashboard.overdueFollowUps', { count: followUpBuckets?.overdue?.length })
                 : t('dashboard.noOverdueFollowUps')}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:border-primary/30 transition-colors"
-          onClick={() => navigate(ROUTES.CONTACTS)}
-        >
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              {t('dashboard.addedThisWeek')}
-            </CardTitle>
-            <UserPlus className="w-4 h-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{contactsCreatedThisWeekCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {contactsCreatedThisWeekCount > 0
-                ? t('dashboard.candidatesAddedThisWeek', { count: contactsCreatedThisWeekCount })
-                : t('dashboard.noCandidatesAddedThisWeek')}
             </p>
           </CardContent>
         </Card>
