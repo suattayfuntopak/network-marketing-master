@@ -106,10 +106,16 @@ export function useAIMessage(): UseAIMessageReturn {
       const { data: sessionData } = await supabase.auth.getSession()
       const accessToken = sessionData.session?.access_token
 
-      const { data, error } = await supabase.functions.invoke('generate-message', {
+      const invokePromise = supabase.functions.invoke('generate-message', {
         body: req,
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
       })
+
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        window.setTimeout(() => reject(new Error('request_timeout')), 15000)
+      })
+
+      const { data, error } = await Promise.race([invokePromise, timeoutPromise])
 
       if (error) throw error
 
@@ -144,6 +150,12 @@ export function useAIMessage(): UseAIMessageReturn {
           code: 'network_error',
           message: err.message,
           details: 'fetch_error',
+        }
+      } else if (err instanceof Error && err.message === 'request_timeout') {
+        classifiedError = {
+          code: 'network_error',
+          message: err.message,
+          details: 'request_timeout',
         }
       } else if (err instanceof Error && /network|failed to fetch/i.test(err.message)) {
         classifiedError = {

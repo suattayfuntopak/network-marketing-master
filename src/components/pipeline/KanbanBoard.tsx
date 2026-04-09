@@ -28,7 +28,6 @@ import { DealCardOverlay } from './DealCard'
 interface Props {
   stages: StageWithDeals[]
   userId: string
-  onAddDeal: (stageId: string) => void
 }
 
 function recalculateStages(stages: StageWithDeals[]) {
@@ -48,7 +47,7 @@ function recalculateStages(stages: StageWithDeals[]) {
   })
 }
 
-export function KanbanBoard({ stages: initialStages, userId, onAddDeal }: Props) {
+export function KanbanBoard({ stages: initialStages, userId }: Props) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const [activeId, setActiveId] = useState<string | null>(null)
@@ -219,12 +218,11 @@ export function KanbanBoard({ stages: initialStages, userId, onAddDeal }: Props)
       onDragCancel={handleDragCancel}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex gap-4 overflow-x-auto pb-4 min-h-0">
+      <div className="flex min-h-full gap-4 overflow-x-auto pb-4">
         {optimisticStages.map((stage) => (
           <KanbanColumn
             key={stage.id}
             stage={stage}
-            onAddDeal={onAddDeal}
             isOver={overStageId === stage.id}
           />
         ))}

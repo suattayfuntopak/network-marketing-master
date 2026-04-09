@@ -3,6 +3,7 @@
     "save": "Kaydet",
     "saving": "Kaydediliyor...",
     "cancel": "İptal",
+    "send": "Gönder",
     "delete": "Sil",
     "edit": "Düzenle",
     "archive": "Arşivle",
@@ -345,7 +346,7 @@
     "title": "Süreç Takibi",
     "newDeal": "Yeni Aksiyon",
     "manageStages": "Aşamaları Yönet",
-    "emptyColumn": "Bu aşamada kayıt yok",
+    "emptyColumn": "Bu aşamada kişi yok",
     "contactSingular": "Kontak",
     "contactPlural": "Kontak",
     "dragError": "Kart yeni aşamaya taşınamadı. Lütfen tekrar dene.",
@@ -357,7 +358,7 @@
     "stageHistory": "Aşama Geçmişi",
     "views": {
       "overview": "Genel Bakış",
-      "kanban": "Kanban",
+      "kanban": "Kişi Süreçleri",
       "table": "Tablo",
       "forecast": "Tahmin"
     },

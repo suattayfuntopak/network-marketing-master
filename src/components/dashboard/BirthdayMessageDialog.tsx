@@ -5,11 +5,18 @@ import { SiInstagram, SiTelegram, SiWhatsapp } from 'react-icons/si'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Textarea } from '@/components/ui/textarea'
 import { useAIMessage } from '@/hooks/useAIMessage'
 import { cn } from '@/lib/utils'
 import type { BirthdayContact } from '@/lib/contacts/queries'
 import type { MessageChannel } from '@/lib/messages/types'
+import { buttonVariants } from '@/components/ui/button'
 
 interface BirthdayMessageDialogProps {
   open: boolean
@@ -45,45 +52,58 @@ function buildInstagramLink(contact: BirthdayContact) {
 }
 
 export function BirthdayMessageDialog({ open, onClose, contact }: BirthdayMessageDialogProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { generate, isGenerating } = useAIMessage()
   const [message, setMessage] = useState('')
-  const [showSendOptions, setShowSendOptions] = useState(false)
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+
+  const buildRequest = () => {
+    if (!contact) return null
+
+    return {
+      contactId: contact.id,
+      contactSnapshot: {
+        full_name: contact.full_name,
+        occupation: contact.occupation,
+        city: contact.city,
+        relationship: contact.relationship,
+        goals: contact.goals,
+        pain_points: contact.pain_points,
+        interests: contact.interests,
+        warmth_score: contact.warmth_score,
+        stage: contact.stage,
+      },
+      category: 'birthday' as const,
+      channel: 'any' as const,
+      tone: 'friendly' as const,
+      userInput: t('dashboard.birthdayAiPrompt'),
+    }
+  }
 
   useEffect(() => {
     if (!open || !contact) {
       setMessage('')
-      setShowSendOptions(false)
       return
     }
 
-    const generateBirthdayMessage = async () => {
-      const variants = await generate({
-        contactId: contact.id,
-        contactSnapshot: {
-          full_name: contact.full_name,
-          occupation: contact.occupation,
-          city: contact.city,
-          relationship: contact.relationship,
-          goals: contact.goals,
-          pain_points: contact.pain_points,
-          interests: contact.interests,
-          warmth_score: contact.warmth_score,
-          stage: contact.stage,
-        },
-        category: 'birthday',
-        channel: 'any',
-        tone: 'friendly',
-        userInput: t('dashboard.birthdayAiPrompt'),
-      })
+    let isCancelled = false
 
-      if (variants?.[0]?.message) {
+    const generateBirthdayMessage = async () => {
+      const request = buildRequest()
+      if (!request) return
+
+      const variants = await generate(request)
+
+      if (!isCancelled && variants?.[0]?.message) {
         setMessage(variants[0].message)
       }
     }
 
     void generateBirthdayMessage()
-  }, [contact, open, t])
+    return () => {
+      isCancelled = true
+    }
+  }, [contact?.id, currentLang, open])
 
   const deliveryChannels = useMemo<DeliveryChannel[]>(() => {
     if (!contact) return []
@@ -117,33 +137,16 @@ export function BirthdayMessageDialog({ open, onClose, contact }: BirthdayMessag
         available: !!buildInstagramLink(contact),
       },
     ].filter((channel) => channel.available)
-  }, [contact, message, t])
+  }, [contact, message])
 
   const handleRegenerate = async () => {
-    if (!contact) return
+    const request = buildRequest()
+    if (!request) return
 
-    const variants = await generate({
-      contactId: contact.id,
-      contactSnapshot: {
-        full_name: contact.full_name,
-        occupation: contact.occupation,
-        city: contact.city,
-        relationship: contact.relationship,
-        goals: contact.goals,
-        pain_points: contact.pain_points,
-        interests: contact.interests,
-        warmth_score: contact.warmth_score,
-        stage: contact.stage,
-      },
-      category: 'birthday',
-      channel: 'any',
-      tone: 'friendly',
-      userInput: t('dashboard.birthdayAiPrompt'),
-    })
+    const variants = await generate(request)
 
     if (variants?.[0]?.message) {
       setMessage(variants[0].message)
-      setShowSendOptions(false)
     }
   }
 
@@ -215,38 +218,33 @@ export function BirthdayMessageDialog({ open, onClose, contact }: BirthdayMessag
               {t('dashboard.regenerateBirthdayMessage')}
             </Button>
 
-            <div className="flex items-start gap-3">
-              <Button
-                onClick={() => setShowSendOptions((prev) => !prev)}
-                disabled={!message.trim()}
-                className="gap-2"
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                disabled={!message.trim() || deliveryChannels.length === 0}
+                className={cn(buttonVariants({ variant: 'default' }), 'gap-2')}
               >
                 <Send className="h-4 w-4" />
                 {t('common.send')}
-              </Button>
-
-              {showSendOptions && deliveryChannels.length > 0 && (
-                <div className="flex flex-col gap-2">
-                  {deliveryChannels.map((channel) => {
-                    const Icon = channel.icon
-                    return (
-                      <button
-                        key={channel.key}
-                        type="button"
-                        title={channel.title}
-                        onClick={() => void handleSend(channel)}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="min-w-44">
+                {deliveryChannels.map((channel) => {
+                  const Icon = channel.icon
+                  return (
+                    <DropdownMenuItem key={channel.key} onClick={() => void handleSend(channel)} className="gap-2">
+                      <span
                         className={cn(
-                          'flex h-10 w-10 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors',
+                          'flex h-8 w-8 items-center justify-center rounded-full border border-border bg-background text-muted-foreground transition-colors',
                           channel.color
                         )}
                       >
                         <Icon className="h-4 w-4" />
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
+                      </span>
+                      <span>{channel.title}</span>
+                    </DropdownMenuItem>
+                  )
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </DialogContent>

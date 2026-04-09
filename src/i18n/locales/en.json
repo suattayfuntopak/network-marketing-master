@@ -3,6 +3,7 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "send": "Send",
     "delete": "Delete",
     "edit": "Edit",
     "archive": "Archive",
@@ -345,7 +346,7 @@
     "title": "Pipeline",
     "newDeal": "New Deal",
     "manageStages": "Manage Stages",
-    "emptyColumn": "No deals in this stage",
+    "emptyColumn": "No people in this stage",
     "contactSingular": "Contact",
     "contactPlural": "Contacts",
     "dragError": "The card could not be moved to the new stage. Please try again.",
@@ -357,7 +358,7 @@
     "stageHistory": "Stage History",
     "views": {
       "overview": "Overview",
-      "kanban": "Kanban",
+      "kanban": "People Processes",
       "table": "Table",
       "forecast": "Forecast"
     },

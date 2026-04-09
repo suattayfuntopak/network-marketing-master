@@ -1,7 +1,6 @@
 import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useTranslation } from 'react-i18next'
-import { Plus } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { STAGE_COLOR_CLASSES } from '@/lib/pipeline/constants'
 import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
@@ -10,11 +9,10 @@ import { DealCard } from './DealCard'
 
 interface Props {
   stage: StageWithDeals
-  onAddDeal: (stageId: string) => void
   isOver?: boolean
 }
 
-export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
+export function KanbanColumn({ stage, isOver }: Props) {
   const { t } = useTranslation()
   const colors = STAGE_COLOR_CLASSES[stage.color]
 
@@ -23,8 +21,7 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
   const dealIds = stage.deals.map((d) => d.id)
 
   return (
-    <div className="flex flex-col w-[280px] shrink-0">
-      {/* Column header */}
+    <div className="flex min-h-full w-[280px] shrink-0 flex-col">
       <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', colors.border, colors.bg)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 min-w-0">
@@ -42,12 +39,12 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
       <div
         ref={setNodeRef}
         className={cn(
-          'flex-1 bg-muted/30 border border-t-0 rounded-b-lg p-2.5 min-h-[120px] transition-colors',
+          'flex min-h-[calc(100vh-15rem)] flex-1 flex-col rounded-b-lg border border-t-0 bg-muted/30 p-2.5 transition-colors',
           isOver && 'bg-primary/5 border-primary/30'
         )}
       >
         <SortableContext items={dealIds} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
+          <div className="flex-1 space-y-2">
             {stage.deals.map((deal) => (
               <DealCard key={deal.id} deal={deal} />
             ))}
@@ -55,19 +52,10 @@ export function KanbanColumn({ stage, onAddDeal, isOver }: Props) {
         </SortableContext>
 
         {stage.deals.length === 0 && (
-          <div className="flex items-center justify-center h-16 text-xs text-muted-foreground/60 text-center px-2">
+          <div className="flex flex-1 items-center justify-center px-2 text-center text-xs text-muted-foreground/60">
             {t('pipeline.emptyColumn')}
           </div>
         )}
-
-        {/* Add deal button */}
-        <button
-          onClick={() => onAddDeal(stage.id)}
-          className="w-full mt-2 flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2 py-1.5 rounded-md hover:bg-muted transition-colors"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          {t('pipeline.newDeal')}
-        </button>
       </div>
     </div>
   )

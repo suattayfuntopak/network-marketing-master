@@ -22,7 +22,7 @@ import { cn } from '@/lib/utils'
 import { STAGE_COLOR_CLASSES, STAGE_COLOR_SEQUENCE, getRandomReadableStageColor, type StageColor } from '@/lib/pipeline/constants'
 import { useCreateStage, useUpdateStage, useDeleteStage, useReorderStages } from '@/hooks/usePipeline'
 import type { PipelineStage } from '@/lib/pipeline/types'
-import { parseStageLabelConfig, resolveStageLabel, serializeStageLabelConfig, slugifyStageLabel } from '@/lib/pipeline/stageLabels'
+import { getStageLabelConfig, resolveStageLabel, serializeStageLabelConfig, slugifyStageLabel } from '@/lib/pipeline/stageLabels'
 
 interface Props {
   open: boolean
@@ -120,11 +120,11 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
   }
 
   const openEdit = (stage: PipelineStage) => {
-    const labels = parseStageLabelConfig(stage.description)
+    const labels = getStageLabelConfig(stage)
     setEditing({
       id: stage.id,
-      trLabel: labels.trLabel || stage.name,
-      enLabel: labels.enLabel || stage.name,
+      trLabel: labels.trLabel,
+      enLabel: labels.enLabel,
       color: stage.color,
     })
   }

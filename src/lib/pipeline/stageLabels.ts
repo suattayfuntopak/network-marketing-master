@@ -16,6 +16,24 @@ export interface StageLabelConfig {
   enLabel?: string
 }
 
+const LEGACY_STAGE_LABELS: Record<string, Required<StageLabelConfig>> = {
+  'new': { trLabel: 'Yeni Aday', enLabel: 'New Prospect' },
+  'contacted': { trLabel: 'İletişim Kuruldu', enLabel: 'Contacted' },
+  'interested': { trLabel: 'İlgileniyor', enLabel: 'Interested' },
+  'presenting': { trLabel: 'Sunum Yapıldı', enLabel: 'Presenting' },
+  'thinking': { trLabel: 'Düşünüyor', enLabel: 'Thinking' },
+  'joined': { trLabel: 'Katıldı', enLabel: 'Joined' },
+  'lost': { trLabel: 'Kaybedildi', enLabel: 'Lost' },
+  'yeni-aday': { trLabel: 'Yeni Aday', enLabel: 'New Prospect' },
+  'iletisim-kuruldu': { trLabel: 'İletişim Kuruldu', enLabel: 'Contacted' },
+  'ilgileniyor': { trLabel: 'İlgileniyor', enLabel: 'Interested' },
+  'sunum-yapildi': { trLabel: 'Sunum Yapıldı', enLabel: 'Presenting' },
+  'dusunuyor': { trLabel: 'Düşünüyor', enLabel: 'Thinking' },
+  'katildi': { trLabel: 'Katıldı', enLabel: 'Joined' },
+  'kaybedildi': { trLabel: 'Kaybedildi', enLabel: 'Lost' },
+  'randevu-verildi': { trLabel: 'Randevu Verildi', enLabel: 'Appointment Scheduled' },
+}
+
 export function parseStageLabelConfig(description?: string | null): StageLabelConfig {
   if (!description) return {}
 
@@ -55,6 +73,20 @@ export function slugifyStageLabel(value: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+function getLegacyStageLabels(stage: Pick<PipelineStage, 'name' | 'slug'>): StageLabelConfig {
+  return LEGACY_STAGE_LABELS[stage.slug] || LEGACY_STAGE_LABELS[slugifyStageLabel(stage.name)] || {}
+}
+
+export function getStageLabelConfig(stage: Pick<PipelineStage, 'name' | 'slug' | 'description'>): Required<StageLabelConfig> {
+  const labels = parseStageLabelConfig(stage.description)
+  const legacyLabels = getLegacyStageLabels(stage)
+
+  return {
+    trLabel: labels.trLabel?.trim() || legacyLabels.trLabel || stage.name,
+    enLabel: labels.enLabel?.trim() || legacyLabels.enLabel || labels.trLabel?.trim() || legacyLabels.trLabel || stage.name,
+  }
+}
+
 export function resolveStageLabel(
   stage: Pick<PipelineStage, 'name' | 'slug' | 'description'>,
   t: (key: string, options?: Record<string, unknown>) => string,
@@ -64,10 +96,9 @@ export function resolveStageLabel(
     return t(`pipelineStages.${stage.slug}`, { defaultValue: stage.name })
   }
 
-  const labels = parseStageLabelConfig(stage.description)
+  const labels = getStageLabelConfig(stage)
   const localized = lang === 'en' ? labels.enLabel : labels.trLabel
   const fallback = lang === 'en' ? labels.trLabel : labels.enLabel
 
   return localized?.trim() || fallback?.trim() || stage.name
 }
-
