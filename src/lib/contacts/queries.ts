@@ -8,6 +8,18 @@ export interface BirthdayContact {
   full_name: string
   birthday: string
   stage: Contact['stage']
+  phone: string | null
+  whatsapp: string | null
+  telegram: string | null
+  email: string | null
+  instagram: string | null
+  occupation: string | null
+  city: string | null
+  relationship: string | null
+  warmth_score: number
+  goals: string[] | null
+  pain_points: string[] | null
+  interests: string[] | null
 }
 
 export async function fetchContacts(params: ContactListParams): Promise<ContactListResult> {
@@ -162,7 +174,7 @@ export async function fetchContactsWithBirthdayToday(userId: string): Promise<Bi
 
   const { data, error } = await supabase
     .from('nmm_contacts')
-    .select('id, full_name, birthday, stage')
+    .select('id, full_name, birthday, stage, phone, whatsapp, telegram, email, instagram, occupation, city, relationship, warmth_score, goals, pain_points, interests')
     .eq('user_id', userId)
     .eq('is_archived', false)
     .not('birthday', 'is', null)

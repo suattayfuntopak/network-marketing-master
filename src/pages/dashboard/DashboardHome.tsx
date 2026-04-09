@@ -1,6 +1,6 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { Users, TrendingUp, UserPlus, ArrowRight, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal, GraduationCap } from 'lucide-react'
+import { Users, TrendingUp, UserPlus, ArrowRight, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal, GraduationCap, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { tr } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
+import { BirthdayMessageDialog } from '@/components/dashboard/BirthdayMessageDialog'
 import { useAuth } from '@/hooks/useAuth'
 import { useAcademyContents } from '@/hooks/useAcademy'
 import { useObjections } from '@/hooks/useObjections'
@@ -51,12 +52,8 @@ const getBirthdayAge = (birthday: string) => {
 }
 
 interface AcademySpotlightItem {
-  kind: 'academy' | 'objection'
   title: string
   summary: string
-  eyebrow: string
-  ctaLabel: string
-  href: string
 }
 
 export function DashboardHome() {
@@ -78,31 +75,29 @@ export function DashboardHome() {
   const { data: academyContents = [] } = useAcademyContents()
   const { data: objections = [] } = useObjections()
   const visitSeed = useMemo(() => Date.now(), [])
+  const [birthdayDialogContact, setBirthdayDialogContact] = useState<BirthdayContact | null>(null)
 
   const academySpotlight = useMemo<AcademySpotlightItem | null>(() => {
     const localizedAcademy = academyContents.filter((item) => item.language === currentLang)
-    const localizedObjections = objections.filter((item) => item.language === currentLang)
     const academyPool = (localizedAcademy.length > 0 ? localizedAcademy : academyContents).map<AcademySpotlightItem>((item: AcademyContent) => ({
-      kind: 'academy',
       title: item.title,
       summary: truncateText(item.summary || item.content, 170),
-      eyebrow: t('dashboard.academyLesson'),
-      ctaLabel: t('dashboard.openAcademy'),
-      href: `${ROUTES.ACADEMY}/${item.id}`,
     }))
+
+    if (academyPool.length === 0) return null
+    return academyPool[visitSeed % academyPool.length]
+  }, [academyContents, currentLang, visitSeed])
+
+  const objectionSpotlight = useMemo<AcademySpotlightItem | null>(() => {
+    const localizedObjections = objections.filter((item) => item.language === currentLang)
     const objectionPool = (localizedObjections.length > 0 ? localizedObjections : objections).map<AcademySpotlightItem>((item: Objection) => ({
-      kind: 'objection',
       title: item.short_label || truncateText(item.objection_text, 70),
       summary: `${t('dashboard.suggestedResponse')}: ${truncateText(item.response_short || item.response_text, 150)}`,
-      eyebrow: t('dashboard.objectionBankNote'),
-      ctaLabel: t('dashboard.openObjections'),
-      href: `${ROUTES.ACADEMY}/itirazlar`,
     }))
-    const pool = [...academyPool, ...objectionPool]
 
-    if (pool.length === 0) return null
-    return pool[visitSeed % pool.length]
-  }, [academyContents, currentLang, objections, t, visitSeed])
+    if (objectionPool.length === 0) return null
+    return objectionPool[visitSeed % objectionPool.length]
+  }, [currentLang, objections, t, visitSeed])
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -337,35 +332,54 @@ export function DashboardHome() {
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-        <Card className="overflow-hidden border-emerald-200/70 bg-gradient-to-br from-emerald-50/80 via-background to-amber-50/40">
+        <Card>
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
             <div>
               <CardTitle className="text-base">{t('dashboard.academyNotes')}</CardTitle>
               <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.academyNotesHint')}</p>
             </div>
-            <GraduationCap className="w-5 h-5 text-emerald-600" />
+            <GraduationCap className="w-5 h-5 text-muted-foreground" />
           </CardHeader>
           <CardContent className="flex min-h-[220px] flex-col justify-between gap-5">
-            {academySpotlight ? (
-              <>
-                <div className="space-y-3">
-                  <span className="inline-flex rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-medium text-emerald-700">
-                    {academySpotlight.eyebrow}
-                  </span>
-                  <div>
-                    <h3 className="text-lg font-semibold leading-snug">{academySpotlight.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{academySpotlight.summary}</p>
-                  </div>
+            {academySpotlight || objectionSpotlight ? (
+              <div className="flex h-full flex-col justify-between gap-5">
+                <div className="space-y-4">
+                  {academySpotlight && (
+                    <div>
+                      <h3 className="text-lg font-semibold leading-snug">{academySpotlight.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{academySpotlight.summary}</p>
+                    </div>
+                  )}
+
+                  {academySpotlight && objectionSpotlight && <div className="border-t border-border" />}
+
+                  {objectionSpotlight && (
+                    <div>
+                      <h3 className="text-lg font-semibold leading-snug">{objectionSpotlight.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{objectionSpotlight.summary}</p>
+                    </div>
+                  )}
                 </div>
-                <Button
-                  variant="outline"
-                  className="w-full justify-between border-emerald-200 bg-white/80 text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800"
-                  onClick={() => navigate(academySpotlight.href)}
-                >
-                  {academySpotlight.ctaLabel}
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </>
+
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => navigate(ROUTES.ACADEMY)}
+                  >
+                    {t('dashboard.openAcademy')}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full justify-between"
+                    onClick={() => navigate(`${ROUTES.ACADEMY}/itirazlar`)}
+                  >
+                    {t('dashboard.openObjections')}
+                    <ArrowRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             ) : (
               <div className="flex min-h-[180px] items-center justify-center text-center text-sm text-muted-foreground">
                 {t('dashboard.noAcademyNotes')}
@@ -374,13 +388,13 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden border-rose-200/70 bg-gradient-to-br from-rose-50/80 via-background to-orange-50/50">
+        <Card>
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
             <div>
               <CardTitle className="text-base">{t('dashboard.todayBirthdays')}</CardTitle>
               <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.todayBirthdaysHint')}</p>
             </div>
-            <CalendarDays className="w-5 h-5 text-rose-500" />
+            <CalendarDays className="w-5 h-5 text-muted-foreground" />
           </CardHeader>
           <CardContent className="min-h-[220px]">
             {birthdaysToday.length === 0 ? (
@@ -395,10 +409,10 @@ export function DashboardHome() {
                     <div
                       key={contact.id}
                       onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-white/70 bg-white/85 px-3 py-3 shadow-sm transition-colors hover:bg-white cursor-pointer"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card px-3 py-3 transition-colors hover:bg-muted/30 cursor-pointer"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-sm font-semibold text-rose-700">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                           {contact.full_name.split(' ').map((part) => part[0]).slice(0, 2).join('').toUpperCase()}
                         </div>
                         <div className="min-w-0">
@@ -410,10 +424,22 @@ export function DashboardHome() {
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
                         {age !== null && (
-                          <span className="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-medium text-rose-700">
+                          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
                             {t('dashboard.turnsAge', { age })}
                           </span>
                         )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8 gap-1 rounded-full px-3 text-xs"
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setBirthdayDialogContact(contact)
+                          }}
+                        >
+                          <Sparkles className="h-3.5 w-3.5 text-primary" />
+                          {t('dashboard.generateBirthdayMessage')}
+                        </Button>
                         <StageBadge stage={contact.stage} />
                       </div>
                     </div>
@@ -449,6 +475,12 @@ export function DashboardHome() {
           </CardContent>
         </Card>
       )}
+
+      <BirthdayMessageDialog
+        open={birthdayDialogContact !== null}
+        contact={birthdayDialogContact}
+        onClose={() => setBirthdayDialogContact(null)}
+      />
     </div>
   )
 }
