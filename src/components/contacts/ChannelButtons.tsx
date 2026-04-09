@@ -12,35 +12,48 @@ interface ChannelButtonsProps {
 export function ChannelButtons({ contact, size = 'default', className }: ChannelButtonsProps) {
   const iconSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4'
   const btnSize = size === 'sm' ? 'p-1' : 'p-1.5'
+  const whatsappValue = contact.whatsapp?.trim() || null
+
+  const buildWhatsAppHref = (value: string | null) => {
+    if (!value) return null
+
+    const normalized = value.trim()
+    const digits = normalized.replace(/\D/g, '')
+
+    if (digits) return `https://wa.me/${digits}`
+    if (/^https?:\/\//i.test(normalized)) return normalized
+
+    return `https://wa.me/${normalized.replace(/^@/, '')}`
+  }
 
   const channels = [
-    {
-      key: 'whatsapp',
-      icon: SiWhatsapp,
-      href: contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace(/\D/g, '')}` : null,
-      label: 'WhatsApp',
-      color: 'hover:text-green-600 dark:hover:text-green-400',
-    },
     {
       key: 'phone',
       icon: Phone,
       href: contact.phone ? `tel:${contact.phone}` : null,
       label: 'Telefon',
-      color: 'hover:text-blue-600 dark:hover:text-blue-400',
+      color: 'hover:bg-primary hover:text-primary-foreground',
     },
     {
-      key: 'email',
-      icon: Mail,
-      href: contact.email ? `mailto:${contact.email}` : null,
-      label: 'Email',
-      color: 'hover:text-purple-600 dark:hover:text-purple-400',
+      key: 'whatsapp',
+      icon: SiWhatsapp,
+      href: buildWhatsAppHref(whatsappValue),
+      label: 'WhatsApp',
+      color: 'text-[#25D366] hover:bg-[#25D366] hover:text-white',
     },
     {
       key: 'telegram',
       icon: SiTelegram,
       href: contact.telegram ? `https://t.me/${contact.telegram.replace('@', '')}` : null,
       label: 'Telegram',
-      color: 'hover:text-sky-600 dark:hover:text-sky-400',
+      color: 'hover:bg-sky-500 hover:text-white',
+    },
+    {
+      key: 'email',
+      icon: Mail,
+      href: contact.email ? `mailto:${contact.email}` : null,
+      label: 'Email',
+      color: 'hover:bg-violet-500 hover:text-white',
     },
     {
       key: 'instagram',
@@ -49,7 +62,7 @@ export function ChannelButtons({ contact, size = 'default', className }: Channel
         ? `https://instagram.com/${contact.instagram.replace('@', '')}`
         : null,
       label: 'Instagram',
-      color: 'hover:text-pink-600 dark:hover:text-pink-400',
+      color: 'hover:bg-pink-500 hover:text-white',
     },
   ]
 
