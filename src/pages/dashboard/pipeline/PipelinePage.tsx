@@ -5,10 +5,13 @@ import { LayoutGrid, List, Settings2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-import { usePipelineStages, useDeals } from '@/hooks/usePipeline'
-import type { StageWithDeals } from '@/lib/pipeline/types'
-import { KanbanBoard } from '@/components/pipeline/KanbanBoard'
-import { PipelineTableView } from './PipelineTableView'
+import { usePipelineStages, useDeals, useCreateDeal, useMoveDeal } from '@/hooks/usePipeline'
+import { useAppointments, useFollowUps } from '@/hooks/useCalendar'
+import { useContacts } from '@/hooks/useContacts'
+import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
+import { slugifyStageLabel } from '@/lib/pipeline/stageLabels'
+import { ContactKanbanBoard, type ContactProcessRecord } from '@/components/pipeline/ContactKanbanBoard'
+import { ContactTableView } from './ContactTableView'
 import { ManageStagesModal } from './modals/ManageStagesModal'
 
 type ViewMode = 'kanban' | 'table'
@@ -30,29 +33,86 @@ export function PipelinePage() {
 
   const { data: stages = [], isLoading: stagesLoading } = usePipelineStages(userId)
   const { data: deals = [], isLoading: dealsLoading } = useDeals(userId, { status: 'open' })
-  const isLoading = stagesLoading || dealsLoading
+  const { data: contactsResult, isLoading: contactsLoading } = useContacts({
+    userId,
+    filters: DEFAULT_FILTERS,
+    sort: DEFAULT_SORT,
+    page: 1,
+    pageSize: 1000,
+  })
+  const { data: appointments = [], isLoading: appointmentsLoading } = useAppointments(userId)
+  const { data: followUps = [], isLoading: followUpsLoading } = useFollowUps(userId, 'pending')
+  const createDeal = useCreateDeal(userId)
+  const moveDeal = useMoveDeal(userId)
 
-  const stagesWithDeals: StageWithDeals[] = stages
-    .filter((stage) => !stage.is_lost_stage)
-    .map((stage) => {
-      const stageDeals = deals
-        .filter((deal) => deal.stage_id === stage.id)
-        .sort((a, b) => a.position_in_stage - b.position_in_stage)
+  const contacts = contactsResult?.data ?? []
+  const isLoading = stagesLoading || dealsLoading || contactsLoading || appointmentsLoading || followUpsLoading
+
+  const contactCount = contacts.length
+  const subtitle = `${contactCount} ${t(contactCount === 1 ? 'pipeline.contactSingular' : 'pipeline.contactPlural')}`
+
+  const processRecords = useMemo<ContactProcessRecord[]>(() => {
+    const stageIds = new Set(stages.map((stage) => stage.id))
+    const stageIdBySlug = new Map(stages.map((stage) => [stage.slug, stage.id]))
+    const openDealByContact = new Map<string, (typeof deals)[number]>()
+
+    for (const deal of deals) {
+      if (!openDealByContact.has(deal.contact_id)) {
+        openDealByContact.set(deal.contact_id, deal)
+      }
+    }
+
+    const fallbackStageId = stages[0]?.id ?? ''
+
+    return contacts.map((contact) => {
+      const openDeal = openDealByContact.get(contact.id) ?? null
+      const matchedFallbackStageId = stageIdBySlug.get(contact.stage)
+      const currentStageId =
+        openDeal && stageIds.has(openDeal.stage_id)
+          ? openDeal.stage_id
+          : matchedFallbackStageId || fallbackStageId
 
       return {
-        ...stage,
-        deals: stageDeals,
-        totalValue: stageDeals.reduce((sum, deal) => sum + deal.value, 0),
-        weightedValue: stageDeals.reduce((sum, deal) => sum + (deal.value * deal.probability) / 100, 0),
+        contact,
+        dealId: openDeal?.id ?? null,
+        stageId: currentStageId,
       }
     })
+  }, [contacts, deals, stages])
 
-  const uniqueContactCount = useMemo(
-    () => new Set(deals.map((deal) => deal.contact_id)).size,
-    [deals]
-  )
+  const handleMoveContact = async (contactId: string, targetStageId: string) => {
+    const record = processRecords.find((item) => item.contact.id === contactId)
+    const targetStage = stages.find((stage) => stage.id === targetStageId)
 
-  const subtitle = `${uniqueContactCount} ${t(uniqueContactCount === 1 ? 'pipeline.contactSingular' : 'pipeline.contactPlural')}`
+    if (!record || !targetStage) return
+
+    const nextPosition = processRecords.filter((item) => item.stageId === targetStageId).length
+
+    if (record.dealId) {
+      await moveDeal.mutateAsync({
+        dealId: record.dealId,
+        stageId: targetStageId,
+        position: nextPosition,
+      })
+      return
+    }
+
+    await createDeal.mutateAsync({
+      user_id: userId,
+      contact_id: record.contact.id,
+      stage_id: targetStageId,
+      title: record.contact.full_name,
+      deal_type: 'prospect',
+      value: 0,
+      probability: targetStage.win_probability ?? 50,
+      position_in_stage: nextPosition,
+      notes: JSON.stringify({
+        autoProcessCard: true,
+        sourceStage: record.contact.stage,
+        targetStageSlug: slugifyStageLabel(targetStage.name),
+      }),
+    })
+  }
 
   return (
     <div className="flex h-full min-h-0 flex-col space-y-4 p-6 pb-20 lg:pb-6">
@@ -104,10 +164,19 @@ export function PipelinePage() {
         <div className="flex-1 min-h-0 overflow-hidden">
           {view === 'kanban' ? (
             <div className="h-full overflow-x-auto">
-              <KanbanBoard stages={stagesWithDeals} userId={userId} />
+              <ContactKanbanBoard
+                stages={stages}
+                records={processRecords}
+                onMove={handleMoveContact}
+              />
             </div>
           ) : (
-            <PipelineTableView deals={deals} stages={stages} />
+            <ContactTableView
+              records={processRecords}
+              stages={stages}
+              appointments={appointments}
+              followUps={followUps}
+            />
           )}
         </div>
       )}

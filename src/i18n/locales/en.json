@@ -356,6 +356,15 @@
     "deals": "deals",
     "dealsMode": "Deals",
     "stageHistory": "Stage History",
+    "columns": {
+      "contactPerson": "Contact Person",
+      "channels": "Channels",
+      "stage": "Stage",
+      "warmth": "Warmth",
+      "appointmentDate": "Appointment Date",
+      "followUpDate": "Follow-up Date",
+      "lastContact": "Last Contact"
+    },
     "views": {
       "overview": "Overview",
       "kanban": "People Processes",

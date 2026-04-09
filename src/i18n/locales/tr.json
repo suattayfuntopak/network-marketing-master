@@ -356,6 +356,15 @@
     "deals": "aksiyon",
     "dealsMode": "Aksiyonlar",
     "stageHistory": "Aşama Geçmişi",
+    "columns": {
+      "contactPerson": "Kontak Kişi",
+      "channels": "Kanallar",
+      "stage": "Aşama",
+      "warmth": "Sıcaklık",
+      "appointmentDate": "Randevu Tarihi",
+      "followUpDate": "Takip Tarihi",
+      "lastContact": "Son Temas"
+    },
     "views": {
       "overview": "Genel Bakış",
       "kanban": "Kişi Süreçleri",

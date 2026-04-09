@@ -74,14 +74,12 @@ function SortableStageRow({
         >
           <Pencil className="w-3.5 h-3.5" />
         </button>
-        {!stage.is_system && (
-          <button
-            onClick={() => onDelete(stage.id)}
-            className="p-1 text-muted-foreground hover:text-red-500 rounded transition-colors"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
+        <button
+          onClick={() => onDelete(stage.id)}
+          className="p-1 text-muted-foreground hover:text-red-500 rounded transition-colors"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
       </div>
     </div>
   )

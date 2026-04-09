@@ -1,219 +1,180 @@
-import { useState, useCallback } from 'react'
-import {
-  DndContext, DragOverlay, PointerSensor, TouchSensor,
-  useSensor, useSensors, type DragStartEvent, type DragEndEvent, closestCenter,
-} from '@dnd-kit/core'
-import { useDroppable } from '@dnd-kit/core'
-import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import { StageBadge } from '@/components/contacts/StageBadge'
-import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
-import { useUpdateContactStageById } from '@/hooks/useContact'
 import { ROUTES } from '@/lib/constants'
+import { STAGE_COLOR_CLASSES } from '@/lib/pipeline/constants'
+import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import type { ContactWithTags } from '@/lib/contacts/types'
-import type { Contact } from '@/types/database'
+import type { PipelineStage } from '@/lib/pipeline/types'
 
-const CONTACT_STAGES = ['new', 'contacted', 'interested', 'presenting', 'thinking', 'joined', 'lost'] as const
-
-const STAGE_HEADER_COLORS: Record<string, string> = {
-  new: 'border-t-gray-400 bg-gray-50 dark:bg-gray-900/30',
-  contacted: 'border-t-blue-500 bg-blue-50 dark:bg-blue-950/30',
-  interested: 'border-t-purple-500 bg-purple-50 dark:bg-purple-950/30',
-  presenting: 'border-t-amber-500 bg-amber-50 dark:bg-amber-950/30',
-  thinking: 'border-t-orange-500 bg-orange-50 dark:bg-orange-950/30',
-  joined: 'border-t-emerald-500 bg-emerald-50 dark:bg-emerald-950/30',
-  lost: 'border-t-red-500 bg-red-50 dark:bg-red-950/30',
-}
-
-interface ContactCardProps {
+export interface ContactProcessRecord {
   contact: ContactWithTags
-  isDragging?: boolean
+  dealId: string | null
+  stageId: string
 }
 
-function ContactCard({ contact, isDragging }: ContactCardProps) {
+interface ContactKanbanBoardProps {
+  stages: PipelineStage[]
+  records: ContactProcessRecord[]
+  onMove: (contactId: string, targetStageId: string) => Promise<void>
+}
+
+function ContactCard({
+  record,
+  isDragging,
+  onDragStart,
+  onDragEnd,
+}: {
+  record: ContactProcessRecord
+  isDragging: boolean
+  onDragStart: (contactId: string) => void
+  onDragEnd: () => void
+}) {
   const navigate = useNavigate()
-  const initials = contact.full_name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()
+  const initials = record.contact.full_name
+    .split(' ')
+    .map((name) => name[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
 
   return (
     <div
+      draggable
+      onDragStart={(event) => {
+        event.dataTransfer.setData('text/plain', record.contact.id)
+        event.dataTransfer.effectAllowed = 'move'
+        onDragStart(record.contact.id)
+      }}
+      onDragEnd={onDragEnd}
+      onClick={() => navigate(`${ROUTES.CONTACTS}/${record.contact.id}`)}
       className={cn(
-        'bg-card border rounded-md p-2.5 space-y-1.5 text-sm cursor-pointer hover:border-primary/40 transition-colors',
-        isDragging && 'opacity-50 shadow-lg'
+        'cursor-grab rounded-xl border bg-card p-3 select-none transition-all active:cursor-grabbing',
+        'hover:border-primary/40 hover:shadow-sm',
+        isDragging && 'opacity-50 shadow-lg ring-2 ring-primary/30'
       )}
-      onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
     >
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary shrink-0">
           {initials}
         </div>
-        <p className="font-medium truncate flex-1 text-xs">{contact.full_name}</p>
-      </div>
-      {contact.occupation && (
-        <p className="text-xs text-muted-foreground truncate">{contact.occupation}</p>
-      )}
-      <div className="flex items-center gap-1.5">
-        <WarmthScoreBadge score={contact.warmth_score} />
+        <p className="truncate text-sm font-semibold">{record.contact.full_name}</p>
       </div>
     </div>
   )
 }
 
-function SortableContactCard({ contact }: { contact: ContactWithTags }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: contact.id })
-  const style = { transform: CSS.Transform.toString(transform), transition }
-  return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ContactCard contact={contact} isDragging={isDragging} />
-    </div>
-  )
-}
-
-interface ColumnProps {
-  stage: string
-  contacts: ContactWithTags[]
-  isOver: boolean
-}
-
-function ContactKanbanColumn({ stage, contacts, isOver }: ColumnProps) {
+export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoardProps) {
   const { t } = useTranslation()
-  const { setNodeRef } = useDroppable({ id: stage })
+  const [activeContactId, setActiveContactId] = useState<string | null>(null)
+  const [hoveredStageId, setHoveredStageId] = useState<string | null>(null)
+  const [localRecords, setLocalRecords] = useState(records)
 
-  return (
-    <div className="flex flex-col w-[200px] shrink-0">
-      <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', STAGE_HEADER_COLORS[stage] ?? 'border-t-gray-400 bg-muted')}>
-        <div className="flex items-center justify-between gap-2">
-          <StageBadge stage={stage as Contact['stage']} />
-          <span className="text-xs font-semibold text-muted-foreground">{contacts.length}</span>
-        </div>
-      </div>
+  useEffect(() => {
+    if (!activeContactId) {
+      setLocalRecords(records)
+    }
+  }, [records, activeContactId])
 
-      <div
-        ref={setNodeRef}
-        className={cn(
-          'flex-1 min-h-[120px] rounded-b-lg border border-t-0 p-2 space-y-2 overflow-y-auto bg-muted/20 transition-colors',
-          isOver && 'bg-primary/5 border-primary/30'
-        )}
-      >
-        <SortableContext items={contacts.map(c => c.id)} strategy={verticalListSortingStrategy}>
-          {contacts.map(contact => (
-            <SortableContactCard key={contact.id} contact={contact} />
-          ))}
-        </SortableContext>
-        {contacts.length === 0 && (
-          <p className="text-xs text-muted-foreground text-center py-4">{t('pipeline.emptyColumn')}</p>
-        )}
-      </div>
-    </div>
-  )
-}
+  const groupedRecords = useMemo(() => {
+    return stages.reduce<Record<string, ContactProcessRecord[]>>((acc, stage) => {
+      acc[stage.id] = localRecords
+        .filter((record) => record.stageId === stage.id)
+        .sort((a, b) => a.contact.full_name.localeCompare(b.contact.full_name, 'tr'))
+      return acc
+    }, {})
+  }, [localRecords, stages])
 
-interface Props {
-  contacts: ContactWithTags[]
-  userId: string
-}
-
-export function ContactKanbanBoard({ contacts, userId }: Props) {
-  const updateStage = useUpdateContactStageById(userId)
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const [overStage, setOverStage] = useState<string | null>(null)
-
-  // Build stage → contacts map with optimistic state
-  const [optimisticContacts, setOptimisticContacts] = useState(contacts)
-
-  // Sync when props change (not during drag)
-  if (activeId === null) {
-    const propsKey = contacts.map(c => c.id + c.stage).join()
-    const optKey = optimisticContacts.map(c => c.id + c.stage).join()
-    if (propsKey !== optKey) setOptimisticContacts(contacts)
-  }
-
-  const grouped = CONTACT_STAGES.reduce((acc, stage) => {
-    acc[stage] = optimisticContacts.filter(c => c.stage === stage)
-    return acc
-  }, {} as Record<string, ContactWithTags[]>)
-
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
-  )
-
-  const activeContact = optimisticContacts.find(c => c.id === activeId) ?? null
-
-  const findStageForContact = useCallback((id: string) => {
-    return CONTACT_STAGES.find(stage => grouped[stage]?.some(c => c.id === id))
-  }, [grouped])
-
-  const [startStage, setStartStage] = useState<string | null>(null)
-
-  const handleDragStart = ({ active }: DragStartEvent) => {
-    setActiveId(active.id as string)
-    setStartStage(findStageForContact(active.id as string) ?? null)
-  }
-
-  const handleDragOver = ({ active, over }: any) => {
-    if (!over) {
-      setOverStage(null)
+  const handleDrop = async (contactId: string, targetStageId: string) => {
+    const currentRecord = localRecords.find((record) => record.contact.id === contactId)
+    if (!currentRecord || currentRecord.stageId === targetStageId) {
+      setActiveContactId(null)
+      setHoveredStageId(null)
       return
     }
-    const contactId = active.id as string
-    const overId = over.id as string
 
-    const currentStage = findStageForContact(contactId) ?? ''
-    const newStage = CONTACT_STAGES.includes(overId as any)
-      ? overId
-      : findStageForContact(overId) ?? currentStage
+    const previousRecords = localRecords
 
-    setOverStage(newStage)
-
-    if (newStage && newStage !== currentStage) {
-      setOptimisticContacts(prev =>
-        prev.map(c => c.id === contactId ? { ...c, stage: newStage as Contact['stage'] } : c)
+    setLocalRecords((current) =>
+      current.map((record) =>
+        record.contact.id === contactId ? { ...record, stageId: targetStageId } : record
       )
+    )
+    setActiveContactId(null)
+    setHoveredStageId(null)
+
+    try {
+      await onMove(contactId, targetStageId)
+    } catch {
+      setLocalRecords(previousRecords)
+      toast.error(t('pipeline.dragError'))
     }
   }
 
-  const handleDragEnd = ({ active }: DragEndEvent) => {
-    setActiveId(null)
-    setOverStage(null)
-    
-    const contactId = active.id as string
-    const newStage = findStageForContact(contactId) ?? ''
-    const oldStage = startStage ?? ''
-
-    if (!newStage || newStage === oldStage) return
-
-    updateStage.mutate({ contactId, newStage: newStage as Contact['stage'], oldStage: oldStage as Contact['stage'] }, {
-      onError: () => {
-        // Revert on error
-        setOptimisticContacts(contacts)
-      },
-    })
-  }
-
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDragEnd={handleDragEnd}
-    >
-      <div className="flex gap-3 overflow-x-auto pb-4 min-h-0 h-full">
-        {CONTACT_STAGES.map(stage => (
-          <ContactKanbanColumn
-            key={stage}
-            stage={stage}
-            contacts={grouped[stage] ?? []}
-            isOver={overStage === stage}
-          />
-        ))}
-      </div>
-      <DragOverlay>
-        {activeContact && <ContactCard contact={activeContact} />}
-      </DragOverlay>
-    </DndContext>
+    <div className="flex h-full min-h-0 gap-4 overflow-x-auto pb-4">
+      {stages.map((stage) => {
+        const colors = STAGE_COLOR_CLASSES[stage.color]
+        const stageRecords = groupedRecords[stage.id] ?? []
+
+        return (
+          <div key={stage.id} className="flex min-h-full w-[280px] shrink-0 flex-col">
+            <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', colors.border, colors.bg)}>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className={cn('truncate text-sm font-semibold', colors.text)}>
+                  {resolveStageLabel(stage, t)}
+                </h3>
+                <span className={cn('shrink-0 rounded-full px-1.5 py-0.5 text-xs font-medium', colors.badge)}>
+                  {stageRecords.length}
+                </span>
+              </div>
+            </div>
+
+            <div
+              onDragOver={(event) => {
+                event.preventDefault()
+                event.dataTransfer.dropEffect = 'move'
+                setHoveredStageId(stage.id)
+              }}
+              onDragLeave={() => {
+                if (hoveredStageId === stage.id) setHoveredStageId(null)
+              }}
+              onDrop={(event) => {
+                event.preventDefault()
+                const contactId = event.dataTransfer.getData('text/plain')
+                void handleDrop(contactId, stage.id)
+              }}
+              className={cn(
+                'flex min-h-[calc(100vh-15rem)] flex-1 flex-col rounded-b-lg border border-t-0 bg-muted/30 p-3 transition-colors',
+                hoveredStageId === stage.id && 'border-primary/30 bg-primary/5'
+              )}
+            >
+              {stageRecords.length > 0 ? (
+                <div className="space-y-3">
+                  {stageRecords.map((record) => (
+                    <ContactCard
+                      key={record.contact.id}
+                      record={record}
+                      isDragging={activeContactId === record.contact.id}
+                      onDragStart={setActiveContactId}
+                      onDragEnd={() => {
+                        setActiveContactId(null)
+                        setHoveredStageId(null)
+                      }}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-1 items-center justify-center px-2 text-center text-xs text-muted-foreground/60">
+                  {t('pipeline.emptyColumn')}
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
   )
 }
