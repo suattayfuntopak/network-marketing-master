@@ -199,7 +199,47 @@
       "aiDescription": "Based on this person's profile and your communication history, you can get instant guidance from the AI assistant on what kind of message to send or what your next step should be.",
       "aiAction": "Get AI Suggestion",
       "aiPlaceholder": "AI-powered suggestions will appear here in Phase 4.",
-      "info": "Info"
+      "info": "Info",
+      "coach": {
+        "label": "Micro Coaching",
+        "nowLabel": "Best Move Right Now",
+        "messageLabel": "Recommended Message",
+        "objectionLabel": "Likely Hesitation",
+        "messageAction": "Prepare Message",
+        "objectionAction": "Open Objection Bank",
+        "cues": {
+          "follow_up": {
+            "title": "Re-open the conversation softly",
+            "body": "The need here is not more pressure, but visible rhythm. A short reminder and one small question usually works better.",
+            "objectionHint": "Likely hesitation: delay, avoidance, or being busy.",
+            "pipeline": "Now: send a short, low-pressure follow-up"
+          },
+          "invite": {
+            "title": "Turn first contact into curiosity",
+            "body": "This is not the moment for a long explanation. A natural opening, a curiosity hook, and a low-pressure invite will land better.",
+            "objectionHint": "Likely hesitation: time resistance or early defensiveness.",
+            "pipeline": "Now: open with a short invite or first-touch message"
+          },
+          "decision": {
+            "title": "Clarify the next step",
+            "body": "There is interest here, but progress is not fully clear. Instead of pushing for a decision, suggest one next step that lowers friction.",
+            "objectionHint": "Likely hesitation: budget or decision weight.",
+            "pipeline": "Now: make the next step clearer and lighter"
+          },
+          "objection": {
+            "title": "Turn hesitation into dialogue",
+            "body": "This person may be looking for safety before movement. Lower the pressure first, validate the concern, and leave a small opening.",
+            "objectionHint": "Likely hesitation: trust, doubt, or needing time to think.",
+            "pipeline": "Now: soften the objection and keep the dialogue open"
+          },
+          "onboarding": {
+            "title": "Build the first rhythm together",
+            "body": "At this stage motivation alone is not enough. Short direction, a small target, and early contact help a new person stay in motion.",
+            "objectionHint": "Likely hesitation: low confidence or not knowing what to do next.",
+            "pipeline": "Now: set the first action and rhythm together"
+          }
+        }
+      }
     },
     "interaction": {
       "add": "Add Interaction",
@@ -350,6 +390,9 @@
     "contactSingular": "Contact",
     "contactPlural": "Contacts",
     "dragError": "The card could not be moved to the new stage. Please try again.",
+    "coach": {
+      "label": "Next Move"
+    },
     "totalValue": "Total Value",
     "weightedValue": "Weighted Value",
     "noDeals": "No deals yet",

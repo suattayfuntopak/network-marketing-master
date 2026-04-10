@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { tr, enUS } from 'date-fns/locale'
@@ -32,7 +32,7 @@ import { useInteractions, useAddInteraction } from '@/hooks/useInteractions'
 import { useTags, useCreateTag } from '@/hooks/useTags'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
-import { STAGE_LABELS } from '@/lib/contacts/constants'
+import { buildContactCoachCue } from '@/lib/contacts/contactCoach'
 import type { InteractionType } from '@/lib/contacts/types'
 import { useContactFollowUps, useContactAppointments, useCreateFollowUp } from '@/hooks/useCalendar'
 import { QUICK_FOLLOW_UP_OFFSETS } from '@/lib/calendar/constants'
@@ -40,6 +40,8 @@ import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { NewAppointmentModal } from '@/components/calendar/modals/NewAppointmentModal'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { addDays, format as fmtDate2 } from 'date-fns'
+import { usePipelineStages } from '@/hooks/usePipeline'
+import { getSyncedPipelineStages, resolveStageLabel } from '@/lib/pipeline/stageLabels'
 
 const INTERACTION_TYPE_KEYS: InteractionType[] = [
   'call', 'whatsapp', 'telegram', 'meeting', 'presentation', 'objection', 'email', 'sms', 'note',
@@ -55,6 +57,7 @@ export function ContactDetailPage() {
   const { t, i18n } = useTranslation()
   const { data: interactions = [], isLoading: loadingInteractions } = useInteractions(id)
   const { data: allTags = [] } = useTags(userId)
+  const { data: pipelineStages = [] } = usePipelineStages(userId)
 
   const updateStageMutation = useUpdateContactStage(id ?? '', userId)
   const archiveMutation = useArchiveContact()
@@ -109,6 +112,13 @@ export function ContactDetailPage() {
     .slice(0, 2)
     .join('')
     .toUpperCase()
+
+  const syncedStages = getSyncedPipelineStages(pipelineStages)
+  const currentSyncedStage = syncedStages.find((stage) => stage.contactStageKey === contact.stage) ?? null
+  const currentStageLabel = currentSyncedStage
+    ? resolveStageLabel(currentSyncedStage, t)
+    : t(`contactStages.${contact.stage}`, { defaultValue: contact.stage })
+  const coachCue = useMemo(() => buildContactCoachCue(contact), [contact])
 
   const handleStageChange = async (newStage: string | null) => {
     if (!newStage || newStage === contact.stage) return
@@ -263,7 +273,13 @@ export function ContactDetailPage() {
 
             {/* Stage */}
             <div className="flex items-center justify-center gap-2">
-              <StageBadge stage={contact.stage} />
+              {currentSyncedStage ? (
+                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary">
+                  {currentStageLabel}
+                </span>
+              ) : (
+                <StageBadge stage={contact.stage} />
+              )}
             </div>
 
             {/* Channel buttons */}
@@ -288,13 +304,13 @@ export function ContactDetailPage() {
             <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.changeStage')}</p>
             <Select value={contact.stage} onValueChange={handleStageChange}>
               <SelectTrigger className="w-full">
-                <SelectValue>
-                  {t(`contactStages.${contact.stage}`, { defaultValue: contact.stage })}
-                </SelectValue>
+                <SelectValue>{currentStageLabel}</SelectValue>
               </SelectTrigger>
               <SelectContent>
-                {Object.keys(STAGE_LABELS).map((key) => (
-                  <SelectItem key={key} value={key}>{t(`contactStages.${key}`)}</SelectItem>
+                {syncedStages.map((stage) => (
+                  <SelectItem key={stage.id} value={stage.contactStageKey}>
+                    {resolveStageLabel(stage, t)}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -513,23 +529,69 @@ export function ContactDetailPage() {
           </div>
 
           {/* AI Assistant */}
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-4">
             <div className="flex items-center gap-2">
-               <Sparkles className="w-4 h-4 text-primary" />
-               <p className="text-sm font-semibold text-primary">{t('contacts.detail.aiSuggestions')}</p>
+              <Sparkles className="w-4 h-4 text-primary" />
+              <p className="text-sm font-semibold text-primary">{t('contacts.detail.coach.label')}</p>
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('contacts.detail.aiDescription')}
-            </p>
-            <Button
-              size="sm"
-              onClick={() => setShowAIModal(true)}
-              className="w-full gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
-              variant="outline"
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              {t('contacts.detail.aiAction')}
-            </Button>
+
+            <div className="rounded-2xl border border-primary/15 bg-background/80 p-4">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary/80">
+                {t('contacts.detail.coach.nowLabel')}
+              </p>
+              <p className="mt-2 text-sm font-semibold">
+                {t(`contacts.detail.coach.cues.${coachCue.key}.title`)}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t(`contacts.detail.coach.cues.${coachCue.key}.body`)}
+              </p>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/70 bg-card/70 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t('contacts.detail.coach.messageLabel')}
+                </p>
+                <p className="mt-2 text-sm text-foreground">
+                  {t(`messages.categories.${coachCue.messageCategory}`)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t(`messages.tones.${coachCue.tone}`)}
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-card/70 p-3">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t('contacts.detail.coach.objectionLabel')}
+                </p>
+                <p className="mt-2 text-sm text-foreground">
+                  {t(`academy.objection.objCategories.${coachCue.objectionCategory}`)}
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {t(`contacts.detail.coach.cues.${coachCue.key}.objectionHint`)}
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-2 sm:grid-cols-2">
+              <Button
+                size="sm"
+                onClick={() => setShowAIModal(true)}
+                className="w-full gap-1.5 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20"
+                variant="outline"
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                {t('contacts.detail.coach.messageAction')}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate(`${ROUTES.ACADEMY}/itirazlar`)}
+                className="w-full gap-1.5"
+              >
+                {t('contacts.detail.coach.objectionAction')}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -553,6 +615,11 @@ export function ContactDetailPage() {
         open={showAIModal}
         onClose={() => setShowAIModal(false)}
         contact={contact}
+        initialCategory={coachCue.messageCategory}
+        initialTone={coachCue.tone}
+        initialChannel="whatsapp"
+        presetLabel={t(`contacts.detail.coach.cues.${coachCue.key}.title`)}
+        presetReason={t(`contacts.detail.coach.cues.${coachCue.key}.body`)}
       />
 
       {/* Add Interaction Modal */}

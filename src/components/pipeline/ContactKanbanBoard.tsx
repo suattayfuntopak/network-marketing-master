@@ -20,6 +20,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { cn } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
+import { buildContactCoachCue } from '@/lib/contacts/contactCoach'
 import { STAGE_COLOR_CLASSES } from '@/lib/pipeline/constants'
 import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import type { ContactWithTags } from '@/lib/contacts/types'
@@ -109,6 +110,7 @@ function ContactCard({
 }) {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const coachCue = buildContactCoachCue(record.contact)
 
   return (
     <div
@@ -169,6 +171,15 @@ function ContactCard({
             {record.contact.tags.length} {t('contacts.fields.tags')}
           </span>
         ) : null}
+      </div>
+
+      <div className="mt-3 border-t border-border/60 pt-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          {t('pipeline.coach.label')}
+        </p>
+        <p className="mt-1 text-xs leading-5 text-muted-foreground">
+          {t(`contacts.detail.coach.cues.${coachCue.key}.pipeline`)}
+        </p>
       </div>
     </div>
   )

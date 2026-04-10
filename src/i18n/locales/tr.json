@@ -199,7 +199,47 @@
       "aiDescription": "Bu kişinin profiline ve iletişim geçmişinize dayanarak, nasıl bir mesaj atmanız veya bir sonraki adımda ne yapmanız gerektiği konusunda AI asistanından anında tavsiye alabilirsiniz.",
       "aiAction": "AI Önerisi Al",
       "aiPlaceholder": "Faz 4'te AI destekli öneriler burada görünecek.",
-      "info": "Bilgiler"
+      "info": "Bilgiler",
+      "coach": {
+        "label": "Mikro Koçluk",
+        "nowLabel": "Şimdi Ne Yapmalı",
+        "messageLabel": "Önerilen Mesaj",
+        "objectionLabel": "Yakın Çekince",
+        "messageAction": "Mesajı Hazırla",
+        "objectionAction": "İtiraz Bankasına Git",
+        "cues": {
+          "follow_up": {
+            "title": "Konuşmayı yumuşak şekilde yeniden aç",
+            "body": "Bu kişide asıl ihtiyaç baskı kurmak değil, ritmi kaybetmeden tekrar görünmek. Kısa bir hatırlatma ve tek küçük soru iyi çalışır.",
+            "objectionHint": "Muhtemel çekince: bekleme, erteleme veya meşguliyet.",
+            "pipeline": "Şimdi: kısa ve baskısız bir takip mesajı"
+          },
+          "invite": {
+            "title": "İlk teması meraka çevir",
+            "body": "Burada amaç uzun anlatım değil. Doğal bir giriş, merak uyandıran kısa bir cümle ve düşük baskılı davet daha doğru olur.",
+            "objectionHint": "Muhtemel çekince: zaman ayıramama veya erken savunma.",
+            "pipeline": "Şimdi: kısa bir davet veya ilk temas açılışı"
+          },
+          "decision": {
+            "title": "Sonraki adımı netleştir",
+            "body": "İlgi var ama ilerleme net değil. Kararı zorlamak yerine sürtünmeyi azaltan tek bir sonraki adım önermek daha etkili olur.",
+            "objectionHint": "Muhtemel çekince: bütçe veya karar yükü.",
+            "pipeline": "Şimdi: tek bir sonraki adımı netleştir"
+          },
+          "objection": {
+            "title": "Çekinceden diyaloğa dön",
+            "body": "Bu kişi karar yerine güvenlik arıyor olabilir. Önce baskıyı düşür, çekinceyi kabul et ve sonra küçük bir açıklık bırak.",
+            "objectionHint": "Muhtemel çekince: güven, şüphe veya düşünme ihtiyacı.",
+            "pipeline": "Şimdi: itirazı yumuşatıp diyaloğu açık tut"
+          },
+          "onboarding": {
+            "title": "İlk ritmi birlikte kur",
+            "body": "Bu aşamada motivasyon tek başına yetmez. Kısa yönlendirme, küçük hedef ve erken temas yeni kişinin oyunda kalmasını sağlar.",
+            "objectionHint": "Muhtemel çekince: özgüven eksikliği veya ne yapacağını bilememe.",
+            "pipeline": "Şimdi: ilk aksiyonu ve ritmi birlikte kur"
+          }
+        }
+      }
     },
     "interaction": {
       "add": "Etkileşim Ekle",
@@ -350,6 +390,9 @@
     "contactSingular": "Kontak",
     "contactPlural": "Kontak",
     "dragError": "Kart yeni aşamaya taşınamadı. Lütfen tekrar dene.",
+    "coach": {
+      "label": "Sıradaki Adım"
+    },
     "totalValue": "Toplam Değer",
     "weightedValue": "Ağırlıklı Değer",
     "noDeals": "Henüz aksiyon yok",
