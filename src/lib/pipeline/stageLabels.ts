@@ -1,6 +1,18 @@
 import i18n from '@/i18n'
 import type { PipelineStage } from './types'
 
+export const CONTACT_STAGE_KEYS = [
+  'new',
+  'contacted',
+  'interested',
+  'presenting',
+  'thinking',
+  'joined',
+  'lost',
+] as const
+
+export type ContactStageKey = (typeof CONTACT_STAGE_KEYS)[number]
+
 const BUILT_IN_STAGE_SLUGS = new Set([
   'new',
   'contacted',
@@ -14,6 +26,10 @@ const BUILT_IN_STAGE_SLUGS = new Set([
 export interface StageLabelConfig {
   trLabel?: string
   enLabel?: string
+}
+
+export interface SyncedPipelineStage extends PipelineStage {
+  contactStageKey: ContactStageKey
 }
 
 const LEGACY_STAGE_LABELS: Record<string, Required<StageLabelConfig>> = {
@@ -75,6 +91,23 @@ export function slugifyStageLabel(value: string): string {
 
 function getLegacyStageLabels(stage: Pick<PipelineStage, 'name' | 'slug'>): StageLabelConfig {
   return LEGACY_STAGE_LABELS[stage.slug] || LEGACY_STAGE_LABELS[slugifyStageLabel(stage.name)] || {}
+}
+
+export function getSyncedPipelineStages(stages: PipelineStage[]): SyncedPipelineStage[] {
+  return [...stages]
+    .sort((a, b) => a.position - b.position)
+    .slice(0, CONTACT_STAGE_KEYS.length)
+    .map((stage, index) => ({
+      ...stage,
+      contactStageKey: CONTACT_STAGE_KEYS[index],
+    }))
+}
+
+export function findSyncedStageByContactStage(
+  stages: PipelineStage[],
+  contactStage: string
+): SyncedPipelineStage | null {
+  return getSyncedPipelineStages(stages).find((stage) => stage.contactStageKey === contactStage) ?? null
 }
 
 export function getStageLabelConfig(stage: Pick<PipelineStage, 'name' | 'slug' | 'description'>): Required<StageLabelConfig> {

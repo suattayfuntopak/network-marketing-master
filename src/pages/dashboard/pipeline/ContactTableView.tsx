@@ -8,13 +8,13 @@ import { ROUTES } from '@/lib/constants'
 import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
 import { ChannelButtons } from '@/components/contacts/ChannelButtons'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
-import type { PipelineStage } from '@/lib/pipeline/types'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
 import type { ContactProcessRecord } from '@/components/pipeline/ContactKanbanBoard'
+import type { SyncedPipelineStage } from '@/lib/pipeline/stageLabels'
 
 interface Props {
   records: ContactProcessRecord[]
-  stages: PipelineStage[]
+  stages: SyncedPipelineStage[]
   appointments: AppointmentWithContact[]
   followUps: FollowUpWithContact[]
 }
@@ -25,7 +25,7 @@ export function ContactTableView({ records, stages, appointments, followUps }: P
   const locale = i18n.language?.startsWith('en') ? enUS : tr
 
   const stageMap = useMemo(
-    () => Object.fromEntries(stages.map((stage) => [stage.id, stage])),
+    () => Object.fromEntries(stages.map((stage) => [stage.contactStageKey, stage])),
     [stages]
   )
 
@@ -80,7 +80,7 @@ export function ContactTableView({ records, stages, appointments, followUps }: P
           ) : (
             records.map((record) => {
               const { contact } = record
-              const stage = stageMap[record.stageId]
+              const stage = stageMap[record.stageKey]
               const appointment = nextAppointmentByContact.get(contact.id)
               const followUp = nextFollowUpByContact.get(contact.id)
               const initials = contact.full_name
