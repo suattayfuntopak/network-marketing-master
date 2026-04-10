@@ -16,7 +16,7 @@ export function MobileNav() {
   const { t } = useTranslation()
 
   return (
-    <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/70 bg-background/90 backdrop-blur-xl lg:hidden">
       <ul className="flex">
         {mobileNavConfig.map(({ key, href, Icon }) => (
           <li key={href} className="flex-1">

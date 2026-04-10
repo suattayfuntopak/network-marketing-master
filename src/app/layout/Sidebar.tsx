@@ -7,7 +7,6 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
-import { useAuth } from '@/hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 
 const navConfig = [
@@ -17,25 +16,19 @@ const navConfig = [
   { key: 'calendar', href: ROUTES.CALENDAR, Icon: Calendar },
   { key: 'messages', href: ROUTES.MESSAGES, Icon: MessageSquare },
   { key: 'academy', href: ROUTES.ACADEMY, Icon: GraduationCap },
-  { key: 'team', href: ROUTES.TEAM, Icon: Users2, roles: ['leader', 'admin'] as string[] },
+  { key: 'team', href: ROUTES.TEAM, Icon: Users2 },
   { key: 'analytics', href: ROUTES.ANALYTICS, Icon: BarChart2 },
   { key: 'settings', href: ROUTES.SETTINGS, Icon: Settings },
 ]
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
-  const { profile } = useAuth()
   const { t } = useTranslation()
-
-  const navItems = navConfig.filter(item => {
-    if (!item.roles) return true
-    return item.roles.includes(profile?.role ?? 'distributor')
-  })
 
   return (
     <aside
       className={cn(
-        'hidden lg:flex flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border transition-all duration-300',
+        'hidden lg:flex flex-col border-r border-sidebar-border/80 bg-sidebar/85 text-sidebar-foreground shadow-[0_20px_60px_rgba(2,6,23,0.28)] backdrop-blur-xl transition-all duration-300',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
@@ -46,23 +39,23 @@ export function Sidebar() {
           <button
             onClick={() => setCollapsed(false)}
             title={t('nav.expand')}
-            className="flex items-center justify-center w-8 h-8 rounded-md mx-auto text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+            className="mx-auto flex h-8 w-8 items-center justify-center rounded-full border border-sidebar-border/80 bg-sidebar-accent/50 text-sidebar-foreground/60 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
         ) : (
           /* Expanded: logo left, toggle right, no overlap */
           <>
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground shrink-0">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-[0_0_24px_rgba(45,212,191,0.28)]">
               <Zap className="w-4 h-4" />
             </div>
-            <span className="font-bold text-xs leading-tight flex-1 min-w-0">
+            <span className="min-w-0 flex-1 text-xs font-bold leading-tight tracking-[0.02em]">
               Network Marketing Master
             </span>
             <button
               onClick={() => setCollapsed(true)}
               title={t('nav.collapse')}
-              className="flex items-center justify-center w-6 h-6 rounded-md shrink-0 text-sidebar-foreground/50 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-sidebar-border/80 text-sidebar-foreground/50 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -73,16 +66,16 @@ export function Sidebar() {
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2">
         <ul className="space-y-1">
-          {navItems.map(({ key, href, Icon }) => (
+          {navConfig.map(({ key, href, Icon }) => (
             <li key={href}>
               <NavLink
                 to={href}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                    'hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                    'flex items-center gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-medium transition-all',
+                    'hover:border-sidebar-border/70 hover:bg-sidebar-accent/80 hover:text-sidebar-accent-foreground',
                     isActive
-                      ? 'bg-sidebar-primary text-sidebar-primary-foreground'
+                      ? 'border-primary/25 bg-sidebar-primary/95 text-sidebar-primary-foreground shadow-[inset_0_0_22px_rgba(45,212,191,0.12),0_0_18px_rgba(45,212,191,0.12)]'
                       : 'text-sidebar-foreground/70',
                     collapsed && 'justify-center px-0 py-3'
                   )
@@ -100,7 +93,7 @@ export function Sidebar() {
       {/* Version footer */}
       <div className="p-3 border-t border-sidebar-border">
         <p className={cn(
-          'text-xs text-sidebar-foreground/40 text-center',
+          'text-center text-xs text-sidebar-foreground/40',
           collapsed && 'opacity-0'
         )}>
           NMM v1.0

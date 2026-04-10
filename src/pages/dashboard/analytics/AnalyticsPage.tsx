@@ -132,10 +132,18 @@ export function AnalyticsPage() {
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
                   <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
-                    contentStyle={{ fontSize: 12, borderRadius: 8 }}
+                    cursor={false}
+                    wrapperStyle={{ outline: 'none' }}
+                    contentStyle={{
+                      fontSize: 12,
+                      borderRadius: 12,
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(9, 14, 25, 0.88)',
+                      backdropFilter: 'blur(16px)',
+                    }}
                     formatter={(value) => [value, t('analytics.contacts')]}
                   />
-                  <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  <Bar dataKey="count" radius={[8, 8, 0, 0]} activeBar={false} animationDuration={550}>
                     {chartData.map((entry, index) => (
                       <Cell key={index} fill={entry.fill} />
                     ))}

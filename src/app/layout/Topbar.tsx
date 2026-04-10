@@ -57,17 +57,17 @@ export function Topbar() {
   )
 
   return (
-    <header className="h-16 border-b border-border flex items-center justify-between px-6 bg-background shrink-0">
+    <header className="flex h-16 shrink-0 items-center justify-between border-b border-border/70 bg-background/70 px-6 backdrop-blur-xl">
       <div className="text-sm text-muted-foreground">{today}</div>
 
       <div className="flex items-center gap-2">
         {/* Language switcher */}
-        <div className="flex items-center gap-0.5 rounded-lg border border-border p-0.5">
+        <div className="flex items-center gap-0.5 rounded-full border border-border/70 bg-card/70 p-0.5 shadow-[0_10px_30px_rgba(3,7,18,0.16)] backdrop-blur-xl">
           <button
             onClick={() => switchLang('tr')}
-            className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               currentLang === 'tr'
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(45,212,191,0.24)]'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
             title="Türkçe"
@@ -76,9 +76,9 @@ export function Topbar() {
           </button>
           <button
             onClick={() => switchLang('en')}
-            className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${
+            className={`rounded-full px-2.5 py-1 text-xs font-medium transition-colors ${
               currentLang === 'en'
-                ? 'bg-primary text-primary-foreground'
+                ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(45,212,191,0.24)]'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
             title="English"
@@ -93,16 +93,17 @@ export function Topbar() {
           size="icon"
           onClick={toggleTheme}
           title={t(theme === 'dark' ? 'theme.light' : 'theme.dark')}
+          className="rounded-full border border-transparent hover:border-border/70 hover:bg-card/70"
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </Button>
 
         {/* User menu */}
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-accent transition-colors outline-none">
+          <DropdownMenuTrigger className="flex items-center gap-2 rounded-full border border-transparent px-2 py-1.5 outline-none transition-colors hover:border-border/70 hover:bg-card/70">
             <Avatar className="w-8 h-8">
               <AvatarImage src={profile?.avatar_url ?? undefined} />
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs shadow-[0_0_18px_rgba(45,212,191,0.25)]">
                 {initials}
               </AvatarFallback>
             </Avatar>

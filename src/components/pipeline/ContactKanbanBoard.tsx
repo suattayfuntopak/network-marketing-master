@@ -36,6 +36,11 @@ interface ContactKanbanBoardProps {
   onMove: (contactId: string, targetStageKey: ContactStageKey) => Promise<void>
 }
 
+interface PendingMove {
+  contactId: string
+  targetStageKey: ContactStageKey
+}
+
 function getInitials(fullName: string) {
   return fullName
     .split(' ')
@@ -43,6 +48,48 @@ function getInitials(fullName: string) {
     .slice(0, 2)
     .join('')
     .toUpperCase()
+}
+
+function moveRecordToStageTop(
+  records: ContactProcessRecord[],
+  contactId: string,
+  targetStageKey: ContactStageKey
+) {
+  const movingRecord = records.find((record) => record.contact.id === contactId)
+  if (!movingRecord) return records
+
+  const remainingRecords = records.filter((record) => record.contact.id !== contactId)
+  const targetStageIndex = remainingRecords.findIndex((record) => record.stageKey === targetStageKey)
+  const movedRecord = { ...movingRecord, stageKey: targetStageKey }
+
+  if (targetStageIndex === -1) {
+    return [...remainingRecords, movedRecord]
+  }
+
+  return [
+    ...remainingRecords.slice(0, targetStageIndex),
+    movedRecord,
+    ...remainingRecords.slice(targetStageIndex),
+  ]
+}
+
+function mergeRecordsPreservingOrder(
+  currentRecords: ContactProcessRecord[],
+  nextRecords: ContactProcessRecord[]
+) {
+  const nextRecordMap = new Map(nextRecords.map((record) => [record.contact.id, record]))
+
+  const orderedRecords = currentRecords
+    .filter((record) => nextRecordMap.has(record.contact.id))
+    .map((record) => {
+      const nextRecord = nextRecordMap.get(record.contact.id)!
+      nextRecordMap.delete(record.contact.id)
+      return nextRecord
+    })
+
+  const newRecords = nextRecords.filter((record) => nextRecordMap.has(record.contact.id))
+
+  return [...orderedRecords, ...newRecords]
 }
 
 function ContactCard({
@@ -77,10 +124,10 @@ function ContactCard({
       }}
       style={transform ? { transform: CSS.Translate.toString(transform) } : undefined}
       className={cn(
-        'group rounded-xl border bg-card p-3 text-left transition-all select-none',
-        'hover:border-primary/35 hover:shadow-md',
+        'group rounded-2xl border border-border/70 bg-card/80 p-3 text-left shadow-[0_12px_28px_rgba(3,7,18,0.18)] backdrop-blur-md transition-all select-none',
+        'hover:border-primary/35 hover:shadow-[0_18px_36px_rgba(3,7,18,0.28)]',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40',
-        isDragging && 'opacity-60 shadow-xl ring-2 ring-primary/30'
+        isDragging && 'opacity-60 shadow-[0_22px_46px_rgba(3,7,18,0.36)] ring-2 ring-primary/30'
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -178,8 +225,8 @@ function PipelineColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          'flex min-h-[calc(100vh-15rem)] flex-1 flex-col rounded-b-lg border border-t-0 bg-muted/30 p-3 transition-colors',
-          isOver && 'border-primary/35 bg-primary/6'
+          'flex min-h-[calc(100vh-15rem)] flex-1 flex-col rounded-b-2xl border border-t-0 border-border/70 bg-muted/25 p-3 backdrop-blur-sm transition-colors',
+          isOver && 'border-primary/45 bg-primary/8 shadow-[inset_0_0_0_1px_rgba(45,212,191,0.12)]'
         )}
       >
         {records.length > 0 ? (
@@ -202,12 +249,25 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
   const { t } = useTranslation()
   const [activeContactId, setActiveContactId] = useState<string | null>(null)
   const [localRecords, setLocalRecords] = useState(records)
+  const [pendingMove, setPendingMove] = useState<PendingMove | null>(null)
 
   useEffect(() => {
-    if (!activeContactId) {
-      setLocalRecords(records)
+    const pendingRecord = pendingMove
+      ? records.find((record) => record.contact.id === pendingMove.contactId)
+      : null
+    const pendingSettled = pendingMove
+      ? pendingRecord?.stageKey === pendingMove.targetStageKey
+      : false
+
+    if (pendingMove && pendingSettled) {
+      setPendingMove(null)
     }
-  }, [records, activeContactId])
+
+    if (activeContactId) return
+    if (pendingMove && !pendingSettled) return
+
+    setLocalRecords((current) => mergeRecordsPreservingOrder(current, records))
+  }, [records, activeContactId, pendingMove])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -221,9 +281,7 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
 
   const groupedRecords = useMemo(() => {
     return stages.reduce<Record<string, ContactProcessRecord[]>>((acc, stage) => {
-      acc[stage.contactStageKey] = localRecords
-        .filter((record) => record.stageKey === stage.contactStageKey)
-        .sort((a, b) => a.contact.full_name.localeCompare(b.contact.full_name, 'tr'))
+      acc[stage.contactStageKey] = localRecords.filter((record) => record.stageKey === stage.contactStageKey)
 
       return acc
     }, {})
@@ -255,15 +313,13 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
 
     const previousRecords = localRecords
 
-    setLocalRecords((current) =>
-      current.map((record) =>
-        record.contact.id === contactId ? { ...record, stageKey: targetStageKey } : record
-      )
-    )
+    setPendingMove({ contactId, targetStageKey })
+    setLocalRecords((current) => moveRecordToStageTop(current, contactId, targetStageKey))
 
     try {
       await onMove(contactId, targetStageKey)
     } catch {
+      setPendingMove(null)
       setLocalRecords(previousRecords)
       toast.error(t('pipeline.dragError'))
     } finally {
@@ -275,6 +331,7 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
+      onDragCancel={resetDragState}
       onDragEnd={(event) => {
         void handleDragEnd(event)
       }}

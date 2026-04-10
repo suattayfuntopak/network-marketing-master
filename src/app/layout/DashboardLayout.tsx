@@ -5,14 +5,14 @@ import { MobileNav } from './MobileNav'
 
 export function DashboardLayout() {
   return (
-    <div className="flex h-screen bg-background overflow-hidden">
+    <div className="relative flex h-screen overflow-hidden bg-background">
       {/* Desktop sidebar */}
       <Sidebar />
 
       {/* Main content area */}
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="flex-1 overflow-y-auto">
+        <main className="relative flex-1 overflow-y-auto">
           <Outlet />
         </main>
       </div>
