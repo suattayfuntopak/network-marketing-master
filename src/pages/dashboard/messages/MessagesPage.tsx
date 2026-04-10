@@ -14,7 +14,13 @@ import {
   Users,
   Pencil,
   RefreshCw,
+  ArrowUpRight,
+  Shield,
+  Clock3,
+  Flame,
+  Compass,
 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -29,10 +35,14 @@ import {
   useUpdateAIMessage,
   useDeleteAIMessage,
 } from '@/hooks/useTemplates'
+import { useFollowUpBuckets } from '@/hooks/useCalendar'
 import { useContacts } from '@/hooks/useContacts'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { TemplateFormModal } from '@/components/messages/TemplateFormModal'
 import { StageBadge } from '@/components/contacts/StageBadge'
+import { ROUTES } from '@/lib/constants'
+import { DEFAULT_FILTERS } from '@/lib/contacts/types'
+import { buildMessagePlaybooks } from '@/lib/messages/messagePlaybooks'
 import type { AIMessage, MessageTemplate } from '@/lib/messages/types'
 import type { ContactWithTags } from '@/lib/contacts/types'
 
@@ -40,6 +50,7 @@ type Tab = 'ai' | 'templates' | 'history' | 'bulk'
 
 export function MessagesPage() {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [tab, setTab] = useState<Tab>('ai')
   const [showAIModal, setShowAIModal] = useState(false)
@@ -54,6 +65,13 @@ export function MessagesPage() {
   const [bulkSearch, setBulkSearch] = useState('')
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
   const [bulkContact, setBulkContact] = useState<ContactWithTags | null>(null)
+  const [aiPreset, setAIPreset] = useState<{
+    category: AIMessage['category']
+    tone: AIMessage['tone']
+    channel: 'whatsapp'
+    label: string
+    reason: string
+  } | null>(null)
   const currentLocale = i18n.language?.startsWith('en') ? 'en-US' : 'tr-TR'
 
   const { data: templates = [], isLoading: templatesLoading } = useTemplates(user?.id ?? '', {
@@ -64,6 +82,16 @@ export function MessagesPage() {
   const toggleFavorite = useToggleTemplateFavorite(user?.id ?? '')
   const updateAIMessage = useUpdateAIMessage(user?.id ?? '')
   const deleteAIMessage = useDeleteAIMessage(user?.id ?? '')
+  const { data: followUpBuckets } = useFollowUpBuckets(user?.id ?? '')
+
+  const { data: guideContactsResult } = useContacts({
+    userId: user?.id ?? '',
+    filters: DEFAULT_FILTERS,
+    sort: { field: 'warmth_score', order: 'desc' },
+    page: 1,
+    pageSize: 500,
+  })
+  const guideContacts = guideContactsResult?.data ?? []
 
   const { data: contactsResult, isLoading: contactsLoading } = useContacts({
     userId: user?.id ?? '',
@@ -85,6 +113,11 @@ export function MessagesPage() {
         displayContent: item.final_content?.trim() || item.generated_content,
       })),
     [aiMessages]
+  )
+
+  const playbooks = useMemo(
+    () => buildMessagePlaybooks({ contacts: guideContacts, followUpBuckets }),
+    [followUpBuckets, guideContacts]
   )
 
   const handleCopy = async (text: string, id: string) => {
@@ -136,6 +169,18 @@ export function MessagesPage() {
     setHistoryDraft('')
   }
 
+  const openPlaybook = (playbook: (typeof playbooks)[number]) => {
+    setBulkContact(playbook.contact)
+    setAIPreset({
+      category: playbook.category,
+      tone: playbook.tone,
+      channel: 'whatsapp',
+      label: t(`messages.playbooks.items.${playbook.key}.title`),
+      reason: t(`messages.playbooks.items.${playbook.key}.reason`),
+    })
+    setShowAIModal(true)
+  }
+
   const TABS: { key: Tab; label: string; Icon: typeof Sparkles }[] = [
     { key: 'ai', label: t('messages.aiGenerator'), Icon: Sparkles },
     { key: 'templates', label: t('messages.templates'), Icon: FileText },
@@ -163,6 +208,82 @@ export function MessagesPage() {
             <Sparkles className="w-4 h-4" />
             {t('messages.generate')}
           </Button>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+              {t('messages.playbooks.label')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t('messages.playbooks.subtitle')}
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => navigate(`${ROUTES.ACADEMY}/itirazlar`)}
+          >
+            <Shield className="h-4 w-4" />
+            {t('messages.playbooks.openObjections')}
+          </Button>
+        </div>
+
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {playbooks.map((playbook) => {
+            const Icon = playbook.key === 'reconnect' ? Clock3 : playbook.key === 'decision' ? Flame : Compass
+
+            return (
+              <button
+                key={playbook.key}
+                type="button"
+                onClick={() => openPlaybook(playbook)}
+                className="rounded-2xl border border-border/70 bg-card/70 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className="text-2xl font-semibold tabular-nums">{playbook.count}</span>
+                </div>
+
+                <p className="mt-4 text-sm font-semibold">{t(`messages.playbooks.items.${playbook.key}.title`)}</p>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                  {t(`messages.playbooks.items.${playbook.key}.body`, { count: playbook.count })}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {t(`messages.categories.${playbook.category}`)}
+                  </span>
+                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {t(`messages.tones.${playbook.tone}`)}
+                  </span>
+                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                    {t(`academy.objection.objCategories.${playbook.objectionCategory}`)}
+                  </span>
+                </div>
+
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/60 pt-3">
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {t('messages.playbooks.bestLead')}
+                    </p>
+                    <p className="mt-1 truncate text-sm text-foreground">
+                      {playbook.contact?.full_name ?? t('messages.playbooks.noLead')}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 text-xs font-medium text-primary">
+                    <span>{t('messages.playbooks.open')}</span>
+                    <ArrowUpRight className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
@@ -525,8 +646,14 @@ export function MessagesPage() {
         onClose={() => {
           setShowAIModal(false)
           setBulkContact(null)
+          setAIPreset(null)
         }}
         contact={bulkContact}
+        initialCategory={aiPreset?.category}
+        initialTone={aiPreset?.tone}
+        initialChannel={aiPreset?.channel}
+        presetLabel={aiPreset?.label}
+        presetReason={aiPreset?.reason}
       />
 
       <TemplateFormModal

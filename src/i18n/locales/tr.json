@@ -781,6 +781,31 @@
     "templates": "Şablonlar",
     "history": "Geçmiş",
     "generate": "✨ AI Mesaj Üret",
+    "playbooks": {
+      "label": "Mesaj Oyun Planı",
+      "subtitle": "Bugünkü saha durumuna göre hangi mesaj yaklaşımını açman gerektiğini hızlıca seç.",
+      "openObjections": "İtiraz Bankası",
+      "bestLead": "Öne Çıkan Kişi",
+      "noLead": "Henüz uygun kişi yok",
+      "open": "Aç",
+      "items": {
+        "reconnect": {
+          "title": "Sessiz konuşmayı geri aç",
+          "body": "{{count}} takip bugün geri dönüş bekliyor. Baskısız ama net bir takip dili burada daha iyi iş görür.",
+          "reason": "Bugün öncelik sessiz kalan veya geciken konuşmaları tekrar güvenli şekilde açmak."
+        },
+        "invite": {
+          "title": "İlk teması davete taşı",
+          "body": "{{count}} kişi ilk yaklaşım veya yumuşak davet için uygun görünüyor. Merak uyandıran kısa mesajlar seç.",
+          "reason": "Bugün yeni kişiyle doğal bağlantı kurup konuşmayı davet penceresine taşıma günü."
+        },
+        "decision": {
+          "title": "Kararsız kişiyi ilerlet",
+          "body": "{{count}} sıcak kişi karar eşiğinde olabilir. İtirazı yumuşatan veya bir sonraki adımı netleştiren dil kullan.",
+          "reason": "Bugün sıcak ama kararsız kişide baskı kurmadan sonraki adımı kolaylaştırmak daha değerli."
+        }
+      }
+    },
     "noTemplates": "Henüz şablon yok",
     "noTemplatesDescription": "Sık kullandığın mesajları şablon olarak kaydederek daha hızlı çalışabilirsin.",
     "noAIMessages": "Henüz AI mesaj üretilmedi",
@@ -847,6 +872,7 @@
       "feedbackMeh": "Orta",
       "feedbackBad": "Kötü",
       "contactHint": "Kontak detay sayfasından da doğrudan kontağa özel mesaj üretebilirsin",
+      "recommendedLabel": "Önerilen Kurulum",
       "errors": {
         "missingConfig": "AI mesaj servisi henüz yapılandırılmamış.",
         "network": "Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.",

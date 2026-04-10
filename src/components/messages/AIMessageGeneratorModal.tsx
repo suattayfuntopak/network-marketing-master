@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, Copy, ExternalLink, RefreshCw, Check, BookmarkPlus } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
@@ -26,18 +26,32 @@ interface Props {
   open: boolean
   onClose: () => void
   contact?: ContactWithTags | null
+  initialCategory?: MessageCategory
+  initialChannel?: MessageChannel
+  initialTone?: MessageTone
+  presetLabel?: string | null
+  presetReason?: string | null
 }
 
-export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
+export function AIMessageGeneratorModal({
+  open,
+  onClose,
+  contact,
+  initialCategory,
+  initialChannel,
+  initialTone,
+  presetLabel,
+  presetReason,
+}: Props) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const { generate, isGenerating } = useAIMessage()
   const saveAIMessage = useSaveAIMessage(user?.id ?? '')
   const rateAIMessage = useRateAIMessage()
 
-  const [category, setCategory] = useState<MessageCategory>('follow_up')
-  const [channel, setChannel] = useState<MessageChannel>('whatsapp')
-  const [tone, setTone] = useState<MessageTone>('friendly')
+  const [category, setCategory] = useState<MessageCategory>(initialCategory ?? 'follow_up')
+  const [channel, setChannel] = useState<MessageChannel>(initialChannel ?? 'whatsapp')
+  const [tone, setTone] = useState<MessageTone>(initialTone ?? 'friendly')
   const [userInput, setUserInput] = useState('')
   const [variants, setVariants] = useState<AIMessageVariant[]>([])
   const [savedMessageId, setSavedMessageId] = useState<string | null>(null)
@@ -48,6 +62,13 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
   const [savingTemplateIdx, setSavingTemplateIdx] = useState<number | null>(null)
   const [templateName, setTemplateName] = useState('')
   const [savedTemplateIdx, setSavedTemplateIdx] = useState<number | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    setCategory(initialCategory ?? 'follow_up')
+    setChannel(initialChannel ?? 'whatsapp')
+    setTone(initialTone ?? 'friendly')
+  }, [initialCategory, initialChannel, initialTone, open])
 
   const handleGenerate = async () => {
     const result = await generate({
@@ -164,6 +185,30 @@ export function AIMessageGeneratorModal({ open, onClose, contact }: Props) {
         </DialogHeader>
 
         <div className="space-y-4 mt-2">
+          {(presetLabel || presetReason) && (
+            <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
+              <div className="flex flex-wrap items-center gap-2">
+                {presetLabel ? (
+                  <span className="rounded-full border border-primary/15 bg-background/80 px-2.5 py-1 text-[11px] font-medium text-primary">
+                    {presetLabel}
+                  </span>
+                ) : null}
+                <span className="rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                  {t(`messages.categories.${category}`)}
+                </span>
+                <span className="rounded-full border border-border px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+                  {t(`messages.tones.${tone}`)}
+                </span>
+              </div>
+              <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('messages.ai.recommendedLabel')}
+              </p>
+              {presetReason ? (
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{presetReason}</p>
+              ) : null}
+            </div>
+          )}
+
           {/* Kategori */}
           <div>
             <p className="text-xs font-medium text-muted-foreground mb-2">{t('messages.ai.selectCategory')}</p>

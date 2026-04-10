@@ -781,6 +781,31 @@
     "templates": "Templates",
     "history": "History",
     "generate": "✨ AI Message",
+    "playbooks": {
+      "label": "Message Playbook",
+      "subtitle": "Quickly choose the message approach that best fits today’s field situation.",
+      "openObjections": "Objection Bank",
+      "bestLead": "Best-Fit Contact",
+      "noLead": "No strong fit yet",
+      "open": "Open",
+      "items": {
+        "reconnect": {
+          "title": "Re-open a quiet conversation",
+          "body": "{{count}} follow-ups are waiting for a response today. A low-pressure but clear re-entry message will help most here.",
+          "reason": "Today the priority is safely re-entering quiet or delayed conversations."
+        },
+        "invite": {
+          "title": "Turn first contact into an invite",
+          "body": "{{count}} people look ready for a first approach or a soft invitation. Use short messages that spark curiosity.",
+          "reason": "Today is a good day to build a natural connection and move it toward an invitation window."
+        },
+        "decision": {
+          "title": "Move the hesitant person forward",
+          "body": "{{count}} warm people may be near a decision point. Use language that lowers hesitation or clarifies the next step.",
+          "reason": "Today it is more valuable to reduce friction for warm but hesitant people without adding pressure."
+        }
+      }
+    },
     "noTemplates": "No templates yet",
     "noTemplatesDescription": "Save frequently used messages as templates to work faster.",
     "noAIMessages": "No AI messages generated yet",
@@ -847,6 +872,7 @@
       "feedbackMeh": "Okay",
       "feedbackBad": "Bad",
       "contactHint": "You can also generate contact-specific messages from the contact detail page",
+      "recommendedLabel": "Recommended Setup",
       "errors": {
         "missingConfig": "The AI message service is not configured yet.",
         "network": "Connection failed. Check your internet and try again.",
