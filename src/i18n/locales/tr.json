@@ -984,7 +984,8 @@
       "overview": "Genel Durum",
       "leaderboard": "Öne Çıkanlar",
       "needsAttention": "Destek Bekleyenler",
-      "activationQueue": "Aktivasyon Kuyruğu"
+      "activationQueue": "Aktivasyon Kuyruğu",
+      "radar": "Radar Sinyalleri"
     },
     "overview": {
       "title": "Ekip Nabzı",
@@ -1009,6 +1010,39 @@
       "active": "Aktif",
       "monitor": "İzlenmeli",
       "inactive": "Müdahale gerekli"
+    },
+    "radar": {
+      "leaderSuggestion": "Lider Önerisi",
+      "status": {
+        "gaining_momentum": "İvme Kazanıyor",
+        "active": "Aktif",
+        "slowing_down": "Yavaşlıyor",
+        "needs_support": "Destek Gerekiyor"
+      },
+      "statusDescriptions": {
+        "gaining_momentum": "Doğru destekle bu hafta görünür ilerleme üretebilir.",
+        "active": "Ritmi korunuyor; küçük yön teyitleri yeterli olabilir.",
+        "slowing_down": "Bağlantı kopmadan önce net bir sonraki adım konuşulmalı.",
+        "needs_support": "Sessizlik uzamış veya takip kaçmış; kısa bir reset konuşması gerekiyor."
+      },
+      "focus": {
+        "followUpDiscipline": "Takip disiplinini geri yerine oturtmak",
+        "newConversations": "Yeni temas ritmini kurmak",
+        "presentationSupport": "Sunum sonrası enerjiyi doğru yöne çevirmek",
+        "decisionSupport": "Karar aşamasında baskıyı azaltmak"
+      },
+      "suggestions": {
+        "praiseAndExpand": "Kısa takdir ver ve bu ivmeyi bir sonraki net adımla büyütmesine yardım et.",
+        "lightCheckIn": "Sadece moral ve yön teyidi veren kısa bir check-in çoğu zaman yeterli olur.",
+        "defineNextStep": "Belirsizliği azalt. Bu hafta için tek bir net takip adımı belirleyin.",
+        "resetWithOneGoal": "Kişiyi yüklemeyin. Sadece bu haftalık tek küçük hedefe odaklanmasını sağlayın."
+      },
+      "momentum": {
+        "building": "Sıcaklık ve ritim birlikte yükseliyor.",
+        "stable": "İlişki açık, ritim korunuyor.",
+        "fragile": "İvme var ama kolayca dağılabilir.",
+        "recovery": "Önce yeniden temas kurup güvenli bir zemin açmak gerekiyor."
+      }
     },
     "reasons": {
       "overdue": "Takip tarihi geçmiş, sıcaklığını kaybetmeden dönmek gerekiyor.",
@@ -1045,7 +1079,37 @@
       "cta": "Ücretsiz Başla",
       "ctaSecondary": "Özellikleri Keşfet",
       "trust2": "Anında kurulum",
-      "trust3": "İstediğin zaman iptal"
+      "trust3": "İstediğin zaman iptal",
+      "panel": {
+        "label": "Canlı İşletim Akışı",
+        "title": "Sadece CRM değil, günlük çalışma sistemi",
+        "subtitle": "Dağınık aday listelerini, doğru kişiye doğru anda dönen bir ritme çevir.",
+        "assistantLabel": "AI Rehberi",
+        "assistantAction": "Sistem önce geciken takibi kapatmanı, sonra sıcak fırsatı ilerletmeni öneriyor.",
+        "assistantMessage": "Bugün önce sessizleşen ama hâlâ sıcak olan kişiye dön. Sonra karar eşiğindeki fırsata tek net sonraki adımı teklif et.",
+        "tasks": [
+          { "state": "kritik", "title": "Geciken takip", "meta": "Dün dönmen gereken konuşma bugün hâlâ sıcak." },
+          { "state": "fırsat", "title": "Sunum sonrası pencere", "meta": "İlgi var ama sonraki adım netleşmezse enerji düşebilir." },
+          { "state": "ritim", "title": "Yeni temas listesi", "meta": "İlk dokunuş bekleyen yeni kişiler hazır." }
+        ],
+        "systemPills": ["Günlük odak", "Takip disiplini", "Ekip görünürlüğü", "İtiraz desteği"]
+      }
+    },
+    "proof": {
+      "items": {
+        "operations": {
+          "title": "Dağınık listeler yerine tek operasyon ekranı",
+          "desc": "Kontak, takip, mesaj, ekip ve akademi aynı ritimde çalışır."
+        },
+        "priorities": {
+          "title": "Tahmin değil, öncelik sırası",
+          "desc": "Sistem hangi konuşmanın bugün öne çıkması gerektiğini görünür kılar."
+        },
+        "guidance": {
+          "title": "Distribütör psikolojisine uygun rehberlik",
+          "desc": "İtiraz, takip ve ekip yönetimi daha baskısız ama daha net ilerler."
+        }
+      }
     },
     "problems": {
       "title": "Tanıdık geliyor mu?",

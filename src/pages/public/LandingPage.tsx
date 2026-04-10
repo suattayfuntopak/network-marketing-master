@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import {
   Zap, Target, Thermometer, MessageSquare, BarChart2, Users2, BookOpen,
-  ArrowRight, CheckCircle, Star, ChevronDown, ChevronUp, Sun, Moon
+  ArrowRight, CheckCircle, Star, ChevronDown, ChevronUp, Sun, Moon, Sparkles
 } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -36,6 +36,9 @@ export function LandingPage() {
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
   const planHighlighted = [false, true, false]
+  const heroTasks = t('landing.hero.panel.tasks', { returnObjects: true }) as { state: string; title: string; meta: string }[]
+  const heroSystemPills = t('landing.hero.panel.systemPills', { returnObjects: true }) as string[]
+  const proofKeys = ['operations', 'priorities', 'guidance'] as const
 
   return (
     <div className="min-h-screen bg-background">
@@ -94,45 +97,125 @@ export function LandingPage() {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 py-20 sm:py-32">
+      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/5 py-20 sm:py-28">
         <div className="absolute inset-0 bg-[size:32px_32px] opacity-5"
           style={{ backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)' }}
         />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 text-center">
-          <Badge variant="secondary" className="mb-6">
-            {t('landing.hero.badge')}
-          </Badge>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-            {t('landing.hero.title1')}{' '}
-            <span className="text-primary">{t('landing.hero.title2')}</span>{' '}
-            {t('landing.hero.title3')}
-          </h1>
-          <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            {t('landing.hero.subtitle')}
-          </p>
-          <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to={ROUTES.REGISTER}>
-              <Button size="lg" className="gap-2 w-full sm:w-auto">
-                {t('landing.hero.cta')}
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            <a href="#features">
-              <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                {t('landing.hero.ctaSecondary')}
-              </Button>
-            </a>
-          </div>
-          <div className="mt-8 flex items-center justify-center gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-primary" />
-              {t('landing.hero.trust2')}
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-[1.02fr_0.98fr]">
+          <div className="text-center lg:text-left">
+            <Badge variant="secondary" className="mb-6">
+              {t('landing.hero.badge')}
+            </Badge>
+            <h1 className="text-4xl font-bold tracking-tight leading-tight sm:text-5xl lg:text-6xl">
+              {t('landing.hero.title1')}{' '}
+              <span className="text-primary">{t('landing.hero.title2')}</span>{' '}
+              {t('landing.hero.title3')}
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl lg:mx-0 mx-auto">
+              {t('landing.hero.subtitle')}
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row lg:justify-start justify-center">
+              <Link to={ROUTES.REGISTER}>
+                <Button size="lg" className="gap-2 w-full sm:w-auto">
+                  {t('landing.hero.cta')}
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              <a href="#features">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  {t('landing.hero.ctaSecondary')}
+                </Button>
+              </a>
             </div>
-            <div className="flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-primary" />
-              {t('landing.hero.trust3')}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground lg:justify-start">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4 text-primary" />
+                {t('landing.hero.trust2')}
+              </div>
+              <div className="flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4 text-primary" />
+                {t('landing.hero.trust3')}
+              </div>
             </div>
           </div>
+
+          <div className="rounded-[28px] border border-border/70 bg-card/75 p-5 shadow-[0_24px_70px_rgba(3,7,18,0.18)] backdrop-blur-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+                  {t('landing.hero.panel.label')}
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                  {t('landing.hero.panel.title')}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {t('landing.hero.panel.subtitle')}
+                </p>
+              </div>
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10 text-primary">
+                <Sparkles className="h-5 w-5" />
+              </div>
+            </div>
+
+            <div className="mt-6 space-y-3">
+              {heroTasks.map((task, index) => (
+                <div key={`${task.state}-${task.title}`} className="rounded-2xl border border-border/70 bg-background/60 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">{task.title}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">{task.meta}</p>
+                    </div>
+                    <span
+                      className={cn(
+                        'shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide',
+                        index === 0 && 'border-rose-500/25 bg-rose-500/10 text-rose-200',
+                        index === 1 && 'border-amber-500/25 bg-amber-500/10 text-amber-100',
+                        index === 2 && 'border-sky-500/25 bg-sky-500/10 text-sky-100'
+                      )}
+                    >
+                      {task.state}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 rounded-2xl border border-primary/15 bg-primary/6 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+                {t('landing.hero.panel.assistantLabel')}
+              </p>
+              <p className="mt-2 text-sm font-medium">
+                {t('landing.hero.panel.assistantAction')}
+              </p>
+              <p className="mt-3 rounded-2xl border border-border/70 bg-background/60 p-3 text-sm leading-6 text-muted-foreground">
+                {t('landing.hero.panel.assistantMessage')}
+              </p>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {heroSystemPills.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-xs text-muted-foreground"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-border/70 bg-card/30 py-5">
+        <div className="mx-auto grid max-w-6xl gap-3 px-4 sm:px-6 md:grid-cols-3">
+          {proofKeys.map((key) => (
+            <div key={key} className="rounded-2xl border border-border/70 bg-background/55 px-4 py-4">
+              <p className="text-sm font-semibold">{t(`landing.proof.items.${key}.title`)}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                {t(`landing.proof.items.${key}.desc`)}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 

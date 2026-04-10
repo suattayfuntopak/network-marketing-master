@@ -14,10 +14,9 @@ import { useAuth } from '@/hooks/useAuth'
 import { useContacts } from '@/hooks/useContacts'
 import { ROUTES } from '@/lib/constants'
 import { DEFAULT_FILTERS } from '@/lib/contacts/types'
+import { buildTeamRadarInsight, getTeamRadarStatus, type TeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { cn } from '@/lib/utils'
 import type { ContactWithTags } from '@/lib/contacts/types'
-
-type ActivityStatus = 'active' | 'monitor' | 'inactive'
 
 function getInitials(fullName: string) {
   return fullName
@@ -34,22 +33,16 @@ function getDaysSince(dateValue: string | null) {
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
 }
 
-function getActivityStatus(contact: ContactWithTags): ActivityStatus {
-  const hasOverdueFollowUp =
-    typeof contact.next_follow_up_at === 'string' && new Date(contact.next_follow_up_at).getTime() < Date.now()
-  const daysSinceLastTouch = getDaysSince(contact.last_contact_at)
-
-  if (hasOverdueFollowUp || daysSinceLastTouch >= 14) return 'inactive'
-  if (daysSinceLastTouch >= 7 || contact.stage === 'thinking') return 'monitor'
-  return 'active'
-}
-
-function getStatusClasses(status: ActivityStatus) {
+function getStatusClasses(status: TeamRadarStatus) {
   if (status === 'active') {
     return 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-400'
   }
 
-  if (status === 'monitor') {
+  if (status === 'gaining_momentum') {
+    return 'border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900/60 dark:bg-sky-950/30 dark:text-sky-400'
+  }
+
+  if (status === 'slowing_down') {
     return 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/30 dark:text-amber-400'
   }
 
@@ -110,13 +103,16 @@ export function TeamPage() {
   })
 
   const members = contactsResult?.data ?? []
+  const radarMembers = useMemo(() => members.map((member) => buildTeamRadarInsight(member)), [members])
 
   const metrics = useMemo(() => {
     const totalMembers = members.length
-    const activeMembers = members.filter((member) => getActivityStatus(member) === 'active').length
+    const activeMembers = radarMembers.filter((member) => member.status === 'active').length
     const newThisMonth = members.filter((member) => Date.now() - new Date(member.created_at).getTime() <= 30 * 24 * 60 * 60 * 1000).length
     const joinedMembers = members.filter((member) => member.stage === 'joined').length
     const overdueMembers = members.filter((member) => Boolean(member.next_follow_up_at) && new Date(member.next_follow_up_at!).getTime() < Date.now()).length
+    const gainingMomentum = radarMembers.filter((member) => member.status === 'gaining_momentum').length
+    const needsSupport = radarMembers.filter((member) => member.status === 'needs_support').length
 
     return {
       totalMembers,
@@ -125,31 +121,37 @@ export function TeamPage() {
       newThisMonth,
       joinedMembers,
       overdueMembers,
+      gainingMomentum,
+      needsSupport,
     }
-  }, [members])
+  }, [members, radarMembers])
 
   const leaderboard = useMemo(
     () =>
-      [...members]
+      [...radarMembers]
         .sort((a, b) => {
-          if (b.warmth_score !== a.warmth_score) return b.warmth_score - a.warmth_score
-          return getDaysSince(a.last_contact_at) - getDaysSince(b.last_contact_at)
+          if (a.status !== b.status) {
+            const weight = { gaining_momentum: 4, active: 3, slowing_down: 2, needs_support: 1 }
+            return weight[b.status] - weight[a.status]
+          }
+          if (b.contact.warmth_score !== a.contact.warmth_score) return b.contact.warmth_score - a.contact.warmth_score
+          return getDaysSince(a.contact.last_contact_at) - getDaysSince(b.contact.last_contact_at)
         })
         .slice(0, 5),
-    [members]
+    [radarMembers]
   )
 
   const needsAttention = useMemo(
     () =>
-      [...members]
-        .filter((member) => getActivityStatus(member) !== 'active')
+      [...radarMembers]
+        .filter((member) => member.status === 'slowing_down' || member.status === 'needs_support')
         .sort((a, b) => {
-          const overdueA = a.next_follow_up_at ? new Date(a.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
-          const overdueB = b.next_follow_up_at ? new Date(b.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
-          return overdueA - overdueB || getDaysSince(b.last_contact_at) - getDaysSince(a.last_contact_at)
+          const overdueA = a.contact.next_follow_up_at ? new Date(a.contact.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
+          const overdueB = b.contact.next_follow_up_at ? new Date(b.contact.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
+          return overdueA - overdueB || getDaysSince(b.contact.last_contact_at) - getDaysSince(a.contact.last_contact_at)
         })
         .slice(0, 4),
-    [members]
+    [radarMembers]
   )
 
   const activationQueue = useMemo(
@@ -162,6 +164,20 @@ export function TeamPage() {
         })
         .slice(0, 6),
     [members]
+  )
+
+  const momentumBoard = useMemo(
+    () =>
+      radarMembers
+        .filter((member) => member.status === 'gaining_momentum' || member.status === 'active')
+        .sort((a, b) => {
+          if (a.status !== b.status) {
+            return a.status === 'gaining_momentum' ? -1 : 1
+          }
+          return b.contact.warmth_score - a.contact.warmth_score
+        })
+        .slice(0, 3),
+    [radarMembers]
   )
 
   const summaryTone = metrics.overdueMembers > 0 ? 'warning' : 'default'
@@ -237,6 +253,27 @@ export function TeamPage() {
         </Card>
       </div>
 
+      <div className="grid gap-3 lg:grid-cols-4">
+        {([
+          { key: 'gaining_momentum', value: metrics.gainingMomentum },
+          { key: 'active', value: metrics.activeMembers },
+          { key: 'slowing_down', value: Math.max(metrics.totalMembers - metrics.activeMembers - metrics.gainingMomentum - metrics.needsSupport, 0) },
+          { key: 'needs_support', value: metrics.needsSupport },
+        ] as const).map(({ key, value }) => (
+          <div key={key} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(key))}>
+                {t(`team.radar.status.${key}`)}
+              </span>
+              <span className="text-2xl font-semibold tabular-nums">{value}</span>
+            </div>
+            <p className="mt-3 text-xs leading-5 text-muted-foreground">
+              {t(`team.radar.statusDescriptions.${key}`)}
+            </p>
+          </div>
+        ))}
+      </div>
+
       <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <Card>
           <CardHeader>
@@ -301,21 +338,27 @@ export function TeamPage() {
           <CardContent className="space-y-3">
             {leaderboard.length > 0 ? (
               leaderboard.map((member, index) => (
-                <div key={member.id} className="rounded-xl border bg-card/70 p-4">
+                <div key={member.contact.id} className="rounded-xl border bg-card/70 p-4">
                   <div className="flex items-center gap-3">
                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                       {index + 1}
                     </div>
                     <Avatar size="sm">
-                      <AvatarFallback>{getInitials(member.full_name)}</AvatarFallback>
+                      <AvatarFallback>{getInitials(member.contact.full_name)}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{member.full_name}</p>
+                      <p className="truncate text-sm font-semibold">{member.contact.full_name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {member.city || t('team.labels.locationFallback')}
+                        {member.contact.city || t('team.labels.locationFallback')}
                       </p>
                     </div>
-                    <WarmthScoreBadge score={member.warmth_score} />
+                    <WarmthScoreBadge score={member.contact.warmth_score} />
+                  </div>
+                  <div className="mt-3 flex items-center justify-between gap-2">
+                    <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
+                      {t(`team.radar.status.${member.status}`)}
+                    </span>
+                    <p className="text-xs text-muted-foreground">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
                   </div>
                 </div>
               ))
@@ -336,24 +379,23 @@ export function TeamPage() {
           <CardContent className="space-y-3">
             {needsAttention.length > 0 ? (
               needsAttention.map((member) => {
-                const status = getActivityStatus(member)
-                const hasOverdueFollowUp = Boolean(member.next_follow_up_at) && new Date(member.next_follow_up_at!).getTime() < Date.now()
+                const hasOverdueFollowUp = Boolean(member.contact.next_follow_up_at) && new Date(member.contact.next_follow_up_at!).getTime() < Date.now()
                 const reason = hasOverdueFollowUp
                   ? t('team.reasons.overdue')
-                  : member.last_contact_at
+                  : member.contact.last_contact_at
                     ? t('team.reasons.noRecentTouch')
                     : t('team.reasons.noTouchYet')
 
                 return (
                   <TeamMemberCard
-                    key={member.id}
-                    contact={member}
+                    key={member.contact.id}
+                    contact={member.contact}
                     subtitle={reason}
                     extra={
                       <div className="space-y-2">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(status))}>
-                            {t(`team.activity.${status}`)}
+                          <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
+                            {t(`team.radar.status.${member.status}`)}
                           </span>
                           {hasOverdueFollowUp ? (
                             <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
@@ -362,10 +404,13 @@ export function TeamPage() {
                             </span>
                           ) : null}
                         </div>
+                        <p className="text-xs text-primary/80">
+                          {t(`team.radar.suggestions.${member.leaderSuggestionKey}`)}
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           {t('team.labels.lastContact')}:{' '}
-                          {member.last_contact_at
-                            ? formatDistanceToNow(new Date(member.last_contact_at), { addSuffix: true, locale })
+                          {member.contact.last_contact_at
+                            ? formatDistanceToNow(new Date(member.contact.last_contact_at), { addSuffix: true, locale })
                             : t('team.labels.noDate')}
                         </p>
                       </div>
@@ -424,14 +469,56 @@ export function TeamPage() {
         </Card>
       </div>
 
-      <div className="rounded-xl border bg-card p-4">
-        <div className="flex items-start gap-3">
-          <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-500" />
-          <div>
-            <p className="text-sm font-semibold">{t('team.focus.title')}</p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {t('team.focus.body', { count: needsAttention.length })}
-            </p>
+      <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('team.sections.radar')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {momentumBoard.length > 0 ? (
+              momentumBoard.map((member) => (
+                <div key={member.contact.id} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-semibold">{member.contact.full_name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {t(`team.radar.focus.${member.focusKey}`)}
+                      </p>
+                    </div>
+                    <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
+                      {t(`team.radar.status.${member.status}`)}
+                    </span>
+                  </div>
+                  <div className="mt-3 rounded-xl border border-border/70 bg-background/40 p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      {t('team.radar.leaderSuggestion')}
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {t(`team.radar.suggestions.${member.leaderSuggestionKey}`)}
+                    </p>
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {t(`team.radar.momentum.${member.momentumKey}`)}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
+                {t('team.empty.leaderboard')}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="rounded-xl border bg-card p-4">
+          <div className="flex items-start gap-3">
+            <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-500" />
+            <div>
+              <p className="text-sm font-semibold">{t('team.focus.title')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('team.focus.body', { count: needsAttention.length })}
+              </p>
+            </div>
           </div>
         </div>
       </div>

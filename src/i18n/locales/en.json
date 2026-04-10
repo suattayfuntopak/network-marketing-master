@@ -984,7 +984,8 @@
       "overview": "Overview",
       "leaderboard": "Top Momentum",
       "needsAttention": "Needs Attention",
-      "activationQueue": "Activation Queue"
+      "activationQueue": "Activation Queue",
+      "radar": "Radar Signals"
     },
     "overview": {
       "title": "Team Pulse",
@@ -1009,6 +1010,39 @@
       "active": "Active",
       "monitor": "Monitor",
       "inactive": "Needs intervention"
+    },
+    "radar": {
+      "leaderSuggestion": "Leader Suggestion",
+      "status": {
+        "gaining_momentum": "Gaining Momentum",
+        "active": "Active",
+        "slowing_down": "Slowing Down",
+        "needs_support": "Needs Support"
+      },
+      "statusDescriptions": {
+        "gaining_momentum": "With the right support, this person could show visible movement this week.",
+        "active": "Rhythm looks healthy; small check-ins may be enough.",
+        "slowing_down": "A clear next step should be discussed before the connection fades.",
+        "needs_support": "Silence has stretched or follow-up was missed; a short reset conversation is needed."
+      },
+      "focus": {
+        "followUpDiscipline": "Restoring follow-up discipline",
+        "newConversations": "Building a rhythm of new conversations",
+        "presentationSupport": "Turning post-presentation energy into the right next move",
+        "decisionSupport": "Reducing pressure near the decision stage"
+      },
+      "suggestions": {
+        "praiseAndExpand": "Give short recognition and help expand this momentum into one clear next move.",
+        "lightCheckIn": "A brief encouragement check-in with simple direction is usually enough.",
+        "defineNextStep": "Reduce ambiguity. Define one clear follow-up move for this week.",
+        "resetWithOneGoal": "Do not overload them. Help them focus on just one small target for this week."
+      },
+      "momentum": {
+        "building": "Warmth and rhythm are rising together.",
+        "stable": "The relationship is open and the rhythm is holding.",
+        "fragile": "There is momentum, but it can easily scatter.",
+        "recovery": "First re-open contact and create a safe base again."
+      }
     },
     "reasons": {
       "overdue": "Follow-up date already passed, so it's worth returning before warmth drops.",
@@ -1045,7 +1079,37 @@
       "cta": "Start Free",
       "ctaSecondary": "Explore Features",
       "trust2": "Instant setup",
-      "trust3": "Cancel anytime"
+      "trust3": "Cancel anytime",
+      "panel": {
+        "label": "Live Operating Flow",
+        "title": "Not just a CRM, a daily working system",
+        "subtitle": "Turn scattered lead lists into a rhythm that returns to the right person at the right time.",
+        "assistantLabel": "AI Guidance",
+        "assistantAction": "The system suggests closing the overdue follow-up first, then moving the warm opportunity.",
+        "assistantMessage": "Start with the person who went quiet but still carries warmth. Then offer one clear next move to the opportunity near decision.",
+        "tasks": [
+          { "state": "critical", "title": "Overdue follow-up", "meta": "A conversation that needed your reply yesterday is still warm today." },
+          { "state": "opportunity", "title": "Post-presentation window", "meta": "Interest is there, but the energy can drop if the next step stays fuzzy." },
+          { "state": "rhythm", "title": "Fresh reach-out list", "meta": "New people are waiting for a natural first touch." }
+        ],
+        "systemPills": ["Daily focus", "Follow-up discipline", "Team visibility", "Objection support"]
+      }
+    },
+    "proof": {
+      "items": {
+        "operations": {
+          "title": "One operating screen instead of scattered lists",
+          "desc": "Contacts, follow-ups, messaging, team, and academy move in the same rhythm."
+        },
+        "priorities": {
+          "title": "Not guesswork, but priority order",
+          "desc": "The system makes visible which conversation deserves attention first today."
+        },
+        "guidance": {
+          "title": "Guidance aligned with distributor psychology",
+          "desc": "Objections, follow-ups, and team leadership move with less pressure and more clarity."
+        }
+      }
     },
     "problems": {
       "title": "Sound familiar?",
