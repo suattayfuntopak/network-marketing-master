@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Users, Bell, Target, GraduationCap, CalendarRange, Flame } from 'lucide-react'
+import { Users, Bell, Target, GraduationCap, CalendarRange, Flame, ShieldAlert, Zap, Activity } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useContactStageCounts } from '@/hooks/useContacts'
+import { useContactCount, useContactStageCounts, useContacts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useOverdueFollowUpsCount, useFollowUpBuckets } from '@/hooks/useCalendar'
 import { getTodayAcademyReadCount } from '@/lib/academy/progress'
+import { buildAnalyticsInsights } from '@/lib/analytics/insights'
+import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import i18n from '@/i18n'
 
 const STAGE_COLORS: Record<string, string> = {
@@ -26,9 +28,17 @@ export function AnalyticsPage() {
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
+  const { data: contactsResult } = useContacts({
+    userId,
+    filters: DEFAULT_FILTERS,
+    sort: DEFAULT_SORT,
+    page: 1,
+    pageSize: 500,
+  })
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
   const { data: overdueCount = 0 } = useOverdueFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
+  const contacts = contactsResult?.data ?? []
 
   const academyTodayCount = getTodayAcademyReadCount()
   const chartData = stageCounts.map(({ stage, count }) => ({
@@ -62,6 +72,13 @@ export function AnalyticsPage() {
   }, [followUpBuckets])
 
   const joinedCount = stageCounts.find((stage) => stage.stage === 'joined')?.count ?? 0
+  const insights = useMemo(() => buildAnalyticsInsights(contacts, followUpBuckets), [contacts, followUpBuckets])
+
+  const SIGNAL_TONE_CLASSES = {
+    good: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
+    watch: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
+    risk: 'border-rose-500/20 bg-rose-500/10 text-rose-100',
+  } as const
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -69,6 +86,71 @@ export function AnalyticsPage() {
         <h1 className="text-2xl font-bold">{t('nav.analytics')}</h1>
         <p className="text-muted-foreground text-sm mt-1">{t('analytics.subtitle')}</p>
       </div>
+
+      <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_30%)]">
+        <CardHeader>
+          <CardTitle className="text-base">{t('analytics.signalBoard.title')}</CardTitle>
+          <p className="text-sm text-muted-foreground">{t('analytics.signalBoard.subtitle')}</p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            {[
+              {
+                key: 'risk',
+                Icon: ShieldAlert,
+                value: insights.riskCount,
+                tone: insights.tones.risk,
+                body: t('analytics.signalBoard.cards.risk.body', {
+                  overdue: insights.overdueFollowUps,
+                  stalled: insights.stalledWarmLeads,
+                }),
+              },
+              {
+                key: 'growth',
+                Icon: Zap,
+                value: insights.growthCount,
+                tone: insights.tones.growth,
+                body: t('analytics.signalBoard.cards.growth.body', {
+                  ready: insights.readyNowLeads,
+                  fresh: insights.freshProspects,
+                }),
+              },
+              {
+                key: 'rhythm',
+                Icon: Activity,
+                value: `${insights.rhythmScore}%`,
+                tone: insights.tones.rhythm,
+                body: t('analytics.signalBoard.cards.rhythm.body', {
+                  score: insights.rhythmScore,
+                }),
+              },
+            ].map(({ key, Icon, value, tone, body }) => (
+              <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${SIGNAL_TONE_CLASSES[tone]}`}>
+                    {t(`analytics.tones.${tone}`)}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm font-semibold">{t(`analytics.signalBoard.cards.${key}.title`)}</p>
+                <p className="mt-2 text-2xl font-bold">{value}</p>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('analytics.signalBoard.nextMoveLabel')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t(`analytics.signalBoard.nextMove.${insights.nextMove}`)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>

@@ -641,6 +641,36 @@
   },
   "analytics": {
     "subtitle": "Track your activity and contact distribution",
+    "tones": {
+      "good": "Strong",
+      "watch": "Watch",
+      "risk": "Risk"
+    },
+    "signalBoard": {
+      "title": "Decision Signals",
+      "subtitle": "See the risk, growth opportunity, and rhythm hiding underneath the numbers at a glance.",
+      "nextMoveLabel": "Best Direction For Today",
+      "nextMove": {
+        "risk": "Start by cleaning up overdue follow-ups and warm people who have gone quiet. Do not push growth before the risk is under control.",
+        "growth": "Today you have room to move warm and fresh opportunities forward. Clear and low-friction next steps should lead the day.",
+        "rhythm": "Rhythm coverage looks soft. Instead of trying to touch everyone, add small but regular touches to the people who have gone less visible.",
+        "balanced": "The picture looks balanced. You can keep warm opportunities and daily follow-up moving together without building extra pressure."
+      },
+      "cards": {
+        "risk": {
+          "title": "Risk Zone",
+          "body": "{{overdue}} overdue follow-ups and {{stalled}} warm-but-stalled people need attention right now."
+        },
+        "growth": {
+          "title": "Growth Window",
+          "body": "{{ready}} people look warm enough for progress, and {{fresh}} people are well positioned for a fresh-touch rhythm."
+        },
+        "rhythm": {
+          "title": "Rhythm Score",
+          "body": "About {{score}}% of your active contacts currently have visible follow-up coverage or a recent touch."
+        }
+      }
+    },
     "joinedCount": "Joined Contacts",
     "overdue": "overdue",
     "academyToday": "Today's Academy Progress",

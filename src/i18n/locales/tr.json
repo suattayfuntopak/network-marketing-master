@@ -641,6 +641,36 @@
   },
   "analytics": {
     "subtitle": "Aktivitelerinizi ve kontak dağılımınızı takip edin",
+    "tones": {
+      "good": "Sağlam",
+      "watch": "İzle",
+      "risk": "Risk"
+    },
+    "signalBoard": {
+      "title": "Karar Sinyalleri",
+      "subtitle": "Sayıların altında saklanan riski, büyüme fırsatını ve ritmi tek bakışta gör.",
+      "nextMoveLabel": "Bugün İçin En Doğru Yön",
+      "nextMove": {
+        "risk": "Önce geciken takipleri ve sıcak ama sessiz kalan kişileri toparla. Risk temizlenmeden büyüme baskısı kurma.",
+        "growth": "Bugün sıcak ve yeni fırsatları daha iyi değerlendirebilirsin. Net ve düşük sürtünmeli sonraki adımlar öne çıkmalı.",
+        "rhythm": "Ritim kapsaması zayıf görünüyor. Herkesle konuşmak yerine görünürlüğü düşük kalan kişilere küçük ama düzenli dokunuşlar ekle.",
+        "balanced": "Görünen tablo dengeli. Riski büyütmeden sıcak fırsatları ve günlük takibi aynı ritimde sürdürebilirsin."
+      },
+      "cards": {
+        "risk": {
+          "title": "Risk Alanı",
+          "body": "{{overdue}} geciken takip ve {{stalled}} sıcak ama duran kişi şu an dikkat istiyor."
+        },
+        "growth": {
+          "title": "Büyüme Penceresi",
+          "body": "{{ready}} kişi karar veya ilerleme için sıcak, {{fresh}} kişi ise yeni temas ritmine uygun görünüyor."
+        },
+        "rhythm": {
+          "title": "Ritim Skoru",
+          "body": "Aktif kontakların yaklaşık {{score}}% kadarında görünür takip veya yakın temas ritmi var."
+        }
+      }
+    },
     "joinedCount": "Katılan Kontak",
     "overdue": "gecikmiş",
     "academyToday": "Bugün Okunan İçerik",
