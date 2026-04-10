@@ -20,6 +20,7 @@ import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
 import { buildDailyFocusSummary, type DailyFocusPriority } from '@/lib/dashboard/dailyFocus'
+import { buildFieldSupportTargets } from '@/lib/dashboard/fieldSupport'
 import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import type { FollowUpActionType } from '@/lib/calendar/types'
 import type { AcademyContent, Objection } from '@/lib/academy/types'
@@ -156,6 +157,103 @@ export function DashboardHome() {
     return objectionPool[visitSeed % objectionPool.length]
   }, [currentLang, objections, t, visitSeed])
 
+  const fieldSupportTargets = useMemo(
+    () =>
+      buildFieldSupportTargets({
+        mode: dailyFocus.recommendedMode,
+        academyContents,
+        objections,
+        language: currentLang,
+      }),
+    [academyContents, currentLang, dailyFocus.recommendedMode, objections]
+  )
+
+  const primaryPriority = dailyFocus.priorities[0] ?? null
+
+  const primaryActionHref = primaryPriority
+    ? `${ROUTES.CONTACTS}/${primaryPriority.contactId}`
+    : dailyFocus.recommendedMode === 'follow_ups'
+      ? `${ROUTES.CALENDAR}/takipler`
+      : dailyFocus.recommendedMode === 'opportunities'
+        ? ROUTES.PIPELINE
+        : `${ROUTES.CONTACTS}/yeni`
+
+  const gamePlanSteps = useMemo(() => {
+    const nextCount =
+      dailyFocus.recommendedMode === 'follow_ups'
+        ? dailyFocus.warmOpportunities
+        : dailyFocus.recommendedMode === 'opportunities'
+          ? dailyFocus.newReachOuts
+          : dailyFocus.urgentFollowUps
+
+    return [
+      {
+        key: 'primary',
+        value: t(`dashboard.focus.modes.${dailyFocus.recommendedMode}`),
+        description: t(`dashboard.gamePlan.primary.${dailyFocus.recommendedMode}`),
+      },
+      {
+        key: 'next',
+        value: t('dashboard.gamePlan.next.value', { count: nextCount }),
+        description: t(`dashboard.gamePlan.next.${dailyFocus.recommendedMode}`, { count: nextCount }),
+      },
+      {
+        key: 'stability',
+        value: t('dashboard.gamePlan.stability.value'),
+        description: t(`dashboard.gamePlan.stability.${dailyFocus.recommendedMode}`),
+      },
+    ] as const
+  }, [
+    dailyFocus.newReachOuts,
+    dailyFocus.recommendedMode,
+    dailyFocus.urgentFollowUps,
+    dailyFocus.warmOpportunities,
+    t,
+  ])
+
+  const supportCards = useMemo(() => {
+    const cards = []
+
+    if (fieldSupportTargets.academy) {
+      cards.push({
+        key: `academy-${fieldSupportTargets.academy.id}`,
+        label: t('dashboard.support.labels.academy'),
+        title: fieldSupportTargets.academy.title,
+        summary: truncateText(fieldSupportTargets.academy.summary || fieldSupportTargets.academy.content, 165),
+        reason: t(`dashboard.support.academyReasons.${dailyFocus.recommendedMode}`),
+        actionLabel: t('dashboard.support.openAcademyItem'),
+        action: () => navigate(`${ROUTES.ACADEMY}/${fieldSupportTargets.academy?.id}`),
+        tone: 'border-emerald-500/15 bg-emerald-500/8 text-emerald-100',
+      })
+    }
+
+    if (fieldSupportTargets.objection) {
+      cards.push({
+        key: `objection-${fieldSupportTargets.objection.id}`,
+        label: t('dashboard.support.labels.objection'),
+        title: fieldSupportTargets.objection.short_label || truncateText(fieldSupportTargets.objection.objection_text, 70),
+        summary: truncateText(fieldSupportTargets.objection.response_short || fieldSupportTargets.objection.response_text, 165),
+        reason: t(`dashboard.support.objectionReasons.${dailyFocus.recommendedMode}`),
+        actionLabel: t('dashboard.support.openObjectionItem'),
+        action: () => navigate(`${ROUTES.ACADEMY}/itirazlar`),
+        tone: 'border-sky-500/15 bg-sky-500/8 text-sky-100',
+      })
+    }
+
+    cards.push({
+      key: 'coach-note',
+      label: t('dashboard.support.labels.coach'),
+      title: t(`dashboard.support.coachTitles.${dailyFocus.recommendedMode}`),
+      summary: t(`dashboard.support.coachSummaries.${dailyFocus.recommendedMode}`),
+      reason: t('dashboard.support.coachReason'),
+      actionLabel: t('dashboard.support.openAcademy'),
+      action: () => navigate(ROUTES.ACADEMY),
+      tone: 'border-amber-500/15 bg-amber-500/8 text-amber-100',
+    })
+
+    return cards.slice(0, 3)
+  }, [dailyFocus.recommendedMode, fieldSupportTargets.academy, fieldSupportTargets.objection, navigate, t])
+
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
       {/* Welcome */}
@@ -166,6 +264,89 @@ export function DashboardHome() {
         <p className="text-muted-foreground mt-1">
           {t('dashboard.welcomeSubtitle')}
         </p>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card className="overflow-hidden border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_30%)]">
+          <CardContent className="pt-6">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="max-w-2xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary/80">
+                  {t('dashboard.gamePlan.label')}
+                </p>
+                <h2 className="mt-2 text-xl font-semibold tracking-tight">{t('dashboard.gamePlan.title')}</h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {t('dashboard.gamePlan.subtitle')}
+                </p>
+              </div>
+              <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                {t(`dashboard.focus.modes.${dailyFocus.recommendedMode}`)}
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              {gamePlanSteps.map((step) => (
+                <div key={step.key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t(`dashboard.gamePlan.steps.${step.key}`)}
+                  </p>
+                  <p className="mt-3 text-sm font-semibold">{step.value}</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button className="gap-1.5" onClick={() => navigate(primaryActionHref)}>
+                {t('dashboard.gamePlan.primaryAction')}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" className="gap-1.5" onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}>
+                {t('dashboard.gamePlan.openCalendar')}
+              </Button>
+              <Button variant="ghost" className="gap-1.5" onClick={() => navigate(ROUTES.ACADEMY)}>
+                {t('dashboard.gamePlan.openAcademy')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-primary/15">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">{t('dashboard.support.title')}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.support.subtitle')}</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {supportCards.slice(0, 2).map((card) => (
+              <button
+                key={card.key}
+                type="button"
+                onClick={card.action}
+                className="w-full rounded-2xl border border-border/70 bg-card/60 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${card.tone}`}>
+                      {card.label}
+                    </span>
+                    <p className="mt-3 text-sm font-semibold leading-6">{card.title}</p>
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">{card.summary}</p>
+                  </div>
+                  <ArrowUpRight className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                </div>
+              </button>
+            ))}
+
+            <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('dashboard.support.coachLabel')}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t(`dashboard.support.coachSummaries.${dailyFocus.recommendedMode}`)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Stats grid */}
@@ -531,13 +712,37 @@ export function DashboardHome() {
         <Card>
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
             <div>
-              <CardTitle className="text-base">{t('dashboard.academyNotes')}</CardTitle>
-              <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.academyNotesHint')}</p>
+              <CardTitle className="text-base">{t('dashboard.support.title')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.support.subtitle')}</p>
             </div>
             <GraduationCap className="w-5 h-5 text-muted-foreground" />
           </CardHeader>
           <CardContent className="flex min-h-[220px] flex-col justify-between gap-5">
-            {academySpotlight || objectionSpotlight ? (
+            {supportCards.length > 0 ? (
+              <div className="space-y-3">
+                {supportCards.map((card) => (
+                  <button
+                    key={card.key}
+                    type="button"
+                    onClick={card.action}
+                    className="flex w-full items-start justify-between gap-3 rounded-2xl border border-border/70 bg-card/60 px-4 py-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+                  >
+                    <div className="min-w-0">
+                      <span className={`inline-flex rounded-full border px-2 py-0.5 text-[11px] font-medium ${card.tone}`}>
+                        {card.label}
+                      </span>
+                      <h3 className="mt-3 text-sm font-semibold leading-6">{card.title}</h3>
+                      <p className="mt-2 text-xs leading-5 text-muted-foreground">{card.reason}</p>
+                      <p className="mt-2 text-sm leading-6 text-muted-foreground">{card.summary}</p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2 pt-0.5 text-xs font-medium text-primary">
+                      <span>{card.actionLabel}</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : academySpotlight || objectionSpotlight ? (
               <div className="flex h-full flex-col justify-between gap-5">
                 <div className="space-y-4">
                   {academySpotlight && (
@@ -555,25 +760,6 @@ export function DashboardHome() {
                       <p className="mt-2 text-sm leading-6 text-muted-foreground">{objectionSpotlight.summary}</p>
                     </div>
                   )}
-                </div>
-
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between"
-                    onClick={() => navigate(ROUTES.ACADEMY)}
-                  >
-                    {t('dashboard.openAcademy')}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-between"
-                    onClick={() => navigate(`${ROUTES.ACADEMY}/itirazlar`)}
-                  >
-                    {t('dashboard.openObjections')}
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
             ) : (

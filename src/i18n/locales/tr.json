@@ -528,6 +528,70 @@
         "new_reachouts": "Yeni temasta amaç satış değil güvenli giriş. Kısa bir bağ kur, merak uyandır ve doğal bir diyalog başlat."
       }
     },
+    "gamePlan": {
+      "label": "Günün Oyun Planı",
+      "title": "Bugünü daha net oynat",
+      "subtitle": "Önce nereye bakacağını, sonra neyi sıcak tutacağını ve ritmi nasıl koruyacağını tek blokta gör.",
+      "steps": {
+        "primary": "Şimdi",
+        "next": "Sonra",
+        "stability": "Ritmi Koru"
+      },
+      "primary": {
+        "follow_ups": "Gecikmiş ve bugün vadesi olan konuşmaları önce toparla.",
+        "opportunities": "Sıcak ve karar eşiğine yakın kişileri bugün bekletme.",
+        "new_reachouts": "Yeni temas bekleyen kişilere kısa ve doğal bir açılış yap."
+      },
+      "next": {
+        "value": "{{count}} kişi",
+        "follow_ups": "Takipleri temizledikten sonra öne çıkan {{count}} sıcak fırsatı ilerlet.",
+        "opportunities": "Sıcak fırsatlardan sonra ritim bekleyen {{count}} yeni kişiye dön.",
+        "new_reachouts": "Yeni temaslardan sonra boşta kalan {{count}} takip aksiyonunu gözden geçir."
+      },
+      "stability": {
+        "value": "Ton ve rehber",
+        "follow_ups": "Kısa bir kontrol, yumuşak bir hatırlatma ve tek sonraki adım dili kullan.",
+        "opportunities": "Detayı çoğaltmak yerine kararı kolaylaştıran tek bir sonraki adım sun.",
+        "new_reachouts": "Satış gibi değil, doğal bir bağlantı gibi hissettiren girişler seç."
+      },
+      "primaryAction": "Ana Aksiyonu Aç",
+      "openCalendar": "Takvime Git",
+      "openAcademy": "Akademiden Destek Al"
+    },
+    "support": {
+      "title": "Saha Desteği",
+      "subtitle": "Bugünkü ritme göre açılabilecek en faydalı akademi ve itiraz desteğini burada topladık.",
+      "coachLabel": "Koç Notu",
+      "openAcademy": "Akademiye Git",
+      "openAcademyItem": "İçeriği Aç",
+      "openObjectionItem": "İtiraz Bankası",
+      "coachReason": "Bugünkü oyun planını saha tonuna çevirir.",
+      "labels": {
+        "academy": "Akademi",
+        "objection": "İtiraz",
+        "coach": "Koç"
+      },
+      "academyReasons": {
+        "follow_ups": "Bugün takip dili ve takip sırası öne çıkıyor.",
+        "opportunities": "Bugün kararı kolaylaştıran içerikler daha çok iş görebilir.",
+        "new_reachouts": "Bugün ilk temas ve davet tonu daha kritik."
+      },
+      "objectionReasons": {
+        "follow_ups": "Sessiz kalan veya bekleten kişilerde bu tür çekinceler sık görünür.",
+        "opportunities": "Sıcak kişilerin karar anında en çok zorlandığı alanlardan biri bu.",
+        "new_reachouts": "İlk temaslarda savunma ve çekince daha erken ortaya çıkabilir."
+      },
+      "coachTitles": {
+        "follow_ups": "Takipte netlik, baskıdan daha güçlüdür",
+        "opportunities": "Sıcak adayda bir sonraki adımı kolaylaştır",
+        "new_reachouts": "İlk temasın hedefi güvenli bir giriş olsun"
+      },
+      "coachSummaries": {
+        "follow_ups": "Son konuşmayı referans ver, tek bir soru sor ve konuşmayı açık bırak. Uzun açıklamalar yerine hafif geri dönüş alanları daha iyi çalışır.",
+        "opportunities": "Sıcak kişiyi bilgiyle boğma. İlgiyi teyit et, küçük bir karar kolaylaştırıcı ekle ve bir sonraki adımı netleştir.",
+        "new_reachouts": "Merak uyandıran kısa bir giriş, ürün ya da fırsatı anlatmaktan daha değerlidir. Konuşmayı doğal bir diyalog gibi aç."
+      }
+    },
     "ctaTitle": "Başlamaya hazır mısın?",
     "ctaText": "İlk kontaklarını ekleyerek Network Marketing Master'ı kullanmaya başla. AI destekli araçlarla ekibini büyüt.",
     "addFirstContact": "İlk Kontağı Ekle"
@@ -899,6 +963,28 @@
         "desc": "Hazır cevaplar, örnek diyaloglar ve baskısız dönüşler için itiraz bankasına geç."
       }
     },
+    "scenarioCards": {
+      "label": "Saha Senaryoları",
+      "subtitle": "Bugün sahada karşılaştığın duruma göre doğru kategoriye tek dokunuşla geç.",
+      "items": {
+        "followUp": {
+          "title": "Sessiz kalan konuşmayı aç",
+          "body": "Takip zamanı gelmiş ama enerji düşmüş konuşmalar için takip ve kapanış içeriklerini aç."
+        },
+        "firstInvite": {
+          "title": "İlk mesajı davete çevir",
+          "body": "İlk yaklaşım, merak uyandırma ve düşük baskılı davet dili için doğru akışı aç."
+        },
+        "postPresentation": {
+          "title": "Sunum sonrası kararsızlığı yönet",
+          "body": "Karar eşiğindeki kişiyi zorlamadan ilerletecek kapanış ve takip içeriklerine geç."
+        },
+        "teamActivation": {
+          "title": "Yeni ekip üyesini oyunda tut",
+          "body": "Başlayan kişinin ritmini koruması için ekip kurma ve liderlik içeriklerini aç."
+        }
+      }
+    },
     "objection": {
       "subtitle": "En yaygın itirazlara hazır, etkili cevaplar",
       "new": "Yeni İtiraz",
@@ -937,6 +1023,28 @@
           "microStep": {
             "title": "Mikro sonraki adım bırak",
             "body": "Cevabı uzun uzun bitirme. Küçük bir soru, kısa bir içerik ya da minik bir teyit konuşmayı açık tutar."
+          }
+        }
+      },
+      "quickScenarios": {
+        "label": "Hızlı Senaryolar",
+        "subtitle": "Sahada en sık gelen çekincelere göre bankayı hızlıca daralt.",
+        "items": {
+          "money": {
+            "title": "Bütçe çekincesi",
+            "body": "Ürün veya iş fırsatında parasal direnç yükseldiyse önce buradan ilerle."
+          },
+          "trust": {
+            "title": "Güven sorusu",
+            "body": "Kişi şirkete, ürüne veya sisteme mesafe koyuyorsa bu kümeyi aç."
+          },
+          "wait": {
+            "title": "Düşüneceğim",
+            "body": "Karar kaçışı mı gerçek düşünme mi, bunu ayıran cevapları gör."
+          },
+          "time": {
+            "title": "Zamanım yok",
+            "body": "Aşırı meşgul görünen kişide düşük bariyerli yaklaşım dilini buradan seç."
           }
         }
       },

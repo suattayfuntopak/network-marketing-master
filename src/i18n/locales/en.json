@@ -528,6 +528,70 @@
         "new_reachouts": "The goal of a first reach-out is not a sale, but a safe opening. Build a short connection, spark curiosity, and start a natural dialogue."
       }
     },
+    "gamePlan": {
+      "label": "Today's Game Plan",
+      "title": "Run the day with more clarity",
+      "subtitle": "See where to look first, what to keep warm next, and how to protect your rhythm in one place.",
+      "steps": {
+        "primary": "Now",
+        "next": "Next",
+        "stability": "Protect Rhythm"
+      },
+      "primary": {
+        "follow_ups": "Clean up overdue and due-today conversations first.",
+        "opportunities": "Do not leave warm people near a decision point waiting today.",
+        "new_reachouts": "Open with a short, natural first touch for the people still waiting."
+      },
+      "next": {
+        "value": "{{count}} people",
+        "follow_ups": "After the backlog, move the top {{count}} warm opportunities forward.",
+        "opportunities": "After warm opportunities, return to the {{count}} new people still waiting for rhythm.",
+        "new_reachouts": "After fresh reach-outs, review the {{count}} follow-up actions you still should not leave open."
+      },
+      "stability": {
+        "value": "Tone and support",
+        "follow_ups": "Use a short check-in, a soft reminder, and one clear next step.",
+        "opportunities": "Instead of adding detail, offer one next step that makes the decision easier.",
+        "new_reachouts": "Choose openings that feel like a natural connection, not a sales pitch."
+      },
+      "primaryAction": "Open Primary Action",
+      "openCalendar": "Open Calendar",
+      "openAcademy": "Get Academy Support"
+    },
+    "support": {
+      "title": "Field Support",
+      "subtitle": "We pulled the most useful academy and objection support for the rhythm you are in today.",
+      "coachLabel": "Coach Note",
+      "openAcademy": "Open Academy",
+      "openAcademyItem": "Open Resource",
+      "openObjectionItem": "Open Objection Bank",
+      "coachReason": "Turns today’s plan into a usable field tone.",
+      "labels": {
+        "academy": "Academy",
+        "objection": "Objection",
+        "coach": "Coach"
+      },
+      "academyReasons": {
+        "follow_ups": "Today the strongest need is better follow-up language and sequence.",
+        "opportunities": "Today content that lowers decision friction will help most.",
+        "new_reachouts": "Today first-touch and invitation tone matters more."
+      },
+      "objectionReasons": {
+        "follow_ups": "Quiet or delaying conversations often surface this kind of hesitation.",
+        "opportunities": "This is one of the most common pressure points when a warm person nears a decision.",
+        "new_reachouts": "In early conversations, defensiveness and hesitation can show up faster."
+      },
+      "coachTitles": {
+        "follow_ups": "In follow-up, clarity is stronger than pressure",
+        "opportunities": "Make the next step easier for the warm prospect",
+        "new_reachouts": "Let the first touch feel safe and natural"
+      },
+      "coachSummaries": {
+        "follow_ups": "Reference the last conversation, ask one simple question, and leave the dialogue open. Light re-entry usually works better than long explanations.",
+        "opportunities": "Do not drown a warm person in detail. Confirm the interest, lower decision friction, and make the next step obvious.",
+        "new_reachouts": "A short curiosity-driven opening is more valuable than explaining the product or opportunity too early. Start a natural dialogue first."
+      }
+    },
     "ctaTitle": "Ready to get started?",
     "ctaText": "Start adding your first contacts to use Network Marketing Master. Grow your team with AI-powered tools.",
     "addFirstContact": "Add First Contact"
@@ -899,6 +963,28 @@
         "desc": "Move into the objection bank for ready answers, example dialogs, and low-pressure pivots."
       }
     },
+    "scenarioCards": {
+      "label": "Field Scenarios",
+      "subtitle": "Jump into the right category in one touch based on the situation you are facing today.",
+      "items": {
+        "followUp": {
+          "title": "Re-open a quiet conversation",
+          "body": "Open follow-up and closing content when timing is due but energy has dropped."
+        },
+        "firstInvite": {
+          "title": "Turn the first message into an invite",
+          "body": "Open the right flow for first approach, curiosity, and low-pressure invitation language."
+        },
+        "postPresentation": {
+          "title": "Handle post-presentation hesitation",
+          "body": "Move into closing and follow-up content that advances the next step without pressure."
+        },
+        "teamActivation": {
+          "title": "Keep a new team member in motion",
+          "body": "Open team-building and leadership content that helps a starter protect rhythm."
+        }
+      }
+    },
     "objection": {
       "subtitle": "Ready, effective responses to the most common objections",
       "new": "New Objection",
@@ -937,6 +1023,28 @@
           "microStep": {
             "title": "Leave a micro next step",
             "body": "Do not end with a long answer. A small question, short resource, or light confirmation keeps the conversation alive."
+          }
+        }
+      },
+      "quickScenarios": {
+        "label": "Quick Scenarios",
+        "subtitle": "Narrow the bank quickly based on the most common field hesitations.",
+        "items": {
+          "money": {
+            "title": "Budget hesitation",
+            "body": "Start here when product or business conversations are running into money resistance."
+          },
+          "trust": {
+            "title": "Trust question",
+            "body": "Open this cluster when the person is holding back from the company, product, or system."
+          },
+          "wait": {
+            "title": "I need to think",
+            "body": "See the replies that separate real thinking from quiet decision avoidance."
+          },
+          "time": {
+            "title": "No time",
+            "body": "Use this when the person feels overloaded and needs a lower-friction frame."
           }
         }
       },

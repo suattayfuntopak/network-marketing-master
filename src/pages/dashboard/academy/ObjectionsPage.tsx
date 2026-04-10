@@ -69,6 +69,13 @@ export function ObjectionsPage() {
     { key: 'microStep', Icon: ArrowRight },
   ] as const
 
+  const quickScenarios = [
+    { key: 'money', category: 'money' as const },
+    { key: 'trust', category: 'trust' as const },
+    { key: 'wait', category: 'wait' as const },
+    { key: 'time', category: 'time' as const },
+  ] as const
+
   const handleCopy = async (id: string, text: string, short = false) => {
     await navigator.clipboard.writeText(text)
     if (short) { setCopiedShortId(id); setTimeout(() => setCopiedShortId(null), 2000) }
@@ -159,6 +166,41 @@ export function ObjectionsPage() {
                 {t(`academy.objection.psychology.cards.${key}.body`)}
               </p>
             </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.objection.quickScenarios.label')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t('academy.objection.quickScenarios.subtitle')}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {quickScenarios.map(({ key, category: scenarioCategory }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => {
+                setSearch('')
+                setCategory(scenarioCategory)
+                setExpandedId(null)
+              }}
+              className="rounded-2xl border border-border/70 bg-background/70 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+            >
+              <p className="text-sm font-semibold">
+                {t(`academy.objection.quickScenarios.items.${key}.title`)}
+              </p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t(`academy.objection.quickScenarios.items.${key}.body`)}
+              </p>
+            </button>
           ))}
         </div>
       </div>
