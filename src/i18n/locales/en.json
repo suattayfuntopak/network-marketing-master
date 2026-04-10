@@ -476,6 +476,58 @@
     "birthdayAiPrompt": "Today is this person's birthday. Generate a short, warm, personal, relationship-focused celebration message that naturally uses the profile details.",
     "birthdayEmailSubject": "Birthday message for {{name}}",
     "messageCopiedForChannel": "Message copied. You can send it through {{channel}}.",
+    "focus": {
+      "title": "Today's Focus Board",
+      "subtitle": "We turned the operating-system thinking from the reference projects into a simple decision layer powered by your real data.",
+      "commandLabel": "Start Here First",
+      "openContact": "Open Contact",
+      "empty": "No critical action stands out right now. You can open the day with fresh reach-outs or academy rhythm.",
+      "rhythmTitle": "Rhythm Signals",
+      "rhythmSubtitle": "See the areas that either slow your distributor flow down or push it forward at a glance.",
+      "playbookLabel": "Mini Playbook",
+      "modes": {
+        "follow_ups": "Follow-up Discipline",
+        "opportunities": "Warm Opportunities",
+        "new_reachouts": "New Reach-outs"
+      },
+      "headlines": {
+        "follow_ups": "{{count}} critical follow-ups need attention today",
+        "opportunities": "{{count}} warm opportunities can move before they cool off",
+        "new_reachouts": "{{count}} new people are waiting for a first touch"
+      },
+      "summaries": {
+        "follow_ups": "First clean up overdue and due-today conversations. Returning to warm opportunities after that usually improves the quality of the day.",
+        "opportunities": "Today the strongest signal is people with heat and decision potential. A small but clear next step can create momentum.",
+        "new_reachouts": "There are people in the lead pool still waiting for a first touch. Low-pressure, short, natural openings usually work best here."
+      },
+      "reasons": {
+        "overdue": "The follow-up is overdue. Re-entering before warmth drops matters here.",
+        "today": "An action is due today. A small touch without delay usually works well.",
+        "presentation": "They are in a presentation or decision window. Clarifying the next step would help.",
+        "opportunity": "Interest still looks warm. It is a good moment to move the conversation forward.",
+        "newContact": "Recently added. There is still a natural window for the first touch.",
+        "freshTouch": "The first contact is still fresh. Building rhythm before silence sets in is an advantage."
+      },
+      "metrics": {
+        "urgentFollowUps": {
+          "title": "Urgent Follow-ups",
+          "hint": "Due today or already overdue"
+        },
+        "warmOpportunities": {
+          "title": "Warm Opportunities",
+          "hint": "People showing interest and close to progress"
+        },
+        "newReachOuts": {
+          "title": "First Touches",
+          "hint": "Recently added people with no rhythm yet"
+        }
+      },
+      "playbooks": {
+        "follow_ups": "Raise clarity, not pressure. Briefly reference the last touch, suggest one next move, and leave the conversation open.",
+        "opportunities": "Do not overload a warm person with detail. Confirm the interest and offer one next step that lowers decision friction.",
+        "new_reachouts": "The goal of a first reach-out is not a sale, but a safe opening. Build a short connection, spark curiosity, and start a natural dialogue."
+      }
+    },
     "ctaTitle": "Ready to get started?",
     "ctaText": "Start adding your first contacts to use Network Marketing Master. Grow your team with AI-powered tools.",
     "addFirstContact": "Add First Contact"
@@ -825,6 +877,28 @@
     "placeholders": {
       "tags": "mindset, beginner, invitation"
     },
+    "quickPaths": {
+      "dailyFocus": {
+        "title": "Protect follow-up rhythm",
+        "desc": "Jump into follow-up content for the people whose conversations should be reopened today."
+      },
+      "inviteFlow": {
+        "title": "Turn a new contact into an invite",
+        "desc": "Open the right content for first approach, curiosity, and low-pressure invitation language."
+      },
+      "postPresentation": {
+        "title": "Protect post-presentation momentum",
+        "desc": "Move into closing and follow-up content that keeps things clear without amplifying hesitation."
+      },
+      "teamRhythm": {
+        "title": "Strengthen team rhythm",
+        "desc": "Open team-building content that helps new members stay in motion and keeps coaching simpler."
+      },
+      "objections": {
+        "title": "Turn objections into dialogue",
+        "desc": "Move into the objection bank for ready answers, example dialogs, and low-pressure pivots."
+      }
+    },
     "objection": {
       "subtitle": "Ready, effective responses to the most common objections",
       "new": "New Objection",
@@ -847,6 +921,24 @@
         "text": "\"Is this a Ponzi scheme?\"",
         "approach": "Empathy + clear info + pressure-free exit",
         "exampleDialog": "A: ...\nB: ..."
+      },
+      "psychology": {
+        "label": "Objection Psychology",
+        "summary": "An objection is usually not a final no; it is often a signal of risk, confusion, or identity protection. Lower the threat first, answer second, and leave a tiny next step last.",
+        "cards": {
+          "validate": {
+            "title": "Hear the emotion first",
+            "body": "People look for safety before logic. Before defending your idea, acknowledge why the concern could feel reasonable."
+          },
+          "depressure": {
+            "title": "Reduce pressure",
+            "body": "Do not speed up when an objection appears. Lower the threat level first. The goal is not to force agreement, but to make thinking feel safe."
+          },
+          "microStep": {
+            "title": "Leave a micro next step",
+            "body": "Do not end with a long answer. A small question, short resource, or light confirmation keeps the conversation alive."
+          }
+        }
       },
       "objCategories": {
         "money": "No Money",

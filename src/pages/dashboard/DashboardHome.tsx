@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { format, formatDistanceToNow } from 'date-fns'
-import { Users, TrendingUp, UserPlus, ArrowRight, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal, GraduationCap, Sparkles } from 'lucide-react'
+import { Users, TrendingUp, UserPlus, ArrowRight, Bell, CalendarDays, Phone, MessageCircle, Mail, MoreHorizontal, GraduationCap, Sparkles, Flame, Clock3, Compass, ArrowUpRight } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { tr } from 'date-fns/locale'
 import { enUS } from 'date-fns/locale'
@@ -14,11 +14,13 @@ import { BirthdayMessageDialog } from '@/components/dashboard/BirthdayMessageDia
 import { useAuth } from '@/hooks/useAuth'
 import { useAcademyContents } from '@/hooks/useAcademy'
 import { useObjections } from '@/hooks/useObjections'
-import { useContactCount, useContactsCreatedThisWeekCount, useContactsWithBirthdayToday, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
+import { useContactCount, useContacts, useContactsCreatedThisWeekCount, useContactsWithBirthdayToday, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useFollowUpBuckets, useTodayAppointments } from '@/hooks/useCalendar'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
+import { buildDailyFocusSummary, type DailyFocusPriority } from '@/lib/dashboard/dailyFocus'
+import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import type { FollowUpActionType } from '@/lib/calendar/types'
 import type { AcademyContent, Objection } from '@/lib/academy/types'
 import type { BirthdayContact } from '@/lib/contacts/queries'
@@ -56,6 +58,48 @@ interface AcademySpotlightItem {
   summary: string
 }
 
+const FOCUS_MODE_META = {
+  follow_ups: {
+    icon: Clock3,
+    tone: 'text-rose-300',
+    badge: 'border-rose-500/25 bg-rose-500/10 text-rose-200',
+  },
+  opportunities: {
+    icon: Flame,
+    tone: 'text-amber-300',
+    badge: 'border-amber-500/25 bg-amber-500/10 text-amber-100',
+  },
+  new_reachouts: {
+    icon: Compass,
+    tone: 'text-sky-300',
+    badge: 'border-sky-500/25 bg-sky-500/10 text-sky-100',
+  },
+} as const
+
+function getPriorityReason(priority: DailyFocusPriority, t: (key: string, options?: Record<string, unknown>) => string) {
+  if (priority.reason === 'overdue_follow_up') {
+    return t('dashboard.focus.reasons.overdue')
+  }
+
+  if (priority.reason === 'due_today') {
+    return t('dashboard.focus.reasons.today')
+  }
+
+  if (priority.reason === 'presentation_window') {
+    return t('dashboard.focus.reasons.presentation')
+  }
+
+  if (priority.reason === 'warm_opportunity') {
+    return t('dashboard.focus.reasons.opportunity')
+  }
+
+  if (priority.reason === 'fresh_touch') {
+    return t('dashboard.focus.reasons.freshTouch')
+  }
+
+  return t('dashboard.focus.reasons.newContact')
+}
+
 export function DashboardHome() {
   const navigate = useNavigate()
   const { profile, user } = useAuth()
@@ -66,6 +110,13 @@ export function DashboardHome() {
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: contactsCreatedThisWeekCount = 0 } = useContactsCreatedThisWeekCount(userId)
+  const { data: contactsResult } = useContacts({
+    userId,
+    filters: DEFAULT_FILTERS,
+    sort: DEFAULT_SORT,
+    page: 1,
+    pageSize: 500,
+  })
   const { data: birthdaysToday = [] } = useContactsWithBirthdayToday(userId)
   const { data: recentContacts = [] } = useRecentContacts(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
@@ -76,6 +127,12 @@ export function DashboardHome() {
   const { data: objections = [] } = useObjections()
   const visitSeed = useMemo(() => Date.now(), [])
   const [birthdayDialogContact, setBirthdayDialogContact] = useState<BirthdayContact | null>(null)
+  const allContacts = contactsResult?.data ?? []
+
+  const dailyFocus = useMemo(
+    () => buildDailyFocusSummary(allContacts, followUpBuckets),
+    [allContacts, followUpBuckets]
+  )
 
   const academySpotlight = useMemo<AcademySpotlightItem | null>(() => {
     const localizedAcademy = academyContents.filter((item) => item.language === currentLang)
@@ -197,6 +254,145 @@ export function DashboardHome() {
                 ? t('dashboard.overdueFollowUps', { count: followUpBuckets?.overdue?.length })
                 : t('dashboard.noOverdueFollowUps')}
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+        <Card className="overflow-hidden">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 pb-3">
+            <div>
+              <CardTitle className="text-base">{t('dashboard.focus.title')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.focus.subtitle')}</p>
+            </div>
+            <div className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              {t(`dashboard.focus.modes.${dailyFocus.recommendedMode}`)}
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="max-w-2xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                    {t('dashboard.focus.commandLabel')}
+                  </p>
+                  <p className="mt-2 text-lg font-semibold leading-snug">
+                    {t(`dashboard.focus.headlines.${dailyFocus.recommendedMode}`, {
+                      count:
+                        dailyFocus.recommendedMode === 'follow_ups'
+                          ? dailyFocus.urgentFollowUps
+                          : dailyFocus.recommendedMode === 'opportunities'
+                            ? dailyFocus.warmOpportunities
+                            : dailyFocus.newReachOuts,
+                    })}
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {t(`dashboard.focus.summaries.${dailyFocus.recommendedMode}`, {
+                      urgent: dailyFocus.urgentFollowUps,
+                      opportunities: dailyFocus.warmOpportunities,
+                      newReachOuts: dailyFocus.newReachOuts,
+                    })}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-card/70 text-primary">
+                  {(() => {
+                    const FocusIcon = FOCUS_MODE_META[dailyFocus.recommendedMode].icon
+                    return <FocusIcon className="h-5 w-5" />
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {dailyFocus.priorities.length > 0 ? (
+              <div className="space-y-3">
+                {dailyFocus.priorities.map((item) => (
+                  <button
+                    key={item.contactId}
+                    type="button"
+                    onClick={() => navigate(`${ROUTES.CONTACTS}/${item.contactId}`)}
+                    className="flex w-full items-start justify-between gap-3 rounded-2xl border border-border/70 bg-card/60 px-4 py-3 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-semibold">{item.contactName}</p>
+                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${FOCUS_MODE_META[item.mode].badge}`}>
+                          {t(`dashboard.focus.modes.${item.mode}`)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-sm text-muted-foreground">{getPriorityReason(item, t)}</p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <StageBadge stage={item.stage as BirthdayContact['stage']} />
+                        {item.warmthScore > 0 ? <WarmthScoreBadge score={item.warmthScore} /> : null}
+                        {(item.city || item.occupation) ? (
+                          <span className="text-xs text-muted-foreground">
+                            {item.occupation || item.city}
+                          </span>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2 pt-0.5 text-xs font-medium text-primary">
+                      <span>{t('dashboard.focus.openContact')}</span>
+                      <ArrowUpRight className="h-3.5 w-3.5" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-2xl border border-border/70 bg-card/50 px-4 py-6 text-center text-sm text-muted-foreground">
+                {t('dashboard.focus.empty')}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">{t('dashboard.focus.rhythmTitle')}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">{t('dashboard.focus.rhythmSubtitle')}</p>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {([
+              {
+                key: 'urgentFollowUps',
+                icon: Clock3,
+                value: dailyFocus.urgentFollowUps,
+                tone: 'border-rose-500/20 bg-rose-500/10 text-rose-200',
+              },
+              {
+                key: 'warmOpportunities',
+                icon: Flame,
+                value: dailyFocus.warmOpportunities,
+                tone: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
+              },
+              {
+                key: 'newReachOuts',
+                icon: Compass,
+                value: dailyFocus.newReachOuts,
+                tone: 'border-sky-500/20 bg-sky-500/10 text-sky-100',
+              },
+            ] as const).map(({ key, icon: Icon, value, tone }) => (
+              <div key={key} className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${tone}`}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium">{t(`dashboard.focus.metrics.${key}.title`)}</p>
+                    <p className="text-xs text-muted-foreground">{t(`dashboard.focus.metrics.${key}.hint`)}</p>
+                  </div>
+                </div>
+                <span className="text-2xl font-semibold tabular-nums">{value}</span>
+              </div>
+            ))}
+
+            <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('dashboard.focus.playbookLabel')}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t(`dashboard.focus.playbooks.${dailyFocus.recommendedMode}`)}
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>

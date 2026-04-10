@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Pencil, Plus } from 'lucide-react'
+import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Pencil, Plus, Shield, ArrowRight, Brain } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -62,6 +62,12 @@ export function ObjectionsPage() {
   const incrementUse = useIncrementObjectionUseCount()
   const createObjection = useCreateObjection()
   const updateObjection = useUpdateObjection()
+
+  const psychologyCards = [
+    { key: 'validate', Icon: Brain },
+    { key: 'depressure', Icon: Shield },
+    { key: 'microStep', Icon: ArrowRight },
+  ] as const
 
   const handleCopy = async (id: string, text: string, short = false) => {
     await navigator.clipboard.writeText(text)
@@ -132,6 +138,29 @@ export function ObjectionsPage() {
           <Plus className="w-4 h-4" />
           {t('academy.objection.new')}
         </Button>
+      </div>
+
+      <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+          {t('academy.objection.psychology.label')}
+        </p>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          {t('academy.objection.psychology.summary')}
+        </p>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {psychologyCards.map(({ key, Icon }) => (
+            <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                <Icon className="h-4 w-4" />
+              </div>
+              <p className="mt-4 text-sm font-semibold">{t(`academy.objection.psychology.cards.${key}.title`)}</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t(`academy.objection.psychology.cards.${key}.body`)}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Arama */}

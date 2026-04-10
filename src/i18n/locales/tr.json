@@ -476,6 +476,58 @@
     "birthdayAiPrompt": "Bugün bu kişinin doğum günü. Kısa, sıcak, kişisel ve ilişki odaklı bir kutlama mesajı üret. Profilindeki bilgilerden doğal şekilde yararlan.",
     "birthdayEmailSubject": "{{name}} için doğum günü mesajı",
     "messageCopiedForChannel": "Mesaj kopyalandı. {{channel}} üzerinden gönderebilirsin.",
+    "focus": {
+      "title": "Bugünün Odak Alanı",
+      "subtitle": "Referans projelerden gelen operating-system yaklaşımını, mevcut verinle çalışan sade bir karar katmanına çevirdik.",
+      "commandLabel": "Bugün Önce Buradan Başla",
+      "openContact": "Kontağı Aç",
+      "empty": "Bugün öne çıkan kritik aksiyon görünmüyor. Yeni temas veya akademi ritmiyle günü açabilirsin.",
+      "rhythmTitle": "Ritim Sinyalleri",
+      "rhythmSubtitle": "Distribütör akışında günü bozan veya hızlandıran alanları tek bakışta gör.",
+      "playbookLabel": "Mini Playbook",
+      "modes": {
+        "follow_ups": "Takip Disiplini",
+        "opportunities": "Sıcak Fırsatlar",
+        "new_reachouts": "Yeni Temas"
+      },
+      "headlines": {
+        "follow_ups": "{{count}} kritik takip bugün odak istiyor",
+        "opportunities": "{{count}} sıcak fırsat soğumadan ilerletilebilir",
+        "new_reachouts": "{{count}} yeni kişi ilk teması bekliyor"
+      },
+      "summaries": {
+        "follow_ups": "Önce geciken ve bugün vadesi gelen konuşmaları toparla. Ardından sıcak fırsatlara dönmek günün kalitesini artırır.",
+        "opportunities": "Bugün sıcaklığı yüksek ve karar eşiğine yakın kişiler öne çıkıyor. Küçük ama net bir sonraki adım momentum yaratır.",
+        "new_reachouts": "Aday havuzunda ilk dokunuş bekleyen kişiler var. Baskısız, kısa ve doğal açılışlar burada en iyi sonucu verir."
+      },
+      "reasons": {
+        "overdue": "Takip tarihi geçmiş. Sıcaklığı düşürmeden geri dönmek önemli.",
+        "today": "Bugün aksiyon bekliyor. Geciktirmeden küçük bir temas iyi çalışır.",
+        "presentation": "Sunum veya karar penceresinde. Sonraki adımı netleştirmek iyi olur.",
+        "opportunity": "İlgi sıcak görünüyor. Konuşmayı ilerletmek için uygun zaman.",
+        "newContact": "Yeni eklendi. İlk temas için doğal bir pencere açık.",
+        "freshTouch": "İlk temas çok taze. Sessiz kalmadan ritmi kurmak avantaj sağlar."
+      },
+      "metrics": {
+        "urgentFollowUps": {
+          "title": "Acil Takip",
+          "hint": "Bugün veya gecikmiş aksiyonlar"
+        },
+        "warmOpportunities": {
+          "title": "Sıcak Fırsat",
+          "hint": "İlgi gösteren ve ilerlemeye yakın kişiler"
+        },
+        "newReachOuts": {
+          "title": "İlk Temas",
+          "hint": "Yeni eklenmiş ve henüz ritim kurulmamış kişiler"
+        }
+      },
+      "playbooks": {
+        "follow_ups": "Önce baskıyı değil netliği artır. Son teması kısaca referans ver, tek bir sonraki adım öner ve konuşmayı açık bırak.",
+        "opportunities": "Sıcak kişide ayrıntıya boğma. İlgiyi teyit et, kararını kolaylaştıracak tek bir sonraki adım sun.",
+        "new_reachouts": "Yeni temasta amaç satış değil güvenli giriş. Kısa bir bağ kur, merak uyandır ve doğal bir diyalog başlat."
+      }
+    },
     "ctaTitle": "Başlamaya hazır mısın?",
     "ctaText": "İlk kontaklarını ekleyerek Network Marketing Master'ı kullanmaya başla. AI destekli araçlarla ekibini büyüt.",
     "addFirstContact": "İlk Kontağı Ekle"
@@ -825,6 +877,28 @@
     "placeholders": {
       "tags": "mindset, başlangıç, davet"
     },
+    "quickPaths": {
+      "dailyFocus": {
+        "title": "Takip ritmini koru",
+        "desc": "Bugün konuşmayı yeniden açman gereken kişiler için takip içeriklerine hızlı geç."
+      },
+      "inviteFlow": {
+        "title": "Yeni teması davete çevir",
+        "desc": "İlk yaklaşım, merak uyandırma ve düşük baskılı davet dili için uygun içerikleri aç."
+      },
+      "postPresentation": {
+        "title": "Sunum sonrası momentumu koru",
+        "desc": "Kararsızlığı büyütmeden sonraki adımı netleştiren kapanış ve takip içeriklerine git."
+      },
+      "teamRhythm": {
+        "title": "Ekip ritmini güçlendir",
+        "desc": "Yeni ekip üyelerini oyunda tutmak ve koçluk akışını sadeleştirmek için ekip kurma içeriklerini aç."
+      },
+      "objections": {
+        "title": "İtirazı konuşmaya çevir",
+        "desc": "Hazır cevaplar, örnek diyaloglar ve baskısız dönüşler için itiraz bankasına geç."
+      }
+    },
     "objection": {
       "subtitle": "En yaygın itirazlara hazır, etkili cevaplar",
       "new": "Yeni İtiraz",
@@ -847,6 +921,24 @@
         "text": "\"Bu Ponzi şeması mı?\"",
         "approach": "Empati + net bilgi + baskısız çıkış",
         "exampleDialog": "A: ...\nB: ..."
+      },
+      "psychology": {
+        "label": "İtiraz Psikolojisi",
+        "summary": "İtiraz çoğu zaman “hayır” değil; risk, kafa karışıklığı veya kimlik koruma sinyalidir. Önce tehdidi azalt, sonra cevabı ver, en sonda küçük bir sonraki adım bırak.",
+        "cards": {
+          "validate": {
+            "title": "Önce duyguyu duy",
+            "body": "İnsanlar mantıktan önce güvenlik arar. Savunmaya geçmeden önce çekincenin neden mantıklı gelebileceğini kabul et."
+          },
+          "depressure": {
+            "title": "Baskıyı düşür",
+            "body": "İtiraz anında hızlanmak yerine tehdit seviyesini azalt. Amaç ikna etmek değil, kişinin rahatça düşünmesini sağlamak."
+          },
+          "microStep": {
+            "title": "Mikro sonraki adım bırak",
+            "body": "Cevabı uzun uzun bitirme. Küçük bir soru, kısa bir içerik ya da minik bir teyit konuşmayı açık tutar."
+          }
+        }
       },
       "objCategories": {
         "money": "Para Yok",
