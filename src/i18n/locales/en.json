@@ -420,6 +420,8 @@
       "updated": "Stage updated",
       "deleted": "Stage deleted",
       "deleteConfirm": "Are you sure you want to delete this stage?",
+      "limitReached": "Maximum stage count reached",
+      "minReached": "At least one stage must remain",
       "namePlaceholder": "Stage name...",
       "trLabelPlaceholder": "Turkish label",
       "enLabelPlaceholder": "English label",
@@ -871,10 +873,68 @@
   },
   "team": {
     "title": "Team",
-    "badge": "Coming Soon",
-    "description": "We're actively building this area for team visibility, activity tracking, and support workflows.",
-    "hint": "For now, you can confidently manage your daily workflow through contacts, messages, and academy modules.",
-    "backToDashboard": "Back to Dashboard"
+    "subtitle": "Track distributor contacts in one place, spot who needs support early, and keep momentum moving without losing visibility.",
+    "summary": {
+      "label": "Team Snapshot",
+      "value": "{{members}} team members • {{overdue}} overdue follow-ups"
+    },
+    "stats": {
+      "members": "Team Members",
+      "membersHint": "Contacts marked as distributors",
+      "activeRate": "Activity Rate",
+      "activeRateHint": "{{count}} people are currently in a warm flow",
+      "newThisMonth": "Added This Month",
+      "newThisMonthHint": "Team candidates added in the last 30 days",
+      "joined": "Joined",
+      "joinedHint": "{{count}} people are waiting for close follow-up"
+    },
+    "sections": {
+      "overview": "Overview",
+      "leaderboard": "Top Momentum",
+      "needsAttention": "Needs Attention",
+      "activationQueue": "Activation Queue"
+    },
+    "overview": {
+      "title": "Team Pulse",
+      "body": "%{{activeRate}} of your {{members}} team members stayed active recently. Catching quiet members early protects growth rhythm.",
+      "followUpTitle": "Follow-up Discipline",
+      "followUpBody": "{{count}} people already passed their follow-up date. This list is ready for your daily coaching flow.",
+      "momentumTitle": "Growth Momentum",
+      "momentumBody": "{{joined}} people already look joined. {{newThisMonth}} new team candidates entered the system in the last 30 days."
+    },
+    "labels": {
+      "warning": "Warning",
+      "healthy": "Healthy",
+      "momentum": "Momentum",
+      "overdue": "Overdue follow-up",
+      "lastContact": "Last touch",
+      "noDate": "Not yet",
+      "locationFallback": "No location added",
+      "progressFallback": "Good candidate for activation",
+      "readiness": "Readiness score"
+    },
+    "activity": {
+      "active": "Active",
+      "monitor": "Monitor",
+      "inactive": "Needs intervention"
+    },
+    "reasons": {
+      "overdue": "Follow-up date already passed, so it's worth returning before warmth drops.",
+      "noRecentTouch": "There hasn't been recent contact, so refreshing the connection could help.",
+      "noTouchYet": "A regular contact rhythm has not been established yet."
+    },
+    "empty": {
+      "leaderboard": "No team members yet.",
+      "attention": "No critical support case is waiting right now.",
+      "activation": "No team member is currently waiting in the activation queue."
+    },
+    "actions": {
+      "openContacts": "Open Contacts"
+    },
+    "focus": {
+      "title": "Today's Coaching Focus",
+      "body": "Start with the {{count}} people who need support, then move the warm names in the activation queue forward. That order usually keeps team momentum steadier."
+    }
   },
   "landing": {
     "nav": {

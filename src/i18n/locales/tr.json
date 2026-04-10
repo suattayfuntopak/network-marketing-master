@@ -420,6 +420,8 @@
       "updated": "Aşama güncellendi",
       "deleted": "Aşama silindi",
       "deleteConfirm": "Bu aşamayı silmek istediğinize emin misiniz?",
+      "limitReached": "Maksimum aşama sayısına ulaşıldı",
+      "minReached": "En az bir aşama kalmalı",
       "namePlaceholder": "Aşama adı...",
       "trLabelPlaceholder": "Türkçe aşama adı",
       "enLabelPlaceholder": "İngilizce aşama adı",
@@ -871,10 +873,68 @@
   },
   "team": {
     "title": "Ekip",
-    "badge": "Yakında",
-    "description": "Ekip görünürlüğü, aktivite takibi ve destek akışları için hazırladığımız alan üzerinde çalışıyoruz.",
-    "hint": "Şimdilik kontaklar, mesajlar ve akademi modülleri üzerinden günlük akışı güvenle yönetebilirsin.",
-    "backToDashboard": "Panoya Dön"
+    "subtitle": "Distribütör kontaklarını tek yerde takip et, desteğe ihtiyacı olanları erken gör ve ivmeyi kaybetmeden aksiyon al.",
+    "summary": {
+      "label": "Ekip Özeti",
+      "value": "{{members}} ekip üyesi • {{overdue}} geciken takip"
+    },
+    "stats": {
+      "members": "Ekip Üyesi",
+      "membersHint": "Distribütör olarak işaretlenen kontaklar",
+      "activeRate": "Aktiflik Oranı",
+      "activeRateHint": "{{count}} kişi şu an sıcak akışta",
+      "newThisMonth": "Bu Ay Eklenen",
+      "newThisMonthHint": "Son 30 günde eklenen ekip adayları",
+      "joined": "Katılanlar",
+      "joinedHint": "{{count}} kişi yakın takip bekliyor"
+    },
+    "sections": {
+      "overview": "Genel Durum",
+      "leaderboard": "Öne Çıkanlar",
+      "needsAttention": "Destek Bekleyenler",
+      "activationQueue": "Aktivasyon Kuyruğu"
+    },
+    "overview": {
+      "title": "Ekip Nabzı",
+      "body": "Toplam {{members}} ekip üyesinin %{{activeRate}} kadarı son dönemde aktif kaldı. Sessizleşenleri erken yakalamak büyüme ritmini korur.",
+      "followUpTitle": "Takip Disiplini",
+      "followUpBody": "{{count}} kişi için takip tarihi geçmiş durumda. Buradaki liste günlük koçluk akışı için hazır.",
+      "momentumTitle": "Büyüme İvmesi",
+      "momentumBody": "{{joined}} kişi katılmış görünüyor. Son 30 günde {{newThisMonth}} yeni ekip adayı sisteme girdi."
+    },
+    "labels": {
+      "warning": "Dikkat",
+      "healthy": "Sağlıklı",
+      "momentum": "İvme",
+      "overdue": "Geciken takip",
+      "lastContact": "Son temas",
+      "noDate": "Henüz yok",
+      "locationFallback": "Konum eklenmedi",
+      "progressFallback": "Aktivasyon için uygun sıra",
+      "readiness": "Hazırlık skoru"
+    },
+    "activity": {
+      "active": "Aktif",
+      "monitor": "İzlenmeli",
+      "inactive": "Müdahale gerekli"
+    },
+    "reasons": {
+      "overdue": "Takip tarihi geçmiş, sıcaklığını kaybetmeden dönmek gerekiyor.",
+      "noRecentTouch": "Bir süredir temas yok, bağlantıyı tazelemek iyi olabilir.",
+      "noTouchYet": "Henüz düzenli bir temas kaydı oluşmamış."
+    },
+    "empty": {
+      "leaderboard": "Henüz ekip üyesi görünmüyor.",
+      "attention": "Şu an kritik destek bekleyen ekip üyesi yok.",
+      "activation": "Aktivasyon kuyruğunda bekleyen ekip üyesi yok."
+    },
+    "actions": {
+      "openContacts": "Kontaklara Git"
+    },
+    "focus": {
+      "title": "Bugünün Koçluk Odağı",
+      "body": "Önce destek bekleyen {{count}} kişiyle ilgilen, ardından aktivasyon kuyruğundaki sıcak isimleri ilerlet. Bu sıra ekip momentumunu daha stabil tutar."
+    }
   },
   "landing": {
     "nav": {
