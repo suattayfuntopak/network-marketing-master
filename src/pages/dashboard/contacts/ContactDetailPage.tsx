@@ -75,6 +75,7 @@ export function ContactDetailPage() {
   const [showFollowUpModal, setShowFollowUpModal] = useState(false)
   const [showAppointmentModal, setShowAppointmentModal] = useState(false)
   const [showInteractionModal, setShowInteractionModal] = useState(false)
+  const [showAllInteractions, setShowAllInteractions] = useState(false)
   const [interactionType, setInteractionType] = useState<InteractionType>('call')
   const [interactionContent, setInteractionContent] = useState('')
   const [interactionSubject, setInteractionSubject] = useState('')
@@ -105,6 +106,8 @@ export function ContactDetailPage() {
       </div>
     )
   }
+
+  const visibleInteractions = showAllInteractions ? interactions : interactions.slice(0, 10)
 
   const initials = contact.full_name
     .split(' ')
@@ -387,8 +390,21 @@ export function ContactDetailPage() {
 
             <QuickNoteInput onSubmit={handleQuickNote} />
 
-            <div className="border-t border-border pt-4">
-              <InteractionTimeline interactions={interactions} loading={loadingInteractions} />
+            <div className="border-t border-border pt-4 space-y-4">
+              <InteractionTimeline interactions={visibleInteractions} loading={loadingInteractions} />
+
+              {!loadingInteractions && interactions.length > 10 && (
+                <div className="border-t border-border/70 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setShowAllInteractions((value) => !value)}
+                  >
+                    {showAllInteractions ? t('common.close') : t('contacts.detail.viewAll')}
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
         </div>
