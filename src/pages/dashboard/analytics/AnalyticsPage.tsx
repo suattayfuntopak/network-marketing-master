@@ -87,10 +87,9 @@ export function AnalyticsPage() {
         <p className="text-muted-foreground text-sm mt-1">{t('analytics.subtitle')}</p>
       </div>
 
-      <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_30%)]">
-        <CardHeader>
+      <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
+        <CardHeader className="pb-3">
           <CardTitle className="text-base">{t('analytics.signalBoard.title')}</CardTitle>
-          <p className="text-sm text-muted-foreground">{t('analytics.signalBoard.subtitle')}</p>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 md:grid-cols-3">
@@ -100,48 +99,33 @@ export function AnalyticsPage() {
                 Icon: ShieldAlert,
                 value: insights.riskCount,
                 tone: insights.tones.risk,
-                body: t('analytics.signalBoard.cards.risk.body', {
-                  overdue: insights.overdueFollowUps,
-                  stalled: insights.stalledWarmLeads,
-                }),
               },
               {
                 key: 'growth',
                 Icon: Zap,
                 value: insights.growthCount,
                 tone: insights.tones.growth,
-                body: t('analytics.signalBoard.cards.growth.body', {
-                  ready: insights.readyNowLeads,
-                  fresh: insights.freshProspects,
-                }),
               },
               {
                 key: 'rhythm',
                 Icon: Activity,
                 value: `${insights.rhythmScore}%`,
                 tone: insights.tones.rhythm,
-                body: t('analytics.signalBoard.cards.rhythm.body', {
-                  score: insights.rhythmScore,
-                }),
               },
-            ].map(({ key, Icon, value, tone, body }) => (
-              <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
-                <div className="flex items-start justify-between gap-3">
+            ].map(({ key, Icon, value, tone }) => (
+              <div key={key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                <div className="flex items-center justify-between gap-3">
                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
                     <Icon className="h-4 w-4" />
                   </div>
-                  <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${SIGNAL_TONE_CLASSES[tone]}`}>
-                    {t(`analytics.tones.${tone}`)}
-                  </span>
+                  <p className="text-2xl font-bold tabular-nums">{value}</p>
                 </div>
-                <p className="mt-4 text-sm font-semibold">{t(`analytics.signalBoard.cards.${key}.title`)}</p>
-                <p className="mt-2 text-2xl font-bold">{value}</p>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
+                <p className="mt-3 text-sm font-medium">{t(`analytics.signalBoard.cards.${key}.title`)}</p>
               </div>
             ))}
           </div>
 
-          <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+          <div className="rounded-2xl border border-border/70 bg-card/50 px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
               {t('analytics.signalBoard.nextMoveLabel')}
             </p>
