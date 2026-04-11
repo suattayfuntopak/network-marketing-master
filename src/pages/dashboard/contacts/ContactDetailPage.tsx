@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { tr, enUS } from 'date-fns/locale'
@@ -118,7 +118,7 @@ export function ContactDetailPage() {
   const currentStageLabel = currentSyncedStage
     ? resolveStageLabel(currentSyncedStage, t)
     : t(`contactStages.${contact.stage}`, { defaultValue: contact.stage })
-  const coachCue = useMemo(() => buildContactCoachCue(contact), [contact])
+  const coachCue = buildContactCoachCue(contact)
 
   const handleStageChange = async (newStage: string | null) => {
     if (!newStage || newStage === contact.stage) return
