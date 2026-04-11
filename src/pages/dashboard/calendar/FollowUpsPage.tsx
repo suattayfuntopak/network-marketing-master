@@ -77,72 +77,38 @@ export function FollowUpsPage() {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      <div className="flex items-center justify-between px-4 py-3 border-b gap-3 shrink-0 flex-wrap">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => navigate(ROUTES.CALENDAR)}
-            className="p-1.5 rounded-md hover:bg-muted transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </button>
-          <div>
-            <h1 className="text-base font-semibold">{t('followUps.pageTitle')}</h1>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              {t('followUps.summary', { count: pendingCount })}
-            </p>
-          </div>
-        </div>
-        <Button
-          size="sm"
-          className="gap-1.5 text-xs h-8"
-          onClick={() => {
-            setEditFollowUp(null)
-            setShowModal(true)
-          }}
-        >
-          <Plus className="w-3.5 h-3.5" />
-          {t('followUps.new')}
-        </Button>
-      </div>
-
-      <div className="flex border-b shrink-0 overflow-x-auto">
-        {tabConfig.map((tab) => {
-          const count = buckets?.[tab.key]?.length ?? 0
-          const isActive = activeTab === tab.key
-          return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                'flex items-center gap-1.5 px-4 py-2.5 text-sm whitespace-nowrap border-b-2 transition-colors',
-                isActive
-                  ? 'border-primary text-primary font-medium'
-                  : 'border-transparent text-muted-foreground hover:text-foreground'
-              )}
+      <div className="shrink-0 border-b px-4 py-4 md:px-6">
+        <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-2">
+              <button
+                onClick={() => navigate(ROUTES.CALENDAR)}
+                className="mt-0.5 p-1.5 rounded-md hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </button>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                  {t('followUps.planner.label')}
+                </p>
+                <h1 className="mt-2 text-base font-semibold">{t('followUps.pageTitle')}</h1>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {t('followUps.summary', { count: pendingCount })}
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              className="gap-1.5 text-xs h-8"
+              onClick={() => {
+                setEditFollowUp(null)
+                setShowModal(true)
+              }}
             >
-              {t(tab.labelKey)}
-              {count > 0 && (
-                <span
-                  className={cn(
-                    'text-xs px-1.5 py-0.5 rounded-full font-medium',
-                    tab.danger
-                      ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                      : 'bg-muted text-muted-foreground'
-                  )}
-                >
-                  {count}
-                </span>
-              )}
-            </button>
-          )
-        })}
-      </div>
-
-      <div className="border-b px-4 py-4 shrink-0">
-        <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
-            {t('followUps.planner.label')}
-          </p>
+              <Plus className="w-3.5 h-3.5" />
+              {t('followUps.new')}
+            </Button>
+          </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-3">
             {[
@@ -189,6 +155,39 @@ export function FollowUpsPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="flex border-b shrink-0 overflow-x-auto">
+        {tabConfig.map((tab) => {
+          const count = buckets?.[tab.key]?.length ?? 0
+          const isActive = activeTab === tab.key
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={cn(
+                'flex items-center gap-1.5 px-4 py-2.5 text-sm whitespace-nowrap border-b-2 transition-colors',
+                isActive
+                  ? 'border-primary text-primary font-medium'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {t(tab.labelKey)}
+              {count > 0 && (
+                <span
+                  className={cn(
+                    'text-xs px-1.5 py-0.5 rounded-full font-medium',
+                    tab.danger
+                      ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      : 'bg-muted text-muted-foreground'
+                  )}
+                >
+                  {count}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </div>
 
       <div className="flex-1 overflow-y-auto">

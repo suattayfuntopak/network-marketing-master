@@ -4,7 +4,6 @@ import { Plus, Upload, Download, LayoutGrid, LayoutList, ChevronLeft, ChevronRig
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar'
 import { ContactFilters } from '@/components/contacts/ContactFilters'
 import { ContactTable } from '@/components/contacts/ContactTable'
@@ -236,16 +235,22 @@ export function ContactsListPage() {
       </div>
 
       {!isLoading && !isError && totalCount > 0 && (
-        <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between gap-3">
-              <CardTitle className="text-base">{t('contacts.signalBoard.title')}</CardTitle>
-              <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                {t('contacts.total', { count: totalCount })}
-              </span>
+        <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                {t('contacts.signalBoard.title')}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t('contacts.signalBoard.subtitle')}
+              </p>
             </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
+            <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              {t('contacts.total', { count: totalCount })}
+            </span>
+          </div>
+
+          <div className="mt-4 space-y-4">
             <div className="grid gap-3 md:grid-cols-3">
               {[
                 { key: 'followUps', Icon: Clock3, value: contactInsights.dueNow, tone: 'blue' as const },
@@ -277,8 +282,8 @@ export function ContactsListPage() {
                 })}
               </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
       {/* Bulk actions */}

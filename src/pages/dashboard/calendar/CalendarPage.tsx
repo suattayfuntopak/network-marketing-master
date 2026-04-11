@@ -126,109 +126,114 @@ export function CalendarPage() {
 
   return (
     <div className="flex flex-col h-full min-h-0">
-      {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b shrink-0 gap-3 flex-wrap">
-        <div className="flex items-center gap-2 min-w-0">
-          <button onClick={handlePrev} className="p-1 rounded-md hover:bg-muted transition-colors shrink-0">
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-          <h2 className="text-sm font-semibold truncate capitalize min-w-0 max-w-[200px] md:max-w-none">
-            {getTitle()}
-          </h2>
-          <button onClick={handleNext} className="p-1 rounded-md hover:bg-muted transition-colors shrink-0">
-            <ChevronRight className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => setCurrentDate(new Date())}
-            className="text-xs px-2 py-1 rounded-md border hover:bg-muted transition-colors ml-1 shrink-0"
-          >
-            {t('calendar.today')}
-          </button>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          {/* View switcher */}
-          <div className="flex items-center border rounded-md overflow-hidden">
-            {VIEWS.map((v, i) => {
-              const Icon = v.icon
-              return (
-                <button
-                  key={v.key}
-                  onClick={() => setView(v.key)}
-                  className={cn(
-                    'px-2.5 py-1.5 text-xs flex items-center gap-1 transition-colors',
-                    i > 0 && 'border-l',
-                    view === v.key ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-                  )}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t(v.labelKey)}</span>
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Follow-ups link */}
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-1.5 text-xs h-8"
-            onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}
-          >
-            <Bell className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t('followUps.pageTitle')}</span>
-          </Button>
-
-          {/* New appointment */}
-          <Button
-            size="sm"
-            className="gap-1.5 text-xs h-8"
-            onClick={() => {
-              setEditAppointment(null)
-              setSelectedDate(undefined)
-              setShowAppointmentModal(true)
-            }}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t('calendar.newAppointment')}</span>
-          </Button>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 border-b px-4 py-3 md:grid-cols-3 shrink-0">
-        {[
-          {
-            key: 'stabilize',
-            Icon: ShieldAlert,
-            value: calendarFollowUpInsights.overdue,
-            hint: t('calendar.pulse.stabilize', { count: calendarFollowUpInsights.overdue }),
-          },
-          {
-            key: 'deliver',
-            Icon: Zap,
-            value: calendarFollowUpInsights.dueToday,
-            hint: t('calendar.pulse.deliver', { count: calendarFollowUpInsights.dueToday }),
-          },
-          {
-            key: 'rhythm',
-            Icon: Activity,
-            value: `${calendarFollowUpInsights.touchCoverage}%`,
-            hint: t('calendar.pulse.rhythm', { coverage: calendarFollowUpInsights.touchCoverage }),
-          },
-        ].map(({ key, Icon, value, hint }) => (
-          <div key={key} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-                  <Icon className="h-4 w-4" />
-                </div>
-                <p className="text-sm font-semibold">{t(`followUps.planner.cards.${key}.title`)}</p>
+      <div className="shrink-0 border-b px-4 py-4 md:px-6">
+        <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="space-y-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                  {t('calendar.title')}
+                </p>
+                <p className="mt-2 text-base font-semibold capitalize">{getTitle()}</p>
               </div>
-              <span className="text-lg font-semibold tabular-nums">{value}</span>
+              <div className="flex items-center gap-2 min-w-0">
+                <button onClick={handlePrev} className="p-1 rounded-md hover:bg-muted transition-colors shrink-0">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button onClick={handleNext} className="p-1 rounded-md hover:bg-muted transition-colors shrink-0">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setCurrentDate(new Date())}
+                  className="text-xs px-2 py-1 rounded-md border hover:bg-muted transition-colors ml-1 shrink-0"
+                >
+                  {t('calendar.today')}
+                </button>
+              </div>
             </div>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center border rounded-md overflow-hidden bg-background/60">
+                {VIEWS.map((v, i) => {
+                  const Icon = v.icon
+                  return (
+                    <button
+                      key={v.key}
+                      onClick={() => setView(v.key)}
+                      className={cn(
+                        'px-2.5 py-1.5 text-xs flex items-center gap-1 transition-colors',
+                        i > 0 && 'border-l',
+                        view === v.key ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                      )}
+                    >
+                      <Icon className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">{t(v.labelKey)}</span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 text-xs h-8"
+                onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t('followUps.pageTitle')}</span>
+              </Button>
+
+              <Button
+                size="sm"
+                className="gap-1.5 text-xs h-8"
+                onClick={() => {
+                  setEditAppointment(null)
+                  setSelectedDate(undefined)
+                  setShowAppointmentModal(true)
+                }}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{t('calendar.newAppointment')}</span>
+              </Button>
+            </div>
           </div>
-        ))}
+
+          <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+            {[
+              {
+                key: 'stabilize',
+                Icon: ShieldAlert,
+                value: calendarFollowUpInsights.overdue,
+                hint: t('calendar.pulse.stabilize', { count: calendarFollowUpInsights.overdue }),
+              },
+              {
+                key: 'deliver',
+                Icon: Zap,
+                value: calendarFollowUpInsights.dueToday,
+                hint: t('calendar.pulse.deliver', { count: calendarFollowUpInsights.dueToday }),
+              },
+              {
+                key: 'rhythm',
+                Icon: Activity,
+                value: `${calendarFollowUpInsights.touchCoverage}%`,
+                hint: t('calendar.pulse.rhythm', { coverage: calendarFollowUpInsights.touchCoverage }),
+              },
+            ].map(({ key, Icon, value, hint }) => (
+              <div key={key} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <p className="text-sm font-semibold">{t(`followUps.planner.cards.${key}.title`)}</p>
+                  </div>
+                  <span className="text-lg font-semibold tabular-nums">{value}</span>
+                </div>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Calendar body */}
