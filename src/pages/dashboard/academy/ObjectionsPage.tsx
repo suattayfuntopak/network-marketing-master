@@ -151,38 +151,21 @@ export function ObjectionsPage() {
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
           {t('academy.objection.psychology.label')}
         </p>
-        <p className="mt-2 text-sm leading-6 text-muted-foreground">
-          {t('academy.objection.psychology.summary')}
-        </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {psychologyCards.map(({ key, Icon }) => (
             <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </div>
               </div>
-              <p className="mt-4 text-sm font-semibold">{t(`academy.objection.psychology.cards.${key}.title`)}</p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {t(`academy.objection.psychology.cards.${key}.body`)}
-              </p>
+              <p className="mt-3 text-sm font-semibold">{t(`academy.objection.psychology.cards.${key}.title`)}</p>
             </div>
           ))}
         </div>
-      </div>
 
-      <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              {t('academy.objection.quickScenarios.label')}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t('academy.objection.quickScenarios.subtitle')}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="mt-4 flex flex-wrap gap-2">
           {quickScenarios.map(({ key, category: scenarioCategory }) => (
             <button
               key={key}
@@ -192,14 +175,9 @@ export function ObjectionsPage() {
                 setCategory(scenarioCategory)
                 setExpandedId(null)
               }}
-              className="rounded-2xl border border-border/70 bg-background/70 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+              className="rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
             >
-              <p className="text-sm font-semibold">
-                {t(`academy.objection.quickScenarios.items.${key}.title`)}
-              </p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {t(`academy.objection.quickScenarios.items.${key}.body`)}
-              </p>
+              {t(`academy.objection.quickScenarios.items.${key}.title`)}
             </button>
           ))}
         </div>

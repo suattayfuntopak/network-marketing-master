@@ -213,12 +213,9 @@ export function MessagesPage() {
 
       <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
+          <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
               {t('messages.playbooks.label')}
-            </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t('messages.playbooks.subtitle')}
             </p>
           </div>
           <Button
@@ -243,7 +240,7 @@ export function MessagesPage() {
                 onClick={() => openPlaybook(playbook)}
                 className="rounded-2xl border border-border/70 bg-card/70 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
               >
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center justify-between gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
                     <Icon className="h-4 w-4" />
                   </div>
@@ -251,21 +248,6 @@ export function MessagesPage() {
                 </div>
 
                 <p className="mt-4 text-sm font-semibold">{t(`messages.playbooks.items.${playbook.key}.title`)}</p>
-                <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                  {t(`messages.playbooks.items.${playbook.key}.body`, { count: playbook.count })}
-                </p>
-
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {t(`messages.categories.${playbook.category}`)}
-                  </span>
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {t(`messages.tones.${playbook.tone}`)}
-                  </span>
-                  <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {t(`academy.objection.objCategories.${playbook.objectionCategory}`)}
-                  </span>
-                </div>
 
                 <div className="mt-4 flex items-center justify-between gap-3 border-t border-border/60 pt-3">
                   <div className="min-w-0">
@@ -277,7 +259,6 @@ export function MessagesPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-1 text-xs font-medium text-primary">
-                    <span>{t('messages.playbooks.open')}</span>
                     <ArrowUpRight className="h-3.5 w-3.5" />
                   </div>
                 </div>

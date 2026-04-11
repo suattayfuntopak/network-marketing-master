@@ -145,23 +145,6 @@ export function AcademyPage() {
         </button>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-        {quickPaths.map(({ key, Icon, action }) => (
-          <button
-            key={key}
-            type="button"
-            onClick={action}
-            className="rounded-2xl border border-border/70 bg-card/60 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
-          >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-              <Icon className="h-4 w-4" />
-            </div>
-            <p className="mt-4 text-sm font-semibold">{t(`academy.quickPaths.${key}.title`)}</p>
-            <p className="mt-2 text-xs leading-5 text-muted-foreground">{t(`academy.quickPaths.${key}.desc`)}</p>
-          </button>
-        ))}
-      </div>
-
       <div className="rounded-2xl border border-primary/12 bg-primary/5 p-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -174,8 +157,8 @@ export function AcademyPage() {
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-          {scenarioCards.map(({ key, Icon, action }) => (
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {quickPaths.map(({ key, Icon, action }) => (
             <button
               key={key}
               type="button"
@@ -185,10 +168,21 @@ export function AcademyPage() {
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
                 <Icon className="h-4 w-4" />
               </div>
-              <p className="mt-4 text-sm font-semibold">{t(`academy.scenarioCards.items.${key}.title`)}</p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                {t(`academy.scenarioCards.items.${key}.body`)}
-              </p>
+              <p className="mt-4 text-sm font-semibold">{t(`academy.quickPaths.${key}.title`)}</p>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">{t(`academy.quickPaths.${key}.desc`)}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {scenarioCards.map(({ key, action }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={action}
+              className="rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
+            >
+              {t(`academy.scenarioCards.items.${key}.title`)}
             </button>
           ))}
         </div>
