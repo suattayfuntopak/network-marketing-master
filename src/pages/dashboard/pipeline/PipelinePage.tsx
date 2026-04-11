@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Clock3, Flame, LayoutGrid, List, Sparkles, Settings2 } from 'lucide-react'
+import { LayoutGrid, List, Settings2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
@@ -10,7 +10,6 @@ import { useAppointments, useFollowUps } from '@/hooks/useCalendar'
 import { useContacts } from '@/hooks/useContacts'
 import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import { getSyncedPipelineStages, type ContactStageKey } from '@/lib/pipeline/stageLabels'
-import { buildPipelineSignalSummary } from '@/lib/pipeline/pipelineSignals'
 import { ContactKanbanBoard, type ContactProcessRecord } from '@/components/pipeline/ContactKanbanBoard'
 import { ContactTableView } from './ContactTableView'
 import { ManageStagesModal } from './modals/ManageStagesModal'
@@ -47,12 +46,6 @@ export function PipelinePage() {
 
   const contacts = contactsResult?.data ?? []
   const isLoading = stagesLoading || contactsLoading || appointmentsLoading || followUpsLoading
-  const pipelineSignals = useMemo(() => buildPipelineSignalSummary(contacts), [contacts])
-  const SIGNAL_TONE_CLASSES = {
-    blue: 'border-blue-500/20 bg-blue-500/10 text-blue-100',
-    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
-    emerald: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
-  } as const
 
   const contactCount = contacts.length
   const subtitle = `${contactCount} ${t(contactCount === 1 ? 'pipeline.contactSingular' : 'pipeline.contactPlural')}`
@@ -125,65 +118,14 @@ export function PipelinePage() {
         </div>
       </div>
 
-      {!isLoading && contactCount > 0 && (
-        <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
-                {t('pipeline.signalBoard.title')}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t('pipeline.signalBoard.subtitle')}
-              </p>
-            </div>
-            <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              {subtitle}
-            </span>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            <div className="grid gap-3 md:grid-cols-3">
-              {[
-                { key: 'risk', Icon: Clock3, value: pipelineSignals.followUpRisk, tone: 'blue' as const },
-                { key: 'momentum', Icon: Flame, value: pipelineSignals.advanceWindow, tone: 'amber' as const },
-                { key: 'openings', Icon: Sparkles, value: pipelineSignals.freshOpenings, tone: 'emerald' as const },
-              ].map(({ key, Icon, value, tone }) => (
-                <div key={key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <p className="text-2xl font-bold tabular-nums">{value}</p>
-                  </div>
-                  <p className="mt-3 text-sm font-medium">{t(`pipeline.signalBoard.cards.${key}.title`)}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="rounded-2xl border border-border/70 bg-card/50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t('pipeline.signalBoard.nextMoveLabel')}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {t(`pipeline.signalBoard.nextMove.${pipelineSignals.focus}`, {
-                  risk: pipelineSignals.followUpRisk,
-                  momentum: pipelineSignals.advanceWindow,
-                  openings: pipelineSignals.freshOpenings,
-                })}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-muted-foreground animate-pulse">{t('common.loading')}</p>
         </div>
       ) : (
-        <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="flex-1 min-h-0">
           {view === 'kanban' ? (
-            <div className="h-full overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-visible pb-4">
               <ContactKanbanBoard
                 stages={syncedStages}
                 records={processRecords}

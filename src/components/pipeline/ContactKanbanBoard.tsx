@@ -240,7 +240,7 @@ function PipelineColumn({
   })
 
   return (
-    <div className="flex min-h-full w-[290px] shrink-0 flex-col">
+    <div className="flex w-[290px] shrink-0 self-start flex-col">
       <div className={cn('rounded-t-lg border-t-4 px-3 py-2.5', colors.border, colors.bg)}>
         <div className="flex items-center justify-between gap-2">
           <h3 className={cn('truncate text-sm font-semibold', colors.text)}>
@@ -258,7 +258,7 @@ function PipelineColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          'flex min-h-[calc(100vh-15rem)] flex-1 flex-col rounded-b-2xl border border-t-0 border-border/70 bg-muted/25 p-3 backdrop-blur-sm transition-colors',
+          'flex min-h-[24rem] flex-col rounded-b-2xl border border-t-0 border-border/70 bg-muted/25 p-3 backdrop-blur-sm transition-colors',
           isOver && 'border-primary/45 bg-primary/8 shadow-[inset_0_0_0_1px_rgba(45,212,191,0.12)]'
         )}
       >
@@ -391,7 +391,7 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
         void handleDragEnd(event)
       }}
     >
-      <div className="flex h-full min-h-0 gap-4 overflow-x-auto pb-4">
+      <div className="flex items-start gap-4 pb-4">
         {stages.map((stage) => (
           <PipelineColumn
             key={stage.id}
