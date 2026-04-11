@@ -15,16 +15,18 @@ export const academyKeys = {
 }
 
 export function useAcademyContents(filters?: AcademyFilters) {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: academyKeys.list(filters),
+    queryKey: [...academyKeys.list(filters), i18n.language],
     queryFn: () => fetchAcademyContents(filters),
     staleTime: 60_000,
   })
 }
 
 export function useAcademyContent(id: string) {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: academyKeys.detail(id),
+    queryKey: [...academyKeys.detail(id), i18n.language],
     queryFn: () => fetchAcademyContent(id),
     enabled: !!id,
   })

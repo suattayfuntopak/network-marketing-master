@@ -161,7 +161,7 @@ export function SettingsPage() {
         : 'border-amber-500/20 bg-amber-500/10 text-amber-100'
 
   return (
-    <div className="p-6 pb-20 lg:pb-6 space-y-6 max-w-4xl">
+    <div className="p-6 pb-20 lg:pb-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold">{t('nav.settings')}</h1>
         <p className="text-muted-foreground text-sm mt-1">{t('settings.subtitle')}</p>

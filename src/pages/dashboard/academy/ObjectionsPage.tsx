@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils'
 import { useObjections, useToggleObjectionFavorite, useIncrementObjectionUseCount, useCreateObjection, useUpdateObjection } from '@/hooks/useObjections'
 import { useAuth } from '@/hooks/useAuth'
+import { isSystemObjectionId } from '@/lib/academy/systemContent'
 import type { Objection, ObjectionCategory } from '@/lib/academy/types'
 
 const CATEGORIES: { value: ObjectionCategory | 'all' }[] = [
@@ -80,7 +81,9 @@ export function ObjectionsPage() {
     await navigator.clipboard.writeText(text)
     if (short) { setCopiedShortId(id); setTimeout(() => setCopiedShortId(null), 2000) }
     else { setCopiedId(id); setTimeout(() => setCopiedId(null), 2000) }
-    incrementUse.mutate(id)
+    if (!isSystemObjectionId(id)) {
+      incrementUse.mutate(id)
+    }
   }
 
   const openEdit = (obj: Objection) => {
@@ -232,6 +235,7 @@ export function ObjectionsPage() {
           {objections.map((obj) => {
             const isExpanded = expandedId === obj.id
             const isOwn = !obj.is_system && obj.user_id === user?.id
+            const canToggleFavorite = !isSystemObjectionId(obj.id)
             return (
               <div key={obj.id} className="border rounded-lg bg-card overflow-hidden">
                 {/* Kart başlığı */}
@@ -263,8 +267,19 @@ export function ObjectionsPage() {
                       {isOwn ? <Pencil className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); toggleFavorite.mutate({ id: obj.id, isFavorite: !obj.is_favorite }) }}
-                      className={cn('p-1.5 rounded transition-colors', obj.is_favorite ? 'text-amber-500' : 'text-muted-foreground hover:text-amber-500')}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        if (!canToggleFavorite) return
+                        toggleFavorite.mutate({ id: obj.id, isFavorite: !obj.is_favorite })
+                      }}
+                      className={cn(
+                        'p-1.5 rounded transition-colors',
+                        canToggleFavorite
+                          ? obj.is_favorite
+                            ? 'text-amber-500'
+                            : 'text-muted-foreground hover:text-amber-500'
+                          : 'text-muted-foreground/30 cursor-default'
+                      )}
                     >
                       <Star className={cn('w-4 h-4', obj.is_favorite && 'fill-current')} />
                     </button>

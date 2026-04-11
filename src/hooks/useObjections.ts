@@ -15,16 +15,18 @@ export const objectionKeys = {
 }
 
 export function useObjections(filters?: ObjectionFilters) {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: objectionKeys.list(filters),
+    queryKey: [...objectionKeys.list(filters), i18n.language],
     queryFn: () => fetchObjections(filters),
     staleTime: 60_000,
   })
 }
 
 export function useObjection(id: string) {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: objectionKeys.detail(id),
+    queryKey: [...objectionKeys.detail(id), i18n.language],
     queryFn: () => fetchObjection(id),
     enabled: !!id,
   })

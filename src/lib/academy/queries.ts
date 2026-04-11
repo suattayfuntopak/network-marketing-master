@@ -1,29 +1,95 @@
 import { supabase } from '@/lib/supabase'
+import i18n from '@/i18n'
 import type { Objection, ObjectionFilters, AcademyContent, AcademyFilters } from './types'
+import {
+  getSystemAcademyContent,
+  getSystemAcademyContents,
+  getSystemObjection,
+  getSystemObjections,
+  isSystemAcademyId,
+  isSystemObjectionId,
+} from './systemContent'
+
+const LEVEL_ORDER = {
+  beginner: 0,
+  intermediate: 1,
+  advanced: 2,
+} as const
+
+function getCurrentLanguage() {
+  return i18n.language?.startsWith('en') ? 'en' : 'tr'
+}
+
+function matchesObjectionFilters(item: Objection, filters?: ObjectionFilters) {
+  const search = filters?.search?.trim().toLowerCase()
+
+  if (filters?.category && item.category !== filters.category) return false
+  if (filters?.favoritesOnly && !item.is_favorite) return false
+  if (!search) return true
+
+  const haystack = [
+    item.objection_text,
+    item.short_label,
+    item.response_text,
+    item.response_short,
+    item.approach,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return haystack.includes(search)
+}
+
+function matchesAcademyFilters(item: AcademyContent, filters?: AcademyFilters) {
+  const search = filters?.search?.trim().toLowerCase()
+
+  if (filters?.category && item.category !== filters.category) return false
+  if (filters?.type && item.type !== filters.type) return false
+  if (filters?.level && item.level !== filters.level) return false
+  if (filters?.favoritesOnly && !item.is_favorite) return false
+  if (!search) return true
+
+  const haystack = [
+    item.title,
+    item.summary,
+    item.content,
+    ...(item.tags ?? []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return haystack.includes(search)
+}
 
 // ─── Objections ───────────────────────────────────────────────
 
 export async function fetchObjections(filters?: ObjectionFilters): Promise<Objection[]> {
-  let query = supabase
+  const language = getCurrentLanguage()
+  const systemItems = getSystemObjections(language)
+
+  const query = supabase
     .from('nmm_objections')
     .select('*')
     .order('category', { ascending: true })
     .order('created_at', { ascending: true })
 
-  if (filters?.category) query = query.eq('category', filters.category)
-  if (filters?.favoritesOnly) query = query.eq('is_favorite', true)
-  if (filters?.search) {
-    query = query.or(
-      `objection_text.ilike.%${filters.search}%,short_label.ilike.%${filters.search}%,response_text.ilike.%${filters.search}%`
-    )
-  }
-
   const { data, error } = await query
   if (error) throw error
-  return data as Objection[]
+
+  const dbItems = ((data as Objection[]) ?? []).filter((item) => !item.language || item.language === language)
+
+  return [...dbItems, ...systemItems]
+    .filter((item) => matchesObjectionFilters(item, filters))
+    .sort((a, b) => a.category.localeCompare(b.category) || a.objection_text.localeCompare(b.objection_text))
 }
 
 export async function fetchObjection(id: string): Promise<Objection | null> {
+  if (isSystemObjectionId(id)) {
+    return getSystemObjection(id, getCurrentLanguage())
+  }
+
   const { data, error } = await supabase
     .from('nmm_objections')
     .select('*')
@@ -37,7 +103,10 @@ export async function fetchObjection(id: string): Promise<Objection | null> {
 // ─── Academy content ──────────────────────────────────────────
 
 export async function fetchAcademyContents(filters?: AcademyFilters): Promise<AcademyContent[]> {
-  let query = supabase
+  const language = getCurrentLanguage()
+  const systemItems = filters?.favoritesOnly ? [] : getSystemAcademyContents(language)
+
+  const query = supabase
     .from('nmm_academy_content')
     .select('*')
     .eq('is_published', true)
@@ -45,20 +114,26 @@ export async function fetchAcademyContents(filters?: AcademyFilters): Promise<Ac
     .order('level', { ascending: true })
     .order('created_at', { ascending: true })
 
-  if (filters?.category) query = query.eq('category', filters.category)
-  if (filters?.type) query = query.eq('type', filters.type)
-  if (filters?.level) query = query.eq('level', filters.level)
-  if (filters?.favoritesOnly) query = query.eq('is_favorite', true)
-  if (filters?.search) {
-    query = query.or(`title.ilike.%${filters.search}%,summary.ilike.%${filters.search}%`)
-  }
-
   const { data, error } = await query
   if (error) throw error
-  return data as AcademyContent[]
+
+  const dbItems = ((data as AcademyContent[]) ?? []).filter((item) => !item.language || item.language === language)
+
+  return [...dbItems, ...systemItems]
+    .filter((item) => matchesAcademyFilters(item, filters))
+    .sort(
+      (a, b) =>
+        a.category.localeCompare(b.category) ||
+        LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level] ||
+        a.title.localeCompare(b.title)
+    )
 }
 
 export async function fetchAcademyContent(id: string): Promise<AcademyContent | null> {
+  if (isSystemAcademyId(id)) {
+    return getSystemAcademyContent(id, getCurrentLanguage())
+  }
+
   const { data, error } = await supabase
     .from('nmm_academy_content')
     .select('*')

@@ -7,12 +7,13 @@ import { cn } from '@/lib/utils'
 import { useAcademyContents, useToggleAcademyFavorite, useIncrementContentView } from '@/hooks/useAcademy'
 import { ROUTES } from '@/lib/constants'
 import { trackAcademyRead } from '@/lib/academy/progress'
+import { isSystemAcademyId } from '@/lib/academy/systemContent'
 import type { ContentCategory, ContentType } from '@/lib/academy/types'
 
 const CATEGORIES: ContentCategory[] = [
   'mindset', 'prospecting', 'inviting', 'presenting',
   'closing', 'follow_up', 'team_building', 'leadership',
-  'social_media', 'compliance',
+  'social_media', 'product_knowledge', 'company_info', 'compliance',
 ]
 
 const TYPE_ICONS: Record<ContentType, typeof BookOpen> = {
@@ -121,7 +122,9 @@ export function AcademyPage() {
   ] as const
 
   const handleOpen = (id: string) => {
-    incrementView.mutate(id)
+    if (!isSystemAcademyId(id)) {
+      incrementView.mutate(id)
+    }
     trackAcademyRead(id)
     navigate(`${ROUTES.ACADEMY}/${id}`)
   }
@@ -247,6 +250,7 @@ export function AcademyPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {contents.map((item) => {
             const Icon = TYPE_ICONS[item.type] ?? BookOpen
+            const canToggleFavorite = !isSystemAcademyId(item.id)
             return (
               <div
                 key={item.id}
@@ -270,11 +274,16 @@ export function AcademyPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
+                        if (!canToggleFavorite) return
                         toggleFavorite.mutate({ id: item.id, isFavorite: !item.is_favorite })
                       }}
                       className={cn(
                         'p-1 rounded transition-colors shrink-0',
-                        item.is_favorite ? 'text-amber-500' : 'text-muted-foreground/40 hover:text-amber-500'
+                        canToggleFavorite
+                          ? item.is_favorite
+                            ? 'text-amber-500'
+                            : 'text-muted-foreground/40 hover:text-amber-500'
+                          : 'text-muted-foreground/25 cursor-default'
                       )}
                     >
                       <Star className={cn('w-3.5 h-3.5', item.is_favorite && 'fill-current')} />

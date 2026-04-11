@@ -11,6 +11,7 @@ import { useAcademyContent, useToggleAcademyFavorite, useCreateAcademyContent, u
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { trackAcademyRead } from '@/lib/academy/progress'
+import { isSystemAcademyId } from '@/lib/academy/systemContent'
 import type { ContentCategory, ContentLevel, ContentType } from '@/lib/academy/types'
 
 const LEVEL_COLORS = {
@@ -76,6 +77,7 @@ export function AcademyContentDetailPage() {
   }, [content?.id])
 
   const isOwn = !!content && !content.is_system && content.user_id === user?.id
+  const canToggleFavorite = !!content && !isSystemAcademyId(content.id)
 
   const handleSave = async () => {
     if (!form.title.trim() || loading || !user?.id) return
@@ -177,12 +179,17 @@ export function AcademyContentDetailPage() {
         <div className="flex items-start justify-between gap-4">
           <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>
           <button
-            onClick={() => toggleFavorite.mutate({ id: content.id, isFavorite: !content.is_favorite })}
+            onClick={() => {
+              if (!canToggleFavorite) return
+              toggleFavorite.mutate({ id: content.id, isFavorite: !content.is_favorite })
+            }}
             className={cn(
               'p-2 rounded-lg transition-colors shrink-0',
-              content.is_favorite
-                ? 'text-amber-500 bg-amber-50 dark:bg-amber-950'
-                : 'text-muted-foreground hover:text-amber-500 hover:bg-muted'
+              canToggleFavorite
+                ? content.is_favorite
+                  ? 'text-amber-500 bg-amber-50 dark:bg-amber-950'
+                  : 'text-muted-foreground hover:text-amber-500 hover:bg-muted'
+                : 'text-muted-foreground/30'
             )}
           >
             <Star className={cn('w-5 h-5', content.is_favorite && 'fill-current')} />
