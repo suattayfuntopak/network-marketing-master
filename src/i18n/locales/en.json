@@ -1269,6 +1269,15 @@
     "placeholders": {
       "tags": "mindset, beginner, invitation"
     },
+    "overview": {
+      "totalLabel": "Total Resources",
+      "totalHint": "Visible training and field support across all tabs",
+      "categoriesLabel": "Categories",
+      "categoriesHint": "Clean, full, and structured training areas",
+      "playbooksLabel": "Ready Flows",
+      "playbooksHint": "Scripts and quick-reference assets",
+      "quickLabel": "Quick Access"
+    },
     "quickPaths": {
       "dailyFocus": {
         "title": "Protect follow-up rhythm",
@@ -1315,6 +1324,14 @@
     },
     "objection": {
       "subtitle": "Ready, effective responses to the most common objections",
+      "overview": {
+        "totalLabel": "Total Replies",
+        "totalHint": "All ready-to-open objection responses",
+        "categoriesLabel": "Categories",
+        "categoriesHint": "Main hesitation themes covered by the bank",
+        "shortLabel": "Short Replies",
+        "shortHint": "Quick copy-ready answers"
+      },
       "new": "New Objection",
       "emptyTitle": "No objections added yet",
       "emptyDescription": "You can create and keep your own objection responses here.",

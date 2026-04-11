@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, Star, Clock, Eye, BookOpen, GraduationCap, Shield, Compass, Target, Users2, ArrowRight, Flame } from 'lucide-react'
+import { Search, Star, Clock, Eye, BookOpen, GraduationCap, Shield, Compass, Target, Users2, ArrowRight } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { useAcademyContents, useToggleAcademyFavorite, useIncrementContentView } from '@/hooks/useAcademy'
@@ -37,6 +37,7 @@ export function AcademyPage() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<ContentCategory | 'all'>('all')
+  const { data: allContents = [] } = useAcademyContents()
 
   const { data: contents = [], isLoading } = useAcademyContents({
     category: category === 'all' ? undefined : category,
@@ -86,40 +87,21 @@ export function AcademyPage() {
     },
   ] as const
 
-  const scenarioCards = [
-    {
-      key: 'followUp',
-      Icon: Clock,
-      action: () => {
-        setSearch('')
-        setCategory('follow_up')
-      },
-    },
-    {
-      key: 'firstInvite',
-      Icon: Compass,
-      action: () => {
-        setSearch('')
-        setCategory('inviting')
-      },
-    },
-    {
-      key: 'postPresentation',
-      Icon: Flame,
-      action: () => {
-        setSearch('')
-        setCategory('closing')
-      },
-    },
-    {
-      key: 'teamActivation',
-      Icon: Users2,
-      action: () => {
-        setSearch('')
-        setCategory('team_building')
-      },
-    },
-  ] as const
+  const academyStats = useMemo(() => {
+    const categoryCount = new Set(allContents.map((item) => item.category)).size
+    const playbookCount = allContents.filter((item) => item.type === 'script' || item.type === 'cheat_sheet').length
+    const categoryCounts = CATEGORIES.reduce<Record<ContentCategory, number>>((acc, key) => {
+      acc[key] = allContents.filter((item) => item.category === key).length
+      return acc
+    }, {} as Record<ContentCategory, number>)
+
+    return {
+      total: allContents.length,
+      categoryCount,
+      playbookCount,
+      categoryCounts,
+    }
+  }, [allContents])
 
   const handleOpen = (id: string) => {
     if (!isSystemAcademyId(id)) {
@@ -149,43 +131,43 @@ export function AcademyPage() {
       </div>
 
       <div className="rounded-2xl border border-primary/12 bg-primary/5 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
-              {t('academy.scenarioCards.label')}
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-border/70 bg-card/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.overview.totalLabel')}
             </p>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              {t('academy.scenarioCards.subtitle')}
+            <p className="mt-3 text-2xl font-semibold">{academyStats.total}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.overview.totalHint')}</p>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-card/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.overview.categoriesLabel')}
             </p>
+            <p className="mt-3 text-2xl font-semibold">{academyStats.categoryCount}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.overview.categoriesHint')}</p>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-card/70 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.overview.playbooksLabel')}
+            </p>
+            <p className="mt-3 text-2xl font-semibold">{academyStats.playbookCount}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.overview.playbooksHint')}</p>
           </div>
         </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+            {t('academy.overview.quickLabel')}
+          </p>
           {quickPaths.map(({ key, Icon, action }) => (
             <button
               key={key}
               type="button"
               onClick={action}
-              className="rounded-2xl border border-border/70 bg-card/70 p-4 text-left transition-all hover:border-primary/25 hover:bg-muted/20"
+              className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-                <Icon className="h-4 w-4" />
-              </div>
-              <p className="mt-4 text-sm font-semibold">{t(`academy.quickPaths.${key}.title`)}</p>
-              <p className="mt-2 text-xs leading-5 text-muted-foreground">{t(`academy.quickPaths.${key}.desc`)}</p>
-            </button>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {scenarioCards.map(({ key, action }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={action}
-              className="rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
-            >
-              {t(`academy.scenarioCards.items.${key}.title`)}
+              <Icon className="h-3.5 w-3.5" />
+              {t(`academy.quickPaths.${key}.title`)}
             </button>
           ))}
         </div>
@@ -214,6 +196,9 @@ export function AcademyPage() {
           )}
         >
           {t('common.all')}
+          <span className="ml-1.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px]">
+            {academyStats.total}
+          </span>
         </button>
         {CATEGORIES.map((cat) => (
           <button
@@ -227,6 +212,9 @@ export function AcademyPage() {
             )}
           >
             {t(`academy.categories.${cat}`)}
+            <span className="ml-1.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px]">
+              {academyStats.categoryCounts[cat] ?? 0}
+            </span>
           </button>
         ))}
       </div>

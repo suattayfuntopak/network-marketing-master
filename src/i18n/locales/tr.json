@@ -1269,6 +1269,15 @@
     "placeholders": {
       "tags": "mindset, başlangıç, davet"
     },
+    "overview": {
+      "totalLabel": "Toplam İçerik",
+      "totalHint": "Tüm sekmelerde görünür eğitim ve saha içeriği",
+      "categoriesLabel": "Kategori",
+      "categoriesHint": "Her biri dolu ve düzenli çalışan eğitim başlıkları",
+      "playbooksLabel": "Hazır Akış",
+      "playbooksHint": "Script ve hızlı referans içerikleri",
+      "quickLabel": "Hızlı Geçiş"
+    },
     "quickPaths": {
       "dailyFocus": {
         "title": "Takip ritmini koru",
@@ -1315,6 +1324,14 @@
     },
     "objection": {
       "subtitle": "En yaygın itirazlara hazır, etkili cevaplar",
+      "overview": {
+        "totalLabel": "Toplam Cevap",
+        "totalHint": "Hızlıca açılabilir tüm hazır itiraz yanıtları",
+        "categoriesLabel": "Kategori",
+        "categoriesHint": "Farklı çekinceleri kapsayan ana başlıklar",
+        "shortLabel": "Kısa Cevap",
+        "shortHint": "Kopyalamaya hazır kısa dönüşler"
+      },
       "new": "Yeni İtiraz",
       "emptyTitle": "Henüz itiraz eklenmemiş",
       "emptyDescription": "Kendi itiraz cevaplarını oluşturarak burada saklayabilirsin.",

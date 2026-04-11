@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Pencil, Plus, Shield, ArrowRight, Brain } from 'lucide-react'
 import { Input } from '@/components/ui/input'
@@ -53,6 +53,7 @@ export function ObjectionsPage() {
   const [showModal, setShowModal] = useState(false)
   const [form, setForm] = useState<EditForm>(EMPTY_FORM)
   const [saving, setSaving] = useState(false)
+  const { data: allObjections = [] } = useObjections()
 
   const { data: objections = [], isLoading } = useObjections({
     category: category === 'all' ? undefined : category,
@@ -76,6 +77,22 @@ export function ObjectionsPage() {
     { key: 'wait', category: 'wait' as const },
     { key: 'time', category: 'time' as const },
   ] as const
+
+  const objectionStats = useMemo(() => {
+    const categoryCount = new Set(allObjections.map((item) => item.category)).size
+    const shortReadyCount = allObjections.filter((item) => item.response_short?.trim()).length
+    const categoryCounts = OBJ_CATEGORIES.reduce<Record<ObjectionCategory, number>>((acc, key) => {
+      acc[key] = allObjections.filter((item) => item.category === key).length
+      return acc
+    }, {} as Record<ObjectionCategory, number>)
+
+    return {
+      total: allObjections.length,
+      categoryCount,
+      shortReadyCount,
+      categoryCounts,
+    }
+  }, [allObjections])
 
   const handleCopy = async (id: string, text: string, short = false) => {
     await navigator.clipboard.writeText(text)
@@ -151,19 +168,38 @@ export function ObjectionsPage() {
       </div>
 
       <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
-          {t('academy.objection.psychology.label')}
-        </p>
+        <div className="grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-border/70 bg-card/65 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.objection.overview.totalLabel')}
+            </p>
+            <p className="mt-3 text-2xl font-semibold">{objectionStats.total}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.objection.overview.totalHint')}</p>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-card/65 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('academy.objection.overview.categoriesLabel')}
+            </p>
+            <p className="mt-3 text-2xl font-semibold">{objectionStats.categoryCount}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.objection.overview.categoriesHint')}</p>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-card/65 p-4">
+            <div className="flex items-center gap-2">
+              <Brain className="h-4 w-4 text-primary" />
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('academy.objection.overview.shortLabel')}
+              </p>
+            </div>
+            <p className="mt-3 text-2xl font-semibold">{objectionStats.shortReadyCount}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{t('academy.objection.overview.shortHint')}</p>
+          </div>
+        </div>
 
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
           {psychologyCards.map(({ key, Icon }) => (
-            <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-                  <Icon className="h-4 w-4" />
-                </div>
-              </div>
-              <p className="mt-3 text-sm font-semibold">{t(`academy.objection.psychology.cards.${key}.title`)}</p>
+            <div key={key} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground">
+              <Icon className="h-3.5 w-3.5 text-primary" />
+              {t(`academy.objection.psychology.cards.${key}.title`)}
             </div>
           ))}
         </div>
@@ -211,6 +247,9 @@ export function ObjectionsPage() {
             )}
           >
             {value === 'all' ? t('common.all') : t(`academy.objection.objCategories.${value}`)}
+            <span className="ml-1.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px]">
+              {value === 'all' ? objectionStats.total : objectionStats.categoryCounts[value] ?? 0}
+            </span>
           </button>
         ))}
       </div>
