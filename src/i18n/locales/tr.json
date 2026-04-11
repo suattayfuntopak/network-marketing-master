@@ -155,29 +155,34 @@
     "exportCount": "{{count}} kontak dışa aktarıldı",
     "importSuccess": "Kontaklar başarıyla içe aktarıldı",
     "signalBoard": {
-      "title": "Kontak Sinyalleri",
-      "subtitle": "Listeyi kalabalıklaştırmadan bugün önce nereyi toparlaman gerektiğini gösterir.",
-      "nextMoveLabel": "Bugünün Kontak Yönü",
-      "cards": {
-        "followUps": {
-          "title": "Önce Dön",
-          "body": "{{count}} kişi geri dönüş ritmi bekliyor. Önce geciken ya da bugünkü takipleri toparlamak iyi olur."
-        },
-        "warm": {
-          "title": "İlerlet",
-          "body": "{{count}} kişi sıcak bölgede. Uzun anlatım yerine tek bir sonraki adımı netleştirmek daha iyi çalışır."
-        },
-        "reactivate": {
-          "title": "Yeniden Isıt",
-          "body": "{{count}} kişi sessize düşmüş görünüyor. Baskısız kısa bir hatırlatma ile tekrar görünmek iyi gelir."
-        }
+      "title": "Kontak Sinyalleri"
+    },
+    "summaryCards": {
+      "all": {
+        "title": "Toplam Kontak Sayısı"
       },
-      "nextMove": {
-        "stabilize": "Önce ritmi stabilize et. Şu anda {{dueNow}} takip gecikmiş ya da bugün için bekliyor; sıcak fırsatlara geçmeden bunları temizlemek akışı sakinleştirir.",
-        "advance": "Şu anda ilerletme penceresi açık. {{warmWindow}} sıcak kişi varken karar istemek yerine tek bir sonraki adımı netleştirmek daha iyi sonuç verir.",
-        "reactivate": "Liste sessizleşmiş görünüyor. {{reactivationPool}} kişi yeniden ısıtma havuzunda; kısa, doğal ve baskısız dönüş mesajlarıyla ritmi geri çağır.",
-        "build": "Liste temiz görünüyor. Şimdi yeni temas açmak ve ilk sıcaklığı kurmak için {{freshProspects}} taze kişiyi küçük davetlerle hareketlendirmek en doğru adım."
+      "month": {
+        "title": "Bu Ay Eklenenler"
+      },
+      "week": {
+        "title": "Bu Hafta Eklenenler"
+      },
+      "today": {
+        "title": "Bugün Eklenenler"
       }
+    },
+    "summaryTable": {
+      "createdAt": "Eklenme Tarihi",
+      "empty": "Bu aralıkta listelenecek kontak görünmüyor."
+    },
+    "sources": {
+      "manual": "Manuel",
+      "referral": "Referans",
+      "social_media": "Sosyal Medya",
+      "event": "Etkinlik",
+      "cold_outreach": "Soğuk Erişim",
+      "import": "İçe Aktarım",
+      "other": "Diğer"
     },
     "columns": {
       "name": "İsim",
@@ -979,8 +984,8 @@
     "newFollowUp": "Yeni Takip",
     "emptyAgenda": "Bu aralıkta etkinlik yok",
     "summaryCards": {
-      "totalActions": {
-        "title": "Toplam Aksiyonlar",
+      "allActions": {
+        "title": "Tüm Aksiyonlar",
         "hint": "{{appointments}} randevu ve {{followUps}} açık takip görüntüleniyor."
       },
       "todayAppointments": {
@@ -1009,7 +1014,7 @@
         "follow_up": "Takip"
       },
       "empty": {
-        "totalActions": "Şu an listelenecek aksiyon görünmüyor.",
+        "allActions": "Şu an listelenecek aksiyon görünmüyor.",
         "todayAppointments": "Bugün için planlı randevu görünmüyor.",
         "todayFollowUps": "Bugün için planlı takip görünmüyor."
       }
@@ -1025,6 +1030,11 @@
       "day": "Gün",
       "agenda": "Gündem"
     },
+    "tabs": {
+      "appointments": "Randevular",
+      "followUps": "Takipler"
+    },
+    "emptyAppointments": "Listelenecek randevu görünmüyor.",
     "appointment": {
       "title": "Başlık",
       "titlePlaceholder": "Randevu başlığı...",

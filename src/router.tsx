@@ -60,6 +60,11 @@ const ContactDetailPage = lazy(async () => {
   return { default: module.ContactDetailPage }
 })
 
+const ContactsSummaryListPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/contacts/ContactsSummaryListPage')
+  return { default: module.ContactsSummaryListPage }
+})
+
 const PipelinePage = lazy(async () => {
   const module = await import('@/pages/dashboard/pipeline/PipelinePage')
   return { default: module.PipelinePage }
@@ -78,6 +83,16 @@ const CalendarPage = lazy(async () => {
 const FollowUpsPage = lazy(async () => {
   const module = await import('@/pages/dashboard/calendar/FollowUpsPage')
   return { default: module.FollowUpsPage }
+})
+
+const CalendarAppointmentsPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/calendar/CalendarAppointmentsPage')
+  return { default: module.CalendarAppointmentsPage }
+})
+
+const CalendarActionListPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/calendar/CalendarActionListPage')
+  return { default: module.CalendarActionListPage }
 })
 
 const NotFoundPage = lazy(async () => {
@@ -169,6 +184,7 @@ export const router = createBrowserRouter([
 
           // Contacts
           { path: ROUTES.CONTACTS, element: renderLazyRoute(<ContactsListPage />) },
+          { path: `${ROUTES.CONTACTS}/ozet/:summaryKey`, element: renderLazyRoute(<ContactsSummaryListPage />) },
           { path: `${ROUTES.CONTACTS}/yeni`, element: renderLazyRoute(<ContactFormPage key="new" />) },
           { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
           { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
@@ -179,6 +195,11 @@ export const router = createBrowserRouter([
 
           // Calendar
           { path: ROUTES.CALENDAR, element: renderLazyRoute(<CalendarPage />) },
+          { path: `${ROUTES.CALENDAR}/hafta`, element: renderLazyRoute(<CalendarPage />) },
+          { path: `${ROUTES.CALENDAR}/gun`, element: renderLazyRoute(<CalendarPage />) },
+          { path: `${ROUTES.CALENDAR}/gundem`, element: renderLazyRoute(<CalendarPage />) },
+          { path: `${ROUTES.CALENDAR}/randevular`, element: renderLazyRoute(<CalendarAppointmentsPage />) },
+          { path: `${ROUTES.CALENDAR}/aksiyonlar/:summaryKey`, element: renderLazyRoute(<CalendarActionListPage />) },
           { path: `${ROUTES.CALENDAR}/takipler`, element: renderLazyRoute(<FollowUpsPage />) },
 
           // Messages

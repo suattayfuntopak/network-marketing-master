@@ -155,29 +155,34 @@
     "exportCount": "{{count}} contacts exported",
     "importSuccess": "Contacts imported successfully",
     "signalBoard": {
-      "title": "Contact Signals",
-      "subtitle": "A light decision layer that shows where your attention should go first today.",
-      "nextMoveLabel": "Today's Contact Direction",
-      "cards": {
-        "followUps": {
-          "title": "Stabilize",
-          "body": "{{count}} people are waiting on rhythm. Clearing overdue or due-today follow-ups first will steady the board."
-        },
-        "warm": {
-          "title": "Advance",
-          "body": "{{count}} people are in the warm zone. A single clear next step will work better than a longer explanation."
-        },
-        "reactivate": {
-          "title": "Reopen",
-          "body": "{{count}} people have gone quiet. A short, low-pressure touch can bring them back into motion."
-        }
+      "title": "Contact Signals"
+    },
+    "summaryCards": {
+      "all": {
+        "title": "Total Contacts"
       },
-      "nextMove": {
-        "stabilize": "Stabilize the list first. {{dueNow}} follow-ups are overdue or due today, so clearing those before chasing warm opportunities will calm the flow.",
-        "advance": "The advancement window is open. With {{warmWindow}} warm people in play, clarifying one next step will work better than pushing for a decision.",
-        "reactivate": "The list has gone a bit quiet. {{reactivationPool}} people are ready for reactivation, so low-pressure check-ins are the best move right now.",
-        "build": "The list looks clean. This is a good moment to build fresh momentum by moving {{freshProspects}} newer contacts with short invites."
+      "month": {
+        "title": "Added This Month"
+      },
+      "week": {
+        "title": "Added This Week"
+      },
+      "today": {
+        "title": "Added Today"
       }
+    },
+    "summaryTable": {
+      "createdAt": "Created At",
+      "empty": "There are no contacts to list in this range."
+    },
+    "sources": {
+      "manual": "Manual",
+      "referral": "Referral",
+      "social_media": "Social Media",
+      "event": "Event",
+      "cold_outreach": "Cold Outreach",
+      "import": "Import",
+      "other": "Other"
     },
     "columns": {
       "name": "Name",
@@ -979,8 +984,8 @@
     "newFollowUp": "New Follow-up",
     "emptyAgenda": "No events in this range",
     "summaryCards": {
-      "totalActions": {
-        "title": "Total Actions",
+      "allActions": {
+        "title": "All Actions",
         "hint": "{{appointments}} appointments and {{followUps}} open follow-ups are visible."
       },
       "todayAppointments": {
@@ -1009,7 +1014,7 @@
         "follow_up": "Follow-up"
       },
       "empty": {
-        "totalActions": "There are no actions to list right now.",
+        "allActions": "There are no actions to list right now.",
         "todayAppointments": "There are no appointments planned for today.",
         "todayFollowUps": "There are no follow-ups planned for today."
       }
@@ -1025,6 +1030,11 @@
       "day": "Day",
       "agenda": "Agenda"
     },
+    "tabs": {
+      "appointments": "Appointments",
+      "followUps": "Follow-ups"
+    },
+    "emptyAppointments": "There are no appointments to list.",
     "appointment": {
       "title": "Title",
       "titlePlaceholder": "Appointment title...",

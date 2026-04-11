@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Upload, Download, LayoutGrid, LayoutList, ChevronLeft, ChevronRight, Clock3, Flame, RefreshCcw } from 'lucide-react'
+import { Plus, Upload, Download, LayoutGrid, LayoutList, Users, CalendarRange, CalendarDays, Clock3, ChevronLeft, ChevronRight } from 'lucide-react'
+import { startOfDay, startOfMonth, startOfWeek } from 'date-fns'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -22,8 +23,7 @@ import { contactKeys } from '@/hooks/useContacts'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { PAGE_SIZE } from '@/lib/contacts/constants'
-import { buildContactInsightSummary } from '@/lib/contacts/contactInsights'
-import { DEFAULT_SORT, type SortField } from '@/lib/contacts/types'
+import { DEFAULT_FILTERS, DEFAULT_SORT, type SortField } from '@/lib/contacts/types'
 
 export function ContactsListPage() {
   const navigate = useNavigate()
@@ -47,10 +47,10 @@ export function ContactsListPage() {
     userId,
   })
   const { data: insightData } = useContacts({
-    filters,
+    filters: DEFAULT_FILTERS,
     sort: DEFAULT_SORT,
     page: 1,
-    pageSize: 500,
+    pageSize: 10000,
     userId,
   })
 
@@ -62,15 +62,25 @@ export function ContactsListPage() {
   const insightContacts = insightData?.data ?? contacts
   const totalPages = data?.totalPages ?? 1
   const totalCount = data?.count ?? 0
-  const contactInsights = useMemo(
-    () => buildContactInsightSummary(insightContacts),
-    [insightContacts]
-  )
+  const contactSummary = useMemo(() => {
+    const now = new Date()
+    const monthStart = startOfMonth(now)
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 })
+    const todayStart = startOfDay(now)
 
-  const SIGNAL_TONE_CLASSES = {
-    blue: 'border-blue-500/20 bg-blue-500/10 text-blue-100',
-    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
-    emerald: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
+    return {
+      total: insightContacts.length,
+      month: insightContacts.filter((contact) => new Date(contact.created_at) >= monthStart).length,
+      week: insightContacts.filter((contact) => new Date(contact.created_at) >= weekStart).length,
+      today: insightContacts.filter((contact) => new Date(contact.created_at) >= todayStart).length,
+    }
+  }, [insightContacts])
+
+  const SUMMARY_TONE_CLASSES = {
+    cyan: 'border-primary/20 bg-primary/10 text-primary',
+    blue: 'border-blue-500/20 bg-blue-500/10 text-blue-500',
+    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-500',
+    rose: 'border-rose-500/20 bg-rose-500/10 text-rose-500',
   } as const
 
   // Sort toggle
@@ -236,52 +246,28 @@ export function ContactsListPage() {
 
       {!isLoading && !isError && totalCount > 0 && (
         <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
-                {t('contacts.signalBoard.title')}
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t('contacts.signalBoard.subtitle')}
-              </p>
-            </div>
-            <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              {t('contacts.total', { count: totalCount })}
-            </span>
-          </div>
-
-          <div className="mt-4 space-y-4">
-            <div className="grid gap-3 md:grid-cols-3">
-              {[
-                { key: 'followUps', Icon: Clock3, value: contactInsights.dueNow, tone: 'blue' as const },
-                { key: 'warm', Icon: Flame, value: contactInsights.warmWindow, tone: 'amber' as const },
-                { key: 'reactivate', Icon: RefreshCcw, value: contactInsights.reactivationPool, tone: 'emerald' as const },
-              ].map(({ key, Icon, value, tone }) => (
-                <div key={key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
-                      <Icon className="h-4 w-4" />
-                    </div>
-                    <p className="text-2xl font-bold tabular-nums">{value}</p>
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+            {[
+              { key: 'all', Icon: Users, value: contactSummary.total, tone: 'cyan' as const },
+              { key: 'month', Icon: CalendarRange, value: contactSummary.month, tone: 'blue' as const },
+              { key: 'week', Icon: CalendarDays, value: contactSummary.week, tone: 'amber' as const },
+              { key: 'today', Icon: Clock3, value: contactSummary.today, tone: 'rose' as const },
+            ].map(({ key, Icon, value, tone }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => navigate(`${ROUTES.CONTACTS}/ozet/${key}`)}
+                className="rounded-2xl border border-border/70 bg-card/60 p-4 text-left transition-colors hover:border-primary/25 hover:ring-1 hover:ring-primary/20"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SUMMARY_TONE_CLASSES[tone]}`}>
+                    <Icon className="h-4 w-4" />
                   </div>
-                  <p className="mt-3 text-sm font-medium">{t(`contacts.signalBoard.cards.${key}.title`)}</p>
+                  <p className="text-2xl font-bold tabular-nums">{value}</p>
                 </div>
-              ))}
-            </div>
-
-            <div className="rounded-2xl border border-border/70 bg-card/50 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                {t('contacts.signalBoard.nextMoveLabel')}
-              </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {t(`contacts.signalBoard.nextMove.${contactInsights.focus}`, {
-                  dueNow: contactInsights.dueNow,
-                  warmWindow: contactInsights.warmWindow,
-                  reactivationPool: contactInsights.reactivationPool,
-                  freshProspects: contactInsights.freshProspects,
-                })}
-              </p>
-            </div>
+                <p className="mt-3 text-sm font-medium">{t(`contacts.summaryCards.${key}.title`)}</p>
+              </button>
+            ))}
           </div>
         </div>
       )}
