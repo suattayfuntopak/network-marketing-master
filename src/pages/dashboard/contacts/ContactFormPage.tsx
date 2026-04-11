@@ -189,22 +189,14 @@ export function ContactFormPage() {
 
       {isEdit && existingContact && (
         <div className="rounded-2xl border border-border/70 bg-card/70 px-4 py-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary/80">
-            {t('contacts.editingContact')}
-          </p>
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-            <p className="text-lg font-semibold text-foreground">{existingContact.full_name}</p>
+            <p className="text-lg font-semibold text-primary">{existingContact.full_name}</p>
             {existingContact.nickname ? (
               <span className="rounded-full border border-border/70 bg-muted/60 px-2.5 py-1 text-xs text-muted-foreground">
                 {existingContact.nickname}
               </span>
             ) : null}
           </div>
-          {(existingContact.phone || existingContact.email) && (
-            <p className="mt-1 text-sm text-muted-foreground">
-              {existingContact.phone || existingContact.email}
-            </p>
-          )}
         </div>
       )}
 
