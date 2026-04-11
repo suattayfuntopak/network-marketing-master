@@ -101,7 +101,37 @@
     "passwordUpdatedDesc": "Your password has been updated successfully. Redirecting you to the login page...",
     "emailConfirmTitle": "Check Your Email",
     "emailConfirmDescription": "We sent a verification link to your email address to activate your account.",
-    "emailConfirmHint": "Didn't receive the email? Check your spam folder."
+    "emailConfirmHint": "Didn't receive the email? Check your spam folder.",
+    "selectedPlan": "Selected Plan",
+    "planLabel": "Choose your plan",
+    "planHelp": "You can change plans later as your workflow grows.",
+    "bestFor": "Best for",
+    "startModeLabel": "Start mode",
+    "continueWithPlan": "Continue with {{plan}}",
+    "planApplied": "Selected plan: {{plan}}",
+    "demoCta": "Open demo workspace",
+    "loginPanelTitle": "Run your rhythm, messages, and follow-ups from one place.",
+    "loginPanelBody": "When you sign in, you are not just opening stored data. You are opening daily focus, warm opportunities, and team visibility inside one calm product surface.",
+    "loginBenefits": [
+      "Contacts, follow-ups, and pipeline movement stay in one decision flow.",
+      "Message support, academy guidance, and objection help open from the same product.",
+      "Your plan and start mode remain visible without clutter."
+    ],
+    "registerBenefits": [
+      "Plan choice flows directly into the product experience from day one.",
+      "If you choose demo start mode, sample contacts, follow-ups, and appointments are created automatically.",
+      "The same calm product language stays with you after signup."
+    ],
+    "startModes": {
+      "clean": {
+        "title": "Clean workspace",
+        "body": "Start from scratch with your own real list and rhythm."
+      },
+      "demo": {
+        "title": "Start with demo data",
+        "body": "Sample contacts, stages, follow-ups, and appointments are created automatically."
+      }
+    }
   },
   "contacts": {
     "title": "Contacts",
@@ -894,6 +924,27 @@
       "copied": "Feedback draft copied to clipboard",
       "template": "What did I try?\n\nWhere did I feel friction?\n\nWhat clearly helped me move faster?\n\nWhat could be simpler?\n\nWhich screen do I use most in the field?"
     },
+    "membership": {
+      "action": "See Plans",
+      "modes": {
+        "clean": "Clean start",
+        "demo": "Demo start"
+      },
+      "plans": {
+        "starter": {
+          "name": "Starter",
+          "body": "A light plan for getting your core rhythm in place and starting calmly."
+        },
+        "pro": {
+          "name": "Pro",
+          "body": "Adds clearer signals and stronger daily flow support for active distributors."
+        },
+        "team": {
+          "name": "Team",
+          "body": "Built for leader visibility, team radar, and deeper growth tracking."
+        }
+      }
+    },
     "roles": {
       "distributor": "Distributor",
       "leader": "Leader",
@@ -1587,7 +1638,7 @@
           "Today's game plan",
           "Contact signals",
           "Pipeline signals",
-          "AI message playbooks",
+          "AI message flows",
           "Micro coaching",
           "Team radar",
           "Decision signals",
@@ -1759,12 +1810,33 @@
       "title": "Plans that stay simple for the first contact and expand naturally when the rhythm grows.",
       "subtitle": "What strong global SaaS pages do well is clarity. So the pricing here is not trying to be clever. Visitors should quickly understand which stage they are in and what they get.",
       "mostPopular": "Most Popular",
+      "bestFor": "Best for",
+      "sharedLabel": "Included in every plan",
+      "shared": [
+        "Turkish and English interface support",
+        "Calm onboarding and fast setup",
+        "One surface for messaging, follow-ups, and training"
+      ],
+      "billing": {
+        "monthly": "Monthly",
+        "yearly": "Yearly"
+      },
+      "demo": {
+        "title": "If you do not want to land in an empty product, open it in demo start mode.",
+        "body": "Sample contacts, stages, follow-ups, and appointments are created after signup.",
+        "cta": "Start Demo"
+      },
       "plans": [
         {
+          "key": "starter",
           "name": "Starter",
-          "price": "Free",
-          "period": "",
+          "monthlyPrice": "Free",
+          "monthlyPeriod": "",
+          "yearlyPrice": "Free",
+          "yearlyPeriod": "",
+          "yearlyNote": "",
           "desc": "For people starting out or trying to bring order to the work for the first time.",
+          "bestFor": "Distributors who want to clean up their first contact list and see the product without pressure.",
           "features": [
             "50 contacts",
             "Basic pipeline tracking",
@@ -1774,23 +1846,33 @@
           "cta": "Start Free"
         },
         {
+          "key": "pro",
           "name": "Pro",
-          "price": "$29",
-          "period": "/mo",
+          "monthlyPrice": "$29",
+          "monthlyPeriod": "/mo",
+          "yearlyPrice": "$290",
+          "yearlyPeriod": "/yr",
+          "yearlyNote": "Roughly 2 months saved on annual billing",
           "desc": "For active distributors who want daily rhythm, sharper prioritization, and more consistent movement.",
+          "bestFor": "People working the field every day and wanting clearer prioritization with less mental drag.",
           "features": [
             "Unlimited contacts",
             "Contact and pipeline signals",
-            "Unlimited AI message playbooks",
+            "Unlimited AI message flows",
             "Decision signals and follow-up planning"
           ],
           "cta": "Choose Pro"
         },
         {
+          "key": "team",
           "name": "Team",
-          "price": "$79",
-          "period": "/mo",
+          "monthlyPrice": "$79",
+          "monthlyPeriod": "/mo",
+          "yearlyPrice": "$790",
+          "yearlyPeriod": "/yr",
+          "yearlyNote": "Built for leaders who want calmer team visibility",
           "desc": "For leaders who need to see momentum, support needs, and activation flow across a growing team.",
+          "bestFor": "Leaders who want to spot slowing members, support needs, and activation gaps earlier.",
           "features": [
             "Everything in Pro",
             "Team radar and leader guidance",

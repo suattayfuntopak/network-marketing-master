@@ -81,6 +81,7 @@ export function LandingPage() {
   const { t } = useTranslation()
   const { theme, toggleTheme } = useTheme()
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly')
 
   const heroTrust = t('landing.hero.trust', { returnObjects: true }) as string[]
   const heroTasks = t('landing.hero.panel.tasks', { returnObjects: true }) as Array<{ state: string; title: string; meta: string }>
@@ -93,13 +94,19 @@ export function LandingPage() {
   const comparisonBefore = t('landing.comparison.before.items', { returnObjects: true }) as string[]
   const comparisonAfter = t('landing.comparison.after.items', { returnObjects: true }) as string[]
   const pricingPlans = t('landing.pricing.plans', { returnObjects: true }) as Array<{
+    key: string
     name: string
-    price: string
-    period: string
+    monthlyPrice: string
+    monthlyPeriod: string
+    yearlyPrice: string
+    yearlyPeriod: string
+    yearlyNote: string
     desc: string
+    bestFor: string
     features: string[]
     cta: string
   }>
+  const pricingShared = t('landing.pricing.shared', { returnObjects: true }) as string[]
   const faqItems = t('landing.faq.items', { returnObjects: true }) as Array<{ q: string; a: string }>
 
   const proofIcons = [Target, Sparkles, ShieldAlert]
@@ -207,7 +214,7 @@ export function LandingPage() {
             </p>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Link to={ROUTES.REGISTER}>
+              <Link to={`${ROUTES.REGISTER}?plan=starter`}>
                 <Button size="lg" className="w-full gap-2 sm:w-auto">
                   {t('landing.hero.cta')}
                   <ArrowRight className="h-4 w-4" />
@@ -218,6 +225,15 @@ export function LandingPage() {
                   {t('landing.hero.ctaSecondary')}
                 </Button>
               </a>
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-3">
+              <Link to={`${ROUTES.REGISTER}?plan=starter&mode=demo`}>
+                <Button variant="ghost" className="gap-2 px-0 text-sm text-primary hover:bg-transparent hover:text-primary/90">
+                  <Sparkles className="h-4 w-4" />
+                  {t('landing.pricing.demo.cta')}
+                </Button>
+              </Link>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-5 text-sm text-muted-foreground">
@@ -483,10 +499,40 @@ export function LandingPage() {
             center
           />
 
+          <div className="mt-8 flex flex-col items-center gap-4">
+            <div className="inline-flex rounded-full border border-border/70 bg-background/60 p-1 shadow-[0_16px_32px_rgba(3,7,18,0.10)]">
+              {(['monthly', 'yearly'] as const).map((cycle) => (
+                <button
+                  key={cycle}
+                  onClick={() => setBillingCycle(cycle)}
+                  className={cn(
+                    'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                    billingCycle === cycle
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground'
+                  )}
+                >
+                  {t(`landing.pricing.billing.${cycle}`)}
+                </button>
+              ))}
+            </div>
+
+            <div className="rounded-[28px] border border-primary/15 bg-primary/8 px-5 py-4 text-center shadow-[0_16px_40px_rgba(3,7,18,0.12)]">
+              <p className="text-sm font-semibold text-foreground">{t('landing.pricing.demo.title')}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{t('landing.pricing.demo.body')}</p>
+              <Link to={`${ROUTES.REGISTER}?plan=starter&mode=demo`} className="mt-3 inline-flex">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  {t('landing.pricing.demo.cta')}
+                </Button>
+              </Link>
+            </div>
+          </div>
+
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             {pricingPlans.map((plan, index) => (
               <div
-                key={plan.name}
+                key={plan.key}
                 className={cn(
                   'rounded-[32px] border p-7 shadow-[0_20px_50px_rgba(3,7,18,0.14)]',
                   index === highlightedPlanIndex
@@ -502,11 +548,24 @@ export function LandingPage() {
 
                 <p className="mt-4 text-2xl font-semibold tracking-tight">{plan.name}</p>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">{plan.desc}</p>
+                <div className="mt-4 rounded-2xl border border-border/70 bg-background/45 px-4 py-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    {t('landing.pricing.bestFor')}
+                  </p>
+                  <p className="mt-2 text-sm text-foreground">{plan.bestFor}</p>
+                </div>
 
                 <div className="mt-6 flex items-end gap-1">
-                  <span className="font-heading text-4xl font-semibold tracking-tight">{plan.price}</span>
-                  <span className="pb-1 text-muted-foreground">{plan.period}</span>
+                  <span className="font-heading text-4xl font-semibold tracking-tight">
+                    {billingCycle === 'yearly' ? plan.yearlyPrice : plan.monthlyPrice}
+                  </span>
+                  <span className="pb-1 text-muted-foreground">
+                    {billingCycle === 'yearly' ? plan.yearlyPeriod : plan.monthlyPeriod}
+                  </span>
                 </div>
+                {billingCycle === 'yearly' && plan.yearlyNote ? (
+                  <p className="mt-2 text-xs font-medium text-primary">{plan.yearlyNote}</p>
+                ) : null}
 
                 <ul className="mt-6 space-y-3">
                   {plan.features.map((feature) => (
@@ -517,13 +576,27 @@ export function LandingPage() {
                   ))}
                 </ul>
 
-                <Link to={ROUTES.REGISTER} className="mt-7 block">
+                <Link to={`${ROUTES.REGISTER}?plan=${plan.key}`} className="mt-7 block">
                   <Button className="w-full" variant={index === highlightedPlanIndex ? 'default' : 'outline'}>
                     {plan.cta}
                   </Button>
                 </Link>
               </div>
             ))}
+          </div>
+
+          <div className="mt-8 rounded-[30px] border border-border/70 bg-background/50 p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              {t('landing.pricing.sharedLabel')}
+            </p>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              {pricingShared.map((item) => (
+                <div key={item} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card/45 p-4 text-sm text-muted-foreground">
+                  <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -557,7 +630,7 @@ export function LandingPage() {
             {t('landing.cta.subtitle')}
           </p>
           <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to={ROUTES.REGISTER}>
+            <Link to={`${ROUTES.REGISTER}?plan=starter`}>
               <Button size="lg" className="gap-2">
                 {t('landing.cta.button')}
                 <ArrowRight className="h-4 w-4" />

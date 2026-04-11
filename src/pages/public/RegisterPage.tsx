@@ -1,23 +1,53 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Zap, Eye, EyeOff } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Zap, Eye, EyeOff, CheckCircle2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
+import { cn } from '@/lib/utils'
 import i18n from '@/i18n'
+
+type PlanKey = 'starter' | 'pro' | 'team'
+type StartMode = 'clean' | 'demo'
 
 export function RegisterPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+  const registerBenefits = t('auth.registerBenefits', { returnObjects: true }) as string[]
+  const pricingPlans = t('landing.pricing.plans', { returnObjects: true }) as Array<{
+    key: PlanKey
+    name: string
+    desc: string
+    bestFor: string
+    features: string[]
+  }>
+
+  const selectedPlanKey = (searchParams.get('plan') as PlanKey) || 'starter'
+  const selectedMode = (searchParams.get('mode') as StartMode) || 'clean'
+  const selectedPlan = useMemo(
+    () => pricingPlans.find((plan) => plan.key === selectedPlanKey) ?? pricingPlans[0],
+    [pricingPlans, selectedPlanKey]
+  )
+
+  const updateParams = (next: Partial<{ plan: PlanKey; mode: StartMode }>) => {
+    setSearchParams((current) => {
+      const updated = new URLSearchParams(current)
+      updated.set('plan', next.plan ?? selectedPlanKey)
+      updated.set('mode', next.mode ?? selectedMode)
+      return updated
+    })
+  }
 
   const validate = (data: {
     full_name: string
@@ -52,6 +82,7 @@ export function RegisterPage() {
       setFieldErrors(errors)
       return
     }
+
     setFieldErrors({})
     setLoading(true)
 
@@ -60,7 +91,13 @@ export function RegisterPage() {
         email,
         password,
         options: {
-          data: { full_name, phone: phone || null },
+          data: {
+            full_name,
+            phone: phone || null,
+            selected_plan: selectedPlan.key,
+            workspace_mode: selectedMode,
+            workspace_role: selectedPlan.key === 'team' ? 'leader' : 'distributor',
+          },
           emailRedirectTo: `${window.location.origin}${ROUTES.EMAIL_CONFIRM}`,
         },
       })
@@ -89,9 +126,8 @@ export function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-8">
-      {/* Language switcher */}
-      <div className="fixed top-4 right-4 flex items-center gap-0.5 rounded-lg border border-border p-0.5 z-10">
+    <div className="min-h-screen bg-background px-4 py-8">
+      <div className="fixed right-4 top-4 z-10 flex items-center gap-0.5 rounded-lg border border-border bg-card/70 p-0.5 backdrop-blur-xl">
         <button
           onClick={() => i18n.changeLanguage('tr')}
           className={`px-2 py-1 text-xs rounded-md font-medium transition-colors ${currentLang === 'tr' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -106,115 +142,197 @@ export function RegisterPage() {
         </button>
       </div>
 
-      <div className="w-full max-w-sm space-y-6">
-        {/* Logo */}
-        <div className="text-center">
-          <Link to={ROUTES.HOME} className="inline-flex items-center gap-2">
-            <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground">
-              <Zap className="w-5 h-5" />
+      <div className="mx-auto grid w-full max-w-[1320px] gap-8 lg:grid-cols-[1.02fr_0.98fr]">
+        <section className="relative overflow-hidden rounded-[32px] border border-border/70 bg-[radial-gradient(circle_at_top_left,rgba(45,212,191,0.14),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_28%)] p-8 shadow-[0_30px_80px_rgba(3,7,18,0.18)]">
+          <Link to={ROUTES.HOME} className="inline-flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
+              <Zap className="h-5 w-5" />
             </div>
-            <span className="font-bold text-lg">NMM</span>
+            <span className="font-heading text-lg font-semibold tracking-tight">Network Marketing Master</span>
           </Link>
-          <h1 className="mt-4 text-2xl font-bold tracking-tight">{t('auth.createAccount')}</h1>
-          <p className="text-sm text-muted-foreground mt-1">{t('auth.registerSubtitle')}</p>
-        </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-              {error}
+          <Badge variant="secondary" className="mt-8 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.18em]">
+            {t('auth.selectedPlan')}
+          </Badge>
+          <h1 className="mt-6 max-w-xl font-heading text-4xl font-semibold tracking-tight sm:text-5xl">
+            {selectedPlan.name}
+          </h1>
+          <p className="mt-4 max-w-xl text-lg leading-8 text-muted-foreground">
+            {selectedPlan.desc}
+          </p>
+
+          <div className="mt-8 rounded-[28px] border border-border/70 bg-background/55 p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('auth.bestFor')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-foreground">{selectedPlan.bestFor}</p>
+            <div className="mt-4 space-y-3">
+              {selectedPlan.features.map((feature) => (
+                <div key={feature} className="flex items-start gap-3 text-sm text-muted-foreground">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{feature}</span>
+                </div>
+              ))}
             </div>
-          )}
-
-          <div className="space-y-2">
-            <Label htmlFor="full_name">{t('auth.fullName')}</Label>
-            <Input
-              id="full_name"
-              name="full_name"
-              type="text"
-              placeholder={t('auth.namePlaceholder')}
-              autoComplete="name"
-            />
-            {fieldErrors.full_name && (
-              <p className="text-xs text-destructive">{fieldErrors.full_name}</p>
-            )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">{t('auth.email')}</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              placeholder={t('auth.emailPlaceholder')}
-              autoComplete="email"
-            />
-            {fieldErrors.email && (
-              <p className="text-xs text-destructive">{fieldErrors.email}</p>
-            )}
+          <div className="mt-8 grid gap-3">
+            {registerBenefits.map((item) => (
+              <div key={item} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-card/45 p-4 text-sm text-muted-foreground">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-[32px] border border-border/70 bg-card/70 p-6 shadow-[0_24px_70px_rgba(3,7,18,0.14)] backdrop-blur-xl sm:p-8">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold tracking-tight">{t('auth.createAccount')}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t('auth.registerSubtitle')}</p>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">
-              {t('auth.phone')} <span className="text-muted-foreground text-xs">({t('common.optional')})</span>
-            </Label>
-            <Input
-              id="phone"
-              name="phone"
-              type="tel"
-              placeholder={t('auth.phonePlaceholder')}
-              autoComplete="tel"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            {error ? (
+              <div className="rounded-2xl bg-destructive/10 p-3 text-sm text-destructive">
+                {error}
+              </div>
+            ) : null}
 
-          <div className="space-y-2">
-            <Label htmlFor="password">{t('auth.password')}</Label>
-            <div className="relative">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3">
+                <Label>{t('auth.planLabel')}</Label>
+                <span className="text-xs text-muted-foreground">{t('auth.planHelp')}</span>
+              </div>
+              <div className="grid gap-2 sm:grid-cols-3">
+                {pricingPlans.map((plan) => (
+                  <button
+                    key={plan.key}
+                    type="button"
+                    onClick={() => updateParams({ plan: plan.key })}
+                    className={cn(
+                      'rounded-2xl border px-4 py-3 text-left transition-colors',
+                      selectedPlan.key === plan.key
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border/70 bg-background/45 text-muted-foreground hover:border-primary/35 hover:text-foreground'
+                    )}
+                  >
+                    <p className="text-sm font-semibold">{plan.name}</p>
+                    <p className="mt-1 text-xs">{plan.key === 'team' ? t('settings.roles.leader') : t('settings.roles.distributor')}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label>{t('auth.startModeLabel')}</Label>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {(['clean', 'demo'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => updateParams({ mode })}
+                    className={cn(
+                      'rounded-2xl border px-4 py-3 text-left transition-colors',
+                      selectedMode === mode
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border/70 bg-background/45 text-muted-foreground hover:border-primary/35 hover:text-foreground'
+                    )}
+                  >
+                    <p className="text-sm font-semibold">{t(`auth.startModes.${mode}.title`)}</p>
+                    <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(`auth.startModes.${mode}.body`)}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="full_name">{t('auth.fullName')}</Label>
               <Input
-                id="password"
-                name="password"
+                id="full_name"
+                name="full_name"
+                type="text"
+                placeholder={t('auth.namePlaceholder')}
+                autoComplete="name"
+              />
+              {fieldErrors.full_name ? <p className="text-xs text-destructive">{fieldErrors.full_name}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">{t('auth.email')}</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder={t('auth.emailPlaceholder')}
+                autoComplete="email"
+              />
+              {fieldErrors.email ? <p className="text-xs text-destructive">{fieldErrors.email}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">
+                {t('auth.phone')} <span className="text-xs text-muted-foreground">({t('common.optional')})</span>
+              </Label>
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder={t('auth.phonePlaceholder')}
+                autoComplete="tel"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password">{t('auth.password')}</Label>
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder={t('auth.passwordPlaceholder')}
+                  autoComplete="new-password"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowPassword((value) => !value)}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {fieldErrors.password ? <p className="text-xs text-destructive">{fieldErrors.password}</p> : null}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password_confirm">{t('auth.passwordConfirm')}</Label>
+              <Input
+                id="password_confirm"
+                name="password_confirm"
                 type={showPassword ? 'text' : 'password'}
-                placeholder={t('auth.passwordPlaceholder')}
+                placeholder={t('auth.passwordConfirmPlaceholder')}
                 autoComplete="new-password"
               />
-              <button
-                type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </button>
+              {fieldErrors.password_confirm ? <p className="text-xs text-destructive">{fieldErrors.password_confirm}</p> : null}
             </div>
-            {fieldErrors.password && (
-              <p className="text-xs text-destructive">{fieldErrors.password}</p>
-            )}
+
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? t('auth.creatingAccount') : t('auth.continueWithPlan', { plan: selectedPlan.name })}
+            </Button>
+          </form>
+
+          <div className="mt-6 flex flex-col gap-3 text-center">
+            <Link to={`${ROUTES.REGISTER}?plan=starter&mode=demo`} className="text-sm font-medium text-primary hover:underline">
+              {t('auth.demoCta')}
+            </Link>
+            <p className="text-sm text-muted-foreground">
+              {t('auth.alreadyHaveAccount')}{' '}
+              <Link to={`${ROUTES.LOGIN}?plan=${selectedPlan.key}&mode=${selectedMode}`} className="font-medium text-primary hover:underline">
+                {t('auth.login')}
+              </Link>
+            </p>
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password_confirm">{t('auth.passwordConfirm')}</Label>
-            <Input
-              id="password_confirm"
-              name="password_confirm"
-              type={showPassword ? 'text' : 'password'}
-              placeholder={t('auth.passwordConfirmPlaceholder')}
-              autoComplete="new-password"
-            />
-            {fieldErrors.password_confirm && (
-              <p className="text-xs text-destructive">{fieldErrors.password_confirm}</p>
-            )}
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? t('auth.creatingAccount') : t('auth.register')}
-          </Button>
-        </form>
-
-        <p className="text-center text-sm text-muted-foreground">
-          {t('auth.alreadyHaveAccount')}{' '}
-          <Link to={ROUTES.LOGIN} className="text-primary hover:underline font-medium">
-            {t('auth.login')}
-          </Link>
-        </p>
+        </section>
       </div>
     </div>
   )

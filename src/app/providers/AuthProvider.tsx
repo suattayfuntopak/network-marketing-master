@@ -1,6 +1,8 @@
 import { useEffect, type ReactNode } from 'react'
+import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
+import { ensureDemoWorkspace } from '@/lib/public/demoWorkspace'
 
 interface AuthProviderProps {
   children: ReactNode
@@ -15,7 +17,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
-        fetchProfile(session.user.id)
+        fetchProfile(session.user)
       } else {
         setLoading(false)
       }
@@ -27,7 +29,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setSession(session)
         setUser(session?.user ?? null)
         if (session?.user) {
-          await fetchProfile(session.user.id)
+          await fetchProfile(session.user)
         } else {
           reset()
         }
@@ -37,14 +39,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => subscription.unsubscribe()
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
+  async function fetchProfile(user: User) {
+    const { data: initialProfile } = await supabase
       .from('nmm_profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single()
 
-    setProfile(data)
+    let nextProfile = initialProfile
+
+    if (user.user_metadata?.workspace_role === 'leader' && initialProfile?.role === 'distributor') {
+      const { data: updatedProfile } = await supabase
+        .from('nmm_profiles')
+        .update({ role: 'leader' })
+        .eq('id', user.id)
+        .select('*')
+        .single()
+
+      nextProfile = updatedProfile ?? initialProfile
+    }
+
+    if (user.user_metadata?.workspace_mode === 'demo') {
+      try {
+        await ensureDemoWorkspace(user.id)
+      } catch (error) {
+        console.error('[AuthProvider] demo workspace seed error:', error)
+      }
+    }
+
+    setProfile(nextProfile)
     setLoading(false)
   }
 

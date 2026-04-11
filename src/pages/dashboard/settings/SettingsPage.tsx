@@ -153,6 +153,8 @@ export function SettingsPage() {
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
   const roleKey = `settings.roles.${profile?.role ?? 'distributor'}`
   const localizedRole = t(roleKey, { defaultValue: t('settings.roles.distributor') })
+  const membershipPlan = (user?.user_metadata?.selected_plan as 'starter' | 'pro' | 'team' | undefined) ?? 'starter'
+  const workspaceMode = (user?.user_metadata?.workspace_mode as 'clean' | 'demo' | undefined) ?? 'clean'
   const permissionTone =
     permission === 'granted'
       ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100'
@@ -374,7 +376,27 @@ export function SettingsPage() {
             {t('settings.account')}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-3">
+        <CardContent className="space-y-4">
+          <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge className="bg-primary/15 text-primary hover:bg-primary/15">
+                {t(`settings.membership.plans.${membershipPlan}.name`)}
+              </Badge>
+              <Badge variant="outline">
+                {t(`settings.membership.modes.${workspaceMode}`)}
+              </Badge>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              {t(`settings.membership.plans.${membershipPlan}.body`)}
+            </p>
+            <Button
+              variant="outline"
+              className="mt-4"
+              onClick={() => navigate(`${ROUTES.HOME}#pricing`)}
+            >
+              {t('settings.membership.action')}
+            </Button>
+          </div>
           <p className="text-sm text-muted-foreground">{t('settings.accountInfo')}</p>
           <Button
             variant="outline"

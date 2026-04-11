@@ -51,7 +51,7 @@
     "login": "Giriş Yap",
     "register": "Kayıt Ol",
     "logout": "Çıkış Yap",
-    "email": "Email",
+    "email": "E-posta",
     "password": "Şifre",
     "fullName": "Ad Soyad",
     "phone": "Telefon",
@@ -101,7 +101,37 @@
     "passwordUpdatedDesc": "Şifreniz başarıyla güncellendi. Giriş sayfasına yönlendiriliyorsunuz...",
     "emailConfirmTitle": "Email'ini Kontrol Et",
     "emailConfirmDescription": "Hesabını aktifleştirmek için email adresine bir doğrulama linki gönderdik.",
-    "emailConfirmHint": "Email gelmedi mi? Spam klasörünü kontrol et."
+    "emailConfirmHint": "Email gelmedi mi? Spam klasörünü kontrol et.",
+    "selectedPlan": "Seçili Plan",
+    "planLabel": "Planını seç",
+    "planHelp": "İhtiyacın büyüdükçe planını daha sonra değiştirebilirsin.",
+    "bestFor": "En uygunu",
+    "startModeLabel": "Başlangıç şekli",
+    "continueWithPlan": "{{plan}} ile devam et",
+    "planApplied": "Seçili plan: {{plan}}",
+    "demoCta": "Demo çalışma alanı aç",
+    "loginPanelTitle": "Ritmini, mesajlarını ve takibini tek yerden yönet.",
+    "loginPanelBody": "Giriş yaptığında yalnızca verilerini görmezsin; günün odağını, sıcak fırsatları ve ekibin nabzını aynı ürün içinde izlersin.",
+    "loginBenefits": [
+      "Kontak, takip ve süreç akışı aynı karar diliyle çalışır.",
+      "Mesaj desteği, akademi ve itiraz bankası tek panelden açılır.",
+      "Planın ve başlangıç modun ürün içinde sade şekilde görünür kalır."
+    ],
+    "registerBenefits": [
+      "Plan seçimi kayıt anında ürün deneyimine taşınır.",
+      "Demo başlangıç modu seçilirse örnek kontaklar, takipler ve randevular otomatik kurulur.",
+      "İlk günden sonra da aynı sade ürün dili korunur."
+    ],
+    "startModes": {
+      "clean": {
+        "title": "Temiz çalışma alanı",
+        "body": "Kendi listen ve kendi ritminle sıfırdan başla."
+      },
+      "demo": {
+        "title": "Demo verilerle başla",
+        "body": "Örnek kontaklar, süreçler, takipler ve randevular otomatik kurulsun."
+      }
+    }
   },
   "contacts": {
     "title": "Kontaklar",
@@ -894,6 +924,27 @@
       "copied": "Geri bildirim taslağı panoya kopyalandı",
       "template": "Ne yaptım?\n\nNerede zorlandım?\n\nNeresi gerçekten işimi hızlandırdı?\n\nNe daha sade olabilir?\n\nSahada en çok hangi ekranı kullanıyorum?"
     },
+    "membership": {
+      "action": "Planları Gör",
+      "modes": {
+        "clean": "Temiz başlangıç",
+        "demo": "Demo başlangıç"
+      },
+      "plans": {
+        "starter": {
+          "name": "Başlangıç",
+          "body": "Temel ritmini kurmak ve ürünü sakin şekilde kullanmaya başlamak için hafif plan."
+        },
+        "pro": {
+          "name": "Pro",
+          "body": "Her gün aktif çalışan distribütör için daha görünür sinyal ve daha güçlü akış desteği sunar."
+        },
+        "team": {
+          "name": "Ekip",
+          "body": "Lider görünürlüğü, ekip radarı ve daha derin büyüme takibi için hazırlanmış plan."
+        }
+      }
+    },
     "roles": {
       "distributor": "Distribütör",
       "leader": "Lider",
@@ -1587,7 +1638,7 @@
           "Günün oyun planı",
           "Kontak sinyalleri",
           "Süreç sinyalleri",
-          "AI mesaj playbook'ları",
+          "AI mesaj akışları",
           "Mikro koçluk",
           "Ekip radar",
           "Karar sinyalleri",
@@ -1642,7 +1693,7 @@
       "items": [
         {
           "title": "Ne yazacağını sıfırdan düşünmek zorunda kalmazsın",
-          "desc": "AI mesaj önerileri ve playbook'lar doğal giriş, takip ve karar mesajlarını tek tıkta başlatır."
+          "desc": "AI mesaj önerileri ve hazır akışlar doğal giriş, takip ve karar mesajlarını tek tıkta başlatır."
         },
         {
           "title": "Kime önce dönmen gerektiği görünür olur",
@@ -1676,7 +1727,7 @@
         },
         {
           "label": "Mesajlar",
-          "title": "AI mesaj playbook'ları",
+          "title": "AI mesaj akışları",
           "desc": "Sessiz konuşmayı açmak, ilk teması davete çevirmek veya kararsız kişiyi ilerletmek için hazır akışlar sunar."
         },
         {
@@ -1725,7 +1776,7 @@
         },
         {
           "title": "Ekip ve performansı tepki vererek değil, erken görerek yönet",
-          "desc": "Team radar, analytics ve follow-up planner büyümeyi daha sakin ve daha tutarlı hale getirir."
+          "desc": "Ekip radarı, analiz ve takip planlayıcı büyümeyi daha sakin ve daha tutarlı hale getirir."
         }
       ]
     },
@@ -1759,12 +1810,33 @@
       "title": "İlk kişi için de ekip lideri için de sade başlayan ama büyüdükçe genişleyen planlar.",
       "subtitle": "Global SaaS örneklerinde iyi çalışan şey netliktir. Bu yüzden fiyat yapısı sürpriz değil; ziyaretçi hangi seviyede ne alacağını hızlıca anlayabilir.",
       "mostPopular": "En Popüler",
+      "bestFor": "En uygunu",
+      "sharedLabel": "Tüm planlarda ortak",
+      "shared": [
+        "TR ve EN arayüz desteği",
+        "Sade onboarding ve hızlı kurulum",
+        "Mesaj, takip ve eğitim akışlarına tek yerden erişim"
+      ],
+      "billing": {
+        "monthly": "Aylık",
+        "yearly": "Yıllık"
+      },
+      "demo": {
+        "title": "Ürünü boş görmek istemiyorsan demo başlangıç modu ile aç.",
+        "body": "Kayıt sonrası örnek kontaklar, süreçler, takipler ve randevular otomatik kurulur.",
+        "cta": "Demo ile Başla"
+      },
       "plans": [
         {
+          "key": "starter",
           "name": "Başlangıç",
-          "price": "Ücretsiz",
-          "period": "",
+          "monthlyPrice": "Ücretsiz",
+          "monthlyPeriod": "",
+          "yearlyPrice": "Ücretsiz",
+          "yearlyPeriod": "",
+          "yearlyNote": "",
           "desc": "Yeni başlayan veya sistemi denemek isteyen bireysel distribütörler için.",
+          "bestFor": "İlk kontağını düzenlemek, sistemi görmek ve günlük ritmini sakin şekilde kurmak isteyen bireysel kullanıcılar için.",
           "features": [
             "50 kontak",
             "Temel süreç takibi",
@@ -1774,26 +1846,36 @@
           "cta": "Ücretsiz Başla"
         },
         {
+          "key": "pro",
           "name": "Pro",
-          "price": "₺299",
-          "period": "/ay",
+          "monthlyPrice": "₺299",
+          "monthlyPeriod": "/ay",
+          "yearlyPrice": "₺2.990",
+          "yearlyPeriod": "/yıl",
+          "yearlyNote": "Yıllıkta yaklaşık 2 ay avantaj",
           "desc": "Her gün aktif sahada olan ve ritmini görünür yönetmek isteyen distribütörler için.",
+          "bestFor": "Her gün mesaj, takip ve süreç akışını tek ekrandan yöneten aktif distribütörler için.",
           "features": [
             "Sınırsız kontak",
             "Kontak ve süreç sinyalleri",
-            "Sınırsız AI mesaj playbook'u",
+            "Sınırsız AI mesaj akışı",
             "Karar sinyalleri ve takip planlayıcı"
           ],
           "cta": "Pro'ya Geç"
         },
         {
+          "key": "team",
           "name": "Ekip",
-          "price": "₺799",
-          "period": "/ay",
+          "monthlyPrice": "₺799",
+          "monthlyPeriod": "/ay",
+          "yearlyPrice": "₺7.990",
+          "yearlyPeriod": "/yıl",
+          "yearlyNote": "Liderler için yıllık avantajlı paket",
           "desc": "Küçük ekipten büyüyen downline'a kadar görünürlük isteyen liderler için.",
+          "bestFor": "Ekibinin ivmesini, aktivasyon kuyruğunu ve destek ihtiyaçlarını erken görmek isteyen liderler için.",
           "features": [
             "Pro'daki her şey",
-            "Ekip radar ve lider yönlendirmeleri",
+            "Ekip radarı ve lider yönlendirmeleri",
             "Takım aktivasyon görünümü",
             "Derinleştirilmiş ekip ve ritim analizi"
           ],
@@ -1816,11 +1898,11 @@
         },
         {
           "q": "Lidersem ekip tarafında gerçekten işime yarar mı?",
-          "a": "Evet. Team radar, ihtiyaç duyan üyeleri, aktivasyon kuyruğunu ve momentum durumunu görünür kılar. Böylece liderlik sonradan fark eden değil, erken gören bir yapıya dönüşür."
+          "a": "Evet. Ekip radarı, ihtiyaç duyan üyeleri, aktivasyon kuyruğunu ve momentum durumunu görünür kılar. Böylece liderlik sonradan fark eden değil, erken gören bir yapıya dönüşür."
         },
         {
           "q": "Mesaj üretimi robotik hissettirir mi?",
-          "a": "Amaç robotik metin üretmek değil; doğal tonu, düşük baskıyı ve bir sonraki net adımı kolaylaştırmak. Bu yüzden mesajlar playbook, objection context ve mikro koçluk ile birlikte çalışır."
+          "a": "Amaç robotik metin üretmek değil; doğal tonu, düşük baskıyı ve bir sonraki net adımı kolaylaştırmak. Bu yüzden mesaj akışları, itiraz bağlamı ve mikro koçluk birlikte çalışır."
         },
         {
           "q": "Verilerim güvende mi?",
