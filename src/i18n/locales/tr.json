@@ -1475,101 +1475,284 @@
       "start": "Başla"
     },
     "hero": {
-      "badge": "Distribütörün dijital komut merkezi",
-      "title1": "Network Marketing'in",
-      "title2": "Efendisi",
-      "title3": "Ol!",
-      "subtitle": "Kontakları yönet, AI ile mesaj üret, ekibini büyüt — hepsi tek yerde. Dağınık listeler ve kaçırılan takipler tarih oluyor.",
+      "badge": "Distribütörün günlük çalışma sistemi",
+      "title": "Network marketing işini dağınık notlardan çıkar, net bir ritme dönüştür.",
+      "subtitle": "Network Marketing Master; kontak, takip, AI mesaj, ekip görünürlüğü, akademi ve itiraz desteğini tek akışta birleştirir.",
+      "body": "Bu sayfa yalnızca bir CRM vaat etmiyor. Sana bugün kime dönmen gerektiğini, hangi fırsatın sıcak kaldığını, hangi itirazın yaklaşmakta olduğunu ve ekibinde kimlerin desteğe ihtiyacı olduğunu görünür hale getiren bir işletim sistemi sunuyor.",
       "cta": "Ücretsiz Başla",
       "ctaSecondary": "Özellikleri Keşfet",
-      "trust2": "Anında kurulum",
-      "trust3": "İstediğin zaman iptal",
+      "trust": [
+        "Kredi kartı gerektirmez",
+        "Dakikalar içinde kurulum",
+        "İhtiyacın büyüdükçe plan yükselt"
+      ],
       "panel": {
-        "label": "Canlı İşletim Akışı",
-        "title": "Sadece CRM değil, günlük çalışma sistemi",
-        "subtitle": "Dağınık aday listelerini, doğru kişiye doğru anda dönen bir ritme çevir.",
-        "assistantLabel": "AI Rehberi",
-        "assistantAction": "Sistem önce geciken takibi kapatmanı, sonra sıcak fırsatı ilerletmeni öneriyor.",
-        "assistantMessage": "Bugün önce sessizleşen ama hâlâ sıcak olan kişiye dön. Sonra karar eşiğindeki fırsata tek net sonraki adımı teklif et.",
+        "label": "Canlı Komut Merkezi",
+        "title": "Sadece neye sahip olduğunu değil, bugün ne yapman gerektiğini de gösterir.",
+        "subtitle": "Dashboard, kontaklar, süreç, mesajlar, akademi, ekip ve takip akışları aynı karar diliyle konuşur.",
+        "commandLabel": "Bugünün Komutu",
+        "commandTitle": "Önce geciken konuşmayı toparla, sonra sıcak fırsatı ilerlet.",
+        "commandBody": "Sistem sana önce ritmi bozulan kişiyi, sonra karar eşiğine yaklaşan fırsatı gösterir. Böylece günün başında “nereden başlamalıyım?” sorusu ortadan kalkar.",
         "tasks": [
-          { "state": "kritik", "title": "Geciken takip", "meta": "Dün dönmen gereken konuşma bugün hâlâ sıcak." },
-          { "state": "fırsat", "title": "Sunum sonrası pencere", "meta": "İlgi var ama sonraki adım netleşmezse enerji düşebilir." },
-          { "state": "ritim", "title": "Yeni temas listesi", "meta": "İlk dokunuş bekleyen yeni kişiler hazır." }
+          { "state": "kritik", "title": "Takip riski", "meta": "Dün dönmen gereken ama hâlâ sıcak duran konuşma görünür kalır." },
+          { "state": "fırsat", "title": "Karar penceresi", "meta": "Sunum sonrası ılık kalan ilgiyi tek net sonraki adıma taşırsın." },
+          { "state": "ritim", "title": "İlk temas kuyruğu", "meta": "Sessiz duran yeni adayları doğal açılışlarla harekete geçirirsin." }
         ],
-        "systemPills": ["Günlük odak", "Takip disiplini", "Ekip görünürlüğü", "İtiraz desteği"]
+        "systemPills": [
+          "Günün oyun planı",
+          "Kontak sinyalleri",
+          "Süreç sinyalleri",
+          "AI mesaj playbook'ları",
+          "Mikro koçluk",
+          "Ekip radar",
+          "Karar sinyalleri",
+          "Takip planlayıcı",
+          "İtiraz desteği"
+        ]
       }
     },
     "proof": {
-      "items": {
-        "operations": {
-          "title": "Dağınık listeler yerine tek operasyon ekranı",
-          "desc": "Kontak, takip, mesaj, ekip ve akademi aynı ritimde çalışır."
+      "items": [
+        {
+          "title": "Tek ekranda günlük öncelik",
+          "desc": "Dashboard ve sinyal katmanları hangi kişiye, hangi sırayla dönmen gerektiğini görünür kılar."
         },
-        "priorities": {
-          "title": "Tahmin değil, öncelik sırası",
-          "desc": "Sistem hangi konuşmanın bugün öne çıkması gerektiğini görünür kılar."
+        {
+          "title": "Baskısız ama net rehberlik",
+          "desc": "Mesaj, itiraz ve mikro koçluk akışları doğal iletişimi bozmaz; sadece bir sonraki doğru adımı kolaylaştırır."
         },
-        "guidance": {
-          "title": "Distribütör psikolojisine uygun rehberlik",
-          "desc": "İtiraz, takip ve ekip yönetimi daha baskısız ama daha net ilerler."
+        {
+          "title": "Yeni başlayan için de lider için de uygun",
+          "desc": "İlk kontağını ekleyen biri de ekip ritmi yöneten lider de aynı ürün içinde netlik kazanır."
         }
-      }
+      ]
     },
     "problems": {
-      "title": "Tanıdık geliyor mu?",
-      "subtitle": "Çoğu distribütörün yaşadığı sorunlar",
+      "label": "Sorun net",
+      "title": "Network marketing'de sorun çoğu zaman motivasyon değil, görünür sistem eksikliği.",
+      "subtitle": "İnsanlar genelde daha çok çalışmaları gerektiğini sanıyor. Oysa asıl sorun; kime, ne zaman, hangi tonla dönüleceğini görünür kılan bir düzen olmaması.",
       "items": [
-        {"emoji": "📋", "title": "Listeler dağınık, takipler kayıp", "desc": "Not defteri, WhatsApp, Excel... Kontaklar her yerde ama hiçbir yerde değil."},
-        {"emoji": "😓", "title": "\"Düşüneceğim\" — sonra?", "desc": "Sunum yaptın, ilgi gösterdi. Ama ne zaman takip edeceksin? Kaç gün sonra?"},
-        {"emoji": "🤷", "title": "Ekipte kim aktif bilmiyorum", "desc": "Downline büyüdükçe takip zorlaşıyor. Kim destek bekliyor, bilmiyorsun."}
+        {
+          "title": "Kontaklar her yerde ama hiçbir yerde değil",
+          "desc": "Defter, WhatsApp, Excel ve hafıza arasında gidip gelen aday listeleri düzen yerine stres üretir."
+        },
+        {
+          "title": "\"Düşüneceğim\" dedikten sonrası boş kalıyor",
+          "desc": "İlgi var ama ritim yoksa sıcaklık düşer. Takip zamanı ve sonraki adım net olmadığı için konuşma söner."
+        },
+        {
+          "title": "Mesaj atarken ton ve kelime yükü artıyor",
+          "desc": "Ne yazacağını düşünürken ya gereğinden fazla baskı kurulur ya da konuşma gereğinden fazla gecikir."
+        },
+        {
+          "title": "Ekip büyüdükçe görünürlük kayboluyor",
+          "desc": "Kim aktif, kim yavaşladı, kim desteğe ihtiyaç duyuyor görmeyince liderlik tepki veren hale gelir."
+        }
       ]
     },
-    "features": {
-      "title": "Her şey tek platformda",
-      "subtitle": "Network marketing başarısı için ihtiyacın olan tüm araçlar",
+    "newcomers": {
+      "label": "Yeni başlayanlar için",
+      "title": "Network marketing'i sadece duymuş olsan bile sayfaya bakınca şunu hissetmelisin: “Bunu ben de yürütebilirim.”",
+      "subtitle": "İlk temas, takip, itiraz ve ekip yönetimi ayrı ayrı uzmanlık alanı gibi görünür. Biz bunları günlük akışa bölüp baskıyı düşürüyoruz.",
       "items": [
-        {"title": "Akıllı Günlük Görev Listesi", "desc": "AI, bugün kime ulaşman gerektiğini söyler. Tahmin yok, öncelikli aksiyon var."},
-        {"title": "Lead Sıcaklık Skoru", "desc": "Her kontağın hazırlık seviyesini anlık takip et. Doğru kişiye doğru zamanda ulaş."},
-        {"title": "AI Mesaj Üretici", "desc": "Kontağa özel, doğal ve ikna edici mesajları saniyeler içinde oluştur."},
-        {"title": "Pipeline Takibi", "desc": "Satış sürecinin her aşamasını görsel olarak takip et. Hiçbir şans kaçırma."},
-        {"title": "Ekip Radar", "desc": "Ekibinin aktivitesini gerçek zamanlı izle. Kim aktif, kim desteğe ihtiyaç duyuyor?"},
-        {"title": "İtiraz Bankası", "desc": "En yaygın itirazlara hazır yanıtlar. Sunum sırasında anında cevap ver."}
+        {
+          "title": "Ne yazacağını sıfırdan düşünmek zorunda kalmazsın",
+          "desc": "AI mesaj önerileri ve playbook'lar doğal giriş, takip ve karar mesajlarını tek tıkta başlatır."
+        },
+        {
+          "title": "Kime önce dönmen gerektiği görünür olur",
+          "desc": "Sıcaklık, temas tarihi ve süreç sinyalleri kararı hafıza yerine ekrana taşır."
+        },
+        {
+          "title": "İtirazlar göz korkutucu olmaktan çıkar",
+          "desc": "Akademi ve itiraz bankası; para, güven, zaman ve “düşüneceğim” gibi çekinceleri baskısız şekilde ele alır."
+        }
       ]
     },
-    "howItWorks": {
-      "title": "Nasıl Çalışır?",
-      "subtitle": "3 basit adımda başarıya ulaş",
+    "system": {
+      "label": "Tam ürün katmanı",
+      "title": "Landing'e giren kişi yalnızca bir tanıtım değil, gerçekten dolu bir ürün omurgası görmeli.",
+      "subtitle": "Network Marketing Master artık sadece temel ekranlardan oluşmuyor. Günlük odak, kontak zekâsı, süreç yönetimi, mesaj akışı, eğitim, ekip ve analiz katmanları tek bir ürün içinde birleşiyor.",
+      "items": [
+        {
+          "label": "Dashboard",
+          "title": "Günün oyun planı",
+          "desc": "Dashboard artık sadece rakam göstermiyor; önce nereyi toparlaman gerektiğini, sonra hangi fırsatı sıcak tutacağını söylüyor."
+        },
+        {
+          "label": "Kontaklar",
+          "title": "Kontak sinyalleri",
+          "desc": "Liste ekranı artık yalnızca kişi listesi değil. Önce dönmen gerekenler, ilerletilecek sıcak kişiler ve yeniden ısıtılacak havuz görünür."
+        },
+        {
+          "label": "Süreç",
+          "title": "Süreç sinyalleri ve Trello hissi",
+          "desc": "Sürükle-bırak board'u daha stabil çalışır; üstteki sinyal alanı da hangi aşama akışına önce dokunman gerektiğini söyler."
+        },
+        {
+          "label": "Mesajlar",
+          "title": "AI mesaj playbook'ları",
+          "desc": "Sessiz konuşmayı açmak, ilk teması davete çevirmek veya kararsız kişiyi ilerletmek için hazır akışlar sunar."
+        },
+        {
+          "label": "Kontak Detayı",
+          "title": "Mikro koçluk",
+          "desc": "Tek bir kişi ekranında şimdi ne yapman gerektiğini, hangi mesajın uygun olduğunu ve hangi itirazın yakın olduğunu gösterir."
+        },
+        {
+          "label": "Akademi",
+          "title": "Akademi ve itiraz bankası",
+          "desc": "Saha senaryolarına göre düzenlenmiş içerikler ve itiraz psikolojisi katmanı yeni başlayanları da liderleri de güçlendirir."
+        },
+        {
+          "label": "Ekip",
+          "title": "Ekip radar",
+          "desc": "Kim ivme kazanıyor, kim yavaşlıyor, kim destek bekliyor; tek bakışta görünür hale gelir."
+        },
+        {
+          "label": "Analiz",
+          "title": "Karar sinyalleri",
+          "desc": "Sayfalar artık sadece grafik göstermiyor. Risk alanı, büyüme penceresi ve ritim skoru gibi karar katmanları sunuyor."
+        },
+        {
+          "label": "Takip",
+          "title": "Takip planlayıcı ve bildirimler",
+          "desc": "Bugün hangi aksiyonların geciktiğini, hangilerinin teslim beklediğini ve bildirimlerle görünür ritmi korumanı sağlar."
+        }
+      ]
+    },
+    "workflow": {
+      "label": "Nasıl çalışır",
+      "title": "Ürün ziyaretçiye şunu hissettirmeli: “İşim karmaşık değilmiş, sadece sistemsizmiş.”",
+      "subtitle": "Bu yüzden landing akışı da ürün gibi ilerliyor: kişi ekle, önceliği gör, doğru mesajı çıkar, ritmi sürdür.",
       "steps": [
-        {"step": "1", "title": "Kontaklarını Ekle", "desc": "Mevcut listeni import et veya tek tek ekle. WhatsApp, Telegram, telefon — her kanalı destekliyoruz."},
-        {"step": "2", "title": "AI Önceliklendirsin", "desc": "Yapay zeka her kontağı analiz eder, sıcaklık skoru verir ve bugünkü aksiyonlarını listeler."},
-        {"step": "3", "title": "Doğru Kişiyle Ulaş", "desc": "Hazırladığı mesajı gönder, takip zamanlamasını ayarla ve sonuçları izle."}
+        {
+          "title": "Kontaklarını ve ilk fırsatlarını içeri al",
+          "desc": "Tek kişi ekleyerek başlayabilir ya da mevcut listenle hızla sisteme giriş yapabilirsin."
+        },
+        {
+          "title": "Sistem bugünün önceliğini netleştirsin",
+          "desc": "Odak alanı, kontak sinyalleri ve süreç sinyalleri günün ağırlık merkezini görünür kılar."
+        },
+        {
+          "title": "Mesaj, takip ve itiraz tarafını akıştan yönet",
+          "desc": "Ne yazacağını, ne zaman döneceğini ve hangi çekinceyi yumuşatacağını aynı ürün içinde çözersin."
+        },
+        {
+          "title": "Ekip ve performansı tepki vererek değil, erken görerek yönet",
+          "desc": "Team radar, analytics ve follow-up planner büyümeyi daha sakin ve daha tutarlı hale getirir."
+        }
       ]
+    },
+    "comparison": {
+      "label": "Dönüşüm farkı",
+      "title": "Aynı kişi, aynı emek. Fark yalnızca işin nasıl organize edildiğinde.",
+      "subtitle": "Landing'de görmek istediğimiz dönüşüm bu: ziyaretçi önce kendi dağınıklığını tanımalı, sonra ürünü görünce bunun çözülebilir olduğunu hissetmeli.",
+      "before": {
+        "title": "Network Marketing Master olmadan",
+        "items": [
+          "Kimin sıcak, kimin sessiz, kimin karar eşiğinde olduğunu hafızayla tutmaya çalışırsın.",
+          "Mesaj atarken her seferinde ton, cümle ve zamanlama kararı sıfırdan verilir.",
+          "\"Düşüneceğim\" ve \"zamanım yok\" gibi itirazlar konuşmayı kolayca durdurur.",
+          "Takipler kısmen takvimde, kısmen notlarda, kısmen zihinde kalır.",
+          "Ekip büyüdükçe kimin desteğe ihtiyaç duyduğu sonradan fark edilir."
+        ]
+      },
+      "after": {
+        "title": "Network Marketing Master ile",
+        "items": [
+          "Günün odağı, kontak sinyali ve süreç sinyali ilk ekranda netleşir.",
+          "AI mesaj akışları ve mikro koçluk bir sonraki doğru adımı hızla çıkarır.",
+          "Akademi ve itiraz bankası, çekinceyi baskı kurmadan yönetmeyi kolaylaştırır.",
+          "Takip planlayıcı ve bildirimler görünür ritmi korur.",
+          "Ekip radar ve karar sinyalleri büyümeyi daha sakin, daha kontrollü hale getirir."
+        ]
+      }
     },
     "pricing": {
-      "title": "Basit Fiyatlandırma",
-      "subtitle": "Sürpriz yok, gizli ücret yok",
+      "label": "Basit planlar",
+      "title": "İlk kişi için de ekip lideri için de sade başlayan ama büyüdükçe genişleyen planlar.",
+      "subtitle": "Global SaaS örneklerinde iyi çalışan şey netliktir. Bu yüzden fiyat yapısı sürpriz değil; ziyaretçi hangi seviyede ne alacağını hızlıca anlayabilir.",
       "mostPopular": "En Popüler",
       "plans": [
-        {"name": "Başlangıç", "price": "Ücretsiz", "period": "", "desc": "Bireysel distribütörler için", "features": ["50 kontak", "Temel pipeline", "AI mesaj (5/gün)", "Mobil uygulama"], "cta": "Ücretsiz Başla"},
-        {"name": "Pro", "price": "₺299", "period": "/ay", "desc": "Büyümeye odaklanmış distribütörler için", "features": ["Sınırsız kontak", "Gelişmiş pipeline", "Sınırsız AI mesaj", "Lead skoru", "Öncelikli destek"], "cta": "Pro Başla"},
-        {"name": "Ekip", "price": "₺799", "period": "/ay", "desc": "Liderler ve ekip yöneticileri için", "features": ["Pro özelliklerin hepsi", "Ekip radar", "20 takım üyesi", "Ekip analizleri", "Özel eğitim"], "cta": "Ekip Başla"}
+        {
+          "name": "Başlangıç",
+          "price": "Ücretsiz",
+          "period": "",
+          "desc": "Yeni başlayan veya sistemi denemek isteyen bireysel distribütörler için.",
+          "features": [
+            "50 kontak",
+            "Temel süreç takibi",
+            "AI mesaj üretimi",
+            "Akademi ve itiraz bankasına giriş"
+          ],
+          "cta": "Ücretsiz Başla"
+        },
+        {
+          "name": "Pro",
+          "price": "₺299",
+          "period": "/ay",
+          "desc": "Her gün aktif sahada olan ve ritmini görünür yönetmek isteyen distribütörler için.",
+          "features": [
+            "Sınırsız kontak",
+            "Kontak ve süreç sinyalleri",
+            "Sınırsız AI mesaj playbook'u",
+            "Karar sinyalleri ve takip planlayıcı"
+          ],
+          "cta": "Pro'ya Geç"
+        },
+        {
+          "name": "Ekip",
+          "price": "₺799",
+          "period": "/ay",
+          "desc": "Küçük ekipten büyüyen downline'a kadar görünürlük isteyen liderler için.",
+          "features": [
+            "Pro'daki her şey",
+            "Ekip radar ve lider yönlendirmeleri",
+            "Takım aktivasyon görünümü",
+            "Derinleştirilmiş ekip ve ritim analizi"
+          ],
+          "cta": "Ekip Planını Başlat"
+        }
       ]
     },
     "faq": {
-      "title": "Sık Sorulan Sorular",
+      "label": "Güveni kapat",
+      "title": "Bir ziyaretçinin hesap açmadan önce aklına gelen temel sorular.",
+      "subtitle": "Kayıt kararını hızlandıran şey sadece iyi tasarım değil; açık cevaplar, düşük sürtünme ve net beklenti yönetimidir.",
       "items": [
-        {"q": "NMM nedir ve kime yönelik?", "a": "Network Marketing Master (NMM), multi-level marketing (MLM) distribütörlerine yönelik bir dijital yönetim aracıdır. Kontak takibi, AI destekli mesajlaşma ve ekip yönetimi özelliklerini tek platformda sunar."},
-        {"q": "Ücretsiz plan yeterli mi?", "a": "Başlangıç için evet! 50 kontak ve temel özelliklerle işe başlayabilirsin. Ekibin büyüdükçe Pro veya Ekip planına geçmek çok kolay."},
-        {"q": "Verilerim güvende mi?", "a": "Evet. Tüm veriler Supabase (PostgreSQL) üzerinde şifreli olarak saklanır. Row Level Security ile yalnızca kendi verilerine erişebilirsin."},
-        {"q": "Hangi network marketing şirketleriyle çalışır?", "a": "NMM şirketten bağımsızdır. Amway, Herbalife, Oriflame, Avon gibi tüm MLM şirketleriyle kullanılabilir."},
-        {"q": "Mobil uygulaması var mı?", "a": "Web uygulaması tüm mobil cihazlarda optimize çalışır. Native iOS/Android uygulamaları yol haritamızda."},
-        {"q": "İptal edebilir miyim?", "a": "Evet, istediğin zaman iptal edebilirsin. Ücretlendirme aylık dönemler halindedir, dönem sonunda iptal gerçekleşir."}
+        {
+          "q": "Bu ürün tam olarak neyi çözüyor?",
+          "a": "Network Marketing Master; kontak, takip, süreç, mesaj, itiraz, ekip ve analiz dağınıklığını tek günlük çalışma sisteminde toplar. Sadece kayıt tutmaz, neye önce dönmen gerektiğini de görünür kılar."
+        },
+        {
+          "q": "Network marketing'de çok yeni biriyim. Yine de bana uygun mu?",
+          "a": "Evet. Ürün özellikle “kime ne yazacağım, ne zaman döneceğim, ilk adımı nasıl atacağım?” belirsizliğini azaltmak için tasarlandı. Onboarding checklist, AI mesaj akışları ve akademi bu yüzden ürünün merkezinde."
+        },
+        {
+          "q": "Lidersem ekip tarafında gerçekten işime yarar mı?",
+          "a": "Evet. Team radar, ihtiyaç duyan üyeleri, aktivasyon kuyruğunu ve momentum durumunu görünür kılar. Böylece liderlik sonradan fark eden değil, erken gören bir yapıya dönüşür."
+        },
+        {
+          "q": "Mesaj üretimi robotik hissettirir mi?",
+          "a": "Amaç robotik metin üretmek değil; doğal tonu, düşük baskıyı ve bir sonraki net adımı kolaylaştırmak. Bu yüzden mesajlar playbook, objection context ve mikro koçluk ile birlikte çalışır."
+        },
+        {
+          "q": "Verilerim güvende mi?",
+          "a": "Evet. Veriler Supabase altyapısında saklanır ve kullanıcı kendi verisine erişir. Ürün çok kullanıcılı düzen içinde güvenli veri ayrımı mantığıyla çalışır."
+        },
+        {
+          "q": "İptal veya plan değişikliği zor mu?",
+          "a": "Hayır. Ürün sürtünmeyi azaltmak için sade plan mantığıyla kurgulandı. İhtiyacın büyüdükçe plan yükseltebilir, uygun olmadığında kullanımını durdurabilirsin."
+        }
       ]
     },
     "cta": {
-      "title": "Bugün başla, fark yarat",
-      "subtitle": "Kredi kartı gerektirmez. 2 dakikada kurulum. İstediğin zaman iptal.",
-      "button": "Ücretsiz Hesap Oluştur"
+      "badge": "Net başla",
+      "title": "Network marketing işini daha çok çalışarak değil, daha görünür yöneterek büyüt.",
+      "subtitle": "Hesap açtığında sadece bir araç almıyorsun. Kontak ritmi, mesaj akışı, süreç yönetimi, ekip görünürlüğü ve karar desteği tek ürün içine oturuyor.",
+      "button": "Ücretsiz Hesap Oluştur",
+      "secondary": "Önce Giriş Yap"
     },
     "footer": {
       "features": "Özellikler",

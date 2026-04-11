@@ -1475,101 +1475,284 @@
       "start": "Get Started"
     },
     "hero": {
-      "badge": "Your distributor's digital command center",
-      "title1": "Master",
-      "title2": "Network",
-      "title3": "Marketing!",
-      "subtitle": "Manage contacts, generate AI messages, grow your team — all in one place. Scattered lists and missed follow-ups are history.",
+      "badge": "Your distributor operating system",
+      "title": "Turn network marketing from scattered notes into a visible daily rhythm.",
+      "subtitle": "Network Marketing Master brings contacts, follow-ups, AI messaging, team visibility, academy guidance, and objection support into one operating flow.",
+      "body": "This page should not feel like a generic CRM pitch. It should feel like a working system that shows who needs your attention today, which opportunity is still warm, what hesitation is likely coming next, and where your team needs support.",
       "cta": "Start Free",
       "ctaSecondary": "Explore Features",
-      "trust2": "Instant setup",
-      "trust3": "Cancel anytime",
+      "trust": [
+        "No credit card required",
+        "Setup in minutes",
+        "Upgrade when your rhythm grows"
+      ],
       "panel": {
-        "label": "Live Operating Flow",
-        "title": "Not just a CRM, a daily working system",
-        "subtitle": "Turn scattered lead lists into a rhythm that returns to the right person at the right time.",
-        "assistantLabel": "AI Guidance",
-        "assistantAction": "The system suggests closing the overdue follow-up first, then moving the warm opportunity.",
-        "assistantMessage": "Start with the person who went quiet but still carries warmth. Then offer one clear next move to the opportunity near decision.",
+        "label": "Live Command Center",
+        "title": "It shows not only what you have, but what you should do next.",
+        "subtitle": "Dashboard, contacts, pipeline, messages, academy, team, and follow-up flows all speak the same decision language.",
+        "commandLabel": "Today's Command",
+        "commandTitle": "Close the overdue conversation first, then move the warm opportunity.",
+        "commandBody": "The system surfaces the person whose rhythm is breaking first, then the opportunity closest to decision. That removes the usual “where do I even start?” friction from the day.",
         "tasks": [
-          { "state": "critical", "title": "Overdue follow-up", "meta": "A conversation that needed your reply yesterday is still warm today." },
-          { "state": "opportunity", "title": "Post-presentation window", "meta": "Interest is there, but the energy can drop if the next step stays fuzzy." },
-          { "state": "rhythm", "title": "Fresh reach-out list", "meta": "New people are waiting for a natural first touch." }
+          { "state": "critical", "title": "Follow-up risk", "meta": "A conversation that needed attention yesterday is still warm and visible." },
+          { "state": "opportunity", "title": "Decision window", "meta": "Post-presentation interest can still move if the next step gets clarified." },
+          { "state": "rhythm", "title": "First-touch queue", "meta": "New prospects are ready for short, natural openings." }
         ],
-        "systemPills": ["Daily focus", "Follow-up discipline", "Team visibility", "Objection support"]
+        "systemPills": [
+          "Today's game plan",
+          "Contact signals",
+          "Pipeline signals",
+          "AI message playbooks",
+          "Micro coaching",
+          "Team radar",
+          "Decision signals",
+          "Follow-up planner",
+          "Objection support"
+        ]
       }
     },
     "proof": {
-      "items": {
-        "operations": {
-          "title": "One operating screen instead of scattered lists",
-          "desc": "Contacts, follow-ups, messaging, team, and academy move in the same rhythm."
+      "items": [
+        {
+          "title": "Daily priority on one screen",
+          "desc": "Dashboard and signal layers make it obvious who deserves your attention first today."
         },
-        "priorities": {
-          "title": "Not guesswork, but priority order",
-          "desc": "The system makes visible which conversation deserves attention first today."
+        {
+          "title": "Less pressure, more clarity",
+          "desc": "Message, objection, and micro-coaching flows do not make you robotic; they simply make the next right move easier."
         },
-        "guidance": {
-          "title": "Guidance aligned with distributor psychology",
-          "desc": "Objections, follow-ups, and team leadership move with less pressure and more clarity."
+        {
+          "title": "Built for beginners and leaders",
+          "desc": "Someone adding a first contact and a leader managing rhythm both gain the same kind of clarity inside the product."
         }
-      }
+      ]
     },
     "problems": {
-      "title": "Sound familiar?",
-      "subtitle": "Problems most distributors face",
+      "label": "The real problem",
+      "title": "In network marketing, the issue is often not motivation. It is the absence of a visible working system.",
+      "subtitle": "Most people assume they need more hustle. In practice, they need a calmer way to see who is warm, when to follow up, what to say next, and where the team rhythm is breaking.",
       "items": [
-        {"emoji": "📋", "title": "Scattered lists, lost follow-ups", "desc": "Notebooks, WhatsApp, Excel... Contacts are everywhere but nowhere organized."},
-        {"emoji": "😓", "title": "\"I'll think about it\" — then what?", "desc": "You presented, they showed interest. But when will you follow up? How many days later?"},
-        {"emoji": "🤷", "title": "Don't know who's active in the team", "desc": "As your downline grows, tracking becomes harder. Who needs support? You don't know."}
+        {
+          "title": "Contacts live everywhere but nowhere clearly",
+          "desc": "Notebooks, WhatsApp, spreadsheets, memory. The list exists, but the system does not."
+        },
+        {
+          "title": "\"I’ll think about it\" kills the rhythm",
+          "desc": "Interest is there, but the next move is fuzzy, so the conversation quietly cools."
+        },
+        {
+          "title": "Messaging becomes mentally heavy",
+          "desc": "Without clarity, every follow-up feels like a fresh wording, timing, and tone decision."
+        },
+        {
+          "title": "Team visibility disappears as you grow",
+          "desc": "Once the downline expands, you notice who needs help too late instead of early."
+        }
       ]
     },
-    "features": {
-      "title": "Everything in one platform",
-      "subtitle": "All the tools you need for network marketing success",
+    "newcomers": {
+      "label": "For people still figuring it out",
+      "title": "Even if someone has only heard about network marketing, the page should make them think: “I could actually run this.”",
+      "subtitle": "First touch, follow-up timing, objections, and team management can feel like separate skill sets. The product lowers that pressure by turning them into guided daily flows.",
       "items": [
-        {"title": "Smart Daily Task List", "desc": "AI tells you who to reach out to today. No guessing, just prioritized actions."},
-        {"title": "Lead Warmth Score", "desc": "Track each contact's readiness level in real-time. Reach the right person at the right time."},
-        {"title": "AI Message Generator", "desc": "Create personalized, natural and persuasive messages in seconds."},
-        {"title": "Pipeline Tracking", "desc": "Visually track every stage of your sales process. Never miss an opportunity."},
-        {"title": "Team Radar", "desc": "Monitor your team's activity in real-time. Who's active, who needs support?"},
-        {"title": "Objection Bank", "desc": "Ready answers to the most common objections. Respond instantly during presentations."}
+        {
+          "title": "You do not have to invent every message from scratch",
+          "desc": "AI message flows and playbooks help you open conversations, follow up naturally, and move decisions with less guesswork."
+        },
+        {
+          "title": "You can see who matters first",
+          "desc": "Warmth, contact history, and pipeline signals move decision-making from memory to the screen."
+        },
+        {
+          "title": "Objections stop feeling intimidating",
+          "desc": "The academy and objection bank help handle money, trust, time, and hesitation without turning the conversation rigid."
+        }
       ]
     },
-    "howItWorks": {
-      "title": "How It Works",
-      "subtitle": "Reach success in 3 simple steps",
+    "system": {
+      "label": "Real product depth",
+      "title": "A strong landing page should reveal a genuinely strong product, not a thin feature sheet.",
+      "subtitle": "Network Marketing Master is no longer a small set of basic screens. It now combines daily focus, contact intelligence, pipeline movement, message support, training, team visibility, follow-up planning, and analytics in one product surface.",
+      "items": [
+        {
+          "label": "Dashboard",
+          "title": "Today's game plan",
+          "desc": "The dashboard no longer just reports numbers. It tells you what to stabilize first, what to keep warm next, and how to protect your rhythm."
+        },
+        {
+          "label": "Contacts",
+          "title": "Contact signals",
+          "desc": "The list view is not just a list anymore. It highlights who needs a return, who is warm enough to advance, and who is ready for reactivation."
+        },
+        {
+          "label": "Pipeline",
+          "title": "Pipeline signals and cleaner drag flow",
+          "desc": "The board feels calmer and more stable, while the signal layer shows which flow deserves attention before the others."
+        },
+        {
+          "label": "Messages",
+          "title": "AI message playbooks",
+          "desc": "You can reopen quiet conversations, turn first touch into curiosity, and move uncertain prospects with guided message setups."
+        },
+        {
+          "label": "Contact Detail",
+          "title": "Micro coaching",
+          "desc": "On a single contact screen, the product can tell you what to do now, what kind of message fits, and which objection is likely nearby."
+        },
+        {
+          "label": "Academy",
+          "title": "Academy and objection bank",
+          "desc": "Scenario-based learning and objection psychology turn vague sales theory into usable field guidance."
+        },
+        {
+          "label": "Team",
+          "title": "Team radar",
+          "desc": "You can see who is gaining momentum, who is slowing down, and who needs leadership support before the rhythm fully breaks."
+        },
+        {
+          "label": "Analytics",
+          "title": "Decision signals",
+          "desc": "The analytics layer does more than show charts. It frames risk, growth windows, and rhythm quality as actionable signals."
+        },
+        {
+          "label": "Follow-ups",
+          "title": "Follow-up planner and notifications",
+          "desc": "You can see what is overdue, what needs action today, and keep that rhythm visible with browser reminders."
+        }
+      ]
+    },
+    "workflow": {
+      "label": "How it works",
+      "title": "The page should make people feel: “Maybe the business was not complicated. Maybe it was just unstructured.”",
+      "subtitle": "That is why the landing flow mirrors the product itself: bring people in, surface the priority, send the right message, and keep rhythm visible.",
       "steps": [
-        {"step": "1", "title": "Add Your Contacts", "desc": "Import your existing list or add one by one. WhatsApp, Telegram, phone — we support every channel."},
-        {"step": "2", "title": "Let AI Prioritize", "desc": "AI analyzes each contact, assigns a warmth score, and lists today's actions."},
-        {"step": "3", "title": "Reach the Right Person", "desc": "Send the prepared message, set follow-up timing, and track results."}
+        {
+          "title": "Bring contacts and opportunities into one place",
+          "desc": "You can start with a single real person or quickly move your existing list into the product."
+        },
+        {
+          "title": "Let the system clarify today's weight",
+          "desc": "Focus board, contact signals, and pipeline signals make the center of gravity for the day visible."
+        },
+        {
+          "title": "Handle messages, follow-ups, and objections from the same flow",
+          "desc": "What to say, when to return, and how to soften hesitation all live inside one product surface."
+        },
+        {
+          "title": "Lead growth by seeing earlier, not reacting later",
+          "desc": "Team radar, analytics, and the follow-up planner create a calmer, more controllable growth rhythm."
+        }
       ]
+    },
+    "comparison": {
+      "label": "The shift",
+      "title": "Same person, same effort. The difference is how the work is organized.",
+      "subtitle": "This is the emotional shift the landing page should create: first, visitors recognize their own chaos. Then they see that the chaos is actually solvable.",
+      "before": {
+        "title": "Without Network Marketing Master",
+        "items": [
+          "You try to remember who is warm, who has gone quiet, and who sits near a decision point.",
+          "Every message asks for a fresh wording, timing, and tone decision.",
+          "\"I need to think about it\" and \"I do not have time\" can easily stall the whole flow.",
+          "Follow-ups live partly in a calendar, partly in notes, and partly in your head.",
+          "As the team grows, support needs become visible too late."
+        ]
+      },
+      "after": {
+        "title": "With Network Marketing Master",
+        "items": [
+          "Daily focus, contact signals, and pipeline signals clarify the order of the day on the first screen.",
+          "AI message playbooks and micro coaching reduce the cost of the next decision.",
+          "Academy and objection support make hesitation easier to navigate without pressure.",
+          "Follow-up planning and notifications keep the rhythm visible.",
+          "Team radar and decision signals help growth feel calmer, earlier, and more controlled."
+        ]
+      }
     },
     "pricing": {
-      "title": "Simple Pricing",
-      "subtitle": "No surprises, no hidden fees",
+      "label": "Simple plans",
+      "title": "Plans that stay simple for the first contact and expand naturally when the rhythm grows.",
+      "subtitle": "What strong global SaaS pages do well is clarity. So the pricing here is not trying to be clever. Visitors should quickly understand which stage they are in and what they get.",
       "mostPopular": "Most Popular",
       "plans": [
-        {"name": "Starter", "price": "Free", "period": "", "desc": "For individual distributors", "features": ["50 contacts", "Basic pipeline", "AI messages (5/day)", "Mobile app"], "cta": "Start Free"},
-        {"name": "Pro", "price": "$29", "period": "/mo", "desc": "For growth-focused distributors", "features": ["Unlimited contacts", "Advanced pipeline", "Unlimited AI messages", "Lead score", "Priority support"], "cta": "Start Pro"},
-        {"name": "Team", "price": "$79", "period": "/mo", "desc": "For leaders and team managers", "features": ["All Pro features", "Team radar", "20 team members", "Team analytics", "Custom training"], "cta": "Start Team"}
+        {
+          "name": "Starter",
+          "price": "Free",
+          "period": "",
+          "desc": "For people starting out or trying to bring order to the work for the first time.",
+          "features": [
+            "50 contacts",
+            "Basic pipeline tracking",
+            "AI message generation",
+            "Academy and objection bank access"
+          ],
+          "cta": "Start Free"
+        },
+        {
+          "name": "Pro",
+          "price": "$29",
+          "period": "/mo",
+          "desc": "For active distributors who want daily rhythm, sharper prioritization, and more consistent movement.",
+          "features": [
+            "Unlimited contacts",
+            "Contact and pipeline signals",
+            "Unlimited AI message playbooks",
+            "Decision signals and follow-up planning"
+          ],
+          "cta": "Choose Pro"
+        },
+        {
+          "name": "Team",
+          "price": "$79",
+          "period": "/mo",
+          "desc": "For leaders who need to see momentum, support needs, and activation flow across a growing team.",
+          "features": [
+            "Everything in Pro",
+            "Team radar and leader guidance",
+            "Activation queue visibility",
+            "Deeper team and rhythm analytics"
+          ],
+          "cta": "Start Team Plan"
+        }
       ]
     },
     "faq": {
-      "title": "Frequently Asked Questions",
+      "label": "Close the trust gap",
+      "title": "The main questions a visitor asks before creating an account.",
+      "subtitle": "Good conversion is not just about a strong hero section. It also comes from low friction, clear expectations, and honest answers.",
       "items": [
-        {"q": "What is NMM and who is it for?", "a": "Network Marketing Master (NMM) is a digital management tool for multi-level marketing (MLM) distributors. It offers contact tracking, AI-powered messaging, and team management in one platform."},
-        {"q": "Is the free plan enough?", "a": "Yes, to get started! You can begin with 50 contacts and basic features. As your team grows, upgrading to Pro or Team is easy."},
-        {"q": "Is my data secure?", "a": "Yes. All data is stored encrypted on Supabase (PostgreSQL). With Row Level Security, only you can access your data."},
-        {"q": "Which network marketing companies does it work with?", "a": "NMM is company-independent. It can be used with Amway, Herbalife, Oriflame, Avon and all MLM companies."},
-        {"q": "Is there a mobile app?", "a": "The web app works optimized on all mobile devices. Native iOS/Android apps are on our roadmap."},
-        {"q": "Can I cancel?", "a": "Yes, you can cancel anytime. Billing is on a monthly basis, cancellation takes effect at the end of the billing period."}
+        {
+          "q": "What does this product really solve?",
+          "a": "Network Marketing Master brings contact tracking, follow-up rhythm, pipeline movement, messaging, objection support, team visibility, and analytics into one daily working system. It does not just store data; it helps clarify the next move."
+        },
+        {
+          "q": "I am still new to network marketing. Is this still for me?",
+          "a": "Yes. The product is designed specifically to reduce the usual beginner questions: who should I message, when should I follow up, how do I open naturally, and what do I say when someone hesitates?"
+        },
+        {
+          "q": "If I lead a team, will this actually help me?",
+          "a": "Yes. Team radar shows who is gaining momentum, who is slowing down, and who needs support. That turns leadership from reactive into visible and earlier."
+        },
+        {
+          "q": "Will the AI messaging feel robotic?",
+          "a": "The goal is not robotic copy. The goal is lower-pressure, more natural communication with clearer next steps. That is why the AI flows are connected to playbooks, objections, and micro coaching."
+        },
+        {
+          "q": "Is my data secure?",
+          "a": "Yes. Data is stored on Supabase and separated per user with secure access controls. The app is built around user-specific visibility."
+        },
+        {
+          "q": "Is changing or canceling plans difficult?",
+          "a": "No. The product keeps the plan structure simple on purpose. You can start light, grow when you need more depth, and stop when the product no longer fits."
+        }
       ]
     },
     "cta": {
-      "title": "Start today, make a difference",
-      "subtitle": "No credit card required. 2-minute setup. Cancel anytime.",
-      "button": "Create Free Account"
+      "badge": "Start with clarity",
+      "title": "Grow your network marketing business by making the work visible, not heavier.",
+      "subtitle": "Creating an account does not just give you access to a tool. It gives you one product surface for contact rhythm, message support, pipeline movement, team visibility, and decision guidance.",
+      "button": "Create Free Account",
+      "secondary": "Log In First"
     },
     "footer": {
       "features": "Features",
