@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -50,8 +50,10 @@ type FormData = z.infer<typeof schema>
 
 export function ContactFormPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { id } = useParams<{ id: string }>()
   const isEdit = !!id
+  const isCustomerMode = location.pathname.startsWith(ROUTES.PRODUCT_CUSTOMERS)
   const { user } = useAuth()
   const userId = user?.id ?? ''
 
@@ -65,14 +67,15 @@ export function ContactFormPage() {
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
   const [isSaving, setIsSaving] = useState(false)
   const { t } = useTranslation()
+  const returnRoute = isCustomerMode ? ROUTES.PRODUCT_CUSTOMERS : ROUTES.CONTACTS
 
   const { register, handleSubmit, setValue, watch, formState: { errors }, reset } = useForm<FormData>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(schema) as any,
     defaultValues: {
       source: 'manual',
-      contact_type: 'prospect',
-      stage: 'new',
+      contact_type: isCustomerMode ? 'customer' : 'prospect',
+      stage: isCustomerMode ? 'joined' : 'new',
       warmth_score: 50,
     },
   })
@@ -95,8 +98,8 @@ export function ContactFormPage() {
         birthday: c.birthday ?? '',
         children_count: c.children_count ?? undefined,
         source: c.source,
-        contact_type: c.contact_type,
-        stage: c.stage,
+        contact_type: isCustomerMode ? 'customer' : c.contact_type,
+        stage: isCustomerMode ? (c.stage || 'joined') : c.stage,
         warmth_score: c.warmth_score,
         notes: c.notes ?? '',
         interests: c.interests?.join(', ') ?? '',
@@ -126,8 +129,12 @@ export function ContactFormPage() {
       birthday: data.birthday || null,
       children_count: data.children_count ?? null,
       source: (data.source as typeof existingContact extends null ? never : NonNullable<typeof existingContact>['source']) ?? 'manual',
-      contact_type: (data.contact_type as NonNullable<typeof existingContact>['contact_type']) ?? 'prospect',
-      stage: (data.stage as NonNullable<typeof existingContact>['stage']) ?? 'new',
+      contact_type: isCustomerMode
+        ? 'customer'
+        : (data.contact_type as NonNullable<typeof existingContact>['contact_type']) ?? 'prospect',
+      stage: isCustomerMode
+        ? (existingContact?.stage ?? 'joined')
+        : (data.stage as NonNullable<typeof existingContact>['stage']) ?? 'new',
       warmth_score: data.warmth_score ?? 50,
       notes: data.notes || null,
       interests: parseArray(data.interests),
@@ -141,7 +148,7 @@ export function ContactFormPage() {
         await updateContact.mutateAsync(payload)
         await setTags.mutateAsync(selectedTagIds)
         toast.success(t('contacts.updated'))
-        navigate(`${ROUTES.CONTACTS}/${id}`, { replace: true })
+        navigate(isCustomerMode ? returnRoute : `${ROUTES.CONTACTS}/${id}`, { replace: true })
       } else {
         const newId = await createContact.mutateAsync(payload)
         if (selectedTagIds.length > 0) {
@@ -149,7 +156,7 @@ export function ContactFormPage() {
         }
         toast.success(t('contacts.saved'))
         console.debug('[ContactForm] Yeni kontak kaydedildi, id:', newId)
-        navigate(ROUTES.CONTACTS, { replace: true })
+        navigate(returnRoute, { replace: true })
       }
     } catch (err) {
       console.error('[ContactForm] Kayıt hatası:', err)
@@ -175,15 +182,39 @@ export function ContactFormPage() {
   }
 
   const isLoading = isSaving
+  const relationshipLabel = isCustomerMode ? t('customers.form.fields.segment') : t('contacts.fields.relationship')
+  const relationshipPlaceholder = isCustomerMode
+    ? t('customers.form.placeholders.segment')
+    : t('contacts.placeholders.relationship')
+  const notesLabel = isCustomerMode ? t('customers.form.fields.notes') : t('contacts.fields.notes')
+  const notesPlaceholder = isCustomerMode ? t('customers.form.placeholders.notes') : t('contacts.placeholders.notes')
+  const interestsLabel = isCustomerMode ? t('customers.form.fields.products') : t('contacts.fields.interests')
+  const interestsPlaceholder = isCustomerMode
+    ? t('customers.form.placeholders.products')
+    : t('contacts.placeholders.interests')
+  const goalsLabel = isCustomerMode ? t('customers.form.fields.nextNeeds') : t('contacts.fields.goals')
+  const goalsPlaceholder = isCustomerMode
+    ? t('customers.form.placeholders.nextNeeds')
+    : t('contacts.placeholders.goals')
+  const painPointsLabel = isCustomerMode ? t('customers.form.fields.watchouts') : t('contacts.fields.painPoints')
+  const painPointsPlaceholder = isCustomerMode
+    ? t('customers.form.placeholders.watchouts')
+    : t('contacts.placeholders.painPoints')
 
   return (
     <div className="p-6 pb-20 lg:pb-6 max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(returnRoute)}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <h1 className="text-2xl font-bold tracking-tight">
-          {isEdit ? t('contacts.edit') : t('contacts.new')}
+          {isCustomerMode
+            ? isEdit
+              ? t('customers.edit')
+              : t('customers.new')
+            : isEdit
+              ? t('contacts.edit')
+              : t('contacts.new')}
         </h1>
       </div>
 
@@ -205,7 +236,9 @@ export function ContactFormPage() {
           <TabsList className="w-full">
             <TabsTrigger value="temel" className="flex-1">{t('contacts.tabs.basic')}</TabsTrigger>
             <TabsTrigger value="detay" className="flex-1">{t('contacts.tabs.detail')}</TabsTrigger>
-            <TabsTrigger value="nm" className="flex-1">{t('contacts.tabs.network')}</TabsTrigger>
+            <TabsTrigger value="nm" className="flex-1">
+              {isCustomerMode ? t('customers.form.tabs.customer') : t('contacts.tabs.network')}
+            </TabsTrigger>
             <TabsTrigger value="notlar" className="flex-1">{t('contacts.tabs.notes')}</TabsTrigger>
           </TabsList>
 
@@ -261,8 +294,8 @@ export function ContactFormPage() {
                 <Input id="occupation" {...register('occupation')} placeholder={t('contacts.placeholders.occupation')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="relationship">{t('contacts.fields.relationship')}</Label>
-                <Input id="relationship" {...register('relationship')} placeholder={t('contacts.placeholders.relationship')} />
+                <Label htmlFor="relationship">{relationshipLabel}</Label>
+                <Input id="relationship" {...register('relationship')} placeholder={relationshipPlaceholder} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="birthday">{t('contacts.fields.birthday')}</Label>
@@ -279,7 +312,7 @@ export function ContactFormPage() {
           <TabsContent value="nm" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>{t('contacts.fields.source')}</Label>
+                <Label>{isCustomerMode ? t('customers.form.fields.channel') : t('contacts.fields.source')}</Label>
                 <Select
                   value={watch('source') ?? 'manual'}
                   onValueChange={(v) => setValue('source', v ?? 'manual')}
@@ -296,45 +329,51 @@ export function ContactFormPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>{t('contacts.fields.contactType')}</Label>
-                <Select
-                  value={watch('contact_type') ?? 'prospect'}
-                  onValueChange={(v) => setValue('contact_type', v ?? 'prospect')}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {t(`contactTypes.${watch('contact_type') ?? 'prospect'}`)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(CONTACT_TYPE_LABELS).map((key) => (
-                      <SelectItem key={key} value={key}>{t(`contactTypes.${key}`)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>{t('contacts.fields.stage')}</Label>
-                <Select
-                  value={watch('stage') ?? 'new'}
-                  onValueChange={(v) => setValue('stage', v ?? 'new')}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {t(`contactStages.${watch('stage') ?? 'new'}`)}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.keys(STAGE_LABELS).map((key) => (
-                      <SelectItem key={key} value={key}>{t(`contactStages.${key}`)}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {!isCustomerMode ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>{t('contacts.fields.contactType')}</Label>
+                    <Select
+                      value={watch('contact_type') ?? 'prospect'}
+                      onValueChange={(v) => setValue('contact_type', v ?? 'prospect')}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue>
+                          {t(`contactTypes.${watch('contact_type') ?? 'prospect'}`)}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.keys(CONTACT_TYPE_LABELS).map((key) => (
+                          <SelectItem key={key} value={key}>{t(`contactTypes.${key}`)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>{t('contacts.fields.stage')}</Label>
+                    <Select
+                      value={watch('stage') ?? 'new'}
+                      onValueChange={(v) => setValue('stage', v ?? 'new')}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue>
+                          {t(`contactStages.${watch('stage') ?? 'new'}`)}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.keys(STAGE_LABELS).map((key) => (
+                          <SelectItem key={key} value={key}>{t(`contactStages.${key}`)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              ) : null}
               <div className="space-y-2">
                 <Label htmlFor="warmth_score">
-                  {t('contacts.fields.warmthScore', { score: watch('warmth_score') ?? 50 })}
+                  {isCustomerMode
+                    ? t('customers.form.fields.loyaltyScore', { score: watch('warmth_score') ?? 50 })
+                    : t('contacts.fields.warmthScore', { score: watch('warmth_score') ?? 50 })}
                 </Label>
                 <input
                   type="range"
@@ -352,36 +391,36 @@ export function ContactFormPage() {
           {/* Tab 4: Notlar & Etiketler */}
           <TabsContent value="notlar" className="space-y-4 mt-4">
             <div className="space-y-2">
-              <Label htmlFor="notes">{t('contacts.fields.notes')}</Label>
+              <Label htmlFor="notes">{notesLabel}</Label>
               <Textarea
                 id="notes"
                 {...register('notes')}
-                placeholder={t('contacts.placeholders.notes')}
+                placeholder={notesPlaceholder}
                 rows={4}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="interests">{t('contacts.fields.interests')}</Label>
+              <Label htmlFor="interests">{interestsLabel}</Label>
               <Input
                 id="interests"
                 {...register('interests')}
-                placeholder={t('contacts.placeholders.interests')}
+                placeholder={interestsPlaceholder}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="goals">{t('contacts.fields.goals')}</Label>
+              <Label htmlFor="goals">{goalsLabel}</Label>
               <Input
                 id="goals"
                 {...register('goals')}
-                placeholder={t('contacts.placeholders.goals')}
+                placeholder={goalsPlaceholder}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="pain_points">{t('contacts.fields.painPoints')}</Label>
+              <Label htmlFor="pain_points">{painPointsLabel}</Label>
               <Input
                 id="pain_points"
                 {...register('pain_points')}
-                placeholder={t('contacts.placeholders.painPoints')}
+                placeholder={painPointsPlaceholder}
               />
             </div>
             <div className="space-y-2">
@@ -402,7 +441,7 @@ export function ContactFormPage() {
         </Tabs>
 
         <div className="mt-6 flex gap-3 justify-end">
-          <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+          <Button type="button" variant="outline" onClick={() => navigate(returnRoute)}>
             {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={isLoading} className="gap-1.5">

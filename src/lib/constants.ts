@@ -17,6 +17,7 @@ export const ROUTES = {
   CALENDAR: '/takvim',
   ACADEMY: '/akademi',
   TEAM: '/ekip',
+  PRODUCT_CUSTOMERS: '/urun-musterileri',
   ANALYTICS: '/analiz',
   SETTINGS: '/ayarlar',
 } as const
@@ -29,6 +30,7 @@ export const NAV_ITEMS = [
   { title: 'Takvim', href: ROUTES.CALENDAR, icon: 'Calendar' },
   { title: 'Akademi', href: ROUTES.ACADEMY, icon: 'GraduationCap' },
   { title: 'Ekip', href: ROUTES.TEAM, icon: 'Users2', roles: ['leader', 'admin'] },
+  { title: 'Ürün Müşterileri', href: ROUTES.PRODUCT_CUSTOMERS, icon: 'Package2' },
   { title: 'Analiz', href: ROUTES.ANALYTICS, icon: 'BarChart2' },
   { title: 'Ayarlar', href: ROUTES.SETTINGS, icon: 'Settings' },
 ] as const

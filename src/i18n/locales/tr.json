@@ -41,6 +41,7 @@
     "calendar": "Takvim",
     "academy": "Akademi",
     "team": "Ekip",
+    "productCustomers": "Ürün Müşterileri",
     "analytics": "Analiz",
     "settings": "Ayarlar",
     "logout": "Çıkış",
@@ -390,6 +391,73 @@
         "relationship": "İlişki Türü",
         "notes": "Notlar",
         "source": "Kaynak"
+      }
+    }
+  },
+  "customers": {
+    "title": "Ürün Müşterileri",
+    "subtitle": "Ürünü kullanan kişileri, memnuniyet sinyallerini ve bir sonraki temas ihtiyacını tek listede görün.",
+    "new": "Yeni Müşteri",
+    "edit": "Müşteri Düzenle",
+    "searchPlaceholder": "Müşteri adı, ürün veya kanal ara...",
+    "exportCount": "{{count}} müşteri dışa aktarıldı",
+    "loadError": "Müşteri listesi yüklenemedi.",
+    "cards": {
+      "total": {
+        "title": "Toplam Müşteri",
+        "body": "Şu anda aktif olarak takip ettiğin tüm ürün müşterileri."
+      },
+      "month": {
+        "title": "Bu Ay Eklenenler",
+        "body": "Bu ay müşteri listene eklenen yeni satın alma ilişkileri."
+      },
+      "activeProducts": {
+        "title": "Ürün Bilgisi Girilenler",
+        "body": "Kullandığı ürünleri görünür olan müşteriler daha sağlıklı yönetilir."
+      },
+      "dueSoon": {
+        "title": "Temas Bekleyenler",
+        "body": "Önümüzdeki 14 gün içinde dokunulması gereken müşteri ilişkileri."
+      }
+    },
+    "columns": {
+      "name": "İsim",
+      "products": "Kullandığı Ürünler",
+      "lastContact": "Son Temas",
+      "nextTouch": "Sonraki Takip",
+      "loyalty": "Memnuniyet",
+      "channel": "Kanal",
+      "customerSince": "Müşteri Olduğu Tarih"
+    },
+    "fallbacks": {
+      "noProducts": "Ürün bilgisi girilmedi",
+      "noDate": "—",
+      "noPlan": "Planlanmadı"
+    },
+    "empty": {
+      "title": "Ürün müşterileri burada toplanacak",
+      "body": "Yeni müşterilerini eklediğinde hangi ürünü kullandıkları, ne zaman tekrar temas gerektiği ve memnuniyet düzeyi burada sakin şekilde görünür olacak.",
+      "cta": "İlk Müşteriyi Ekle"
+    },
+    "form": {
+      "tabs": {
+        "customer": "Müşteri"
+      },
+      "fields": {
+        "segment": "Müşteri Profili",
+        "channel": "Satın Alma Kanalı",
+        "loyaltyScore": "Memnuniyet / Bağlılık Skoru: {{score}}",
+        "notes": "Müşteri Notları",
+        "products": "Kullandığı Ürünler",
+        "nextNeeds": "Sonraki Ürün İhtiyaçları",
+        "watchouts": "Dikkat Edilecek Noktalar"
+      },
+      "placeholders": {
+        "segment": "ör. düzenli kullanıcı, aile paketi, sadık müşteri",
+        "notes": "Bu müşterinin kullanım deneyimi, alışveriş alışkanlığı ve özel notları...",
+        "products": "kolajen, kahve, cilt seti (virgülle ayır)",
+        "nextNeeds": "yenileme, hediye paketi, farklı ürün denemesi (virgülle ayır)",
+        "watchouts": "fiyat hassasiyeti, düzenli hatırlatma ihtiyacı (virgülle ayır)"
       }
     }
   },

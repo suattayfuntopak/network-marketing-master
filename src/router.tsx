@@ -125,6 +125,11 @@ const TeamPage = lazy(async () => {
   return { default: module.TeamPage }
 })
 
+const ProductCustomersPage = lazy(async () => {
+  const module = await import('@/pages/dashboard/customers/ProductCustomersPage')
+  return { default: module.ProductCustomersPage }
+})
+
 const AnalyticsPage = lazy(async () => {
   const module = await import('@/pages/dashboard/analytics/AnalyticsPage')
   return { default: module.AnalyticsPage }
@@ -210,6 +215,9 @@ export const router = createBrowserRouter([
           { path: `${ROUTES.ACADEMY}/itirazlar`, element: renderLazyRoute(<ObjectionsPage />) },
           { path: `${ROUTES.ACADEMY}/:id`, element: renderLazyRoute(<AcademyContentDetailPage />) },
           { path: ROUTES.TEAM, element: renderLazyRoute(<TeamPage />) },
+          { path: ROUTES.PRODUCT_CUSTOMERS, element: renderLazyRoute(<ProductCustomersPage />) },
+          { path: `${ROUTES.PRODUCT_CUSTOMERS}/yeni`, element: renderLazyRoute(<ContactFormPage key="customer-new" />) },
+          { path: `${ROUTES.PRODUCT_CUSTOMERS}/:id/duzenle`, element: <ContactFormWrapper /> },
           { path: ROUTES.ANALYTICS, element: renderLazyRoute(<AnalyticsPage />) },
           { path: ROUTES.SETTINGS, element: renderLazyRoute(<SettingsPage />) },
         ],

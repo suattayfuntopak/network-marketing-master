@@ -1,22 +1,14 @@
-import { useMemo, type ReactNode } from 'react'
-import { formatDistanceToNow } from 'date-fns'
-import { enUS, tr } from 'date-fns/locale'
-import { Activity, AlertTriangle, ArrowUpRight, ShieldAlert, Sparkles, Users } from 'lucide-react'
+import { useMemo } from 'react'
+import { Activity, ArrowUpRight, Sparkles, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate } from 'react-router-dom'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
 import { useContacts } from '@/hooks/useContacts'
-import { ROUTES } from '@/lib/constants'
 import { DEFAULT_FILTERS } from '@/lib/contacts/types'
-import { buildTeamRadarInsight, getTeamRadarStatus, type TeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
+import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { cn } from '@/lib/utils'
-import type { ContactWithTags } from '@/lib/contacts/types'
 
 function getInitials(fullName: string) {
   return fullName
@@ -49,49 +41,12 @@ function getStatusClasses(status: TeamRadarStatus) {
   return 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400'
 }
 
-function TeamMemberCard({
-  contact,
-  subtitle,
-  extra,
-}: {
-  contact: ContactWithTags
-  subtitle: string
-  extra?: ReactNode
-}) {
-  const navigate = useNavigate()
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
-      className="w-full rounded-xl border bg-card p-4 text-left transition-all hover:border-primary/30 hover:shadow-sm"
-    >
-      <div className="flex items-start gap-3">
-        <Avatar size="default">
-          <AvatarFallback>{getInitials(contact.full_name)}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{contact.full_name}</p>
-          <p className="mt-1 text-xs text-muted-foreground">{subtitle}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <StageBadge stage={contact.stage} />
-            <WarmthScoreBadge score={contact.warmth_score} />
-          </div>
-          {extra ? <div className="mt-3">{extra}</div> : null}
-        </div>
-      </div>
-    </button>
-  )
-}
-
 export function TeamPage() {
-  const { t, i18n } = useTranslation()
-  const navigate = useNavigate()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const userId = user?.id ?? ''
-  const locale = i18n.language?.startsWith('en') ? enUS : tr
 
-  const { data: contactsResult, isLoading } = useContacts({
+  const { data: contactsResult } = useContacts({
     userId,
     filters: {
       ...DEFAULT_FILTERS,
@@ -140,47 +95,6 @@ export function TeamPage() {
         .slice(0, 5),
     [radarMembers]
   )
-
-  const needsAttention = useMemo(
-    () =>
-      [...radarMembers]
-        .filter((member) => member.status === 'slowing_down' || member.status === 'needs_support')
-        .sort((a, b) => {
-          const overdueA = a.contact.next_follow_up_at ? new Date(a.contact.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
-          const overdueB = b.contact.next_follow_up_at ? new Date(b.contact.next_follow_up_at).getTime() : Number.POSITIVE_INFINITY
-          return overdueA - overdueB || getDaysSince(b.contact.last_contact_at) - getDaysSince(a.contact.last_contact_at)
-        })
-        .slice(0, 4),
-    [radarMembers]
-  )
-
-  const activationQueue = useMemo(
-    () =>
-      [...members]
-        .filter((member) => member.stage !== 'joined' && member.stage !== 'lost')
-        .sort((a, b) => {
-          if (b.warmth_score !== a.warmth_score) return b.warmth_score - a.warmth_score
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        })
-        .slice(0, 6),
-    [members]
-  )
-
-  const momentumBoard = useMemo(
-    () =>
-      radarMembers
-        .filter((member) => member.status === 'gaining_momentum' || member.status === 'active')
-        .sort((a, b) => {
-          if (a.status !== b.status) {
-            return a.status === 'gaining_momentum' ? -1 : 1
-          }
-          return b.contact.warmth_score - a.contact.warmth_score
-        })
-        .slice(0, 3),
-    [radarMembers]
-  )
-
-  const summaryTone = metrics.overdueMembers > 0 ? 'warning' : 'default'
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -274,254 +188,44 @@ export function TeamPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('team.sections.overview')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="rounded-xl border border-primary/15 bg-primary/5 p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Users className="h-5 w-5" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold">{t('team.overview.title')}</p>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {t('team.overview.body', {
-                      members: metrics.totalMembers,
-                      activeRate: metrics.activeRate,
-                    })}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <div className="rounded-xl border bg-card/70 p-4">
-                <div className="flex items-center gap-2">
-                  <Badge
-                    variant="outline"
-                    className={cn('border-current', summaryTone === 'warning' ? 'text-amber-600' : 'text-emerald-600')}
-                  >
-                    {summaryTone === 'warning' ? t('team.labels.warning') : t('team.labels.healthy')}
-                  </Badge>
-                </div>
-                <p className="mt-3 text-sm font-medium">{t('team.overview.followUpTitle')}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t('team.overview.followUpBody', { count: metrics.overdueMembers })}
-                </p>
-              </div>
-
-              <div className="rounded-xl border bg-card/70 p-4">
-                <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="text-sky-600">
-                    {t('team.labels.momentum')}
-                  </Badge>
-                </div>
-                <p className="mt-3 text-sm font-medium">{t('team.overview.momentumTitle')}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {t('team.overview.momentumBody', {
-                    joined: metrics.joinedMembers,
-                    newThisMonth: metrics.newThisMonth,
-                  })}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('team.sections.leaderboard')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {leaderboard.length > 0 ? (
-              leaderboard.map((member, index) => (
-                <div key={member.contact.id} className="rounded-xl border bg-card/70 p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                      {index + 1}
-                    </div>
-                    <Avatar size="sm">
-                      <AvatarFallback>{getInitials(member.contact.full_name)}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold">{member.contact.full_name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {member.contact.city || t('team.labels.locationFallback')}
-                      </p>
-                    </div>
-                    <WarmthScoreBadge score={member.contact.warmth_score} />
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('team.sections.leaderboard')}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {leaderboard.length > 0 ? (
+            leaderboard.map((member, index) => (
+              <div key={member.contact.id} className="rounded-xl border bg-card/70 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                    {index + 1}
                   </div>
-                  <div className="mt-3 flex items-center justify-between gap-2">
-                    <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
-                      {t(`team.radar.status.${member.status}`)}
-                    </span>
-                    <p className="text-xs text-muted-foreground">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-                {t('team.empty.leaderboard')}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('team.sections.needsAttention')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {needsAttention.length > 0 ? (
-              needsAttention.map((member) => {
-                const hasOverdueFollowUp = Boolean(member.contact.next_follow_up_at) && new Date(member.contact.next_follow_up_at!).getTime() < Date.now()
-                const reason = hasOverdueFollowUp
-                  ? t('team.reasons.overdue')
-                  : member.contact.last_contact_at
-                    ? t('team.reasons.noRecentTouch')
-                    : t('team.reasons.noTouchYet')
-
-                return (
-                  <TeamMemberCard
-                    key={member.contact.id}
-                    contact={member.contact}
-                    subtitle={reason}
-                    extra={
-                      <div className="space-y-2">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
-                            {t(`team.radar.status.${member.status}`)}
-                          </span>
-                          {hasOverdueFollowUp ? (
-                            <span className="inline-flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400">
-                              <AlertTriangle className="h-3 w-3" />
-                              {t('team.labels.overdue')}
-                            </span>
-                          ) : null}
-                        </div>
-                        <p className="text-xs text-primary/80">
-                          {t(`team.radar.suggestions.${member.leaderSuggestionKey}`)}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {t('team.labels.lastContact')}:{' '}
-                          {member.contact.last_contact_at
-                            ? formatDistanceToNow(new Date(member.contact.last_contact_at), { addSuffix: true, locale })
-                            : t('team.labels.noDate')}
-                        </p>
-                      </div>
-                    }
-                  />
-                )
-              })
-            ) : (
-              <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-                {t('team.empty.attention')}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between gap-3">
-            <CardTitle>{t('team.sections.activationQueue')}</CardTitle>
-            <Button variant="outline" size="sm" onClick={() => navigate(ROUTES.CONTACTS)}>
-              {t('team.actions.openContacts')}
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {activationQueue.length > 0 ? (
-              activationQueue.map((member) => {
-                const progress = Math.max(8, member.warmth_score)
-
-                return (
-                  <TeamMemberCard
-                    key={member.id}
-                    contact={member}
-                    subtitle={member.occupation || member.city || t('team.labels.progressFallback')}
-                    extra={
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs text-muted-foreground">
-                          <span>{t('team.labels.readiness')}</span>
-                          <span>{progress}%</span>
-                        </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-primary),rgba(16,185,129,0.9))]"
-                            style={{ width: `${progress}%` }}
-                          />
-                        </div>
-                      </div>
-                    }
-                  />
-                )
-              })
-            ) : (
-              <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-                {t('team.empty.activation')}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('team.sections.radar')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {momentumBoard.length > 0 ? (
-              momentumBoard.map((member) => (
-                <div key={member.contact.id} className="rounded-2xl border border-border/70 bg-card/60 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold">{member.contact.full_name}</p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {t(`team.radar.focus.${member.focusKey}`)}
-                      </p>
-                    </div>
-                    <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
-                      {t(`team.radar.status.${member.status}`)}
-                    </span>
-                  </div>
-                  <div className="mt-3 rounded-xl border border-border/70 bg-background/40 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      {t('team.radar.leaderSuggestion')}
-                    </p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {t(`team.radar.suggestions.${member.leaderSuggestionKey}`)}
+                  <Avatar size="sm">
+                    <AvatarFallback>{getInitials(member.contact.full_name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-semibold">{member.contact.full_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {member.contact.city || t('team.labels.locationFallback')}
                     </p>
                   </div>
-                  <p className="mt-3 text-xs text-muted-foreground">
-                    {t(`team.radar.momentum.${member.momentumKey}`)}
-                  </p>
+                  <WarmthScoreBadge score={member.contact.warmth_score} />
                 </div>
-              ))
-            ) : (
-              <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-                {t('team.empty.leaderboard')}
+                <div className="mt-3 flex items-center justify-between gap-2">
+                  <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
+                    {t(`team.radar.status.${member.status}`)}
+                  </span>
+                  <p className="text-xs text-muted-foreground">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
+                </div>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="rounded-xl border bg-card p-4">
-          <div className="flex items-start gap-3">
-            <ShieldAlert className="mt-0.5 h-5 w-5 text-amber-500" />
-            <div>
-              <p className="text-sm font-semibold">{t('team.focus.title')}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t('team.focus.body', { count: needsAttention.length })}
-              </p>
+            ))
+          ) : (
+            <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
+              {t('team.empty.leaderboard')}
             </div>
-          </div>
-        </div>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

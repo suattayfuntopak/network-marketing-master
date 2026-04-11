@@ -55,7 +55,7 @@ export function ContactsSummaryListPage() {
   }, [activeKey, contacts])
 
   const titleKeyMap: Record<ContactSummaryKey, string> = {
-    all: 'contacts.summaryCards.total.title',
+    all: 'contacts.summaryCards.all.title',
     month: 'contacts.summaryCards.month.title',
     week: 'contacts.summaryCards.week.title',
     today: 'contacts.summaryCards.today.title',

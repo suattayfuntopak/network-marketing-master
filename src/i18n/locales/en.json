@@ -41,6 +41,7 @@
     "calendar": "Calendar",
     "academy": "Academy",
     "team": "Team",
+    "productCustomers": "Product Customers",
     "analytics": "Analytics",
     "settings": "Settings",
     "logout": "Log Out",
@@ -390,6 +391,73 @@
         "relationship": "Relationship Type",
         "notes": "Notes",
         "source": "Source"
+      }
+    }
+  },
+  "customers": {
+    "title": "Product Customers",
+    "subtitle": "See who is using the product, how healthy the relationship looks, and who needs the next touch in one calm view.",
+    "new": "New Customer",
+    "edit": "Edit Customer",
+    "searchPlaceholder": "Search by customer name, product, or channel...",
+    "exportCount": "{{count}} customers exported",
+    "loadError": "The customer list could not be loaded.",
+    "cards": {
+      "total": {
+        "title": "Total Customers",
+        "body": "Every product customer you are actively keeping visible."
+      },
+      "month": {
+        "title": "Added This Month",
+        "body": "New purchase relationships added to your customer list this month."
+      },
+      "activeProducts": {
+        "title": "With Product Info",
+        "body": "Customers with visible product usage are easier to manage well."
+      },
+      "dueSoon": {
+        "title": "Needs Touch Soon",
+        "body": "Customer relationships that should be touched within the next 14 days."
+      }
+    },
+    "columns": {
+      "name": "Name",
+      "products": "Products Used",
+      "lastContact": "Last Contact",
+      "nextTouch": "Next Follow-up",
+      "loyalty": "Loyalty",
+      "channel": "Channel",
+      "customerSince": "Customer Since"
+    },
+    "fallbacks": {
+      "noProducts": "No product info yet",
+      "noDate": "—",
+      "noPlan": "Not planned"
+    },
+    "empty": {
+      "title": "Your product customers will gather here",
+      "body": "Once you begin adding customers, the products they use, when they need the next touch, and their satisfaction level will stay visible here in a calmer way.",
+      "cta": "Add First Customer"
+    },
+    "form": {
+      "tabs": {
+        "customer": "Customer"
+      },
+      "fields": {
+        "segment": "Customer Profile",
+        "channel": "Purchase Channel",
+        "loyaltyScore": "Satisfaction / Loyalty Score: {{score}}",
+        "notes": "Customer Notes",
+        "products": "Products Used",
+        "nextNeeds": "Next Product Needs",
+        "watchouts": "Things to Watch"
+      },
+      "placeholders": {
+        "segment": "e.g. regular user, family pack, loyal customer",
+        "notes": "Usage experience, buying habits, and special notes for this customer...",
+        "products": "collagen, coffee, skincare set (comma separated)",
+        "nextNeeds": "refill, gift pack, trying a different product (comma separated)",
+        "watchouts": "price sensitivity, needs regular reminders (comma separated)"
       }
     }
   },

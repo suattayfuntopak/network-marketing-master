@@ -3,7 +3,7 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard, Users, GitMerge, MessageSquare, Calendar,
   GraduationCap, Users2, BarChart2, Settings, ChevronLeft, ChevronRight,
-  Zap
+  Zap, Package2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { ROUTES } from '@/lib/constants'
@@ -17,6 +17,7 @@ const navConfig = [
   { key: 'messages', href: ROUTES.MESSAGES, Icon: MessageSquare },
   { key: 'academy', href: ROUTES.ACADEMY, Icon: GraduationCap },
   { key: 'team', href: ROUTES.TEAM, Icon: Users2 },
+  { key: 'productCustomers', href: ROUTES.PRODUCT_CUSTOMERS, Icon: Package2 },
   { key: 'analytics', href: ROUTES.ANALYTICS, Icon: BarChart2 },
   { key: 'settings', href: ROUTES.SETTINGS, Icon: Settings },
 ]
