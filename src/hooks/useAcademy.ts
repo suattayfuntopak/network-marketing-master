@@ -6,6 +6,8 @@ import {
   createAcademyContent, updateAcademyContent, deleteAcademyContent,
   incrementContentViewCount,
 } from '@/lib/academy/mutations'
+import { isSystemAcademyId } from '@/lib/academy/systemContent'
+import { setSystemFavorite } from '@/lib/academy/favorites'
 import type { AcademyContentInsert, AcademyContentUpdate, AcademyFilters } from '@/lib/academy/types'
 
 export const academyKeys = {
@@ -76,10 +78,17 @@ export function useDeleteAcademyContent() {
 export function useToggleAcademyFavorite() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, isFavorite }: { id: string; isFavorite: boolean }) =>
-      updateAcademyContent(id, { is_favorite: isFavorite }),
-    onSuccess: () => {
+    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
+      if (isSystemAcademyId(id)) {
+        setSystemFavorite('academy', id, isFavorite)
+        return
+      }
+
+      await updateAcademyContent(id, { is_favorite: isFavorite })
+    },
+    onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: academyKeys.all })
+      qc.invalidateQueries({ queryKey: academyKeys.detail(id) })
     },
   })
 }

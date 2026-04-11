@@ -6,6 +6,8 @@ import {
   createObjection, updateObjection, deleteObjection,
   toggleObjectionFavorite, incrementObjectionUseCount,
 } from '@/lib/academy/mutations'
+import { isSystemObjectionId } from '@/lib/academy/systemContent'
+import { setSystemFavorite } from '@/lib/academy/favorites'
 import type { ObjectionInsert, ObjectionUpdate, ObjectionFilters } from '@/lib/academy/types'
 
 export const objectionKeys = {
@@ -75,10 +77,17 @@ export function useDeleteObjection() {
 export function useToggleObjectionFavorite() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, isFavorite }: { id: string; isFavorite: boolean }) =>
-      toggleObjectionFavorite(id, isFavorite),
-    onSuccess: () => {
+    mutationFn: async ({ id, isFavorite }: { id: string; isFavorite: boolean }) => {
+      if (isSystemObjectionId(id)) {
+        setSystemFavorite('objection', id, isFavorite)
+        return
+      }
+
+      await toggleObjectionFavorite(id, isFavorite)
+    },
+    onSuccess: (_, { id }) => {
       qc.invalidateQueries({ queryKey: objectionKeys.all })
+      qc.invalidateQueries({ queryKey: objectionKeys.detail(id) })
     },
   })
 }

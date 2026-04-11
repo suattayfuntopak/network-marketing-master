@@ -1316,6 +1316,8 @@
     "objections": "Objection Bank",
     "systemLabel": "System",
     "copyAndEdit": "Copy & Edit",
+    "favoritesOnly": "Favorites",
+    "new": "New Training",
     "copyDescription": "This will be added to your own library and will not change the original.",
     "scripts": "Scripts",
     "lessons": "Lessons",

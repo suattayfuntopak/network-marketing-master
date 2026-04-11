@@ -9,6 +9,7 @@ import {
   isSystemAcademyId,
   isSystemObjectionId,
 } from './systemContent'
+import { isSystemFavorite } from './favorites'
 
 const LEVEL_ORDER = {
   beginner: 0,
@@ -35,11 +36,29 @@ function normalizeObjection(item: Objection): Objection {
   }
 }
 
+function withSystemObjectionFavorite(item: Objection): Objection {
+  if (!item.is_system) return item
+
+  return {
+    ...item,
+    is_favorite: isSystemFavorite('objection', item.id),
+  }
+}
+
+function withSystemAcademyFavorite(item: AcademyContent): AcademyContent {
+  if (!item.is_system) return item
+
+  return {
+    ...item,
+    is_favorite: isSystemFavorite('academy', item.id),
+  }
+}
+
 function dedupeObjections(items: Objection[]) {
   const unique = new Map<string, Objection>()
 
   items.forEach((item) => {
-    const normalized = normalizeObjection(item)
+    const normalized = withSystemObjectionFavorite(normalizeObjection(item))
     const key = `${normalized.category}:${normalized.objection_text.trim().toLocaleLowerCase()}`
 
     if (!unique.has(key)) {
@@ -118,7 +137,7 @@ export async function fetchObjections(filters?: ObjectionFilters): Promise<Objec
 export async function fetchObjection(id: string): Promise<Objection | null> {
   if (isSystemObjectionId(id)) {
     const item = getSystemObjection(id, getCurrentLanguage())
-    return item ? normalizeObjection(item) : null
+    return item ? withSystemObjectionFavorite(normalizeObjection(item)) : null
   }
 
   const { data, error } = await supabase
@@ -135,7 +154,7 @@ export async function fetchObjection(id: string): Promise<Objection | null> {
 
 export async function fetchAcademyContents(filters?: AcademyFilters): Promise<AcademyContent[]> {
   const language = getCurrentLanguage()
-  const systemItems = filters?.favoritesOnly ? [] : getSystemAcademyContents(language)
+  const systemItems = getSystemAcademyContents(language).map(withSystemAcademyFavorite)
 
   const query = supabase
     .from('nmm_academy_content')
@@ -162,7 +181,8 @@ export async function fetchAcademyContents(filters?: AcademyFilters): Promise<Ac
 
 export async function fetchAcademyContent(id: string): Promise<AcademyContent | null> {
   if (isSystemAcademyId(id)) {
-    return getSystemAcademyContent(id, getCurrentLanguage())
+    const item = getSystemAcademyContent(id, getCurrentLanguage())
+    return item ? withSystemAcademyFavorite(item) : null
   }
 
   const { data, error } = await supabase

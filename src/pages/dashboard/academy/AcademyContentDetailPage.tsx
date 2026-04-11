@@ -77,7 +77,7 @@ export function AcademyContentDetailPage() {
   }, [content?.id])
 
   const isOwn = !!content && !content.is_system && content.user_id === user?.id
-  const canToggleFavorite = !!content && !isSystemAcademyId(content.id)
+  const canToggleFavorite = !!content
 
   const handleSave = async () => {
     if (!form.title.trim() || loading || !user?.id) return

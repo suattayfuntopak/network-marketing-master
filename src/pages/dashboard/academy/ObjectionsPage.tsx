@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Pencil, Plus, Shield, ArrowRight, Brain } from 'lucide-react'
+import { Search, Copy, Check, ChevronDown, ChevronUp, Star, MessageSquare, Plus, Brain } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -43,6 +43,7 @@ export function ObjectionsPage() {
   const { user } = useAuth()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<ObjectionCategory | 'all'>('all')
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [copiedShortId, setCopiedShortId] = useState<string | null>(null)
@@ -58,6 +59,7 @@ export function ObjectionsPage() {
   const { data: objections = [], isLoading } = useObjections({
     category: category === 'all' ? undefined : category,
     search: search.length >= 2 ? search : undefined,
+    favoritesOnly,
   })
 
   const toggleFavorite = useToggleObjectionFavorite()
@@ -65,34 +67,26 @@ export function ObjectionsPage() {
   const createObjection = useCreateObjection()
   const updateObjection = useUpdateObjection()
 
-  const psychologyCards = [
-    { key: 'validate', Icon: Brain },
-    { key: 'depressure', Icon: Shield },
-    { key: 'microStep', Icon: ArrowRight },
-  ] as const
-
-  const quickScenarios = [
-    { key: 'money', category: 'money' as const },
-    { key: 'trust', category: 'trust' as const },
-    { key: 'wait', category: 'wait' as const },
-    { key: 'time', category: 'time' as const },
-  ] as const
+  const statObjections = useMemo(
+    () => (favoritesOnly ? allObjections.filter((item) => item.is_favorite) : allObjections),
+    [allObjections, favoritesOnly]
+  )
 
   const objectionStats = useMemo(() => {
-    const categoryCount = new Set(allObjections.map((item) => item.category)).size
-    const shortReadyCount = allObjections.filter((item) => item.response_short?.trim()).length
+    const categoryCount = new Set(statObjections.map((item) => item.category)).size
+    const shortReadyCount = statObjections.filter((item) => item.response_short?.trim()).length
     const categoryCounts = OBJ_CATEGORIES.reduce<Record<ObjectionCategory, number>>((acc, key) => {
-      acc[key] = allObjections.filter((item) => item.category === key).length
+      acc[key] = statObjections.filter((item) => item.category === key).length
       return acc
     }, {} as Record<ObjectionCategory, number>)
 
     return {
-      total: allObjections.length,
+      total: statObjections.length,
       categoryCount,
       shortReadyCount,
       categoryCounts,
     }
-  }, [allObjections])
+  }, [statObjections])
 
   const handleCopy = async (id: string, text: string, short = false) => {
     await navigator.clipboard.writeText(text)
@@ -161,10 +155,21 @@ export function ObjectionsPage() {
           <h1 className="text-2xl font-bold">{t('academy.objections')}</h1>
           <p className="text-muted-foreground text-sm mt-1">{t('academy.objection.subtitle')}</p>
         </div>
-        <Button size="sm" variant="outline" onClick={openNew} className="gap-1.5 shrink-0">
-          <Plus className="w-4 h-4" />
-          {t('academy.objection.new')}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            size="sm"
+            variant={favoritesOnly ? 'default' : 'outline'}
+            onClick={() => setFavoritesOnly((current) => !current)}
+            className="gap-1.5"
+          >
+            <Star className={cn('w-4 h-4', favoritesOnly && 'fill-current')} />
+            {t('academy.favoritesOnly')}
+          </Button>
+          <Button size="sm" variant="outline" onClick={openNew} className="gap-1.5">
+            <Plus className="w-4 h-4" />
+            {t('academy.objection.new')}
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
@@ -195,31 +200,6 @@ export function ObjectionsPage() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {psychologyCards.map(({ key, Icon }) => (
-            <div key={key} className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground">
-              <Icon className="h-3.5 w-3.5 text-primary" />
-              {t(`academy.objection.psychology.cards.${key}.title`)}
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {quickScenarios.map(({ key, category: scenarioCategory }) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => {
-                setSearch('')
-                setCategory(scenarioCategory)
-                setExpandedId(null)
-              }}
-              className="rounded-full border border-border/70 bg-background/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
-            >
-              {t(`academy.objection.quickScenarios.items.${key}.title`)}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Arama */}
@@ -247,7 +227,10 @@ export function ObjectionsPage() {
             )}
           >
             {value === 'all' ? t('common.all') : t(`academy.objection.objCategories.${value}`)}
-            <span className="ml-1.5 rounded-full bg-background/70 px-1.5 py-0.5 text-[10px]">
+            <span className={cn(
+              'ml-1.5 rounded-full px-1.5 py-0.5 text-[10px]',
+              category === value ? 'bg-black/20 text-white' : 'bg-background/70 text-foreground dark:text-white'
+            )}>
               {value === 'all' ? objectionStats.total : objectionStats.categoryCounts[value] ?? 0}
             </span>
           </button>
@@ -274,7 +257,7 @@ export function ObjectionsPage() {
           {objections.map((obj) => {
             const isExpanded = expandedId === obj.id
             const isOwn = !obj.is_system && obj.user_id === user?.id
-            const canToggleFavorite = !isSystemObjectionId(obj.id)
+            const canToggleFavorite = true
             return (
               <div key={obj.id} className="border rounded-lg bg-card overflow-hidden">
                 {/* Kart başlığı */}
@@ -298,13 +281,15 @@ export function ObjectionsPage() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {/* Düzenle / Kopyala & Düzenle */}
-                    <button
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5"
                       onClick={(e) => { e.stopPropagation(); openEdit(obj) }}
-                      title={isOwn ? t('common.edit') : t('academy.copyAndEdit')}
-                      className="p-1.5 rounded text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      {isOwn ? <Pencil className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    </button>
+                      <Copy className="w-3.5 h-3.5" />
+                      {t('academy.copyAndEdit')}
+                    </Button>
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
