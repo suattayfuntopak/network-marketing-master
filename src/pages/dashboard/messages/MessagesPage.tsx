@@ -211,11 +211,14 @@ export function MessagesPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
+      <div className="rounded-3xl border border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)] p-4 md:p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
               {t('messages.playbooks.label')}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {t('messages.playbooks.subtitle')}
             </p>
           </div>
           <Button
@@ -227,6 +230,21 @@ export function MessagesPage() {
             <Shield className="h-4 w-4" />
             {t('messages.playbooks.openObjections')}
           </Button>
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {[
+            { label: t('messages.aiGenerator'), value: playbooks.length },
+            { label: t('messages.templates'), value: templates.length },
+            { label: t('messages.history'), value: historyItems.length },
+          ].map((item) => (
+            <div key={item.label} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {item.label}
+              </p>
+              <p className="mt-2 text-2xl font-semibold tabular-nums">{item.value}</p>
+            </div>
+          ))}
         </div>
 
         <div className="mt-4 grid gap-3 lg:grid-cols-3">

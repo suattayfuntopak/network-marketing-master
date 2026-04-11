@@ -87,9 +87,19 @@ export function AnalyticsPage() {
         <p className="text-muted-foreground text-sm mt-1">{t('analytics.subtitle')}</p>
       </div>
 
-      <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
+      <Card className="overflow-hidden rounded-3xl border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.08),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">{t('analytics.signalBoard.title')}</CardTitle>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                {t('analytics.signalBoard.title')}
+              </p>
+              <p className="mt-2 text-sm text-muted-foreground">{t('analytics.signalBoard.subtitle')}</p>
+            </div>
+            <span className="rounded-full border border-border/70 bg-card/60 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+              {t('contacts.total', { count: contactCount })}
+            </span>
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3 md:grid-cols-3">
@@ -136,8 +146,8 @@ export function AnalyticsPage() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium text-muted-foreground">{t('dashboard.totalContacts')}</CardTitle>
             <Users className="w-4 h-4 text-muted-foreground" />
@@ -147,7 +157,7 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium text-muted-foreground">{t('analytics.joinedCount')}</CardTitle>
             <Target className="w-4 h-4 text-emerald-500" />
@@ -157,7 +167,7 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium text-muted-foreground">{t('dashboard.todayFollowUps')}</CardTitle>
             <Bell className="w-4 h-4 text-muted-foreground" />
@@ -170,7 +180,7 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-medium text-muted-foreground">{t('analytics.academyToday')}</CardTitle>
             <GraduationCap className="w-4 h-4 text-amber-500" />
@@ -183,7 +193,7 @@ export function AnalyticsPage() {
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader>
             <CardTitle className="text-base">{t('analytics.stageDistribution')}</CardTitle>
           </CardHeader>
@@ -220,7 +230,7 @@ export function AnalyticsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader>
             <CardTitle className="text-base">{t('analytics.quickSummary')}</CardTitle>
           </CardHeader>
@@ -266,7 +276,7 @@ export function AnalyticsPage() {
         </Card>
       </div>
 
-      <Card>
+      <Card className="rounded-3xl border-border/70 bg-card/70">
         <CardHeader>
           <CardTitle className="text-base">{t('analytics.stageBreakdown')}</CardTitle>
         </CardHeader>

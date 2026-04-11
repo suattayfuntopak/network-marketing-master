@@ -157,7 +157,7 @@ export function DashboardHome() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="cursor-pointer transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.CONTACTS)}>
+        <Card className="cursor-pointer rounded-3xl border-border/70 bg-card/70 transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.CONTACTS)}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.totalContacts')}</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -172,7 +172,7 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.CALENDAR)}>
+        <Card className="cursor-pointer rounded-3xl border-border/70 bg-card/70 transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.CALENDAR)}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.todayAppointments')}</CardTitle>
             <CalendarDays className="h-4 w-4 text-muted-foreground" />
@@ -185,7 +185,7 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer transition-colors hover:border-primary/30" onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}>
+        <Card className="cursor-pointer rounded-3xl border-border/70 bg-card/70 transition-colors hover:border-primary/30" onClick={() => navigate(`${ROUTES.CALENDAR}/takipler`)}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.todayFollowUpsCount')}</CardTitle>
             <Bell className="h-4 w-4 text-muted-foreground" />
@@ -200,7 +200,7 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.PIPELINE)}>
+        <Card className="cursor-pointer rounded-3xl border-border/70 bg-card/70 transition-colors hover:border-primary/30" onClick={() => navigate(ROUTES.PIPELINE)}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">{t('dashboard.stageSummary.title')}</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -230,10 +230,12 @@ export function DashboardHome() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-        <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
+        <Card className="overflow-hidden rounded-3xl border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.08),transparent_30%)]">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">{t('dashboard.priority.title')}</CardTitle>
-            <p className="text-sm text-muted-foreground">{t('dashboard.priority.subtitle')}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+              {t('dashboard.priority.title')}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('dashboard.priority.subtitle')}</p>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="rounded-2xl border border-primary/15 bg-primary/8 p-4">
@@ -294,10 +296,12 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">{t('dashboard.agenda.title')}</CardTitle>
-            <p className="text-sm text-muted-foreground">{t('dashboard.agenda.subtitle')}</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+              {t('dashboard.agenda.title')}
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">{t('dashboard.agenda.subtitle')}</p>
           </CardHeader>
           <CardContent className="space-y-5">
             <div>
@@ -386,7 +390,7 @@ export function DashboardHome() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="flex flex-row items-center justify-between pb-3">
             <CardTitle className="text-base">{t('dashboard.recentContacts')}</CardTitle>
             <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs" onClick={() => navigate(ROUTES.CONTACTS)}>
@@ -425,7 +429,7 @@ export function DashboardHome() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-3xl border-border/70 bg-card/70">
           <CardHeader className="pb-3">
             <CardTitle className="text-base">{t('dashboard.quickActions.title')}</CardTitle>
             <p className="text-sm text-muted-foreground">{t('dashboard.quickActions.subtitle')}</p>
@@ -469,7 +473,7 @@ export function DashboardHome() {
       </div>
 
       {contactCount === 0 && !onboarding.show ? (
-        <Card className="border-primary/20 bg-primary/5">
+        <Card className="rounded-3xl border-primary/20 bg-primary/5">
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">
               <div className="rounded-xl bg-primary/10 p-3">
