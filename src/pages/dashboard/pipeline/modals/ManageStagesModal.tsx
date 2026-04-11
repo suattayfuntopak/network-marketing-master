@@ -15,6 +15,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { useTranslation } from 'react-i18next'
 import { GripVertical, Pencil, Trash2, Plus, Check, X } from 'lucide-react'
+import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,7 +23,15 @@ import { cn } from '@/lib/utils'
 import { STAGE_COLOR_CLASSES, STAGE_COLOR_SEQUENCE, getRandomReadableStageColor, type StageColor } from '@/lib/pipeline/constants'
 import { useCreateStage, useUpdateStage, useDeleteStage, useReorderStages } from '@/hooks/usePipeline'
 import type { PipelineStage } from '@/lib/pipeline/types'
-import { getStageLabelConfig, resolveStageLabel, serializeStageLabelConfig, slugifyStageLabel } from '@/lib/pipeline/stageLabels'
+import {
+  CONTACT_STAGE_KEYS,
+  getStageLabelConfig,
+  getSyncedPipelineStages,
+  resolveStageLabel,
+  serializeStageLabelConfig,
+  slugifyStageLabel,
+  type ContactStageKey,
+} from '@/lib/pipeline/stageLabels'
 
 interface Props {
   open: boolean
@@ -36,6 +45,7 @@ interface EditingStage {
   trLabel: string
   enLabel: string
   color: StageColor
+  contactStageKey: ContactStageKey
 }
 
 function SortableStageRow({
@@ -94,6 +104,8 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
 
   const [editing, setEditing] = useState<EditingStage | null>(null)
   const [localStages, setLocalStages] = useState(stages)
+  const canCreateStage = localStages.length < CONTACT_STAGE_KEYS.length
+  const syncedStages = getSyncedPipelineStages(localStages)
 
   useEffect(() => {
     if (!editing) {
@@ -119,12 +131,19 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
 
   const openEdit = (stage: PipelineStage) => {
     const labels = getStageLabelConfig(stage)
+    const syncedStage = syncedStages.find((item) => item.id === stage.id)
     setEditing({
       id: stage.id,
       trLabel: labels.trLabel,
       enLabel: labels.enLabel,
       color: stage.color,
+      contactStageKey: syncedStage?.contactStageKey ?? 'new',
     })
+  }
+
+  const getDefaultContactStageKey = (): ContactStageKey => {
+    const usedKeys = new Set(syncedStages.map((stage) => stage.contactStageKey))
+    return CONTACT_STAGE_KEYS.find((key) => !usedKeys.has(key)) ?? 'lost'
   }
 
   const handleSave = async () => {
@@ -138,9 +157,15 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
     const description = serializeStageLabelConfig({
       trLabel: trLabel || primaryLabel,
       enLabel: enLabel || primaryLabel,
+      contactStageKey: editing.contactStageKey,
     })
 
     if (editing.id === null) {
+      if (!canCreateStage) {
+        toast.error(t('pipeline.stage.limitReached'))
+        return
+      }
+
       const created = await createStage.mutateAsync({
         user_id: userId,
         name: primaryLabel,
@@ -149,6 +174,8 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
         color: editing.color,
         position: localStages.length,
         win_probability: 50,
+        is_won_stage: editing.contactStageKey === 'joined',
+        is_lost_stage: editing.contactStageKey === 'lost',
       })
       setLocalStages((current) => [...current, created].sort((a, b) => a.position - b.position))
     } else {
@@ -158,6 +185,8 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
           name: primaryLabel,
           description,
           color: editing.color,
+          is_won_stage: editing.contactStageKey === 'joined',
+          is_lost_stage: editing.contactStageKey === 'lost',
         },
       })
       setLocalStages((current) => current.map((stage) => (stage.id === updated.id ? updated : stage)).sort((a, b) => a.position - b.position))
@@ -167,6 +196,11 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
   }
 
   const handleDelete = async (id: string) => {
+    if (localStages.length <= 1) {
+      toast.error(t('pipeline.stage.minReached'))
+      return
+    }
+
     if (!confirm(t('pipeline.stage.deleteConfirm'))) return
     await deleteStage.mutateAsync(id)
     setLocalStages((current) => current.filter((stage) => stage.id !== id))
@@ -241,15 +275,17 @@ export function ManageStagesModal({ open, onClose, userId, stages }: Props) {
               variant="outline"
               size="sm"
               className="w-full gap-1.5"
+              disabled={!canCreateStage}
               onClick={() => setEditing({
                 id: null,
                 trLabel: '',
                 enLabel: '',
                 color: getRandomReadableStageColor(localStages.length),
+                contactStageKey: getDefaultContactStageKey(),
               })}
             >
               <Plus className="w-4 h-4" />
-              {t('pipeline.stage.new')}
+              {canCreateStage ? t('pipeline.stage.new') : t('pipeline.stage.limitReached')}
             </Button>
           )}
         </div>

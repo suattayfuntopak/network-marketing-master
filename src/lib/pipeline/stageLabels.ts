@@ -26,13 +26,14 @@ const BUILT_IN_STAGE_SLUGS = new Set([
 export interface StageLabelConfig {
   trLabel?: string
   enLabel?: string
+  contactStageKey?: ContactStageKey
 }
 
 export interface SyncedPipelineStage extends PipelineStage {
   contactStageKey: ContactStageKey
 }
 
-const LEGACY_STAGE_LABELS: Record<string, Required<StageLabelConfig>> = {
+const LEGACY_STAGE_LABELS: Record<string, { trLabel: string; enLabel: string }> = {
   'new': { trLabel: 'Yeni Aday', enLabel: 'New Prospect' },
   'contacted': { trLabel: 'İletişim Kuruldu', enLabel: 'Contacted' },
   'interested': { trLabel: 'İlgileniyor', enLabel: 'Interested' },
@@ -59,6 +60,9 @@ export function parseStageLabelConfig(description?: string | null): StageLabelCo
       return {
         trLabel: typeof parsed.trLabel === 'string' ? parsed.trLabel : undefined,
         enLabel: typeof parsed.enLabel === 'string' ? parsed.enLabel : undefined,
+        contactStageKey: CONTACT_STAGE_KEYS.includes(parsed.contactStageKey as ContactStageKey)
+          ? (parsed.contactStageKey as ContactStageKey)
+          : undefined,
       }
     }
   } catch {
@@ -72,6 +76,7 @@ export function serializeStageLabelConfig(labels: StageLabelConfig): string {
   return JSON.stringify({
     trLabel: labels.trLabel?.trim() || '',
     enLabel: labels.enLabel?.trim() || '',
+    ...(labels.contactStageKey ? { contactStageKey: labels.contactStageKey } : {}),
   })
 }
 
@@ -93,14 +98,63 @@ function getLegacyStageLabels(stage: Pick<PipelineStage, 'name' | 'slug'>): Stag
   return LEGACY_STAGE_LABELS[stage.slug] || LEGACY_STAGE_LABELS[slugifyStageLabel(stage.name)] || {}
 }
 
+function inferContactStageKey(stage: Pick<PipelineStage, 'name' | 'slug' | 'description' | 'is_won_stage' | 'is_lost_stage'>): ContactStageKey | null {
+  const labels = parseStageLabelConfig(stage.description)
+  if (labels.contactStageKey && CONTACT_STAGE_KEYS.includes(labels.contactStageKey)) {
+    return labels.contactStageKey
+  }
+
+  if (stage.is_lost_stage) return 'lost'
+  if (stage.is_won_stage) return 'joined'
+
+  const normalizedSlug = slugifyStageLabel(stage.slug)
+  if (CONTACT_STAGE_KEYS.includes(normalizedSlug as ContactStageKey)) {
+    return normalizedSlug as ContactStageKey
+  }
+
+  const fromLegacy = LEGACY_STAGE_LABELS[stage.slug] || LEGACY_STAGE_LABELS[slugifyStageLabel(stage.name)]
+  if (!fromLegacy) return null
+
+  const matchedKey = (Object.entries(LEGACY_STAGE_LABELS).find(([, value]) =>
+    value.trLabel === fromLegacy.trLabel && value.enLabel === fromLegacy.enLabel
+  )?.[0] ?? '').trim()
+
+  if (CONTACT_STAGE_KEYS.includes(matchedKey as ContactStageKey)) {
+    return matchedKey as ContactStageKey
+  }
+
+  return null
+}
+
 export function getSyncedPipelineStages(stages: PipelineStage[]): SyncedPipelineStage[] {
-  return [...stages]
-    .sort((a, b) => a.position - b.position)
-    .slice(0, CONTACT_STAGE_KEYS.length)
-    .map((stage, index) => ({
-      ...stage,
-      contactStageKey: CONTACT_STAGE_KEYS[index],
-    }))
+  const sortedStages = [...stages].sort((a, b) => a.position - b.position)
+  const assignedKeys = new Set<ContactStageKey>()
+  const explicit = new Map<string, ContactStageKey>()
+
+  for (const stage of sortedStages) {
+    const key = inferContactStageKey(stage)
+    if (!key || assignedKeys.has(key)) continue
+    explicit.set(stage.id, key)
+    assignedKeys.add(key)
+  }
+
+  const remainingKeys = CONTACT_STAGE_KEYS.filter((key) => !assignedKeys.has(key))
+  const explicitStageIds = new Set(explicit.keys())
+  const selectedStages = [
+    ...sortedStages.filter((stage) => explicitStageIds.has(stage.id)),
+    ...sortedStages.filter((stage) => !explicitStageIds.has(stage.id)),
+  ].slice(0, CONTACT_STAGE_KEYS.length)
+
+  return selectedStages
+    .map((stage) => {
+      const explicitKey = explicit.get(stage.id)
+      const nextAvailableKey = remainingKeys.shift() ?? CONTACT_STAGE_KEYS[CONTACT_STAGE_KEYS.length - 1]
+
+      return {
+        ...stage,
+        contactStageKey: explicitKey ?? nextAvailableKey,
+      }
+    })
 }
 
 export function findSyncedStageByContactStage(
@@ -110,13 +164,18 @@ export function findSyncedStageByContactStage(
   return getSyncedPipelineStages(stages).find((stage) => stage.contactStageKey === contactStage) ?? null
 }
 
-export function getStageLabelConfig(stage: Pick<PipelineStage, 'name' | 'slug' | 'description'>): Required<StageLabelConfig> {
+export function getStageLabelConfig(stage: Pick<PipelineStage, 'name' | 'slug' | 'description'>): {
+  trLabel: string
+  enLabel: string
+  contactStageKey?: ContactStageKey
+} {
   const labels = parseStageLabelConfig(stage.description)
   const legacyLabels = getLegacyStageLabels(stage)
 
   return {
     trLabel: labels.trLabel?.trim() || legacyLabels.trLabel || stage.name,
     enLabel: labels.enLabel?.trim() || legacyLabels.enLabel || labels.trLabel?.trim() || legacyLabels.trLabel || stage.name,
+    contactStageKey: labels.contactStageKey,
   }
 }
 
