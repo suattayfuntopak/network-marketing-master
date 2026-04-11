@@ -479,6 +479,40 @@
   "dashboard": {
     "welcome": "Welcome, {{name}} 👋",
     "welcomeSubtitle": "Welcome to your Network Marketing Master dashboard.",
+    "onboarding": {
+      "label": "Getting Started",
+      "title": "{{name}}, let’s set the system up together",
+      "subtitle": "You should not have to guess where to begin. Once these four basics are in place, the product starts working much more naturally for you.",
+      "progressLabel": "Progress",
+      "done": "Done",
+      "pending": "Next",
+      "steps": {
+        "profile": {
+          "title": "Clarify your profile",
+          "body": "Your name and basic identity help the product feel more personal from the start.",
+          "action": "Complete Profile",
+          "hint": "As a first step, quickly review the settings area."
+        },
+        "first_contact": {
+          "title": "Add your first contact",
+          "body": "The system really starts working once you begin building rhythm with a real person.",
+          "action": "Add First Contact",
+          "hint": "Do not overthink it. Start with the most real person already on your mind today."
+        },
+        "first_follow_up": {
+          "title": "Create your first follow-up",
+          "body": "A contact without a next step disappears quickly. A small follow-up changes the whole flow.",
+          "action": "Plan First Follow-up",
+          "hint": "As soon as a follow-up appears on the calendar, the product can guide you much better."
+        },
+        "first_learning": {
+          "title": "Open one training resource",
+          "body": "The academy makes objection handling and message flow noticeably smarter.",
+          "action": "Open Academy",
+          "hint": "Even one resource can improve the quality of your next messages and follow-ups."
+        }
+      }
+    },
     "totalContacts": "Total Contacts",
     "activePipeline": "Active Pipeline",
     "weeklyMessages": "Weekly Messages",

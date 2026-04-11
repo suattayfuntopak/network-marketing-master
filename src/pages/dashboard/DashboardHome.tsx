@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next'
 import i18n from '@/i18n'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
+import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { BirthdayMessageDialog } from '@/components/dashboard/BirthdayMessageDialog'
@@ -21,10 +22,12 @@ import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
 import { buildDailyFocusSummary, type DailyFocusPriority } from '@/lib/dashboard/dailyFocus'
 import { buildFieldSupportTargets } from '@/lib/dashboard/fieldSupport'
+import { buildDashboardOnboarding } from '@/lib/dashboard/onboarding'
 import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import type { FollowUpActionType } from '@/lib/calendar/types'
 import type { AcademyContent, Objection } from '@/lib/academy/types'
 import type { BirthdayContact } from '@/lib/contacts/queries'
+import { getTodayAcademyReadCount } from '@/lib/academy/progress'
 
 const STAGE_DOT_COLORS: Record<string, string> = {
   new: 'bg-gray-400',
@@ -129,6 +132,7 @@ export function DashboardHome() {
   const visitSeed = useMemo(() => Date.now(), [])
   const [birthdayDialogContact, setBirthdayDialogContact] = useState<BirthdayContact | null>(null)
   const allContacts = contactsResult?.data ?? []
+  const academyTodayCount = getTodayAcademyReadCount()
 
   const dailyFocus = useMemo(
     () => buildDailyFocusSummary(allContacts, followUpBuckets),
@@ -254,6 +258,17 @@ export function DashboardHome() {
     return cards.slice(0, 3)
   }, [dailyFocus.recommendedMode, fieldSupportTargets.academy, fieldSupportTargets.objection, navigate, t])
 
+  const onboarding = useMemo(
+    () =>
+      buildDashboardOnboarding({
+        profileName: profile?.full_name,
+        contactCount,
+        followUpCount: followUpBuckets?.all.length ?? 0,
+        academyTodayCount,
+      }),
+    [academyTodayCount, contactCount, followUpBuckets?.all.length, profile?.full_name]
+  )
+
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
       {/* Welcome */}
@@ -265,6 +280,11 @@ export function DashboardHome() {
           {t('dashboard.welcomeSubtitle')}
         </p>
       </div>
+
+      <OnboardingChecklist
+        summary={onboarding}
+        firstName={profile?.full_name?.split(' ')[0] ?? null}
+      />
 
       <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
         <Card className="overflow-hidden border-primary/20 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.12),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_30%)]">
@@ -833,7 +853,7 @@ export function DashboardHome() {
       </div>
 
       {/* CTA (only when no contacts) */}
-      {contactCount === 0 && (
+      {contactCount === 0 && !onboarding.show && (
         <Card className="border-primary/20 bg-primary/5">
           <CardContent className="pt-6">
             <div className="flex items-start gap-4">

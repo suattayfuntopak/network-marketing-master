@@ -479,6 +479,40 @@
   "dashboard": {
     "welcome": "Hoş geldin, {{name}} 👋",
     "welcomeSubtitle": "Network Marketing Master kontrol panelinize hoş geldiniz.",
+    "onboarding": {
+      "label": "Başlangıç Akışı",
+      "title": "{{name}}, sistemi birlikte kuralım",
+      "subtitle": "İlk kullanımda nereden başlayacağını düşünmek zorunda kalma. En temel dört adımı tamamladığında ürün senin için çok daha akıcı çalışır.",
+      "progressLabel": "İlerleme",
+      "done": "Tamam",
+      "pending": "Sırada",
+      "steps": {
+        "profile": {
+          "title": "Profilini netleştir",
+          "body": "Adın ve temel kimliğin ürün içinde daha kişisel bir akış kurar.",
+          "action": "Profili Tamamla",
+          "hint": "İlk adım olarak ayarlar tarafını hızlıca gözden geçir."
+        },
+        "first_contact": {
+          "title": "İlk kontağını ekle",
+          "body": "Sistemin gerçekten çalışmaya başlaması için önce bir kişiyle ritim kur.",
+          "action": "İlk Kontağı Ekle",
+          "hint": "Çok düşünmeden, bugün aklında olan en gerçek kişiyle başla."
+        },
+        "first_follow_up": {
+          "title": "İlk takip planını kur",
+          "body": "Takipsiz kontak çabuk görünmez olur. Küçük bir sonraki adım bütün akışı değiştirir.",
+          "action": "İlk Takibi Planla",
+          "hint": "Takvimde bir takip görünür olduğu anda ürün seni daha iyi yönlendirmeye başlar."
+        },
+        "first_learning": {
+          "title": "Bir eğitim içeriği aç",
+          "body": "Akademi tarafı itiraz ve mesaj akışlarını daha akıllı hale getirir.",
+          "action": "Akademiye Git",
+          "hint": "İlk içerik bile sonraki mesaj ve takip kalitesini fark edilir biçimde artırır."
+        }
+      }
+    },
     "totalContacts": "Toplam Kontak",
     "activePipeline": "Aktif Süreç Takibi",
     "weeklyMessages": "Bu Haftaki Mesaj",
