@@ -733,6 +733,11 @@
     "newAppointment": "New Appointment",
     "newFollowUp": "New Follow-up",
     "emptyAgenda": "No events in this range",
+    "pulse": {
+      "stabilize": "{{count}} overdue follow-ups should be cleaned up first.",
+      "deliver": "{{count}} follow-ups are waiting for action today.",
+      "rhythm": "About {{coverage}}% of your active follow-up load currently has visible rhythm."
+    },
     "views": {
       "month": "Month",
       "week": "Week",
@@ -769,6 +774,36 @@
     "new": "New Follow-up",
     "edit": "Edit Follow-up",
     "summary": "{{count}} open follow-ups are waiting for you",
+    "planner": {
+      "label": "Follow-up Planner",
+      "subtitle": "Read your follow-up load through three simple signals: clear the risk first, finish today, then prepare what is coming next.",
+      "tones": {
+        "good": "Strong",
+        "watch": "Watch",
+        "risk": "Risk"
+      },
+      "cards": {
+        "stabilize": {
+          "title": "Stabilize First",
+          "body": "{{count}} overdue follow-ups are now at risk of cooling the conversation."
+        },
+        "deliver": {
+          "title": "Deliver Today",
+          "body": "{{count}} follow-ups are waiting for a visible touch today."
+        },
+        "prepare": {
+          "title": "Prepare What Is Next",
+          "body": "There are {{tomorrow}} follow-ups tomorrow and {{week}} more coming later this week."
+        }
+      },
+      "nextMoveLabel": "Direction For Today",
+      "nextMove": {
+        "stabilize": "Start by clearing overdue items. Adding new load before quiet conversations are stabilized can hurt rhythm further.",
+        "deliver": "Make today’s actions visible and complete. Short, clear follow-ups with a real next step will lighten the day.",
+        "prepare": "While the load is lighter, prepare tomorrow and the rest of the week. This is a good moment to simplify titles and next steps.",
+        "steady": "The follow-up load looks balanced. Keep the flow steady and make completed touches visible. Current coverage is about {{coverage}}%."
+      }
+    },
     "actionType": "Action Type",
     "actionTypes": {
       "call": "Call",

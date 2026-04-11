@@ -13,6 +13,9 @@ import {
   Send,
   Eye,
   MoreHorizontal,
+  ShieldAlert,
+  Zap,
+  CalendarClock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -22,6 +25,7 @@ import { FollowUpItem } from '@/components/calendar/FollowUpItem'
 import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { ROUTES } from '@/lib/constants'
 import { getLocale } from '@/lib/calendar/dateHelpers'
+import { buildFollowUpInsights } from '@/lib/calendar/followUpInsights'
 import type { FollowUpActionType, FollowUpWithContact } from '@/lib/calendar/types'
 
 type BucketKey = 'all' | 'today' | 'tomorrow' | 'thisWeek' | 'overdue' | 'completed'
@@ -54,6 +58,13 @@ export function FollowUpsPage() {
     () => (buckets?.all ?? []).filter((item) => item.status !== 'completed').length,
     [buckets]
   )
+  const insights = useMemo(() => buildFollowUpInsights(buckets), [buckets])
+
+  const SIGNAL_TONE_CLASSES = {
+    good: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
+    watch: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
+    risk: 'border-rose-500/20 bg-rose-500/10 text-rose-100',
+  } as const
 
   const tabConfig: { key: BucketKey; labelKey: string; danger?: boolean }[] = [
     { key: 'all', labelKey: 'followUps.buckets.all' },
@@ -125,6 +136,76 @@ export function FollowUpsPage() {
             </button>
           )
         })}
+      </div>
+
+      <div className="border-b px-4 py-4 shrink-0">
+        <div className="rounded-2xl border border-primary/15 bg-primary/5 p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary/80">
+                {t('followUps.planner.label')}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t('followUps.planner.subtitle')}
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-3">
+            {[
+              {
+                key: 'stabilize',
+                Icon: ShieldAlert,
+                value: insights.overdue,
+                tone: insights.tones.stabilize,
+                body: t('followUps.planner.cards.stabilize.body', { count: insights.overdue }),
+              },
+              {
+                key: 'deliver',
+                Icon: Zap,
+                value: insights.dueToday,
+                tone: insights.tones.deliver,
+                body: t('followUps.planner.cards.deliver.body', { count: insights.dueToday }),
+              },
+              {
+                key: 'prepare',
+                Icon: CalendarClock,
+                value: insights.dueTomorrow + insights.upcomingWeek,
+                tone: insights.tones.prepare,
+                body: t('followUps.planner.cards.prepare.body', {
+                  tomorrow: insights.dueTomorrow,
+                  week: insights.upcomingWeek,
+                }),
+              },
+            ].map(({ key, Icon, value, tone, body }) => (
+              <div key={key} className="rounded-2xl border border-border/70 bg-card/70 p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${SIGNAL_TONE_CLASSES[tone]}`}>
+                    {t(`followUps.planner.tones.${tone}`)}
+                  </span>
+                </div>
+                <p className="mt-4 text-sm font-semibold">{t(`followUps.planner.cards.${key}.title`)}</p>
+                <p className="mt-2 text-2xl font-bold">{value}</p>
+                <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-border/70 bg-card/50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              {t('followUps.planner.nextMoveLabel')}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              {t(`followUps.planner.nextMove.${insights.nextMove}`, {
+                coverage: insights.touchCoverage,
+                completed: insights.completed,
+              })}
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">

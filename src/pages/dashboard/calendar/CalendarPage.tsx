@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, Plus, Bell, CalendarDays, List, CalendarRange, Calendar } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Bell, CalendarDays, List, CalendarRange, Calendar, Activity, ShieldAlert, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
@@ -21,6 +21,7 @@ import {
 } from '@/lib/calendar/dateHelpers'
 import { startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays } from 'date-fns'
 import { ROUTES } from '@/lib/constants'
+import { buildFollowUpInsights } from '@/lib/calendar/followUpInsights'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
 
 type CalendarView = 'month' | 'week' | 'day' | 'agenda'
@@ -62,6 +63,27 @@ export function CalendarPage() {
 
   const { data: appointments = [] } = useAppointments(userId, from, to)
   const { data: followUps = [] } = useFollowUps(userId, ['pending', 'snoozed'])
+  const calendarFollowUpInsights = buildFollowUpInsights({
+    all: followUps,
+    today: followUps.filter((item) => {
+      const date = new Date(item.due_at)
+      const now = new Date()
+      return date.toDateString() === now.toDateString()
+    }),
+    tomorrow: followUps.filter((item) => {
+      const date = new Date(item.due_at)
+      const tomorrow = addDays(new Date(), 1)
+      return date.toDateString() === tomorrow.toDateString()
+    }),
+    thisWeek: followUps.filter((item) => {
+      const date = new Date(item.due_at).getTime()
+      const start = startOfWeek(new Date(), { weekStartsOn: 1 }).getTime()
+      const end = endOfWeek(new Date(), { weekStartsOn: 1 }).getTime()
+      return date >= start && date <= end
+    }),
+    overdue: followUps.filter((item) => new Date(item.due_at) < new Date()),
+    completed: [],
+  })
 
   // Poll for appointment reminders
   useAppointmentNotifications(appointments)
@@ -171,6 +193,42 @@ export function CalendarPage() {
             <span className="hidden sm:inline">{t('calendar.newAppointment')}</span>
           </Button>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 border-b px-4 py-3 md:grid-cols-3 shrink-0">
+        {[
+          {
+            key: 'stabilize',
+            Icon: ShieldAlert,
+            value: calendarFollowUpInsights.overdue,
+            hint: t('calendar.pulse.stabilize', { count: calendarFollowUpInsights.overdue }),
+          },
+          {
+            key: 'deliver',
+            Icon: Zap,
+            value: calendarFollowUpInsights.dueToday,
+            hint: t('calendar.pulse.deliver', { count: calendarFollowUpInsights.dueToday }),
+          },
+          {
+            key: 'rhythm',
+            Icon: Activity,
+            value: `${calendarFollowUpInsights.touchCoverage}%`,
+            hint: t('calendar.pulse.rhythm', { coverage: calendarFollowUpInsights.touchCoverage }),
+          },
+        ].map(({ key, Icon, value, hint }) => (
+          <div key={key} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </div>
+                <p className="text-sm font-semibold">{t(`followUps.planner.cards.${key}.title`)}</p>
+              </div>
+              <span className="text-lg font-semibold tabular-nums">{value}</span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
+          </div>
+        ))}
       </div>
 
       {/* Calendar body */}

@@ -733,6 +733,11 @@
     "newAppointment": "Yeni Randevu",
     "newFollowUp": "Yeni Takip",
     "emptyAgenda": "Bu aralıkta etkinlik yok",
+    "pulse": {
+      "stabilize": "{{count}} geciken takip önce temizlenmeli.",
+      "deliver": "{{count}} takip bugün aksiyon bekliyor.",
+      "rhythm": "Aktif takibin yaklaşık {{coverage}}% kadarında görünür ritim var."
+    },
     "views": {
       "month": "Ay",
       "week": "Hafta",
@@ -769,6 +774,36 @@
     "new": "Yeni Takip",
     "edit": "Takibi Düzenle",
     "summary": "{{count}} açık takip seni bekliyor",
+    "planner": {
+      "label": "Takip Planlayıcı",
+      "subtitle": "Takip yükünü üç basit sinyalde gör: önce riski temizle, sonra bugünü tamamla, ardından yaklaşan yükü hazırla.",
+      "tones": {
+        "good": "Sağlam",
+        "watch": "İzle",
+        "risk": "Risk"
+      },
+      "cards": {
+        "stabilize": {
+          "title": "Önce Stabilize Et",
+          "body": "{{count}} geciken takip şu an sıcaklığı düşürme riski taşıyor."
+        },
+        "deliver": {
+          "title": "Bugünü Tamamla",
+          "body": "{{count}} takip bugün görünür bir temas bekliyor."
+        },
+        "prepare": {
+          "title": "Yaklaşanı Hazırla",
+          "body": "Yarın {{tomorrow}} takip ve bu hafta ayrıca {{week}} yaklaşan aksiyon var."
+        }
+      },
+      "nextMoveLabel": "Bugünün Yönü",
+      "nextMove": {
+        "stabilize": "Önce gecikenleri temizle. Sessiz kalan konuşmalar toparlanmadan yeni yük eklemek ritmi daha da bozabilir.",
+        "deliver": "Bugünkü aksiyonları görünür şekilde tamamla. Kısa, net ve kapanışı olan temaslar günü hafifletir.",
+        "prepare": "Bugün yük hafifken yarın ve hafta içi yaklaşan takipleri netleştir. Başlıkları ve sonraki adımları şimdi sadeleştirmek iyi olur.",
+        "steady": "Takip yükü dengeli görünüyor. Günü düzenli akışla ilerletip tamamlananları görünür tutabilirsin. Şu anki kapsama yaklaşık {{coverage}}%."
+      }
+    },
     "actionType": "Aksiyon Türü",
     "actionTypes": {
       "call": "Ara",
