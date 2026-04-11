@@ -200,6 +200,9 @@ export function ContactFormPage() {
   const painPointsPlaceholder = isCustomerMode
     ? t('customers.form.placeholders.watchouts')
     : t('contacts.placeholders.painPoints')
+  const birthdayLabel = isCustomerMode ? t('customers.form.fields.lastPurchaseDate') : t('contacts.fields.birthday')
+  const childrenCountLabel = isCustomerMode ? t('customers.form.fields.reorderCycle') : t('contacts.fields.children')
+  const childrenCountPlaceholder = isCustomerMode ? t('customers.form.placeholders.reorderCycle') : undefined
 
   return (
     <div className="p-6 pb-20 lg:pb-6 max-w-2xl mx-auto space-y-6">
@@ -298,12 +301,18 @@ export function ContactFormPage() {
                 <Input id="relationship" {...register('relationship')} placeholder={relationshipPlaceholder} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="birthday">{t('contacts.fields.birthday')}</Label>
+                <Label htmlFor="birthday">{birthdayLabel}</Label>
                 <Input id="birthday" type="date" {...register('birthday')} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="children_count">{t('contacts.fields.children')}</Label>
-                <Input id="children_count" type="number" min={0} {...register('children_count')} />
+                <Label htmlFor="children_count">{childrenCountLabel}</Label>
+                <Input
+                  id="children_count"
+                  type="number"
+                  min={0}
+                  placeholder={childrenCountPlaceholder}
+                  {...register('children_count')}
+                />
               </div>
             </div>
           </TabsContent>

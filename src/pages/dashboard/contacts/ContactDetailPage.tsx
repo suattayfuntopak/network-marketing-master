@@ -124,6 +124,15 @@ export function ContactDetailPage() {
     ? resolveStageLabel(currentSyncedStage, t)
     : t(`contactStages.${contact.stage}`, { defaultValue: contact.stage })
   const coachCue = buildContactCoachCue(contact)
+  const lastPurchaseDate = isCustomer && contact.birthday ? new Date(contact.birthday) : null
+  const reorderWindowDays = isCustomer && typeof contact.children_count === 'number'
+    ? contact.children_count
+    : null
+  const reorderDueDate = lastPurchaseDate && reorderWindowDays !== null
+    ? addDays(lastPurchaseDate, reorderWindowDays)
+    : null
+  const recommendedProduct = isCustomer ? contact.goals?.[0] ?? null : null
+  const satisfactionNote = isCustomer ? contact.notes?.trim() ?? '' : ''
 
   const handleStageChange = async (newStage: string | null) => {
     if (!newStage || newStage === contact.stage) return
@@ -343,7 +352,7 @@ export function ContactDetailPage() {
                   <span>{contact.relationship}</span>
                 </div>
               )}
-              {contact.birthday && (
+              {contact.birthday && !isCustomer && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Calendar className="w-3.5 h-3.5 shrink-0" />
                   <span>{format(new Date(contact.birthday), 'd MMMM', { locale: dateLocale })}</span>
@@ -419,16 +428,76 @@ export function ContactDetailPage() {
 
         {/* RIGHT: Context */}
         <div className="space-y-4">
+          {isCustomer && (
+            <div className="rounded-lg border border-border bg-card p-4 space-y-4">
+              <div className="flex items-center gap-2">
+                <Briefcase className="w-4 h-4 text-primary" />
+                <p className="text-sm font-semibold">{t('customers.detail.summaryTitle')}</p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-1.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    {t('customers.detail.lastPurchase')}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {lastPurchaseDate
+                      ? format(lastPurchaseDate, 'd MMMM yyyy', { locale: dateLocale })
+                      : t('customers.detail.noLastPurchase')}
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-1.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    {t('customers.detail.reorderCycle')}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {reorderWindowDays !== null
+                      ? t('customers.detail.reorderCycleValue', { count: reorderWindowDays })
+                      : t('customers.detail.noReorderCycle')}
+                  </p>
+                  {reorderDueDate ? (
+                    <p className="text-xs text-muted-foreground">
+                      {t('customers.detail.reorderDue', {
+                        date: format(reorderDueDate, 'd MMMM yyyy', { locale: dateLocale }),
+                      })}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-1.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    {t('customers.detail.recommendedProduct')}
+                  </p>
+                  <p className="text-sm font-medium">
+                    {recommendedProduct || t('customers.detail.noRecommendedProduct')}
+                  </p>
+                </div>
+
+                <div className="rounded-lg border border-border/70 bg-muted/20 p-3 space-y-1.5">
+                  <p className="text-[11px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
+                    {t('customers.detail.satisfactionNote')}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {satisfactionNote || t('customers.detail.noSatisfactionNote')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* About */}
           {(contact.interests?.length || contact.goals?.length || contact.pain_points?.length) && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-3">
-              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.about')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">
+                {isCustomer ? t('customers.detail.aboutTitle') : t('contacts.detail.about')}
+              </p>
 
               {contact.interests && contact.interests.length > 0 && (
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Heart className="w-3.5 h-3.5 text-pink-500" />
-                    {t('contacts.detail.interests')}
+                    {isCustomer ? t('customers.form.fields.products') : t('contacts.detail.interests')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.interests.map((item) => (
@@ -442,7 +511,7 @@ export function ContactDetailPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Target className="w-3.5 h-3.5 text-emerald-500" />
-                    {t('contacts.detail.goals')}
+                    {isCustomer ? t('customers.form.fields.nextNeeds') : t('contacts.detail.goals')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.goals.map((item) => (
@@ -456,7 +525,7 @@ export function ContactDetailPage() {
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-1.5 text-xs font-medium">
                     <Frown className="w-3.5 h-3.5 text-red-500" />
-                    {t('contacts.detail.painPoints')}
+                    {isCustomer ? t('customers.form.fields.watchouts') : t('contacts.detail.painPoints')}
                   </div>
                   <div className="flex flex-wrap gap-1">
                     {contact.pain_points.map((item) => (
@@ -469,9 +538,11 @@ export function ContactDetailPage() {
           )}
 
           {/* Notes */}
-          {contact.notes && (
+          {contact.notes && !isCustomer && (
             <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.notes')}</p>
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">
+                {isCustomer ? t('customers.form.fields.notes') : t('contacts.detail.notes')}
+              </p>
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">{contact.notes}</p>
             </div>
           )}
