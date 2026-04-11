@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Copy, ExternalLink, RefreshCw, Check, BookmarkPlus } from 'lucide-react'
+import { Sparkles, Copy, RefreshCw, Check, BookmarkPlus, MessageCircle } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -325,11 +325,11 @@ export function AIMessageGeneratorModal({
                     </span>
                   </div>
                   <p className="text-sm whitespace-pre-wrap leading-relaxed">{v.message}</p>
-                  <div className="flex gap-2 flex-wrap">
+                  <div className="grid grid-cols-3 gap-2">
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-7 text-xs gap-1"
+                      className="h-8 text-xs gap-1.5 w-full"
                       onClick={() => handleCopy(v.message, idx)}
                     >
                       {copiedIdx === idx ? (
@@ -342,17 +342,18 @@ export function AIMessageGeneratorModal({
                       <Button
                         size="sm"
                         variant="outline"
-                        className="h-7 text-xs gap-1 text-green-600 border-green-600/30 hover:bg-green-50 dark:hover:bg-green-950"
+                        className="h-8 text-xs gap-1.5 w-full text-green-600 border-green-600/30 hover:bg-green-50 dark:hover:bg-green-950"
                         onClick={() => handleWhatsApp(v.message)}
                       >
-                        <ExternalLink className="w-3 h-3" />
-                        {t('messages.ai.openInWhatsapp')}
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        {t('messages.channels.whatsapp')}
                       </Button>
                     )}
+                    {!(channel === 'whatsapp' || channel === 'any') && <div />}
                     <Button
                       size="sm"
                       variant="outline"
-                      className="h-7 text-xs gap-1 text-amber-600 border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-950"
+                      className="h-8 text-xs gap-1.5 w-full text-amber-600 border-amber-500/30 hover:bg-amber-50 dark:hover:bg-amber-950"
                       onClick={() => {
                         setSavingTemplateIdx(savingTemplateIdx === idx ? null : idx)
                         setTemplateName('')
