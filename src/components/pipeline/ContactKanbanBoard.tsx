@@ -9,7 +9,6 @@ import {
   useSensor,
   useSensors,
   type DragEndEvent,
-  type DragOverEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
@@ -92,6 +91,25 @@ function mergeRecordsPreservingOrder(
   const newRecords = nextRecords.filter((record) => nextRecordMap.has(record.contact.id))
 
   return [...orderedRecords, ...newRecords]
+}
+
+function resolveTargetStageKey(
+  overId: string,
+  records: ContactProcessRecord[],
+  stages: SyncedPipelineStage[],
+  overData?: { stageKey?: ContactStageKey }
+): ContactStageKey | null {
+  const stageKeys = new Set(stages.map((stage) => stage.contactStageKey))
+
+  if (stageKeys.has(overId as ContactStageKey)) {
+    return overId as ContactStageKey
+  }
+
+  if (overData?.stageKey && stageKeys.has(overData.stageKey)) {
+    return overData.stageKey
+  }
+
+  return records.find((record) => record.contact.id === overId)?.stageKey ?? null
 }
 
 function ContactCard({
@@ -319,19 +337,6 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
     setActiveContactId(contactId)
   }
 
-  const handleDragOver = ({ active, over }: DragOverEvent) => {
-    if (!over) return
-
-    const contactId = (active.data.current?.contactId as string | undefined) ?? (active.id as string)
-    const targetStageKey = over.id as ContactStageKey
-
-    setLocalRecords((current) => {
-      const currentRecord = current.find((record) => record.contact.id === contactId)
-      if (!currentRecord || currentRecord.stageKey === targetStageKey) return current
-      return moveRecordToStageTop(current, contactId, targetStageKey)
-    })
-  }
-
   const handleDragEnd = async ({ active, over }: DragEndEvent) => {
     if (!over) {
       restoreDragSnapshot()
@@ -342,10 +347,15 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
 
     const contactId = (active.data.current?.contactId as string | undefined) ?? (active.id as string)
     const sourceStageKey = active.data.current?.stageKey as ContactStageKey | undefined
-    const targetStageKey = over.id as ContactStageKey
+    const targetStageKey = resolveTargetStageKey(
+      String(over.id),
+      localRecords,
+      stages,
+      over.data.current as { stageKey?: ContactStageKey } | undefined
+    )
     const currentRecord = localRecords.find((record) => record.contact.id === contactId)
 
-    if (!currentRecord || !sourceStageKey || sourceStageKey === targetStageKey) {
+    if (!currentRecord || !sourceStageKey || !targetStageKey || sourceStageKey === targetStageKey) {
       dragSnapshotRef.current = null
       resetDragState()
       return
@@ -372,7 +382,6 @@ export function ContactKanbanBoard({ stages, records, onMove }: ContactKanbanBoa
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragCancel={() => {
         restoreDragSnapshot()
         dragSnapshotRef.current = null

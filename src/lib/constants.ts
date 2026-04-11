@@ -24,7 +24,7 @@ export const ROUTES = {
 export const NAV_ITEMS = [
   { title: 'Pano', href: ROUTES.DASHBOARD, icon: 'LayoutDashboard' },
   { title: 'Kontaklar', href: ROUTES.CONTACTS, icon: 'Users' },
-  { title: 'Pipeline', href: ROUTES.PIPELINE, icon: 'GitMerge' },
+  { title: 'Süreç Takibi', href: ROUTES.PIPELINE, icon: 'GitMerge' },
   { title: 'Mesajlar', href: ROUTES.MESSAGES, icon: 'MessageSquare' },
   { title: 'Takvim', href: ROUTES.CALENDAR, icon: 'Calendar' },
   { title: 'Akademi', href: ROUTES.ACADEMY, icon: 'GraduationCap' },

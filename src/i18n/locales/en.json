@@ -426,7 +426,7 @@
     "signalBoard": {
       "title": "Pipeline Signals",
       "subtitle": "A calm decision layer that shows which flow needs your attention first today.",
-      "nextMoveLabel": "Today's Pipeline Direction",
+      "nextMoveLabel": "Today's Process Direction",
       "cards": {
         "risk": {
           "title": "Follow-up Risk",
@@ -597,6 +597,38 @@
     "noTodayAppointments": "No appointments today",
     "overdueFollowUps": "{{count}} overdue",
     "noOverdueFollowUps": "No overdue follow-ups",
+    "stats": {
+      "appointmentsHint": "Your planned meetings for today",
+      "followUpsHint": "{{count}} follow-ups are planned for today"
+    },
+    "stageSummary": {
+      "title": "Process Snapshot",
+      "hint": "Most crowded stage right now: {{stage}} ({{count}} people)",
+      "empty": "No one is visible in the process yet"
+    },
+    "priority": {
+      "title": "Today's Priority",
+      "subtitle": "See who matters first and move forward with one clean action.",
+      "primaryAction": "Open Main Action",
+      "openPipeline": "Open Pipeline"
+    },
+    "agenda": {
+      "title": "Today's Agenda",
+      "subtitle": "Keep appointments and follow-ups together in one card.",
+      "appointments": "Appointments",
+      "followUps": "Follow-ups",
+      "openFollowUps": "Open Follow-ups"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "subtitle": "Jump into the core flows you use most.",
+      "items": {
+        "contacts": "Add New Contact",
+        "pipeline": "Open Pipeline",
+        "calendar": "View Follow-ups",
+        "messages": "Open Messages"
+      }
+    },
     "academyNotes": "Academy Notes",
     "academyNotesHint": "Keep your pace with a short reminder from Academy or the objection bank.",
     "academyLesson": "Training Summary",

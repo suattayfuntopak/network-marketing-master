@@ -9,8 +9,10 @@ import i18n from '@/i18n'
 const SYSTEM_TAG_TRANSLATIONS: Record<string, { tr: string; en: string }> = {
   'VIP':            { tr: 'VIP',           en: 'VIP' },
   'Yakın Çevre':    { tr: 'Yakın Çevre',   en: 'Inner Circle' },
-  'Sıcak Lead':     { tr: 'Sıcak Lead',    en: 'Hot Lead' },
-  'Soğuk Lead':     { tr: 'Soğuk Lead',    en: 'Cold Lead' },
+  'Sıcak Lead':     { tr: 'Sıcak Aday',    en: 'Hot Lead' },
+  'Soğuk Lead':     { tr: 'Soğuk Aday',    en: 'Cold Lead' },
+  'Sıcak Aday':     { tr: 'Sıcak Aday',    en: 'Hot Lead' },
+  'Soğuk Aday':     { tr: 'Soğuk Aday',    en: 'Cold Lead' },
   'Ürün Odaklı':    { tr: 'Ürün Odaklı',   en: 'Product Focused' },
   'İş Odaklı':      { tr: 'İş Odaklı',     en: 'Business Focused' },
   'Takip Gerekli':  { tr: 'Takip Gerekli', en: 'Needs Follow-up' },

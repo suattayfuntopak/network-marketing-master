@@ -426,7 +426,7 @@
     "signalBoard": {
       "title": "Süreç Sinyalleri",
       "subtitle": "Board'a bakınca bugün önce hangi akışı sakinleştirmen gerektiğini gösterir.",
-      "nextMoveLabel": "Bugünün Pipeline Yönü",
+      "nextMoveLabel": "Bugünün Süreç Yönü",
       "cards": {
         "risk": {
           "title": "Takip Riski",
@@ -583,7 +583,7 @@
     "addedThisWeek": "Bu Hafta Eklenenler",
     "noContacts": "Henüz kontak yok",
     "activeContacts": "Aktif kontak",
-    "noPipeline": "Henüz pipeline yok",
+    "noPipeline": "Henüz süreç görünmüyor",
     "noMessages": "Henüz mesaj yok",
     "candidatesAddedThisWeek_one": "Bu hafta {{count}} aday eklendi",
     "candidatesAddedThisWeek_other": "Bu hafta {{count}} aday eklendi",
@@ -597,6 +597,38 @@
     "noTodayAppointments": "Bugün randevu yok",
     "overdueFollowUps": "{{count}} gecikmeli",
     "noOverdueFollowUps": "Gecikmiş takip yok",
+    "stats": {
+      "appointmentsHint": "Bugün planlı randevuların burada",
+      "followUpsHint": "Bugün için {{count}} takip planlı"
+    },
+    "stageSummary": {
+      "title": "Süreç Özeti",
+      "hint": "Şu an en yoğun aşama: {{stage}} ({{count}} kişi)",
+      "empty": "Henüz süreçte kişi görünmüyor"
+    },
+    "priority": {
+      "title": "Bugünün Önceliği",
+      "subtitle": "Önce kimi ele alacağını hızlıca gör ve tek bir aksiyonla ilerle.",
+      "primaryAction": "Ana Aksiyonu Aç",
+      "openPipeline": "Süreç Takibine Git"
+    },
+    "agenda": {
+      "title": "Bugünün Ajandası",
+      "subtitle": "Randevu ve takiplerini tek kartta toparla.",
+      "appointments": "Randevular",
+      "followUps": "Takipler",
+      "openFollowUps": "Takipleri Aç"
+    },
+    "quickActions": {
+      "title": "Hızlı İşlemler",
+      "subtitle": "Sık kullandığın ana akışlara tek tıkla git.",
+      "items": {
+        "contacts": "Yeni Kontak Ekle",
+        "pipeline": "Süreç Takibini Aç",
+        "calendar": "Takipleri Gör",
+        "messages": "Mesajlara Git"
+      }
+    },
     "academyNotes": "Akademi'den Notlar",
     "academyNotesHint": "Akademi veya itiraz bankasından kısa bir hatırlatma ile ritmini koru.",
     "academyLesson": "Eğitim Özeti",
@@ -855,7 +887,7 @@
     },
     "feedback": {
       "description": "Sahada hissettiğin eksikleri veya güzel çalışan noktaları kısa notlarla toparla. İstersen önce hazır şablonu doldur.",
-      "placeholder": "Örneğin: Mesajlar ekranında hızlı filtre daha görünür olabilir. Pipeline tarafındaki yeni sinyal alanı ise gerçekten karar vermemi kolaylaştırdı.",
+      "placeholder": "Örneğin: Mesajlar ekranında hızlı filtre daha görünür olabilir. Süreç takibi tarafındaki yeni özet alanı ise karar vermemi gerçekten hızlandırdı.",
       "templateTitle": "Geri Bildirim Taslağı",
       "templateAction": "Hazır Şablonu Kullan",
       "copyAction": "Taslağı Kopyala",
