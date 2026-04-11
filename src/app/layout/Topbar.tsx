@@ -51,6 +51,11 @@ export function Topbar() {
     i18n.changeLanguage(lang)
   }
 
+  const goToSettingsSection = (section?: string) => {
+    const search = section ? `?section=${section}` : ''
+    navigate(`${ROUTES.SETTINGS}${search}`)
+  }
+
   const today = new Date().toLocaleDateString(
     currentLang === 'tr' ? 'tr-TR' : 'en-US',
     { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
@@ -123,17 +128,16 @@ export function Topbar() {
 
             <DropdownMenuSeparator />
 
-            {/* Navigation items — disabled until pages are built */}
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem onClick={() => goToSettingsSection('profile')}>
                 <User className="w-4 h-4 mr-2" />
                 {t('profile.myProfile')}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem onClick={() => goToSettingsSection('settings')}>
                 <Settings className="w-4 h-4 mr-2" />
                 {t('profile.settings')}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem onClick={() => goToSettingsSection('notifications')}>
                 <Bell className="w-4 h-4 mr-2" />
                 {t('profile.notifications')}
               </DropdownMenuItem>
@@ -152,13 +156,12 @@ export function Topbar() {
 
             <DropdownMenuSeparator />
 
-            {/* Help — disabled until pages are built */}
             <DropdownMenuGroup>
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem onClick={() => goToSettingsSection('support')}>
                 <HelpCircle className="w-4 h-4 mr-2" />
                 {t('profile.help')}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled>
+              <DropdownMenuItem onClick={() => goToSettingsSection('feedback')}>
                 <MessageSquare className="w-4 h-4 mr-2" />
                 {t('profile.feedback')}
               </DropdownMenuItem>

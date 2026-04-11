@@ -798,6 +798,70 @@
     "account": "Hesap",
     "accountInfo": "Hesap silme ve güvenlik işlemleri için destek ile iletişime geçin.",
     "saved": "Profil güncellendi",
+    "sections": {
+      "profile": "Profil",
+      "settings": "Tercihler",
+      "notifications": "Bildirimler",
+      "support": "Destek",
+      "feedback": "Geri Bildirim"
+    },
+    "controlCenter": {
+      "title": "Hesap Kontrol Merkezi",
+      "subtitle": "Profil, tercih ve destek akışlarını tek yerden yönet.",
+      "nextLabel": "Şimdi En Faydalı Adım",
+      "nextMove": {
+        "profile": "Profil bilgilerini net tutmak ürünün sana daha kişisel görünmesini sağlar.",
+        "settings": "Dil ve temel tercihler oturduğunda sistem günlük kullanıma daha doğal akar.",
+        "notifications": "Bildirimleri açmak özellikle takip ve randevu ritmini görünür tutar.",
+        "support": "Takıldığın yerde ürün içinden doğru destek kapısına gitmek hız kazandırır.",
+        "feedback": "Kısa geri bildirimler ürünü gerçekten saha kullanımına yaklaştırır.",
+        "account": "Hesap alanı son güvenlik ve çıkış kontrol noktandır."
+      }
+    },
+    "notifications": {
+      "description": "Tarayıcı bildirimlerini açarsan yaklaşan randevu ve ritim hatırlatmaları seni daha az yükle yakalar.",
+      "enableAction": "Bildirimleri Aç",
+      "testAction": "Test Bildirimi Gönder",
+      "enabled": "Bildirim izni etkinleştirildi",
+      "denied": "Tarayıcı bildirimleri engellenmiş görünüyor. Tarayıcı ayarlarından izin vermen gerekebilir.",
+      "unavailable": "Bu cihaz veya tarayıcı bildirim desteği sunmuyor.",
+      "enableFirst": "Önce bildirim iznini açman gerekiyor.",
+      "sent": "Test bildirimi gönderildi",
+      "ready": "Bildirimler hazır",
+      "testTitle": "Network Marketing Master",
+      "testBody": "Takip ve randevu ritmini görünür tutmak için bildirimlerin hazır.",
+      "status": {
+        "granted": "Aktif",
+        "denied": "Engellendi",
+        "default": "Hazır Değil"
+      }
+    },
+    "support": {
+      "description": "İhtiyacına göre doğru kapıya git. Eğitim, itiraz ve takip ritmi alanları sahada takıldığın yerleri en hızlı açan alanlar.",
+      "cards": {
+        "academy": {
+          "title": "Akademi Desteği",
+          "body": "Temel anlatım, ekip ritmi ve saha akışını tazelemek için eğitim tarafına git."
+        },
+        "objections": {
+          "title": "İtiraz Bankası",
+          "body": "Para, güven, zaman veya düşünme gibi en sık çekinceler için hazır akışı aç."
+        },
+        "followUps": {
+          "title": "Takip Ritmi",
+          "body": "Geciken ya da bugün bekleyen aksiyonları toparlayıp ritmi yeniden kur."
+        }
+      }
+    },
+    "feedback": {
+      "description": "Sahada hissettiğin eksikleri veya güzel çalışan noktaları kısa notlarla toparla. İstersen önce hazır şablonu doldur.",
+      "placeholder": "Örneğin: Mesajlar ekranında hızlı filtre daha görünür olabilir. Pipeline tarafındaki yeni sinyal alanı ise gerçekten karar vermemi kolaylaştırdı.",
+      "templateTitle": "Geri Bildirim Taslağı",
+      "templateAction": "Hazır Şablonu Kullan",
+      "copyAction": "Taslağı Kopyala",
+      "copied": "Geri bildirim taslağı panoya kopyalandı",
+      "template": "Ne yaptım?\n\nNerede zorlandım?\n\nNeresi gerçekten işimi hızlandırdı?\n\nNe daha sade olabilir?\n\nSahada en çok hangi ekranı kullanıyorum?"
+    },
     "roles": {
       "distributor": "Distribütör",
       "leader": "Lider",

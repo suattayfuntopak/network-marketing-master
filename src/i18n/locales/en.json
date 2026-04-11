@@ -798,6 +798,70 @@
     "account": "Account",
     "accountInfo": "For account deletion and security, please contact support.",
     "saved": "Profile updated",
+    "sections": {
+      "profile": "Profile",
+      "settings": "Preferences",
+      "notifications": "Notifications",
+      "support": "Support",
+      "feedback": "Feedback"
+    },
+    "controlCenter": {
+      "title": "Account Control Center",
+      "subtitle": "Manage profile, preferences, and support flows from one place.",
+      "nextLabel": "Most Useful Next Step",
+      "nextMove": {
+        "profile": "Keeping your profile clear helps the product feel more personal everywhere.",
+        "settings": "Once language and base preferences are in place, daily use feels much more natural.",
+        "notifications": "Turning on notifications helps keep follow-up and appointment rhythm visible.",
+        "support": "Going to the right support door inside the product saves momentum when you get stuck.",
+        "feedback": "Short feedback notes are one of the fastest ways to make the product more field-ready.",
+        "account": "This is your final checkpoint for sign-out and account safety."
+      }
+    },
+    "notifications": {
+      "description": "If you enable browser notifications, upcoming appointments and rhythm reminders can reach you with less mental load.",
+      "enableAction": "Enable Notifications",
+      "testAction": "Send Test Notification",
+      "enabled": "Notification permission enabled",
+      "denied": "Browser notifications appear to be blocked. You may need to allow them in your browser settings.",
+      "unavailable": "This device or browser does not support notifications.",
+      "enableFirst": "You need to enable notifications first.",
+      "sent": "Test notification sent",
+      "ready": "Notifications are ready",
+      "testTitle": "Network Marketing Master",
+      "testBody": "Your notifications are ready to help keep follow-up and appointment rhythm visible.",
+      "status": {
+        "granted": "Active",
+        "denied": "Blocked",
+        "default": "Not Ready"
+      }
+    },
+    "support": {
+      "description": "Use the right support door for the job. Training, objections, and follow-up rhythm are usually the fastest ways to unblock field work.",
+      "cards": {
+        "academy": {
+          "title": "Academy Support",
+          "body": "Go to the training area to refresh your core explanation, team rhythm, and field execution."
+        },
+        "objections": {
+          "title": "Objection Bank",
+          "body": "Open the objection flow for money, trust, time, or “I need to think about it” moments."
+        },
+        "followUps": {
+          "title": "Follow-up Rhythm",
+          "body": "Clean up overdue or due-today actions and get your rhythm visible again."
+        }
+      }
+    },
+    "feedback": {
+      "description": "Capture what feels slow, what feels strong, and what would make the product simpler in the field. You can start from a ready-made template.",
+      "placeholder": "For example: The Messages screen could surface quick filters more clearly. The new signal area in Pipeline really helps me decide faster.",
+      "templateTitle": "Feedback Draft",
+      "templateAction": "Use Ready Template",
+      "copyAction": "Copy Draft",
+      "copied": "Feedback draft copied to clipboard",
+      "template": "What did I try?\n\nWhere did I feel friction?\n\nWhat clearly helped me move faster?\n\nWhat could be simpler?\n\nWhich screen do I use most in the field?"
+    },
     "roles": {
       "distributor": "Distributor",
       "leader": "Leader",
