@@ -20,6 +20,36 @@ function getCurrentLanguage() {
   return i18n.language?.startsWith('en') ? 'en' : 'tr'
 }
 
+function normalizeObjectionTitle(text: string) {
+  const trimmed = text.trim()
+  const stripped = trimmed.replace(/^[^:]{1,60}:\s*/, '').trim()
+
+  if (!stripped) return trimmed
+  return stripped.charAt(0).toUpperCase() + stripped.slice(1)
+}
+
+function normalizeObjection(item: Objection): Objection {
+  return {
+    ...item,
+    objection_text: normalizeObjectionTitle(item.objection_text),
+  }
+}
+
+function dedupeObjections(items: Objection[]) {
+  const unique = new Map<string, Objection>()
+
+  items.forEach((item) => {
+    const normalized = normalizeObjection(item)
+    const key = `${normalized.category}:${normalized.objection_text.trim().toLocaleLowerCase()}`
+
+    if (!unique.has(key)) {
+      unique.set(key, normalized)
+    }
+  })
+
+  return Array.from(unique.values())
+}
+
 function matchesObjectionFilters(item: Objection, filters?: ObjectionFilters) {
   const search = filters?.search?.trim().toLowerCase()
 
@@ -80,14 +110,15 @@ export async function fetchObjections(filters?: ObjectionFilters): Promise<Objec
 
   const dbItems = ((data as Objection[]) ?? []).filter((item) => !item.language || item.language === language)
 
-  return [...dbItems, ...systemItems]
+  return dedupeObjections([...dbItems, ...systemItems])
     .filter((item) => matchesObjectionFilters(item, filters))
     .sort((a, b) => a.category.localeCompare(b.category) || a.objection_text.localeCompare(b.objection_text))
 }
 
 export async function fetchObjection(id: string): Promise<Objection | null> {
   if (isSystemObjectionId(id)) {
-    return getSystemObjection(id, getCurrentLanguage())
+    const item = getSystemObjection(id, getCurrentLanguage())
+    return item ? normalizeObjection(item) : null
   }
 
   const { data, error } = await supabase
@@ -97,7 +128,7 @@ export async function fetchObjection(id: string): Promise<Objection | null> {
     .single()
 
   if (error) throw error
-  return data as Objection
+  return normalizeObjection(data as Objection)
 }
 
 // ─── Academy content ──────────────────────────────────────────

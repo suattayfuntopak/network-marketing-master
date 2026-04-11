@@ -729,7 +729,7 @@ const CATEGORY_SUBJECTS_EN: CategorySubject[] = [
 const OBJECTION_BLUEPRINTS_TR: ObjectionBlueprint[] = [
   {
     suffix: 'core',
-    buildQuestion: (pack) => `${pack.shortLabel}: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} Önce sadece ${pack.nextMove.toLowerCase()} tarafını netleştirelim.`,
     buildResponse: (pack) => `${pack.reframe}
 
@@ -748,7 +748,7 @@ Sen: ${pack.softQuestion}`,
   },
   {
     suffix: 'identity',
-    buildQuestion: (pack) => `Bana göre değil gibi: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} Bu iş herkese aynı kalıpla yürümez; sana uygun ${pack.nextMove.toLowerCase()} bulmak daha önemli.`,
     buildResponse: (pack) => `${pack.reframe}
 
@@ -767,7 +767,7 @@ Sen: ${pack.softQuestion}`,
   },
   {
     suffix: 'delay',
-    buildQuestion: (pack) => `Şimdilik dursun: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} Kararı büyütmek yerine ${pack.nextMove.toLowerCase()} küçültelim.`,
     buildResponse: (pack) => `${pack.reframe}
 
@@ -789,7 +789,7 @@ Sen: ${pack.softQuestion}`,
 const OBJECTION_BLUEPRINTS_EN: ObjectionBlueprint[] = [
   {
     suffix: 'core',
-    buildQuestion: (pack) => `${pack.shortLabel}: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} Let us first make ${pack.nextMove.toLowerCase()} clearer.`,
     buildResponse: (pack) => `${pack.reframe}
 
@@ -808,7 +808,7 @@ You: ${pack.softQuestion}`,
   },
   {
     suffix: 'identity',
-    buildQuestion: (pack) => `It may not be for me: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} This does not have to look the same for everyone; the real question is what ${pack.nextMove.toLowerCase()} would fit you.`,
     buildResponse: (pack) => `${pack.reframe}
 
@@ -827,7 +827,7 @@ You: ${pack.softQuestion}`,
   },
   {
     suffix: 'delay',
-    buildQuestion: (pack) => `Let me leave it for now: ${pack.rootFear}`,
+    buildQuestion: (pack) => pack.rootFear,
     buildShort: (pack) => `${pack.reframe} Instead of making the decision bigger, let us make ${pack.nextMove.toLowerCase()} smaller.`,
     buildResponse: (pack) => `${pack.reframe}
 

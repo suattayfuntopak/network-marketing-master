@@ -138,7 +138,8 @@ export function AcademyContentDetailPage() {
   }
 
   return (
-    <div className="p-6 pb-20 lg:pb-6 space-y-6">
+    <div className="p-6 pb-20 lg:pb-6">
+      <div className="mx-auto max-w-6xl space-y-6">
       {/* Geri + aksiyonlar */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="sm" onClick={() => navigate(ROUTES.ACADEMY)} className="gap-2">
@@ -160,7 +161,8 @@ export function AcademyContentDetailPage() {
       </div>
 
       {/* Meta */}
-      <div className="space-y-3 max-w-3xl">
+      <div className="max-w-5xl rounded-[28px] border border-border/70 bg-card/55 p-6 md:p-8 lg:p-10">
+        <div className="space-y-4">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">
             {t(`academy.categories.${content.category}`)}
@@ -177,7 +179,7 @@ export function AcademyContentDetailPage() {
         </div>
 
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-2xl font-bold leading-tight">{content.title}</h1>
+          <h1 className="text-3xl font-bold leading-tight text-balance">{content.title}</h1>
           <button
             onClick={() => {
               if (!canToggleFavorite) return
@@ -197,7 +199,7 @@ export function AcademyContentDetailPage() {
         </div>
 
         {content.summary && (
-          <p className="text-muted-foreground text-sm leading-relaxed">{content.summary}</p>
+          <p className="max-w-4xl text-base leading-8 text-justify text-muted-foreground">{content.summary}</p>
         )}
 
         <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -215,10 +217,11 @@ export function AcademyContentDetailPage() {
           )}
         </div>
       </div>
+      </div>
 
       {/* Video */}
       {content.video_url && (
-        <div className="aspect-video max-w-3xl rounded-lg overflow-hidden border">
+        <div className="aspect-video max-w-5xl rounded-[24px] overflow-hidden border border-border/70 bg-card">
           <iframe
             src={content.video_url}
             className="w-full h-full"
@@ -230,37 +233,41 @@ export function AcademyContentDetailPage() {
 
       {/* İçerik */}
       {content.content && (
-        <div className="max-w-3xl space-y-1">
+        <div className="max-w-5xl rounded-[28px] border border-border/70 bg-card/45 p-6 md:p-8 lg:p-10">
+          <div className="space-y-2">
           {content.content.split('\n').map((line, i) => {
-            if (line.startsWith('## ')) return <h2 key={i} className="text-lg font-bold mt-6 mb-3">{line.slice(3)}</h2>
-            if (line.startsWith('### ')) return <h3 key={i} className="text-base font-semibold mt-4 mb-2">{line.slice(4)}</h3>
+            if (line.startsWith('## ')) return <h2 key={i} className="pt-4 text-2xl font-bold tracking-tight">{line.slice(3)}</h2>
+            if (line.startsWith('### ')) return <h3 key={i} className="pt-2 text-lg font-semibold">{line.slice(4)}</h3>
             if (line.startsWith('- ')) {
               return (
-                <div key={i} className="flex gap-2 text-sm">
-                  <span className="text-primary mt-0.5">•</span>
+                <div key={i} className="grid grid-cols-[auto_1fr] gap-3 text-[15px] leading-8 text-justify">
+                  <span className="mt-1 text-primary">•</span>
                   <span dangerouslySetInnerHTML={{ __html: line.slice(2).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
                 </div>
               )
             }
-            if (line.startsWith('❌ ') || line.startsWith('✅ ')) return <p key={i} className="text-sm">{line}</p>
-            if (line.startsWith('---')) return <hr key={i} className="my-4" />
-            if (line === '') return <div key={i} className="h-2" />
+            if (line.startsWith('❌ ') || line.startsWith('✅ ')) return <p key={i} className="text-[15px] leading-8 text-justify">{line}</p>
+            if (line.startsWith('---')) return <hr key={i} className="my-5 border-border/70" />
+            if (line === '') return <div key={i} className="h-3" />
             return (
-              <p key={i} className="text-sm leading-relaxed"
+              <p key={i} className="text-[15px] leading-8 text-justify text-foreground/95"
                 dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
             )
           })}
+          </div>
         </div>
       )}
 
       {/* Etiketler */}
       {content.tags && content.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 pt-2 border-t max-w-3xl">
+        <div className="max-w-5xl rounded-[24px] border border-border/70 bg-card/35 p-5">
+          <div className="flex flex-wrap gap-2">
           {content.tags.map((tag) => (
-            <span key={tag} className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+            <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-muted text-muted-foreground">
               #{tag}
             </span>
           ))}
+          </div>
         </div>
       )}
 
@@ -355,6 +362,7 @@ export function AcademyContentDetailPage() {
           </div>
         </DialogContent>
       </Dialog>
+      </div>
     </div>
   )
 }
