@@ -114,11 +114,41 @@
     "total": "{{count}} kontak",
     "selected": "{{count}} kontak seçildi",
     "clearFilters": "Filtreleri Temizle",
+    "empty": {
+      "title": "İlk kontak listen burada şekillenecek",
+      "body": "İlk birkaç kişiyi eklediğinde sistem sıcaklık, ritim ve sonraki adım sinyallerini burada göstermeye başlayacak.",
+      "filteredBody": "Bu filtrelerle eşleşen kişi görünmüyor. Filtreleri yumuşatıp tekrar bakmak daha iyi sonuç verebilir."
+    },
     "viewCard": "Kart görünümü",
     "viewTable": "Tablo görünümü",
     "exporting": "Dışa aktarıldı",
     "exportCount": "{{count}} kontak dışa aktarıldı",
     "importSuccess": "Kontaklar başarıyla içe aktarıldı",
+    "signalBoard": {
+      "title": "Kontak Sinyalleri",
+      "subtitle": "Listeyi kalabalıklaştırmadan bugün önce nereyi toparlaman gerektiğini gösterir.",
+      "nextMoveLabel": "Bugünün Kontak Yönü",
+      "cards": {
+        "followUps": {
+          "title": "Önce Dön",
+          "body": "{{count}} kişi geri dönüş ritmi bekliyor. Önce geciken ya da bugünkü takipleri toparlamak iyi olur."
+        },
+        "warm": {
+          "title": "İlerlet",
+          "body": "{{count}} kişi sıcak bölgede. Uzun anlatım yerine tek bir sonraki adımı netleştirmek daha iyi çalışır."
+        },
+        "reactivate": {
+          "title": "Yeniden Isıt",
+          "body": "{{count}} kişi sessize düşmüş görünüyor. Baskısız kısa bir hatırlatma ile tekrar görünmek iyi gelir."
+        }
+      },
+      "nextMove": {
+        "stabilize": "Önce ritmi stabilize et. Şu anda {{dueNow}} takip gecikmiş ya da bugün için bekliyor; sıcak fırsatlara geçmeden bunları temizlemek akışı sakinleştirir.",
+        "advance": "Şu anda ilerletme penceresi açık. {{warmWindow}} sıcak kişi varken karar istemek yerine tek bir sonraki adımı netleştirmek daha iyi sonuç verir.",
+        "reactivate": "Liste sessizleşmiş görünüyor. {{reactivationPool}} kişi yeniden ısıtma havuzunda; kısa, doğal ve baskısız dönüş mesajlarıyla ritmi geri çağır.",
+        "build": "Liste temiz görünüyor. Şimdi yeni temas açmak ve ilk sıcaklığı kurmak için {{freshProspects}} taze kişiyi küçük davetlerle hareketlendirmek en doğru adım."
+      }
+    },
     "columns": {
       "name": "İsim",
       "channels": "Kanallar",

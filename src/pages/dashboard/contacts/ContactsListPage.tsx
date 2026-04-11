@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Upload, Download, LayoutGrid, LayoutList, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Upload, Download, LayoutGrid, LayoutList, ChevronLeft, ChevronRight, Clock3, Flame, RefreshCcw } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ContactSearchBar } from '@/components/contacts/ContactSearchBar'
 import { ContactFilters } from '@/components/contacts/ContactFilters'
 import { ContactTable } from '@/components/contacts/ContactTable'
@@ -22,7 +23,8 @@ import { contactKeys } from '@/hooks/useContacts'
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { PAGE_SIZE } from '@/lib/contacts/constants'
-import type { SortField } from '@/lib/contacts/types'
+import { buildContactInsightSummary } from '@/lib/contacts/contactInsights'
+import { DEFAULT_SORT, type SortField } from '@/lib/contacts/types'
 
 export function ContactsListPage() {
   const navigate = useNavigate()
@@ -45,14 +47,32 @@ export function ContactsListPage() {
     pageSize: PAGE_SIZE,
     userId,
   })
+  const { data: insightData } = useContacts({
+    filters,
+    sort: DEFAULT_SORT,
+    page: 1,
+    pageSize: 500,
+    userId,
+  })
 
   const { data: tags = [] } = useTags(userId)
   const archiveMutation = useArchiveContact()
   const deleteMutation = useDeleteContact()
 
   const contacts = data?.data ?? []
+  const insightContacts = insightData?.data ?? contacts
   const totalPages = data?.totalPages ?? 1
   const totalCount = data?.count ?? 0
+  const contactInsights = useMemo(
+    () => buildContactInsightSummary(insightContacts),
+    [insightContacts]
+  )
+
+  const SIGNAL_TONE_CLASSES = {
+    blue: 'border-blue-500/20 bg-blue-500/10 text-blue-100',
+    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
+    emerald: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
+  } as const
 
   // Sort toggle
   const handleSort = (field: SortField) => {
@@ -215,6 +235,75 @@ export function ContactsListPage() {
         </div>
       </div>
 
+      {!isLoading && !isError && totalCount > 0 && (
+        <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_30%)]">
+          <CardHeader>
+            <CardTitle className="text-base">{t('contacts.signalBoard.title')}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t('contacts.signalBoard.subtitle')}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-3">
+              {[
+                {
+                  key: 'followUps',
+                  Icon: Clock3,
+                  value: contactInsights.dueNow,
+                  tone: 'blue' as const,
+                  body: t('contacts.signalBoard.cards.followUps.body', {
+                    count: contactInsights.dueNow,
+                  }),
+                },
+                {
+                  key: 'warm',
+                  Icon: Flame,
+                  value: contactInsights.warmWindow,
+                  tone: 'amber' as const,
+                  body: t('contacts.signalBoard.cards.warm.body', {
+                    count: contactInsights.warmWindow,
+                  }),
+                },
+                {
+                  key: 'reactivate',
+                  Icon: RefreshCcw,
+                  value: contactInsights.reactivationPool,
+                  tone: 'emerald' as const,
+                  body: t('contacts.signalBoard.cards.reactivate.body', {
+                    count: contactInsights.reactivationPool,
+                  }),
+                },
+              ].map(({ key, Icon, value, tone, body }) => (
+                <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${SIGNAL_TONE_CLASSES[tone]}`}>
+                      {t(`contacts.signalBoard.cards.${key}.title`)}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-2xl font-bold">{value}</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('contacts.signalBoard.nextMoveLabel')}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t(`contacts.signalBoard.nextMove.${contactInsights.focus}`, {
+                  dueNow: contactInsights.dueNow,
+                  warmWindow: contactInsights.warmWindow,
+                  reactivationPool: contactInsights.reactivationPool,
+                  freshProspects: contactInsights.freshProspects,
+                })}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Bulk actions */}
       {selectedIds.length > 0 && (
         <BulkActionsBar
@@ -281,21 +370,32 @@ export function ContactsListPage() {
           <p className="text-red-500/80 mt-2">{t('contacts.connectionErrorHint')}</p>
         </div>
       ) : contacts.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-12 text-center">
-          <p className="text-muted-foreground text-sm mb-3">
-            {hasActiveFilters ? t('contacts.noResults') : t('contacts.noContacts')}
+        <div className="rounded-2xl border border-dashed border-border/80 bg-card/30 p-12 text-center">
+          <p className="text-base font-semibold">
+            {hasActiveFilters ? t('contacts.noResults') : t('contacts.empty.title')}
           </p>
-          {!hasActiveFilters && (
-            <Button onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)} className="gap-1.5">
-              <Plus className="w-4 h-4" />
-              {t('contacts.addFirst')}
-            </Button>
-          )}
-          {hasActiveFilters && (
-            <Button variant="outline" onClick={resetFilters}>
-              {t('contacts.clearFilters')}
-            </Button>
-          )}
+          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
+            {hasActiveFilters ? t('contacts.empty.filteredBody') : t('contacts.empty.body')}
+          </p>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            {!hasActiveFilters && (
+              <>
+                <Button onClick={() => navigate(`${ROUTES.CONTACTS}/yeni`)} className="gap-1.5">
+                  <Plus className="w-4 h-4" />
+                  {t('contacts.addFirst')}
+                </Button>
+                <Button variant="outline" onClick={() => setShowImport(true)} className="gap-1.5">
+                  <Upload className="w-4 h-4" />
+                  {t('common.import')}
+                </Button>
+              </>
+            )}
+            {hasActiveFilters && (
+              <Button variant="outline" onClick={resetFilters}>
+                {t('contacts.clearFilters')}
+              </Button>
+            )}
+          </div>
         </div>
       ) : viewMode === 'table' ? (
         <ContactTable

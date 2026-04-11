@@ -114,11 +114,41 @@
     "total": "{{count}} contacts",
     "selected": "{{count}} contacts selected",
     "clearFilters": "Clear Filters",
+    "empty": {
+      "title": "Your first contact list starts here",
+      "body": "Once you add your first few people, the system will begin showing warmth, rhythm, and next-step signals here.",
+      "filteredBody": "Nothing is showing for these filters right now. Loosening the filters a bit may reveal the right people."
+    },
     "viewCard": "Card view",
     "viewTable": "Table view",
     "exporting": "Exported",
     "exportCount": "{{count}} contacts exported",
     "importSuccess": "Contacts imported successfully",
+    "signalBoard": {
+      "title": "Contact Signals",
+      "subtitle": "A light decision layer that shows where your attention should go first today.",
+      "nextMoveLabel": "Today's Contact Direction",
+      "cards": {
+        "followUps": {
+          "title": "Stabilize",
+          "body": "{{count}} people are waiting on rhythm. Clearing overdue or due-today follow-ups first will steady the board."
+        },
+        "warm": {
+          "title": "Advance",
+          "body": "{{count}} people are in the warm zone. A single clear next step will work better than a longer explanation."
+        },
+        "reactivate": {
+          "title": "Reopen",
+          "body": "{{count}} people have gone quiet. A short, low-pressure touch can bring them back into motion."
+        }
+      },
+      "nextMove": {
+        "stabilize": "Stabilize the list first. {{dueNow}} follow-ups are overdue or due today, so clearing those before chasing warm opportunities will calm the flow.",
+        "advance": "The advancement window is open. With {{warmWindow}} warm people in play, clarifying one next step will work better than pushing for a decision.",
+        "reactivate": "The list has gone a bit quiet. {{reactivationPool}} people are ready for reactivation, so low-pressure check-ins are the best move right now.",
+        "build": "The list looks clean. This is a good moment to build fresh momentum by moving {{freshProspects}} newer contacts with short invites."
+      }
+    },
     "columns": {
       "name": "Name",
       "channels": "Channels",
