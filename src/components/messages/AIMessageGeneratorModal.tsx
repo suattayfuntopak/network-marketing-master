@@ -1,8 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles, Copy, RefreshCw, Check, BookmarkPlus, MessageCircle } from 'lucide-react'
+import { Sparkles, Copy, RefreshCw, Check, BookmarkPlus, MessageCircle, Mail, Send } from 'lucide-react'
+import { SiInstagram, SiTelegram, SiWhatsapp } from 'react-icons/si'
+import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -31,6 +39,13 @@ interface Props {
   initialTone?: MessageTone
   presetLabel?: string | null
   presetReason?: string | null
+  deliveryMode?: 'default' | 'multi'
+}
+
+interface DeliveryChannel {
+  key: 'whatsapp' | 'telegram' | 'email' | 'instagram_dm' | 'sms'
+  icon: React.ElementType
+  title: string
 }
 
 export function AIMessageGeneratorModal({
@@ -42,6 +57,7 @@ export function AIMessageGeneratorModal({
   initialTone,
   presetLabel,
   presetReason,
+  deliveryMode = 'default',
 }: Props) {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -62,6 +78,42 @@ export function AIMessageGeneratorModal({
   const [savingTemplateIdx, setSavingTemplateIdx] = useState<number | null>(null)
   const [templateName, setTemplateName] = useState('')
   const [savedTemplateIdx, setSavedTemplateIdx] = useState<number | null>(null)
+
+  const buildWhatsAppLink = (message: string) => {
+    const source = contact?.whatsapp?.trim() || contact?.phone?.trim() || ''
+    const digits = source.replace(/\D/g, '')
+    if (digits) return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`
+    return `https://wa.me/?text=${encodeURIComponent(message)}`
+  }
+
+  const buildTelegramLink = () => {
+    const username = contact?.telegram?.trim().replace(/^@/, '')
+    return username ? `https://t.me/${username}` : null
+  }
+
+  const buildInstagramLink = () => {
+    const username = contact?.instagram?.trim().replace(/^@/, '')
+    return username ? `https://instagram.com/${username}` : null
+  }
+
+  const buildSmsLink = (message: string) => {
+    const number = contact?.phone?.trim()
+    if (!number) return null
+    const digits = number.replace(/\D/g, '')
+    return digits ? `sms:${digits}?body=${encodeURIComponent(message)}` : null
+  }
+
+  const deliveryChannels = useMemo<DeliveryChannel[]>(() => {
+    if (!contact) return []
+
+    return [
+      { key: 'whatsapp', icon: SiWhatsapp, title: 'WhatsApp' },
+      ...(contact.telegram ? [{ key: 'telegram', icon: SiTelegram, title: 'Telegram' }] : []),
+      ...(contact.email ? [{ key: 'email', icon: Mail, title: 'Email' }] : []),
+      ...(contact.instagram ? [{ key: 'instagram_dm', icon: SiInstagram, title: 'Instagram' }] : []),
+      ...(contact.phone ? [{ key: 'sms', icon: MessageCircle, title: 'SMS' }] : []),
+    ] as DeliveryChannel[]
+  }, [contact])
 
   useEffect(() => {
     if (!open) return
@@ -122,11 +174,47 @@ export function AIMessageGeneratorModal({
   }
 
   const handleWhatsApp = (message: string) => {
-    const phone = contact?.phone?.replace(/\D/g, '')
-    const url = phone
-      ? `https://wa.me/${phone}?text=${encodeURIComponent(message)}`
-      : `https://wa.me/?text=${encodeURIComponent(message)}`
-    window.open(url, '_blank')
+    window.open(buildWhatsAppLink(message), '_blank')
+  }
+
+  const handleSend = async (target: DeliveryChannel, message: string) => {
+    if (!contact) return
+
+    if (target.key === 'whatsapp') {
+      window.open(buildWhatsAppLink(message), '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    if (target.key === 'email' && contact.email) {
+      const href = `mailto:${contact.email}?body=${encodeURIComponent(message)}`
+      window.open(href, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    if (target.key === 'sms') {
+      const href = buildSmsLink(message)
+      if (href) window.open(href, '_blank', 'noopener,noreferrer')
+      return
+    }
+
+    if (target.key === 'telegram') {
+      const href = buildTelegramLink()
+      if (href) {
+        await navigator.clipboard.writeText(message)
+        toast.success(t('dashboard.messageCopiedForChannel', { channel: 'Telegram' }))
+        window.open(href, '_blank', 'noopener,noreferrer')
+      }
+      return
+    }
+
+    if (target.key === 'instagram_dm') {
+      const href = buildInstagramLink()
+      if (href) {
+        await navigator.clipboard.writeText(message)
+        toast.success(t('dashboard.messageCopiedForChannel', { channel: 'Instagram' }))
+        window.open(href, '_blank', 'noopener,noreferrer')
+      }
+    }
   }
 
   const handleRate = (feedback: 'great' | 'good' | 'meh' | 'bad') => {
@@ -338,7 +426,32 @@ export function AIMessageGeneratorModal({
                         <><Copy className="w-3 h-3" /> {t('messages.ai.copyToClipboard')}</>
                       )}
                     </Button>
-                    {(channel === 'whatsapp' || channel === 'any') && (
+                    {deliveryMode === 'multi' ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          disabled={deliveryChannels.length === 0}
+                          className="inline-flex h-8 w-full items-center justify-center gap-1.5 rounded-md border border-input bg-background px-3 text-xs font-medium shadow-xs transition-[color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground disabled:pointer-events-none disabled:opacity-50"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          {t('common.send')}
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="center" className="min-w-44">
+                          {deliveryChannels.map((target) => {
+                            const Icon = target.icon
+                            return (
+                              <DropdownMenuItem
+                                key={target.key}
+                                onClick={() => void handleSend(target, v.message)}
+                                className="gap-2"
+                              >
+                                <Icon className="h-4 w-4" />
+                                <span>{target.title}</span>
+                              </DropdownMenuItem>
+                            )
+                          })}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (channel === 'whatsapp' || channel === 'any') ? (
                       <Button
                         size="sm"
                         variant="outline"
@@ -348,8 +461,7 @@ export function AIMessageGeneratorModal({
                         <MessageCircle className="w-3.5 h-3.5" />
                         {t('messages.channels.whatsapp')}
                       </Button>
-                    )}
-                    {!(channel === 'whatsapp' || channel === 'any') && <div />}
+                    ) : <div />}
                     <Button
                       size="sm"
                       variant="outline"

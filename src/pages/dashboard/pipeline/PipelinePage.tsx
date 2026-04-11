@@ -44,7 +44,10 @@ export function PipelinePage() {
   const { data: followUps = [], isLoading: followUpsLoading } = useFollowUps(userId, 'pending')
   const updateContactStage = useUpdateContactStageById(userId)
 
-  const contacts = contactsResult?.data ?? []
+  const contacts = useMemo(
+    () => (contactsResult?.data ?? []).filter((contact) => contact.contact_type !== 'customer'),
+    [contactsResult?.data]
+  )
   const isLoading = stagesLoading || contactsLoading || appointmentsLoading || followUpsLoading
 
   const contactCount = contacts.length

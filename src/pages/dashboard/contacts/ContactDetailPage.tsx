@@ -107,6 +107,8 @@ export function ContactDetailPage() {
     )
   }
 
+  const isCustomer = contact.contact_type === 'customer'
+  const returnRoute = isCustomer ? ROUTES.PRODUCT_CUSTOMERS : ROUTES.CONTACTS
   const visibleInteractions = showAllInteractions ? interactions : interactions.slice(0, 10)
 
   const initials = contact.full_name
@@ -173,7 +175,7 @@ export function ContactDetailPage() {
     if (!confirm(t('contacts.deleteConfirm'))) return
     await deleteMutation.mutateAsync(id!)
     toast.success(t('contacts.deleted'))
-    navigate(ROUTES.CONTACTS)
+    navigate(returnRoute)
   }
 
   const handleTagToggle = async (tagId: string) => {
@@ -216,7 +218,7 @@ export function ContactDetailPage() {
     <div className="p-4 lg:p-6 pb-20 lg:pb-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => navigate(ROUTES.CONTACTS)}>
+        <Button variant="ghost" size="icon" onClick={() => navigate(returnRoute)}>
           <ArrowLeft className="w-4 h-4" />
         </Button>
         <h1 className="text-xl font-bold truncate flex-1">{contact.full_name}</h1>
@@ -232,7 +234,7 @@ export function ContactDetailPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => navigate(`${ROUTES.CONTACTS}/${id}/duzenle`)}
+            onClick={() => navigate(`${isCustomer ? ROUTES.PRODUCT_CUSTOMERS : ROUTES.CONTACTS}/${id}/duzenle`)}
             className="gap-1.5"
           >
             <Edit className="w-3.5 h-3.5" />
@@ -263,10 +265,12 @@ export function ContactDetailPage() {
             </div>
             <div>
               <h2 className="font-semibold text-lg">{contact.full_name}</h2>
-              {contact.nickname && (
+              {isCustomer ? (
+                <p className="text-sm text-muted-foreground">{t('customers.detail.productCustomer')}</p>
+              ) : contact.nickname ? (
                 <p className="text-sm text-muted-foreground">"{contact.nickname}"</p>
-              )}
-              {contact.occupation && (
+              ) : null}
+              {!isCustomer && contact.occupation && (
                 <p className="text-sm text-muted-foreground">{contact.occupation}</p>
               )}
             </div>
@@ -275,15 +279,17 @@ export function ContactDetailPage() {
             <WarmthScoreBar score={contact.warmth_score} />
 
             {/* Stage */}
-            <div className="flex items-center justify-center gap-2">
-              {currentSyncedStage ? (
-                <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary">
-                  {currentStageLabel}
-                </span>
-              ) : (
-                <StageBadge stage={contact.stage} />
-              )}
-            </div>
+            {!isCustomer && (
+              <div className="flex items-center justify-center gap-2">
+                {currentSyncedStage ? (
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary">
+                    {currentStageLabel}
+                  </span>
+                ) : (
+                  <StageBadge stage={contact.stage} />
+                )}
+              </div>
+            )}
 
             {/* Channel buttons */}
             <div className="flex justify-center">
@@ -303,21 +309,23 @@ export function ContactDetailPage() {
           </div>
 
           {/* Stage selector */}
-          <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-            <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.changeStage')}</p>
-            <Select value={contact.stage} onValueChange={handleStageChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue>{currentStageLabel}</SelectValue>
-              </SelectTrigger>
-              <SelectContent>
-                {syncedStages.map((stage) => (
-                  <SelectItem key={stage.id} value={stage.contactStageKey}>
-                    {resolveStageLabel(stage, t)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          {!isCustomer && (
+            <div className="rounded-lg border border-border bg-card p-4 space-y-2">
+              <p className="text-xs font-medium text-muted-foreground tracking-wide">{t('contacts.detail.changeStage')}</p>
+              <Select value={contact.stage} onValueChange={handleStageChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue>{currentStageLabel}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  {syncedStages.map((stage) => (
+                    <SelectItem key={stage.id} value={stage.contactStageKey}>
+                      {resolveStageLabel(stage, t)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Basic info */}
           <div className="rounded-lg border border-border bg-card p-4 space-y-2">
@@ -355,7 +363,7 @@ export function ContactDetailPage() {
               )}
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Briefcase className="w-3.5 h-3.5 shrink-0" />
-                <span>{t(`contactSources.${contact.source}`)} · {t(`contactTypes.${contact.contact_type}`)}</span>
+                <span>{t(`contactSources.${contact.source}`)} · {isCustomer ? t('customers.detail.productCustomer') : t(`contactTypes.${contact.contact_type}`)}</span>
               </div>
             </div>
           </div>
@@ -631,11 +639,22 @@ export function ContactDetailPage() {
         open={showAIModal}
         onClose={() => setShowAIModal(false)}
         contact={contact}
-        initialCategory={coachCue.messageCategory}
-        initialTone={coachCue.tone}
-        initialChannel="whatsapp"
-        presetLabel={t(`contacts.detail.coach.cues.${coachCue.key}.title`)}
-        presetReason={t(`contacts.detail.coach.cues.${coachCue.key}.body`)}
+        initialCategory={isCustomer ? 'follow_up' : coachCue.messageCategory}
+        initialTone={isCustomer ? 'friendly' : coachCue.tone}
+        initialChannel={isCustomer
+          ? (contact.whatsapp || contact.phone
+            ? 'whatsapp'
+            : contact.email
+              ? 'email'
+              : contact.telegram
+                ? 'telegram'
+                : contact.instagram
+                  ? 'instagram_dm'
+                  : 'sms')
+          : 'whatsapp'}
+        presetLabel={isCustomer ? t('customers.detail.messagePresetLabel') : t(`contacts.detail.coach.cues.${coachCue.key}.title`)}
+        presetReason={isCustomer ? t('customers.detail.messagePresetBody') : t(`contacts.detail.coach.cues.${coachCue.key}.body`)}
+        deliveryMode={isCustomer ? 'multi' : 'default'}
       />
 
       {/* Add Interaction Modal */}

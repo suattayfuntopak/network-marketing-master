@@ -1,12 +1,16 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Download, Package2, Plus, RefreshCw, Search } from 'lucide-react'
-import { startOfMonth } from 'date-fns'
+import { CalendarPlus, Download, MessageSquarePlus, Package2, Plus, Search } from 'lucide-react'
+import { startOfDay, startOfMonth, startOfWeek } from 'date-fns'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ChannelButtons } from '@/components/contacts/ChannelButtons'
+import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
+import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { useContacts } from '@/hooks/useContacts'
+import { useFollowUps } from '@/hooks/useCalendar'
 import { useAuth } from '@/hooks/useAuth'
 import { fetchContacts } from '@/lib/contacts/queries'
 import { exportContactsToCSV } from '@/lib/contacts/export'
@@ -32,6 +36,8 @@ export function ProductCustomersPage() {
   const userId = user?.id ?? ''
   const [search, setSearch] = useState('')
   const [exporting, setExporting] = useState(false)
+  const [followUpContact, setFollowUpContact] = useState<ContactWithTags | null>(null)
+  const [messageContact, setMessageContact] = useState<ContactWithTags | null>(null)
 
   const filters = useMemo(
     () => ({
@@ -65,25 +71,34 @@ export function ProductCustomersPage() {
     pageSize: 10000,
     userId,
   })
+  const { data: followUps = [] } = useFollowUps(userId, 'pending')
 
   const rows = data?.data ?? []
   const insightRows = insightData?.data ?? rows
 
   const metrics = useMemo(() => {
     const monthStart = startOfMonth(new Date())
-    const dueSoonThreshold = Date.now() + 14 * 24 * 60 * 60 * 1000
+    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
+    const todayStart = startOfDay(new Date())
 
     return {
       total: insightRows.length,
       month: insightRows.filter((contact) => new Date(contact.created_at) >= monthStart).length,
-      activeProducts: insightRows.filter((contact) => (contact.interests?.length ?? 0) > 0).length,
-      dueSoon: insightRows.filter((contact) => {
-        if (!contact.next_follow_up_at) return false
-        const nextTouch = new Date(contact.next_follow_up_at).getTime()
-        return nextTouch <= dueSoonThreshold
-      }).length,
+      week: insightRows.filter((contact) => new Date(contact.created_at) >= weekStart).length,
+      today: insightRows.filter((contact) => new Date(contact.created_at) >= todayStart).length,
     }
   }, [insightRows])
+
+  const nextFollowUps = useMemo(() => {
+    const nextByContact = new Map<string, string>()
+
+    followUps.forEach((item) => {
+      if (!item.contact_id || nextByContact.has(item.contact_id)) return
+      nextByContact.set(item.contact_id, item.due_at)
+    })
+
+    return nextByContact
+  }, [followUps])
 
   const handleExport = async () => {
     setExporting(true)
@@ -148,17 +163,17 @@ export function ProductCustomersPage() {
               icon: Plus,
             },
             {
-              key: 'activeProducts',
-              value: metrics.activeProducts,
-              label: t('customers.cards.activeProducts.title'),
-              body: t('customers.cards.activeProducts.body'),
-              icon: RefreshCw,
+              key: 'week',
+              value: metrics.week,
+              label: t('customers.cards.week.title'),
+              body: t('customers.cards.week.body'),
+              icon: CalendarPlus,
             },
             {
-              key: 'dueSoon',
-              value: metrics.dueSoon,
-              label: t('customers.cards.dueSoon.title'),
-              body: t('customers.cards.dueSoon.body'),
+              key: 'today',
+              value: metrics.today,
+              label: t('customers.cards.today.title'),
+              body: t('customers.cards.today.body'),
               icon: Search,
             },
           ].map(({ key, value, label, body, icon: Icon }) => (
@@ -198,22 +213,25 @@ export function ProductCustomersPage() {
         </div>
       ) : rows.length > 0 ? (
         <div className="overflow-x-auto rounded-3xl border border-border/70 bg-card/55">
-          <div className="min-w-[1120px]">
-            <div className="grid grid-cols-[1.35fr_1.2fr_150px_150px_130px_150px_150px_110px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
+          <div className="min-w-[1560px]">
+            <div className="grid grid-cols-[1.2fr_150px_130px_150px_1.2fr_120px_140px_150px_130px_140px_110px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
               <span>{t('customers.columns.name')}</span>
+              <span>{t('customers.columns.source')}</span>
+              <span>{t('customers.columns.channels')}</span>
+              <span>{t('customers.columns.customerSince')}</span>
               <span>{t('customers.columns.products')}</span>
+              <span>{t('customers.columns.loyalty')}</span>
               <span>{t('customers.columns.lastContact')}</span>
               <span>{t('customers.columns.nextTouch')}</span>
-              <span>{t('customers.columns.loyalty')}</span>
-              <span>{t('customers.columns.channel')}</span>
-              <span>{t('customers.columns.customerSince')}</span>
+              <span>{t('customers.columns.planFollowUp')}</span>
+              <span>{t('customers.columns.aiMessage')}</span>
               <span>{t('common.edit')}</span>
             </div>
             <div className="divide-y">
               {rows.map((contact: ContactWithTags) => (
                 <div
                   key={contact.id}
-                  className="grid grid-cols-[1.35fr_1.2fr_150px_150px_130px_150px_150px_110px] items-center gap-3 px-4 py-3 text-sm"
+                  className="grid grid-cols-[1.2fr_150px_130px_150px_1.2fr_120px_140px_150px_130px_140px_110px] items-center gap-3 px-4 py-3 text-sm"
                 >
                   <button
                     type="button"
@@ -222,20 +240,45 @@ export function ProductCustomersPage() {
                   >
                     {contact.full_name}
                   </button>
+                  <span className="truncate text-muted-foreground">{t(`contactSources.${contact.source}`)}</span>
+                  <div className="flex items-center">
+                    <ChannelButtons contact={contact} size="sm" />
+                  </div>
+                  <span className="truncate text-muted-foreground">
+                    {formatDate(contact.created_at, i18n.language, t('customers.fallbacks.noDate'))}
+                  </span>
                   <span className="truncate text-muted-foreground">
                     {formatList(contact.interests, t('customers.fallbacks.noProducts'))}
                   </span>
+                  <span className="truncate text-muted-foreground">{contact.warmth_score}</span>
                   <span className="truncate text-muted-foreground">
                     {formatDate(contact.last_contact_at, i18n.language, t('customers.fallbacks.noDate'))}
                   </span>
                   <span className="truncate text-muted-foreground">
-                    {formatDate(contact.next_follow_up_at, i18n.language, t('customers.fallbacks.noPlan'))}
+                    {formatDate(nextFollowUps.get(contact.id) ?? null, i18n.language, t('customers.fallbacks.noPlan'))}
                   </span>
-                  <span className="truncate text-muted-foreground">{contact.warmth_score}</span>
-                  <span className="truncate text-muted-foreground">{t(`contacts.sources.${contact.source}`)}</span>
-                  <span className="truncate text-muted-foreground">
-                    {formatDate(contact.created_at, i18n.language, t('customers.fallbacks.noDate'))}
-                  </span>
+                  <div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFollowUpContact(contact)}
+                      className="w-full gap-1.5"
+                    >
+                      <CalendarPlus className="h-3.5 w-3.5" />
+                      {t('customers.actions.planFollowUp')}
+                    </Button>
+                  </div>
+                  <div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setMessageContact(contact)}
+                      className="w-full gap-1.5"
+                    >
+                      <MessageSquarePlus className="h-3.5 w-3.5" />
+                      {t('customers.actions.aiMessage')}
+                    </Button>
+                  </div>
                   <div>
                     <Button
                       variant="outline"
@@ -260,6 +303,34 @@ export function ProductCustomersPage() {
           </Button>
         </div>
       )}
+
+      <NewFollowUpModal
+        open={!!followUpContact}
+        onClose={() => setFollowUpContact(null)}
+        userId={userId}
+        defaultContactId={followUpContact?.id}
+        defaultContactName={followUpContact?.full_name}
+      />
+
+      <AIMessageGeneratorModal
+        open={!!messageContact}
+        onClose={() => setMessageContact(null)}
+        contact={messageContact}
+        initialCategory="follow_up"
+        initialChannel={
+          messageContact?.whatsapp || messageContact?.phone
+            ? 'whatsapp'
+            : messageContact?.email
+              ? 'email'
+              : messageContact?.telegram
+                ? 'telegram'
+                : messageContact?.instagram
+                  ? 'instagram_dm'
+                  : 'sms'
+        }
+        initialTone="friendly"
+        deliveryMode="multi"
+      />
     </div>
   )
 }

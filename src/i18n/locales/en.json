@@ -177,7 +177,7 @@
       "empty": "There are no contacts to list in this range."
     },
     "sources": {
-      "manual": "Manual",
+      "manual": "Warm Outreach",
       "referral": "Referral",
       "social_media": "Social Media",
       "event": "Event",
@@ -411,23 +411,35 @@
         "title": "Added This Month",
         "body": "New purchase relationships added to your customer list this month."
       },
-      "activeProducts": {
-        "title": "With Product Info",
-        "body": "Customers with visible product usage are easier to manage well."
+      "week": {
+        "title": "Added This Week",
+        "body": "New product customers added to your list this week."
       },
-      "dueSoon": {
-        "title": "Needs Touch Soon",
-        "body": "Customer relationships that should be touched within the next 14 days."
+      "today": {
+        "title": "Added Today",
+        "body": "New product customers added to your list today."
       }
     },
     "columns": {
       "name": "Name",
+      "source": "Source",
+      "channels": "Channels",
+      "planFollowUp": "Plan Follow-up",
+      "aiMessage": "Generate AI Message",
       "products": "Products Used",
       "lastContact": "Last Contact",
       "nextTouch": "Next Follow-up",
-      "loyalty": "Loyalty",
-      "channel": "Channel",
+      "loyalty": "Satisfaction",
       "customerSince": "Customer Since"
+    },
+    "actions": {
+      "planFollowUp": "Plan Follow-up",
+      "aiMessage": "Generate AI Message"
+    },
+    "detail": {
+      "productCustomer": "Product Customer",
+      "messagePresetLabel": "Customer touchpoint",
+      "messagePresetBody": "Generate a natural customer message based on products used, satisfaction level, and latest contact rhythm."
     },
     "fallbacks": {
       "noProducts": "No product info yet",
@@ -487,7 +499,7 @@
     "lost": "Lost"
   },
   "contactSources": {
-    "manual": "Manual",
+    "manual": "Warm Outreach",
     "referral": "Referral",
     "social_media": "Social Media",
     "event": "Event",

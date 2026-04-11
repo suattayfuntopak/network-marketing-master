@@ -177,7 +177,7 @@
       "empty": "Bu aralıkta listelenecek kontak görünmüyor."
     },
     "sources": {
-      "manual": "Manuel",
+      "manual": "Sıcak Temas",
       "referral": "Referans",
       "social_media": "Sosyal Medya",
       "event": "Etkinlik",
@@ -411,23 +411,35 @@
         "title": "Bu Ay Eklenenler",
         "body": "Bu ay müşteri listene eklenen yeni satın alma ilişkileri."
       },
-      "activeProducts": {
-        "title": "Ürün Bilgisi Girilenler",
-        "body": "Kullandığı ürünleri görünür olan müşteriler daha sağlıklı yönetilir."
+      "week": {
+        "title": "Bu Hafta Eklenenler",
+        "body": "Bu hafta müşteri listene eklenen yeni ürün müşterileri."
       },
-      "dueSoon": {
-        "title": "Temas Bekleyenler",
-        "body": "Önümüzdeki 14 gün içinde dokunulması gereken müşteri ilişkileri."
+      "today": {
+        "title": "Bugün Eklenenler",
+        "body": "Bugün müşteri listene eklenen yeni ürün müşterileri."
       }
     },
     "columns": {
       "name": "İsim",
+      "source": "Kaynak",
+      "channels": "Kanallar",
+      "planFollowUp": "Takip Planla",
+      "aiMessage": "Ai Mesaj Üret",
       "products": "Kullandığı Ürünler",
       "lastContact": "Son Temas",
       "nextTouch": "Sonraki Takip",
       "loyalty": "Memnuniyet",
-      "channel": "Kanal",
       "customerSince": "Müşteri Olduğu Tarih"
+    },
+    "actions": {
+      "planFollowUp": "Takip Planla",
+      "aiMessage": "Ai Mesaj Üret"
+    },
+    "detail": {
+      "productCustomer": "Ürün Müşterisi",
+      "messagePresetLabel": "Müşteri teması",
+      "messagePresetBody": "Kullandığı ürünler, memnuniyet düzeyi ve son temas ritmine göre doğal bir müşteri mesajı üret."
     },
     "fallbacks": {
       "noProducts": "Ürün bilgisi girilmedi",
@@ -487,7 +499,7 @@
     "lost": "Kaybedildi"
   },
   "contactSources": {
-    "manual": "Manuel",
+    "manual": "Sıcak Temas",
     "referral": "Tavsiye",
     "social_media": "Sosyal Medya",
     "event": "Etkinlik",
