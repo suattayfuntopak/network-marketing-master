@@ -240,6 +240,7 @@
     },
     "saved": "Contact added",
     "updated": "Contact updated",
+    "editingContact": "Editing Contact",
     "deleted": "Contact deleted",
     "archived": "Contact archived",
     "unarchived": "Unarchived",
