@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, ChevronRight, Plus, Bell, CalendarDays, List, CalendarRange, Calendar, Activity, ShieldAlert, Zap } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Bell, CalendarDays, List, CalendarRange, Calendar, Layers3, CalendarClock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/useAuth'
-import { useAppointments, useFollowUps } from '@/hooks/useCalendar'
+import { useAppointments, useFollowUps, useTodayAppointments } from '@/hooks/useCalendar'
 import { useNotifications, useAppointmentNotifications } from '@/hooks/useNotifications'
 import { CalendarMonthView } from '@/components/calendar/CalendarMonthView'
 import { CalendarWeekView } from '@/components/calendar/CalendarWeekView'
@@ -14,7 +14,7 @@ import { CalendarAgendaView } from '@/components/calendar/CalendarAgendaView'
 import { NewAppointmentModal } from '@/components/calendar/modals/NewAppointmentModal'
 import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import {
-  fmtMonthYear, fmtWeekRange, fmtDayFull,
+  fmtDate, fmtMonthYear, fmtTime, fmtWeekRange, fmtDayFull,
   prevMonth, nextMonth,
   prevWeek, nextWeek,
   prevDay, nextDay,
@@ -25,6 +25,19 @@ import { buildFollowUpInsights } from '@/lib/calendar/followUpInsights'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
 
 type CalendarView = 'month' | 'week' | 'day' | 'agenda'
+type SummaryCardKey = 'totalActions' | 'todayAppointments' | 'todayFollowUps'
+
+interface SummaryRow {
+  id: string
+  actionType: 'appointment' | 'follow_up'
+  contactName: string
+  phone: string | null
+  stage: string | null
+  title: string
+  datetime: string
+  status: string
+  onClick: () => void
+}
 
 const VIEWS: { key: CalendarView; icon: React.ElementType; labelKey: string }[] = [
   { key: 'month',  icon: CalendarDays,  labelKey: 'calendar.views.month' },
@@ -63,6 +76,8 @@ export function CalendarPage() {
 
   const { data: appointments = [] } = useAppointments(userId, from, to)
   const { data: followUps = [] } = useFollowUps(userId, ['pending', 'snoozed'])
+  const { data: todayAppointments = [] } = useTodayAppointments(userId)
+  const [activeSummaryCard, setActiveSummaryCard] = useState<SummaryCardKey>('totalActions')
   const calendarFollowUpInsights = buildFollowUpInsights({
     all: followUps,
     today: followUps.filter((item) => {
@@ -123,6 +138,105 @@ export function CalendarPage() {
     setCurrentDate(date)
     setView('day')
   }
+
+  const todayFollowUps = useMemo(
+    () =>
+      followUps.filter((item) => {
+        const date = new Date(item.due_at)
+        const now = new Date()
+        return date.toDateString() === now.toDateString()
+      }),
+    [followUps]
+  )
+
+  const summaryRows = useMemo<Record<SummaryCardKey, SummaryRow[]>>(
+    () => ({
+      totalActions: [
+        ...appointments.map((appointment) => ({
+          id: `appointment-${appointment.id}`,
+          actionType: 'appointment' as const,
+          contactName: appointment.contact?.full_name ?? t('calendar.summaryTable.noContact'),
+          phone: appointment.contact?.phone ?? null,
+          stage: null,
+          title: appointment.title,
+          datetime: appointment.all_day
+            ? `${fmtDate(appointment.starts_at, 'd MMM')} · ${t('calendar.appointment.allDay')}`
+            : `${fmtDate(appointment.starts_at, 'd MMM')} · ${fmtTime(appointment.starts_at)} - ${fmtTime(appointment.ends_at)}`,
+          status: t(`calendar.appointment.types.${appointment.type}`),
+          onClick: () => handleAppointmentClick(appointment),
+        })),
+        ...followUps.map((followUp) => ({
+          id: `followup-${followUp.id}`,
+          actionType: 'follow_up' as const,
+          contactName: followUp.contact.full_name,
+          phone: followUp.contact.phone,
+          stage: followUp.contact.stage,
+          title: followUp.title,
+          datetime: `${fmtDate(followUp.due_at, 'd MMM')} · ${fmtTime(followUp.due_at)}`,
+          status: t(`followUps.status.${new Date(followUp.due_at) < new Date() ? 'overdue' : 'pending'}`),
+          onClick: () => {
+            setEditFollowUp(followUp)
+            setShowFollowUpModal(true)
+          },
+        })),
+      ],
+      todayAppointments: todayAppointments.map((appointment) => ({
+        id: `today-appointment-${appointment.id}`,
+        actionType: 'appointment' as const,
+        contactName: appointment.contact?.full_name ?? t('calendar.summaryTable.noContact'),
+        phone: appointment.contact?.phone ?? null,
+        stage: null,
+        title: appointment.title,
+        datetime: appointment.all_day
+          ? t('calendar.appointment.allDay')
+          : `${fmtTime(appointment.starts_at)} - ${fmtTime(appointment.ends_at)}`,
+        status: t(`calendar.appointment.types.${appointment.type}`),
+        onClick: () => handleAppointmentClick(appointment),
+      })),
+      todayFollowUps: todayFollowUps.map((followUp) => ({
+        id: `today-followup-${followUp.id}`,
+        actionType: 'follow_up' as const,
+        contactName: followUp.contact.full_name,
+        phone: followUp.contact.phone,
+        stage: followUp.contact.stage,
+        title: followUp.title,
+        datetime: `${fmtTime(followUp.due_at)}`,
+        status: t(`followUps.status.${new Date(followUp.due_at) < new Date() ? 'overdue' : 'pending'}`),
+        onClick: () => {
+          setEditFollowUp(followUp)
+          setShowFollowUpModal(true)
+        },
+      })),
+    }),
+    [appointments, followUps, t, todayAppointments, todayFollowUps]
+  )
+
+  const summaryCards = [
+    {
+      key: 'totalActions' as const,
+      Icon: Layers3,
+      value: appointments.length + followUps.length,
+      title: t('calendar.summaryCards.totalActions.title'),
+      hint: t('calendar.summaryCards.totalActions.hint', {
+        appointments: appointments.length,
+        followUps: followUps.length,
+      }),
+    },
+    {
+      key: 'todayAppointments' as const,
+      Icon: CalendarClock,
+      value: todayAppointments.length,
+      title: t('calendar.summaryCards.todayAppointments.title'),
+      hint: t('calendar.summaryCards.todayAppointments.hint', { count: todayAppointments.length }),
+    },
+    {
+      key: 'todayFollowUps' as const,
+      Icon: Bell,
+      value: todayFollowUps.length,
+      title: t('calendar.summaryCards.todayFollowUps.title'),
+      hint: t('calendar.summaryCards.todayFollowUps.hint', { count: todayFollowUps.length }),
+    },
+  ]
 
   return (
     <div className="flex flex-col h-full min-h-0">
@@ -199,39 +313,88 @@ export function CalendarPage() {
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-            {[
-              {
-                key: 'stabilize',
-                Icon: ShieldAlert,
-                value: calendarFollowUpInsights.overdue,
-                hint: t('calendar.pulse.stabilize', { count: calendarFollowUpInsights.overdue }),
-              },
-              {
-                key: 'deliver',
-                Icon: Zap,
-                value: calendarFollowUpInsights.dueToday,
-                hint: t('calendar.pulse.deliver', { count: calendarFollowUpInsights.dueToday }),
-              },
-              {
-                key: 'rhythm',
-                Icon: Activity,
-                value: `${calendarFollowUpInsights.touchCoverage}%`,
-                hint: t('calendar.pulse.rhythm', { coverage: calendarFollowUpInsights.touchCoverage }),
-              },
-            ].map(({ key, Icon, value, hint }) => (
-              <div key={key} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-3">
+            {summaryCards.map(({ key, Icon, value, hint, title }) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setActiveSummaryCard(key)}
+                className={cn(
+                  'rounded-2xl border bg-card/60 px-4 py-3 text-left transition-colors',
+                  activeSummaryCard === key
+                    ? 'border-primary/40 ring-1 ring-primary/25'
+                    : 'border-border/70 hover:border-primary/25'
+                )}
+              >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
                       <Icon className="h-4 w-4" />
                     </div>
-                    <p className="text-sm font-semibold">{t(`followUps.planner.cards.${key}.title`)}</p>
+                    <p className="text-sm font-semibold">{title}</p>
                   </div>
                   <span className="text-lg font-semibold tabular-nums">{value}</span>
                 </div>
                 <p className="mt-2 text-xs leading-5 text-muted-foreground">{hint}</p>
-              </div>
+              </button>
             ))}
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-border/70 bg-card/50 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t('calendar.summaryTable.label')}
+                </p>
+                <p className="mt-2 text-sm font-semibold">
+                  {t(`calendar.summaryCards.${activeSummaryCard}.title`)}
+                </p>
+              </div>
+              <span className="rounded-full border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-medium text-muted-foreground">
+                {summaryRows[activeSummaryCard].length}
+              </span>
+            </div>
+
+            {summaryRows[activeSummaryCard].length > 0 ? (
+              <div className="mt-4 overflow-x-auto">
+                <div className="min-w-[760px] overflow-hidden rounded-2xl border border-border/70">
+                  <div className="grid grid-cols-[120px_1.3fr_140px_140px_1.3fr_140px_120px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
+                    <span>{t('calendar.summaryTable.columns.type')}</span>
+                    <span>{t('calendar.summaryTable.columns.person')}</span>
+                    <span>{t('calendar.summaryTable.columns.phone')}</span>
+                    <span>{t('calendar.summaryTable.columns.stage')}</span>
+                    <span>{t('calendar.summaryTable.columns.title')}</span>
+                    <span>{t('calendar.summaryTable.columns.datetime')}</span>
+                    <span>{t('calendar.summaryTable.columns.status')}</span>
+                  </div>
+                  <div className="divide-y">
+                    {summaryRows[activeSummaryCard].map((row) => (
+                      <button
+                        key={row.id}
+                        type="button"
+                        onClick={row.onClick}
+                        className="grid w-full grid-cols-[120px_1.3fr_140px_140px_1.3fr_140px_120px] gap-3 px-4 py-3 text-left text-sm transition-colors hover:bg-muted/20"
+                      >
+                        <span className="font-medium">
+                          {t(`calendar.summaryTable.types.${row.actionType}`)}
+                        </span>
+                        <span className="truncate">{row.contactName}</span>
+                        <span className="truncate text-muted-foreground">{row.phone ?? '—'}</span>
+                        <span className="truncate text-muted-foreground">
+                          {row.stage ? t(`pipelineStages.${row.stage}`) : '—'}
+                        </span>
+                        <span className="truncate">{row.title}</span>
+                        <span className="truncate text-muted-foreground">{row.datetime}</span>
+                        <span className="truncate text-muted-foreground">{row.status}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-xl border border-dashed border-border/70 px-4 py-6 text-sm text-muted-foreground">
+                {t(`calendar.summaryTable.empty.${activeSummaryCard}`)}
+              </div>
+            )}
           </div>
         </div>
       </div>

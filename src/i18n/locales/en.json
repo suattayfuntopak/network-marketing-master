@@ -927,6 +927,42 @@
     "newAppointment": "New Appointment",
     "newFollowUp": "New Follow-up",
     "emptyAgenda": "No events in this range",
+    "summaryCards": {
+      "totalActions": {
+        "title": "Total Actions",
+        "hint": "{{appointments}} appointments and {{followUps}} open follow-ups are visible."
+      },
+      "todayAppointments": {
+        "title": "Today's Appointments",
+        "hint": "{{count}} appointments are planned for today."
+      },
+      "todayFollowUps": {
+        "title": "Today's Follow-ups",
+        "hint": "{{count}} follow-up actions are due today."
+      }
+    },
+    "summaryTable": {
+      "label": "Detail List",
+      "noContact": "No linked contact",
+      "columns": {
+        "type": "Type",
+        "person": "Person",
+        "phone": "Phone",
+        "stage": "Stage",
+        "title": "Title",
+        "datetime": "Time",
+        "status": "Status"
+      },
+      "types": {
+        "appointment": "Appointment",
+        "follow_up": "Follow-up"
+      },
+      "empty": {
+        "totalActions": "There are no actions to list right now.",
+        "todayAppointments": "There are no appointments planned for today.",
+        "todayFollowUps": "There are no follow-ups planned for today."
+      }
+    },
     "pulse": {
       "stabilize": "{{count}} overdue follow-ups should be cleaned up first.",
       "deliver": "{{count}} follow-ups are waiting for action today.",

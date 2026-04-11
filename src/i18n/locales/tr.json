@@ -927,6 +927,42 @@
     "newAppointment": "Yeni Randevu",
     "newFollowUp": "Yeni Takip",
     "emptyAgenda": "Bu aralıkta etkinlik yok",
+    "summaryCards": {
+      "totalActions": {
+        "title": "Toplam Aksiyonlar",
+        "hint": "{{appointments}} randevu ve {{followUps}} açık takip görüntüleniyor."
+      },
+      "todayAppointments": {
+        "title": "Bugünün Randevuları",
+        "hint": "Bugün için {{count}} randevu planlı."
+      },
+      "todayFollowUps": {
+        "title": "Bugünün Takipleri",
+        "hint": "Bugün için {{count}} takip aksiyonu var."
+      }
+    },
+    "summaryTable": {
+      "label": "Detay Listesi",
+      "noContact": "Kontak bağlanmadı",
+      "columns": {
+        "type": "Tür",
+        "person": "Kişi",
+        "phone": "Telefon",
+        "stage": "Aşama",
+        "title": "Başlık",
+        "datetime": "Zaman",
+        "status": "Durum"
+      },
+      "types": {
+        "appointment": "Randevu",
+        "follow_up": "Takip"
+      },
+      "empty": {
+        "totalActions": "Şu an listelenecek aksiyon görünmüyor.",
+        "todayAppointments": "Bugün için planlı randevu görünmüyor.",
+        "todayFollowUps": "Bugün için planlı takip görünmüyor."
+      }
+    },
     "pulse": {
       "stabilize": "{{count}} geciken takip önce temizlenmeli.",
       "deliver": "{{count}} takip bugün aksiyon bekliyor.",
