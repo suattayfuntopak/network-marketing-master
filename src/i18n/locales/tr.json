@@ -423,6 +423,40 @@
     "coach": {
       "label": "Sıradaki Adım"
     },
+    "signalBoard": {
+      "title": "Süreç Sinyalleri",
+      "subtitle": "Board'a bakınca bugün önce hangi akışı sakinleştirmen gerektiğini gösterir.",
+      "nextMoveLabel": "Bugünün Pipeline Yönü",
+      "cards": {
+        "risk": {
+          "title": "Takip Riski",
+          "body": "{{count}} kişi takip ritmi istiyor. Önce gecikmiş adımları toparlamak board'u sakinleştirir."
+        },
+        "momentum": {
+          "title": "İlerleme Penceresi",
+          "body": "{{count}} kişi sıcak ilerleme bölgesinde. Burada uzun anlatım değil, tek net sonraki adım daha etkilidir."
+        },
+        "openings": {
+          "title": "Yeni Açılış",
+          "body": "{{count}} kişi ilk temas için uygun görünüyor. Kısa ve doğal açılışlar burada daha iyi çalışır."
+        }
+      },
+      "nextMove": {
+        "stabilize": "Önce süreci stabilize et. {{risk}} kişi takip riski taşıyor; sıcak fırsatlara geçmeden bu kartları sakin şekilde yerine oturtmak akışı toparlar.",
+        "advance": "İlerleme penceresi açık. {{momentum}} kişi sıcak bölgede; karar baskısı kurmadan tek bir sonraki adımı netleştirmek en doğru yaklaşım olur.",
+        "open": "Board temiz görünüyor. Şimdi {{openings}} yeni açılışı kısa davetler ve doğal ilk mesajlarla harekete geçirmek için iyi bir an.",
+        "nurture": "Şu anda board dengede. Yeni baskı kurmak yerine mevcut ritmi koruyup sıcaklığı düşmeyen kişilerle görünür kalmak daha doğru olur."
+      }
+    },
+    "columnCues": {
+      "new": "İlk sıcaklığı kur",
+      "contacted": "Merakı açık tut",
+      "interested": "İlgiyi sonraki adıma çevir",
+      "presenting": "Sunum sonrası momentumu koru",
+      "thinking": "Kararı kolaylaştır",
+      "joined": "İlk ritmi birlikte kur",
+      "lost": "Dersi al, baskı kurma"
+    },
     "totalValue": "Toplam Değer",
     "weightedValue": "Ağırlıklı Değer",
     "noDeals": "Henüz aksiyon yok",

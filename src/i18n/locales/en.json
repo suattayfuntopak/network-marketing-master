@@ -423,6 +423,40 @@
     "coach": {
       "label": "Next Move"
     },
+    "signalBoard": {
+      "title": "Pipeline Signals",
+      "subtitle": "A calm decision layer that shows which flow needs your attention first today.",
+      "nextMoveLabel": "Today's Pipeline Direction",
+      "cards": {
+        "risk": {
+          "title": "Follow-up Risk",
+          "body": "{{count}} people need rhythm. Clearing overdue steps first will steady the board."
+        },
+        "momentum": {
+          "title": "Momentum Window",
+          "body": "{{count}} people are in a warm advancement zone. One clear next step works better than a longer pitch here."
+        },
+        "openings": {
+          "title": "Fresh Openings",
+          "body": "{{count}} people look ready for a first touch. Short, natural openings will land better here."
+        }
+      },
+      "nextMove": {
+        "stabilize": "Stabilize the flow first. {{risk}} people carry follow-up risk, so settling those cards before chasing warm opportunities will calm the board.",
+        "advance": "The advancement window is open. With {{momentum}} warm people in play, clarifying one next step is stronger than adding more pressure.",
+        "open": "The board looks clean. This is a good moment to move {{openings}} fresh openings with short invites and natural first messages.",
+        "nurture": "The board is balanced right now. Instead of forcing new pressure, keep the rhythm visible and stay present with the people already in motion."
+      }
+    },
+    "columnCues": {
+      "new": "Create the first warmth",
+      "contacted": "Keep curiosity open",
+      "interested": "Turn interest into a next step",
+      "presenting": "Protect momentum after the presentation",
+      "thinking": "Make the decision easier",
+      "joined": "Build the first rhythm together",
+      "lost": "Learn and do not force it"
+    },
     "totalValue": "Total Value",
     "weightedValue": "Weighted Value",
     "noDeals": "No deals yet",

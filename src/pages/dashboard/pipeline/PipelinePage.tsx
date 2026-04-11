@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutGrid, List, Settings2 } from 'lucide-react'
+import { Clock3, Flame, LayoutGrid, List, Sparkles, Settings2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import { useAppointments, useFollowUps } from '@/hooks/useCalendar'
 import { useContacts } from '@/hooks/useContacts'
 import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import { getSyncedPipelineStages, type ContactStageKey } from '@/lib/pipeline/stageLabels'
+import { buildPipelineSignalSummary } from '@/lib/pipeline/pipelineSignals'
 import { ContactKanbanBoard, type ContactProcessRecord } from '@/components/pipeline/ContactKanbanBoard'
 import { ContactTableView } from './ContactTableView'
 import { ManageStagesModal } from './modals/ManageStagesModal'
@@ -46,6 +48,12 @@ export function PipelinePage() {
 
   const contacts = contactsResult?.data ?? []
   const isLoading = stagesLoading || contactsLoading || appointmentsLoading || followUpsLoading
+  const pipelineSignals = useMemo(() => buildPipelineSignalSummary(contacts), [contacts])
+  const SIGNAL_TONE_CLASSES = {
+    blue: 'border-blue-500/20 bg-blue-500/10 text-blue-100',
+    amber: 'border-amber-500/20 bg-amber-500/10 text-amber-100',
+    emerald: 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100',
+  } as const
 
   const contactCount = contacts.length
   const subtitle = `${contactCount} ${t(contactCount === 1 ? 'pipeline.contactSingular' : 'pipeline.contactPlural')}`
@@ -117,6 +125,74 @@ export function PipelinePage() {
           </Button>
         </div>
       </div>
+
+      {!isLoading && contactCount > 0 && (
+        <Card className="overflow-hidden border-primary/15 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.10),transparent_34%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.10),transparent_30%)]">
+          <CardHeader>
+            <CardTitle className="text-base">{t('pipeline.signalBoard.title')}</CardTitle>
+            <p className="text-sm text-muted-foreground">{t('pipeline.signalBoard.subtitle')}</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-3">
+              {[
+                {
+                  key: 'risk',
+                  Icon: Clock3,
+                  value: pipelineSignals.followUpRisk,
+                  tone: 'blue' as const,
+                  body: t('pipeline.signalBoard.cards.risk.body', {
+                    count: pipelineSignals.followUpRisk,
+                  }),
+                },
+                {
+                  key: 'momentum',
+                  Icon: Flame,
+                  value: pipelineSignals.advanceWindow,
+                  tone: 'amber' as const,
+                  body: t('pipeline.signalBoard.cards.momentum.body', {
+                    count: pipelineSignals.advanceWindow,
+                  }),
+                },
+                {
+                  key: 'openings',
+                  Icon: Sparkles,
+                  value: pipelineSignals.freshOpenings,
+                  tone: 'emerald' as const,
+                  body: t('pipeline.signalBoard.cards.openings.body', {
+                    count: pipelineSignals.freshOpenings,
+                  }),
+                },
+              ].map(({ key, Icon, value, tone, body }) => (
+                <div key={key} className="rounded-2xl border border-border/70 bg-card/65 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className={`flex h-10 w-10 items-center justify-center rounded-xl border ${SIGNAL_TONE_CLASSES[tone]}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${SIGNAL_TONE_CLASSES[tone]}`}>
+                      {t(`pipeline.signalBoard.cards.${key}.title`)}
+                    </span>
+                  </div>
+                  <p className="mt-4 text-2xl font-bold">{value}</p>
+                  <p className="mt-2 text-xs leading-5 text-muted-foreground">{body}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t('pipeline.signalBoard.nextMoveLabel')}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {t(`pipeline.signalBoard.nextMove.${pipelineSignals.focus}`, {
+                  risk: pipelineSignals.followUpRisk,
+                  momentum: pipelineSignals.advanceWindow,
+                  openings: pipelineSignals.freshOpenings,
+                })}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center">
