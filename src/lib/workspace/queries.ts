@@ -1,5 +1,12 @@
 import { supabase } from '@/lib/supabase'
-import type { Profile, WorkspaceContext, WorkspaceDirectoryMember, WorkspaceMember, WorkspaceRelationship } from '@/lib/workspace/types'
+import type {
+  Profile,
+  WorkspaceContext,
+  WorkspaceDirectoryMember,
+  WorkspaceInviteCandidate,
+  WorkspaceMember,
+  WorkspaceRelationship,
+} from '@/lib/workspace/types'
 
 function getErrorCode(error: unknown) {
   if (typeof error === 'object' && error !== null && 'code' in error) {
@@ -153,14 +160,25 @@ export async function bootstrapWorkspaceForCurrentUser() {
   return data
 }
 
-export async function fetchWorkspaceMembers(workspaceId: string, currentUserId: string): Promise<WorkspaceDirectoryMember[]> {
+export async function fetchWorkspaceMembers(
+  workspaceId: string,
+  currentUserId: string,
+  statuses: WorkspaceMember['status'][] = ['active']
+): Promise<WorkspaceDirectoryMember[]> {
   try {
-    const { data: membershipRows, error: membershipError } = await supabase
+    let membershipQuery = supabase
       .from('nmm_workspace_members')
       .select('id, workspace_id, user_id, role, status, invited_by, joined_at, created_at, updated_at')
       .eq('workspace_id', workspaceId)
-      .eq('status', 'active')
-      .order('joined_at', { ascending: true })
+      .order('created_at', { ascending: false })
+
+    if (statuses.length === 1) {
+      membershipQuery = membershipQuery.eq('status', statuses[0])
+    } else {
+      membershipQuery = membershipQuery.in('status', statuses)
+    }
+
+    const { data: membershipRows, error: membershipError } = await membershipQuery
 
     if (membershipError) throw membershipError
 
@@ -203,6 +221,38 @@ export async function fetchWorkspaceMembers(workspaceId: string, currentUserId: 
   }
 }
 
+export async function searchWorkspaceInviteCandidates(
+  workspaceId: string,
+  query: string,
+  currentUserId: string
+): Promise<WorkspaceInviteCandidate[]> {
+  const normalizedQuery = query.trim()
+  if (normalizedQuery.length < 2) return []
+
+  const { data: existingRows, error: existingError } = await supabase
+    .from('nmm_workspace_members')
+    .select('user_id')
+    .eq('workspace_id', workspaceId)
+    .neq('status', 'removed')
+
+  if (existingError) throw existingError
+
+  const excludedIds = new Set<string>([currentUserId, ...((existingRows ?? []).map((row) => row.user_id))])
+
+  const { data, error } = await supabase
+    .from('nmm_profiles')
+    .select('id, full_name, email, role, company, avatar_url')
+    .or(`full_name.ilike.%${normalizedQuery}%,email.ilike.%${normalizedQuery}%`)
+    .order('full_name', { ascending: true })
+    .limit(12)
+
+  if (error) throw error
+
+  return ((data ?? []) as WorkspaceInviteCandidate[])
+    .filter((profile) => !excludedIds.has(profile.id))
+    .slice(0, 8)
+}
+
 export async function updateWorkspaceMember(
   memberId: string,
   data: Partial<Pick<WorkspaceMember, 'role' | 'status'>>
@@ -219,4 +269,53 @@ export async function updateWorkspaceMember(
 
   if (error) throw error
   return updatedRow as WorkspaceMember
+}
+
+export async function inviteWorkspaceMember({
+  workspaceId,
+  candidateUserId,
+  invitedBy,
+  role,
+}: {
+  workspaceId: string
+  candidateUserId: string
+  invitedBy: string
+  role: WorkspaceMember['role']
+}) {
+  const now = new Date().toISOString()
+
+  const { data: insertedMember, error: memberError } = await supabase
+    .from('nmm_workspace_members')
+    .insert({
+      workspace_id: workspaceId,
+      user_id: candidateUserId,
+      role,
+      status: 'invited',
+      invited_by: invitedBy,
+      joined_at: now,
+      created_at: now,
+      updated_at: now,
+    })
+    .select('id, workspace_id, user_id, role, status, invited_by, joined_at, created_at, updated_at')
+    .single()
+
+  if (memberError) throw memberError
+
+  const { error: relationshipError } = await supabase
+    .from('nmm_member_relationships')
+    .upsert(
+      {
+        workspace_id: workspaceId,
+        sponsor_user_id: invitedBy,
+        member_user_id: candidateUserId,
+        depth: 1,
+      },
+      { onConflict: 'workspace_id,member_user_id' }
+    )
+
+  if (relationshipError && !isWorkspaceSchemaMissing(relationshipError)) {
+    throw relationshipError
+  }
+
+  return insertedMember as WorkspaceMember
 }

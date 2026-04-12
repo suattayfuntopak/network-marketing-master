@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Activity, ArrowUpRight, MoreHorizontal, Sparkles, Users } from 'lucide-react'
+import { Activity, ArrowUpRight, MoreHorizontal, Sparkles, UserPlus, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -19,10 +19,17 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { PageState } from '@/components/shared/PageState'
+import { InviteWorkspaceMemberDialog } from '@/components/team/InviteWorkspaceMemberDialog'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
 import { usePipelineStages } from '@/hooks/usePipeline'
-import { useBootstrapWorkspace, useUpdateWorkspaceMember, useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
+import {
+  useBootstrapWorkspace,
+  useUpdateWorkspaceMember,
+  useWorkspaceContext,
+  useWorkspaceMembers,
+  useWorkspacePendingMembers,
+} from '@/hooks/useWorkspace'
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { buildPageWindow } from '@/lib/pagination'
 import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
@@ -63,9 +70,11 @@ export function TeamPage() {
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
   const [referenceNow] = useState(() => Date.now())
   const [membersPage, setMembersPage] = useState(1)
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
   const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
+  const { data: pendingMembers = [], isLoading: pendingMembersLoading } = useWorkspacePendingMembers(workspaceId, userId)
   const bootstrapWorkspace = useBootstrapWorkspace(userId)
   const updateWorkspaceMember = useUpdateWorkspaceMember(userId, workspaceId)
   const { data: pipelineStages = [] } = usePipelineStages(userId)
@@ -231,7 +240,18 @@ export function TeamPage() {
       {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t('team.sections.workspaceMembers')}</CardTitle>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <CardTitle>{t('team.sections.workspaceMembers')}</CardTitle>
+                <p className="mt-1 text-sm text-muted-foreground">{t('team.workspace.membersBody')}</p>
+              </div>
+              {canManageMembers ? (
+                <Button onClick={() => setInviteDialogOpen(true)} className="gap-1.5">
+                  <UserPlus className="h-4 w-4" />
+                  {t('team.workspace.inviteAction')}
+                </Button>
+              ) : null}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -334,6 +354,50 @@ export function TeamPage() {
                 {t('team.workspace.emptyBody')}
               </div>
             )}
+
+            {canManageMembers ? (
+              <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{t('team.workspace.pendingTitle')}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t('team.workspace.pendingBody')}</p>
+                  </div>
+                  <span className="text-sm font-semibold tabular-nums">{pendingMembers.length}</span>
+                </div>
+                <div className="mt-4 space-y-3">
+                  {pendingMembersLoading ? (
+                    <div className="rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
+                      {t('common.loading')}
+                    </div>
+                  ) : pendingMembers.length > 0 ? (
+                    pendingMembers.map((member) => (
+                      <div key={member.membership.id} className="rounded-xl border bg-card/70 px-4 py-3">
+                        <div className="flex items-start gap-3">
+                          <Avatar size="sm">
+                            <AvatarFallback>{getInitials(member.profile?.full_name ?? member.profile?.email ?? 'WI')}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold">
+                              {member.profile?.full_name ?? member.profile?.email ?? t('team.workspace.memberFallback')}
+                            </p>
+                            <p className="mt-1 truncate text-xs text-muted-foreground">
+                              {member.profile?.email ?? t('team.workspace.noEmail')}
+                            </p>
+                          </div>
+                          <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-500">
+                            {t('team.workspace.pendingBadge')}
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
+                      {t('team.workspace.pendingEmpty')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
       ) : null}
@@ -511,6 +575,13 @@ export function TeamPage() {
       </Card>
         </>
       ) : null}
+
+      <InviteWorkspaceMemberDialog
+        open={inviteDialogOpen}
+        onClose={() => setInviteDialogOpen(false)}
+        workspaceId={workspaceId}
+        currentUserId={userId}
+      />
     </div>
   )
 }

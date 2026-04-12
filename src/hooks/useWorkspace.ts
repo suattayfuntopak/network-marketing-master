@@ -1,11 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { bootstrapWorkspaceForCurrentUser, fetchWorkspaceContext, fetchWorkspaceMembers, updateWorkspaceMember } from '@/lib/workspace/queries'
+import {
+  bootstrapWorkspaceForCurrentUser,
+  fetchWorkspaceContext,
+  fetchWorkspaceMembers,
+  inviteWorkspaceMember,
+  searchWorkspaceInviteCandidates,
+  updateWorkspaceMember,
+} from '@/lib/workspace/queries'
 import type { WorkspaceMember } from '@/lib/workspace/types'
 
 export const workspaceKeys = {
   all: ['workspace'] as const,
   context: (userId: string) => [...workspaceKeys.all, 'context', userId] as const,
   members: (workspaceId: string) => [...workspaceKeys.all, 'members', workspaceId] as const,
+  pendingMembers: (workspaceId: string) => [...workspaceKeys.all, 'pending-members', workspaceId] as const,
+  inviteSearch: (workspaceId: string, query: string) => [...workspaceKeys.all, 'invite-search', workspaceId, query] as const,
 }
 
 export function useWorkspaceContext(userId: string) {
@@ -29,6 +38,29 @@ export function useWorkspaceMembers(workspaceId: string, currentUserId: string) 
     refetchOnMount: true,
     refetchOnReconnect: true,
     refetchOnWindowFocus: true,
+  })
+}
+
+export function useWorkspacePendingMembers(workspaceId: string, currentUserId: string) {
+  return useQuery({
+    queryKey: workspaceKeys.pendingMembers(workspaceId),
+    queryFn: () => fetchWorkspaceMembers(workspaceId, currentUserId, ['invited']),
+    enabled: !!workspaceId && !!currentUserId,
+    staleTime: 30_000,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+  })
+}
+
+export function useWorkspaceInviteCandidates(workspaceId: string, currentUserId: string, query: string) {
+  const normalizedQuery = query.trim()
+
+  return useQuery({
+    queryKey: workspaceKeys.inviteSearch(workspaceId, normalizedQuery),
+    queryFn: () => searchWorkspaceInviteCandidates(workspaceId, normalizedQuery, currentUserId),
+    enabled: !!workspaceId && !!currentUserId && normalizedQuery.length >= 2,
+    staleTime: 15_000,
   })
 }
 
@@ -58,6 +90,26 @@ export function useUpdateWorkspaceMember(userId: string, workspaceId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: workspaceKeys.context(userId) })
       qc.invalidateQueries({ queryKey: workspaceKeys.members(workspaceId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.all })
+    },
+  })
+}
+
+export function useInviteWorkspaceMember(userId: string, workspaceId: string) {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      candidateUserId,
+      role,
+    }: {
+      candidateUserId: string
+      role: WorkspaceMember['role']
+    }) => inviteWorkspaceMember({ workspaceId, candidateUserId, invitedBy: userId, role }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: workspaceKeys.context(userId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.members(workspaceId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.pendingMembers(workspaceId) })
       qc.invalidateQueries({ queryKey: workspaceKeys.all })
     },
   })

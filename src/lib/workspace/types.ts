@@ -20,3 +20,12 @@ export interface WorkspaceDirectoryMember {
   depth: number | null
   isCurrentUser: boolean
 }
+
+export interface WorkspaceInviteCandidate {
+  id: string
+  full_name: string
+  email: string
+  role: Profile['role']
+  company: string | null
+  avatar_url: string | null
+}
