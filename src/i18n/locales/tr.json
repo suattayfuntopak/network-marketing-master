@@ -30,6 +30,13 @@
     "preparingPage": "Sayfa hazırlanıyor...",
     "pageNotFound": "Sayfa Bulunamadı",
     "pageNotFoundDescription": "Aradığınız sayfa mevcut değil veya taşınmış olabilir.",
+    "somethingWentWrong": "Bir şeyler ters gitti",
+    "noResultsFound": "Gösterilecek sonuç bulunamadı",
+    "loadingWorkspace": "Çalışma alanı hazırlanıyor, modüller güvenli şekilde yükleniyor.",
+    "routeLoadError": "Sayfa güvenli modda açıldı",
+    "returnDashboard": "Panoya Dön",
+    "appCrashed": "Uygulama güvenli moda geçti",
+    "appCrashedDescription": "Beklenmeyen bir hata yakaladık. Verileri koruduk; panoya dönerek devam edebilirsin.",
     "selected": "{{count}} öğe seçildi",
     "page": "Sayfa {{page}} / {{total}}"
   },
@@ -338,7 +345,8 @@
       "notFound": "Etiket bulunamadı",
       "empty": "Henüz etiket yok",
       "createNew": "Yeni etiket oluştur",
-      "namePlaceholder": "Etiket adı"
+      "namePlaceholder": "Etiket adı",
+      "existing": "Mevcut etiketler"
     },
     "bulk": {
       "stage": "Aşama",
@@ -965,7 +973,8 @@
       "settings": "Tercihler",
       "notifications": "Bildirimler",
       "support": "Destek",
-      "feedback": "Geri Bildirim"
+      "feedback": "Geri Bildirim",
+      "account": "Hesap"
     },
     "controlCenter": {
       "title": "Hesap Kontrol Merkezi",
@@ -1043,6 +1052,32 @@
           "name": "Ekip",
           "body": "Lider görünürlüğü, ekip radarı ve daha derin büyüme takibi için hazırlanmış plan."
         }
+      }
+    },
+    "workspace": {
+      "title": "Workspace Durumu",
+      "subtitle": "Gercek ekip mimarisine gecis hazirligini ve aktif yapini buradan takip et.",
+      "loadingBody": "Workspace bilgileri kontrol ediliyor. Sistem mevcut ekip omurgasini guvenli sekilde okuyup durumunu hazirliyor.",
+      "unavailableBody": "Workspace durumu su an okunamadi. Uygulama legacy akisla guvenli sekilde calismaya devam ediyor.",
+      "legacyBody": "Workspace migrasyonu henuz devrede degil. Uygulama ekip alanlarini bozmadan mevcut distributor-kontak yapisiyla calismayi surduruyor.",
+      "activeBody": "{{workspace}} icinde {{members}} aktif uye ve senin rolun {{role}} olarak gorunuyor. Gercek ekip mimarisi bu hesap icin artik hazir.",
+      "nameFallback": "Kisisel workspace hazirlaniyor",
+      "roleFallback": "Rol henuz okunmadi",
+      "status": {
+        "loading": "Kontrol ediliyor",
+        "unavailable": "Durum okunamadi",
+        "legacy": "Legacy mod",
+        "active": "Workspace aktif"
+      },
+      "architecture": {
+        "legacy": "Kontak proxy omurgasi",
+        "workspace": "Gercek workspace omurgasi"
+      },
+      "fields": {
+        "architecture": "Mimari",
+        "role": "Rol",
+        "members": "Aktif uye",
+        "workspace": "Workspace"
       }
     },
     "roles": {
@@ -1617,6 +1652,26 @@
       "label": "Ekip Özeti",
       "value": "{{members}} ekip üyesi • {{overdue}} geciken takip"
     },
+    "workspace": {
+      "label": "Workspace",
+      "value": "{{workspace}} • {{members}} aktif uye • {{role}}",
+      "legacyTitle": "Legacy ekip gorunumu aktif",
+      "legacyBody": "Bu ekran su an distributor kontaklarini ekip gibi okuyarak calisiyor. Faz 5 workspace migrasyonu hazir; veritabani uygulandiginda gercek ekip uyeleri ve roller bu alana baglanacak.",
+      "activeTitle": "Workspace omurgasi algilandi",
+      "activeBody": "{{workspace}} icinde {{members}} aktif uye gorunuyor. Mevcut radar akisini bozmadan gercek ekip mimarisine gecis zemini hazir.",
+      "emptyBody": "Gercek ekip omurgasi icin zemin hazir. Uye eklendikce bu ekran kontak proxy mantigindan workspace mantigina tam olarak gececek.",
+      "memberFallback": "Workspace uyesi",
+      "you": "Sen",
+      "noEmail": "E-posta bilgisi yok",
+      "joinedAt": "Katilim: {{date}}",
+      "depth": "Seviye {{count}}",
+      "roles": {
+        "owner": "Sahip",
+        "leader": "Lider",
+        "member": "Uye",
+        "assistant": "Asistan"
+      }
+    },
     "stats": {
       "members": "Ekip Üyesi",
       "membersHint": "Distribütör olarak işaretlenen kontaklar",
@@ -1630,6 +1685,7 @@
     "sections": {
       "overview": "Genel Durum",
       "leaderboard": "Öne Çıkanlar",
+      "workspaceMembers": "Workspace Uyeleri",
       "needsAttention": "Destek Bekleyenler",
       "activationQueue": "Aktivasyon Kuyruğu",
       "radar": "Radar Sinyalleri"

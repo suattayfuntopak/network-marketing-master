@@ -18,10 +18,12 @@ export function useContact(id: string | undefined) {
     queryKey: ['contact', id],
     queryFn: () => fetchContact(id!),
     enabled: !!id,
-    retry: 1,
-    staleTime: 30_000,
+    retry: 2,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -100,7 +102,7 @@ export function useSetContactTags(contactId: string) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (tagIds: string[]) => setContactTags(contactId, tagIds),
-    onSuccess: (_, tagIds) => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: contactKeys.all })
       qc.invalidateQueries({ queryKey: ['contact', contactId] })
       qc.invalidateQueries({ queryKey: tagKeys.all })

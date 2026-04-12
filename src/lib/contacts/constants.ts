@@ -69,6 +69,11 @@ export function getWarmthKey(score: number): string {
   return 'veryCold'
 }
 
+export function getDisplayWarmthScore(score: number, stage?: string | null): number {
+  if (stage === 'lost') return 0
+  return Math.max(0, Math.min(100, score))
+}
+
 export function getWarmthLabel(score: number): string {
   if (score >= 80) return 'Çok Sıcak'
   if (score >= 60) return 'Sıcak'

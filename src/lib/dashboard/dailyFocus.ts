@@ -1,5 +1,5 @@
 import type { FollowUpBuckets, FollowUpWithContact } from '@/lib/calendar/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { ContactInsight } from '@/lib/contacts/types'
 
 export type DailyFocusMode = 'follow_ups' | 'opportunities' | 'new_reachouts'
 export type DailyFocusReason =
@@ -57,7 +57,7 @@ function addPriority(
 }
 
 export function buildDailyFocusSummary(
-  contacts: ContactWithTags[],
+  contacts: ContactInsight[],
   followUpBuckets?: FollowUpBuckets
 ): DailyFocusSummary {
   const priorityMap = new Map<string, DailyFocusPriority>()

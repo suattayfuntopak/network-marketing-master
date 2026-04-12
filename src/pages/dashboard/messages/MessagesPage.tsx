@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Sparkles,
@@ -36,15 +36,16 @@ import {
   useDeleteAIMessage,
 } from '@/hooks/useTemplates'
 import { useFollowUpBuckets } from '@/hooks/useCalendar'
-import { useContacts } from '@/hooks/useContacts'
+import { useMessageContacts } from '@/hooks/useContacts'
+import { usePipelineStages } from '@/hooks/usePipeline'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
 import { TemplateFormModal } from '@/components/messages/TemplateFormModal'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { ROUTES } from '@/lib/constants'
-import { DEFAULT_FILTERS } from '@/lib/contacts/types'
 import { buildMessagePlaybooks } from '@/lib/messages/messagePlaybooks'
+import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 import type { AIMessage, MessageTemplate } from '@/lib/messages/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { MessageContact } from '@/lib/contacts/types'
 
 type Tab = 'ai' | 'templates' | 'history' | 'bulk'
 
@@ -64,7 +65,7 @@ export function MessagesPage() {
 
   const [bulkSearch, setBulkSearch] = useState('')
   const [bulkSelected, setBulkSelected] = useState<Set<string>>(new Set())
-  const [bulkContact, setBulkContact] = useState<ContactWithTags | null>(null)
+  const [bulkContact, setBulkContact] = useState<MessageContact | null>(null)
   const [aiPreset, setAIPreset] = useState<{
     category: AIMessage['category']
     tone: AIMessage['tone']
@@ -83,28 +84,18 @@ export function MessagesPage() {
   const updateAIMessage = useUpdateAIMessage(user?.id ?? '')
   const deleteAIMessage = useDeleteAIMessage(user?.id ?? '')
   const { data: followUpBuckets } = useFollowUpBuckets(user?.id ?? '')
+  const { data: pipelineStages = [] } = usePipelineStages(user?.id ?? '')
 
-  const { data: guideContactsResult } = useContacts({
+  const { data: guideContacts = [] } = useMessageContacts({
     userId: user?.id ?? '',
-    filters: DEFAULT_FILTERS,
-    sort: { field: 'warmth_score', order: 'desc' },
-    page: 1,
-    pageSize: 500,
+    limit: 200,
   })
-  const guideContacts = guideContactsResult?.data ?? []
 
-  const { data: contactsResult, isLoading: contactsLoading } = useContacts({
+  const { data: bulkContacts = [], isLoading: contactsLoading } = useMessageContacts({
     userId: user?.id ?? '',
-    filters: {
-      stages: [], warmthMin: 0, warmthMax: 100, sources: [],
-      tagIds: [], contactTypes: [], pendingFollowUp: false, archived: false,
-      search: bulkSearch.length >= 2 ? bulkSearch : '',
-    },
-    sort: { field: 'warmth_score', order: 'desc' },
-    page: 1,
-    pageSize: 100,
+    search: bulkSearch.length >= 2 ? bulkSearch : '',
+    limit: 100,
   })
-  const bulkContacts = contactsResult?.data ?? []
 
   const historyItems = useMemo(
     () =>
@@ -118,6 +109,11 @@ export function MessagesPage() {
   const playbooks = useMemo(
     () => buildMessagePlaybooks({ contacts: guideContacts, followUpBuckets }),
     [followUpBuckets, guideContacts]
+  )
+
+  const getStageLabel = useCallback(
+    (stage: MessageContact['stage']) => resolveContactStageLabel(pipelineStages, stage, t, currentLocale.startsWith('en') ? 'en' : 'tr'),
+    [currentLocale, pipelineStages, t]
   )
 
   const handleCopy = async (text: string, id: string) => {
@@ -526,7 +522,7 @@ export function MessagesPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <StageBadge stage={contact.stage} />
+                        <StageBadge stage={contact.stage} label={getStageLabel(contact.stage)} />
                         <Button
                           size="sm"
                           variant="ghost"

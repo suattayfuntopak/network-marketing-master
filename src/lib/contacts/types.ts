@@ -6,6 +6,63 @@ export interface ContactWithTags extends Contact {
   tags: Tag[]
 }
 
+export type ContactInsight = Pick<
+  Contact,
+  | 'id'
+  | 'full_name'
+  | 'city'
+  | 'occupation'
+  | 'warmth_score'
+  | 'stage'
+  | 'created_at'
+  | 'last_contact_at'
+  | 'next_follow_up_at'
+  | 'contact_type'
+>
+
+export type MessageContact = Pick<
+  Contact,
+  | 'id'
+  | 'full_name'
+  | 'occupation'
+  | 'city'
+  | 'relationship'
+  | 'goals'
+  | 'pain_points'
+  | 'interests'
+  | 'warmth_score'
+  | 'stage'
+  | 'phone'
+  | 'whatsapp'
+  | 'telegram'
+  | 'email'
+  | 'instagram'
+  | 'created_at'
+  | 'last_contact_at'
+  | 'next_follow_up_at'
+  | 'contact_type'
+>
+
+export type ProcessContact = Pick<
+  Contact,
+  | 'id'
+  | 'full_name'
+  | 'city'
+  | 'occupation'
+  | 'warmth_score'
+  | 'stage'
+  | 'last_contact_at'
+  | 'next_follow_up_at'
+  | 'contact_type'
+  | 'phone'
+  | 'whatsapp'
+  | 'telegram'
+  | 'email'
+  | 'instagram'
+> & {
+  tagCount: number
+}
+
 export interface ContactFilters {
   search: string
   stages: string[]
@@ -57,6 +114,23 @@ export interface ContactListResult {
   page: number
   pageSize: number
   totalPages: number
+}
+
+export interface ContactInsightQueryParams {
+  userId: string
+  contactTypes?: Contact['contact_type'][]
+  limit?: number
+}
+
+export interface MessageContactQueryParams {
+  userId: string
+  search?: string
+  limit?: number
+}
+
+export interface ProcessContactQueryParams {
+  userId: string
+  limit?: number
 }
 
 export type InteractionType = Interaction['type']

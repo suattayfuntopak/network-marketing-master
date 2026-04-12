@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import type { ElementType } from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { tr, enUS } from 'date-fns/locale'
@@ -23,14 +23,15 @@ import { OnboardingChecklist } from '@/components/dashboard/OnboardingChecklist'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useContacts, useContactsCreatedThisWeekCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
+import { useContactCount, useContactInsights, useContactsCreatedThisWeekCount, useRecentContacts, useContactStageCounts } from '@/hooks/useContacts'
 import { useFollowUpBuckets, useTodayAppointments, useTodayFollowUpsCount } from '@/hooks/useCalendar'
+import { usePipelineStages } from '@/hooks/usePipeline'
 import { APPOINTMENT_TYPE_COLORS } from '@/lib/calendar/constants'
 import { fmtTime } from '@/lib/calendar/dateHelpers'
 import { ROUTES } from '@/lib/constants'
 import { buildDailyFocusSummary, type DailyFocusPriority } from '@/lib/dashboard/dailyFocus'
 import { buildDashboardOnboarding } from '@/lib/dashboard/onboarding'
-import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
+import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 import type { FollowUpActionType } from '@/lib/calendar/types'
 import type { Contact } from '@/types/database'
 
@@ -73,20 +74,17 @@ export function DashboardHome() {
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: contactsCreatedThisWeekCount = 0 } = useContactsCreatedThisWeekCount(userId)
-  const { data: contactsResult } = useContacts({
+  const { data: allContacts = [] } = useContactInsights({
     userId,
-    filters: DEFAULT_FILTERS,
-    sort: DEFAULT_SORT,
-    page: 1,
-    pageSize: 500,
+    limit: 250,
   })
   const { data: recentContacts = [] } = useRecentContacts(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
   const { data: todayAppointments = [] } = useTodayAppointments(userId)
+  const { data: pipelineStages = [] } = usePipelineStages(userId)
 
-  const allContacts = contactsResult?.data ?? []
   const dailyFocus = useMemo(
     () => buildDailyFocusSummary(allContacts, followUpBuckets),
     [allContacts, followUpBuckets]
@@ -124,6 +122,11 @@ export function DashboardHome() {
   const compactStageCounts = useMemo(
     () => stageCounts.filter((item) => item.count > 0).slice(0, 4),
     [stageCounts]
+  )
+
+  const getStageLabel = useCallback(
+    (stage: Contact['stage']) => resolveContactStageLabel(pipelineStages, stage, t, currentLang),
+    [currentLang, pipelineStages, t]
   )
 
   const stageTotal = useMemo(
@@ -267,8 +270,8 @@ export function DashboardHome() {
                       <p className="truncate text-sm font-semibold">{item.contactName}</p>
                       <p className="mt-1 text-xs leading-5 text-muted-foreground">{getPriorityReason(item, t)}</p>
                       <div className="mt-2 flex flex-wrap items-center gap-2">
-                        <StageBadge stage={item.stage as Contact['stage']} />
-                        {item.warmthScore > 0 ? <WarmthScoreBadge score={item.warmthScore} /> : null}
+                        <StageBadge stage={item.stage as Contact['stage']} label={getStageLabel(item.stage as Contact['stage'])} />
+                        {item.warmthScore > 0 ? <WarmthScoreBadge score={item.warmthScore} stage={item.stage} /> : null}
                       </div>
                     </div>
                     <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-primary" />
@@ -415,8 +418,8 @@ export function DashboardHome() {
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
-                      <StageBadge stage={contact.stage} />
-                      <WarmthScoreBadge score={contact.warmth_score} />
+                      <StageBadge stage={contact.stage} label={getStageLabel(contact.stage)} />
+                      <WarmthScoreBadge score={contact.warmth_score} stage={contact.stage} />
                     </div>
                   </button>
                 ))}

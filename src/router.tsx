@@ -3,6 +3,8 @@ import { createBrowserRouter } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import { ROUTES } from '@/lib/constants'
 import { ProtectedRoute } from '@/components/shared/ProtectedRoute'
+import { RouteErrorFallback } from '@/components/shared/RouteErrorFallback'
+import { PageState } from '@/components/shared/PageState'
 import i18n from '@/i18n'
 
 const LandingPage = lazy(async () => {
@@ -142,8 +144,12 @@ const SettingsPage = lazy(async () => {
 
 function RouteLoadingFallback() {
   return (
-    <div className="p-6 text-center text-muted-foreground">
-      {i18n.t('common.preparingPage')}
+    <div className="p-6">
+      <PageState
+        variant="loading"
+        title={i18n.t('common.preparingPage')}
+        description={i18n.t('common.loadingWorkspace')}
+      />
     </div>
   )
 }
@@ -170,61 +176,66 @@ function ContactFormWrapper() {
 }
 
 export const router = createBrowserRouter([
-  // Public routes
-  { path: ROUTES.HOME, element: renderLazyRoute(<LandingPage />) },
-  { path: ROUTES.LOGIN, element: renderLazyRoute(<LoginPage />) },
-  { path: ROUTES.REGISTER, element: renderLazyRoute(<RegisterPage />) },
-  { path: ROUTES.FORGOT_PASSWORD, element: renderLazyRoute(<ForgotPasswordPage />) },
-  { path: ROUTES.RESET_PASSWORD, element: renderLazyRoute(<ResetPasswordPage />) },
-  { path: ROUTES.EMAIL_CONFIRM, element: renderLazyRoute(<EmailConfirmPage />) },
-
-  // Protected routes
   {
-    element: <ProtectedRoute />,
+    errorElement: <RouteErrorFallback />,
     children: [
+      // Public routes
+      { path: ROUTES.HOME, element: renderLazyRoute(<LandingPage />) },
+      { path: ROUTES.LOGIN, element: renderLazyRoute(<LoginPage />) },
+      { path: ROUTES.REGISTER, element: renderLazyRoute(<RegisterPage />) },
+      { path: ROUTES.FORGOT_PASSWORD, element: renderLazyRoute(<ForgotPasswordPage />) },
+      { path: ROUTES.RESET_PASSWORD, element: renderLazyRoute(<ResetPasswordPage />) },
+      { path: ROUTES.EMAIL_CONFIRM, element: renderLazyRoute(<EmailConfirmPage />) },
+
+      // Protected routes
       {
-        element: renderLazyRoute(<DashboardLayout />),
+        element: <ProtectedRoute />,
         children: [
-          { path: ROUTES.DASHBOARD, element: renderLazyRoute(<DashboardHome />) },
+          {
+            element: renderLazyRoute(<DashboardLayout />),
+            children: [
+              { path: ROUTES.DASHBOARD, element: renderLazyRoute(<DashboardHome />) },
 
-          // Contacts
-          { path: ROUTES.CONTACTS, element: renderLazyRoute(<ContactsListPage />) },
-          { path: `${ROUTES.CONTACTS}/ozet/:summaryKey`, element: renderLazyRoute(<ContactsSummaryListPage />) },
-          { path: `${ROUTES.CONTACTS}/yeni`, element: renderLazyRoute(<ContactFormPage key="new" />) },
-          { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
-          { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
+              // Contacts
+              { path: ROUTES.CONTACTS, element: renderLazyRoute(<ContactsListPage />) },
+              { path: `${ROUTES.CONTACTS}/ozet/:summaryKey`, element: renderLazyRoute(<ContactsSummaryListPage />) },
+              { path: `${ROUTES.CONTACTS}/yeni`, element: renderLazyRoute(<ContactFormPage key="new" />) },
+              { path: `${ROUTES.CONTACTS}/:id`, element: <ContactDetailWrapper /> },
+              { path: `${ROUTES.CONTACTS}/:id/duzenle`, element: <ContactFormWrapper /> },
 
-          // Pipeline
-          { path: ROUTES.PIPELINE, element: renderLazyRoute(<PipelinePage />) },
-          { path: `${ROUTES.PIPELINE}/:dealId`, element: renderLazyRoute(<DealDetailPage />) },
+              // Pipeline
+              { path: ROUTES.PIPELINE, element: renderLazyRoute(<PipelinePage />) },
+              { path: `${ROUTES.PIPELINE}/:dealId`, element: renderLazyRoute(<DealDetailPage />) },
 
-          // Calendar
-          { path: ROUTES.CALENDAR, element: renderLazyRoute(<CalendarPage />) },
-          { path: `${ROUTES.CALENDAR}/hafta`, element: renderLazyRoute(<CalendarPage />) },
-          { path: `${ROUTES.CALENDAR}/gun`, element: renderLazyRoute(<CalendarPage />) },
-          { path: `${ROUTES.CALENDAR}/gundem`, element: renderLazyRoute(<CalendarPage />) },
-          { path: `${ROUTES.CALENDAR}/randevular`, element: renderLazyRoute(<CalendarAppointmentsPage />) },
-          { path: `${ROUTES.CALENDAR}/aksiyonlar/:summaryKey`, element: renderLazyRoute(<CalendarActionListPage />) },
-          { path: `${ROUTES.CALENDAR}/takipler`, element: renderLazyRoute(<FollowUpsPage />) },
+              // Calendar
+              { path: ROUTES.CALENDAR, element: renderLazyRoute(<CalendarPage />) },
+              { path: `${ROUTES.CALENDAR}/hafta`, element: renderLazyRoute(<CalendarPage />) },
+              { path: `${ROUTES.CALENDAR}/gun`, element: renderLazyRoute(<CalendarPage />) },
+              { path: `${ROUTES.CALENDAR}/gundem`, element: renderLazyRoute(<CalendarPage />) },
+              { path: `${ROUTES.CALENDAR}/randevular`, element: renderLazyRoute(<CalendarAppointmentsPage />) },
+              { path: `${ROUTES.CALENDAR}/aksiyonlar/:summaryKey`, element: renderLazyRoute(<CalendarActionListPage />) },
+              { path: `${ROUTES.CALENDAR}/takipler`, element: renderLazyRoute(<FollowUpsPage />) },
 
-          // Messages
-          { path: ROUTES.MESSAGES, element: renderLazyRoute(<MessagesPage />) },
+              // Messages
+              { path: ROUTES.MESSAGES, element: renderLazyRoute(<MessagesPage />) },
 
-          // Academy
-          { path: ROUTES.ACADEMY, element: renderLazyRoute(<AcademyPage />) },
-          { path: `${ROUTES.ACADEMY}/itirazlar`, element: renderLazyRoute(<ObjectionsPage />) },
-          { path: `${ROUTES.ACADEMY}/:id`, element: renderLazyRoute(<AcademyContentDetailPage />) },
-          { path: ROUTES.TEAM, element: renderLazyRoute(<TeamPage />) },
-          { path: ROUTES.PRODUCT_CUSTOMERS, element: renderLazyRoute(<ProductCustomersPage />) },
-          { path: `${ROUTES.PRODUCT_CUSTOMERS}/yeni`, element: renderLazyRoute(<ContactFormPage key="customer-new" />) },
-          { path: `${ROUTES.PRODUCT_CUSTOMERS}/:id/duzenle`, element: <ContactFormWrapper /> },
-          { path: ROUTES.ANALYTICS, element: renderLazyRoute(<AnalyticsPage />) },
-          { path: ROUTES.SETTINGS, element: renderLazyRoute(<SettingsPage />) },
+              // Academy
+              { path: ROUTES.ACADEMY, element: renderLazyRoute(<AcademyPage />) },
+              { path: `${ROUTES.ACADEMY}/itirazlar`, element: renderLazyRoute(<ObjectionsPage />) },
+              { path: `${ROUTES.ACADEMY}/:id`, element: renderLazyRoute(<AcademyContentDetailPage />) },
+              { path: ROUTES.TEAM, element: renderLazyRoute(<TeamPage />) },
+              { path: ROUTES.PRODUCT_CUSTOMERS, element: renderLazyRoute(<ProductCustomersPage />) },
+              { path: `${ROUTES.PRODUCT_CUSTOMERS}/yeni`, element: renderLazyRoute(<ContactFormPage key="customer-new" />) },
+              { path: `${ROUTES.PRODUCT_CUSTOMERS}/:id/duzenle`, element: <ContactFormWrapper /> },
+              { path: ROUTES.ANALYTICS, element: renderLazyRoute(<AnalyticsPage />) },
+              { path: ROUTES.SETTINGS, element: renderLazyRoute(<SettingsPage />) },
+            ],
+          },
         ],
       },
+
+      // 404
+      { path: '*', element: renderLazyRoute(<NotFoundPage />) },
     ],
   },
-
-  // 404
-  { path: '*', element: renderLazyRoute(<NotFoundPage />) },
 ])

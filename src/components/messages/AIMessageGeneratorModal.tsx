@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, Copy, RefreshCw, Check, BookmarkPlus, MessageCircle, Mail, Send } from 'lucide-react'
 import { SiInstagram, SiTelegram, SiWhatsapp } from 'react-icons/si'
@@ -18,7 +18,7 @@ import { useAIMessage } from '@/hooks/useAIMessage'
 import { useSaveAIMessage, useRateAIMessage, useCreateTemplate } from '@/hooks/useTemplates'
 import { useAuth } from '@/hooks/useAuth'
 import type { MessageCategory, MessageChannel, MessageTone, AIMessageVariant } from '@/lib/messages/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { MessageContact } from '@/lib/contacts/types'
 
 const CATEGORIES: MessageCategory[] = [
   'first_contact', 'warm_up', 'value_share', 'invitation',
@@ -33,7 +33,7 @@ const TONES: MessageTone[] = ['friendly', 'professional', 'curious', 'empathetic
 interface Props {
   open: boolean
   onClose: () => void
-  contact?: ContactWithTags | null
+  contact?: MessageContact | null
   initialCategory?: MessageCategory
   initialChannel?: MessageChannel
   initialTone?: MessageTone
@@ -51,6 +51,26 @@ interface DeliveryChannel {
 export function AIMessageGeneratorModal({
   open,
   onClose,
+  ...props
+}: Props) {
+  const dialogKey = [
+    props.contact?.id ?? 'no-contact',
+    props.initialCategory ?? 'follow_up',
+    props.initialChannel ?? 'whatsapp',
+    props.initialTone ?? 'friendly',
+    props.presetLabel ?? '',
+    props.presetReason ?? '',
+    props.deliveryMode ?? 'default',
+  ].join(':')
+
+  return (
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()}>
+      {open ? <AIMessageGeneratorModalContent key={dialogKey} {...props} /> : null}
+    </Dialog>
+  )
+}
+
+function AIMessageGeneratorModalContent({
   contact,
   initialCategory,
   initialChannel,
@@ -58,7 +78,7 @@ export function AIMessageGeneratorModal({
   presetLabel,
   presetReason,
   deliveryMode = 'default',
-}: Props) {
+}: Omit<Props, 'open' | 'onClose'>) {
   const { t } = useTranslation()
   const { user } = useAuth()
   const { generate, isGenerating } = useAIMessage()
@@ -114,13 +134,6 @@ export function AIMessageGeneratorModal({
       ...(contact.phone ? [{ key: 'sms', icon: MessageCircle, title: 'SMS' }] : []),
     ] as DeliveryChannel[]
   }, [contact])
-
-  useEffect(() => {
-    if (!open) return
-    setCategory(initialCategory ?? 'follow_up')
-    setChannel(initialChannel ?? 'whatsapp')
-    setTone(initialTone ?? 'friendly')
-  }, [initialCategory, initialChannel, initialTone, open])
 
   const handleGenerate = async () => {
     const result = await generate({
@@ -245,34 +258,22 @@ export function AIMessageGeneratorModal({
     }
   }
 
-  const handleClose = () => {
-    setVariants([])
-    setUserInput('')
-    setSavedMessageId(null)
-    setRated(null)
-    setSavingTemplateIdx(null)
-    setTemplateName('')
-    setSavedTemplateIdx(null)
-    onClose()
-  }
-
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-amber-500" />
-            {t('messages.ai.title')}
-          </DialogTitle>
-          {contact && (
-            <p className="text-sm text-muted-foreground">
-              {contact.full_name}
-              {contact.occupation && ` · ${contact.occupation}`}
-            </p>
-          )}
-        </DialogHeader>
+    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-amber-500" />
+          {t('messages.ai.title')}
+        </DialogTitle>
+        {contact && (
+          <p className="text-sm text-muted-foreground">
+            {contact.full_name}
+            {contact.occupation && ` · ${contact.occupation}`}
+          </p>
+        )}
+      </DialogHeader>
 
-        <div className="space-y-4 mt-2">
+      <div className="space-y-4 mt-2">
           {(presetLabel || presetReason) && (
             <div className="rounded-2xl border border-primary/15 bg-primary/6 p-4">
               <div className="flex flex-wrap items-center gap-2">
@@ -521,8 +522,7 @@ export function AIMessageGeneratorModal({
               </div>
             </div>
           )}
-        </div>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </DialogContent>
   )
 }

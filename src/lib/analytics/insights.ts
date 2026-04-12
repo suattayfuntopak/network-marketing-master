@@ -1,5 +1,5 @@
 import type { FollowUpBuckets } from '@/lib/calendar/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { ContactInsight } from '@/lib/contacts/types'
 
 type InsightTone = 'good' | 'watch' | 'risk'
 
@@ -53,7 +53,7 @@ function getRhythmTone(score: number): InsightTone {
 }
 
 export function buildAnalyticsInsights(
-  contacts: ContactWithTags[],
+  contacts: ContactInsight[],
   followUpBuckets?: FollowUpBuckets
 ): AnalyticsInsights {
   const activeContacts = contacts.filter((contact) => contact.stage !== 'lost')

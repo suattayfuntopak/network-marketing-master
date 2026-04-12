@@ -2,6 +2,7 @@ import { RouterProvider } from 'react-router-dom'
 import { ThemeProvider } from '@/app/providers/ThemeProvider'
 import { QueryProvider } from '@/app/providers/QueryProvider'
 import { AuthProvider } from '@/app/providers/AuthProvider'
+import { AppErrorBoundary } from '@/components/shared/AppErrorBoundary'
 import { Toaster } from '@/components/ui/sonner'
 import { router } from '@/router'
 
@@ -10,7 +11,9 @@ import { router } from '@/router'
 function AppWithAuth() {
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <AppErrorBoundary>
+        <RouterProvider router={router} />
+      </AppErrorBoundary>
       <Toaster />
     </AuthProvider>
   )

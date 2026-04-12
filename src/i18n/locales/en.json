@@ -30,6 +30,13 @@
     "preparingPage": "Preparing page...",
     "pageNotFound": "Page Not Found",
     "pageNotFoundDescription": "The page you are looking for may not exist or may have been moved.",
+    "somethingWentWrong": "Something went wrong",
+    "noResultsFound": "No results to display",
+    "loadingWorkspace": "Preparing your workspace and loading modules safely.",
+    "routeLoadError": "The page opened in safe mode",
+    "returnDashboard": "Return to Dashboard",
+    "appCrashed": "The app switched to safe mode",
+    "appCrashedDescription": "We caught an unexpected error. Your data is safe; you can continue from the dashboard.",
     "selected": "{{count}} items selected",
     "page": "Page {{page}} / {{total}}"
   },
@@ -338,7 +345,8 @@
       "notFound": "No tags found",
       "empty": "No tags yet",
       "createNew": "Create new tag",
-      "namePlaceholder": "Tag name"
+      "namePlaceholder": "Tag name",
+      "existing": "Existing tags"
     },
     "bulk": {
       "stage": "Stage",
@@ -965,7 +973,8 @@
       "settings": "Preferences",
       "notifications": "Notifications",
       "support": "Support",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "account": "Account"
     },
     "controlCenter": {
       "title": "Account Control Center",
@@ -1043,6 +1052,32 @@
           "name": "Team",
           "body": "Built for leader visibility, team radar, and deeper growth tracking."
         }
+      }
+    },
+    "workspace": {
+      "title": "Workspace Status",
+      "subtitle": "Track your readiness for real team architecture and see the active operating shape of your account.",
+      "loadingBody": "Workspace information is being checked. The system is safely reading the current team foundation and preparing your status.",
+      "unavailableBody": "Workspace status could not be read right now. The app is continuing safely in legacy flow.",
+      "legacyBody": "Workspace migration is not active yet. The app continues using the current distributor-contact structure without breaking team areas.",
+      "activeBody": "{{workspace}} currently shows {{members}} active members and your role is {{role}}. Real team architecture is now ready for this account.",
+      "nameFallback": "Personal workspace is being prepared",
+      "roleFallback": "Role not available yet",
+      "status": {
+        "loading": "Checking",
+        "unavailable": "Status unavailable",
+        "legacy": "Legacy mode",
+        "active": "Workspace active"
+      },
+      "architecture": {
+        "legacy": "Contact-proxy foundation",
+        "workspace": "Real workspace foundation"
+      },
+      "fields": {
+        "architecture": "Architecture",
+        "role": "Role",
+        "members": "Active members",
+        "workspace": "Workspace"
       }
     },
     "roles": {
@@ -1617,6 +1652,26 @@
       "label": "Team Snapshot",
       "value": "{{members}} team members • {{overdue}} overdue follow-ups"
     },
+    "workspace": {
+      "label": "Workspace",
+      "value": "{{workspace}} • {{members}} active members • {{role}}",
+      "legacyTitle": "Legacy team view is active",
+      "legacyBody": "This screen is still reading distributor contacts as if they were team members. The Phase 5 workspace migration is ready; once the database migration is applied, real members and roles will power this area.",
+      "activeTitle": "Workspace foundation detected",
+      "activeBody": "{{workspace}} currently shows {{members}} active members. The ground is ready to move from contact-proxy logic to real team architecture without breaking the current radar flow.",
+      "emptyBody": "The foundation for real team architecture is ready. As members are added, this screen can move fully from contact proxy logic to workspace logic.",
+      "memberFallback": "Workspace member",
+      "you": "You",
+      "noEmail": "No email available",
+      "joinedAt": "Joined: {{date}}",
+      "depth": "Level {{count}}",
+      "roles": {
+        "owner": "Owner",
+        "leader": "Leader",
+        "member": "Member",
+        "assistant": "Assistant"
+      }
+    },
     "stats": {
       "members": "Team Members",
       "membersHint": "Contacts marked as distributors",
@@ -1630,6 +1685,7 @@
     "sections": {
       "overview": "Overview",
       "leaderboard": "Top Momentum",
+      "workspaceMembers": "Workspace Members",
       "needsAttention": "Needs Attention",
       "activationQueue": "Activation Queue",
       "radar": "Radar Signals"

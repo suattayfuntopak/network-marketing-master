@@ -11,7 +11,6 @@ import { useAcademyContent, useToggleAcademyFavorite, useCreateAcademyContent, u
 import { useAuth } from '@/hooks/useAuth'
 import { ROUTES } from '@/lib/constants'
 import { trackAcademyRead } from '@/lib/academy/progress'
-import { isSystemAcademyId } from '@/lib/academy/systemContent'
 import type { ContentCategory, ContentLevel, ContentType } from '@/lib/academy/types'
 
 const LEVEL_COLORS = {

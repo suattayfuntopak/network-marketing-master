@@ -1,5 +1,5 @@
 import type { ObjectionCategory } from '@/lib/academy/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { Contact, ProcessContact } from '@/lib/contacts/types'
 import type { MessageCategory, MessageTone } from '@/lib/messages/types'
 
 export type ContactCoachCueKey = 'follow_up' | 'invite' | 'decision' | 'objection' | 'onboarding'
@@ -10,6 +10,14 @@ export interface ContactCoachCue {
   tone: MessageTone
   objectionCategory: ObjectionCategory
 }
+
+type ContactCoachInput = Pick<
+  Contact,
+  'stage' | 'contact_type' | 'warmth_score' | 'next_follow_up_at' | 'last_contact_at'
+> | Pick<
+  ProcessContact,
+  'stage' | 'contact_type' | 'warmth_score' | 'next_follow_up_at' | 'last_contact_at'
+>
 
 function getDaysUntil(value: string | null) {
   if (!value) return Number.POSITIVE_INFINITY
@@ -23,7 +31,7 @@ function getDaysSince(value: string | null) {
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
 }
 
-export function buildContactCoachCue(contact: ContactWithTags): ContactCoachCue {
+export function buildContactCoachCue(contact: ContactCoachInput): ContactCoachCue {
   const daysUntilFollowUp = getDaysUntil(contact.next_follow_up_at)
   const daysSinceLastTouch = getDaysSince(contact.last_contact_at)
 

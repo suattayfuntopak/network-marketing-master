@@ -58,6 +58,108 @@ export interface Database {
         }
       }
 
+      nmm_workspaces: {
+        Row: {
+          id: string
+          owner_user_id: string
+          name: string
+          slug: string
+          default_locale: string
+          country_code: string
+          is_personal: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          owner_user_id: string
+          name: string
+          slug: string
+          default_locale?: string
+          country_code?: string
+          is_personal?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+        Update: {
+          id?: string
+          owner_user_id?: string
+          name?: string
+          slug?: string
+          default_locale?: string
+          country_code?: string
+          is_personal?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
+      nmm_workspace_members: {
+        Row: {
+          id: string
+          workspace_id: string
+          user_id: string
+          role: 'owner' | 'leader' | 'member' | 'assistant'
+          status: 'invited' | 'active' | 'paused' | 'removed'
+          invited_by: string | null
+          joined_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          user_id: string
+          role?: 'owner' | 'leader' | 'member' | 'assistant'
+          status?: 'invited' | 'active' | 'paused' | 'removed'
+          invited_by?: string | null
+          joined_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+        Update: {
+          id?: string
+          workspace_id?: string
+          user_id?: string
+          role?: 'owner' | 'leader' | 'member' | 'assistant'
+          status?: 'invited' | 'active' | 'paused' | 'removed'
+          invited_by?: string | null
+          joined_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+
+      nmm_member_relationships: {
+        Row: {
+          id: string
+          workspace_id: string
+          sponsor_user_id: string
+          member_user_id: string
+          depth: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          sponsor_user_id: string
+          member_user_id: string
+          depth?: number
+          created_at?: string
+        }
+        Relationships: []
+        Update: {
+          id?: string
+          workspace_id?: string
+          sponsor_user_id?: string
+          member_user_id?: string
+          depth?: number
+          created_at?: string
+        }
+      }
+
       nmm_contacts: {
         Row: {
           id: string
@@ -734,6 +836,12 @@ export interface Database {
 export type Profile = Database['public']['Tables']['nmm_profiles']['Row']
 export type ProfileInsert = Database['public']['Tables']['nmm_profiles']['Insert']
 export type ProfileUpdate = Database['public']['Tables']['nmm_profiles']['Update']
+
+export type Workspace = Database['public']['Tables']['nmm_workspaces']['Row']
+export type WorkspaceInsert = Database['public']['Tables']['nmm_workspaces']['Insert']
+export type WorkspaceMember = Database['public']['Tables']['nmm_workspace_members']['Row']
+export type WorkspaceMemberInsert = Database['public']['Tables']['nmm_workspace_members']['Insert']
+export type MemberRelationship = Database['public']['Tables']['nmm_member_relationships']['Row']
 
 export type Contact = Database['public']['Tables']['nmm_contacts']['Row']
 export type ContactInsert = Database['public']['Tables']['nmm_contacts']['Insert']

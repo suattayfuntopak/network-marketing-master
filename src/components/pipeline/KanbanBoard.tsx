@@ -8,13 +8,12 @@ import {
   useSensors,
   closestCenter,
   getFirstCollision,
-  pointerWithin,
-  rectIntersection,
-  type CollisionDetection,
-  type DragCancelEvent,
-  type DragEndEvent,
-  type DragOverEvent,
-  type DragStartEvent,
+    pointerWithin,
+    rectIntersection,
+    type CollisionDetection,
+    type DragEndEvent,
+    type DragOverEvent,
+    type DragStartEvent,
 } from '@dnd-kit/core'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
@@ -167,7 +166,7 @@ export function KanbanBoard({ stages: initialStages, userId }: Props) {
     }
   }, [findStageForDeal, moveDealInStages, optimisticStages])
 
-  const handleDragCancel = useCallback((_: DragCancelEvent) => {
+  const handleDragCancel = useCallback(() => {
     resetDragState(true)
   }, [resetDragState])
 

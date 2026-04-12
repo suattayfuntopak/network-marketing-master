@@ -29,7 +29,6 @@ import { ROUTES } from '@/lib/constants'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
 
 type CalendarView = 'month' | 'week' | 'day' | 'agenda'
-type SummaryRouteKey = 'all-actions' | 'today-appointments' | 'today-follow-ups'
 
 const VIEW_PATHS: Record<CalendarView, string> = {
   month: ROUTES.CALENDAR,
@@ -293,10 +292,6 @@ export function CalendarPage() {
             appointments={appointments}
             followUps={followUps}
             onDayClick={(date) => updateDate(date, 'day')}
-            onAddClick={(date) => {
-              setSelectedDate(date)
-              setShowAppointmentModal(true)
-            }}
             onAppointmentClick={handleAppointmentClick}
           />
         )}

@@ -108,7 +108,7 @@ export function ContactFormPage() {
       })
       setSelectedTagIds(c.tags.map((t) => t.id))
     }
-  }, [existingContact, reset])
+  }, [existingContact, isCustomerMode, reset])
 
   const onSubmit = async (data: FormData) => {
     const parseArray = (s?: string) =>

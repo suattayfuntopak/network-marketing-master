@@ -12,14 +12,11 @@ interface Props {
   appointments: AppointmentWithContact[]
   followUps: FollowUpWithContact[]
   onDayClick: (date: Date) => void
-  onAddClick: (date: Date) => void
   onAppointmentClick?: (apt: AppointmentWithContact) => void
 }
 
-const WEEKDAY_KEYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-
-export function CalendarMonthView({ currentDate, appointments, followUps, onDayClick, onAddClick, onAppointmentClick }: Props) {
-  const { t } = useTranslation()
+export function CalendarMonthView({ currentDate, appointments, followUps, onDayClick, onAppointmentClick }: Props) {
+  useTranslation()
   const locale = getLocale()
   const weeks = buildMonthGrid(currentDate)
 

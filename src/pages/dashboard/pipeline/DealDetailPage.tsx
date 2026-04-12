@@ -16,7 +16,6 @@ import { useAuth } from '@/hooks/useAuth'
 import { useDeal, useStageHistory, usePipelineStages, useCloseDeal, useReopenDeal, useUpdateDeal } from '@/hooks/usePipeline'
 import { STAGE_COLOR_CLASSES, DEAL_TYPE_COLORS, DEAL_STATUS_COLORS } from '@/lib/pipeline/constants'
 import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
-import type { DealStatus } from '@/lib/pipeline/types'
 
 export function DealDetailPage() {
   const { dealId } = useParams<{ dealId: string }>()

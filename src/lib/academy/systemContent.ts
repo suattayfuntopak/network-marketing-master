@@ -755,7 +755,7 @@ Sen: ${pack.softQuestion}`,
 Zaten amaç seni başkasının kalıbına sokmak değil. Bu tür durumlarda en doğru yaklaşım, sana uyan en küçük ${pack.nextMove.toLowerCase()} görmek. Büyük tabloyu sonra konuşuruz.
 
 ${pack.proof}`,
-    buildApproach: (pack) => `Kimlik savunmasını kırmaya çalışma; kişiye kendi hızında ilerleyebileceği hafif bir kapı aç.`,
+    buildApproach: () => `Kimlik savunmasını kırmaya çalışma; kişiye kendi hızında ilerleyebileceği hafif bir kapı aç.`,
     buildExample: (pack) => `Aday: Ben o tarz biri değilim.
 
 Sen: Olmak zorunda da değilsin.
@@ -774,7 +774,7 @@ Sen: ${pack.softQuestion}`,
 Bu cümle genelde istememekten çok, kararın ağır gelmesi demektir. O yüzden büyük sonuca değil, küçük bir ${pack.nextMove.toLowerCase()} bakmak daha iyi olur. Böylece konu zihninde yük olmadan netleşir.
 
 ${pack.proof}`,
-    buildApproach: (pack) => `Erteleme cümlesini ret gibi okumadan, karar yükünü küçült ve konuşmayı bir adım hafiflet.`,
+    buildApproach: () => `Erteleme cümlesini ret gibi okumadan, karar yükünü küçült ve konuşmayı bir adım hafiflet.`,
     buildExample: (pack) => `Aday: Biraz bekleyeyim.
 
 Sen: Tabii, acele ettirmek istemem.

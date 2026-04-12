@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next'
-import { format, isSameDay, parseISO, addDays, eachDayOfInterval } from 'date-fns'
+import { isSameDay, parseISO, addDays, eachDayOfInterval } from 'date-fns'
 import { MapPin, Video, Phone, Coffee, Users, Calendar, Bell, ExternalLink } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { getLocale, fmtTime, relativeDay, isToday } from '@/lib/calendar/dateHelpers'
+import { fmtTime, relativeDay, isToday } from '@/lib/calendar/dateHelpers'
 import { APPOINTMENT_TYPE_COLORS, PRIORITY_COLORS } from '@/lib/calendar/constants'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
 
@@ -18,7 +18,6 @@ interface Props {
 
 export function CalendarAgendaView({ currentDate, appointments, followUps, onAddAppointment, onAppointmentClick }: Props) {
   const { t } = useTranslation()
-  const locale = getLocale()
 
   const days = eachDayOfInterval({ start: currentDate, end: addDays(currentDate, 29) })
 

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { User, Globe, Shield, LogOut, Bell, HelpCircle, MessageSquare, Sparkles, Copy, CheckCircle2 } from 'lucide-react'
+import { User, Globe, Shield, LogOut, Bell, HelpCircle, MessageSquare, Sparkles, Copy, CheckCircle2, Users, Layers3 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { useNotifications } from '@/hooks/useNotifications'
+import { useWorkspaceContext } from '@/hooks/useWorkspace'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
@@ -27,6 +28,7 @@ export function SettingsPage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { requestPermission, showNotification, permission } = useNotifications()
+  const workspaceQuery = useWorkspaceContext(user?.id ?? '')
 
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
   const [saving, setSaving] = useState(false)
@@ -155,6 +157,40 @@ export function SettingsPage() {
   const localizedRole = t(roleKey, { defaultValue: t('settings.roles.distributor') })
   const membershipPlan = (user?.user_metadata?.selected_plan as 'starter' | 'pro' | 'team' | undefined) ?? 'starter'
   const workspaceMode = (user?.user_metadata?.workspace_mode as 'clean' | 'demo' | undefined) ?? 'clean'
+  const workspaceContext = workspaceQuery.data
+  const workspaceStatusKey = workspaceQuery.isLoading
+    ? 'loading'
+    : workspaceQuery.isError
+      ? 'unavailable'
+      : workspaceContext?.mode === 'workspace'
+        ? 'active'
+        : 'legacy'
+  const workspaceStatusTone =
+    workspaceStatusKey === 'active'
+      ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100'
+      : workspaceStatusKey === 'legacy'
+        ? 'border-amber-500/20 bg-amber-500/10 text-amber-100'
+        : 'border-border/70 bg-card/70 text-muted-foreground'
+  const workspaceRole = workspaceContext?.membership?.role
+    ? t(`team.workspace.roles.${workspaceContext.membership.role}`)
+    : t('settings.workspace.roleFallback')
+  const workspaceName = workspaceContext?.workspace?.name ?? t('settings.workspace.nameFallback')
+  const workspaceArchitecture = t(
+    workspaceContext?.mode === 'workspace'
+      ? 'settings.workspace.architecture.workspace'
+      : 'settings.workspace.architecture.legacy'
+  )
+  const workspaceBody = workspaceQuery.isLoading
+    ? t('settings.workspace.loadingBody')
+    : workspaceQuery.isError
+      ? t('settings.workspace.unavailableBody')
+      : workspaceContext?.mode === 'workspace'
+        ? t('settings.workspace.activeBody', {
+            workspace: workspaceName,
+            members: workspaceContext.memberCount,
+            role: workspaceRole,
+          })
+        : t('settings.workspace.legacyBody')
   const permissionTone =
     permission === 'granted'
       ? 'border-emerald-500/20 bg-emerald-500/10 text-emerald-100'
@@ -182,6 +218,7 @@ export function SettingsPage() {
               { key: 'notifications' as const, icon: Bell },
               { key: 'support' as const, icon: HelpCircle },
               { key: 'feedback' as const, icon: MessageSquare },
+              { key: 'account' as const, icon: Shield },
             ].map(({ key, icon: Icon }) => (
               <button
                 key={key}
@@ -396,6 +433,47 @@ export function SettingsPage() {
             >
               {t('settings.membership.action')}
             </Button>
+          </div>
+          <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold">{t('settings.workspace.title')}</p>
+                <p className="mt-1 text-xs leading-5 text-muted-foreground">{t('settings.workspace.subtitle')}</p>
+              </div>
+              <Badge className={workspaceStatusTone}>{t(`settings.workspace.status.${workspaceStatusKey}`)}</Badge>
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{workspaceBody}</p>
+            <div className="mt-4 grid gap-3 md:grid-cols-3">
+              <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  <Layers3 className="h-4 w-4" />
+                  {t('settings.workspace.fields.architecture')}
+                </p>
+                <p className="mt-2 text-sm font-medium">{workspaceArchitecture}</p>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  <Shield className="h-4 w-4" />
+                  {t('settings.workspace.fields.role')}
+                </p>
+                <p className="mt-2 text-sm font-medium">{workspaceRole}</p>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-background/40 p-3">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  <Users className="h-4 w-4" />
+                  {t('settings.workspace.fields.members')}
+                </p>
+                <p className="mt-2 text-sm font-medium">
+                  {workspaceQuery.isLoading ? '...' : workspaceContext?.memberCount ?? 0}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 rounded-xl border border-border/60 bg-background/30 p-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                {t('settings.workspace.fields.workspace')}
+              </p>
+              <p className="mt-2 text-sm font-medium">{workspaceName}</p>
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">{t('settings.accountInfo')}</p>
           <Button

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { startOfDay, endOfDay, addDays, startOfWeek, endOfWeek } from 'date-fns'
+import { startOfDay, endOfDay, addDays, endOfWeek } from 'date-fns'
 import type { AppointmentWithContact, FollowUpBuckets, FollowUpWithContact, FollowUpStatus } from './types'
 
 // ─── Appointments ─────────────────────────────────────────────

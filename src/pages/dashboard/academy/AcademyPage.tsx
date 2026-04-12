@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search, Star, Clock, Eye, BookOpen, GraduationCap, Shield, Plus, Copy } from 'lucide-react'
+import { Search, Star, Clock, Eye, BookOpen, GraduationCap, Shield, Plus } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'

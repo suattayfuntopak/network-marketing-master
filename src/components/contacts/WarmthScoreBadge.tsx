@@ -1,4 +1,4 @@
-import { getWarmthKey, getWarmthColor } from '@/lib/contacts/constants'
+import { getDisplayWarmthScore, getWarmthKey, getWarmthColor } from '@/lib/contacts/constants'
 import { cn } from '@/lib/utils'
 import { useTranslation } from 'react-i18next'
 
@@ -12,13 +12,15 @@ const colorClasses: Record<string, string> = {
 
 interface WarmthScoreBadgeProps {
   score: number
+  stage?: string | null
   className?: string
 }
 
-export function WarmthScoreBadge({ score, className }: WarmthScoreBadgeProps) {
+export function WarmthScoreBadge({ score, stage, className }: WarmthScoreBadgeProps) {
   const { t } = useTranslation()
-  const color = getWarmthColor(score)
-  const label = t(`contactWarmth.${getWarmthKey(score)}`)
+  const displayScore = getDisplayWarmthScore(score, stage)
+  const color = getWarmthColor(displayScore)
+  const label = t(`contactWarmth.${getWarmthKey(displayScore)}`)
 
   return (
     <span
@@ -28,7 +30,7 @@ export function WarmthScoreBadge({ score, className }: WarmthScoreBadgeProps) {
         className
       )}
     >
-      <span className="tabular-nums">{score}</span>
+      <span className="tabular-nums">{displayScore}</span>
       <span>· {label}</span>
     </span>
   )

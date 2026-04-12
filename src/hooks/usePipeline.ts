@@ -42,9 +42,11 @@ export function usePipelineStages(userId: string) {
     queryKey: pipelineKeys.stages(userId),
     queryFn: () => fetchPipelineStages(userId),
     enabled: !!userId,
-    staleTime: 60_000,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -55,9 +57,11 @@ export function useDeals(userId: string, filters?: DealFilters) {
     queryKey: pipelineKeys.deals(userId, filters),
     queryFn: () => fetchDeals(userId, filters),
     enabled: !!userId,
-    staleTime: 30_000,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 

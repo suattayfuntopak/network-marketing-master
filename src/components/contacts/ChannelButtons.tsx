@@ -3,8 +3,10 @@ import { SiWhatsapp, SiTelegram, SiInstagram } from 'react-icons/si'
 import type { Contact } from '@/types/database'
 import { cn } from '@/lib/utils'
 
+type ChannelContact = Pick<Contact, 'phone' | 'whatsapp' | 'telegram' | 'email' | 'instagram'>
+
 interface ChannelButtonsProps {
-  contact: Contact
+  contact: ChannelContact
   size?: 'sm' | 'default'
   className?: string
 }

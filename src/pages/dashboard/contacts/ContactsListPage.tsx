@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, Upload, Download, LayoutGrid, LayoutList, Users, CalendarRange, CalendarDays, Clock3, ChevronLeft, ChevronRight } from 'lucide-react'
-import { startOfDay, startOfMonth, startOfWeek } from 'date-fns'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
@@ -11,26 +10,29 @@ import { ContactTable } from '@/components/contacts/ContactTable'
 import { ContactCard } from '@/components/contacts/ContactCard'
 import { BulkActionsBar } from '@/components/contacts/BulkActionsBar'
 import { ContactImportModal } from './ContactImportModal'
-import { useContacts } from '@/hooks/useContacts'
+import { useContacts, useContactSummaryCounts } from '@/hooks/useContacts'
 import { useContactFilters } from '@/hooks/useContactFilters'
 import { useTags } from '@/hooks/useTags'
 import { useArchiveContact, useDeleteContact } from '@/hooks/useContact'
 import { useQueryClient } from '@tanstack/react-query'
 import { bulkUpdateStage, bulkArchive, bulkDelete, bulkAddTag, bulkRemoveTag } from '@/lib/contacts/mutations'
 import { exportContactsToCSV } from '@/lib/contacts/export'
-import { fetchContacts } from '@/lib/contacts/queries'
+import { fetchContactsForExport } from '@/lib/contacts/queries'
 import { contactKeys } from '@/hooks/useContacts'
 import { useAuth } from '@/hooks/useAuth'
+import { usePipelineStages } from '@/hooks/usePipeline'
 import { ROUTES } from '@/lib/constants'
 import { PAGE_SIZE } from '@/lib/contacts/constants'
-import { DEFAULT_FILTERS, DEFAULT_SORT, type SortField } from '@/lib/contacts/types'
+import type { SortField } from '@/lib/contacts/types'
+import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 
 export function ContactsListPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const userId = user?.id ?? ''
   const qc = useQueryClient()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
 
   const { filters, sort, page, setFilters, setSort, setPage, resetFilters, hasActiveFilters } = useContactFilters()
   const [viewMode, setViewMode] = useState<'table' | 'card'>('table')
@@ -46,35 +48,22 @@ export function ContactsListPage() {
     pageSize: PAGE_SIZE,
     userId,
   })
-  const { data: insightData } = useContacts({
-    filters: DEFAULT_FILTERS,
-    sort: DEFAULT_SORT,
-    page: 1,
-    pageSize: 10000,
-    userId,
-  })
+  const { data: summaryCounts } = useContactSummaryCounts(userId)
 
   const { data: tags = [] } = useTags(userId)
+  const { data: pipelineStages = [] } = usePipelineStages(userId)
   const archiveMutation = useArchiveContact()
   const deleteMutation = useDeleteContact()
 
   const contacts = data?.data ?? []
-  const insightContacts = insightData?.data ?? contacts
   const totalPages = data?.totalPages ?? 1
   const totalCount = data?.count ?? 0
-  const contactSummary = useMemo(() => {
-    const now = new Date()
-    const monthStart = startOfMonth(now)
-    const weekStart = startOfWeek(now, { weekStartsOn: 1 })
-    const todayStart = startOfDay(now)
+  const contactSummary = summaryCounts ?? { total: totalCount, month: 0, week: 0, today: 0 }
 
-    return {
-      total: insightContacts.length,
-      month: insightContacts.filter((contact) => new Date(contact.created_at) >= monthStart).length,
-      week: insightContacts.filter((contact) => new Date(contact.created_at) >= weekStart).length,
-      today: insightContacts.filter((contact) => new Date(contact.created_at) >= todayStart).length,
-    }
-  }, [insightContacts])
+  const getStageLabel = useCallback(
+    (stage: (typeof contacts)[number]['stage']) => resolveContactStageLabel(pipelineStages, stage, t, currentLang),
+    [currentLang, pipelineStages, t]
+  )
 
   const SUMMARY_TONE_CLASSES = {
     cyan: 'border-primary/20 bg-primary/10 text-primary',
@@ -134,15 +123,14 @@ export function ContactsListPage() {
   const handleExport = async () => {
     setExporting(true)
     try {
-      const result = await fetchContacts({
+      const exportRows = await fetchContactsForExport({
         filters,
         sort,
-        page: 1,
-        pageSize: 10000,
         userId,
+        batchSize: 250,
       })
-      exportContactsToCSV(result.data)
-      toast.success(t('contacts.exportCount', { count: result.data.length }))
+      exportContactsToCSV(exportRows)
+      toast.success(t('contacts.exportCount', { count: exportRows.length }))
     } catch {
       toast.error(t('contacts.saveError'))
     } finally {
@@ -368,6 +356,7 @@ export function ContactsListPage() {
       ) : viewMode === 'table' ? (
         <ContactTable
           contacts={contacts}
+          getStageLabel={getStageLabel}
           selectedIds={selectedIds}
           sort={sort}
           onSort={handleSort}
@@ -383,6 +372,7 @@ export function ContactsListPage() {
             <ContactCard
               key={contact.id}
               contact={contact}
+              stageLabel={getStageLabel(contact.stage)}
               selected={selectedIds.includes(contact.id)}
               onToggleSelect={() => toggleSelect(contact.id)}
               onEdit={() => handleEdit(contact.id)}

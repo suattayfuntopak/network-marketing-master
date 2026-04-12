@@ -23,11 +23,11 @@ import { ROUTES } from '@/lib/constants'
 import { buildContactCoachCue } from '@/lib/contacts/contactCoach'
 import { STAGE_COLOR_CLASSES } from '@/lib/pipeline/constants'
 import { resolveStageLabel } from '@/lib/pipeline/stageLabels'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { ProcessContact } from '@/lib/contacts/types'
 import type { ContactStageKey, SyncedPipelineStage } from '@/lib/pipeline/stageLabels'
 
 export interface ContactProcessRecord {
-  contact: ContactWithTags
+  contact: ProcessContact
   stageKey: ContactStageKey
 }
 
@@ -184,10 +184,10 @@ function ContactCard({
       </div>
 
       <div className="mt-3 flex items-center justify-between gap-2">
-        <WarmthScoreBadge score={record.contact.warmth_score} className="max-w-full" />
-        {record.contact.tags.length > 0 ? (
+        <WarmthScoreBadge score={record.contact.warmth_score} stage={record.contact.stage} className="max-w-full" />
+        {record.contact.tagCount > 0 ? (
           <span className="shrink-0 text-xs text-muted-foreground">
-            {record.contact.tags.length} {t('contacts.fields.tags')}
+            {record.contact.tagCount} {t('contacts.fields.tags')}
           </span>
         ) : null}
       </div>

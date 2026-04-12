@@ -1,9 +1,9 @@
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { ContactInsight } from '@/lib/contacts/types'
 
 export type TeamRadarStatus = 'active' | 'slowing_down' | 'needs_support' | 'gaining_momentum'
 
 export interface TeamRadarInsight {
-  contact: ContactWithTags
+  contact: ContactInsight
   status: TeamRadarStatus
   daysSinceLastActivity: number
   focusKey: 'followUpDiscipline' | 'newConversations' | 'presentationSupport' | 'decisionSupport'
@@ -17,7 +17,7 @@ function getDaysSince(dateValue: string | null) {
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
 }
 
-export function getTeamRadarStatus(contact: ContactWithTags): TeamRadarStatus {
+export function getTeamRadarStatus(contact: ContactInsight): TeamRadarStatus {
   const daysSinceLastActivity = getDaysSince(contact.last_contact_at)
   const hasOverdueFollowUp =
     typeof contact.next_follow_up_at === 'string' && new Date(contact.next_follow_up_at).getTime() < Date.now()
@@ -45,7 +45,7 @@ export function getTeamRadarStatus(contact: ContactWithTags): TeamRadarStatus {
   return 'active'
 }
 
-export function buildTeamRadarInsight(contact: ContactWithTags): TeamRadarInsight {
+export function buildTeamRadarInsight(contact: ContactInsight): TeamRadarInsight {
   const status = getTeamRadarStatus(contact)
   const daysSinceLastActivity = getDaysSince(contact.last_contact_at)
 

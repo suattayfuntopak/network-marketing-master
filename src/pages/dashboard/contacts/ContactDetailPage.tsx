@@ -21,7 +21,6 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { StageBadge } from '@/components/contacts/StageBadge'
 import { WarmthScoreBar } from '@/components/contacts/WarmthScoreBar'
-import { TagChip } from '@/components/contacts/TagChip'
 import { ChannelButtons } from '@/components/contacts/ChannelButtons'
 import { InteractionTimeline } from '@/components/contacts/InteractionTimeline'
 import { QuickNoteInput } from '@/components/contacts/QuickNoteInput'
@@ -221,6 +220,7 @@ export function ContactDetailPage() {
     })
     const current = contact.tags.map((t) => t.id)
     await setTagsMutation.mutateAsync([...current, newId])
+    toast.success(t('contacts.tag.added'))
   }
 
   return (
@@ -285,18 +285,12 @@ export function ContactDetailPage() {
             </div>
 
             {/* Warmth */}
-            <WarmthScoreBar score={contact.warmth_score} />
+            <WarmthScoreBar score={contact.warmth_score} stage={contact.stage} />
 
             {/* Stage */}
             {!isCustomer && (
               <div className="flex items-center justify-center gap-2">
-                {currentSyncedStage ? (
-                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-primary/10 text-primary">
-                    {currentStageLabel}
-                  </span>
-                ) : (
-                  <StageBadge stage={contact.stage} />
-                )}
+                <StageBadge stage={contact.stage} label={currentStageLabel} />
               </div>
             )}
 
@@ -313,6 +307,7 @@ export function ContactDetailPage() {
                 onToggle={handleTagToggle}
                 onCreateTag={handleCreateTag}
                 userId={userId}
+                creationMode="direct"
               />
             </div>
           </div>

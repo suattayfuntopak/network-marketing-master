@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useCallback, useEffect, type ReactNode } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '@/lib/supabase'
 import { useAuthStore } from '@/stores/authStore'
@@ -11,35 +11,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const { setUser, setSession, setProfile, setLoading, reset } = useAuthStore()
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user)
-      } else {
-        setLoading(false)
-      }
-    })
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session)
-        setUser(session?.user ?? null)
-        if (session?.user) {
-          await fetchProfile(session.user)
-        } else {
-          reset()
-        }
-      }
-    )
-
-    return () => subscription.unsubscribe()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  async function fetchProfile(user: User) {
+  const fetchProfile = useCallback(async (user: User) => {
     const { data: initialProfile } = await supabase
       .from('nmm_profiles')
       .select('*')
@@ -69,7 +41,48 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
     setProfile(nextProfile)
     setLoading(false)
-  }
+  }, [setLoading, setProfile])
+
+  useEffect(() => {
+    let isMounted = true
+
+    const bootstrapAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!isMounted) return
+
+      setSession(session)
+      setUser(session?.user ?? null)
+
+      if (session?.user) {
+        await fetchProfile(session.user)
+        return
+      }
+
+      setLoading(false)
+    }
+
+    void bootstrapAuth()
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (!isMounted) return
+
+        setSession(session)
+        setUser(session?.user ?? null)
+
+        if (session?.user) {
+          await fetchProfile(session.user)
+        } else {
+          reset()
+        }
+      }
+    )
+
+    return () => {
+      isMounted = false
+      subscription.unsubscribe()
+    }
+  }, [fetchProfile, reset, setLoading, setSession, setUser])
 
   return <>{children}</>
 }

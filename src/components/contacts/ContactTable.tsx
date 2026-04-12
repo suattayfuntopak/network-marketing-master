@@ -6,7 +6,6 @@ import { MoreHorizontal, ArrowUpDown, ArrowUp, ArrowDown, Edit, Archive, Trash2 
 import { useTranslation } from 'react-i18next'
 import i18n from '@/i18n'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,11 +19,13 @@ import { ChannelButtons } from './ChannelButtons'
 import { TagChip } from './TagChip'
 import type { ContactWithTags } from '@/lib/contacts/types'
 import type { ContactSort, SortField } from '@/lib/contacts/types'
+import { getDisplayWarmthScore } from '@/lib/contacts/constants'
 import { ROUTES } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 interface ContactTableProps {
   contacts: ContactWithTags[]
+  getStageLabel?: (stage: ContactWithTags['stage']) => string
   selectedIds: string[]
   sort: ContactSort
   onSort: (field: SortField) => void
@@ -67,6 +68,7 @@ function SortHeader({
 
 export function ContactTable({
   contacts,
+  getStageLabel,
   selectedIds,
   sort,
   onSort,
@@ -81,7 +83,6 @@ export function ContactTable({
   const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
   const dateLocale = currentLang === 'en' ? enUS : tr
   const allSelected = contacts.length > 0 && contacts.every((c) => selectedIds.includes(c.id))
-  const someSelected = contacts.some((c) => selectedIds.includes(c.id))
 
   const handleSort = (field: SortField) => {
     if (sort.field === field) {
@@ -151,11 +152,11 @@ export function ContactTable({
                   <ChannelButtons contact={contact} size="sm" />
                 </td>
                 <td className="px-3 py-3">
-                  <StageBadge stage={contact.stage} />
+                  <StageBadge stage={contact.stage} label={getStageLabel?.(contact.stage)} />
                 </td>
                 <td className="px-3 py-3 min-w-32">
-                  <WarmthScoreBar score={contact.warmth_score} showLabel={false} />
-                  <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">{contact.warmth_score}</p>
+                  <WarmthScoreBar score={contact.warmth_score} stage={contact.stage} showLabel={false} />
+                  <p className="text-xs text-muted-foreground mt-0.5 tabular-nums">{getDisplayWarmthScore(contact.warmth_score, contact.stage)}</p>
                 </td>
                 <td className="px-3 py-3">
                   <div className="flex flex-wrap gap-1">

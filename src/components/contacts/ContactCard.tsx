@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 
 interface ContactCardProps {
   contact: ContactWithTags
+  stageLabel?: string
   selected: boolean
   onToggleSelect: () => void
   onEdit: () => void
@@ -30,6 +31,7 @@ interface ContactCardProps {
 
 export function ContactCard({
   contact,
+  stageLabel,
   selected,
   onToggleSelect,
   onEdit,
@@ -92,7 +94,7 @@ export function ContactCard({
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <StageBadge stage={contact.stage} />
+        <StageBadge stage={contact.stage} label={stageLabel} />
         {contact.last_contact_at && (
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(new Date(contact.last_contact_at), { addSuffix: true, locale: dateLocale })}
@@ -100,7 +102,7 @@ export function ContactCard({
         )}
       </div>
 
-      <WarmthScoreBar score={contact.warmth_score} />
+      <WarmthScoreBar score={contact.warmth_score} stage={contact.stage} />
 
       <div className="flex items-center justify-between" onClick={(e) => e.stopPropagation()}>
         <ChannelButtons contact={contact} size="sm" />

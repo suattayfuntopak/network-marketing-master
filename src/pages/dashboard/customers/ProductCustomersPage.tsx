@@ -1,28 +1,20 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { CalendarPlus, Download, MessageSquarePlus, Package2, Plus, Search } from 'lucide-react'
-import { startOfDay, startOfMonth, startOfWeek } from 'date-fns'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ChannelButtons } from '@/components/contacts/ChannelButtons'
 import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { AIMessageGeneratorModal } from '@/components/messages/AIMessageGeneratorModal'
-import { useContacts } from '@/hooks/useContacts'
+import { useContacts, useContactSummaryCounts } from '@/hooks/useContacts'
 import { useFollowUps } from '@/hooks/useCalendar'
 import { useAuth } from '@/hooks/useAuth'
-import { fetchContacts } from '@/lib/contacts/queries'
+import { fetchContactsForExport } from '@/lib/contacts/queries'
 import { exportContactsToCSV } from '@/lib/contacts/export'
 import { PAGE_SIZE } from '@/lib/contacts/constants'
 import { ROUTES } from '@/lib/constants'
 import { DEFAULT_FILTERS, DEFAULT_SORT, type ContactWithTags } from '@/lib/contacts/types'
-
-function formatList(items: string[] | null, fallback: string) {
-  if (!items || items.length === 0) return fallback
-  if (items.length === 1) return items[0]
-  return `${items.slice(0, 2).join(', ')}${items.length > 2 ? ` +${items.length - 2}` : ''}`
-}
 
 function formatDate(value: string | null, locale: string, fallback: string) {
   if (!value) return fallback
@@ -48,14 +40,6 @@ export function ProductCustomersPage() {
     [search]
   )
 
-  const insightFilters = useMemo(
-    () => ({
-      ...DEFAULT_FILTERS,
-      contactTypes: ['customer'],
-    }),
-    []
-  )
-
   const { data, isLoading, isError } = useContacts({
     filters,
     sort: { field: 'created_at', order: 'desc' },
@@ -63,31 +47,11 @@ export function ProductCustomersPage() {
     pageSize: PAGE_SIZE,
     userId,
   })
-
-  const { data: insightData } = useContacts({
-    filters: insightFilters,
-    sort: DEFAULT_SORT,
-    page: 1,
-    pageSize: 10000,
-    userId,
-  })
+  const { data: metrics } = useContactSummaryCounts(userId, ['customer'])
   const { data: followUps = [] } = useFollowUps(userId, 'pending')
 
   const rows = data?.data ?? []
-  const insightRows = insightData?.data ?? rows
-
-  const metrics = useMemo(() => {
-    const monthStart = startOfMonth(new Date())
-    const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
-    const todayStart = startOfDay(new Date())
-
-    return {
-      total: insightRows.length,
-      month: insightRows.filter((contact) => new Date(contact.created_at) >= monthStart).length,
-      week: insightRows.filter((contact) => new Date(contact.created_at) >= weekStart).length,
-      today: insightRows.filter((contact) => new Date(contact.created_at) >= todayStart).length,
-    }
-  }, [insightRows])
+  const customerMetrics = metrics ?? { total: rows.length, month: 0, week: 0, today: 0 }
 
   const nextFollowUps = useMemo(() => {
     const nextByContact = new Map<string, string>()
@@ -103,15 +67,17 @@ export function ProductCustomersPage() {
   const handleExport = async () => {
     setExporting(true)
     try {
-      const result = await fetchContacts({
-        filters: insightFilters,
+      const exportRows = await fetchContactsForExport({
+        filters: {
+          ...DEFAULT_FILTERS,
+          contactTypes: ['customer'],
+        },
         sort: DEFAULT_SORT,
-        page: 1,
-        pageSize: 10000,
         userId,
+        batchSize: 250,
       })
-      exportContactsToCSV(result.data)
-      toast.success(t('customers.exportCount', { count: result.data.length }))
+      exportContactsToCSV(exportRows)
+      toast.success(t('customers.exportCount', { count: exportRows.length }))
     } catch {
       toast.error(t('contacts.saveError'))
     } finally {
@@ -132,7 +98,7 @@ export function ProductCustomersPage() {
             variant="outline"
             size="sm"
             onClick={handleExport}
-            disabled={exporting || metrics.total === 0}
+            disabled={exporting || customerMetrics.total === 0}
             className="gap-1.5"
           >
             <Download className="h-4 w-4" />
@@ -150,28 +116,28 @@ export function ProductCustomersPage() {
           {[
             {
               key: 'total',
-              value: metrics.total,
+              value: customerMetrics.total,
               label: t('customers.cards.total.title'),
               body: t('customers.cards.total.body'),
               icon: Package2,
             },
             {
               key: 'month',
-              value: metrics.month,
+              value: customerMetrics.month,
               label: t('customers.cards.month.title'),
               body: t('customers.cards.month.body'),
               icon: Plus,
             },
             {
               key: 'week',
-              value: metrics.week,
+              value: customerMetrics.week,
               label: t('customers.cards.week.title'),
               body: t('customers.cards.week.body'),
               icon: CalendarPlus,
             },
             {
               key: 'today',
-              value: metrics.today,
+              value: customerMetrics.today,
               label: t('customers.cards.today.title'),
               body: t('customers.cards.today.body'),
               icon: Search,
@@ -213,14 +179,12 @@ export function ProductCustomersPage() {
         </div>
       ) : rows.length > 0 ? (
         <div className="overflow-x-auto rounded-3xl border border-border/70 bg-card/55">
-          <div className="min-w-[1560px]">
-            <div className="grid grid-cols-[1.2fr_150px_130px_150px_1.2fr_120px_140px_150px_130px_140px_110px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
+          <div className="min-w-[1220px]">
+            <div className="grid grid-cols-[minmax(240px,1.5fr)_130px_130px_minmax(220px,1.2fr)_130px_140px_130px_140px_96px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
               <span>{t('customers.columns.name')}</span>
               <span>{t('customers.columns.source')}</span>
-              <span>{t('customers.columns.channels')}</span>
               <span>{t('customers.columns.customerSince')}</span>
               <span>{t('customers.columns.products')}</span>
-              <span>{t('customers.columns.loyalty')}</span>
               <span>{t('customers.columns.lastContact')}</span>
               <span>{t('customers.columns.nextTouch')}</span>
               <span>{t('customers.columns.planFollowUp')}</span>
@@ -231,26 +195,30 @@ export function ProductCustomersPage() {
               {rows.map((contact: ContactWithTags) => (
                 <div
                   key={contact.id}
-                  className="grid grid-cols-[1.2fr_150px_130px_150px_1.2fr_120px_140px_150px_130px_140px_110px] items-center gap-3 px-4 py-3 text-sm"
+                  className="grid grid-cols-[minmax(240px,1.5fr)_130px_130px_minmax(220px,1.2fr)_130px_140px_130px_140px_96px] items-start gap-3 px-4 py-3 text-sm"
                 >
                   <button
                     type="button"
                     onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
-                    className="truncate text-left font-medium transition-colors hover:text-primary"
+                    className="whitespace-normal break-words text-left font-medium leading-5 transition-colors hover:text-primary"
                   >
                     {contact.full_name}
                   </button>
                   <span className="truncate text-muted-foreground">{t(`contactSources.${contact.source}`)}</span>
-                  <div className="flex items-center">
-                    <ChannelButtons contact={contact} size="sm" />
-                  </div>
                   <span className="truncate text-muted-foreground">
                     {formatDate(contact.created_at, i18n.language, t('customers.fallbacks.noDate'))}
                   </span>
-                  <span className="truncate text-muted-foreground">
-                    {formatList(contact.interests, t('customers.fallbacks.noProducts'))}
-                  </span>
-                  <span className="truncate text-muted-foreground">{contact.warmth_score}</span>
+                  <div className="space-y-1 text-muted-foreground">
+                    {contact.interests && contact.interests.length > 0 ? (
+                      contact.interests.map((product) => (
+                        <div key={`${contact.id}-${product}`} className="whitespace-normal break-words leading-5">
+                          {product}
+                        </div>
+                      ))
+                    ) : (
+                      <span>{t('customers.fallbacks.noProducts')}</span>
+                    )}
+                  </div>
                   <span className="truncate text-muted-foreground">
                     {formatDate(contact.last_contact_at, i18n.language, t('customers.fallbacks.noDate'))}
                   </span>

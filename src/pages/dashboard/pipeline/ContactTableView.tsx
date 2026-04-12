@@ -111,7 +111,7 @@ export function ContactTableView({ records, stages, appointments, followUps }: P
                     <span className="text-sm">{stage ? resolveStageLabel(stage, t) : '—'}</span>
                   </td>
                   <td className="px-4 py-3">
-                    <WarmthScoreBadge score={contact.warmth_score} />
+                    <WarmthScoreBadge score={contact.warmth_score} stage={contact.stage} />
                   </td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {appointment ? format(parseISO(appointment.starts_at), 'd MMM yyyy', { locale }) : '—'}

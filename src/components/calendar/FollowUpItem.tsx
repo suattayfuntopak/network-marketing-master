@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { formatDistanceToNow, parseISO, addMinutes, addHours, addDays } from 'date-fns'
 import {
   Phone, MessageCircle, Mail, MapPin, Send, Eye, MoreHorizontal,
-  CheckCircle2, Clock, Pencil, Trash2, ChevronDown,
+  CheckCircle2, Clock, Pencil, Trash2,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getLocale } from '@/lib/calendar/dateHelpers'
-import { PRIORITY_COLORS, PRIORITY_DOT } from '@/lib/calendar/constants'
+import { PRIORITY_COLORS } from '@/lib/calendar/constants'
 import { useCompleteFollowUp, useUncompleteFollowUp, useSnoozeFollowUp, useDeleteFollowUp } from '@/hooks/useCalendar'
 import type { FollowUpWithContact } from '@/lib/calendar/types'
 

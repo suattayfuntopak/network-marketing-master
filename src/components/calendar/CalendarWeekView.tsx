@@ -1,7 +1,6 @@
-import { useTranslation } from 'react-i18next'
 import { format, isSameDay, parseISO, differenceInMinutes } from 'date-fns'
 import { cn } from '@/lib/utils'
-import { buildWeekDays, getLocale, fmtTime, isToday } from '@/lib/calendar/dateHelpers'
+import { buildWeekDays, getLocale, isToday } from '@/lib/calendar/dateHelpers'
 import { AppointmentCard } from './AppointmentCard'
 import { Bell } from 'lucide-react'
 import type { AppointmentWithContact, FollowUpWithContact } from '@/lib/calendar/types'
@@ -33,7 +32,6 @@ function aptHeightPx(apt: AppointmentWithContact): number {
 }
 
 export function CalendarWeekView({ currentDate, appointments, followUps, onDayClick, onAppointmentClick }: Props) {
-  const { t } = useTranslation()
   const locale = getLocale()
   const days = buildWeekDays(currentDate)
   const gridH = HOURS.length * HOUR_PX

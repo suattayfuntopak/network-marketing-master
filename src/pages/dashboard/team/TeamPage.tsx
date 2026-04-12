@@ -1,12 +1,14 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Activity, ArrowUpRight, Sparkles, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
+import { PageState } from '@/components/shared/PageState'
 import { useAuth } from '@/hooks/useAuth'
-import { useContacts } from '@/hooks/useContacts'
-import { DEFAULT_FILTERS } from '@/lib/contacts/types'
+import { useContactInsights } from '@/hooks/useContacts'
+import { useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { cn } from '@/lib/utils'
 
@@ -19,9 +21,9 @@ function getInitials(fullName: string) {
     .toUpperCase()
 }
 
-function getDaysSince(dateValue: string | null) {
+function getDaysSince(dateValue: string | null, now: number) {
   if (!dateValue) return Number.POSITIVE_INFINITY
-  const diffMs = Date.now() - new Date(dateValue).getTime()
+  const diffMs = now - new Date(dateValue).getTime()
   return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
 }
 
@@ -43,29 +45,29 @@ function getStatusClasses(status: TeamRadarStatus) {
 
 export function TeamPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const userId = user?.id ?? ''
+  const [referenceNow] = useState(() => Date.now())
+  const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId)
+  const workspaceId = workspaceContext?.workspace?.id ?? ''
+  const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
 
-  const { data: contactsResult } = useContacts({
+  const { data: members = [] } = useContactInsights({
     userId,
-    filters: {
-      ...DEFAULT_FILTERS,
-      contactTypes: ['distributor'],
-    },
-    sort: { field: 'warmth_score', order: 'desc' },
-    page: 1,
-    pageSize: 500,
+    contactTypes: ['distributor'],
+    limit: 250,
   })
 
-  const members = contactsResult?.data ?? []
   const radarMembers = useMemo(() => members.map((member) => buildTeamRadarInsight(member)), [members])
 
   const metrics = useMemo(() => {
+    const now = referenceNow
     const totalMembers = members.length
     const activeMembers = radarMembers.filter((member) => member.status === 'active').length
-    const newThisMonth = members.filter((member) => Date.now() - new Date(member.created_at).getTime() <= 30 * 24 * 60 * 60 * 1000).length
+    const newThisMonth = members.filter((member) => now - new Date(member.created_at).getTime() <= 30 * 24 * 60 * 60 * 1000).length
     const joinedMembers = members.filter((member) => member.stage === 'joined').length
-    const overdueMembers = members.filter((member) => Boolean(member.next_follow_up_at) && new Date(member.next_follow_up_at!).getTime() < Date.now()).length
+    const overdueMembers = members.filter((member) => Boolean(member.next_follow_up_at) && new Date(member.next_follow_up_at!).getTime() < now).length
     const gainingMomentum = radarMembers.filter((member) => member.status === 'gaining_momentum').length
     const needsSupport = radarMembers.filter((member) => member.status === 'needs_support').length
 
@@ -79,22 +81,34 @@ export function TeamPage() {
       gainingMomentum,
       needsSupport,
     }
-  }, [members, radarMembers])
+  }, [members, radarMembers, referenceNow])
 
   const leaderboard = useMemo(
     () =>
-      [...radarMembers]
+      radarMembers
+        .filter((member) => member.contact.stage !== 'lost')
         .sort((a, b) => {
           if (a.status !== b.status) {
             const weight = { gaining_momentum: 4, active: 3, slowing_down: 2, needs_support: 1 }
             return weight[b.status] - weight[a.status]
           }
           if (b.contact.warmth_score !== a.contact.warmth_score) return b.contact.warmth_score - a.contact.warmth_score
-          return getDaysSince(a.contact.last_contact_at) - getDaysSince(b.contact.last_contact_at)
+          return getDaysSince(a.contact.last_contact_at, referenceNow) - getDaysSince(b.contact.last_contact_at, referenceNow)
         })
         .slice(0, 5),
-    [radarMembers]
+    [radarMembers, referenceNow]
   )
+
+  const workspaceRoleLabel = workspaceContext?.membership?.role
+    ? t(`team.workspace.roles.${workspaceContext.membership.role}`)
+    : null
+  const workspaceRoleCounts = useMemo(() => {
+    return workspaceMembers.reduce<Record<string, number>>((acc, member) => {
+      const role = member.membership.role
+      acc[role] = (acc[role] ?? 0) + 1
+      return acc
+    }, {})
+  }, [workspaceMembers])
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -106,17 +120,123 @@ export function TeamPage() {
 
         <div className="rounded-xl border bg-card px-4 py-3">
           <div className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-            {t('team.summary.label')}
+            {workspaceContext?.mode === 'workspace' ? t('team.workspace.label') : t('team.summary.label')}
           </div>
           <p className="mt-1 text-sm font-medium">
-            {t('team.summary.value', {
-              members: metrics.totalMembers,
-              overdue: metrics.overdueMembers,
-            })}
+            {workspaceContext?.mode === 'workspace'
+              ? t('team.workspace.value', {
+                  workspace: workspaceContext.workspace?.name,
+                  members: workspaceContext.memberCount,
+                  role: workspaceRoleLabel,
+                })
+              : t('team.summary.value', {
+                  members: metrics.totalMembers,
+                  overdue: metrics.overdueMembers,
+                })}
           </p>
         </div>
       </div>
 
+      {!workspaceLoading && workspaceContext?.mode !== 'workspace' ? (
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-4">
+          <p className="text-sm font-semibold text-foreground">{t('team.workspace.legacyTitle')}</p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('team.workspace.legacyBody')}</p>
+        </div>
+      ) : null}
+
+      {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4">
+          <p className="text-sm font-semibold text-foreground">{t('team.workspace.activeTitle')}</p>
+          <p className="mt-1 text-sm leading-6 text-muted-foreground">
+            {t('team.workspace.activeBody', {
+              workspace: workspaceContext.workspace?.name,
+              members: workspaceContext.memberCount,
+              role: workspaceRoleLabel,
+            })}
+          </p>
+        </div>
+      ) : null}
+
+      {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('team.sections.workspaceMembers')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              {(['owner', 'leader', 'member', 'assistant'] as const).map((role) => (
+                <div key={role} className="rounded-2xl border border-border/70 bg-card/60 px-4 py-4">
+                  <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    {t(`team.workspace.roles.${role}`)}
+                  </div>
+                  <div className="mt-2 text-2xl font-semibold tabular-nums">{workspaceRoleCounts[role] ?? 0}</div>
+                </div>
+              ))}
+            </div>
+
+            {workspaceMembersLoading ? (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {t('common.loading')}
+              </div>
+            ) : workspaceMembers.length > 0 ? (
+              <div className="space-y-3">
+                {workspaceMembers.map((member) => {
+                  const roleLabel = t(`team.workspace.roles.${member.membership.role}`)
+                  const joinedLabel = new Date(member.membership.joined_at).toLocaleDateString()
+
+                  return (
+                    <div key={member.membership.id} className="rounded-xl border bg-card/70 p-4">
+                      <div className="flex items-start gap-3">
+                        <Avatar size="sm">
+                          <AvatarFallback>{getInitials(member.profile?.full_name ?? member.profile?.email ?? 'WM')}</AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="truncate text-sm font-semibold">
+                              {member.profile?.full_name ?? member.profile?.email ?? t('team.workspace.memberFallback')}
+                            </p>
+                            {member.isCurrentUser ? (
+                              <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                                {t('team.workspace.you')}
+                              </span>
+                            ) : null}
+                            <span className="rounded-full border px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                              {roleLabel}
+                            </span>
+                          </div>
+                          <p className="mt-1 truncate text-xs text-muted-foreground">
+                            {member.profile?.email ?? t('team.workspace.noEmail')}
+                          </p>
+                          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <span>{t('team.workspace.joinedAt', { date: joinedLabel })}</span>
+                            {member.depth ? <span>{t('team.workspace.depth', { count: member.depth })}</span> : null}
+                            {member.profile?.company ? <span>{member.profile.company}</span> : null}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {t('team.workspace.emptyBody')}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {members.length === 0 ? (
+        <PageState
+          variant="empty"
+          title={t('team.empty.leaderboard')}
+          description={t('team.workspace.emptyBody')}
+        />
+      ) : null}
+
+      {members.length > 0 ? (
+        <>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -195,7 +315,12 @@ export function TeamPage() {
         <CardContent className="space-y-3">
           {leaderboard.length > 0 ? (
             leaderboard.map((member, index) => (
-              <div key={member.contact.id} className="rounded-xl border bg-card/70 p-4">
+              <button
+                key={member.contact.id}
+                type="button"
+                onClick={() => navigate(`/dashboard/contacts/${member.contact.id}`)}
+                className="w-full rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
                     {index + 1}
@@ -209,7 +334,7 @@ export function TeamPage() {
                       {member.contact.city || t('team.labels.locationFallback')}
                     </p>
                   </div>
-                  <WarmthScoreBadge score={member.contact.warmth_score} />
+                  <WarmthScoreBadge score={member.contact.warmth_score} stage={member.contact.stage} />
                 </div>
                 <div className="mt-3 flex items-center justify-between gap-2">
                   <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
@@ -217,7 +342,7 @@ export function TeamPage() {
                   </span>
                   <p className="text-xs text-muted-foreground">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
                 </div>
-              </div>
+              </button>
             ))
           ) : (
             <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
@@ -226,6 +351,8 @@ export function TeamPage() {
           )}
         </CardContent>
       </Card>
+        </>
+      ) : null}
     </div>
   )
 }

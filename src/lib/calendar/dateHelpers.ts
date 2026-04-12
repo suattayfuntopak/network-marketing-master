@@ -77,7 +77,6 @@ export function dayRange(date: Date): { from: string; to: string } {
 }
 
 // Format for display in lists
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function relativeDay(date: Date | string, t: (key: string) => string): string {
   const d = typeof date === 'string' ? parseISO(date) : date
   const locale = getLocale()

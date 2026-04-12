@@ -46,7 +46,7 @@ export function NewAppointmentModal({ open, onClose, userId, defaultDate, editAp
   const defaultStart = defaultDate ?? new Date()
   const defaultEnd   = addHours(defaultStart, 1)
 
-  const { register, handleSubmit, reset, watch, setValue } = useForm<FormValues>({
+  const { register, handleSubmit, reset, watch } = useForm<FormValues>({
     defaultValues: {
       type: 'meeting',
       starts_at: format(defaultStart, "yyyy-MM-dd'T'HH:mm"),

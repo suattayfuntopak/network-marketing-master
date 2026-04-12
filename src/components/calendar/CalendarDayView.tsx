@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { parseISO, isSameDay, differenceInMinutes } from 'date-fns'
 import { Bell } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import { fmtDayFull } from '@/lib/calendar/dateHelpers'
 import { AppointmentCard } from './AppointmentCard'
 import { FollowUpItem } from './FollowUpItem'

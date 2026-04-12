@@ -2,15 +2,12 @@ import { useMemo } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft } from 'lucide-react'
-import { startOfDay, startOfMonth, startOfWeek } from 'date-fns'
-import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
-import { fetchContacts } from '@/lib/contacts/queries'
-import { DEFAULT_FILTERS, DEFAULT_SORT, type ContactWithTags } from '@/lib/contacts/types'
+import { useContactSummaryRows } from '@/hooks/useContacts'
+import { getDisplayWarmthScore } from '@/lib/contacts/constants'
+import type { ContactSummaryKey } from '@/lib/contacts/queries'
 import { ROUTES } from '@/lib/constants'
-
-type ContactSummaryKey = 'all' | 'month' | 'week' | 'today'
 
 export function ContactsSummaryListPage() {
   const { t } = useTranslation()
@@ -18,41 +15,12 @@ export function ContactsSummaryListPage() {
   const { summaryKey } = useParams<{ summaryKey: ContactSummaryKey }>()
   const { user } = useAuth()
   const userId = user?.id ?? ''
-
-  const { data } = useQuery({
-    queryKey: ['contacts', 'summary-list', userId],
-    queryFn: () =>
-      fetchContacts({
-        userId,
-        filters: DEFAULT_FILTERS,
-        sort: DEFAULT_SORT,
-        page: 1,
-        pageSize: 10000,
-      }),
-    enabled: !!userId,
-    staleTime: 10000,
-  })
-
-  const contacts = data?.data ?? []
   const activeKey: ContactSummaryKey =
     summaryKey === 'month' || summaryKey === 'week' || summaryKey === 'today' || summaryKey === 'all'
       ? summaryKey
       : 'all'
-
-  const rows = useMemo(() => {
-    const now = new Date()
-    const monthStart = startOfMonth(now)
-    const weekStart = startOfWeek(now, { weekStartsOn: 1 })
-    const todayStart = startOfDay(now)
-
-    return contacts.filter((contact) => {
-      const createdAt = new Date(contact.created_at)
-      if (activeKey === 'month') return createdAt >= monthStart
-      if (activeKey === 'week') return createdAt >= weekStart
-      if (activeKey === 'today') return createdAt >= todayStart
-      return true
-    })
-  }, [activeKey, contacts])
+  const { data } = useContactSummaryRows(userId, activeKey)
+  const rows = useMemo(() => data ?? [], [data])
 
   const titleKeyMap: Record<ContactSummaryKey, string> = {
     all: 'contacts.summaryCards.all.title',
@@ -93,7 +61,7 @@ export function ContactsSummaryListPage() {
               <span>{t('contacts.summaryTable.createdAt')}</span>
             </div>
             <div className="divide-y">
-              {rows.map((contact: ContactWithTags) => (
+              {rows.map((contact) => (
                 <button
                   key={contact.id}
                   type="button"
@@ -105,7 +73,7 @@ export function ContactsSummaryListPage() {
                   <span className="truncate text-muted-foreground">
                     {contact.last_contact_at ? new Date(contact.last_contact_at).toLocaleDateString() : t('contacts.columns.noLastContact')}
                   </span>
-                  <span className="truncate text-muted-foreground">{contact.warmth_score}</span>
+                  <span className="truncate text-muted-foreground">{getDisplayWarmthScore(contact.warmth_score, contact.stage)}</span>
                   <span className="truncate text-muted-foreground">{t(`contacts.sources.${contact.source}`)}</span>
                   <span className="truncate text-muted-foreground">{new Date(contact.created_at).toLocaleDateString()}</span>
                 </button>

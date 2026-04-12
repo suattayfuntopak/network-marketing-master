@@ -1,6 +1,6 @@
 import type { ObjectionCategory } from '@/lib/academy/types'
 import type { FollowUpBuckets } from '@/lib/calendar/types'
-import type { ContactWithTags } from '@/lib/contacts/types'
+import type { MessageContact } from '@/lib/contacts/types'
 import type { MessageCategory, MessageChannel, MessageTone } from '@/lib/messages/types'
 
 type MessagePlaybookKey = 'reconnect' | 'invite' | 'decision'
@@ -12,7 +12,7 @@ export interface MessagePlaybook {
   tone: MessageTone
   channel: MessageChannel
   objectionCategory: ObjectionCategory
-  contact: ContactWithTags | null
+  contact: MessageContact | null
 }
 
 const DECISION_STAGES = new Set(['interested', 'presenting', 'thinking'])
@@ -28,7 +28,7 @@ export function buildMessagePlaybooks({
   contacts,
   followUpBuckets,
 }: {
-  contacts: ContactWithTags[]
+  contacts: MessageContact[]
   followUpBuckets?: FollowUpBuckets
 }): MessagePlaybook[] {
   const sortedContacts = [...contacts].sort((a, b) => {

@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase'
 import type { MessageTemplateInsert, MessageTemplateUpdate, AIMessageInsert, AIMessageUpdate } from './types'
+import type { Json } from '@/types/database'
 
 // ─── Templates ────────────────────────────────────────────────
 
@@ -43,9 +44,14 @@ export async function incrementTemplateUseCount(id: string): Promise<void> {
 // ─── AI Messages ──────────────────────────────────────────────
 
 export async function saveAIMessage(data: AIMessageInsert): Promise<string> {
+  const payload = {
+    ...data,
+    context: (data.context ?? {}) as Json,
+    variants: (data.variants ?? null) as Json,
+  }
   const { data: row, error } = await supabase
     .from('nmm_ai_messages')
-    .insert(data as any)
+    .insert(payload)
     .select('id')
     .single()
   if (error) throw error

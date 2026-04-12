@@ -194,3 +194,16 @@ export function resolveStageLabel(
 
   return localized?.trim() || fallback?.trim() || stage.name
 }
+
+export function resolveContactStageLabel(
+  stages: PipelineStage[],
+  contactStage: string,
+  t: (key: string, options?: Record<string, unknown>) => string,
+  lang = i18n.language?.startsWith('en') ? 'en' : 'tr'
+): string {
+  const syncedStage = findSyncedStageByContactStage(stages, contactStage)
+
+  return syncedStage
+    ? resolveStageLabel(syncedStage, t, lang)
+    : t(`contactStages.${contactStage}`, { defaultValue: contactStage })
+}

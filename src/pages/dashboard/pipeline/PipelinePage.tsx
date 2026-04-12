@@ -7,8 +7,7 @@ import { Button } from '@/components/ui/button'
 import { useAuth } from '@/hooks/useAuth'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import { useAppointments, useFollowUps } from '@/hooks/useCalendar'
-import { useContacts } from '@/hooks/useContacts'
-import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
+import { useProcessContacts } from '@/hooks/useContacts'
 import { getSyncedPipelineStages, type ContactStageKey } from '@/lib/pipeline/stageLabels'
 import { ContactKanbanBoard, type ContactProcessRecord } from '@/components/pipeline/ContactKanbanBoard'
 import { ContactTableView } from './ContactTableView'
@@ -33,21 +32,14 @@ export function PipelinePage() {
   const [showManageStages, setShowManageStages] = useState(false)
 
   const { data: stages = [], isLoading: stagesLoading } = usePipelineStages(userId)
-  const { data: contactsResult, isLoading: contactsLoading } = useContacts({
+  const { data: contacts = [], isLoading: contactsLoading } = useProcessContacts({
     userId,
-    filters: DEFAULT_FILTERS,
-    sort: DEFAULT_SORT,
-    page: 1,
-    pageSize: 1000,
+    limit: 500,
   })
   const { data: appointments = [], isLoading: appointmentsLoading } = useAppointments(userId)
   const { data: followUps = [], isLoading: followUpsLoading } = useFollowUps(userId, 'pending')
   const updateContactStage = useUpdateContactStageById(userId)
 
-  const contacts = useMemo(
-    () => (contactsResult?.data ?? []).filter((contact) => contact.contact_type !== 'customer'),
-    [contactsResult?.data]
-  )
   const isLoading = stagesLoading || contactsLoading || appointmentsLoading || followUpsLoading
 
   const contactCount = contacts.length

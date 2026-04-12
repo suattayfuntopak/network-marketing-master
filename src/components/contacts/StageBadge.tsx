@@ -15,12 +15,14 @@ const colorClasses: Record<string, string> = {
 
 interface StageBadgeProps {
   stage: Contact['stage']
+  label?: string
   className?: string
 }
 
-export function StageBadge({ stage, className }: StageBadgeProps) {
+export function StageBadge({ stage, label, className }: StageBadgeProps) {
   const { t } = useTranslation()
   const color = STAGE_COLORS[stage]
+  const displayLabel = label ?? t(`contactStages.${stage}`)
 
   return (
     <span
@@ -30,7 +32,7 @@ export function StageBadge({ stage, className }: StageBadgeProps) {
         className
       )}
     >
-      {t(`contactStages.${stage}`)}
+      {displayLabel}
     </span>
   )
 }

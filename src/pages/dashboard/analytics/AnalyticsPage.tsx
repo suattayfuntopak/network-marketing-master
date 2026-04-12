@@ -1,14 +1,13 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Users, Bell, Target, GraduationCap, CalendarRange, Flame, ShieldAlert, Zap, Activity } from 'lucide-react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
-import { useContactCount, useContactStageCounts, useContacts } from '@/hooks/useContacts'
+import { useContactCount, useContactInsights, useContactStageCounts } from '@/hooks/useContacts'
 import { useTodayFollowUpsCount, useOverdueFollowUpsCount, useFollowUpBuckets } from '@/hooks/useCalendar'
 import { getTodayAcademyReadCount } from '@/lib/academy/progress'
 import { buildAnalyticsInsights } from '@/lib/analytics/insights'
-import { DEFAULT_FILTERS, DEFAULT_SORT } from '@/lib/contacts/types'
 import i18n from '@/i18n'
 
 const STAGE_COLORS: Record<string, string> = {
@@ -25,20 +24,17 @@ export function AnalyticsPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
   const userId = user?.id ?? ''
+  const [referenceNow] = useState(() => Date.now())
 
   const { data: contactCount = 0 } = useContactCount(userId)
   const { data: stageCounts = [] } = useContactStageCounts(userId)
-  const { data: contactsResult } = useContacts({
+  const { data: contacts = [] } = useContactInsights({
     userId,
-    filters: DEFAULT_FILTERS,
-    sort: DEFAULT_SORT,
-    page: 1,
-    pageSize: 500,
+    limit: 250,
   })
   const { data: todayFollowUpsCount = 0 } = useTodayFollowUpsCount(userId)
   const { data: overdueCount = 0 } = useOverdueFollowUpsCount(userId)
   const { data: followUpBuckets } = useFollowUpBuckets(userId)
-  const contacts = contactsResult?.data ?? []
 
   const academyTodayCount = getTodayAcademyReadCount()
   const chartData = stageCounts.map(({ stage, count }) => ({
@@ -48,10 +44,10 @@ export function AnalyticsPage() {
   }))
 
   const activeSummary = useMemo(() => {
+    const now = referenceNow
     const pending = followUpBuckets?.all.filter((item) => item.status !== 'completed') ?? []
     const nextSevenDays = pending.filter((item) => {
       const dueTime = new Date(item.due_at).getTime()
-      const now = Date.now()
       const sevenDaysFromNow = now + 7 * 24 * 60 * 60 * 1000
       return dueTime >= now && dueTime <= sevenDaysFromNow
     }).length
@@ -69,7 +65,7 @@ export function AnalyticsPage() {
       busiestDayKey,
       busiestDayCount,
     }
-  }, [followUpBuckets])
+  }, [followUpBuckets, referenceNow])
 
   const joinedCount = stageCounts.find((stage) => stage.stage === 'joined')?.count ?? 0
   const insights = useMemo(() => buildAnalyticsInsights(contacts, followUpBuckets), [contacts, followUpBuckets])

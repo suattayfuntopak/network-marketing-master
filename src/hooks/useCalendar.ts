@@ -139,9 +139,11 @@ export function useAppointments(userId: string, from?: Date, to?: Date) {
     queryKey: calendarKeys.appointmentsRange(userId, from?.toISOString(), to?.toISOString()),
     queryFn: () => fetchAppointments(userId, from, to),
     enabled: !!userId,
-    staleTime: 30_000,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -172,9 +174,11 @@ export function useTodayAppointments(userId: string) {
     queryKey: calendarKeys.todayAppointments(userId),
     queryFn: () => fetchTodayAppointments(userId),
     enabled: !!userId,
-    staleTime: 30_000,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 
@@ -183,9 +187,11 @@ export function useFollowUps(userId: string, status?: FollowUpStatus | FollowUpS
     queryKey: [...calendarKeys.followUps(userId), status],
     queryFn: () => fetchFollowUps(userId, status),
     enabled: !!userId,
-    staleTime: 15_000,
+    staleTime: 10_000,
     placeholderData: (previousData) => previousData,
-    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
   })
 }
 

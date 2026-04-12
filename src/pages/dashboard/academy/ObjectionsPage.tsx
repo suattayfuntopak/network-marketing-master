@@ -256,7 +256,6 @@ export function ObjectionsPage() {
         <div className="space-y-2">
           {objections.map((obj) => {
             const isExpanded = expandedId === obj.id
-            const isOwn = !obj.is_system && obj.user_id === user?.id
             const canToggleFavorite = true
             return (
               <div key={obj.id} className="border rounded-lg bg-card overflow-hidden">
