@@ -52,6 +52,8 @@ export function ProductCustomersPage() {
 
   const rows = data?.data ?? []
   const customerMetrics = metrics ?? { total: rows.length, month: 0, week: 0, today: 0 }
+  const tableColumns =
+    'grid-cols-[minmax(188px,1.55fr)_minmax(116px,0.96fr)_minmax(112px,0.88fr)_minmax(170px,1.28fr)_minmax(104px,0.9fr)_minmax(110px,0.95fr)_minmax(112px,1fr)_minmax(112px,1fr)_84px]'
 
   const nextFollowUps = useMemo(() => {
     const nextByContact = new Map<string, string>()
@@ -179,8 +181,8 @@ export function ProductCustomersPage() {
         </div>
       ) : rows.length > 0 ? (
         <div className="overflow-x-auto rounded-3xl border border-border/70 bg-card/55">
-          <div className="min-w-[1100px]">
-            <div className="grid grid-cols-[minmax(200px,1.85fr)_minmax(110px,1fr)_108px_minmax(170px,1.45fr)_108px_116px_122px_122px_72px] gap-x-3 gap-y-2 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
+          <div className="min-w-[1104px]">
+            <div className={`grid ${tableColumns} gap-x-2 gap-y-2 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground`}>
               <span>{t('customers.columns.name')}</span>
               <span>{t('customers.columns.source')}</span>
               <span>{t('customers.columns.customerSince')}</span>
@@ -195,7 +197,7 @@ export function ProductCustomersPage() {
               {rows.map((contact: ContactWithTags) => (
                 <div
                   key={contact.id}
-                  className="grid grid-cols-[minmax(200px,1.85fr)_minmax(110px,1fr)_108px_minmax(170px,1.45fr)_108px_116px_122px_122px_72px] items-start gap-x-3 gap-y-2 px-4 py-3 text-sm"
+                  className={`grid ${tableColumns} items-start gap-x-2 gap-y-2 px-4 py-3 text-sm`}
                 >
                   <button
                     type="button"
@@ -204,8 +206,8 @@ export function ProductCustomersPage() {
                   >
                     {contact.full_name}
                   </button>
-                  <span className="truncate text-muted-foreground">{t(`contactSources.${contact.source}`)}</span>
-                  <span className="truncate text-muted-foreground">
+                  <span className="whitespace-normal break-words leading-5 text-muted-foreground">{t(`contactSources.${contact.source}`)}</span>
+                  <span className="leading-5 text-muted-foreground">
                     {formatDate(contact.created_at, i18n.language, t('customers.fallbacks.noDate'))}
                   </span>
                   <div className="space-y-1 text-muted-foreground">
@@ -219,10 +221,10 @@ export function ProductCustomersPage() {
                       <span>{t('customers.fallbacks.noProducts')}</span>
                     )}
                   </div>
-                  <span className="truncate text-muted-foreground">
+                  <span className="leading-5 text-muted-foreground">
                     {formatDate(contact.last_contact_at, i18n.language, t('customers.fallbacks.noDate'))}
                   </span>
-                  <span className="truncate text-muted-foreground">
+                  <span className="leading-5 text-muted-foreground">
                     {formatDate(nextFollowUps.get(contact.id) ?? null, i18n.language, t('customers.fallbacks.noPlan'))}
                   </span>
                   <div>

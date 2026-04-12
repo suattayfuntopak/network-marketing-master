@@ -1655,8 +1655,8 @@
     "workspace": {
       "label": "Workspace",
       "value": "{{workspace}} • {{members}} aktif uye • {{role}}",
-      "legacyTitle": "Legacy ekip gorunumu aktif",
-      "legacyBody": "Bu ekran su an distributor kontaklarini ekip gibi okuyarak calisiyor. Faz 5 workspace migrasyonu hazir; veritabani uygulandiginda gercek ekip uyeleri ve roller bu alana baglanacak.",
+      "legacyTitle": "Ekip gorunumu hazir",
+      "legacyBody": "Ekibine ekledigin distributor kontaklari burada tek listede gorebilirsin. Workspace omurgasi baglandiginda gercek uye rolleri de ayni alana otomatik tasinacak.",
       "bootstrapHint": "Workspace tablolari hazirsa bu hesabi tek tikla gercek ekip omurgasina tasiyabilirsin.",
       "bootstrapAction": "Workspace'i Aktif Et",
       "bootstrapping": "Workspace hazirlaniyor",
@@ -1696,6 +1696,8 @@
     "sections": {
       "overview": "Genel Durum",
       "leaderboard": "Öne Çıkanlar",
+      "membersList": "Ekip Uyeleri",
+      "membersListBody": "Son eklenenler ustte olacak sekilde ekip listesini sayfa sayfa buradan takip et.",
       "workspaceMembers": "Workspace Uyeleri",
       "needsAttention": "Destek Bekleyenler",
       "activationQueue": "Aktivasyon Kuyruğu",
@@ -1714,6 +1716,7 @@
       "healthy": "Sağlıklı",
       "momentum": "İvme",
       "overdue": "Geciken takip",
+      "addedAt": "Eklenme",
       "lastContact": "Son temas",
       "noDate": "Henüz yok",
       "locationFallback": "Konum eklenmedi",
@@ -1764,6 +1767,7 @@
       "noTouchYet": "Henüz düzenli bir temas kaydı oluşmamış."
     },
     "empty": {
+      "members": "Henüz ekip üyesi görünmüyor.",
       "leaderboard": "Henüz ekip üyesi görünmüyor.",
       "attention": "Şu an kritik destek bekleyen ekip üyesi yok.",
       "activation": "Aktivasyon kuyruğunda bekleyen ekip üyesi yok."

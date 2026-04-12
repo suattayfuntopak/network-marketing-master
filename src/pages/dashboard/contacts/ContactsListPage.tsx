@@ -23,6 +23,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import { ROUTES } from '@/lib/constants'
 import { PAGE_SIZE } from '@/lib/contacts/constants'
+import { buildPageWindow } from '@/lib/pagination'
 import type { SortField } from '@/lib/contacts/types'
 import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 
@@ -59,6 +60,7 @@ export function ContactsListPage() {
   const totalPages = data?.totalPages ?? 1
   const totalCount = data?.count ?? 0
   const contactSummary = summaryCounts ?? { total: totalCount, month: 0, week: 0, today: 0 }
+  const visiblePages = buildPageWindow(page, totalPages)
 
   const getStageLabel = useCallback(
     (stage: (typeof contacts)[number]['stage']) => resolveContactStageLabel(pipelineStages, stage, t, currentLang),
@@ -385,11 +387,11 @@ export function ContactsListPage() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex flex-col gap-3 text-sm md:flex-row md:items-center md:justify-between">
           <p className="text-muted-foreground">
             {t('common.page', { page, total: totalPages })}
           </p>
-          <div className="flex items-center gap-1">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="icon"
@@ -399,6 +401,17 @@ export function ContactsListPage() {
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
+            {visiblePages.map((pageNumber) => (
+              <Button
+                key={pageNumber}
+                variant={pageNumber === page ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setPage(pageNumber)}
+                className="h-8 min-w-8 px-2"
+              >
+                {pageNumber}
+              </Button>
+            ))}
             <Button
               variant="outline"
               size="icon"

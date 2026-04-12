@@ -1655,8 +1655,8 @@
     "workspace": {
       "label": "Workspace",
       "value": "{{workspace}} • {{members}} active members • {{role}}",
-      "legacyTitle": "Legacy team view is active",
-      "legacyBody": "This screen is still reading distributor contacts as if they were team members. The Phase 5 workspace migration is ready; once the database migration is applied, real members and roles will power this area.",
+      "legacyTitle": "Team view is ready",
+      "legacyBody": "You can follow distributor contacts added to your team in one clean list here. When the workspace foundation is connected, real member roles will move into this same area automatically.",
       "bootstrapHint": "If the workspace tables are ready, you can move this account onto the real team foundation with one action.",
       "bootstrapAction": "Activate Workspace",
       "bootstrapping": "Preparing workspace",
@@ -1696,6 +1696,8 @@
     "sections": {
       "overview": "Overview",
       "leaderboard": "Top Momentum",
+      "membersList": "Team Members",
+      "membersListBody": "Track your team list here page by page, with the newest names shown first.",
       "workspaceMembers": "Workspace Members",
       "needsAttention": "Needs Attention",
       "activationQueue": "Activation Queue",
@@ -1714,6 +1716,7 @@
       "healthy": "Healthy",
       "momentum": "Momentum",
       "overdue": "Overdue follow-up",
+      "addedAt": "Added",
       "lastContact": "Last touch",
       "noDate": "Not yet",
       "locationFallback": "No location added",
@@ -1764,6 +1767,7 @@
       "noTouchYet": "A regular contact rhythm has not been established yet."
     },
     "empty": {
+      "members": "No team members yet.",
       "leaderboard": "No team members yet.",
       "attention": "No critical support case is waiting right now.",
       "activation": "No team member is currently waiting in the activation queue."

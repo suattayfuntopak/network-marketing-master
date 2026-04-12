@@ -21,9 +21,14 @@ import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { PageState } from '@/components/shared/PageState'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
+import { usePipelineStages } from '@/hooks/usePipeline'
 import { useBootstrapWorkspace, useUpdateWorkspaceMember, useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
+import { buildPageWindow } from '@/lib/pagination'
+import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 import { cn } from '@/lib/utils'
+
+const TEAM_MEMBERS_PAGE_SIZE = 15
 
 function getInitials(fullName: string) {
   return fullName
@@ -32,12 +37,6 @@ function getInitials(fullName: string) {
     .slice(0, 2)
     .join('')
     .toUpperCase()
-}
-
-function getDaysSince(dateValue: string | null, now: number) {
-  if (!dateValue) return Number.POSITIVE_INFINITY
-  const diffMs = now - new Date(dateValue).getTime()
-  return Math.max(0, Math.floor(diffMs / (1000 * 60 * 60 * 24)))
 }
 
 function getStatusClasses(status: TeamRadarStatus) {
@@ -57,16 +56,19 @@ function getStatusClasses(status: TeamRadarStatus) {
 }
 
 export function TeamPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
   const userId = user?.id ?? ''
+  const currentLang = i18n.language?.startsWith('en') ? 'en' : 'tr'
   const [referenceNow] = useState(() => Date.now())
+  const [membersPage, setMembersPage] = useState(1)
   const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
   const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
   const bootstrapWorkspace = useBootstrapWorkspace(userId)
   const updateWorkspaceMember = useUpdateWorkspaceMember(userId, workspaceId)
+  const { data: pipelineStages = [] } = usePipelineStages(userId)
 
   const { data: members = [] } = useContactInsights({
     userId,
@@ -98,21 +100,25 @@ export function TeamPage() {
     }
   }, [members, radarMembers, referenceNow])
 
-  const leaderboard = useMemo(
+  const sortedMembers = useMemo(
     () =>
-      radarMembers
-        .filter((member) => member.contact.stage !== 'lost')
-        .sort((a, b) => {
-          if (a.status !== b.status) {
-            const weight = { gaining_momentum: 4, active: 3, slowing_down: 2, needs_support: 1 }
-            return weight[b.status] - weight[a.status]
-          }
-          if (b.contact.warmth_score !== a.contact.warmth_score) return b.contact.warmth_score - a.contact.warmth_score
-          return getDaysSince(a.contact.last_contact_at, referenceNow) - getDaysSince(b.contact.last_contact_at, referenceNow)
-        })
-        .slice(0, 5),
-    [radarMembers, referenceNow]
+      [...radarMembers].sort((a, b) => {
+        const createdDiff = new Date(b.contact.created_at).getTime() - new Date(a.contact.created_at).getTime()
+        if (createdDiff !== 0) return createdDiff
+        return b.contact.warmth_score - a.contact.warmth_score
+      }),
+    [radarMembers]
   )
+  const memberTotalPages = Math.max(1, Math.ceil(sortedMembers.length / TEAM_MEMBERS_PAGE_SIZE))
+  const resolvedMembersPage = Math.min(membersPage, memberTotalPages)
+  const memberPageNumbers = useMemo(
+    () => buildPageWindow(resolvedMembersPage, memberTotalPages),
+    [memberTotalPages, resolvedMembersPage]
+  )
+  const visibleMembers = useMemo(() => {
+    const startIndex = (resolvedMembersPage - 1) * TEAM_MEMBERS_PAGE_SIZE
+    return sortedMembers.slice(startIndex, startIndex + TEAM_MEMBERS_PAGE_SIZE)
+  }, [resolvedMembersPage, sortedMembers])
 
   const workspaceRoleLabel = workspaceContext?.membership?.role
     ? t(`team.workspace.roles.${workspaceContext.membership.role}`)
@@ -153,6 +159,14 @@ export function TeamPage() {
     } catch {
       toast.error(t('team.workspace.memberUpdateError'))
     }
+  }
+
+  const getStageLabel = (stage: (typeof members)[number]['stage']) =>
+    resolveContactStageLabel(pipelineStages, stage, t, currentLang)
+
+  const formatDate = (value: string | null) => {
+    if (!value) return t('team.labels.noDate')
+    return new Date(value).toLocaleDateString(i18n.language)
   }
 
   return (
@@ -327,7 +341,7 @@ export function TeamPage() {
       {members.length === 0 ? (
         <PageState
           variant="empty"
-          title={t('team.empty.leaderboard')}
+          title={t('team.empty.members')}
           description={t('team.workspace.emptyBody')}
         />
       ) : null}
@@ -407,45 +421,92 @@ export function TeamPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('team.sections.leaderboard')}</CardTitle>
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle>{t('team.sections.membersList')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('team.sections.membersListBody')}
+              </p>
+            </div>
+            {memberTotalPages > 1 ? (
+              <div className="text-xs font-medium text-muted-foreground">
+                {t('common.page', { page: resolvedMembersPage, total: memberTotalPages })}
+              </div>
+            ) : null}
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
-          {leaderboard.length > 0 ? (
-            leaderboard.map((member, index) => (
+          {visibleMembers.length > 0 ? (
+            visibleMembers.map((member, index) => (
               <button
                 key={member.contact.id}
                 type="button"
                 onClick={() => navigate(`/dashboard/contacts/${member.contact.id}`)}
                 className="w-full rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                    {index + 1}
+                <div className="flex flex-col gap-3 md:flex-row md:items-start">
+                  <div className="flex items-center gap-3 md:flex-1">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                      {(resolvedMembersPage - 1) * TEAM_MEMBERS_PAGE_SIZE + index + 1}
+                    </div>
+                    <Avatar size="sm">
+                      <AvatarFallback>{getInitials(member.contact.full_name)}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-semibold">{member.contact.full_name}</p>
+                        <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                          {getStageLabel(member.contact.stage)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {[member.contact.city || t('team.labels.locationFallback'), member.contact.occupation]
+                          .filter(Boolean)
+                          .join(' • ')}
+                      </p>
+                    </div>
                   </div>
-                  <Avatar size="sm">
-                    <AvatarFallback>{getInitials(member.contact.full_name)}</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold">{member.contact.full_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {member.contact.city || t('team.labels.locationFallback')}
-                    </p>
+                  <div className="flex flex-wrap items-center gap-2 md:justify-end">
+                    <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
+                      {t(`team.radar.status.${member.status}`)}
+                    </span>
+                    <WarmthScoreBadge score={member.contact.warmth_score} stage={member.contact.stage} />
                   </div>
-                  <WarmthScoreBadge score={member.contact.warmth_score} stage={member.contact.stage} />
                 </div>
-                <div className="mt-3 flex items-center justify-between gap-2">
-                  <span className={cn('rounded-full border px-2 py-0.5 text-xs font-medium', getStatusClasses(member.status))}>
-                    {t(`team.radar.status.${member.status}`)}
-                  </span>
-                  <p className="text-xs text-muted-foreground">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
+                <div className="mt-3 grid gap-2 text-xs text-muted-foreground md:grid-cols-3">
+                  <p>
+                    <span className="font-medium text-foreground">{t('team.labels.addedAt')}:</span>{' '}
+                    {formatDate(member.contact.created_at)}
+                  </p>
+                  <p>
+                    <span className="font-medium text-foreground">{t('team.labels.lastContact')}:</span>{' '}
+                    {formatDate(member.contact.last_contact_at)}
+                  </p>
+                  <p className="md:text-right">{t(`team.radar.momentum.${member.momentumKey}`)}</p>
                 </div>
               </button>
             ))
           ) : (
             <div className="rounded-xl border border-dashed p-6 text-sm text-muted-foreground">
-              {t('team.empty.leaderboard')}
+              {t('team.empty.members')}
             </div>
           )}
+          {memberTotalPages > 1 ? (
+            <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border/70 pt-2">
+              {memberPageNumbers.map((pageNumber) => (
+                <Button
+                  key={pageNumber}
+                  type="button"
+                  variant={pageNumber === resolvedMembersPage ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setMembersPage(pageNumber)}
+                  className="h-8 min-w-8 px-2"
+                >
+                  {pageNumber}
+                </Button>
+              ))}
+            </div>
+          ) : null}
         </CardContent>
       </Card>
         </>
