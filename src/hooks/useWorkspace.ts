@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
-import { fetchWorkspaceContext, fetchWorkspaceMembers } from '@/lib/workspace/queries'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { bootstrapWorkspaceForCurrentUser, fetchWorkspaceContext, fetchWorkspaceMembers } from '@/lib/workspace/queries'
 
 export const workspaceKeys = {
   all: ['workspace'] as const,
@@ -28,5 +28,17 @@ export function useWorkspaceMembers(workspaceId: string, currentUserId: string) 
     refetchOnMount: true,
     refetchOnReconnect: true,
     refetchOnWindowFocus: true,
+  })
+}
+
+export function useBootstrapWorkspace(userId: string) {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => bootstrapWorkspaceForCurrentUser(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: workspaceKeys.context(userId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.all })
+    },
   })
 }

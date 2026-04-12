@@ -10,6 +10,7 @@ export interface WorkspaceContext {
   workspace: Workspace | null
   membership: WorkspaceMember | null
   memberCount: number
+  schemaReady: boolean
 }
 
 export interface WorkspaceDirectoryMember {

@@ -97,6 +97,7 @@ export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceCo
         workspace: null,
         membership: null,
         memberCount: 0,
+        schemaReady: true,
       }
     }
 
@@ -123,6 +124,7 @@ export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceCo
         updated_at: membership.updated_at,
       },
       memberCount: count ?? 0,
+      schemaReady: true,
     }
   } catch (error) {
     if (isWorkspaceSchemaMissing(error)) {
@@ -131,11 +133,24 @@ export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceCo
         workspace: null,
         membership: null,
         memberCount: 0,
+        schemaReady: false,
       }
     }
 
     throw error
   }
+}
+
+export async function bootstrapWorkspaceForCurrentUser() {
+  const rpcClient = supabase as typeof supabase & {
+    rpc: (
+      fn: 'nmm_bootstrap_workspace_for_current_user'
+    ) => Promise<{ data: string | null; error: { message?: string } | null }>
+  }
+
+  const { data, error } = await rpcClient.rpc('nmm_bootstrap_workspace_for_current_user')
+  if (error) throw error
+  return data
 }
 
 export async function fetchWorkspaceMembers(workspaceId: string, currentUserId: string): Promise<WorkspaceDirectoryMember[]> {

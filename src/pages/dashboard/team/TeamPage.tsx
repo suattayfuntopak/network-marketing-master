@@ -2,13 +2,15 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Activity, ArrowUpRight, Sparkles, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { PageState } from '@/components/shared/PageState'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
-import { useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
+import { useBootstrapWorkspace, useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { cn } from '@/lib/utils'
 
@@ -52,6 +54,7 @@ export function TeamPage() {
   const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
   const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
+  const bootstrapWorkspace = useBootstrapWorkspace(userId)
 
   const { data: members = [] } = useContactInsights({
     userId,
@@ -110,6 +113,15 @@ export function TeamPage() {
     }, {})
   }, [workspaceMembers])
 
+  const handleBootstrapWorkspace = async () => {
+    try {
+      await bootstrapWorkspace.mutateAsync()
+      toast.success(t('team.workspace.bootstrapSuccess'))
+    } catch {
+      toast.error(t('team.workspace.bootstrapError'))
+    }
+  }
+
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
@@ -141,6 +153,18 @@ export function TeamPage() {
         <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-4">
           <p className="text-sm font-semibold text-foreground">{t('team.workspace.legacyTitle')}</p>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('team.workspace.legacyBody')}</p>
+          {workspaceContext?.schemaReady ? (
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <p className="text-xs text-muted-foreground">{t('team.workspace.bootstrapHint')}</p>
+              <Button
+                size="sm"
+                onClick={() => void handleBootstrapWorkspace()}
+                disabled={bootstrapWorkspace.isPending}
+              >
+                {bootstrapWorkspace.isPending ? t('team.workspace.bootstrapping') : t('team.workspace.bootstrapAction')}
+              </Button>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
