@@ -179,8 +179,8 @@ export function ProductCustomersPage() {
         </div>
       ) : rows.length > 0 ? (
         <div className="overflow-x-auto rounded-3xl border border-border/70 bg-card/55">
-          <div className="min-w-[1220px]">
-            <div className="grid grid-cols-[minmax(240px,1.5fr)_130px_130px_minmax(220px,1.2fr)_130px_140px_130px_140px_96px] gap-3 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
+          <div className="min-w-[1100px]">
+            <div className="grid grid-cols-[minmax(200px,1.85fr)_minmax(110px,1fr)_108px_minmax(170px,1.45fr)_108px_116px_122px_122px_72px] gap-x-3 gap-y-2 border-b bg-muted/25 px-4 py-3 text-xs font-semibold text-muted-foreground">
               <span>{t('customers.columns.name')}</span>
               <span>{t('customers.columns.source')}</span>
               <span>{t('customers.columns.customerSince')}</span>
@@ -195,12 +195,12 @@ export function ProductCustomersPage() {
               {rows.map((contact: ContactWithTags) => (
                 <div
                   key={contact.id}
-                  className="grid grid-cols-[minmax(240px,1.5fr)_130px_130px_minmax(220px,1.2fr)_130px_140px_130px_140px_96px] items-start gap-3 px-4 py-3 text-sm"
+                  className="grid grid-cols-[minmax(200px,1.85fr)_minmax(110px,1fr)_108px_minmax(170px,1.45fr)_108px_116px_122px_122px_72px] items-start gap-x-3 gap-y-2 px-4 py-3 text-sm"
                 >
                   <button
                     type="button"
                     onClick={() => navigate(`${ROUTES.CONTACTS}/${contact.id}`)}
-                    className="whitespace-normal break-words text-left font-medium leading-5 transition-colors hover:text-primary"
+                    className="pr-2 whitespace-normal break-words text-left font-medium leading-5 transition-colors hover:text-primary"
                   >
                     {contact.full_name}
                   </button>
@@ -230,7 +230,7 @@ export function ProductCustomersPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setFollowUpContact(contact)}
-                      className="w-full gap-1.5"
+                      className="w-full gap-1 px-2 text-xs"
                     >
                       <CalendarPlus className="h-3.5 w-3.5" />
                       {t('customers.actions.planFollowUp')}
@@ -241,7 +241,7 @@ export function ProductCustomersPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setMessageContact(contact)}
-                      className="w-full gap-1.5"
+                      className="w-full gap-1 px-2 text-xs"
                     >
                       <MessageSquarePlus className="h-3.5 w-3.5" />
                       {t('customers.actions.aiMessage')}
@@ -252,6 +252,7 @@ export function ProductCustomersPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => navigate(`${ROUTES.PRODUCT_CUSTOMERS}/${contact.id}/duzenle`)}
+                      className="w-full px-2 text-xs"
                     >
                       {t('common.edit')}
                     </Button>

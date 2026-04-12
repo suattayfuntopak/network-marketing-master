@@ -258,7 +258,7 @@ function PipelineColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          'flex min-h-[24rem] flex-col rounded-b-2xl border border-t-0 border-border/70 bg-muted/25 p-3 backdrop-blur-sm transition-colors',
+          'flex min-h-[11.5rem] flex-col rounded-b-2xl border border-t-0 border-border/70 bg-muted/25 p-3 backdrop-blur-sm transition-colors',
           isOver && 'border-primary/45 bg-primary/8 shadow-[inset_0_0_0_1px_rgba(45,212,191,0.12)]'
         )}
       >
