@@ -5,6 +5,7 @@ import {
   fetchWorkspaceMembers,
   inviteWorkspaceMember,
   searchWorkspaceInviteCandidates,
+  updateWorkspaceRelationship,
   updateWorkspaceMember,
 } from '@/lib/workspace/queries'
 import type { WorkspaceMember } from '@/lib/workspace/types'
@@ -106,6 +107,26 @@ export function useInviteWorkspaceMember(userId: string, workspaceId: string) {
       candidateUserId: string
       role: WorkspaceMember['role']
     }) => inviteWorkspaceMember({ workspaceId, candidateUserId, invitedBy: userId, role }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: workspaceKeys.context(userId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.members(workspaceId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.pendingMembers(workspaceId) })
+      qc.invalidateQueries({ queryKey: workspaceKeys.all })
+    },
+  })
+}
+
+export function useUpdateWorkspaceRelationship(userId: string, workspaceId: string) {
+  const qc = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({
+      memberUserId,
+      sponsorUserId,
+    }: {
+      memberUserId: string
+      sponsorUserId: string
+    }) => updateWorkspaceRelationship({ workspaceId, memberUserId, sponsorUserId }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: workspaceKeys.context(userId) })
       qc.invalidateQueries({ queryKey: workspaceKeys.members(workspaceId) })

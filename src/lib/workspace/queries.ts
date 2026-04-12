@@ -42,6 +42,19 @@ type MembershipRow = WorkspaceMember
 type ProfileRow = Pick<Profile, 'id' | 'full_name' | 'email' | 'role' | 'avatar_url' | 'company'>
 type RelationshipRow = Pick<WorkspaceRelationship, 'member_user_id' | 'sponsor_user_id' | 'depth'>
 
+async function resolveWorkspaceDepth(workspaceId: string, sponsorUserId: string) {
+  const { data, error } = await supabase
+    .from('nmm_member_relationships')
+    .select('depth')
+    .eq('workspace_id', workspaceId)
+    .eq('member_user_id', sponsorUserId)
+    .limit(1)
+    .maybeSingle()
+
+  if (error && !isWorkspaceSchemaMissing(error)) throw error
+  return data?.depth ? data.depth + 1 : 1
+}
+
 export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceContext> {
   try {
     const { data: membershipRow, error: membershipError } = await supabase
@@ -201,16 +214,35 @@ export async function fetchWorkspaceMembers(
     if (profilesError) throw profilesError
     if (relationshipsError && !isWorkspaceSchemaMissing(relationshipsError)) throw relationshipsError
 
+    const relationships = (relationshipRows ?? []) as RelationshipRow[]
+    const sponsorIds = relationships
+      .map((row) => row.sponsor_user_id)
+      .filter((value, index, array) => Boolean(value) && array.indexOf(value) === index)
+
+    let sponsorProfilesById = new Map<string, ProfileRow>()
+
+    if (sponsorIds.length > 0) {
+      const { data: sponsorRows, error: sponsorError } = await supabase
+        .from('nmm_profiles')
+        .select('id, full_name, email, role, avatar_url, company')
+        .in('id', sponsorIds)
+
+      if (sponsorError) throw sponsorError
+      sponsorProfilesById = new Map(((sponsorRows ?? []) as ProfileRow[]).map((profile) => [profile.id, profile]))
+    }
+
     const profilesById = new Map(((profileRows ?? []) as ProfileRow[]).map((profile) => [profile.id, profile]))
-    const relationshipsByMemberId = new Map(((relationshipRows ?? []) as RelationshipRow[]).map((row) => [row.member_user_id, row]))
+    const relationshipsByMemberId = new Map(relationships.map((row) => [row.member_user_id, row]))
 
     return memberships.map((membership) => {
       const relationship = relationshipsByMemberId.get(membership.user_id)
+      const sponsorProfile = relationship?.sponsor_user_id ? sponsorProfilesById.get(relationship.sponsor_user_id) : null
 
       return {
         membership,
         profile: profilesById.get(membership.user_id) ?? null,
         sponsorUserId: relationship?.sponsor_user_id ?? null,
+        sponsorName: sponsorProfile?.full_name ?? sponsorProfile?.email ?? null,
         depth: relationship?.depth ?? null,
         isCurrentUser: membership.user_id === currentUserId,
       }
@@ -283,6 +315,7 @@ export async function inviteWorkspaceMember({
   role: WorkspaceMember['role']
 }) {
   const now = new Date().toISOString()
+  const depth = await resolveWorkspaceDepth(workspaceId, invitedBy)
 
   const { data: insertedMember, error: memberError } = await supabase
     .from('nmm_workspace_members')
@@ -308,7 +341,7 @@ export async function inviteWorkspaceMember({
         workspace_id: workspaceId,
         sponsor_user_id: invitedBy,
         member_user_id: candidateUserId,
-        depth: 1,
+        depth,
       },
       { onConflict: 'workspace_id,member_user_id' }
     )
@@ -318,4 +351,33 @@ export async function inviteWorkspaceMember({
   }
 
   return insertedMember as WorkspaceMember
+}
+
+export async function updateWorkspaceRelationship({
+  workspaceId,
+  memberUserId,
+  sponsorUserId,
+}: {
+  workspaceId: string
+  memberUserId: string
+  sponsorUserId: string
+}) {
+  const depth = await resolveWorkspaceDepth(workspaceId, sponsorUserId)
+
+  const { data, error } = await supabase
+    .from('nmm_member_relationships')
+    .upsert(
+      {
+        workspace_id: workspaceId,
+        member_user_id: memberUserId,
+        sponsor_user_id: sponsorUserId,
+        depth,
+      },
+      { onConflict: 'workspace_id,member_user_id' }
+    )
+    .select('id, workspace_id, sponsor_user_id, member_user_id, depth, created_at')
+    .single()
+
+  if (error) throw error
+  return data as WorkspaceRelationship
 }

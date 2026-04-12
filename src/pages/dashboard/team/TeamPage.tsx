@@ -25,6 +25,7 @@ import { useContactInsights } from '@/hooks/useContacts'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import {
   useBootstrapWorkspace,
+  useUpdateWorkspaceRelationship,
   useUpdateWorkspaceMember,
   useWorkspaceContext,
   useWorkspaceMembers,
@@ -77,6 +78,7 @@ export function TeamPage() {
   const { data: pendingMembers = [], isLoading: pendingMembersLoading } = useWorkspacePendingMembers(workspaceId, userId)
   const bootstrapWorkspace = useBootstrapWorkspace(userId)
   const updateWorkspaceMember = useUpdateWorkspaceMember(userId, workspaceId)
+  const updateWorkspaceRelationship = useUpdateWorkspaceRelationship(userId, workspaceId)
   const { data: pipelineStages = [] } = usePipelineStages(userId)
 
   const { data: members = [] } = useContactInsights({
@@ -141,6 +143,13 @@ export function TeamPage() {
   }, [workspaceMembers])
   const currentWorkspaceRole = workspaceContext?.membership?.role ?? null
   const canManageMembers = currentWorkspaceRole === 'owner' || currentWorkspaceRole === 'leader'
+  const sponsorCandidates = useMemo(
+    () => workspaceMembers.map((member) => ({
+      userId: member.membership.user_id,
+      label: member.profile?.full_name ?? member.profile?.email ?? t('team.workspace.memberFallback'),
+    })),
+    [t, workspaceMembers]
+  )
 
   const canManageWorkspaceMember = (role: 'owner' | 'leader' | 'member' | 'assistant', isCurrentUser: boolean) => {
     if (!canManageMembers || isCurrentUser) return false
@@ -167,6 +176,15 @@ export function TeamPage() {
       toast.success(t('team.workspace.memberUpdated'))
     } catch {
       toast.error(t('team.workspace.memberUpdateError'))
+    }
+  }
+
+  const handleWorkspaceRelationshipUpdate = async (memberUserId: string, sponsorUserId: string) => {
+    try {
+      await updateWorkspaceRelationship.mutateAsync({ memberUserId, sponsorUserId })
+      toast.success(t('team.workspace.sponsorUpdated'))
+    } catch {
+      toast.error(t('team.workspace.sponsorUpdateError'))
     }
   }
 
@@ -275,6 +293,7 @@ export function TeamPage() {
                   const roleLabel = t(`team.workspace.roles.${member.membership.role}`)
                   const joinedLabel = new Date(member.membership.joined_at).toLocaleDateString()
                   const memberCanBeManaged = canManageWorkspaceMember(member.membership.role, member.isCurrentUser)
+                  const availableSponsors = sponsorCandidates.filter((candidate) => candidate.userId !== member.membership.user_id)
 
                   return (
                     <div key={member.membership.id} className="rounded-xl border bg-card/70 p-4">
@@ -302,6 +321,7 @@ export function TeamPage() {
                           <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                             <span>{t('team.workspace.joinedAt', { date: joinedLabel })}</span>
                             {member.depth ? <span>{t('team.workspace.depth', { count: member.depth })}</span> : null}
+                            <span>{t('team.workspace.sponsorLabel', { sponsor: member.sponsorName ?? t('team.workspace.noSponsor') })}</span>
                             {member.profile?.company ? <span>{member.profile.company}</span> : null}
                           </div>
                         </div>
@@ -329,6 +349,21 @@ export function TeamPage() {
                                     ))}
                                 </DropdownMenuSubContent>
                               </DropdownMenuSub>
+                              {availableSponsors.length > 0 ? (
+                                <DropdownMenuSub>
+                                  <DropdownMenuSubTrigger>{t('team.workspace.changeSponsor')}</DropdownMenuSubTrigger>
+                                  <DropdownMenuSubContent>
+                                    {availableSponsors.map((candidate) => (
+                                      <DropdownMenuItem
+                                        key={candidate.userId}
+                                        onClick={() => void handleWorkspaceRelationshipUpdate(member.membership.user_id, candidate.userId)}
+                                      >
+                                        {candidate.label}
+                                      </DropdownMenuItem>
+                                    ))}
+                                  </DropdownMenuSubContent>
+                                </DropdownMenuSub>
+                              ) : null}
                               <DropdownMenuSeparator />
                               <DropdownMenuItem
                                 onClick={() => void handleWorkspaceMemberUpdate(member.membership.id, { status: 'paused' })}
@@ -382,6 +417,9 @@ export function TeamPage() {
                             </p>
                             <p className="mt-1 truncate text-xs text-muted-foreground">
                               {member.profile?.email ?? t('team.workspace.noEmail')}
+                            </p>
+                            <p className="mt-2 text-xs text-muted-foreground">
+                              {t('team.workspace.sponsorLabel', { sponsor: member.sponsorName ?? t('team.workspace.noSponsor') })}
                             </p>
                           </div>
                           <span className="rounded-full border border-amber-500/20 bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-500">

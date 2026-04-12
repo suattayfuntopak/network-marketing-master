@@ -17,6 +17,7 @@ export interface WorkspaceDirectoryMember {
   membership: WorkspaceMember
   profile: Pick<Profile, 'id' | 'full_name' | 'email' | 'role' | 'avatar_url' | 'company'> | null
   sponsorUserId: string | null
+  sponsorName: string | null
   depth: number | null
   isCurrentUser: boolean
 }
