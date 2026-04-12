@@ -11,10 +11,16 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/hooks/useAuth'
 import { useNotifications } from '@/hooks/useNotifications'
-import { useWorkspaceContext } from '@/hooks/useWorkspace'
+import {
+  useIncomingWorkspaceInvites,
+  useRespondToWorkspaceInvite,
+  useUserWorkspaceMemberships,
+  useWorkspaceContext,
+} from '@/hooks/useWorkspace'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { ROUTES } from '@/lib/constants'
+import { getPreferredWorkspaceId, setPreferredWorkspaceId } from '@/lib/workspace/storage'
 import i18n from '@/i18n'
 
 type SettingsSection = 'profile' | 'settings' | 'notifications' | 'support' | 'feedback' | 'account'
@@ -28,7 +34,11 @@ export function SettingsPage() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
   const { requestPermission, showNotification, permission } = useNotifications()
-  const workspaceQuery = useWorkspaceContext(user?.id ?? '')
+  const [preferredWorkspace, setPreferredWorkspace] = useState(() => getPreferredWorkspaceId())
+  const workspaceQuery = useWorkspaceContext(user?.id ?? '', preferredWorkspace)
+  const workspaceMembershipsQuery = useUserWorkspaceMemberships(user?.id ?? '')
+  const incomingInvitesQuery = useIncomingWorkspaceInvites(user?.id ?? '')
+  const respondToInvite = useRespondToWorkspaceInvite(user?.id ?? '')
 
   const [fullName, setFullName] = useState(profile?.full_name ?? '')
   const [saving, setSaving] = useState(false)
@@ -158,6 +168,8 @@ export function SettingsPage() {
   const membershipPlan = (user?.user_metadata?.selected_plan as 'starter' | 'pro' | 'team' | undefined) ?? 'starter'
   const workspaceMode = (user?.user_metadata?.workspace_mode as 'clean' | 'demo' | undefined) ?? 'clean'
   const workspaceContext = workspaceQuery.data
+  const workspaceMemberships = workspaceMembershipsQuery.data ?? []
+  const incomingInvites = incomingInvitesQuery.data ?? []
   const workspaceStatusKey = workspaceQuery.isLoading
     ? 'loading'
     : workspaceQuery.isError
@@ -197,6 +209,27 @@ export function SettingsPage() {
       : permission === 'denied'
         ? 'border-rose-500/20 bg-rose-500/10 text-rose-100'
         : 'border-amber-500/20 bg-amber-500/10 text-amber-100'
+
+  const handleSwitchWorkspace = (workspaceId: string) => {
+    setPreferredWorkspaceId(workspaceId)
+    setPreferredWorkspace(workspaceId)
+    toast.success(t('settings.workspace.switcher.switchSuccess'))
+  }
+
+  const handleRespondToInvite = async (membershipId: string, workspaceId: string, action: 'accept' | 'decline') => {
+    try {
+      await respondToInvite.mutateAsync({ membershipId, action })
+      if (action === 'accept') {
+        setPreferredWorkspaceId(workspaceId)
+        setPreferredWorkspace(workspaceId)
+        toast.success(t('settings.workspace.invites.acceptSuccess'))
+      } else {
+        toast.success(t('settings.workspace.invites.declineSuccess'))
+      }
+    } catch {
+      toast.error(t('settings.workspace.invites.error'))
+    }
+  }
 
   return (
     <div className="p-6 pb-20 lg:pb-6 space-y-6">
@@ -473,6 +506,81 @@ export function SettingsPage() {
                 {t('settings.workspace.fields.workspace')}
               </p>
               <p className="mt-2 text-sm font-medium">{workspaceName}</p>
+            </div>
+            {workspaceMemberships.length > 1 ? (
+              <div className="mt-3 rounded-xl border border-border/60 bg-background/30 p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  {t('settings.workspace.switcher.title')}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{t('settings.workspace.switcher.body')}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {workspaceMemberships.map((item) => (
+                    <Button
+                      key={item.membership.id}
+                      variant={item.workspace.id === workspaceContext?.workspace?.id ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => handleSwitchWorkspace(item.workspace.id)}
+                    >
+                      {item.workspace.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+            <div className="mt-3 rounded-xl border border-border/60 bg-background/30 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    {t('settings.workspace.invites.title')}
+                  </p>
+                  <p className="mt-2 text-sm text-muted-foreground">{t('settings.workspace.invites.body')}</p>
+                </div>
+                <Badge variant="outline">{incomingInvites.length}</Badge>
+              </div>
+              <div className="mt-3 space-y-3">
+                {incomingInvitesQuery.isLoading ? (
+                  <div className="rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
+                    {t('common.loading')}
+                  </div>
+                ) : incomingInvites.length > 0 ? (
+                  incomingInvites.map((invite) => (
+                    <div key={invite.membership.id} className="rounded-xl border border-border/70 bg-card/50 p-4">
+                      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <p className="text-sm font-semibold">{invite.workspace.name}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {t('settings.workspace.invites.detail', {
+                              inviter: invite.inviter?.full_name ?? invite.inviter?.email ?? t('settings.workspace.roleFallback'),
+                              role: t(`team.workspace.roles.${invite.membership.role}`),
+                            })}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => void handleRespondToInvite(invite.membership.id, invite.workspace.id, 'accept')}
+                            disabled={respondToInvite.isPending}
+                          >
+                            {t('settings.workspace.invites.accept')}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void handleRespondToInvite(invite.membership.id, invite.workspace.id, 'decline')}
+                            disabled={respondToInvite.isPending}
+                          >
+                            {t('settings.workspace.invites.decline')}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
+                    {t('settings.workspace.invites.empty')}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           <p className="text-sm text-muted-foreground">{t('settings.accountInfo')}</p>

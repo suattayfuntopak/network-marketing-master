@@ -1,9 +1,11 @@
 import { supabase } from '@/lib/supabase'
 import type {
+  IncomingWorkspaceInvite,
   Profile,
   WorkspaceContext,
   WorkspaceDirectoryMember,
   WorkspaceInviteCandidate,
+  WorkspaceMembershipSummary,
   WorkspaceMember,
   WorkspaceRelationship,
 } from '@/lib/workspace/types'
@@ -41,6 +43,29 @@ function isWorkspaceSchemaMissing(error: unknown) {
 type MembershipRow = WorkspaceMember
 type ProfileRow = Pick<Profile, 'id' | 'full_name' | 'email' | 'role' | 'avatar_url' | 'company'>
 type RelationshipRow = Pick<WorkspaceRelationship, 'member_user_id' | 'sponsor_user_id' | 'depth'>
+type MinimalInviterProfile = Pick<Profile, 'id' | 'full_name' | 'email'>
+type WorkspaceMembershipWithWorkspace = {
+  id: string
+  workspace_id: string
+  user_id: string
+  role: 'owner' | 'leader' | 'member' | 'assistant'
+  status: 'invited' | 'active' | 'paused' | 'removed'
+  invited_by: string | null
+  joined_at: string
+  created_at: string
+  updated_at: string
+  workspace: {
+    id: string
+    owner_user_id: string
+    name: string
+    slug: string
+    default_locale: string
+    country_code: string
+    is_personal: boolean
+    created_at: string
+    updated_at: string
+  } | null
+}
 
 async function resolveWorkspaceDepth(workspaceId: string, sponsorUserId: string) {
   const { data, error } = await supabase
@@ -55,9 +80,9 @@ async function resolveWorkspaceDepth(workspaceId: string, sponsorUserId: string)
   return data?.depth ? data.depth + 1 : 1
 }
 
-export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceContext> {
+export async function fetchWorkspaceContext(userId: string, preferredWorkspaceId = ''): Promise<WorkspaceContext> {
   try {
-    const { data: membershipRow, error: membershipError } = await supabase
+    const { data: membershipRows, error: membershipError } = await supabase
       .from('nmm_workspace_members')
       .select(`
         id,
@@ -83,33 +108,14 @@ export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceCo
       `)
       .eq('user_id', userId)
       .eq('status', 'active')
-      .limit(1)
-      .maybeSingle()
+      .order('updated_at', { ascending: false })
 
     if (membershipError) throw membershipError
 
-    const membership = membershipRow as {
-      id: string
-      workspace_id: string
-      user_id: string
-      role: 'owner' | 'leader' | 'member' | 'assistant'
-      status: 'invited' | 'active' | 'paused' | 'removed'
-      invited_by: string | null
-      joined_at: string
-      created_at: string
-      updated_at: string
-      workspace: {
-        id: string
-        owner_user_id: string
-        name: string
-        slug: string
-        default_locale: string
-        country_code: string
-        is_personal: boolean
-        created_at: string
-        updated_at: string
-      } | null
-    } | null
+    const memberships = (membershipRows ?? []) as unknown as WorkspaceMembershipWithWorkspace[]
+    const membership =
+      memberships.find((item) => item.workspace?.id === preferredWorkspaceId)
+      ?? memberships[0]
 
     if (!membership?.workspace) {
       return {
@@ -159,6 +165,120 @@ export async function fetchWorkspaceContext(userId: string): Promise<WorkspaceCo
 
     throw error
   }
+}
+
+export async function fetchUserWorkspaceMemberships(userId: string): Promise<WorkspaceMembershipSummary[]> {
+  const { data, error } = await supabase
+    .from('nmm_workspace_members')
+    .select(`
+      id,
+      workspace_id,
+      user_id,
+      role,
+      status,
+      invited_by,
+      joined_at,
+      created_at,
+      updated_at,
+      workspace:nmm_workspaces(
+        id,
+        owner_user_id,
+        name,
+        slug,
+        default_locale,
+        country_code,
+        is_personal,
+        created_at,
+        updated_at
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('status', 'active')
+    .order('updated_at', { ascending: false })
+
+  if (error) throw error
+
+  return (((data ?? []) as unknown as WorkspaceMembershipWithWorkspace[]))
+    .filter((row) => Boolean(row.workspace))
+    .map((row) => ({
+      membership: {
+        id: row.id,
+        workspace_id: row.workspace_id,
+        user_id: row.user_id,
+        role: row.role,
+        status: row.status,
+        invited_by: row.invited_by,
+        joined_at: row.joined_at,
+        created_at: row.created_at,
+        updated_at: row.updated_at,
+      },
+      workspace: row.workspace as WorkspaceMembershipWithWorkspace['workspace'] & {},
+    }))
+}
+
+export async function fetchIncomingWorkspaceInvites(userId: string): Promise<IncomingWorkspaceInvite[]> {
+  const { data, error } = await supabase
+    .from('nmm_workspace_members')
+    .select(`
+      id,
+      workspace_id,
+      user_id,
+      role,
+      status,
+      invited_by,
+      joined_at,
+      created_at,
+      updated_at,
+      workspace:nmm_workspaces(
+        id,
+        owner_user_id,
+        name,
+        slug,
+        default_locale,
+        country_code,
+        is_personal,
+        created_at,
+        updated_at
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('status', 'invited')
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+
+  const rows = ((data ?? []) as unknown as WorkspaceMembershipWithWorkspace[]).filter((row) => Boolean(row.workspace))
+  const inviterIds = rows
+    .map((row) => row.invited_by)
+    .filter((value, index, array): value is string => Boolean(value) && array.indexOf(value) === index)
+
+  let invitersById = new Map<string, MinimalInviterProfile>()
+
+  if (inviterIds.length > 0) {
+    const { data: inviterRows, error: inviterError } = await supabase
+      .from('nmm_profiles')
+      .select('id, full_name, email')
+      .in('id', inviterIds)
+
+    if (inviterError) throw inviterError
+    invitersById = new Map(((inviterRows ?? []) as MinimalInviterProfile[]).map((profile) => [profile.id, profile]))
+  }
+
+  return rows.map((row) => ({
+    membership: {
+      id: row.id,
+      workspace_id: row.workspace_id,
+      user_id: row.user_id,
+      role: row.role,
+      status: row.status,
+      invited_by: row.invited_by,
+      joined_at: row.joined_at,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+    },
+    workspace: row.workspace as WorkspaceMembershipWithWorkspace['workspace'] & {},
+    inviter: row.invited_by ? invitersById.get(row.invited_by) ?? null : null,
+  }))
 }
 
 export async function bootstrapWorkspaceForCurrentUser() {
@@ -380,4 +500,28 @@ export async function updateWorkspaceRelationship({
 
   if (error) throw error
   return data as WorkspaceRelationship
+}
+
+export async function respondToWorkspaceInvite({
+  membershipId,
+  action,
+}: {
+  membershipId: string
+  action: 'accept' | 'decline'
+}) {
+  const now = new Date().toISOString()
+
+  const { data, error } = await supabase
+    .from('nmm_workspace_members')
+    .update({
+      status: action === 'accept' ? 'active' : 'removed',
+      updated_at: now,
+      joined_at: action === 'accept' ? now : undefined,
+    })
+    .eq('id', membershipId)
+    .select('id, workspace_id, user_id, role, status, invited_by, joined_at, created_at, updated_at')
+    .single()
+
+  if (error) throw error
+  return data as WorkspaceMember
 }

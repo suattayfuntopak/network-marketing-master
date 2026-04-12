@@ -1078,6 +1078,22 @@
         "role": "Role",
         "members": "Active members",
         "workspace": "Workspace"
+      },
+      "switcher": {
+        "title": "Workspace Switcher",
+        "body": "If you have more than one active workspace membership, choose which one you want to operate in here.",
+        "switchSuccess": "Active workspace switched"
+      },
+      "invites": {
+        "title": "Incoming Invites",
+        "body": "See team invites here and accept or decline them directly.",
+        "detail": "{{inviter}} invited you as {{role}}.",
+        "accept": "Accept",
+        "decline": "Decline",
+        "acceptSuccess": "Invite accepted and workspace activated",
+        "declineSuccess": "Invite declined",
+        "error": "Invite action could not be completed",
+        "empty": "There are no pending team invites."
       }
     },
     "roles": {

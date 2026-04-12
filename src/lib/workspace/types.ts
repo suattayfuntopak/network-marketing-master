@@ -30,3 +30,14 @@ export interface WorkspaceInviteCandidate {
   company: string | null
   avatar_url: string | null
 }
+
+export interface WorkspaceMembershipSummary {
+  membership: WorkspaceMember
+  workspace: Workspace
+}
+
+export interface IncomingWorkspaceInvite {
+  membership: WorkspaceMember
+  workspace: Workspace
+  inviter: Pick<Profile, 'id' | 'full_name' | 'email'> | null
+}

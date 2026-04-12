@@ -1078,6 +1078,22 @@
         "role": "Rol",
         "members": "Aktif uye",
         "workspace": "Workspace"
+      },
+      "switcher": {
+        "title": "Workspace Gecisi",
+        "body": "Birden fazla aktif workspace uyeligin varsa burada hangisini kullanmak istedigini sec.",
+        "switchSuccess": "Aktif workspace degistirildi"
+      },
+      "invites": {
+        "title": "Gelen Davetler",
+        "body": "Ekip davetlerini burada gorup dogrudan kabul ya da reddedebilirsin.",
+        "detail": "{{inviter}} seni {{role}} roluyle davet etti.",
+        "accept": "Kabul Et",
+        "decline": "Reddet",
+        "acceptSuccess": "Davet kabul edildi ve workspace aktiflestirildi",
+        "declineSuccess": "Davet reddedildi",
+        "error": "Davet islemi tamamlanamadi",
+        "empty": "Bekleyen bir ekip daveti gorunmuyor."
       }
     },
     "roles": {

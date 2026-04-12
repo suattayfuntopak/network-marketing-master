@@ -34,6 +34,7 @@ import {
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { buildPageWindow } from '@/lib/pagination'
 import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
+import { getPreferredWorkspaceId } from '@/lib/workspace/storage'
 import { cn } from '@/lib/utils'
 
 const TEAM_MEMBERS_PAGE_SIZE = 15
@@ -72,7 +73,8 @@ export function TeamPage() {
   const [referenceNow] = useState(() => Date.now())
   const [membersPage, setMembersPage] = useState(1)
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
-  const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId)
+  const preferredWorkspaceId = getPreferredWorkspaceId()
+  const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId, preferredWorkspaceId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
   const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
   const { data: pendingMembers = [], isLoading: pendingMembersLoading } = useWorkspacePendingMembers(workspaceId, userId)
