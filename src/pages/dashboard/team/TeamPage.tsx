@@ -1,16 +1,27 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Activity, ArrowUpRight, Sparkles, Users } from 'lucide-react'
+import { Activity, ArrowUpRight, MoreHorizontal, Sparkles, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { PageState } from '@/components/shared/PageState'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
-import { useBootstrapWorkspace, useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
+import { useBootstrapWorkspace, useUpdateWorkspaceMember, useWorkspaceContext, useWorkspaceMembers } from '@/hooks/useWorkspace'
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { cn } from '@/lib/utils'
 
@@ -55,6 +66,7 @@ export function TeamPage() {
   const workspaceId = workspaceContext?.workspace?.id ?? ''
   const { data: workspaceMembers = [], isLoading: workspaceMembersLoading } = useWorkspaceMembers(workspaceId, userId)
   const bootstrapWorkspace = useBootstrapWorkspace(userId)
+  const updateWorkspaceMember = useUpdateWorkspaceMember(userId, workspaceId)
 
   const { data: members = [] } = useContactInsights({
     userId,
@@ -112,6 +124,15 @@ export function TeamPage() {
       return acc
     }, {})
   }, [workspaceMembers])
+  const currentWorkspaceRole = workspaceContext?.membership?.role ?? null
+  const canManageMembers = currentWorkspaceRole === 'owner' || currentWorkspaceRole === 'leader'
+
+  const canManageWorkspaceMember = (role: 'owner' | 'leader' | 'member' | 'assistant', isCurrentUser: boolean) => {
+    if (!canManageMembers || isCurrentUser) return false
+    if (currentWorkspaceRole === 'owner') return role !== 'owner'
+    if (currentWorkspaceRole === 'leader') return role === 'member' || role === 'assistant'
+    return false
+  }
 
   const handleBootstrapWorkspace = async () => {
     try {
@@ -119,6 +140,18 @@ export function TeamPage() {
       toast.success(t('team.workspace.bootstrapSuccess'))
     } catch {
       toast.error(t('team.workspace.bootstrapError'))
+    }
+  }
+
+  const handleWorkspaceMemberUpdate = async (
+    memberId: string,
+    data: { role?: 'owner' | 'leader' | 'member' | 'assistant'; status?: 'active' | 'paused' | 'removed' }
+  ) => {
+    try {
+      await updateWorkspaceMember.mutateAsync({ memberId, data })
+      toast.success(t('team.workspace.memberUpdated'))
+    } catch {
+      toast.error(t('team.workspace.memberUpdateError'))
     }
   }
 
@@ -207,6 +240,7 @@ export function TeamPage() {
                 {workspaceMembers.map((member) => {
                   const roleLabel = t(`team.workspace.roles.${member.membership.role}`)
                   const joinedLabel = new Date(member.membership.joined_at).toLocaleDateString()
+                  const memberCanBeManaged = canManageWorkspaceMember(member.membership.role, member.isCurrentUser)
 
                   return (
                     <div key={member.membership.id} className="rounded-xl border bg-card/70 p-4">
@@ -237,6 +271,45 @@ export function TeamPage() {
                             {member.profile?.company ? <span>{member.profile.company}</span> : null}
                           </div>
                         </div>
+                        {memberCanBeManaged ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="min-w-44">
+                              <DropdownMenuLabel>{t('team.workspace.manage')}</DropdownMenuLabel>
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>{t('team.workspace.changeRole')}</DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                  {(['leader', 'member', 'assistant'] as const)
+                                    .filter((role) => role !== member.membership.role)
+                                    .map((role) => (
+                                      <DropdownMenuItem
+                                        key={role}
+                                        onClick={() => void handleWorkspaceMemberUpdate(member.membership.id, { role })}
+                                      >
+                                        {t(`team.workspace.roles.${role}`)}
+                                      </DropdownMenuItem>
+                                    ))}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuSub>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                onClick={() => void handleWorkspaceMemberUpdate(member.membership.id, { status: 'paused' })}
+                              >
+                                {t('team.workspace.pauseMember')}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                variant="destructive"
+                                onClick={() => void handleWorkspaceMemberUpdate(member.membership.id, { status: 'removed' })}
+                              >
+                                {t('team.workspace.removeMember')}
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : null}
                       </div>
                     </div>
                   )

@@ -202,3 +202,21 @@ export async function fetchWorkspaceMembers(workspaceId: string, currentUserId: 
     throw error
   }
 }
+
+export async function updateWorkspaceMember(
+  memberId: string,
+  data: Partial<Pick<WorkspaceMember, 'role' | 'status'>>
+) {
+  const { data: updatedRow, error } = await supabase
+    .from('nmm_workspace_members')
+    .update({
+      ...data,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', memberId)
+    .select('id, workspace_id, user_id, role, status, invited_by, joined_at, created_at, updated_at')
+    .single()
+
+  if (error) throw error
+  return updatedRow as WorkspaceMember
+}
