@@ -307,6 +307,36 @@ export function TeamPage() {
       return acc
     }, {})
   }, [workspaceMembers])
+  const sponsorTreeLevels = useMemo(() => {
+    if (workspaceMembers.length === 0) return []
+
+    const childrenBySponsor = workspaceMembers.reduce<Map<string, number>>((acc, member) => {
+      if (!member.sponsorUserId) return acc
+      acc.set(member.sponsorUserId, (acc.get(member.sponsorUserId) ?? 0) + 1)
+      return acc
+    }, new Map())
+
+    const maxDepth = workspaceMembers.reduce((acc, member) => Math.max(acc, member.depth ?? 0), 0)
+
+    return Array.from({ length: maxDepth + 1 }, (_, depth) => ({
+      depth,
+      members: workspaceMembers
+        .filter((member) => (member.depth ?? 0) === depth)
+        .sort((a, b) => {
+          const rolePriority = { owner: 0, leader: 1, member: 2, assistant: 3 }
+          const roleDiff = rolePriority[a.membership.role] - rolePriority[b.membership.role]
+          if (roleDiff !== 0) return roleDiff
+          return (a.profile?.full_name ?? a.profile?.email ?? '').localeCompare(
+            b.profile?.full_name ?? b.profile?.email ?? '',
+            i18n.language
+          )
+        })
+        .map((member) => ({
+          ...member,
+          childCount: childrenBySponsor.get(member.membership.user_id) ?? 0,
+        })),
+    })).filter((level) => level.members.length > 0)
+  }, [i18n.language, workspaceMembers])
   const currentWorkspaceRole = workspaceContext?.membership?.role ?? null
   const canManageMembers = currentWorkspaceRole === 'owner' || currentWorkspaceRole === 'leader'
   const sponsorCandidates = useMemo(
@@ -602,6 +632,74 @@ export function TeamPage() {
                 </div>
               </div>
             ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
+
+      {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
+        <Card>
+          <CardHeader>
+            <div>
+              <CardTitle>{t('team.workspace.sponsorTreeTitle')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('team.workspace.sponsorTreeBody')}</p>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {workspaceMembersLoading ? (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {t('common.loading')}
+              </div>
+            ) : sponsorTreeLevels.length > 0 ? (
+              <div className="overflow-x-auto pb-2">
+                <div className="flex min-w-max gap-4">
+                  {sponsorTreeLevels.map((level) => (
+                    <div key={level.depth} className="w-[260px] shrink-0 space-y-3">
+                      <div className="rounded-2xl border border-border/70 bg-card/50 px-4 py-3">
+                        <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                          {t('team.workspace.sponsorLevel', { count: level.depth + 1 })}
+                        </div>
+                        <div className="mt-2 text-sm font-semibold">
+                          {t('team.workspace.sponsorLevelHint', { count: level.members.length })}
+                        </div>
+                      </div>
+
+                      {level.members.map((member) => (
+                        <div key={member.membership.id} className="rounded-2xl border border-border/70 bg-card/70 p-4">
+                          <div className="flex items-start gap-3">
+                            <Avatar size="sm">
+                              <AvatarFallback>{getInitials(member.profile?.full_name ?? member.profile?.email ?? 'WM')}</AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <p className="truncate text-sm font-semibold">
+                                  {member.profile?.full_name ?? member.profile?.email ?? t('team.workspace.memberFallback')}
+                                </p>
+                                {member.depth === 0 ? (
+                                  <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                                    {t('team.workspace.rootBadge')}
+                                  </span>
+                                ) : null}
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {t(`team.workspace.roles.${member.membership.role}`)}
+                              </p>
+                              <div className="mt-3 space-y-1 text-xs text-muted-foreground">
+                                <p>{t('team.workspace.sponsorLabel', { sponsor: member.sponsorName ?? t('team.workspace.noSponsor') })}</p>
+                                <p>{t('team.workspace.childrenCount', { count: member.childCount })}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {t('team.workspace.emptyBody')}
+              </div>
+            )}
           </CardContent>
         </Card>
       ) : null}
