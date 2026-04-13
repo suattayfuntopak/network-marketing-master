@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { format, addDays } from 'date-fns'
@@ -24,19 +24,36 @@ interface FormValues {
 
 interface ContactOption { id: string; full_name: string; phone: string | null }
 
+interface FollowUpDraft {
+  title?: string
+  action_type?: FollowUpActionType
+  priority?: FollowUpPriority
+  due_at?: string
+  notes?: string
+}
+
 interface Props {
   open: boolean
   onClose: () => void
   userId: string
   defaultContactId?: string
   defaultContactName?: string
+  defaultDraft?: FollowUpDraft | null
   editFollowUp?: FollowUpWithContact | null
 }
 
 const PRIORITIES: FollowUpPriority[] = ['low', 'medium', 'high', 'urgent']
 const ACTIONS: FollowUpActionType[]  = ['call', 'message', 'email', 'visit', 'send_info', 'check_in', 'other']
 
-export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defaultContactName, editFollowUp }: Props) {
+export function NewFollowUpModal({
+  open,
+  onClose,
+  userId,
+  defaultContactId,
+  defaultContactName,
+  defaultDraft,
+  editFollowUp,
+}: Props) {
   const { t } = useTranslation()
   const createFollowUp = useCreateFollowUp(userId)
   const updateFollowUp = useUpdateFollowUp(userId)
@@ -60,6 +77,16 @@ export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defa
   const [showContactList, setShowContactList] = useState(false)
   const [quickOffset, setQuickOffset] = useState<number | null>(3)
 
+  const applyCreateDefaults = useCallback(() => {
+    reset({
+      title: defaultDraft?.title ?? '',
+      action_type: defaultDraft?.action_type ?? 'call',
+      priority: defaultDraft?.priority ?? 'medium',
+      due_at: defaultDraft?.due_at ?? format(addDays(new Date(), 3), "yyyy-MM-dd'T'HH:mm"),
+      notes: defaultDraft?.notes ?? '',
+    })
+  }, [defaultDraft, reset])
+
   const { data: contactResults = [], isFetching: searchFetching } = useQuery({
     queryKey: ['contact-search', contactSearch],
     queryFn: async () => {
@@ -78,10 +105,16 @@ export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defa
 
   // ── Pre-fill from default contact ─────────────────────────────
   useEffect(() => {
-    if (defaultContactId && defaultContactName && open && !isEdit) {
-      setSelectedContact({ id: defaultContactId, full_name: defaultContactName, phone: null })
-    }
-  }, [defaultContactId, defaultContactName, open, isEdit])
+    if (!open || isEdit) return
+
+    applyCreateDefaults()
+    setQuickOffset(defaultDraft?.due_at ? null : 3)
+    setSelectedContact(
+      defaultContactId && defaultContactName
+        ? { id: defaultContactId, full_name: defaultContactName, phone: null }
+        : null
+    )
+  }, [applyCreateDefaults, defaultContactId, defaultContactName, defaultDraft, isEdit, open])
 
   // ── Pre-fill on edit ──────────────────────────────────────────
   useEffect(() => {
@@ -105,10 +138,10 @@ export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defa
   // ── Auto-title when contact + action type changes ─────────────
   const actionType = watch('action_type')
   useEffect(() => {
-    if (selectedContact && !isEdit) {
+    if (selectedContact && !isEdit && !defaultDraft?.title) {
       setValue('title', `${selectedContact.full_name} - ${t(`followUps.actionTypes.${actionType}`)}`)
     }
-  }, [selectedContact, actionType, t, setValue, isEdit])
+  }, [selectedContact, actionType, t, setValue, isEdit, defaultDraft?.title])
 
   const handleQuickDate = (days: number) => {
     setQuickOffset(days)
@@ -148,11 +181,11 @@ export function NewFollowUpModal({ open, onClose, userId, defaultContactId, defa
   }
 
   const handleClose = () => {
-    reset()
+    applyCreateDefaults()
     setSelectedContact(null)
     setContactSearch('')
     setShowContactList(false)
-    setQuickOffset(3)
+    setQuickOffset(defaultDraft?.due_at ? null : 3)
     onClose()
   }
 

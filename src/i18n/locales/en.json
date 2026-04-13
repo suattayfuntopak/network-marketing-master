@@ -1685,6 +1685,7 @@
       "sponsorLevelHint": "{{count}} members",
       "rootBadge": "Root Line",
       "childrenCount": "{{count}} direct lines",
+      "openDetail": "Open mini detail",
       "manage": "Member Management",
       "changeRole": "Change Role",
       "pauseMember": "Pause Member",
@@ -1717,10 +1718,25 @@
       "activeBody": "{{workspace}} currently shows {{members}} active members. Real team structure is active for this account.",
       "emptyBody": "The foundation for real team architecture is ready. As members are added, this screen can move fully from contact proxy logic to workspace logic.",
       "memberFallback": "Workspace member",
+      "memberDetailBody": "See the mini sponsor-network summary for this {{role}}.",
       "you": "You",
       "noEmail": "No email available",
       "joinedAt": "Joined: {{date}}",
       "depth": "Level {{count}}",
+      "lineageTitle": "Sponsor Chain",
+      "lineageEmpty": "This member starts from the root line, so there is no sponsor chain above.",
+      "directLinesTitle": "Direct Lines",
+      "directLinesBody": "Track the lines this member grows directly from here.",
+      "directLinesEmpty": "There is no direct line yet.",
+      "detailMetrics": {
+        "level": "Level",
+        "levelHint": "{{count}} other members are visible on the same level.",
+        "directLines": "Direct Lines",
+        "directLinesHint": "Members growing directly under this line.",
+        "lineSize": "Line Size",
+        "lineSizeHint": "Combined total of direct and indirect downlines.",
+        "joined": "Joined"
+      },
       "roles": {
         "owner": "Owner",
         "leader": "Leader",
@@ -1829,6 +1845,55 @@
       "body": "Manage the follow-up and guidance tasks you opened for team members here.",
       "newTask": "New Coaching Task",
       "empty": "There are no planned coaching tasks for the team yet.",
+      "weeklyTargets": {
+        "title": "Weekly Member Targets",
+        "body": "See who needs your touch this week and what the clearest next move is through focused cards.",
+        "targetLabel": "This week's target",
+        "empty": "There are not enough team signals yet to surface weekly targets.",
+        "summary": {
+          "priority": "Priority Members",
+          "priorityHint": "Members slowing down or needing support gather here first.",
+          "planned": "Planned This Week",
+          "plannedHint": "Open coaching tasks currently spread across this week.",
+          "gap": "No Visible Plan",
+          "gapHint": "Team members who still do not have an open coaching task."
+        },
+        "actions": {
+          "openTask": "Open Task",
+          "completeTask": "Complete Task",
+          "snoozeTask": "Snooze To Tomorrow",
+          "openContact": "Open Contact"
+        },
+        "metrics": {
+          "open": "{{count}} open tasks",
+          "overdue": "{{count}} overdue",
+          "thisWeek": "{{count}} this week"
+        },
+        "drafts": {
+          "resetRhythm": {
+            "title": "Run a reset conversation with {{name}}",
+            "notes": "Rebuild rhythm for {{name}}. Start with a short reset, then define one clear next step around {{focus}}."
+          },
+          "secureNextStep": {
+            "title": "Clarify the next move for {{name}}",
+            "notes": "Lock one clear move for {{name}} into this week. Keep the focus on {{focus}} and remove ambiguity."
+          },
+          "expandMomentum": {
+            "title": "Expand momentum for {{name}}",
+            "notes": "{{name}} is already in a healthy flow. Give quick recognition, then open one move that expands {{focus}}."
+          },
+          "buildRhythm": {
+            "title": "Start the first rhythm with {{name}}",
+            "notes": "Open a light first touch with {{name}}. The goal is to create one visible task around {{focus}}."
+          }
+        },
+        "targets": {
+          "resetRhythm": "Have one reset conversation and make the next follow-up date visible again.",
+          "secureNextStep": "Lock a clear next step into this week and remove ambiguity.",
+          "expandMomentum": "Open one expansion move that keeps the momentum warm and visible.",
+          "buildRhythm": "Start a new contact rhythm with one small but visible first task."
+        }
+      },
       "analyticsTitle": "Coaching Performance",
       "analyticsBody": "See task coverage, delay pressure, and the names needing leader attention in one glance.",
       "peakLoadLabel": "Highest Load",

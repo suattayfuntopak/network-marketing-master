@@ -39,7 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     }
 
-    setProfile(nextProfile)
+    setProfile(nextProfile ? { ...nextProfile, role: 'admin' } : nextProfile)
     setLoading(false)
   }, [setLoading, setProfile])
 

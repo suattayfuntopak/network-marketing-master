@@ -1685,6 +1685,7 @@
       "sponsorLevelHint": "{{count}} uye",
       "rootBadge": "Ana Hat",
       "childrenCount": "{{count}} alt hat",
+      "openDetail": "Mini detayi ac",
       "manage": "Uye Yonetimi",
       "changeRole": "Rol Degistir",
       "pauseMember": "Uyeyi Duraklat",
@@ -1717,10 +1718,25 @@
       "activeBody": "{{workspace}} icinde {{members}} aktif uye gorunuyor. Gercek ekip yapisi bu hesapta aktif.",
       "emptyBody": "Gercek ekip omurgasi icin zemin hazir. Uye eklendikce bu ekran kontak proxy mantigindan workspace mantigina tam olarak gececek.",
       "memberFallback": "Workspace uyesi",
+      "memberDetailBody": "{{role}} rolunde, sponsor agi icindeki mini ozeti burada gor.",
       "you": "Sen",
       "noEmail": "E-posta bilgisi yok",
       "joinedAt": "Katilim: {{date}}",
       "depth": "Seviye {{count}}",
+      "lineageTitle": "Sponsor Zinciri",
+      "lineageEmpty": "Bu uye ana hattan basliyor; ust sponsor zinciri yok.",
+      "directLinesTitle": "Direkt Kollar",
+      "directLinesBody": "Bu uyenin dogrudan buyuttugu kollari buradan takip et.",
+      "directLinesEmpty": "Henuz direkt bir kol gorunmuyor.",
+      "detailMetrics": {
+        "level": "Seviye",
+        "levelHint": "Ayni seviyede {{count}} diger uye gorunuyor.",
+        "directLines": "Direkt Kol",
+        "directLinesHint": "Dogrudan bu hat altinda buyuyen uye sayisi.",
+        "lineSize": "Alt Ag Hacmi",
+        "lineSizeHint": "Direkt ve dolayli tum alt hat toplami.",
+        "joined": "Katilim"
+      },
       "roles": {
         "owner": "Sahip",
         "leader": "Lider",
@@ -1829,6 +1845,55 @@
       "body": "Ekip üyeleri için açtığın takip ve yönlendirme görevlerini buradan yönet.",
       "newTask": "Koçluk Gorevi Ac",
       "empty": "Henüz ekip için planlanmış bir koçluk görevi görünmüyor.",
+      "weeklyTargets": {
+        "title": "Haftalik Uye Hedefleri",
+        "body": "Bu hafta hangi uyeye hangi net adimla dokunman gerektigini sade kartlarla gor.",
+        "targetLabel": "Bu haftanin hedefi",
+        "empty": "Henuz haftalik hedef cikaracak yeterli ekip sinyali görünmuyor.",
+        "summary": {
+          "priority": "Oncelikli Uye",
+          "priorityHint": "Yavaslayan veya destek isteyen uyeler once burada toplanir.",
+          "planned": "Bu Hafta Planli",
+          "plannedHint": "Hafta icine dagilan acik koçluk gorevleri.",
+          "gap": "Plansiz Uye",
+          "gapHint": "Henuz görünur bir koçluk gorevi olmayan ekip uyeleri."
+        },
+        "actions": {
+          "openTask": "Gorev Ac",
+          "completeTask": "Gorevi Tamamla",
+          "snoozeTask": "Yarina Ertele",
+          "openContact": "Kontagi Ac"
+        },
+        "metrics": {
+          "open": "{{count}} acik gorev",
+          "overdue": "{{count}} geciken",
+          "thisWeek": "{{count}} bu hafta"
+        },
+        "drafts": {
+          "resetRhythm": {
+            "title": "{{name}} ile reset konuşmasi yap",
+            "notes": "{{name}} icin ritmi yeniden kur. Once kisa bir reset yap, sonra {{focus}} odağiyla tek net sonraki adimi belirle."
+          },
+          "secureNextStep": {
+            "title": "{{name}} icin sonraki adimi netlestir",
+            "notes": "{{name}} ile bu haftalik tek net adimi takvime bagla. Odağı {{focus}} olarak tut ve belirsizligi azalt."
+          },
+          "expandMomentum": {
+            "title": "{{name}} icin ivmeyi buyut",
+            "notes": "{{name}} dogru akista. Kisa takdir ver, sonra {{focus}} odağiyla momentumu buyutecek tek bir adim ac."
+          },
+          "buildRhythm": {
+            "title": "{{name}} icin ilk ritmi kur",
+            "notes": "{{name}} ile hafif bir temas baslat. Amaç {{focus}} odağiyla gorunur bir ilk gorev acmak."
+          }
+        },
+        "targets": {
+          "resetRhythm": "Tek bir reset konuşmasi yap ve yeni takip tarihini gorunur hale getir.",
+          "secureNextStep": "Net sonraki adimi bu hafta takvime bagla ve belirsizligi kapat.",
+          "expandMomentum": "Ivmeyi sicak tutacak bir genisletme adimi ac ve hiz kaybini onle.",
+          "buildRhythm": "Yeni temas ritmini kucuk ama görünur bir ilk gorevle baslat."
+        }
+      },
       "analyticsTitle": "Koçluk Performansi",
       "analyticsBody": "Görev kapsamasını, gecikme baskısını ve lider dokunuşu gerektiren isimleri tek bakışta gör.",
       "peakLoadLabel": "En Yogun Uye",

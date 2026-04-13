@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Activity, ArrowUpRight, CalendarClock, MoreHorizontal, Sparkles, UserPlus, Users } from 'lucide-react'
+import { Activity, ArrowUpRight, CalendarClock, CheckCircle2, Clock3, GitBranch, MoreHorizontal, Sparkles, UserPlus, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -19,12 +19,13 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { WarmthScoreBadge } from '@/components/contacts/WarmthScoreBadge'
 import { PageState } from '@/components/shared/PageState'
 import { InviteWorkspaceMemberDialog } from '@/components/team/InviteWorkspaceMemberDialog'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
-import { useFollowUps } from '@/hooks/useCalendar'
+import { useCompleteFollowUp, useFollowUps, useSnoozeFollowUp } from '@/hooks/useCalendar'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import {
   useBootstrapWorkspace,
@@ -37,6 +38,7 @@ import {
 import { buildTeamRadarInsight, type TeamRadarStatus } from '@/lib/team/teamRadar'
 import { buildPageWindow } from '@/lib/pagination'
 import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
+import { ROUTES } from '@/lib/constants'
 import { getPreferredWorkspaceId } from '@/lib/workspace/storage'
 import { cn } from '@/lib/utils'
 import type { FollowUpWithContact } from '@/lib/calendar/types'
@@ -68,6 +70,61 @@ function getStatusClasses(status: TeamRadarStatus) {
   return 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400'
 }
 
+function getStatusPriority(status: TeamRadarStatus) {
+  if (status === 'needs_support') return 0
+  if (status === 'slowing_down') return 1
+  if (status === 'gaining_momentum') return 2
+  return 3
+}
+
+function compareWorkspaceMembers(
+  a: {
+    membership: { role: 'owner' | 'leader' | 'member' | 'assistant' }
+    profile: { full_name: string | null; email: string | null } | null
+  },
+  b: {
+    membership: { role: 'owner' | 'leader' | 'member' | 'assistant' }
+    profile: { full_name: string | null; email: string | null } | null
+  },
+  locale: string
+) {
+  const rolePriority = { owner: 0, leader: 1, member: 2, assistant: 3 }
+  const roleDiff = rolePriority[a.membership.role] - rolePriority[b.membership.role]
+  if (roleDiff !== 0) return roleDiff
+
+  return (a.profile?.full_name ?? a.profile?.email ?? '').localeCompare(
+    b.profile?.full_name ?? b.profile?.email ?? '',
+    locale
+  )
+}
+
+function getWeekWindow(referenceNow: number) {
+  const start = new Date(referenceNow)
+  const day = start.getDay()
+  const diff = day === 0 ? -6 : 1 - day
+  start.setDate(start.getDate() + diff)
+  start.setHours(0, 0, 0, 0)
+
+  const end = new Date(start)
+  end.setDate(end.getDate() + 6)
+  end.setHours(23, 59, 59, 999)
+
+  return {
+    startMs: start.getTime(),
+    endMs: end.getTime(),
+  }
+}
+
+function formatDateTimeLocalInput(date: Date) {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  const hours = `${date.getHours()}`.padStart(2, '0')
+  const minutes = `${date.getMinutes()}`.padStart(2, '0')
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
 export function TeamPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -79,6 +136,17 @@ export function TeamPage() {
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [showCoachingModal, setShowCoachingModal] = useState(false)
   const [editCoachingTask, setEditCoachingTask] = useState<FollowUpWithContact | null>(null)
+  const [selectedSponsorMemberId, setSelectedSponsorMemberId] = useState<string | null>(null)
+  const autoBootstrapAttemptedRef = useRef(false)
+  const [coachingDraft, setCoachingDraft] = useState<{
+    contactId: string
+    contactName: string
+    title: string
+    action_type: 'call' | 'message' | 'check_in'
+    priority: 'medium' | 'high' | 'urgent'
+    due_at: string
+    notes: string
+  } | null>(null)
   const preferredWorkspaceId = getPreferredWorkspaceId()
   const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId, preferredWorkspaceId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
@@ -89,6 +157,8 @@ export function TeamPage() {
   const updateWorkspaceRelationship = useUpdateWorkspaceRelationship(userId, workspaceId)
   const { data: pipelineStages = [] } = usePipelineStages(userId)
   const { data: followUps = [], isLoading: followUpsLoading } = useFollowUps(userId, ['pending', 'snoozed'])
+  const completeFollowUp = useCompleteFollowUp(userId)
+  const snoozeFollowUp = useSnoozeFollowUp(userId)
 
   const { data: members = [] } = useContactInsights({
     userId,
@@ -300,6 +370,7 @@ export function TeamPage() {
   const workspaceRoleLabel = workspaceContext?.membership?.role
     ? t(`team.workspace.roles.${workspaceContext.membership.role}`)
     : null
+  const weekWindow = useMemo(() => getWeekWindow(referenceNow), [referenceNow])
   const workspaceRoleCounts = useMemo(() => {
     return workspaceMembers.reduce<Record<string, number>>((acc, member) => {
       const role = member.membership.role
@@ -322,21 +393,95 @@ export function TeamPage() {
       depth,
       members: workspaceMembers
         .filter((member) => (member.depth ?? 0) === depth)
-        .sort((a, b) => {
-          const rolePriority = { owner: 0, leader: 1, member: 2, assistant: 3 }
-          const roleDiff = rolePriority[a.membership.role] - rolePriority[b.membership.role]
-          if (roleDiff !== 0) return roleDiff
-          return (a.profile?.full_name ?? a.profile?.email ?? '').localeCompare(
-            b.profile?.full_name ?? b.profile?.email ?? '',
-            i18n.language
-          )
-        })
+        .sort((a, b) => compareWorkspaceMembers(a, b, i18n.language))
         .map((member) => ({
           ...member,
           childCount: childrenBySponsor.get(member.membership.user_id) ?? 0,
         })),
     })).filter((level) => level.members.length > 0)
   }, [i18n.language, workspaceMembers])
+  const sponsorNetworkInsights = useMemo(() => {
+    const membersByUserId = new Map(workspaceMembers.map((member) => [member.membership.user_id, member]))
+    const childrenBySponsor = workspaceMembers.reduce<Map<string, typeof workspaceMembers>>((acc, member) => {
+      if (!member.sponsorUserId) return acc
+      const current = acc.get(member.sponsorUserId) ?? []
+      current.push(member)
+      acc.set(member.sponsorUserId, current)
+      return acc
+    }, new Map())
+
+    childrenBySponsor.forEach((children, userId) => {
+      children.sort((a, b) => compareWorkspaceMembers(a, b, i18n.language))
+      childrenBySponsor.set(userId, children)
+    })
+
+    const lineageCache = new Map<string, typeof workspaceMembers>()
+    const descendantCache = new Map<string, number>()
+
+    const getLineage = (userId: string): typeof workspaceMembers => {
+      const cached = lineageCache.get(userId)
+      if (cached) return cached
+
+      const member = membersByUserId.get(userId)
+      if (!member?.sponsorUserId) {
+        lineageCache.set(userId, [])
+        return []
+      }
+
+      const sponsor = membersByUserId.get(member.sponsorUserId)
+      if (!sponsor) {
+        lineageCache.set(userId, [])
+        return []
+      }
+
+      const lineage = [...getLineage(sponsor.membership.user_id), sponsor]
+      lineageCache.set(userId, lineage)
+      return lineage
+    }
+
+    const getDescendantCount = (userId: string): number => {
+      const cached = descendantCache.get(userId)
+      if (typeof cached === 'number') return cached
+
+      const directChildren = childrenBySponsor.get(userId) ?? []
+      const total = directChildren.reduce((sum, child) => {
+        return sum + 1 + getDescendantCount(child.membership.user_id)
+      }, 0)
+
+      descendantCache.set(userId, total)
+      return total
+    }
+
+    const peersByUserId = new Map(
+      workspaceMembers.map((member) => [
+        member.membership.user_id,
+        Math.max(workspaceMembers.filter((candidate) => (candidate.depth ?? 0) === (member.depth ?? 0)).length - 1, 0),
+      ])
+    )
+
+    return {
+      membersByUserId,
+      childrenBySponsor,
+      getLineage,
+      getDescendantCount,
+      peersByUserId,
+    }
+  }, [i18n.language, workspaceMembers])
+  const selectedSponsorMember = selectedSponsorMemberId
+    ? sponsorNetworkInsights.membersByUserId.get(selectedSponsorMemberId) ?? null
+    : null
+  const selectedSponsorLineage = selectedSponsorMember
+    ? sponsorNetworkInsights.getLineage(selectedSponsorMember.membership.user_id)
+    : []
+  const selectedSponsorChildren = selectedSponsorMember
+    ? sponsorNetworkInsights.childrenBySponsor.get(selectedSponsorMember.membership.user_id) ?? []
+    : []
+  const selectedSponsorDescendantCount = selectedSponsorMember
+    ? sponsorNetworkInsights.getDescendantCount(selectedSponsorMember.membership.user_id)
+    : 0
+  const selectedSponsorPeerCount = selectedSponsorMember
+    ? sponsorNetworkInsights.peersByUserId.get(selectedSponsorMember.membership.user_id) ?? 0
+    : 0
   const currentWorkspaceRole = workspaceContext?.membership?.role ?? null
   const canManageMembers = currentWorkspaceRole === 'owner' || currentWorkspaceRole === 'leader'
   const sponsorCandidates = useMemo(
@@ -346,6 +491,70 @@ export function TeamPage() {
     })),
     [t, workspaceMembers]
   )
+  const weeklyTargetSummary = useMemo(() => {
+    const plannedThisWeek = coachingTasks.filter((task) => {
+      const due = new Date(task.due_at).getTime()
+      return due >= weekWindow.startMs && due <= weekWindow.endMs
+    }).length
+
+    const priorityMembers = radarMembers.filter(
+      (member) => member.status === 'needs_support' || member.status === 'slowing_down'
+    ).length
+    const membersWithoutPlan = radarMembers.filter(
+      (member) => (coachingTaskMap.get(member.contact.id) ?? []).length === 0
+    ).length
+
+    return {
+      priorityMembers,
+      plannedThisWeek,
+      membersWithoutPlan,
+    }
+  }, [coachingTaskMap, coachingTasks, radarMembers, weekWindow.endMs, weekWindow.startMs])
+  const weeklyTargets = useMemo(() => {
+    return radarMembers
+      .map((member) => {
+        const tasks = [...(coachingTaskMap.get(member.contact.id) ?? [])].sort(
+          (a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime()
+        )
+        const overdueCount = tasks.filter((task) => new Date(task.due_at).getTime() < referenceNow).length
+        const dueThisWeekCount = tasks.filter((task) => {
+          const due = new Date(task.due_at).getTime()
+          return due >= weekWindow.startMs && due <= weekWindow.endMs
+        }).length
+        const nextTask = tasks[0] ?? null
+        const targetKey =
+          overdueCount > 0
+            ? 'resetRhythm'
+            : member.status === 'gaining_momentum'
+              ? 'expandMomentum'
+              : member.focusKey === 'newConversations'
+                ? 'buildRhythm'
+                : 'secureNextStep'
+
+        return {
+          member,
+          targetKey,
+          openCount: tasks.length,
+          overdueCount,
+          dueThisWeekCount,
+          nextTask,
+        }
+      })
+      .sort((a, b) => {
+        const statusDiff = getStatusPriority(a.member.status) - getStatusPriority(b.member.status)
+        if (statusDiff !== 0) return statusDiff
+        if (b.overdueCount !== a.overdueCount) return b.overdueCount - a.overdueCount
+        if (b.dueThisWeekCount !== a.dueThisWeekCount) return b.dueThisWeekCount - a.dueThisWeekCount
+        if (a.openCount !== b.openCount) return b.openCount - a.openCount
+        if (a.nextTask && b.nextTask) {
+          return new Date(a.nextTask.due_at).getTime() - new Date(b.nextTask.due_at).getTime()
+        }
+        if (a.nextTask) return -1
+        if (b.nextTask) return 1
+        return b.member.contact.warmth_score - a.member.contact.warmth_score
+      })
+      .slice(0, 4)
+  }, [coachingTaskMap, radarMembers, referenceNow, weekWindow.endMs, weekWindow.startMs])
 
   const canManageWorkspaceMember = (role: 'owner' | 'leader' | 'member' | 'assistant', isCurrentUser: boolean) => {
     if (!canManageMembers || isCurrentUser) return false
@@ -375,6 +584,21 @@ export function TeamPage() {
     }
   }
 
+  useEffect(() => {
+    if (
+      autoBootstrapAttemptedRef.current
+      || workspaceLoading
+      || workspaceContext?.mode === 'workspace'
+      || !workspaceContext?.schemaReady
+      || bootstrapWorkspace.isPending
+    ) {
+      return
+    }
+
+    autoBootstrapAttemptedRef.current = true
+    void handleBootstrapWorkspace()
+  }, [bootstrapWorkspace.isPending, workspaceContext?.mode, workspaceContext?.schemaReady, workspaceLoading])
+
   const handleWorkspaceRelationshipUpdate = async (memberUserId: string, sponsorUserId: string) => {
     try {
       await updateWorkspaceRelationship.mutateAsync({ memberUserId, sponsorUserId })
@@ -390,6 +614,56 @@ export function TeamPage() {
   const formatDate = (value: string | null) => {
     if (!value) return t('team.labels.noDate')
     return new Date(value).toLocaleDateString(i18n.language)
+  }
+
+  const openWeeklyTargetTask = (entry: (typeof weeklyTargets)[number]) => {
+    const dueAt = new Date()
+    dueAt.setSeconds(0, 0)
+
+    if (entry.overdueCount > 0) {
+      dueAt.setHours(17, 0, 0, 0)
+    } else if (entry.member.status === 'gaining_momentum') {
+      dueAt.setDate(dueAt.getDate() + 2)
+      dueAt.setHours(10, 0, 0, 0)
+    } else {
+      dueAt.setDate(dueAt.getDate() + 1)
+      dueAt.setHours(9, 30, 0, 0)
+    }
+
+    const actionType =
+      entry.targetKey === 'buildRhythm' ? 'message' : entry.targetKey === 'expandMomentum' ? 'check_in' : 'call'
+    const priority = entry.overdueCount > 0 ? 'urgent' : entry.member.status === 'needs_support' ? 'high' : 'medium'
+
+    setEditCoachingTask(null)
+    setCoachingDraft({
+      contactId: entry.member.contact.id,
+      contactName: entry.member.contact.full_name,
+      title: t(`team.coaching.weeklyTargets.drafts.${entry.targetKey}.title`, {
+        name: entry.member.contact.full_name,
+      }),
+      action_type: actionType,
+      priority,
+      due_at: formatDateTimeLocalInput(dueAt),
+      notes: t(`team.coaching.weeklyTargets.drafts.${entry.targetKey}.notes`, {
+        name: entry.member.contact.full_name,
+        focus: t(`team.radar.focus.${entry.member.focusKey}`),
+      }),
+    })
+    setShowCoachingModal(true)
+  }
+
+  const completeWeeklyTargetTask = (entry: (typeof weeklyTargets)[number]) => {
+    if (!entry.nextTask || completeFollowUp.isPending) return
+    completeFollowUp.mutate(entry.nextTask.id)
+  }
+
+  const snoozeWeeklyTargetTask = (entry: (typeof weeklyTargets)[number]) => {
+    if (!entry.nextTask || snoozeFollowUp.isPending) return
+
+    const until = new Date()
+    until.setDate(until.getDate() + 1)
+    until.setHours(9, 30, 0, 0)
+    snoozeFollowUp.mutate({ id: entry.nextTask.id, until })
   }
 
   return (
@@ -416,40 +690,19 @@ export function TeamPage() {
                   overdue: metrics.overdueMembers,
                 })}
           </p>
-        </div>
-      </div>
-
-      {!workspaceLoading && workspaceContext?.mode !== 'workspace' ? (
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-4">
-          <p className="text-sm font-semibold text-foreground">{t('team.workspace.legacyTitle')}</p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">{t('team.workspace.legacyBody')}</p>
-          {workspaceContext?.schemaReady ? (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <p className="text-xs text-muted-foreground">{t('team.workspace.bootstrapHint')}</p>
-              <Button
-                size="sm"
-                onClick={() => void handleBootstrapWorkspace()}
-                disabled={bootstrapWorkspace.isPending}
-              >
-                {bootstrapWorkspace.isPending ? t('team.workspace.bootstrapping') : t('team.workspace.bootstrapAction')}
-              </Button>
-            </div>
+          {!workspaceLoading && workspaceContext?.mode !== 'workspace' && workspaceContext?.schemaReady ? (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-3 h-8"
+              onClick={() => void handleBootstrapWorkspace()}
+              disabled={bootstrapWorkspace.isPending}
+            >
+              {bootstrapWorkspace.isPending ? t('team.workspace.bootstrapping') : t('team.workspace.bootstrapAction')}
+            </Button>
           ) : null}
         </div>
-      ) : null}
-
-      {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4">
-          <p className="text-sm font-semibold text-foreground">{t('team.workspace.activeTitle')}</p>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            {t('team.workspace.activeBody', {
-              workspace: workspaceContext.workspace?.name,
-              members: workspaceContext.memberCount,
-              role: workspaceRoleLabel,
-            })}
-          </p>
-        </div>
-      ) : null}
+      </div>
 
       {!workspaceLoading && workspaceContext?.mode === 'workspace' ? (
         <Card>
@@ -664,7 +917,12 @@ export function TeamPage() {
                       </div>
 
                       {level.members.map((member) => (
-                        <div key={member.membership.id} className="rounded-2xl border border-border/70 bg-card/70 p-4">
+                        <button
+                          key={member.membership.id}
+                          type="button"
+                          onClick={() => setSelectedSponsorMemberId(member.membership.user_id)}
+                          className="w-full rounded-2xl border border-border/70 bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
+                        >
                           <div className="flex items-start gap-3">
                             <Avatar size="sm">
                               <AvatarFallback>{getInitials(member.profile?.full_name ?? member.profile?.email ?? 'WM')}</AvatarFallback>
@@ -686,10 +944,11 @@ export function TeamPage() {
                               <div className="mt-3 space-y-1 text-xs text-muted-foreground">
                                 <p>{t('team.workspace.sponsorLabel', { sponsor: member.sponsorName ?? t('team.workspace.noSponsor') })}</p>
                                 <p>{t('team.workspace.childrenCount', { count: member.childCount })}</p>
+                                <p className="text-primary">{t('team.workspace.openDetail')}</p>
                               </div>
                             </div>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   ))}
@@ -711,6 +970,166 @@ export function TeamPage() {
           description={t('team.workspace.emptyBody')}
         />
       ) : null}
+
+      <Sheet open={Boolean(selectedSponsorMember)} onOpenChange={(open) => !open && setSelectedSponsorMemberId(null)}>
+        <SheetContent side="right" className="overflow-y-auto p-0 sm:max-w-md">
+          {selectedSponsorMember ? (
+            <>
+              <SheetHeader className="border-b border-border/70 pb-4">
+                <div className="flex items-start gap-3 pr-10">
+                  <Avatar size="sm">
+                    <AvatarFallback>
+                      {getInitials(selectedSponsorMember.profile?.full_name ?? selectedSponsorMember.profile?.email ?? 'WM')}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <SheetTitle className="truncate">
+                        {selectedSponsorMember.profile?.full_name ?? selectedSponsorMember.profile?.email ?? t('team.workspace.memberFallback')}
+                      </SheetTitle>
+                      {selectedSponsorMember.depth === 0 ? (
+                        <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                          {t('team.workspace.rootBadge')}
+                        </span>
+                      ) : null}
+                      {selectedSponsorMember.isCurrentUser ? (
+                        <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
+                          {t('team.workspace.you')}
+                        </span>
+                      ) : null}
+                    </div>
+                    <SheetDescription className="mt-1">
+                      {t('team.workspace.memberDetailBody', {
+                        role: t(`team.workspace.roles.${selectedSponsorMember.membership.role}`),
+                      })}
+                    </SheetDescription>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                      <span className="rounded-full border border-border/70 px-2 py-0.5">
+                        {selectedSponsorMember.profile?.email ?? t('team.workspace.noEmail')}
+                      </span>
+                      {selectedSponsorMember.profile?.company ? (
+                        <span className="rounded-full border border-border/70 px-2 py-0.5">
+                          {selectedSponsorMember.profile.company}
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              </SheetHeader>
+
+              <div className="space-y-5 p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                    <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {t('team.workspace.detailMetrics.level')}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold tabular-nums">
+                      {(selectedSponsorMember.depth ?? 0) + 1}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t('team.workspace.detailMetrics.levelHint', { count: selectedSponsorPeerCount })}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                    <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {t('team.workspace.detailMetrics.directLines')}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold tabular-nums">{selectedSponsorChildren.length}</div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t('team.workspace.detailMetrics.directLinesHint')}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                    <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {t('team.workspace.detailMetrics.lineSize')}
+                    </div>
+                    <div className="mt-2 text-2xl font-semibold tabular-nums">{selectedSponsorDescendantCount}</div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t('team.workspace.detailMetrics.lineSizeHint')}
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                    <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {t('team.workspace.detailMetrics.joined')}
+                    </div>
+                    <div className="mt-2 text-sm font-semibold">
+                      {new Date(selectedSponsorMember.membership.joined_at).toLocaleDateString(i18n.language)}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                      {t('team.workspace.sponsorLabel', {
+                        sponsor: selectedSponsorMember.sponsorName ?? t('team.workspace.noSponsor'),
+                      })}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+                  <div className="flex items-center gap-2">
+                    <GitBranch className="h-4 w-4 text-primary" />
+                    <p className="text-sm font-semibold">{t('team.workspace.lineageTitle')}</p>
+                  </div>
+                  {selectedSponsorLineage.length > 0 ? (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {selectedSponsorLineage.map((member) => (
+                        <button
+                          key={member.membership.id}
+                          type="button"
+                          onClick={() => setSelectedSponsorMemberId(member.membership.user_id)}
+                          className="rounded-full border border-border/70 px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/25 hover:text-foreground"
+                        >
+                          {member.profile?.full_name ?? member.profile?.email ?? t('team.workspace.memberFallback')}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-3 text-xs text-muted-foreground">{t('team.workspace.lineageEmpty')}</p>
+                  )}
+                </div>
+
+                <div className="rounded-2xl border border-border/70 bg-card/50 p-4">
+                  <div>
+                    <p className="text-sm font-semibold">{t('team.workspace.directLinesTitle')}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">{t('team.workspace.directLinesBody')}</p>
+                  </div>
+                  {selectedSponsorChildren.length > 0 ? (
+                    <div className="mt-4 space-y-3">
+                      {selectedSponsorChildren.map((child) => (
+                        <button
+                          key={child.membership.id}
+                          type="button"
+                          onClick={() => setSelectedSponsorMemberId(child.membership.user_id)}
+                          className="flex w-full items-start gap-3 rounded-xl border border-border/70 bg-card/70 p-3 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
+                        >
+                          <Avatar size="sm">
+                            <AvatarFallback>{getInitials(child.profile?.full_name ?? child.profile?.email ?? 'WM')}</AvatarFallback>
+                          </Avatar>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="truncate text-sm font-semibold">
+                                {child.profile?.full_name ?? child.profile?.email ?? t('team.workspace.memberFallback')}
+                              </p>
+                              <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                                {t(`team.workspace.roles.${child.membership.role}`)}
+                              </span>
+                            </div>
+                            <p className="mt-1 text-xs text-muted-foreground">
+                              {child.profile?.email ?? t('team.workspace.noEmail')}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-4 rounded-xl border border-dashed px-4 py-5 text-sm text-muted-foreground">
+                      {t('team.workspace.directLinesEmpty')}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : null}
+        </SheetContent>
+      </Sheet>
 
       {members.length > 0 ? (
         <>
@@ -784,6 +1203,169 @@ export function TeamPage() {
           </div>
         ))}
       </div>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>{t('team.coaching.weeklyTargets.title')}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">{t('team.coaching.weeklyTargets.body')}</p>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.priority')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{weeklyTargetSummary.priorityMembers}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.priorityHint')}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.planned')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{weeklyTargetSummary.plannedThisWeek}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.plannedHint')}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.gap')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{weeklyTargetSummary.membersWithoutPlan}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.weeklyTargets.summary.gapHint')}
+              </p>
+            </div>
+          </div>
+
+          {weeklyTargets.length > 0 ? (
+            <div className="grid gap-3 xl:grid-cols-2">
+              {weeklyTargets.map((entry) => (
+                <div
+                  key={entry.member.contact.id}
+                  className="rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-sm font-semibold">{entry.member.contact.full_name}</p>
+                        <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                          {getStageLabel(entry.member.contact.stage)}
+                        </span>
+                      </div>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {[entry.member.contact.city || t('team.labels.locationFallback'), entry.member.contact.occupation]
+                          .filter(Boolean)
+                          .join(' • ')}
+                      </p>
+                    </div>
+                    <WarmthScoreBadge score={entry.member.contact.warmth_score} stage={entry.member.contact.stage} />
+                  </div>
+
+                  <div className="mt-4 rounded-xl border border-border/70 bg-background/30 px-3 py-3">
+                    <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      {t('team.coaching.weeklyTargets.targetLabel')}
+                    </p>
+                    <p className="mt-1 text-sm font-medium">
+                      {t(`team.coaching.weeklyTargets.targets.${entry.targetKey}`)}
+                    </p>
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className={cn('rounded-full border px-2 py-0.5 font-medium', getStatusClasses(entry.member.status))}>
+                      {t(`team.radar.status.${entry.member.status}`)}
+                    </span>
+                    <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                      {t(`team.radar.focus.${entry.member.focusKey}`)}
+                    </span>
+                    <span className="rounded-full border border-border/70 px-2 py-0.5 font-medium text-muted-foreground">
+                      {t('team.coaching.weeklyTargets.metrics.open', { count: entry.openCount })}
+                    </span>
+                    <span
+                      className={cn(
+                        'rounded-full border px-2 py-0.5 font-medium',
+                        entry.overdueCount > 0
+                          ? 'border-rose-500/20 bg-rose-500/10 text-rose-500'
+                          : 'border-border/70 text-muted-foreground'
+                      )}
+                    >
+                      {t('team.coaching.weeklyTargets.metrics.overdue', { count: entry.overdueCount })}
+                    </span>
+                    <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 font-medium text-sky-500">
+                      {t('team.coaching.weeklyTargets.metrics.thisWeek', { count: entry.dueThisWeekCount })}
+                    </span>
+                  </div>
+
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    {entry.nextTask
+                      ? t('team.coaching.nextTaskHint', {
+                          title: entry.nextTask.title,
+                          date: formatDate(entry.nextTask.due_at),
+                        })
+                      : t('team.coaching.noTaskHint')}
+                  </p>
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                    {t(`team.radar.suggestions.${entry.member.leaderSuggestionKey}`)}
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {entry.nextTask ? (
+                      <>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="gap-1.5"
+                          onClick={() => completeWeeklyTargetTask(entry)}
+                          disabled={completeFollowUp.isPending}
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          {t('team.coaching.weeklyTargets.actions.completeTask')}
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="gap-1.5"
+                          onClick={() => snoozeWeeklyTargetTask(entry)}
+                          disabled={snoozeFollowUp.isPending}
+                        >
+                          <Clock3 className="h-4 w-4" />
+                          {t('team.coaching.weeklyTargets.actions.snoozeTask')}
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => openWeeklyTargetTask(entry)}
+                      >
+                        <CalendarClock className="h-4 w-4" />
+                        {t('team.coaching.weeklyTargets.actions.openTask')}
+                      </Button>
+                    )}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigate(`${ROUTES.CONTACTS}/${entry.member.contact.id}`)}
+                    >
+                      {t('team.coaching.weeklyTargets.actions.openContact')}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              {t('team.coaching.weeklyTargets.empty')}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -919,7 +1501,7 @@ export function TeamPage() {
                   <button
                     key={entry.member.id}
                     type="button"
-                    onClick={() => navigate(`/dashboard/contacts/${entry.member.id}`)}
+                    onClick={() => navigate(`${ROUTES.CONTACTS}/${entry.member.id}`)}
                     className="rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -1013,7 +1595,7 @@ export function TeamPage() {
                     variant="outline"
                     size="sm"
                     className="mt-4 w-full"
-                    onClick={() => navigate(`/dashboard/contacts/${recommendation.memberId}`)}
+                    onClick={() => navigate(`${ROUTES.CONTACTS}/${recommendation.memberId}`)}
                   >
                     {t('dashboard.focus.openContact')}
                   </Button>
@@ -1050,7 +1632,7 @@ export function TeamPage() {
               <button
                 key={member.contact.id}
                 type="button"
-                onClick={() => navigate(`/dashboard/contacts/${member.contact.id}`)}
+                onClick={() => navigate(`${ROUTES.CONTACTS}/${member.contact.id}`)}
                 className="w-full rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
               >
                 <div className="flex flex-col gap-3 md:flex-row md:items-start">
@@ -1132,8 +1714,12 @@ export function TeamPage() {
         onClose={() => {
           setShowCoachingModal(false)
           setEditCoachingTask(null)
+          setCoachingDraft(null)
         }}
         userId={userId}
+        defaultContactId={coachingDraft?.contactId}
+        defaultContactName={coachingDraft?.contactName}
+        defaultDraft={coachingDraft}
         editFollowUp={editCoachingTask}
       />
     </div>
