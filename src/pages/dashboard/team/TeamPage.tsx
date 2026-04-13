@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Activity, ArrowUpRight, MoreHorizontal, Sparkles, UserPlus, Users } from 'lucide-react'
+import { Activity, ArrowUpRight, CalendarClock, MoreHorizontal, Sparkles, UserPlus, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
+import { FollowUpItem } from '@/components/calendar/FollowUpItem'
+import { NewFollowUpModal } from '@/components/calendar/modals/NewFollowUpModal'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   DropdownMenu,
@@ -22,6 +24,7 @@ import { PageState } from '@/components/shared/PageState'
 import { InviteWorkspaceMemberDialog } from '@/components/team/InviteWorkspaceMemberDialog'
 import { useAuth } from '@/hooks/useAuth'
 import { useContactInsights } from '@/hooks/useContacts'
+import { useFollowUps } from '@/hooks/useCalendar'
 import { usePipelineStages } from '@/hooks/usePipeline'
 import {
   useBootstrapWorkspace,
@@ -36,6 +39,7 @@ import { buildPageWindow } from '@/lib/pagination'
 import { resolveContactStageLabel } from '@/lib/pipeline/stageLabels'
 import { getPreferredWorkspaceId } from '@/lib/workspace/storage'
 import { cn } from '@/lib/utils'
+import type { FollowUpWithContact } from '@/lib/calendar/types'
 
 const TEAM_MEMBERS_PAGE_SIZE = 15
 
@@ -73,6 +77,8 @@ export function TeamPage() {
   const [referenceNow] = useState(() => Date.now())
   const [membersPage, setMembersPage] = useState(1)
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
+  const [showCoachingModal, setShowCoachingModal] = useState(false)
+  const [editCoachingTask, setEditCoachingTask] = useState<FollowUpWithContact | null>(null)
   const preferredWorkspaceId = getPreferredWorkspaceId()
   const { data: workspaceContext, isLoading: workspaceLoading } = useWorkspaceContext(userId, preferredWorkspaceId)
   const workspaceId = workspaceContext?.workspace?.id ?? ''
@@ -82,6 +88,7 @@ export function TeamPage() {
   const updateWorkspaceMember = useUpdateWorkspaceMember(userId, workspaceId)
   const updateWorkspaceRelationship = useUpdateWorkspaceRelationship(userId, workspaceId)
   const { data: pipelineStages = [] } = usePipelineStages(userId)
+  const { data: followUps = [], isLoading: followUpsLoading } = useFollowUps(userId, ['pending', 'snoozed'])
 
   const { data: members = [] } = useContactInsights({
     userId,
@@ -90,6 +97,30 @@ export function TeamPage() {
   })
 
   const radarMembers = useMemo(() => members.map((member) => buildTeamRadarInsight(member)), [members])
+  const memberIds = useMemo(() => new Set(members.map((member) => member.id)), [members])
+  const coachingTasks = useMemo(
+    () =>
+      followUps
+        .filter((followUp) => memberIds.has(followUp.contact.id))
+        .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime()),
+    [followUps, memberIds]
+  )
+  const coachingMetrics = useMemo(() => {
+    const now = new Date()
+    const todayStart = new Date(now)
+    todayStart.setHours(0, 0, 0, 0)
+    const todayEnd = new Date(now)
+    todayEnd.setHours(23, 59, 59, 999)
+
+    return {
+      overdue: coachingTasks.filter((task) => new Date(task.due_at).getTime() < todayStart.getTime()).length,
+      today: coachingTasks.filter((task) => {
+        const due = new Date(task.due_at).getTime()
+        return due >= todayStart.getTime() && due <= todayEnd.getTime()
+      }).length,
+      upcoming: coachingTasks.filter((task) => new Date(task.due_at).getTime() > todayEnd.getTime()).length,
+    }
+  }, [coachingTasks])
 
   const metrics = useMemo(() => {
     const now = referenceNow
@@ -525,6 +556,69 @@ export function TeamPage() {
 
       <Card>
         <CardHeader>
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle>{t('team.coaching.title')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('team.coaching.body')}</p>
+            </div>
+            <Button
+              onClick={() => {
+                setEditCoachingTask(null)
+                setShowCoachingModal(true)
+              }}
+              className="gap-1.5"
+            >
+              <CalendarClock className="h-4 w-4" />
+              {t('team.coaching.newTask')}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            {([
+              { key: 'overdue', value: coachingMetrics.overdue, tone: 'border-rose-500/20 bg-rose-500/10 text-rose-100' },
+              { key: 'today', value: coachingMetrics.today, tone: 'border-amber-500/20 bg-amber-500/10 text-amber-100' },
+              { key: 'upcoming', value: coachingMetrics.upcoming, tone: 'border-sky-500/20 bg-sky-500/10 text-sky-100' },
+            ] as const).map(({ key, value, tone }) => (
+              <div key={key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${tone}`}>
+                    {t(`team.coaching.metrics.${key}`)}
+                  </span>
+                  <span className="text-2xl font-semibold tabular-nums">{value}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {followUpsLoading ? (
+            <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              {t('common.loading')}
+            </div>
+          ) : coachingTasks.length > 0 ? (
+            <div className="space-y-3">
+              {coachingTasks.slice(0, 6).map((task) => (
+                <FollowUpItem
+                  key={task.id}
+                  followUp={task}
+                  userId={userId}
+                  onEdit={(followUp) => {
+                    setEditCoachingTask(followUp)
+                    setShowCoachingModal(true)
+                  }}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              {t('team.coaching.empty')}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle>{t('team.sections.membersList')}</CardTitle>
@@ -621,6 +715,15 @@ export function TeamPage() {
         onClose={() => setInviteDialogOpen(false)}
         workspaceId={workspaceId}
         currentUserId={userId}
+      />
+      <NewFollowUpModal
+        open={showCoachingModal}
+        onClose={() => {
+          setShowCoachingModal(false)
+          setEditCoachingTask(null)
+        }}
+        userId={userId}
+        editFollowUp={editCoachingTask}
       />
     </div>
   )

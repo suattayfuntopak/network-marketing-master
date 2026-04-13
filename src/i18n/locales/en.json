@@ -1817,6 +1817,17 @@
     "focus": {
       "title": "Today's Coaching Focus",
       "body": "Start with the {{count}} people who need support, then move the warm names in the activation queue forward. That order usually keeps team momentum steadier."
+    },
+    "coaching": {
+      "title": "Coaching Tasks",
+      "body": "Manage the follow-up and guidance tasks you opened for team members here.",
+      "newTask": "New Coaching Task",
+      "empty": "There are no planned coaching tasks for the team yet.",
+      "metrics": {
+        "overdue": "Overdue",
+        "today": "Today",
+        "upcoming": "Upcoming"
+      }
     }
   },
   "landing": {

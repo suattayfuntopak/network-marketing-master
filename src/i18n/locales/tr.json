@@ -1817,6 +1817,17 @@
     "focus": {
       "title": "Bugünün Koçluk Odağı",
       "body": "Önce destek bekleyen {{count}} kişiyle ilgilen, ardından aktivasyon kuyruğundaki sıcak isimleri ilerlet. Bu sıra ekip momentumunu daha stabil tutar."
+    },
+    "coaching": {
+      "title": "Koçluk Görevleri",
+      "body": "Ekip üyeleri için açtığın takip ve yönlendirme görevlerini buradan yönet.",
+      "newTask": "Koçluk Gorevi Ac",
+      "empty": "Henüz ekip için planlanmış bir koçluk görevi görünmüyor.",
+      "metrics": {
+        "overdue": "Geciken",
+        "today": "Bugun",
+        "upcoming": "Siradaki"
+      }
     }
   },
   "landing": {
