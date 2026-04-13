@@ -1823,10 +1823,31 @@
       "body": "Manage the follow-up and guidance tasks you opened for team members here.",
       "newTask": "New Coaching Task",
       "empty": "There are no planned coaching tasks for the team yet.",
+      "analyticsTitle": "Coaching Performance",
+      "analyticsBody": "See task coverage, delay pressure, and the names needing leader attention in one glance.",
+      "peakLoadLabel": "Highest Load",
+      "peakLoadValue": "{{count}} open tasks • {{overdue}} overdue",
+      "analyticsEmpty": "There are not enough open coaching tasks yet to show analytics.",
+      "focusListTitle": "Needs Leader Attention",
+      "focusListBody": "Team members with the heaviest open or overdue coaching load appear here first.",
+      "nextTaskHint": "Next task: {{title}} • {{date}}",
+      "noTaskHint": "There is no open coaching task for this person.",
+      "focusMetrics": {
+        "openTasks": "{{count}} open tasks",
+        "overdueTasks": "{{count}} overdue"
+      },
       "metrics": {
         "overdue": "Overdue",
         "today": "Today",
         "upcoming": "Upcoming"
+      },
+      "analytics": {
+        "coverage": "Coverage",
+        "coverageHint": "{{covered}} / {{total}} team members currently have an open coaching task.",
+        "risk": "Risk Area",
+        "riskHint": "{{overdue}} members carry overdue tasks, and {{noPlan}} still have no plan.",
+        "load": "Average Load",
+        "loadHint": "{{count}} open tasks are currently spread across the team."
       }
     }
   },

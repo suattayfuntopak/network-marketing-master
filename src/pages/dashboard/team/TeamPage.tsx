@@ -105,6 +105,14 @@ export function TeamPage() {
         .sort((a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime()),
     [followUps, memberIds]
   )
+  const coachingTaskMap = useMemo(() => {
+    return coachingTasks.reduce<Map<string, FollowUpWithContact[]>>((acc, task) => {
+      const current = acc.get(task.contact.id) ?? []
+      current.push(task)
+      acc.set(task.contact.id, current)
+      return acc
+    }, new Map())
+  }, [coachingTasks])
   const coachingMetrics = useMemo(() => {
     const now = new Date()
     const todayStart = new Date(now)
@@ -121,6 +129,51 @@ export function TeamPage() {
       upcoming: coachingTasks.filter((task) => new Date(task.due_at).getTime() > todayEnd.getTime()).length,
     }
   }, [coachingTasks])
+  const coachingAnalytics = useMemo(() => {
+    const now = new Date()
+    const coveredMembers = members.filter((member) => (coachingTaskMap.get(member.id) ?? []).length > 0).length
+    const overdueMembers = members.filter((member) =>
+      (coachingTaskMap.get(member.id) ?? []).some((task) => new Date(task.due_at).getTime() < now.getTime())
+    ).length
+    const averageTasks = members.length > 0 ? Math.round((coachingTasks.length / members.length) * 10) / 10 : 0
+
+    const focusMembers = members
+      .map((member) => {
+        const tasks = [...(coachingTaskMap.get(member.id) ?? [])].sort(
+          (a, b) => new Date(a.due_at).getTime() - new Date(b.due_at).getTime()
+        )
+        const overdueCount = tasks.filter((task) => new Date(task.due_at).getTime() < now.getTime()).length
+
+        return {
+          member,
+          tasks,
+          totalTasks: tasks.length,
+          overdueCount,
+          nextTask: tasks[0] ?? null,
+        }
+      })
+      .filter((entry) => entry.totalTasks > 0)
+      .sort((a, b) => {
+        if (b.overdueCount !== a.overdueCount) return b.overdueCount - a.overdueCount
+        if (b.totalTasks !== a.totalTasks) return b.totalTasks - a.totalTasks
+        if (a.nextTask && b.nextTask) {
+          return new Date(a.nextTask.due_at).getTime() - new Date(b.nextTask.due_at).getTime()
+        }
+        if (a.nextTask) return -1
+        if (b.nextTask) return 1
+        return b.member.warmth_score - a.member.warmth_score
+      })
+
+    return {
+      coverageRate: members.length > 0 ? Math.round((coveredMembers / members.length) * 100) : 0,
+      coveredMembers,
+      noPlanMembers: Math.max(members.length - coveredMembers, 0),
+      overdueMembers,
+      averageTasks,
+      focusMembers: focusMembers.slice(0, 4),
+      peakLoadMember: focusMembers[0] ?? null,
+    }
+  }, [coachingTaskMap, coachingTasks.length, members])
 
   const metrics = useMemo(() => {
     const now = referenceNow
@@ -612,6 +665,131 @@ export function TeamPage() {
           ) : (
             <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
               {t('team.coaching.empty')}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <div>
+              <CardTitle>{t('team.coaching.analyticsTitle')}</CardTitle>
+              <p className="mt-1 text-sm text-muted-foreground">{t('team.coaching.analyticsBody')}</p>
+            </div>
+            {coachingAnalytics.peakLoadMember ? (
+              <div className="rounded-xl border border-border/70 bg-card/60 px-3 py-2 text-right">
+                <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  {t('team.coaching.peakLoadLabel')}
+                </div>
+                <p className="mt-1 text-sm font-semibold">{coachingAnalytics.peakLoadMember.member.full_name}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('team.coaching.peakLoadValue', {
+                    count: coachingAnalytics.peakLoadMember.totalTasks,
+                    overdue: coachingAnalytics.peakLoadMember.overdueCount,
+                  })}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.analytics.coverage')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{coachingAnalytics.coverageRate}%</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.analytics.coverageHint', {
+                  covered: coachingAnalytics.coveredMembers,
+                  total: metrics.totalMembers,
+                })}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.analytics.risk')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{coachingAnalytics.overdueMembers}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.analytics.riskHint', {
+                  overdue: coachingAnalytics.overdueMembers,
+                  noPlan: coachingAnalytics.noPlanMembers,
+                })}
+              </p>
+            </div>
+            <div className="rounded-2xl border border-border/70 bg-card/60 p-4">
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                {t('team.coaching.analytics.load')}
+              </div>
+              <div className="mt-2 text-2xl font-semibold tabular-nums">{coachingAnalytics.averageTasks}</div>
+              <p className="mt-2 text-xs leading-5 text-muted-foreground">
+                {t('team.coaching.analytics.loadHint', { count: coachingTasks.length })}
+              </p>
+            </div>
+          </div>
+
+          {coachingAnalytics.focusMembers.length > 0 ? (
+            <div className="space-y-3">
+              <div>
+                <p className="text-sm font-semibold">{t('team.coaching.focusListTitle')}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{t('team.coaching.focusListBody')}</p>
+              </div>
+              <div className="grid gap-3 xl:grid-cols-2">
+                {coachingAnalytics.focusMembers.map((entry) => (
+                  <button
+                    key={entry.member.id}
+                    type="button"
+                    onClick={() => navigate(`/dashboard/contacts/${entry.member.id}`)}
+                    className="rounded-xl border bg-card/70 p-4 text-left transition-colors hover:border-primary/25 hover:bg-muted/20"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="truncate text-sm font-semibold">{entry.member.full_name}</p>
+                          <span className="rounded-full border border-border/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                            {getStageLabel(entry.member.stage)}
+                          </span>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {[entry.member.city || t('team.labels.locationFallback'), entry.member.occupation]
+                            .filter(Boolean)
+                            .join(' • ')}
+                        </p>
+                      </div>
+                      <WarmthScoreBadge score={entry.member.warmth_score} stage={entry.member.stage} />
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                      <span className="rounded-full border border-sky-500/20 bg-sky-500/10 px-2 py-0.5 font-medium text-sky-500">
+                        {t('team.coaching.focusMetrics.openTasks', { count: entry.totalTasks })}
+                      </span>
+                      <span
+                        className={cn(
+                          'rounded-full border px-2 py-0.5 font-medium',
+                          entry.overdueCount > 0
+                            ? 'border-rose-500/20 bg-rose-500/10 text-rose-500'
+                            : 'border-emerald-500/20 bg-emerald-500/10 text-emerald-500'
+                        )}
+                      >
+                        {t('team.coaching.focusMetrics.overdueTasks', { count: entry.overdueCount })}
+                      </span>
+                    </div>
+                    <p className="mt-3 text-xs text-muted-foreground">
+                      {entry.nextTask
+                        ? t('team.coaching.nextTaskHint', {
+                            title: entry.nextTask.title,
+                            date: formatDate(entry.nextTask.due_at),
+                          })
+                        : t('team.coaching.noTaskHint')}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              {t('team.coaching.analyticsEmpty')}
             </div>
           )}
         </CardContent>

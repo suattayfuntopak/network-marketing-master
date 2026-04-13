@@ -1823,10 +1823,31 @@
       "body": "Ekip üyeleri için açtığın takip ve yönlendirme görevlerini buradan yönet.",
       "newTask": "Koçluk Gorevi Ac",
       "empty": "Henüz ekip için planlanmış bir koçluk görevi görünmüyor.",
+      "analyticsTitle": "Koçluk Performansi",
+      "analyticsBody": "Görev kapsamasını, gecikme baskısını ve lider dokunuşu gerektiren isimleri tek bakışta gör.",
+      "peakLoadLabel": "En Yogun Uye",
+      "peakLoadValue": "{{count}} acik gorev • {{overdue}} geciken",
+      "analyticsEmpty": "Analiz cikaracak kadar acik koçluk görevi henuz yok.",
+      "focusListTitle": "Lider Dokunuşu Gerektirenler",
+      "focusListBody": "En cok acik ya da geciken koçluk görevi biriken ekip uyeleri once burada gorunur.",
+      "nextTaskHint": "Siradaki gorev: {{title}} • {{date}}",
+      "noTaskHint": "Bu kisi icin acik koçluk gorevi görünmüyor.",
+      "focusMetrics": {
+        "openTasks": "{{count}} acik gorev",
+        "overdueTasks": "{{count}} geciken"
+      },
       "metrics": {
         "overdue": "Geciken",
         "today": "Bugun",
         "upcoming": "Siradaki"
+      },
+      "analytics": {
+        "coverage": "Kapsama",
+        "coverageHint": "{{covered}} / {{total}} ekip uyesi icin acik bir koçluk gorevi var.",
+        "risk": "Risk Alani",
+        "riskHint": "{{overdue}} uyede geciken gorev, {{noPlan}} uyede ise henuz plan yok.",
+        "load": "Ortalama Yuk",
+        "loadHint": "Toplam {{count}} acik gorev ekip genelinde dagiliyor."
       }
     }
   },
