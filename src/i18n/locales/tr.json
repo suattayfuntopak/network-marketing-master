@@ -1848,6 +1848,25 @@
         "riskHint": "{{overdue}} uyede geciken gorev, {{noPlan}} uyede ise henuz plan yok.",
         "load": "Ortalama Yuk",
         "loadHint": "Toplam {{count}} acik gorev ekip genelinde dagiliyor."
+      },
+      "recommendations": {
+        "title": "Lider Onerileri",
+        "body": "Bugun hangi uyeye nasil dokunman gerektigini radar ve görev yukune gore kisa kartlarla oku.",
+        "empty": "Henuz ekibe yonelik ayristirilmis bir lider onerisi görünmüyor.",
+        "items": {
+          "urgentReset": {
+            "title": "Gecikmeyi Temizle",
+            "body": "{{name}} uzerinde {{overdue}} geciken gorev birikmis durumda. Once tek net sonraki adimi görünür hale getir."
+          },
+          "coverageGap": {
+            "title": "Plansiz Riski Kapat",
+            "body": "{{name}} icin su an görünür bir koçluk plani yok. Ritim dağılmadan kucuk ve net bir hedef koy."
+          },
+          "momentumSupport": {
+            "title": "Ivmeyi Buyut",
+            "body": "{{name}} dogru akista. Kisa takdir ve tek bir genisletme adimi bu momentumu guclendirebilir."
+          }
+        }
       }
     }
   },

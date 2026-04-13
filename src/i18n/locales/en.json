@@ -1848,6 +1848,25 @@
         "riskHint": "{{overdue}} members carry overdue tasks, and {{noPlan}} still have no plan.",
         "load": "Average Load",
         "loadHint": "{{count}} open tasks are currently spread across the team."
+      },
+      "recommendations": {
+        "title": "Leader Suggestions",
+        "body": "Read who needs your touch today and what kind of support fits best through short cards built from radar and task load.",
+        "empty": "There is no separated leader suggestion for the team yet.",
+        "items": {
+          "urgentReset": {
+            "title": "Clear The Delay",
+            "body": "{{name}} is carrying {{overdue}} overdue tasks. First make one clear next step visible again."
+          },
+          "coverageGap": {
+            "title": "Close The Planning Gap",
+            "body": "{{name}} currently has no visible coaching plan. Set one small, clear target before the rhythm scatters."
+          },
+          "momentumSupport": {
+            "title": "Expand Momentum",
+            "body": "{{name}} is in a healthy flow. Short recognition plus one expansion step can strengthen that momentum."
+          }
+        }
       }
     }
   },

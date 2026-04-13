@@ -97,6 +97,10 @@ export function TeamPage() {
   })
 
   const radarMembers = useMemo(() => members.map((member) => buildTeamRadarInsight(member)), [members])
+  const radarMemberMap = useMemo(
+    () => new Map(radarMembers.map((member) => [member.contact.id, member])),
+    [radarMembers]
+  )
   const memberIds = useMemo(() => new Set(members.map((member) => member.id)), [members])
   const coachingTasks = useMemo(
     () =>
@@ -174,6 +178,82 @@ export function TeamPage() {
       peakLoadMember: focusMembers[0] ?? null,
     }
   }, [coachingTaskMap, coachingTasks.length, members])
+  const coachingRecommendations = useMemo(() => {
+    const items: Array<{
+      key: 'urgentReset' | 'coverageGap' | 'momentumSupport'
+      memberId: string
+      memberName: string
+      stage: (typeof members)[number]['stage']
+      status: TeamRadarStatus
+      focusKey: 'followUpDiscipline' | 'newConversations' | 'presentationSupport' | 'decisionSupport'
+      leaderSuggestionKey: 'praiseAndExpand' | 'lightCheckIn' | 'defineNextStep' | 'resetWithOneGoal'
+      bodyValues: Record<string, string | number>
+    }> = []
+
+    const urgentEntry = coachingAnalytics.focusMembers.find((entry) => entry.overdueCount > 0)
+    if (urgentEntry) {
+      const urgentRadar = radarMemberMap.get(urgentEntry.member.id)
+      if (urgentRadar) {
+        items.push({
+          key: 'urgentReset',
+          memberId: urgentEntry.member.id,
+          memberName: urgentEntry.member.full_name,
+          stage: urgentEntry.member.stage,
+          status: urgentRadar.status,
+          focusKey: urgentRadar.focusKey,
+          leaderSuggestionKey: urgentRadar.leaderSuggestionKey,
+          bodyValues: {
+            name: urgentEntry.member.full_name,
+            overdue: urgentEntry.overdueCount,
+          },
+        })
+      }
+    }
+
+    const noPlanCandidate = radarMembers
+      .filter((member) => (coachingTaskMap.get(member.contact.id) ?? []).length === 0)
+      .filter((member) => member.status === 'needs_support' || member.status === 'slowing_down')
+      .sort((a, b) => {
+        if (a.status !== b.status) return a.status === 'needs_support' ? -1 : 1
+        return b.contact.warmth_score - a.contact.warmth_score
+      })[0]
+
+    if (noPlanCandidate && !items.some((item) => item.memberId === noPlanCandidate.contact.id)) {
+      items.push({
+        key: 'coverageGap',
+        memberId: noPlanCandidate.contact.id,
+        memberName: noPlanCandidate.contact.full_name,
+        stage: noPlanCandidate.contact.stage,
+        status: noPlanCandidate.status,
+        focusKey: noPlanCandidate.focusKey,
+        leaderSuggestionKey: noPlanCandidate.leaderSuggestionKey,
+        bodyValues: {
+          name: noPlanCandidate.contact.full_name,
+        },
+      })
+    }
+
+    const momentumCandidate = [...radarMembers]
+      .filter((member) => member.status === 'gaining_momentum')
+      .sort((a, b) => b.contact.warmth_score - a.contact.warmth_score)[0]
+
+    if (momentumCandidate && !items.some((item) => item.memberId === momentumCandidate.contact.id)) {
+      items.push({
+        key: 'momentumSupport',
+        memberId: momentumCandidate.contact.id,
+        memberName: momentumCandidate.contact.full_name,
+        stage: momentumCandidate.contact.stage,
+        status: momentumCandidate.status,
+        focusKey: momentumCandidate.focusKey,
+        leaderSuggestionKey: momentumCandidate.leaderSuggestionKey,
+        bodyValues: {
+          name: momentumCandidate.contact.full_name,
+        },
+      })
+    }
+
+    return items
+  }, [coachingAnalytics.focusMembers, coachingTaskMap, radarMemberMap, radarMembers])
 
   const metrics = useMemo(() => {
     const now = referenceNow
@@ -790,6 +870,61 @@ export function TeamPage() {
           ) : (
             <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
               {t('team.coaching.analyticsEmpty')}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>{t('team.coaching.recommendations.title')}</CardTitle>
+            <p className="mt-1 text-sm text-muted-foreground">{t('team.coaching.recommendations.body')}</p>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {coachingRecommendations.length > 0 ? (
+            <div className="grid gap-3 xl:grid-cols-3">
+              {coachingRecommendations.map((recommendation) => (
+                <div key={recommendation.key} className="rounded-2xl border border-border/70 bg-card/60 p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold">{t(`team.coaching.recommendations.items.${recommendation.key}.title`)}</p>
+                      <p className="mt-1 truncate text-xs text-muted-foreground">{recommendation.memberName}</p>
+                    </div>
+                    <span className={cn('rounded-full border px-2 py-0.5 text-[11px] font-medium', getStatusClasses(recommendation.status))}>
+                      {t(`team.radar.status.${recommendation.status}`)}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs">
+                    <span className="rounded-full border border-border/70 px-2 py-0.5 font-medium text-muted-foreground">
+                      {getStageLabel(recommendation.stage)}
+                    </span>
+                    <span className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 font-medium text-primary">
+                      {t(`team.radar.focus.${recommendation.focusKey}`)}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                    {t(`team.coaching.recommendations.items.${recommendation.key}.body`, recommendation.bodyValues)}
+                  </p>
+                  <p className="mt-3 text-xs leading-5 text-muted-foreground">
+                    {t(`team.radar.suggestions.${recommendation.leaderSuggestionKey}`)}
+                  </p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="mt-4 w-full"
+                    onClick={() => navigate(`/dashboard/contacts/${recommendation.memberId}`)}
+                  >
+                    {t('dashboard.focus.openContact')}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              {t('team.coaching.recommendations.empty')}
             </div>
           )}
         </CardContent>
