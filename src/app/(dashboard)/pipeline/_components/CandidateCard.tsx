@@ -1,6 +1,7 @@
 'use client'
 
-import { MessageCircle, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
@@ -81,10 +82,10 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             href={waLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56] transition-all hover:scale-105 hover:shadow-md"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
             aria-label="WhatsApp"
           >
-            <MessageCircle className="h-4 w-4" strokeWidth={1.75} />
+            <WhatsAppIcon className="h-4 w-4" />
           </a>
         )}
       </div>

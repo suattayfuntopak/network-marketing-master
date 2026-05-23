@@ -1,6 +1,7 @@
 'use client'
 
-import { Phone, MessageCircle, Bell } from 'lucide-react'
+import { Phone, Bell } from 'lucide-react'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import type { NmmCandidate } from '@/types/database.types'
 
@@ -85,10 +86,10 @@ export function DailyList({ candidates }: DailyListProps) {
                 href={`https://wa.me/90${candidate.phone.replace(/^0/, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56] transition-all hover:scale-105 hover:shadow-md"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
                 aria-label="WhatsApp"
               >
-                <MessageCircle className="h-4 w-4" strokeWidth={1.75} />
+                <WhatsAppIcon className="h-4 w-4" />
               </a>
             )}
             <button
