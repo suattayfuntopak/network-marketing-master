@@ -75,7 +75,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
             )}
             {candidate.note && (
-              <p className="mt-1 truncate text-xs text-[var(--text-2)]">{candidate.note}</p>
+              <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">{candidate.note}</p>
             )}
           </div>
 

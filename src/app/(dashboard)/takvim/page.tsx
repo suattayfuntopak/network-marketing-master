@@ -1,4 +1,5 @@
 import { CalendarDays } from 'lucide-react'
+import { TakvimClient } from './_components/TakvimClient'
 
 export default function TakvimPage() {
   return (
@@ -8,13 +9,11 @@ export default function TakvimPage() {
           <CalendarDays className="h-5 w-5 text-[#72243E]" strokeWidth={1.75} />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Takvim</h1>
-          <p className="text-sm text-gray-400">Planlı takip günleri</p>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Takvim</h1>
+          <p className="text-sm text-[var(--text-2)]">Planlı takip günleri</p>
         </div>
       </header>
-      <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-400">
-        Yakında burada takip planını görebileceksin.
-      </div>
+      <TakvimClient />
     </main>
   )
 }
