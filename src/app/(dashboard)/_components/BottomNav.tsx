@@ -7,7 +7,7 @@ import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
   { href: '/bugun',    label: 'Bugün',    icon: Zap        },
-  { href: '/pipeline', label: 'Pipeline', icon: BarChart2  },
+  { href: '/pipeline', label: 'Boru Hattı', icon: BarChart2  },
   { href: '/yazar',    label: 'Yazar',    icon: PenLine    },
   { href: '/ekip',     label: 'Ekibim',   icon: Users      },
 ]

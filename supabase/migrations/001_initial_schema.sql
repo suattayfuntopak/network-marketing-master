@@ -96,21 +96,28 @@ alter table nmm_daily_actions     enable row level security;
 create policy "nmm_workspace_owner_all" on nmm_workspaces
   for all using (owner_id = auth.uid());
 
--- nmm_workspace_members: aynı workspace üyesi olan herkes okuyabilir
-create policy "nmm_member_read_own_workspace" on nmm_workspace_members
+-- nmm_workspace_members: kendi satırını veya sahip olduğu workspace'in üyelerini görebilir
+create policy "nmm_member_read" on nmm_workspace_members
   for select using (
-    workspace_id in (
-      select workspace_id from nmm_workspace_members
-      where user_id = auth.uid()
+    user_id = auth.uid()
+    or workspace_id in (
+      select id from nmm_workspaces where owner_id = auth.uid()
     )
   );
 
--- nmm_workspace_members: liderler insert/update yapabilir
+-- nmm_workspace_members: workspace sahibi yönetebilir + ilk üyelik için self-insert
 create policy "nmm_leader_manage_members" on nmm_workspace_members
   for all using (
     workspace_id in (
-      select workspace_id from nmm_workspace_members
-      where user_id = auth.uid() and role = 'leader'
+      select id from nmm_workspaces where owner_id = auth.uid()
+    )
+  );
+
+create policy "nmm_owner_insert_first_membership" on nmm_workspace_members
+  for insert with check (
+    user_id = auth.uid() and
+    workspace_id in (
+      select id from nmm_workspaces where owner_id = auth.uid()
     )
   );
 

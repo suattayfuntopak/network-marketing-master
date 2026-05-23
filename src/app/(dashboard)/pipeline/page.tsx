@@ -29,7 +29,7 @@ export default function PipelinePage() {
   }
 
   if (wsLoading) return <PageShell><Spinner /></PageShell>
-  if (wsError)   return <PageShell><ErrorMsg msg="Workspace yüklenemedi." /></PageShell>
+  if (wsError)   return <PageShell><ErrorMsg msg={`Workspace yüklenemedi: ${(wsError as Error).message}`} /></PageShell>
 
   return (
     <PageShell>
@@ -38,7 +38,7 @@ export default function PipelinePage() {
           <BarChart2 className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">Pipeline</h1>
+          <h1 className="text-xl font-bold text-gray-900">Boru Hattı</h1>
           <p className="text-sm text-gray-400">{all.length} aday</p>
         </div>
         <button

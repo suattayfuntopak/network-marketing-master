@@ -16,11 +16,16 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   // Mevcut üyelik var mı?
-  const { data: membership } = await supabase
+  const { data: membership, error: memSelectError } = await supabase
     .from('nmm_workspace_members')
     .select('workspace_id, role, full_name')
     .eq('user_id', user.id)
     .maybeSingle()
+
+  if (memSelectError) {
+    console.error('[useWorkspace] membership select error:', memSelectError)
+    throw new Error(`Üyelik okunamadı: ${memSelectError.message}`)
+  }
 
   if (membership) {
     return {
@@ -39,14 +44,22 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     .select('id')
     .single()
 
-  if (wsError || !ws) throw new Error('Workspace oluşturulamadı.')
+  if (wsError || !ws) {
+    console.error('[useWorkspace] workspace insert error:', wsError)
+    throw new Error(`Workspace oluşturulamadı: ${wsError?.message}`)
+  }
 
-  await supabase.from('nmm_workspace_members').insert({
+  const { error: memInsertError } = await supabase.from('nmm_workspace_members').insert({
     workspace_id: ws.id,
     user_id: user.id,
     role: 'leader',
     full_name: fullName,
   })
+
+  if (memInsertError) {
+    console.error('[useWorkspace] membership insert error:', memInsertError)
+    throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
+  }
 
   return { workspaceId: ws.id, role: 'leader', fullName }
 }

@@ -51,7 +51,7 @@ export function useAddCandidate(workspaceId: string) {
         workspace_id: workspaceId,
         owner_id: user.id,
       })
-      if (error) throw error
+      if (error) throw new Error(error.message)
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ['candidates', workspaceId] }),
   })
