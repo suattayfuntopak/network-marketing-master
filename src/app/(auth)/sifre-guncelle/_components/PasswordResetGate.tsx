@@ -16,20 +16,25 @@ export function PasswordResetGate() {
   useEffect(() => {
     const supabase = createClient()
 
-    // PASSWORD_RECOVERY event'i: hem implicit hem PKCE flow'da tetiklenir
+    // PKCE flow: ?code= query param varsa client-side exchange yap
+    const code = new URLSearchParams(window.location.search).get('code')
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) setStatus('error')
+        else setStatus('ready')
+      })
+      return
+    }
+
+    // Implicit flow: hash fragment'taki PASSWORD_RECOVERY event'ini dinle
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'PASSWORD_RECOVERY' && session) {
-          setStatus('ready')
-        }
-        // /auth/callback üzerinden gelip session zaten kurulmuşsa
-        if (event === 'SIGNED_IN' && session) {
-          setStatus('ready')
-        }
+        if (event === 'PASSWORD_RECOVERY' && session) setStatus('ready')
+        if (event === 'SIGNED_IN' && session) setStatus('ready')
       }
     )
 
-    // Sayfa açıldığında zaten session varsa (callback'ten geldi)
+    // /auth/callback üzerinden session zaten kurulmuşsa
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setStatus('ready')
     })
