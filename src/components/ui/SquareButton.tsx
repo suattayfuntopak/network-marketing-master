@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 
@@ -14,10 +15,21 @@ const colorMap: Record<ButtonColor, string> = {
   coral:  'bg-[#FEF0EC] text-[#C03E1F] hover:bg-[#FDE3DA]',
 }
 
+const sharedClass = (color: ButtonColor, className?: string) =>
+  clsx(
+    'flex aspect-square flex-col items-center justify-center gap-2',
+    'rounded-[14px] p-4 transition-all duration-150',
+    'active:scale-95 hover:scale-[1.03] hover:shadow-md',
+    'md:rounded-[12px]',
+    colorMap[color],
+    className
+  )
+
 interface SquareButtonProps {
   icon: LucideIcon
   label: string
   color?: ButtonColor
+  href?: string
   onClick?: () => void
   disabled?: boolean
   className?: string
@@ -27,26 +39,33 @@ export function SquareButton({
   icon: Icon,
   label,
   color = 'purple',
+  href,
   onClick,
   disabled = false,
   className,
 }: SquareButtonProps) {
+  const content = (
+    <>
+      <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+      <span className="text-center text-xs font-semibold leading-tight">{label}</span>
+    </>
+  )
+
+  if (href) {
+    return (
+      <Link href={href} className={sharedClass(color, className)}>
+        {content}
+      </Link>
+    )
+  }
+
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx(
-        'flex aspect-square flex-col items-center justify-center gap-2',
-        'rounded-[14px] p-4 transition-all duration-150',
-        'active:scale-95 hover:scale-[1.03] hover:shadow-md',
-        'disabled:pointer-events-none disabled:opacity-40',
-        'md:rounded-[12px]',
-        colorMap[color],
-        className
-      )}
+      className={clsx(sharedClass(color, className), 'disabled:pointer-events-none disabled:opacity-40')}
     >
-      <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
-      <span className="text-xs font-semibold leading-tight text-center">{label}</span>
+      {content}
     </button>
   )
 }
