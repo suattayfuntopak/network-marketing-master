@@ -39,6 +39,7 @@ export interface Database {
           owner_id?: string | null
           created_at?: string
         }
+        Relationships: []
       }
       nmm_workspace_members: {
         Row: {
@@ -65,6 +66,15 @@ export interface Database {
           full_name?: string | null
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_workspace_members_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          }
+        ]
       }
       nmm_candidates: {
         Row: {
@@ -103,6 +113,15 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_candidates_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          }
+        ]
       }
       nmm_daily_actions: {
         Row: {
@@ -132,11 +151,27 @@ export interface Database {
           note?: string | null
           created_at?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_daily_actions_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'nmm_daily_actions_candidate_id_fkey'
+            columns: ['candidate_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_candidates'
+            referencedColumns: ['id']
+          }
+        ]
       }
     }
-    Views: Record<string, never>
-    Functions: Record<string, never>
-    Enums: Record<string, never>
+    Views: { [_ in never]: never }
+    Functions: { [_ in never]: never }
+    Enums: { [_ in never]: never }
   }
 }
 
