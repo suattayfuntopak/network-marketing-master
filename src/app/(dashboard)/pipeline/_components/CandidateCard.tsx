@@ -61,7 +61,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   return (
     <>
-      <li className="relative rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+      <li className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
         <div className="flex items-start gap-3">
           {/* Avatar */}
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
@@ -70,12 +70,12 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
           {/* Bilgi */}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-gray-900">{candidate.full_name}</p>
+            <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
             {candidate.phone && (
-              <p className="text-xs text-gray-400">{candidate.phone}</p>
+              <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
             )}
             {candidate.note && (
-              <p className="mt-1 truncate text-xs text-gray-500">{candidate.note}</p>
+              <p className="mt-1 truncate text-xs text-[var(--text-2)]">{candidate.note}</p>
             )}
           </div>
 
@@ -111,14 +111,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </button>
 
             {stageOpen && (
-              <ul className="absolute left-0 top-full z-20 mt-1 w-44 rounded-xl border border-gray-100 bg-white py-1 shadow-lg">
+              <ul className="absolute left-0 top-full z-20 mt-1 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-1 shadow-lg">
                 {STAGE_ORDER.map(s => (
                   <li key={s}>
                     <button
                       onClick={() => changeStage(s)}
                       className={clsx(
-                        'w-full px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-gray-50',
-                        s === candidate.stage ? 'text-[#534AB7]' : 'text-gray-700'
+                        'w-full px-3 py-2 text-left text-xs font-medium transition-colors hover:bg-[var(--bg-subtle)]',
+                        s === candidate.stage ? 'text-[#534AB7]' : 'text-[var(--text-1)]'
                       )}
                     >
                       {STAGE_LABEL[s]}

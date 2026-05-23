@@ -102,7 +102,7 @@ export default function PipelinePage() {
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-white px-4 pb-28 pt-6 md:pb-8">
+    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       {children}
     </main>
   )

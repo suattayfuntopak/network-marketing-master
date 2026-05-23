@@ -39,8 +39,8 @@ export function BugunContent() {
   return (
     <>
       <header className="mb-6">
-        <p className="text-sm font-medium text-gray-400">{greeting},</p>
-        <h1 className="text-2xl font-bold text-gray-900">{firstName} 👋</h1>
+        <p className="text-sm font-medium text-[var(--text-2)]">{greeting},</p>
+        <h1 className="text-2xl font-bold text-[var(--text-1)]">{firstName} 👋</h1>
       </header>
 
       <div className="mb-5 flex gap-2">
@@ -53,7 +53,7 @@ export function BugunContent() {
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-base font-semibold text-gray-700">Bugün bunlarla ilgilen</h2>
+        <h2 className="mb-3 text-base font-semibold text-[var(--text-1)]">Bugün bunlarla ilgilen</h2>
         <DailyList candidates={candidates} />
       </section>
     </>
