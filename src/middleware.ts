@@ -40,7 +40,10 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && isPublic) {
+  // /sifre-guncelle: şifre sıfırlama akışında oturum açılmış olsa da buraya erişilmeli
+  const isPasswordReset = pathname.startsWith('/sifre-guncelle')
+
+  if (user && isPublic && !isPasswordReset) {
     const url = request.nextUrl.clone()
     url.pathname = '/bugun'
     return NextResponse.redirect(url)
