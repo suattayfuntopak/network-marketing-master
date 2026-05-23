@@ -4,19 +4,24 @@ import { useTheme } from 'next-themes'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-const CYCLE = ['light', 'dark', 'system'] as const
-type Theme = typeof CYCLE[number]
-
-const ICONS: Record<Theme, React.ReactNode> = {
-  light:  <Sun    className="h-4 w-4" strokeWidth={1.75} />,
-  dark:   <Moon   className="h-4 w-4" strokeWidth={1.75} />,
-  system: <Monitor className="h-4 w-4" strokeWidth={1.75} />,
+// Mevcut tema → basınca geçilecek tema
+const NEXT: Record<string, string> = {
+  dark:   'light',
+  light:  'system',
+  system: 'dark',
 }
 
-const LABELS: Record<Theme, string> = {
-  light:  'Açık tema',
-  dark:   'Koyu tema',
-  system: 'Sistem teması',
+// Mevcut tema → gösterilecek ikon (ne olacağını göster)
+const NEXT_ICON: Record<string, React.ReactNode> = {
+  dark:   <Sun     className="h-4 w-4" strokeWidth={1.75} />,   // dark'tayken güneş görün
+  light:  <Monitor className="h-4 w-4" strokeWidth={1.75} />,   // light'tayken monitör görün
+  system: <Moon    className="h-4 w-4" strokeWidth={1.75} />,   // system'dayken ay görün
+}
+
+const NEXT_LABEL: Record<string, string> = {
+  dark:   'Light moduna geç',
+  light:  'System moduna geç',
+  system: 'Dark moduna geç',
 }
 
 export function ThemeToggle() {
@@ -26,20 +31,15 @@ export function ThemeToggle() {
   useEffect(() => setMounted(true), [])
   if (!mounted) return <div className="h-9 w-9" />
 
-  const current = (CYCLE.includes(theme as Theme) ? theme : 'system') as Theme
-
-  function cycle() {
-    const idx = CYCLE.indexOf(current)
-    setTheme(CYCLE[(idx + 1) % CYCLE.length])
-  }
+  const current = theme && theme in NEXT ? theme : 'system'
 
   return (
     <button
-      onClick={cycle}
-      title={LABELS[current]}
+      onClick={() => setTheme(NEXT[current])}
+      title={NEXT_LABEL[current]}
       className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-2)] transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
     >
-      {ICONS[current]}
+      {NEXT_ICON[current]}
     </button>
   )
 }

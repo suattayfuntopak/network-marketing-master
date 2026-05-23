@@ -26,12 +26,12 @@ export function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 hidden h-full w-64 flex-col border-r border-[var(--border)] bg-[var(--bg-card)] md:flex">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-6 pr-3">
+      <div className="flex items-center gap-3 px-4 py-5 pr-3">
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]">
-          <span className="text-sm font-black text-white">N</span>
+          <span className="text-[10px] font-black tracking-tight text-white">NMM</span>
         </div>
-        <span className="flex-1 text-xs font-bold leading-tight text-gray-900 dark:text-gray-100">
-          Network Marketing<br />Master
+        <span className="flex-1 text-[9px] font-black uppercase tracking-widest leading-snug text-[var(--text-1)]">
+          Network<br />Marketing<br />Master
         </span>
         <ThemeToggle />
       </div>
