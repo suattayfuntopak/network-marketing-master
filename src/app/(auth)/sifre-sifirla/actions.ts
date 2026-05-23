@@ -15,7 +15,7 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
 
   const headersList = await headers()
   const origin = headersList.get('origin') ?? ''
-  const redirectTo = `${origin}/auth/callback?next=/sifre-guncelle`
+  const redirectTo = `${origin}/sifre-guncelle`
 
   const supabase = await createClient()
   const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
