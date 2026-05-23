@@ -1,6 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, CandidateStage } from '@/types/database.types'
 
@@ -17,7 +18,7 @@ async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
     .eq('workspace_id', workspaceId)
     .order('updated_at', { ascending: false })
 
-  if (error) throw error
+  if (error) throw new Error(error.message)
   return data
 }
 
@@ -53,7 +54,11 @@ export function useAddCandidate(workspaceId: string) {
       })
       if (error) throw new Error(error.message)
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['candidates', workspaceId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      toast.success('Aday eklendi')
+    },
+    onError: (e: Error) => toast.error(`Eklenemedi: ${e.message}`),
   })
 }
 
@@ -66,8 +71,28 @@ export function useUpdateCandidate(workspaceId: string) {
         .from('nmm_candidates')
         .update({ ...patch, last_contact_at: new Date().toISOString() })
         .eq('id', id)
-      if (error) throw error
+      if (error) throw new Error(error.message)
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['candidates', workspaceId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      toast.success('Güncellendi')
+    },
+    onError: (e: Error) => toast.error(`Güncellenemedi: ${e.message}`),
+  })
+}
+
+export function useDeleteCandidate(workspaceId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient()
+      const { error } = await supabase.from('nmm_candidates').delete().eq('id', id)
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      toast.success('Aday silindi')
+    },
+    onError: (e: Error) => toast.error(`Silinemedi: ${e.message}`),
   })
 }

@@ -39,7 +39,6 @@ export default function PipelinePage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-gray-900">Boru Hattı</h1>
-          <p className="text-sm text-gray-400">{all.length} aday</p>
         </div>
         <button
           onClick={() => setSheetOpen(true)}
@@ -50,16 +49,36 @@ export default function PipelinePage() {
         </button>
       </div>
 
+      {/* Stat bar */}
+      <div className="mb-5 grid grid-cols-3 gap-3">
+        <div className="rounded-2xl bg-gray-50 p-3 text-center">
+          <p className="text-xl font-bold text-gray-900">{all.length}</p>
+          <p className="text-xs text-gray-400">Toplam</p>
+        </div>
+        <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center">
+          <p className="text-xl font-bold text-[#854F0B]">{aktif.length}</p>
+          <p className="text-xs text-[#854F0B]">Aktif</p>
+        </div>
+        <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center">
+          <p className="text-xl font-bold text-[#0F6E56]">{sicak.length}</p>
+          <p className="text-xs text-[#0F6E56]">Sıcak</p>
+        </div>
+      </div>
+
       <StageFilter active={filter} onChange={setFilter} counts={counts} />
 
       <div className="mt-4">
         {isLoading && <Spinner />}
         {error && <ErrorMsg msg="Adaylar yüklenemedi." />}
         {!isLoading && !error && candidates.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center text-sm text-gray-400">
-            {filter === 'tumü'
-              ? 'Henüz aday yok. İlk adayını ekle!'
-              : 'Bu filtrede aday bulunmuyor.'}
+          <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center">
+            <p className="text-2xl mb-2">🎯</p>
+            <p className="text-sm font-semibold text-gray-700">
+              {filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
+            </p>
+            <p className="mt-1 text-xs text-gray-400">
+              {filter === 'tumü' ? '"Aday Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
+            </p>
           </div>
         )}
         {!isLoading && candidates.length > 0 && (
