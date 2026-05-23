@@ -1,4 +1,5 @@
 import { PenLine } from 'lucide-react'
+import { YazarForm } from './_components/YazarForm'
 
 export default function YazarPage() {
   return (
@@ -12,9 +13,7 @@ export default function YazarPage() {
           <p className="text-sm text-gray-400">AI destekli WhatsApp mesajları</p>
         </div>
       </header>
-      <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-400">
-        Yakında burada AI ile WhatsApp mesajları yazabileceksin.
-      </div>
+      <YazarForm />
     </main>
   )
 }

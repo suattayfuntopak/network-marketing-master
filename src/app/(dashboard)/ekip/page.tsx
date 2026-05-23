@@ -1,4 +1,5 @@
 import { Users } from 'lucide-react'
+import { EkipPanel } from './_components/EkipPanel'
 
 export default function EkipPage() {
   return (
@@ -12,9 +13,7 @@ export default function EkipPage() {
           <p className="text-sm text-gray-400">Ekip performans paneli</p>
         </div>
       </header>
-      <div className="rounded-2xl border border-dashed border-gray-200 p-8 text-center text-sm text-gray-400">
-        Yakında burada ekip aktivitelerini takip edebileceksin.
-      </div>
+      <EkipPanel />
     </main>
   )
 }
