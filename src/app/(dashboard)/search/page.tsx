@@ -39,10 +39,7 @@ function SearchPageContent() {
         const term = query.toLowerCase()
         return (
           c.full_name?.toLowerCase().includes(term) ||
-          c.notes?.toLowerCase().includes(term) ||
-          c.city?.toLowerCase().includes(term) ||
-          c.job?.toLowerCase().includes(term) ||
-          c.email?.toLowerCase().includes(term) ||
+          c.note?.toLowerCase().includes(term) ||
           c.phone?.toLowerCase().includes(term)
         )
       })
@@ -120,34 +117,28 @@ function SearchPageContent() {
                   href={`/pipeline/${c.id}`}
                   className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-[#534AB7]/30 hover:shadow-md"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
                       {c.full_name?.charAt(0).toUpperCase()}
                     </div>
-                    <div>
-                      <h3 className="text-sm font-semibold text-[var(--text-1)] group-hover:text-[#534AB7] transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm font-semibold text-[var(--text-1)] group-hover:text-[#534AB7] transition-colors truncate">
                         {c.full_name}
                       </h3>
-                      <div className="mt-0.5 flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-[var(--text-3)]">
-                        {c.job && <span>{c.job}</span>}
-                        {c.city && (
+                      <div className="mt-0.5 flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-[var(--text-3)] min-w-0">
+                        {c.phone && <span>{c.phone}</span>}
+                        {c.note && (
                           <>
-                            <span>•</span>
-                            <span>{c.city}</span>
-                          </>
-                        )}
-                        {c.phone && (
-                          <>
-                            <span>•</span>
-                            <span>{c.phone}</span>
+                            <span className="hidden sm:inline">•</span>
+                            <span className="truncate block max-w-[200px] sm:max-w-[400px]">{c.note}</span>
                           </>
                         )}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 shrink-0 ml-3">
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${STAGE_COLOR[c.stage]}`}>
-                      {STAGE_LABEL[c.stage] || c.stage}
+                      {t(`stages.${c.stage}`)}
                     </span>
                     <ChevronRight className="h-4 w-4 text-[var(--text-3)] group-hover:text-[var(--text-2)] transition-colors" />
                   </div>

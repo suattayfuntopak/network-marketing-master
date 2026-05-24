@@ -40,7 +40,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
     try {
       await addCandidate.mutateAsync({
         full_name: fullName.trim(),
-        notes: notes.trim() || null,
+        note: notes.trim() || null,
         stage: 'yeni', // Default stage: Yeni Aday
       })
       onClose()
