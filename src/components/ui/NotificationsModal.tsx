@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { X, Bell, Mail, Monitor, Volume2, Trash2, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { Z } from '@/lib/zIndex'
 
 interface NotificationsModalProps {
   onClose: () => void
@@ -93,12 +94,12 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
+        className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/50 backdrop-blur-sm`}
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all">
+      <div className={`fixed left-1/2 top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all`}>
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>

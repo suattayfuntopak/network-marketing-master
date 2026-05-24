@@ -22,32 +22,35 @@ interface MemberRow {
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
-  const { data: members, error } = await supabase
-    .from('nmm_workspace_members')
-    .select('user_id, full_name, role')
-    .eq('workspace_id', workspaceId)
+
+  // 2 sorgu — N+1 yerine aggregated
+  const [{ data: members, error }, { data: candidatesRaw }] = await Promise.all([
+    supabase
+      .from('nmm_workspace_members')
+      .select('user_id, full_name, role')
+      .eq('workspace_id', workspaceId),
+    supabase
+      .from('nmm_candidates')
+      .select('owner_id, stage')
+      .eq('workspace_id', workspaceId),
+  ])
   if (error) throw error
 
-  const counts = await Promise.all(
-    (members ?? []).map(async m => {
-      const { data: candidates } = await supabase
-        .from('nmm_candidates')
-        .select('stage')
-        .eq('workspace_id', workspaceId)
-        .eq('owner_id', m.user_id)
+  const candidates = candidatesRaw ?? []
 
-      const list = candidates ?? []
+  return (members ?? [])
+    .map(m => {
+      const mc = candidates.filter(c => c.owner_id === m.user_id)
       return {
         ...m,
-        candidate_count: list.length,
-        yeni_count: list.filter(c => c.stage === 'yeni').length,
-        sunum_count: list.filter(c => c.stage === 'sunum').length,
-        takip_count: list.filter(c => c.stage === 'takip').length,
-        katildi_count: list.filter(c => c.stage === 'katildi').length,
+        candidate_count: mc.length,
+        yeni_count:    mc.filter(c => c.stage === 'yeni').length,
+        sunum_count:   mc.filter(c => c.stage === 'sunum').length,
+        takip_count:   mc.filter(c => c.stage === 'takip').length,
+        katildi_count: mc.filter(c => c.stage === 'katildi').length,
       }
     })
-  )
-  return counts.sort((a, b) => b.candidate_count - a.candidate_count)
+    .sort((a, b) => b.candidate_count - a.candidate_count)
 }
 
 export function EkipPanel() {
@@ -89,8 +92,8 @@ export function EkipPanel() {
   const isSolo = members.length <= 1
 
   function handleCopyInviteCode() {
-    if (!ws?.workspaceId) return
-    navigator.clipboard.writeText(ws.workspaceId)
+    if (!ws?.inviteCode) return
+    navigator.clipboard.writeText(ws.inviteCode)
     setCopied(true)
     toast.success('Davet kodu kopyalandı!')
     setTimeout(() => setCopied(false), 2000)
@@ -99,25 +102,25 @@ export function EkipPanel() {
   async function handleJoinWorkspace(e: React.FormEvent) {
     e.preventDefault()
     if (joining) return
-    
-    const code = inviteCodeInput.trim()
+
+    const code = inviteCodeInput.trim().toUpperCase()
     if (!code) {
       toast.error('Lütfen bir davet kodu girin!')
       return
     }
 
-    if (code === ws?.workspaceId) {
+    if (code === ws?.inviteCode) {
       toast.error('Zaten bu çalışma alanındasınız!')
       return
     }
 
     setJoining(true)
     try {
-      // 1. Check if workspace exists
+      // 1. invite_code ile workspace bul
       const { data: targetWs, error: wsError } = await supabase
         .from('nmm_workspaces')
         .select('id, name')
-        .eq('id', code)
+        .eq('invite_code', code)
         .maybeSingle()
 
       if (wsError || !targetWs) {
@@ -166,9 +169,11 @@ export function EkipPanel() {
 
     try {
       // 1. Create a new solo workspace for the removed user
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+      const newCode = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
       const { data: newWs, error: wsError } = await supabase
         .from('nmm_workspaces')
-        .insert({ name: `${memberName}'in Ekibi`, owner_id: memberId })
+        .insert({ name: `${memberName}'in Ekibi`, owner_id: memberId, invite_code: newCode })
         .select('id')
         .single()
 
@@ -229,8 +234,8 @@ export function EkipPanel() {
               Ekip üyelerinizin uygulamaya kendi hesaplarıyla üye olmasını sağlayın. Ardından aşağıdaki kodu "Ekibim" sayfasından girerek ekibinize dahil olmalarını isteyin.
             </p>
             <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-xs text-[var(--text-1)]">
-                {ws?.workspaceId}
+              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-lg font-bold tracking-widest text-[var(--text-1)]">
+                {ws?.inviteCode}
               </div>
               <button
                 onClick={handleCopyInviteCode}
@@ -241,7 +246,7 @@ export function EkipPanel() {
               </button>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.workspaceId}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe aninda katılabilirsin!`
+                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.inviteCode}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -400,6 +405,7 @@ export function EkipPanel() {
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (
         <ConfirmDeleteModal
+          message={`${memberToRemove.name} ekibinizden çıkarılacak.`}
           onConfirm={handleRemoveMemberConfirmed}
           onCancel={() => setMemberToRemove(null)}
         />

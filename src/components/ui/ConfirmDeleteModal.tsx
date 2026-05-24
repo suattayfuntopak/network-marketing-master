@@ -2,13 +2,15 @@
 
 import { useEffect } from 'react'
 import { AlertTriangle, Trash2 } from 'lucide-react'
+import { Z } from '@/lib/zIndex'
 
 interface ConfirmDeleteModalProps {
+  message?: string
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
+export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDeleteModalProps) {
   // Escape tuşuyla kapat
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -22,12 +24,12 @@ export function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalPr
     <>
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm"
+        className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/50 backdrop-blur-sm`}
         onClick={onCancel}
       />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 z-[90] w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]">
+      <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]`}>
         {/* İkon */}
         <div className="mb-4 flex justify-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEAF0]">
@@ -36,9 +38,12 @@ export function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalPr
         </div>
 
         {/* Başlık */}
-        <h2 className="mb-6 text-center text-base font-bold text-[var(--text-1)]">
+        <h2 className={`text-center text-base font-bold text-[var(--text-1)] ${message ? 'mb-2' : 'mb-6'}`}>
           Silmek istediğinizden emin misiniz?
         </h2>
+        {message && (
+          <p className="mb-6 text-center text-sm text-[var(--text-2)]">{message}</p>
+        )}
 
         {/* Butonlar */}
         <div className="flex gap-3">

@@ -5,6 +5,7 @@ import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { Z } from '@/lib/zIndex'
 
 interface ProfileModalProps {
   onClose: () => void
@@ -171,10 +172,10 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/50 backdrop-blur-sm`} onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]" style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div className={`fixed left-1/2 top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]`} style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
