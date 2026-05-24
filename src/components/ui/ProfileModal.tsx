@@ -110,7 +110,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
     } catch (err: any) {
       console.error(err)
       // Bucket might not exist yet — store as base64 in metadata as fallback
-      toast.error('Fotoğraf yüklenemedi. Supabase Storage "avatars" bucket\'ı kontrol edin.')
+      toast.error('Fotoğraf yüklenemedi. Supabase Storage "nmm-avatars" bucket\'ı için upload policy gerekiyor.')
       setAvatarPreview(avatarUrl) // revert preview
     } finally {
       setUploadingAvatar(false)
