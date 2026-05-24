@@ -12,16 +12,19 @@ export function getAIUsageToday(): number {
   return parseInt(localStorage.getItem(todayKey()) ?? '0', 10)
 }
 
-export function incrementAIUsage(): number {
+export function incrementAIUsage(bypass: boolean = false): number {
+  if (bypass) return getAIUsageToday()
   const count = getAIUsageToday() + 1
   localStorage.setItem(todayKey(), String(count))
   return count
 }
 
-export function isAILimitReached(): boolean {
+export function isAILimitReached(bypass: boolean = false): boolean {
+  if (bypass) return false
   return getAIUsageToday() >= DAILY_AI_LIMIT
 }
 
-export function remainingAIUsage(): number {
+export function remainingAIUsage(bypass: boolean = false): number | string {
+  if (bypass) return 'Sınırsız'
   return Math.max(0, DAILY_AI_LIMIT - getAIUsageToday())
 }

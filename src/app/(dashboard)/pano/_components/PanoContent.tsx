@@ -69,8 +69,8 @@ export function PanoContent() {
         <SquareButton icon={Users}                  label="Ekibim"            color="amber"  href="/ekip"          />
         <SquareButton icon={CalendarDays}           label="Takvim"            color="pink"   href="/takvim"        />
         <SquareButton icon={MessageCircleQuestion}  label="İtirazlara Cevaplar" color="indigo" href="/itirazlar"     />
-        <SquareButton icon={BookOpen}               label="Vaktin Varsa"      color="rose"   href="/egitim"        />
-        <SquareButton icon={Trophy}                 label="Kazanımlar"        color="coral"  href="/kazanimlar"    />
+        <SquareButton icon={BookOpen}               label="Vaktin Varsa"      color="amber"  href="/egitim"        />
+        <SquareButton icon={Trophy}                 label="Kazanımlar"        color="teal"   href="/kazanimlar"    />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}

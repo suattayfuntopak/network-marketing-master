@@ -10,6 +10,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
 import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import type { NmmCandidate } from '@/types/database.types'
 
@@ -92,11 +93,21 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)
 
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null)
+    })
+  }, [])
+
   // Sayfa yüklenince localStorage'dan history + limit durumunu al
   useEffect(() => {
     setHistory(loadHistory())
-    setLimitReached(isAILimitReached())
-  }, [])
+    setLimitReached(isAILimitReached(isSuperAdmin))
+  }, [isSuperAdmin])
 
   useEffect(() => {
     if (initialName && candidates.length > 0 && !prefilledRef.current) {
@@ -125,8 +136,8 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   useEffect(() => {
     if (state.message && state.message !== prevMessageRef.current) {
       prevMessageRef.current = state.message
-      incrementAIUsage()
-      setLimitReached(isAILimitReached())
+      incrementAIUsage(isSuperAdmin)
+      setLimitReached(isAILimitReached(isSuperAdmin))
       const entry: HistoryEntry = {
         message: state.message,
         candidateName: selected?.full_name ?? query ?? 'Kişisiz',
@@ -136,7 +147,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
       saveToHistory(entry)
       setHistory(loadHistory())
     }
-  }, [state.message, selected, query, messageType])
+  }, [state.message, selected, query, messageType, isSuperAdmin])
 
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
@@ -169,7 +180,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   }
 
   const waLink = waHref(selected?.phone, state.message)
-  const remaining = remainingAIUsage()
+  const remaining = remainingAIUsage(isSuperAdmin)
 
   return (
     <div className="space-y-5">
@@ -303,7 +314,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
           >
             {isPending
               ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-              : <><Bot className="h-4 w-4" /> Üret ({remaining} hak kaldı)</>
+              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(${remaining} hak kaldı)`}</>
             }
           </button>
         )}

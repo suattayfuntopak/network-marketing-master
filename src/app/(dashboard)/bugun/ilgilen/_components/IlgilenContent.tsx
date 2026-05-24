@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { List, LayoutList, Phone, Bot, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -32,8 +33,18 @@ export function IlgilenContent() {
   const { daily, remaining } = useDailyActions(candidates)
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null)
+    })
+  }, [])
+
   async function handleAIMessage(id: string, name: string, stage: string, note: string | null) {
-    if (isAILimitReached()) {
+    if (isAILimitReached(isSuperAdmin)) {
       toast.error(`Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
       return
     }
@@ -44,11 +55,11 @@ export function IlgilenContent() {
       toast.error(result.error ?? 'Mesaj oluşturulamadı.')
       return
     }
-    incrementAIUsage()
+    incrementAIUsage(isSuperAdmin)
     await navigator.clipboard.writeText(result.message)
     setCopiedFor(id)
-    const remaining = remainingAIUsage()
-    toast.success(`Mesaj panoya kopyalandı! (${remaining} hak kaldı)`)
+    const remaining = remainingAIUsage(isSuperAdmin)
+    toast.success(`Mesaj panoya kopyalandı! ${isSuperAdmin ? '(Sınırsız)' : `(${remaining} hak kaldı)`}`)
     setTimeout(() => setCopiedFor(null), 2500)
   }
 
