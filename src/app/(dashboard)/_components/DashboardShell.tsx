@@ -27,9 +27,43 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     return false
   })
   const [pendingHref, setPendingHref] = useState<string | null>(null)
+  const [scrollDir, setScrollDir] = useState<'up' | 'down'>('up')
   const router = useRouter()
   const pathname = usePathname()
   const touchStart = useRef<{ x: number; y: number } | null>(null)
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+    let ticking = false
+
+    const updateScrollDir = () => {
+      const scrollY = window.scrollY
+      
+      // Minimum threshold of 8px scroll difference to trigger changes (reduces jumpiness)
+      if (Math.abs(scrollY - lastScrollY) < 8) {
+        ticking = false
+        return
+      }
+
+      if (scrollY > lastScrollY && scrollY > 60) {
+        setScrollDir('down')
+      } else {
+        setScrollDir('up')
+      }
+      lastScrollY = scrollY > 0 ? scrollY : 0
+      ticking = false
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(updateScrollDir)
+        ticking = true
+      }
+    }
+
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   function handleTouchStart(e: React.TouchEvent) {
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
@@ -75,7 +109,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
-      <Header />
+      <Header visible={scrollDir === 'up'} />
       <Sidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed(v => {
@@ -95,7 +129,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <div className="h-16" />
         {children}
       </div>
-      <BottomNav pendingHref={pendingHref} />
+      <BottomNav pendingHref={pendingHref} visible={scrollDir === 'up'} />
     </div>
   )
 }

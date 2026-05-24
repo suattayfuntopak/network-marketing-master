@@ -54,7 +54,7 @@ export const USFlag = () => (
   </svg>
 )
 
-export function Header() {
+export function Header({ visible = true }: { visible?: boolean }) {
   const { lang, setLang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const router = useRouter()
@@ -91,9 +91,11 @@ export function Header() {
     }
   }
 
+  const isHeaderVisible = visible || isMobileSearchOpen
+
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md transition-all duration-300">
+      <header className={`fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         
         {/* Mobil Tam Ekran Arama Çubuğu Popup */}
         {isMobileSearchOpen && (

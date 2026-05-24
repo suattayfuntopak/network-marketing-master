@@ -16,9 +16,10 @@ const NAV_ITEMS = [
 
 interface BottomNavProps {
   pendingHref?: string | null
+  visible?: boolean
 }
 
-export function BottomNav({ pendingHref }: BottomNavProps) {
+export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { lang, t } = useTranslation()
@@ -33,7 +34,7 @@ export function BottomNav({ pendingHref }: BottomNavProps) {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden">
+    <nav className={`fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
       {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
