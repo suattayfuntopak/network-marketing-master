@@ -7,7 +7,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
-import { NotificationsModal } from '@/components/ui/NotificationsModal'
+import { NotificationsModal, loadNotifications } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
 
 export const TRFlag = () => (
@@ -62,8 +62,13 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(2) // Mock count
+  const [unreadCount, setUnreadCount] = useState(0)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
+
+  // Sayfa yüklendiğinde localStorage'dan okunmamış bildirim sayısını al
+  useEffect(() => {
+    setUnreadCount(loadNotifications().filter(n => !n.read).length)
+  }, [])
 
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {

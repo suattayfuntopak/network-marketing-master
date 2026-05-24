@@ -49,7 +49,7 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
 const NOTIF_DISMISSED_KEY = 'nmm_notif_dismissed_ids'
 const NOTIF_READ_KEY = 'nmm_notif_read_ids'
 
-function loadNotifications(): NotificationItem[] {
+export function loadNotifications(): NotificationItem[] {
   try {
     const dismissed = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY) ?? '[]'))
     const read = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_READ_KEY) ?? '[]'))
