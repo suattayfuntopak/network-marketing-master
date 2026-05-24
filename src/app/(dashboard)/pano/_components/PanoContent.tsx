@@ -25,7 +25,7 @@ export function PanoContent() {
   const joinedCount = candidates.filter(c => c.stage === 'katildi').length
 
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Günaydın' : hour < 18 ? 'İyi günler' : 'İyi akşamlar'
+  const greeting = hour < 12 ? 'Günaydın' : hour < 14 ? 'Tünaydın' : hour < 19 ? 'İyi günler' : 'İyi akşamlar'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
   if (wsLoading || cLoading) {
