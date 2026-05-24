@@ -11,7 +11,7 @@ const NAV_ITEMS = [
   { href: '/yazar',      label: 'YZ Mesajı Üret',   icon: Bot                      },
   { href: '/ekip',       label: 'Ekibim',           icon: Users                    },
   { href: '/takvim',     label: 'Takvim',           icon: CalendarDays             },
-  { href: '/itirazlar',  label: 'İtirazlara Cevap', icon: MessageCircleQuestion    },
+  { href: '/itirazlar',  label: 'İtirazlara Cevaplar', icon: MessageCircleQuestion    },
   { href: '/egitim',     label: 'Vaktin Varsa',     icon: BookOpen                 },
   { href: '/kazanimlar', label: 'Kazanımlar',       icon: Trophy                   },
 ]

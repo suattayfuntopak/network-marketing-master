@@ -63,14 +63,14 @@ export function PanoContent() {
 
       {/* ── 8 hızlı erişim karesi — mobil 2 sütun (4 satır), masaüstü 4 sütun (2 satır) ── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        <SquareButton icon={Zap}                    label="Bugün İlgilen"    color="purple" href="/bugun/ilgilen" />
-        <SquareButton icon={TrendingUp}             label="Boru Hattı"       color="blue"   href="/pipeline"      />
-        <SquareButton icon={Bot}                    label="YZ Mesajı Üret"   color="teal"   href="/yazar"         />
-        <SquareButton icon={Users}                  label="Ekibim"           color="amber"  href="/ekip"          />
-        <SquareButton icon={CalendarDays}           label="Takvim"           color="pink"   href="/takvim"        />
-        <SquareButton icon={MessageCircleQuestion}  label="İtirazlara Cevap" color="rose"   href="/itirazlar"     />
-        <SquareButton icon={BookOpen}               label="Vaktin Varsa"     color="indigo" href="/egitim"        />
-        <SquareButton icon={Trophy}                 label="Kazanımlar"       color="coral"  href="/kazanimlar"    />
+        <SquareButton icon={Zap}                    label="Bugün İlgilen"     color="purple" href="/bugun/ilgilen" />
+        <SquareButton icon={TrendingUp}             label="Boru Hattı"        color="blue"   href="/pipeline"      />
+        <SquareButton icon={Bot}                    label="YZ Mesajı Üret"    color="teal"   href="/yazar"         />
+        <SquareButton icon={Users}                  label="Ekibim"            color="amber"  href="/ekip"          />
+        <SquareButton icon={CalendarDays}           label="Takvim"            color="pink"   href="/takvim"        />
+        <SquareButton icon={MessageCircleQuestion}  label="İtirazlara Cevaplar" color="indigo" href="/itirazlar"     />
+        <SquareButton icon={BookOpen}               label="Vaktin Varsa"      color="rose"   href="/egitim"        />
+        <SquareButton icon={Trophy}                 label="Kazanımlar"        color="coral"  href="/kazanimlar"    />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}

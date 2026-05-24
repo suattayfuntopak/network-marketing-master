@@ -253,7 +253,7 @@ export default function ItirazlarPage() {
             <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">İtirazlara Cevap</h1>
+            <h1 className="text-xl font-bold text-[var(--text-1)]">İtirazlara Cevaplar</h1>
             <p className="text-sm text-[var(--text-3)]">Sahadaki en sık sorulara hazır cevaplar</p>
           </div>
         </div>

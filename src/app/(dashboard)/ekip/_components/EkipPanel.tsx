@@ -66,7 +66,7 @@ export function EkipPanel() {
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
 
-  const { data: members = [], isLoading: mLoading, isError: mError } = useQuery({
+  const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
     queryFn: () => fetchMembers(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
@@ -93,7 +93,7 @@ export function EkipPanel() {
       <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
         <p className="mb-2 text-3xl">⚠️</p>
         <p className="text-sm font-semibold text-[var(--text-1)]">Ekip verileri yüklenemedi</p>
-        <p className="mt-1 text-xs text-[var(--text-2)]">Bağlantınızı kontrol edip sayfayı yenileyin</p>
+        <p className="mt-1 text-xs text-[var(--text-2)]">{(queryError as Error)?.message || 'Bağlantınızı kontrol edip sayfayı yenileyin'}</p>
       </div>
     )
   }
