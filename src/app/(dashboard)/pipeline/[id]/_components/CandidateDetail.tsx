@@ -2,12 +2,13 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
+import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, FOLLOW_DAYS } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
@@ -55,6 +56,30 @@ export function CandidateDetail({ candidateId }: Props) {
   const { data: activityLog = [] } = useActivityHistory(candidateId)
 
   const c = candidates.find(x => x.id === candidateId)
+
+  const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
+  const senderName = ws?.fullName || 'Danışmanınız'
+  const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
+  
+  const presentationMessage = `Sayın ${c?.full_name?.trim() || 'Müşteri'}, sunum materyallerine aşağıdaki bağlantıdan ulaşabilirsiniz:\n\n${GREENLEAF_PRESENTATION_URL}\n\nSorularınız olursa ${senderName} ile iletişime geçebilirsiniz.`
+
+  const handleSendWhatsApp = useCallback(() => {
+    if (!candidatePhoneClean) return
+    navigator.clipboard.writeText(presentationMessage)
+      .then(() => toast.success('Sunum mesajı kopyalandı!'))
+      .catch(() => {})
+    const encodedText = encodeURIComponent(presentationMessage)
+    window.open(`https://wa.me/${candidatePhoneClean}?text=${encodedText}`, '_blank', 'noopener,noreferrer')
+  }, [candidatePhoneClean, presentationMessage])
+
+  const handleSendSms = useCallback(() => {
+    if (!candidatePhoneClean) return
+    navigator.clipboard.writeText(presentationMessage)
+      .then(() => toast.success('Sunum mesajı kopyalandı!'))
+      .catch(() => {})
+    const encodedText = encodeURIComponent(presentationMessage)
+    window.open(`sms:${candidatePhoneClean}?body=${encodedText}`, '_blank', 'noopener,noreferrer')
+  }, [candidatePhoneClean, presentationMessage])
 
   if (wsLoading || cLoading) {
     return (
@@ -249,37 +274,44 @@ export function CandidateDetail({ candidateId }: Props) {
         </div>
 
         {/* Sunum Materyalleri */}
-        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-          <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-            <Presentation className="h-3.5 w-3.5" />
-            Sunum Materyalleri
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { emoji: '🎬', baslik: 'Video Tanıtım', aciklama: '2 dakikalık fırsat özeti', renk: 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc]', href: '#' },
-              { emoji: '📋', baslik: 'Ürün Kataloğu', aciklama: 'Ürün yelpazesi ve fiyatlar', renk: 'bg-[#E1F5EE] dark:bg-[#0d3d2e] text-[#0F6E56] dark:text-[#4ade80]', href: '#' },
-              { emoji: '💰', baslik: 'Kazanç Planı', aciklama: 'Komisyon yapısı detayları', renk: 'bg-[#FAEEDA] dark:bg-[#3a2200] text-[#854F0B] dark:text-[#fbbf24]', href: '#' },
-              { emoji: '🏆', baslik: 'Başarı Hikayeleri', aciklama: 'Gerçek kişi deneyimleri', renk: 'bg-[#FFF1F3] dark:bg-[#3d0a1a] text-[#9B1D47] dark:text-[#fda4af]', href: '#' },
-            ].map(m => (
-              <a
-                key={m.baslik}
-                href={m.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-start gap-2.5 rounded-2xl p-3 transition hover:opacity-85 active:scale-[0.98] ${m.renk}`}
-              >
-                <span className="text-xl leading-none shrink-0">{m.emoji}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-bold leading-tight">{m.baslik}</p>
-                  <p className="mt-0.5 text-[10px] opacity-70 leading-tight">{m.aciklama}</p>
-                </div>
-                <ExternalLink className="h-3 w-3 shrink-0 mt-0.5 opacity-60" />
-              </a>
-            ))}
+        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+          <div>
+            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+              <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
+              Sunum Materyalleri
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-[var(--text-3)]">
+              Adayınıza bir açıklama eşliğinde WhatsApp ya da SMS üzerinden sunum linkini gönderebilirsiniz. Bu link açıldığında adayınız güncel sunumu izleyebilir ve inceleyebilir.
+            </p>
           </div>
-          <p className="mt-3 text-[10px] text-[var(--text-3)] text-center">
-            Bağlantıları düzenlemek için profil ayarlarına gidin
-          </p>
+
+          {!candidatePhoneClean ? (
+            <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 p-3 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
+              ⚠️ <strong>DİKKAT:</strong> Hazır mesajı gönderebilmek için bu adaya ait telefon numarasını <strong>Düzenle</strong> bölümünden ekleyin!
+            </p>
+          ) : null}
+
+          <div className="mt-4 grid w-full grid-cols-2 items-stretch gap-2.5">
+            <button
+              type="button"
+              disabled={!candidatePhoneClean}
+              onClick={handleSendSms}
+              className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-sky-600 hover:bg-sky-500 shadow-md hover:shadow-sky-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <MessageSquare className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">SMS İle Gönder</span>
+            </button>
+            
+            <button
+              type="button"
+              disabled={!candidatePhoneClean}
+              onClick={handleSendWhatsApp}
+              className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+            >
+              <WhatsAppIcon className="h-4 w-4 shrink-0" />
+              <span className="text-center leading-tight">WhatsApp İle Gönder</span>
+            </button>
+          </div>
         </div>
 
         {/* Aktivite Geçmişi */}
