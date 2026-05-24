@@ -101,30 +101,6 @@ export function UserMenu() {
             Ayarlar
           </button>
 
-          {/* Mobil için Dil ve Tema Seçenekleri */}
-          <div className="flex items-center justify-between border-t border-[var(--border)] px-4 py-2.5 sm:hidden">
-            <span className="text-xs font-semibold text-[var(--text-3)]">{t('common.settings')}</span>
-            <div className="flex items-center gap-2">
-              <ThemeToggle />
-              <div className="flex h-8 items-center rounded-lg bg-[var(--bg-subtle)] border border-[var(--border)] p-0.5 gap-0.5">
-                <button
-                  onClick={() => setLang('tr')}
-                  className={`flex h-6 items-center justify-center rounded-md px-1.5 transition-all ${lang === 'tr' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
-                  title="Türkçe"
-                >
-                  <TRFlag />
-                </button>
-                <button
-                  onClick={() => setLang('en')}
-                  className={`flex h-6 items-center justify-center rounded-md px-1.5 transition-all ${lang === 'en' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
-                  title="English"
-                >
-                  <USFlag />
-                </button>
-              </div>
-            </div>
-          </div>
-
           <div className="my-1 border-t border-[var(--border)]" />
 
           <form action={logoutAction}>

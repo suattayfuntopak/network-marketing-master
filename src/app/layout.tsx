@@ -25,6 +25,11 @@ export const metadata: Metadata = {
   title: "Network Marketing Master",
   description: "Ağ pazarlaması takip uygulaması",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",

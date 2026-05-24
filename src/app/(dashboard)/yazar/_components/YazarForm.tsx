@@ -15,18 +15,34 @@ import { toast } from 'sonner'
 import type { NmmCandidate } from '@/types/database.types'
 
 const MESSAGE_TYPES = [
-  { value: 'genel',    label: 'Genel' },
-  { value: 'davet',    label: 'Davet' },
-  { value: 'sunum',    label: 'Sunum' },
-  { value: 'takip',    label: 'Takip' },
+  { value: 'genel', label: 'Genel' },
+  { value: 'ilk_temas', label: 'İlk Temas' },
+  { value: 'bag_kurma', label: 'Bağ Kurma' },
+  { value: 'deger_paylasimi', label: 'Değer Paylaşımı' },
+  { value: 'davet', label: 'Davet' },
+  { value: 'sunum', label: 'Sunum' },
+  { value: 'takip', label: 'Takip' },
+  { value: 'itiraz_yonetimi', label: 'İtiraz Yönetimi' },
+  { value: 'karar_asamasi', label: 'Karar Aşaması' },
+  { value: 'hayir_sonrasi', label: 'Hayır Sonrası' },
+  { value: 'yeniden_bag', label: 'Yeniden Bağ' },
+  { value: 'dogum_gunu', label: 'Doğum Günü' },
+  { value: 'evlilik_yildonumu', label: 'Evlilik Yıldönümü' },
+  { value: 'siparis_tesekkuru', label: 'Sipariş Teşekkürü' },
+  { value: 'yeniden_siparis_daveti', label: 'Yeniden Sipariş Daveti' },
   { value: 'tesekkur', label: 'Teşekkür' },
+  { value: 'yeni_uye_karsilama', label: 'Yeni Üye Karşılama' },
 ]
 
 const TONES = [
-  { value: 'samimi',  label: 'Samimi' },
-  { value: 'resmi',   label: 'Resmi' },
-  { value: 'neseli',  label: 'Neşeli' },
+  { value: 'samimi', label: 'Samimi' },
+  { value: 'profesyonel', label: 'Profesyonel' },
   { value: 'merakli', label: 'Meraklı' },
+  { value: 'empatik', label: 'Empatik' },
+  { value: 'kendinden_emin', label: 'Kendinden Emin' },
+  { value: 'esprili', label: 'Esprili' },
+  { value: 'net', label: 'Net' },
+  { value: 'motive_edici', label: 'Motive Edici' },
 ]
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
@@ -190,26 +206,47 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
         <input type="hidden" name="stage" value={selected?.stage ?? ''} />
         <input type="hidden" name="name" value={selected?.full_name ?? query} />
 
-        {/* Mesaj Türü + Ton — side by side on desktop */}
+        {/* Mesaj Türü + Ton Dropdown'ları */}
         <div className="grid gap-4 md:grid-cols-2">
           <div>
-            <p className="mb-2 text-sm font-semibold text-[var(--text-1)]">Mesaj Türü</p>
-            <div className="flex flex-wrap gap-2">
-              {MESSAGE_TYPES.map(t => (
-                <Pill key={t.value} active={messageType === t.value} onClick={() => setMessageType(t.value)}>
-                  {t.label}
-                </Pill>
-              ))}
+            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
+              Mesaj Türü
+            </label>
+            <div className="relative">
+              <select
+                id="messageTypeSelect"
+                value={messageType}
+                onChange={e => setMessageType(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
+              >
+                {MESSAGE_TYPES.map(t => (
+                  <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
             </div>
           </div>
+
           <div>
-            <p className="mb-2 text-sm font-semibold text-[var(--text-1)]">Ton</p>
-            <div className="flex flex-wrap gap-2">
-              {TONES.map(t => (
-                <Pill key={t.value} active={tone === t.value} onClick={() => setTone(t.value)}>
-                  {t.label}
-                </Pill>
-              ))}
+            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="toneSelect">
+              Ton
+            </label>
+            <div className="relative">
+              <select
+                id="toneSelect"
+                value={tone}
+                onChange={e => setTone(e.target.value)}
+                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
+              >
+                {TONES.map(t => (
+                  <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
             </div>
           </div>
         </div>

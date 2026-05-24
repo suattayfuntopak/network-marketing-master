@@ -190,7 +190,7 @@ export const tr = {
   },
   training: {
     title: "Vaktin Varsa",
-    subtitle: "Okusa kardır — seçilmiş içerik havuzu",
+    subtitle: "Başarılı bir Networker olmak için faydalı okumalar",
     heroTitle: "📖 Kimse seni zorlamıyor — ama bilgi fark yaratır",
     heroDesc: "Her konu 4–8 dakika. Sahada fark edilir sonuçlar için sıra sıra değil, ihtiyaca göre oku.",
     topicsCount: "{count} konu",

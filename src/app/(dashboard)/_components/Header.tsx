@@ -149,7 +149,7 @@ export function Header() {
         </form>
 
         {/* Sağ Taraf Buton Grubu */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5">
+        <div className="flex items-center gap-1 sm:gap-2">
           
           {/* Mobil Arama (Mercek) Butonu */}
           <button
@@ -171,27 +171,27 @@ export function Header() {
           </button>
 
           {/* Tema Butonu */}
-          <div className="hidden sm:block shrink-0">
+          <div className="shrink-0">
             <ThemeToggle />
           </div>
 
-          {/* Dil Switcher Toggle */}
-          <div className="hidden sm:flex h-9 items-center rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] p-1 gap-1 shrink-0">
-            <button
-              onClick={() => setLang('tr')}
-              className={`flex h-7 items-center justify-center rounded-lg px-2 transition-all ${lang === 'tr' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
-              title="Türkçe"
-            >
-              <TRFlag />
-            </button>
-            <button
-              onClick={() => setLang('en')}
-              className={`flex h-7 items-center justify-center rounded-lg px-2 transition-all ${lang === 'en' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
-              title="English"
-            >
-              <USFlag />
-            </button>
-          </div>
+          {/* TR Bayrak Dil Butonu */}
+          <button
+            onClick={() => setLang('tr')}
+            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'tr' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+            title="Türkçe"
+          >
+            <TRFlag />
+          </button>
+
+          {/* USA Bayrak Dil Butonu */}
+          <button
+            onClick={() => setLang('en')}
+            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'en' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+            title="English"
+          >
+            <USFlag />
+          </button>
 
           {/* Bildirim Çanı */}
           <button

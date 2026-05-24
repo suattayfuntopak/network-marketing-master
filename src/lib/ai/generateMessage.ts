@@ -18,10 +18,33 @@ const STAGE_CONTEXT: Record<string, string> = {
 
 const TYPE_CONTEXT: Record<string, string> = {
   genel:    'Genel iletişim — doğal ve samimi selamlama.',
-  davet:    'Bir etkinliğe veya sunum seansına davet et.',
-  sunum:    'Fırsatı tanıtmak için ön hazırlık mesajı yaz.',
-  takip:    'Önceki görüşmenin takibini yap.',
-  tesekkur: 'Zaman ve ilgisi için teşekkür et.',
+  ilk_temas: 'Adayla ilk kez temas kur, sıcak ve ilgisini çekecek şekilde bağlantı aç.',
+  bag_kurma: 'Kişiyle ortak ilgi alanları üzerinden bağ kur ve dostça sohbet et.',
+  deger_paylasimi: 'Adayın işine veya hayatına değer katacak bir içerik, kitap veya bilgi paylaş.',
+  davet:    'Bir toplantıya, webinara veya sunum seansına merak uyandırarak davet et.',
+  sunum:    'Fırsatı veya sunumu izlemesi için ön hazırlık mesajı yaz.',
+  takip:    'Sunum veya görüşme sonrasında takip yap, düşüncelerini öğren.',
+  itiraz_yonetimi: 'Adayın tereddütlerini ve itirazlarını saygılı, yapıcı ve profesyonel şekilde cevapla.',
+  karar_asamasi: 'Adayın karar vermesine rehberlik et, süreci netleştir.',
+  hayir_sonrasi: 'Aday olumsuz yanıt verdikten sonra kapıyı açık bırakacak ve ilişkiyi koruyacak nezaket mesajı yaz.',
+  yeniden_bag: 'Eski ve iletişimi kopmuş adayla samimi bir şekilde yeniden bağlantı kur.',
+  dogum_gunu: 'Adayın doğum gününü içtenlikle kutla.',
+  evlilik_yildonumu: 'Adayın evlilik yıldönümünü kutla.',
+  siparis_tesekkuru: 'Müşteriye siparişi için teşekkür et ve ürün deneyimi ile ilgilen.',
+  yeniden_siparis_daveti: 'Müşteriyi yeni sipariş vermesi veya eksilen ürünleri tamamlaması için nazikçe davet et.',
+  tesekkur: 'Zamanı, ilgisi veya görüşme için içtenlikle teşekkür et.',
+  yeni_uye_karsilama: 'Ekibe yeni katılan iş ortağına sıcak bir karşılama yap ve motivasyon ver.',
+}
+
+const TONE_CONTEXT: Record<string, string> = {
+  samimi: 'Sıcak, içten ve dostça bir dil.',
+  profesyonel: 'İş odaklı, saygın ve kurumsal ama sıkıcı olmayan bir üslup.',
+  merakli: 'Soru soran ve adayı sohbete çeken merak uyandırıcı dil.',
+  empatik: 'Adayın durumunu anlayan, duyarlı ve destekleyici bir dil.',
+  kendinden_emin: 'Kararlı, liderlik duruşu olan ve güven veren güçlü bir dil.',
+  esprili: 'Hafif mizahi, neşeli ve tebessüm ettiren bir üslup.',
+  net: 'Kısa, dolaysız, açık ve doğrudan konuya giren bir dil.',
+  motive_edici: 'İlham veren, enerjik, heyecanlandırıcı ve cesaretlendirici bir dil.',
 }
 
 export interface GenerateMessageInput {
@@ -47,13 +70,14 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
 
   const stageInfo = stage ? (STAGE_CONTEXT[stage] ?? '') : ''
   const typeInfo  = TYPE_CONTEXT[messageType] ?? ''
+  const toneInfo  = TONE_CONTEXT[tone] ?? ''
 
   const stageStr = stage && stageInfo ? `Aşama: ${stage} — ${stageInfo}\n` : ''
   const noteStr  = note    ? `Notlar: ${note}\n`      : ''
   const ctxStr   = context ? `Ek bilgi: ${context}\n` : ''
 
   const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 400,
     system: [
       {
@@ -73,7 +97,7 @@ Her durumda sadece yanıtı veya mesajı yaz, başka açıklama ekleme.`,
     messages: [
       {
         role: 'user',
-        content: `Alıcı: ${name}\n${stageStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone}`,
+        content: `Alıcı: ${name}\n${stageStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone} — ${toneInfo}`,
       },
     ],
   })
