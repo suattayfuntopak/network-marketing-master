@@ -1,16 +1,17 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
+import { useTranslation } from '@/providers/LanguageProvider'
 import { LayoutDashboard, TrendingUp, Bot, Users, MessageCircleQuestion } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 
 const NAV_ITEMS = [
-  { href: '/pano',      label: 'Pano',           icon: LayoutDashboard        },
-  { href: '/pipeline',  label: 'Boru Hattı',     icon: TrendingUp             },
-  { href: '/yazar',     label: 'YZ Mesajı',      icon: Bot                    },
-  { href: '/itirazlar', label: 'İtirazlar',      icon: MessageCircleQuestion  },
-  { href: '/ekip',      label: 'Ekibim',         icon: Users                  },
+  { href: '/pano',      translationKey: 'nav.pano',      icon: LayoutDashboard        },
+  { href: '/pipeline',  translationKey: 'nav.pipeline',  icon: TrendingUp             },
+  { href: '/yazar',     translationKey: 'nav.yazar',     icon: Bot                    },
+  { href: '/itirazlar', translationKey: 'nav.itirazlar', icon: MessageCircleQuestion  },
+  { href: '/ekip',      translationKey: 'nav.ekip',      icon: Users                  },
 ]
 
 interface BottomNavProps {
@@ -20,6 +21,7 @@ interface BottomNavProps {
 export function BottomNav({ pendingHref }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useTranslation()
 
   function navigate(targetHref: string) {
     const currentIdx = NAV_ITEMS.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
@@ -32,9 +34,10 @@ export function BottomNav({ pendingHref }: BottomNavProps) {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden">
-      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+      {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
+        const label = t(translationKey)
         return (
           <button
             key={href}
@@ -56,3 +59,4 @@ export function BottomNav({ pendingHref }: BottomNavProps) {
     </nav>
   )
 }
+

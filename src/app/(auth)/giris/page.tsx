@@ -1,11 +1,17 @@
+'use client'
+
+import { useTranslation } from '@/providers/LanguageProvider'
 import { LoginForm } from './_components/LoginForm'
 
 export default function GirisPage() {
+  const { t } = useTranslation()
+
   return (
-    <div className="rounded-3xl bg-white p-8 shadow-sm">
-      <h2 className="mb-1 text-xl font-bold text-gray-900">Giriş Yap</h2>
-      <p className="mb-6 text-sm text-gray-500">Hesabına giriş yap, ekibini yönet.</p>
+    <div className="rounded-2xl border border-white/10 bg-[#161824]/60 p-8 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <h2 className="mb-1 text-xl font-bold text-white">{t('auth.loginTitle')}</h2>
+      <p className="mb-6 text-sm text-gray-400">{t('auth.welcome')}</p>
       <LoginForm />
     </div>
   )
 }
+

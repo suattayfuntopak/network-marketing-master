@@ -7,26 +7,35 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
 import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen } from 'lucide-react'
-import { ACTIVE_STAGES, STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
-
-function daysAgoLabel(days: number): string {
-  if (!isFinite(days)) return 'Hiç temas yok'
-  if (days < 1) return 'Bugün'
-  if (days < 2) return 'Dün'
-  return `${Math.floor(days)} gün önce`
-}
+import { useTranslation } from '@/providers/LanguageProvider'
 
 export function PanoContent() {
+  const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { daily, remaining } = useDailyActions(candidates)
+
+  function daysAgoLabel(days: number): string {
+    if (!isFinite(days)) return t('common.noContact')
+    if (days < 1) return t('common.today')
+    if (days < 2) return t('common.yesterday')
+    return t('common.daysAgo', { days: Math.floor(days) })
+  }
 
   const activeCount = candidates.filter(c => ACTIVE_STAGES.includes(c.stage)).length
   const joinedCount = candidates.filter(c => c.stage === 'katildi').length
 
   const hour = new Date().getHours()
-  const greeting = hour < 12 ? 'Günaydın' : hour < 14 ? 'Tünaydın' : hour < 19 ? 'İyi günler' : 'İyi akşamlar'
+  const greeting = hour < 12 
+    ? t('dashboard.greetingMorning') 
+    : hour < 14 
+      ? t('dashboard.greetingAfternoon') 
+      : hour < 19 
+        ? t('dashboard.greetingDay') 
+        : t('dashboard.greetingEvening')
+
   const greetingIcon = hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
@@ -63,29 +72,29 @@ export function PanoContent() {
 
       {/* ── 8 hızlı erişim karesi — mobil 2 sütun (4 satır), masaüstü 4 sütun (2 satır) ── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        <SquareButton icon={Zap}                    label="Bugün İlgilen"     color="purple" href="/bugun/ilgilen" />
-        <SquareButton icon={TrendingUp}             label="Boru Hattı"        color="blue"   href="/pipeline"      />
-        <SquareButton icon={Bot}                    label="YZ Mesajı Üret"    color="teal"   href="/yazar"         />
-        <SquareButton icon={Users}                  label="Ekibim"            color="amber"  href="/ekip"          />
-        <SquareButton icon={CalendarDays}           label="Takvim"            color="pink"   href="/takvim"        />
-        <SquareButton icon={MessageCircleQuestion}  label="İtirazlara Cevaplar" color="indigo" href="/itirazlar"     />
-        <SquareButton icon={BookOpen}               label="Vaktin Varsa"      color="amber"  href="/egitim"        />
-        <SquareButton icon={Trophy}                 label="Kazanımlar"        color="teal"   href="/kazanimlar"    />
+        <SquareButton icon={Zap}                    label={lang === 'en' ? "Today's Focus" : "Bugün İlgilen"}     color="purple" href="/bugun/ilgilen" />
+        <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="blue"   href="/pipeline"      />
+        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
+        <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />
+        <SquareButton icon={CalendarDays}           label={t('nav.takvim')}           color="pink"   href="/takvim"        />
+        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="indigo" href="/itirazlar"     />
+        <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="amber"  href="/egitim"        />
+        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="teal"   href="/kazanimlar"    />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
           <p className="text-2xl font-bold text-[var(--text-1)] md:text-3xl">{candidates.length}</p>
-          <p className="mt-1 text-xs text-[var(--text-3)]">Toplam Kişi</p>
+          <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.totalPeople')}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
           <p className="text-2xl font-bold text-[#534AB7] md:text-3xl">{activeCount}</p>
-          <p className="mt-1 text-xs text-[var(--text-3)]">Aktif Aday</p>
+          <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.activeCandidates')}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
           <p className="text-2xl font-bold text-[#0F6E56] md:text-3xl">{joinedCount}</p>
-          <p className="mt-1 text-xs text-[var(--text-3)]">Katıldı</p>
+          <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.joined')}</p>
         </div>
       </div>
 
@@ -93,21 +102,21 @@ export function PanoContent() {
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-            Bugün Öncelikliler
+            {t('dashboard.todayPriorities')}
           </p>
           {(daily.length > 0 || remaining > 0) && (
             <Link
               href="/bugun/ilgilen"
               className="text-xs font-medium text-[#534AB7] transition hover:underline"
             >
-              Tümünü gör →
+              {t('dashboard.seeAll')}
             </Link>
           )}
         </div>
 
         {daily.length === 0 ? (
           <p className="py-6 text-center text-sm text-[var(--text-3)]">
-            Bugün için bekleyen eylem yok 🎉
+            {t('dashboard.noPendingActions')}
           </p>
         ) : (
           <ul className="divide-y divide-[var(--border)]">
@@ -125,14 +134,14 @@ export function PanoContent() {
                     <p className="text-xs text-[var(--text-3)]">{daysAgoLabel(c.daysSinceContact)}</p>
                   </div>
                   <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
-                    {STAGE_LABEL[c.stage]}
+                    {t(`stages.${c.stage}`)}
                   </span>
                 </Link>
               </li>
             ))}
             {remaining > 0 && (
               <li className="pt-2 text-center text-xs text-[var(--text-3)]">
-                +{remaining} kişi daha bekliyor
+                {t('dashboard.remainingPeople', { count: remaining })}
               </li>
             )}
           </ul>
@@ -141,3 +150,4 @@ export function PanoContent() {
     </div>
   )
 }
+

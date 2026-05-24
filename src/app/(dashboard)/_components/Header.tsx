@@ -1,0 +1,195 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/providers/LanguageProvider'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { UserMenu } from './UserMenu'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { Zap, Bell, Search } from 'lucide-react'
+import { NotificationsModal } from '@/components/ui/NotificationsModal'
+import { QuickAddModal } from '@/components/ui/QuickAddModal'
+
+const TRFlag = () => (
+  <svg viewBox="0 0 1200 800" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">
+    <rect width="1200" height="800" fill="#E30A17" />
+    <circle cx="400" cy="400" r="200" fill="#fff" />
+    <circle cx="450" cy="400" r="160" fill="#E30A17" />
+    <polygon points="575,400 633.7,419.1 597.5,369.1 597.5,430.9 633.7,380.9" fill="#fff" />
+  </svg>
+)
+
+const USFlag = () => (
+  <svg viewBox="0 0 7410 3900" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">
+    <rect width="7410" height="3900" fill="#B22234" />
+    <path d="M0,300 h7410 M0,900 h7410 M0,1500 h7410 M0,2100 h7410 M0,2700 h7410 M0,3300 h7410" stroke="#fff" strokeWidth="300" />
+    <rect width="2964" height="2100" fill="#3C3B6E" />
+    <g fill="#fff">
+      {/* 9 columns and 5 rows of stars simplified */}
+      <circle cx="300" cy="250" r="50" />
+      <circle cx="800" cy="250" r="50" />
+      <circle cx="1300" cy="250" r="50" />
+      <circle cx="1800" cy="250" r="50" />
+      <circle cx="2300" cy="250" r="50" />
+      <circle cx="550" cy="500" r="50" />
+      <circle cx="1050" cy="500" r="50" />
+      <circle cx="1550" cy="500" r="50" />
+      <circle cx="2050" cy="500" r="50" />
+      <circle cx="300" cy="750" r="50" />
+      <circle cx="800" cy="750" r="50" />
+      <circle cx="1300" cy="750" r="50" />
+      <circle cx="1800" cy="750" r="50" />
+      <circle cx="2300" cy="750" r="50" />
+      <circle cx="550" cy="1000" r="50" />
+      <circle cx="1050" cy="1000" r="50" />
+      <circle cx="1550" cy="1000" r="50" />
+      <circle cx="2050" cy="1000" r="50" />
+      <circle cx="300" cy="1250" r="50" />
+      <circle cx="800" cy="1250" r="50" />
+      <circle cx="1300" cy="1250" r="50" />
+      <circle cx="1800" cy="1250" r="50" />
+      <circle cx="2300" cy="1250" r="50" />
+    </g>
+  </svg>
+)
+
+export function Header() {
+  const { lang, setLang, t } = useTranslation()
+  const { data: ws } = useWorkspace()
+  const router = useRouter()
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  
+  const [searchQuery, setSearchQuery] = useState('')
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [quickAddOpen, setQuickAddOpen] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(2) // Mock count
+
+  // Handle Command + K / Ctrl + K shortcut
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
+  function handleSearchSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+    }
+  }
+
+  return (
+    <>
+      <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md transition-all duration-300">
+        
+        {/* Sol Taraf: Neon Logo ve Marka */}
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+            <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
+          </div>
+          <div className="hidden flex-col md:flex">
+            <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-xs font-black tracking-tight text-transparent">
+              Network Marketing Master
+            </span>
+            <span className="text-[8px] font-bold tracking-[0.2em] text-[var(--text-3)] uppercase">
+              {t('common.operatingSystem')}
+            </span>
+          </div>
+        </div>
+
+        {/* Orta Taraf: Google-Style Arama Barı */}
+        <form onSubmit={handleSearchSubmit} className="mx-4 flex max-w-md flex-1 items-center">
+          <div className="relative w-full">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('common.searchPlaceholder')}
+              className="h-10 w-full rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] pl-10 pr-12 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition-[border-color,box-shadow] focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
+            />
+            <kbd className="absolute right-3.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--text-3)] sm:inline-block">
+              ⌘K
+            </kbd>
+          </div>
+        </form>
+
+        {/* Sağ Taraf Buton Grubu */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
+          
+          {/* Kıvılcım (Hızlı Aday Ekleme) Butonu */}
+          <button
+            onClick={() => setQuickAddOpen(true)}
+            title={t('common.sparkButtonTooltip')}
+            className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 border border-cyan-100 hover:bg-cyan-100 hover:text-cyan-700 dark:bg-cyan-950/20 dark:text-cyan-400 dark:border-cyan-950/40 dark:hover:bg-cyan-950/40 transition-colors shadow-sm shrink-0"
+          >
+            <Zap className="h-4.5 w-4.5 fill-current animate-pulse" />
+          </button>
+
+          {/* Tema Butonu */}
+          <div className="shrink-0">
+            <ThemeToggle />
+          </div>
+
+          {/* Dil Switcher Toggle */}
+          <div className="flex h-9 items-center rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] p-1 gap-1 shrink-0">
+            <button
+              onClick={() => setLang('tr')}
+              className={`flex h-7 items-center justify-center rounded-lg px-2 transition-all ${lang === 'tr' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+              title="Türkçe"
+            >
+              <TRFlag />
+            </button>
+            <button
+              onClick={() => setLang('en')}
+              className={`flex h-7 items-center justify-center rounded-lg px-2 transition-all ${lang === 'en' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+              title="English"
+            >
+              <USFlag />
+            </button>
+          </div>
+
+          {/* Bildirim Çanı */}
+          <button
+            onClick={() => setNotificationsOpen(true)}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-2)] transition-colors hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] shrink-0"
+            title={t('common.notifications')}
+          >
+            <Bell className="h-4.5 w-4.5" strokeWidth={1.75} />
+            {unreadCount > 0 && (
+              <span className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-black text-white ring-2 ring-[var(--bg-card)] animate-bounce">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
+          {/* Kullanıcı Dropdown */}
+          <div className="shrink-0">
+            <UserMenu />
+          </div>
+
+        </div>
+      </header>
+
+      {/* Modallar */}
+      {notificationsOpen && (
+        <NotificationsModal
+          onClose={() => {
+            setNotificationsOpen(false)
+            setUnreadCount(0) // Read all notifications when modal opened
+          }}
+        />
+      )}
+
+      {quickAddOpen && (
+        <QuickAddModal onClose={() => setQuickAddOpen(false)} />
+      )}
+    </>
+  )
+}

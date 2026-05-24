@@ -8,8 +8,10 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import { StageFilter } from './_components/StageFilter'
 import { CandidateCard } from './_components/CandidateCard'
 import { AddCandidateSheet } from './_components/AddCandidateSheet'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function PipelinePage() {
+  const { lang, t } = useTranslation()
   const [filter, setFilter] = useState<CandidateFilter>('tumü')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -34,39 +36,39 @@ export default function PipelinePage() {
   }
 
   if (wsLoading) return <PageShell><Spinner /></PageShell>
-  if (wsError)   return <PageShell><ErrorMsg msg={`Workspace yüklenemedi: ${(wsError as Error).message}`} /></PageShell>
+  if (wsError)   return <PageShell><ErrorMsg msg={`${t('common.error')}: ${(wsError as Error).message}`} /></PageShell>
 
   return (
     <PageShell>
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-5 flex items-center gap-3 animate-in fade-in duration-300">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] dark:bg-[#0a1f4d]">
           <TrendingUp className="h-5 w-5 text-[#1A56DB] dark:text-[#93c5fd]" strokeWidth={1.75} />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-[var(--text-1)]">Boru Hattı</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>
         </div>
         <button
           onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0]"
+          className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
         >
           <Plus className="h-4 w-4" />
-          Kişi Ekle
+          {t('pipeline.addCandidate')}
         </button>
       </div>
 
       {/* Stat bar */}
-      <div className="mb-5 grid grid-cols-3 gap-3">
-        <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center">
+      <div className="mb-5 grid grid-cols-3 gap-3 animate-in fade-in duration-300 delay-100">
+        <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center border border-[var(--border)]">
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
-          <p className="text-xs text-[var(--text-3)]">Toplam</p>
+          <p className="text-xs text-[var(--text-3)]">{lang === 'en' ? 'Total' : 'Toplam'}</p>
         </div>
-        <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center">
+        <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center border border-[#FAEEDA]/50 dark:bg-[#FAEEDA]/5">
           <p className="text-xl font-bold text-[#854F0B]">{counts.aktif}</p>
-          <p className="text-xs text-[#854F0B]">Aktif</p>
+          <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{lang === 'en' ? 'Active' : 'Aktif'}</p>
         </div>
-        <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center">
+        <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center border border-[#E1F5EE]/50 dark:bg-[#E1F5EE]/5">
           <p className="text-xl font-bold text-[#0F6E56]">{counts.sicak}</p>
-          <p className="text-xs text-[#0F6E56]">Sıcak</p>
+          <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{lang === 'en' ? 'Hot' : 'Sıcak'}</p>
         </div>
       </div>
 
@@ -77,8 +79,8 @@ export default function PipelinePage() {
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          placeholder="İsimle ara..."
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-9 pr-9 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
+          placeholder={t('pipeline.searchCandidate')}
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-9 pr-9 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
         />
         {searchQuery && (
           <button
@@ -94,15 +96,15 @@ export default function PipelinePage() {
 
       <div className="mt-4">
         {isLoading && <Spinner />}
-        {error && <ErrorMsg msg="Adaylar yüklenemedi." />}
+        {error && <ErrorMsg msg={t('common.error')} />}
         {!isLoading && !error && candidates.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-[var(--border)] py-12 text-center">
+          <div className="rounded-2xl border border-dashed border-[var(--border)] py-12 text-center bg-[var(--bg-card)]">
             <p className="text-2xl mb-2">🎯</p>
             <p className="text-sm font-semibold text-[var(--text-1)]">
-              {searchQuery ? 'Arama sonucu bulunamadı' : filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
+              {searchQuery ? t('common.searchNoResults') : filter === 'tumü' ? t('pipeline.noCandidatesTitle') : t('common.searchNoResults')}
             </p>
             <p className="mt-1 text-xs text-[var(--text-3)]">
-              {searchQuery ? 'Farklı bir isim dene' : filter === 'tumü' ? '"Kişi Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
+              {searchQuery ? t('pipeline.noCandidatesDesc') : filter === 'tumü' ? t('pipeline.noCandidatesDesc') : t('pipeline.noCandidatesDesc')}
             </p>
           </div>
         )}
@@ -146,3 +148,4 @@ function ErrorMsg({ msg }: { msg: string }) {
     <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">{msg}</div>
   )
 }
+

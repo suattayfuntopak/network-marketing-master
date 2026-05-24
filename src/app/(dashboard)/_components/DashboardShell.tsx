@@ -3,10 +3,8 @@
 import { useState, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
-import { MobileHeader } from './MobileHeader'
+import { Header } from './Header'
 import { BottomNav } from './BottomNav'
-import { UserMenu } from './UserMenu'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const NAV_ROUTES = ['/pano', '/pipeline', '/yazar', '/itirazlar', '/ekip']
 
@@ -70,6 +68,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
+      <Header />
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
       <div
         className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 [view-transition-name:main-content] ${collapsed ? 'md:ml-[72px]' : 'md:ml-64'}`}
@@ -78,19 +77,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         onTouchEnd={handleTouchEnd}
         onTouchCancel={handleTouchCancel}
       >
-        <MobileHeader />
-        {/* Mobile spacer — clears fixed MobileHeader (~56px tall) */}
-        <div className="block md:hidden h-14" />
-        {/* Desktop spacer — clears fixed ThemeToggle + UserMenu at top-3 (~48px tall) */}
-        <div className="hidden md:block h-14" />
+        {/* Spacer to clear the fixed h-16 Header */}
+        <div className="h-16" />
         {children}
       </div>
       <BottomNav pendingHref={pendingHref} />
-      {/* Theme toggle + user menu — fixed top-right on all screens */}
-      <div className="fixed right-4 top-3 z-50 flex items-center gap-1">
-        <ThemeToggle />
-        <UserMenu />
-      </div>
     </div>
   )
 }
+
