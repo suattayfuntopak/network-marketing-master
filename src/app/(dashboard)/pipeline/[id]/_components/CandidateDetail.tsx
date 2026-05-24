@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory } from '@/hooks/useCandidates'
@@ -15,27 +15,50 @@ import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 
-function suggestedFollowUp(c: NmmCandidate): string | null {
+function suggestedFollowUp(c: NmmCandidate, lang: string): string | null {
   const days = FOLLOW_DAYS[c.stage]
   if (!days) return null
   const base = new Date(c.last_contact_at ?? c.created_at)
   base.setDate(base.getDate() + days)
-  return base.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })
+  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
+  return base.toLocaleDateString(locale, { day: 'numeric', month: 'long' })
 }
 
-function daysSince(iso: string | null): string {
-  if (!iso) return 'Hiç temas yok'
+function daysSince(iso: string | null, lang: string): string {
+  if (!iso) return lang === 'en' ? 'No contact yet' : 'Hiç temas yok'
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000)
-  if (d === 0) return 'Bugün'
-  if (d === 1) return 'Dün'
-  return `${d} gün önce`
+  if (d === 0) return lang === 'en' ? 'Today' : 'Bugün'
+  if (d === 1) return lang === 'en' ? 'Yesterday' : 'Dün'
+  return lang === 'en' ? `${d} days ago` : `${d} gün önce`
 }
 
-function toInputDate(iso: string | null): string {
+function toInputDateTime(iso: string | null): string {
   if (!iso) return ''
-  return iso.slice(0, 10)
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  const pad = (n: number) => n.toString().padStart(2, '0')
+  const YYYY = d.getFullYear()
+  const MM = pad(d.getMonth() + 1)
+  const DD = pad(d.getDate())
+  const hh = pad(d.getHours())
+  const mm = pad(d.getMinutes())
+  return `${YYYY}-${MM}-${DD}T${hh}:${mm}`
+}
+
+function formatFollowUpDate(iso: string | null, lang: string): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
+  return d.toLocaleDateString(locale, {
+    day: 'numeric',
+    month: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
 
 interface Props {
@@ -43,10 +66,12 @@ interface Props {
 }
 
 export function CandidateDetail({ candidateId }: Props) {
+  const { lang, t } = useTranslation()
   const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
   const [stageOpen, setStageOpen] = useState(false)
   const [editingFollowUp, setEditingFollowUp] = useState(false)
+  const [tempFollowUp, setTempFollowUp] = useState<string>('')
   const [confirmOpen, setConfirmOpen] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
@@ -112,8 +137,8 @@ export function CandidateDetail({ candidateId }: Props) {
 
   const waLink = waHref(c.phone)
   const nextFollow = c.next_follow_up_at
-    ? new Date(c.next_follow_up_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })
-    : suggestedFollowUp(c)
+    ? formatFollowUpDate(c.next_follow_up_at, lang)
+    : suggestedFollowUp(c, lang)
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -222,57 +247,6 @@ export function CandidateDetail({ candidateId }: Props) {
           )}
         </div>
 
-        {/* Aşama */}
-        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">Aşama</p>
-          <button
-            onClick={() => setStageOpen(v => !v)}
-            className={clsx(
-              'flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-80',
-              STAGE_COLOR[c.stage]
-            )}
-          >
-            {STAGE_LABEL[c.stage]}
-            <ChevronDown className="h-4 w-4" />
-          </button>
-        </div>
-
-        {/* Takip bilgisi */}
-        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">Takip</p>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <p className="text-xs text-[var(--text-3)]">Son Temas</p>
-              <p className="mt-0.5 text-sm font-semibold text-[var(--text-1)]">{daysSince(c.last_contact_at)}</p>
-            </div>
-            <div>
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-[var(--text-3)]">Sonraki Takip</p>
-                <button
-                  onClick={() => setEditingFollowUp(v => !v)}
-                  className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
-                >
-                  <Pencil className="h-3 w-3" />
-                </button>
-              </div>
-              {editingFollowUp ? (
-                <input
-                  type="date"
-                  defaultValue={toInputDate(c.next_follow_up_at)}
-                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
-                  onChange={e => saveFollowUpDate(e.target.value)}
-                  onBlur={e => saveFollowUpDate(e.target.value)}
-                  autoFocus
-                />
-              ) : (
-                <p className="mt-0.5 text-sm font-semibold text-[#534AB7]">
-                  {nextFollow ?? '—'}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Sunum Materyalleri */}
         <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
           <div>
@@ -346,14 +320,100 @@ export function CandidateDetail({ candidateId }: Props) {
           </div>
         )}
 
-        {/* Sil */}
-        <button
-          onClick={handleDelete}
-          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0] py-3.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
-        >
-          <Trash2 className="h-4 w-4" />
-          Kişiyi Sil
-        </button>
+        {/* Alt Yerleşim Grubu (Aşama, Takip ve Sil Butonları 3'lü Grid) */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          {/* Aşama Card */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+              {t('pipeline.stage')}
+            </p>
+            <button
+              onClick={() => setStageOpen(v => !v)}
+              className={clsx(
+                'mt-2 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-90',
+                STAGE_COLOR[c.stage]
+              )}
+              title={t('pipeline.stage')}
+            >
+              {t(`stages.${c.stage}`)}
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </div>
+
+          {/* Takip Card */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+            <div className="flex items-center justify-between">
+              <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                {t('pipeline.nextContact')}
+              </p>
+              {!editingFollowUp && (
+                <button
+                  onClick={() => {
+                    setEditingFollowUp(true)
+                    setTempFollowUp(toInputDateTime(c.next_follow_up_at))
+                  }}
+                  className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
+                  title={t('common.edit')}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="mt-2 flex-1 flex flex-col justify-end">
+              {editingFollowUp ? (
+                <div className="flex items-center gap-1.5 w-full">
+                  <input
+                    type="datetime-local"
+                    value={tempFollowUp}
+                    onChange={e => setTempFollowUp(e.target.value)}
+                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
+                    autoFocus
+                  />
+                  <button
+                    onClick={() => saveFollowUpDate(tempFollowUp)}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 transition shadow-sm"
+                    title={t('common.save')}
+                  >
+                    <Check className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setEditingFollowUp(false)}
+                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
+                    title={t('common.cancel')}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-baseline justify-between w-full">
+                  <p className="text-sm font-semibold text-[#534AB7] truncate">
+                    {nextFollow ?? '—'}
+                  </p>
+                  <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
+                    ({daysSince(c.last_contact_at, lang)})
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Silme Card */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+              {t('common.delete')}
+            </p>
+            <button
+              onClick={handleDelete}
+              className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] py-2.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+              title={t('common.delete')}
+            >
+              <Trash2 className="h-4 w-4" />
+              {t('common.delete')}
+            </button>
+          </div>
+
+        </div>
       </main>
 
       {editOpen && ws && (
@@ -376,7 +436,7 @@ export function CandidateDetail({ candidateId }: Props) {
           <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={() => setStageOpen(false)} />
           <div className={`fixed bottom-0 left-0 right-0 ${Z.sheet} rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0`}>
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <p className="text-sm font-bold text-[var(--text-1)]">Aşama Seç</p>
+              <p className="text-sm font-bold text-[var(--text-1)]">{lang === 'en' ? 'Select Stage' : 'Aşama Seç'}</p>
               <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
                 <X className="h-4 w-4" />
               </button>

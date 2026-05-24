@@ -6,11 +6,11 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { Zap, Bell, Search } from 'lucide-react'
+import { Zap, Bell, Search, X } from 'lucide-react'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
 
-const TRFlag = () => (
+export const TRFlag = () => (
   <svg viewBox="0 0 1200 800" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">
     <rect width="1200" height="800" fill="#E30A17" />
     <circle cx="400" cy="400" r="200" fill="#fff" />
@@ -19,7 +19,7 @@ const TRFlag = () => (
   </svg>
 )
 
-const USFlag = () => (
+export const USFlag = () => (
   <svg viewBox="0 0 7410 3900" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">
     <rect width="7410" height="3900" fill="#B22234" />
     <path d="M0,300 h7410 M0,900 h7410 M0,1500 h7410 M0,2100 h7410 M0,2700 h7410 M0,3300 h7410" stroke="#fff" strokeWidth="300" />
@@ -63,6 +63,7 @@ export function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
   const [unreadCount, setUnreadCount] = useState(2) // Mock count
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
 
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {
@@ -79,6 +80,7 @@ export function Header() {
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (searchQuery.trim()) {
+      setIsMobileSearchOpen(false)
       router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
     }
   }
@@ -87,6 +89,32 @@ export function Header() {
     <>
       <header className="fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md transition-all duration-300">
         
+        {/* Mobil Tam Ekran Arama Çubuğu Popup */}
+        {isMobileSearchOpen && (
+          <div className="absolute inset-0 z-50 flex items-center bg-[var(--bg-card)] px-4 animate-in fade-in slide-in-from-top duration-200">
+            <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
+              <Search className="h-4.5 w-4.5 text-[var(--text-3)]" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('common.searchPlaceholder')}
+                className="h-10 flex-1 rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-4 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none"
+                autoFocus
+              />
+              <button
+                type="button"
+                onClick={() => setIsMobileSearchOpen(false)}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]"
+                title={t('common.close')}
+              >
+                <X className="h-4.5 w-4.5" />
+              </button>
+            </form>
+          </div>
+        )}
+
         {/* Sol Taraf: Neon Logo ve Marka */}
         <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
@@ -102,8 +130,8 @@ export function Header() {
           </div>
         </div>
 
-        {/* Orta Taraf: Google-Style Arama Barı */}
-        <form onSubmit={handleSearchSubmit} className="mx-4 flex max-w-md flex-1 items-center">
+        {/* Orta Taraf: Google-Style Arama Barı (Masaüstü) */}
+        <form onSubmit={handleSearchSubmit} className="mx-4 hidden md:flex max-w-md flex-1 items-center">
           <div className="relative w-full">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
             <input
@@ -123,6 +151,16 @@ export function Header() {
         {/* Sağ Taraf Buton Grubu */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
           
+          {/* Mobil Arama (Mercek) Butonu */}
+          <button
+            type="button"
+            onClick={() => setIsMobileSearchOpen(true)}
+            className="flex md:hidden h-9 w-9 items-center justify-center rounded-xl text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] shrink-0"
+            title={t('common.search')}
+          >
+            <Search className="h-4.5 w-4.5" />
+          </button>
+
           {/* Kıvılcım (Hızlı Aday Ekleme) Butonu */}
           <button
             onClick={() => setQuickAddOpen(true)}
@@ -133,12 +171,12 @@ export function Header() {
           </button>
 
           {/* Tema Butonu */}
-          <div className="shrink-0">
+          <div className="hidden sm:block shrink-0">
             <ThemeToggle />
           </div>
 
           {/* Dil Switcher Toggle */}
-          <div className="flex h-9 items-center rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] p-1 gap-1 shrink-0">
+          <div className="hidden sm:flex h-9 items-center rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] p-1 gap-1 shrink-0">
             <button
               onClick={() => setLang('tr')}
               className={`flex h-7 items-center justify-center rounded-lg px-2 transition-all ${lang === 'tr' ? 'bg-[var(--bg-card)] border border-[var(--border)] shadow-sm' : 'opacity-50 hover:opacity-100'}`}

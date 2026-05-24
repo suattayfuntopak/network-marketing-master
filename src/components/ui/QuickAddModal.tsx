@@ -70,6 +70,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
             </div>
             <div>
               <h2 className="text-base font-bold text-[var(--text-1)]">{t('common.quickAddTitle')}</h2>
+              <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{t('common.quickAddSubtitle')}</p>
             </div>
           </div>
           <button

@@ -32,6 +32,7 @@ export const tr = {
     logout: "Çıkış Yap",
     sparkButtonTooltip: "Hızlı Aday Ekle",
     quickAddTitle: "Hızlı Aday Ekle",
+    quickAddSubtitle: "Hızlıca ekle, sonra düzenle.",
     quickAddNamePlaceholder: "Adayın Adı Soyadı",
     quickAddInfoPlaceholder: "Ekstra bilgi, telefon veya not (Opsiyonel)",
     quickAddSuccess: "Aday başarıyla 'Yeni Aday' olarak eklendi!",
