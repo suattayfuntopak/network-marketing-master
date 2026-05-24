@@ -218,9 +218,9 @@ export function EkipPanel() {
       <div className="grid gap-4 md:grid-cols-2">
         {/* Lider Davet Kodu Üretici */}
         {isLeader && (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB]">
                 <UserPlus className="h-5 w-5" />
               </div>
               <h3 className="text-sm font-bold text-[var(--text-1)]">Ekip Arkadaşı Davet Et</h3>
@@ -228,7 +228,7 @@ export function EkipPanel() {
             <p className="text-xs text-[var(--text-2)] leading-relaxed">
               Ekip üyelerinizin uygulamaya kendi hesaplarıyla üye olmasını sağlayın. Ardından aşağıdaki kodu "Ekibim" sayfasından girerek ekibinize dahil olmalarını isteyin.
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2 overflow-hidden">
               <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-xs text-[var(--text-1)]">
                 {ws?.workspaceId}
               </div>
@@ -241,7 +241,7 @@ export function EkipPanel() {
               </button>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.workspaceId}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!`
+                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.workspaceId}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe aninda katılabilirsin!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -256,9 +256,9 @@ export function EkipPanel() {
 
         {/* Solo Lider veya normal üyeler için "Bir Ekibe Katıl" kutusu */}
         {(isSolo || !isLeader) && (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56]">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56]">
                 <LogIn className="h-5 w-5" />
               </div>
               <h3 className="text-sm font-bold text-[var(--text-1)]">Bir Liderin Ekibine Katıl</h3>
@@ -266,7 +266,7 @@ export function EkipPanel() {
             <p className="text-xs text-[var(--text-2)] leading-relaxed">
               Liderinizin sizinle paylaştığı davet kodunu aşağıya girerek onun çalışma alanına dahil olun. Mevcut tüm aday verileriniz otomatik olarak bu ekibe aktarılacaktır.
             </p>
-            <form onSubmit={handleJoinWorkspace} className="flex gap-2">
+            <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-2 overflow-hidden">
               <input
                 type="text"
                 required
@@ -289,13 +289,10 @@ export function EkipPanel() {
 
       {/* 3. Detaylı Ekip Listesi & Performans Analizi */}
       <section className="space-y-3">
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
-            <BarChart2 className="h-4 w-4" />
-            Ekip Performans Paneli
-          </h2>
-          <span className="text-[10px] text-[var(--text-3)]">Aday aşamalarına göre dağılım</span>
-        </div>
+        <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
+          <BarChart2 className="h-4 w-4" />
+          Ekip Performans Paneli
+        </h2>
 
         <ul className="space-y-3">
           {members.map(m => {

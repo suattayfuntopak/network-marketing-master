@@ -88,13 +88,13 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       const path = `avatars/${userId}.${ext}`
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('nmm-avatars')
         .upload(path, file, { upsert: true, contentType: file.type })
 
       if (uploadError) throw uploadError
 
       const { data: { publicUrl } } = supabase.storage
-        .from('avatars')
+        .from('nmm-avatars')
         .getPublicUrl(path)
 
       // Save to auth metadata
