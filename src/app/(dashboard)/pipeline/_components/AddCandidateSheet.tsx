@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/stages'
 import { Z } from '@/lib/zIndex'
+import { PHONE_RE } from '@/lib/validation'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -13,8 +14,6 @@ interface AddCandidateSheetProps {
   workspaceId: string
   onClose: () => void
 }
-
-const PHONE_RE = /^(\+90|0)5\d{9}$/
 
 export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetProps) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -72,9 +71,9 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
           </div>
           <div>
             <label className={labelClass} htmlFor="note">
-              Not <span className="font-normal text-[var(--text-3)]">(max 500 karakter)</span>
+              Not <span className="font-normal text-[var(--text-3)]">(max 1000 karakter)</span>
             </label>
-            <textarea id="note" name="note" rows={2} maxLength={500} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="note" name="note" rows={2} maxLength={1000} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           {add.isError && (
             <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">Kişi eklenemedi. Tekrar dene.</p>

@@ -8,8 +8,7 @@ import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/zIndex'
-
-const PHONE_RE = /^(\+90|0)5\d{9}$/
+import { PHONE_RE } from '@/lib/validation'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -92,9 +91,9 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-note">
-              Not <span className="font-normal text-[var(--text-3)]">(max 500 karakter)</span>
+              Not <span className="font-normal text-[var(--text-3)]">(max 1000 karakter)</span>
             </label>
-            <textarea id="edit-note" name="note" rows={3} maxLength={500} defaultValue={candidate.note ?? ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={candidate.note ?? ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           <div className="flex gap-3 pt-1">
             <button type="submit" disabled={update.isPending} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">

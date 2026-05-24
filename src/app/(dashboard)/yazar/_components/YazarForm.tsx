@@ -219,7 +219,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
             id="context"
             name="context"
             rows={2}
-            maxLength={500}
+            maxLength={1000}
             defaultValue={initialNote}
             placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
             className={`${inputClass} resize-none`}

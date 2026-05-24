@@ -47,3 +47,29 @@ body {
   from { stroke-dashoffset: 0; }
   to   { stroke-dashoffset: 88; }
 }
+
+/* ── View transitions — page navigation ── */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) { animation: 160ms ease-in both vt-fade-out; }
+  ::view-transition-new(root) { animation: 220ms ease-out 60ms both vt-fade-in; }
+
+  html[data-nav-dir="forward"] ::view-transition-old(root) { animation: 160ms ease-in both vt-slide-left-out; }
+  html[data-nav-dir="forward"] ::view-transition-new(root) { animation: 240ms ease-out 60ms both vt-slide-left-in; }
+
+  html[data-nav-dir="back"] ::view-transition-old(root) { animation: 160ms ease-in both vt-slide-right-out; }
+  html[data-nav-dir="back"] ::view-transition-new(root) { animation: 240ms ease-out 60ms both vt-slide-right-in; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*), ::view-transition-new(*), ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+@keyframes vt-fade-out      { to   { opacity: 0; } }
+@keyframes vt-fade-in       { from { opacity: 0; } }
+@keyframes vt-slide-left-out  { to   { opacity: 0; transform: translateX(-24px); } }
+@keyframes vt-slide-left-in   { from { opacity: 0; transform: translateX(24px); } }
+@keyframes vt-slide-right-out { to   { opacity: 0; transform: translateX(24px); } }
+@keyframes vt-slide-right-in  { from { opacity: 0; transform: translateX(-24px); } }
