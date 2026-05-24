@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import { MessageCircleQuestion, Search, X, ChevronDown } from 'lucide-react'
+import { useState, useMemo, useEffect } from 'react'
+import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Itiraz {
   id: number
@@ -45,7 +46,6 @@ const ITIRAZLAR: Itiraz[] = [
       'Network marketing\'de piyasanın doygunluğu yoktur — çünkü insanlar sürekli değişiyor, tüketim devam ediyor. McDonald\'s\'ın 1955\'te açılan franchise\'ının geç kalındığı söylenseydi, bugün yüz binlerce şube olmazdı. Sıra sende: sen de "erken kalan" biri olabilirsin.',
     emoji: '⏰',
   },
-
   // — Zaman —
   {
     id: 5,
@@ -63,7 +63,6 @@ const ITIRAZLAR: Itiraz[] = [
       'Bunu anlıyorum ve saygı duyuyorum. Belki de şu an değil, ama bu konuşmayı aklının bir köşesine koy. Çok zor dönemler geçer — ve çıkışı kolaylaştıracak bir ek gelir kaynağı tam da bu dönemde anlam kazanır. Hazır olduğunda buradayım.',
     emoji: '🤝',
   },
-
   // — Güven / Şüphe —
   {
     id: 7,
@@ -97,7 +96,6 @@ const ITIRAZLAR: Itiraz[] = [
       'Dürüst olmak gerekirse: evet, bir kazancım olacak — ama bu ancak sen de kazanırsan sürdürülebilir. Senin başarın benim başarım. İstersen rakamları ve komisyon yapısını şeffaf biçimde göstereyim, hiçbir şey gizli değil.',
     emoji: '🪞',
   },
-
   // — Yetenek / Kimlik —
   {
     id: 11,
@@ -123,7 +121,6 @@ const ITIRAZLAR: Itiraz[] = [
       'Bu iş üniversite diploması değil, öğrenme isteği ister. Başlarken yanında bir mentor, bir sistem ve adım adım eğitim materyali olacak. Hiçbir şey bilmeden başlayan, bugün lider olan yüzlerce kişi var.',
     emoji: '📚',
   },
-
   // — Aile / Çevre —
   {
     id: 14,
@@ -141,7 +138,6 @@ const ITIRAZLAR: Itiraz[] = [
       'İlk çevren her zaman en zor gruptur — çünkü seni "eski sen" olarak tanıyorlar. Bu iş sadece yakın çevrenle değil, tüm insanlarla yapılır. Ağını genişletmek için yöntemler var; adım adım öğrenirsin.',
     emoji: '🌐',
   },
-
   // — Ürün / Sistem —
   {
     id: 16,
@@ -167,7 +163,6 @@ const ITIRAZLAR: Itiraz[] = [
       'Evet, rekabet var — ve bu olgunlaşmış bir pazarın işareti. Soru şu: hangi şirket daha güçlü sisteme, daha iyi ürüne ve sana daha iyi destek veren bir ekibe sahip? Bunu beraber karşılaştıralım.',
     emoji: '⚖️',
   },
-
   // — Genel —
   {
     id: 19,
@@ -187,25 +182,67 @@ const ITIRAZLAR: Itiraz[] = [
   },
 ]
 
-const KATEGORILER = ['Tümü', ...Array.from(new Set(ITIRAZLAR.map(i => i.kategori)))]
+const FAV_KEY = 'nmm_itiraz_favori'
+const KATEGORILER = ['Tümü', 'Favoriler', ...Array.from(new Set(ITIRAZLAR.map(i => i.kategori)))]
+
+function loadFavs(): Set<number> {
+  if (typeof window === 'undefined') return new Set()
+  try {
+    const raw = localStorage.getItem(FAV_KEY)
+    return raw ? new Set(JSON.parse(raw) as number[]) : new Set()
+  } catch { return new Set() }
+}
+
+function saveFavs(favs: Set<number>) {
+  localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs)))
+}
 
 export default function ItirazlarPage() {
   const [search, setSearch] = useState('')
   const [acikId, setAcikId] = useState<number | null>(null)
   const [aktifKategori, setAktifKategori] = useState('Tümü')
+  const [favs, setFavs] = useState<Set<number>>(new Set())
+  const [copiedId, setCopiedId] = useState<number | null>(null)
 
-  const filtrelenmis = useMemo(() => {
-    const q = search.toLowerCase().trim()
-    return ITIRAZLAR.filter(i => {
-      const kategoriEslesti = aktifKategori === 'Tümü' || i.kategori === aktifKategori
-      const aramaEslesti = !q || i.soru.toLowerCase().includes(q) || i.cevap.toLowerCase().includes(q)
-      return kategoriEslesti && aramaEslesti
+  useEffect(() => { setFavs(loadFavs()) }, [])
+
+  function toggleFav(id: number, e: React.MouseEvent) {
+    e.stopPropagation()
+    setFavs(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      saveFavs(next)
+      return next
     })
-  }, [search, aktifKategori])
+  }
+
+  async function copyCevap(cevap: string, id: number, e: React.MouseEvent) {
+    e.stopPropagation()
+    try {
+      await navigator.clipboard.writeText(cevap)
+      setCopiedId(id)
+      toast.success('Cevap kopyalandı!')
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch {
+      toast.error('Kopyalama başarısız')
+    }
+  }
 
   function toggle(id: number) {
     setAcikId(prev => (prev === id ? null : id))
   }
+
+  const filtrelenmis = useMemo(() => {
+    const q = search.toLowerCase().trim()
+    return ITIRAZLAR.filter(i => {
+      if (aktifKategori === 'Favoriler') return favs.has(i.id)
+      const kategoriEslesti = aktifKategori === 'Tümü' || i.kategori === aktifKategori
+      const aramaEslesti = !q || i.soru.toLowerCase().includes(q) || i.cevap.toLowerCase().includes(q)
+      return kategoriEslesti && aramaEslesti
+    })
+  }, [search, aktifKategori, favs])
+
+  const favCount = favs.size
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -220,17 +257,21 @@ export default function ItirazlarPage() {
             <p className="text-sm text-[var(--text-3)]">Sahadaki en sık sorulara hazır cevaplar</p>
           </div>
         </div>
-        {/* İstatistik */}
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
           <span className="text-2xl">🛡️</span>
-          <div>
+          <div className="flex-1">
             <p className="text-xs font-semibold text-[#9B1D47] dark:text-[#fda4af]">
-              {ITIRAZLAR.length} itiraz · {KATEGORILER.length - 1} kategori
+              {ITIRAZLAR.length} itiraz · {KATEGORILER.length - 2} kategori
             </p>
             <p className="text-[11px] text-[#9B1D47]/70 dark:text-[#fda4af]/70">
-              Hazır cevabın olsun, sahada kaybolma
+              ⭐ ile sabitle, 📋 ile kopyala, sahada kaybolma
             </p>
           </div>
+          {favCount > 0 && (
+            <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
+              {favCount} favori
+            </span>
+          )}
         </div>
       </header>
 
@@ -260,13 +301,19 @@ export default function ItirazlarPage() {
           <button
             key={k}
             onClick={() => setAktifKategori(k)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
               aktifKategori === k
                 ? 'bg-[#9B1D47] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
                 : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#9B1D47] dark:hover:border-[#fda4af]'
             }`}
           >
+            {k === 'Favoriler' && <Star className="h-3 w-3" />}
             {k}
+            {k === 'Favoriler' && favCount > 0 && (
+              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === k ? 'bg-white/20' : 'bg-[#9B1D47]/10 text-[#9B1D47] dark:text-[#fda4af]'}`}>
+                {favCount}
+              </span>
+            )}
           </button>
         ))}
       </div>
@@ -278,8 +325,17 @@ export default function ItirazlarPage() {
         </p>
       )}
 
+      {/* Favoriler boş uyarısı */}
+      {aktifKategori === 'Favoriler' && favCount === 0 && (
+        <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
+          <p className="mb-2 text-3xl">⭐</p>
+          <p className="text-sm font-semibold text-[var(--text-1)]">Henüz favori yok</p>
+          <p className="mt-1 text-xs text-[var(--text-2)]">İtirazların yanındaki ⭐ ile sabitleyebilirsin</p>
+        </div>
+      )}
+
       {/* İtiraz listesi */}
-      {filtrelenmis.length === 0 ? (
+      {filtrelenmis.length === 0 && !(aktifKategori === 'Favoriler' && favCount === 0) ? (
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">🔍</p>
           <p className="text-sm font-semibold text-[var(--text-1)]">Eşleşen itiraz bulunamadı</p>
@@ -289,18 +345,22 @@ export default function ItirazlarPage() {
         <ul className="space-y-3">
           {filtrelenmis.map(itiraz => {
             const acik = acikId === itiraz.id
+            const isFav = favs.has(itiraz.id)
+            const copied = copiedId === itiraz.id
             return (
               <li key={itiraz.id}>
-                <button
-                  onClick={() => toggle(itiraz.id)}
-                  className={`w-full text-left rounded-2xl border transition-all duration-200 ${
+                <div
+                  className={`rounded-2xl border transition-all duration-200 ${
                     acik
                       ? 'border-[#9B1D47]/30 dark:border-[#fda4af]/30 bg-[var(--bg-card)] shadow-md'
                       : 'border-[var(--border)] bg-[var(--bg-card)] hover:border-[#9B1D47]/30 dark:hover:border-[#fda4af]/30 hover:shadow-sm'
                   }`}
                 >
                   {/* Başlık satırı */}
-                  <div className="flex items-center gap-3 p-4">
+                  <button
+                    onClick={() => toggle(itiraz.id)}
+                    className="flex w-full items-center gap-3 p-4 text-left"
+                  >
                     <span className="shrink-0 text-xl leading-none">{itiraz.emoji}</span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9B1D47] dark:text-[#fda4af] mb-0.5">
@@ -310,11 +370,23 @@ export default function ItirazlarPage() {
                         "{itiraz.soru}"
                       </p>
                     </div>
+                    {/* Favori butonu */}
+                    <button
+                      onClick={e => toggleFav(itiraz.id, e)}
+                      title={isFav ? 'Favorilerden çıkar' : 'Favorilere ekle'}
+                      className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
+                        isFav
+                          ? 'bg-[#9B1D47]/10 text-[#9B1D47] dark:bg-[#fda4af]/10 dark:text-[#fda4af]'
+                          : 'text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af]'
+                      }`}
+                    >
+                      <Star className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
+                    </button>
                     <ChevronDown
                       className={`h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform duration-200 ${acik ? 'rotate-180' : ''}`}
                       strokeWidth={2}
                     />
-                  </div>
+                  </button>
 
                   {/* Cevap — açılır panel */}
                   {acik && (
@@ -323,13 +395,27 @@ export default function ItirazlarPage() {
                         <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF1F3] dark:bg-[#3d0a1a]">
                           <span className="text-[10px]">💡</span>
                         </div>
-                        <p className="text-sm leading-relaxed text-[var(--text-2)]">
+                        <p className="flex-1 text-sm leading-relaxed text-[var(--text-2)]">
                           {itiraz.cevap}
                         </p>
                       </div>
+                      {/* Kopyala butonu */}
+                      <button
+                        onClick={e => copyCevap(itiraz.cevap, itiraz.id, e)}
+                        className={`mt-3 ml-7 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                          copied
+                            ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
+                            : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#FFF1F3] hover:text-[#9B1D47] dark:hover:bg-[#3d0a1a] dark:hover:text-[#fda4af]'
+                        }`}
+                      >
+                        {copied
+                          ? <><Check className="h-3 w-3" /> Kopyalandı!</>
+                          : <><Copy className="h-3 w-3" /> Cevabı Kopyala</>
+                        }
+                      </button>
                     </div>
                   )}
-                </button>
+                </div>
               </li>
             )
           })}

@@ -8,7 +8,7 @@ import { BottomNav } from './BottomNav'
 import { UserMenu } from './UserMenu'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
-const NAV_ROUTES = ['/pano', '/pipeline', '/yazar', '/ekip']
+const NAV_ROUTES = ['/pano', '/pipeline', '/yazar', '/itirazlar', '/ekip']
 
 function getRouteIndex(pathname: string) {
   return NAV_ROUTES.findIndex(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))

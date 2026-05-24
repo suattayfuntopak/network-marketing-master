@@ -23,6 +23,16 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Network Marketing Master",
   description: "Ağ pazarlaması takip uygulaması",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "NMM",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "theme-color": "#534AB7",
+  },
 };
 
 export default function RootLayout({

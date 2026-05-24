@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { BookOpen, ChevronDown, Clock, Star } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { BookOpen, ChevronDown, Clock, Star, CheckCircle2, Circle } from 'lucide-react'
 
 interface Konu {
   id: string
@@ -227,12 +227,42 @@ const SEVIYE_RENK: Record<string, string> = {
   'İleri': 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
 }
 
+const READ_KEY = 'nmm_egitim_read'
+
+function loadRead(): Set<string> {
+  if (typeof window === 'undefined') return new Set()
+  try {
+    const raw = localStorage.getItem(READ_KEY)
+    return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
+  } catch { return new Set() }
+}
+
+function saveRead(read: Set<string>) {
+  localStorage.setItem(READ_KEY, JSON.stringify(Array.from(read)))
+}
+
 export default function EgitimPage() {
   const [acikKonu, setAcikKonu] = useState<string | null>(null)
+  const [read, setRead] = useState<Set<string>>(new Set())
+
+  useEffect(() => { setRead(loadRead()) }, [])
 
   function toggle(id: string) {
     setAcikKonu(prev => (prev === id ? null : id))
   }
+
+  function toggleRead(id: string, e: React.MouseEvent) {
+    e.stopPropagation()
+    setRead(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      saveRead(next)
+      return next
+    })
+  }
+
+  const toplamKonu = KATEGORILER.reduce((s, k) => s + k.konular.length, 0)
+  const okunanKonu = read.size
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -260,7 +290,7 @@ export default function EgitimPage() {
             <div className="flex items-center gap-1.5">
               <Clock className="h-3.5 w-3.5 text-[#3730A3] dark:text-[#a5b4fc]" />
               <span className="text-[11px] font-medium text-[#3730A3] dark:text-[#a5b4fc]">
-                {KATEGORILER.reduce((s, k) => s + k.konular.length, 0)} konu
+                {toplamKonu} konu
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -269,6 +299,14 @@ export default function EgitimPage() {
                 {KATEGORILER.length} kategori
               </span>
             </div>
+            {okunanKonu > 0 && (
+              <div className="ml-auto flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+                  {okunanKonu}/{toplamKonu} okundu
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -290,25 +328,31 @@ export default function EgitimPage() {
             <ul className="space-y-2 pl-1">
               {kategori.konular.map(konu => {
                 const acik = acikKonu === konu.id
+                const okundu = read.has(konu.id)
                 return (
                   <li key={konu.id}>
-                    <button
-                      onClick={() => toggle(konu.id)}
-                      className={`w-full text-left rounded-2xl border transition-all duration-200 ${
+                    <div
+                      className={`rounded-2xl border transition-all duration-200 ${
                         acik
                           ? 'border-[#3730A3]/20 dark:border-[#a5b4fc]/20 bg-[var(--bg-card)] shadow-md'
                           : 'border-[var(--border)] bg-[var(--bg-card)] hover:shadow-sm hover:border-[#3730A3]/20 dark:hover:border-[#a5b4fc]/20'
                       }`}
                     >
                       {/* Konu başlık satırı */}
-                      <div className="flex items-center gap-3 p-3.5">
-                        <span className="text-lg leading-none shrink-0">{konu.emoji}</span>
+                      <button
+                        onClick={() => toggle(konu.id)}
+                        className="flex w-full items-center gap-3 p-3.5 text-left"
+                      >
+                        <span className={`text-lg leading-none shrink-0 transition-all ${okundu ? 'opacity-50' : ''}`}>{konu.emoji}</span>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
-                            <p className="text-sm font-semibold text-[var(--text-1)]">{konu.baslik}</p>
+                            <p className={`text-sm font-semibold leading-tight ${okundu ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>{konu.baslik}</p>
                             <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${SEVIYE_RENK[konu.seviye]}`}>
                               {konu.seviye}
                             </span>
+                            {okundu && (
+                              <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/30 px-2 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">Okundu</span>
+                            )}
                           </div>
                           <div className="flex items-center gap-2">
                             <Clock className="h-3 w-3 text-[var(--text-3)]" />
@@ -317,11 +361,26 @@ export default function EgitimPage() {
                             <span className="text-[11px] text-[var(--text-3)]">{konu.ozet}</span>
                           </div>
                         </div>
+                        {/* Okundu toggle */}
+                        <button
+                          onClick={e => toggleRead(konu.id, e)}
+                          title={okundu ? 'Okunmadı olarak işaretle' : 'Okundu olarak işaretle'}
+                          className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
+                            okundu
+                              ? 'text-emerald-600 dark:text-emerald-400'
+                              : 'text-[var(--text-3)] hover:text-emerald-600 dark:hover:text-emerald-400'
+                          }`}
+                        >
+                          {okundu
+                            ? <CheckCircle2 className="h-5 w-5" />
+                            : <Circle className="h-5 w-5" />
+                          }
+                        </button>
                         <ChevronDown
                           className={`h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform duration-200 ${acik ? 'rotate-180' : ''}`}
                           strokeWidth={2}
                         />
-                      </div>
+                      </button>
 
                       {/* Açık içerik */}
                       {acik && (
@@ -338,7 +397,7 @@ export default function EgitimPage() {
                           </ul>
                         </div>
                       )}
-                    </button>
+                    </div>
                   </li>
                 )
               })}

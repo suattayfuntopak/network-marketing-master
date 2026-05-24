@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, ExternalLink } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory } from '@/hooks/useCandidates'
@@ -246,6 +246,40 @@ export function CandidateDetail({ candidateId }: Props) {
               )}
             </div>
           </div>
+        </div>
+
+        {/* Sunum Materyalleri */}
+        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+            <Presentation className="h-3.5 w-3.5" />
+            Sunum Materyalleri
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { emoji: '🎬', baslik: 'Video Tanıtım', aciklama: '2 dakikalık fırsat özeti', renk: 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc]', href: '#' },
+              { emoji: '📋', baslik: 'Ürün Kataloğu', aciklama: 'Ürün yelpazesi ve fiyatlar', renk: 'bg-[#E1F5EE] dark:bg-[#0d3d2e] text-[#0F6E56] dark:text-[#4ade80]', href: '#' },
+              { emoji: '💰', baslik: 'Kazanç Planı', aciklama: 'Komisyon yapısı detayları', renk: 'bg-[#FAEEDA] dark:bg-[#3a2200] text-[#854F0B] dark:text-[#fbbf24]', href: '#' },
+              { emoji: '🏆', baslik: 'Başarı Hikayeleri', aciklama: 'Gerçek kişi deneyimleri', renk: 'bg-[#FFF1F3] dark:bg-[#3d0a1a] text-[#9B1D47] dark:text-[#fda4af]', href: '#' },
+            ].map(m => (
+              <a
+                key={m.baslik}
+                href={m.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-start gap-2.5 rounded-2xl p-3 transition hover:opacity-85 active:scale-[0.98] ${m.renk}`}
+              >
+                <span className="text-xl leading-none shrink-0">{m.emoji}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-bold leading-tight">{m.baslik}</p>
+                  <p className="mt-0.5 text-[10px] opacity-70 leading-tight">{m.aciklama}</p>
+                </div>
+                <ExternalLink className="h-3 w-3 shrink-0 mt-0.5 opacity-60" />
+              </a>
+            ))}
+          </div>
+          <p className="mt-3 text-[10px] text-[var(--text-3)] text-center">
+            Bağlantıları düzenlemek için profil ayarlarına gidin
+          </p>
         </div>
 
         {/* Aktivite Geçmişi */}

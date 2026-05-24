@@ -1,6 +1,54 @@
 # Hot Log
 
+## 2026-05-24 — Walkthrough Önerileri + Sunum Materyalleri
+
+### feat: İtirazlara Cevap — Favori Sabitleme + Kopyala Butonu
+
+- Yıldız ikonu ile itirazlar favorilere sabitlenebilir (`localStorage`)
+- "Favoriler" kategori filtresi eklendi, aktif favori sayısı chip'te görünür
+- Açık kart içinde "Cevabı Kopyala" butonu → clipboard + toast + 2sn onay animasyonu
+- Hero kutusunda favori sayacı göstergesi
+
+### feat: Vaktin Varsa — Okundu İşareti + İlerleme Sayacı
+
+- Her konunun sağında daire/check ikonu ile "Okundu" işaretleme (`localStorage`)
+- Okundu konular: üstü çizili başlık, soluk emoji, yeşil "Okundu" rozeti
+- Hero kutusunda `X/11 okundu` ilerleme sayacı (emerald renk)
+- Tüm durum sıfır backend maliyetiyle localStorage'da
+
+### feat: BottomNav — İtirazlara Cevap eklendi (5 item)
+
+- Takvim çıkartıldı, yerine İtirazlara Cevap (`/itirazlar`) eklendi
+- Sahada en pratik sayfa artık mobil çubuğunda
+- `DashboardShell` `NAV_ROUTES`'a `/itirazlar` eklendi — swipe ile geçiş çalışıyor
+
+### feat: Kişi Detay Sayfası — Sunum Materyalleri bölümü
+
+- Her adayın şahsi sayfasında "Sunum Materyalleri" bölümü eklendi
+- 2x2 grid: Video Tanıtım, Ürün Kataloğu, Kazanç Planı, Başarı Hikayeleri
+- Her materyal renkli pastel kart + external link ikonu
+- Linkler şimdilik `#` — ileride profil ayarlarından özelleştirilebilir
+
+### feat: PWA Manifest
+
+- `public/manifest.json` oluşturuldu: standalone mod, NMM tema (#534AB7), 3 shortcut
+- `layout.tsx` metadata: `manifest`, `appleWebApp`, `theme-color` eklendi
+- "Ana Ekrana Ekle" ile native uygulama deneyimi
+
+---
+
+
+
+### fix: TakvimClient `toKey()` UTC → yerel saat dilimi
+
+**Sorun:** `toKey(d)` içinde `d.toISOString().slice(0, 10)` kullanılıyordu. `toISOString()` tarihi UTC'ye çevirir; Türkiye +03:00 offset'inde gece 00:00–02:59 arası tıklamada tarih bir gün geri kayıyordu. Takvim grid tıklaması doğru aday gösterirken "Önümüzdeki 7 Gün" bölümü bir gün ileriden başlıyordu.
+
+**Çözüm:** `getFullYear() / getMonth() / getDate()` ile yerel bileşenlerden `YYYY-MM-DD` üretildi. Tüm `toKey()` çağrıları tek fonksiyon üzerinden geçtiğinden tek satır değişiklik tüm takvimi düzeltti.
+
+---
+
 ## 2026-05-24 — Pano Genişletme & Ekibim Fix
+
 
 ### feat: Pano 6 → 8 kare, grid 2×4
 

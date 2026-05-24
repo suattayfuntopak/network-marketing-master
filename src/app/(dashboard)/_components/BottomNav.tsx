@@ -1,15 +1,16 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, Bot, Users } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bot, Users, MessageCircleQuestion } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 
 const NAV_ITEMS = [
-  { href: '/pano',     label: 'Pano',           icon: LayoutDashboard },
-  { href: '/pipeline', label: 'Boru Hattı',     icon: TrendingUp      },
-  { href: '/yazar',    label: 'YZ Mesajı Üret', icon: Bot             },
-  { href: '/ekip',     label: 'Ekibim',         icon: Users           },
+  { href: '/pano',      label: 'Pano',           icon: LayoutDashboard        },
+  { href: '/pipeline',  label: 'Boru Hattı',     icon: TrendingUp             },
+  { href: '/yazar',     label: 'YZ Mesajı',      icon: Bot                    },
+  { href: '/itirazlar', label: 'İtirazlar',      icon: MessageCircleQuestion  },
+  { href: '/ekip',      label: 'Ekibim',         icon: Users                  },
 ]
 
 interface BottomNavProps {

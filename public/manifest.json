@@ -1,0 +1,42 @@
+{
+  "name": "Network Marketing Master",
+  "short_name": "NMM",
+  "description": "Network marketing ekibini yönet, adaylarını takip et, YZ destekli mesajlar üret.",
+  "start_url": "/pano",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#534AB7",
+  "orientation": "portrait-primary",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bugün İlgilen",
+      "url": "/bugun/ilgilen",
+      "description": "Bugün takip edilecek adaylar"
+    },
+    {
+      "name": "Boru Hattı",
+      "url": "/pipeline",
+      "description": "Tüm adayları görüntüle"
+    },
+    {
+      "name": "İtirazlara Cevap",
+      "url": "/itirazlar",
+      "description": "Sahadaki itirazlara hazır cevaplar"
+    }
+  ]
+}
