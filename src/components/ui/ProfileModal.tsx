@@ -138,6 +138,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
           .update({ full_name: fullName.trim() })
           .eq('user_id', user.id)
         if (memberError) throw memberError
+        await supabase.auth.updateUser({ data: { full_name: fullName.trim() } })
       }
 
       if (email !== user.email) {

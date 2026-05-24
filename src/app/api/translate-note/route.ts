@@ -17,22 +17,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ translated: text ?? '' })
   }
 
-  const response = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 512,
-    messages: [
-      {
-        role: 'user',
-        content: `Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks:\n\n${text}`,
-      },
-    ],
-  })
+  try {
+    const response = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 512,
+      messages: [
+        {
+          role: 'user',
+          content: `Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks:\n\n${text}`,
+        },
+      ],
+    })
 
-  const translated = response.content
-    .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-    .map(b => b.text)
-    .join('')
-    .trim()
+    const translated = response.content
+      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim()
 
-  return NextResponse.json({ translated: translated || text })
+    return NextResponse.json({ translated: translated || text })
+  } catch {
+    return NextResponse.json({ translated: text })
+  }
 }

@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-25 — Canvas Perf, Dead Code, API Errors, full_name Sync (Council #9-12)
+
+### perf: EkipPanel canvas noise — 6000 → 480 draw call/sn (Council #9)
+- `EkipPanel.tsx`: Film grain döngüsü 100 → 8 piksel/frame olarak düşürüldü. Görsel etki korundu, yük %92 azaldı.
+
+### fix: handleIndividualBroadcast dead code kaldırıldı (Council #10)
+- `EkipPanel.tsx`: `memberId` parametresi hiç kullanılmayan `handleIndividualBroadcast` fonksiyonu silindi.
+
+### fix: translate-note API — Anthropic hatası production'a sızıyordu (Council #11)
+- `api/translate-note/route.ts`: Anthropic `client.messages.create()` çağrısı try-catch içine alındı; hata durumunda orijinal metin döndürülür, 500 veya SDK hata mesajı istemciye ulaşmaz.
+
+### fix: full_name senkronizasyonu — workspace member ↔ auth.users (Council #12)
+- `ProfileModal.tsx`: Ad soyad güncellenirken yalnızca `nmm_workspace_members.full_name` yazılıyordu; artık `supabase.auth.updateUser({ data: { full_name } })` ile `auth.users.user_metadata` da güncelleniyor. Yeni workspace oluştururken metadata'daki eski isim artık kalmıyor.
+
 ## 2026-05-25 — Ownership Kontrolü + Swipe Bug Düzeltmesi (Council #6 & #7)
 
 ### fix: generateCoachMessage — candidate ownership doğrulaması (Council #6)

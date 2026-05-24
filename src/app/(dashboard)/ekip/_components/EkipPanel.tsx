@@ -72,12 +72,9 @@ function SpoilerCode({ code }: { code: string }) {
         ctx.fill()
       })
       
-      for (let i = 0; i < 100; i++) {
-        const x = Math.random() * canvas.width
-        const y = Math.random() * canvas.height
-        const size = Math.random() * 1
-        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`
-        ctx.fillRect(x, y, size, size)
+      for (let i = 0; i < 8; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.3})`
+        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1)
       }
       
       animationFrameId = requestAnimationFrame(draw)
@@ -201,12 +198,6 @@ export function EkipPanel() {
   }
 
   function handleGroupBroadcast() {
-    const text = composeBroadcastMessage()
-    if (!text) { toast.error(t('team.broadcastEmpty')); return }
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
-  }
-
-  function handleIndividualBroadcast(memberId: string) {
     const text = composeBroadcastMessage()
     if (!text) { toast.error(t('team.broadcastEmpty')); return }
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
