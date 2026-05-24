@@ -93,7 +93,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
       />
 
       {/* Modal */}
-      <div className={`fixed left-1/2 top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all`}>
+      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all`} style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
