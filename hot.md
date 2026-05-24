@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-05-24 — AI Limit Sunucu Tarafına Taşındı + Lider Notu Modül Yerleşimi
+
+### fix: AI mesaj limiti localStorage'dan DB sayacına taşındı (Council #3)
+- `src/lib/aiUsage.ts` localStorage sayacı yalnızca optimistik UX ipucu olarak kalır; gerçek limit artık sunucuda uygulanır.
+- `database.types.ts`: `ActionType`'a `'ai_generate'` eklendi.
+- `yazar/actions.ts` ve `pipeline/[id]/actions.ts`: Her iki server action'da artık `supabase.auth.getUser()` ile kullanıcı doğrulanır, `nmm_daily_actions`'dan bugünkü `ai_generate` kaydı sayılır; limit aşılırsa `401 + açıklayıcı hata` döndürülür, başarı durumunda `candidate_id: null` ile kayıt eklenir. Super admin (suattayfuntopak@gmail.com) bypass korunur.
+
+### feat: Lider Notu modülü Sunum Materyalleri ile Aktivite Geçmişi arasına taşındı
+- `CandidateDetail.tsx`: 2-kolonlu grid layout kaldırıldı, tek kolon `space-y-4` düzenine geçildi. Lider Notu kartı artık Sunum → Lider Notu → Aktivite Geçmişi sırasıyla yerleşik.
+
 ## 2026-05-24 — Güvenlik: translate-note API Endpoint Auth Koruması
 
 ### fix: /api/translate-note — Kimlik Doğrulama Zorunlu Hale Getirildi

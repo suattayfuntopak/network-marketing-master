@@ -266,13 +266,9 @@ export function CandidateDetail({ candidateId }: Props) {
           </button>
         </div>
 
-        {/* 2-Column Responsive Layout */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start">
-          
-          {/* Sol/Orta Kolon: Birincil Detaylar (Col-span 2) */}
-          <div className="lg:col-span-2 space-y-4">
-            
-            {/* Profil kartı */}
+        <div className="space-y-4">
+
+          {/* Profil kartı */}
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
               <div className="flex items-center gap-4">
                 {profilePhoto ? (
@@ -383,6 +379,93 @@ export function CandidateDetail({ candidateId }: Props) {
                   <span className="text-center leading-tight">{t('pipeline.shareWhatsapp')}</span>
                 </button>
               </div>
+            </div>
+
+            {/* Lider Notu */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300">
+              <button
+                onClick={() => setNotesOpen(!notesOpen)}
+                className="flex w-full items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]">
+                    <StickyNote className="h-4.5 w-4.5" />
+                  </div>
+                  <span className="text-sm font-bold text-[var(--text-1)]">
+                    {lang === 'en' ? 'Leader Note' : 'Lider Notu'}
+                  </span>
+                  {notes.length > 0 && (
+                    <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
+                      {notes.length}
+                    </span>
+                  )}
+                </div>
+                {notesOpen ? (
+                  <ChevronUp className="h-4 w-4 text-[var(--text-3)]" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />
+                )}
+              </button>
+              {notesOpen && (
+                <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                  {notes.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[var(--border)] p-5 text-center text-xs text-[var(--text-3)]">
+                      {lang === 'en' ? 'No leader notes recorded yet. Write your first note below!' : 'Henüz lider notu kaydedilmemiş. İlk notu aşağıdan yazabilirsiniz!'}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
+                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => (
+                          <div
+                            key={n.id}
+                            className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] border border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
+                          >
+                            <p className="whitespace-pre-wrap break-words">{n.note}</p>
+                            <p className="mt-2 text-[9px] font-medium text-[var(--text-3)] tracking-wide">
+                              {new Date(n.created_at).toLocaleDateString(locale, {
+                                day: 'numeric', month: 'short', year: 'numeric',
+                                hour: '2-digit', minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                      {notes.length > 5 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllNotes(!showAllNotes)}
+                          className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline py-1 transition active:scale-95"
+                        >
+                          {showAllNotes
+                            ? (lang === 'en' ? 'Show Less' : 'Kapat')
+                            : (lang === 'en' ? 'Show All' : 'Tümünü Gör')}
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  <div className="border-t border-[var(--border)] pt-4 space-y-3">
+                    <textarea
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      placeholder={lang === 'en' ? `Write a leader note for ${c.full_name}...` : `${c.full_name} için lider notunu yaz...`}
+                      className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                      rows={3}
+                      maxLength={1000}
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        disabled={!newNote.trim() || addNoteMutation.isPending}
+                        onClick={handleSaveNote}
+                        className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                        {lang === 'en' ? 'Save Note' : 'Notu Kaydet'}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Aktivite Geçmişi */}
@@ -512,121 +595,7 @@ export function CandidateDetail({ candidateId }: Props) {
 
             </div>
 
-          </div> {/* End Sol Kolon */}
-
-          {/* Sağ Kolon: Lider Notu Collapsible CRM Paneli (Col-span 1) */}
-          <div className="space-y-4">
-            
-            {/* Lider Notu Collapsible Card */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300">
-              
-              {/* Collapsible Header */}
-              <button
-                onClick={() => setNotesOpen(!notesOpen)}
-                className="flex w-full items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]">
-                    <StickyNote className="h-4.5 w-4.5" />
-                  </div>
-                  <span className="text-sm font-bold text-[var(--text-1)]">
-                    {lang === 'en' ? 'Leader Note' : 'Lider Notu'}
-                  </span>
-                  {notes.length > 0 && (
-                    <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
-                      {notes.length}
-                    </span>
-                  )}
-                </div>
-                {notesOpen ? (
-                  <ChevronUp className="h-4 w-4 text-[var(--text-3)]" />
-                ) : (
-                  <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />
-                )}
-              </button>
-
-              {/* Collapsible Body */}
-              {notesOpen && (
-                <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                  
-                  {/* Notes Feed Container */}
-                  {notes.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-[var(--border)] p-5 text-center text-xs text-[var(--text-3)]">
-                      {lang === 'en' ? 'No leader notes recorded yet. Write your first note below!' : 'Henüz lider notu kaydedilmemiş. İlk notu aşağıdan yazabilirsiniz!'}
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
-                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => (
-                          <div
-                            key={n.id}
-                            className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] border border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
-                          >
-                            <p className="whitespace-pre-wrap break-words">{n.note}</p>
-                            <p className="mt-2 text-[9px] font-medium text-[var(--text-3)] tracking-wide">
-                              {new Date(n.created_at).toLocaleDateString(locale, {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              })}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Tümünü Gör / Kapat toggle */}
-                      {notes.length > 5 && (
-                        <button
-                          type="button"
-                          onClick={() => setShowAllNotes(!showAllNotes)}
-                          className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline py-1 transition active:scale-95"
-                        >
-                          {showAllNotes
-                            ? (lang === 'en' ? 'Show Less' : 'Kapat')
-                            : (lang === 'en' ? 'Show All' : 'Tümünü Gör')
-                          }
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Add Note text box */}
-                  <div className="border-t border-[var(--border)] pt-4 space-y-3">
-                    <textarea
-                      value={newNote}
-                      onChange={(e) => setNewNote(e.target.value)}
-                      placeholder={
-                        lang === 'en'
-                          ? `Write a leader note for ${c.full_name}...`
-                          : `${c.full_name} için lider notunu yaz...`
-                      }
-                      className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
-                      rows={3}
-                      maxLength={1000}
-                    />
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        disabled={!newNote.trim() || addNoteMutation.isPending}
-                        onClick={handleSaveNote}
-                        className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                        {lang === 'en' ? 'Save Note' : 'Notu Kaydet'}
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-              )}
-
-            </div>
-
-          </div> {/* End Sağ Kolon */}
-
-        </div> {/* End 2-Column Responsive Layout */}
+        </div>
       </main>
 
       {editOpen && ws && (

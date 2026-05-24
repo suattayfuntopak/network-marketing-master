@@ -18,7 +18,7 @@ export type CandidateStage =
 
 export type WorkspaceMemberRole = 'leader' | 'member'
 
-export type ActionType = 'call' | 'whatsapp' | 'note' | 'stage_change'
+export type ActionType = 'call' | 'whatsapp' | 'note' | 'stage_change' | 'ai_generate'
 
 export interface Database {
   public: {
