@@ -59,6 +59,7 @@ export function YZKocuSheet({ candidate, onClose }: Props) {
 
         <form action={action} className="space-y-4">
           {/* Gizli alanlar */}
+          <input type="hidden" name="candidateId" value={candidate.id} />
           <input type="hidden" name="name" value={candidate.full_name} />
           <input type="hidden" name="stage" value={candidate.stage} />
           <input type="hidden" name="note" value={candidate.note ? candidate.note.split('|||')[0].trim() : ''} />

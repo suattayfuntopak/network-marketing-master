@@ -9,7 +9,7 @@ import { BottomNav } from './BottomNav'
 const NAV_ROUTES = ['/pano', '/pipeline', '/yazar', '/itirazlar', '/ekip']
 
 function getRouteIndex(pathname: string) {
-  return NAV_ROUTES.findIndex(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))
+  return NAV_ROUTES.findIndex(r => pathname === r)
 }
 
 export function setNavDir(dir: 'forward' | 'back') {

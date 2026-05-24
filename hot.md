@@ -1,6 +1,16 @@
 # Hot Log
 
-## 2026-05-24 — getSession→getUser Düzeltmesi + Atomik Workspace İşlemleri (Council #4 & #5)
+## 2026-05-25 — Ownership Kontrolü + Swipe Bug Düzeltmesi (Council #6 & #7)
+
+### fix: generateCoachMessage — candidate ownership doğrulaması (Council #6)
+- `pipeline/[id]/_components/YZKocuSheet.tsx`: Form'a `<input type="hidden" name="candidateId">` eklendi.
+- `pipeline/[id]/actions.ts`: `candidateId` formData'dan alınıp, non-admin kullanıcı için `nmm_candidates` tablosunda `id + workspace_id` eşleşmesi doğrulanıyor. Eşleşme yoksa `'Erişim reddedildi.'` döner, Anthropic çağrısı yapılmaz.
+
+### fix: DashboardShell — swipe `/pipeline/[id]` sayfasında yanlış çalışıyordu (Council #7)
+- `_components/DashboardShell.tsx:12`: `getRouteIndex` fonksiyonu `startsWith(r)` kullanıyordu; `/pipeline/abc-123` gibi detail URL'lerinde `/pipeline` eşleşmesi yapıp swipe navigation tetikleniyordu.
+- Düzeltme: `pathname === r` ile tam eşleşmeye indirgendi. Detail sayfalarında swipe artık devre dışı.
+
+## 2026-05-25 — getSession→getUser Düzeltmesi + Atomik Workspace İşlemleri (Council #4 & #5)
 
 ### fix: useCandidates.ts — getSession() → getUser() (Council #4)
 - `src/hooks/useCandidates.ts:79`: Stage change logu sırasında kullanılan `getSession()` çağrısı `getUser()`'a değiştirildi; sunucu tarafında doğrulanmış kimlik kullanılıyor.
