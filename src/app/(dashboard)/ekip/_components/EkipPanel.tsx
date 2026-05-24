@@ -78,6 +78,8 @@ export function EkipPanel() {
     })
   }, [supabase])
 
+  const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
+
   if (wsLoading || mLoading) {
     return (
       <div className="space-y-3">
@@ -169,8 +171,6 @@ export function EkipPanel() {
       setJoining(false)
     }
   }
-
-  const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
   async function handleRemoveMemberConfirmed() {
     if (!memberToRemove) return
