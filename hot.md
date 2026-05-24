@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-05-25 — Lider Notu Sistemi (Tam Uygulama)
+
+### feat: Lider Notu dropdown kutusu — kişi detay sayfaları
+
+- `CandidateDetail.tsx`: `StickyNote` ikonlu collapsible Lider Notu kartı eklendi; `notesOpen` state varsayılan `false` — sayfa açılışında kapalı.
+- Kart başlığında toplam not sayısı badge'i gösterilir.
+- Açıldığında en güncel 5 not listelenir (tarih/saat damgalı); 5'ten fazla varsa **Tümünü Gör** butonu belirir, tıklandığında **Kapat**'a dönüşür (`showAllNotes` toggle).
+- Kart altında `textarea` + **Notu Kaydet** butonu — boş not kaydedilemez, `addNoteMutation.isPending` sırasında buton disable.
+- Animasyon: `animate-in fade-in slide-in-from-top-1 duration-200`.
+
+### feat: useCandidateNotes + useAddCandidateNote hook'ları
+
+- `src/hooks/useCandidates.ts`: `useCandidateNotes(candidateId)` — `nmm_daily_actions` tablosundan `action_type = 'note'` filtreliyor, `created_at DESC` sıralıyor.
+- `useAddCandidateNote(workspaceId)` — `getUser()` ile auth doğrulama + insert; başarıda `['candidate-notes', candidateId]` ve `['activity', candidateId]` query'leri invalidate ediliyor.
+
+### feat: YazarForm lider notu entegrasyonu
+
+- `YazarForm.tsx`: Kişi seçildiğinde (`selectCandidate`) veya aday sayfasından yönlenildiğinde (`initialName` prefill `useEffect`), son 5 lider notu Supabase'den çekilip **Ek Bilgi** alanına `Lider Notları:\n- ...` formatında eklenir.
+- Aday sayfasındaki **YZ Mesajı** butonu `?name=...&note=...` ile yazar sayfasına yönlendiriyor; YazarForm aynı mantıkla notları bağlamına otomatik ekliyor.
+
 ## 2026-05-25 — Semantic Renk Token'ları + EkipPanel Bölünmesi (Council #16 & #19)
 
 ### refactor: Semantic color tokens — globals.css @theme (Council #16)
