@@ -78,15 +78,17 @@ export function PanoContent() {
   const joinedCount = candidates.filter(c => c.stage === 'katildi').length
 
   const hour = new Date().getHours()
-  const greeting = hour < 12 
-    ? t('dashboard.greetingMorning') 
-    : hour < 14 
-      ? t('dashboard.greetingAfternoon') 
-      : hour < 19 
-        ? t('dashboard.greetingDay') 
-        : t('dashboard.greetingEvening')
+  const greeting = hour < 5
+    ? t('dashboard.greetingNight')
+    : hour < 12
+      ? t('dashboard.greetingMorning')
+      : hour < 14
+        ? t('dashboard.greetingAfternoon')
+        : hour < 19
+          ? t('dashboard.greetingDay')
+          : t('dashboard.greetingEvening')
 
-  const greetingIcon = hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
+  const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
   if (wsLoading || cLoading) {

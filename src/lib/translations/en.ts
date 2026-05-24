@@ -106,6 +106,7 @@ export const en = {
     greetingAfternoon: "Good afternoon",
     greetingDay: "Good day",
     greetingEvening: "Good evening",
+    greetingNight: "Good night",
     totalPeople: "Total Leads",
     activeCandidates: "Active Prospects",
     joined: "Joined",

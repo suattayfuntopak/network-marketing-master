@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-05-25 — Gece Selamlama, Retry Fix, Type Safety, Safe-Area, Aktivite Limit (Council #3 + #13-15 + greeting)
+
+### feat: Pano gece selamlama — 00:00-05:00 arası "İyi Geceler" (yeni)
+- `PanoContent.tsx`: `hour < 5` koşulu eklendi. Gece yarısından sabah 05:00'e kadar 🌙 İyi Geceler/Good night gösterilir; 05:00 itibarıyla 🌅 Günaydın başlar.
+- `tr.ts` / `en.ts`: `greetingNight` çevirisi eklendi.
+
+### fix: useWorkspace — React Query retry riski giderildi (Council #3)
+- `useWorkspace.ts`: `retry: false` eklendi. Daha önce hata sonrası yeniden deneme (default 3x), kısmi başarılı workspace oluşturma durumunda duplicate kayıt riski taşıyordu.
+
+### fix: EkipPanel useState<any> → User | null (Council #13)
+- `EkipPanel.tsx:161`: `useState<any>` → `useState<User | null>`, Supabase `User` tipi import edildi.
+
+### fix: pb-safe Tailwind v4'te tanımsızdı (Council #14)
+- `globals.css`: `@utility pb-safe { padding-bottom: env(safe-area-inset-bottom); }` eklendi.
+- `layout.tsx`: `viewport.viewportFit = 'cover'` eklendi. iOS notch/home indicator artık BottomNav'ı örtmüyor.
+
+### fix: Aktivite geçmişi limit 10 → 50 (Council #15)
+- `useCandidates.ts` `useActivityHistory`: `.limit(10)` → `.limit(50)`. 10'dan fazla aktivitesi olan adaylarda eski kayıtlar artık kesilmiyor.
+
+### verify: updated_at DB trigger (Council #8)
+- Migration 001'de `nmm_candidates_updated_at` trigger'ı mevcut ve çalışıyor. Ek aksiyon gerekmedi.
+
 ## 2026-05-25 — Canvas Perf, Dead Code, API Errors, full_name Sync (Council #9-12)
 
 ### perf: EkipPanel canvas noise — 6000 → 480 draw call/sn (Council #9)

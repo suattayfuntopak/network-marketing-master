@@ -24,6 +24,11 @@
   --text-3:      #6b7280;
 }
 
+/* iOS notch / home indicator safe area */
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 html, body {
   overflow-x: hidden;
 }

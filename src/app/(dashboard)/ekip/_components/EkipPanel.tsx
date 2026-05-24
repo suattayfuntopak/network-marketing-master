@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
   TrendingUp, BarChart2, Send, FileText, MessageSquare,
@@ -158,7 +159,7 @@ export function EkipPanel() {
   const supabase = createClient()
   const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   // Invite/Join states
   const [copied, setCopied] = useState(false)

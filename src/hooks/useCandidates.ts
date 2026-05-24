@@ -150,7 +150,7 @@ export function useActivityHistory(candidateId: string) {
         .select('*')
         .eq('candidate_id', candidateId)
         .order('created_at', { ascending: false })
-        .limit(10)
+        .limit(50)
       if (error) throw new Error(error.message)
       return data ?? []
     },

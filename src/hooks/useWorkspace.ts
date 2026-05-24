@@ -88,5 +88,6 @@ export function useWorkspace() {
     queryKey: ['workspace'],
     queryFn: fetchOrCreateWorkspace,
     staleTime: Infinity,
+    retry: false,
   })
 }

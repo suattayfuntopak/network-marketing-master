@@ -106,6 +106,7 @@ export const tr = {
     greetingAfternoon: "Tünaydın",
     greetingDay: "İyi günler",
     greetingEvening: "İyi akşamlar",
+    greetingNight: "İyi geceler",
     totalPeople: "Toplam Kişi",
     activeCandidates: "Aktif Aday",
     joined: "Katıldı",
