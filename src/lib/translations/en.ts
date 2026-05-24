@@ -235,7 +235,7 @@ export const en = {
     broadcastNotePlaceholder: "Add a short note about this content...",
     broadcastMsgLabel: "Write your message",
     broadcastMsgPlaceholder: "Write the message you want to send to your team...",
-    broadcastRecipientGroup: "Whole Team (WhatsApp Group)",
+    broadcastRecipientGroup: "Whole Team",
     broadcastRecipientSelect: "Select Individuals",
     broadcastSend: "Send via WhatsApp",
     broadcastSendGroup: "Share with Group",

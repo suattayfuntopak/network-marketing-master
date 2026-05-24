@@ -235,7 +235,7 @@ export const tr = {
     broadcastNotePlaceholder: "Bu içerikle ilgili kısa bir not ekleyin...",
     broadcastMsgLabel: "Mesajınızı yazın",
     broadcastMsgPlaceholder: "Ekibinize iletmek istediğiniz mesajı yazın...",
-    broadcastRecipientGroup: "Tüm Ekip (WhatsApp Grubu)",
+    broadcastRecipientGroup: "Tüm Ekip",
     broadcastRecipientSelect: "Kişileri Seç",
     broadcastSend: "WhatsApp'ta Gönder",
     broadcastSendGroup: "Grupla Paylaş",
