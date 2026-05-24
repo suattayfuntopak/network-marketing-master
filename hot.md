@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-05-24 — Güvenlik: translate-note API Endpoint Auth Koruması
+
+### fix: /api/translate-note — Kimlik Doğrulama Zorunlu Hale Getirildi
+- `src/app/api/translate-note/route.ts` endpoint'i auth kontrolsüz açıktı; herhangi bir istek Anthropic API'sine ulaşabiliyordu.
+- Supabase `createClient()` + `getUser()` eklenerek oturum kontrolü yapıldı. Oturum yoksa `401 Unauthorized` döndürülür, Anthropic çağrısı yapılmaz.
+- Council analizi bulgusu #2 giderildi.
+
 ## 2026-05-24 — Council Triad Analizi: Kapsamlı Proje Güvenlik ve Kalite Denetimi
 
 ### analysis: 4 Council Üyesi ile Cerrah Titizliğinde Proje Analizi
