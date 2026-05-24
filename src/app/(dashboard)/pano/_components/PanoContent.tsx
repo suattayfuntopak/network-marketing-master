@@ -27,7 +27,7 @@ export function PanoContent() {
           <div className="h-7 w-36 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
           <div className="h-7 w-28 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-2 md:max-w-[300px]">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-3 md:max-w-[460px]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-square animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
           ))}
@@ -52,7 +52,7 @@ export function PanoContent() {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-2 md:max-w-[300px]">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-3 md:max-w-[460px]">
         <SquareButton icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
         <SquareButton icon={PenLine}      label="Mesaj Yaz"    color="teal"   href="/yazar"         />

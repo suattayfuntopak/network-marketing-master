@@ -2,14 +2,16 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BarChart2, PenLine, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, BarChart2, PenLine, Users, CalendarDays, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
-  { href: '/pano',     label: 'Pano',       icon: LayoutDashboard },
-  { href: '/pipeline', label: 'Boru Hattı', icon: BarChart2       },
-  { href: '/yazar',    label: 'Mesaj Yaz',  icon: PenLine         },
-  { href: '/ekip',     label: 'Ekibim',     icon: Users           },
+  { href: '/pano',       label: 'Pano',       icon: LayoutDashboard },
+  { href: '/pipeline',   label: 'Boru Hattı', icon: BarChart2       },
+  { href: '/yazar',      label: 'Mesaj Yaz',  icon: PenLine         },
+  { href: '/ekip',       label: 'Ekibim',     icon: Users           },
+  { href: '/takvim',     label: 'Takvim',     icon: CalendarDays    },
+  { href: '/kazanimlar', label: 'Kazanımlar', icon: Trophy          },
 ]
 
 interface SidebarProps {

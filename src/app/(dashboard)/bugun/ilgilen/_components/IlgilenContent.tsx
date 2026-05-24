@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { List, LayoutList, Phone } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates } from '@/hooks/useCandidates'
+import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
@@ -24,7 +24,8 @@ export function IlgilenContent() {
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
-  const { daily } = useDailyActions(candidates)
+  const { daily, remaining } = useDailyActions(candidates)
+  const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
   if (wsLoading || cLoading) {
     return (
@@ -51,7 +52,10 @@ export function IlgilenContent() {
       {/* Başlık + görünüm toggle */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-[var(--text-2)]">
-          <span className="font-semibold text-[var(--text-1)]">{daily.length}</span> kişi bekliyor
+          <span className="font-semibold text-[var(--text-1)]">{daily.length}</span> kişi öncelikli
+          {remaining > 0 && (
+            <span className="ml-1 text-[var(--text-3)]">+{remaining} daha bekliyor</span>
+          )}
         </p>
         <div className="flex overflow-hidden rounded-xl border border-[var(--border)]">
           <button
@@ -101,6 +105,7 @@ export function IlgilenContent() {
                     href={waHref(c.phone)!}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => markContacted.mutate({ id: c.id, actionType: 'whatsapp' })}
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white"
                     aria-label="WhatsApp"
                   >
@@ -110,6 +115,7 @@ export function IlgilenContent() {
                 {c.phone && (
                   <a
                     href={`tel:${c.phone}`}
+                    onClick={() => markContacted.mutate({ id: c.id, actionType: 'call' })}
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]"
                     aria-label="Ara"
                   >
@@ -142,6 +148,12 @@ export function IlgilenContent() {
             </div>
           ))}
         </div>
+      )}
+
+      {remaining > 0 && (
+        <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-xs text-[var(--text-3)]">
+          +{remaining} kişi daha takip bekliyor — önce bu {daily.length}&apos;ini tamamla
+        </p>
       )}
     </div>
   )

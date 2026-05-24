@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Plus, BarChart2 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, type CandidateFilter } from '@/hooks/useCandidates'
+import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import { StageFilter } from './_components/StageFilter'
 import { CandidateCard } from './_components/CandidateCard'
 import { AddCandidateSheet } from './_components/AddCandidateSheet'
@@ -13,19 +14,18 @@ export default function PipelinePage() {
   const [sheetOpen, setSheetOpen] = useState(false)
 
   const { data: ws, isLoading: wsLoading, error: wsError } = useWorkspace()
-  const { candidates, isLoading, error } = useCandidates(ws?.workspaceId, filter)
+  const { candidates: all, isLoading, error } = useCandidates(ws?.workspaceId)
 
-  // Filtre sayaçları için tüm adayları ayrıca çek
-  const { candidates: all }      = useCandidates(ws?.workspaceId, 'tumü')
-  const { candidates: aktif }    = useCandidates(ws?.workspaceId, 'aktif')
-  const { candidates: sicak }    = useCandidates(ws?.workspaceId, 'sicak')
-  const { candidates: kayb }     = useCandidates(ws?.workspaceId, 'kaybolanlar')
+  const candidates = filter === 'tumü'        ? all
+    : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
+    : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
+    : all.filter(c => c.stage === 'kayboldu')
 
   const counts: Record<CandidateFilter, number> = {
     tumü:        all.length,
-    aktif:       aktif.length,
-    sicak:       sicak.length,
-    kaybolanlar: kayb.length,
+    aktif:       all.filter(c => ACTIVE_STAGES.includes(c.stage)).length,
+    sicak:       all.filter(c => HOT_STAGES.includes(c.stage)).length,
+    kaybolanlar: all.filter(c => c.stage === 'kayboldu').length,
   }
 
   if (wsLoading) return <PageShell><Spinner /></PageShell>
@@ -52,15 +52,15 @@ export default function PipelinePage() {
       {/* Stat bar */}
       <div className="mb-5 grid grid-cols-3 gap-3">
         <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center">
-          <p className="text-xl font-bold text-[var(--text-1)]">{all.length}</p>
+          <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
           <p className="text-xs text-[var(--text-3)]">Toplam</p>
         </div>
         <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center">
-          <p className="text-xl font-bold text-[#854F0B]">{aktif.length}</p>
+          <p className="text-xl font-bold text-[#854F0B]">{counts.aktif}</p>
           <p className="text-xs text-[#854F0B]">Aktif</p>
         </div>
         <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center">
-          <p className="text-xl font-bold text-[#0F6E56]">{sicak.length}</p>
+          <p className="text-xl font-bold text-[#0F6E56]">{counts.sicak}</p>
           <p className="text-xs text-[#0F6E56]">Sıcak</p>
         </div>
       </div>

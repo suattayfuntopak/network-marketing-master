@@ -1,7 +1,7 @@
 'use client'
 
-import { useActionState, useState, useRef } from 'react'
-import { Copy, Loader2, Bot, X, Search } from 'lucide-react'
+import { useActionState, useState, useRef, useEffect } from 'react'
+import { Copy, Loader2, Bot, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateMessageAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -47,45 +47,57 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
 
 export function YazarForm() {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
-  const [selectedName, setSelectedName] = useState('')
-  const [selectedStage, setSelectedStage] = useState('')
-  const [search, setSearch] = useState('')
-  const [pickerOpen, setPickerOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<NmmCandidate | null>(null)
+  const [dropdownOpen, setDropdownOpen] = useState(false)
   const [messageType, setMessageType] = useState('genel')
   const [tone, setTone] = useState('samimi')
-  const searchRef = useRef<HTMLInputElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)
 
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', onOutside)
+    return () => document.removeEventListener('mousedown', onOutside)
+  }, [])
+
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
   )
-  const filtered = search
-    ? sorted.filter(c => c.full_name.toLowerCase().includes(search.toLowerCase()))
-    : sorted
+  const filtered = sorted.filter(c =>
+    c.full_name.toLowerCase().includes(query.toLowerCase())
+  )
 
   function selectCandidate(c: NmmCandidate) {
-    setSelectedName(c.full_name)
-    setSelectedStage(c.stage)
-    setSearch('')
-    setPickerOpen(false)
+    setSelected(c)
+    setQuery('')
+    setDropdownOpen(false)
+  }
+
+  function clearSelection() {
+    setSelected(null)
+    setQuery('')
   }
 
   function handleCopy() {
     if (state.message) navigator.clipboard.writeText(state.message)
   }
 
-  const selectedCandidate = candidates.find(c => c.full_name === selectedName)
-  const waLink = waHref(selectedCandidate?.phone, state.message)
+  const waLink = waHref(selected?.phone, state.message)
 
   return (
     <div className="space-y-5">
       <form action={action} className="space-y-5">
-        {/* Hidden fields */}
         <input type="hidden" name="messageType" value={messageType} />
         <input type="hidden" name="tone" value={tone} />
-        <input type="hidden" name="stage" value={selectedStage} />
+        <input type="hidden" name="stage" value={selected?.stage ?? ''} />
+        <input type="hidden" name="name" value={selected?.full_name ?? query} />
 
         {/* Mesaj Türü + Ton — side by side on desktop */}
         <div className="grid gap-4 md:grid-cols-2">
@@ -111,22 +123,71 @@ export function YazarForm() {
           </div>
         </div>
 
-        {/* Kişi seçimi */}
-        <div>
-          <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="name">
+        {/* Kişi — inline combobox */}
+        <div ref={containerRef} className="relative">
+          <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]">
             Kişi
           </label>
-          <input
-            id="name"
-            name="name"
-            required
-            value={selectedName}
-            onChange={e => setSelectedName(e.target.value)}
-            onFocus={() => setPickerOpen(true)}
-            placeholder="Kişi adını yaz veya listeden seç..."
-            autoComplete="off"
-            className={inputClass}
-          />
+
+          {selected ? (
+            <div className="flex items-center justify-between rounded-xl border border-[#0F6E56] bg-[var(--bg-card)] px-4 py-3 ring-2 ring-[#E1F5EE]">
+              <div>
+                <p className="text-sm font-semibold text-[var(--text-1)]">{selected.full_name}</p>
+                <p className="text-xs text-[var(--text-3)]">{STAGE_LABEL[selected.stage]}</p>
+              </div>
+              <button
+                type="button"
+                onClick={clearSelection}
+                className="ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] transition hover:text-[var(--text-1)]"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            <input
+              type="text"
+              value={query}
+              onChange={e => {
+                setQuery(e.target.value)
+                setDropdownOpen(true)
+              }}
+              onFocus={() => { if (query) setDropdownOpen(true) }}
+              placeholder="Kişi adını yaz..."
+              autoComplete="off"
+              className={inputClass}
+            />
+          )}
+
+          {dropdownOpen && !selected && query.length > 0 && (
+            <div
+              className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-xl"
+              style={{ maxHeight: '240px', overflowY: 'auto' }}
+            >
+              {filtered.length === 0 ? (
+                <p className="py-6 text-center text-sm text-[var(--text-3)]">Kişi bulunamadı</p>
+              ) : (
+                filtered.map(c => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onMouseDown={() => selectCandidate(c)}
+                    className="flex w-full items-center gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition hover:bg-[var(--bg-subtle)] last:border-b-0"
+                  >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
+                      {c.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
+                      {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
+                    </div>
+                    <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
+                      {STAGE_LABEL[c.stage]}
+                    </span>
+                  </button>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Ek bilgi */}
@@ -156,12 +217,11 @@ export function YazarForm() {
         >
           {isPending
             ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-            : <><Bot className="h-4 w-4" /> Yapay Zeka Mesajı Oluştur</>
+            : <><Bot className="h-4 w-4" /> Üret</>
           }
         </button>
       </form>
 
-      {/* Oluşturulan mesaj */}
       {state.message && (
         <div className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
           <div className="mb-3 flex items-center justify-between">
@@ -186,66 +246,6 @@ export function YazarForm() {
             </div>
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)]">{state.message}</p>
-        </div>
-      )}
-
-      {/* Kişi seçici modal */}
-      {pickerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center">
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-            onClick={() => setPickerOpen(false)}
-          />
-          <div className="relative z-10 flex w-full max-w-lg flex-col rounded-t-3xl bg-[var(--bg-card)] shadow-2xl md:rounded-2xl" style={{ maxHeight: '80vh' }}>
-            <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <p className="text-sm font-bold text-[var(--text-1)]">Kişi Seç</p>
-              <button
-                onClick={() => setPickerOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
-            <div className="border-b border-[var(--border)] px-4 py-3">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
-                <input
-                  ref={searchRef}
-                  type="text"
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder="Ara..."
-                  autoFocus
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 pl-9 pr-4 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7]"
-                />
-              </div>
-            </div>
-            <div className="flex-1 overflow-y-auto">
-              {filtered.length === 0 ? (
-                <p className="py-8 text-center text-sm text-[var(--text-3)]">Kişi bulunamadı</p>
-              ) : (
-                filtered.map(c => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onMouseDown={() => selectCandidate(c)}
-                    className="flex w-full items-center gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition hover:bg-[var(--bg-subtle)] last:border-b-0"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
-                      {c.full_name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
-                      {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
-                    </div>
-                    <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
-                      {STAGE_LABEL[c.stage]}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
         </div>
       )}
     </div>

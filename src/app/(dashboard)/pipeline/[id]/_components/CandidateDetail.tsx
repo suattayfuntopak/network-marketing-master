@@ -9,14 +9,11 @@ import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/u
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { YZKocuSheet } from './YZKocuSheet'
-import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER } from '@/lib/stages'
+import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, FOLLOW_DAYS } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
-const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
-  yeni: 2, iletisim: 3, davetli: 2, takip: 3, sunum: 1, kararsiz: 7,
-}
 
 function suggestedFollowUp(c: NmmCandidate): string | null {
   const days = FOLLOW_DAYS[c.stage]

@@ -1,32 +1,10 @@
 'use server'
 
-import Anthropic from '@anthropic-ai/sdk'
+import { generateMessage } from '@/lib/ai/generateMessage'
 
 export interface YazarFormState {
   message?: string
   error?: string
-}
-
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
-const STAGE_CONTEXT: Record<string, string> = {
-  yeni:        'Bu kişiyle henüz iletişim kurulmadı. İlk temas mesajı yazılacak.',
-  iletisim:    'Bu kişiyle daha önce iletişim kuruldu. Takip mesajı yazılacak.',
-  davetli:     'Bu kişi toplantıya davet edildi. Hatırlatma veya sonraki adım mesajı yazılacak.',
-  takip:       'Bu kişi takip aşamasında. Tekrar hatırlatma mesajı yazılacak.',
-  sunum:       'Bu kişiye sunum yapıldı. Geri bildirim isteği ya da sonraki adım mesajı yazılacak.',
-  kararsiz:    'Bu kişi kararsız. Şüphelerini gidermeye yönelik nazik bir mesaj yazılacak.',
-  katildi:     'Bu kişi ekibe katıldı. Teşekkür veya hoş geldin mesajı yazılacak.',
-  ilgilenmedi: 'Bu kişi şu an ilgilenmedi. Kapıyı açık bırakan nazik bir mesaj yazılacak.',
-  kayboldu:    'Bu kişiyle iletişim kesildi. Hafifçe yeniden bağlantı kurmak için bir mesaj yazılacak.',
-}
-
-const MESSAGE_TYPE_CONTEXT: Record<string, string> = {
-  genel:    'Genel iletişim mesajı — doğal ve samimi bir selamlama.',
-  davet:    'Bir etkinliğe, toplantıya veya sunum seansına davet mesajı.',
-  sunum:    'Fırsat veya ürün sunumu için ön hazırlık mesajı.',
-  takip:    'Önceki bir görüşmenin veya paylaşımın takip mesajı.',
-  tesekkur: 'Teşekkür mesajı — görüşme, zaman, ilgi veya katılım için.',
 }
 
 export async function generateMessageAction(
@@ -41,38 +19,8 @@ export async function generateMessageAction(
 
   if (!name) return { error: 'Kişi adı zorunlu.' }
 
-  const stageInfo   = stage ? (STAGE_CONTEXT[stage] ?? '') : ''
-  const typeInfo    = MESSAGE_TYPE_CONTEXT[messageType] ?? ''
-
-  const stageStr = stage && stageInfo ? `Süreç Aşaması: ${stage} — ${stageInfo}\n` : ''
-
-  const prompt = `Sen bir network marketing danışmanısın. WhatsApp için kısa, samimi ve Türkçe bir mesaj yaz.
-
-Alıcı: ${name}
-${stageStr}Mesaj Türü: ${messageType} — ${typeInfo}
-Ek bilgi: ${context || 'Yok'}
-Ton: ${tone}
-
-Kurallar:
-- Maksimum 3 kısa paragraf
-- Emoji kullanabilirsin ama abartma (2-3 yeterli)
-- Doğal ve kişisel görünsün
-- Satış baskısı yapma
-- Sadece mesaj metnini yaz, açıklama ekleme`
-
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 400,
-      messages: [{ role: 'user', content: prompt }],
-    })
-
-    const message = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
-
+    const message = await generateMessage({ name, stage, context, tone, messageType })
     return { message }
   } catch {
     return { error: 'Mesaj oluşturulamadı. ANTHROPIC_API_KEY ayarlı mı?' }
