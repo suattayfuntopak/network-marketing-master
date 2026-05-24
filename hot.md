@@ -38,3 +38,38 @@
 
 - 4. öneri `lib/deleteWithUndo.tsx`'te halihazırda uygulanmış durumdaydı
 - Circular SVG countdown animasyonu + "Geri Al" butonu + 5 saniyelik timer zaten aktif
+
+---
+
+## 2026-05-24 (tur 3)
+
+### fix: EditCandidateSheet'e telefon doğrulaması eklendi
+
+- `PHONE_RE` regex doğrulaması `EditCandidateSheet`'e eklendi (`AddCandidateSheet` ile tutarlı)
+- Hatalı format girişinde inline hata mesajı, alanın kırmızı kenarlaşması ve düzeltince otomatik temizleme
+
+### fix: deleteWithUndo çift onClose kaldırıldı
+
+- `deleteWithUndo` fonksiyonunun `onClose?` parametresi kaldırıldı
+- `EditCandidateSheet` ve `CandidateDetail`'daki çift çağrı temizlendi; `onClose`/`router.push` artık sadece çağıran tarafından anında tetikleniyor
+
+### fix: ConfirmDeleteModal onCancel useCallback ile sabitlendi
+
+- `EditCandidateSheet`, `CandidateDetail`, `CandidateCard`, `EkipPanel`'de `onCancel` arrow function `useCallback` ile memoize edildi
+- `useEffect` listener yeniden bağlanması engellendi
+
+### refactor: CLAUDE.md'ye z-index ve deleteWithUndo kuralları eklendi
+
+- `src/lib/zIndex.ts` kullanımı ve `deleteWithUndo`'nun parametre politikası belgelendi
+
+### feat: aşama renkleri birbirinden ayrıştırıldı
+
+- `sunum` → gökyüzü mavisi (`#E0F2FE / #0369A1`) — önceden yeşil ile aynıydı
+- `katildi` → zümrüt yeşili (`#D1FAE5 / #065F46`) — tüm sekiz aşama artık görsel olarak belirgin
+- `STAGE_CARD_BG` kart arka planları da güncellendi
+
+### feat: swipe ile sekme navigasyonu
+
+- `DashboardShell`'e dokunmatik swipe desteği eklendi
+- Yatay kaydırma (≥60px, yatay/dikey oranı ≥2) sağa/sola sekme değiştiriyor
+- Dikey kaydırma, diyagonal ve küçük kaydırmalar yok sayılıyor; masaüstünde etkisiz
