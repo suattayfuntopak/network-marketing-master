@@ -27,42 +27,45 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     return false
   })
   const [pendingHref, setPendingHref] = useState<string | null>(null)
-  const [scrollDir, setScrollDir] = useState<'up' | 'down'>('up')
+  const [visible, setVisible] = useState(true)
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
   const pathname = usePathname()
   const touchStart = useRef<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
-    let lastScrollY = window.scrollY
-    let ticking = false
-
-    const updateScrollDir = () => {
+    const handleScroll = () => {
       const scrollY = window.scrollY
-      
-      // Minimum threshold of 8px scroll difference to trigger changes (reduces jumpiness)
-      if (Math.abs(scrollY - lastScrollY) < 8) {
-        ticking = false
+
+      // Always show at the very top of the page
+      if (scrollY < 20) {
+        setVisible(true)
+        if (scrollTimeout.current) {
+          clearTimeout(scrollTimeout.current)
+        }
         return
       }
 
-      if (scrollY > lastScrollY && scrollY > 60) {
-        setScrollDir('down')
-      } else {
-        setScrollDir('up')
+      // Hide immediately during active scroll events
+      setVisible(false)
+
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
       }
-      lastScrollY = scrollY > 0 ? scrollY : 0
-      ticking = false
+
+      // Re-enable visibility after scroll stops for 400ms
+      scrollTimeout.current = setTimeout(() => {
+        setVisible(true)
+      }, 400)
     }
 
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateScrollDir)
-        ticking = true
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
       }
     }
-
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   function handleTouchStart(e: React.TouchEvent) {
@@ -109,7 +112,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
-      <Header visible={scrollDir === 'up'} />
+      <Header visible={visible} />
       <Sidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed(v => {
@@ -129,7 +132,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <div className="h-16" />
         {children}
       </div>
-      <BottomNav pendingHref={pendingHref} visible={scrollDir === 'up'} />
+      <BottomNav pendingHref={pendingHref} visible={visible} />
     </div>
   )
 }
