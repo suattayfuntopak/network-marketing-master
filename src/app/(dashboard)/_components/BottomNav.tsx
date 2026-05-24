@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, BarChart2, PenLine, Users } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bot, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
-  { href: '/pano',     label: 'Pano',       icon: LayoutDashboard },
-  { href: '/pipeline', label: 'Boru Hattı', icon: BarChart2       },
-  { href: '/yazar',    label: 'Mesaj Yaz',  icon: PenLine         },
-  { href: '/ekip',     label: 'Ekibim',     icon: Users           },
+  { href: '/pano',     label: 'Pano',           icon: LayoutDashboard },
+  { href: '/pipeline', label: 'Boru Hattı',     icon: TrendingUp      },
+  { href: '/yazar',    label: 'YZ Mesajı Üret', icon: Bot             },
+  { href: '/ekip',     label: 'Ekibim',         icon: Users           },
 ]
 
 export function BottomNav() {

@@ -47,9 +47,10 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
 
 interface Props {
   initialName?: string
+  initialNote?: string
 }
 
-export function YazarForm({ initialName = '' }: Props) {
+export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
@@ -219,6 +220,7 @@ export function YazarForm({ initialName = '' }: Props) {
             name="context"
             rows={2}
             maxLength={500}
+            defaultValue={initialNote}
             placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
             className={`${inputClass} resize-none`}
           />

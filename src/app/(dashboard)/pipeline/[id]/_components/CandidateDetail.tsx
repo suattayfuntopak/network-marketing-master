@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, MessageSquare, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, MessageSquare, Trash2, X, Bot } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
@@ -158,13 +158,13 @@ export function CandidateDetail({ candidateId }: Props) {
           )}
         </div>
 
-        {/* Aksiyon butonları: YZ Koçu | WhatsApp | Ara */}
+        {/* Aksiyon butonları: YZ Mesajı | WhatsApp | Ara */}
         <div className="mb-4 grid grid-cols-3 gap-3">
           <button
-            onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}`)}
+            onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(c.note ?? '')}`)}
             className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
           >
-            <MessageSquare className="h-4 w-4" strokeWidth={1.75} />
+            <Bot className="h-4 w-4" strokeWidth={1.75} />
             YZ Mesajı
           </button>
           {waLink ? (
