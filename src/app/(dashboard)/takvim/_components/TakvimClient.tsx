@@ -17,6 +17,13 @@ const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
 }
 
 function followUpDate(c: NmmCandidate): Date | null {
+  // Önce manuel atanmış tarihi kullan
+  if (c.next_follow_up_at) {
+    const d = new Date(c.next_follow_up_at)
+    d.setHours(0, 0, 0, 0)
+    return d
+  }
+  // Yoksa aşama bazlı formülle hesapla
   const days = FOLLOW_DAYS[c.stage]
   if (!days) return null
   const base = new Date(c.last_contact_at ?? c.created_at)

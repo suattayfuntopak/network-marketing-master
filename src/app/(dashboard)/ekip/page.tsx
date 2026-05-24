@@ -9,8 +9,8 @@ export default function EkipPage() {
           <Users className="h-5 w-5 text-[#854F0B]" strokeWidth={1.75} />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Ekibim</h1>
-          <p className="text-sm text-gray-400">Ekip performans paneli</p>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Ekibim</h1>
+          <p className="text-sm text-[var(--text-3)]">Ekip performans paneli</p>
         </div>
       </header>
       <EkipPanel />

@@ -41,3 +41,16 @@ export const ACTIVE_STAGES: CandidateStage[] = [
 ]
 
 export const HOT_STAGES: CandidateStage[] = ['davetli', 'takip', 'sunum']
+
+// Kart arka plan renkleri — çok hafif pastel, light + dark mode
+export const STAGE_CARD_BG: Record<CandidateStage, string> = {
+  yeni:        'bg-[#f0f4ff] dark:bg-[#1b2240]',
+  iletisim:    'bg-[#f3f2fe] dark:bg-[#1f1d44]',
+  davetli:     'bg-[#fff4f0] dark:bg-[#311510]',
+  sunum:       'bg-[#f0faf6] dark:bg-[#0d2e22]',
+  takip:       'bg-[#fffbf0] dark:bg-[#2a1e00]',
+  kararsiz:    'bg-[#fff0f5] dark:bg-[#2e0f1c]',
+  katildi:     'bg-[#f0faf3] dark:bg-[#0a2c18]',
+  ilgilenmedi: 'bg-[#f5f6f8] dark:bg-[#191c22]',
+  kayboldu:    'bg-[#f3f4f6] dark:bg-[#141618]',
+}

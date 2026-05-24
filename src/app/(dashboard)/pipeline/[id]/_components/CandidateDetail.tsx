@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Bot, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, MessageSquare, Trash2, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
-import { YZKocuSheet } from './YZKocuSheet'
+import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, FOLLOW_DAYS } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
@@ -43,9 +43,9 @@ interface Props {
 export function CandidateDetail({ candidateId }: Props) {
   const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
-  const [kocuOpen, setKocuOpen] = useState(false)
   const [stageOpen, setStageOpen] = useState(false)
   const [editingFollowUp, setEditingFollowUp] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -103,6 +103,11 @@ export function CandidateDetail({ candidateId }: Props) {
   }
 
   function handleDelete() {
+    setConfirmOpen(true)
+  }
+
+  function handleDeleteConfirmed() {
+    setConfirmOpen(false)
     deleteWithUndo(
       c!.full_name,
       () => del.mutate(c!.id),
@@ -156,11 +161,11 @@ export function CandidateDetail({ candidateId }: Props) {
         {/* Aksiyon butonları: YZ Koçu | WhatsApp | Ara */}
         <div className="mb-4 grid grid-cols-3 gap-3">
           <button
-            onClick={() => setKocuOpen(true)}
+            onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}`)}
             className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
           >
-            <Bot className="h-4 w-4" strokeWidth={1.75} />
-            YZ Koçu
+            <MessageSquare className="h-4 w-4" strokeWidth={1.75} />
+            YZ Mesajı
           </button>
           {waLink ? (
             <a
@@ -261,10 +266,11 @@ export function CandidateDetail({ candidateId }: Props) {
         />
       )}
 
-      {kocuOpen && (
-        <YZKocuSheet
-          candidate={c}
-          onClose={() => setKocuOpen(false)}
+      {confirmOpen && (
+        <ConfirmDeleteModal
+          name={c.full_name}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmOpen(false)}
         />
       )}
 

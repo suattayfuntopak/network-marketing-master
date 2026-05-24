@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState, useRef, useEffect } from 'react'
+import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
 import { Copy, Loader2, Bot, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateMessageAction } from '../actions'
@@ -45,7 +45,11 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
   )
 }
 
-export function YazarForm() {
+interface Props {
+  initialName?: string
+}
+
+export function YazarForm({ initialName = '' }: Props) {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState('')
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
@@ -53,6 +57,7 @@ export function YazarForm() {
   const [messageType, setMessageType] = useState('genel')
   const [tone, setTone] = useState('samimi')
   const containerRef = useRef<HTMLDivElement>(null)
+  const prefilledRef = useRef(false)
 
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)

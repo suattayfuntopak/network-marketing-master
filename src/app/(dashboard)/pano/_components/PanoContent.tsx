@@ -6,7 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { Zap, TrendingUp, PenLine, Users, CalendarDays, Trophy } from 'lucide-react'
+import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 
 function daysAgoLabel(days: number): string {
@@ -60,7 +60,7 @@ export function PanoContent() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
         <SquareButton icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
-        <SquareButton icon={PenLine}      label="Mesaj Yaz"    color="teal"   href="/yazar"         />
+        <SquareButton icon={Bot}          label="YZ Mesajı Üret" color="teal"   href="/yazar"         />
         <SquareButton icon={Users}        label="Ekibim"       color="amber"  href="/ekip"          />
         <SquareButton icon={CalendarDays} label="Takvim"       color="pink"   href="/takvim"        />
         <SquareButton icon={Trophy}       label="Kazanımlar"   color="coral"  href="/kazanimlar"    />

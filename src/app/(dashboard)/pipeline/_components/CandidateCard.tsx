@@ -8,7 +8,8 @@ import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from './EditCandidateSheet'
-import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER } from '@/lib/stages'
+import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
+import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 
@@ -28,6 +29,7 @@ interface CandidateCardProps {
 export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
 
@@ -36,7 +38,8 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
     update.mutate({ id: candidate.id, stage })
   }
 
-  function handleDelete() {
+  function handleDeleteConfirmed() {
+    setConfirmOpen(false)
     deleteWithUndo(
       candidate.full_name,
       () => del.mutate(candidate.id),
@@ -47,7 +50,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   return (
     <>
-      <li className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
+      <li className={clsx('relative rounded-2xl border border-[var(--border)] p-4 shadow-sm transition-colors', STAGE_CARD_BG[candidate.stage])}>
         <div className="flex items-start gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
           <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
@@ -72,7 +75,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               aria-label="Düzenle">
               <Pencil className="h-4 w-4" />
             </button>
-            <button onClick={handleDelete}
+            <button onClick={() => setConfirmOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#FBEAF0] hover:text-[#72243E] hover:shadow-md"
               aria-label="Sil">
               <Trash2 className="h-4 w-4" />
@@ -111,6 +114,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
           candidate={candidate}
           workspaceId={workspaceId}
           onClose={() => setEditOpen(false)}
+        />
+      )}
+
+      {confirmOpen && (
+        <ConfirmDeleteModal
+          name={candidate.full_name}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmOpen(false)}
         />
       )}
 

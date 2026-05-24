@@ -1,7 +1,13 @@
 import { Bot } from 'lucide-react'
 import { YazarForm } from './_components/YazarForm'
 
-export default function YazarPage() {
+interface PageProps {
+  searchParams: Promise<{ name?: string }>
+}
+
+export default async function YazarPage({ searchParams }: PageProps) {
+  const { name } = await searchParams
+
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <header className="mb-6 flex items-center gap-3">
@@ -13,7 +19,7 @@ export default function YazarPage() {
           <p className="text-sm text-[var(--text-2)]">AI destekli WhatsApp mesajları</p>
         </div>
       </header>
-      <YazarForm />
+      <YazarForm initialName={name ?? ''} />
     </main>
   )
 }

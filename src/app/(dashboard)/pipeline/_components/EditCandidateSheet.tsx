@@ -1,10 +1,11 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
+import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
@@ -18,6 +19,7 @@ interface Props {
 
 export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
 
@@ -35,6 +37,11 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   }
 
   function handleDelete() {
+    setConfirmOpen(true)
+  }
+
+  function handleDeleteConfirmed() {
+    setConfirmOpen(false)
     deleteWithUndo(
       candidate.full_name,
       () => del.mutate(candidate.id),
@@ -46,7 +53,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   return (
     <>
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-3xl bg-[var(--bg-card)] p-6 pb-10 shadow-2xl md:bottom-auto md:left-1/2 md:right-auto md:top-1/2 md:w-96 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-6">
+      <div className="fixed left-1/2 top-1/2 z-40 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl" style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-[var(--text-1)]">Düzenle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
@@ -85,6 +92,14 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           </div>
         </form>
       </div>
+
+      {confirmOpen && (
+        <ConfirmDeleteModal
+          name={candidate.full_name}
+          onConfirm={handleDeleteConfirmed}
+          onCancel={() => setConfirmOpen(false)}
+        />
+      )}
     </>
   )
 }
