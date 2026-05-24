@@ -1,116 +1,22 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
-  TrendingUp, BarChart2, Send, FileText, MessageSquare,
-  Users, CheckSquare, Square,
+  TrendingUp, BarChart2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { SpoilerCode } from './SpoilerCode'
+import { BroadcastPanel } from './BroadcastPanel'
 
-function SpoilerCode({ code }: { code: string }) {
-  const [revealed, setRevealed] = useState(false)
-  const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  
-  useEffect(() => {
-    if (revealed) return
-    const canvas = canvasRef.current
-    if (!canvas) return
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
-    
-    let animationFrameId: number
-    
-    const resize = () => {
-      if (!canvas) return
-      canvas.width = canvas.parentElement?.clientWidth || 200
-      canvas.height = canvas.parentElement?.clientHeight || 40
-    }
-    resize()
-    window.addEventListener('resize', resize)
-    
-    const numParticles = 60
-    const particles: {x: number, y: number, size: number, speed: number, alpha: number}[] = []
-    
-    for (let i = 0; i < numParticles; i++) {
-      particles.push({
-        x: Math.random() * (canvas.width || 200),
-        y: Math.random() * 40,
-        size: Math.random() * 1.5 + 0.5,
-        speed: Math.random() * 0.03 + 0.01,
-        alpha: Math.random()
-      })
-    }
-    
-    const draw = () => {
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
-      const gradient = ctx.createRadialGradient(
-        canvas.width / 2, canvas.height / 2, 5,
-        canvas.width / 2, canvas.height / 2, canvas.width / 2
-      )
-      gradient.addColorStop(0, 'rgba(83, 74, 183, 0.15)')
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
-      
-      particles.forEach(p => {
-        p.alpha += p.speed
-        if (p.alpha > 1 || p.alpha < 0) {
-          p.speed = -p.speed
-        }
-        ctx.fillStyle = `rgba(165, 243, 252, ${Math.max(0, Math.min(1, p.alpha))})`
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fill()
-      })
-      
-      for (let i = 0; i < 8; i++) {
-        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.3})`
-        ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 1, 1)
-      }
-      
-      animationFrameId = requestAnimationFrame(draw)
-    }
-    
-    draw()
-    
-    return () => {
-      window.removeEventListener('resize', resize)
-      cancelAnimationFrame(animationFrameId)
-    }
-  }, [revealed])
-  
-  return (
-    <div 
-      onClick={() => setRevealed(true)}
-      className="relative flex-1 min-w-0 h-10 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] font-mono text-base font-bold tracking-widest text-[var(--text-1)] cursor-pointer flex items-center justify-center transition-all select-none"
-    >
-      <span className={`transition-all duration-500 ease-out transform ${revealed ? 'scale-100 opacity-100 blur-0' : 'scale-90 opacity-0 blur-md'}`}>
-        {code}
-      </span>
-      
-      {!revealed && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center transition-all duration-500 ease-out">
-          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-          <span className="relative z-20 text-[10px] uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none">
-            Açmak için tıkla ✨
-          </span>
-        </div>
-      )}
-    </div>
-  )
-}
-
-interface MemberRow {
+export interface MemberRow {
   user_id: string
   full_name: string | null
   role: 'leader' | 'member'
@@ -161,20 +67,11 @@ export function EkipPanel() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
 
-  // Invite/Join states
   const [copied, setCopied] = useState(false)
   const [inviteCodeInput, setInviteCodeInput] = useState('')
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
-
-  // Broadcast states
-  const [broadcastMode, setBroadcastMode] = useState<'doc' | 'motiv'>('motiv')
-  const [broadcastLink, setBroadcastLink] = useState('')
-  const [broadcastNote, setBroadcastNote] = useState('')
-  const [broadcastMessage, setBroadcastMessage] = useState('')
-  const [broadcastTarget, setBroadcastTarget] = useState<'grup' | 'tekli'>('grup')
-  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set())
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -187,38 +84,6 @@ export function EkipPanel() {
   }, [supabase])
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
-
-  function composeBroadcastMessage() {
-    if (broadcastMode === 'doc') {
-      const linkLine = broadcastLink.trim()
-      const noteLine = broadcastNote.trim()
-      const header = lang === 'en' ? '📄 *Document / Link*' : '📄 *Doküman / Link*'
-      return [header, linkLine, noteLine].filter(Boolean).join('\n\n')
-    }
-    return broadcastMessage.trim()
-  }
-
-  function handleGroupBroadcast() {
-    const text = composeBroadcastMessage()
-    if (!text) { toast.error(t('team.broadcastEmpty')); return }
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
-  }
-
-  function toggleMember(id: string) {
-    setSelectedMembers(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id); else next.add(id)
-      return next
-    })
-  }
-
-  function selectAllMembers() {
-    setSelectedMembers(new Set(members.map(m => m.user_id)))
-  }
-
-  function clearMemberSelection() {
-    setSelectedMembers(new Set())
-  }
 
   if (wsLoading || mLoading) {
     return (
@@ -242,8 +107,6 @@ export function EkipPanel() {
 
   const isLeader = ws.role === 'leader'
   const isSolo = members.length <= 1
-  const broadcastPreviewText = composeBroadcastMessage()
-  const selectedCount = selectedMembers.size
 
   function handleCopyInviteCode() {
     if (!ws?.inviteCode) return
@@ -315,8 +178,8 @@ export function EkipPanel() {
             <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
           </div>
-          <div className="rounded-2xl border border-[#4169E1]/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
-            <p className="text-3xl font-extrabold text-[#4169E1]">
+          <div className="rounded-2xl border border-accent-blue/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
+            <p className="text-3xl font-extrabold text-accent-blue">
               {members.reduce((s, m) => s + m.candidate_count, 0)}
             </p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
@@ -333,7 +196,7 @@ export function EkipPanel() {
                 className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition hover:shadow-md space-y-4"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-base font-bold text-[#534AB7]">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-base font-bold text-brand">
                     {(m.full_name ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1 overflow-hidden">
@@ -356,7 +219,7 @@ export function EkipPanel() {
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="text-xl font-black text-[#4169E1]">{m.candidate_count}</p>
+                    <p className="text-xl font-black text-accent-blue">{m.candidate_count}</p>
                     <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">{t('team.totalCandidates')}</p>
                   </div>
                   {isLeader && m.role !== 'leader' && (
@@ -374,7 +237,7 @@ export function EkipPanel() {
                 </div>
                 <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
                   <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-2)]">
-                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-[#534AB7]" />
+                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-brand" />
                     <span>{t('team.funnelDistribution')}</span>
                   </div>
                   {m.candidate_count === 0 ? (
@@ -432,7 +295,7 @@ export function EkipPanel() {
               <SpoilerCode code={ws?.inviteCode ?? ''} />
               <button
                 onClick={handleCopyInviteCode}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#534AB7] text-white hover:bg-[#433a9f] transition active:scale-95"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-[#433a9f] transition active:scale-95"
                 title={lang === 'en' ? 'Copy Code' : 'Kodu Kopyala'}
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
@@ -445,7 +308,7 @@ export function EkipPanel() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white hover:bg-[#20ba56] transition active:scale-95"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white hover:bg-[#20ba56] transition active:scale-95"
                 title="WhatsApp ile Paylaş"
               >
                 <WhatsAppIcon className="h-4 w-4" />
@@ -473,7 +336,7 @@ export function EkipPanel() {
                 value={inviteCodeInput}
                 onChange={e => setInviteCodeInput(e.target.value)}
                 placeholder={lang === 'en' ? 'Paste invite code...' : 'Davet kodunu yapıştırın...'}
-                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all"
               />
               <button
                 type="submit"
@@ -488,208 +351,7 @@ export function EkipPanel() {
       )}
 
       {/* ─── 4. EKİBE TOPLU GÖNDER ─── */}
-      <section>
-        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
-          <Send className="h-4 w-4" />
-          {t('team.broadcastTitle')}
-        </h2>
-
-        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
-          {/* Üst başlık bantı */}
-          <div className="flex items-start gap-3 border-b border-[var(--border)] bg-gradient-to-r from-[#534AB7]/8 to-[#25D366]/8 p-4">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]/10 text-[#534AB7] dark:bg-[#534AB7]/20">
-              <Send className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-sm font-bold text-[var(--text-1)]">{t('team.broadcastTitle')}</p>
-              <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-2)]">{t('team.broadcastSubtitle')}</p>
-            </div>
-          </div>
-
-          <div className="space-y-5 p-4">
-            {/* İçerik türü seçici */}
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
-                {lang === 'en' ? 'Content Type' : 'İçerik Türü'}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setBroadcastMode('doc')}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                    broadcastMode === 'doc'
-                      ? 'border-[#534AB7] bg-[#534AB7] text-white'
-                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
-                  }`}
-                >
-                  <FileText className="h-3.5 w-3.5 shrink-0" />
-                  {t('team.broadcastTypeDoc')}
-                </button>
-                <button
-                  onClick={() => setBroadcastMode('motiv')}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                    broadcastMode === 'motiv'
-                      ? 'border-[#534AB7] bg-[#534AB7] text-white'
-                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
-                  }`}
-                >
-                  <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-                  {t('team.broadcastTypeMotiv')}
-                </button>
-              </div>
-            </div>
-
-            {/* İçerik girişi */}
-            {broadcastMode === 'doc' ? (
-              <div className="space-y-3">
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-[var(--text-2)]">
-                    {t('team.broadcastLinkLabel')}
-                  </label>
-                  <input
-                    type="url"
-                    value={broadcastLink}
-                    onChange={e => setBroadcastLink(e.target.value)}
-                    placeholder={t('team.broadcastLinkPlaceholder')}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-[11px] font-semibold text-[var(--text-2)]">
-                    {t('team.broadcastNoteLabel')}
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={broadcastNote}
-                    onChange={e => setBroadcastNote(e.target.value)}
-                    placeholder={t('team.broadcastNotePlaceholder')}
-                    className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-semibold text-[var(--text-2)]">
-                  {t('team.broadcastMsgLabel')}
-                </label>
-                <textarea
-                  rows={4}
-                  value={broadcastMessage}
-                  onChange={e => setBroadcastMessage(e.target.value)}
-                  placeholder={t('team.broadcastMsgPlaceholder')}
-                  className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
-                />
-              </div>
-            )}
-
-            {/* Alıcı seçimi */}
-            <div className="space-y-2.5">
-              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
-                {lang === 'en' ? 'Recipients' : 'Alıcılar'}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setBroadcastTarget('grup')}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                    broadcastTarget === 'grup'
-                      ? 'border-[#25D366] bg-[#25D366]/10 text-[#1a9e4f] dark:text-[#25D366]'
-                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
-                  }`}
-                >
-                  <Users className="h-3.5 w-3.5 shrink-0" />
-                  {t('team.broadcastRecipientGroup')}
-                </button>
-                <button
-                  onClick={() => setBroadcastTarget('tekli')}
-                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
-                    broadcastTarget === 'tekli'
-                      ? 'border-[#25D366] bg-[#25D366]/10 text-[#1a9e4f] dark:text-[#25D366]'
-                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
-                  }`}
-                >
-                  <CheckSquare className="h-3.5 w-3.5 shrink-0" />
-                  {t('team.broadcastRecipientSelect')}
-                </button>
-              </div>
-
-              {/* Grup gönder */}
-              {broadcastTarget === 'grup' && (
-                <button
-                  onClick={handleGroupBroadcast}
-                  disabled={!broadcastPreviewText}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white shadow-sm shadow-[#25D366]/20 transition hover:bg-[#1fb85a] active:scale-[0.98] disabled:opacity-40"
-                >
-                  <WhatsAppIcon className="h-4 w-4" />
-                  {t('team.broadcastSendGroup')}
-                </button>
-              )}
-
-              {/* Tekli seçim */}
-              {broadcastTarget === 'tekli' && (
-                <div className="space-y-2">
-                  {members.length > 1 && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-[11px] text-[var(--text-3)]">
-                        {selectedCount > 0
-                          ? t('team.broadcastMembersSelected', { count: String(selectedCount) })
-                          : lang === 'en' ? 'Select recipients' : 'Kişileri seçin'}
-                      </span>
-                      <div className="flex gap-2">
-                        <button onClick={selectAllMembers} className="text-[11px] font-semibold text-[#534AB7] hover:underline">
-                          {t('team.broadcastSelectAll')}
-                        </button>
-                        <span className="text-[var(--border)]">·</span>
-                        <button onClick={clearMemberSelection} className="text-[11px] font-semibold text-[var(--text-3)] hover:underline">
-                          {t('team.broadcastClearAll')}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  <ul className="space-y-2">
-                    {members.map(m => {
-                      const selected = selectedMembers.has(m.user_id)
-                      return (
-                        <li key={m.user_id} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 transition hover:bg-[var(--bg)]">
-                          <button
-                            onClick={() => toggleMember(m.user_id)}
-                            className="shrink-0 text-[var(--text-3)] transition hover:text-[#534AB7]"
-                          >
-                            {selected
-                              ? <CheckSquare className="h-4 w-4 text-[#534AB7]" />
-                              : <Square className="h-4 w-4" />}
-                          </button>
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
-                            {(m.full_name ?? '?').charAt(0).toUpperCase()}
-                          </span>
-                          <span className="flex-1 truncate text-xs font-semibold text-[var(--text-1)]">
-                            {m.full_name ?? 'İsimsiz Üye'}
-                          </span>
-                          {selected && (
-                            <a
-                              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastPreviewText || '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={e => { if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')) } }}
-                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#25D366] text-white transition hover:bg-[#1fb85a] active:scale-95"
-                              title={`WhatsApp: ${m.full_name ?? ''}`}
-                            >
-                              <WhatsAppIcon className="h-3.5 w-3.5" />
-                            </a>
-                          )}
-                        </li>
-                      )
-                    })}
-                  </ul>
-                  {members.length <= 1 && (
-                    <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)]">
-                      {lang === 'en' ? 'No other team members yet.' : 'Henüz başka ekip üyeniz yok.'}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
+      <BroadcastPanel members={members} lang={lang} t={t} />
 
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (

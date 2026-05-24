@@ -29,6 +29,13 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Semantic color tokens — brand, whatsapp, accent-blue */
+@theme {
+  --color-brand: #534AB7;
+  --color-whatsapp: #25D366;
+  --color-accent-blue: #4169E1;
+}
+
 html, body {
   overflow-x: hidden;
 }
