@@ -202,15 +202,15 @@ export function EkipPanel() {
     <div className="space-y-6">
       {/* 1. Üst İstatistik Kartları */}
       <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-[var(--border)] bg-[#FAEEDA]/10 p-5 backdrop-blur-sm">
-          <p className="text-3xl font-extrabold text-[#854F0B]">{members.length}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#854F0B]/80">Ekip Üyesi</p>
+        <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5">
+          <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">Ekip Üyesi</p>
         </div>
-        <div className="rounded-2xl border border-[var(--border)] bg-[#EEEDFE]/10 p-5 backdrop-blur-sm">
-          <p className="text-3xl font-extrabold text-[#534AB7]">
+        <div className="rounded-2xl border border-[#4169E1]/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
+          <p className="text-3xl font-extrabold text-[#4169E1]">
             {members.reduce((s, m) => s + m.candidate_count, 0)}
           </p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#534AB7]/80">Toplam Aday</p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">Toplam Aday</p>
         </div>
       </div>
 
@@ -304,16 +304,16 @@ export function EkipPanel() {
             return (
               <li
                 key={m.user_id}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-sm transition hover:shadow-md space-y-4"
+                className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition hover:shadow-md space-y-4"
               >
                 {/* Üye Bilgisi Satırı */}
-                <div className="flex items-center gap-3">
+                <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-base font-bold text-[#534AB7]">
                     {(m.full_name ?? '?').charAt(0).toUpperCase()}
                   </div>
                   
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
+                  <div className="min-w-0 flex-1 overflow-hidden">
+                    <div className="flex min-w-0 items-center gap-2">
                       <p className="truncate text-sm font-bold text-[var(--text-1)]">
                         {m.full_name ?? 'İsimsiz Üye'}
                         {isCurrentUser && <span className="ml-1.5 text-[10px] font-normal text-[var(--text-3)]">(Siz)</span>}
@@ -328,8 +328,8 @@ export function EkipPanel() {
                   </div>
 
                   {/* Toplam Aday Sayısı */}
-                  <div className="shrink-0 text-right pr-2">
-                    <p className="text-xl font-black text-[var(--text-1)]">{m.candidate_count}</p>
+                  <div className="shrink-0 text-right">
+                    <p className="text-xl font-black text-[#4169E1]">{m.candidate_count}</p>
                     <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">Toplam Aday</p>
                   </div>
 
@@ -344,7 +344,7 @@ export function EkipPanel() {
                       {removingId === m.user_id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
                       ) : (
-                        <Trash2 className="h-4.5 w-4.5" />
+                        <Trash2 className="h-4 w-4" />
                       )}
                     </button>
                   )}
