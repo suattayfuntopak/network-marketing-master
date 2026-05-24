@@ -161,7 +161,7 @@ function EgitimPageContent() {
               : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
           }`}
         >
-          {lang === 'en' ? 'All Content' : 'Tüm İçerik'}
+          {t('training.allContent')}
           {aktifTab === 'all' && (
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#3730A3] dark:bg-[#a5b4fc]" />
           )}
@@ -175,7 +175,7 @@ function EgitimPageContent() {
           }`}
         >
           <Star className={`h-4 w-4 ${aktifTab === 'favorites' ? 'fill-current text-amber-500' : ''}`} />
-          {lang === 'en' ? 'Favorites' : 'Favoriler'}
+          {t('training.favorites')}
           {favs.size > 0 && (
             <span className="rounded-full bg-[#EEF2FF] dark:bg-[#1e1b4b] px-1.5 py-0.5 text-[10px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
               {favs.size}
@@ -192,12 +192,10 @@ function EgitimPageContent() {
         <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] p-12 text-center">
           <Star className="mx-auto h-8 w-8 text-[var(--text-3)] mb-3 opacity-60" />
           <h3 className="text-sm font-semibold text-[var(--text-1)] mb-1">
-            {lang === 'en' ? 'No Favorites Yet' : 'Henüz Favori Yok'}
+            {t('training.noFavorites')}
           </h3>
           <p className="text-xs text-[var(--text-3)] max-w-xs mx-auto leading-relaxed">
-            {lang === 'en' 
-              ? 'Star your favorite training articles to save them here for quick access later.' 
-              : 'Beğendiğiniz eğitim konularını yıldızlayarak buraya kaydedebilir, daha sonra hızlıca erişebilirsiniz.'}
+            {t('training.noFavoritesDesc')}
           </p>
         </div>
       ) : (
@@ -261,7 +259,7 @@ function EgitimPageContent() {
                           {/* Favori Yıldızı */}
                           <button
                             onClick={e => toggleFav(konu.id, e)}
-                            title={favori ? (lang === 'en' ? 'Remove from Favorites' : 'Favorilerden Çıkar') : (lang === 'en' ? 'Add to Favorites' : 'Favorilere Ekle')}
+                            title={favori ? t('training.removeFromFavorites') : t('training.addToFavorites')}
                             className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
                               favori
                                 ? 'text-amber-500 hover:text-amber-600'

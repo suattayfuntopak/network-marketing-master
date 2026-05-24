@@ -1,6 +1,7 @@
 -- 004: Üye self-update RLS + joined_at kolonu
 
 -- Üyelerin kendi membership satırlarını güncelleyebilmesi (ekibe katılma akışı için gerekli)
+DROP POLICY IF EXISTS "nmm_member_self_update" ON nmm_workspace_members;
 CREATE POLICY "nmm_member_self_update" ON nmm_workspace_members
   FOR UPDATE
   USING (user_id = auth.uid())

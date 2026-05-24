@@ -46,6 +46,34 @@ const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
   },
 ]
 
+const NOTIF_DISMISSED_KEY = 'nmm_notif_dismissed_ids'
+const NOTIF_READ_KEY = 'nmm_notif_read_ids'
+
+function loadNotifications(): NotificationItem[] {
+  try {
+    const dismissed = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY) ?? '[]'))
+    const read = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_READ_KEY) ?? '[]'))
+    return DEFAULT_NOTIFICATIONS
+      .filter(n => !dismissed.has(n.id))
+      .map(n => ({ ...n, read: read.has(n.id) || n.read }))
+  } catch {
+    return DEFAULT_NOTIFICATIONS
+  }
+}
+
+function persistRead(notifications: NotificationItem[]) {
+  const readIds = notifications.filter(n => n.read).map(n => n.id)
+  localStorage.setItem(NOTIF_READ_KEY, JSON.stringify(readIds))
+}
+
+function persistDismissed(ids: string[]) {
+  try {
+    const existing = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY) ?? '[]'))
+    ids.forEach(id => existing.add(id))
+    localStorage.setItem(NOTIF_DISMISSED_KEY, JSON.stringify([...existing]))
+  } catch {}
+}
+
 function NotifIcon({ type, size = 'sm' }: { type: NotificationItem['icon']; size?: 'sm' | 'lg' }) {
   const cls = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4'
   if (type === 'alert')    return <AlertCircle    className={`${cls} text-amber-500`} />
@@ -82,6 +110,9 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     if (pushPref  !== null) setPushAlerts(pushPref   === 'true')
     if (soundPref !== null) setSoundAlerts(soundPref === 'true')
 
+    // Restore persisted read/dismissed state
+    setNotifications(loadNotifications())
+
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
         if (selected) setSelected(null)
@@ -102,12 +133,15 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   function openNotification(n: NotificationItem) {
     setSelected(n)
-    // Okundu olarak işaretle
-    setNotifications(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x))
+    setNotifications(prev => {
+      const updated = prev.map(x => x.id === n.id ? { ...x, read: true } : x)
+      persistRead(updated)
+      return updated
+    })
   }
 
   function markAllRead() {
-    // Tümünü sil (kullanıcı beklentisi: mark all = clear all)
+    persistDismissed(notifications.map(n => n.id))
     setNotifications([])
     toast.success('Tüm bildirimler temizlendi')
   }

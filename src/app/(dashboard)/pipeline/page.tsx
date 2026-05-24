@@ -60,15 +60,15 @@ export default function PipelinePage() {
       <div className="mb-5 grid grid-cols-3 gap-3 animate-in fade-in duration-300 delay-100">
         <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center border border-[var(--border)]">
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
-          <p className="text-xs text-[var(--text-3)]">{lang === 'en' ? 'Total' : 'Toplam'}</p>
+          <p className="text-xs text-[var(--text-3)]">{t('pipeline.total')}</p>
         </div>
         <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center border border-[#FAEEDA]/50 dark:bg-[#FAEEDA]/5">
           <p className="text-xl font-bold text-[#854F0B]">{counts.aktif}</p>
-          <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{lang === 'en' ? 'Active' : 'Aktif'}</p>
+          <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{t('pipeline.active')}</p>
         </div>
         <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center border border-[#E1F5EE]/50 dark:bg-[#E1F5EE]/5">
           <p className="text-xl font-bold text-[#0F6E56]">{counts.sicak}</p>
-          <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{lang === 'en' ? 'Hot' : 'Sıcak'}</p>
+          <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{t('pipeline.hot')}</p>
         </div>
       </div>
 

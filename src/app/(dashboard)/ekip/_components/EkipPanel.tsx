@@ -8,6 +8,7 @@ import { Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2, TrendingUp, BarCh
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 interface MemberRow {
   user_id: string
@@ -60,6 +61,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
 export function EkipPanel() {
   const queryClient = useQueryClient()
   const supabase = createClient()
+  const { t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const [currentUser, setCurrentUser] = useState<any>(null)
   
@@ -98,8 +100,8 @@ export function EkipPanel() {
     return (
       <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
         <p className="mb-2 text-3xl">⚠️</p>
-        <p className="text-sm font-semibold text-[var(--text-1)]">Ekip verileri yüklenemedi</p>
-        <p className="mt-1 text-xs text-[var(--text-2)]">{(queryError as Error)?.message || 'Bağlantınızı kontrol edip sayfayı yenileyin'}</p>
+        <p className="text-sm font-semibold text-[var(--text-1)]">{t('team.loadError')}</p>
+        <p className="mt-1 text-xs text-[var(--text-2)]">{(queryError as Error)?.message || t('team.loadErrorHint')}</p>
       </div>
     )
   }
@@ -111,7 +113,7 @@ export function EkipPanel() {
     if (!ws?.inviteCode) return
     navigator.clipboard.writeText(ws.inviteCode)
     setCopied(true)
-    toast.success('Davet kodu kopyalandı!')
+    toast.success(t('team.inviteCopied'))
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -126,7 +128,7 @@ export function EkipPanel() {
     }
 
     if (code === ws?.inviteCode) {
-      toast.error('Zaten bu çalışma alanındasınız!')
+      toast.error(t('team.alreadyInTeam'))
       return
     }
 
@@ -140,12 +142,12 @@ export function EkipPanel() {
         .maybeSingle()
 
       if (wsError || !targetWs) {
-        toast.error('Geçersiz veya bulunamayan davet kodu!')
+        toast.error(t('team.invalidCode'))
         setJoining(false)
         return
       }
 
-      if (!currentUser?.id) throw new Error('Oturum bilgisi alınamadı.')
+      if (!currentUser?.id) throw new Error(t('team.noSessionError'))
 
       // 2. Update membership to member in the target workspace
       const { error: memError } = await supabase
@@ -161,7 +163,7 @@ export function EkipPanel() {
         .update({ workspace_id: targetWs.id })
         .eq('owner_id', currentUser.id)
 
-      toast.success(`"${targetWs.name}" ekibine başarıyla katıldınız!`)
+      toast.success(t('team.joinSuccess', { name: targetWs.name }))
       setInviteCodeInput('')
       
       // Invalidate all query caches
@@ -170,7 +172,7 @@ export function EkipPanel() {
       queryClient.invalidateQueries({ queryKey: ['candidates'] })
     } catch (err: any) {
       console.error(err)
-      toast.error(err.message || 'Ekibe katılırken bir hata oluştu.')
+      toast.error(err.message || t('team.joinError'))
     } finally {
       setJoining(false)
     }
@@ -209,11 +211,11 @@ export function EkipPanel() {
         .update({ workspace_id: newWs.id })
         .eq('owner_id', memberId)
 
-      toast.success(`${memberName} başarıyla ekipten çıkarıldı.`)
+      toast.success(t('team.removeSuccess', { name: memberName }))
       queryClient.invalidateQueries({ queryKey: ['members'] })
     } catch (err: any) {
       console.error(err)
-      toast.error(err.message || 'Üye çıkarılırken bir hata oluştu.')
+      toast.error(err.message || t('team.removeError'))
     } finally {
       setRemovingId(null)
     }
@@ -225,13 +227,13 @@ export function EkipPanel() {
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5">
           <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">Ekip Üyesi</p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
         </div>
         <div className="rounded-2xl border border-[#4169E1]/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
           <p className="text-3xl font-extrabold text-[#4169E1]">
             {members.reduce((s, m) => s + m.candidate_count, 0)}
           </p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">Toplam Aday</p>
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
         </div>
       </div>
 
@@ -244,10 +246,10 @@ export function EkipPanel() {
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB]">
                 <UserPlus className="h-5 w-5" />
               </div>
-              <h3 className="text-sm font-bold text-[var(--text-1)]">Ekip Arkadaşı Davet Et</h3>
+              <h3 className="text-sm font-bold text-[var(--text-1)]">{t('team.inviteTeammate')}</h3>
             </div>
             <p className="text-xs text-[var(--text-2)] leading-relaxed">
-              Ekip üyelerinizin uygulamaya kendi hesaplarıyla üye olmasını sağlayın. Ardından aşağıdaki kodu "Ekibim" sayfasından girerek ekibinize dahil olmalarını isteyin.
+              {t('team.inviteTeammateDesc')}
             </p>
             <div className="flex min-w-0 items-center gap-2 overflow-hidden">
               <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-lg font-bold tracking-widest text-[var(--text-1)]">
@@ -282,10 +284,10 @@ export function EkipPanel() {
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56]">
                 <LogIn className="h-5 w-5" />
               </div>
-              <h3 className="text-sm font-bold text-[var(--text-1)]">Bir Liderin Ekibine Katıl</h3>
+              <h3 className="text-sm font-bold text-[var(--text-1)]">{t('team.joinATeam')}</h3>
             </div>
             <p className="text-xs text-[var(--text-2)] leading-relaxed">
-              Liderinizin sizinle paylaştığı davet kodunu aşağıya girerek onun çalışma alanına dahil olun. Mevcut tüm aday verileriniz otomatik olarak bu ekibe aktarılacaktır.
+              {t('team.joinATeamDesc')}
             </p>
             <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-2 overflow-hidden">
               <input
@@ -301,7 +303,7 @@ export function EkipPanel() {
                 disabled={joining}
                 className="flex h-10 px-4 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0F6E56] text-sm font-semibold text-white hover:bg-[#0a5a44] transition active:scale-95 disabled:opacity-50"
               >
-                {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Katıl'}
+                {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : t('team.joinBtn')}
               </button>
             </form>
           </div>
@@ -312,7 +314,7 @@ export function EkipPanel() {
       <section className="space-y-3">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
           <BarChart2 className="h-4 w-4" />
-          Ekip Performans Paneli
+          {t('team.performancePanel')}
         </h2>
 
         <ul className="space-y-3">
@@ -334,17 +336,17 @@ export function EkipPanel() {
                     <div className="flex min-w-0 items-center gap-2">
                       <p className="truncate text-sm font-bold text-[var(--text-1)]">
                         {m.full_name ?? 'İsimsiz Üye'}
-                        {isCurrentUser && <span className="ml-1.5 text-[10px] font-normal text-[var(--text-3)]">(Siz)</span>}
+                        {isCurrentUser && <span className="ml-1.5 text-[10px] font-normal text-[var(--text-3)]">({t('common.you')})</span>}
                       </p>
                       {m.role === 'leader' && (
                         <Crown className="h-3.5 w-3.5 shrink-0 text-[#854F0B]" strokeWidth={2} />
                       )}
                     </div>
                     <p className="text-xs text-[var(--text-3)] capitalize mt-0.5">
-                      {m.role === 'leader' ? 'Lider' : 'Ekip Üyesi'}
+                      {m.role === 'leader' ? t('common.leader') : t('common.member')}
                       {m.joined_at && (
                         <span className="ml-1.5 text-[10px]">
-                          · {new Date(m.joined_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })} katıldı
+                          · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
                         </span>
                       )}
                     </p>
@@ -353,16 +355,16 @@ export function EkipPanel() {
                   {/* Toplam Aday Sayısı */}
                   <div className="shrink-0 text-right">
                     <p className="text-xl font-black text-[#4169E1]">{m.candidate_count}</p>
-                    <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">Toplam Aday</p>
+                    <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">{t('team.totalCandidates')}</p>
                   </div>
 
                   {/* Liderler diğer üyeleri ekipten çıkarabilir (kendini çıkaramaz) */}
                   {isLeader && m.role !== 'leader' && (
                     <button
-                      onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? 'Üye' })}
+                      onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? t('common.member') })}
                       disabled={removingId === m.user_id}
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition active:scale-95 disabled:opacity-50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40"
-                      title="Ekipten Çıkar"
+                      title={t('team.removeFromTeam')}
                     >
                       {removingId === m.user_id ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -377,35 +379,28 @@ export function EkipPanel() {
                 <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
                   <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-2)]">
                     <TrendingUp className="h-3.5 w-3.5 shrink-0 text-[#534AB7]" />
-                    <span>Aday Hunisi Dağılımı</span>
+                    <span>{t('team.funnelDistribution')}</span>
                   </div>
 
                   {m.candidate_count === 0 ? (
-                    <p className="text-[11px] text-[var(--text-3)] italic py-1">Bu üyenin henüz boru hattında kayıtlı adayı bulunmuyor.</p>
+                    <p className="text-[11px] text-[var(--text-3)] italic py-1">{t('team.noTeamCandidates')}</p>
                   ) : (
                     <div className="grid grid-cols-2 gap-2 pt-1 text-center sm:grid-cols-4">
-                      {/* Yeni Aday */}
                       <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/10 p-2 border border-blue-100/30 dark:border-blue-900/10">
                         <span className="block text-xs font-bold text-blue-600 dark:text-blue-400">{m.yeni_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">Yeni</span>
+                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.yeni')}</span>
                       </div>
-                      
-                      {/* Sunum */}
                       <div className="rounded-xl bg-emerald-50/50 dark:bg-emerald-950/10 p-2 border border-emerald-100/30 dark:border-emerald-900/10">
                         <span className="block text-xs font-bold text-emerald-600 dark:text-emerald-400">{m.sunum_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">Sunum</span>
+                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.sunum')}</span>
                       </div>
-
-                      {/* Takip */}
                       <div className="rounded-xl bg-amber-50/50 dark:bg-amber-950/10 p-2 border border-amber-100/30 dark:border-amber-900/10">
                         <span className="block text-xs font-bold text-amber-600 dark:text-amber-400">{m.takip_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">Takipte</span>
+                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.takip')}</span>
                       </div>
-
-                      {/* Katıldı (Gold/Premium) */}
                       <div className="rounded-xl bg-[#FAEEDA]/50 dark:bg-[#FAEEDA]/5 p-2 border border-[#FAEEDA]/30 dark:border-[#FAEEDA]/10">
                         <span className="block text-xs font-bold text-[#854F0B] dark:text-[#fcd34d]">{m.katildi_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-semibold text-[#854F0B] dark:text-[#fcd34d]">Katıldı</span>
+                        <span className="text-[9px] font-semibold text-[#854F0B] dark:text-[#fcd34d]">{t('stages.katildi')}</span>
                       </div>
                     </div>
                   )}
@@ -419,21 +414,21 @@ export function EkipPanel() {
       {/* Solo Lider için bilgilendirme */}
       {isSolo && isLeader && (
         <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
-          Henüz bir ekip üyeniz yok. Yukarıdaki davet kodunu paylaşarak ekibinizi büyütebilirsiniz.
+          {t('team.soloHint')}
         </p>
       )}
 
       {/* Üye rolü için bilgilendirme */}
       {!isLeader && (
         <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
-          Bir ekibe dahil olduğunuz için ekip yönetimi yetkiniz bulunmamaktadır. Kendi boru hattınızı yönetmeye devam edebilir, performansınızı liderinizle paylaşabilirsiniz.
+          {t('team.memberHint')}
         </p>
       )}
 
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (
         <ConfirmDeleteModal
-          message={`${memberToRemove.name} ekibinizden çıkarılacak.`}
+          message={t('team.removeMemberMsg', { name: memberToRemove.name })}
           onConfirm={handleRemoveMemberConfirmed}
           onCancel={handleMemberRemoveCancel}
         />

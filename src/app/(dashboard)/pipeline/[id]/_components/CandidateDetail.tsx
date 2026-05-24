@@ -27,12 +27,12 @@ function suggestedFollowUp(c: NmmCandidate, lang: string): string | null {
   return base.toLocaleDateString(locale, { day: 'numeric', month: 'long' })
 }
 
-function daysSince(iso: string | null, lang: string): string {
-  if (!iso) return lang === 'en' ? 'No contact yet' : 'Hiç temas yok'
+function daysSince(iso: string | null, t: (k: string, v?: Record<string, string | number>) => string): string {
+  if (!iso) return t('common.noContact')
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000)
-  if (d === 0) return lang === 'en' ? 'Today' : 'Bugün'
-  if (d === 1) return lang === 'en' ? 'Yesterday' : 'Dün'
-  return lang === 'en' ? `${d} days ago` : `${d} gün önce`
+  if (d === 0) return t('common.today')
+  if (d === 1) return t('common.yesterday')
+  return t('common.daysAgo', { days: d })
 }
 
 function toInputDateTime(iso: string | null): string {
@@ -83,28 +83,27 @@ export function CandidateDetail({ candidateId }: Props) {
   const c = candidates.find(x => x.id === candidateId)
 
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
-  const senderName = ws?.fullName || 'Danışmanınız'
+  const senderName = ws?.fullName || (lang === 'en' ? 'Your Advisor' : 'Danışmanınız')
   const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
-  
-  const presentationMessage = `Sayın ${c?.full_name?.trim() || 'Müşteri'}, sunum materyallerine aşağıdaki bağlantıdan ulaşabilirsiniz:\n\n${GREENLEAF_PRESENTATION_URL}\n\nSorularınız olursa ${senderName} ile iletişime geçebilirsiniz.`
+
+  const getPresentationMessage = useCallback(() => {
+    const name = c?.full_name?.trim() || (lang === 'en' ? 'Customer' : 'Müşteri')
+    return t('pipeline.presentationMessageTemplate', { name, url: GREENLEAF_PRESENTATION_URL, sender: senderName })
+  }, [c, lang, senderName, t])
 
   const handleSendWhatsApp = useCallback(() => {
     if (!candidatePhoneClean) return
-    navigator.clipboard.writeText(presentationMessage)
-      .then(() => toast.success('Sunum mesajı kopyalandı!'))
-      .catch(() => {})
-    const encodedText = encodeURIComponent(presentationMessage)
-    window.open(`https://wa.me/${candidatePhoneClean}?text=${encodedText}`, '_blank', 'noopener,noreferrer')
-  }, [candidatePhoneClean, presentationMessage])
+    const msg = getPresentationMessage()
+    navigator.clipboard.writeText(msg).then(() => toast.success(t('pipeline.presentationCopied'))).catch(() => {})
+    window.open(`https://wa.me/${candidatePhoneClean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+  }, [candidatePhoneClean, getPresentationMessage, t])
 
   const handleSendSms = useCallback(() => {
     if (!candidatePhoneClean) return
-    navigator.clipboard.writeText(presentationMessage)
-      .then(() => toast.success('Sunum mesajı kopyalandı!'))
-      .catch(() => {})
-    const encodedText = encodeURIComponent(presentationMessage)
-    window.open(`sms:${candidatePhoneClean}?body=${encodedText}`, '_blank', 'noopener,noreferrer')
-  }, [candidatePhoneClean, presentationMessage])
+    const msg = getPresentationMessage()
+    navigator.clipboard.writeText(msg).then(() => toast.success(t('pipeline.presentationCopied'))).catch(() => {})
+    window.open(`sms:${candidatePhoneClean}?body=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
+  }, [candidatePhoneClean, getPresentationMessage, t])
 
   if (wsLoading || cLoading) {
     return (
@@ -123,12 +122,12 @@ export function CandidateDetail({ candidateId }: Props) {
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg)]">
         <div className="text-center">
           <p className="text-2xl mb-2">🔍</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">Aday bulunamadı</p>
+          <p className="text-sm font-semibold text-[var(--text-1)]">{t('pipeline.candidateNotFound')}</p>
           <button
             onClick={() => router.push('/pipeline')}
             className="mt-4 rounded-xl bg-[#534AB7] px-4 py-2 text-sm font-semibold text-white"
           >
-            Boru Hattı'na Dön
+            {t('pipeline.backToPipeline')}
           </button>
         </div>
       </main>
@@ -139,6 +138,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const nextFollow = c.next_follow_up_at
     ? formatFollowUpDate(c.next_follow_up_at, lang)
     : suggestedFollowUp(c, lang)
+  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -176,14 +176,14 @@ export function CandidateDetail({ candidateId }: Props) {
             className="flex items-center gap-1.5 text-sm font-medium text-[var(--text-2)] transition hover:text-[var(--text-1)]"
           >
             <ArrowLeft className="h-4 w-4" />
-            Geri
+            {t('pipeline.back')}
           </button>
           <button
             onClick={() => setEditOpen(true)}
             className="flex items-center gap-1.5 rounded-xl bg-[var(--bg-subtle)] px-3 py-2 text-sm font-medium text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7]"
           >
             <Pencil className="h-4 w-4" />
-            Düzenle
+            {t('common.edit')}
           </button>
         </div>
 
@@ -208,14 +208,14 @@ export function CandidateDetail({ candidateId }: Props) {
           )}
         </div>
 
-        {/* Aksiyon butonları: YZ Mesajı | WhatsApp | Ara */}
+        {/* Aksiyon butonları */}
         <div className="mb-4 grid grid-cols-3 gap-3">
           <button
             onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(c.note ?? '')}`)}
             className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
           >
             <Bot className="h-4 w-4" strokeWidth={1.75} />
-            YZ Mesajı
+            {t('pipeline.aiMessage')}
           </button>
           {waLink ? (
             <a
@@ -229,7 +229,7 @@ export function CandidateDetail({ candidateId }: Props) {
             </a>
           ) : (
             <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
-              WA yok
+              {t('pipeline.noWhatsApp')}
             </div>
           )}
           {c.phone ? (
@@ -238,11 +238,11 @@ export function CandidateDetail({ candidateId }: Props) {
               className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90"
             >
               <Phone className="h-4 w-4" strokeWidth={1.75} />
-              Ara
+              {t('pipeline.call')}
             </a>
           ) : (
             <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
-              Tel yok
+              {t('pipeline.noPhone')}
             </div>
           )}
         </div>
@@ -252,18 +252,18 @@ export function CandidateDetail({ candidateId }: Props) {
           <div>
             <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
               <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
-              Sunum Materyalleri
+              {t('pipeline.presentationMaterials')}
             </p>
             <p className="mt-2 text-xs leading-relaxed text-[var(--text-3)]">
-              Adayınıza bir açıklama eşliğinde WhatsApp ya da SMS üzerinden sunum linkini gönderebilirsiniz. Bu link açıldığında adayınız güncel sunumu izleyebilir ve inceleyebilir.
+              {t('pipeline.presentationMaterialsDesc')}
             </p>
           </div>
 
-          {!candidatePhoneClean ? (
+          {!candidatePhoneClean && (
             <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 p-3 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-              ⚠️ <strong>DİKKAT:</strong> Hazır mesajı gönderebilmek için bu adaya ait telefon numarasını <strong>Düzenle</strong> bölümünden ekleyin!
+              {t('pipeline.presentationWarning')}
             </p>
-          ) : null}
+          )}
 
           <div className="mt-4 grid w-full grid-cols-2 items-stretch gap-2.5">
             <button
@@ -273,9 +273,8 @@ export function CandidateDetail({ candidateId }: Props) {
               className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-sky-600 hover:bg-sky-500 shadow-md hover:shadow-sky-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
             >
               <MessageSquare className="h-4 w-4 shrink-0" />
-              <span className="text-center leading-tight">SMS İle Gönder</span>
+              <span className="text-center leading-tight">{t('pipeline.shareSms')}</span>
             </button>
-            
             <button
               type="button"
               disabled={!candidatePhoneClean}
@@ -283,7 +282,7 @@ export function CandidateDetail({ candidateId }: Props) {
               className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
             >
               <WhatsAppIcon className="h-4 w-4 shrink-0" />
-              <span className="text-center leading-tight">WhatsApp İle Gönder</span>
+              <span className="text-center leading-tight">{t('pipeline.shareWhatsapp')}</span>
             </button>
           </div>
         </div>
@@ -293,7 +292,7 @@ export function CandidateDetail({ candidateId }: Props) {
           <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
             <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
               <History className="h-3.5 w-3.5" />
-              Aktivite Geçmişi
+              {t('pipeline.activityHistory')}
             </p>
             <ul className="space-y-2">
               {activityLog.map(a => (
@@ -305,14 +304,14 @@ export function CandidateDetail({ candidateId }: Props) {
                     {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
                   </span>
                   <span className="flex-1 text-[var(--text-2)]">
-                    {a.action_type === 'call'         && 'Arama'}
+                    {a.action_type === 'call'         && t('pipeline.activityCall')}
                     {a.action_type === 'whatsapp'     && 'WhatsApp'}
-                    {a.action_type === 'note'         && 'Not'}
-                    {a.action_type === 'stage_change' && 'Aşama değişti'}
+                    {a.action_type === 'note'         && t('pipeline.activityNote')}
+                    {a.action_type === 'stage_change' && t('pipeline.activityStageChange')}
                     {a.note && <span className="text-[var(--text-3)]"> — {a.note}</span>}
                   </span>
                   <span className="shrink-0 text-[10px] text-[var(--text-3)]">
-                    {new Date(a.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                    {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
                   </span>
                 </li>
               ))}
@@ -391,7 +390,7 @@ export function CandidateDetail({ candidateId }: Props) {
                     {nextFollow ?? '—'}
                   </p>
                   <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
-                    ({daysSince(c.last_contact_at, lang)})
+                    ({daysSince(c.last_contact_at, t)})
                   </span>
                 </div>
               )}
@@ -436,7 +435,7 @@ export function CandidateDetail({ candidateId }: Props) {
           <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={() => setStageOpen(false)} />
           <div className={`fixed bottom-0 left-0 right-0 ${Z.sheet} rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0`}>
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <p className="text-sm font-bold text-[var(--text-1)]">{lang === 'en' ? 'Select Stage' : 'Aşama Seç'}</p>
+              <p className="text-sm font-bold text-[var(--text-1)]">{t('pipeline.selectStage')}</p>
               <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
                 <X className="h-4 w-4" />
               </button>
@@ -452,7 +451,7 @@ export function CandidateDetail({ candidateId }: Props) {
                     )}
                   >
                     <span className={clsx('inline-block h-2 w-2 shrink-0 rounded-full', STAGE_COLOR[s].split(' ')[0])} />
-                    {STAGE_LABEL[s]}
+                    {t(`stages.${s}`)}
                   </button>
                 </li>
               ))}

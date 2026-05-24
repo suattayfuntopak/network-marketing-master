@@ -212,24 +212,22 @@ export function IlgilenContent() {
           <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-xs text-[var(--text-3)]">
             {showAll ? (
               <>
-                {lang === 'en' ? 'All priority leads are listed.' : 'Tüm öncelikli adaylar listelendi.'}{' '}
+                {t('today.allPriorityListed')}{' '}
                 <button
                   onClick={() => setShowAll(false)}
                   className="font-bold text-[#72243E] hover:underline ml-1"
                 >
-                  {lang === 'en' ? 'Collapse' : 'Kapat'}
+                  {t('today.collapse')}
                 </button>
               </>
             ) : (
               <>
-                {lang === 'en'
-                  ? `+${remaining} more leads pending — complete these ${daily.length} first.`
-                  : `+${remaining} kişi daha takip bekliyor — önce bu ${daily.length}'ini tamamla.`}{' '}
+                {t('today.moreLeadsPending', { remaining, count: daily.length })}{' '}
                 <button
                   onClick={() => setShowAll(true)}
                   className="font-bold text-[#534AB7] hover:underline ml-1"
                 >
-                  {lang === 'en' ? 'Show All' : 'Tümünü Gör'}
+                  {t('today.showAll')}
                 </button>
               </>
             )}

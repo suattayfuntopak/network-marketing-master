@@ -122,7 +122,7 @@ export function PanoContent() {
 
       {/* ── 8 hızlı erişim karesi — mobil 2 sütun (4 satır), masaüstü 4 sütun (2 satır) ── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-        <SquareButton icon={Zap}                    label={lang === 'en' ? "Today's Focus" : "Bugün İlgilen"}     color="purple" href="/bugun/ilgilen" />
+        <SquareButton icon={Zap}                    label={t('nav.todayFocus')}     color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="blue"   href="/pipeline"      />
         <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
         <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />

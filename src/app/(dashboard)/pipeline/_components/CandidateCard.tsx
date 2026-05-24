@@ -15,12 +15,12 @@ import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 import { Z } from '@/lib/zIndex'
 
-function daysSince(iso: string | null): string {
-  if (!iso) return 'Hiç aranmadı'
+function daysSince(iso: string | null, t: (k: string, v?: Record<string, string | number>) => string): string {
+  if (!iso) return t('common.noContact')
   const d = Math.floor((Date.now() - new Date(iso).getTime()) / 86_400_000)
-  if (d === 0) return 'Bugün'
-  if (d === 1) return 'Dün'
-  return `${d} gün önce`
+  if (d === 0) return t('common.today')
+  if (d === 1) return t('common.yesterday')
+  return t('common.daysAgo', { days: d })
 }
 
 interface CandidateCardProps {
@@ -104,9 +104,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80',
                 STAGE_COLOR[candidate.stage]
               )}
-              title={lang === 'en' ? 'Change Stage' : 'Aşama Değiştir'}
+              title={t('pipeline.changeStage')}
             >
-              {STAGE_LABEL[candidate.stage]}
+              {t(`stages.${candidate.stage}`)}
               <ChevronDown className="h-3 w-3" />
             </button>
           </div>
@@ -117,13 +117,13 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 onClick={() => update.mutate({ id: candidate.id, stage: 'iletisim' })}
                 disabled={update.isPending}
                 className="flex items-center gap-1 rounded-full border border-[#534AB7]/30 bg-[#EEEDFE] px-2.5 py-1 text-[10px] font-semibold text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white disabled:opacity-50"
-                title="İletişim aşamasına geri al"
+                title={t('pipeline.reactivateTitle')}
               >
                 <RotateCcw className="h-2.5 w-2.5" />
-                Yeniden Aktif Et
+                {t('pipeline.reactivate')}
               </button>
             )}
-            <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at)}</span>
+            <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at, t)}</span>
           </div>
         </div>
       </li>
@@ -148,7 +148,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
           <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={() => setStageOpen(false)} />
           <div className={`fixed bottom-0 left-0 right-0 ${Z.sheet} rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0`}>
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <p className="text-sm font-bold text-[var(--text-1)]">Aşama Seç</p>
+              <p className="text-sm font-bold text-[var(--text-1)]">{t('pipeline.selectStage')}</p>
               <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
                 <X className="h-4 w-4" />
               </button>
@@ -164,7 +164,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                     )}
                   >
                     <span className={clsx('inline-block h-2 w-2 shrink-0 rounded-full', STAGE_COLOR[s].split(' ')[0])} />
-                    {STAGE_LABEL[s]}
+                    {t(`stages.${s}`)}
                   </button>
                 </li>
               ))}
