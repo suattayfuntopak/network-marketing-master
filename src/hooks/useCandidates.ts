@@ -76,11 +76,11 @@ export function useUpdateCandidate(workspaceId: string) {
 
       // Stage değişikliğini aktivite geçmişine logla
       if (patch.stage) {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (session?.user) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
           await supabase.from('nmm_daily_actions').insert({
             workspace_id: workspaceId,
-            user_id: session.user.id,
+            user_id: user.id,
             candidate_id: id,
             action_type: 'stage_change' as const,
             note: patch.stage,

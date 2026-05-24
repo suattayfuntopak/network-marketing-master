@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-24 — getSession→getUser Düzeltmesi + Atomik Workspace İşlemleri (Council #4 & #5)
+
+### fix: useCandidates.ts — getSession() → getUser() (Council #4)
+- `src/hooks/useCandidates.ts:79`: Stage change logu sırasında kullanılan `getSession()` çağrısı `getUser()`'a değiştirildi; sunucu tarafında doğrulanmış kimlik kullanılıyor.
+
+### fix: EkipPanel — join/leave atomik değildi (Council #5)
+- **Sorun:** `handleJoinWorkspace` ve `handleRemoveMemberConfirmed` fonksiyonları membership + candidates tablolarını ayrı sorgularla güncelliyordu. İlk sorgu başarılı, ikincisi başarısız olursa veriler tutarsız kalıyordu. Üstelik `remove_member` kendi workspace'i olmayan bir workspace eklemeye çalıştığından RLS da ihlal ediliyordu.
+- **Çözüm:** `supabase/migrations/007_atomic_workspace_ops.sql` ile iki Postgres fonksiyonu eklendi:
+  - `nmm_join_workspace(p_invite_code)` — üyelik + aday taşıma tek transaction'da
+  - `nmm_remove_member(p_member_id, p_member_name)` — yeni workspace oluşturma + üye/aday taşıma tek transaction'da; çağıranın owner olduğu doğrulanır; kod üretimi DB'de yapılır
+  - Her ikisi de `SECURITY DEFINER SET search_path = public` ile güvenli
+- `EkipPanel.tsx`: Sıralı 3 sorgu yerine tek `supabase.rpc()` çağrısı
+- `database.types.ts`: `Functions` bölümüne `nmm_join_workspace` ve `nmm_remove_member` tip tanımları eklendi
+
 ## 2026-05-24 — AI Limit Sunucu Tarafına Taşındı + Lider Notu Modül Yerleşimi
 
 ### fix: AI mesaj limiti localStorage'dan DB sayacına taşındı (Council #3)

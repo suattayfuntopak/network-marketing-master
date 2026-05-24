@@ -269,20 +269,13 @@ export function EkipPanel() {
     if (code === ws?.inviteCode) { toast.error(t('team.alreadyInTeam')); return }
     setJoining(true)
     try {
-      const { data: targetWs, error: wsError } = await supabase
-        .from('nmm_workspaces')
-        .select('id, name')
-        .eq('invite_code', code)
-        .maybeSingle()
-      if (wsError || !targetWs) { toast.error(t('team.invalidCode')); setJoining(false); return }
-      if (!currentUser?.id) throw new Error(t('team.noSessionError'))
-      const { error: memError } = await supabase
-        .from('nmm_workspace_members')
-        .update({ workspace_id: targetWs.id, role: 'member' })
-        .eq('user_id', currentUser.id)
-      if (memError) throw memError
-      await supabase.from('nmm_candidates').update({ workspace_id: targetWs.id }).eq('owner_id', currentUser.id)
-      toast.success(t('team.joinSuccess', { name: targetWs.name }))
+      const { data, error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
+      if (rpcError) {
+        toast.error(rpcError.message?.includes('invalid_invite_code') ? t('team.invalidCode') : t('team.joinError'))
+        setJoining(false)
+        return
+      }
+      toast.success(t('team.joinSuccess', { name: (data as any)?.workspace_name ?? '' }))
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['members'] })
@@ -302,20 +295,8 @@ export function EkipPanel() {
     setMemberToRemove(null)
     setRemovingId(memberId)
     try {
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-      const newCode = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
-      const { data: newWs, error: wsError } = await supabase
-        .from('nmm_workspaces')
-        .insert({ name: `${memberName}'in Ekibi`, owner_id: memberId, invite_code: newCode })
-        .select('id')
-        .single()
-      if (wsError || !newWs) throw wsError
-      const { error: memError } = await supabase
-        .from('nmm_workspace_members')
-        .update({ workspace_id: newWs.id, role: 'leader' })
-        .eq('user_id', memberId)
-      if (memError) throw memError
-      await supabase.from('nmm_candidates').update({ workspace_id: newWs.id }).eq('owner_id', memberId)
+      const { error: rpcError } = await supabase.rpc('nmm_remove_member', { p_member_id: memberId, p_member_name: memberName })
+      if (rpcError) throw rpcError
       toast.success(t('team.removeSuccess', { name: memberName }))
       queryClient.invalidateQueries({ queryKey: ['members'] })
     } catch (err: any) {

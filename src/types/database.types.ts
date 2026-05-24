@@ -182,7 +182,16 @@ export interface Database {
       }
     }
     Views: { [_ in never]: never }
-    Functions: { [_ in never]: never }
+    Functions: {
+      nmm_join_workspace: {
+        Args: { p_invite_code: string }
+        Returns: Json
+      }
+      nmm_remove_member: {
+        Args: { p_member_id: string; p_member_name: string }
+        Returns: Json
+      }
+    }
     Enums: { [_ in never]: never }
   }
 }
