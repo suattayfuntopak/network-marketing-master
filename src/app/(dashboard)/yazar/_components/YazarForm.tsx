@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
-import { Copy, Loader2, Bot, X } from 'lucide-react'
+import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateMessageAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -9,6 +9,8 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
+import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { toast } from 'sonner'
 import type { NmmCandidate } from '@/types/database.types'
 
 const MESSAGE_TYPES = [
@@ -27,6 +29,29 @@ const TONES = [
 ]
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
+
+const HISTORY_KEY = 'nmm_message_history'
+const MAX_HISTORY = 5
+
+interface HistoryEntry {
+  message: string
+  candidateName: string
+  messageType: string
+  timestamp: number
+}
+
+function loadHistory(): HistoryEntry[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
+  } catch { return [] }
+}
+
+function saveToHistory(entry: HistoryEntry) {
+  const history = loadHistory()
+  const updated = [entry, ...history].slice(0, MAX_HISTORY)
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(updated))
+}
 
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
@@ -57,11 +82,21 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [messageType, setMessageType] = useState('genel')
   const [tone, setTone] = useState('samimi')
+  const [history, setHistory] = useState<HistoryEntry[]>([])
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [limitReached, setLimitReached] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const prefilledRef = useRef(false)
+  const prevMessageRef = useRef<string | undefined>(undefined)
 
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)
+
+  // Sayfa yüklenince localStorage'dan history + limit durumunu al
+  useEffect(() => {
+    setHistory(loadHistory())
+    setLimitReached(isAILimitReached())
+  }, [])
 
   useEffect(() => {
     if (initialName && candidates.length > 0 && !prefilledRef.current) {
@@ -86,6 +121,23 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
     return () => document.removeEventListener('mousedown', onOutside)
   }, [])
 
+  // Yeni mesaj üretilince history'ye kaydet
+  useEffect(() => {
+    if (state.message && state.message !== prevMessageRef.current) {
+      prevMessageRef.current = state.message
+      incrementAIUsage()
+      setLimitReached(isAILimitReached())
+      const entry: HistoryEntry = {
+        message: state.message,
+        candidateName: selected?.full_name ?? query ?? 'Kişisiz',
+        messageType,
+        timestamp: Date.now(),
+      }
+      saveToHistory(entry)
+      setHistory(loadHistory())
+    }
+  }, [state.message, selected, query, messageType])
+
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
   )
@@ -105,10 +157,19 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   }
 
   function handleCopy() {
-    if (state.message) navigator.clipboard.writeText(state.message)
+    if (state.message) {
+      navigator.clipboard.writeText(state.message)
+      toast.success('Mesaj kopyalandı!')
+    }
+  }
+
+  function handleCopyHistory(msg: string) {
+    navigator.clipboard.writeText(msg)
+    toast.success('Mesaj kopyalandı!')
   }
 
   const waLink = waHref(selected?.phone, state.message)
+  const remaining = remainingAIUsage()
 
   return (
     <div className="space-y-5">
@@ -230,16 +291,22 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
           <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">{state.error}</p>
         )}
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E56] py-3.5 text-sm font-semibold text-white transition hover:bg-[#0a5a44] disabled:opacity-60"
-        >
-          {isPending
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-            : <><Bot className="h-4 w-4" /> Üret</>
-          }
-        </button>
+        {limitReached ? (
+          <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
+            Günlük {DAILY_AI_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
+          </div>
+        ) : (
+          <button
+            type="submit"
+            disabled={isPending}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E56] py-3.5 text-sm font-semibold text-white transition hover:bg-[#0a5a44] disabled:opacity-60"
+          >
+            {isPending
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
+              : <><Bot className="h-4 w-4" /> Üret ({remaining} hak kaldı)</>
+            }
+          </button>
+        )}
       </form>
 
       {state.message && (
@@ -266,6 +333,49 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
             </div>
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)]">{state.message}</p>
+        </div>
+      )}
+
+      {/* Mesaj Geçmişi */}
+      {history.length > 0 && (
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
+          <button
+            onClick={() => setHistoryOpen(v => !v)}
+            className="flex w-full items-center justify-between px-4 py-3"
+          >
+            <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-2)]">
+              <Clock className="h-4 w-4" />
+              Son Mesajlar ({history.length})
+            </span>
+            {historyOpen ? <ChevronUp className="h-4 w-4 text-[var(--text-3)]" /> : <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />}
+          </button>
+          {historyOpen && (
+            <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
+              {history.map((entry, i) => (
+                <li key={i} className="p-4">
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-[var(--text-1)]">{entry.candidateName}</span>
+                      <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[10px] font-medium text-[#0F6E56]">
+                        {MESSAGE_TYPES.find(t => t.value === entry.messageType)?.label ?? entry.messageType}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleCopyHistory(entry.message)}
+                      className="flex items-center gap-1 rounded-lg bg-[var(--bg-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)]"
+                    >
+                      <Copy className="h-2.5 w-2.5" />
+                      Kopyala
+                    </button>
+                  </div>
+                  <p className="line-clamp-2 text-xs leading-relaxed text-[var(--text-3)]">{entry.message}</p>
+                  <p className="mt-1 text-[10px] text-[var(--text-3)]">
+                    {new Date(entry.timestamp).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
     </div>

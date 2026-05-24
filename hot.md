@@ -1,6 +1,49 @@
 # Hot Log
 
-## 2026-05-24 — Council Triad İyileştirme Paketi
+## 2026-05-24 — Pano Genişletme & Ekibim Fix
+
+### feat: Pano 6 → 8 kare, grid 2×4
+
+- Pano grid düzenlemesi: `grid-cols-2 md:grid-cols-3` → `grid-cols-2 md:grid-cols-4`
+- Yeni 6. kare: **İtirazlara Cevap** (`/itirazlar`) — rose renk, `MessageCircleQuestion` ikonu
+- Yeni 7. kare: **Vaktin Varsa** (`/egitim`) — indigo renk, `BookOpen` ikonu
+- Kazanımlar kutusu 6. sıradan 8. sıraya taşındı
+- Skeleton loader 6 → 8 eleman olarak güncellendi
+- `SquareButton`'a dark mode desteği tüm mevcut renklere eklendi
+- İki yeni pastel renk varyantı eklendi: `rose` ve `indigo` (light+dark tam destekli)
+
+### feat: /itirazlar — İtirazlara Cevap sayfası
+
+- 20 sahada karşılaşılan itiraz, 6 kategori
+- Kategori filtresi (yatay kaydırılabilir chip'ler)
+- Gerçek zamanlı arama kutusu (soru + cevap içinde arar)
+- Açılır accordion — her itiraz kart, tıklanınca cevabı açar
+- Light/dark mode tam destekli, rose renk paleti
+
+### feat: /egitim — Vaktin Varsa sayfası
+
+- 4 kategori, 11 konu (Zihniyet, İletişim, Ekip, Strateji)
+- Her konu: başlık, süre etiketi, seviye rozeti (Temel/Orta/İleri), özet, numaralı maddeler
+- Accordion yapısı: tıklanınca içerik açılır
+- Hero bilgi kutusu + toplam konu/kategori sayacı
+- Light/dark mode tam destekli, indigo renk paleti
+
+### feat: Sidebar — 2 yeni nav item
+
+- `/itirazlar` → İtirazlara Cevap (`MessageCircleQuestion`)
+- `/egitim` → Vaktin Varsa (`BookOpen`)
+- Kazanımlar sona taşındı, sıralama pano ile tutarlı
+
+### fix: EkipPanel — hata durumu ve ws=undefined güvenliği
+
+- `useQuery`'ye `isError` yakalandı: hata durumunda boş sayfa yerine açıklayıcı hata ekranı gösterilir
+- `ws?.role` → `ws.role` (ws undefined guard sonrasına taşındı, TypeScript güvenli)
+- Solo lider bilgilendirme koşulu: `!isLeader` (yanlış) → `isSolo && isLeader` (doğru)
+- Üye rolü bilgilendirme ayrı blok olarak `!isLeader` koşuluyla korundu
+
+---
+
+
 
 ### bug: useUpdateCandidate last_contact_at kaldırıldı (Kritik)
 

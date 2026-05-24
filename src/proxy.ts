@@ -4,7 +4,7 @@ import type { Database } from '@/types/database.types'
 
 const PUBLIC_PATHS = ['/giris', '/kayit', '/sifre-sifirla', '/sifre-guncelle', '/auth/callback', '/auth/reset-password']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient<Database>(
@@ -28,7 +28,6 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Token'ı yenile — getUser() Auth server'a dokunur, getClaims() yapmaz
   const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
@@ -40,7 +39,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // /sifre-guncelle: şifre sıfırlama akışında oturum açılmış olsa da buraya erişilmeli
   const isPasswordReset = pathname.startsWith('/sifre-guncelle')
 
   if (user && isPublic && !isPasswordReset) {

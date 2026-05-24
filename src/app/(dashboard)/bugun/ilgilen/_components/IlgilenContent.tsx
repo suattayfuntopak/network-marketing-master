@@ -12,6 +12,7 @@ import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
 import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
+import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'
@@ -32,6 +33,10 @@ export function IlgilenContent() {
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
   async function handleAIMessage(id: string, name: string, stage: string, note: string | null) {
+    if (isAILimitReached()) {
+      toast.error(`Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
+      return
+    }
     setGeneratingFor(id)
     const result = await generateQuickMessageAction({ name, stage, note })
     setGeneratingFor(null)
@@ -39,9 +44,11 @@ export function IlgilenContent() {
       toast.error(result.error ?? 'Mesaj oluşturulamadı.')
       return
     }
+    incrementAIUsage()
     await navigator.clipboard.writeText(result.message)
     setCopiedFor(id)
-    toast.success('Mesaj panoya kopyalandı!')
+    const remaining = remainingAIUsage()
+    toast.success(`Mesaj panoya kopyalandı! (${remaining} hak kaldı)`)
     setTimeout(() => setCopiedFor(null), 2500)
   }
 

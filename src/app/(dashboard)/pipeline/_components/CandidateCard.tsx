@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Pencil, Trash2, X } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2, X, RotateCcw } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState, useCallback } from 'react'
 import Link from 'next/link'
@@ -105,7 +105,20 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </button>
           </div>
 
-          <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at)}</span>
+          <div className="flex items-center gap-2">
+            {(candidate.stage === 'kayboldu' || candidate.stage === 'ilgilenmedi') && (
+              <button
+                onClick={() => update.mutate({ id: candidate.id, stage: 'iletisim' })}
+                disabled={update.isPending}
+                className="flex items-center gap-1 rounded-full border border-[#534AB7]/30 bg-[#EEEDFE] px-2.5 py-1 text-[10px] font-semibold text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white disabled:opacity-50"
+                title="İletişim aşamasına geri al"
+              >
+                <RotateCcw className="h-2.5 w-2.5" />
+                Yeniden Aktif Et
+              </button>
+            )}
+            <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at)}</span>
+          </div>
         </div>
       </li>
 

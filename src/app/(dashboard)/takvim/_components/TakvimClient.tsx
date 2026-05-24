@@ -108,6 +108,7 @@ export function TakvimClient() {
             const isSelected = key === selected
             const hasDot = !!byDate[key]
             const isPast = date < today && !isToday
+            const isOverdue = isPast && hasDot
 
             return (
               <button
@@ -116,12 +117,17 @@ export function TakvimClient() {
                 className={`relative flex flex-col items-center justify-center rounded-xl py-2 text-sm font-medium transition-colors
                   ${isSelected ? 'bg-[#534AB7] text-white' :
                     isToday ? 'bg-[#EEEDFE] text-[#534AB7]' :
+                    isOverdue ? 'text-[#72243E]' :
                     'text-[var(--text-1)] hover:bg-[var(--bg-subtle)]'}
-                  ${isPast ? 'opacity-40' : ''}`}
+                  ${isPast && !isOverdue ? 'opacity-40' : ''}`}
               >
                 {day}
                 {hasDot && (
-                  <span className={`mt-0.5 h-1 w-1 rounded-full ${isSelected ? 'bg-white' : 'bg-[#534AB7]'}`} />
+                  <span className={`mt-0.5 h-1 w-1 rounded-full ${
+                    isSelected ? 'bg-white' :
+                    isOverdue ? 'bg-[#72243E]' :
+                    'bg-[#534AB7]'
+                  }`} />
                 )}
               </button>
             )
@@ -135,6 +141,14 @@ export function TakvimClient() {
           {selected === toKey(today) ? 'Bugün' : selected.split('-').reverse().join('.')} — Takip Listesi
         </p>
 
+        {selected < toKey(today) && selectedCandidates.length > 0 && (
+          <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2">
+            <span className="h-2 w-2 rounded-full bg-[#72243E]" />
+            <p className="text-xs font-semibold text-[#72243E]">
+              {selectedCandidates.length} takip kaçırıldı — hemen iletlen
+            </p>
+          </div>
+        )}
         {selectedCandidates.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--border)] py-10 text-center">
             <p className="text-2xl mb-1">✅</p>

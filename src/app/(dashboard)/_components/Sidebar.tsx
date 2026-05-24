@@ -2,16 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, TrendingUp, Bot, Users, CalendarDays, Trophy, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
-  { href: '/pano',       label: 'Pano',           icon: LayoutDashboard },
-  { href: '/pipeline',   label: 'Boru Hattı',     icon: TrendingUp      },
-  { href: '/yazar',      label: 'YZ Mesajı Üret', icon: Bot             },
-  { href: '/ekip',       label: 'Ekibim',         icon: Users           },
-  { href: '/takvim',     label: 'Takvim',         icon: CalendarDays    },
-  { href: '/kazanimlar', label: 'Kazanımlar',     icon: Trophy          },
+  { href: '/pano',       label: 'Pano',             icon: LayoutDashboard          },
+  { href: '/pipeline',   label: 'Boru Hattı',       icon: TrendingUp               },
+  { href: '/yazar',      label: 'YZ Mesajı Üret',   icon: Bot                      },
+  { href: '/ekip',       label: 'Ekibim',           icon: Users                    },
+  { href: '/takvim',     label: 'Takvim',           icon: CalendarDays             },
+  { href: '/itirazlar',  label: 'İtirazlara Cevap', icon: MessageCircleQuestion    },
+  { href: '/egitim',     label: 'Vaktin Varsa',     icon: BookOpen                 },
+  { href: '/kazanimlar', label: 'Kazanımlar',       icon: Trophy                   },
 ]
 
 interface SidebarProps {

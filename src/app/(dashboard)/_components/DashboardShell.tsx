@@ -45,6 +45,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     setPendingHref(target ?? null)
   }
 
+  function handleTouchCancel() {
+    touchStart.current = null
+    setPendingHref(null)
+  }
+
   function handleTouchEnd(e: React.TouchEvent) {
     if (!touchStart.current) return
     const dx = e.changedTouches[0].clientX - touchStart.current.x
@@ -67,10 +72,11 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
       <div
-        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 ${collapsed ? 'md:ml-[72px]' : 'md:ml-64'}`}
+        className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 [view-transition-name:main-content] ${collapsed ? 'md:ml-[72px]' : 'md:ml-64'}`}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchCancel}
       >
         <MobileHeader />
         {/* Mobile spacer — clears fixed MobileHeader (~56px tall) */}

@@ -48,16 +48,22 @@ body {
   to   { stroke-dashoffset: 88; }
 }
 
-/* ── View transitions — page navigation ── */
+/* ── View transitions — page navigation (scoped to main content only) ── */
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(root) { animation: 160ms ease-in both vt-fade-out; }
-  ::view-transition-new(root) { animation: 220ms ease-out 60ms both vt-fade-in; }
+  /* Root: instant — sidebar/header stay put, no flash */
+  ::view-transition-old(root),
+  ::view-transition-new(root) { animation: none; }
 
-  html[data-nav-dir="forward"] ::view-transition-old(root) { animation: 160ms ease-in both vt-slide-left-out; }
-  html[data-nav-dir="forward"] ::view-transition-new(root) { animation: 240ms ease-out 60ms both vt-slide-left-in; }
+  /* Content area: fade by default */
+  ::view-transition-old(main-content) { animation: 160ms ease-in both vt-fade-out; }
+  ::view-transition-new(main-content) { animation: 200ms ease-out 40ms both vt-fade-in; }
 
-  html[data-nav-dir="back"] ::view-transition-old(root) { animation: 160ms ease-in both vt-slide-right-out; }
-  html[data-nav-dir="back"] ::view-transition-new(root) { animation: 240ms ease-out 60ms both vt-slide-right-in; }
+  /* Content area: slide on directional nav */
+  html[data-nav-dir="forward"] ::view-transition-old(main-content) { animation: 160ms ease-in both vt-slide-left-out; }
+  html[data-nav-dir="forward"] ::view-transition-new(main-content) { animation: 240ms ease-out 40ms both vt-slide-left-in; }
+
+  html[data-nav-dir="back"] ::view-transition-old(main-content) { animation: 160ms ease-in both vt-slide-right-out; }
+  html[data-nav-dir="back"] ::view-transition-new(main-content) { animation: 240ms ease-out 40ms both vt-slide-right-in; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -67,9 +73,9 @@ body {
   }
 }
 
-@keyframes vt-fade-out      { to   { opacity: 0; } }
-@keyframes vt-fade-in       { from { opacity: 0; } }
-@keyframes vt-slide-left-out  { to   { opacity: 0; transform: translateX(-24px); } }
-@keyframes vt-slide-left-in   { from { opacity: 0; transform: translateX(24px); } }
-@keyframes vt-slide-right-out { to   { opacity: 0; transform: translateX(24px); } }
-@keyframes vt-slide-right-in  { from { opacity: 0; transform: translateX(-24px); } }
+@keyframes vt-fade-out        { to   { opacity: 0; } }
+@keyframes vt-fade-in         { from { opacity: 0; } }
+@keyframes vt-slide-left-out  { to   { opacity: 0; transform: translateX(-20px); } }
+@keyframes vt-slide-left-in   { from { opacity: 0; transform: translateX(20px); } }
+@keyframes vt-slide-right-out { to   { opacity: 0; transform: translateX(20px); } }
+@keyframes vt-slide-right-in  { from { opacity: 0; transform: translateX(-20px); } }

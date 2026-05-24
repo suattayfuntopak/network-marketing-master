@@ -70,9 +70,24 @@ export function useUpdateCandidate(workspaceId: string) {
         .update(patch)
         .eq('id', id)
       if (error) throw new Error(error.message)
+
+      // Stage değişikliğini aktivite geçmişine logla
+      if (patch.stage) {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          await supabase.from('nmm_daily_actions').insert({
+            workspace_id: workspaceId,
+            user_id: session.user.id,
+            candidate_id: id,
+            action_type: 'stage_change' as const,
+            note: patch.stage,
+          })
+        }
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      qc.invalidateQueries({ queryKey: ['activity'] })
       toast.success('Güncellendi')
     },
     onError: (e: Error) => toast.error(`Güncellenemedi: ${e.message}`),

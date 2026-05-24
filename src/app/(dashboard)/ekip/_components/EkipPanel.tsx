@@ -66,7 +66,7 @@ export function EkipPanel() {
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
 
-  const { data: members = [], isLoading: mLoading } = useQuery({
+  const { data: members = [], isLoading: mLoading, isError: mError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
     queryFn: () => fetchMembers(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
@@ -88,7 +88,17 @@ export function EkipPanel() {
     )
   }
 
-  const isLeader = ws?.role === 'leader'
+  if (mError || !ws) {
+    return (
+      <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
+        <p className="mb-2 text-3xl">⚠️</p>
+        <p className="text-sm font-semibold text-[var(--text-1)]">Ekip verileri yüklenemedi</p>
+        <p className="mt-1 text-xs text-[var(--text-2)]">Bağlantınızı kontrol edip sayfayı yenileyin</p>
+      </div>
+    )
+  }
+
+  const isLeader = ws.role === 'leader'
   const isSolo = members.length <= 1
 
   function handleCopyInviteCode() {
@@ -397,7 +407,14 @@ export function EkipPanel() {
         </ul>
       </section>
 
-      {/* Solo Liderler İçin Bilgilendirme */}
+      {/* Solo Lider için bilgilendirme */}
+      {isSolo && isLeader && (
+        <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
+          Henüz bir ekip üyeniz yok. Yukarıdaki davet kodunu paylaşarak ekibinizi büyütebilirsiniz.
+        </p>
+      )}
+
+      {/* Üye rolü için bilgilendirme */}
       {!isLeader && (
         <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
           Bir ekibe dahil olduğunuz için ekip yönetimi yetkiniz bulunmamaktadır. Kendi boru hattınızı yönetmeye devam edebilir, performansınızı liderinizle paylaşabilirsiniz.

@@ -6,7 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy } from 'lucide-react'
+import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 
@@ -35,8 +35,8 @@ export function PanoContent() {
       <div className="md:max-w-[80%] md:mx-auto space-y-4">
         <div className="h-4 w-24 animate-pulse rounded bg-[var(--bg-subtle)]" />
         <div className="h-8 w-44 animate-pulse rounded bg-[var(--bg-subtle)]" />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+          {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="aspect-square animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
           ))}
         </div>
@@ -61,14 +61,16 @@ export function PanoContent() {
         <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
       </header>
 
-      {/* ── 6 hızlı erişim karesi (3 üst + 3 alt) ── */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
-        <SquareButton icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
-        <SquareButton icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
-        <SquareButton icon={Bot}          label="YZ Mesajı Üret" color="teal"   href="/yazar"         />
-        <SquareButton icon={Users}        label="Ekibim"       color="amber"  href="/ekip"          />
-        <SquareButton icon={CalendarDays} label="Takvim"       color="pink"   href="/takvim"        />
-        <SquareButton icon={Trophy}       label="Kazanımlar"   color="coral"  href="/kazanimlar"    />
+      {/* ── 8 hızlı erişim karesi — mobil 2 sütun (4 satır), masaüstü 4 sütun (2 satır) ── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <SquareButton icon={Zap}                    label="Bugün İlgilen"    color="purple" href="/bugun/ilgilen" />
+        <SquareButton icon={TrendingUp}             label="Boru Hattı"       color="blue"   href="/pipeline"      />
+        <SquareButton icon={Bot}                    label="YZ Mesajı Üret"   color="teal"   href="/yazar"         />
+        <SquareButton icon={Users}                  label="Ekibim"           color="amber"  href="/ekip"          />
+        <SquareButton icon={CalendarDays}           label="Takvim"           color="pink"   href="/takvim"        />
+        <SquareButton icon={MessageCircleQuestion}  label="İtirazlara Cevap" color="rose"   href="/itirazlar"     />
+        <SquareButton icon={BookOpen}               label="Vaktin Varsa"     color="indigo" href="/egitim"        />
+        <SquareButton icon={Trophy}                 label="Kazanımlar"       color="coral"  href="/kazanimlar"    />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
