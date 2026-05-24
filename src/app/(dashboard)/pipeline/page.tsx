@@ -38,7 +38,7 @@ export default function PipelinePage() {
           <BarChart2 className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">Boru Hattı</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">Boru Hattı</h1>
         </div>
         <button
           onClick={() => setSheetOpen(true)}
@@ -51,9 +51,9 @@ export default function PipelinePage() {
 
       {/* Stat bar */}
       <div className="mb-5 grid grid-cols-3 gap-3">
-        <div className="rounded-2xl bg-gray-50 p-3 text-center">
-          <p className="text-xl font-bold text-gray-900">{all.length}</p>
-          <p className="text-xs text-gray-400">Toplam</p>
+        <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center">
+          <p className="text-xl font-bold text-[var(--text-1)]">{all.length}</p>
+          <p className="text-xs text-[var(--text-3)]">Toplam</p>
         </div>
         <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center">
           <p className="text-xl font-bold text-[#854F0B]">{aktif.length}</p>
@@ -71,12 +71,12 @@ export default function PipelinePage() {
         {isLoading && <Spinner />}
         {error && <ErrorMsg msg="Adaylar yüklenemedi." />}
         {!isLoading && !error && candidates.length === 0 && (
-          <div className="rounded-2xl border border-dashed border-gray-200 py-12 text-center">
+          <div className="rounded-2xl border border-dashed border-[var(--border)] py-12 text-center">
             <p className="text-2xl mb-2">🎯</p>
-            <p className="text-sm font-semibold text-gray-700">
+            <p className="text-sm font-semibold text-[var(--text-1)]">
               {filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
             </p>
-            <p className="mt-1 text-xs text-gray-400">
+            <p className="mt-1 text-xs text-[var(--text-3)]">
               {filter === 'tumü' ? '"Aday Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
             </p>
           </div>

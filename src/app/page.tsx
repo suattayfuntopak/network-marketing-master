@@ -16,7 +16,7 @@ export default function RootPage() {
         return
       }
       if (session) {
-        router.push('/bugun')
+        router.push('/pano')
       } else {
         router.push('/giris')
       }
@@ -25,7 +25,7 @@ export default function RootPage() {
     // Anlık session kontrolü (hash olmayan durumlar için)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.push('/bugun')
+        router.push('/pano')
       } else {
         // Hash fragment yoksa girise at (onAuthStateChange halleder gerisi)
         const hasHash = window.location.hash.includes('access_token')

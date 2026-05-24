@@ -3,6 +3,7 @@
 import { ChevronDown, Pencil } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
+import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -25,7 +26,7 @@ const STAGE_COLOR: Record<CandidateStage, string> = {
   sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
   kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
   katildi:  'bg-[#E1F5EE] text-[#0F6E56]',
-  kayboldu: 'bg-gray-100 text-gray-500',
+  kayboldu: 'bg-[var(--bg-subtle)] text-[var(--text-2)]',
 }
 
 const STAGE_ORDER: CandidateStage[] = [
@@ -63,21 +64,21 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
     <>
       <li className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
         <div className="flex items-start gap-3">
-          {/* Avatar */}
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-            {candidate.full_name.charAt(0).toUpperCase()}
-          </div>
-
-          {/* Bilgi */}
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
-            {candidate.phone && (
-              <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
-            )}
-            {candidate.note && (
-              <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">{candidate.note}</p>
-            )}
-          </div>
+          {/* Avatar + Bilgi → detay sayfasına link */}
+          <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
+              {candidate.full_name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
+              {candidate.phone && (
+                <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
+              )}
+              {candidate.note && (
+                <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">{candidate.note}</p>
+              )}
+            </div>
+          </Link>
 
           {/* Eylemler */}
           <div className="flex shrink-0 items-center gap-1.5">
@@ -89,7 +90,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               </a>
             )}
             <button onClick={() => setEditOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-500 transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
               aria-label="Düzenle">
               <Pencil className="h-4 w-4" />
             </button>
@@ -129,7 +130,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             )}
           </div>
 
-          <span className="text-xs text-gray-400">{daysSince(candidate.last_contact_at)}</span>
+          <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at)}</span>
         </div>
       </li>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { Phone, Bell } from 'lucide-react'
+import { Phone } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import type { NmmCandidate } from '@/types/database.types'
@@ -22,7 +22,7 @@ const STAGE_COLOR: Record<NmmCandidate['stage'], string> = {
   sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
   kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
   katildi:  'bg-[#E1F5EE] text-[#0F6E56]',
-  kayboldu: 'bg-gray-100 text-gray-500',
+  kayboldu: 'bg-[var(--bg-subtle)] text-[var(--text-2)]',
 }
 
 function formatDaysAgo(days: number): string {
@@ -41,7 +41,7 @@ export function DailyList({ candidates }: DailyListProps) {
 
   if (daily.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400">
+      <div className="rounded-2xl border border-dashed border-[var(--border)] p-6 text-center text-sm text-[var(--text-3)]">
         Bugün için bekleyen eylem yok 🎉
       </div>
     )
@@ -50,54 +50,35 @@ export function DailyList({ candidates }: DailyListProps) {
   return (
     <ul className="space-y-3">
       {daily.map(candidate => (
-        <li
-          key={candidate.id}
-          className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
-        >
-          {/* Avatar */}
+        <li key={candidate.id} className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
             {candidate.full_name.charAt(0).toUpperCase()}
           </div>
-
-          {/* Bilgi */}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-gray-900">{candidate.full_name}</p>
+            <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
             <div className="mt-0.5 flex items-center gap-2">
               <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STAGE_COLOR[candidate.stage]}`}>
                 {STAGE_LABEL[candidate.stage]}
               </span>
-              <span className="text-xs text-gray-400">{formatDaysAgo(candidate.daysSinceContact)}</span>
+              <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(candidate.daysSinceContact)}</span>
             </div>
           </div>
-
-          {/* Eylem butonları */}
           <div className="flex shrink-0 gap-2">
             {candidate.phone && (
-              <a
-                href={`tel:${candidate.phone}`}
+              <a href={`tel:${candidate.phone}`}
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:shadow-md"
-                aria-label="Ara"
-              >
+                aria-label="Ara">
                 <Phone className="h-4 w-4" strokeWidth={1.75} />
               </a>
             )}
             {candidate.phone && (
-              <a
-                href={`https://wa.me/90${candidate.phone.replace(/^0/, '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
+              <a href={`https://wa.me/90${candidate.phone.replace(/^0/, '')}`}
+                target="_blank" rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
-                aria-label="WhatsApp"
-              >
+                aria-label="WhatsApp">
                 <WhatsAppIcon className="h-4 w-4" />
               </a>
             )}
-            <button
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#FAEEDA] text-[#854F0B] transition-all hover:scale-105 hover:shadow-md"
-              aria-label="Hatırlat"
-            >
-              <Bell className="h-4 w-4" strokeWidth={1.75} />
-            </button>
           </div>
         </li>
       ))}

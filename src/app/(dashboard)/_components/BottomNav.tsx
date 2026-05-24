@@ -2,14 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Zap, BarChart2, PenLine, Users } from 'lucide-react'
+import { LayoutDashboard, BarChart2, PenLine, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
-  { href: '/bugun',    label: 'Bugün',    icon: Zap        },
-  { href: '/pipeline', label: 'Boru Hattı', icon: BarChart2  },
-  { href: '/yazar',    label: 'Yazar',    icon: PenLine    },
-  { href: '/ekip',     label: 'Ekibim',   icon: Users      },
+  { href: '/pano',     label: 'Pano',       icon: LayoutDashboard },
+  { href: '/pipeline', label: 'Boru Hattı', icon: BarChart2       },
+  { href: '/yazar',    label: 'Mesaj Yaz',  icon: PenLine         },
+  { href: '/ekip',     label: 'Ekibim',     icon: Users           },
 ]
 
 export function BottomNav() {
@@ -18,7 +18,7 @@ export function BottomNav() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden">
       {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
-        const active = pathname.startsWith(href)
+        const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         return (
           <Link
             key={href}

@@ -3,7 +3,7 @@
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { Crown, User } from 'lucide-react'
+import { Crown } from 'lucide-react'
 
 interface MemberRow {
   user_id: string
@@ -14,14 +14,11 @@ interface MemberRow {
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
-
   const { data: members, error } = await supabase
     .from('nmm_workspace_members')
     .select('user_id, full_name, role')
     .eq('workspace_id', workspaceId)
-
   if (error) throw error
-
   const counts = await Promise.all(
     (members ?? []).map(async m => {
       const { count } = await supabase
@@ -32,13 +29,11 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       return { ...m, candidate_count: count ?? 0 }
     })
   )
-
   return counts.sort((a, b) => b.candidate_count - a.candidate_count)
 }
 
 export function EkipPanel() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
-
   const { data: members = [], isLoading: mLoading } = useQuery({
     queryKey: ['members', ws?.workspaceId],
     queryFn: () => fetchMembers(ws!.workspaceId),
@@ -49,7 +44,7 @@ export function EkipPanel() {
     return (
       <div className="space-y-3">
         {[1, 2].map(i => (
-          <div key={i} className="h-20 animate-pulse rounded-2xl bg-gray-100" />
+          <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
         ))}
       </div>
     )
@@ -59,7 +54,6 @@ export function EkipPanel() {
 
   return (
     <div className="space-y-6">
-      {/* Özet */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-2xl bg-[#FAEEDA] p-4">
           <p className="text-2xl font-bold text-[#854F0B]">{members.length}</p>
@@ -73,34 +67,30 @@ export function EkipPanel() {
         </div>
       </div>
 
-      {/* Üye listesi */}
       <section>
-        <h2 className="mb-3 text-sm font-semibold text-gray-500 uppercase tracking-wide">Üyeler</h2>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">Üyeler</h2>
         <ul className="space-y-2">
           {members.map(m => (
-            <li
-              key={m.user_id}
-              className="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4 shadow-sm"
-            >
+            <li key={m.user_id} className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#FAEEDA] text-sm font-bold text-[#854F0B]">
                 {(m.full_name ?? '?').charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <p className="truncate text-sm font-semibold text-gray-900">
+                  <p className="truncate text-sm font-semibold text-[var(--text-1)]">
                     {m.full_name ?? 'İsimsiz'}
                   </p>
                   {m.role === 'leader' && (
                     <Crown className="h-3.5 w-3.5 shrink-0 text-[#854F0B]" strokeWidth={2} />
                   )}
                 </div>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-[var(--text-3)]">
                   {m.role === 'leader' ? 'Lider' : 'Üye'}
                 </p>
               </div>
               <div className="shrink-0 text-right">
-                <p className="text-lg font-bold text-gray-900">{m.candidate_count}</p>
-                <p className="text-xs text-gray-400">aday</p>
+                <p className="text-lg font-bold text-[var(--text-1)]">{m.candidate_count}</p>
+                <p className="text-xs text-[var(--text-3)]">aday</p>
               </div>
             </li>
           ))}
@@ -108,7 +98,7 @@ export function EkipPanel() {
       </section>
 
       {!isLeader && (
-        <p className="rounded-xl bg-gray-50 px-4 py-3 text-center text-sm text-gray-400">
+        <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-sm text-[var(--text-2)]">
           Ekip yönetimi sadece lider tarafından yapılabilir.
         </p>
       )}
