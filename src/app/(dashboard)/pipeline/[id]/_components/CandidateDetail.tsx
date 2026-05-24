@@ -84,6 +84,32 @@ export function CandidateDetail({ candidateId }: Props) {
 
   const c = candidates.find(x => x.id === candidateId)
 
+  // Not çevirisi: EN modunda localStorage cache'li AI çevirisi
+  useEffect(() => {
+    if (lang !== 'en' || !c?.note) {
+      setTranslatedNote(null)
+      return
+    }
+    let h = 0
+    for (let i = 0; i < c.note.length; i++) h = (Math.imul(31, h) + c.note.charCodeAt(i)) | 0
+    const cacheKey = `nmm_note_en_${candidateId}_${(h >>> 0).toString(36)}`
+    const cached = localStorage.getItem(cacheKey)
+    if (cached) { setTranslatedNote(cached); return }
+    setIsTranslating(true)
+    fetch('/api/translate-note', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: c.note }),
+    })
+      .then(r => r.json())
+      .then(({ translated }: { translated: string }) => {
+        setTranslatedNote(translated)
+        localStorage.setItem(cacheKey, translated)
+      })
+      .catch(() => setTranslatedNote(c!.note))
+      .finally(() => setIsTranslating(false))
+  }, [lang, c?.note, candidateId])
+
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
   const senderName = ws?.fullName || (lang === 'en' ? 'Your Advisor' : 'Danışmanınız')
   const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
@@ -204,8 +230,13 @@ export function CandidateDetail({ candidateId }: Props) {
           </div>
 
           {c.note && (
-            <p className="mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed">
-              {c.note}
+            <p className={`mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed transition-opacity ${isTranslating ? 'opacity-50' : 'opacity-100'}`}>
+              {lang === 'en' ? (translatedNote ?? c.note) : c.note}
+              {isTranslating && (
+                <span className="ml-2 text-[10px] text-[var(--text-3)] animate-pulse">
+                  {t('pipeline.noteTranslating')}
+                </span>
+              )}
             </p>
           )}
         </div>
@@ -402,15 +433,15 @@ export function CandidateDetail({ candidateId }: Props) {
           {/* Silme Card */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {lang === 'en' ? 'Delete Candidate' : 'Kişi Sil'}
+              {t('pipeline.deleteCandidate')}
             </p>
             <button
               onClick={handleDelete}
               className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] py-2.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
-              title={t('common.delete')}
+              title={t('pipeline.deleteCandidate')}
             >
               <Trash2 className="h-4 w-4" />
-              {t('common.delete')}
+              {t('pipeline.deleteCandidate')}
             </button>
           </div>
 
