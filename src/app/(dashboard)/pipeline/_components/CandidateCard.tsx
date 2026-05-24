@@ -119,7 +119,6 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
       {confirmOpen && (
         <ConfirmDeleteModal
-          name={candidate.full_name}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmOpen(false)}
         />

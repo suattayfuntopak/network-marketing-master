@@ -268,7 +268,6 @@ export function CandidateDetail({ candidateId }: Props) {
 
       {confirmOpen && (
         <ConfirmDeleteModal
-          name={c.full_name}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmOpen(false)}
         />

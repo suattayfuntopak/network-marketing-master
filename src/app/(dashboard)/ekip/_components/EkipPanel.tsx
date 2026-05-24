@@ -400,7 +400,6 @@ export function EkipPanel() {
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (
         <ConfirmDeleteModal
-          name={memberToRemove.name}
           onConfirm={handleRemoveMemberConfirmed}
           onCancel={() => setMemberToRemove(null)}
         />

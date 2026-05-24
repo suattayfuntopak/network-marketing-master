@@ -4,12 +4,11 @@ import { useEffect } from 'react'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 
 interface ConfirmDeleteModalProps {
-  name: string
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function ConfirmDeleteModal({ name, onConfirm, onCancel }: ConfirmDeleteModalProps) {
+export function ConfirmDeleteModal({ onConfirm, onCancel }: ConfirmDeleteModalProps) {
   // Escape tuşuyla kapat
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -37,14 +36,9 @@ export function ConfirmDeleteModal({ name, onConfirm, onCancel }: ConfirmDeleteM
         </div>
 
         {/* Başlık */}
-        <h2 className="mb-2 text-center text-base font-bold text-[var(--text-1)]">
+        <h2 className="mb-6 text-center text-base font-bold text-[var(--text-1)]">
           Silmek istediğinizden emin misiniz?
         </h2>
-        <p className="mb-6 text-center text-sm text-[var(--text-2)] leading-relaxed">
-          <span className="font-semibold text-[var(--text-1)]">{name}</span> silindikten sonra
-          <br />
-          5 saniye içinde geri alabilirsiniz.
-        </p>
 
         {/* Butonlar */}
         <div className="flex gap-3">

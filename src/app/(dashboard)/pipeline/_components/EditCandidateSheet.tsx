@@ -95,7 +95,6 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
 
       {confirmOpen && (
         <ConfirmDeleteModal
-          name={candidate.full_name}
           onConfirm={handleDeleteConfirmed}
           onCancel={() => setConfirmOpen(false)}
         />
