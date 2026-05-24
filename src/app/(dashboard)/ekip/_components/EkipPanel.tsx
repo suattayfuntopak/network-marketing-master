@@ -289,7 +289,7 @@ export function EkipPanel() {
 
       {/* 3. Detaylı Ekip Listesi & Performans Analizi */}
       <section className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-0.5">
           <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
             <BarChart2 className="h-4 w-4" />
             Ekip Performans Paneli
@@ -352,9 +352,9 @@ export function EkipPanel() {
 
                 {/* PRO Performans Dağılım Grafiği */}
                 <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-semibold text-[var(--text-2)]">
-                    <span className="flex items-center gap-1"><TrendingUp className="h-3.5 w-3.5 text-[#534AB7]" /> Aday Hunisi Dağılımı</span>
-                    <span className="text-[10px] text-[var(--text-3)]">Aşama detayları</span>
+                  <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-2)]">
+                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-[#534AB7]" />
+                    <span>Aday Hunisi Dağılımı</span>
                   </div>
 
                   {m.candidate_count === 0 ? (

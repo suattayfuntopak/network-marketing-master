@@ -26,6 +26,7 @@ export function PanoContent() {
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Günaydın' : hour < 14 ? 'Tünaydın' : hour < 19 ? 'İyi günler' : 'İyi akşamlar'
+  const greetingIcon = hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
   if (wsLoading || cLoading) {
@@ -52,7 +53,7 @@ export function PanoContent() {
     <div className="md:max-w-[80%] md:mx-auto space-y-5">
       {/* Selamlama */}
       <header>
-        <h1 className="text-2xl font-bold text-[var(--text-1)]">{greeting} {firstName} 👋🏻</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
       </header>
 
       {/* ── 6 hızlı erişim karesi (3 üst + 3 alt) ── */}
