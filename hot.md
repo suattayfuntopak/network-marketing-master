@@ -1,5 +1,62 @@
 # Hot Log
 
+## 2026-05-24 — Council Triad İyileştirme Paketi
+
+### bug: useUpdateCandidate last_contact_at kaldırıldı (Kritik)
+
+- `useUpdateCandidate`'te `last_contact_at: new Date().toISOString()` satırı kaldırıldı
+- Not düzelten, takip tarihi güncelleyen kullanıcı artık "az önce arandı" kaydı oluşturmuyor
+- `useDailyActions` algoritması artık temiz girdiye sahip; önceliklendirme düzgün çalışıyor
+- `last_contact_at` yalnızca `useMarkContacted` (WA/Ara tıklaması) ile güncelleniyor
+
+### bug: TakvimClient FOLLOW_DAYS duplikasyonu giderildi
+
+- `TakvimClient.tsx`'teki yerel `FOLLOW_DAYS` sabiti silindi
+- `lib/stages.ts`'den import edildi; tek kaynak of truth sağlandı
+
+### feat: Bugün İlgilen — inline AI mesaj butonu
+
+- Her aday kartına Bot ikonu eklendi (WA/Ara yanında)
+- Tıklanınca `generateQuickMessageAction` server action çağrılıyor
+- Mesaj üretilince clipboard'a otomatik kopyalanıyor + toast
+- `/bugun/ilgilen → /pipeline/[id] → /yazar` 3 sayfa akışı tek tapa indi
+
+### perf: EkipPanel N+1 sorgusu giderildi
+
+- `fetchMembers`: N+1 (1 üye listesi + N aday sorgusu) → 2 paralel sorgu
+- Tüm adaylar tek sorguda çekiliyor, JavaScript'te owner_id'ye göre gruplanıyor
+
+### feat: Human-readable davet kodu (8 karakter)
+
+- `nmm_workspaces.invite_code` kolonu eklendi (migration 003)
+- 38 karakter UUID yerine `AHMET42` formatında 8 char alfanumerik kod
+- Davet kodu büyük monospace font ile gösteriliyor
+- Ekibe katılma flow'u `invite_code` ile arama yapıyor
+- RLS yeniden yapılandırıldı: authenticated_read + owner_write ayrıldı
+- **Not:** Migration 003'ü Supabase Dashboard → SQL Editor'dan çalıştır
+
+### feat: Pipeline isim araması
+
+- Stage filter'ın üstüne Search input eklendi
+- Gerçek zamanlı filtreleme (büyük/küçük harf duyarsız)
+- X butonu ile hızlı temizleme
+
+### feat: Aktivite geçmişi (nmm_daily_actions artık okunuyor)
+
+- `useActivityHistory(candidateId)` hook'u `useCandidates.ts`'e eklendi
+- Kişi detay sayfasında son 10 eylem görüntüleniyor (arama / WA / not / aşama)
+- Tablonun write-only durumu sona erdi
+
+### feat: 3 adımlı onboarding modal
+
+- Yeni kullanıcı 0 adayla baş başa kalıyordu → `OnboardingModal` bileşeni
+- Adım 1: Hoş geldin motivasyonu
+- Adım 2: İlk adayı ekle (inline AddCandidate)
+- Adım 3: Lider davet kodu gir (opsiyonel join)
+- `localStorage('nmm_onboarding_done')` ile bir kez gösterilir, sadece 0 adaylı kullanıcıya
+
+---
+
 ## 2026-05-24
 
 ### ux: silme onay modalı sadeleştirildi
