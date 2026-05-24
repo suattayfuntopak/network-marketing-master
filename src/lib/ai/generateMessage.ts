@@ -72,12 +72,16 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const typeInfo  = TYPE_CONTEXT[messageType] ?? ''
   const toneInfo  = TONE_CONTEXT[tone] ?? ''
 
+  // Clean translation delimiters if present
+  const cleanNote = note && note.includes('|||') ? note.split('|||')[0].trim() : note
+  const cleanContext = context && context.includes('|||') ? context.split('|||')[0].trim() : context
+
   const stageStr = stage && stageInfo ? `Aşama: ${stage} — ${stageInfo}\n` : ''
-  const noteStr  = note    ? `Notlar: ${note}\n`      : ''
-  const ctxStr   = context ? `Ek bilgi: ${context}\n` : ''
+  const noteStr  = cleanNote    ? `Notlar: ${cleanNote}\n`      : ''
+  const ctxStr   = cleanContext ? `Ek bilgi: ${cleanContext}\n` : ''
 
   const response = await client.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-sonnet-4-6',
     max_tokens: 400,
     system: [
       {

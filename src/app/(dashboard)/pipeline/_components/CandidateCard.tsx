@@ -8,6 +8,7 @@ import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { parseNote } from '@/lib/noteParser'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/stages'
@@ -33,20 +34,10 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [profilePhoto, setProfilePhoto] = useState<string | null>(() => {
-    if (typeof window === 'undefined') return null
-    return localStorage.getItem(`nmm_candidate_photo_${candidate.id}`)
-  })
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
-
-  // Refresh photo when edit modal closes
-  useEffect(() => {
-    if (!editOpen) {
-      const photo = localStorage.getItem(`nmm_candidate_photo_${candidate.id}`)
-      setProfilePhoto(photo)
-    }
-  }, [editOpen, candidate.id])
+  const parsed = parseNote(candidate.note)
+  const profilePhoto = parsed.avatarUrl || null
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -85,7 +76,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
               )}
               {candidate.note && (
-                <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">{candidate.note}</p>
+                <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">
+                  {lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr}
+                </p>
               )}
             </div>
           </Link>

@@ -61,7 +61,7 @@ export function YZKocuSheet({ candidate, onClose }: Props) {
           {/* Gizli alanlar */}
           <input type="hidden" name="name" value={candidate.full_name} />
           <input type="hidden" name="stage" value={candidate.stage} />
-          <input type="hidden" name="note" value={candidate.note ?? ''} />
+          <input type="hidden" name="note" value={candidate.note ? candidate.note.split('|||')[0].trim() : ''} />
           <input type="hidden" name="messageType" value={messageType} />
 
           {/* Mesaj türü */}

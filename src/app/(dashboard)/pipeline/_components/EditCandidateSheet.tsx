@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { X, Trash2, Camera, Upload } from 'lucide-react'
+import { X, Trash2, Camera, Upload, Loader2 } from 'lucide-react'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
@@ -9,28 +9,14 @@ import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/zIndex'
 import { PHONE_RE } from '@/lib/validation'
+import { createClient } from '@/lib/supabase/client'
+import { parseNote, formatNote } from '@/lib/noteParser'
+import { toast } from 'sonner'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
 
-const PHOTO_KEY_PREFIX = 'nmm_candidate_photo_'
-
-function getPhotoKey(candidateId: string) {
-  return `${PHOTO_KEY_PREFIX}${candidateId}`
-}
-
-function loadPhoto(candidateId: string): string | null {
-  if (typeof window === 'undefined') return null
-  return localStorage.getItem(getPhotoKey(candidateId))
-}
-
-function savePhoto(candidateId: string, dataUrl: string) {
-  localStorage.setItem(getPhotoKey(candidateId), dataUrl)
-}
-
-function removePhoto(candidateId: string) {
-  localStorage.removeItem(getPhotoKey(candidateId))
-}
+// localStorage helpers deleted
 
 interface Props {
   candidate: NmmCandidate
@@ -43,12 +29,20 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [phoneError, setPhoneError] = useState('')
-  const [photo, setPhoto] = useState<string | null>(() => loadPhoto(candidate.id))
+  
+  // central note parsing
+  const parsed = parseNote(candidate.note)
+  const [photo, setPhoto] = useState<string | null>(parsed.avatarUrl || null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [uploadingPhoto, setUploadingPhoto] = useState(false)
+
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    if (uploadingPhoto) return
+
     const fd = new FormData(e.currentTarget)
     const phone = (fd.get('phone') as string).trim()
     if (phone && !PHONE_RE.test(phone)) {
@@ -56,14 +50,47 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       return
     }
     setPhoneError('')
-    await update.mutateAsync({
-      id: candidate.id,
-      full_name: (fd.get('fullName') as string).trim(),
-      phone: phone || null,
-      note: (fd.get('note') as string).trim() || null,
-      stage: fd.get('stage') as CandidateStage,
-    })
-    onClose()
+
+    setUploadingPhoto(true)
+    try {
+      let avatarUrl = photo || ''
+
+      if (photoFile) {
+        const supabase = createClient()
+        const ext = photoFile.name.split('.').pop() ?? 'jpg'
+        const path = `candidates/${candidate.id}_${Date.now()}.${ext}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('nmm-avatars')
+          .upload(path, photoFile, { contentType: photoFile.type })
+
+        if (uploadError) throw uploadError
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('nmm-avatars')
+          .getPublicUrl(path)
+        
+        avatarUrl = publicUrl
+      }
+
+      // Format note combining tr, en and new/existing avatarUrl
+      const rawNoteInput = (fd.get('note') as string).trim()
+      const finalNote = formatNote(rawNoteInput, parsed.en, avatarUrl)
+
+      await update.mutateAsync({
+        id: candidate.id,
+        full_name: (fd.get('fullName') as string).trim(),
+        phone: phone || null,
+        note: finalNote || null,
+        stage: fd.get('stage') as CandidateStage,
+      })
+      onClose()
+    } catch (err: any) {
+      console.error(err)
+      toast.error('Fotoğraf kaydedilirken hata oluştu.')
+    } finally {
+      setUploadingPhoto(false)
+    }
   }
 
   function handleDelete() {
@@ -81,18 +108,28 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Fotoğraf 2MB\'den büyük olamaz.')
+      return
+    }
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen geçerli bir resim dosyası seçin.')
+      return
+    }
+
+    setPhotoFile(file)
     const reader = new FileReader()
     reader.onload = ev => {
       const dataUrl = ev.target?.result as string
       setPhoto(dataUrl)
-      savePhoto(candidate.id, dataUrl)
     }
     reader.readAsDataURL(file)
   }
 
   function handleRemovePhoto() {
     setPhoto(null)
-    removePhoto(candidate.id)
+    setPhotoFile(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
@@ -160,7 +197,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             className="hidden"
             onChange={handlePhotoChange}
           />
-          <p className="mt-1.5 text-[11px] text-[var(--text-3)]">Fotoğraf cihazınızda yerel olarak saklanır.</p>
+          <p className="mt-1.5 text-[11px] text-[var(--text-3)]">Fotoğraf bulut veritabanında kalıcı olarak saklanır.</p>
         </div>
 
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
@@ -188,11 +225,11 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <label className={labelClass} htmlFor="edit-note">
               Not <span className="font-normal text-[var(--text-3)]">(max 1000 karakter)</span>
             </label>
-            <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={candidate.note ?? ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={candidate.note ? candidate.note.split('|||')[0].trim() : ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="submit" disabled={update.isPending} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
-              {update.isPending ? 'Kaydediliyor...' : 'Kaydet'}
+            <button type="submit" disabled={update.isPending || uploadingPhoto} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
+              {update.isPending || uploadingPhoto ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
             <button type="button" onClick={handleDelete} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FBEAF0] text-[#72243E] transition hover:bg-[#f5d4e0]">
               <Trash2 className="h-4 w-4" />

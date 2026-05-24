@@ -93,6 +93,7 @@ interface Props {
 }
 
 export function YazarForm({ initialName = '', initialNote = '' }: Props) {
+  const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : ''
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
@@ -329,7 +330,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
             name="context"
             rows={2}
             maxLength={1000}
-            defaultValue={initialNote}
+            defaultValue={cleanInitialNote}
             placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
             className={`${inputClass} resize-none`}
           />
