@@ -1,6 +1,27 @@
 # Hot Log
 
-## 2026-05-24 — Ekibim Hook Fix + RLS Recursion Fix + Presentation Materials Redesign
+## 2026-05-24 — Super Admin Bypass + Pano Grid Colors + Ekibim Hook Fix + RLS Recursion Fix
+
+### feat: suattayfuntopak@gmail.com İçin Super Admin AI Limit Bypass
+
+- **Özellik:** Uygulama sahibi olan `suattayfuntopak@gmail.com` e-posta adresi için günlük 20 AI mesaj limiti tamamen devre dışı bırakıldı (Sınırsız yapıldı).
+- **Detaylar:**
+  - `aiUsage.ts` kütüphanesine `bypass` parametresi eklendi.
+  - Aktif kullanıcının e-postası Supabase Auth üzerinden çekilerek `suattayfuntopak@gmail.com` ise `isSuperAdmin` flag'i aktif edildi.
+  - Super Admin için `isAILimitReached` kontrolü her zaman `false` döner, sayaç artırılmaz (`incrementAIUsage` engellenir) ve YZ sayfasındaki buton metninde `Üret (Sınırsız)` ifadesi yer alır. Olası tüm diğer yetki kısıtlamaları Super Admin için devre dışı bırakıldı.
+- **Sıfırlanma Periyodu:** Günlük 20 limitinin sıfırlanması localStorage'da tarih damgasıyla (`YYYY-MM-DD`) tutulmaktadır. Dolayısıyla her gece yarısı 00:00 itibarıyla yeni bir gün anahtarı oluşturulduğunda sıfırlanma kendiliğinden milisaniyeler içinde gerçekleşmektedir.
+
+### feat: Hızlı Erişim Kareleri Renk Sinerjisi ve Simetri Dengeleme
+
+- **Renk Değişikliği:**
+  - Vaktin Varsa kutusunun rengi **amber** yapılarak **Ekibim** kutusunun rengiyle birebir eşleştirildi.
+  - Kazanımlar kutusunun rengi **teal** yapılarak **YZ Mesajı Üret** kutusunun rengiyle birebir eşleştirildi.
+- **Renk Dağılımı:**
+  - 1. Sütun: Zap (`purple`) ➔ Takvim (`pink`)
+  - 2. Sütun: Boru Hattı (`blue`) ➔ İtirazlara Cevaplar (`indigo`)
+  - 3. Sütun: YZ Mesajı Üret (`teal`) ➔ Vaktin Varsa (`amber`)
+  - 4. Sütun: Ekibim (`amber`) ➔ Kazanımlar (`teal`)
+  Böylece 3. ve 4. sütunlar simetrik olarak birbirinin zıt rengi yapılmış (Teal/Amber ve Amber/Teal) ve müthiş bir tasarım kalitesi elde edilmiştir.
 
 ### fix: Ekibim Sayfası React Hook Kural İhlali (React Error #310)
 
