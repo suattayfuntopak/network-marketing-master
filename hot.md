@@ -1,5 +1,43 @@
 # Hot Log
 
+## 2026-05-24 — İtirazlar/Eğitim Zenginleştirme + Ekibim Yeniden Tasarımı + Toplu Gönder Modülü
+
+### feat: İtirazlara Cevaplar — 34 Madde, Çift Dil, Okundu Takibi, Sayfalama
+
+- 20 mevcut itiraz → 34'e çıkarıldı (NMU seed'lerinden 14 yeni madde: id 21-34)
+- Tüm maddeler tam çift dilli (TR/EN): `kategori`, `soru`, `cevap` field'ları
+- `nmm_itiraz_read` localStorage ile okundu takibi; header'da `X/34 okundu` sayacı
+- Sayfalama: her sayfada 10 madde, altında numaralı sayfa butonları, sayfa değişiminde scroll-to-top
+- ID'ler geriye dönük uyumlu: orijinal 20 item'ın ID'si değişmedi (`1-20`), yeniler `21-34`
+
+### feat: Vaktin Varsa (Eğitim) — 30 Madde, 8 Kategori, NMU Seed'leri
+
+- 11 mevcut içerik → 30'a çıkarıldı (NMU akademi seed'lerinden 19 yeni madde)
+- Kategoriler: Zihniyet & Temel, İletişim & Takip, Davet & Aday Bulma (yeni), Sunum & Kapanış (yeni), Ekip & Liderlik, Strateji & Büyüme, Uyum & Etik (yeni), Ürün & Şirket (yeni)
+- Her madde tam TR ve EN bullet point listeleriyle çift dilli yapıldı
+
+### feat: Ekibim Sayfası — Panel Sıralama + Ekibe Toplu Gönder Modülü
+
+**Yeni panel sırası:**
+1. Ekip Performans Paneli (istatistik + üye listesi) — en üste taşındı
+2. Ekip Arkadaşı Davet Et (lider için)
+3. Bir Liderin Ekibine Katıl (solo lider / üye için)
+4. Ekibe Toplu Gönder (yeni modül) — en alta eklendi
+
+**Ekibe Toplu Gönder modülü:**
+- İki içerik türü toggle: **Doküman / Link** (URL + ek not) | **Motivasyon Mesajı** (textarea)
+- Mesaj önizleme accordion'u (collapsible)
+- İki alıcı modu: **Tüm Ekip (WhatsApp Grubu)** → tek "Grupla Paylaş" butonu | **Kişileri Seç** → checkbox listesi
+- Kişi seçiminde: "Tümünü Seç" / "Temizle" hızlı kontrolleri, seçilen üyeler yanında bireysel WhatsApp butonu
+- Tüm yeni translation key'leri `tr.ts` + `en.ts`'ye eklendi (`broadcastTitle`, `broadcastSubtitle`, `broadcastTypeDoc` vb. — 21 yeni anahtar)
+
+### fix: CandidateDetail — Silme kartı section başlığı "Kişi Sil" / "Delete Candidate"
+
+- Silme card'ının üst `<p>` etiketi `t('common.delete')` → `lang === 'en' ? 'Delete Candidate' : 'Kişi Sil'` olarak güncellendi
+- Silme butonu metni değişmedi (hâlâ "Sil" / "Delete")
+
+---
+
 ## 2026-05-24 — Tam i18n Geçişi, Bildirim Kalıcılığı ve Migration Düzeltmeleri
 
 ### fix: Migration 004 — "Policy Already Exists" Hatası Çözüldü
