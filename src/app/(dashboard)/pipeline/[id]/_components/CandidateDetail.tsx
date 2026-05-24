@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -89,6 +89,8 @@ export function CandidateDetail({ candidateId }: Props) {
   const parsed = c ? parseNote(c.note) : { tr: '', en: '', avatarUrl: '' }
   const profilePhoto = parsed.avatarUrl || null
 
+  const attemptedUpdates = useRef<Record<string, boolean>>({})
+
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {
     if (lang !== 'en' || !c?.note) {
@@ -110,7 +112,14 @@ export function CandidateDetail({ candidateId }: Props) {
     if (cached) {
       setTranslatedNote(cached)
       // Veritabanına da kaydet ki diğer cihazlarda veya localstorage temizlendiğinde çalışsın
-      update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, cached, parsedLocal.avatarUrl) })
+      if (!attemptedUpdates.current[candidateId]) {
+        attemptedUpdates.current[candidateId] = true
+        update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, cached, parsedLocal.avatarUrl) })
+      }
+      return
+    }
+
+    if (isTranslating || attemptedUpdates.current[candidateId]) {
       return
     }
 
@@ -125,11 +134,14 @@ export function CandidateDetail({ candidateId }: Props) {
         setTranslatedNote(translated)
         localStorage.setItem(cacheKey, translated)
         // Veritabanına kalıcı olarak kaydet
-        update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, translated, parsedLocal.avatarUrl) })
+        if (!attemptedUpdates.current[candidateId]) {
+          attemptedUpdates.current[candidateId] = true
+          update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, translated, parsedLocal.avatarUrl) })
+        }
       })
       .catch(() => setTranslatedNote(parsedLocal.tr))
       .finally(() => setIsTranslating(false))
-  }, [lang, c?.note, candidateId, update])
+  }, [lang, c?.note, candidateId, update, isTranslating])
 
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
   const senderName = ws?.fullName || (lang === 'en' ? 'Your Advisor' : 'Danışmanınız')

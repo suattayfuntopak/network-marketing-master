@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { UserMenu } from './UserMenu'
@@ -121,11 +122,11 @@ export function Header() {
         )}
 
         {/* Sol Taraf: Neon Logo ve Marka */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+        <Link href="/pano" className="flex items-center gap-3 transition-opacity hover:opacity-85">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] cursor-pointer">
             <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
           </div>
-          <div className="hidden flex-col md:flex">
+          <div className="hidden flex-col md:flex cursor-pointer">
             <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-xs font-black tracking-tight text-transparent">
               Network Marketing Master
             </span>
@@ -133,7 +134,7 @@ export function Header() {
               {t('common.operatingSystem')}
             </span>
           </div>
-        </div>
+        </Link>
 
         {/* Orta Taraf: Google-Style Arama Barı (Masaüstü) */}
         <form onSubmit={handleSearchSubmit} className="mx-4 hidden md:flex max-w-md flex-1 items-center">
