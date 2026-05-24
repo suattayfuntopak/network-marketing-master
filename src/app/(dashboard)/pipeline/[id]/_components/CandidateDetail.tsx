@@ -75,6 +75,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [translatedNote, setTranslatedNote] = useState<string | null>(null)
   const [isTranslating, setIsTranslating] = useState(false)
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(null)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -109,6 +110,13 @@ export function CandidateDetail({ candidateId }: Props) {
       .catch(() => setTranslatedNote(c!.note))
       .finally(() => setIsTranslating(false))
   }, [lang, c?.note, candidateId])
+
+  // Load profile photo from localStorage
+  useEffect(() => {
+    if (!candidateId) return
+    const photo = localStorage.getItem(`nmm_candidate_photo_${candidateId}`)
+    setProfilePhoto(photo)
+  }, [candidateId, editOpen]) // re-check after edit modal closes
 
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
   const senderName = ws?.fullName || (lang === 'en' ? 'Your Advisor' : 'Danışmanınız')
@@ -218,9 +226,17 @@ export function CandidateDetail({ candidateId }: Props) {
         {/* Profil kartı */}
         <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xl font-bold text-[#534AB7]">
-              {c.full_name.charAt(0).toUpperCase()}
-            </div>
+            {profilePhoto ? (
+              <img
+                src={profilePhoto}
+                alt={c.full_name}
+                className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-[#EEEDFE]"
+              />
+            ) : (
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xl font-bold text-[#534AB7]">
+                {c.full_name.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
               {c.phone && (

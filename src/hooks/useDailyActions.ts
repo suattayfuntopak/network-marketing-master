@@ -21,6 +21,7 @@ const STAGE_PRIORITY: Record<NmmCandidate['stage'], number> = {
   yeni:        5,
   katildi:     9,
   ilgilenmedi: 9,
+  pasif:       9,
   kayboldu:    9,
 }
 
@@ -37,7 +38,7 @@ export interface DailyActionsResult {
 export function useDailyActions(candidates: NmmCandidate[]): DailyActionsResult {
   return useMemo(() => {
     const actionable = candidates
-      .filter(c => c.stage !== 'katildi' && c.stage !== 'ilgilenmedi' && c.stage !== 'kayboldu')
+      .filter(c => c.stage !== 'katildi' && c.stage !== 'ilgilenmedi' && c.stage !== 'kayboldu' && c.stage !== 'pasif')
       .map(c => ({ ...c, daysSinceContact: daysSince(c.last_contact_at) }))
       .filter(c => {
         if (c.stage === 'takip') return true

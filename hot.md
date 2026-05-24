@@ -1,6 +1,65 @@
 # Hot Log
 
-## 2026-05-24 — İtirazlar/Eğitim Zenginleştirme + Ekibim Yeniden Tasarımı + Toplu Gönder Modülü
+## 2026-05-24 — Paylaşım Butonları, Sidebar Kalıcılığı, Profil Fotoğrafı, Pipeline Yenileme
+
+### feat: İtirazlara Cevaplar — Kopyala + SMS + WhatsApp Paylaşım Butonları
+
+- Her açılan itiraz cevabının altına 3 buton eklendi: **Cevabı Kopyala** → **SMS İle Gönder** → **WhatsApp İle Gönder**
+- Sıralama tam olarak istenen sırayla uygulandı
+- SMS: `sms:?body=` deep link, WhatsApp: `api.whatsapp.com/send?text=` URL encode ile
+
+### feat: Vaktin Varsa — Kopyala + SMS + WhatsApp Paylaşım Butonları
+
+- Her konu içeriğinin (madde listesi) altına **Kopyala** → **SMS İle Gönder** → **WhatsApp İle Gönder** butonları eklendi
+- İçerik numaralı maddeler newline birleştirilmiş şekilde paylaşılıyor
+- heroTitle sonuna ünlem eklendi; heroDesc `sırayla değil` olarak düzeltildi
+
+### fix: Sidebar — Daralt Durumu Sayfa Yenilemede Korunuyor
+
+- `DashboardShell`'deki `collapsed` state `localStorage` (`nmm_sidebar_collapsed`) ile kalıcı hale getirildi
+- `useState` initializer'ı SSR güvenli `typeof window !== 'undefined'` kontrolüyle yazıldı
+- Toggle butonu her tıklamada localStorage'ı güncelliyor
+
+### feat: Profil Fotoğrafı Yükleme (EditCandidateSheet)
+
+- Düzenle popup'ının en üstüne profil fotoğrafı modülü eklendi: avatar önizleme, kamera ikonu, Fotoğraf Yükle ve Fotoğrafı Kaldır butonları
+- Fotoğraflar `FileReader` ile base64'e çevrilerek `localStorage`'da (`nmm_candidate_photo_<id>`) saklanıyor
+- `CandidateCard` (liste) ve `CandidateDetail` (detay sayfası) da localStorage'dan fotoğrafı okuyup gösteriyor
+- Düzenle modalı kapandığında liste ve detay sayfası fotoğrafı otomatik yeniliyor
+
+### feat: Boru Hattı — Stat Kutuları Tıklanabilir, Renkler Değiştirildi
+
+- **Aktif** kutusu artık yeşil (`#E1F5EE / #0F6E56`), **Sıcak** kutusu turuncu (`#FAEEDA / #854F0B`) — renkler çaprazlama değiştirildi
+- Tümü, Aktif ve Sıcak kutularına tıklanınca ilgili aşama filtresi seçiliyor (stat = filter butonu)
+- Seçilen kutu ring efektiyle vurgulanıyor
+
+### feat: Boru Hattı — Tüm Aşamalar Sekme Filtresi (StageFilter)
+
+- Sekme filtresi 4 gruptan (Tümü/Aktif/Sıcak/Kaybolanlar) → **11 aşamalı** kaydırılabilir pill listesine dönüştürüldü
+- Sıralama: Tümü → Yeni Aday → İletişime Geçildi → Davet Edildi → Sunum Yapıldı → Takipte → Kararsız → Katıldı → İlgilenmedi → Pasif → Kaybedildi
+- `CandidateFilter` tipi tüm stage değerlerini de kapsayacak şekilde genişletildi
+
+### feat: Aday Ekle Popup — Başlık ve Buton Güncellendi
+
+- Başlık: `Yeni Kişi Ekle` → **`Yeni Aday Ekle`**
+- Buton: `Kişi Ekle` → **`Aday Ekle`**
+
+### feat: Ekibim Sayfası — Metin ve Yapı Güncellemeleri
+
+- `broadcastTitle`: "EKİBE TOPLU GÖNDER" → **"EKİBE GÖNDER"**
+- `broadcastSubtitle`: "...motivasyon mesajını..." → kısaltıldı
+- `broadcastTypeMotiv`: "Motivasyon Mesajı" → **"Ekibe Mesaj"**
+- **Mesaj Önizleme** accordion kutusu kaldırıldı (hem Doküman/Link hem Ekibe Mesaj sekmesinden)
+
+### feat: Aşama İsimleri ve Pasif Aşaması
+
+- `davetli` etiketi: "Toplantıya Davet Edildi" → **"Davet Edildi"** (sistem genelinde)
+- `kayboldu` etiketi: "Kayboldu" → **"Kaybedildi"** (sistem genelinde)
+- **`pasif`** yeni aşaması eklendi: `CandidateStage` tipi, `stages.ts` STAGE_LABEL/THEME/ORDER, `useDailyActions` STAGE_PRIORITY, TR/EN çeviriler güncellendi
+
+---
+
+
 
 ### feat: İtirazlara Cevaplar — 34 Madde, Çift Dil, Okundu Takibi, Sayfalama
 

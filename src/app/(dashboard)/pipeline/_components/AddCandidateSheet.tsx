@@ -43,7 +43,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
       <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={onClose} />
       <div className={`fixed left-1/2 top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl`} style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Kişi Ekle</h2>
+          <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Aday Ekle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
           </button>
@@ -79,7 +79,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">Kişi eklenemedi. Tekrar dene.</p>
           )}
           <button type="submit" disabled={add.isPending} className="w-full rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
-            {add.isPending ? 'Ekleniyor...' : 'Kişi Ekle'}
+            {add.isPending ? 'Ekleniyor...' : 'Aday Ekle'}
           </button>
         </form>
       </div>

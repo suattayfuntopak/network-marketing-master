@@ -13,6 +13,7 @@ export type CandidateStage =
   | 'kararsiz'
   | 'katildi'
   | 'ilgilenmedi'
+  | 'pasif'
   | 'kayboldu'
 
 export type WorkspaceMemberRole = 'leader' | 'member'

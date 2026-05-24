@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
-export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar'
+export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = createClient()
@@ -31,6 +31,9 @@ export function useCandidates(workspaceId: string | undefined, filter: Candidate
     if (filter === 'aktif') return ACTIVE_STAGES.includes(c.stage)
     if (filter === 'sicak') return HOT_STAGES.includes(c.stage)
     if (filter === 'kaybolanlar') return c.stage === 'kayboldu'
+    // Stage-specific filters
+    const stageFilters = ['yeni', 'iletisim', 'davetli', 'sunum', 'takip', 'kararsiz', 'katildi', 'ilgilenmedi', 'pasif', 'kayboldu']
+    if (stageFilters.includes(filter as string)) return c.stage === filter
     return true
   })
 

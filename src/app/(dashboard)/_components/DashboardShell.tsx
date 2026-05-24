@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -17,8 +17,15 @@ export function setNavDir(dir: 'forward' | 'back') {
   setTimeout(() => { delete document.documentElement.dataset.navDir }, 500)
 }
 
+const SIDEBAR_KEY = 'nmm_sidebar_collapsed'
+
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem(SIDEBAR_KEY) === 'true'
+    }
+    return false
+  })
   const [pendingHref, setPendingHref] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
@@ -69,7 +76,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
       <Header />
-      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
+      <Sidebar
+        collapsed={collapsed}
+        onToggle={() => setCollapsed(v => {
+          const next = !v
+          localStorage.setItem(SIDEBAR_KEY, String(next))
+          return next
+        })}
+      />
       <div
         className={`min-w-0 flex-1 overflow-x-hidden transition-[margin] duration-300 [view-transition-name:main-content] ${collapsed ? 'md:ml-[72px]' : 'md:ml-64'}`}
         onTouchStart={handleTouchStart}

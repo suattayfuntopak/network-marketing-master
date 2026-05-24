@@ -1,13 +1,21 @@
 'use client'
 
 import { clsx } from 'clsx'
+import { useTranslation } from '@/providers/LanguageProvider'
 import type { CandidateFilter } from '@/hooks/useCandidates'
 
-const FILTERS: { key: CandidateFilter; label: string }[] = [
-  { key: 'tumü',       label: 'Tümü'      },
-  { key: 'aktif',      label: 'Aktif'     },
-  { key: 'sicak',      label: 'Sıcak 🔥'  },
-  { key: 'kaybolanlar', label: 'Kaybolanlar' },
+const STAGE_FILTERS: CandidateFilter[] = [
+  'tumü',
+  'yeni',
+  'iletisim',
+  'davetli',
+  'sunum',
+  'takip',
+  'kararsiz',
+  'katildi',
+  'ilgilenmedi',
+  'pasif',
+  'kayboldu',
 ]
 
 interface StageFilterProps {
@@ -17,22 +25,29 @@ interface StageFilterProps {
 }
 
 export function StageFilter({ active, onChange, counts }: StageFilterProps) {
+  const { t, lang } = useTranslation()
+
+  function getLabel(key: CandidateFilter): string {
+    if (key === 'tumü') return lang === 'en' ? 'All' : 'Tümü'
+    return t(`stages.${key}`)
+  }
+
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1">
-      {FILTERS.map(({ key, label }) => (
+    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      {STAGE_FILTERS.map((key) => (
         <button
           key={key}
           onClick={() => onChange(key)}
           className={clsx(
-            'shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold transition-colors',
+            'shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors whitespace-nowrap',
             active === key
               ? 'bg-[#534AB7] text-white'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-[var(--bg-subtle)] dark:text-[var(--text-2)] dark:hover:bg-[var(--border)]'
           )}
         >
-          {label}
-          <span className={clsx('ml-1.5', active === key ? 'text-purple-200' : 'text-gray-400')}>
-            {counts[key]}
+          {getLabel(key)}
+          <span className={clsx('ml-1.5', active === key ? 'text-purple-200' : 'text-gray-400 dark:text-[var(--text-3)]')}>
+            {counts[key] ?? 0}
           </span>
         </button>
       ))}

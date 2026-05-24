@@ -2,7 +2,7 @@
 
 import { ChevronDown, Pencil, Trash2, X, RotateCcw } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
@@ -33,8 +33,20 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [profilePhoto, setProfilePhoto] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    return localStorage.getItem(`nmm_candidate_photo_${candidate.id}`)
+  })
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
+
+  // Refresh photo when edit modal closes
+  useEffect(() => {
+    if (!editOpen) {
+      const photo = localStorage.getItem(`nmm_candidate_photo_${candidate.id}`)
+      setProfilePhoto(photo)
+    }
+  }, [editOpen, candidate.id])
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -56,9 +68,17 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         <div className="flex items-start gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
           <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-              {candidate.full_name.charAt(0).toUpperCase()}
-            </div>
+            {profilePhoto ? (
+              <img
+                src={profilePhoto}
+                alt={candidate.full_name}
+                className="h-10 w-10 shrink-0 rounded-full object-cover border border-[#EEEDFE]"
+              />
+            ) : (
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
+                {candidate.full_name.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
               {candidate.phone && (

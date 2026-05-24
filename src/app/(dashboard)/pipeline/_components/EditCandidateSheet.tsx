@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, useCallback } from 'react'
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, Camera, Upload } from 'lucide-react'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
@@ -13,6 +13,25 @@ import { PHONE_RE } from '@/lib/validation'
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
 
+const PHOTO_KEY_PREFIX = 'nmm_candidate_photo_'
+
+function getPhotoKey(candidateId: string) {
+  return `${PHOTO_KEY_PREFIX}${candidateId}`
+}
+
+function loadPhoto(candidateId: string): string | null {
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem(getPhotoKey(candidateId))
+}
+
+function savePhoto(candidateId: string, dataUrl: string) {
+  localStorage.setItem(getPhotoKey(candidateId), dataUrl)
+}
+
+function removePhoto(candidateId: string) {
+  localStorage.removeItem(getPhotoKey(candidateId))
+}
+
 interface Props {
   candidate: NmmCandidate
   workspaceId: string
@@ -21,8 +40,10 @@ interface Props {
 
 export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [phoneError, setPhoneError] = useState('')
+  const [photo, setPhoto] = useState<string | null>(() => loadPhoto(candidate.id))
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
 
@@ -57,6 +78,24 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
 
   const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
 
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = ev => {
+      const dataUrl = ev.target?.result as string
+      setPhoto(dataUrl)
+      savePhoto(candidate.id, dataUrl)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  function handleRemovePhoto() {
+    setPhoto(null)
+    removePhoto(candidate.id)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   return (
     <>
       <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={onClose} />
@@ -66,6 +105,62 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Profil Fotoğrafı */}
+        <div className="mb-5">
+          <label className={labelClass}>Profil Fotoğrafı</label>
+          <div className="flex items-center gap-4">
+            <div className="relative h-20 w-20 shrink-0">
+              {photo ? (
+                <img
+                  src={photo}
+                  alt="Profil"
+                  className="h-20 w-20 rounded-full object-cover border-2 border-[#EEEDFE]"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EEEDFE] text-2xl font-bold text-[#534AB7]">
+                  {candidate.full_name.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]"
+                title="Fotoğraf Yükle"
+              >
+                <Camera className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7]"
+              >
+                <Upload className="h-3.5 w-3.5" />
+                Fotoğraf Yükle
+              </button>
+              {photo && (
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  className="flex items-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] px-3 py-2 text-xs font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Fotoğrafı Kaldır
+                </button>
+              )}
+            </div>
+          </div>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handlePhotoChange}
+          />
+          <p className="mt-1.5 text-[11px] text-[var(--text-3)]">Fotoğraf cihazınızda yerel olarak saklanır.</p>
         </div>
 
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">

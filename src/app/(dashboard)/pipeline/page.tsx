@@ -22,7 +22,8 @@ export default function PipelinePage() {
   const filtered = filter === 'tumü'        ? all
     : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
     : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
-    : all.filter(c => c.stage === 'kayboldu')
+    : filter === 'kaybolanlar' ? all.filter(c => c.stage === 'kayboldu')
+    : all.filter(c => c.stage === filter)
 
   const candidates = searchQuery.trim()
     ? filtered.filter(c => c.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -33,6 +34,17 @@ export default function PipelinePage() {
     aktif:       all.filter(c => ACTIVE_STAGES.includes(c.stage)).length,
     sicak:       all.filter(c => HOT_STAGES.includes(c.stage)).length,
     kaybolanlar: all.filter(c => c.stage === 'kayboldu').length,
+    // Stage-specific counts
+    yeni:        all.filter(c => c.stage === 'yeni').length,
+    iletisim:    all.filter(c => c.stage === 'iletisim').length,
+    davetli:     all.filter(c => c.stage === 'davetli').length,
+    sunum:       all.filter(c => c.stage === 'sunum').length,
+    takip:       all.filter(c => c.stage === 'takip').length,
+    kararsiz:    all.filter(c => c.stage === 'kararsiz').length,
+    katildi:     all.filter(c => c.stage === 'katildi').length,
+    ilgilenmedi: all.filter(c => c.stage === 'ilgilenmedi').length,
+    pasif:       all.filter(c => c.stage === 'pasif').length,
+    kayboldu:    all.filter(c => c.stage === 'kayboldu').length,
   }
 
   if (wsLoading) return <PageShell><Spinner /></PageShell>
@@ -56,20 +68,43 @@ export default function PipelinePage() {
         </button>
       </div>
 
-      {/* Stat bar */}
+      {/* Stat bar — clickable */}
       <div className="mb-5 grid grid-cols-3 gap-3 animate-in fade-in duration-300 delay-100">
-        <div className="rounded-2xl bg-[var(--bg-subtle)] p-3 text-center border border-[var(--border)]">
+        <button
+          onClick={() => setFilter('tumü')}
+          className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
+            filter === 'tumü'
+              ? 'bg-[var(--bg-subtle)] border-[#534AB7] ring-2 ring-[#534AB7]/20'
+              : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-[#534AB7]/40'
+          }`}
+        >
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
           <p className="text-xs text-[var(--text-3)]">{t('pipeline.total')}</p>
-        </div>
-        <div className="rounded-2xl bg-[#FAEEDA] p-3 text-center border border-[#FAEEDA]/50 dark:bg-[#FAEEDA]/5">
-          <p className="text-xl font-bold text-[#854F0B]">{counts.aktif}</p>
-          <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{t('pipeline.active')}</p>
-        </div>
-        <div className="rounded-2xl bg-[#E1F5EE] p-3 text-center border border-[#E1F5EE]/50 dark:bg-[#E1F5EE]/5">
-          <p className="text-xl font-bold text-[#0F6E56]">{counts.sicak}</p>
-          <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{t('pipeline.hot')}</p>
-        </div>
+        </button>
+        {/* Aktif — was orange, now gets green (Sıcak's old color) */}
+        <button
+          onClick={() => setFilter('aktif')}
+          className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
+            filter === 'aktif'
+              ? 'bg-[#E1F5EE] border-[#0F6E56] ring-2 ring-[#0F6E56]/20 dark:bg-[#E1F5EE]/5'
+              : 'bg-[#E1F5EE] border-[#E1F5EE]/50 hover:border-[#0F6E56]/40 dark:bg-[#E1F5EE]/5'
+          }`}
+        >
+          <p className="text-xl font-bold text-[#0F6E56]">{counts.aktif}</p>
+          <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{t('pipeline.active')}</p>
+        </button>
+        {/* Sıcak — was green, now gets orange (Aktif's old color) */}
+        <button
+          onClick={() => setFilter('sicak')}
+          className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
+            filter === 'sicak'
+              ? 'bg-[#FAEEDA] border-[#854F0B] ring-2 ring-[#854F0B]/20 dark:bg-[#FAEEDA]/5'
+              : 'bg-[#FAEEDA] border-[#FAEEDA]/50 hover:border-[#854F0B]/40 dark:bg-[#FAEEDA]/5'
+          }`}
+        >
+          <p className="text-xl font-bold text-[#854F0B]">{counts.sicak}</p>
+          <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{t('pipeline.hot')}</p>
+        </button>
       </div>
 
       {/* İsim arama kutusu */}
@@ -148,4 +183,3 @@ function ErrorMsg({ msg }: { msg: string }) {
     <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">{msg}</div>
   )
 }
-

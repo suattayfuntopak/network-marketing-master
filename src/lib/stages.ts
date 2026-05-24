@@ -3,13 +3,14 @@ import type { CandidateStage } from '@/types/database.types'
 export const STAGE_LABEL: Record<CandidateStage, string> = {
   yeni:        'Yeni Aday',
   iletisim:    'İletişime Geçildi',
-  davetli:     'Toplantıya Davet Edildi',
+  davetli:     'Davet Edildi',
   sunum:       'Sunum Yapıldı',
   takip:       'Takipte',
   kararsiz:    'Kararsız',
   katildi:     'Katıldı',
   ilgilenmedi: 'İlgilenmedi',
-  kayboldu:    'Kayboldu',
+  kayboldu:    'Kaybedildi',
+  pasif:       'Pasif',
 }
 
 // Tek kaynak: badge + kart arka planı birlikte
@@ -23,6 +24,7 @@ const STAGE_THEME: Record<CandidateStage, { badge: string; card: string }> = {
   katildi:     { badge: 'bg-[#D1FAE5] text-[#065F46] dark:bg-[#052e16] dark:text-[#6ee7b7]', card: 'bg-[#D1FAE5] dark:bg-[#143B27]' },
   ilgilenmedi: { badge: 'bg-[#F3F4F6] text-[#6B7280] dark:bg-[#1f2937] dark:text-[#9ca3af]', card: 'bg-[#F3F4F6] dark:bg-[#2A2E38]' },
   kayboldu:    { badge: 'bg-[#F3F4F6] text-[#9CA3AF] dark:bg-[#111827] dark:text-[#6b7280]', card: 'bg-[#F3F4F6] dark:bg-[#20242D]' },
+  pasif:       { badge: 'bg-[#F0FDF4] text-[#16A34A] dark:bg-[#052e16] dark:text-[#4ade80]', card: 'bg-[#F0FDF4] dark:bg-[#0d2b1a]' },
 }
 
 export const STAGE_COLOR: Record<CandidateStage, string> = Object.fromEntries(
@@ -35,7 +37,7 @@ export const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
 
 export const STAGE_ORDER: CandidateStage[] = [
   'yeni', 'iletisim', 'davetli', 'sunum', 'takip',
-  'kararsiz', 'katildi', 'ilgilenmedi', 'kayboldu',
+  'kararsiz', 'katildi', 'ilgilenmedi', 'pasif', 'kayboldu',
 ]
 
 export const STAGES_FORM: { value: CandidateStage; label: string }[] =

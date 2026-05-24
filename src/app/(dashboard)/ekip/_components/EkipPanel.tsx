@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
   TrendingUp, BarChart2, Send, FileText, MessageSquare,
-  Users, CheckSquare, Square, ChevronDown, ChevronUp,
+  Users, CheckSquare, Square,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -79,7 +79,6 @@ export function EkipPanel() {
   const [broadcastMessage, setBroadcastMessage] = useState('')
   const [broadcastTarget, setBroadcastTarget] = useState<'grup' | 'tekli'>('grup')
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set())
-  const [previewOpen, setPreviewOpen] = useState(false)
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -510,26 +509,6 @@ export function EkipPanel() {
                   placeholder={t('team.broadcastMsgPlaceholder')}
                   className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
                 />
-              </div>
-            )}
-
-            {/* Mesaj önizleme */}
-            {broadcastPreviewText && (
-              <div className="overflow-hidden rounded-xl border border-[#534AB7]/20 bg-[#534AB7]/5">
-                <button
-                  onClick={() => setPreviewOpen(v => !v)}
-                  className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
-                >
-                  <span className="text-[11px] font-semibold text-[#534AB7]">{t('team.broadcastPreview')}</span>
-                  {previewOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#534AB7]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#534AB7]" />}
-                </button>
-                {previewOpen && (
-                  <div className="border-t border-[#534AB7]/15 px-3.5 pb-3 pt-2">
-                    <pre className="whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-[var(--text-2)]">
-                      {broadcastPreviewText}
-                    </pre>
-                  </div>
-                )}
               </div>
             )}
 
