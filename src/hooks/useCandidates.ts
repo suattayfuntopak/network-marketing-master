@@ -3,12 +3,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, CandidateStage } from '@/types/database.types'
+import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
+import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, CandidateStage, ActionType } from '@/types/database.types'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar'
-
-const ACTIVE_STAGES: CandidateStage[] = ['yeni', 'iletisim', 'davetli', 'sunum', 'takip', 'kararsiz']
-const HOT_STAGES: CandidateStage[] = ['davetli', 'takip', 'sunum']
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = createClient()
@@ -94,5 +92,32 @@ export function useDeleteCandidate(workspaceId: string) {
       toast.success('Aday silindi')
     },
     onError: (e: Error) => toast.error(`Silinemedi: ${e.message}`),
+  })
+}
+
+export function useMarkContacted(workspaceId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, actionType }: { id: string; actionType: ActionType }) => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Oturum yok')
+      await Promise.all([
+        supabase
+          .from('nmm_candidates')
+          .update({ last_contact_at: new Date().toISOString() })
+          .eq('id', id),
+        supabase.from('nmm_daily_actions').insert({
+          workspace_id: workspaceId,
+          user_id: user.id,
+          candidate_id: id,
+          action_type: actionType,
+        }),
+      ])
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+    },
+    onError: (e: Error) => toast.error(`Kayıt hatası: ${e.message}`),
   })
 }

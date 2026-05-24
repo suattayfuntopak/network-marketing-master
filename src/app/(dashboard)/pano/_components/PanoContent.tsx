@@ -9,7 +9,7 @@ import { Zap, TrendingUp, PenLine, Users, CalendarDays, Trophy } from 'lucide-re
 export function PanoContent() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
-  const daily = useDailyActions(candidates)
+  const { daily, remaining } = useDailyActions(candidates)
   const hotCount = candidates.filter(c => c.stage === 'takip' || c.stage === 'sunum').length
 
   const hour = new Date().getHours()
@@ -27,7 +27,7 @@ export function PanoContent() {
           <div className="h-7 w-36 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
           <div className="h-7 w-28 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
         </div>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-2 md:max-w-[300px]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="aspect-square animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
           ))}
@@ -45,14 +45,14 @@ export function PanoContent() {
 
       <div className="mb-5 flex gap-2 flex-wrap">
         <span className="rounded-full bg-[#FAEEDA] px-3 py-1 text-xs font-semibold text-[#854F0B]">
-          {daily.length} aksiyon bekliyor
+          {daily.length + remaining} aksiyon bekliyor
         </span>
         <span className="rounded-full bg-[#E1F5EE] px-3 py-1 text-xs font-semibold text-[#0F6E56]">
           {hotCount} sıcak aday
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-2 md:max-w-[300px]">
         <SquareButton icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
         <SquareButton icon={PenLine}      label="Mesaj Yaz"    color="teal"   href="/yazar"         />

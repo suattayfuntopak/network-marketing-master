@@ -24,7 +24,7 @@ export function IlgilenContent() {
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
-  const daily = useDailyActions(candidates)
+  const { daily } = useDailyActions(candidates)
 
   if (wsLoading || cLoading) {
     return (

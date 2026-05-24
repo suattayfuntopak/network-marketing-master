@@ -9,7 +9,7 @@ export function BugunContent() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
 
-  const daily = useDailyActions(candidates)
+  const { daily } = useDailyActions(candidates)
   const hotCount = candidates.filter(c => c.stage === 'takip' || c.stage === 'sunum').length
 
   const hour = new Date().getHours()

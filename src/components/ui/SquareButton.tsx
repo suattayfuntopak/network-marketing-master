@@ -21,7 +21,7 @@ const sharedClass = (color: ButtonColor, compact?: boolean, className?: string) 
     'rounded-[14px] transition-all duration-150',
     'active:scale-95 hover:scale-[1.03] hover:shadow-md',
     'md:rounded-[12px]',
-    compact ? 'h-[76px] p-3' : 'aspect-square p-4',
+    compact ? 'h-[76px] p-3' : 'aspect-square p-4 md:p-3',
     colorMap[color],
     className
   )

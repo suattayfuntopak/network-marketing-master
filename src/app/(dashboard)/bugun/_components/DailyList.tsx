@@ -19,7 +19,7 @@ interface DailyListProps {
 }
 
 export function DailyList({ candidates }: DailyListProps) {
-  const daily = useDailyActions(candidates)
+  const { daily } = useDailyActions(candidates)
 
   if (daily.length === 0) {
     return (

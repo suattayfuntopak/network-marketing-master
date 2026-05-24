@@ -28,7 +28,12 @@ export interface DailyCandidate extends NmmCandidate {
   daysSinceContact: number
 }
 
-export function useDailyActions(candidates: NmmCandidate[]): DailyCandidate[] {
+export interface DailyActionsResult {
+  daily: DailyCandidate[]
+  remaining: number
+}
+
+export function useDailyActions(candidates: NmmCandidate[]): DailyActionsResult {
   return useMemo(() => {
     const actionable = candidates
       .filter(c => c.stage !== 'katildi' && c.stage !== 'ilgilenmedi' && c.stage !== 'kayboldu')
@@ -45,6 +50,9 @@ export function useDailyActions(candidates: NmmCandidate[]): DailyCandidate[] {
         return b.daysSinceContact - a.daysSinceContact
       })
 
-    return actionable.slice(0, MAX_DAILY_CANDIDATES)
+    return {
+      daily: actionable.slice(0, MAX_DAILY_CANDIDATES),
+      remaining: Math.max(0, actionable.length - MAX_DAILY_CANDIDATES),
+    }
   }, [candidates])
 }

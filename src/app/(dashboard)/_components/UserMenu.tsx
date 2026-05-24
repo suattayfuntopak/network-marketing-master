@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { LogOut, User, Settings, Bell, ChevronDown } from 'lucide-react'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { logoutAction } from '../actions'
 
@@ -49,14 +48,6 @@ export function UserMenu() {
               {ws?.role === 'leader' ? 'Lider' : 'Üye'}
             </p>
           </div>
-
-          {/* Tema */}
-          <div className="flex items-center justify-between px-4 py-2">
-            <span className="text-sm text-[var(--text-2)]">Tema</span>
-            <ThemeToggle />
-          </div>
-
-          <div className="my-1 border-t border-[var(--border)]" />
 
           <button className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)]">
             <User className="h-4 w-4" strokeWidth={1.75} />
