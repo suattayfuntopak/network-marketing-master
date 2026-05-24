@@ -4,7 +4,11 @@ import { useState, useEffect, useCallback } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2, TrendingUp, BarChart2 } from 'lucide-react'
+import {
+  Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
+  TrendingUp, BarChart2, Send, FileText, MessageSquare,
+  Users, CheckSquare, Square, ChevronDown, ChevronUp,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -24,8 +28,6 @@ interface MemberRow {
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
-
-  // 2 sorgu — N+1 yerine aggregated
   const [{ data: members, error }, { data: candidatesRaw }] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
@@ -37,9 +39,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .eq('workspace_id', workspaceId),
   ])
   if (error) throw error
-
   const candidates = candidatesRaw ?? []
-
   return (members ?? [])
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
@@ -61,16 +61,25 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
 export function EkipPanel() {
   const queryClient = useQueryClient()
   const supabase = createClient()
-  const { t } = useTranslation()
+  const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const [currentUser, setCurrentUser] = useState<any>(null)
-  
-  // UI states
+
+  // Invite/Join states
   const [copied, setCopied] = useState(false)
   const [inviteCodeInput, setInviteCodeInput] = useState('')
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+
+  // Broadcast states
+  const [broadcastMode, setBroadcastMode] = useState<'doc' | 'motiv'>('motiv')
+  const [broadcastLink, setBroadcastLink] = useState('')
+  const [broadcastNote, setBroadcastNote] = useState('')
+  const [broadcastMessage, setBroadcastMessage] = useState('')
+  const [broadcastTarget, setBroadcastTarget] = useState<'grup' | 'tekli'>('grup')
+  const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set())
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -79,17 +88,53 @@ export function EkipPanel() {
   })
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setCurrentUser(user)
-    })
+    supabase.auth.getUser().then(({ data: { user } }) => setCurrentUser(user))
   }, [supabase])
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
+  function composeBroadcastMessage() {
+    if (broadcastMode === 'doc') {
+      const linkLine = broadcastLink.trim()
+      const noteLine = broadcastNote.trim()
+      const header = lang === 'en' ? '📄 *Document / Link*' : '📄 *Doküman / Link*'
+      return [header, linkLine, noteLine].filter(Boolean).join('\n\n')
+    }
+    return broadcastMessage.trim()
+  }
+
+  function handleGroupBroadcast() {
+    const text = composeBroadcastMessage()
+    if (!text) { toast.error(t('team.broadcastEmpty')); return }
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  function handleIndividualBroadcast(memberId: string) {
+    const text = composeBroadcastMessage()
+    if (!text) { toast.error(t('team.broadcastEmpty')); return }
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+  }
+
+  function toggleMember(id: string) {
+    setSelectedMembers(prev => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id); else next.add(id)
+      return next
+    })
+  }
+
+  function selectAllMembers() {
+    setSelectedMembers(new Set(members.map(m => m.user_id)))
+  }
+
+  function clearMemberSelection() {
+    setSelectedMembers(new Set())
+  }
+
   if (wsLoading || mLoading) {
     return (
       <div className="space-y-3">
-        {[1, 2].map(i => (
+        {[1, 2, 3].map(i => (
           <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
         ))}
       </div>
@@ -108,6 +153,8 @@ export function EkipPanel() {
 
   const isLeader = ws.role === 'leader'
   const isSolo = members.length <= 1
+  const broadcastPreviewText = composeBroadcastMessage()
+  const selectedCount = selectedMembers.size
 
   function handleCopyInviteCode() {
     if (!ws?.inviteCode) return
@@ -120,53 +167,26 @@ export function EkipPanel() {
   async function handleJoinWorkspace(e: React.FormEvent) {
     e.preventDefault()
     if (joining) return
-
     const code = inviteCodeInput.trim().toUpperCase()
-    if (!code) {
-      toast.error('Lütfen bir davet kodu girin!')
-      return
-    }
-
-    if (code === ws?.inviteCode) {
-      toast.error(t('team.alreadyInTeam'))
-      return
-    }
-
+    if (!code) { toast.error('Lütfen bir davet kodu girin!'); return }
+    if (code === ws?.inviteCode) { toast.error(t('team.alreadyInTeam')); return }
     setJoining(true)
     try {
-      // 1. invite_code ile workspace bul
       const { data: targetWs, error: wsError } = await supabase
         .from('nmm_workspaces')
         .select('id, name')
         .eq('invite_code', code)
         .maybeSingle()
-
-      if (wsError || !targetWs) {
-        toast.error(t('team.invalidCode'))
-        setJoining(false)
-        return
-      }
-
+      if (wsError || !targetWs) { toast.error(t('team.invalidCode')); setJoining(false); return }
       if (!currentUser?.id) throw new Error(t('team.noSessionError'))
-
-      // 2. Update membership to member in the target workspace
       const { error: memError } = await supabase
         .from('nmm_workspace_members')
         .update({ workspace_id: targetWs.id, role: 'member' })
         .eq('user_id', currentUser.id)
-
       if (memError) throw memError
-
-      // 3. Move their existing candidates to the new workspace so their data is merged
-      await supabase
-        .from('nmm_candidates')
-        .update({ workspace_id: targetWs.id })
-        .eq('owner_id', currentUser.id)
-
+      await supabase.from('nmm_candidates').update({ workspace_id: targetWs.id }).eq('owner_id', currentUser.id)
       toast.success(t('team.joinSuccess', { name: targetWs.name }))
       setInviteCodeInput('')
-      
-      // Invalidate all query caches
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['members'] })
       queryClient.invalidateQueries({ queryKey: ['candidates'] })
@@ -184,9 +204,7 @@ export function EkipPanel() {
     const memberName = memberToRemove.name
     setMemberToRemove(null)
     setRemovingId(memberId)
-
     try {
-      // 1. Create a new solo workspace for the removed user
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
       const newCode = Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
       const { data: newWs, error: wsError } = await supabase
@@ -194,23 +212,13 @@ export function EkipPanel() {
         .insert({ name: `${memberName}'in Ekibi`, owner_id: memberId, invite_code: newCode })
         .select('id')
         .single()
-
       if (wsError || !newWs) throw wsError
-
-      // 2. Re-assign their membership row to their new solo workspace as 'leader'
       const { error: memError } = await supabase
         .from('nmm_workspace_members')
         .update({ workspace_id: newWs.id, role: 'leader' })
         .eq('user_id', memberId)
-
       if (memError) throw memError
-
-      // 3. Move their candidate records back to their new solo workspace
-      await supabase
-        .from('nmm_candidates')
-        .update({ workspace_id: newWs.id })
-        .eq('owner_id', memberId)
-
+      await supabase.from('nmm_candidates').update({ workspace_id: newWs.id }).eq('owner_id', memberId)
       toast.success(t('team.removeSuccess', { name: memberName }))
       queryClient.invalidateQueries({ queryKey: ['members'] })
     } catch (err: any) {
@@ -223,115 +231,41 @@ export function EkipPanel() {
 
   return (
     <div className="space-y-6">
-      {/* 1. Üst İstatistik Kartları */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5">
-          <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
-        </div>
-        <div className="rounded-2xl border border-[#4169E1]/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
-          <p className="text-3xl font-extrabold text-[#4169E1]">
-            {members.reduce((s, m) => s + m.candidate_count, 0)}
-          </p>
-          <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
-        </div>
-      </div>
 
-      {/* 2. Lider Davet Kartı / Üye Katılma Kartı */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Lider Davet Kodu Üretici */}
-        {isLeader && (
-          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB]">
-                <UserPlus className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-bold text-[var(--text-1)]">{t('team.inviteTeammate')}</h3>
-            </div>
-            <p className="text-xs text-[var(--text-2)] leading-relaxed">
-              {t('team.inviteTeammateDesc')}
-            </p>
-            <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-lg font-bold tracking-widest text-[var(--text-1)]">
-                {ws?.inviteCode}
-              </div>
-              <button
-                onClick={handleCopyInviteCode}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#534AB7] text-white hover:bg-[#433a9f] transition active:scale-95"
-                title="Kodu Kopyala"
-              >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </button>
-              <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.inviteCode}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!`
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white hover:bg-[#20ba56] transition active:scale-95"
-                title="WhatsApp ile Paylaş"
-              >
-                <WhatsAppIcon className="h-4 w-4" />
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* Solo Lider veya normal üyeler için "Bir Ekibe Katıl" kutusu */}
-        {(isSolo || !isLeader) && (
-          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E1F5EE] text-[#0F6E56]">
-                <LogIn className="h-5 w-5" />
-              </div>
-              <h3 className="text-sm font-bold text-[var(--text-1)]">{t('team.joinATeam')}</h3>
-            </div>
-            <p className="text-xs text-[var(--text-2)] leading-relaxed">
-              {t('team.joinATeamDesc')}
-            </p>
-            <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-2 overflow-hidden">
-              <input
-                type="text"
-                required
-                value={inviteCodeInput}
-                onChange={e => setInviteCodeInput(e.target.value)}
-                placeholder="Davet kodunu yapıştırın..."
-                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
-              />
-              <button
-                type="submit"
-                disabled={joining}
-                className="flex h-10 px-4 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0F6E56] text-sm font-semibold text-white hover:bg-[#0a5a44] transition active:scale-95 disabled:opacity-50"
-              >
-                {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : t('team.joinBtn')}
-              </button>
-            </form>
-          </div>
-        )}
-      </div>
-
-      {/* 3. Detaylı Ekip Listesi & Performans Analizi */}
-      <section className="space-y-3">
+      {/* ─── 1. EKİP PERFORMANS PANELİ ─── */}
+      <section className="space-y-4">
         <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
           <BarChart2 className="h-4 w-4" />
           {t('team.performancePanel')}
         </h2>
 
+        {/* Özet istatistik kartları */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5">
+            <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
+          </div>
+          <div className="rounded-2xl border border-[#4169E1]/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
+            <p className="text-3xl font-extrabold text-[#4169E1]">
+              {members.reduce((s, m) => s + m.candidate_count, 0)}
+            </p>
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
+          </div>
+        </div>
+
+        {/* Üye performans listesi */}
         <ul className="space-y-3">
           {members.map(m => {
-            const isCurrentUser = m.user_id === currentUser?.id;
-            
+            const isCurrentUser = m.user_id === currentUser?.id
             return (
               <li
                 key={m.user_id}
                 className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition hover:shadow-md space-y-4"
               >
-                {/* Üye Bilgisi Satırı */}
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-base font-bold text-[#534AB7]">
                     {(m.full_name ?? '?').charAt(0).toUpperCase()}
                   </div>
-                  
                   <div className="min-w-0 flex-1 overflow-hidden">
                     <div className="flex min-w-0 items-center gap-2">
                       <p className="truncate text-sm font-bold text-[var(--text-1)]">
@@ -351,14 +285,10 @@ export function EkipPanel() {
                       )}
                     </p>
                   </div>
-
-                  {/* Toplam Aday Sayısı */}
                   <div className="shrink-0 text-right">
                     <p className="text-xl font-black text-[#4169E1]">{m.candidate_count}</p>
                     <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">{t('team.totalCandidates')}</p>
                   </div>
-
-                  {/* Liderler diğer üyeleri ekipten çıkarabilir (kendini çıkaramaz) */}
                   {isLeader && m.role !== 'leader' && (
                     <button
                       onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? t('common.member') })}
@@ -366,22 +296,17 @@ export function EkipPanel() {
                       className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition active:scale-95 disabled:opacity-50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40"
                       title={t('team.removeFromTeam')}
                     >
-                      {removingId === m.user_id ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="h-4 w-4" />
-                      )}
+                      {removingId === m.user_id
+                        ? <Loader2 className="h-4 w-4 animate-spin" />
+                        : <Trash2 className="h-4 w-4" />}
                     </button>
                   )}
                 </div>
-
-                {/* PRO Performans Dağılım Grafiği */}
                 <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
                   <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-2)]">
                     <TrendingUp className="h-3.5 w-3.5 shrink-0 text-[#534AB7]" />
                     <span>{t('team.funnelDistribution')}</span>
                   </div>
-
                   {m.candidate_count === 0 ? (
                     <p className="text-[11px] text-[var(--text-3)] italic py-1">{t('team.noTeamCandidates')}</p>
                   ) : (
@@ -406,24 +331,317 @@ export function EkipPanel() {
                   )}
                 </div>
               </li>
-            );
+            )
           })}
         </ul>
+
+        {isSolo && isLeader && (
+          <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
+            {t('team.soloHint')}
+          </p>
+        )}
+        {!isLeader && (
+          <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
+            {t('team.memberHint')}
+          </p>
+        )}
       </section>
 
-      {/* Solo Lider için bilgilendirme */}
-      {isSolo && isLeader && (
-        <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
-          {t('team.soloHint')}
-        </p>
+      {/* ─── 2. EKİP ARKADAŞI DAVET ET ─── */}
+      {isLeader && (
+        <section>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
+            <UserPlus className="h-4 w-4" />
+            {t('team.inviteTeammate')}
+          </h2>
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
+            <p className="text-xs text-[var(--text-2)] leading-relaxed">
+              {t('team.inviteTeammateDesc')}
+            </p>
+            <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-lg font-bold tracking-widest text-[var(--text-1)]">
+                {ws?.inviteCode}
+              </div>
+              <button
+                onClick={handleCopyInviteCode}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#534AB7] text-white hover:bg-[#433a9f] transition active:scale-95"
+                title={lang === 'en' ? 'Copy Code' : 'Kodu Kopyala'}
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </button>
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  lang === 'en'
+                    ? `Hi! You can use this invite code to join our Network Marketing Master team:\n\n*${ws?.inviteCode}*\n\nAfter signing up, enter this code from the "My Team" page to join instantly!`
+                    : `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.inviteCode}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white hover:bg-[#20ba56] transition active:scale-95"
+                title="WhatsApp ile Paylaş"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* Üye rolü için bilgilendirme */}
-      {!isLeader && (
-        <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
-          {t('team.memberHint')}
-        </p>
+      {/* ─── 3. BİR LİDERİN EKİBİNE KATIL ─── */}
+      {(isSolo || !isLeader) && (
+        <section>
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
+            <LogIn className="h-4 w-4" />
+            {t('team.joinATeam')}
+          </h2>
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
+            <p className="text-xs text-[var(--text-2)] leading-relaxed">
+              {t('team.joinATeamDesc')}
+            </p>
+            <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-2 overflow-hidden">
+              <input
+                type="text"
+                required
+                value={inviteCodeInput}
+                onChange={e => setInviteCodeInput(e.target.value)}
+                placeholder={lang === 'en' ? 'Paste invite code...' : 'Davet kodunu yapıştırın...'}
+                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+              />
+              <button
+                type="submit"
+                disabled={joining}
+                className="flex h-10 px-4 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0F6E56] text-sm font-semibold text-white hover:bg-[#0a5a44] transition active:scale-95 disabled:opacity-50"
+              >
+                {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : t('team.joinBtn')}
+              </button>
+            </form>
+          </div>
+        </section>
       )}
+
+      {/* ─── 4. EKİBE TOPLU GÖNDER ─── */}
+      <section>
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
+          <Send className="h-4 w-4" />
+          {t('team.broadcastTitle')}
+        </h2>
+
+        <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
+          {/* Üst başlık bantı */}
+          <div className="flex items-start gap-3 border-b border-[var(--border)] bg-gradient-to-r from-[#534AB7]/8 to-[#25D366]/8 p-4">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]/10 text-[#534AB7] dark:bg-[#534AB7]/20">
+              <Send className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-[var(--text-1)]">{t('team.broadcastTitle')}</p>
+              <p className="mt-0.5 text-[11px] leading-relaxed text-[var(--text-2)]">{t('team.broadcastSubtitle')}</p>
+            </div>
+          </div>
+
+          <div className="space-y-5 p-4">
+            {/* İçerik türü seçici */}
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                {lang === 'en' ? 'Content Type' : 'İçerik Türü'}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBroadcastMode('doc')}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                    broadcastMode === 'doc'
+                      ? 'border-[#534AB7] bg-[#534AB7] text-white'
+                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
+                  }`}
+                >
+                  <FileText className="h-3.5 w-3.5 shrink-0" />
+                  {t('team.broadcastTypeDoc')}
+                </button>
+                <button
+                  onClick={() => setBroadcastMode('motiv')}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                    broadcastMode === 'motiv'
+                      ? 'border-[#534AB7] bg-[#534AB7] text-white'
+                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
+                  }`}
+                >
+                  <MessageSquare className="h-3.5 w-3.5 shrink-0" />
+                  {t('team.broadcastTypeMotiv')}
+                </button>
+              </div>
+            </div>
+
+            {/* İçerik girişi */}
+            {broadcastMode === 'doc' ? (
+              <div className="space-y-3">
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-[var(--text-2)]">
+                    {t('team.broadcastLinkLabel')}
+                  </label>
+                  <input
+                    type="url"
+                    value={broadcastLink}
+                    onChange={e => setBroadcastLink(e.target.value)}
+                    placeholder={t('team.broadcastLinkPlaceholder')}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[11px] font-semibold text-[var(--text-2)]">
+                    {t('team.broadcastNoteLabel')}
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={broadcastNote}
+                    onChange={e => setBroadcastNote(e.target.value)}
+                    placeholder={t('team.broadcastNotePlaceholder')}
+                    className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-semibold text-[var(--text-2)]">
+                  {t('team.broadcastMsgLabel')}
+                </label>
+                <textarea
+                  rows={4}
+                  value={broadcastMessage}
+                  onChange={e => setBroadcastMessage(e.target.value)}
+                  placeholder={t('team.broadcastMsgPlaceholder')}
+                  className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                />
+              </div>
+            )}
+
+            {/* Mesaj önizleme */}
+            {broadcastPreviewText && (
+              <div className="overflow-hidden rounded-xl border border-[#534AB7]/20 bg-[#534AB7]/5">
+                <button
+                  onClick={() => setPreviewOpen(v => !v)}
+                  className="flex w-full items-center justify-between px-3.5 py-2.5 text-left"
+                >
+                  <span className="text-[11px] font-semibold text-[#534AB7]">{t('team.broadcastPreview')}</span>
+                  {previewOpen ? <ChevronUp className="h-3.5 w-3.5 text-[#534AB7]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#534AB7]" />}
+                </button>
+                {previewOpen && (
+                  <div className="border-t border-[#534AB7]/15 px-3.5 pb-3 pt-2">
+                    <pre className="whitespace-pre-wrap break-words font-sans text-[11px] leading-relaxed text-[var(--text-2)]">
+                      {broadcastPreviewText}
+                    </pre>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Alıcı seçimi */}
+            <div className="space-y-2.5">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                {lang === 'en' ? 'Recipients' : 'Alıcılar'}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setBroadcastTarget('grup')}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                    broadcastTarget === 'grup'
+                      ? 'border-[#25D366] bg-[#25D366]/10 text-[#1a9e4f] dark:text-[#25D366]'
+                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
+                  }`}
+                >
+                  <Users className="h-3.5 w-3.5 shrink-0" />
+                  {t('team.broadcastRecipientGroup')}
+                </button>
+                <button
+                  onClick={() => setBroadcastTarget('tekli')}
+                  className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-semibold transition ${
+                    broadcastTarget === 'tekli'
+                      ? 'border-[#25D366] bg-[#25D366]/10 text-[#1a9e4f] dark:text-[#25D366]'
+                      : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
+                  }`}
+                >
+                  <CheckSquare className="h-3.5 w-3.5 shrink-0" />
+                  {t('team.broadcastRecipientSelect')}
+                </button>
+              </div>
+
+              {/* Grup gönder */}
+              {broadcastTarget === 'grup' && (
+                <button
+                  onClick={handleGroupBroadcast}
+                  disabled={!broadcastPreviewText}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 text-sm font-bold text-white shadow-sm shadow-[#25D366]/20 transition hover:bg-[#1fb85a] active:scale-[0.98] disabled:opacity-40"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                  {t('team.broadcastSendGroup')}
+                </button>
+              )}
+
+              {/* Tekli seçim */}
+              {broadcastTarget === 'tekli' && (
+                <div className="space-y-2">
+                  {members.length > 1 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] text-[var(--text-3)]">
+                        {selectedCount > 0
+                          ? t('team.broadcastMembersSelected', { count: String(selectedCount) })
+                          : lang === 'en' ? 'Select recipients' : 'Kişileri seçin'}
+                      </span>
+                      <div className="flex gap-2">
+                        <button onClick={selectAllMembers} className="text-[11px] font-semibold text-[#534AB7] hover:underline">
+                          {t('team.broadcastSelectAll')}
+                        </button>
+                        <span className="text-[var(--border)]">·</span>
+                        <button onClick={clearMemberSelection} className="text-[11px] font-semibold text-[var(--text-3)] hover:underline">
+                          {t('team.broadcastClearAll')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  <ul className="space-y-2">
+                    {members.map(m => {
+                      const selected = selectedMembers.has(m.user_id)
+                      return (
+                        <li key={m.user_id} className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 transition hover:bg-[var(--bg)]">
+                          <button
+                            onClick={() => toggleMember(m.user_id)}
+                            className="shrink-0 text-[var(--text-3)] transition hover:text-[#534AB7]"
+                          >
+                            {selected
+                              ? <CheckSquare className="h-4 w-4 text-[#534AB7]" />
+                              : <Square className="h-4 w-4" />}
+                          </button>
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
+                            {(m.full_name ?? '?').charAt(0).toUpperCase()}
+                          </span>
+                          <span className="flex-1 truncate text-xs font-semibold text-[var(--text-1)]">
+                            {m.full_name ?? 'İsimsiz Üye'}
+                          </span>
+                          {selected && (
+                            <a
+                              href={`https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastPreviewText || '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={e => { if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')) } }}
+                              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#25D366] text-white transition hover:bg-[#1fb85a] active:scale-95"
+                              title={`WhatsApp: ${m.full_name ?? ''}`}
+                            >
+                              <WhatsAppIcon className="h-3.5 w-3.5" />
+                            </a>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                  {members.length <= 1 && (
+                    <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)]">
+                      {lang === 'en' ? 'No other team members yet.' : 'Henüz başka ekip üyeniz yok.'}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (

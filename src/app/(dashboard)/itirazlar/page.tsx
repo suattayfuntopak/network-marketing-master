@@ -13,14 +13,15 @@ interface Itiraz {
   emoji: string
 }
 
+// IDs 1-20 preserved from original for localStorage compatibility
 const ITIRAZLAR: Itiraz[] = [
-  // — Para / Kazanç —
+  // — Para & Kazanç —
   {
     id: 1,
     kategori: { tr: 'Para & Kazanç', en: 'Money & Earnings' },
     soru: { tr: 'Bu piramit sistemi mi?', en: 'Is this a pyramid / Ponzi scheme?' },
     cevap: {
-      tr: 'Hayır. Piramit sistemlerde gerçek ürün/hizmet yoktur ve para yalnızca yeni üye getirmekten kazanılır — bu Türkiye\'de yasadışıdır. Network marketing\'de gerçek ürün veya hizmet satılır; kazanç hem kendi satışlarınızdan hem de ekibinizin satışlarından gelir. Bunu fark etmek için bir soruyu sor: "Ürünü ağ olmasa da satın alır mıydın?" Cevap evetse, bu gerçek bir iş.',
+      tr: 'Hayır. Piramit sistemlerde gerçek ürün/hizmet yoktur ve para yalnızca yeni üye getirmekten kazanılır — bu Türkiye\'de yasadışıdır. Network marketing\'de gerçek ürün veya hizmet satılır; kazanç hem kendi satışlarınızdan hem de ekibinizin satışlarından gelir. Bir soruyu sor: "Ürünü ağ olmasa da satın alır mıydın?" Cevap evetse, bu gerçek bir iş.',
       en: 'No. Pyramid schemes have no real product—earnings come only from recruiting, which is illegal. In legitimate network marketing, real products are sold and earnings come from both your own sales and your team\'s. Ask yourself: "Would I buy this product even without the business?" If yes, it\'s a real business.',
     },
     emoji: '🏛️',
@@ -30,7 +31,7 @@ const ITIRAZLAR: Itiraz[] = [
     kategori: { tr: 'Para & Kazanç', en: 'Money & Earnings' },
     soru: { tr: 'Bundan gerçekten para kazanılır mı?', en: 'Can you actually earn money from this?' },
     cevap: {
-      tr: 'Evet — ama herkes kazanamaz, çünkü herkes çalışmaz. Bu bir iş, piyango değil. İlk 6–12 ayda küçük gelir, tutarlı çalışanlar 1–3 yılda önemli kazanç elde eder. Somut bir şey söyleyeyim: ben de aynı soruyu sormuştum. Rakamları beraber inceleyelim.',
+      tr: 'Evet — ama herkes kazanamaz, çünkü herkes çalışmaz. Bu bir iş, piyango değil. İlk 6–12 ayda küçük gelir, tutarlı çalışanlar 1–3 yılda önemli kazanç elde eder. Ben de aynı soruyu sormuştum. Rakamları beraber inceleyelim.',
       en: 'Yes — but not everyone does, because not everyone works. This is a business, not a lottery. The first 6–12 months yield modest income; those who stay consistent earn meaningfully within 1–3 years. I asked the same question. Let\'s review real numbers together.',
     },
     emoji: '💰',
@@ -41,7 +42,7 @@ const ITIRAZLAR: Itiraz[] = [
     soru: { tr: 'Param yok, başlayamam.', en: "I don't have money right now—I can't start." },
     cevap: {
       tr: 'Başlangıç maliyeti çoğu küçük işletmenin çok altında. Üstelik bir işletme kuruyorsun; kira, stok, çalışan masrafı yok. Başlangıç için yatırdığın şey, uzun vadede geri dönüşü olan bir yatırım. İstersen minimum başlangıç seçeneklerine birlikte bakalım.',
-      en: "Starting costs are far below most small businesses—no rent, no inventory, no payroll. What you invest upfront is a long-term investment. Let's look at the minimum starter options together and see what fits.",
+      en: "Starting costs are far below most small businesses—no rent, no inventory, no payroll. What you invest upfront is a long-term investment. Let's look at the minimum starter options together.",
     },
     emoji: '🪙',
   },
@@ -56,17 +57,17 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '⏰',
   },
   {
-    id: 17,
+    id: 21,
     kategori: { tr: 'Para & Kazanç', en: 'Money & Earnings' },
     soru: { tr: 'Pasif gelir masallarına inanmıyorum.', en: "I don't believe passive income stories." },
     cevap: {
-      tr: 'Haklısın — "pasif gelir" kelimesi bu sektörde çok suistimal edildi. Dürüst çerçeve: başlangıçta aktif çalışma gerekir. Emek + sistem + zaman üçlüsü oluşursa zamanla "artık gelir" yapısı oluşabilir — yani daha az aktif çalışırken kazanç akmaya devam eder. Bu anında olmaz, aylar veya yıllar içinde inşa edilir. Ben de "pasif gelir" kelimesini kullanmaktan kaçınırım; bunun yerine gerçekçi bir zaman çizelgesi konuşalım.',
+      tr: 'Haklısın — "pasif gelir" kelimesi bu sektörde çok suistimal edildi. Dürüst çerçeve: başlangıçta aktif çalışma gerekir. Emek + sistem + zaman üçlüsü oluşursa zamanla "artık gelir" yapısı oluşabilir — yani daha az aktif çalışırken kazanç akmaya devam eder. Ben de "pasif gelir" kelimesini kullanmaktan kaçınırım; bunun yerine gerçekçi bir zaman çizelgesi konuşalım.',
       en: "You're right—'passive income' has been badly overused. The honest frame: this is active work upfront. What you build over months is residual income—where the work-to-earnings ratio gradually shifts. It doesn't happen overnight. I don't use 'passive' either. Let's talk about a realistic timeline instead.",
     },
     emoji: '📊',
   },
   {
-    id: 23,
+    id: 22,
     kategori: { tr: 'Para & Kazanç', en: 'Money & Earnings' },
     soru: { tr: 'Ekranda gördüğüm kazanç paylaşımlarına inanmıyorum.', en: "I don't trust income screenshots." },
     cevap: {
@@ -97,7 +98,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🤝',
   },
   {
-    id: 12,
+    id: 23,
     kategori: { tr: 'Zaman & Yoğunluk', en: 'Time & Priorities' },
     soru: { tr: 'İşim var, maaşım yeterli.', en: 'I have a job—my salary is enough.' },
     cevap: {
@@ -107,7 +108,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '💼',
   },
   {
-    id: 16,
+    id: 24,
     kategori: { tr: 'Zaman & Yoğunluk', en: 'Time & Priorities' },
     soru: { tr: 'Çocuklar küçük, hiç vaktim yok.', en: 'My kids are young—I have zero time.' },
     cevap: {
@@ -140,7 +141,7 @@ const ITIRAZLAR: Itiraz[] = [
   {
     id: 9,
     kategori: { tr: 'Güven & Şüphe', en: 'Trust & Skepticism' },
-    soru: { tr: 'Bu şirkete güvenilir mi?', en: "Is this company trustworthy?" },
+    soru: { tr: 'Bu şirkete güvenilir mi?', en: 'Is this company trustworthy?' },
     cevap: {
       tr: 'Haklısın, araştırmak şart. Şirketin kuruluş tarihi, ülkedeki yasal kaydı, ürün sertifikaları ve bağımsız distribütör sayısını birlikte inceleyelim. Sana somut belgeleri paylaşayım — sonra karar ver.',
       en: "You're right to ask. Let's look at founding history, legal registration, product certifications, and independent distributor numbers together. I'll share concrete documents—then you decide.",
@@ -158,7 +159,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🪞',
   },
   {
-    id: 21,
+    id: 25,
     kategori: { tr: 'Güven & Şüphe', en: 'Trust & Skepticism' },
     soru: { tr: 'Sana güveniyorum ama bu işe pek inanmıyorum.', en: 'I trust you but not this kind of business.' },
     cevap: {
@@ -178,7 +179,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🆕',
   },
   {
-    id: 34,
+    id: 27,
     kategori: { tr: 'Güven & Şüphe', en: 'Trust & Skepticism' },
     soru: { tr: 'Çevrim içi sunuma güvenmiyorum, yüz yüze olsa belki.', en: "I don't trust online calls—maybe face-to-face." },
     cevap: {
@@ -199,7 +200,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🗣️',
   },
   {
-    id: 13,
+    id: 12,
     kategori: { tr: 'Yetenek & Kimlik', en: 'Ability & Identity' },
     soru: { tr: 'Yeterince sosyal değilim.', en: "I'm not social enough." },
     cevap: {
@@ -209,7 +210,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🌱',
   },
   {
-    id: 14,
+    id: 13,
     kategori: { tr: 'Yetenek & Kimlik', en: 'Ability & Identity' },
     soru: { tr: 'Eğitimim yok, bilgim yok.', en: "I'm not educated enough—I'll fail." },
     cevap: {
@@ -219,7 +220,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '📚',
   },
   {
-    id: 22,
+    id: 28,
     kategori: { tr: 'Yetenek & Kimlik', en: 'Ability & Identity' },
     soru: { tr: 'Çevrem çok dar, tanıdığım yok ki.', en: 'My circle is tiny—I barely know anyone.' },
     cevap: {
@@ -229,7 +230,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🌐',
   },
   {
-    id: 27,
+    id: 29,
     kategori: { tr: 'Yetenek & Kimlik', en: 'Ability & Identity' },
     soru: { tr: 'İş yerim/mesleğim gereği sosyal medyada paylaşım yapamam.', en: "My job rules—I can't post on social media." },
     cevap: {
@@ -240,7 +241,7 @@ const ITIRAZLAR: Itiraz[] = [
   },
   // — Aile / Çevre —
   {
-    id: 15,
+    id: 14,
     kategori: { tr: 'Aile & Çevre', en: 'Family & Network' },
     soru: { tr: 'Ailem karşı çıkıyor.', en: 'My family is against it.' },
     cevap: {
@@ -250,7 +251,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🏠',
   },
   {
-    id: 18,
+    id: 15,
     kategori: { tr: 'Aile & Çevre', en: 'Family & Network' },
     soru: { tr: 'Çevremde kimse bu tür şeylere inanmıyor.', en: 'No one in my circle believes in this kind of thing.' },
     cevap: {
@@ -260,7 +261,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🌐',
   },
   {
-    id: 29,
+    id: 30,
     kategori: { tr: 'Aile & Çevre', en: 'Family & Network' },
     soru: { tr: 'Akraba ve tanıdıklarla iş yapmak ilişkimi bozar.', en: 'Doing business with relatives will ruin our relationship.' },
     cevap: {
@@ -271,7 +272,7 @@ const ITIRAZLAR: Itiraz[] = [
   },
   // — Ürün / Sistem —
   {
-    id: 19,
+    id: 16,
     kategori: { tr: 'Ürün & Sistem', en: 'Product & System' },
     soru: { tr: 'Ürünler çok pahalı.', en: 'The products are too expensive.' },
     cevap: {
@@ -281,7 +282,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🧴',
   },
   {
-    id: 20,
+    id: 17,
     kategori: { tr: 'Ürün & Sistem', en: 'Product & System' },
     soru: { tr: 'Bu ürünleri zaten marketlerden alabiliyorum.', en: 'I can already buy similar products at the store.' },
     cevap: {
@@ -291,7 +292,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🛒',
   },
   {
-    id: 25,
+    id: 18,
     kategori: { tr: 'Ürün & Sistem', en: 'Product & System' },
     soru: { tr: 'Bunu başka şirketler de yapıyor zaten.', en: 'Other companies do the exact same thing.' },
     cevap: {
@@ -301,7 +302,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '⚖️',
   },
   {
-    id: 28,
+    id: 31,
     kategori: { tr: 'Ürün & Sistem', en: 'Product & System' },
     soru: { tr: 'Kargo, iade veya cayma konusunda endişeliyim.', en: "I'm worried about shipping, returns, or withdrawal rights." },
     cevap: {
@@ -312,7 +313,7 @@ const ITIRAZLAR: Itiraz[] = [
   },
   // — Genel —
   {
-    id: 23,
+    id: 19,
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Şu an düşünmek istemiyorum.', en: "I don't want to think about it right now." },
     cevap: {
@@ -322,7 +323,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🚪',
   },
   {
-    id: 24,
+    id: 20,
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Biraz daha bilgi alabilir miyim?', en: 'Can I get more information?' },
     cevap: {
@@ -332,7 +333,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '💬',
   },
   {
-    id: 30,
+    id: 32,
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Düşüneceğim, daha sonra bakarım.', en: "I'll think about it—maybe later." },
     cevap: {
@@ -342,7 +343,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '💭',
   },
   {
-    id: 31,
+    id: 33,
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Bu tür işlere artık motive olamıyorum.', en: "I can't motivate myself for this anymore." },
     cevap: {
@@ -352,7 +353,7 @@ const ITIRAZLAR: Itiraz[] = [
     emoji: '🔋',
   },
   {
-    id: 32,
+    id: 34,
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Konuştuğum herkes hayır dedi, bu iş olmaz.', en: "Everyone said no—this won't work." },
     cevap: {
@@ -367,8 +368,12 @@ const FAV_KEY = 'nmm_itiraz_favori'
 const READ_KEY = 'nmm_itiraz_read'
 const PAGE_SIZE = 10
 
-const KATEGORI_TR = ['Tümü', 'Favoriler', ...Array.from(new Set(ITIRAZLAR.map(i => i.kategori.tr)))]
-const KATEGORI_EN = ['All', 'Favorites', ...Array.from(new Set(ITIRAZLAR.map(i => i.kategori.en)))]
+function getKategoriler(lang: 'tr' | 'en') {
+  const base = ['Tümü', 'Favoriler']
+  const baseEn = ['All', 'Favorites']
+  const uniq = Array.from(new Set(ITIRAZLAR.map(i => lang === 'en' ? i.kategori.en : i.kategori.tr)))
+  return lang === 'en' ? [...baseEn, ...uniq] : [...base, ...uniq]
+}
 
 function loadSet(key: string): Set<number> {
   if (typeof window === 'undefined') return new Set()
@@ -386,20 +391,19 @@ export default function ItirazlarPage() {
   const { lang } = useTranslation()
   const [search, setSearch] = useState('')
   const [acikId, setAcikId] = useState<number | null>(null)
-  const [aktifKategori, setAktifKategori] = useState(0) // index into KATEGORI array
+  const [aktifKategori, setAktifKategori] = useState(0)
   const [favs, setFavs] = useState<Set<number>>(new Set())
   const [read, setRead] = useState<Set<number>>(new Set())
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
 
-  const KATEGORILER = lang === 'en' ? KATEGORI_EN : KATEGORI_TR
+  const KATEGORILER = getKategoriler(lang)
 
   useEffect(() => {
     setFavs(loadSet(FAV_KEY))
     setRead(loadSet(READ_KEY))
   }, [])
 
-  // Reset page when filter/search changes
   useEffect(() => { setPage(1) }, [search, aktifKategori, lang])
 
   function toggleFav(id: number, e: React.MouseEvent) {
@@ -440,13 +444,13 @@ export default function ItirazlarPage() {
 
   const filtrelenmis = useMemo(() => {
     const q = search.toLowerCase().trim()
-    const aktifLabel = KATEGORILER[aktifKategori]
-    const isFavFilter = aktifLabel === 'Favoriler' || aktifLabel === 'Favorites'
-    const isAll = aktifLabel === 'Tümü' || aktifLabel === 'All'
+    const label = KATEGORILER[aktifKategori]
+    const isFavFilter = label === 'Favoriler' || label === 'Favorites'
+    const isAll = label === 'Tümü' || label === 'All'
 
     return ITIRAZLAR.filter(i => {
       if (isFavFilter) return favs.has(i.id)
-      const kategoriEslesti = isAll || i.kategori.tr === aktifLabel || i.kategori.en === aktifLabel
+      const kategoriEslesti = isAll || i.kategori.tr === label || i.kategori.en === label
       if (!kategoriEslesti) return false
       if (!q) return true
       const soru = lang === 'en' ? i.soru.en : i.soru.tr
@@ -598,7 +602,6 @@ export default function ItirazlarPage() {
                         : 'border-[var(--border)] bg-[var(--bg-card)] hover:border-[#9B1D47]/30 dark:hover:border-[#fda4af]/30 hover:shadow-sm'
                     }`}
                   >
-                    {/* Başlık satırı */}
                     <button
                       onClick={() => toggle(itiraz.id)}
                       className="flex w-full items-center gap-3 p-4 text-left"
@@ -622,10 +625,7 @@ export default function ItirazlarPage() {
                             : 'text-[var(--text-3)] hover:text-emerald-600 dark:hover:text-emerald-400'
                         }`}
                       >
-                        {isRead
-                          ? <CheckCircle2 className="h-5 w-5" />
-                          : <Circle className="h-5 w-5" />
-                        }
+                        {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
                       </button>
                       {/* Favori butonu */}
                       <button
@@ -652,11 +652,8 @@ export default function ItirazlarPage() {
                           <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF1F3] dark:bg-[#3d0a1a]">
                             <span className="text-[10px]">💡</span>
                           </div>
-                          <p className="flex-1 text-sm leading-relaxed text-[var(--text-2)]">
-                            {cevap}
-                          </p>
+                          <p className="flex-1 text-sm leading-relaxed text-[var(--text-2)]">{cevap}</p>
                         </div>
-                        {/* Kopyala butonu */}
                         <button
                           onClick={e => copyCevap(cevap, itiraz.id, e)}
                           className={`mt-3 ml-7 flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${

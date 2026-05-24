@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -73,6 +73,8 @@ export function CandidateDetail({ candidateId }: Props) {
   const [editingFollowUp, setEditingFollowUp] = useState(false)
   const [tempFollowUp, setTempFollowUp] = useState<string>('')
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [translatedNote, setTranslatedNote] = useState<string | null>(null)
+  const [isTranslating, setIsTranslating] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -400,7 +402,7 @@ export function CandidateDetail({ candidateId }: Props) {
           {/* Silme Card */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
             <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {t('common.delete')}
+              {lang === 'en' ? 'Delete Candidate' : 'Kişi Sil'}
             </p>
             <button
               onClick={handleDelete}
