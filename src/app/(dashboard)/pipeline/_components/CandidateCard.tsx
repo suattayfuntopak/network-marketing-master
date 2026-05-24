@@ -2,7 +2,7 @@
 
 import { ChevronDown, Pencil, Trash2, X } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
@@ -39,12 +39,11 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
     update.mutate({ id: candidate.id, stage })
   }
 
+  const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
+
   function handleDeleteConfirmed() {
     setConfirmOpen(false)
-    deleteWithUndo(
-      candidate.full_name,
-      () => del.mutate(candidate.id),
-    )
+    deleteWithUndo(candidate.full_name, () => del.mutate(candidate.id))
   }
 
   const waLink = waHref(candidate.phone)
@@ -121,7 +120,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
       {confirmOpen && (
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
-          onCancel={() => setConfirmOpen(false)}
+          onCancel={handleConfirmCancel}
         />
       )}
 

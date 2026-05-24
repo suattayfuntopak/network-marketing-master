@@ -4,17 +4,8 @@ import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
-import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { STAGE_LABEL, STAGE_COLOR, FOLLOW_DAYS } from '@/lib/stages'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-
-const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
-  yeni:     2,
-  iletisim: 3,
-  davetli:  2,
-  takip:    3,
-  sunum:    1,
-  kararsiz: 7,
-}
 
 function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan

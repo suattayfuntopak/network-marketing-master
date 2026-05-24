@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, MessageSquare, Trash2, X, Bot } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -52,6 +52,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
+  const { data: activityLog = [] } = useActivityHistory(candidateId)
 
   const c = candidates.find(x => x.id === candidateId)
 
@@ -107,13 +108,11 @@ export function CandidateDetail({ candidateId }: Props) {
     setConfirmOpen(true)
   }
 
+  const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
+
   function handleDeleteConfirmed() {
     setConfirmOpen(false)
-    deleteWithUndo(
-      c!.full_name,
-      () => del.mutate(c!.id),
-      () => router.push('/pipeline'),
-    )
+    deleteWithUndo(c!.full_name, () => del.mutate(c!.id))
     router.push('/pipeline')
   }
 
@@ -249,6 +248,38 @@ export function CandidateDetail({ candidateId }: Props) {
           </div>
         </div>
 
+        {/* Aktivite Geçmişi */}
+        {activityLog.length > 0 && (
+          <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+            <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+              <History className="h-3.5 w-3.5" />
+              Aktivite Geçmişi
+            </p>
+            <ul className="space-y-2">
+              {activityLog.map(a => (
+                <li key={a.id} className="flex items-center gap-2.5 text-sm">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)]">
+                    {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
+                    {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
+                    {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
+                    {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
+                  </span>
+                  <span className="flex-1 text-[var(--text-2)]">
+                    {a.action_type === 'call'         && 'Arama'}
+                    {a.action_type === 'whatsapp'     && 'WhatsApp'}
+                    {a.action_type === 'note'         && 'Not'}
+                    {a.action_type === 'stage_change' && 'Aşama değişti'}
+                    {a.note && <span className="text-[var(--text-3)]"> — {a.note}</span>}
+                  </span>
+                  <span className="shrink-0 text-[10px] text-[var(--text-3)]">
+                    {new Date(a.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Sil */}
         <button
           onClick={handleDelete}
@@ -270,7 +301,7 @@ export function CandidateDetail({ candidateId }: Props) {
       {confirmOpen && (
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
-          onCancel={() => setConfirmOpen(false)}
+          onCancel={handleConfirmCancel}
         />
       )}
 

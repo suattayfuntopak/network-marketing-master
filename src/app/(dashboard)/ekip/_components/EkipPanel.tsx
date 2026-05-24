@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -159,6 +159,8 @@ export function EkipPanel() {
       setJoining(false)
     }
   }
+
+  const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
   async function handleRemoveMemberConfirmed() {
     if (!memberToRemove) return
@@ -407,7 +409,7 @@ export function EkipPanel() {
         <ConfirmDeleteModal
           message={`${memberToRemove.name} ekibinizden çıkarılacak.`}
           onConfirm={handleRemoveMemberConfirmed}
-          onCancel={() => setMemberToRemove(null)}
+          onCancel={handleMemberRemoveCancel}
         />
       )}
     </div>

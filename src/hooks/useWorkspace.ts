@@ -5,9 +5,15 @@ import { createClient } from '@/lib/supabase/client'
 
 export interface WorkspaceContext {
   workspaceId: string
+  inviteCode: string
   role: 'leader' | 'member'
   fullName: string | null
   avatarUrl: string | null
+}
+
+function generateInviteCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
 async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
@@ -31,8 +37,16 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
 
   if (membership) {
+    // Workspace'in invite_code'unu çek
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('invite_code')
+      .eq('id', membership.workspace_id)
+      .single()
+
     return {
       workspaceId: membership.workspace_id,
+      inviteCode: ws?.invite_code ?? membership.workspace_id.slice(0, 8).toUpperCase(),
       role: membership.role,
       fullName: membership.full_name,
       avatarUrl,
@@ -41,11 +55,12 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
 
   // Yeni workspace + leader üyeliği oluştur
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Kullanıcı'
+  const inviteCode = generateInviteCode()
 
   const { data: ws, error: wsError } = await supabase
     .from('nmm_workspaces')
-    .insert({ name: `${fullName}'in Ekibi`, owner_id: user.id })
-    .select('id')
+    .insert({ name: `${fullName}'in Ekibi`, owner_id: user.id, invite_code: inviteCode })
+    .select('id, invite_code')
     .single()
 
   if (wsError || !ws) {
@@ -65,7 +80,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
   }
 
-  return { workspaceId: ws.id, role: 'leader', fullName, avatarUrl }
+  return { workspaceId: ws.id, inviteCode: ws.invite_code ?? inviteCode, role: 'leader', fullName, avatarUrl }
 }
 
 export function useWorkspace() {

@@ -47,16 +47,12 @@ function DeleteToast({
 export function deleteWithUndo(
   name: string,
   deleteFn: () => void,
-  onClose?: () => void,
 ) {
   let cancelled = false
   let toastId: string | number
 
   const timer = setTimeout(() => {
-    if (!cancelled) {
-      deleteFn()
-      onClose?.()
-    }
+    if (!cancelled) deleteFn()
   }, 5000)
 
   toastId = toast.custom(

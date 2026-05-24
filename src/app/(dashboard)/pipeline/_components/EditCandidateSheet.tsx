@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useCallback } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/stages'
@@ -8,6 +8,8 @@ import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/zIndex'
+
+const PHONE_RE = /^(\+90|0)5\d{9}$/
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -21,16 +23,23 @@ interface Props {
 export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const formRef = useRef<HTMLFormElement>(null)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [phoneError, setPhoneError] = useState('')
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const fd = new FormData(e.currentTarget)
+    const phone = (fd.get('phone') as string).trim()
+    if (phone && !PHONE_RE.test(phone)) {
+      setPhoneError('Geçerli bir numara girin (ör. 05xx xxx xx xx)')
+      return
+    }
+    setPhoneError('')
     await update.mutateAsync({
       id: candidate.id,
       full_name: (fd.get('fullName') as string).trim(),
-      phone: (fd.get('phone') as string).trim() || null,
+      phone: phone || null,
       note: (fd.get('note') as string).trim() || null,
       stage: fd.get('stage') as CandidateStage,
     })
@@ -43,13 +52,11 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
 
   function handleDeleteConfirmed() {
     setConfirmOpen(false)
-    deleteWithUndo(
-      candidate.full_name,
-      () => del.mutate(candidate.id),
-      onClose,
-    )
+    deleteWithUndo(candidate.full_name, () => del.mutate(candidate.id))
     onClose()
   }
+
+  const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
 
   return (
     <>
@@ -69,7 +76,13 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-phone">Telefon</label>
-            <input id="edit-phone" name="phone" type="tel" defaultValue={candidate.phone ?? ''} placeholder="05xxxxxxxxx" className={inputClass} />
+            <input
+              id="edit-phone" name="phone" type="tel"
+              defaultValue={candidate.phone ?? ''} placeholder="05xxxxxxxxx"
+              className={`${inputClass} ${phoneError ? 'border-[#72243E] focus:border-[#72243E] focus:ring-[#FBEAF0]' : ''}`}
+              onChange={() => phoneError && setPhoneError('')}
+            />
+            {phoneError && <p className="mt-1 text-xs text-[#72243E]">{phoneError}</p>}
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-stage">Aşama</label>
@@ -97,7 +110,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       {confirmOpen && (
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
-          onCancel={() => setConfirmOpen(false)}
+          onCancel={handleConfirmCancel}
         />
       )}
     </>

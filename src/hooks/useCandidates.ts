@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
-import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, CandidateStage, ActionType } from '@/types/database.types'
+import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar'
 
@@ -67,7 +67,7 @@ export function useUpdateCandidate(workspaceId: string) {
       const supabase = createClient()
       const { error } = await supabase
         .from('nmm_candidates')
-        .update({ ...patch, last_contact_at: new Date().toISOString() })
+        .update(patch)
         .eq('id', id)
       if (error) throw new Error(error.message)
     },
@@ -119,5 +119,23 @@ export function useMarkContacted(workspaceId: string) {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
     },
     onError: (e: Error) => toast.error(`Kayıt hatası: ${e.message}`),
+  })
+}
+
+export function useActivityHistory(candidateId: string) {
+  return useQuery<NmmDailyAction[]>({
+    queryKey: ['activity', candidateId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('nmm_daily_actions')
+        .select('*')
+        .eq('candidate_id', candidateId)
+        .order('created_at', { ascending: false })
+        .limit(10)
+      if (error) throw new Error(error.message)
+      return data ?? []
+    },
+    enabled: !!candidateId,
   })
 }

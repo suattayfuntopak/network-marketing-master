@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { List, LayoutList, Phone } from 'lucide-react'
+import { List, LayoutList, Phone, Bot, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
@@ -10,6 +10,8 @@ import { useDailyActions } from '@/hooks/useDailyActions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
+import { generateQuickMessageAction } from '../actions'
+import { toast } from 'sonner'
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'
@@ -21,11 +23,27 @@ function formatDaysAgo(days: number): string {
 export function IlgilenContent() {
   const router = useRouter()
   const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
+  const [generatingFor, setGeneratingFor] = useState<string | null>(null)
+  const [copiedFor, setCopiedFor] = useState<string | null>(null)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { daily, remaining } = useDailyActions(candidates)
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
+
+  async function handleAIMessage(id: string, name: string, stage: string, note: string | null) {
+    setGeneratingFor(id)
+    const result = await generateQuickMessageAction({ name, stage, note })
+    setGeneratingFor(null)
+    if (result.error || !result.message) {
+      toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+      return
+    }
+    await navigator.clipboard.writeText(result.message)
+    setCopiedFor(id)
+    toast.success('Mesaj panoya kopyalandı!')
+    setTimeout(() => setCopiedFor(null), 2500)
+  }
 
   if (wsLoading || cLoading) {
     return (
@@ -99,7 +117,24 @@ export function IlgilenContent() {
                   <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact)}</span>
                 </div>
               </div>
+              {/* Eylem butonları — tıklama propagasyonu engelle */}
               <div className="flex shrink-0 gap-1.5" onClick={e => e.stopPropagation()}>
+                {/* Inline AI Mesaj */}
+                <button
+                  onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null)}
+                  disabled={generatingFor === c.id}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition hover:opacity-80 disabled:opacity-50"
+                  aria-label="AI Mesaj Üret"
+                  title="AI Mesaj Üret ve Kopyala"
+                >
+                  {generatingFor === c.id ? (
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+                  ) : copiedFor === c.id ? (
+                    <Check className="h-4 w-4" />
+                  ) : (
+                    <Bot className="h-4 w-4" strokeWidth={1.75} />
+                  )}
+                </button>
                 {waHref(c.phone) && (
                   <a
                     href={waHref(c.phone)!}

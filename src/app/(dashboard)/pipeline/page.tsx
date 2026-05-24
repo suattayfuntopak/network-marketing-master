@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, BarChart2 } from 'lucide-react'
+import { Plus, BarChart2, Search, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, type CandidateFilter } from '@/hooks/useCandidates'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
@@ -12,14 +12,19 @@ import { AddCandidateSheet } from './_components/AddCandidateSheet'
 export default function PipelinePage() {
   const [filter, setFilter] = useState<CandidateFilter>('tumü')
   const [sheetOpen, setSheetOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const { data: ws, isLoading: wsLoading, error: wsError } = useWorkspace()
   const { candidates: all, isLoading, error } = useCandidates(ws?.workspaceId)
 
-  const candidates = filter === 'tumü'        ? all
+  const filtered = filter === 'tumü'        ? all
     : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
     : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
     : all.filter(c => c.stage === 'kayboldu')
+
+  const candidates = searchQuery.trim()
+    ? filtered.filter(c => c.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : filtered
 
   const counts: Record<CandidateFilter, number> = {
     tumü:        all.length,
@@ -65,6 +70,26 @@ export default function PipelinePage() {
         </div>
       </div>
 
+      {/* İsim arama kutusu */}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          placeholder="İsimle ara..."
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-9 pr-9 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-3)] hover:text-[var(--text-1)]"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
       <StageFilter active={filter} onChange={setFilter} counts={counts} />
 
       <div className="mt-4">
@@ -74,10 +99,10 @@ export default function PipelinePage() {
           <div className="rounded-2xl border border-dashed border-[var(--border)] py-12 text-center">
             <p className="text-2xl mb-2">🎯</p>
             <p className="text-sm font-semibold text-[var(--text-1)]">
-              {filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
+              {searchQuery ? 'Arama sonucu bulunamadı' : filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
             </p>
             <p className="mt-1 text-xs text-[var(--text-3)]">
-              {filter === 'tumü' ? '"Kişi Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
+              {searchQuery ? 'Farklı bir isim dene' : filter === 'tumü' ? '"Kişi Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
             </p>
           </div>
         )}

@@ -8,6 +8,7 @@ import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
 import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { OnboardingModal } from './OnboardingModal'
 
 function daysAgoLabel(days: number): string {
   if (!isFinite(days)) return 'Hiç temas yok'
@@ -51,6 +52,10 @@ export function PanoContent() {
 
   return (
     <div className="md:max-w-[80%] md:mx-auto space-y-5">
+      {/* Onboarding — sadece hiç aday yoksa göster */}
+      {candidates.length === 0 && ws && (
+        <OnboardingModal workspaceId={ws.workspaceId} inviteCode={ws.inviteCode} />
+      )}
       {/* Selamlama */}
       <header>
         <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
