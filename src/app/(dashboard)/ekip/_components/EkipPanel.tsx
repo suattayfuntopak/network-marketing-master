@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -13,6 +13,104 @@ import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
+
+function SpoilerCode({ code }: { code: string }) {
+  const [revealed, setRevealed] = useState(false)
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  
+  useEffect(() => {
+    if (revealed) return
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    
+    let animationFrameId: number
+    
+    const resize = () => {
+      if (!canvas) return
+      canvas.width = canvas.parentElement?.clientWidth || 200
+      canvas.height = canvas.parentElement?.clientHeight || 40
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    
+    const numParticles = 60
+    const particles: {x: number, y: number, size: number, speed: number, alpha: number}[] = []
+    
+    for (let i = 0; i < numParticles; i++) {
+      particles.push({
+        x: Math.random() * (canvas.width || 200),
+        y: Math.random() * 40,
+        size: Math.random() * 1.5 + 0.5,
+        speed: Math.random() * 0.03 + 0.01,
+        alpha: Math.random()
+      })
+    }
+    
+    const draw = () => {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      const gradient = ctx.createRadialGradient(
+        canvas.width / 2, canvas.height / 2, 5,
+        canvas.width / 2, canvas.height / 2, canvas.width / 2
+      )
+      gradient.addColorStop(0, 'rgba(83, 74, 183, 0.15)')
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = gradient
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      
+      particles.forEach(p => {
+        p.alpha += p.speed
+        if (p.alpha > 1 || p.alpha < 0) {
+          p.speed = -p.speed
+        }
+        ctx.fillStyle = `rgba(165, 243, 252, ${Math.max(0, Math.min(1, p.alpha))})`
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      })
+      
+      for (let i = 0; i < 100; i++) {
+        const x = Math.random() * canvas.width
+        const y = Math.random() * canvas.height
+        const size = Math.random() * 1
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.3})`
+        ctx.fillRect(x, y, size, size)
+      }
+      
+      animationFrameId = requestAnimationFrame(draw)
+    }
+    
+    draw()
+    
+    return () => {
+      window.removeEventListener('resize', resize)
+      cancelAnimationFrame(animationFrameId)
+    }
+  }, [revealed])
+  
+  return (
+    <div 
+      onClick={() => setRevealed(true)}
+      className="relative flex-1 min-w-0 h-10 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] font-mono text-base font-bold tracking-widest text-[var(--text-1)] cursor-pointer flex items-center justify-center transition-all select-none"
+    >
+      <span className={`transition-all duration-500 ease-out transform ${revealed ? 'scale-100 opacity-100 blur-0' : 'scale-90 opacity-0 blur-md'}`}>
+        {code}
+      </span>
+      
+      {!revealed && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center transition-all duration-500 ease-out">
+          <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+          <span className="relative z-20 text-[10px] uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none">
+            Açmak için tıkla ✨
+          </span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 interface MemberRow {
   user_id: string
@@ -358,9 +456,7 @@ export function EkipPanel() {
               {t('team.inviteTeammateDesc')}
             </p>
             <div className="flex min-w-0 items-center gap-2 overflow-hidden">
-              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-lg font-bold tracking-widest text-[var(--text-1)]">
-                {ws?.inviteCode}
-              </div>
+              <SpoilerCode code={ws?.inviteCode ?? ''} />
               <button
                 onClick={handleCopyInviteCode}
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#534AB7] text-white hover:bg-[#433a9f] transition active:scale-95"
