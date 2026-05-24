@@ -37,7 +37,7 @@ export function YZKocuSheet({ candidate, onClose }: Props) {
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-[var(--bg-card)] px-5 pb-10 pt-5 shadow-2xl md:bottom-auto md:left-1/2 md:right-auto md:top-1/2 md:w-[420px] md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-6" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="fixed left-1/2 top-4 md:top-1/2 z-50 w-[calc(100%-2rem)] md:w-[420px] -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl" style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
         {/* Başlık */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">

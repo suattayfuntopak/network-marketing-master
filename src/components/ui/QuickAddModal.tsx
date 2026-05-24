@@ -22,14 +22,20 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    // Focus the input automatically on mount
-    inputRef.current?.focus()
+    const originalScrollY = window.scrollY
+    
+    // Focus the input automatically on mount without scrolling viewport Y
+    inputRef.current?.focus({ preventScroll: true })
 
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      // Restore scroll Y position to prevent keyboard / focus shifting on mobile
+      window.scrollTo(window.scrollX, originalScrollY)
+    }
   }, [onClose])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -60,7 +66,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
       />
 
       {/* Modal Card */}
-      <div className={`fixed left-1/2 top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all animate-in fade-in zoom-in-95 duration-200`}>
+      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all animate-in fade-in zoom-in-95 duration-200`} style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
         
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
