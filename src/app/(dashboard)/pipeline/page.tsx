@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, BarChart2, Search, X } from 'lucide-react'
+import { Plus, TrendingUp, Search, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, type CandidateFilter } from '@/hooks/useCandidates'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
@@ -39,8 +39,8 @@ export default function PipelinePage() {
   return (
     <PageShell>
       <div className="mb-5 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEEDFE]">
-          <BarChart2 className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] dark:bg-[#0a1f4d]">
+          <TrendingUp className="h-5 w-5 text-[#1A56DB] dark:text-[#93c5fd]" strokeWidth={1.75} />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[var(--text-1)]">Boru Hattı</h1>
