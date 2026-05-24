@@ -52,8 +52,7 @@ export function PanoContent() {
     <div className="md:max-w-[80%] md:mx-auto space-y-5">
       {/* Selamlama */}
       <header>
-        <p className="text-sm font-medium text-[var(--text-2)]">{greeting},</p>
-        <h1 className="text-2xl font-bold text-[var(--text-1)]">{firstName} 👋</h1>
+        <h1 className="text-2xl font-bold text-[var(--text-1)]">{greeting} {firstName} 👋🏻</h1>
       </header>
 
       {/* ── 6 hızlı erişim karesi (3 üst + 3 alt) ── */}
