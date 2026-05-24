@@ -1,6 +1,11 @@
 # Hot Log
 
-## 2026-05-24 — RLS Recursion Fix + Presentation Materials Redesign
+## 2026-05-24 — Ekibim Hook Fix + RLS Recursion Fix + Presentation Materials Redesign
+
+### fix: Ekibim Sayfası React Hook Kural İhlali (React Error #310)
+
+- **Sorun:** Ekibim sayfasında yer alan `EkipPanel.tsx` bileşeni yüklenirken tarayıcıda `Minified React error #310` (Rendered more hooks than during the previous render) hatasıyla çöküyordu. Bu durum, loading veya error durumlarındaki erken return'lerin (early returns) altında yer alan `handleMemberRemoveCancel` isimli `useCallback` hook'unun, koşullu olarak çalıştırılmasından (React'in Hook kurallarının ihlal edilmesinden) kaynaklanıyordu.
+- **Çözüm:** `handleMemberRemoveCancel` `useCallback` hook tanımı dosyanın en üst seviyesine (tüm erken return/render koşullarının üstüne) taşınarak React Hook düzen kurallarına tam uyum sağlandı, sayfa çökmesi tamamen giderildi.
 
 ### fix: nmm_workspace_members RLS Infinite Recursion
 
