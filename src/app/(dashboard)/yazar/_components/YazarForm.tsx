@@ -51,7 +51,7 @@ interface Props {
 
 export function YazarForm({ initialName = '' }: Props) {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState(initialName)
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [messageType, setMessageType] = useState('genel')
@@ -61,6 +61,19 @@ export function YazarForm({ initialName = '' }: Props) {
 
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)
+
+  useEffect(() => {
+    if (initialName && candidates.length > 0 && !prefilledRef.current) {
+      const match = candidates.find(
+        c => c.full_name.toLowerCase() === initialName.toLowerCase()
+      )
+      if (match) {
+        setSelected(match)
+        setQuery('')
+      }
+      prefilledRef.current = true
+    }
+  }, [initialName, candidates])
 
   useEffect(() => {
     function onOutside(e: MouseEvent) {

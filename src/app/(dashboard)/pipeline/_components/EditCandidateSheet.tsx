@@ -52,8 +52,8 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="fixed left-1/2 top-1/2 z-40 w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl" style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
+      <div className="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm" onClick={onClose} />
+      <div className="fixed left-1/2 top-1/2 z-[70] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl" style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold text-[var(--text-1)]">Düzenle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">

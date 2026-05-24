@@ -276,8 +276,8 @@ export function CandidateDetail({ candidateId }: Props) {
 
       {stageOpen && (
         <>
-          <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={() => setStageOpen(false)} />
-          <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0">
+          <div className="fixed inset-0 z-[60] bg-black/30 backdrop-blur-sm" onClick={() => setStageOpen(false)} />
+          <div className="fixed bottom-0 left-0 right-0 z-[70] rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0">
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
               <p className="text-sm font-bold text-[var(--text-1)]">Aşama Seç</p>
               <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
