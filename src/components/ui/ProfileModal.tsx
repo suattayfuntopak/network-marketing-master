@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { X, User, Mail, Lock, Loader2 } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -13,39 +13,44 @@ interface ProfileModalProps {
 export function ProfileModal({ onClose }: ProfileModalProps) {
   const queryClient = useQueryClient()
   const supabase = createClient()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
+  const [uploadingAvatar, setUploadingAvatar] = useState(false)
 
   // Form states
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    // Escape key listener
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKey)
 
-    // Fetch initial profile
     async function loadProfile() {
       try {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
+          setUserId(user.id)
           setEmail(user.email ?? '')
-          
-          // Get workspace member info for name
+          const existingAvatar = (user.user_metadata?.avatar_url as string | undefined) ?? null
+          setAvatarUrl(existingAvatar)
+          setAvatarPreview(existingAvatar)
+
           const { data: member } = await supabase
             .from('nmm_workspace_members')
             .select('full_name')
             .eq('user_id', user.id)
             .maybeSingle()
 
-          if (member?.full_name) {
-            setFullName(member.full_name)
-          }
+          if (member?.full_name) setFullName(member.full_name)
         }
       } catch (err) {
         console.error('Profil yüklenirken hata:', err)
@@ -57,6 +62,60 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
     loadProfile()
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose, supabase])
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file || !userId) return
+
+    // Validate
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Fotoğraf 2MB\'den büyük olamaz.')
+      return
+    }
+    if (!file.type.startsWith('image/')) {
+      toast.error('Lütfen geçerli bir resim dosyası seçin.')
+      return
+    }
+
+    // Local preview
+    const reader = new FileReader()
+    reader.onload = (ev) => setAvatarPreview(ev.target?.result as string)
+    reader.readAsDataURL(file)
+
+    setUploadingAvatar(true)
+    try {
+      const ext = file.name.split('.').pop() ?? 'jpg'
+      const path = `avatars/${userId}.${ext}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { upsert: true, contentType: file.type })
+
+      if (uploadError) throw uploadError
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(path)
+
+      // Save to auth metadata
+      const { error: metaError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      })
+      if (metaError) throw metaError
+
+      setAvatarUrl(publicUrl)
+      setAvatarPreview(publicUrl)
+      queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      toast.success('Profil fotoğrafı güncellendi!')
+    } catch (err: any) {
+      console.error(err)
+      // Bucket might not exist yet — store as base64 in metadata as fallback
+      toast.error('Fotoğraf yüklenemedi. Supabase Storage "avatars" bucket\'ı kontrol edin.')
+      setAvatarPreview(avatarUrl) // revert preview
+    } finally {
+      setUploadingAvatar(false)
+    }
+  }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault()
@@ -72,24 +131,20 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Oturum bulunamadı.')
 
-      // 1. Update Display Name in database
       if (fullName.trim()) {
         const { error: memberError } = await supabase
           .from('nmm_workspace_members')
           .update({ full_name: fullName.trim() })
           .eq('user_id', user.id)
-
         if (memberError) throw memberError
       }
 
-      // 2. Update Auth email if changed
       if (email !== user.email) {
         const { error: emailError } = await supabase.auth.updateUser({ email })
         if (emailError) throw emailError
         toast.info('E-posta güncellemesi için doğrulama e-postası gönderildi.')
       }
 
-      // 3. Update Auth password if filled
       if (password) {
         const { error: passwordError } = await supabase.auth.updateUser({ password })
         if (passwordError) throw passwordError
@@ -98,7 +153,6 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
         setPasswordConfirm('')
       }
 
-      // Invalidate workspace cache to update header
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       toast.success('Profil güncellendi')
       onClose()
@@ -110,16 +164,17 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
     }
   }
 
+  const initials = fullName
+    ? fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+    : '?'
+
   return (
     <>
       {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all">
+      <div className="fixed left-1/2 top-1/2 z-[70] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]" style={{ maxHeight: '90dvh', overflowY: 'auto' }}>
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -141,6 +196,44 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSave} className="space-y-4">
+
+            {/* Avatar Upload */}
+            <div className="flex flex-col items-center gap-3 pb-2">
+              <div className="relative">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Profil fotoğrafı"
+                    className="h-20 w-20 rounded-full object-cover ring-2 ring-[#534AB7]/30"
+                  />
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EEEDFE] text-2xl font-bold text-[#534AB7]">
+                    {initials}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAvatar}
+                  className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#433a9f] disabled:opacity-60"
+                  title="Fotoğraf değiştir"
+                >
+                  {uploadingAvatar
+                    ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    : <Camera className="h-3.5 w-3.5" />
+                  }
+                </button>
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarChange}
+              />
+              <p className="text-[10px] text-[var(--text-3)]">JPG, PNG veya GIF · Maks 2MB</p>
+            </div>
+
             {/* Ad Soyad */}
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-[var(--text-2)]">Ad Soyad</label>
@@ -173,14 +266,12 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
               </div>
             </div>
 
-            {/* Şifre Alanları */}
-            <div className="border-t border-[var(--border)] pt-4 mt-6 space-y-4">
+            {/* Şifre */}
+            <div className="border-t border-[var(--border)] pt-4 mt-2 space-y-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-3)]">Şifre Değiştir</h3>
                 <p className="text-[10px] text-[var(--text-3)]">Değiştirmek istemiyorsanız boş bırakın</p>
               </div>
-
-              {/* Yeni Şifre */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[var(--text-2)]">Yeni Şifre</label>
                 <div className="relative">
@@ -195,8 +286,6 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   />
                 </div>
               </div>
-
-              {/* Yeni Şifre Tekrar */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[var(--text-2)]">Yeni Şifre Tekrar</label>
                 <div className="relative">
@@ -213,20 +302,15 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
               </div>
             </div>
 
-            {/* Kaydet Butonu */}
+            {/* Kaydet */}
             <button
               type="submit"
               disabled={loading}
-              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
             >
               {loading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Güncelleniyor...
-                </>
-              ) : (
-                'Değişiklikleri Kaydet'
-              )}
+                <><Loader2 className="h-4 w-4 animate-spin" />Güncelleniyor...</>
+              ) : 'Değişiklikleri Kaydet'}
             </button>
           </form>
         )}

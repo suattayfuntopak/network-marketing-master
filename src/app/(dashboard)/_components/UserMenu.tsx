@@ -28,6 +28,7 @@ export function UserMenu() {
   const initials = ws?.fullName
     ? ws.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
+  const avatarUrl = ws?.avatarUrl ?? null
 
   return (
     <div ref={ref} className="relative">
@@ -35,9 +36,17 @@ export function UserMenu() {
         onClick={() => setOpen(v => !v)}
         className="flex items-center gap-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] px-2.5 py-1.5 transition hover:bg-[var(--bg-subtle)]"
       >
-        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EEEDFE] text-[10px] font-bold text-[#534AB7]">
-          {initials}
-        </div>
+        {avatarUrl ? (
+          <img
+            src={avatarUrl}
+            alt="Profil"
+            className="h-7 w-7 rounded-full object-cover ring-1 ring-[#534AB7]/30"
+          />
+        ) : (
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EEEDFE] text-[10px] font-bold text-[#534AB7]">
+            {initials}
+          </div>
+        )}
         {ws?.fullName && (
           <span className="hidden max-w-[120px] truncate text-xs font-semibold text-[var(--text-1)] lg:block">
             {ws.fullName.split(' ')[0]}

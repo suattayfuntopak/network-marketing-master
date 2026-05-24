@@ -7,6 +7,7 @@ export interface WorkspaceContext {
   workspaceId: string
   role: 'leader' | 'member'
   fullName: string | null
+  avatarUrl: string | null
 }
 
 async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
@@ -27,11 +28,14 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik okunamadı: ${memSelectError.message}`)
   }
 
+  const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
+
   if (membership) {
     return {
       workspaceId: membership.workspace_id,
       role: membership.role,
       fullName: membership.full_name,
+      avatarUrl,
     }
   }
 
@@ -61,7 +65,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
   }
 
-  return { workspaceId: ws.id, role: 'leader', fullName }
+  return { workspaceId: ws.id, role: 'leader', fullName, avatarUrl }
 }
 
 export function useWorkspace() {
