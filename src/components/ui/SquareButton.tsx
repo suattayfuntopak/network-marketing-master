@@ -17,11 +17,12 @@ const colorMap: Record<ButtonColor, string> = {
 
 const sharedClass = (color: ButtonColor, compact?: boolean, className?: string) =>
   clsx(
-    'flex flex-col items-center justify-center gap-1.5',
+    'flex flex-col items-center justify-center',
+    compact ? 'gap-1.5' : 'gap-1.5 md:gap-2.5',
     'rounded-[14px] transition-all duration-150',
     'active:scale-95 hover:scale-[1.03] hover:shadow-md',
     'md:rounded-[12px]',
-    compact ? 'h-[76px] p-3' : 'aspect-square p-4',
+    compact ? 'h-[76px] p-3' : 'aspect-square p-4 md:p-6',
     colorMap[color],
     className
   )
@@ -49,8 +50,8 @@ export function SquareButton({
 }: SquareButtonProps) {
   const content = (
     <>
-      <Icon className={compact ? 'h-5 w-5 shrink-0' : 'h-6 w-6 shrink-0'} strokeWidth={1.75} />
-      <span className="text-center text-xs font-semibold leading-tight">{label}</span>
+      <Icon className={compact ? 'h-5 w-5 shrink-0' : 'h-6 w-6 shrink-0 md:h-9 md:w-9'} strokeWidth={1.75} />
+      <span className={compact ? 'text-center text-xs font-semibold leading-tight' : 'text-center text-xs font-semibold leading-tight md:text-sm'}>{label}</span>
     </>
   )
 

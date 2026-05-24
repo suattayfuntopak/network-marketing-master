@@ -15,6 +15,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(v => !v)} />
       <div className={`flex-1 transition-[margin] duration-300 ${collapsed ? 'md:ml-[72px]' : 'md:ml-64'}`}>
         <MobileHeader />
+        {/* Desktop spacer — clears fixed ThemeToggle + UserMenu at top-3 (~48px tall) */}
+        <div className="hidden md:block h-14" />
         {children}
       </div>
       <BottomNav />
