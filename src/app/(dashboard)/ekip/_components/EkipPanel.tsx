@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2, TrendingUp, BarChart2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 interface MemberRow {
   user_id: string
@@ -238,6 +239,17 @@ export function EkipPanel() {
               >
                 {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
               </button>
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                  `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.workspaceId}*\n\nUygulamaya üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!`
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#25D366] text-white hover:bg-[#20ba56] transition active:scale-95"
+                title="WhatsApp ile Paylaş"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+              </a>
             </div>
           </div>
         )}
@@ -348,7 +360,7 @@ export function EkipPanel() {
                   {m.candidate_count === 0 ? (
                     <p className="text-[11px] text-[var(--text-3)] italic py-1">Bu üyenin henüz boru hattında kayıtlı adayı bulunmuyor.</p>
                   ) : (
-                    <div className="grid grid-cols-4 gap-2 pt-1 text-center">
+                    <div className="grid grid-cols-2 gap-2 pt-1 text-center sm:grid-cols-4">
                       {/* Yeni Aday */}
                       <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/10 p-2 border border-blue-100/30 dark:border-blue-900/10">
                         <span className="block text-xs font-bold text-blue-600 dark:text-blue-400">{m.yeni_count}</span>
