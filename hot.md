@@ -130,3 +130,43 @@
 - `DashboardShell`'e dokunmatik swipe desteği eklendi
 - Yatay kaydırma (≥60px, yatay/dikey oranı ≥2) sağa/sola sekme değiştiriyor
 - Dikey kaydırma, diyagonal ve küçük kaydırmalar yok sayılıyor; masaüstünde etkisiz
+
+---
+
+## 2026-05-24 (tur 4)
+
+### feat: sayfa geçiş animasyonları (View Transitions API)
+
+- `next.config.ts`'e `experimental: { viewTransition: true }` eklendi
+- `globals.css`'e `::view-transition-old/new(root)` kuralları + 6 keyframe eklendi
+- `data-nav-dir="forward"` → sola kayarak geçiş; `"back"` → sağa kayarak geri
+- `prefers-reduced-motion: reduce` desteğiyle animasyonlar erişilebilir
+
+### feat: yön duyarlı swipe + BottomNav anlık geri bildirim
+
+- `DashboardShell`'de `onTouchMove` ile swipe hedefi erken hesaplanıyor
+- `pendingHref` `BottomNav`'a aktarılıyor: hedef sekme scale-110 ile öne çıkıyor
+- BottomNav tıklamalarında `setNavDir` ile geçiş yönü belirleniyor
+
+### refactor: PHONE_RE merkezi validation dosyasına taşındı
+
+- `src/lib/validation.ts` oluşturuldu: `export const PHONE_RE = /^(\+90|0)5\d{9}$/`
+- `AddCandidateSheet`'deki yerel kopya (satır 17) kaldırıldı; import ile değiştirildi
+- `EditCandidateSheet` de aynı import'u kullanıyor
+
+### refactor: STAGE_THEME tek kaynak olarak birleştirildi
+
+- Badge + kart renkleri ayrı objeler yerine tek `STAGE_THEME` objesinde tanımlanıyor
+- `STAGE_COLOR` ve `STAGE_CARD_BG` artık `STAGE_THEME`'den türetiliyor; ilerleyen değişikliklerde renk tutarsızlığı önlendi
+
+### feat: YZ Mesajı güvenlik duvarı — konu dışı soru yönlendirme
+
+- `generateMessage.ts` sistem promptu 3 görev modeli ile güncellendi
+- NM sektörü soruları → kısa pratik Türkçe cevap
+- Tamamen konu dışı istekler (haber, yemek, yazılım vb.) → kibar yönlendirme mesajı
+- Mesaj üretme ana görevi değişmeden korunuyor
+
+### ux: not karakter limiti 500 → 1000 karakter
+
+- `AddCandidateSheet`, `EditCandidateSheet`, `YazarForm` güncellendi
+- Etiket metni "(max 500 karakter)" → "(max 1000 karakter)" olarak düzeltildi
