@@ -21,7 +21,7 @@ interface BottomNavProps {
 export function BottomNav({ pendingHref }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { t } = useTranslation()
+  const { lang, t } = useTranslation()
 
   function navigate(targetHref: string) {
     const currentIdx = NAV_ITEMS.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
@@ -37,7 +37,10 @@ export function BottomNav({ pendingHref }: BottomNavProps) {
       {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
-        const label = t(translationKey)
+        let label = t(translationKey)
+        if (translationKey === 'nav.itirazlar') {
+          label = lang === 'en' ? 'Objections' : 'İtirazlar'
+        }
         return (
           <button
             key={href}

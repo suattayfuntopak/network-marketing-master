@@ -97,6 +97,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
+  const [context, setContext] = useState(cleanInitialNote)
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [messageType, setMessageType] = useState('genel')
   const [tone, setTone] = useState('samimi')
@@ -134,10 +135,17 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
       if (match) {
         setSelected(match)
         setQuery('')
+        // Pre-populate candidate information
+        const parsedNote = match.note ? match.note.split('|||')[0].trim() : ''
+        const stageName = STAGE_LABEL[match.stage] || match.stage
+        const infoText = `Aday: ${match.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}\n\n`
+        setContext(infoText)
+      } else if (cleanInitialNote) {
+        setContext(cleanInitialNote)
       }
       prefilledRef.current = true
     }
-  }, [initialName, candidates])
+  }, [initialName, candidates, cleanInitialNote])
 
   useEffect(() => {
     function onOutside(e: MouseEvent) {
@@ -177,11 +185,18 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
     setSelected(c)
     setQuery('')
     setDropdownOpen(false)
+
+    // Pre-populate candidate information
+    const parsedNote = c.note ? c.note.split('|||')[0].trim() : ''
+    const stageName = STAGE_LABEL[c.stage] || c.stage
+    const infoText = `Aday: ${c.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}\n\n`
+    setContext(infoText)
   }
 
   function clearSelection() {
     setSelected(null)
     setQuery('')
+    setContext('')
   }
 
   function handleCopy() {
@@ -328,9 +343,10 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
           <textarea
             id="context"
             name="context"
-            rows={2}
-            maxLength={1000}
-            defaultValue={cleanInitialNote}
+            rows={4}
+            maxLength={1500}
+            value={context}
+            onChange={e => setContext(e.target.value)}
             placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
             className={`${inputClass} resize-none`}
           />
