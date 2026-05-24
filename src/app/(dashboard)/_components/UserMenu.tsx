@@ -7,8 +7,10 @@ import { logoutAction } from '../actions'
 import { ProfileModal } from '@/components/ui/ProfileModal'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 export function UserMenu() {
+  const { lang, t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -35,6 +37,7 @@ export function UserMenu() {
       <button
         onClick={() => setOpen(v => !v)}
         className="flex items-center gap-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] px-2.5 py-1.5 transition hover:bg-[var(--bg-subtle)]"
+        title={lang === 'en' ? 'Profile Menu' : 'Profil Menüsü'}
       >
         {avatarUrl ? (
           <img

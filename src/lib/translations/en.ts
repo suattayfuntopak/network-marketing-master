@@ -31,7 +31,7 @@ export const en = {
     settings: "Settings",
     logout: "Log Out",
     sparkButtonTooltip: "Quick Add Candidate",
-    quickAddTitle: "Quick Add Candidate (Spark)",
+    quickAddTitle: "Quick Add",
     quickAddNamePlaceholder: "Candidate Name",
     quickAddInfoPlaceholder: "Extra info, phone, or notes (Optional)",
     quickAddSuccess: "Candidate successfully added as 'New Prospect'!",

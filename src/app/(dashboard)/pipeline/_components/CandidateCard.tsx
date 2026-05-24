@@ -6,6 +6,7 @@ import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -28,6 +29,7 @@ interface CandidateCardProps {
 }
 
 export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
+  const { lang, t } = useTranslation()
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -72,18 +74,21 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
           <div className="flex shrink-0 items-center gap-1.5">
             <button onClick={() => setEditOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
-              aria-label="Düzenle">
+              aria-label="Düzenle"
+              title={t('common.edit')}>
               <Pencil className="h-4 w-4" />
             </button>
             <button onClick={() => setConfirmOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#FBEAF0] hover:text-[#72243E] hover:shadow-md"
-              aria-label="Sil">
+              aria-label="Sil"
+              title={t('common.delete')}>
               <Trash2 className="h-4 w-4" />
             </button>
             {waLink && (
               <a href={waLink} target="_blank" rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
-                aria-label="WhatsApp">
+                aria-label="WhatsApp"
+                title="WhatsApp">
                 <WhatsAppIcon className="h-4 w-4" />
               </a>
             )}
@@ -99,6 +104,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold transition-opacity hover:opacity-80',
                 STAGE_COLOR[candidate.stage]
               )}
+              title={lang === 'en' ? 'Change Stage' : 'Aşama Değiştir'}
             >
               {STAGE_LABEL[candidate.stage]}
               <ChevronDown className="h-3 w-3" />

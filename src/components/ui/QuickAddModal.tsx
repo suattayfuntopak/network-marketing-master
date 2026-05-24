@@ -70,7 +70,6 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
             </div>
             <div>
               <h2 className="text-base font-bold text-[var(--text-1)]">{t('common.quickAddTitle')}</h2>
-              <p className="text-xs text-[var(--text-3)]">{t('stages.yeni')}</p>
             </div>
           </div>
           <button
