@@ -4,6 +4,7 @@ import { Phone } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { waHref } from '@/lib/waLink'
 import type { NmmCandidate } from '@/types/database.types'
 
 function formatDaysAgo(days: number): string {
@@ -52,8 +53,8 @@ export function DailyList({ candidates }: DailyListProps) {
                 <Phone className="h-4 w-4" strokeWidth={1.75} />
               </a>
             )}
-            {candidate.phone && (
-              <a href={`https://wa.me/90${candidate.phone.replace(/^0/, '')}`}
+            {waHref(candidate.phone) && (
+              <a href={waHref(candidate.phone)!}
                 target="_blank" rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
                 aria-label="WhatsApp">

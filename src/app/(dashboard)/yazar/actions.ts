@@ -39,16 +39,17 @@ export async function generateMessageAction(
   const tone        = (formData.get('tone')        as string | null)?.trim() ?? 'samimi'
   const messageType = (formData.get('messageType') as string | null)?.trim() ?? 'genel'
 
-  if (!name || !stage) return { error: 'Ad ve aşama zorunlu.' }
+  if (!name) return { error: 'Kişi adı zorunlu.' }
 
-  const stageInfo   = STAGE_CONTEXT[stage]   ?? ''
+  const stageInfo   = stage ? (STAGE_CONTEXT[stage] ?? '') : ''
   const typeInfo    = MESSAGE_TYPE_CONTEXT[messageType] ?? ''
+
+  const stageStr = stage && stageInfo ? `Süreç Aşaması: ${stage} — ${stageInfo}\n` : ''
 
   const prompt = `Sen bir network marketing danışmanısın. WhatsApp için kısa, samimi ve Türkçe bir mesaj yaz.
 
 Alıcı: ${name}
-Süreç Aşaması: ${stage} — ${stageInfo}
-Mesaj Türü: ${messageType} — ${typeInfo}
+${stageStr}Mesaj Türü: ${messageType} — ${typeInfo}
 Ek bilgi: ${context || 'Yok'}
 Ton: ${tone}
 

@@ -9,6 +9,7 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { waHref } from '@/lib/waLink'
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'
@@ -95,9 +96,9 @@ export function IlgilenContent() {
                 </div>
               </div>
               <div className="flex shrink-0 gap-1.5" onClick={e => e.stopPropagation()}>
-                {c.phone && (
+                {waHref(c.phone) && (
                   <a
-                    href={`https://wa.me/90${c.phone.replace(/^0/, '')}`}
+                    href={waHref(c.phone)!}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white"

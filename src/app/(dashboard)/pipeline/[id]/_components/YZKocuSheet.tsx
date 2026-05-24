@@ -5,6 +5,7 @@ import { X, Bot, Copy, Loader2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateCoachMessage } from '../actions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { waHref } from '@/lib/waLink'
 import type { NmmCandidate } from '@/types/database.types'
 
 const MESSAGE_TYPES = [
@@ -29,9 +30,8 @@ export function YZKocuSheet({ candidate, onClose }: Props) {
   }
 
   function handleWhatsApp() {
-    if (!state.message || !candidate.phone) return
-    const number = `90${candidate.phone.replace(/^0/, '')}`
-    window.open(`https://wa.me/${number}?text=${encodeURIComponent(state.message)}`, '_blank')
+    const href = waHref(candidate.phone, state.message)
+    if (href) window.open(href, '_blank')
   }
 
   return (

@@ -45,7 +45,7 @@ export default function PipelinePage() {
           className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0]"
         >
           <Plus className="h-4 w-4" />
-          Aday Ekle
+          Kişi Ekle
         </button>
       </div>
 
@@ -77,7 +77,7 @@ export default function PipelinePage() {
               {filter === 'tumü' ? 'Henüz aday yok' : 'Bu filtrede aday yok'}
             </p>
             <p className="mt-1 text-xs text-[var(--text-3)]">
-              {filter === 'tumü' ? '"Aday Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
+              {filter === 'tumü' ? '"Kişi Ekle" butonuyla başla' : 'Filtreyi değiştirmeyi dene'}
             </p>
           </div>
         )}

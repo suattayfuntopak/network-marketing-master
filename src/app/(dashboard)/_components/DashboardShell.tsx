@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Sidebar } from './Sidebar'
 import { MobileHeader } from './MobileHeader'
 import { BottomNav } from './BottomNav'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { UserMenu } from './UserMenu'
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [collapsed, setCollapsed] = useState(false)
@@ -17,9 +17,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {children}
       </div>
       <BottomNav />
-      {/* Desktop theme toggle — fixed top-right */}
-      <div className="fixed right-4 top-4 z-50 hidden md:block">
-        <ThemeToggle />
+      {/* Desktop user menu — fixed top-right */}
+      <div className="fixed right-4 top-3 z-50 hidden md:block">
+        <UserMenu />
       </div>
     </div>
   )

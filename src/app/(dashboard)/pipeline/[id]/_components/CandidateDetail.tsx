@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Bot, Trash2 } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Bot, Trash2, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
@@ -11,6 +11,7 @@ import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { YZKocuSheet } from './YZKocuSheet'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER } from '@/lib/stages'
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
+import { waHref } from '@/lib/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
 const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
@@ -85,7 +86,7 @@ export function CandidateDetail({ candidateId }: Props) {
     )
   }
 
-  const waLink = c.phone ? `https://wa.me/90${c.phone.replace(/^0/, '')}` : null
+  const waLink = waHref(c.phone)
   const nextFollow = c.next_follow_up_at
     ? new Date(c.next_follow_up_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })
     : suggestedFollowUp(c)
@@ -197,35 +198,16 @@ export function CandidateDetail({ candidateId }: Props) {
         {/* Aşama */}
         <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
           <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">Aşama</p>
-          <div className="relative">
-            <button
-              onClick={() => setStageOpen(v => !v)}
-              className={clsx(
-                'flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-80',
-                STAGE_COLOR[c.stage]
-              )}
-            >
-              {STAGE_LABEL[c.stage]}
-              <ChevronDown className="h-4 w-4" />
-            </button>
-            {stageOpen && (
-              <ul className="absolute left-0 top-full z-20 mt-1 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-1 shadow-lg">
-                {STAGE_ORDER.map(s => (
-                  <li key={s}>
-                    <button
-                      onClick={() => changeStage(s)}
-                      className={clsx(
-                        'w-full px-4 py-2.5 text-left text-sm font-medium transition hover:bg-[var(--bg-subtle)]',
-                        s === c.stage ? 'text-[#534AB7]' : 'text-[var(--text-1)]'
-                      )}
-                    >
-                      {STAGE_LABEL[s]}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+          <button
+            onClick={() => setStageOpen(v => !v)}
+            className={clsx(
+              'flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-80',
+              STAGE_COLOR[c.stage]
             )}
-          </div>
+          >
+            {STAGE_LABEL[c.stage]}
+            <ChevronDown className="h-4 w-4" />
+          </button>
         </div>
 
         {/* Takip bilgisi */}
@@ -287,6 +269,36 @@ export function CandidateDetail({ candidateId }: Props) {
           candidate={c}
           onClose={() => setKocuOpen(false)}
         />
+      )}
+
+      {stageOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm" onClick={() => setStageOpen(false)} />
+          <div className="fixed bottom-0 left-0 right-0 z-50 rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0">
+            <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
+              <p className="text-sm font-bold text-[var(--text-1)]">Aşama Seç</p>
+              <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <ul className="overflow-y-auto py-1" style={{ maxHeight: '60vh' }}>
+              {STAGE_ORDER.map(s => (
+                <li key={s}>
+                  <button
+                    onClick={() => changeStage(s)}
+                    className={clsx(
+                      'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition hover:bg-[var(--bg-subtle)]',
+                      s === c.stage ? 'text-[#534AB7]' : 'text-[var(--text-1)]'
+                    )}
+                  >
+                    <span className={clsx('inline-block h-2 w-2 shrink-0 rounded-full', STAGE_COLOR[s].split(' ')[0])} />
+                    {STAGE_LABEL[s]}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
       )}
     </>
   )
