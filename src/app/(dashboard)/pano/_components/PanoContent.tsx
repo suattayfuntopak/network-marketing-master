@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useMemo } from 'react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -10,6 +11,55 @@ import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestio
 import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
+import type { NmmCandidate } from '@/types/database.types'
+
+const WEEK_DAYS_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+
+function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
+  const bars = useMemo(() => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(today)
+      d.setDate(d.getDate() - (6 - i))
+      const next = new Date(d)
+      next.setDate(next.getDate() + 1)
+      const count = candidates.filter(c => {
+        const t = new Date(c.created_at)
+        return t >= d && t < next
+      }).length
+      const dayIdx = (d.getDay() + 6) % 7 // Mon=0
+      return { label: WEEK_DAYS_SHORT[dayIdx], count, isToday: i === 6 }
+    })
+  }, [candidates])
+
+  const max = Math.max(...bars.map(b => b.count), 1)
+
+  return (
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
+      <div className="mb-4 flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+          Son 7 Gün — Yeni Aday Trendi
+        </p>
+        <span className="text-xs font-bold text-[#534AB7]">
+          {bars.reduce((s, b) => s + b.count, 0)} aday
+        </span>
+      </div>
+      <div className="flex items-end gap-1.5 h-16">
+        {bars.map((b, i) => (
+          <div key={i} className="flex flex-1 flex-col items-center gap-1">
+            <span className="text-[9px] font-bold text-[var(--text-1)]">{b.count > 0 ? b.count : ''}</span>
+            <div
+              className={`w-full rounded-t-md transition-all ${b.isToday ? 'bg-[#534AB7]' : 'bg-[#EEEDFE] dark:bg-[#534AB7]/20'}`}
+              style={{ height: `${Math.max((b.count / max) * 48, b.count > 0 ? 6 : 2)}px` }}
+            />
+            <span className={`text-[9px] font-semibold ${b.isToday ? 'text-[#534AB7]' : 'text-[var(--text-3)]'}`}>{b.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export function PanoContent() {
   const { lang, t } = useTranslation()
@@ -147,6 +197,9 @@ export function PanoContent() {
           </ul>
         )}
       </div>
+
+      {/* ── Mini trend (son 7 gün yeni aday) ── */}
+      <MiniTrend candidates={candidates} />
     </div>
   )
 }

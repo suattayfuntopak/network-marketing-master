@@ -218,10 +218,8 @@ export function Header() {
       {/* Modallar */}
       {notificationsOpen && (
         <NotificationsModal
-          onClose={() => {
-            setNotificationsOpen(false)
-            setUnreadCount(0) // Read all notifications when modal opened
-          }}
+          onClose={() => setNotificationsOpen(false)}
+          onUnreadCountChange={(count) => setUnreadCount(count)}
         />
       )}
 

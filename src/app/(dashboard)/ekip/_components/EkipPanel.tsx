@@ -13,6 +13,7 @@ interface MemberRow {
   user_id: string
   full_name: string | null
   role: 'leader' | 'member'
+  joined_at: string | null
   candidate_count: number
   yeni_count: number
   sunum_count: number
@@ -27,7 +28,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const [{ data: members, error }, { data: candidatesRaw }] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
-      .select('user_id, full_name, role')
+      .select('user_id, full_name, role, joined_at')
       .eq('workspace_id', workspaceId),
     supabase
       .from('nmm_candidates')
@@ -42,7 +43,10 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
       return {
-        ...m,
+        user_id: m.user_id,
+        full_name: m.full_name,
+        role: m.role as 'leader' | 'member',
+        joined_at: m.joined_at ?? null,
         candidate_count: mc.length,
         yeni_count:    mc.filter(c => c.stage === 'yeni').length,
         sunum_count:   mc.filter(c => c.stage === 'sunum').length,
@@ -338,6 +342,11 @@ export function EkipPanel() {
                     </div>
                     <p className="text-xs text-[var(--text-3)] capitalize mt-0.5">
                       {m.role === 'leader' ? 'Lider' : 'Ekip Üyesi'}
+                      {m.joined_at && (
+                        <span className="ml-1.5 text-[10px]">
+                          · {new Date(m.joined_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })} katıldı
+                        </span>
+                      )}
                     </p>
                   </div>
 
