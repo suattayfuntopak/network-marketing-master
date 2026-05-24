@@ -31,6 +31,7 @@ export interface DailyCandidate extends NmmCandidate {
 export interface DailyActionsResult {
   daily: DailyCandidate[]
   remaining: number
+  all: DailyCandidate[]
 }
 
 export function useDailyActions(candidates: NmmCandidate[]): DailyActionsResult {
@@ -53,6 +54,7 @@ export function useDailyActions(candidates: NmmCandidate[]): DailyActionsResult 
     return {
       daily: actionable.slice(0, MAX_DAILY_CANDIDATES),
       remaining: Math.max(0, actionable.length - MAX_DAILY_CANDIDATES),
+      all: actionable,
     }
   }, [candidates])
 }

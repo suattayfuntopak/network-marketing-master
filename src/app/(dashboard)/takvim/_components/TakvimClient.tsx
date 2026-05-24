@@ -6,6 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { STAGE_LABEL, STAGE_COLOR, FOLLOW_DAYS } from '@/lib/stages'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
+import { useRouter } from 'next/navigation'
 
 function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan
@@ -36,6 +37,7 @@ const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
 const DAYS   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
 
 export function TakvimClient() {
+  const router = useRouter()
   const { data: ws } = useWorkspace()
   const { candidates } = useCandidates(ws?.workspaceId)
 
@@ -161,7 +163,11 @@ export function TakvimClient() {
         ) : (
           <ul className="space-y-2">
             {selectedCandidates.map(c => (
-              <li key={c.id} className="flex items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+              <li
+                key={c.id}
+                onClick={() => router.push(`/pipeline/${c.id}`)}
+                className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition hover:border-[#534AB7]/30 hover:shadow-sm active:scale-[0.99]"
+              >
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
                   {c.full_name.charAt(0).toUpperCase()}
                 </div>

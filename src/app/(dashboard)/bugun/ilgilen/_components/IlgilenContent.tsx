@@ -14,6 +14,7 @@ import { waHref } from '@/lib/waLink'
 import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
 import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'
@@ -23,14 +24,16 @@ function formatDaysAgo(days: number): string {
 }
 
 export function IlgilenContent() {
+  const { lang, t } = useTranslation()
   const router = useRouter()
   const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
   const [copiedFor, setCopiedFor] = useState<string | null>(null)
+  const [showAll, setShowAll] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
-  const { daily, remaining } = useDailyActions(candidates)
+  const { daily, remaining, all } = useDailyActions(candidates)
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
   const [userEmail, setUserEmail] = useState<string | null>(null)
@@ -83,41 +86,43 @@ export function IlgilenContent() {
     )
   }
 
-  return (
-    <div className="space-y-4">
-      {/* Başlık + görünüm toggle */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-[var(--text-2)]">
-          <span className="font-semibold text-[var(--text-1)]">{daily.length}</span> kişi öncelikli
-          {remaining > 0 && (
-            <span className="ml-1 text-[var(--text-3)]">+{remaining} daha bekliyor</span>
-          )}
-        </p>
-        <div className="flex overflow-hidden rounded-xl border border-[var(--border)]">
-          <button
-            onClick={() => setViewMode('list')}
-            className={clsx(
-              'flex h-9 w-9 items-center justify-center transition-colors',
-              viewMode === 'list' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-            )}
-          >
-            <List className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => setViewMode('compact')}
-            className={clsx(
-              'flex h-9 w-9 items-center justify-center transition-colors',
-              viewMode === 'compact' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-            )}
-          >
-            <LayoutList className="h-4 w-4" />
-          </button>
-        </div>
-      </div>
+      const listData = showAll ? all : daily
 
-      {viewMode === 'list' ? (
-        <ul className="space-y-3">
-          {daily.map(c => (
+      return (
+        <div className="space-y-4">
+          {/* Başlık + görünüm toggle */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-[var(--text-2)]">
+              <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> kişi öncelikli
+              {remaining > 0 && !showAll && (
+                <span className="ml-1 text-[var(--text-3)]">+{remaining} daha bekliyor</span>
+              )}
+            </p>
+            <div className="flex overflow-hidden rounded-xl border border-[var(--border)]">
+              <button
+                onClick={() => setViewMode('list')}
+                className={clsx(
+                  'flex h-9 w-9 items-center justify-center transition-colors',
+                  viewMode === 'list' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
+                )}
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                onClick={() => setViewMode('compact')}
+                className={clsx(
+                  'flex h-9 w-9 items-center justify-center transition-colors',
+                  viewMode === 'compact' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
+                )}
+              >
+                <LayoutList className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+    
+          {viewMode === 'list' ? (
+            <ul className="space-y-3">
+              {listData.map(c => (
             <li
               key={c.id}
               onClick={() => router.push(`/pipeline/${c.id}`)}
@@ -179,35 +184,57 @@ export function IlgilenContent() {
             </li>
           ))}
         </ul>
-      ) : (
-        <div className="rounded-2xl border border-[var(--border)] overflow-hidden">
-          {daily.map((c, i) => (
-            <div
-              key={c.id}
-              onClick={() => router.push(`/pipeline/${c.id}`)}
-              className={clsx(
-                'flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-subtle)] active:scale-[0.99]',
-                i > 0 && 'border-t border-[var(--border)]'
-              )}
-            >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
-                {c.full_name.charAt(0).toUpperCase()}
+        ) : (
+          <div className="rounded-2xl border border-[var(--border)] overflow-hidden">
+            {listData.map((c, i) => (
+              <div
+                key={c.id}
+                onClick={() => router.push(`/pipeline/${c.id}`)}
+                className={clsx(
+                  'flex cursor-pointer items-center gap-3 px-4 py-3 transition-colors hover:bg-[var(--bg-subtle)] active:scale-[0.99]',
+                  i > 0 && 'border-t border-[var(--border)]'
+                )}
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
+                  {c.full_name.charAt(0).toUpperCase()}
+                </div>
+                <p className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
+                <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
+                  {STAGE_LABEL[c.stage]}
+                </span>
+                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact)}</span>
               </div>
-              <p className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
-              <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
-                {STAGE_LABEL[c.stage]}
-              </span>
-              <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact)}</span>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {remaining > 0 && (
-        <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-xs text-[var(--text-3)]">
-          +{remaining} kişi daha takip bekliyor — önce bu {daily.length}&apos;ini tamamla
-        </p>
-      )}
-    </div>
+        {remaining > 0 && (
+          <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-xs text-[var(--text-3)]">
+            {showAll ? (
+              <>
+                {lang === 'en' ? 'All priority leads are listed.' : 'Tüm öncelikli adaylar listelendi.'}{' '}
+                <button
+                  onClick={() => setShowAll(false)}
+                  className="font-bold text-[#72243E] hover:underline ml-1"
+                >
+                  {lang === 'en' ? 'Collapse' : 'Kapat'}
+                </button>
+              </>
+            ) : (
+              <>
+                {lang === 'en'
+                  ? `+${remaining} more leads pending — complete these ${daily.length} first.`
+                  : `+${remaining} kişi daha takip bekliyor — önce bu ${daily.length}'ini tamamla.`}{' '}
+                <button
+                  onClick={() => setShowAll(true)}
+                  className="font-bold text-[#534AB7] hover:underline ml-1"
+                >
+                  {lang === 'en' ? 'Show All' : 'Tümünü Gör'}
+                </button>
+              </>
+            )}
+          </p>
+        )}
+      </div>
   )
 }
