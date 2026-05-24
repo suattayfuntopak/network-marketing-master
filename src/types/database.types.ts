@@ -7,10 +7,12 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type CandidateStage =
   | 'yeni'
   | 'iletisim'
-  | 'takip'
+  | 'davetli'
   | 'sunum'
+  | 'takip'
   | 'kararsiz'
   | 'katildi'
+  | 'ilgilenmedi'
   | 'kayboldu'
 
 export type WorkspaceMemberRole = 'leader' | 'member'
@@ -86,6 +88,7 @@ export interface Database {
           stage: CandidateStage
           last_contact_at: string | null
           note: string | null
+          next_follow_up_at: string | null
           created_at: string
           updated_at: string
         }
@@ -98,6 +101,7 @@ export interface Database {
           stage?: CandidateStage
           last_contact_at?: string | null
           note?: string | null
+          next_follow_up_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -110,6 +114,7 @@ export interface Database {
           stage?: CandidateStage
           last_contact_at?: string | null
           note?: string | null
+          next_follow_up_at?: string | null
           created_at?: string
           updated_at?: string
         }

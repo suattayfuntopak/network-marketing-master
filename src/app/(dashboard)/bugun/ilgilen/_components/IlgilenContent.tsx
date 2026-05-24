@@ -8,23 +8,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import type { NmmCandidate } from '@/types/database.types'
-
-const STAGE_LABEL: Partial<Record<NmmCandidate['stage'], string>> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim',
-  takip:    'Takip',
-  sunum:    'Sunum',
-  kararsiz: 'Kararsız',
-}
-
-const STAGE_COLOR: Partial<Record<NmmCandidate['stage'], string>> = {
-  yeni:     'bg-[#E8F0FE] text-[#1A56DB]',
-  iletisim: 'bg-[#EEEDFE] text-[#534AB7]',
-  takip:    'bg-[#FAEEDA] text-[#854F0B]',
-  sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
-  kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
-}
+import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'

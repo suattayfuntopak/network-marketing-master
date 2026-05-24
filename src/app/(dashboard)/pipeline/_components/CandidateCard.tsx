@@ -1,37 +1,15 @@
 'use client'
 
-import { ChevronDown, Pencil } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState } from 'react'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-import { useUpdateCandidate } from '@/hooks/useCandidates'
+import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from './EditCandidateSheet'
-
-export const STAGE_LABEL: Record<CandidateStage, string> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim Kuruldu',
-  takip:    'Takip Bekliyor',
-  sunum:    'Sunum Yapıldı',
-  kararsiz: 'Kararsız',
-  katildi:  'Katıldı ✅',
-  kayboldu: 'Kayboldu ❌',
-}
-
-const STAGE_COLOR: Record<CandidateStage, string> = {
-  yeni:     'bg-[#E8F0FE] text-[#1A56DB]',
-  iletisim: 'bg-[#EEEDFE] text-[#534AB7]',
-  takip:    'bg-[#FAEEDA] text-[#854F0B]',
-  sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
-  kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
-  katildi:  'bg-[#E1F5EE] text-[#0F6E56]',
-  kayboldu: 'bg-[var(--bg-subtle)] text-[var(--text-2)]',
-}
-
-const STAGE_ORDER: CandidateStage[] = [
-  'yeni', 'iletisim', 'takip', 'sunum', 'kararsiz', 'katildi', 'kayboldu',
-]
+import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER } from '@/lib/stages'
+import { deleteWithUndo } from '@/lib/deleteWithUndo'
 
 function daysSince(iso: string | null): string {
   if (!iso) return 'Hiç aranmadı'
@@ -50,10 +28,18 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
+  const del = useDeleteCandidate(workspaceId)
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
     update.mutate({ id: candidate.id, stage })
+  }
+
+  function handleDelete() {
+    deleteWithUndo(
+      candidate.full_name,
+      () => del.mutate(candidate.id),
+    )
   }
 
   const waLink = candidate.phone
@@ -80,8 +66,18 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </div>
           </Link>
 
-          {/* Eylemler */}
+          {/* Eylemler: Düzenle | Sil | WhatsApp */}
           <div className="flex shrink-0 items-center gap-1.5">
+            <button onClick={() => setEditOpen(true)}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
+              aria-label="Düzenle">
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button onClick={handleDelete}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#FBEAF0] hover:text-[#72243E] hover:shadow-md"
+              aria-label="Sil">
+              <Trash2 className="h-4 w-4" />
+            </button>
             {waLink && (
               <a href={waLink} target="_blank" rel="noopener noreferrer"
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
@@ -89,11 +85,6 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 <WhatsAppIcon className="h-4 w-4" />
               </a>
             )}
-            <button onClick={() => setEditOpen(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
-              aria-label="Düzenle">
-              <Pencil className="h-4 w-4" />
-            </button>
           </div>
         </div>
 
@@ -112,7 +103,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </button>
 
             {stageOpen && (
-              <ul className="absolute left-0 top-full z-20 mt-1 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-1 shadow-lg">
+              <ul className="absolute left-0 top-full z-20 mt-1 w-52 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-1 shadow-lg">
                 {STAGE_ORDER.map(s => (
                   <li key={s}>
                     <button

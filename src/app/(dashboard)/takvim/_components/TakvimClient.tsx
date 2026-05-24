@@ -4,12 +4,13 @@ import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
+import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
-// Aşamaya göre kaç günde bir takip yapılmalı
 const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
   yeni:     2,
   iletisim: 3,
+  davetli:  2,
   takip:    3,
   sunum:    1,
   kararsiz: 7,
@@ -32,22 +33,6 @@ function toKey(d: Date) {
 const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
                  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
 const DAYS   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
-
-const STAGE_LABEL: Partial<Record<CandidateStage, string>> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim',
-  takip:    'Takip',
-  sunum:    'Sunum',
-  kararsiz: 'Kararsız',
-}
-
-const STAGE_COLOR: Partial<Record<CandidateStage, string>> = {
-  yeni:     'bg-[#E8F0FE] text-[#1A56DB]',
-  iletisim: 'bg-[#EEEDFE] text-[#534AB7]',
-  takip:    'bg-[#FAEEDA] text-[#854F0B]',
-  sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
-  kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
-}
 
 export function TakvimClient() {
   const { data: ws } = useWorkspace()

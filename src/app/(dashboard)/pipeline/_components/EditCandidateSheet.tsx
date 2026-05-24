@@ -3,17 +3,9 @@
 import { useRef } from 'react'
 import { X, Trash2 } from 'lucide-react'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { STAGES_FORM } from '@/lib/stages'
+import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-
-const STAGES: { value: CandidateStage; label: string }[] = [
-  { value: 'yeni',     label: 'Yeni Aday' },
-  { value: 'iletisim', label: 'İletişim Kuruldu' },
-  { value: 'takip',    label: 'Takip Bekliyor' },
-  { value: 'sunum',    label: 'Sunum Yapıldı' },
-  { value: 'kararsiz', label: 'Kararsız' },
-  { value: 'katildi',  label: 'Katıldı' },
-  { value: 'kayboldu', label: 'Kayboldu' },
-]
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -42,9 +34,12 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
     onClose()
   }
 
-  async function handleDelete() {
-    if (!confirm(`"${candidate.full_name}" silinsin mi?`)) return
-    await del.mutateAsync(candidate.id)
+  function handleDelete() {
+    deleteWithUndo(
+      candidate.full_name,
+      () => del.mutate(candidate.id),
+      onClose,
+    )
     onClose()
   }
 
@@ -53,7 +48,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-3xl bg-[var(--bg-card)] p-6 pb-10 shadow-2xl md:left-auto md:right-8 md:top-8 md:bottom-auto md:w-96 md:rounded-2xl md:pb-6">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[var(--text-1)]">Adayı Düzenle</h2>
+          <h2 className="text-lg font-bold text-[var(--text-1)]">Düzenle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
           </button>
@@ -71,20 +66,20 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           <div>
             <label className={labelClass} htmlFor="edit-stage">Aşama</label>
             <select id="edit-stage" name="stage" defaultValue={candidate.stage} className={inputClass}>
-              {STAGES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+              {STAGES_FORM.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
             </select>
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-note">
-              Not <span className="font-normal text-[var(--text-3)]">(max 200 karakter)</span>
+              Not <span className="font-normal text-[var(--text-3)]">(max 500 karakter)</span>
             </label>
-            <textarea id="edit-note" name="note" rows={2} maxLength={200} defaultValue={candidate.note ?? ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="edit-note" name="note" rows={3} maxLength={500} defaultValue={candidate.note ?? ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           <div className="flex gap-3 pt-1">
             <button type="submit" disabled={update.isPending} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
               {update.isPending ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
-            <button type="button" onClick={handleDelete} disabled={del.isPending} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FBEAF0] text-[#72243E] transition hover:bg-[#f5d4e0] disabled:opacity-60">
+            <button type="button" onClick={handleDelete} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FBEAF0] text-[#72243E] transition hover:bg-[#f5d4e0]">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>

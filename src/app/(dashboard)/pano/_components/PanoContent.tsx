@@ -27,9 +27,9 @@ export function PanoContent() {
           <div className="h-7 w-36 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
           <div className="h-7 w-28 animate-pulse rounded-full bg-[var(--bg-subtle)]" />
         </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="aspect-square animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
+            <div key={i} className="h-[76px] animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
           ))}
         </div>
       </div>
@@ -52,13 +52,13 @@ export function PanoContent() {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <SquareButton icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
-        <SquareButton icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
-        <SquareButton icon={PenLine}      label="Mesaj Yaz"    color="teal"   href="/yazar"         />
-        <SquareButton icon={Users}        label="Ekibim"       color="amber"  href="/ekip"          />
-        <SquareButton icon={CalendarDays} label="Takvim"       color="pink"   href="/takvim"        />
-        <SquareButton icon={Trophy}       label="Kazanımlar"   color="coral"  href="/kazanimlar"    />
+      <div className="grid grid-cols-3 gap-2">
+        <SquareButton compact icon={Zap}          label="Bugün İlgilen" color="purple" href="/bugun/ilgilen" />
+        <SquareButton compact icon={TrendingUp}   label="Boru Hattı"   color="blue"   href="/pipeline"      />
+        <SquareButton compact icon={PenLine}      label="Mesaj Yaz"    color="teal"   href="/yazar"         />
+        <SquareButton compact icon={Users}        label="Ekibim"       color="amber"  href="/ekip"          />
+        <SquareButton compact icon={CalendarDays} label="Takvim"       color="pink"   href="/takvim"        />
+        <SquareButton compact icon={Trophy}       label="Kazanımlar"   color="coral"  href="/kazanimlar"    />
       </div>
     </>
   )

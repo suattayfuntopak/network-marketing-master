@@ -2,43 +2,22 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Bot, Trash2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
+import { YZKocuSheet } from './YZKocuSheet'
+import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER } from '@/lib/stages'
+import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
-const STAGE_LABEL: Record<CandidateStage, string> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim Kuruldu',
-  takip:    'Takip Bekliyor',
-  sunum:    'Sunum Yapıldı',
-  kararsiz: 'Kararsız',
-  katildi:  'Katıldı ✅',
-  kayboldu: 'Kayboldu ❌',
-}
-
-const STAGE_COLOR: Record<CandidateStage, string> = {
-  yeni:     'bg-[#E8F0FE] text-[#1A56DB]',
-  iletisim: 'bg-[#EEEDFE] text-[#534AB7]',
-  takip:    'bg-[#FAEEDA] text-[#854F0B]',
-  sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
-  kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
-  katildi:  'bg-[#E1F5EE] text-[#0F6E56]',
-  kayboldu: 'bg-[var(--bg-subtle)] text-[var(--text-2)]',
-}
-
-const STAGE_ORDER: CandidateStage[] = [
-  'yeni', 'iletisim', 'takip', 'sunum', 'kararsiz', 'katildi', 'kayboldu',
-]
-
 const FOLLOW_DAYS: Partial<Record<CandidateStage, number>> = {
-  yeni: 2, iletisim: 3, takip: 3, sunum: 1, kararsiz: 7,
+  yeni: 2, iletisim: 3, davetli: 2, takip: 3, sunum: 1, kararsiz: 7,
 }
 
-function followUpDate(c: NmmCandidate): string | null {
+function suggestedFollowUp(c: NmmCandidate): string | null {
   const days = FOLLOW_DAYS[c.stage]
   if (!days) return null
   const base = new Date(c.last_contact_at ?? c.created_at)
@@ -54,6 +33,11 @@ function daysSince(iso: string | null): string {
   return `${d} gün önce`
 }
 
+function toInputDate(iso: string | null): string {
+  if (!iso) return ''
+  return iso.slice(0, 10)
+}
+
 interface Props {
   candidateId: string
 }
@@ -61,11 +45,14 @@ interface Props {
 export function CandidateDetail({ candidateId }: Props) {
   const router = useRouter()
   const [editOpen, setEditOpen] = useState(false)
+  const [kocuOpen, setKocuOpen] = useState(false)
   const [stageOpen, setStageOpen] = useState(false)
+  const [editingFollowUp, setEditingFollowUp] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
+  const del = useDeleteCandidate(ws?.workspaceId ?? '')
 
   const c = candidates.find(x => x.id === candidateId)
 
@@ -99,11 +86,31 @@ export function CandidateDetail({ candidateId }: Props) {
   }
 
   const waLink = c.phone ? `https://wa.me/90${c.phone.replace(/^0/, '')}` : null
-  const nextFollow = followUpDate(c)
+  const nextFollow = c.next_follow_up_at
+    ? new Date(c.next_follow_up_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' })
+    : suggestedFollowUp(c)
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
     update.mutate({ id: c!.id, stage })
+  }
+
+  function saveFollowUpDate(dateStr: string) {
+    setEditingFollowUp(false)
+    if (!dateStr) {
+      update.mutate({ id: c!.id, next_follow_up_at: null })
+      return
+    }
+    update.mutate({ id: c!.id, next_follow_up_at: new Date(dateStr).toISOString() })
+  }
+
+  function handleDelete() {
+    deleteWithUndo(
+      c!.full_name,
+      () => del.mutate(c!.id),
+      () => router.push('/pipeline'),
+    )
+    router.push('/pipeline')
   }
 
   return (
@@ -148,34 +155,41 @@ export function CandidateDetail({ candidateId }: Props) {
           )}
         </div>
 
-        {/* Aksiyon butonları */}
-        <div className="mb-4 grid grid-cols-2 gap-3">
+        {/* Aksiyon butonları: YZ Koçu | WhatsApp | Ara */}
+        <div className="mb-4 grid grid-cols-3 gap-3">
+          <button
+            onClick={() => setKocuOpen(true)}
+            className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
+          >
+            <Bot className="h-4 w-4" strokeWidth={1.75} />
+            YZ Koçu
+          </button>
           {waLink ? (
             <a
               href={waLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90"
+              className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90"
             >
-              <WhatsAppIcon className="h-5 w-5" />
+              <WhatsAppIcon className="h-4 w-4" />
               WhatsApp
             </a>
           ) : (
-            <div className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-subtle)] py-4 text-sm font-medium text-[var(--text-3)]">
-              WhatsApp yok
+            <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
+              WA yok
             </div>
           )}
           {c.phone ? (
             <a
               href={`tel:${c.phone}`}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
+              className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90"
             >
-              <Phone className="h-5 w-5" strokeWidth={1.75} />
+              <Phone className="h-4 w-4" strokeWidth={1.75} />
               Ara
             </a>
           ) : (
-            <div className="flex items-center justify-center gap-2 rounded-2xl bg-[var(--bg-subtle)] py-4 text-sm font-medium text-[var(--text-3)]">
-              Telefon yok
+            <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
+              Tel yok
             </div>
           )}
         </div>
@@ -215,21 +229,49 @@ export function CandidateDetail({ candidateId }: Props) {
         </div>
 
         {/* Takip bilgisi */}
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">Takip</p>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs text-[var(--text-3)]">Son Temas</p>
               <p className="mt-0.5 text-sm font-semibold text-[var(--text-1)]">{daysSince(c.last_contact_at)}</p>
             </div>
-            {nextFollow && (
-              <div>
+            <div>
+              <div className="flex items-center justify-between">
                 <p className="text-xs text-[var(--text-3)]">Sonraki Takip</p>
-                <p className="mt-0.5 text-sm font-semibold text-[#534AB7]">{nextFollow}</p>
+                <button
+                  onClick={() => setEditingFollowUp(v => !v)}
+                  className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
               </div>
-            )}
+              {editingFollowUp ? (
+                <input
+                  type="date"
+                  defaultValue={toInputDate(c.next_follow_up_at)}
+                  className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
+                  onChange={e => saveFollowUpDate(e.target.value)}
+                  onBlur={e => saveFollowUpDate(e.target.value)}
+                  autoFocus
+                />
+              ) : (
+                <p className="mt-0.5 text-sm font-semibold text-[#534AB7]">
+                  {nextFollow ?? '—'}
+                </p>
+              )}
+            </div>
           </div>
         </div>
+
+        {/* Sil */}
+        <button
+          onClick={handleDelete}
+          className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0] py-3.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+        >
+          <Trash2 className="h-4 w-4" />
+          Kişiyi Sil
+        </button>
       </main>
 
       {editOpen && ws && (
@@ -237,6 +279,13 @@ export function CandidateDetail({ candidateId }: Props) {
           candidate={c}
           workspaceId={ws.workspaceId}
           onClose={() => setEditOpen(false)}
+        />
+      )}
+
+      {kocuOpen && (
+        <YZKocuSheet
+          candidate={c}
+          onClose={() => setKocuOpen(false)}
         />
       )}
     </>

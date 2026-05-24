@@ -1,39 +1,39 @@
 'use client'
 
 import { useActionState, useState, useRef } from 'react'
-import { Copy, Loader2, Bot, Users, X, Search } from 'lucide-react'
+import { Copy, Loader2, Bot, X, Search } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateMessageAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { STAGE_LABEL, STAGES_FORM } from '@/lib/stages'
 import type { NmmCandidate } from '@/types/database.types'
 
-const STAGES = [
-  { value: 'yeni',     label: 'Yeni Aday' },
-  { value: 'iletisim', label: 'İletişim Kuruldu' },
-  { value: 'takip',    label: 'Takip Bekliyor' },
-  { value: 'sunum',    label: 'Sunum Yapıldı' },
-  { value: 'kararsiz', label: 'Kararsız' },
+const MESSAGE_TYPES = [
+  { value: 'genel',    label: 'Genel' },
+  { value: 'davet',    label: 'Davet' },
+  { value: 'sunum',    label: 'Sunum' },
+  { value: 'takip',    label: 'Takip' },
+  { value: 'tesekkur', label: 'Teşekkür' },
 ]
 
 const TONES = [
   { value: 'samimi',  label: 'Samimi' },
   { value: 'resmi',   label: 'Resmi' },
-  { value: 'neşeli',  label: 'Neşeli' },
-  { value: 'meraklı', label: 'Meraklı' },
+  { value: 'neseli',  label: 'Neşeli' },
+  { value: 'merakli', label: 'Meraklı' },
 ]
-
-const STAGE_LABEL: Partial<Record<NmmCandidate['stage'], string>> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim',
-  takip:    'Takip',
-  sunum:    'Sunum',
-  kararsiz: 'Kararsız',
-}
 
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
+const pillClass = (active: boolean) =>
+  clsx(
+    'rounded-full border px-4 py-1.5 text-sm font-medium transition cursor-pointer select-none',
+    active
+      ? 'border-[#0F6E56] bg-[#E1F5EE] text-[#0F6E56]'
+      : 'border-[var(--border)] text-[var(--text-2)] hover:border-[#0F6E56]/50'
+  )
 
 export function YazarForm() {
   const [state, action, isPending] = useActionState(generateMessageAction, {})
@@ -41,6 +41,7 @@ export function YazarForm() {
   const [selectedStage, setSelectedStage] = useState('')
   const [search, setSearch] = useState('')
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [messageType, setMessageType] = useState('genel')
   const searchRef = useRef<HTMLInputElement>(null)
 
   const { data: ws } = useWorkspace()
@@ -55,14 +56,9 @@ export function YazarForm() {
 
   function selectCandidate(c: NmmCandidate) {
     setSelectedName(c.full_name)
-    setSelectedStage(c.stage in { yeni:1, iletisim:1, takip:1, sunum:1, kararsiz:1 } ? c.stage : '')
+    setSelectedStage(c.stage)
     setSearch('')
     setPickerOpen(false)
-  }
-
-  function openPicker() {
-    setPickerOpen(true)
-    setTimeout(() => searchRef.current?.focus(), 50)
   }
 
   function handleCopy() {
@@ -81,46 +77,56 @@ export function YazarForm() {
   return (
     <div className="space-y-6">
       <form action={action} className="space-y-4">
-        {/* Aday adı — arama / seçim */}
+        {/* Mesaj türü */}
         <div>
-          <label className={labelClass} htmlFor="name">Aday Adı</label>
-          <div className="relative flex items-center">
+          <label className={labelClass}>Mesaj Türü</label>
+          <div className="flex flex-wrap gap-2">
+            {MESSAGE_TYPES.map(t => (
+              <button
+                key={t.value}
+                type="button"
+                onClick={() => setMessageType(t.value)}
+                className={pillClass(messageType === t.value)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+          <input type="hidden" name="messageType" value={messageType} />
+        </div>
+
+        {/* Kişi + Aşama (equal height, same style) */}
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass} htmlFor="name">Kişi</label>
             <input
               id="name"
               name="name"
               required
               value={selectedName}
               onChange={e => setSelectedName(e.target.value)}
-              placeholder="Aday adı yazın veya seçin"
-              className={`${inputClass} pr-10`}
+              onFocus={() => setPickerOpen(true)}
+              placeholder="Seç veya yaz..."
+              autoComplete="off"
+              className={inputClass}
             />
-            <button
-              type="button"
-              onClick={openPicker}
-              title="Adaylardan seç"
-              className="absolute right-3 flex h-6 w-6 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
-            >
-              <Users className="h-4 w-4" />
-            </button>
           </div>
-        </div>
-
-        {/* Aşama */}
-        <div>
-          <label className={labelClass} htmlFor="stage">Aşama</label>
-          <select
-            id="stage"
-            name="stage"
-            required
-            value={selectedStage}
-            onChange={e => setSelectedStage(e.target.value)}
-            className={inputClass}
-          >
-            <option value="">Seç...</option>
-            {STAGES.map(s => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </select>
+          <div>
+            <label className={labelClass} htmlFor="stage">Aşama</label>
+            <select
+              id="stage"
+              name="stage"
+              required
+              value={selectedStage}
+              onChange={e => setSelectedStage(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Seç...</option>
+              {STAGES_FORM.map(s => (
+                <option key={s.value} value={s.value}>{s.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Ek bilgi */}
@@ -130,6 +136,7 @@ export function YazarForm() {
             id="context"
             name="context"
             rows={2}
+            maxLength={500}
             placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
             className={`${inputClass} resize-none`}
           />
@@ -202,9 +209,8 @@ export function YazarForm() {
             onClick={() => setPickerOpen(false)}
           />
           <div className="relative z-10 flex w-full max-w-lg flex-col rounded-t-3xl bg-[var(--bg-card)] shadow-2xl md:rounded-2xl" style={{ maxHeight: '80vh' }}>
-            {/* Başlık */}
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <p className="text-sm font-bold text-[var(--text-1)]">Aday Seç</p>
+              <p className="text-sm font-bold text-[var(--text-1)]">Kişi Seç</p>
               <button
                 onClick={() => setPickerOpen(false)}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]"
@@ -213,7 +219,6 @@ export function YazarForm() {
               </button>
             </div>
 
-            {/* Arama */}
             <div className="border-b border-[var(--border)] px-4 py-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
@@ -223,21 +228,21 @@ export function YazarForm() {
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="Ara..."
+                  autoFocus
                   className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 pl-9 pr-4 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7]"
                 />
               </div>
             </div>
 
-            {/* Liste */}
             <div className="flex-1 overflow-y-auto">
               {filtered.length === 0 ? (
-                <p className="py-8 text-center text-sm text-[var(--text-3)]">Aday bulunamadı</p>
+                <p className="py-8 text-center text-sm text-[var(--text-3)]">Kişi bulunamadı</p>
               ) : (
                 filtered.map(c => (
                   <button
                     key={c.id}
                     type="button"
-                    onClick={() => selectCandidate(c)}
+                    onMouseDown={() => selectCandidate(c)}
                     className="flex w-full items-center gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition hover:bg-[var(--bg-subtle)] last:border-b-0"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
@@ -247,11 +252,9 @@ export function YazarForm() {
                       <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
                       {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
                     </div>
-                    {STAGE_LABEL[c.stage] && (
-                      <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
-                        {STAGE_LABEL[c.stage]}
-                      </span>
-                    )}
+                    <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
+                      {STAGE_LABEL[c.stage]}
+                    </span>
                   </button>
                 ))
               )}

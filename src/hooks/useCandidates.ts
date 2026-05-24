@@ -7,8 +7,8 @@ import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, CandidateSta
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar'
 
-const ACTIVE_STAGES: CandidateStage[] = ['yeni', 'iletisim', 'takip', 'sunum', 'kararsiz']
-const HOT_STAGES: CandidateStage[] = ['takip', 'sunum']
+const ACTIVE_STAGES: CandidateStage[] = ['yeni', 'iletisim', 'davetli', 'sunum', 'takip', 'kararsiz']
+const HOT_STAGES: CandidateStage[] = ['davetli', 'takip', 'sunum']
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = createClient()

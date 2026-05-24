@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import { X } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
+import { STAGES_FORM } from '@/lib/stages'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -22,8 +23,9 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
     const fullName = (fd.get('fullName') as string).trim()
     const phone = (fd.get('phone') as string).trim()
     const note = (fd.get('note') as string).trim()
+    const stage = (fd.get('stage') as string | null) || 'yeni'
     if (!fullName) return
-    await add.mutateAsync({ full_name: fullName, phone: phone || null, note: note || null, stage: 'yeni', last_contact_at: null })
+    await add.mutateAsync({ full_name: fullName, phone: phone || null, note: note || null, stage: stage as never, last_contact_at: null })
     formRef.current?.reset()
     onClose()
   }
@@ -33,7 +35,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
       <div className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm" onClick={onClose} />
       <div className="fixed bottom-0 left-0 right-0 z-40 rounded-t-3xl bg-[var(--bg-card)] p-6 pb-10 shadow-2xl md:left-auto md:right-8 md:top-8 md:bottom-auto md:w-96 md:rounded-2xl md:pb-6">
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Aday Ekle</h2>
+          <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Kişi Ekle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
           </button>
@@ -49,16 +51,22 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             <input id="phone" name="phone" type="tel" placeholder="05xxxxxxxxx" className={inputClass} />
           </div>
           <div>
+            <label className={labelClass} htmlFor="stage">Aşama</label>
+            <select id="stage" name="stage" className={inputClass}>
+              {STAGES_FORM.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div>
             <label className={labelClass} htmlFor="note">
-              Not <span className="font-normal text-[var(--text-3)]">(max 200 karakter)</span>
+              Not <span className="font-normal text-[var(--text-3)]">(max 500 karakter)</span>
             </label>
-            <textarea id="note" name="note" rows={2} maxLength={200} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="note" name="note" rows={2} maxLength={500} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           {add.isError && (
-            <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">Aday eklenemedi. Tekrar dene.</p>
+            <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">Kişi eklenemedi. Tekrar dene.</p>
           )}
           <button type="submit" disabled={add.isPending} className="w-full rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
-            {add.isPending ? 'Ekleniyor...' : 'Aday Ekle'}
+            {add.isPending ? 'Ekleniyor...' : 'Kişi Ekle'}
           </button>
         </form>
       </div>

@@ -6,7 +6,6 @@ import { LayoutDashboard, BarChart2, PenLine, Users, LogOut, ChevronLeft, Chevro
 import { clsx } from 'clsx'
 import { logoutAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const NAV_ITEMS = [
   { href: '/pano',     label: 'Pano',       icon: LayoutDashboard },
@@ -45,12 +44,9 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <span className="text-[10px] font-black tracking-tight text-white">NMM</span>
         </div>
         {!collapsed && (
-          <>
-            <span className="flex-1 text-[9px] font-black uppercase tracking-widest leading-snug text-[var(--text-1)]">
-              Network<br />Marketing<br />Master
-            </span>
-            <ThemeToggle />
-          </>
+          <span className="flex-1 text-[9px] font-black uppercase tracking-widest leading-snug text-[var(--text-1)]">
+            Network<br />Marketing<br />Master
+          </span>
         )}
       </div>
 
@@ -81,13 +77,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Alt kısım: kullanıcı + tema toggle (collapsed'da) + çıkış + toggle */}
       <div className={clsx('border-t border-[var(--border)] pb-2 pt-2', collapsed ? 'px-2' : 'px-3 space-y-1')}>
-        {/* Tema toggle sadece collapsed modda buraya taşınır */}
-        {collapsed && (
-          <div className="flex justify-center py-1">
-            <ThemeToggle />
-          </div>
-        )}
-
         {/* Kullanıcı */}
         {ws && (
           <div className={clsx(

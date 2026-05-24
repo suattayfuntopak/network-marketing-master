@@ -15,12 +15,13 @@ const colorMap: Record<ButtonColor, string> = {
   coral:  'bg-[#FEF0EC] text-[#C03E1F] hover:bg-[#FDE3DA]',
 }
 
-const sharedClass = (color: ButtonColor, className?: string) =>
+const sharedClass = (color: ButtonColor, compact?: boolean, className?: string) =>
   clsx(
-    'flex aspect-square flex-col items-center justify-center gap-2',
-    'rounded-[14px] p-4 transition-all duration-150',
+    'flex flex-col items-center justify-center gap-1.5',
+    'rounded-[14px] transition-all duration-150',
     'active:scale-95 hover:scale-[1.03] hover:shadow-md',
     'md:rounded-[12px]',
+    compact ? 'h-[76px] p-3' : 'aspect-square p-4',
     colorMap[color],
     className
   )
@@ -32,6 +33,7 @@ interface SquareButtonProps {
   href?: string
   onClick?: () => void
   disabled?: boolean
+  compact?: boolean
   className?: string
 }
 
@@ -42,18 +44,19 @@ export function SquareButton({
   href,
   onClick,
   disabled = false,
+  compact = false,
   className,
 }: SquareButtonProps) {
   const content = (
     <>
-      <Icon className="h-6 w-6 shrink-0" strokeWidth={1.75} />
+      <Icon className={compact ? 'h-5 w-5 shrink-0' : 'h-6 w-6 shrink-0'} strokeWidth={1.75} />
       <span className="text-center text-xs font-semibold leading-tight">{label}</span>
     </>
   )
 
   if (href) {
     return (
-      <Link href={href} className={sharedClass(color, className)}>
+      <Link href={href} className={sharedClass(color, compact, className)}>
         {content}
       </Link>
     )
@@ -63,7 +66,7 @@ export function SquareButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx(sharedClass(color, className), 'disabled:pointer-events-none disabled:opacity-40')}
+      className={clsx(sharedClass(color, compact, className), 'disabled:pointer-events-none disabled:opacity-40')}
     >
       {content}
     </button>

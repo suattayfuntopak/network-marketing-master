@@ -34,3 +34,16 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   transition: background-color 0.2s, color 0.2s;
 }
+
+/* iOS input zoom prevention — must be ≥16px on mobile */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Delete countdown SVG animation */
+@keyframes stroke-countdown {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 88; }
+}

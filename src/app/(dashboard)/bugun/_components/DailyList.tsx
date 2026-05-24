@@ -3,27 +3,8 @@
 import { Phone } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useDailyActions } from '@/hooks/useDailyActions'
+import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import type { NmmCandidate } from '@/types/database.types'
-
-const STAGE_LABEL: Record<NmmCandidate['stage'], string> = {
-  yeni:     'Yeni Aday',
-  iletisim: 'İletişim Kuruldu',
-  takip:    'Takip Bekliyor',
-  sunum:    'Sunum Yapıldı',
-  kararsiz: 'Kararsız',
-  katildi:  'Katıldı',
-  kayboldu: 'Kayboldu',
-}
-
-const STAGE_COLOR: Record<NmmCandidate['stage'], string> = {
-  yeni:     'bg-[#E8F0FE] text-[#1A56DB]',
-  iletisim: 'bg-[#EEEDFE] text-[#534AB7]',
-  takip:    'bg-[#FAEEDA] text-[#854F0B]',
-  sunum:    'bg-[#E1F5EE] text-[#0F6E56]',
-  kararsiz: 'bg-[#FBEAF0] text-[#72243E]',
-  katildi:  'bg-[#E1F5EE] text-[#0F6E56]',
-  kayboldu: 'bg-[var(--bg-subtle)] text-[var(--text-2)]',
-}
 
 function formatDaysAgo(days: number): string {
   if (!isFinite(days)) return 'Hiç aranmadı'
