@@ -157,3 +157,47 @@ export function useActivityHistory(candidateId: string) {
     enabled: !!candidateId,
   })
 }
+
+export function useCandidateNotes(candidateId: string) {
+  return useQuery<NmmDailyAction[]>({
+    queryKey: ['candidate-notes', candidateId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data, error } = await supabase
+        .from('nmm_daily_actions')
+        .select('*')
+        .eq('candidate_id', candidateId)
+        .eq('action_type', 'note')
+        .order('created_at', { ascending: false })
+      if (error) throw new Error(error.message)
+      return data ?? []
+    },
+    enabled: !!candidateId,
+  })
+}
+
+export function useAddCandidateNote(workspaceId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ candidateId, note }: { candidateId: string; note: string }) => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Oturum yok')
+
+      const { error } = await supabase.from('nmm_daily_actions').insert({
+        workspace_id: workspaceId,
+        user_id: user.id,
+        candidate_id: candidateId,
+        action_type: 'note' as const,
+        note: note.trim(),
+      })
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: (_, { candidateId }) => {
+      qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
+      qc.invalidateQueries({ queryKey: ['activity', candidateId] })
+      toast.success('Not kaydedildi')
+    },
+    onError: (e: Error) => toast.error(`Not kaydedilemedi: ${e.message}`),
+  })
+}

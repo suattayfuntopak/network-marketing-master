@@ -2,10 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { toast } from 'sonner'
@@ -79,11 +79,20 @@ export function CandidateDetail({ candidateId }: Props) {
   const [translatedNote, setTranslatedNote] = useState<string | null>(null)
   const [isTranslating, setIsTranslating] = useState(false)
 
+  // Leader Notes states
+  const [notesOpen, setNotesOpen] = useState(false)
+  const [showAllNotes, setShowAllNotes] = useState(false)
+  const [newNote, setNewNote] = useState('')
+
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
   const { data: activityLog = [] } = useActivityHistory(candidateId)
+  
+  // Fetch leader notes and declare add note mutation
+  const { data: notes = [] } = useCandidateNotes(candidateId)
+  const addNoteMutation = useAddCandidateNote(ws?.workspaceId ?? '')
 
   const c = candidates.find(x => x.id === candidateId)
   const parsed = c ? parseNote(c.note) : { tr: '', en: '', avatarUrl: '' }
@@ -227,6 +236,15 @@ export function CandidateDetail({ candidateId }: Props) {
     router.push('/pipeline')
   }
 
+  const handleSaveNote = () => {
+    if (!newNote.trim()) return
+    addNoteMutation.mutate({ candidateId, note: newNote.trim() }, {
+      onSuccess: () => {
+        setNewNote('')
+      }
+    })
+  }
+
   return (
     <>
       <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -248,245 +266,367 @@ export function CandidateDetail({ candidateId }: Props) {
           </button>
         </div>
 
-        {/* Profil kartı */}
-        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
-          <div className="flex items-center gap-4">
-            {profilePhoto ? (
-              <img
-                src={profilePhoto}
-                alt={c.full_name}
-                className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-[#EEEDFE]"
-              />
-            ) : (
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xl font-bold text-[#534AB7]">
-                {c.full_name.charAt(0).toUpperCase()}
+        {/* 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 items-start">
+          
+          {/* Sol/Orta Kolon: Birincil Detaylar (Col-span 2) */}
+          <div className="lg:col-span-2 space-y-4">
+            
+            {/* Profil kartı */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+              <div className="flex items-center gap-4">
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    alt={c.full_name}
+                    className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-[#EEEDFE]"
+                  />
+                ) : (
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xl font-bold text-[#534AB7]">
+                    {c.full_name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
+                  {c.phone && (
+                    <p className="text-sm text-[var(--text-2)]">{c.phone}</p>
+                  )}
+                </div>
+              </div>
+
+              {c.note && (
+                <p className={`mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed transition-opacity ${isTranslating ? 'opacity-50' : 'opacity-100'}`}>
+                  {lang === 'en' ? (translatedNote || parsed.en || parsed.tr) : parsed.tr}
+                  {isTranslating && (
+                    <span className="ml-2 text-[10px] text-[var(--text-3)] animate-pulse">
+                      {t('pipeline.noteTranslating')}
+                    </span>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {/* Aksiyon butonları */}
+            <div className="grid grid-cols-3 gap-3">
+              <button
+                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.tr)}`)}
+                className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
+              >
+                <Bot className="h-4 w-4" strokeWidth={1.75} />
+                {t('pipeline.aiMessage')}
+              </button>
+              {waLink ? (
+                <a
+                  href={waLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                  WhatsApp
+                </a>
+              ) : (
+                <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
+                  {t('pipeline.noWhatsApp')}
+                </div>
+              )}
+              {c.phone ? (
+                <a
+                  href={`tel:${c.phone}`}
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
+                >
+                  <Phone className="h-4 w-4" strokeWidth={1.75} />
+                  {t('pipeline.call')}
+                </a>
+              ) : (
+                <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
+                  {t('pipeline.noPhone')}
+                </div>
+              )}
+            </div>
+
+            {/* Sunum Materyalleri */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+              <div>
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                  <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
+                  {t('pipeline.presentationMaterials')}
+                </p>
+                <p className="mt-2 text-xs leading-relaxed text-[var(--text-3)]">
+                  {t('pipeline.presentationMaterialsDesc')}
+                </p>
+              </div>
+
+              {!candidatePhoneClean && (
+                <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 p-3 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
+                  {t('pipeline.presentationWarning')}
+                </p>
+              )}
+
+              <div className="mt-4 grid w-full grid-cols-2 items-stretch gap-2.5">
+                <button
+                  type="button"
+                  disabled={!candidatePhoneClean}
+                  onClick={handleSendSms}
+                  className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-sky-600 hover:bg-sky-500 shadow-md hover:shadow-sky-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <MessageSquare className="h-4 w-4 shrink-0" />
+                  <span className="text-center leading-tight">{t('pipeline.shareSms')}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={!candidatePhoneClean}
+                  onClick={handleSendWhatsApp}
+                  className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                >
+                  <WhatsAppIcon className="h-4 w-4 shrink-0" />
+                  <span className="text-center leading-tight">{t('pipeline.shareWhatsapp')}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Aktivite Geçmişi */}
+            {activityLog.length > 0 && (
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+                <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                  <History className="h-3.5 w-3.5" />
+                  {t('pipeline.activityHistory')}
+                </p>
+                <ul className="space-y-2">
+                  {activityLog.map(a => (
+                    <li key={a.id} className="flex items-center gap-2.5 text-sm">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)]">
+                        {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
+                        {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
+                        {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
+                        {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
+                      </span>
+                      <span className="flex-1 text-[var(--text-2)]">
+                        {a.action_type === 'call'         && t('pipeline.activityCall')}
+                        {a.action_type === 'whatsapp'     && 'WhatsApp'}
+                        {a.action_type === 'note'         && t('pipeline.activityNote')}
+                        {a.action_type === 'stage_change' && t('pipeline.activityStageChange')}
+                        {a.note && <span className="text-[var(--text-3)]"> — {a.note}</span>}
+                      </span>
+                      <span className="shrink-0 text-[10px] text-[var(--text-3)]">
+                        {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
-            <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
-              {c.phone && (
-                <p className="text-sm text-[var(--text-2)]">{c.phone}</p>
-              )}
-            </div>
-          </div>
 
-          {c.note && (
-            <p className={`mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed transition-opacity ${isTranslating ? 'opacity-50' : 'opacity-100'}`}>
-              {lang === 'en' ? (translatedNote || parsed.en || parsed.tr) : parsed.tr}
-              {isTranslating && (
-                <span className="ml-2 text-[10px] text-[var(--text-3)] animate-pulse">
-                  {t('pipeline.noteTranslating')}
-                </span>
-              )}
-            </p>
-          )}
-        </div>
-
-        {/* Aksiyon butonları */}
-        <div className="mb-4 grid grid-cols-3 gap-3">
-          <button
-            onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.tr)}`)}
-            className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90"
-          >
-            <Bot className="h-4 w-4" strokeWidth={1.75} />
-            {t('pipeline.aiMessage')}
-          </button>
-          {waLink ? (
-            <a
-              href={waLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90"
-            >
-              <WhatsAppIcon className="h-4 w-4" />
-              WhatsApp
-            </a>
-          ) : (
-            <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
-              {t('pipeline.noWhatsApp')}
-            </div>
-          )}
-          {c.phone ? (
-            <a
-              href={`tel:${c.phone}`}
-              className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90"
-            >
-              <Phone className="h-4 w-4" strokeWidth={1.75} />
-              {t('pipeline.call')}
-            </a>
-          ) : (
-            <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
-              {t('pipeline.noPhone')}
-            </div>
-          )}
-        </div>
-
-        {/* Sunum Materyalleri */}
-        <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
-          <div>
-            <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
-              {t('pipeline.presentationMaterials')}
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-[var(--text-3)]">
-              {t('pipeline.presentationMaterialsDesc')}
-            </p>
-          </div>
-
-          {!candidatePhoneClean && (
-            <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 p-3 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-              {t('pipeline.presentationWarning')}
-            </p>
-          )}
-
-          <div className="mt-4 grid w-full grid-cols-2 items-stretch gap-2.5">
-            <button
-              type="button"
-              disabled={!candidatePhoneClean}
-              onClick={handleSendSms}
-              className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-sky-600 hover:bg-sky-500 shadow-md hover:shadow-sky-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-            >
-              <MessageSquare className="h-4 w-4 shrink-0" />
-              <span className="text-center leading-tight">{t('pipeline.shareSms')}</span>
-            </button>
-            <button
-              type="button"
-              disabled={!candidatePhoneClean}
-              onClick={handleSendWhatsApp}
-              className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-            >
-              <WhatsAppIcon className="h-4 w-4 shrink-0" />
-              <span className="text-center leading-tight">{t('pipeline.shareWhatsapp')}</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Aktivite Geçmişi */}
-        {activityLog.length > 0 && (
-          <div className="mb-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-            <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              <History className="h-3.5 w-3.5" />
-              {t('pipeline.activityHistory')}
-            </p>
-            <ul className="space-y-2">
-              {activityLog.map(a => (
-                <li key={a.id} className="flex items-center gap-2.5 text-sm">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)]">
-                    {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
-                    {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
-                    {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
-                    {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
-                  </span>
-                  <span className="flex-1 text-[var(--text-2)]">
-                    {a.action_type === 'call'         && t('pipeline.activityCall')}
-                    {a.action_type === 'whatsapp'     && 'WhatsApp'}
-                    {a.action_type === 'note'         && t('pipeline.activityNote')}
-                    {a.action_type === 'stage_change' && t('pipeline.activityStageChange')}
-                    {a.note && <span className="text-[var(--text-3)]"> — {a.note}</span>}
-                  </span>
-                  <span className="shrink-0 text-[10px] text-[var(--text-3)]">
-                    {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Alt Yerleşim Grubu (Aşama, Takip ve Sil Butonları 3'lü Grid) */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-          
-          {/* Aşama Card */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {t('pipeline.stage')}
-            </p>
-            <button
-              onClick={() => setStageOpen(v => !v)}
-              className={clsx(
-                'mt-2 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-90',
-                STAGE_COLOR[c.stage]
-              )}
-              title={t('pipeline.stage')}
-            >
-              {t(`stages.${c.stage}`)}
-              <ChevronDown className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* Takip Card */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-                {t('pipeline.nextContact')}
-              </p>
-              {!editingFollowUp && (
+            {/* Alt Yerleşim Grubu (Aşama, Takip ve Sil Butonları 3'lü Grid) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              {/* Aşama Card */}
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                  {t('pipeline.stage')}
+                </p>
                 <button
-                  onClick={() => {
-                    setEditingFollowUp(true)
-                    setTempFollowUp(toInputDateTime(c.next_follow_up_at))
-                  }}
-                  className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
-                  title={t('common.edit')}
+                  onClick={() => setStageOpen(v => !v)}
+                  className={clsx(
+                    'mt-2 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition hover:opacity-90',
+                    STAGE_COLOR[c.stage]
+                  )}
+                  title={t('pipeline.stage')}
                 >
-                  <Pencil className="h-3.5 w-3.5" />
+                  {t(`stages.${c.stage}`)}
+                  <ChevronDown className="h-4 w-4" />
                 </button>
-              )}
-            </div>
-            <div className="mt-2 flex-1 flex flex-col justify-end">
-              {editingFollowUp ? (
-                <div className="flex items-center gap-1.5 w-full">
-                  <input
-                    type="datetime-local"
-                    value={tempFollowUp}
-                    onChange={e => setTempFollowUp(e.target.value)}
-                    className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => saveFollowUpDate(tempFollowUp)}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 transition shadow-sm"
-                    title={t('common.save')}
-                  >
-                    <Check className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setEditingFollowUp(false)}
-                    className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
-                    title={t('common.cancel')}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-baseline justify-between w-full">
-                  <p className="text-sm font-semibold text-[#534AB7] truncate">
-                    {nextFollow ?? '—'}
+              </div>
+
+              {/* Takip Card */}
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                    {t('pipeline.nextContact')}
                   </p>
-                  <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
-                    ({daysSince(c.last_contact_at, t)})
+                  {!editingFollowUp && (
+                    <button
+                      onClick={() => {
+                        setEditingFollowUp(true)
+                        setTempFollowUp(toInputDateTime(c.next_follow_up_at))
+                      }}
+                      className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
+                      title={t('common.edit')}
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+                <div className="mt-2 flex-1 flex flex-col justify-end">
+                  {editingFollowUp ? (
+                    <div className="flex items-center gap-1.5 w-full">
+                      <input
+                        type="datetime-local"
+                        value={tempFollowUp}
+                        onChange={e => setTempFollowUp(e.target.value)}
+                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
+                        autoFocus
+                      />
+                      <button
+                        onClick={() => saveFollowUpDate(tempFollowUp)}
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 transition shadow-sm"
+                        title={t('common.save')}
+                      >
+                        <Check className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => setEditingFollowUp(false)}
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
+                        title={t('common.cancel')}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-baseline justify-between w-full">
+                      <p className="text-sm font-semibold text-[#534AB7] truncate">
+                        {nextFollow ?? '—'}
+                      </p>
+                      <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
+                        ({daysSince(c.last_contact_at, t)})
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Silme Card */}
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
+                <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+                  {t('pipeline.deleteCandidate')}
+                </p>
+                <button
+                  onClick={handleDelete}
+                  className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] py-2.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+                  title={t('pipeline.deleteCandidate')}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {t('pipeline.deleteCandidate')}
+                </button>
+              </div>
+
+            </div>
+
+          </div> {/* End Sol Kolon */}
+
+          {/* Sağ Kolon: Lider Notu Collapsible CRM Paneli (Col-span 1) */}
+          <div className="space-y-4">
+            
+            {/* Lider Notu Collapsible Card */}
+            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300">
+              
+              {/* Collapsible Header */}
+              <button
+                onClick={() => setNotesOpen(!notesOpen)}
+                className="flex w-full items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]">
+                    <StickyNote className="h-4.5 w-4.5" />
+                  </div>
+                  <span className="text-sm font-bold text-[var(--text-1)]">
+                    {lang === 'en' ? 'Leader Note' : 'Lider Notu'}
                   </span>
+                  {notes.length > 0 && (
+                    <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
+                      {notes.length}
+                    </span>
+                  )}
+                </div>
+                {notesOpen ? (
+                  <ChevronUp className="h-4 w-4 text-[var(--text-3)]" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />
+                )}
+              </button>
+
+              {/* Collapsible Body */}
+              {notesOpen && (
+                <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                  
+                  {/* Notes Feed Container */}
+                  {notes.length === 0 ? (
+                    <div className="rounded-xl border border-dashed border-[var(--border)] p-5 text-center text-xs text-[var(--text-3)]">
+                      {lang === 'en' ? 'No leader notes recorded yet. Write your first note below!' : 'Henüz lider notu kaydedilmemiş. İlk notu aşağıdan yazabilirsiniz!'}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
+                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => (
+                          <div
+                            key={n.id}
+                            className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] border border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
+                          >
+                            <p className="whitespace-pre-wrap break-words">{n.note}</p>
+                            <p className="mt-2 text-[9px] font-medium text-[var(--text-3)] tracking-wide">
+                              {new Date(n.created_at).toLocaleDateString(locale, {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Tümünü Gör / Kapat toggle */}
+                      {notes.length > 5 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAllNotes(!showAllNotes)}
+                          className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline py-1 transition active:scale-95"
+                        >
+                          {showAllNotes
+                            ? (lang === 'en' ? 'Show Less' : 'Kapat')
+                            : (lang === 'en' ? 'Show All' : 'Tümünü Gör')
+                          }
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Add Note text box */}
+                  <div className="border-t border-[var(--border)] pt-4 space-y-3">
+                    <textarea
+                      value={newNote}
+                      onChange={(e) => setNewNote(e.target.value)}
+                      placeholder={
+                        lang === 'en'
+                          ? `Write a leader note for ${c.full_name}...`
+                          : `${c.full_name} için lider notunu yaz...`
+                      }
+                      className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                      rows={3}
+                      maxLength={1000}
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        disabled={!newNote.trim() || addNoteMutation.isPending}
+                        onClick={handleSaveNote}
+                        className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
+                      >
+                        <Check className="h-3.5 w-3.5" />
+                        {lang === 'en' ? 'Save Note' : 'Notu Kaydet'}
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
               )}
+
             </div>
-          </div>
 
-          {/* Silme Card */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 flex flex-col justify-between min-h-[110px]">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {t('pipeline.deleteCandidate')}
-            </p>
-            <button
-              onClick={handleDelete}
-              className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] py-2.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
-              title={t('pipeline.deleteCandidate')}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t('pipeline.deleteCandidate')}
-            </button>
-          </div>
+          </div> {/* End Sağ Kolon */}
 
-        </div>
+        </div> {/* End 2-Column Responsive Layout */}
       </main>
 
       {editOpen && ws && (

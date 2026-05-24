@@ -1,5 +1,30 @@
 # Hot Log
 
+## 2026-05-24 — Council Triad Analizi: Kapsamlı Proje Güvenlik ve Kalite Denetimi
+
+### analysis: 4 Council Üyesi ile Cerrah Titizliğinde Proje Analizi
+- Socrates (güvenlik/mimari), Torvalds (mühendislik kalitesi), Ada (veri/tip sistemi), Feynman (UX/performans) perspektiflerinden eş zamanlı analiz yapıldı.
+- **Toplam 19 bulgu** kritikliğe göre sınıflandırıldı.
+
+### verify: Next.js 16 Proxy Konvansiyonu Doğrulandı
+- Council analizi `src/proxy.ts` dosyasının çalışmadığını öngörmüştü — bu **yanlış alarmdı**.
+- Next.js 16, Middleware'i `Proxy` olarak yeniden adlandırdı. Dokümanlar: *"Starting with Next.js 16, Middleware is now called Proxy."*
+- `src/proxy.ts` + `export async function proxy(request: NextRequest)` kombinasyonu **tamamen doğru** — Next.js kaynak kodu (`middleware.js` template) `page === '/src/proxy'` kontrolüyle bu dosyayı tanıdığı teyit edildi.
+- `PROXY_FILENAME = 'proxy'` ve `PROXY_LOCATION_REGEXP = '(?:src/)?proxy'` sabitler Next.js 16 `constants.js`'de mevcuttur. Auth guard aktif ve çalışıyor.
+
+### findings: Gerçek Kritik Bulgular (Düzeltme Gerektirenler)
+Gerçekten düzeltilmesi gereken bulgular (öncelik sırasıyla):
+1. `/api/translate-note` — auth kontrolü yok, Anthropic kredi riski (🔴)
+2. `src/lib/aiUsage.ts` — AI limiti localStorage'da, bypass edilebilir (🔴)
+3. `useWorkspace` queryFn içinde DB insert — React Query retry riski (🔴)
+4. `useCandidates.ts:79` — `getSession()` yerine `getUser()` kullanılmalı (🟠)
+5. `EkipPanel` join/leave — atomik olmayan multi-table write (🟠)
+6. `generateCoachMessage` — ownership kontrolü eksik (🟠)
+7. Swipe bug — `/pipeline/[id]` detail sayfasında `startsWith` yanlış match ediyor (🟠)
+8. `updated_at` — DB trigger varlığı belirsiz (🟡)
+9. Canvas noise loop — saniyede 6000 gereksiz draw call (🟡)
+10. `handleIndividualBroadcast` — memberId parametresi kullanılmıyor (🟡)
+
 ## 2026-05-24 — Masaüstü Header Koruma, Çift Yönlü Mobil Scroll-to-Hide ve Kazanımlar Sayfası Premium Tasarımı
 
 ### fix: Bilgisayar Sürümü Header Koruma (Statik Görünüm)

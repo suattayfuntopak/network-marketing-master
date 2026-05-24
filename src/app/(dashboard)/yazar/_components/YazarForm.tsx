@@ -138,8 +138,23 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
         // Pre-populate candidate information
         const parsedNote = match.note ? match.note.split('|||')[0].trim() : ''
         const stageName = STAGE_LABEL[match.stage] || match.stage
-        const infoText = `Aday: ${match.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}\n\n`
-        setContext(infoText)
+        
+        // Fetch last 5 leader notes
+        const supabase = createClient()
+        supabase
+          .from('nmm_daily_actions')
+          .select('note')
+          .eq('candidate_id', match.id)
+          .eq('action_type', 'note')
+          .order('created_at', { ascending: false })
+          .limit(5)
+          .then(({ data }) => {
+            const notesText = data && data.length > 0
+              ? '\n\nLider Notları:\n' + data.map(n => `- ${n.note}`).join('\n')
+              : ''
+            const infoText = `Aday: ${match.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}\n\n`
+            setContext(infoText)
+          })
       } else if (cleanInitialNote) {
         setContext(cleanInitialNote)
       }
@@ -189,8 +204,23 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
     // Pre-populate candidate information
     const parsedNote = c.note ? c.note.split('|||')[0].trim() : ''
     const stageName = STAGE_LABEL[c.stage] || c.stage
-    const infoText = `Aday: ${c.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}\n\n`
-    setContext(infoText)
+
+    // Fetch last 5 leader notes
+    const supabase = createClient()
+    supabase
+      .from('nmm_daily_actions')
+      .select('note')
+      .eq('candidate_id', c.id)
+      .eq('action_type', 'note')
+      .order('created_at', { ascending: false })
+      .limit(5)
+      .then(({ data }) => {
+        const notesText = data && data.length > 0
+          ? '\n\nLider Notları:\n' + data.map(n => `- ${n.note}`).join('\n')
+          : ''
+        const infoText = `Aday: ${c.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}\n\n`
+        setContext(infoText)
+      })
   }
 
   function clearSelection() {
