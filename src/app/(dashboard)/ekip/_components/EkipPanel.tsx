@@ -229,7 +229,7 @@ export function EkipPanel() {
               Ekip üyelerinizin uygulamaya kendi hesaplarıyla üye olmasını sağlayın. Ardından aşağıdaki kodu "Ekibim" sayfasından girerek ekibinize dahil olmalarını isteyin.
             </p>
             <div className="flex items-center gap-2">
-              <div className="flex-1 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-xs text-[var(--text-1)]">
+              <div className="flex-1 min-w-0 truncate rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 font-mono text-xs text-[var(--text-1)]">
                 {ws?.workspaceId}
               </div>
               <button
@@ -273,7 +273,7 @@ export function EkipPanel() {
                 value={inviteCodeInput}
                 onChange={e => setInviteCodeInput(e.target.value)}
                 placeholder="Davet kodunu yapıştırın..."
-                className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
               />
               <button
                 type="submit"
