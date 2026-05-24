@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-05-25 — Semantic Renk Token'ları + EkipPanel Bölünmesi (Council #16 & #19)
+
+### refactor: Semantic color tokens — globals.css @theme (Council #16)
+- `globals.css`: `@theme { --color-brand: #534AB7; --color-whatsapp: #25D366; --color-accent-blue: #4169E1; }` eklendi. Artık `bg-brand`, `text-whatsapp`, `border-brand` gibi Tailwind yardımcı sınıfları kullanılabilir.
+- `EkipPanel.tsx` + `BroadcastPanel.tsx`: Hardcoded hex değerleri (`#534AB7`, `#25D366`, `#4169E1`) token sınıflarına dönüştürüldü.
+
+### refactor: EkipPanel monolith bölündü (Council #19)
+- `EkipPanel.tsx` 704 satırdan ~350 satıra indirildi.
+- `SpoilerCode.tsx` (~90 satır): Canvas particle animasyonu ayrı dosyaya taşındı. Kendi `useRef` ve `useEffect` import'larını yönetiyor.
+- `BroadcastPanel.tsx` (~200 satır): Tüm yayın state'i, compose fonksiyonları, grup/tekli gönderim UI'ı ayrı bileşene taşındı. `MemberRow` tipini `EkipPanel.tsx`'ten import ediyor.
+- TypeScript kontrolü `npx tsc --noEmit` ile doğrulandı — hata yok.
+
 ## 2026-05-25 — Gece Selamlama, Retry Fix, Type Safety, Safe-Area, Aktivite Limit (Council #3 + #13-15 + greeting)
 
 ### feat: Pano gece selamlama — 00:00-05:00 arası "İyi Geceler" (yeni)
