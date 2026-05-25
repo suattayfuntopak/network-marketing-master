@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { toast } from 'sonner'
@@ -200,7 +200,19 @@ export function CandidateDetail({ candidateId }: Props) {
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
+  const deleteActivityMutation = useDeleteActivity(ws?.workspaceId ?? '')
   const { data: activityLog = [] } = useActivityHistory(candidateId)
+  
+  const [activityToDelete, setActivityToDelete] = useState<any | null>(null)
+
+  function handleActivityDeleteConfirmed() {
+    if (!activityToDelete) return
+    const id = activityToDelete.id
+    const typeLabel = lang === 'en' ? 'Activity Log' : 'Aktivite Kaydı'
+    setActivityToDelete(null)
+    deleteWithUndo(typeLabel, () => deleteActivityMutation.mutate(id))
+  }
+
   
   // Fetch leader notes and declare add note mutation
   const { data: notes = [] } = useCandidateNotes(candidateId)
@@ -707,9 +719,9 @@ export function CandidateDetail({ candidateId }: Props) {
                   <History className="h-3.5 w-3.5" />
                   {t('pipeline.activityHistory')}
                 </p>
-                <ul className="space-y-2">
+                 <ul className="space-y-2">
                   {(showAllActivity ? activityLog : activityLog.slice(0, 5)).map(a => (
-                    <li key={a.id} className="flex items-start gap-2.5 text-sm py-0.5 animate-in fade-in duration-200">
+                    <li key={a.id} className="group flex items-start gap-2.5 text-sm py-0.5 animate-in fade-in duration-200">
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] mt-0.5">
                         {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
                         {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
@@ -725,6 +737,13 @@ export function CandidateDetail({ candidateId }: Props) {
                           {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
+                      <button
+                        onClick={() => setActivityToDelete(a)}
+                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 dark:hover:bg-red-950/20 active:scale-95 mt-1"
+                        title={lang === 'en' ? 'Delete activity' : 'Aktiviteyi sil'}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -852,6 +871,14 @@ export function CandidateDetail({ candidateId }: Props) {
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
           onCancel={handleConfirmCancel}
+        />
+      )}
+
+      {activityToDelete && (
+        <ConfirmDeleteModal
+          message={lang === 'en' ? 'Are you sure you want to delete this activity log?' : 'Bu aktivite kaydını silmek istediğinize emin misiniz?'}
+          onConfirm={handleActivityDeleteConfirmed}
+          onCancel={() => setActivityToDelete(null)}
         />
       )}
 

@@ -272,3 +272,22 @@ export function useAddCandidateNote(workspaceId: string) {
     onError: (e: Error) => toast.error(`Not kaydedilemedi: ${e.message}`),
   })
 }
+
+export function useDeleteActivity(workspaceId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (activityId: string) => {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('nmm_daily_actions')
+        .delete()
+        .eq('id', activityId)
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: (_, activityId) => {
+      qc.invalidateQueries({ queryKey: ['activity'] })
+      qc.invalidateQueries({ queryKey: ['candidate-notes'] })
+    },
+    onError: (e: Error) => toast.error(`Aktivite silinemedi: ${e.message}`),
+  })
+}
