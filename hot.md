@@ -2,8 +2,8 @@
 
 ## 2026-05-25 — Uyum Sayfası Genişlik Revizyonu (Uyum Page Centered Layout Update)
 
-### style: Uyum Sayfası Ortalanmış ve Daraltılmış Düzene Getirildi
-- `uyum/page.tsx`: Sayfanın tam genişlikte (`w-full`) yayılması yerine, sağdan ve soldan boşluk bırakıp içeriği ortalayan `mx-auto max-w-5xl` konteyner yapısı entegre edildi.
+### style: Uyum Sayfası Ortalanmış ve İdeal Genişlik Düzene Getirildi
+- `uyum/page.tsx`: Sayfanın tam genişlikte (`w-full`) yayılması yerine, tam ekran ile dar görünümün ortalaması (ideal genişlik) olan `mx-auto max-w-7xl` konteyner yapısı entegre edildi. Ortalanarak sağdan soldan dengeli ve ferah boşluklar bırakıldı.
 
 ## 2026-05-25 — Modüllerin Tam Sayfa Yapılması (Full-Width Layout Updates)
 
