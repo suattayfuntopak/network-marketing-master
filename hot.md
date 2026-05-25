@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-05-25 — Yapay Zeka Koçu Prova Simülasyonları Dinamikleştirildi & Yeni Senaryolar Eklendi
+
+### feat: Saha Provası Yap Modülü Türkçe Rozet Çevirisi & Çift Dil Desteği
+- `ProvaForm.tsx`: Saha Provası Yap sekmesindeki tüm senaryo kartlarının üzerindeki `"SIMULATION"` rozetleri, kullanıcı arayüzü dili Türkçe olduğunda `"SİMÜLASYON"` olarak güncellendi. İngilizce dil ayarında ise `"SIMULATION"` olarak kalması sağlandı.
+
+### feat: İtiraz Karşılama ve Diğer Prova Başlangıçları Dinamik ve Rastgele Hale Getirildi
+- `ProvaForm.tsx`: İtiraz Karşılama Pratiği'nin her tıklamada statik tek bir soru getirmesi yerine; kibar, şüpheci, kaba, meşgul, meraklı, caiz değil şüphesi barındıran veya satış yapmaktan çekinen 7 farklı gerçekçi insan profili ve itiraz şablonu (`OBJECTION_PROMPTS`) arasından rastgele seçim yapılması sağlandı. Aynı dinamik rastgelelik Davet ve Kapanış Pratikleri için de (`DYNAMIC_PROMPTS`) devreye alındı.
+
+### feat: Boş Kalan Senaryo Kartları İçin 2 Yeni Premium Senaryo Eklendi (12 Karta Tamamlandı)
+- `ProvaForm.tsx`: Sayfanın alt sağ kısmında boş kalan alanları doldurmak ve 4'lü grid yapısını görsel olarak mükemmelleştirmek amacıyla iki yeni prova senaryosu eklendi:
+  1. **Sosyal Medya Adayı (📱):** Instagram/Facebook gönderisini beğenen ve DM'den meraklı şekilde yazan adayı, işi hemen açıklamadan merak uyandırarak sunuma davet etme pratiği.
+  2. **Etik Pazarlama Pratiği (⚖️):** Şüpheci adayın "bu ürün hastalık iyileştiriyor mu?" sorusuna, hiçbir sağlık veya gelir abartısı yapmadan tamamen yasal ve dürüst kurallarla yanıt verme/ürün tanıtma pratiği.
+
 ## 2026-05-25 — İdeal Sayfa Genişliği, İsimlendirmeler, Grafik İyileştirmeleri & Anında Kayıt Yönlendirmesi
 
 ### style: Global Sayfa Genişliği max-w-[1360px] Yapıldı ve İstatistik Grafikleri Kusursuz Hizalandı

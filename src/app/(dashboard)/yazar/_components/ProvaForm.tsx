@@ -3,7 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { 
   Zap, Phone, Shield, BarChart3, Target, Clock, Users, RefreshCw,
-  MessageSquare, UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, X, Loader2
+  MessageSquare, UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, X, Loader2,
+  Compass
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateRoleplayResponseAction } from '../actions'
@@ -142,10 +143,104 @@ const SCENARIOS: Scenario[] = [
     initialPromptTr: 'Sosyal medyadan yeni tanıştığın biriyim. İş konuşmadan önce benimle doğal bir bağ kur!',
     initialPromptEn: 'I am someone you just met on social media. Build a natural connection before pitching!',
     color: 'border-cyan-100 text-cyan-600 dark:border-cyan-900/30 dark:text-cyan-400 bg-cyan-50/50 dark:bg-cyan-950/10'
+  },
+  {
+    id: 'sosyal_aday',
+    emoji: '📱',
+    icon: Compass,
+    titleTr: 'Sosyal Medya Adayı',
+    titleEn: 'Social Media Prospect',
+    descTr: 'Sosyal medyada gönderini beğenen meraklı yabancı adayı sunuma davet etme',
+    descEn: 'Invite an interested stranger who liked your social post to a presentation',
+    initialPromptTr: 'Ben senin Instagram gönderini beğenen ve meraklı olan biriyim. İşinin ne olduğunu merak ettim, DM\'den yazıyorum. Bana işi anlatmadan merak uyandırarak sunuma davet et!',
+    initialPromptEn: 'I am someone who liked your Instagram post and am curious. I\'m DMing you to ask what your business is. Invite me to the presentation with high curiosity without explaining the business yet!',
+    color: 'border-teal-100 text-teal-600 dark:border-teal-900/30 dark:text-teal-400 bg-teal-50/50 dark:bg-teal-950/10'
+  },
+  {
+    id: 'etik_pazarlama',
+    emoji: '⚖️',
+    icon: Shield,
+    titleTr: 'Etik Pazarlama Pratiği',
+    titleEn: 'Ethical Pitching',
+    descTr: 'Sağlık veya gelir abartısı yapmadan adaya yasal ve dürüst ürün tanıtımı yapma',
+    descEn: 'Present the product legally and honestly without making exaggerated medical/income claims',
+    initialPromptTr: 'Ben ürünleri merak eden titiz ve şüpheci bir adayım. Ürünlerin hastalıkları iyileştirip iyileştirmediğini soruyorum. Hiçbir abartı yapmadan dürüst ve yasal kurallara uygun şekilde ürününü tanıt!',
+    initialPromptEn: 'I am a meticulous and skeptical prospect curious about products. I am asking if they cure diseases. Pitch me your product honestly and legally without exaggerations!',
+    color: 'border-slate-100 text-slate-600 dark:border-slate-900/30 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-950/10'
   }
 ]
 
-import { Compass } from 'lucide-react'
+const OBJECTION_PROMPTS = [
+  {
+    tr: 'Sana kibarca "Aslında iş güzel ama benim bu işi yapacak hiç çevrem yok" diyorum. Bana kibar bir yaklaşımla cevap ver!',
+    en: 'I politely tell you "Actually the business is nice but I have no network to do this". Reply to me with a polite approach!'
+  },
+  {
+    tr: 'Sana şüpheci ve soğuk bir tavırla "Bu işler saadet zinciri / titan zinciri değil mi? İnsanları kandırıp para kazanıyorsunuz" diyorum. Beni ikna et!',
+    en: 'I tell you skeptically and coldly "Isn\'t this a pyramid scheme? You earn money by fooling people". Convince me!'
+  },
+  {
+    tr: 'Aceleci ve meşgul bir ses tonuyla "Kardeşim çok acelem var, sadede gel. Benim bu işlere hiç zamanım yok" diyorum. Bana pratik bir cevap ver!',
+    en: 'In a rushed and busy tone, I tell you "Brother, I\'m in a big rush, get to the point. I have no time for these things". Give me a practical response!'
+  },
+  {
+    tr: 'Karamsar ve kaba bir tavırla "Geç bunları, benim bir arkadaşım girdi bu işe, batıp para kaybetti. Hepsi yalan!" diyorum. Beni ikna et!',
+    en: 'In a pessimistic and rude tone, I tell you "Forget all this, a friend of mine got into this, went broke and lost money. It\'s all a lie!" Convince me!'
+  },
+  {
+    tr: 'Meraklı ama kararsız bir şekilde "Ürünleriniz çok güzel görünüyor ama çok pahalı. Kimse bu devirde buna para vermez." diyorum. İtirazımı karşıla!',
+    en: 'Curiously but hesitantly, I tell you "Your products look great but they are very expensive. No one will spend money on this nowadays." Handle my objection!'
+  },
+  {
+    tr: 'Muhafazakar ve şüpheli bir edayla "Bu sistem dinen caiz mi? Üsttekiler alttakilerin sırtından helal olmayan para kazanıyor diyorlar." diyorum. Beni aydınlat!',
+    en: 'With a conservative and suspicious vibe, I say "Is this system religiously permissible? They say people at the top make non-permissible money off the back of people at the bottom." Enlighten me!'
+  },
+  {
+    tr: 'Çekingen ve kaba bir şekilde "Ben asla satış yapamam, insanlara bir şey pazarlama fikri bana çok itici geliyor." diyorum. Yaklaşımını göster!',
+    en: 'Shyly and bluntly, I tell you "I can never sell, the idea of marketing anything to people is highly repulsive to me." Show me your approach!'
+  }
+]
+
+const DYNAMIC_PROMPTS: Record<string, { tr: string; en: string }[]> = {
+  itiraz: OBJECTION_PROMPTS,
+  davet: [
+    {
+      tr: 'Ben senin liseden beri görüşmediğin eski bir arkadaşınım. Sosyal medyadan hal hatır sorarken bana teklif yapmadan samimi bir mesaj at!',
+      en: 'I am an old high school friend of yours whom you haven\'t spoken to in years. Send me a friendly message without pitching yet while catch up!'
+    },
+    {
+      tr: 'Ben LinkedIn üzerinden eklediğin profesyonel biriyim. Sektör hakkında konuşmak istiyorsun, bana iş odaklı şık bir davet mesajı yaz!',
+      en: 'I am a professional you added on LinkedIn. You want to talk about the industry, write me a sleek, business-oriented invitation!'
+    },
+    {
+      tr: 'Ben senin yakın ve samimi bir arkadaşınım. Beni iş sunumuna davet eden heyecanlı ve samimi bir mesaj gönder!',
+      en: 'I am a close, personal friend of yours. Send me an excited and friendly invite message to the business presentation!'
+    }
+  ],
+  kapanis: [
+    {
+      tr: 'Sunumu dinledim, beğendim ama karar veremiyorum, çok kararsızım. Kapanış konuşmasını yap!',
+      en: 'I listened to the presentation, I liked it but I am hesitant. Do the closing pitch!'
+    },
+    {
+      tr: 'Sunumu dinledim ama "Ya yapamazsam, ya param boşa giderse" diye korkuyorum. Beni korkularım konusunda rahatlat!',
+      en: 'I listened to the presentation but I\'m afraid "What if I can\'t do it, what if my money is wasted". Comfort me regarding my fears!'
+    },
+    {
+      tr: 'Sunumu izledim. "Şu an param yok ama başlamak istiyorum, borç mu alsam acaba?" diyorum. Bana bir lider olarak yol göster!',
+      en: 'I watched the presentation. I say "I don\'t have money right now but I want to start, should I borrow some?". As a leader, guide me!'
+    }
+  ]
+}
+
+function getInitialPrompt(s: Scenario, lang: string): string {
+  const dynamics = DYNAMIC_PROMPTS[s.id]
+  if (dynamics && dynamics.length > 0) {
+    const randomPrompt = dynamics[Math.floor(Math.random() * dynamics.length)]
+    return lang === 'en' ? randomPrompt.en : randomPrompt.tr
+  }
+  return lang === 'en' ? s.initialPromptEn : s.initialPromptTr
+}
 
 interface Message {
   role: 'candidate' | 'user' | 'yzk'
@@ -172,7 +267,7 @@ export function ProvaForm() {
 
   function selectScenario(s: Scenario) {
     setActiveScenario(s)
-    const initText = lang === 'en' ? s.initialPromptEn : s.initialPromptTr
+    const initText = getInitialPrompt(s, lang)
     setMessages([
       {
         role: 'candidate',
@@ -183,7 +278,7 @@ export function ProvaForm() {
 
   function resetSession() {
     if (activeScenario) {
-      const initText = lang === 'en' ? activeScenario.initialPromptEn : activeScenario.initialPromptTr
+      const initText = getInitialPrompt(activeScenario, lang)
       setMessages([
         {
           role: 'candidate',
@@ -443,7 +538,7 @@ export function ProvaForm() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-black tracking-widest text-[#D97706] uppercase mb-0.5">
-                  {s.emoji} SIMULATION
+                  {s.emoji} {lang === 'en' ? 'SIMULATION' : 'SİMÜLASYON'}
                 </p>
                 <h3 className="text-sm font-bold text-[var(--text-1)] group-hover:text-[#D97706] transition-colors truncate">
                   {title}
