@@ -95,8 +95,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             onClick={() => navigate(href)}
             className={clsx(
               'flex flex-col items-center gap-1 py-3 text-[10px] font-bold transition-all duration-150 shrink-0 px-2 min-w-[76px] sm:min-w-[84px] text-center cursor-pointer',
-              active ? 'text-[#534AB7]' : 'text-gray-400 hover:text-gray-600',
-              pending && 'scale-110 text-[#534AB7]'
+              active ? 'text-[#534AB7] dark:text-[#FACC15]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400',
+              pending && 'scale-110 text-[#534AB7] dark:text-[#FACC15]'
             )}
           >
             <Icon
