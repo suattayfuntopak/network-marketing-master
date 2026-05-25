@@ -76,14 +76,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
     update.mutate({ id: candidate.id, next_follow_up_at: null })
   }
 
-  function advanceStage() {
-    setQuickActionOpen(false)
-    const currentIndex = STAGE_ORDER.indexOf(candidate.stage)
-    if (currentIndex !== -1 && currentIndex < STAGE_ORDER.length - 1) {
-      const nextStage = STAGE_ORDER[currentIndex + 1]
-      changeStage(nextStage)
-    }
-  }
+
 
   const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
 
@@ -196,11 +189,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                       {/* İlerlet */}
                       {candidate.stage !== 'kayboldu' && candidate.stage !== 'ilgilenmedi' && (
                         <button
-                          onClick={advanceStage}
+                          onClick={() => {
+                            setQuickActionOpen(false)
+                            setStageOpen(true)
+                          }}
                           className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[#534AB7] transition"
                         >
                           <Zap className="h-3.5 w-3.5 text-amber-500" />
-                          <span>{lang === 'en' ? 'Advance Stage ➔' : 'Aşama İlerlet ➔'}</span>
+                          <span>{lang === 'en' ? 'Change Stage ➔' : 'Aşama Değiştir ➔'}</span>
                         </button>
                       )}
 
