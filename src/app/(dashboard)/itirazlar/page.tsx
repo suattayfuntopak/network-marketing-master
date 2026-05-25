@@ -1,10 +1,11 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, Suspense } from 'react'
 import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star, CheckCircle2, Circle, MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
+import { useSearchParams } from 'next/navigation'
 
 interface Itiraz {
   id: number
@@ -15,7 +16,7 @@ interface Itiraz {
 }
 
 // IDs 1-20 preserved from original for localStorage compatibility
-const ITIRAZLAR: Itiraz[] = [
+export const ITIRAZLAR: Itiraz[] = [
   // — Para & Kazanç —
   {
     id: 1,
@@ -374,8 +375,9 @@ function getKategoriler(lang: 'tr' | 'en') {
   return lang === 'en' ? [...baseEn, ...uniq] : [...base, ...uniq]
 }
 
-export default function ItirazlarPage() {
+function ItirazlarPageContent() {
   const { lang } = useTranslation()
+  const searchParams = useSearchParams()
   const {
     readObjections: read,
     favObjections: favs,
@@ -435,6 +437,25 @@ export default function ItirazlarPage() {
       return soru.toLowerCase().includes(q) || cevap.toLowerCase().includes(q)
     })
   }, [search, aktifKategori, favs, lang, KATEGORILER])
+
+  useEffect(() => {
+    const topicIdStr = searchParams.get('id')
+    if (topicIdStr) {
+      const topicId = parseInt(topicIdStr, 10)
+      if (!isNaN(topicId)) {
+        const idx = filtrelenmis.findIndex(t => t.id === topicId)
+        if (idx !== -1) {
+          const targetPage = Math.floor(idx / PAGE_SIZE) + 1
+          setPage(targetPage)
+          setAcikId(topicId)
+          setTimeout(() => {
+            const el = document.getElementById(`konu-${topicId}`)
+            el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }, 300)
+        }
+      }
+    }
+  }, [searchParams, filtrelenmis])
 
   const totalPages = Math.ceil(filtrelenmis.length / PAGE_SIZE)
   const pageItems = filtrelenmis.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
@@ -571,7 +592,7 @@ export default function ItirazlarPage() {
               const cevap = lang === 'en' ? itiraz.cevap.en : itiraz.cevap.tr
               const kategori = lang === 'en' ? itiraz.kategori.en : itiraz.kategori.tr
               return (
-                <li key={itiraz.id}>
+                <li key={itiraz.id} id={`konu-${itiraz.id}`}>
                   <div
                     className={`rounded-2xl border transition-all duration-200 ${
                       acik
@@ -699,5 +720,13 @@ export default function ItirazlarPage() {
         </>
       )}
     </main>
+  )
+}
+
+export default function ItirazlarPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-sm text-[var(--text-3)]">Yükleniyor...</div>}>
+      <ItirazlarPageContent />
+    </Suspense>
   )
 }

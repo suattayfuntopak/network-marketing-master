@@ -3,13 +3,14 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Users, BookOpen, ChevronRight, CornerDownRight, ArrowLeft } from 'lucide-react'
+import { Search, Users, BookOpen, ChevronRight, CornerDownRight, ArrowLeft, MessageCircleQuestion } from 'lucide-react'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getTrainingData } from '@/lib/trainingData'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
 import { parseNote } from '@/lib/noteParser'
+import { ITIRAZLAR } from '../itirazlar/page'
 
 function SearchPageContent() {
   const { lang, t } = useTranslation()
@@ -59,7 +60,22 @@ function SearchPageContent() {
         })
     : []
 
-  const totalResults = filteredCandidates.length + filteredTraining.length
+  // Filter objections locally
+  const filteredObjections = query.trim()
+    ? ITIRAZLAR.filter(i => {
+        const term = query.toLowerCase()
+        const question = lang === 'en' ? i.soru.en : i.soru.tr
+        const answer = lang === 'en' ? i.cevap.en : i.cevap.tr
+        const category = lang === 'en' ? i.kategori.en : i.kategori.tr
+        return (
+          question.toLowerCase().includes(term) ||
+          answer.toLowerCase().includes(term) ||
+          category.toLowerCase().includes(term)
+        )
+      })
+    : []
+
+  const totalResults = filteredCandidates.length + filteredTraining.length + filteredObjections.length
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 max-w-4xl mx-auto space-y-6">
@@ -202,6 +218,50 @@ function SearchPageContent() {
                   </div>
                 </Link>
               ))}
+            </div>
+          </section>
+        )}
+        {/* Objections Section */}
+        {filteredObjections.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text-3)]">
+              <MessageCircleQuestion className="h-4 w-4 text-[#9B1D47]" />
+              {lang === 'en' ? 'Objections & Answers' : 'İtirazlar ve Cevaplar'} ({filteredObjections.length})
+            </h2>
+            <div className="grid gap-2.5">
+              {filteredObjections.map(objection => {
+                const question = lang === 'en' ? objection.soru.en : objection.soru.tr
+                const answer = lang === 'en' ? objection.cevap.en : objection.cevap.tr
+                const category = lang === 'en' ? objection.kategori.en : objection.kategori.tr
+                return (
+                  <Link
+                    key={objection.id}
+                    href={`/itirazlar?id=${objection.id}`}
+                    className="group flex flex-col gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-[#9B1D47]/30 hover:shadow-md"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg leading-none shrink-0 mt-0.5">{objection.emoji}</span>
+                        <div>
+                          <span className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider">
+                            {category}
+                          </span>
+                          <h3 className="text-sm font-semibold text-[var(--text-1)] group-hover:text-[#9B1D47] dark:group-hover:text-[#fda4af] transition-colors mt-0.5">
+                            "{question}"
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-[var(--text-2)] pl-8 line-clamp-2">
+                      {answer}
+                    </p>
+                    <div className="flex items-center gap-1.5 pl-8 text-[11px] font-semibold text-[#9B1D47] dark:text-[#fda4af] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <CornerDownRight className="h-3.5 w-3.5" />
+                      <span>{lang === 'en' ? 'Read Answer ➔' : 'Cevabı oku ➔'}</span>
+                    </div>
+                  </Link>
+                )
+              })}
             </div>
           </section>
         )}

@@ -211,6 +211,43 @@ export function TakvimClient() {
           </div>
         )
       })()}
+
+      {/* Yaklaşan takipler özeti: Önümüzdeki Ay */}
+      {(() => {
+        const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1)
+        const nmYear = nextMonthDate.getFullYear()
+        const nmMonth = nextMonthDate.getMonth()
+        const daysInNm = new Date(nmYear, nmMonth + 1, 0).getDate()
+        
+        const nextMonthKeys = Array.from({ length: daysInNm }, (_, i) => {
+          const d = new Date(nmYear, nmMonth, i + 1)
+          return toKey(d)
+        }).filter(k => byDate[k])
+
+        if (!nextMonthKeys.length) return null
+
+        return (
+          <div className="mt-4 border-t border-[var(--border)] pt-4">
+            <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
+              Önümüzdeki Ay ({MONTHS[nmMonth]} {nmYear})
+            </p>
+            <ul className="space-y-1.5">
+              {nextMonthKeys.map(k => (
+                <button key={k} onClick={() => {
+                  setView(new Date(nmYear, nmMonth, 1))
+                  setSelected(k)
+                }}
+                  className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
+                  <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
+                  <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
+                    {byDate[k].length} aday
+                  </span>
+                </button>
+              ))}
+            </ul>
+          </div>
+        )
+      })()}
     </div>
   )
 }

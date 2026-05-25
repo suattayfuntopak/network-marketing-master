@@ -195,12 +195,24 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
               {quickActionOpen && (
                 <>
-                  <div className="fixed inset-0 z-[60]" onClick={() => setQuickActionOpen(false)} />
-                  <div className="absolute left-0 mt-2 z-[65] w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-xl animate-in fade-in slide-in-from-top-1 duration-150">
-                    <p className="px-2 py-1 text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider">
-                      {lang === 'en' ? 'Quick Actions' : 'Hızlı Eylemler'}
-                    </p>
-                    <div className="mt-1 space-y-1">
+                  <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" onClick={() => setQuickActionOpen(false)} />
+                  <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[65] w-[calc(100%-2rem)] max-w-xs rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl animate-in fade-in zoom-in duration-200">
+                    <div className="flex items-center justify-between border-b border-[var(--border)] pb-3.5 mb-3.5">
+                      <div className="flex items-center gap-2">
+                        <Zap className="h-4 w-4 text-amber-500 animate-pulse" />
+                        <p className="text-sm font-bold text-[var(--text-1)]">
+                          {lang === 'en' ? 'Quick Actions' : 'Hızlı Eylemler'}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => setQuickActionOpen(false)}
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
                       {/* İlerlet */}
                       {candidate.stage !== 'kayboldu' && candidate.stage !== 'ilgilenmedi' && (
                         <button
@@ -208,48 +220,54 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                             setQuickActionOpen(false)
                             setStageOpen(true)
                           }}
-                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[#534AB7] transition"
+                          className="flex w-full items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-left text-xs font-semibold text-[var(--text-1)] hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:border-[#534AB7]/30 transition"
                         >
-                          <Zap className="h-3.5 w-3.5 text-amber-500" />
+                          <Zap className="h-4 w-4 text-amber-500" />
                           <span>{lang === 'en' ? 'Change Stage ➔' : 'Aşama Değiştir ➔'}</span>
                         </button>
                       )}
 
                       {/* Takip Ertele */}
-                      <p className="px-2 pt-1.5 pb-0.5 text-[9px] font-semibold text-[var(--text-3)] uppercase border-t border-[var(--border)]">
-                        {lang === 'en' ? 'Reschedule Contact' : 'Teması Planla'}
-                      </p>
-                      <button
-                        onClick={() => addFollowUpDays(1)}
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
-                      >
-                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                        <span>+1 {lang === 'en' ? 'Day' : 'Gün'}</span>
-                      </button>
-                      <button
-                        onClick={() => addFollowUpDays(3)}
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
-                      >
-                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                        <span>+3 {lang === 'en' ? 'Days' : 'Gün'}</span>
-                      </button>
-                      <button
-                        onClick={() => addFollowUpDays(7)}
-                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
-                      >
-                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
-                        <span>+7 {lang === 'en' ? 'Days' : 'Gün'}</span>
-                      </button>
+                      <div className="pt-1.5">
+                        <p className="px-1 pb-2 text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider">
+                          {lang === 'en' ? 'Reschedule Contact' : 'Teması Planla'}
+                        </p>
+                        <div className="grid grid-cols-3 gap-2">
+                          <button
+                            onClick={() => addFollowUpDays(1)}
+                            className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
+                          >
+                            <Calendar className="h-4 w-4 text-blue-500" />
+                            <span>+1 {lang === 'en' ? 'Day' : 'Gün'}</span>
+                          </button>
+                          <button
+                            onClick={() => addFollowUpDays(3)}
+                            className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
+                          >
+                            <Calendar className="h-4 w-4 text-blue-500" />
+                            <span>+3 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                          </button>
+                          <button
+                            onClick={() => addFollowUpDays(7)}
+                            className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
+                          >
+                            <Calendar className="h-4 w-4 text-blue-500" />
+                            <span>+7 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                          </button>
+                        </div>
+                      </div>
 
                       {/* Takibi Kapat */}
                       {candidate.next_follow_up_at && (
-                        <button
-                          onClick={clearFollowUp}
-                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition border-t border-[var(--border)]"
-                        >
-                          <X className="h-3.5 w-3.5 shrink-0" />
-                          <span>{lang === 'en' ? 'Remove Follow-up' : 'Takibi İptal Et'}</span>
-                        </button>
+                        <div className="pt-2.5 border-t border-[var(--border)] mt-2">
+                          <button
+                            onClick={clearFollowUp}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-center text-xs font-bold text-red-600 dark:border-red-950/20 dark:bg-red-950/10 dark:text-red-400 hover:bg-red-100 transition"
+                          >
+                            <X className="h-4 w-4 shrink-0" />
+                            <span>{lang === 'en' ? 'Remove Follow-up' : 'Takibi İptal Et'}</span>
+                          </button>
+                        </div>
                       )}
                     </div>
                   </div>
