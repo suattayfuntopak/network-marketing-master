@@ -1,11 +1,12 @@
 # Hot Log
 
-## 2026-05-25 — Uyum ve YZ Koçu Modül Yerleşimi & Sekme Ortalama Güncellemeleri
+## 2026-05-25 — Global Sayfa Genişliği Standardizasyonu (Standardized Global Page Width)
 
-### style: Uyum & YZ Koçu Ortalanmış İdeal Genişlik ve Sekme Tasarımı
-- `uyum/page.tsx`: Sayfanın tam genişlikte yayılması yerine, tam ekran ile dar görünümün ortalaması (ideal genişlik) olan `mx-auto max-w-7xl` konteyner yapısı entegre edildi. Ayrıca sayfa altındaki tab seçici sekmeler ortalandı (`mx-auto`).
-- `yazar/page.tsx`: Yapay Zeka Koçu sayfasının dış kabuğu da Uyum sayfası ile tamamen uyumlu olacak şekilde `mx-auto max-w-7xl` ideal genişlik düzenine uyarlandı.
-- `yazar/_components/YzKocuContainer.tsx`: Yapay Zeka Koçu modülünün üstündeki "Koçluk Al / Prova Yap" iki sekmeli kontrol paneli ortalandı (`mx-auto`).
+### style: Tüm Panel Sayfaları Ortalanmış İdeal Genişliğe (max-w-7xl) Kavuşturuldu
+- `DashboardShell.tsx`: Sistemdeki tüm sayfaların yerleşim boyutlarını Yapay Zeka Koçu ve Uyum Merkezi kalitesine getirmek için `{children}` global düzeyde `mx-auto max-w-7xl w-full` konteyneriyle sarmalandı. Böylece tüm modüller ve sayfalar masaüstünde ferah ve son derece asil bir hizalamaya kavuşturuldu.
+- `pano/_components/PanoContent.tsx`: Pano üzerindeki eski `md:max-w-[80%]` sınırlaması kaldırılarak `w-full` yapıldı, böylece pano da standardı takip ederek 1280px genişlikte mükemmel dengelendi.
+- `search/page.tsx`: Arama sonuçları sayfasındaki `max-w-4xl` sınırlaması kaldırılarak standarda uyarlandı.
+- `uyum/page.tsx` & `yazar/page.tsx`: Özel `max-w-7xl` sarmalayıcıları kaldırılarak global yapıya entegre edildi; sekmelerin (`mx-auto`) ortalanması korundu.
 
 ## 2026-05-25 — Modüllerin Tam Sayfa Yapılması (Full-Width Layout Updates)
 

@@ -93,7 +93,7 @@ export function PanoContent() {
 
   if (wsLoading || cLoading) {
     return (
-      <div className="md:max-w-[80%] md:mx-auto space-y-4">
+      <div className="w-full space-y-4">
         <div className="h-4 w-24 animate-pulse rounded bg-[var(--bg-subtle)]" />
         <div className="h-8 w-44 animate-pulse rounded bg-[var(--bg-subtle)]" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
@@ -112,7 +112,7 @@ export function PanoContent() {
   }
 
   return (
-    <div className="md:max-w-[80%] md:mx-auto space-y-5">
+    <div className="w-full space-y-5">
       {/* Onboarding — sadece hiç aday yoksa göster */}
       {candidates.length === 0 && ws && (
         <OnboardingModal workspaceId={ws.workspaceId} inviteCode={ws.inviteCode} />

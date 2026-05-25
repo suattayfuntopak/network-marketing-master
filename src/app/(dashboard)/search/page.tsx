@@ -78,7 +78,7 @@ function SearchPageContent() {
   const totalResults = filteredCandidates.length + filteredTraining.length + filteredObjections.length
 
   return (
-    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 max-w-4xl mx-auto space-y-6">
+    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 w-full space-y-6">
       
       {/* Back button and title */}
       <div className="flex items-center gap-3">

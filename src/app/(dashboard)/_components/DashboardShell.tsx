@@ -138,7 +138,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       >
         {/* Spacer to clear the fixed h-16 Header */}
         <div className="h-16" />
-        {children}
+        <div className="mx-auto max-w-7xl w-full">
+          {children}
+        </div>
       </div>
       <BottomNav pendingHref={pendingHref} visible={visible} />
     </div>
