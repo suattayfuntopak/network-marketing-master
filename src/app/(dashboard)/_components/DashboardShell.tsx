@@ -69,6 +69,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   }, [])
 
   function handleTouchStart(e: React.TouchEvent) {
+    let target = e.target as HTMLElement | null
+    while (target) {
+      if (target.dataset?.noSwipe === 'true' || target.classList?.contains('no-swipe')) {
+        touchStart.current = null
+        return
+      }
+      target = target.parentElement
+    }
     touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
     setPendingHref(null)
   }

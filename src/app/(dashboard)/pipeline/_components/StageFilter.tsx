@@ -33,7 +33,7 @@ export function StageFilter({ active, onChange, counts }: StageFilterProps) {
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
       {STAGE_FILTERS.map((key) => (
         <button
           key={key}

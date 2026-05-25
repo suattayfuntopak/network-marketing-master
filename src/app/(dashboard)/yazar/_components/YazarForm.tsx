@@ -28,8 +28,6 @@ const MESSAGE_TYPES = [
   { value: 'yeniden_bag', label: 'Yeniden Bağ' },
   { value: 'dogum_gunu', label: 'Doğum Günü' },
   { value: 'evlilik_yildonumu', label: 'Evlilik Yıldönümü' },
-  { value: 'siparis_tesekkuru', label: 'Sipariş Teşekkürü' },
-  { value: 'yeniden_siparis_daveti', label: 'Yeniden Sipariş Daveti' },
   { value: 'tesekkur', label: 'Teşekkür' },
   { value: 'yeni_uye_karsilama', label: 'Yeni Üye Karşılama' },
 ]

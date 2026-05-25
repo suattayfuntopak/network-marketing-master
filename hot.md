@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-05-25 — YZ Mesaj Türleri & Boru Hattı Mobil Kaydırma İyileştirmesi
+
+### fix: YZ Mesajı Üret sayfasından bazı mesaj türleri kaldırıldı
+- `YazarForm.tsx`: Mesaj türü seçeneklerinden `Sipariş Teşekkürü` (`siparis_tesekkuru`) ve `Yeniden Sipariş Daveti` (`yeniden_siparis_daveti`) seçenekleri çıkarıldı.
+
+### feat: Boru Hattı sayfasındaki kategori butonları için mobil kaydırma çakışması çözüldü
+- `DashboardShell.tsx`: Global sekme geçişi sağlayan mobil parmak kaydırma (swipe) algılayıcısına muafiyet mekanizması eklendi. Touch start event'i `no-swipe` sınıfına veya `data-no-swipe="true"` özniteliğine sahip bir element veya bu elementin alt dalları içerisinden tetiklendiyse, sayfa değiştirme hareketi tamamen iptal edilir.
+- `StageFilter.tsx`: Boru Hattı sayfasındaki yatay kaydırılabilir kategori butonları kapsayıcısına `no-swipe` ve `data-no-swipe="true"` öznitelikleri eklenerek, sayfa/sekme değişme çakışması tamamen çözüldü. Artık mobilde kategoriler parmakla rahatça kaydırılabilir.
+
 ## 2026-05-25 — Lider Notu Sistemi (Tam Uygulama)
 
 ### feat: Lider Notu dropdown kutusu — kişi detay sayfaları
