@@ -64,23 +64,27 @@ Görevin, kullanıcının girdiği pazarlama metnini, reklam ve tüketici koruma
 3. Agresif veya Yanıltıcı İletişim (Örn: banka dekontu paylaşımı, spam benzeri taciz edici recruitment metinleri, yanlış "öncesi/sonrası" iddiaları).
 
 ÇIKTI FORMATI VE DİL KURALI:
-- Eğer dil (language) 'en' ise tüm yollar, açıklamalar, kategoriler ve improved_text tamamen İNGİLİZCE olmalıdır.
+- Eğer dil (language) 'en' ise tüm ihlaller, açıklamalar, kategoriler ve improved_text tamamen İNGİLİZCE olmalıdır.
 - Eğer dil 'tr' ise tüm içerik tamamen TÜRKÇE olmalıdır.
-- Kesinlikle sadece aşağıdaki formatta GEÇERLİ BİR JSON objesi dön. Başında veya sonunda hiçbir kod bloğu işareti (\`\`\`), açıklama, giriş veya sonuç ekleme.
+- Kesinlikle sadece geçerli bir JSON objesi döndür. Başında veya sonunda hiçbir açıklama, giriş veya sonuç ekleme. JSON içinde asla yorum satırları (//) kullanma.
 
-JSON ŞABLONU:
+JSON ŞABLONU (Bu yapıyı tam olarak takip et, asla yorum satırı veya açıklama ekleme):
 {
-  "score": 85, // 0 ile 100 arası güvenlik puanı (hiç ihlal yoksa 100, kritik ihlaller varsa daha düşük)
-  "safety_level": "safe", // "safe" (puan >= 90), "warning" (puan 65-89 arası), "danger" (puan < 65)
-  "violations": [ // İhlal yoksa bu dizi boş kalmalı
+  "score": 85,
+  "safety_level": "safe",
+  "violations": [
     {
       "phrase": "riskli veya yasaklı kelime öbeği",
-      "category": "Sağlık İddiası" (veya "Gelir İddiası", "Yanıltıcı/Agresif Tanıtım"),
+      "category": "Sağlık İddiası",
       "reason": "Neden riskli olduğuna dair yasal ve kısa açıklama"
     }
   ],
   "improved_text": "Kullanıcının girdiği metnin yasalara 100% uyumlu hale getirilmiş, onaylı ifadeler içeren, hem yasal hem de çekici ve etkili olan düzeltilmiş versiyonu."
 }
+
+Not: Eğer hiç ihlal yoksa score 100 olmalı, safety_level "safe" olmalı ve violations dizisi boş kalmalıdır ( [] ).
+safety_level değeri: score >= 90 ise "safe", score 65-89 arası ise "warning", score < 65 ise "danger" olmalıdır.
+category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Gelir İddiası", "Yanıltıcı/Agresif Tanıtım".
 `;
 
   try {
@@ -107,16 +111,11 @@ JSON ŞABLONU:
       .join('')
       .trim()
 
-    // Strip markdown fences
-    if (text.startsWith('```json')) {
-      text = text.substring(7)
-    } else if (text.startsWith('```')) {
-      text = text.substring(3)
+    // Strip markdown fences and extract clean JSON object
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      text = jsonMatch[0]
     }
-    if (text.endsWith('```')) {
-      text = text.substring(0, text.length - 3)
-    }
-    text = text.trim()
 
     const parsed = JSON.parse(text)
 

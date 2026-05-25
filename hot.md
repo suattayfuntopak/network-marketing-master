@@ -1,6 +1,11 @@
 # Hot Log
 
-## 2026-05-25 — Yapay Zeka Koçu Prova Simülasyonları Dinamikleştirildi & Yeni Senaryolar Eklendi
+## 2026-05-25 — Yapay Zeka Koçu Prova Simülasyonları Dinamikleştirildi & Uyum Denetleyicisi Hata Düzeltmesi
+
+### fix: Uyum Merkezi YZ Uyum Denetleyicisi JSON Ayrıştırma (SyntaxError) Hatası Çözüldü
+- `uyum/actions.ts`: Kullanıcı sağlık veya gelir beyanı içeren riskli bir metin girdiğinde ortaya çıkan `"Metin denetlenirken bir hata oluştu"` sorunu giderildi. 
+  - **Sebep:** `systemPrompt` içindeki JSON şablonunda bulunan yorum satırları (`//`) ve parantezli açıklamaların, Claude tarafından aynen taklit edilerek JSON çıktısının içine yerleştirilmesi ve standart `JSON.parse` işleminin çökmesine yol açması.
+  - **Çözüm:** `systemPrompt` içerisindeki JSON şablonu tamamen temizlendi, yorum satırlarından arındırılarak %100 geçerli JSON standartlarına getirildi. Ayrıca, Anthropic API'sinden gelen cevabın içindeki JSON objesini (`{ ... }`) her koşulda güvenli ve hatasız yakalayabilmek için **Regex tabanlı gelişmiş bir JSON ayıklayıcı** entegre edildi.
 
 ### feat: Saha Provası Yap Modülü Türkçe Rozet Çevirisi & Çift Dil Desteği
 - `ProvaForm.tsx`: Saha Provası Yap sekmesindeki tüm senaryo kartlarının üzerindeki `"SIMULATION"` rozetleri, kullanıcı arayüzü dili Türkçe olduğunda `"SİMÜLASYON"` olarak güncellendi. İngilizce dil ayarında ise `"SIMULATION"` olarak kalması sağlandı.
