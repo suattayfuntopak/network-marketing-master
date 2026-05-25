@@ -1,5 +1,10 @@
 # Hot Log
 
+## 2026-05-25 — Uyum Sayfası Genişlik Revizyonu (Uyum Page Centered Layout Update)
+
+### style: Uyum Sayfası Ortalanmış ve Daraltılmış Düzene Getirildi
+- `uyum/page.tsx`: Sayfanın tam genişlikte (`w-full`) yayılması yerine, sağdan ve soldan boşluk bırakıp içeriği ortalayan `mx-auto max-w-5xl` konteyner yapısı entegre edildi.
+
 ## 2026-05-25 — Modüllerin Tam Sayfa Yapılması (Full-Width Layout Updates)
 
 ### feat: Uyum, İstatistikler ve Prova Yap Modülleri Tam Sayfa (Full-Width) Yapıldı

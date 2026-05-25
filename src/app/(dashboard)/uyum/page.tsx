@@ -194,7 +194,7 @@ export default function CompliancePage() {
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
-      <div className="w-full space-y-6">
+      <div className="mx-auto max-w-5xl w-full space-y-6">
         
         {/* Header */}
         <header className="flex items-center gap-3">
