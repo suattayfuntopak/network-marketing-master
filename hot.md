@@ -791,4 +791,29 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - Bu sayede, kartın en altta veya alt menüye çok yakın olması durumunda bile açılan tüm kutular, modaller ve popover'lar `z-50` katmanındaki alt menü barının (`BottomNav`) üzerinde kusursuz bir şekilde render ediliyor.
 - Mobil uyumlu `YZEkipKocuSheet` ve `YZKocuSheet` modallerinin z-index katmanları, `zIndex.ts` kütüphanesine uygun şekilde `Z.sheetBackdrop` (`z-[60]`) ve `Z.sheet` (`z-[70]`) sabitleri ile güncellendi. Böylece alt menü barının (`z-50`) veya başlıkların (`z-40`) altında kalmaları tamamen engellendi.
 
+---
+
+## 2026-05-25 (tur 3)
+
+### feat: Hızlı aksiyon menüsü tam ortalanmış modal popup'a dönüştürüldü
+
+- `CandidateCard.tsx` içindeki "Zap" tuşuna basınca açılan popover, mobil ve masaüstü dahil tüm ekranlarda sayfayı hem yatay hem dikey olarak tam ortalayacak şekilde (`rounded-3xl` modern kart formunda) modal popup'a dönüştürüldü.
+- Sağ üst köşesine X kapatma butonu eklendi, eylem butonları ise kolay tıklama ve mobil uyumluluk için 3 sütunlu modern bir grid düzenine kavuşturuldu. Arka planı flu yapan `backdrop-blur` desteği ve gövde kilitli koyu backdrop eklendi.
+
+### feat: Eğitim arama ve akıllı accordion oto-açma & oto-scrolling entegrasyonu
+
+- `search/page.tsx` sayfasına İtirazlar ve Cevaplar (`ITIRAZLAR`) veritabanı da dahil edilerek tüm arama akışlarında genel eğitimlerin yanı sıra itiraz cevaplarının da aranabilmesi sağlandı.
+- `/egitim` ve `/itirazlar` sayfaları URL query parametresi (`?id=...`) desteğine kavuşturuldu. Arama sonuçlarından herhangi bir eğitime veya itiraz konusuna tıklandığında, ilgili sayfa açıldığında konunun kaçıncı sayfada olduğu otomatik hesaplanıp o sayfaya geçiliyor, accordion (chevron) kendiliğinden açılıyor ve sayfa yumuşak bir animasyonla (`scrollIntoView`) direkt o konunun üzerine odaklanıyor.
+- `itirazlar/page.tsx` sayfasındaki her bir itiraz öğesine `id={`konu-${itiraz.id}`}` verilerek arama yönlendirme hedefi tamamlandı. Next.js App Router uyumluluğu için sayfa `<Suspense>` ile sarmalandı.
+
+### feat: Takvim sayfasına "Önümüzdeki Ay" modülü eklendi
+
+- `TakvimClient.tsx` sayfasının en altında yer alan "Önümüzdeki 7 gün" bölümüne ek olarak, aktif takvim ayından bir sonraki ayda (`view.getMonth() + 1`) hangi takipler varsa listeleyen şık bir **"Önümüzdeki Ay"** modülü en alta eklendi.
+- Listelenen tarihe tıklandığında takvimin otomatik olarak o aya geçmesi ve ilgili günü seçerek detayları listelemesi sağlandı.
+
+### db: 007_atomic_workspace_ops.sql migration incelemesi
+
+- RPC fonksiyonları (`nmm_join_workspace`, `nmm_remove_member`) kontrol edilerek, ekip modülündeki geçiş ve silme işlemlerinin veri bütünlüğünü koruması ve partial-write riskini engellemesi için kesinlikle Supabase SQL Editor üzerinden çalıştırılması gerektiği doğrulandı.
+
+
 
