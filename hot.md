@@ -2,6 +2,12 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: Mobilde Sağa Sola Kaydırılabilir (Swipeable) 11 Kapsamlı Alt Menü Entegre Edildi
+- `BottomNav.tsx`: Mobil alt gezinti barı baştan aşağı yenilenerek, 5 kısıtlı öğe yerine **tüm 11 panel/özellik modülüne** tek tıkla ve kaydırarak erişebileceğimiz premium bir "Swipeable Tab Strip" altyapısına kavuşturuldu.
+- **Kusursuz Otomatik Ortalama (Scroll-Centering):** Navigasyon barına akıllı bir `useEffect` ve `DOM scrollIntoView` motoru eklenerek, kullanıcı hangi sayfaya giderse gitsin, alt menünün o aktif sekmeyi **pürüzsüzce yatayda ortalayacak şekilde kayması** sağlandı.
+- **Akıllı ve Kısa Türkçe/İngilizce Etiketler:** Menünün mobilde taşma veya çirkin kelime kesilmesi yapmaması için tüm 11 özellik adı estetik ve son derece kısa terimlerle (örn. Boru Hattı -> Huni, İstatistikler -> Grafik, İtirazlara Cevaplar -> İtirazlar) eşleştirildi.
+- `globals.css` (`@utility scrollbar-none`): Mobil menünün altında tarayıcı scrollbar'ı görünmemesi için son derece şık ve modern bir kaydırma çubuğu gizleme sınıfı eklendi.
+
 ### fix: Onboarding Ekibe Katılma Akışındaki parent_id ve Workspace Kayma Hatası Düzeltildi
 - `OnboardingModal.tsx`: Sisteme yeni kaydolan distribütörün onboarding modalı içerisinden davet kodu girdiğinde, `nmm_workspace_members` tablosunu eski modelde direkt update ederek workspace kaymasına ve organizasyon dışı kalmasına neden olan kritik hata giderildi.
 - **Düzeltme:** Onboarding modalındaki ekibe katılma akışı da strictly **`nmm_join_workspace` RPC** sunucu fonksiyonumuza bağlanarak yeni MLM bağımsız workspace/parent_id sponsorluk altyapısıyla 100% uyumlu hale getirildi. Artık onboarding üzerinden kod girildiğinde de üyenin kendi Workspace `parent_id` bağı pürüzsüzce kurulur, liderin performans paneline ve ekibim listesine anında düşer.

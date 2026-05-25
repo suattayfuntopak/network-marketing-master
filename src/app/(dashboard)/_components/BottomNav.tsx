@@ -2,16 +2,26 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, TrendingUp, Bot, Users, MessageCircleQuestion } from 'lucide-react'
+import { useEffect, useRef } from 'react'
+import { 
+  LayoutDashboard, Zap, TrendingUp, Bot, Users, 
+  CalendarDays, MessageCircleQuestion, BookOpen, Trophy, Shield, BarChart2 
+} from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 
 const NAV_ITEMS = [
-  { href: '/pano',      translationKey: 'nav.pano',      icon: LayoutDashboard        },
-  { href: '/pipeline',  translationKey: 'nav.pipeline',  icon: TrendingUp             },
-  { href: '/yazar',     translationKey: 'nav.yazar',     icon: Bot                    },
-  { href: '/itirazlar', translationKey: 'nav.itirazlar', icon: MessageCircleQuestion  },
-  { href: '/ekip',      translationKey: 'nav.ekip',      icon: Users                  },
+  { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard        },
+  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus',    icon: Zap                    },
+  { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp             },
+  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                    },
+  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                  },
+  { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays           },
+  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion  },
+  { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen               },
+  { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                 },
+  { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                 },
+  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
 ]
 
 interface BottomNavProps {
@@ -23,6 +33,18 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
   const { lang, t } = useTranslation()
+  const activeRef = useRef<HTMLButtonElement | null>(null)
+
+  // Automatically scroll & center active item horizontally
+  useEffect(() => {
+    if (activeRef.current) {
+      activeRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      })
+    }
+  }, [pathname])
 
   function navigate(targetHref: string) {
     const currentIdx = NAV_ITEMS.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
@@ -34,22 +56,45 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   }
 
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform ${visible ? 'translate-y-0' : 'translate-y-full'}`}>
+    <nav className={clsx(
+      "fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform overflow-x-auto scrollbar-none",
+      visible ? 'translate-y-0' : 'translate-y-full'
+    )}>
       {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
+
+        // Dynamic shortened premium labels to fit perfectly
         let label = t(translationKey)
-        if (translationKey === 'nav.yazar') {
+        if (translationKey === 'nav.todayFocus') {
+          label = lang === 'en' ? 'Today' : 'Bugün'
+        } else if (translationKey === 'nav.pipeline') {
+          label = lang === 'en' ? 'Pipeline' : 'Huni'
+        } else if (translationKey === 'nav.yazar') {
           label = lang === 'en' ? 'AI Coach' : 'YZ Koçu'
+        } else if (translationKey === 'nav.ekip') {
+          label = lang === 'en' ? 'Team' : 'Ekibim'
+        } else if (translationKey === 'nav.takvim') {
+          label = lang === 'en' ? 'Calendar' : 'Takvim'
         } else if (translationKey === 'nav.itirazlar') {
           label = lang === 'en' ? 'Objections' : 'İtirazlar'
+        } else if (translationKey === 'nav.egitim') {
+          label = lang === 'en' ? 'Training' : 'Eğitim'
+        } else if (translationKey === 'nav.kazanimlar') {
+          label = lang === 'en' ? 'Awards' : 'Kazanımlar'
+        } else if (translationKey === 'nav.uyum') {
+          label = lang === 'en' ? 'Compliance' : 'Uyum'
+        } else if (translationKey === 'nav.istatistikler') {
+          label = lang === 'en' ? 'Stats' : 'Grafik'
         }
+
         return (
           <button
             key={href}
+            ref={active ? activeRef : undefined}
             onClick={() => navigate(href)}
             className={clsx(
-              'flex flex-1 flex-col items-center gap-1 py-3 text-[10px] font-semibold transition-all duration-150',
+              'flex flex-col items-center gap-1 py-3 text-[10px] font-bold transition-all duration-150 shrink-0 w-16 sm:w-20 cursor-pointer',
               active ? 'text-[#534AB7]' : 'text-gray-400 hover:text-gray-600',
               pending && 'scale-110 text-[#534AB7]'
             )}
@@ -65,4 +110,3 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
     </nav>
   )
 }
-
