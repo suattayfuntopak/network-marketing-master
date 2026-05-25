@@ -438,105 +438,105 @@ export default function AnalyticsPage() {
                 )}
               </section>
 
-              {/* Yapay Zeka Günlük Kullanım Kotası */}
-              <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFFBEB] dark:bg-[#201600]">
-                    <Sparkles className="h-4 w-4 text-[#D97706]" strokeWidth={2} />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-bold text-[var(--text-1)]">
-                      {lang === 'en' ? 'AI Daily Usage Quotas' : 'Yapay Zeka Günlük Kullanım Kotası'}
-                    </h2>
-                    <p className="text-[11px] text-[var(--text-3)]">
-                      {lang === 'en' ? 'Your feature-specific dynamic daily message rights' : 'Özellik bazlı dinamik günlük yapay zeka haklarınız'}
-                    </p>
-                  </div>
-                </div>
-
-                {usage?.isSuperAdmin ? (
-                  /* Super Admin Custom View */
-                  <div className="relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent p-4 shadow-inner">
-                    <div className="flex items-start gap-3">
-                      <div className="text-2xl mt-0.5 animate-bounce">👑</div>
-                      <div className="space-y-1">
-                        <h3 className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                          {lang === 'en' ? 'UNLIMITED DEVELOPER ACCOUNT' : 'SINIRSIZ SÜPER ADMİN HESABI'}
-                        </h3>
-                        <p className="text-xs leading-relaxed text-[var(--text-2)] font-semibold">
-                          {lang === 'en'
-                            ? 'All artificial intelligence action limits and usage quotas are fully bypassed for your account. Happy testing!'
-                            : 'Network Marketing Master geliştirici hesabınız için tüm yapay zeka limitleri ve kullanım kotaları kaldırılmıştır. Keyifli testler dileriz!'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  /* Standard User progress bars */
-                  <div className="space-y-3.5 pt-1">
-                    {/* 1. Yapay Zeka Koçu */}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-[#534AB7]" />
-                          {lang === 'en' ? 'AI Coach (Roleplay)' : 'Yapay Zeka Koçu (Rol Provası)'}
-                        </span>
-                        <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                          {Math.max(0, 20 - (usage?.roleplayUsed ?? 0))} / 20 {lang === 'en' ? 'left' : 'kalan'}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-[#534AB7] transition-all duration-500"
-                          style={{ width: `${Math.min(100, (Math.max(0, 20 - (usage?.roleplayUsed ?? 0)) / 20) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* 2. YZ Mesajı Üret */}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-[#0F6E56]" />
-                          {lang === 'en' ? 'Write Message (AI Writer)' : 'YZ Mesajı Üret'}
-                        </span>
-                        <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                          {Math.max(0, 15 - (usage?.messageUsed ?? 0))} / 15 {lang === 'en' ? 'left' : 'kalan'}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-[#0F6E56] transition-all duration-500"
-                          style={{ width: `${Math.min(100, (Math.max(0, 15 - (usage?.messageUsed ?? 0)) / 15) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* 3. Uyum Denetimi */}
-                    <div className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
-                        <span className="flex items-center gap-1.5">
-                          <span className="h-2 w-2 rounded-full bg-[#C03E1F]" />
-                          {lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi'}
-                        </span>
-                        <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                          {Math.max(0, 5 - (usage?.complianceUsed ?? 0))} / 5 {lang === 'en' ? 'left' : 'kalan'}
-                        </span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-[#C03E1F] transition-all duration-500"
-                          style={{ width: `${Math.min(100, (Math.max(0, 5 - (usage?.complianceUsed ?? 0)) / 5) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </section>
-
             </div>
 
           </div>
+
+          {/* Yapay Zeka Günlük Kullanım Kotası */}
+          <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFFBEB] dark:bg-[#201600]">
+                <Sparkles className="h-4 w-4 text-[#D97706]" strokeWidth={2} />
+              </div>
+              <div>
+                <h2 className="text-sm font-bold text-[var(--text-1)]">
+                  {lang === 'en' ? 'AI Daily Usage Quotas' : 'Yapay Zeka Günlük Kullanım Kotası'}
+                </h2>
+                <p className="text-[11px] text-[var(--text-3)]">
+                  {lang === 'en' ? 'Your feature-specific dynamic daily message rights' : 'Özellik bazlı dinamik günlük yapay zeka haklarınız'}
+                </p>
+              </div>
+            </div>
+
+            {usage?.isSuperAdmin ? (
+              /* Super Admin Custom View */
+              <div className="relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent p-4 shadow-inner">
+                <div className="flex items-start gap-3">
+                  <div className="text-2xl mt-0.5 animate-bounce">👑</div>
+                  <div className="space-y-1">
+                    <h3 className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                      {lang === 'en' ? 'UNLIMITED DEVELOPER ACCOUNT' : 'SINIRSIZ SÜPER ADMİN HESABI'}
+                    </h3>
+                    <p className="text-xs leading-relaxed text-[var(--text-2)] font-semibold">
+                      {lang === 'en'
+                        ? 'All artificial intelligence action limits and usage quotas are fully bypassed for your account. Happy testing!'
+                        : 'Network Marketing Master geliştirici hesabınız için tüm yapay zeka limitleri ve kullanım kotaları kaldırılmıştır. Keyifli testler dileriz!'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Standard User progress bars - Beautiful 3-column layout */
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-1">
+                {/* 1. Yapay Zeka Koçu */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-[#534AB7]" />
+                      {lang === 'en' ? 'AI Coach (Roleplay)' : 'Yapay Zeka Koçu (Rol Provası)'}
+                    </span>
+                    <span className="font-extrabold text-[var(--text-2)] tabular-nums">
+                      {Math.max(0, 20 - (usage?.roleplayUsed ?? 0))} / 20 {lang === 'en' ? 'left' : 'kalan'}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[#534AB7] transition-all duration-500"
+                      style={{ width: `${Math.min(100, (Math.max(0, 20 - (usage?.roleplayUsed ?? 0)) / 20) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* 2. YZ Mesajı Üret */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-[#0F6E56]" />
+                      {lang === 'en' ? 'Write Message (AI Writer)' : 'YZ Mesajı Üret'}
+                    </span>
+                    <span className="font-extrabold text-[var(--text-2)] tabular-nums">
+                      {Math.max(0, 15 - (usage?.messageUsed ?? 0))} / 15 {lang === 'en' ? 'left' : 'kalan'}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[#0F6E56] transition-all duration-500"
+                      style={{ width: `${Math.min(100, (Math.max(0, 15 - (usage?.messageUsed ?? 0)) / 15) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* 3. Uyum Denetimi */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+                    <span className="flex items-center gap-1.5">
+                      <span className="h-2 w-2 rounded-full bg-[#C03E1F]" />
+                      {lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi'}
+                    </span>
+                    <span className="font-extrabold text-[var(--text-2)] tabular-nums">
+                      {Math.max(0, 5 - (usage?.complianceUsed ?? 0))} / 5 {lang === 'en' ? 'left' : 'kalan'}
+                    </span>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-[#C03E1F] transition-all duration-500"
+                      style={{ width: `${Math.min(100, (Math.max(0, 5 - (usage?.complianceUsed ?? 0)) / 5) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
 
           {/* Bilgi Notu */}
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">
