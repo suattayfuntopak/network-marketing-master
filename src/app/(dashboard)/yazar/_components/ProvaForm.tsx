@@ -264,7 +264,7 @@ export function ProvaForm() {
   if (activeScenario) {
     const scTitle = lang === 'en' ? activeScenario.titleEn : activeScenario.titleTr
     return (
-      <div className="mx-auto max-w-2xl bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl p-5 shadow-xl animate-in fade-in zoom-in duration-200">
+      <div className="w-full bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl p-5 shadow-xl animate-in fade-in zoom-in duration-200">
         
         {/* Chat Header */}
         <div className="flex items-center justify-between border-b border-[var(--border)] pb-4 mb-4">
@@ -414,7 +414,7 @@ export function ProvaForm() {
     <div className="space-y-6">
       
       {/* Intro info box */}
-      <div className="rounded-2xl border border-dashed border-[var(--border)] p-5 text-center bg-[var(--bg-card)] max-w-xl mx-auto shadow-sm animate-in fade-in duration-300">
+      <div className="rounded-2xl border border-dashed border-[var(--border)] p-5 text-center bg-[var(--bg-card)] w-full shadow-sm animate-in fade-in duration-300">
         <span className="text-3xl leading-none block mb-2">🎭</span>
         <h2 className="text-sm font-bold text-[var(--text-1)]">
           {lang === 'en' ? 'Select Scenario, Start Rehearsing!' : 'Senaryo seç, prova başlasın!'}
@@ -427,7 +427,7 @@ export function ProvaForm() {
       </div>
 
       {/* 10 Scenario Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
         {SCENARIOS.map(s => {
           const Icon = s.icon
           const title = lang === 'en' ? s.titleEn : s.titleTr

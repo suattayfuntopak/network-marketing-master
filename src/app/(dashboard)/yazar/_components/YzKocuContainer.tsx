@@ -19,7 +19,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
   return (
     <div className="space-y-6">
       {/* Premium Segmented Tab Selector */}
-      <div className="flex rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm max-w-md mx-auto">
+      <div className="flex rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm max-w-md">
         <button
           onClick={() => setActiveTab('yazar')}
           className={`flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${

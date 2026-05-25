@@ -158,7 +158,7 @@ export default function AnalyticsPage() {
 
   if (wsLoading || cLoading) {
     return (
-      <div className="md:max-w-[80%] md:mx-auto space-y-4 px-4 pt-6">
+      <div className="w-full space-y-4 px-4 pt-6">
         <div className="h-6 w-32 animate-pulse rounded bg-[var(--bg-subtle)]" />
         <div className="h-10 w-44 animate-pulse rounded bg-[var(--bg-subtle)]" />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -173,7 +173,7 @@ export default function AnalyticsPage() {
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
-      <div className="mx-auto max-w-4xl space-y-6">
+      <div className="w-full space-y-6">
         
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

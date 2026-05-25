@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-05-25 — Modüllerin Tam Sayfa Yapılması (Full-Width Layout Updates)
+
+### feat: Uyum, İstatistikler ve Prova Yap Modülleri Tam Sayfa (Full-Width) Yapıldı
+- `uyum/page.tsx`: Uyum Merkezi sayfasındaki maksimum genişlik sınırlamaları (`max-w-4xl`, `mx-auto`) kaldırılarak modülün sağdan sola ekranın tamamını pürüzsüzce kaplaması sağlandı.
+- `istatistikler/page.tsx`: İstatistikler sayfasının kendisi ve yüklenme (loading/skeleton) görünümü tam genişliğe (`w-full`) kavuşturularak visual datalar ve custom grafikler için maksimum ekran alanı sunuldu.
+- `yazar/_components/ProvaForm.tsx` & `YzKocuContainer.tsx`: Yapay Zeka Koçu / Prova Yap simülatör ekranı, senaryo seçim kartları ızgarası (`max-w-3xl` -> responsive 4 sütunlu `lg:grid-cols-4 w-full` düzeni) ve aktif simülasyon sohbet kartı (`max-w-2xl` -> `w-full`) tam ekran genişliğine uyarlandı. Ayrıca sayfa üstündeki modül tab seçici `mx-auto` kaldırılarak sol hizalı ve tutarlı bir yerleşime getirildi.
+
 ## 2026-05-25 — Uyum Merkezi (9. Kutu), İstatistikler (10. Kutu) ve Distribütör Başlatma Entegrasyonu (Zero-Debt Modül Entegrasyonu)
 
 ### feat: Uyum Merkezi & Yapay Zeka Uyum Denetleyicisi (9. Kutu)
