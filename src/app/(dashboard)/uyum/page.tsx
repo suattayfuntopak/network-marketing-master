@@ -8,6 +8,8 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { auditComplianceMessageAction, type ComplianceAuditState } from './actions'
 import { toast } from 'sonner'
+import { useAIUsage } from '@/hooks/useAIUsage'
+import { useQueryClient } from '@tanstack/react-query'
 
 const APPROVED_CLAIMS = {
   tr: [
@@ -122,6 +124,9 @@ export default function CompliancePage() {
   const [copiedImproved, setCopiedImproved] = useState(false)
   const [activeTab, setActiveTab] = useState<'auditor' | 'library'>('auditor')
 
+  const { data: usage } = useAIUsage()
+  const qc = useQueryClient()
+
   const [auditResult, setAuditResult] = useState<ComplianceAuditState | null>(null)
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({})
 
@@ -179,6 +184,7 @@ export default function CompliancePage() {
         toast.error(res.error)
       } else {
         setAuditResult(res)
+        qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
         toast.success(lang === 'en' ? 'Audit completed successfully!' : 'Denetim başarıyla tamamlandı!')
       }
     } catch {
@@ -268,11 +274,11 @@ export default function CompliancePage() {
                     className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
                   />
                   <div className="flex justify-end items-center gap-4">
-                    {auditResult?.remaining !== undefined && (
-                      <span className="text-xs text-[var(--text-3)]">
+                    {!usage?.isSuperAdmin && usage && (
+                      <span className="text-xs font-semibold text-[var(--text-3)]">
                         {lang === 'en'
-                          ? `Daily Audits: ${auditResult.remaining} remaining`
-                          : `Kalan Günlük Denetim: ${auditResult.remaining}`}
+                          ? `Daily Audits: ${Math.max(0, 5 - usage.complianceUsed)} / 5`
+                          : `Kalan Günlük Denetim: ${Math.max(0, 5 - usage.complianceUsed)} / 5`}
                       </span>
                     )}
                     <button

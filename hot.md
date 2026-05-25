@@ -2,6 +2,16 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: Yapay Zeka Günlük Limitleri (20 / 5 / 15), Kalan Hak Rozetleri & İstatistikler Cam Morfin İlerleme Kartı
+- **Yeni Limit Mimarisi:** Supabase veritabanı logları (`nmm_daily_actions`) üzerinden çalışan, strictly denetlenen özellik bazlı dinamik limitler hayata geçirildi:
+  - **Yapay Zeka Koçu (Rol Provası):** `20` günlük hak (`note = 'roleplay'`).
+  - **YZ Mesajı Üret / Genel AI Mesajı:** `15` günlük hak (`note = 'message'`).
+  - **Uyum Denetimi:** `5` günlük hak (`note = 'compliance'`).
+- **Gelişmiş useAIUsage Hook'u:** İstemci tarafında tekil ve son derece hafif bir Supabase sorgusuyla bugünkü tüm yapay zeka aksiyonlarını çekip özellik bazında sınıflandıran TanStack Query tabanlı `useAIUsage` custom hook'u yazıldı.
+- **Kalan Hak Arayüz Rozetleri:** **Uyum Denetimi** (Kalan: X / 5), **YZ Mesajı Üret** (Kalan: X / 15) ve **Saha Provası Yap** (Kalan: X / 20) sayfalarındaki tüm butonların ve form alanlarının yanına anlık güncellenen kalan hak rozetleri eklendi. Geliştirici hesabı (`suattayfuntopak@gmail.com`) için bu rozetler tamamen gizlendi veya "Sınırsız" yapıldı.
+- **İstatistikler Premium Cam Morfin (Glassmorphism) Kartı:** İstatistikler sayfasına asil koyu tema estetiğimize, marka ve durum renklerine uyumlu (`#534AB7`, `#0F6E56`, `#C03E1F`) 3 dikey ilerleme çubuğu içeren **Yapay Zeka Günlük Kullanım Kotası** modülü eklendi. Geliştirici hesabı girildiğinde bu modül parıldayan altın neon efektli **"👑 Sınırsız Süper Admin Hesabı"** tebrik kartına dönüşüyor.
+- **Güvenli Geçiş:** Rol provası ve mesaj üretimi başarıyla sonlandığı anda React Query önbelleği (`daily-ai-usage`) otomatik geçersiz kılınarak arayüzün sayfa yenilemesiz, pürüzsüzce senkronize olması sağlandı.
+
 ### fix: Süper Admin İçin Kalan Limit Rozetleri Gizlendi
 - `uyum/actions.ts` & `yazar/actions.ts`: Giriş yapan kullanıcı süper admin (`suattayfuntopak@gmail.com`) olduğunda, `remaining` parametresi `undefined` döndürülerek arayüzdeki "Kalan Günlük Denetim" ve "Kalan Günlük Simülasyon" etiketlerinin kendisi için **tamamen gizlenmesi** sağlandı. Diğer tüm normal kullanıcılar için limit rozetleri aktif ve görünür kalmaya devam eder.
 

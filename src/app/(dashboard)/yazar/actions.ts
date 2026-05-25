@@ -2,7 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { DAILY_MESSAGE_LIMIT, DAILY_ROLEPLAY_LIMIT } from '@/lib/aiUsage'
 import Anthropic from '@anthropic-ai/sdk'
 
 const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -34,6 +34,7 @@ export async function generateMessageAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
+  let remaining = DAILY_MESSAGE_LIMIT
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -42,11 +43,14 @@ export async function generateMessageAction(
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('action_type', 'ai_generate')
+      .or('note.is.null,note.eq.message')
       .gte('created_at', today.toISOString())
 
-    if ((count ?? 0) >= DAILY_AI_LIMIT) {
-      return { error: `Günlük ${DAILY_AI_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    const used = count ?? 0
+    if (used >= DAILY_MESSAGE_LIMIT) {
+      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
     }
+    remaining = DAILY_MESSAGE_LIMIT - used - 1
   }
 
   const { data: membership } = await supabase
@@ -64,10 +68,11 @@ export async function generateMessageAction(
         user_id: user.id,
         candidate_id: null,
         action_type: 'ai_generate' as const,
+        note: 'message',
       })
     }
 
-    return { message }
+    return { message, remaining: isSuperAdmin ? undefined : remaining }
   } catch {
     return { error: 'Mesaj oluşturulamadı.' }
   }
@@ -94,7 +99,7 @@ export async function generateRoleplayResponseAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
-  let remaining = 20
+  let remaining = DAILY_ROLEPLAY_LIMIT
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -107,10 +112,10 @@ export async function generateRoleplayResponseAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_AI_LIMIT) {
-      return { error: `Günlük ${DAILY_AI_LIMIT} prova limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    if (used >= DAILY_ROLEPLAY_LIMIT) {
+      return { error: `Günlük ${DAILY_ROLEPLAY_LIMIT} prova limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
     }
-    remaining = DAILY_AI_LIMIT - used - 1
+    remaining = DAILY_ROLEPLAY_LIMIT - used - 1
   }
 
   // Construct message history string

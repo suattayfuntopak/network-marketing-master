@@ -2,7 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
 import Anthropic from '@anthropic-ai/sdk'
 
 const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
@@ -56,10 +56,11 @@ export async function generateCoachMessage(
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('action_type', 'ai_generate')
+      .or('note.is.null,note.eq.message')
       .gte('created_at', today.toISOString())
 
-    if ((count ?? 0) >= DAILY_AI_LIMIT) {
-      return { error: `Günlük ${DAILY_AI_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
+    if ((count ?? 0) >= DAILY_MESSAGE_LIMIT) {
+      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
     }
   }
 
@@ -78,6 +79,7 @@ export async function generateCoachMessage(
         user_id: user.id,
         candidate_id: null,
         action_type: 'ai_generate' as const,
+        note: 'message',
       })
     }
 
@@ -115,10 +117,11 @@ export async function generateDownlineCoachingMessage(
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('action_type', 'ai_generate')
+      .or('note.is.null,note.eq.message')
       .gte('created_at', today.toISOString())
 
-    if ((count ?? 0) >= DAILY_AI_LIMIT) {
-      return { error: `Günlük ${DAILY_AI_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
+    if ((count ?? 0) >= DAILY_MESSAGE_LIMIT) {
+      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
     }
   }
 
@@ -171,6 +174,7 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
           user_id: user.id,
           candidate_id: null,
           action_type: 'ai_generate' as const,
+          note: 'message',
         })
       } catch (dbErr) {
         console.error('Failed to insert coaching daily action log (constraint issues):', dbErr)

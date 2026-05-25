@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_AI_LIMIT } from '@/lib/aiUsage'
+import { DAILY_COMPLIANCE_LIMIT } from '@/lib/aiUsage'
 import Anthropic from '@anthropic-ai/sdk'
 
 const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
@@ -61,7 +61,7 @@ export async function auditComplianceMessageAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
-  let remaining = 20
+  let remaining = DAILY_COMPLIANCE_LIMIT
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -74,15 +74,15 @@ export async function auditComplianceMessageAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_AI_LIMIT) {
+    if (used >= DAILY_COMPLIANCE_LIMIT) {
       return {
         error: lang === 'en'
-          ? `You have reached your daily ${DAILY_AI_LIMIT} compliance audit limit. Try again tomorrow.`
-          : `Günlük ${DAILY_AI_LIMIT} uyum denetleme limitine ulaştınız. Yarın tekrar deneyin.`,
+          ? `You have reached your daily ${DAILY_COMPLIANCE_LIMIT} compliance audit limit. Try again tomorrow.`
+          : `Günlük ${DAILY_COMPLIANCE_LIMIT} uyum denetleme limitine ulaştınız. Yarın tekrar deneyin.`,
         remaining: 0
       }
     }
-    remaining = DAILY_AI_LIMIT - used - 1
+    remaining = DAILY_COMPLIANCE_LIMIT - used - 1
   }
 
   const systemPrompt = `Sen bir Network Marketing ve Doğrudan Satış yasal mevzuat uyum denetleyicisisin (Compliance Officer).

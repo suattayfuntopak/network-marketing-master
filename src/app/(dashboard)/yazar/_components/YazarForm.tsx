@@ -9,9 +9,10 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { STAGE_LABEL } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
-import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { useAIUsage } from '@/hooks/useAIUsage'
+import { useQueryClient } from '@tanstack/react-query'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { parseNote } from '@/lib/noteParser'
 
@@ -109,23 +110,19 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   })
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
-  const [limitReached, setLimitReached] = useState(false)
+  const { data: usage } = useAIUsage()
+  const qc = useQueryClient()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const used = usage?.messageUsed ?? 0
+  const remaining = Math.max(0, 15 - used)
+  const limitReached = !isSuperAdmin && remaining <= 0
+
   const containerRef = useRef<HTMLDivElement>(null)
   const prefilledRef = useRef(false)
   const prevMessageRef = useRef<string | undefined>(undefined)
 
   const { data: ws } = useWorkspace()
-  const { candidates } = useCandidates(ws?.workspaceId)
-
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserEmail(user?.email ?? null)
-    })
-  }, [])
+  const { candidates = [] } = useCandidates(ws?.workspaceId)
 
   const fetchAndFormatCandidateContext = useCallback((c: NmmCandidate) => {
     setSelected(c)
@@ -185,11 +182,10 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       })
   }, [])
 
-  // Sayfa yüklenince localStorage'dan history + limit durumunu al
+  // Sayfa yüklenince localStorage'dan history al
   useEffect(() => {
     setHistory(loadHistory())
-    setLimitReached(isAILimitReached(isSuperAdmin))
-  }, [isSuperAdmin])
+  }, [])
 
   useEffect(() => {
     if (initialName && candidates.length > 0 && !prefilledRef.current) {
@@ -215,12 +211,11 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     return () => document.removeEventListener('mousedown', onOutside)
   }, [])
 
-  // Yeni mesaj üretilince history'ye kaydet
+  // Yeni mesaj üretilince history'ye kaydet ve usage query'sini yenile
   useEffect(() => {
     if (state.message && state.message !== prevMessageRef.current) {
       prevMessageRef.current = state.message
-      incrementAIUsage(isSuperAdmin)
-      setLimitReached(isAILimitReached(isSuperAdmin))
+      qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
       const entry: HistoryEntry = {
         message: state.message,
         candidateName: selected?.full_name ?? query ?? 'Kişisiz',
@@ -230,7 +225,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       saveToHistory(entry)
       setHistory(loadHistory())
     }
-  }, [state.message, selected, query, messageType, isSuperAdmin])
+  }, [state.message, selected, query, messageType, qc])
 
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
@@ -263,7 +258,6 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   }
 
   const waLink = waHref(selected?.phone, state.message)
-  const remaining = remainingAIUsage(isSuperAdmin)
 
   return (
     <div className="space-y-5">
@@ -377,7 +371,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                       {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
                     </div>
                     <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
-                      {STAGE_LABEL[c.stage]}
+                      {STAGE_LABEL[c.stage as CandidateStage]}
                     </span>
                   </button>
                 ))
@@ -410,7 +404,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
         {limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            Günlük {DAILY_AI_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
+            Günlük 15 mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
           </div>
         ) : (
           <button
@@ -420,7 +414,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             {isPending
               ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(${remaining} hak kaldı)`}</>
+              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(Kalan: ${remaining} / 15)`}</>
             }
           </button>
         )}

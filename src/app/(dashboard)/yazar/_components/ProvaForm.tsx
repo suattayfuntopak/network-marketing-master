@@ -9,6 +9,8 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateRoleplayResponseAction } from '../actions'
 import { toast } from 'sonner'
+import { useAIUsage } from '@/hooks/useAIUsage'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface Scenario {
   id: string
@@ -258,6 +260,12 @@ export function ProvaForm() {
   const [isPending, setIsPending] = useState(false)
   const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
 
+  const { data: usage } = useAIUsage()
+  const qc = useQueryClient()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const roleplayUsed = usage?.roleplayUsed ?? 0
+  const remaining = Math.max(0, 20 - roleplayUsed)
+
   const chatEndRef = useRef<HTMLDivElement>(null)
 
   // Scroll to bottom when messages update
@@ -326,6 +334,8 @@ export function ProvaForm() {
         // Rollback user message on quota failure
         setMessages(messages)
       } else if (result.candidate_reply) {
+        qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
+
         // Set remaining limits if returned
         if (typeof result.remaining === 'number') {
           setRemainingUsage(result.remaining)
@@ -496,9 +506,9 @@ export function ProvaForm() {
         </form>
 
         {/* Usage notification */}
-        {remainingUsage !== null && (
+        {!isSuperAdmin && usage && (
           <p className="mt-2 text-center text-[10px] font-semibold text-[var(--text-3)] animate-pulse">
-            {lang === 'en' ? `Remaining AI Roleplay Credits: ${remainingUsage}` : `Kalan Günlük Simülasyon Krediniz: ${remainingUsage}`}
+            {lang === 'en' ? `Remaining AI Roleplay Credits: ${remaining} / 20` : `Kalan Günlük Simülasyon Krediniz: ${remaining} / 20`}
           </p>
         )}
       </div>
@@ -519,6 +529,13 @@ export function ProvaForm() {
             ? 'The AI acts as a realistic prospect or team member. Type your replies, receive direct mentor scores, strengths, and leadership tips.'
             : 'YZ aday veya yeni ortak rolüne girer; distribütörü zorlayan gerçekçi itirazlar sunar. Yazdığınız her yanıttan sonra net YZK notu ve puan kazanırsınız.'}
         </p>
+        {!isSuperAdmin && usage && (
+          <p className="mt-2.5 text-xs font-bold text-[var(--text-3)] animate-pulse">
+            {lang === 'en'
+              ? `Daily Roleplay Quota: ${remaining} / 20 remaining today`
+              : `Kalan Günlük Simülasyon Krediniz: ${remaining} / 20`}
+          </p>
+        )}
       </div>
 
       {/* 10 Scenario Cards Grid */}
