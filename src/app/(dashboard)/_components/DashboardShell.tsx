@@ -138,7 +138,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       >
         {/* Spacer to clear the fixed h-16 Header */}
         <div className="h-16" />
-        <div className="mx-auto max-w-8xl w-full">
+        <div className="mx-auto max-w-[1360px] w-full">
           {children}
         </div>
       </div>

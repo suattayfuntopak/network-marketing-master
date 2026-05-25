@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-05-25 — İdeal Sayfa Genişliği, İsimlendirmeler, Grafik İyileştirmeleri & Anında Kayıt Yönlendirmesi
+
+### style: Global Sayfa Genişliği max-w-[1360px] Yapıldı ve İstatistik Grafikleri Kusursuz Hizalandı
+- `DashboardShell.tsx`: Ekranın aşırı dolmasını engellemek amacıyla, `1280px` (dar) ve `1440px` (geniş) limitlerinin tam ortalaması olan **`max-w-[1360px]`** (ideal genişlik) standardı getirildi. Böylece ekran hem ferah hem de sağa sola yapışmadan son derece asil bir görünüme kavuştu.
+- `istatistikler/page.tsx`: İstatistikler sayfasındaki tüm kutular arasındaki boşlukların `space-y-6` ile tamamen eşit kalması sağlandı. *Aday Kazanım İvmesi* kutusu `flex-1` ile dikeyde yukarıya doğru esnetildi, içerisindeki bar grafiği piksel yüksekliği **h-28 ➔ flex-1 min-h-[130px]**, katsayı ise **80 ➔ 105** yapılarak sol sütunla alt ve üst sınırda kusursuz bir yatay paralellik sağlandı.
+
+### feat: YZ Mesajı Üret Modülü "Yapay Zeka Koçu" Olarak Yeniden Adlandırıldı
+- `tr.ts` & `en.ts`: Pano butonu, sidebar navigasyonu ve diğer menülerdeki "YZ Mesajı Üret" ifadeleri **"Yapay Zeka Koçu"** (AI Coach) olarak güncellendi.
+- `BottomNav.tsx`: Mobil alt barda dikey kayma yapmaması için kısa ve okunaklı biçimde **"YZ Koçu"** olarak gösterilmesi sağlandı.
+- `yazar/page.tsx`: Sayfa başlığı altındaki açıklama yazısı *"Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap."* olarak güncellendi.
+- `YzKocuContainer.tsx`: Yapay Zeka Koçu sekmelerinin adları sırasıyla **"YZ Mesajı Üret"** ve **"Saha Provası Yap"** olarak revize edildi.
+
+### feat: Ekibim Davet Mesajı Geliştirildi ve Anında Kayıt/Yönlendirme Desteği Eklendi
+- `EkipPanel.tsx`: WhatsApp davet mesajı, kullanıcının talebine tam uyumlu profesyonel emoji ve kod yerleşimine kavuşturuldu.
+- `actions.ts` & `SignupForm.tsx`: Supabase projesinde e-posta onayı kapatıldığında, yeni kaydolan adayların onay e-postası beklemeden anında uygulamaya giriş yapıp panoya yönlenmesi (`auto-redirect`) sağlandı. Sunucu tarafında `session` algılandığında istemci otomatik olarak 1 saniye içinde `/bugun` sayfasına aktarılıyor.
+
 ## 2026-05-25 — Layout Revizyonu, Grafik Hizalama, Kayıt Linki & Auth Hata Düzeltmeleri
 
 ### style: Global Sayfa Genişliği max-w-8xl Yapıldı ve İstatistik Grafikleri Dikey Hizalandı

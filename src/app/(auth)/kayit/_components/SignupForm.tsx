@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { signupAction } from '../actions'
@@ -8,6 +8,7 @@ import { signupAction } from '../actions'
 interface FormState {
   error?: string
   success?: string
+  shouldRedirect?: boolean
 }
 
 export function SignupForm() {
@@ -16,6 +17,15 @@ export function SignupForm() {
     signupAction,
     {}
   )
+
+  useEffect(() => {
+    if (state.success && state.shouldRedirect) {
+      const timer = setTimeout(() => {
+        window.location.href = '/bugun'
+      }, 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [state.success, state.shouldRedirect])
 
   if (state.success) {
     return (

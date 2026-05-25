@@ -587,8 +587,8 @@ export function EkipPanel() {
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
                   lang === 'en'
-                    ? `Hi! You can use this invite code to join our Network Marketing Master team:\n\n*${ws?.inviteCode}*\n\nAfter signing up from the link below, enter this code on the "My Team" page to join instantly!\n\nhttps://network-marketing-master.vercel.app/kayit`
-                    : `Merhaba! Network Marketing Master ekibimize katılman için bu davet kodunu kullanabilirsin:\n\n*${ws?.inviteCode}*\n\nUygulamaya aşağıdaki linkten üye olduktan sonra "Ekibim" sayfasından bu kodu girerek ekibe anında katılabilirsin!\n\nhttps://network-marketing-master.vercel.app/kayit`
+                    ? `Hi! You are invited to our Network Marketing Master team!\n\nComplete your registration from the link below, and enter the code *${ws?.inviteCode}* on the "My Team" page to join us instantly:\n\n🔗 https://network-marketing-master.vercel.app/kayit`
+                    : `Merhaba! Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp "Ekibim" sayfasından *${ws?.inviteCode}* kodunu girerek aramıza anında katılabilirsin:\n\n🔗 https://network-marketing-master.vercel.app/kayit`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

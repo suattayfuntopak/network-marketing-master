@@ -62,7 +62,7 @@ export const tr = {
   nav: {
     pano: "Pano",
     pipeline: "Boru Hattı",
-    yazar: "YZ Mesajı Üret",
+    yazar: "Yapay Zeka Koçu",
     ekip: "Ekibim",
     takvim: "Takvim",
     itirazlar: "İtirazlara Cevaplar",
@@ -171,7 +171,7 @@ export const tr = {
     noteTranslating: "Not çevriliyor...",
   },
   aiWriter: {
-    title: "YZ Mesajı Üret",
+    title: "Yapay Zeka Koçu",
     subtitle: "Adaylarınızla etkileşimi artıracak akıllı ve kişiselleştirilmiş şablonlar üretin",
     candidateSelect: "Aday Seç",
     candidateSelectPlaceholder: "Bir aday seçin (İsteğe bağlı)",

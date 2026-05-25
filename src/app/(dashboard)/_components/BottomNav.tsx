@@ -39,7 +39,9 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
         let label = t(translationKey)
-        if (translationKey === 'nav.itirazlar') {
+        if (translationKey === 'nav.yazar') {
+          label = lang === 'en' ? 'AI Coach' : 'YZ Koçu'
+        } else if (translationKey === 'nav.itirazlar') {
           label = lang === 'en' ? 'Objections' : 'İtirazlar'
         }
         return (

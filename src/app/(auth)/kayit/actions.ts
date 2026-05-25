@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/server'
 interface FormState {
   error?: string
   success?: string
+  shouldRedirect?: boolean
 }
 
 const ERROR_MESSAGES: Record<string, string> = {
@@ -40,6 +41,13 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   // E-posta onayı zorunlu değilse identities boş gelir (zaten kayıtlı kullanıcı gibi davranır)
   if (data.user && data.user.identities?.length === 0) {
     return { error: 'Bu e-posta adresi zaten kayıtlı.' }
+  }
+
+  if (data.session) {
+    return {
+      success: 'Hesabınız başarıyla oluşturuldu! Giriş yapılıyor, yönlendiriliyorsunuz...',
+      shouldRedirect: true
+    }
   }
 
   return {

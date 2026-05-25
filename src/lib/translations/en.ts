@@ -62,7 +62,7 @@ export const en = {
   nav: {
     pano: "Dashboard",
     pipeline: "Pipeline",
-    yazar: "AI Message Writer",
+    yazar: "AI Coach",
     ekip: "My Team",
     takvim: "Calendar",
     itirazlar: "Objection Handling",
@@ -171,7 +171,7 @@ export const en = {
     noteTranslating: "Translating note...",
   },
   aiWriter: {
-    title: "AI Message Writer",
+    title: "AI Coach",
     subtitle: "Generate high-converting personalized scripts to engage your leads effortlessly",
     candidateSelect: "Select Prospect",
     candidateSelectPlaceholder: "Choose a prospect (Optional)",

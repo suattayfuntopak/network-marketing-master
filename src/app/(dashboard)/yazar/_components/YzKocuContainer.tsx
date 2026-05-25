@@ -29,7 +29,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
           }`}
         >
           <MessageSquare className="h-4 w-4" />
-          <span>{lang === 'en' ? 'Ask Coach (Writer)' : 'Koçluk Al (Yazar)'}</span>
+          <span>{lang === 'en' ? 'Generate AI Message' : 'YZ Mesajı Üret'}</span>
         </button>
         <button
           onClick={() => setActiveTab('prova')}
@@ -40,7 +40,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
           }`}
         >
           <Target className="h-4 w-4" />
-          <span>{lang === 'en' ? 'Roleplay (Rehearsal)' : 'Prova Yap (Simüle)'}</span>
+          <span>{lang === 'en' ? 'Do Field Rehearsal' : 'Saha Provası Yap'}</span>
         </button>
       </div>
 
