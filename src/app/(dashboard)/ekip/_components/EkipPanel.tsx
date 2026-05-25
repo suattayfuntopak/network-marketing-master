@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
-  TrendingUp, BarChart2, ChevronDown, ChevronUp,
+  TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -29,6 +29,28 @@ export interface MemberRow {
   katildi_count: number
   last_activity_at: string | null
 }
+
+export interface OnboardingStep {
+  id: string
+  week: 1 | 2 | 3 | 4
+  label_tr: string
+  label_en: string
+}
+
+export const ONBOARDING_STEPS: OnboardingStep[] = [
+  { id: 'step_why', week: 1, label_tr: 'Başlangıç Görüşmesi & "Neden?" Belirleme', label_en: 'Kickoff Meeting & Define "Why"' },
+  { id: 'step_list', week: 1, label_tr: '20-50 Kişilik Liste Oluşturma', label_en: 'Create a list of 20-50 Names' },
+  { id: 'step_first_5', week: 1, label_tr: 'İlk 5 Adayı Belirleme ve Mesaj Gönderme', label_en: 'Identify first 5 and send messages' },
+  
+  { id: 'step_3way', week: 2, label_tr: 'Sponsorla İlk 3\'lü Görüşme (3-Way Call)', label_en: 'First 3-Way Call with Sponsor' },
+  { id: 'step_social', week: 2, label_tr: 'Sosyal Medyada İlk Ürün Paylaşımı', label_en: 'First Product Post on Social Media' },
+  
+  { id: 'step_independent', week: 3, label_tr: 'Sponsorsuz İlk Bağımsız Sunum', label_en: 'First Independent Presentation' },
+  { id: 'step_objections', week: 3, label_tr: 'İtirazlara Cevaplar Modülü Eğitimi', label_en: 'Study Objection Handling Module' },
+  
+  { id: 'step_90day', week: 4, label_tr: '90 Günlük Saha Aksiyon Planı Yazımı', label_en: 'Write 90-Day Field Action Plan' },
+  { id: 'step_complete', week: 4, label_tr: '30. Gün Kapanış & Değerlendirme', label_en: 'Day 30 Review & Reflection' },
+]
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
@@ -97,6 +119,30 @@ export function EkipPanel() {
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [coachingMember, setCoachingMember] = useState<{ member: MemberRow; days: number } | null>(null)
   const [scorecardOpen, setScorecardOpen] = useState(true)
+
+  const [expandedOnboardingId, setExpandedOnboardingId] = useState<string | null>(null)
+  const [onboardingWeekTab, setOnboardingWeekTab] = useState<1 | 2 | 3 | 4>(1)
+  const [onboardingState, setOnboardingState] = useState<Record<string, Record<string, boolean>>>(() => {
+    if (typeof window === 'undefined') return {}
+    try {
+      const stored = localStorage.getItem('nmm_onboarding_v1')
+      return stored ? JSON.parse(stored) : {}
+    } catch {
+      return {}
+    }
+  })
+
+  const toggleOnboardingStep = useCallback((userId: string, stepId: string) => {
+    setOnboardingState(prev => {
+      const userState = prev[userId] ?? {}
+      const nextUserState = { ...userState, [stepId]: !userState[stepId] }
+      const next = { ...prev, [userId]: nextUserState }
+      try {
+        localStorage.setItem('nmm_onboarding_v1', JSON.stringify(next))
+      } catch {}
+      return next
+    })
+  }, [])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -418,6 +464,89 @@ export function EkipPanel() {
                     </div>
                   )}
                 </div>
+
+                {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
+                {m.role === 'member' && (
+                  <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
+                      className="flex w-full items-center justify-between text-xs font-semibold text-[var(--text-2)] hover:text-brand transition cursor-pointer"
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <Rocket className="h-3.5 w-3.5 text-[#854F0B] dark:text-[#fbbf24]" />
+                        <span>{lang === 'en' ? 'Distributor Onboarding Progress' : 'Distribütör Başlatma Süreci'}</span>
+                      </span>
+                      <span className="flex items-center gap-2">
+                        {(() => {
+                          const doneCount = ONBOARDING_STEPS.filter(s => onboardingState[m.user_id]?.[s.id]).length
+                          const totalCount = ONBOARDING_STEPS.length
+                          const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
+                          return (
+                            <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-2 py-0.5 text-[10px] font-bold text-[#854F0B] dark:text-[#fbbf24]">
+                              %{pct}
+                            </span>
+                          )
+                        })()}
+                        {expandedOnboardingId === m.user_id ? (
+                          <ChevronUp className="h-3.5 w-3.5" />
+                        ) : (
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        )}
+                      </span>
+                    </button>
+
+                    {expandedOnboardingId === m.user_id && (
+                      <div className="pt-2 border-t border-dashed border-[var(--border)] space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                        {/* 4 Weekly Tabs */}
+                        <div className="flex gap-1.5 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-0.5 rounded-lg border border-[var(--border)]">
+                          {([1, 2, 3, 4] as const).map(w => (
+                            <button
+                              key={w}
+                              type="button"
+                              onClick={() => setOnboardingWeekTab(w)}
+                              className={`flex-1 text-[10px] font-bold py-1 rounded-md transition-all cursor-pointer ${
+                                onboardingWeekTab === w
+                                  ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
+                                  : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                              }`}
+                            >
+                              {lang === 'en' ? `W${w}` : `${w}. Hafta`}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Steps list */}
+                        <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
+                          {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
+                            const isStepDone = onboardingState[m.user_id]?.[step.id] ?? false
+                            return (
+                              <button
+                                key={step.id}
+                                type="button"
+                                onClick={() => toggleOnboardingStep(m.user_id, step.id)}
+                                className={`w-full flex items-center gap-2.5 rounded-xl border p-2.5 text-left transition-all active:scale-[0.99] cursor-pointer ${
+                                  isStepDone
+                                    ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)] font-semibold'
+                                    : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 hover:bg-[var(--bg-card)] text-[var(--text-2)]'
+                                }`}
+                              >
+                                <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all ${
+                                  isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
+                                }`}>
+                                  {isStepDone && <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />}
+                                </span>
+                                <span className="text-[11px] leading-tight">
+                                  {lang === 'en' ? step.label_en : step.label_tr}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </li>
             )
           })}

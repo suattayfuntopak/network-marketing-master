@@ -71,6 +71,8 @@ export const tr = {
     collapse: "Daralt",
     expand: "Genişlet",
     todayFocus: "Bugün İlgilen",
+    uyum: "Uyum Merkezi",
+    istatistikler: "İstatistikler",
   },
   stages: {
     yeni: "Yeni Aday",

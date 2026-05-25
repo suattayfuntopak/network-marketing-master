@@ -3,18 +3,20 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2 } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
-  { href: '/pano',       translationKey: 'nav.pano',       icon: LayoutDashboard          },
-  { href: '/pipeline',   translationKey: 'nav.pipeline',   icon: TrendingUp               },
-  { href: '/yazar',      translationKey: 'nav.yazar',      icon: Bot                      },
-  { href: '/ekip',       translationKey: 'nav.ekip',       icon: Users                    },
-  { href: '/takvim',     translationKey: 'nav.takvim',     icon: CalendarDays             },
-  { href: '/itirazlar',  translationKey: 'nav.itirazlar',  icon: MessageCircleQuestion    },
-  { href: '/egitim',     translationKey: 'nav.egitim',     icon: BookOpen                 },
-  { href: '/kazanimlar', translationKey: 'nav.kazanimlar', icon: Trophy                   },
+  { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard          },
+  { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp               },
+  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                      },
+  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                    },
+  { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays             },
+  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion    },
+  { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen                 },
+  { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                   },
+  { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                   },
+  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
 ]
 
 interface SidebarProps {

@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-05-25 — Uyum Merkezi (9. Kutu), İstatistikler (10. Kutu) ve Distribütör Başlatma Entegrasyonu (Zero-Debt Modül Entegrasyonu)
+
+### feat: Uyum Merkezi & Yapay Zeka Uyum Denetleyicisi (9. Kutu)
+- `uyum/actions.ts` & `uyum/page.tsx`: NMM panosuna 9. Kutu olarak **Uyum Merkezi** eklendi. NMU'daki statik yapının ötesine geçilerek NMM'in yapay zeka gücüyle çalışan bir **Yapay Zeka Uyum Denetleyicisi** (AI Compliance Auditor) sıfırdan inşa edildi. Claude Sonnet (`claude-sonnet-4-6`) tabanlı bu denetleyici, girilen pazarlama ve reklam metinlerini sağlık iddiaları, kesin gelir vaatleri yönünden saniyeler içinde tarar, 0-100 arası güvenlik skoru ve durum rozeti (Güvenli, Riskli, Tehlikeli) verir, yasal ihlal yapan kelimeleri ve nedenlerini açıklar, son olarak tek tıkla kopyalanabilecek **"Önerilen Yasal ve Etkili Alternatifini"** üretir.
+- Sayfaya ayrıca **Onaylı İfadeler Şablon Kütüphanesi**, **Yasaklı İfadeler Örnekleri** ve yerel hafızada (`localStorage`) tutulan interaktif 7 maddelik **Paylaşım Öncesi Kontrol Listesi** entegre edildi.
+
+### feat: İstatistikler & Paket Yükü Olmayan Görsel Analiz (10. Kutu)
+- `istatistikler/page.tsx`: NMM panosuna 10. Kutu olarak **İstatistikler** eklendi. Recharts gibi Next.js App Router üzerinde hidrasyon hatası çıkaran ağır grafik paketlerini yüklememek ve veritabanına ek tablo yükü bindirmemek amacıyla **sadece NMM aday verilerini analiz eden göz alıcı Custom SVG ve CSS Grafikleri** geliştirildi.
+- Sayfa; Yeni Aday ➔ İletişim ➔ Davet ➔ Sunum ➔ Takip ➔ Katıldı akışındaki kümülatif dağılımı ve kayıp yüzdelerini gösteren **Dönüşüm Hunisi (Funnel)**, adayların sıcaklık durumlarını gösteren **Sürecin Sıcaklığı (Donut Grafik)** ve aday edinme ritmini gösteren **Kazanım İvmesi (Barlar)** ile donatıldı.
+
+### feat: Distribütör Başlatma — Ekibim Kart İçi Entegrasyonu
+- `EkipPanel.tsx`: Distribütör başlatma çeklistini bağımsız veritabanı tablolarıyla hantallaştırmak yerine doğrudan **Ekibim** modülündeki üye kartlarının içine akıllıca entegre ettik.
+- Lider, ekibindeki bir distribütörün kartına tıkladığında kart aşağı doğru genişler (Accordion) ve üyenin 4 haftalık (Temel Kurulum, İlk Temas, Bağımsızlaşma, 90 Gün Planı) **Hızlı Başlangıç Gelişimi** açılır. Üyenin tamamladığı adımların oranını dinamik hesaplayan bir ilerleme yüzdesi (Örn: `%44`) bulunur. Adımların tamamlanma durumu liderin cihazında `localStorage` tabanlı tutulur.
+
+### feat: Pano Izgara Dengesi ve Sidebar Entegrasyonu
+- `PanoContent.tsx`: Hızlı erişim ızgarası 10 kutuya çıkarıldı. Mobil 2 sütunlu yapıyı korurken, masaüstünde 5 sütunlu dengeli ve son derece asil bir düzene kavuşturuldu.
+- `Sidebar.tsx`: Masaüstü yan navigasyon çubuğuna Uyum Merkezi ve İstatistikler modülleri ikonları ve çevirileriyle birlikte entegre edildi.
+
 ## 2026-05-25 — Supabase Eğitim Senkronizasyonu, Derin Aktivite Takibi, YZ Yazar Sadeleştirme & YZ Ekip Koçu Entegrasyonu (Konsey Önerileri & Ek İstekler)
 
 ### feat: YZ Ekip Koçu — Downline İnaktif Üye Mentörlük Sistemi (Konsey Önerisi — Paket C)

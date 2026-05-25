@@ -7,7 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen } from 'lucide-react'
+import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, Shield, BarChart2 } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -122,8 +122,8 @@ export function PanoContent() {
         <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
       </header>
 
-      {/* ── 8 hızlı erişim karesi — mobil 2 sütun (4 satır), masaüstü 4 sütun (2 satır) ── */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+      {/* ── 10 hızlı erişim karesi — mobil 2 sütun (5 satır), masaüstü 5 sütun (2 satır) ── */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
         <SquareButton icon={Zap}                    label={t('nav.todayFocus')}     color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="blue"   href="/pipeline"      />
         <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
@@ -132,6 +132,8 @@ export function PanoContent() {
         <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="indigo" href="/itirazlar"     />
         <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="amber"  href="/egitim"        />
         <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="teal"   href="/kazanimlar"    />
+        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="coral"  href="/uyum"          />
+        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="blue"   href="/istatistikler" />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}

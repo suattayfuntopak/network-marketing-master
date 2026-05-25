@@ -71,6 +71,8 @@ export const en = {
     collapse: "Collapse",
     expand: "Expand",
     todayFocus: "Today's Focus",
+    uyum: "Compliance Center",
+    istatistikler: "Statistics",
   },
   stages: {
     yeni: "New Prospect",
