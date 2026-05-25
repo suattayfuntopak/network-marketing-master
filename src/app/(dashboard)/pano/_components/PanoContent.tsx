@@ -132,11 +132,11 @@ export function PanoContent() {
         <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="teal"   href="/egitim"        />
 
         {/* Alt Sıra */}
-        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="pink"   href="/itirazlar"     />
+        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="purple" href="/itirazlar"     />
         <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="amber"  href="/yazar"         />
-        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="purple" href="/kazanimlar"    />
-        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="pink"   href="/uyum"          />
-        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="amber"  href="/istatistikler" />
+        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="pink"   href="/kazanimlar"    />
+        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" href="/uyum"          />
+        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   href="/istatistikler" />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
