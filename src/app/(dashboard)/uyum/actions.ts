@@ -169,7 +169,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       safety_level: parsed.safety_level,
       violations: parsed.violations,
       improved_text: parsed.improved_text,
-      remaining
+      remaining: isSuperAdmin ? undefined : remaining
     }
   } catch (err: any) {
     console.error('Uyum Denetimi Hatası:', err)

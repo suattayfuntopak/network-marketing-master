@@ -209,7 +209,7 @@ Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi dönd�
       yzk_score: parsed.yzk_score,
       yzk_strengths: parsed.yzk_strengths,
       yzk_improvements: parsed.yzk_improvements,
-      remaining
+      remaining: isSuperAdmin ? undefined : remaining
     }
   } catch (err: any) {
     console.error('YZK Simülasyon Hatası:', err)

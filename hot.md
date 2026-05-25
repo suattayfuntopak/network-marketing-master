@@ -2,6 +2,9 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### fix: Süper Admin İçin Kalan Limit Rozetleri Gizlendi
+- `uyum/actions.ts` & `yazar/actions.ts`: Giriş yapan kullanıcı süper admin (`suattayfuntopak@gmail.com`) olduğunda, `remaining` parametresi `undefined` döndürülerek arayüzdeki "Kalan Günlük Denetim" ve "Kalan Günlük Simülasyon" etiketlerinin kendisi için **tamamen gizlenmesi** sağlandı. Diğer tüm normal kullanıcılar için limit rozetleri aktif ve görünür kalmaya devam eder.
+
 ### feat: MLM Sponsorluk ve Hiyerarşik Downline Yapısı Sıfırdan İnşa Edildi (Bağımsız Lider Modeli)
 - `009_add_workspace_parent_id.sql`: Ekip üyelerinin (`member`) kendi isimlerini, kendi davet kodlarını görememesi, organizasyon kuramaması ve üst liderinin verilerini/ekibini aynen görerek veri ihlali yaşaması mimari olarak **kökten çözüldü**.
   - **Yeni Model:** `nmm_workspaces` tablosuna **`parent_id uuid`** kolonu eklenerek bağımsız distribütör sponsorluk bağı kuruldu.
