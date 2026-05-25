@@ -100,7 +100,11 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   return (
     <>
-      <li className={clsx('relative rounded-2xl border border-[var(--border)] p-4 shadow-sm transition-colors', STAGE_CARD_BG[candidate.stage])}>
+      <li className={clsx(
+        'relative rounded-2xl border border-[var(--border)] p-4 shadow-sm transition-colors',
+        STAGE_CARD_BG[candidate.stage],
+        (quickActionOpen || stageOpen || editOpen || confirmOpen) && 'z-[60]'
+      )}>
         <div className="flex items-start gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
           <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
@@ -191,8 +195,8 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
               {quickActionOpen && (
                 <>
-                  <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
-                  <div className="absolute left-0 mt-2 z-50 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-xl animate-in fade-in slide-in-from-top-1 duration-150">
+                  <div className="fixed inset-0 z-[60]" onClick={() => setQuickActionOpen(false)} />
+                  <div className="absolute left-0 mt-2 z-[65] w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-xl animate-in fade-in slide-in-from-top-1 duration-150">
                     <p className="px-2 py-1 text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider">
                       {lang === 'en' ? 'Quick Actions' : 'Hızlı Eylemler'}
                     </p>

@@ -8,7 +8,7 @@ import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyActi
 
 import { parseNote } from '@/lib/noteParser'
 
-export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
+export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = createClient()

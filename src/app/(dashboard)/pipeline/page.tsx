@@ -9,6 +9,7 @@ import { StageFilter } from './_components/StageFilter'
 import { CandidateCard } from './_components/CandidateCard'
 import { AddCandidateSheet } from './_components/AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { clsx } from 'clsx'
 
 function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | null {
   if (!iso) return null
@@ -34,7 +35,6 @@ export default function PipelinePage() {
   const [filter, setFilter] = useState<CandidateFilter>('tumü')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [showOnlyFollowUp, setShowOnlyFollowUp] = useState(false)
 
   const { data: ws, isLoading: wsLoading, error: wsError } = useWorkspace()
   const { candidates: all, isLoading, error } = useCandidates(ws?.workspaceId)
@@ -44,18 +44,15 @@ export default function PipelinePage() {
     return status === 'past' || status === 'today'
   }).length
 
-  let filtered = filter === 'tumü'        ? all
+  const filtered = filter === 'tumü'        ? all
     : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
     : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
+    : filter === 'takip_zamani'? all.filter(c => {
+        const status = getFollowUpStatus(c.next_follow_up_at)
+        return status === 'past' || status === 'today'
+      })
     : filter === 'kaybolanlar' ? all.filter(c => c.stage === 'kayboldu')
     : all.filter(c => c.stage === filter)
-
-  if (showOnlyFollowUp) {
-    filtered = filtered.filter(c => {
-      const status = getFollowUpStatus(c.next_follow_up_at)
-      return status === 'past' || status === 'today'
-    })
-  }
 
   const candidates = searchQuery.trim()
     ? filtered.filter(c => c.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -65,6 +62,7 @@ export default function PipelinePage() {
     tumü:        all.length,
     aktif:       all.filter(c => ACTIVE_STAGES.includes(c.stage)).length,
     sicak:       all.filter(c => HOT_STAGES.includes(c.stage)).length,
+    takip_zamani: followUpAlertCount,
     kaybolanlar: all.filter(c => c.stage === 'kayboldu').length,
     // Stage-specific counts
     yeni:        all.filter(c => c.stage === 'yeni').length,
@@ -101,41 +99,53 @@ export default function PipelinePage() {
       </div>
 
       {/* Stat bar — clickable */}
-      <div className="mb-5 grid grid-cols-3 gap-3 animate-in fade-in duration-300 delay-100">
+      <div className="mb-5 grid grid-cols-2 sm:grid-cols-4 gap-3 animate-in fade-in duration-300 delay-100">
         <button
           onClick={() => setFilter('tumü')}
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'tumü'
-              ? 'bg-[var(--bg-subtle)] border-[#534AB7] ring-2 ring-[#534AB7]/20'
+              ? 'bg-[var(--bg-subtle)] border-[#534AB7] ring-2 ring-[#534AB7]/20 shadow-md shadow-[#534AB7]/5'
               : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-[#534AB7]/40'
           }`}
         >
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
           <p className="text-xs text-[var(--text-3)]">{t('pipeline.total')}</p>
         </button>
-        {/* Aktif — was orange, now gets green (Sıcak's old color) */}
+        {/* Aktif — was orange, now gets green */}
         <button
           onClick={() => setFilter('aktif')}
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'aktif'
-              ? 'bg-[#E1F5EE] border-[#0F6E56] ring-2 ring-[#0F6E56]/20 dark:bg-[#E1F5EE]/5'
+              ? 'bg-[#E1F5EE] border-[#0F6E56] ring-2 ring-[#0F6E56]/20 shadow-md shadow-[#0F6E56]/5 dark:bg-[#E1F5EE]/5'
               : 'bg-[#E1F5EE] border-[#E1F5EE]/50 hover:border-[#0F6E56]/40 dark:bg-[#E1F5EE]/5'
           }`}
         >
           <p className="text-xl font-bold text-[#0F6E56]">{counts.aktif}</p>
           <p className="text-xs text-[#0F6E56] dark:text-[#6ee7b7]">{t('pipeline.active')}</p>
         </button>
-        {/* Sıcak — was green, now gets orange (Aktif's old color) */}
+        {/* Sıcak — was green, now gets orange */}
         <button
           onClick={() => setFilter('sicak')}
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'sicak'
-              ? 'bg-[#FAEEDA] border-[#854F0B] ring-2 ring-[#854F0B]/20 dark:bg-[#FAEEDA]/5'
+              ? 'bg-[#FAEEDA] border-[#854F0B] ring-2 ring-[#854F0B]/20 shadow-md shadow-[#854F0B]/5 dark:bg-[#FAEEDA]/5'
               : 'bg-[#FAEEDA] border-[#FAEEDA]/50 hover:border-[#854F0B]/40 dark:bg-[#FAEEDA]/5'
           }`}
         >
           <p className="text-xl font-bold text-[#854F0B]">{counts.sicak}</p>
           <p className="text-xs text-[#854F0B] dark:text-[#fcd34d]">{t('pipeline.hot')}</p>
+        </button>
+        {/* Takip Zamanı (4. Kutu) — Pastel Kırmızı */}
+        <button
+          onClick={() => setFilter('takip_zamani')}
+          className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
+            filter === 'takip_zamani'
+              ? 'bg-red-500 border-red-500 text-white ring-2 ring-red-500/20 shadow-lg shadow-red-500/10 dark:bg-red-600'
+              : 'bg-red-50/30 border-red-100/50 hover:border-red-500/40 dark:bg-red-950/5 dark:border-red-900/10'
+          }`}
+        >
+          <p className={clsx('text-xl font-bold transition-colors', filter === 'takip_zamani' ? 'text-white' : 'text-red-500 dark:text-red-400')}>{counts.takip_zamani}</p>
+          <p className={clsx('text-xs transition-colors font-semibold', filter === 'takip_zamani' ? 'text-white' : 'text-red-600 dark:text-red-400')}>{lang === 'en' ? 'Follow-up Due' : 'Takip Zamanı'}</p>
         </button>
       </div>
 
@@ -157,28 +167,6 @@ export default function PipelinePage() {
             <X className="h-4 w-4" />
           </button>
         )}
-      </div>
-
-      {/* Hızlı Filtreler Strip */}
-      <div className="mb-4 flex flex-wrap gap-2 animate-in fade-in duration-300 delay-150">
-        <button
-          onClick={() => setShowOnlyFollowUp(prev => !prev)}
-          className={`rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
-            showOnlyFollowUp
-              ? 'bg-red-500 text-white dark:bg-red-600 border border-red-500 shadow-red-500/20'
-              : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-red-500/40 dark:hover:border-red-500/20'
-          }`}
-        >
-          <span>⏳</span>
-          <span>{lang === 'en' ? 'Follow-up Overdue/Today' : 'Takip Gecikti / Bugün'}</span>
-          {followUpAlertCount > 0 && (
-            <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-black tracking-wider ${
-              showOnlyFollowUp ? 'bg-white text-red-600 dark:text-red-700' : 'bg-red-500 text-white'
-            }`}>
-              {followUpAlertCount}
-            </span>
-          )}
-        </button>
       </div>
 
       <StageFilter active={filter} onChange={setFilter} counts={counts} />

@@ -776,3 +776,19 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Hızlı Eylemler (Inline Popover)**: Boru hattı aday kartlarına minimalist bir Yıldırım (`Zap`) ikonu eklendi.
 - **1-Tıkla Güncelleme & Aşama Seçim Kontrolü**: Sayfa değiştirmeden inline popover üzerinden temas planlama (+1 Gün, +3 Gün, +7 Gün) veya takibi sonlandırma eylemleri supabase mutasyonlarıyla anlık hale getirildi. Yanlışlıkla yapılan hatalı aşama geçişlerini önlemek için popover içindeki "Aşama Değiştir" butonu adayı direkt ilerletmek yerine aşama seçme listesini tetikleyecek şekilde güncellendi. Aşama Seçme Popup'ı hem mobilde hem masaüstünde ekranı tam ortalayacak şekilde (`rounded-3xl` şık kart formunda) konumlandırıldı ve popup açıkken arka planın kaymasını engelleyen gövde kilidi (body scroll-lock) entegre edildi.
 
+---
+
+## 2026-05-25 (tur 2)
+
+### fix: Pipeline sayfasında `clsx` import hatası giderildi
+
+- `src/app/(dashboard)/pipeline/page.tsx` içindeki `clsx` kullanımından kaynaklanan derleme hatası, kütüphanenin dosya başına import edilmesiyle çözüldü.
+- TypeScript derlemesi (`npx tsc --noEmit`) 100% başarılı ve sorunsuz hale getirildi.
+
+### fix: Alt Menü Barı (`BottomNav` z-50) altında kalma ve responsive z-index çakışmaları giderildi
+
+- `CandidateCard.tsx` içindeki liste elemanına (`li`), hızlı aksiyon popover'ı (`quickActionOpen`), aşama değiştirme penceresi (`stageOpen`), düzenleme (`editOpen`) veya silme onay penceresi (`confirmOpen`) açıkken dinamik olarak `z-[60]` atandı.
+- Bu sayede, kartın en altta veya alt menüye çok yakın olması durumunda bile açılan tüm kutular, modaller ve popover'lar `z-50` katmanındaki alt menü barının (`BottomNav`) üzerinde kusursuz bir şekilde render ediliyor.
+- Mobil uyumlu `YZEkipKocuSheet` ve `YZKocuSheet` modallerinin z-index katmanları, `zIndex.ts` kütüphanesine uygun şekilde `Z.sheetBackdrop` (`z-[60]`) ve `Z.sheet` (`z-[70]`) sabitleri ile güncellendi. Böylece alt menü barının (`z-50`) veya başlıkların (`z-40`) altında kalmaları tamamen engellendi.
+
+

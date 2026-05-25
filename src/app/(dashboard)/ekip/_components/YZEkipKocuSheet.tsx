@@ -7,6 +7,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/waLink'
 import type { MemberRow } from './EkipPanel'
 import { toast } from 'sonner'
+import { Z } from '@/lib/zIndex'
 
 interface Props {
   member: MemberRow
@@ -34,10 +35,10 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/40 backdrop-blur-sm`} onClick={onClose} />
       
       {/* Sheet panel */}
-      <div className="fixed left-1/2 top-4 md:top-1/2 z-50 w-[calc(100%-2rem)] md:w-[420px] -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 border border-[var(--border)] shadow-2xl transition-all"
+      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] md:w-[420px] -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 border border-[var(--border)] shadow-2xl transition-all`}
            style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
         
         {/* Başlık */}
