@@ -271,7 +271,7 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
             {/* Dönüşüm Hunisi */}
-            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
+            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 h-full">
               <div>
                 <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                   <Target className="h-4 w-4 text-[#1A56DB]" />
@@ -325,7 +325,7 @@ export default function AnalyticsPage() {
             </section>
 
             {/* İvme Grafikleri: Sıcaklık & Mini Trend */}
-            <div className="space-y-6">
+            <div className="flex flex-col justify-between h-full space-y-6 md:space-y-0">
               
               {/* Sıcaklık Dağılımı Donut */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
@@ -344,7 +344,7 @@ export default function AnalyticsPage() {
                     {lang === 'en' ? 'No candidates to analyze' : 'Analiz edilecek aday yok'}
                   </div>
                 ) : (
-                  <div className="flex items-center gap-6 py-2">
+                  <div className="flex items-center gap-6 py-4 md:py-6">
                     {/* SVG Concentric Gauge / Ring Chart */}
                     <div className="relative h-24 w-24 flex items-center justify-center shrink-0">
                       <svg width="96" height="96" className="transform -rotate-90">
@@ -420,13 +420,13 @@ export default function AnalyticsPage() {
                     {lang === 'en' ? 'No recent trend data' : 'Kayıt trendi verisi yok'}
                   </div>
                 ) : (
-                  <div className="flex items-end gap-2 h-20 pt-4">
+                  <div className="flex items-end gap-2 h-28 pt-4">
                     {trendBars.map((bar, i) => (
                       <div key={i} className="flex flex-1 flex-col items-center gap-1">
                         <span className="text-[9px] font-bold text-[var(--text-1)]">{bar.count > 0 ? bar.count : ''}</span>
                         <div
                           className={`w-full rounded-t-md transition-all ${bar.count > 0 ? 'bg-[#4169E1]' : 'bg-[#EEF2FF] dark:bg-[#4169E1]/20'}`}
-                          style={{ height: `${Math.max((bar.count / maxTrendCount) * 52, bar.count > 0 ? 6 : 2)}px` }}
+                          style={{ height: `${Math.max((bar.count / maxTrendCount) * 80, bar.count > 0 ? 8 : 2)}px` }}
                         />
                         <span className="text-[9px] font-semibold text-[var(--text-3)] truncate w-full text-center">{bar.label}</span>
                       </div>

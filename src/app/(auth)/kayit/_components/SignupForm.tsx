@@ -75,7 +75,7 @@ export function SignupForm() {
 
       {state.error && (
         <p className="rounded-xl bg-[#FBEAF0]/10 border border-[#72243E]/20 px-4 py-2.5 text-sm text-rose-300">
-          {t('auth.errorOccured')}
+          {state.error}
         </p>
       )}
 

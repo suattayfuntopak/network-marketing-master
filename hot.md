@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-05-25 — Layout Revizyonu, Grafik Hizalama, Kayıt Linki & Auth Hata Düzeltmeleri
+
+### style: Global Sayfa Genişliği max-w-8xl Yapıldı ve İstatistik Grafikleri Dikey Hizalandı
+- `DashboardShell.tsx`: Global sayfa genişliği, sağdan ve soldan boşlukları biraz daha azaltarak ekranı daha ferah doldurması amacıyla `max-w-7xl` (1280px) değerinden `max-w-8xl` (1440px) genişliğine çıkarıldı.
+- `istatistikler/page.tsx`: Süreç Sıcaklık Dağılımı ve Aday Kazanım İvmesi kutularının toplam yükseklikleri, sol taraftaki Aday Dönüşüm Hunisi ile dikeyde tam hizalanacak şekilde flex stretch / `h-full` yapısı ile dengelendi. Ayrıca donut ve bar grafiği boyutları/padding değerleri orantılı şekilde büyütüldü.
+
+### feat: Ekibim Davet Şablonuna Kayıt Linki Eklendi
+- `EkipPanel.tsx`: WhatsApp davet butonu mesaj şablonu geliştirilerek, yeni adayların kolayca üye olup kodu girebilmesi için `/kayit` (register) adresi şablona link olarak eklendi.
+
+### fix: Giriş ve Kayıt Sayfalarındaki Gizli Hata Detayları Çözüldü
+- `SignupForm.tsx` & `LoginForm.tsx`: Supabase Auth tarafından dönen ve kayıt/giriş başarısızlık nedenini açıklayan gerçek hata mesajlarının (`state.error`) UI tarafında gösterilmesi sağlandı. Eski hardcoded generic hata metni temizlendi, artık e-posta/şifre çakışmaları ve doğrulama sorunları anında görülebiliyor.
+
 ## 2026-05-25 — Global Sayfa Genişliği Standardizasyonu (Standardized Global Page Width)
 
 ### style: Tüm Panel Sayfaları Ortalanmış İdeal Genişliğe (max-w-7xl) Kavuşturuldu
