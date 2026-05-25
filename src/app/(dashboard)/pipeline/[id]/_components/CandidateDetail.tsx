@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity } from '@/hooks/useCandidates'
@@ -727,7 +727,7 @@ export function CandidateDetail({ candidateId }: Props) {
                         {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
                         {a.action_type === 'ai_generate'   && <Bot className="h-3.5 w-3.5 text-[#534AB7]" />}
                         {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
-                        {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
+                        {a.action_type === 'stage_change' && <ArrowRight className="h-3.5 w-3.5 text-[#854F0B]" />}
                       </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-[13px] leading-relaxed text-[var(--text-2)] break-words">

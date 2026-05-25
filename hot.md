@@ -757,7 +757,7 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 
 ### feat: Aktivite Geçmişi Normalizasyonu ve Lider Notu Yerelleştirme
 
-- **Aşama Dil Çevirisi**: `renderActivityText` fonksiyonunda `stageKeyMap` normalization haritası eklenerek `katildi`/`katıldı` ve benzeri aşama adlarının İngilizce ve Türkçe seçeneğinde anında doğru tercümesi sağlandı.
+- **Aşama Dil Çevirisi & İkon İyileştirmesi**: `renderActivityText` fonksiyonunda `stageKeyMap` normalization haritası eklenerek `katildi`/`katıldı` ve benzeri aşama adlarının İngilizce ve Türkçe seçeneğinde anında doğru tercümesi sağlandı. Ayrıca, tıklanabilir bir dropdown algısı yaratan `ChevronDown` (aşağı ok) ikonu yerine, "aşamalar arası ilerlemeyi ve geçişi" temsil eden çok daha şık bir sağa ok (`ArrowRight`) ikonu aktivite geçmişine entegre edildi.
 - **Lider Notu Ayrıştırma & Otomatik Geriye Dönük Çeviri**: Aktivite geçmişindeki lider notları `parseSimpleNote` ile işlenerek `TR ||| EN` formatından dille uyumlu şekilde ayıklanıp gösterilmeye başlandı. Eğer notun İngilizce karşılığı yoksa (eski kayıtlar), sayfa İngilizce açıldığında arka planda otomatik olarak Claude ile tercüme edilip Supabase'e kalıcı olarak geri yazılması sağlandı.
 - **Geri Al (Undo) Destekli Aktivite Silme**: Yanlışlıkla yapılan eylemlerin (aşama değişimi, arama kaydı vb.) geçmişte kalmaması için aktivite geçmişi satırlarına fareyle üzerine gelindiğinde (hover) beliren şık bir silme butonu eklendi. Tıklandığında onay alan, onaylandıktan sonra ise 5 saniyelik dairesel "Geri Al" animasyonu sunan güvenli silme mekanizması supabase entegrasyonuyla eklendi.
 
