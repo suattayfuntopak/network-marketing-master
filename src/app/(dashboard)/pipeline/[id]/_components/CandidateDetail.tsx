@@ -62,6 +62,60 @@ function formatFollowUpDate(iso: string | null, lang: string): string {
   })
 }
 
+function renderActivityText(a: any, lang: string, t: any): string {
+  const warmthMap: Record<string, {tr: string, en: string}> = {
+    sicak: { tr: 'Sıcak 🔥', en: 'Hot 🔥' },
+    ilik: { tr: 'Ilık ☀️', en: 'Warm ☀️' },
+    soguk: { tr: 'Soğuk ❄️', en: 'Cold ❄️' }
+  }
+
+  if (a.action_type === 'call') {
+    return t('pipeline.activityCall')
+  }
+  if (a.action_type === 'whatsapp') {
+    return 'WhatsApp'
+  }
+  if (a.action_type === 'ai_generate') {
+    return lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi'
+  }
+  if (a.action_type === 'stage_change') {
+    const stageName = a.note ? (t(`stages.${a.note}`) || a.note) : ''
+    return lang === 'en'
+      ? `Stage changed to ${stageName}`
+      : `Aşama değiştirildi: ${stageName}`
+  }
+  if (a.action_type === 'note') {
+    if (a.note?.startsWith('system_note:candidate_created')) {
+      return lang === 'en' ? 'Candidate profile created' : 'Aday profili oluşturuldu'
+    }
+    if (a.note?.startsWith('system_note:profile_update')) {
+      return lang === 'en' ? 'Profile details updated' : 'Profil bilgileri güncellendi'
+    }
+    if (a.note?.startsWith('system_note:warmth_change:')) {
+      const parts = a.note.replace('system_note:warmth_change:', '').split('->')
+      const oldW = warmthMap[parts[0]] ? warmthMap[parts[0]][lang === 'en' ? 'en' : 'tr'] : parts[0]
+      const newW = warmthMap[parts[1]] ? warmthMap[parts[1]][lang === 'en' ? 'en' : 'tr'] : parts[1]
+      return lang === 'en'
+        ? `Relationship warmth updated: ${oldW} ➔ ${newW}`
+        : `İlişki sıcaklığı güncellendi: ${oldW} ➔ ${newW}`
+    }
+    if (a.note?.startsWith('system_note:follow_up_change:')) {
+      const parts = a.note.replace('system_note:follow_up_change:', '').split('->')
+      const formatD = (val: string) => {
+        if (val === 'none' || !val) return lang === 'en' ? 'None' : 'Yok'
+        try {
+          return new Date(val).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+        } catch { return val }
+      }
+      return lang === 'en'
+        ? `Next follow-up date changed: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
+        : `Sonraki takip tarihi değiştirildi: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
+    }
+    return a.note || t('pipeline.activityNote')
+  }
+  return a.note || ''
+}
+
 // parseNote is now imported from @/lib/noteParser
 
 interface Props {
@@ -83,6 +137,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const [notesOpen, setNotesOpen] = useState(false)
   const [showAllNotes, setShowAllNotes] = useState(false)
   const [newNote, setNewNote] = useState('')
+  const [showAllActivity, setShowAllActivity] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -481,33 +536,43 @@ export function CandidateDetail({ candidateId }: Props) {
 
             {/* Aktivite Geçmişi */}
             {activityLog.length > 0 && (
-              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
-                <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
+                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
                   <History className="h-3.5 w-3.5" />
                   {t('pipeline.activityHistory')}
                 </p>
                 <ul className="space-y-2">
-                  {activityLog.map(a => (
-                    <li key={a.id} className="flex items-center gap-2.5 text-sm">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)]">
+                  {(showAllActivity ? activityLog : activityLog.slice(0, 5)).map(a => (
+                    <li key={a.id} className="flex items-start gap-2.5 text-sm py-0.5 animate-in fade-in duration-200">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] mt-0.5">
                         {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
                         {a.action_type === 'whatsapp'     && <MessageSquare className="h-3.5 w-3.5 text-[#25D366]" />}
+                        {a.action_type === 'ai_generate'   && <Bot className="h-3.5 w-3.5 text-[#534AB7]" />}
                         {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
                         {a.action_type === 'stage_change' && <ChevronDown className="h-3.5 w-3.5 text-[#854F0B]" />}
                       </span>
-                      <span className="flex-1 text-[var(--text-2)]">
-                        {a.action_type === 'call'         && t('pipeline.activityCall')}
-                        {a.action_type === 'whatsapp'     && 'WhatsApp'}
-                        {a.action_type === 'note'         && t('pipeline.activityNote')}
-                        {a.action_type === 'stage_change' && t('pipeline.activityStageChange')}
-                        {a.note && <span className="text-[var(--text-3)]"> — {a.note}</span>}
-                      </span>
-                      <span className="shrink-0 text-[10px] text-[var(--text-3)]">
-                        {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short' })}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] leading-relaxed text-[var(--text-2)] break-words">
+                          {renderActivityText(a, lang, t)}
+                        </p>
+                        <p className="text-[9px] text-[var(--text-3)] font-medium mt-0.5">
+                          {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
                     </li>
                   ))}
                 </ul>
+                {activityLog.length > 5 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllActivity(!showAllActivity)}
+                    className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline pt-2 border-t border-[var(--border)] transition active:scale-95"
+                  >
+                    {showAllActivity
+                      ? (lang === 'en' ? 'Show Less' : 'Kapat')
+                      : (lang === 'en' ? 'Show All' : 'Tümünü Gör')}
+                  </button>
+                )}
               </div>
             )}
 

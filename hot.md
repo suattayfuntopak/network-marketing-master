@@ -1,6 +1,18 @@
 # Hot Log
 
-## 2026-05-25 — Supabase Eğitim Senkronizasyonu, Ekip Panel İnaktif Üye Takibi & Akıllı Takip Hızlı Filtresi (Konsey Önerileri)
+## 2026-05-25 — Supabase Eğitim Senkronizasyonu, Derin Aktivite Takibi, YZ Yazar Sadeleştirme & YZ Ekip Koçu Entegrasyonu (Konsey Önerileri & Ek İstekler)
+
+### feat: YZ Ekip Koçu — Downline İnaktif Üye Mentörlük Sistemi (Konsey Önerisi — Paket C)
+- `actions.ts` & `YZEkipKocuSheet.tsx`: Liderlerin son 7 gündür inaktif olan alt hat (downline) distribütörlerine nokta atışı mentörlük yapabilmesi için YZ Ekip Koçu geliştirildi. Claude `claude-sonnet-4-6` motoru ile entegre edilen sunucu aksiyonu (`generateDownlineCoachingMessage`), inaktif üyenin huni dağılımını (yeni aday, sunum, takip, katıldı sayılarını) analiz ederek ona özel, suçlayıcı olmayan, son derece yapıcı ve birebir görüşmeye davet eden motive edici Türkçe mentörlük mesajları üretir.
+- `EkipPanel.tsx`: İnaktif downline üyelerinin yanındaki **⚠️ Destek Gerekebilir** amber renkli aksiyon rozeti tıklanabilir hale getirilerek YZ Ekip Koçu paneline bağlandı. Liderler tek tıkla mentörlük mesajı üretip kopyalayabilir veya WhatsApp ile paylaşabilir.
+
+### feat: YZ Mesajı Üret Sadeleştirildi & Ek Bilgi Zenginleştirildi (Ek İstek)
+- `YazarForm.tsx`: Form üzerindeki mükerrer ve gereksiz olan "İlişki Derecesi (Sıcaklık)" seçmeli dropdown modülü tamamen kaldırıldı. Arayüz `md:grid-cols-2` olarak yeniden tasarlanarak "Mesaj Türü" ve "Ton" alanları yan yana asil bir şekilde konumlandırıldı.
+- Aday seçildiğinde (veya detay sayfasından yönlenildiğinde) arka planda sıcaklık derecesi saptanmaya devam eder; ayrıca adayın sıcaklık bilgisi (`warmth`), son 5 lider notu ve son 5 aktivite kaydı otomatik olarak Supabase'den çekilip **Ek Bilgi** (`context`) metin alanına `- 24 May: WhatsApp Mesajı` gibi zaman damgalı satırlarla yazılır. Böylece YZ mesaj üretirken adayın tüm geçmiş serüvenine 10x daha hakim olur.
+
+### feat: Supabase Derin Aktivite Takibi & Collapsible Aktivite Geçmişi (Ek İstek)
+- `useCandidates.ts`: Adaylar üzerindeki her türlü eylemi geçmişte loglamak için veritabanı loglama kapsamı genişletildi. Aday oluşturulduğunda (`system_note:candidate_created`), adayın sıcaklık derecesi değiştirildiğinde (`system_note:warmth_change:old->new`), sonraki takip tarihi güncellendiğinde (`system_note:follow_up_change:old->new`) veya profil bilgileri değiştiğinde (`system_note:profile_update`) Supabase `nmm_daily_actions` tablosuna standart check-constraint'leri bozmayan akıllı sistem notları kaydedilir.
+- `CandidateDetail.tsx`: Aday detay sayfasındaki "Aktivite Geçmişi" bölümü baştan aşağı yenilendi. Türkçe ve İngilizce dillerine göre tüm aşama değişimleri (`katıldı`, `yeni`, `takip` vb.) ve system_note kayıtları pürüzsüzce yerelleştirildi. Listenin dikeyde aşırı uzamasını engellemek için ilk 5 eylem sonrası **Tümünü Gör / Kapat** collapsible durum yöneticisi entegre edildi.
 
 ### feat: Supabase Eğitim Senkronizasyonu Entegre Edildi (Konsey Analizi — Paket C)
 - `egitim/page.tsx`: Eğitim okundu ve favoriler durum yönetimleri tamamen yerel `localStorage` bağımlılığından arındırıldı.

@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/client'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
+import { parseNote } from '@/lib/noteParser'
+
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
@@ -48,12 +50,26 @@ export function useAddCandidate(workspaceId: string) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Oturum yok')
 
-      const { error } = await supabase.from('nmm_candidates').insert({
-        ...payload,
-        workspace_id: workspaceId,
-        owner_id: user.id,
-      })
+      const { data, error } = await supabase
+        .from('nmm_candidates')
+        .insert({
+          ...payload,
+          workspace_id: workspaceId,
+          owner_id: user.id,
+        })
+        .select('id')
+        .single()
       if (error) throw new Error(error.message)
+
+      if (data) {
+        await supabase.from('nmm_daily_actions').insert({
+          workspace_id: workspaceId,
+          user_id: user.id,
+          candidate_id: data.id,
+          action_type: 'note' as const,
+          note: 'system_note:candidate_created',
+        })
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
@@ -68,23 +84,78 @@ export function useUpdateCandidate(workspaceId: string) {
   return useMutation({
     mutationFn: async ({ id, ...patch }: NmmCandidateUpdate & { id: string }) => {
       const supabase = createClient()
+      
+      const { data: currentCandidate } = await supabase
+        .from('nmm_candidates')
+        .select('*')
+        .eq('id', id)
+        .single()
+
       const { error } = await supabase
         .from('nmm_candidates')
         .update(patch)
         .eq('id', id)
       if (error) throw new Error(error.message)
 
-      // Stage değişikliğini aktivite geçmişine logla
-      if (patch.stage) {
+      if (currentCandidate) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          await supabase.from('nmm_daily_actions').insert({
-            workspace_id: workspaceId,
-            user_id: user.id,
-            candidate_id: id,
-            action_type: 'stage_change' as const,
-            note: patch.stage,
-          })
+          const inserts: any[] = []
+
+          // Stage change
+          if (patch.stage && patch.stage !== currentCandidate.stage) {
+            inserts.push({
+              workspace_id: workspaceId,
+              user_id: user.id,
+              candidate_id: id,
+              action_type: 'stage_change' as const,
+              note: patch.stage,
+            })
+          }
+
+          // Warmth change
+          if (patch.note !== undefined && patch.note !== currentCandidate.note) {
+            const currentWarmth = parseNote(currentCandidate.note).warmth || 'ilik'
+            const newWarmth = parseNote(patch.note).warmth || 'ilik'
+            if (currentWarmth !== newWarmth) {
+              inserts.push({
+                workspace_id: workspaceId,
+                user_id: user.id,
+                candidate_id: id,
+                action_type: 'note' as const,
+                note: `system_note:warmth_change:${currentWarmth}->${newWarmth}`,
+              })
+            }
+          }
+
+          // Follow-up date change
+          if (patch.next_follow_up_at !== undefined && patch.next_follow_up_at !== currentCandidate.next_follow_up_at) {
+            const oldDate = currentCandidate.next_follow_up_at || 'none'
+            const newDate = patch.next_follow_up_at || 'none'
+            inserts.push({
+              workspace_id: workspaceId,
+              user_id: user.id,
+              candidate_id: id,
+              action_type: 'note' as const,
+              note: `system_note:follow_up_change:${oldDate}->${newDate}`,
+            })
+          }
+
+          // Profile change
+          if ((patch.full_name && patch.full_name !== currentCandidate.full_name) ||
+              (patch.phone !== undefined && patch.phone !== currentCandidate.phone)) {
+            inserts.push({
+              workspace_id: workspaceId,
+              user_id: user.id,
+              candidate_id: id,
+              action_type: 'note' as const,
+              note: 'system_note:profile_update',
+            })
+          }
+
+          if (inserts.length > 0) {
+            await supabase.from('nmm_daily_actions').insert(inserts)
+          }
         }
       }
     },

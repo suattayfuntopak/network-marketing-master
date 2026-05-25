@@ -12,7 +12,7 @@ import { waHref } from '@/lib/waLink'
 import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
-import type { NmmCandidate } from '@/types/database.types'
+import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { parseNote } from '@/lib/noteParser'
 
 const MESSAGE_TYPES = [
@@ -127,6 +127,64 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     })
   }, [])
 
+  const fetchAndFormatCandidateContext = useCallback((c: NmmCandidate) => {
+    setSelected(c)
+    setQuery('')
+    setDropdownOpen(false)
+
+    const parsed = parseNote(c.note)
+    const parsedNote = parsed.tr
+    setWarmth(parsed.warmth || 'ilik')
+    const stageName = STAGE_LABEL[c.stage] || c.stage
+
+    const warmthMap: Record<string, string> = {
+      sicak: 'Sıcak (Hot) 🔥',
+      ilik: 'Ilık (Warm) ☀️',
+      soguk: 'Soğuk (Cold) ❄️'
+    }
+    const warmthText = warmthMap[parsed.warmth || 'ilik']
+
+    const supabase = createClient()
+    supabase
+      .from('nmm_daily_actions')
+      .select('action_type, note, created_at')
+      .eq('candidate_id', c.id)
+      .order('created_at', { ascending: false })
+      .limit(10)
+      .then(({ data }) => {
+        const rawActions = data ?? []
+        // Leader notes (non-system notes)
+        const leaderNotes = rawActions.filter(a => a.action_type === 'note' && !a.note?.startsWith('system_note:'))
+        // Activities
+        const activities = rawActions.slice(0, 5)
+
+        const notesText = leaderNotes.length > 0
+          ? '\n\nLider Notları:\n' + leaderNotes.map(n => `- ${n.note}`).join('\n')
+          : ''
+
+        const activityLines = activities.map(a => {
+          const dateStr = new Date(a.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
+          const actionText = a.action_type === 'call' ? 'Telefon Araması'
+            : a.action_type === 'whatsapp' ? 'WhatsApp Mesajı'
+            : a.action_type === 'ai_generate' ? 'YZ Mesajı Üretildi'
+            : a.action_type === 'stage_change' ? `Aşama değişti: ${STAGE_LABEL[a.note as CandidateStage] || a.note}`
+            : a.note?.startsWith('system_note:candidate_created') ? 'Aday profili oluşturuldu'
+            : a.note?.startsWith('system_note:profile_update') ? 'Profil güncellendi'
+            : a.note?.startsWith('system_note:warmth_change:') ? 'Sıcaklık derecesi güncellendi'
+            : a.note?.startsWith('system_note:follow_up_change:') ? 'Takip tarihi güncellendi'
+            : a.note || 'Not Eklendi'
+          return `- ${dateStr}: ${actionText}`
+        }).join('\n')
+
+        const activitiesText = activities.length > 0
+          ? '\n\nSon Aktiviteler:\n' + activityLines
+          : ''
+
+        const infoText = `Aday: ${c.full_name}\nİlişki Derecesi: ${warmthText}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
+        setContext(infoText)
+      })
+  }, [])
+
   // Sayfa yüklenince localStorage'dan history + limit durumunu al
   useEffect(() => {
     setHistory(loadHistory())
@@ -139,36 +197,13 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         c => c.full_name.toLowerCase() === initialName.toLowerCase()
       )
       if (match) {
-        setSelected(match)
-        setQuery('')
-        // Pre-populate candidate information
-        const parsed = parseNote(match.note)
-        const parsedNote = parsed.tr
-        setWarmth(parsed.warmth || 'ilik')
-        const stageName = STAGE_LABEL[match.stage] || match.stage
-        
-        // Fetch last 5 leader notes
-        const supabase = createClient()
-        supabase
-          .from('nmm_daily_actions')
-          .select('note')
-          .eq('candidate_id', match.id)
-          .eq('action_type', 'note')
-          .order('created_at', { ascending: false })
-          .limit(5)
-          .then(({ data }) => {
-            const notesText = data && data.length > 0
-              ? '\n\nLider Notları:\n' + data.map(n => `- ${n.note}`).join('\n')
-              : ''
-            const infoText = `Aday: ${match.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}\n\n`
-            setContext(infoText)
-          })
+        fetchAndFormatCandidateContext(match)
       } else if (cleanInitialNote) {
         setContext(cleanInitialNote)
       }
       prefilledRef.current = true
     }
-  }, [initialName, candidates, cleanInitialNote])
+  }, [initialName, candidates, cleanInitialNote, fetchAndFormatCandidateContext])
 
   useEffect(() => {
     function onOutside(e: MouseEvent) {
@@ -205,32 +240,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   )
 
   function selectCandidate(c: NmmCandidate) {
-    setSelected(c)
-    setQuery('')
-    setDropdownOpen(false)
-
-    // Pre-populate candidate information
-    const parsed = parseNote(c.note)
-    const parsedNote = parsed.tr
-    setWarmth(parsed.warmth || 'ilik')
-    const stageName = STAGE_LABEL[c.stage] || c.stage
-
-    // Fetch last 5 leader notes
-    const supabase = createClient()
-    supabase
-      .from('nmm_daily_actions')
-      .select('note')
-      .eq('candidate_id', c.id)
-      .eq('action_type', 'note')
-      .order('created_at', { ascending: false })
-      .limit(5)
-      .then(({ data }) => {
-        const notesText = data && data.length > 0
-          ? '\n\nLider Notları:\n' + data.map(n => `- ${n.note}`).join('\n')
-          : ''
-        const infoText = `Aday: ${c.full_name}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}\n\n`
-        setContext(infoText)
-      })
+    fetchAndFormatCandidateContext(c)
   }
 
   function clearSelection() {
@@ -264,8 +274,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         <input type="hidden" name="stage" value={selected?.stage ?? ''} />
         <input type="hidden" name="name" value={selected?.full_name ?? query} />
 
-        {/* Mesaj Türü + Ton + Sıcaklık Dropdown'ları */}
-        <div className="grid gap-4 md:grid-cols-3">
+        {/* Mesaj Türü + Ton Dropdown'ları */}
+        <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
               Mesaj Türü
@@ -303,25 +313,6 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                     {t.label}
                   </option>
                 ))}
-              </select>
-              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
-            </div>
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="warmthSelect">
-              İlişki Derecesi (Sıcaklık)
-            </label>
-            <div className="relative">
-              <select
-                id="warmthSelect"
-                value={warmth}
-                onChange={e => setWarmth(e.target.value as any)}
-                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
-              >
-                <option value="sicak" className="bg-[var(--bg-card)] text-[var(--text-1)]">🔥 Sıcak (Hot)</option>
-                <option value="ilik" className="bg-[var(--bg-card)] text-[var(--text-1)]">☀️ Ilık (Warm)</option>
-                <option value="soguk" className="bg-[var(--bg-card)] text-[var(--text-1)]">❄️ Soğuk (Cold)</option>
               </select>
               <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
             </div>

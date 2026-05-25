@@ -15,6 +15,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { SpoilerCode } from './SpoilerCode'
 import { BroadcastPanel } from './BroadcastPanel'
+import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 
 export interface MemberRow {
   user_id: string
@@ -94,6 +95,7 @@ export function EkipPanel() {
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
+  const [coachingMember, setCoachingMember] = useState<{ member: MemberRow; days: number } | null>(null)
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -243,10 +245,14 @@ export function EkipPanel() {
                         <Crown className="h-3.5 w-3.5 shrink-0 text-[#854F0B]" strokeWidth={2} />
                       )}
                       {isInactive && (
-                        <span className="shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[9px] font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 animate-pulse">
+                        <button
+                          onClick={() => setCoachingMember({ member: m, days: daysInactive })}
+                          className="shrink-0 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[9px] font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 animate-pulse hover:scale-105 active:scale-95 transition-all"
+                          title={lang === 'en' ? 'Get AI Coaching Message' : 'YZ Koçluk Mesajı Al'}
+                        >
                           <span>⚠️</span>
                           <span>{lang === 'en' ? 'Needs Support' : 'Destek Gerekebilir'}</span>
-                        </span>
+                        </button>
                       )}
                     </div>
                     <p className="text-xs text-[var(--text-3)] capitalize mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
@@ -404,6 +410,16 @@ export function EkipPanel() {
           message={t('team.removeMemberMsg', { name: memberToRemove.name })}
           onConfirm={handleRemoveMemberConfirmed}
           onCancel={handleMemberRemoveCancel}
+        />
+      )}
+
+      {/* YZ Ekip Koçu Mentörlük Paneli */}
+      {coachingMember && (
+        <YZEkipKocuSheet
+          member={coachingMember.member}
+          daysInactive={coachingMember.days}
+          lang={lang}
+          onClose={() => setCoachingMember(null)}
         />
       )}
     </div>
