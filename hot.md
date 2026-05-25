@@ -2,6 +2,13 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### fix: Onboarding Ekibe Katılma Akışındaki parent_id ve Workspace Kayma Hatası Düzeltildi
+- `OnboardingModal.tsx`: Sisteme yeni kaydolan distribütörün onboarding modalı içerisinden davet kodu girdiğinde, `nmm_workspace_members` tablosunu eski modelde direkt update ederek workspace kaymasına ve organizasyon dışı kalmasına neden olan kritik hata giderildi.
+- **Düzeltme:** Onboarding modalındaki ekibe katılma akışı da strictly **`nmm_join_workspace` RPC** sunucu fonksiyonumuza bağlanarak yeni MLM bağımsız workspace/parent_id sponsorluk altyapısıyla 100% uyumlu hale getirildi. Artık onboarding üzerinden kod girildiğinde de üyenin kendi Workspace `parent_id` bağı pürüzsüzce kurulur, liderin performans paneline ve ekibim listesine anında düşer.
+
+### style: Tüm Uygulama Font Slaytları Küresel Olarak 1 Punto (1px) Büyütüldü
+- `globals.css`: Hem mobil hem de masaüstü ekranlarda okunabilirliği en üst seviyeye çıkarmak amacıyla Tailwind CSS v4 `@theme` katmanında küresel font-size tanımları (`--font-size-*`) tam olarak **1 punto (0.0625rem / 1px)** artırıldı. `text-xs`, `text-sm`, `text-base` gibi tüm yardımcı sınıflar orantılı ve güvenli bir şekilde büyütüldü. (Kullanıcı testi sonrası eski haline tek tıkla geri alınabilir).
+
 ### feat: Yapay Zeka Günlük Limitleri (20 / 5 / 15), Kalan Hak Rozetleri & İstatistikler Cam Morfin İlerleme Kartı
 - **Yeni Limit Mimarisi:** Supabase veritabanı logları (`nmm_daily_actions`) üzerinden çalışan, strictly denetlenen özellik bazlı dinamik limitler hayata geçirildi:
   - **Yapay Zeka Koçu (Rol Provası):** `20` günlük hak (`note = 'roleplay'`).

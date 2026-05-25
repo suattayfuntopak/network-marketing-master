@@ -51,22 +51,22 @@ export function OnboardingModal({ workspaceId, inviteCode }: Props) {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Oturum yok.')
 
-      const { data: targetWs } = await supabase
-        .from('nmm_workspaces').select('id, name').eq('invite_code', code).maybeSingle()
+      const { data, error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
+      if (rpcError) {
+        toast.error(rpcError.message?.includes('invalid_invite_code') ? 'Geçersiz davet kodu.' : 'Ekibe katılım sırasında bir hata oluştu.')
+        setJoining(false)
+        return
+      }
 
-      if (!targetWs) { toast.error('Davet kodu bulunamadı.'); setJoining(false); return }
-
-      await supabase.from('nmm_workspace_members')
-        .update({ workspace_id: targetWs.id, role: 'member' }).eq('user_id', user.id)
-
-      await supabase.from('nmm_candidates')
-        .update({ workspace_id: targetWs.id }).eq('owner_id', user.id)
-
-      toast.success(`"${targetWs.name}" ekibine katıldınız!`)
+      toast.success('Başarıyla ekibe katıldınız!')
       qc.invalidateQueries({ queryKey: ['workspace'] })
+      qc.invalidateQueries({ queryKey: ['members'] })
       qc.invalidateQueries({ queryKey: ['candidates'] })
-    } catch { toast.error('Katılım başarısız oldu.') }
-    finally { setJoining(false) }
+    } catch {
+      toast.error('Katılım başarısız oldu.')
+    } finally {
+      setJoining(false)
+    }
     dismiss()
   }
 
