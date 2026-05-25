@@ -16,7 +16,8 @@ import { waHref } from '@/lib/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { parseNote, formatNote } from '@/lib/noteParser'
+import { parseNote, formatNote, parseSimpleNote, formatSimpleNote } from '@/lib/noteParser'
+import { generateNotesSummary } from '../actions'
 
 
 function suggestedFollowUp(c: NmmCandidate, lang: string): string | null {
@@ -79,7 +80,29 @@ function renderActivityText(a: any, lang: string, t: any): string {
     return lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi'
   }
   if (a.action_type === 'stage_change') {
-    const stageName = a.note ? (t(`stages.${a.note}`) || a.note) : ''
+    const rawNote = (a.note || '').toLowerCase().trim()
+    const stageKeyMap: Record<string, string> = {
+      'yeni': 'yeni',
+      'iletisim': 'iletisim',
+      'iletişime geçildi': 'iletisim',
+      'davetli': 'davetli',
+      'davet edildi': 'davetli',
+      'sunum': 'sunum',
+      'sunum yapıldı': 'sunum',
+      'takip': 'takip',
+      'takipte': 'takip',
+      'kararsiz': 'kararsiz',
+      'kararsız': 'kararsiz',
+      'katildi': 'katildi',
+      'katıldı': 'katildi',
+      'joined': 'katildi',
+      'ilgilenmedi': 'ilgilenmedi',
+      'pasif': 'pasif',
+      'kayboldu': 'kayboldu',
+      'kaybedildi': 'kayboldu'
+    }
+    const resolvedKey = stageKeyMap[rawNote] || rawNote
+    const stageName = t(`stages.${resolvedKey}`) || a.note || ''
     return lang === 'en'
       ? `Stage changed to ${stageName}`
       : `Aşama değiştirildi: ${stageName}`
@@ -111,7 +134,11 @@ function renderActivityText(a: any, lang: string, t: any): string {
         ? `Next follow-up date changed: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
         : `Sonraki takip tarihi değiştirildi: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
     }
-    return a.note || t('pipeline.activityNote')
+    
+    // Parse Lider Note (TR ||| EN)
+    const parsed = parseSimpleNote(a.note || '')
+    const displayNote = lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr
+    return `${lang === 'en' ? 'Leader note added' : 'Lider notu eklendi'}: "${displayNote}"`
   }
   return a.note || ''
 }
@@ -138,6 +165,32 @@ export function CandidateDetail({ candidateId }: Props) {
   const [showAllNotes, setShowAllNotes] = useState(false)
   const [newNote, setNewNote] = useState('')
   const [showAllActivity, setShowAllActivity] = useState(false)
+
+  // AI Notes Summary states
+  const [aiSummary, setAiSummary] = useState<string | null>(null)
+  const [isSummaryPending, setIsSummaryPending] = useState(false)
+
+  const handleGenerateSummary = async () => {
+    if (notes.length === 0) return
+    setIsSummaryPending(true)
+    try {
+      const rawNotes = notes.map(n => {
+        const parsedN = parseSimpleNote(n.note)
+        return parsedN.tr
+      })
+      const res = await generateNotesSummary(rawNotes)
+      if (res.error) {
+        toast.error(res.error)
+      } else if (res.summary) {
+        setAiSummary(res.summary)
+      }
+    } catch {
+      toast.error(lang === 'en' ? 'Could not generate summary' : 'Özet oluşturulamadı')
+    } finally {
+      setIsSummaryPending(false)
+    }
+  }
+
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -291,13 +344,24 @@ export function CandidateDetail({ candidateId }: Props) {
     router.push('/pipeline')
   }
 
-  const handleSaveNote = () => {
-    if (!newNote.trim()) return
-    addNoteMutation.mutate({ candidateId, note: newNote.trim() }, {
-      onSuccess: () => {
-        setNewNote('')
-      }
-    })
+  const handleSaveNote = async () => {
+    const textToSave = newNote.trim()
+    if (!textToSave) return
+    setNewNote('') // Clear input immediately for optimal UX response
+
+    try {
+      const res = await fetch('/api/translate-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: textToSave }),
+      })
+      const { translated } = await res.json()
+      const formatted = formatSimpleNote(textToSave, translated)
+      addNoteMutation.mutate({ candidateId, note: formatted })
+    } catch {
+      // Fallback: save raw if translation fails
+      addNoteMutation.mutate({ candidateId, note: textToSave })
+    }
   }
 
   return (
@@ -480,21 +544,84 @@ export function CandidateDetail({ candidateId }: Props) {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
-                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => (
-                          <div
-                            key={n.id}
-                            className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] border border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
-                          >
-                            <p className="whitespace-pre-wrap break-words">{n.note}</p>
-                            <p className="mt-2 text-[9px] font-medium text-[var(--text-3)] tracking-wide">
-                              {new Date(n.created_at).toLocaleDateString(locale, {
-                                day: 'numeric', month: 'short', year: 'numeric',
-                                hour: '2-digit', minute: '2-digit',
-                              })}
-                            </p>
+                      {/* YZ Özet & Aksiyon Planı Kartı */}
+                      {notes.length > 0 && (
+                        <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3.5 dark:border-indigo-950/40 dark:bg-indigo-950/15 space-y-2.5 transition-all duration-300">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 dark:text-indigo-300">
+                              <Bot className="h-4 w-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
+                              <span>{lang === 'en' ? 'AI Mentor Analysis' : 'YZ Mentör Analizi'}</span>
+                            </div>
+                            {!aiSummary && (
+                              <button
+                                type="button"
+                                disabled={isSummaryPending}
+                                onClick={handleGenerateSummary}
+                                className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition disabled:opacity-50 active:scale-95"
+                              >
+                                {isSummaryPending ? (lang === 'en' ? 'Analyzing...' : 'Analiz ediliyor...') : (lang === 'en' ? 'Analyze & Summarize ✨' : 'Analiz Et & Özetle ✨')}
+                              </button>
+                            )}
                           </div>
-                        ))}
+                          
+                          {isSummaryPending && (
+                            <div className="flex items-center gap-2 py-1">
+                              <div className="h-1.5 w-1.5 animate-ping rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
+                              <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70 font-semibold">
+                                {lang === 'en' ? 'Claude is reviewing all notes...' : 'Claude tüm notları inceliyor...'}
+                              </span>
+                            </div>
+                          )}
+
+                          {aiSummary && (
+                            <div className="text-xs leading-relaxed text-indigo-950 dark:text-indigo-200 animate-in fade-in duration-300 space-y-2">
+                              {(() => {
+                                const parsedSummary = parseSimpleNote(aiSummary)
+                                const displaySummary = lang === 'en' ? (parsedSummary.en || parsedSummary.tr) : parsedSummary.tr
+                                return <p className="font-medium whitespace-pre-wrap">{displaySummary}</p>
+                              })()}
+                              <div className="flex justify-end pt-1">
+                                <button
+                                  type="button"
+                                  onClick={handleGenerateSummary}
+                                  disabled={isSummaryPending}
+                                  className="text-[9px] font-bold text-indigo-600/80 hover:text-indigo-800 dark:text-indigo-400/80 dark:hover:text-indigo-300 transition"
+                                >
+                                  {lang === 'en' ? 'Re-Analyze 🔄' : 'Yeniden Analiz Et 🔄'}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {!aiSummary && !isSummaryPending && (
+                            <p className="text-[10px] leading-relaxed text-indigo-800/80 dark:text-indigo-300/80">
+                              {lang === 'en' 
+                                ? 'Let AI analyze all notes to extract a summary and a dynamic action plan.' 
+                                : 'Notların özetini çıkarmak ve dinamik aksiyon planı üretmek için YZ analizi başlatın.'}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
+                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => {
+                          const parsedN = parseSimpleNote(n.note)
+                          const displayText = lang === 'en' ? (parsedN.en || parsedN.tr) : parsedN.tr
+                          return (
+                            <div
+                              key={n.id}
+                              className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] border border-[var(--border)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
+                            >
+                              <p className="whitespace-pre-wrap break-words">{displayText}</p>
+                              <p className="mt-2 text-[9px] font-medium text-[var(--text-3)] tracking-wide">
+                                {new Date(n.created_at).toLocaleDateString(locale, {
+                                  day: 'numeric', month: 'short', year: 'numeric',
+                                  hour: '2-digit', minute: '2-digit',
+                                })}
+                              </p>
+                            </div>
+                          )
+                        })}
                       </div>
                       {notes.length > 5 && (
                         <button

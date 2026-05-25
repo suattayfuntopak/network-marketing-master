@@ -35,3 +35,23 @@ export function formatNote(tr: string, en?: string, avatarUrl?: string, warmth?:
   
   return parts.join(' ||| ')
 }
+
+export interface ParsedSimpleNote {
+  tr: string
+  en: string
+}
+
+export function parseSimpleNote(raw: string | null): ParsedSimpleNote {
+  if (!raw) return { tr: '', en: '' }
+  if (raw.startsWith('system_note:')) return { tr: raw, en: raw }
+  const parts = raw.split('|||')
+  return {
+    tr: parts[0]?.trim() ?? '',
+    en: parts[1]?.trim() ?? parts[0]?.trim() ?? ''
+  }
+}
+
+export function formatSimpleNote(tr: string, en?: string): string {
+  if (!en || !en.trim()) return tr.trim()
+  return `${tr.trim()} ||| ${en.trim()}`
+}

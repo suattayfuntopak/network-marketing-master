@@ -750,3 +750,28 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 
 - `AddCandidateSheet`, `EditCandidateSheet`, `YazarForm` güncellendi
 - Etiket metni "(max 500 karakter)" → "(max 1000 karakter)" olarak düzeltildi
+
+---
+
+## 2026-05-25 (tur 1)
+
+### feat: Aktivite Geçmişi Normalizasyonu ve Lider Notu Yerelleştirme
+
+- **Aşama Dil Çevirisi**: `renderActivityText` fonksiyonunda `stageKeyMap` normalization haritası eklenerek `katildi`/`katıldı` ve benzeri aşama adlarının İngilizce ve Türkçe seçeneğinde anında doğru tercümesi sağlandı.
+- **Lider Notu Ayrıştırma**: Aktivite geçmişindeki lider notları `parseSimpleNote` ile işlenerek `TR ||| EN` formatından dille uyumlu şekilde ayıklanıp gösterilmeye başlandı.
+
+### feat: YZ Lider Not Analizi & Dinamik Aksiyon Planı
+
+- **YZ Mentör Analizi Server Action**: Adayın tüm lider notlarını okuyup Claude Sonnet aracılığıyla 2 satırlık net bir özet ve hemen atılması gereken 1 aksiyon planı üreten `generateNotesSummary` server action'ı eklendi.
+- **Premium Arayüz Modülü**: `CandidateDetail.tsx` içine pastel renkli, ultra şık ve animasyonlu bir YZ Analiz kartı entegre edildi.
+
+### feat: Haftalık Organizasyon Performans Durumu (Team Scorecard)
+
+- **NM Metrik Karnesi**: Ekip sayfasının en üstüne, liderlere özel, katlanabilir ve minimalist bir `Haftalık Organizasyon Performans Durumu` kartı eklendi.
+- **Hap Performans Metrikleri**: Son 7 gündeki aktif distribütör oranı (`%`), sıcak aday hunisi potansiyeli (Sunum + Takip) ve ekibe kazandırılan toplam partner momentumu (Katıldı) anlık hesaplanarak listelendi.
+
+### feat: Kart Hızlı Aksiyon Arayüzü (Pipeline Quick Actions)
+
+- **Hızlı Eylemler (Inline Popover)**: Boru hattı aday kartlarına minimalist bir Yıldırım (`Zap`) ikonu eklendi.
+- **1-Tıkla Güncelleme**: Sayfa değiştirmeden inline popover üzerinden adayı sonraki aşamaya ilerletme, temas planlama (+1 Gün, +3 Gün, +7 Gün) veya takibi sonlandırma eylemleri supabase mutasyonlarıyla instantaneous hale getirildi.
+

@@ -178,3 +178,46 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
     return { error: 'Koçluk mesajı oluşturulamadı.' }
   }
 }
+
+export async function generateNotesSummary(notes: string[]): Promise<{ summary?: string; error?: string }> {
+  if (!notes || notes.length === 0) return { error: 'Not bulunamadı.' }
+  
+  try {
+    const response = await client.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 300,
+      system: [
+        {
+          type: 'text',
+          text: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
+Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net bir özet ve hemen atılması gereken 1 cümlelik aksiyon planı üreteceksin.
+Ürettiğin yanıtı hem Türkçe hem İngilizce olarak hazırlayacak ve tam olarak şu formatta döneceksin:
+[Türkçe Özet + Aksiyon Planı] ||| [English Summary + Action Plan]
+
+Örnek Yanıt formatı:
+Aday ürünlere çok ilgili ancak bütçe kısıtı var. Takip planı yapıldı. Ürün paketlerinin detaylarını ve ödeme kolaylıklarını içeren kısa bir WhatsApp mesajı atın. ||| The candidate is very interested in products but has budget constraints. Follow-up plan completed. Send a short WhatsApp message explaining product package details and flexible payment terms.
+
+Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.`
+        }
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `Lider Notları:\n${notes.map((n, i) => `${i + 1}. ${n}`).join('\n')}`
+        }
+      ]
+    })
+
+    const summary = response.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim()
+
+    return { summary }
+  } catch (err: any) {
+    console.error('Notes summary generation error', err)
+    return { error: 'Özet oluşturulurken bir hata meydana geldi.' }
+  }
+}
+

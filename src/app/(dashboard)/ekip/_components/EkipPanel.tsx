@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
-  TrendingUp, BarChart2,
+  TrendingUp, BarChart2, ChevronDown, ChevronUp,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -96,6 +96,7 @@ export function EkipPanel() {
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [coachingMember, setCoachingMember] = useState<{ member: MemberRow; days: number } | null>(null)
+  const [scorecardOpen, setScorecardOpen] = useState(true)
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -186,6 +187,20 @@ export function EkipPanel() {
     }
   }
 
+  const totalCandidates = members.reduce((s, m) => s + m.candidate_count, 0)
+  const totalJoined = members.reduce((s, m) => s + m.katildi_count, 0)
+  const totalTakip = members.reduce((s, m) => s + m.takip_count, 0)
+  const totalSunum = members.reduce((s, m) => s + m.sunum_count, 0)
+  const warmPipelinePotentials = totalTakip + totalSunum
+
+  // Son 7 günde aktif distribütörler (last_activity_at son 7 günde olanlar)
+  const activePartnersCount = members.filter(m => {
+    if (!m.last_activity_at) return false
+    const days = Math.floor((Date.now() - new Date(m.last_activity_at).getTime()) / 86400000)
+    return days < 7
+  }).length
+  const activeRatio = members.length > 0 ? Math.round((activePartnersCount / members.length) * 100) : 0
+
   return (
     <div className="space-y-6">
 
@@ -204,11 +219,100 @@ export function EkipPanel() {
           </div>
           <div className="rounded-2xl border border-accent-blue/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
             <p className="text-3xl font-extrabold text-accent-blue">
-              {members.reduce((s, m) => s + m.candidate_count, 0)}
+              {totalCandidates}
             </p>
             <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
           </div>
         </div>
+
+        {/* Haftalık Organizasyon Performans Durumu Kartı */}
+        {isLeader && (
+          <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 dark:border-indigo-950/20 dark:bg-indigo-950/5 space-y-4 animate-in fade-in duration-300">
+            <button
+              type="button"
+              onClick={() => setScorecardOpen(!scorecardOpen)}
+              className="flex w-full items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400">
+                  <TrendingUp className="h-4 w-4" />
+                </div>
+                <span className="text-sm font-bold text-indigo-950 dark:text-indigo-200">
+                  {lang === 'en' ? 'Weekly Team Performance Scorecard' : 'Haftalık Organizasyon Performans Durumu'}
+                </span>
+              </div>
+              {scorecardOpen ? (
+                <ChevronUp className="h-4 w-4 text-indigo-500" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-indigo-500" />
+              )}
+            </button>
+
+            {scorecardOpen && (
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                {/* Metrik 1: Aktif Partner Oranı */}
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                    {lang === 'en' ? 'Active Partner Ratio' : 'Aktif Distribütör Oranı'}
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                      %{activeRatio}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-medium">
+                      ({activePartnersCount}/{members.length})
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 leading-tight">
+                    {lang === 'en' 
+                      ? 'Partners active in the last 7 days.' 
+                      : 'Son 7 günde sahada aktif olan ekip üyeleriniz.'}
+                  </p>
+                </div>
+
+                {/* Metrik 2: Sıcak Huni Potansiyeli */}
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                    {lang === 'en' ? 'Warm Pipeline Potential' : 'Sıcak Aday Potansiyeli'}
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                      {warmPipelinePotentials}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-medium">
+                      {lang === 'en' ? 'Leads' : 'Aday'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 leading-tight">
+                    {lang === 'en'
+                      ? 'Total active presentation and follow-up candidates.'
+                      : 'Sunum yapılmış ve takibi devam eden sıcak adaylar.'}
+                  </p>
+                </div>
+
+                {/* Metrik 3: Kayıt Hunisi Momentumu */}
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                    {lang === 'en' ? 'Onboarding Momentum' : 'Kayıt Hunisi Momentumu'}
+                  </span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                      {totalJoined}
+                    </span>
+                    <span className="text-[10px] text-zinc-500 font-medium">
+                      {lang === 'en' ? 'Joined' : 'Katıldı'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-zinc-500 leading-tight">
+                    {lang === 'en'
+                      ? 'Total candidates successfully registered as partners.'
+                      : 'Huniden başarıyla ekibe dahil edilen iş ortakları.'}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Üye performans listesi */}
         <ul className="space-y-3">

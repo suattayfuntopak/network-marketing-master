@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Pencil, Trash2, X, RotateCcw } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
@@ -53,6 +53,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [stageOpen, setStageOpen] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [quickActionOpen, setQuickActionOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
   const parsed = parseNote(candidate.note)
@@ -61,6 +62,27 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
     update.mutate({ id: candidate.id, stage })
+  }
+
+  function addFollowUpDays(days: number) {
+    setQuickActionOpen(false)
+    const base = new Date()
+    base.setDate(base.getDate() + days)
+    update.mutate({ id: candidate.id, next_follow_up_at: base.toISOString() })
+  }
+
+  function clearFollowUp() {
+    setQuickActionOpen(false)
+    update.mutate({ id: candidate.id, next_follow_up_at: null })
+  }
+
+  function advanceStage() {
+    setQuickActionOpen(false)
+    const currentIndex = STAGE_ORDER.indexOf(candidate.stage)
+    if (currentIndex !== -1 && currentIndex < STAGE_ORDER.length - 1) {
+      const nextStage = STAGE_ORDER[currentIndex + 1]
+      changeStage(nextStage)
+    }
   }
 
   const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
@@ -140,7 +162,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
         {/* Alt satır: aşama + son temas */}
         <div className="mt-3 flex items-center justify-between">
-          <div>
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setStageOpen(v => !v)}
               className={clsx(
@@ -152,6 +174,77 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               {t(`stages.${candidate.stage}`)}
               <ChevronDown className="h-3 w-3" />
             </button>
+
+            {/* Quick Actions (Minimalist Lightning Popover) */}
+            <div className="relative">
+              <button
+                onClick={() => setQuickActionOpen(!quickActionOpen)}
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all active:scale-95 border border-[var(--border)]"
+                title={lang === 'en' ? 'Quick Actions' : 'Hızlı Aksiyonlar'}
+              >
+                <Zap className="h-3 w-3 shrink-0" />
+              </button>
+
+              {quickActionOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setQuickActionOpen(false)} />
+                  <div className="absolute left-0 mt-2 z-50 w-44 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2 shadow-xl animate-in fade-in slide-in-from-top-1 duration-150">
+                    <p className="px-2 py-1 text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider">
+                      {lang === 'en' ? 'Quick Actions' : 'Hızlı Eylemler'}
+                    </p>
+                    <div className="mt-1 space-y-1">
+                      {/* İlerlet */}
+                      {candidate.stage !== 'kayboldu' && candidate.stage !== 'ilgilenmedi' && (
+                        <button
+                          onClick={advanceStage}
+                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[#534AB7] transition"
+                        >
+                          <Zap className="h-3.5 w-3.5 text-amber-500" />
+                          <span>{lang === 'en' ? 'Advance Stage ➔' : 'Aşama İlerlet ➔'}</span>
+                        </button>
+                      )}
+
+                      {/* Takip Ertele */}
+                      <p className="px-2 pt-1.5 pb-0.5 text-[9px] font-semibold text-[var(--text-3)] uppercase border-t border-[var(--border)]">
+                        {lang === 'en' ? 'Reschedule Contact' : 'Teması Planla'}
+                      </p>
+                      <button
+                        onClick={() => addFollowUpDays(1)}
+                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                      >
+                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                        <span>+1 {lang === 'en' ? 'Day' : 'Gün'}</span>
+                      </button>
+                      <button
+                        onClick={() => addFollowUpDays(3)}
+                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                      >
+                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                        <span>+3 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                      </button>
+                      <button
+                        onClick={() => addFollowUpDays(7)}
+                        className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-medium text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                      >
+                        <Calendar className="h-3.5 w-3.5 text-blue-500" />
+                        <span>+7 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                      </button>
+
+                      {/* Takibi Kapat */}
+                      {candidate.next_follow_up_at && (
+                        <button
+                          onClick={clearFollowUp}
+                          className="flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition border-t border-[var(--border)]"
+                        >
+                          <X className="h-3.5 w-3.5 shrink-0" />
+                          <span>{lang === 'en' ? 'Remove Follow-up' : 'Takibi İptal Et'}</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
