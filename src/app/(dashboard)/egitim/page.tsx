@@ -6,6 +6,8 @@ import { getTrainingData } from '@/lib/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
 
+import { useProgressSync } from '@/hooks/useProgressSync'
+
 const SEVIYE_RENK: Record<string, string> = {
   'Temel': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/20',
   'Orta': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/20',
@@ -13,33 +15,6 @@ const SEVIYE_RENK: Record<string, string> = {
   'Basic': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/20',
   'Medium': 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/20',
   'Advanced': 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/20',
-}
-
-const READ_KEY = 'nmm_egitim_read'
-const FAV_KEY = 'nmm_egitim_favori'
-
-function loadRead(): Set<string> {
-  if (typeof window === 'undefined') return new Set()
-  try {
-    const raw = localStorage.getItem(READ_KEY)
-    return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
-  } catch { return new Set() }
-}
-
-function saveRead(read: Set<string>) {
-  localStorage.setItem(READ_KEY, JSON.stringify(Array.from(read)))
-}
-
-function loadFavs(): Set<string> {
-  if (typeof window === 'undefined') return new Set()
-  try {
-    const raw = localStorage.getItem(FAV_KEY)
-    return raw ? new Set(JSON.parse(raw) as string[]) : new Set()
-  } catch { return new Set() }
-}
-
-function saveFavs(favs: Set<string>) {
-  localStorage.setItem(FAV_KEY, JSON.stringify(Array.from(favs)))
 }
 
 const PAGE_SIZE = 10
@@ -53,17 +28,18 @@ function EgitimPageContent() {
   const [page, setPage] = useState(1)
   const [acikId, setAcikId] = useState<string | null>(null)
   
-  const [read, setRead] = useState<Set<string>>(new Set())
-  const [favs, setFavs] = useState<Set<string>>(new Set())
+  const {
+    readTrainings: read,
+    favTrainings: favs,
+    toggleTrainingRead,
+    toggleTrainingFav,
+  } = useProgressSync()
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const KATEGORILER_DATA = getTrainingData(lang)
 
   // Load state & query param
   useEffect(() => {
-    setRead(loadRead())
-    setFavs(loadFavs())
-    
     const topicId = searchParams.get('id')
     if (topicId) {
       setAcikId(topicId)
@@ -155,22 +131,12 @@ function EgitimPageContent() {
 
   function toggleRead(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    setRead(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      saveRead(next)
-      return next
-    })
+    toggleTrainingRead(id)
   }
 
   function toggleFav(id: string, e: React.MouseEvent) {
     e.stopPropagation()
-    setFavs(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      saveFavs(next)
-      return next
-    })
+    toggleTrainingFav(id)
   }
 
   async function copyKonu(maddeler: string[], id: string, e: React.MouseEvent) {

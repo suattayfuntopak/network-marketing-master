@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-05-25 — Supabase Eğitim Senkronizasyonu, Ekip Panel İnaktif Üye Takibi & Akıllı Takip Hızlı Filtresi (Konsey Önerileri)
+
+### feat: Supabase Eğitim Senkronizasyonu Entegre Edildi (Konsey Analizi — Paket C)
+- `egitim/page.tsx`: Eğitim okundu ve favoriler durum yönetimleri tamamen yerel `localStorage` bağımlılığından arındırıldı.
+- Ortak `useProgressSync` hook'u entegre edilerek; okuma durumları (`readTrainings`), favori eğitim konuları (`favTrainings`), `toggleTrainingRead` ve `toggleTrainingFav` özellikleri Supabase `nmm_daily_actions` tablosundaki tekil JSON blob'una (`nmm_progress_v1:...`) senkronize edildi. Böylece tarayıcı önbelleği silinse dahi hiçbir eğitim ilerlemesi kaybolmayacak ve çoklu cihaz senkronizasyonu mükemmel çalışacak.
+
+### feat: Ekip Paneli İnaktif Üye Takip Mekanizması (Konsey Analizi — Paket C)
+- `EkipPanel.tsx`: Takım liderlerinin organizasyonu çok daha dinamik yönetebilmesi ve inaktif üyeleri erken fark edip mentörlük desteği sunabilmesi amacıyla **İnaktif Üye Takibi** geliştirildi.
+- `fetchMembers`: Supabase sorgusu genişletilerek son 30 güne ait `nmm_daily_actions` kayıtları da tek bir hafif sorguda çekildi. Üyelerin sisteme katılım tarihleri (`joined_at`), aday ekleme/güncelleme ve YZ eylemleri JavaScript tarafında analiz edilerek her bir üyenin **Son Aktiflik Zamanı** (`last_activity_at`) saptandı.
+- Arayüz Yenilemesi: Son 7 gündür hiçbir aday eklememiş veya eylem kaydetmemiş downline üyelerinin isimlerinin yanına parıldayan asil amber renkli **⚠️ Destek Gerekebilir** durum rozeti yerleştirildi. Üye kartlarının altındaki detay satırına son derece asil ve hassas zaman damgaları eklenerek `"Son aktiflik: 24 May (1 gün önce)"` gibi detaylar liderin bilgisine sunuldu.
+
+### feat: Akıllı Takip Geciken / Bugün Hızlı Filtre Butonu (Konsey Analizi)
+- `pipeline/page.tsx`: Boru Hattı sayfasında takip zamanı yaklaşan veya kaçan adayları tek tuşla süzebilmek amacıyla **Hızlı Filtre Strip** alanı oluşturuldu.
+- `getFollowUpStatus`: Adayların bir sonraki takip zamanı (`next_follow_up_at`) parametrelerini kontrol ederek geciken (`past`) veya bugün yapılması gereken (`today`) takipleri saptayan tarih motoru eklendi.
+- Arayüz Yenilemesi: Arama kutusunun hemen altına, üzerinde toplam geciken/bugün takip bekleyen aday sayısını dinamik kırmızı bir baloncukla gösteren son derece asil bir **⏳ Takip Gecikti / Bugün** hızlı süzme butonu eklendi. Butona basıldığında boru hattındaki diğer kategori filtrelerinin üzerine dinamik bir katman ekleyerek yalnızca acil aksiyon bekleyen adayları listeler.
+
 ## 2026-05-25 — YZ Sıcaklık Modülü, Akıllı Takip Uyarıları & Mobil İyileştirmeler
 
 ### feat: YZ Sıcaklık Modülü entegre edildi (Konsey Analizi — Paket A)

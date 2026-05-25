@@ -26,11 +26,12 @@ export interface MemberRow {
   sunum_count: number
   takip_count: number
   katildi_count: number
+  last_activity_at: string | null
 }
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
-  const [{ data: members, error }, { data: candidatesRaw }] = await Promise.all([
+  const [{ data: members, error }, { data: candidatesRaw }, { data: recentActions }] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
       .select('user_id, full_name, role, joined_at')
@@ -39,9 +40,29 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .from('nmm_candidates')
       .select('owner_id, stage')
       .eq('workspace_id', workspaceId),
+    supabase
+      .from('nmm_daily_actions')
+      .select('user_id, created_at')
+      .eq('workspace_id', workspaceId)
+      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
   ])
   if (error) throw error
   const candidates = candidatesRaw ?? []
+  const actions = recentActions ?? []
+
+  const lastActionMap: Record<string, string> = {}
+  members?.forEach(m => {
+    if (m.joined_at) {
+      lastActionMap[m.user_id] = m.joined_at
+    }
+  })
+  actions.forEach(act => {
+    const current = lastActionMap[act.user_id]
+    if (!current || new Date(act.created_at) > new Date(current)) {
+      lastActionMap[act.user_id] = act.created_at
+    }
+  })
+
   return (members ?? [])
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
@@ -55,6 +76,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         sunum_count:   mc.filter(c => c.stage === 'sunum').length,
         takip_count:   mc.filter(c => c.stage === 'takip').length,
         katildi_count: mc.filter(c => c.stage === 'katildi').length,
+        last_activity_at: lastActionMap[m.user_id] ?? null,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
@@ -190,17 +212,29 @@ export function EkipPanel() {
         <ul className="space-y-3">
           {members.map(m => {
             const isCurrentUser = m.user_id === currentUser?.id
+            const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
+            const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
+            const isInactive = daysInactive >= 7 && !isCurrentUser
+
             return (
               <li
                 key={m.user_id}
-                className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition hover:shadow-md space-y-4"
+                className={`overflow-hidden rounded-2xl border transition-all duration-200 p-4 shadow-sm hover:shadow-md space-y-4 ${
+                  isInactive
+                    ? 'border-amber-200/50 bg-amber-50/5 dark:border-amber-900/20 dark:bg-amber-950/5'
+                    : 'border-[var(--border)] bg-[var(--bg-card)]'
+                }`}
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-base font-bold text-brand">
+                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-base font-bold ${
+                    isInactive
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                      : 'bg-[#EEEDFE] text-brand'
+                  }`}>
                     {(m.full_name ?? '?').charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1 overflow-hidden">
-                    <div className="flex min-w-0 items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <p className="truncate text-sm font-bold text-[var(--text-1)]">
                         {m.full_name ?? 'İsimsiz Üye'}
                         {isCurrentUser && <span className="ml-1.5 text-[10px] font-normal text-[var(--text-3)]">({t('common.you')})</span>}
@@ -208,12 +242,23 @@ export function EkipPanel() {
                       {m.role === 'leader' && (
                         <Crown className="h-3.5 w-3.5 shrink-0 text-[#854F0B]" strokeWidth={2} />
                       )}
+                      {isInactive && (
+                        <span className="shrink-0 rounded-full bg-amber-100 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[9px] font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 animate-pulse">
+                          <span>⚠️</span>
+                          <span>{lang === 'en' ? 'Needs Support' : 'Destek Gerekebilir'}</span>
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-[var(--text-3)] capitalize mt-0.5">
-                      {m.role === 'leader' ? t('common.leader') : t('common.member')}
+                    <p className="text-xs text-[var(--text-3)] capitalize mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                      <span>{m.role === 'leader' ? t('common.leader') : t('common.member')}</span>
                       {m.joined_at && (
-                        <span className="ml-1.5 text-[10px]">
+                        <span className="text-[10px] text-[var(--text-3)]/70">
                           · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
+                        </span>
+                      )}
+                      {lastActiveDate && (
+                        <span className={`text-[10px] ${isInactive ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-[var(--text-3)]/70'}`}>
+                          · {lang === 'en' ? 'Last active:' : 'Son aktiflik:'} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? (lang === 'en' ? 'today' : 'bugün') : `${daysInactive} ${lang === 'en' ? 'd ago' : 'gün önce'}`})
                         </span>
                       )}
                     </p>

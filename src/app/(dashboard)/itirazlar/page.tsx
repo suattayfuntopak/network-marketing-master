@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star, CheckCircle2, Circle, MessageSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useProgressSync } from '@/hooks/useProgressSync'
 
 interface Itiraz {
   id: number
@@ -214,7 +215,7 @@ const ITIRAZLAR: Itiraz[] = [
     kategori: { tr: 'Yetenek & Kimlik', en: 'Ability & Identity' },
     soru: { tr: 'Eğitimim yok, bilgim yok.', en: "I'm not educated enough—I'll fail." },
     cevap: {
-      tr: 'Bu iş üniversite diploması değil, öğrenme isteği ister. Başlarken yanında bir mentor, bir sistem ve adım adım eğitim materyali olacak. Gerekli olan şeyler: iletişim kurabilmek, dinleyebilmek ve öğrenmeye açık olmak. Bu üçü varsa sistem sana gerisini öğretir.',
+      tr: 'Bu iş üniversite diploması değil, öğrenme isteği ister. Başlarken yanında bir mentor, bir sistem ogrenim materyali olacak. Gerekli olan şeyler: iletişim kurabilmek, dinleyebilmek ve öğrenmeye açık olmak. Bu üçü varsa sistem sana gerisini öğretir.',
       en: "This isn't a university exam—it's a willingness to learn. You'll have a mentor, a system, and step-by-step training materials. The actual requirements: can you have a real conversation? Can you listen? Are you open to learning? If yes, the system teaches you the rest.",
     },
     emoji: '📚',
@@ -317,7 +318,7 @@ const ITIRAZLAR: Itiraz[] = [
     kategori: { tr: 'Genel', en: 'General' },
     soru: { tr: 'Şu an düşünmek istemiyorum.', en: "I don't want to think about it right now." },
     cevap: {
-      tr: 'Tamam, hiç sorun değil. Seni zorlamak istemem. Sadece şunu bırakayım: hazır olduğunda veya aklına takılan sorular olduğunda bana yaz. Kapı her zaman açık.',
+      tr: 'Tamam, hiç sorun değil. Seni zorlamak istemerim. Sadece şunu bırakayım: hazır olduğunda veya aklına takılan sorular olduğunda bana yaz. Kapı her zaman açık.',
       en: "Totally fine—no pressure. I just want to leave this: when you're ready, or if a question comes up, reach out. The door is always open.",
     },
     emoji: '🚪',
@@ -364,8 +365,6 @@ const ITIRAZLAR: Itiraz[] = [
   },
 ]
 
-const FAV_KEY = 'nmm_itiraz_favori'
-const READ_KEY = 'nmm_itiraz_read'
 const PAGE_SIZE = 10
 
 function getKategoriler(lang: 'tr' | 'en') {
@@ -375,55 +374,33 @@ function getKategoriler(lang: 'tr' | 'en') {
   return lang === 'en' ? [...baseEn, ...uniq] : [...base, ...uniq]
 }
 
-function loadSet(key: string): Set<number> {
-  if (typeof window === 'undefined') return new Set()
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? new Set(JSON.parse(raw) as number[]) : new Set()
-  } catch { return new Set() }
-}
-
-function saveSet(key: string, set: Set<number>) {
-  localStorage.setItem(key, JSON.stringify(Array.from(set)))
-}
-
 export default function ItirazlarPage() {
   const { lang } = useTranslation()
+  const {
+    readObjections: read,
+    favObjections: favs,
+    toggleObjectionRead,
+    toggleObjectionFav,
+  } = useProgressSync()
+
   const [search, setSearch] = useState('')
   const [acikId, setAcikId] = useState<number | null>(null)
   const [aktifKategori, setAktifKategori] = useState(0)
-  const [favs, setFavs] = useState<Set<number>>(new Set())
-  const [read, setRead] = useState<Set<number>>(new Set())
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
 
   const KATEGORILER = getKategoriler(lang)
 
-  useEffect(() => {
-    setFavs(loadSet(FAV_KEY))
-    setRead(loadSet(READ_KEY))
-  }, [])
-
   useEffect(() => { setPage(1) }, [search, aktifKategori, lang])
 
   function toggleFav(id: number, e: React.MouseEvent) {
     e.stopPropagation()
-    setFavs(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      saveSet(FAV_KEY, next)
-      return next
-    })
+    toggleObjectionFav(id)
   }
 
   function toggleRead(id: number, e: React.MouseEvent) {
     e.stopPropagation()
-    setRead(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      saveSet(READ_KEY, next)
-      return next
-    })
+    toggleObjectionRead(id)
   }
 
   async function copyCevap(cevap: string, id: number, e: React.MouseEvent) {

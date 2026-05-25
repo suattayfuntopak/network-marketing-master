@@ -10,20 +10,52 @@ import { CandidateCard } from './_components/CandidateCard'
 import { AddCandidateSheet } from './_components/AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
 
+function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | null {
+  if (!iso) return null
+  const followDate = new Date(iso)
+  if (isNaN(followDate.getTime())) return null
+  
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const followDateZero = new Date(followDate)
+  followDateZero.setHours(0, 0, 0, 0)
+  
+  if (followDateZero.getTime() < today.getTime()) {
+    return 'past'
+  } else if (followDateZero.getTime() === today.getTime()) {
+    return 'today'
+  }
+  return 'future'
+}
+
 export default function PipelinePage() {
   const { lang, t } = useTranslation()
   const [filter, setFilter] = useState<CandidateFilter>('tumü')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showOnlyFollowUp, setShowOnlyFollowUp] = useState(false)
 
   const { data: ws, isLoading: wsLoading, error: wsError } = useWorkspace()
   const { candidates: all, isLoading, error } = useCandidates(ws?.workspaceId)
 
-  const filtered = filter === 'tumü'        ? all
+  const followUpAlertCount = all.filter(c => {
+    const status = getFollowUpStatus(c.next_follow_up_at)
+    return status === 'past' || status === 'today'
+  }).length
+
+  let filtered = filter === 'tumü'        ? all
     : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
     : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
     : filter === 'kaybolanlar' ? all.filter(c => c.stage === 'kayboldu')
     : all.filter(c => c.stage === filter)
+
+  if (showOnlyFollowUp) {
+    filtered = filtered.filter(c => {
+      const status = getFollowUpStatus(c.next_follow_up_at)
+      return status === 'past' || status === 'today'
+    })
+  }
 
   const candidates = searchQuery.trim()
     ? filtered.filter(c => c.full_name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -125,6 +157,28 @@ export default function PipelinePage() {
             <X className="h-4 w-4" />
           </button>
         )}
+      </div>
+
+      {/* Hızlı Filtreler Strip */}
+      <div className="mb-4 flex flex-wrap gap-2 animate-in fade-in duration-300 delay-150">
+        <button
+          onClick={() => setShowOnlyFollowUp(prev => !prev)}
+          className={`rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm ${
+            showOnlyFollowUp
+              ? 'bg-red-500 text-white dark:bg-red-600 border border-red-500 shadow-red-500/20'
+              : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-red-500/40 dark:hover:border-red-500/20'
+          }`}
+        >
+          <span>⏳</span>
+          <span>{lang === 'en' ? 'Follow-up Overdue/Today' : 'Takip Gecikti / Bugün'}</span>
+          {followUpAlertCount > 0 && (
+            <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-black tracking-wider ${
+              showOnlyFollowUp ? 'bg-white text-red-600 dark:text-red-700' : 'bg-red-500 text-white'
+            }`}>
+              {followUpAlertCount}
+            </span>
+          )}
+        </button>
       </div>
 
       <StageFilter active={filter} onChange={setFilter} counts={counts} />
