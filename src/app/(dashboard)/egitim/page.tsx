@@ -38,18 +38,6 @@ function EgitimPageContent() {
 
   const KATEGORILER_DATA = getTrainingData(lang)
 
-  // Load state & query param
-  useEffect(() => {
-    const topicId = searchParams.get('id')
-    if (topicId) {
-      setAcikId(topicId)
-      setTimeout(() => {
-        const el = document.getElementById(`konu-${topicId}`)
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }, 300)
-    }
-  }, [searchParams])
-
   // Category array (Tümü, Favoriler, and individual categories)
   const KATEGORILER = useMemo(() => {
     const base = lang === 'en'
@@ -106,6 +94,23 @@ function EgitimPageContent() {
       return baslikMatch || ozetMatch || maddelerMatch
     })
   }, [search, aktifKategori, favs, ALL_TOPICS, KATEGORILER])
+
+  // Load state & query param & auto pagination & scroll to it
+  useEffect(() => {
+    const topicId = searchParams.get('id')
+    if (topicId) {
+      const idx = filtrelenmis.findIndex(t => t.id === topicId)
+      if (idx !== -1) {
+        const targetPage = Math.floor(idx / PAGE_SIZE) + 1
+        setPage(targetPage)
+        setAcikId(topicId)
+        setTimeout(() => {
+          const el = document.getElementById(`konu-${topicId}`)
+          el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }, 300)
+      }
+    }
+  }, [searchParams, filtrelenmis])
 
   // Reset page when category changes
   useEffect(() => {
