@@ -66,6 +66,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
     const phone = (fd.get('phone') as string).trim()
     const note = (fd.get('note') as string).trim()
     const stage = (fd.get('stage') as string | null) || 'yeni'
+    const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'
     
     if (!fullName) return
     if (phone && !PHONE_RE.test(phone)) {
@@ -98,8 +99,8 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
         avatarUrl = publicUrl
       }
 
-      // If a photo was uploaded, format note as Delimited (tr ||| en ||| avatarUrl)
-      const finalNote = formatNote(note, '', avatarUrl)
+      // If a photo was uploaded, format note as Delimited (tr ||| en ||| avatarUrl ||| warmth)
+      const finalNote = formatNote(note, '', avatarUrl, warmth)
 
       await add.mutateAsync({
         id: candidateId,
@@ -212,6 +213,14 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             <label className={labelClass} htmlFor="stage">Aşama</label>
             <select id="stage" name="stage" className={inputClass}>
               {STAGES_FORM.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="warmth">İlişki Derecesi (Sıcaklık)</label>
+            <select id="warmth" name="warmth" defaultValue="ilik" className={inputClass}>
+              <option value="sicak">🔥 Sıcak (Hot)</option>
+              <option value="ilik">☀️ Ilık (Warm)</option>
+              <option value="soguk">❄️ Soğuk (Cold)</option>
             </select>
           </div>
           <div>

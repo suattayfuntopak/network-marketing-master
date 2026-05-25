@@ -13,6 +13,7 @@ import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } 
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import type { NmmCandidate } from '@/types/database.types'
+import { parseNote } from '@/lib/noteParser'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -88,9 +89,10 @@ function Pill({ active, onClick, children }: { active: boolean; onClick: () => v
 interface Props {
   initialName?: string
   initialNote?: string
+  initialWarmth?: string
 }
 
-export function YazarForm({ initialName = '', initialNote = '' }: Props) {
+export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 'ilik' }: Props) {
   const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : ''
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
@@ -99,6 +101,12 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [messageType, setMessageType] = useState('genel')
   const [tone, setTone] = useState('samimi')
+  const [warmth, setWarmth] = useState<'sicak' | 'ilik' | 'soguk'>(() => {
+    if (initialWarmth === 'sicak' || initialWarmth === 'ilik' || initialWarmth === 'soguk') {
+      return initialWarmth
+    }
+    return 'ilik'
+  })
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
   const [limitReached, setLimitReached] = useState(false)
@@ -134,7 +142,9 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
         setSelected(match)
         setQuery('')
         // Pre-populate candidate information
-        const parsedNote = match.note ? match.note.split('|||')[0].trim() : ''
+        const parsed = parseNote(match.note)
+        const parsedNote = parsed.tr
+        setWarmth(parsed.warmth || 'ilik')
         const stageName = STAGE_LABEL[match.stage] || match.stage
         
         // Fetch last 5 leader notes
@@ -200,7 +210,9 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
     setDropdownOpen(false)
 
     // Pre-populate candidate information
-    const parsedNote = c.note ? c.note.split('|||')[0].trim() : ''
+    const parsed = parseNote(c.note)
+    const parsedNote = parsed.tr
+    setWarmth(parsed.warmth || 'ilik')
     const stageName = STAGE_LABEL[c.stage] || c.stage
 
     // Fetch last 5 leader notes
@@ -225,6 +237,7 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
     setSelected(null)
     setQuery('')
     setContext('')
+    setWarmth('ilik')
   }
 
   function handleCopy() {
@@ -247,11 +260,12 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
       <form action={action} className="space-y-5">
         <input type="hidden" name="messageType" value={messageType} />
         <input type="hidden" name="tone" value={tone} />
+        <input type="hidden" name="warmth" value={warmth} />
         <input type="hidden" name="stage" value={selected?.stage ?? ''} />
         <input type="hidden" name="name" value={selected?.full_name ?? query} />
 
-        {/* Mesaj Türü + Ton Dropdown'ları */}
-        <div className="grid gap-4 md:grid-cols-2">
+        {/* Mesaj Türü + Ton + Sıcaklık Dropdown'ları */}
+        <div className="grid gap-4 md:grid-cols-3">
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
               Mesaj Türü
@@ -289,6 +303,25 @@ export function YazarForm({ initialName = '', initialNote = '' }: Props) {
                     {t.label}
                   </option>
                 ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="warmthSelect">
+              İlişki Derecesi (Sıcaklık)
+            </label>
+            <div className="relative">
+              <select
+                id="warmthSelect"
+                value={warmth}
+                onChange={e => setWarmth(e.target.value as any)}
+                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
+              >
+                <option value="sicak" className="bg-[var(--bg-card)] text-[var(--text-1)]">🔥 Sıcak (Hot)</option>
+                <option value="ilik" className="bg-[var(--bg-card)] text-[var(--text-1)]">☀️ Ilık (Warm)</option>
+                <option value="soguk" className="bg-[var(--bg-card)] text-[var(--text-1)]">❄️ Soğuk (Cold)</option>
               </select>
               <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
             </div>

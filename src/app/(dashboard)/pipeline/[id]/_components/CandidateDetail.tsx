@@ -95,7 +95,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const addNoteMutation = useAddCandidateNote(ws?.workspaceId ?? '')
 
   const c = candidates.find(x => x.id === candidateId)
-  const parsed = c ? parseNote(c.note) : { tr: '', en: '', avatarUrl: '' }
+  const parsed = c ? parseNote(c.note) : { tr: '', en: '', avatarUrl: '', warmth: 'ilik' as const }
   const profilePhoto = parsed.avatarUrl || null
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
@@ -283,7 +283,18 @@ export function CandidateDetail({ candidateId }: Props) {
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
+                    {parsed.warmth === 'sicak' && (
+                      <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/30 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {lang === 'en' ? 'Hot' : 'Sıcak'}</span>
+                    )}
+                    {parsed.warmth === 'ilik' && (
+                      <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {lang === 'en' ? 'Warm' : 'Ilık'}</span>
+                    )}
+                    {parsed.warmth === 'soguk' && (
+                      <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {lang === 'en' ? 'Cold' : 'Soğuk'}</span>
+                    )}
+                  </div>
                   {c.phone && (
                     <p className="text-sm text-[var(--text-2)]">{c.phone}</p>
                   )}
@@ -305,7 +316,7 @@ export function CandidateDetail({ candidateId }: Props) {
             {/* Aksiyon butonları */}
             <div className="grid grid-cols-3 gap-3">
               <button
-                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.tr)}`)}
+                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.tr)}&warmth=${parsed.warmth}`)}
                 className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
               >
                 <Bot className="h-4 w-4" strokeWidth={1.75} />

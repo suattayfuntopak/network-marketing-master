@@ -21,6 +21,7 @@ export async function generateMessageAction(
   const context     = (formData.get('context')     as string | null)?.trim() ?? ''
   const tone        = (formData.get('tone')        as string | null)?.trim() ?? 'samimi'
   const messageType = (formData.get('messageType') as string | null)?.trim() ?? 'genel'
+  const warmth      = (formData.get('warmth')      as string | null)?.trim() ?? 'ilik'
 
   if (!name) return { error: 'Kişi adı zorunlu.' }
 
@@ -52,7 +53,7 @@ export async function generateMessageAction(
     .maybeSingle()
 
   try {
-    const message = await generateMessage({ name, stage, context, tone, messageType })
+    const message = await generateMessage({ name, stage, context, tone, messageType, warmth })
 
     if (membership && !isSuperAdmin) {
       await supabase.from('nmm_daily_actions').insert({

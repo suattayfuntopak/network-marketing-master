@@ -54,6 +54,13 @@ export interface GenerateMessageInput {
   context?: string
   tone?: string
   messageType?: string
+  warmth?: string
+}
+
+const WARMTH_CONTEXT: Record<string, string> = {
+  sicak: 'Sıcak Kontak — Çok samimi olduğun, yakın arkadaşın veya aileden biri. Resmiyetten tamamen uzak, samimi, gündelik ve içten bir dil kullan.',
+  ilik: 'Ilık Kontak — Tanıdığın ama çok sık görüşmediğin biri. Ne çok resmi ne aşırı samimi, dengeli ve arkadaşça bir dil kullan.',
+  soguk: 'Soğuk Kontak — Sosyal medyadan veya yabancı bir ortamdan yeni tanıştığın/bağlantı kurduğun kişi. Mesafeli, saygılı ama merak uyandırıcı, profesyonel ve sıcakkanlı bir dil kullan.',
 }
 
 export async function generateMessage(input: GenerateMessageInput): Promise<string> {
@@ -64,6 +71,7 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
     context = '',
     tone = 'samimi',
     messageType = 'genel',
+    warmth = 'ilik',
   } = input
 
   if (!name) throw new Error('Kişi adı zorunlu.')
@@ -71,12 +79,14 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const stageInfo = stage ? (STAGE_CONTEXT[stage] ?? '') : ''
   const typeInfo  = TYPE_CONTEXT[messageType] ?? ''
   const toneInfo  = TONE_CONTEXT[tone] ?? ''
+  const warmthInfo = warmth ? (WARMTH_CONTEXT[warmth] ?? '') : ''
 
   // Clean translation delimiters if present
   const cleanNote = note && note.includes('|||') ? note.split('|||')[0].trim() : note
   const cleanContext = context && context.includes('|||') ? context.split('|||')[0].trim() : context
 
   const stageStr = stage && stageInfo ? `Aşama: ${stage} — ${stageInfo}\n` : ''
+  const warmthStr = warmth && warmthInfo ? `İlişki Sıcaklığı: ${warmth} — ${warmthInfo}\n` : ''
   const noteStr  = cleanNote    ? `Notlar: ${cleanNote}\n`      : ''
   const ctxStr   = cleanContext ? `Ek bilgi: ${cleanContext}\n` : ''
 
@@ -88,7 +98,7 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
         type: 'text',
         text: `Sen bir network marketing danışmanısın. Üç görevin var:
 
-1. MESAJ ÜRETME: Kişi adı, boru hattı aşaması ve ek bilgiler verildiğinde o kişiye WhatsApp'tan gönderilecek Türkçe mesaj yaz. Kısa (max 3 paragraf), samimi, 2-3 emoji, satış baskısı yok.
+1. MESAJ ÜRETME: Kişi adı, boru hattı aşaması, ilişki sıcaklığı ve ek bilgiler verildiğinde o kişiye WhatsApp'tan gönderilecek Türkçe mesaj yaz. Kısa (max 3 paragraf), samimi, 2-3 emoji, satış baskısı yok.
 
 2. NM SORU-CEVAP: Ek Bilgi alanında network marketing, MLM, doğrudan satış, ekip büyütme, ürün tanıtımı, kişisel gelişim, pasif gelir veya bu sektörle ilgili bir soru sorulursa kısa ve pratik Türkçe cevap ver.
 
@@ -101,7 +111,7 @@ Her durumda sadece yanıtı veya mesajı yaz, başka açıklama ekleme.`,
     messages: [
       {
         role: 'user',
-        content: `Alıcı: ${name}\n${stageStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone} — ${toneInfo}`,
+        content: `Alıcı: ${name}\n${stageStr}${warmthStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone} — ${toneInfo}`,
       },
     ],
   })

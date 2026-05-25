@@ -74,9 +74,10 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
         avatarUrl = publicUrl
       }
 
-      // Format note combining tr, en and new/existing avatarUrl
+      // Format note combining tr, en, new/existing avatarUrl and warmth
       const rawNoteInput = (fd.get('note') as string).trim()
-      const finalNote = formatNote(rawNoteInput, parsed.en, avatarUrl)
+      const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'
+      const finalNote = formatNote(rawNoteInput, parsed.en, avatarUrl, warmth)
 
       await update.mutateAsync({
         id: candidate.id,
@@ -220,6 +221,14 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <label className={labelClass} htmlFor="edit-stage">Aşama</label>
             <select id="edit-stage" name="stage" defaultValue={candidate.stage} className={inputClass}>
               {STAGES_FORM.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="edit-warmth">İlişki Derecesi (Sıcaklık)</label>
+            <select id="edit-warmth" name="warmth" defaultValue={parsed.warmth || 'ilik'} className={inputClass}>
+              <option value="sicak">🔥 Sıcak (Hot)</option>
+              <option value="ilik">☀️ Ilık (Warm)</option>
+              <option value="soguk">❄️ Soğuk (Cold)</option>
             </select>
           </div>
           <div>

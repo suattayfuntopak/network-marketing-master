@@ -24,6 +24,25 @@ function daysSince(iso: string | null, t: (k: string, v?: Record<string, string 
   return t('common.daysAgo', { days: d })
 }
 
+function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | null {
+  if (!iso) return null
+  const followDate = new Date(iso)
+  if (isNaN(followDate.getTime())) return null
+  
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  
+  const followDateZero = new Date(followDate)
+  followDateZero.setHours(0, 0, 0, 0)
+  
+  if (followDateZero.getTime() < today.getTime()) {
+    return 'past'
+  } else if (followDateZero.getTime() === today.getTime()) {
+    return 'today'
+  }
+  return 'future'
+}
+
 interface CandidateCardProps {
   candidate: NmmCandidate
   workspaceId: string
@@ -71,7 +90,18 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               </div>
             )}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
+                {parsed.warmth === 'sicak' && (
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {lang === 'en' ? 'Hot' : 'Sıcak'}</span>
+                )}
+                {parsed.warmth === 'ilik' && (
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {lang === 'en' ? 'Warm' : 'Ilık'}</span>
+                )}
+                {parsed.warmth === 'soguk' && (
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {lang === 'en' ? 'Cold' : 'Soğuk'}</span>
+                )}
+              </div>
               {candidate.phone && (
                 <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
               )}
@@ -136,6 +166,24 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 {t('pipeline.reactivate')}
               </button>
             )}
+            {(() => {
+              const status = getFollowUpStatus(candidate.next_follow_up_at)
+              if (status === 'past') {
+                return (
+                  <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/20 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:text-red-300 border border-red-200/50 dark:border-red-900/30">
+                    ⚠️ {lang === 'en' ? 'Follow-up Overdue' : 'Takip Gecikti'}
+                  </span>
+                )
+              }
+              if (status === 'today') {
+                return (
+                  <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-900/30 animate-pulse">
+                    🔔 {lang === 'en' ? 'Follow-up Today' : 'Bugün Takip'}
+                  </span>
+                )
+              }
+              return null
+            })()}
             <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at, t)}</span>
           </div>
         </div>

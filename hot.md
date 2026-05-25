@@ -1,6 +1,16 @@
 # Hot Log
 
-## 2026-05-25 — YZ Mesaj Türleri & Boru Hattı Mobil Kaydırma İyileştirmesi
+## 2026-05-25 — YZ Sıcaklık Modülü, Akıllı Takip Uyarıları & Mobil İyileştirmeler
+
+### feat: YZ Sıcaklık Modülü entegre edildi (Konsey Analizi — Paket A)
+- `noteParser.ts`: SQL şemasını değiştirmeden veri geriye dönük uyumluluğunu korumak için `ParsedNote` yapısı genişletildi ve `warmth` ('sicak' | 'ilik' | 'soguk') parametresi 4. bileşen olarak (`|||` ayıracı ile) eklendi.
+- `AddCandidateSheet.tsx` & `EditCandidateSheet.tsx`: Aday ekleme ve düzenleme formlarına **İlişki Derecesi (Sıcaklık)** seçim kutusu eklendi; YZ için sıcaklık düzeyi seçilip kaydedilebilir hale getirildi.
+- `CandidateCard.tsx` & `CandidateDetail.tsx`: Aday kartlarının üzerinde ve aday detay sayfasında adın yanında **🔥 Sıcak**, **☀️ Ilık** veya **❄️ Soğuk** şeklinde son derece asil ve pastel renkli durum rozetleri gösterildi. Detay sayfasından YZ Yazar'a geçiş yaparken adayın sıcaklık bilgisi query param olarak aktarılıyor.
+- `YazarForm.tsx`: Aday listesinden seçim yapıldığında veya aday detayından yönlenildiğinde adayın sıcaklık düzeyi otomatik yüklenir. Kullanıcı dilerse form üzerinden sıcaklığı YZ mesajı üretilmeden önce değiştirebilir.
+- `generateMessage.ts` & `yazar/actions.ts`: Formdan alınan ilişki sıcaklığı `generateMessage` prompt derleyicisine iletildi. Claude modeline sıcak kontaklara son derece samimi ve gündelik, soğuk kontaklara ise mesafeli, saygılı ama merak uyandırıcı yazması için gerekli sistem yönergeleri entegre edildi.
+
+### feat: Akıllı Takip Uyarı Rozetleri (Konsey Analizi — Paket B)
+- `CandidateCard.tsx`: Boru hattındaki tüm aday kartlarının altına, girilen takip tarihi geçmişse **⚠️ Takip Gecikti**, bugün ise **🔔 Bugün Takip** şeklinde parıldayan, renk kodlu ve dikkat çekici takip uyarı rozetleri yerleştirildi. Distribütörün saha takip disiplini ve aksiyon alma kabiliyeti zirveye taşındı.
 
 ### fix: YZ Mesajı Üret sayfasından bazı mesaj türleri kaldırıldı
 - `YazarForm.tsx`: Mesaj türü seçeneklerinden `Sipariş Teşekkürü` (`siparis_tesekkuru`) ve `Yeniden Sipariş Daveti` (`yeniden_siparis_daveti`) seçenekleri çıkarıldı.

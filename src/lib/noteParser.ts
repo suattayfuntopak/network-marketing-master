@@ -2,23 +2,30 @@ export interface ParsedNote {
   tr: string
   en: string
   avatarUrl: string
+  warmth: 'sicak' | 'ilik' | 'soguk'
 }
 
 export function parseNote(rawNote: string | null): ParsedNote {
-  const result = { tr: '', en: '', avatarUrl: '' }
+  const result: ParsedNote = { tr: '', en: '', avatarUrl: '', warmth: 'ilik' }
   if (!rawNote) return result
   const parts = rawNote.split('|||')
   result.tr = parts[0]?.trim() ?? ''
   result.en = parts[1]?.trim() ?? ''
   result.avatarUrl = parts[2]?.trim() ?? ''
+  
+  const w = parts[3]?.trim()
+  if (w === 'sicak' || w === 'ilik' || w === 'soguk') {
+    result.warmth = w
+  }
   return result
 }
 
-export function formatNote(tr: string, en?: string, avatarUrl?: string): string {
+export function formatNote(tr: string, en?: string, avatarUrl?: string, warmth?: 'sicak' | 'ilik' | 'soguk'): string {
   const parts = [
     tr.trim(),
     (en ?? '').trim(),
-    (avatarUrl ?? '').trim()
+    (avatarUrl ?? '').trim(),
+    (warmth ?? 'ilik').trim()
   ]
   
   // Trim trailing empty parts to keep data footprint compact
