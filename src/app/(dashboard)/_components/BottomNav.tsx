@@ -71,7 +71,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         } else if (translationKey === 'nav.pipeline') {
           label = lang === 'en' ? 'Pipeline' : 'Boru Hattı'
         } else if (translationKey === 'nav.yazar') {
-          label = lang === 'en' ? 'AI Coach' : 'Yapay Zeka Koçu'
+          label = lang === 'en' ? 'AI Coach' : 'YZ Koçu'
         } else if (translationKey === 'nav.ekip') {
           label = lang === 'en' ? 'Team' : 'Ekibim'
         } else if (translationKey === 'nav.takvim') {
