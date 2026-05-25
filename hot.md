@@ -1,9 +1,11 @@
 # Hot Log
 
-## 2026-05-25 — Uyum Sayfası Genişlik Revizyonu (Uyum Page Centered Layout Update)
+## 2026-05-25 — Uyum ve YZ Koçu Modül Yerleşimi & Sekme Ortalama Güncellemeleri
 
-### style: Uyum Sayfası Ortalanmış ve İdeal Genişlik Düzene Getirildi
-- `uyum/page.tsx`: Sayfanın tam genişlikte (`w-full`) yayılması yerine, tam ekran ile dar görünümün ortalaması (ideal genişlik) olan `mx-auto max-w-7xl` konteyner yapısı entegre edildi. Ortalanarak sağdan soldan dengeli ve ferah boşluklar bırakıldı.
+### style: Uyum & YZ Koçu Ortalanmış İdeal Genişlik ve Sekme Tasarımı
+- `uyum/page.tsx`: Sayfanın tam genişlikte yayılması yerine, tam ekran ile dar görünümün ortalaması (ideal genişlik) olan `mx-auto max-w-7xl` konteyner yapısı entegre edildi. Ayrıca sayfa altındaki tab seçici sekmeler ortalandı (`mx-auto`).
+- `yazar/page.tsx`: Yapay Zeka Koçu sayfasının dış kabuğu da Uyum sayfası ile tamamen uyumlu olacak şekilde `mx-auto max-w-7xl` ideal genişlik düzenine uyarlandı.
+- `yazar/_components/YzKocuContainer.tsx`: Yapay Zeka Koçu modülünün üstündeki "Koçluk Al / Prova Yap" iki sekmeli kontrol paneli ortalandı (`mx-auto`).
 
 ## 2026-05-25 — Modüllerin Tam Sayfa Yapılması (Full-Width Layout Updates)
 

@@ -212,7 +212,7 @@ export default function CompliancePage() {
         </header>
 
         {/* Tab Selector */}
-        <div className="flex rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)] max-w-md">
+        <div className="flex rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)] max-w-md mx-auto">
           <button
             onClick={() => setActiveTab('auditor')}
             className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all cursor-pointer ${
