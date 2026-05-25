@@ -17,6 +17,36 @@ export interface ComplianceAuditState {
   error?: string
 }
 
+function parseSafeJSON(text: string): any {
+  let clean = text.trim()
+  
+  // 1. Extract JSON object block using regex
+  const jsonMatch = clean.match(/\{[\s\S]*\}/)
+  if (jsonMatch) {
+    clean = jsonMatch[0]
+  }
+
+  // 2. Fix missing commas between adjacent JSON objects inside arrays:
+  // e.g. } {  or }   {  => },{
+  clean = clean.replace(/\}\s*\{/g, '},{')
+
+  // 3. Fix missing commas between adjacent JSON arrays inside arrays:
+  // e.g. ] [  or ]   [  => ],[
+  clean = clean.replace(/\]\s*\[/g, '],[')
+
+  // 4. Remove trailing commas before closing braces/brackets (invalid in standard JSON)
+  clean = clean.replace(/,(\s*[\]}])/g, '$1')
+
+  // 5. Try parsing standard JSON
+  try {
+    return JSON.parse(clean)
+  } catch (err: any) {
+    console.error('Failed to parse JSON directly. Raw text:', text)
+    console.error('Cleaned text before parse:', clean)
+    throw new Error(`JSON ayrıştırma hatası (${err.message}). Lütfen tekrar deneyin.`)
+  }
+}
+
 export async function auditComplianceMessageAction(
   textToAudit: string,
   lang: string
@@ -82,7 +112,7 @@ JSON ŞABLONU (Bu yapıyı tam olarak takip et, asla yorum satırı veya açıkl
   "improved_text": "Kullanıcının girdiği metnin yasalara 100% uyumlu hale getirilmiş, onaylı ifadeler içeren, hem yasal hem de çekici ve etkili olan düzeltilmiş versiyonu."
 }
 
-Not: Eğer hiç ihlal yoksa score 100 olmalı, safety_level "safe" olmalı ve violations dizisi boş kalmalıdır ( [] ).
+Not: Eğer hiç ihlal yoksa score 100 olmalı, safety_level "safe" olmalı and violations dizisi boş kalmalıdır ( [] ).
 safety_level değeri: score >= 90 ise "safe", score 65-89 arası ise "warning", score < 65 ise "danger" olmalıdır.
 category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Gelir İddiası", "Yanıltıcı/Agresif Tanıtım".
 `;
@@ -111,13 +141,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       .join('')
       .trim()
 
-    // Strip markdown fences and extract clean JSON object
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      text = jsonMatch[0]
-    }
-
-    const parsed = JSON.parse(text)
+    const parsed = parseSafeJSON(text)
 
     // Save action usage in Supabase
     const { data: membership } = await supabase

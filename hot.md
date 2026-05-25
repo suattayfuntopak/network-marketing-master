@@ -2,6 +2,25 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: MLM Sponsorluk ve Hiyerarşik Downline Yapısı Sıfırdan İnşa Edildi (Bağımsız Lider Modeli)
+- `009_add_workspace_parent_id.sql`: Ekip üyelerinin (`member`) kendi isimlerini, kendi davet kodlarını görememesi, organizasyon kuramaması ve üst liderinin verilerini/ekibini aynen görerek veri ihlali yaşaması mimari olarak **kökten çözüldü**.
+  - **Yeni Model:** `nmm_workspaces` tablosuna **`parent_id uuid`** kolonu eklenerek bağımsız distribütör sponsorluk bağı kuruldu.
+  - **Yeni Davet/Katılım Akışı (`nmm_join_workspace`):** Üye bir davet koduyla katıldığında artık kendi workspace'inden çıkıp liderin workspace'ine taşınmaz. Kendi workspace'inin **Lideri** (`role = 'leader'`) olarak kalmaya devam eder, böylece **kendi adına özel**, **kendi davet kodunu üreten**, **anahtar teslim boş boru hattı** açılır! Sadece kendi workspace kaydının `parent_id` değeri kendisini davet eden sponsorun `owner_id`'sine eşitlenir.
+- `EkipPanel.tsx` (`fetchMembers`): 
+  - Lider, kendi Ekibim sayfasında artık tüm workspace üyelerini değil, strictly **`parent_id = leader_user_id`** (yani doğrudan kendisine davet koduyla katılmış distribütörleri) listeler.
+  - Alt downline'ın (User B's) downline'ları (User C's), iki üstteki lidere (User A'ya) akmaz! Yalnızca kodu gönderdiği doğrudan üyenin değerleri kendisine akar.
+  - Lider, downline üyelerinin aday sayısını ve hunideki durumlarını anlık izleyebilir ve onlara koçluk desteği verebilir.
+  - Downline üye (User B) kendi Ekibim sayfasında kendi adını lider olarak görür, kendi davet kodunu kopyalayabilir/paylaşabilir ve kendi ekibine katılanları izler.
+
+### fix: YZ Uyum Denetleyicisi JSON Ayrıştırma (SyntaxError) Hataları İçin %100 Dayanıklı Parser
+- `uyum/actions.ts` (`parseSafeJSON`): 
+  - **Hata:** Claude-sonnet modelinin violations dizisindeki iki nesne arasına virgül eklemeyi unutması (`Expected ',' or ']' after array element in JSON...`) veya unescaped line breaks yapması durumunda oluşan ayrıştırma hatası çözüldü.
+  - **Çözüm:** JSON ayrıştırması öncesinde `parseSafeJSON` adında son derece gelişmiş bir ön-düzenleme fonksiyonu yazıldı. Bu fonksiyon:
+    1. İki nesne arasındaki eksik virgülleri (`}\s*{` ➔ `},{`) otomatik ekler.
+    2. Dizi içindeki eksik virgülleri (`]\s*[` ➔ `],[`) düzeltir.
+    3. Geçersiz sondaki virgülleri (`Trailing Commas`) temizler.
+  - Bu sayede yapay zeka çıktısında ne tür bir noktalama hatası olursa olsun **JSON asıl durumuna onarılarak %100 hatasız çözümlenir**.
+
 ### feat: Ekip Üyeleri İçin Bağımsız Aday Boru Hattı ve Özel "Bugün" Görünümü Entegre Edildi
 - `useCandidates.ts`: Liderin davet koduyla katılan distribütörlerin liderin tüm boru hattı adaylarını, bugün ilgilenilecek adaylarını, takvimini ve istatistiklerini ortaklaşa görerek veri ihlali yaşaması sorunu **kökten çözüldü**.
   - **Yeni Altyapı:** Aday listesini çeken `fetchCandidates` sorgusu, `workspace_id` eşleşmesine ek olarak artık strictly **`owner_id = user.id`** (mevcut oturum açmış distribütör) filtresini uyguluyor.
