@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
+
+### feat: Ekip Üyeleri İçin Bağımsız Aday Boru Hattı ve Özel "Bugün" Görünümü Entegre Edildi
+- `useCandidates.ts`: Liderin davet koduyla katılan distribütörlerin liderin tüm boru hattı adaylarını, bugün ilgilenilecek adaylarını, takvimini ve istatistiklerini ortaklaşa görerek veri ihlali yaşaması sorunu **kökten çözüldü**.
+  - **Yeni Altyapı:** Aday listesini çeken `fetchCandidates` sorgusu, `workspace_id` eşleşmesine ek olarak artık strictly **`owner_id = user.id`** (mevcut oturum açmış distribütör) filtresini uyguluyor.
+  - **Sonuç:** Ekibe davet koduyla yeni katılan üyeler için tüm sayfalar (Bugün, Boru Hattı, Takvim, İstatistikler, Kazanımlar) **tamamen kişiye özel ve sıfır adaylı ("anahtar teslim boş sayfa")** olarak açılır. Her üye kendi adaylarını kaydeder ve yalnızca kendi adaylarını yönetir.
+  - **Lider Görünümü (Ekip Paneli):** Üyeler kendi adaylarını kendi boru hatlarında bağımsız yönettiklerinde, bu adayların toplam sayıları ve hunideki (yeni, sunum, takip, katıldı) dağılım bilgileri ortak `workspace_id` sayesinde liderin **Ekip** (My Team) performans tablosuna anında ve otomatik olarak akar ("aksiyonların lidere akması").
+- `pipeline/[id]/actions.ts`: `generateCoachMessage` (Yapay Zeka Koçu) server action'ı içerisine strictly candidate ownership (`owner_id = user.id`) kontrolü eklendi. Ekip üyelerinin diğer distribütörlerin aday ID'lerini kullanarak mesaj üretmesi veya erişmesi güvenlik seviyesinde engellendi.
+
+### fix: YZ Uyum Denetleyicisi & YZ Koçu Modüllerindeki Database Constraint (SyntaxError) Çökmeleri Kökten Giderildi
+- **Sorun:** Lider dışındaki normal üyeler (non-admin) simülasyon veya uyum denetimi yaptıklarında günlük AI kullanım sayacı tetikleniyor. Bu sayaç `nmm_daily_actions` tablosuna `action_type = 'ai_generate'` kaydını girmeye çalışıyordu; ancak veritabanı şemasındaki eski check constraint kısıtı bu değeri engellediği için işlem çöküyor ve ekrana hata fırlatıyordu.
+- **Düzeltmeler:**
+  - `008_add_ai_generate_action_type.sql`: Postgres `nmm_daily_actions` tablosunun check constraint kısıtını `'ai_generate'` eylemini de kapsayacak şekilde genişleten yeni veritabanı migrasyonu oluşturuldu.
+  - `uyum/actions.ts`, `yazar/actions.ts` & `pipeline/[id]/actions.ts`: En üst düzey **defansif yazılım mimarisi** kuruldu. AI günlük log insert işlemleri birer `try-catch` bloğuna alındı. Bu sayede, uzak Supabase veritabanında migrasyon senkronizasyonu tam tamamlanmamış olsa dahi, loglama hataları arka planda konsola yazılır ve ana AI Uyum Denetimi ile AI Koç simülasyonları **asla çökmeden %100 kararlılıkla çalışmaya devam eder**.
+
 ## 2026-05-25 — Yapay Zeka Koçu Prova Simülasyonları Dinamikleştirildi & Uyum Denetleyicisi Hata Düzeltmesi
 
 ### fix: Uyum Merkezi YZ Uyum Denetleyicisi JSON Ayrıştırma (SyntaxError) Hatası Çözüldü

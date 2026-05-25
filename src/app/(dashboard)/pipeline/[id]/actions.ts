@@ -44,6 +44,7 @@ export async function generateCoachMessage(
       .select('*', { count: 'exact', head: true })
       .eq('id', candidateId)
       .eq('workspace_id', membership.workspace_id)
+      .eq('owner_id', user.id)
     if ((count ?? 0) === 0) return { error: 'Erişim reddedildi.' }
   }
 
@@ -164,18 +165,22 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
     if (!message) throw new Error('Boş yanıt döndü.')
 
     if (membership && !isSuperAdmin) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-      })
+      try {
+        await supabase.from('nmm_daily_actions').insert({
+          workspace_id: membership.workspace_id,
+          user_id: user.id,
+          candidate_id: null,
+          action_type: 'ai_generate' as const,
+        })
+      } catch (dbErr) {
+        console.error('Failed to insert coaching daily action log (constraint issues):', dbErr)
+      }
     }
 
     return { message }
   } catch (err: any) {
     console.error('Coaching message error', err)
-    return { error: 'Koçluk mesajı oluşturulamadı.' }
+    return { error: 'Koçluk mesajı oluşturulamadı: ' + (err?.message || String(err)) }
   }
 }
 

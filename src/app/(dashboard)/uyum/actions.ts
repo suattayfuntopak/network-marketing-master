@@ -127,13 +127,17 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       .maybeSingle()
 
     if (membership && !isSuperAdmin) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-        note: 'compliance',
-      })
+      try {
+        await supabase.from('nmm_daily_actions').insert({
+          workspace_id: membership.workspace_id,
+          user_id: user.id,
+          candidate_id: null,
+          action_type: 'ai_generate' as const,
+          note: 'compliance',
+        })
+      } catch (dbErr) {
+        console.error('Failed to insert compliance daily action log (constraint issues):', dbErr)
+      }
     }
 
     return {
@@ -143,8 +147,10 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       improved_text: parsed.improved_text,
       remaining
     }
-  } catch (err) {
-    console.error(err)
-    return { error: lang === 'en' ? 'Failed to audit message.' : 'Metin denetlenirken bir hata oluştu.' }
+  } catch (err: any) {
+    console.error('Uyum Denetimi Hatası:', err)
+    return { 
+      error: (lang === 'en' ? 'Audit failed: ' : 'Metin denetlenirken hata oluştu: ') + (err?.message || String(err))
+    }
   }
 }

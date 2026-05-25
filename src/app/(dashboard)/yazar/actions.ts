@@ -191,13 +191,17 @@ Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi dönd�
       .maybeSingle()
 
     if (membership && !isSuperAdmin) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-        note: 'roleplay',
-      })
+      try {
+        await supabase.from('nmm_daily_actions').insert({
+          workspace_id: membership.workspace_id,
+          user_id: user.id,
+          candidate_id: null,
+          action_type: 'ai_generate' as const,
+          note: 'roleplay',
+        })
+      } catch (dbErr) {
+        console.error('Failed to insert roleplay daily action log (constraint issues):', dbErr)
+      }
     }
 
     return {
@@ -207,8 +211,8 @@ Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi dönd�
       yzk_improvements: parsed.yzk_improvements,
       remaining
     }
-  } catch (err) {
-    console.error(err)
-    return { error: 'Simülasyon yanıtı oluşturulamadı.' }
+  } catch (err: any) {
+    console.error('YZK Simülasyon Hatası:', err)
+    return { error: (lang === 'en' ? 'Simulation failed: ' : 'Simülasyon yanıtı oluşturulamadı: ') + (err?.message || String(err)) }
   }
 }

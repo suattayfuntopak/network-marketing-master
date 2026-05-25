@@ -12,10 +12,14 @@ export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'ka
 
 async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
   const { data, error } = await supabase
     .from('nmm_candidates')
     .select('*')
     .eq('workspace_id', workspaceId)
+    .eq('owner_id', user.id)
     .order('updated_at', { ascending: false })
 
   if (error) throw new Error(error.message)
