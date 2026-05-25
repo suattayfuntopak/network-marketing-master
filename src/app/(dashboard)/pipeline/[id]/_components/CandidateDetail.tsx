@@ -18,6 +18,9 @@ import { Z } from '@/lib/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { parseNote, formatNote, parseSimpleNote, formatSimpleNote } from '@/lib/noteParser'
 import { generateNotesSummary } from '../actions'
+import { useQueryClient } from '@tanstack/react-query'
+import { createClient } from '@/lib/supabase/client'
+
 
 
 function suggestedFollowUp(c: NmmCandidate, lang: string): string | null {
@@ -192,6 +195,7 @@ export function CandidateDetail({ candidateId }: Props) {
   }
 
 
+  const queryClient = useQueryClient()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
@@ -207,6 +211,41 @@ export function CandidateDetail({ candidateId }: Props) {
   const profilePhoto = parsed.avatarUrl || null
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
+  const attemptedActionUpdates = useRef<Record<string, boolean>>({})
+
+  // Lider notları otomatik geriye dönük çeviri ve kalıcı saklama tetikleyicisi
+  useEffect(() => {
+    if (lang !== 'en' || notes.length === 0) return
+
+    notes.forEach(n => {
+      const parsedN = parseSimpleNote(n.note)
+      if (!parsedN.en && parsedN.tr && !attemptedActionUpdates.current[n.id]) {
+        attemptedActionUpdates.current[n.id] = true
+        
+        fetch('/api/translate-note', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: parsedN.tr }),
+        })
+          .then(r => r.json())
+          .then(async ({ translated }: { translated: string }) => {
+            if (translated) {
+              const formatted = formatSimpleNote(parsedN.tr, translated)
+              const supabase = createClient()
+              await supabase
+                .from('nmm_daily_actions')
+                .update({ note: formatted })
+                .eq('id', n.id)
+                
+              queryClient.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
+              queryClient.invalidateQueries({ queryKey: ['activity', candidateId] })
+            }
+          })
+          .catch(err => console.error('Lider notu otomatik çeviri hatası:', err))
+      }
+    })
+  }, [lang, notes, candidateId, queryClient])
+
 
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {
