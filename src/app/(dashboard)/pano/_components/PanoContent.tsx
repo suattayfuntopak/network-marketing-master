@@ -129,14 +129,14 @@ export function PanoContent() {
         <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="teal"   href="/pipeline"      />
         <SquareButton icon={CalendarDays}           label={t('nav.takvim')}           color="pink"   href="/takvim"        />
         <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />
-        <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="amber"  href="/egitim"        />
+        <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="teal"   href="/egitim"        />
 
         {/* Alt Sıra */}
-        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="indigo" href="/itirazlar"     />
-        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
-        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="pink"   href="/kazanimlar"    />
-        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="coral"  href="/uyum"          />
-        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="blue"   href="/istatistikler" />
+        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="pink"   href="/itirazlar"     />
+        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="amber"  href="/yazar"         />
+        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="purple" href="/kazanimlar"    />
+        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="pink"   href="/uyum"          />
+        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="amber"  href="/istatistikler" />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
