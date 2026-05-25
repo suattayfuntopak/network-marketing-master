@@ -6,10 +6,22 @@ import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 
-const NAV_ROUTES = ['/pano', '/pipeline', '/yazar', '/itirazlar', '/ekip']
+const NAV_ROUTES = [
+  '/pano',
+  '/bugun/ilgilen',
+  '/pipeline',
+  '/takvim',
+  '/ekip',
+  '/egitim',
+  '/itirazlar',
+  '/yazar',
+  '/kazanimlar',
+  '/uyum',
+  '/istatistikler'
+]
 
 function getRouteIndex(pathname: string) {
-  return NAV_ROUTES.findIndex(r => pathname === r)
+  return NAV_ROUTES.findIndex(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))
 }
 
 export function setNavDir(dir: 'forward' | 'back') {

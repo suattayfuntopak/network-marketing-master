@@ -3,17 +3,18 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2 } from 'lucide-react'
+import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2 } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
   { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard          },
+  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus',    icon: Zap                      },
   { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp               },
-  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                      },
-  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                    },
   { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays             },
-  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion    },
+  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                    },
   { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen                 },
+  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion    },
+  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                      },
   { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                   },
   { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                   },
   { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },

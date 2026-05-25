@@ -124,13 +124,16 @@ export function PanoContent() {
 
       {/* ── 10 hızlı erişim karesi — mobil 2 sütun (5 satır), masaüstü 5 sütun (2 satır) ── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+        {/* Üst Sıra */}
         <SquareButton icon={Zap}                    label={t('nav.todayFocus')}     color="purple" href="/bugun/ilgilen" />
         <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="blue"   href="/pipeline"      />
-        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
-        <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />
         <SquareButton icon={CalendarDays}           label={t('nav.takvim')}           color="pink"   href="/takvim"        />
-        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="indigo" href="/itirazlar"     />
+        <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />
         <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="amber"  href="/egitim"        />
+
+        {/* Alt Sıra */}
+        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="indigo" href="/itirazlar"     />
+        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="teal"   href="/yazar"         />
         <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="teal"   href="/kazanimlar"    />
         <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="coral"  href="/uyum"          />
         <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="blue"   href="/istatistikler" />

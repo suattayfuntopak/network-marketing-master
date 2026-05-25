@@ -14,11 +14,11 @@ const NAV_ITEMS = [
   { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard        },
   { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus',    icon: Zap                    },
   { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp             },
-  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                    },
-  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                  },
   { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays           },
-  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion  },
+  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                  },
   { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen               },
+  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion  },
+  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                    },
   { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                 },
   { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                 },
   { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
@@ -64,14 +64,14 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
 
-        // Dynamic shortened premium labels to fit perfectly
+        // Dynamic premium labels to fit perfectly
         let label = t(translationKey)
         if (translationKey === 'nav.todayFocus') {
-          label = lang === 'en' ? 'Today' : 'Bugün'
+          label = lang === 'en' ? 'Today' : 'Bugün İlgilen'
         } else if (translationKey === 'nav.pipeline') {
-          label = lang === 'en' ? 'Pipeline' : 'Huni'
+          label = lang === 'en' ? 'Pipeline' : 'Boru Hattı'
         } else if (translationKey === 'nav.yazar') {
-          label = lang === 'en' ? 'AI Coach' : 'YZ Koçu'
+          label = lang === 'en' ? 'AI Coach' : 'Yapay Zeka Koçu'
         } else if (translationKey === 'nav.ekip') {
           label = lang === 'en' ? 'Team' : 'Ekibim'
         } else if (translationKey === 'nav.takvim') {
@@ -79,13 +79,13 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         } else if (translationKey === 'nav.itirazlar') {
           label = lang === 'en' ? 'Objections' : 'İtirazlar'
         } else if (translationKey === 'nav.egitim') {
-          label = lang === 'en' ? 'Training' : 'Eğitim'
+          label = lang === 'en' ? 'Training' : 'Vaktin Varsa'
         } else if (translationKey === 'nav.kazanimlar') {
           label = lang === 'en' ? 'Awards' : 'Kazanımlar'
         } else if (translationKey === 'nav.uyum') {
-          label = lang === 'en' ? 'Compliance' : 'Uyum'
+          label = lang === 'en' ? 'Compliance' : 'Uyum Merkezi'
         } else if (translationKey === 'nav.istatistikler') {
-          label = lang === 'en' ? 'Stats' : 'Grafik'
+          label = lang === 'en' ? 'Stats' : 'İstatistikler'
         }
 
         return (
@@ -94,7 +94,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             ref={active ? activeRef : undefined}
             onClick={() => navigate(href)}
             className={clsx(
-              'flex flex-col items-center gap-1 py-3 text-[10px] font-bold transition-all duration-150 shrink-0 w-16 sm:w-20 cursor-pointer',
+              'flex flex-col items-center gap-1 py-3 text-[10px] font-bold transition-all duration-150 shrink-0 px-2 min-w-[76px] sm:min-w-[84px] text-center cursor-pointer',
               active ? 'text-[#534AB7]' : 'text-gray-400 hover:text-gray-600',
               pending && 'scale-110 text-[#534AB7]'
             )}
@@ -103,7 +103,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
               className={clsx('h-5 w-5', active && 'drop-shadow-sm')}
               strokeWidth={active || pending ? 2.25 : 1.75}
             />
-            {label}
+            <span className="whitespace-nowrap">{label}</span>
           </button>
         )
       })}
