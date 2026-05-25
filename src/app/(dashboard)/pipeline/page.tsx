@@ -141,7 +141,7 @@ export default function PipelinePage() {
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'takip_zamani'
               ? 'bg-red-500 border-red-500 text-white ring-2 ring-red-500/20 shadow-lg shadow-red-500/10 dark:bg-red-600'
-              : 'bg-red-50/30 border-red-100/50 hover:border-red-500/40 dark:bg-red-950/5 dark:border-red-900/10'
+              : 'bg-red-50 border-red-200 hover:border-red-500/40 dark:bg-red-950/20 dark:border-red-900/50'
           }`}
         >
           <p className={clsx('text-xl font-bold transition-colors', filter === 'takip_zamani' ? 'text-white' : 'text-red-500 dark:text-red-400')}>{counts.takip_zamani}</p>
