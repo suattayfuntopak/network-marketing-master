@@ -258,6 +258,19 @@ export function CandidateDetail({ candidateId }: Props) {
     })
   }, [lang, notes, candidateId, queryClient])
 
+  // Popup açıldığında arka plan kaymasını önleme (body scroll-lock)
+  useEffect(() => {
+    if (stageOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [stageOpen])
+
+
 
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {
@@ -885,14 +898,14 @@ export function CandidateDetail({ candidateId }: Props) {
       {stageOpen && (
         <>
           <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={() => setStageOpen(false)} />
-          <div className={`fixed bottom-0 left-0 right-0 ${Z.sheet} rounded-t-3xl bg-[var(--bg-card)] pb-8 shadow-2xl md:left-1/2 md:top-1/2 md:bottom-auto md:w-72 md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-2xl md:pb-0`}>
+          <div className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[320px] ${Z.sheet} rounded-3xl bg-[var(--bg-card)] shadow-2xl overflow-hidden pb-4 border border-[var(--border)] animate-in fade-in zoom-in duration-200`}>
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
               <p className="text-sm font-bold text-[var(--text-1)]">{t('pipeline.selectStage')}</p>
               <button onClick={() => setStageOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)]">
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <ul className="overflow-y-auto py-1" style={{ maxHeight: '60vh' }}>
+            <ul className="overflow-y-auto py-1" style={{ maxHeight: '55vh' }}>
               {STAGE_ORDER.map(s => (
                 <li key={s}>
                   <button
