@@ -527,7 +527,7 @@ function ItirazlarPageContent() {
       </div>
 
       {/* Kategori filtreleri */}
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
         {KATEGORILER.map((k, idx) => (
           <button
             key={k}
