@@ -553,23 +553,14 @@ export function CandidateDetail({ candidateId }: Props) {
                 </p>
               )}
 
-              <div className="mt-4 grid w-full grid-cols-2 items-stretch gap-2.5">
-                <button
-                  type="button"
-                  disabled={!candidatePhoneClean}
-                  onClick={handleSendSms}
-                  className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-sky-600 hover:bg-sky-500 shadow-md hover:shadow-sky-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
-                >
-                  <MessageSquare className="h-4 w-4 shrink-0" />
-                  <span className="text-center leading-tight">{t('pipeline.shareSms')}</span>
-                </button>
+              <div className="mt-4 w-full">
                 <button
                   type="button"
                   disabled={!candidatePhoneClean}
                   onClick={handleSendWhatsApp}
-                  className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40"
+                  className="flex w-full min-h-[2.75rem] items-center justify-center gap-2 rounded-2xl px-3 py-2.5 text-xs font-bold text-white transition-all bg-[#25D366] hover:bg-[#20BD5A] shadow-md hover:shadow-green-500/20 active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
                 >
-                  <WhatsAppIcon className="h-4 w-4 shrink-0" />
+                  <WhatsAppIcon className="h-4.5 w-4.5 shrink-0" />
                   <span className="text-center leading-tight">{t('pipeline.shareWhatsapp')}</span>
                 </button>
               </div>

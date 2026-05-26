@@ -186,7 +186,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
           {/* TR Bayrak Dil Butonu */}
           <button
             onClick={() => setLang('tr')}
-            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'tr' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+            className={`hidden md:flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'tr' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
             title="Türkçe"
           >
             <TRFlag />
@@ -195,7 +195,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
           {/* USA Bayrak Dil Butonu */}
           <button
             onClick={() => setLang('en')}
-            className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'en' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
+            className={`hidden md:flex h-9 w-9 items-center justify-center rounded-xl transition-all shrink-0 hover:bg-[var(--bg-subtle)] ${lang === 'en' ? 'bg-[#534AB7]/10 border border-[#534AB7]/30 ring-1 ring-[#534AB7]/20 shadow-sm' : 'opacity-50 hover:opacity-100'}`}
             title="English"
           >
             <USFlag />

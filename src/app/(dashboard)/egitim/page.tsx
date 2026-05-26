@@ -216,7 +216,7 @@ function EgitimPageContent() {
       </div>
 
       {/* Kategori Filtreleri */}
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
         {KATEGORILER.map((k, idx) => (
           <button
             key={k}
@@ -419,15 +419,6 @@ function EgitimPageContent() {
                             }
                           </button>
 
-                          {/* SMS ile Gönder */}
-                          <a
-                            href={`sms:?body=${encodeURIComponent(konu.maddeler.join('\n'))}`}
-                            onClick={e => e.stopPropagation()}
-                            className="flex items-center gap-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/30 px-3 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 transition-all hover:bg-sky-100 dark:hover:bg-sky-950/50"
-                          >
-                            <MessageSquare className="h-3 w-3" />
-                            {lang === 'en' ? 'Send via SMS' : 'SMS İle Gönder'}
-                          </a>
 
                           {/* WhatsApp ile Gönder */}
                           <a

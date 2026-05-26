@@ -667,15 +667,7 @@ function ItirazlarPageContent() {
                               : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala'}</>
                             }
                           </button>
-                          {/* SMS ile Gönder */}
-                          <a
-                            href={`sms:?body=${encodeURIComponent(cevap)}`}
-                            onClick={e => e.stopPropagation()}
-                            className="flex items-center gap-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/30 px-3 py-1.5 text-xs font-semibold text-sky-700 dark:text-sky-300 transition-all hover:bg-sky-100 dark:hover:bg-sky-950/50"
-                          >
-                            <MessageSquare className="h-3 w-3" />
-                            {lang === 'en' ? 'Send via SMS' : 'SMS İle Gönder'}
-                          </a>
+
                           {/* WhatsApp ile Gönder */}
                           <a
                             href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cevap)}`}

@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { List, LayoutList, Phone, Bot, Copy, Check } from 'lucide-react'
+import { List, LayoutList, Phone, Bot, Copy, Check, Sparkles, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
@@ -30,6 +31,12 @@ export function IlgilenContent() {
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
   const [copiedFor, setCopiedFor] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
+  const [activeMessage, setActiveMessage] = useState<{
+    candidateId: string;
+    candidateName: string;
+    candidatePhone: string | null;
+    message: string;
+  } | null>(null)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -46,24 +53,32 @@ export function IlgilenContent() {
     })
   }, [])
 
-  async function handleAIMessage(id: string, name: string, stage: string, note: string | null) {
+  async function handleAIMessage(id: string, name: string, stage: string, note: string | null, phone: string | null) {
     if (isAILimitReached(isSuperAdmin)) {
       toast.error(`Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
       return
     }
     setGeneratingFor(id)
-    const result = await generateQuickMessageAction({ name, stage, note })
-    setGeneratingFor(null)
-    if (result.error || !result.message) {
-      toast.error(result.error ?? 'Mesaj oluşturulamadı.')
-      return
+    try {
+      const result = await generateQuickMessageAction({ name, stage, note })
+      if (result.error || !result.message) {
+        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        return
+      }
+      incrementAIUsage(isSuperAdmin)
+      
+      setActiveMessage({
+        candidateId: id,
+        candidateName: name,
+        candidatePhone: phone,
+        message: result.message
+      })
+    } catch (err) {
+      console.error(err)
+      toast.error('Mesaj oluşturulamadı.')
+    } finally {
+      setGeneratingFor(null)
     }
-    incrementAIUsage(isSuperAdmin)
-    await navigator.clipboard.writeText(result.message)
-    setCopiedFor(id)
-    const remaining = remainingAIUsage(isSuperAdmin)
-    toast.success(`Mesaj panoya kopyalandı! ${isSuperAdmin ? '(Sınırsız)' : `(${remaining} hak kaldı)`}`)
-    setTimeout(() => setCopiedFor(null), 2500)
   }
 
   if (wsLoading || cLoading) {
@@ -144,7 +159,7 @@ export function IlgilenContent() {
               <div className="flex shrink-0 gap-1.5" onClick={e => e.stopPropagation()}>
                 {/* Inline AI Mesaj */}
                 <button
-                  onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null)}
+                  onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null, c.phone ?? null)}
                   disabled={generatingFor === c.id}
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition hover:opacity-80 disabled:opacity-50"
                   aria-label="AI Mesaj Üret"
@@ -233,6 +248,78 @@ export function IlgilenContent() {
             )}
           </p>
         )}
-      </div>
+      {/* AI Message Result Modal */}
+      {activeMessage && createPortal(
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveMessage(null)} />
+          
+          <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                  <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[var(--text-1)]">Yapay Zeka Mesajı</h2>
+                  <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{activeMessage.candidateName} için üretildi</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveMessage(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Textarea */}
+            <div className="relative mb-5">
+              <textarea
+                value={activeMessage.message}
+                readOnly
+                rows={6}
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] leading-relaxed outline-none resize-none"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2.5">
+              {/* Copy Button */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(activeMessage.message)
+                  toast.success('Mesaj kopyalandı!')
+                }}
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                Kopyala
+              </button>
+
+              {/* WhatsApp Button */}
+              {activeMessage.candidatePhone && waHref(activeMessage.candidatePhone) && (
+                <a
+                  href={`${waHref(activeMessage.candidatePhone)}&text=${encodeURIComponent(activeMessage.message)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    if (ws?.workspaceId && activeMessage.candidateId) {
+                      markContacted.mutate({ id: activeMessage.candidateId, actionType: 'whatsapp' })
+                    }
+                    setActiveMessage(null)
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                  WhatsApp ile Gönder
+                </a>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+    </div>
   )
 }
