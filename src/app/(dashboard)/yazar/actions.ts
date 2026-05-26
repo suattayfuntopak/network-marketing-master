@@ -176,7 +176,7 @@ JSON yapısı şu şekilde olmalıdır:
         }
       ],
       generationConfig: {
-        maxOutputTokens: 600,
+        maxOutputTokens: 16384,
         temperature: 0.7,
         responseMimeType: 'application/json',
         responseSchema: {
@@ -321,7 +321,7 @@ Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türk�
         }
       ],
       generationConfig: {
-        maxOutputTokens: 800,
+        maxOutputTokens: 8192,
         temperature: 0.7,
       }
     })
@@ -379,7 +379,7 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
         }
       ],
       generationConfig: {
-        maxOutputTokens: 1200,
+        maxOutputTokens: 8192,
         temperature: 0.3,
       }
     })

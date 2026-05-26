@@ -108,7 +108,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
         }
       ],
       generationConfig: {
-        maxOutputTokens: 800,
+        maxOutputTokens: 16384,
         temperature: 0.1,
         responseMimeType: 'application/json',
         responseSchema: {

@@ -166,7 +166,7 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
         }
       ],
       generationConfig: {
-        maxOutputTokens: 400,
+        maxOutputTokens: 8192,
         temperature: 0.7,
       }
     })
@@ -229,7 +229,7 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
         }
       ],
       generationConfig: {
-        maxOutputTokens: 300,
+        maxOutputTokens: 8192,
         temperature: 0.3,
       }
     })

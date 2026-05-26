@@ -119,7 +119,7 @@ Her durumda sadece yanıtı veya mesajı yaz, başka açıklama ekleme.`
       }
     ],
     generationConfig: {
-      maxOutputTokens: 400,
+      maxOutputTokens: 8192,
       temperature: 0.7,
     }
   })

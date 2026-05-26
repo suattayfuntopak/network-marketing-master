@@ -30,6 +30,19 @@
   - `src/app/(dashboard)/yazar/actions.ts`
 - **Doğrulama:** API anahtarı ile yapılan testlerde yeni nesil `gemini-2.5-flash` modelinin Türkçe yanıtları milisaniyeler içerisinde hatasız şekilde ürettiği ve entegrasyonun kusursuz çalıştığı onaylandı.
 
+### fix: Gemini 2.5 Thinking Model Token Bütçesi Düzeltmesi (Yarım Mesaj ve JSON Hatası Çözümü)
+
+- **Sorun:** Gemini 2.5 modelleri "thinking model" (düşünen model) mimarisine sahiptir. Yanıt üretmeden önce dahili "düşünme token'ları" harcayarak akıl yürütme yapar. `maxOutputTokens` parametresi düşünme + yanıt toplamını kapsar. Örneğin `maxOutputTokens: 400` ayarında model 350 token düşünüp sadece 50 token'lık yarım mesaj döndürür. JSON yapılarında ise JSON yarıda kesildiği için `"Unexpected end of JSON input"` hatası oluşur.
+- **Belirtiler:**
+  - Boru Hattı ve Kazanımlar popup'larında kesilmiş, yarım mesajlar
+  - Uyum Denetleyicisi'nde `"Unexpected end of JSON input"` hatası (JSON yapısı yarıda kesiliyor)
+  - Saha Provası simülasyonunda `"Unexpected end of JSON input"` hatası
+  - Koçluk Al sekmesinin süresiz dönmesi (tüm token bütçesi düşünmeye harcandığı için yanıt boş kalıyor)
+- **Çözüm:** Tüm `maxOutputTokens` değerleri düşünme token'larını da karşılayacak şekilde yükseltildi:
+  - Mesaj üretimi, koçluk, not özeti, çeviri: `400-800` ➔ `8192`
+  - Uyum denetimi ve saha provası (yapılandırılmış JSON): `600-800` ➔ `16384`
+- **Etkilenen Dosyalar:** `generateMessage.ts`, `translate-note/route.ts`, `kazanimlar/actions.ts`, `uyum/actions.ts`, `pipeline/[id]/actions.ts`, `yazar/actions.ts`
+
 ### feat: Mobilde Sağa Sola Kaydırılabilir (Swipeable) 11 Kapsamlı Alt Menü Entegre Edildi
 - `BottomNav.tsx`: Mobil alt gezinti barı baştan aşağı yenilenerek, 5 kısıtlı öğe yerine **tüm 11 panel/özellik modülüne** tek tıkla ve kaydırarak erişebileceğimiz premium bir "Swipeable Tab Strip" altyapısına kavuşturuldu.
 - **Kusursuz Otomatik Ortalama (Scroll-Centering):** Navigasyon barına akıllı bir `useEffect` ve `DOM scrollIntoView` motoru eklenerek, kullanıcı hangi sayfaya giderse gitsin, alt menünün o aktif sekmeyi **pürüzsüzce yatayda ortalayacak şekilde kayması** sağlandı.

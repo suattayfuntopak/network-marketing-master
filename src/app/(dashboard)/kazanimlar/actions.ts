@@ -33,7 +33,7 @@ Ton: Samimi, sıcak, lider duruşlu, güven verici ve heyecanlandırıcı (2-3 e
         }
       ],
       generationConfig: {
-        maxOutputTokens: 400,
+        maxOutputTokens: 8192,
         temperature: 0.7,
       }
     })
