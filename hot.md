@@ -2,6 +2,16 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat/fix: MLM Ekibim Sayfası Downline (Alt Ekip) Veri Gösterim RLS Güvenlik Yetkilendirmesi (Migration 010)
+
+- **Doğrudan Davet Edilen Distribütörlerin (Direct Downlines) Görünürlüğü Kökten Çözüldü:**
+  - `nmm_join_workspace` RPC'sinin başarıyla ilişkilendirdiği downline workspace `parent_id` bağına uygun olarak **Supabase RLS** (Satır Bazlı Güvenlik) politikaları güncellendi.
+  - Liderin (Sponsorun) doğrudan kendi davet koduyla kaydolan downline distribütörlerin üyelik detaylarını okuyabilmesi için `nmm_workspace_members` tablosuna SELECT izni tanımlandı (`nmm_member_read_downlines`).
+  - Liderin doğrudan downline aday sayılarını (huni aşamaları: yeni, sunum, takip, katıldı) görebilmesi için `nmm_candidates` tablosuna SELECT izni tanımlandı (`nmm_candidate_read_downlines`).
+  - Liderin doğrudan downline distribütörlerinin son saha aktivitesini analiz ederek "Son Aktiflik" durumlarını paneline yansıtabilmesi için `nmm_daily_actions` tablosuna SELECT izni eklendi (`nmm_action_read_downlines`).
+  - **Gizlilik Koruması Korundu:** Alt ekibin alt ekibi (sub-downlines) gibi transif/dolaylı ilişkilerin lider ekranına akması engellendi. Sadece doğrudan davet edilen kişilerin verilerinin akması güvenceye alınarak sistem tamamen premium bir bağımsız liderlik modeline kavuşturuldu.
+  - Supabase SQL Editor üzerinden uygulanmak üzere `supabase/migrations/010_downline_rls_policies.sql` göç dosyası hazırlandı.
+
 ### style/feat: Kendi Eğitim İçeriği ve İtiraz Ekleme Popup Formlarının Okunabilirlik, Boyut ve Mobil Centering İyileştirmesi (Optimizasyon & Dengeli Orta Yol)
 
 - **Popup Kart Boyutlarının Altın Oran Dengesine Çekilmesi:**
