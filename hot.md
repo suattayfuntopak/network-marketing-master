@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-26 — Ekibim Sayfası Üye Profil Fotoğrafları Senkronizasyonu (Avatar Sync)
+
+### feat: Ekibim Sayfası Üye Profil Fotoğrafları Senkronizasyonu
+
+- **Profil Fotoğrafı Senkronizasyonu & Kalıcı Avatar Desteği:**
+  - **Veritabanı Desteği (`015_member_avatar_url.sql`):** `nmm_workspace_members` tablosuna `avatar_url` kolonu eklendi. Ayrıca mevcut üyelerin daha önce yüklediği fotoğrafları anında senkronize etmek için `auth.users` tablosundaki `raw_user_meta_data->>'avatar_url'` değerinden otomatik olarak dolduran (backfill) SQL güncelleme mantığı hazırlandı.
+  - **Otomatik ve Anlık Güncelleme (`ProfileModal.tsx`):** Kullanıcı profil resmi yüklediğinde hem `auth.user_metadata` güncellenir hem de `nmm_workspace_members` tablosundaki satırı güncellenerek alt ekip arkadaşları panelinde (Ekibim sayfası) anında senkronize olması sağlanır. İşlem bittiğinde hem `members` hem de `workspace` önbellekleri (`invalidateQueries`) otomatik geçersiz kılınır.
+  - **Estetik Arayüz Entegrasyonu (`EkipPanel.tsx`):** Ekip listesindeki kartlarda üye baş harfi gösterilen alanlar, eğer profil fotoğrafı mevcutsa şık ve yuvarlak bir `<img>` bileşeniyle render edilecek şekilde güncellendi.
+  - **Akıllı Fallback / Hata Yönetimi:** Profil resmi yüklenemez veya silinirse, ya da internet kesintisinden dolayı resim yüklenmesinde bir hata oluşursa, `onError` tetikleyicisiyle resim gizlenerek otomatik olarak üyenin baş harfi (initials) renkli arka planla kusursuz şekilde geriye dönük gösterilir.
+  - **TypeScript Uyum Değişiklikleri:** Supabase otomatik tiplerinde henüz yer almayan bu yeni alan için `any` cast işlemleriyle güvenli ve hata üretmeyen temiz kod yapıları kuruldu.
+
 ## 2026-05-26 — Seçenek A (Birleşik Ekip Merkezi) & Saha Provası Sayfası Entegrasyonu
 
 ### feat: Seçenek A (Birleşik Ekip Merkezi) & Saha Provası Standalone Sayfası Entegrasyonu

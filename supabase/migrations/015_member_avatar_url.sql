@@ -6,5 +6,9 @@ ALTER TABLE nmm_workspace_members
   ADD COLUMN IF NOT EXISTS avatar_url text;
 
 -- Mevcut üyeler için auth.users.raw_user_meta_data'dan avatar_url'yi doldur
--- NOT: Bu update sadece veritabanı seviyesinde çalışır, güvenli Security Definer gerektirir.
--- Client-side uygulama, profil güncellemesinde bu kolonu da güncelleyecek.
+UPDATE nmm_workspace_members
+SET avatar_url = au.raw_user_meta_data->>'avatar_url'
+FROM auth.users au
+WHERE nmm_workspace_members.user_id = au.id
+  AND au.raw_user_meta_data->>'avatar_url' IS NOT NULL;
+
