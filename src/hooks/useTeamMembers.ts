@@ -17,6 +17,9 @@ export interface TeamMember {
   katildi_count: number
   last_activity_at: string | null
   onboarding_steps?: string[]
+  today_roleplay?: number
+  today_compliance?: number
+  today_message?: number
 }
 
 async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
@@ -44,11 +47,15 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
   const allUserIds = [ownWs.owner_id, ...downlineUserIds].filter(Boolean) as string[]
 
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+
   const [
     { data: members, error },
     { data: candidatesRaw },
     { data: recentActions },
-    { data: onboardingRaw }
+    { data: onboardingRaw },
+    { data: todayActionsRaw }
   ] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
@@ -66,13 +73,20 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
     supabase
       .from('nmm_onboarding_progress' as any)
       .select('user_id, step_id')
+      .in('user_id', allUserIds),
+    supabase
+      .from('nmm_daily_actions')
+      .select('user_id, note')
       .in('user_id', allUserIds)
+      .eq('action_type', 'ai_generate')
+      .gte('created_at', todayStart.toISOString())
   ])
 
   if (error) throw error
   const candidates = candidatesRaw ?? []
   const actions = recentActions ?? []
   const onboarding = onboardingRaw ?? []
+  const todayActions = todayActionsRaw ?? []
 
   // Create clean map of members to remove duplicates
   const uniqueMembersMap: Record<string, typeof members[0]> = {}
@@ -109,6 +123,21 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
         .filter((o: any) => o.user_id === m.user_id)
         .map((o: any) => o.step_id)
 
+      const memberTodayActions = todayActions.filter(act => act.user_id === m.user_id)
+      let todayRoleplay = 0
+      let todayCompliance = 0
+      let todayMessage = 0
+
+      memberTodayActions.forEach(act => {
+        if (act.note === 'roleplay') {
+          todayRoleplay++
+        } else if (act.note === 'compliance') {
+          todayCompliance++
+        } else {
+          todayMessage++
+        }
+      })
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -123,6 +152,9 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
         katildi_count:   mc.filter(c => c.stage === 'katildi').length,
         last_activity_at: lastActionMap[m.user_id] ?? null,
         onboarding_steps: completedSteps,
+        today_roleplay: todayRoleplay,
+        today_compliance: todayCompliance,
+        today_message: todayMessage,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
