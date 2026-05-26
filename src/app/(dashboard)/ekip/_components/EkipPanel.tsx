@@ -496,8 +496,8 @@ export function EkipPanel() {
                   </div>
 
                   {/* Sağ Taraf: Toplam Aday Göstergesi */}
-                  <div className="flex items-center justify-between sm:justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0">
-                    <div className="text-left sm:text-right">
+                  <div className="flex items-center justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0 sm:pr-24 w-full sm:w-auto">
+                    <div className="text-right">
                       <p className="text-3xl font-black text-accent-blue tabular-nums leading-none">{m.candidate_count}</p>
                       <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider mt-1">{t('team.totalCandidates')}</p>
                     </div>
