@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/components/ui/NotificationsModal'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useRouter } from 'next/navigation'
 
 export interface NotificationItem {
   id: string
@@ -43,6 +44,7 @@ export function useNotifications() {
   const queryClient = useQueryClient()
   const supabase = createClient()
   const { lang } = useTranslation()
+  const router = useRouter()
 
   const query = useQuery({
     queryKey: ['notifications'],
@@ -90,7 +92,7 @@ export function useNotifications() {
               action: {
                 label: lang === 'en' ? 'View' : 'Görüntüle',
                 onClick: () => {
-                  // Can trigger notification modal open event if needed
+                  router.push('/ekip')
                 },
               },
             })
