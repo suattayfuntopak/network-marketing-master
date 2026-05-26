@@ -3,10 +3,9 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { DAILY_MESSAGE_LIMIT, DAILY_ROLEPLAY_LIMIT } from '@/lib/aiUsage'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
-const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
 
 export interface YazarFormState {
@@ -142,7 +141,7 @@ DİL POLİTİKASI:
 Eğer dil (language) parametresi 'en' ise, tüm JSON içeriğini (candidate_reply, yzk_strengths, yzk_improvements) tamamen İngilizce yaz. Eğer 'tr' ise tamamen Türkçe yaz.
 
 FORMAT KURALI:
-Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi döndür. Başında veya sonunda hiçbir kod bloğu işareti (\`\`\`), açıklama, giriş veya sonuç ekleme. JSON yapısı şu şekilde olmalıdır:
+JSON yapısı şu şekilde olmalıdır:
 {
   "candidate_reply": "Adayın distribütöre vereceği cevap...",
   "yzk_score": 85,
@@ -152,40 +151,53 @@ Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi dönd�
 `;
 
   try {
-    const response = await anthropicClient.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 600,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Konuşma Geçmişi:\n${promptHistory}\n\nDistribütörün Son Yanıtı: ${userReply}\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`,
-        }
-      ]
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      systemInstruction: systemPrompt,
     })
 
-    let text = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Konuşma Geçmişi:\n${promptHistory}\n\nDistribütörün Son Yanıtı: ${userReply}\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 600,
+        temperature: 0.7,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            candidate_reply: {
+              type: SchemaType.STRING,
+              description: "Adayın distribütöre vereceği cevap."
+            },
+            yzk_score: {
+              type: SchemaType.INTEGER,
+              description: "Distribütörün son cevabına verilen koçluk puanı (0-100)."
+            },
+            yzk_strengths: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: "Distribütörün cevabındaki en fazla 2 güçlü yön."
+            },
+            yzk_improvements: {
+              type: SchemaType.STRING,
+              description: "Bir sonraki sefere daha iyi yapması için motivasyonel tavsiye."
+            }
+          },
+          required: ["candidate_reply", "yzk_score", "yzk_strengths", "yzk_improvements"]
+        }
+      }
+    })
 
-    // Strip markdown code fences if present
-    if (text.startsWith('```json')) {
-      text = text.substring(7)
-    } else if (text.startsWith('```')) {
-      text = text.substring(3)
-    }
-    if (text.endsWith('```')) {
-      text = text.substring(0, text.length - 3)
-    }
-    text = text.trim()
-
+    const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
     // Save action usage in Supabase
@@ -280,28 +292,29 @@ DİL POLİTİKASI:
 Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.`;
 
   try {
-    const response = await anthropicClient.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 800,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Kullanıcı Sorusu: ${question}\n\nDil Parametresi: ${lang}`,
-        }
-      ]
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      systemInstruction: systemPrompt,
     })
 
-    const answer = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Kullanıcı Sorusu: ${question}\n\nDil Parametresi: ${lang}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 800,
+        temperature: 0.7,
+      }
+    })
+
+    const answer = result.response.text().trim()
 
     if (membership && !isSuperAdmin) {
       await supabase.from('nmm_daily_actions').insert({
@@ -330,31 +343,32 @@ export async function translateTextAction(text: string, targetLang: 'tr' | 'en')
   const systemPrompt = `Sen profesyonel bir çevirmensin. Görevin, verilen metni anlamını ve tonunu koruyarak ${
     targetLang === 'en' ? 'İngilizceye' : 'Türkçeye'
   } çevirmektir.
-Herhangi bir açıklama, giriş veya sonuç ekleme. Sadece çeviriyi döndür.`;
+Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sadece çeviriyi döndür.`;
 
   try {
-    const response = await anthropicClient.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 1200,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: text,
-        }
-      ]
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: systemPrompt,
     })
 
-    const translatedText = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: text
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 1200,
+        temperature: 0.3,
+      }
+    })
+
+    const translatedText = result.response.text().trim()
 
     return { translatedText }
   } catch (err) {

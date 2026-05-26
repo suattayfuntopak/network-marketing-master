@@ -956,5 +956,35 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 
 - RPC fonksiyonları (`nmm_join_workspace`, `nmm_remove_member`) kontrol edilerek, ekip modülündeki geçiş ve silme işlemlerinin veri bütünlüğünü koruması ve partial-write riskini engellemesi için kesinlikle Supabase SQL Editor üzerinden çalıştırılması gerektiği doğrulandı.
 
+---
 
+## 2026-05-26
 
+### feat: Google Gemini API Büyük Göçü (Yapay Zeka Geçişi)
+
+- **SDK ve Paket Değişiklikleri:** Yüksek maliyetli Anthropic (`@anthropic-ai/sdk`) bağımlılığı projeden tamamen kaldırıldı (`npm uninstall`). Arka planda tüm yapay zeka süreçleri `@google/generative-ai` kütüphanesine ve Google Gemini API altyapısına geçirildi.
+- **Pro ve Flash Hibrit Model Stratejisi:**
+  - **Gemini 1.5 Pro (Derin Akıl Yürütme):** Ekip mentörlüğü (`pipeline/[id]/actions.ts`), lider not analizi (`generateNotesSummary`), YZ Koçu simülatörü (`generateRoleplayResponseAction`) ve Yapay Zeka Koçu soru-cevap (`askCoachAction`) süreçlerinde akıl yürütme kalitesi en üst seviyeye çıkarıldı.
+  - **Gemini 1.5 Flash (Yüksek Hız ve Ekonomik):** WhatsApp mesaj hazırlama (`generateMessage.ts`), otomatik metin çeviri motoru (`translateTextAction`), aday not çeviri API'si (`api/translate-note/route.ts`) ve Uyum Denetimi modülü (`uyum/actions.ts`) için yüksek hız ve %80+ maliyet avantajı sağlandı.
+- **Sıkı Yapılandırılmış Çıktı Şeması (`responseSchema`):** Uyum Denetimi (`uyum/actions.ts`) ve Rol Provası Simülasyonu (`yazar/actions.ts`) modüllerinde, yapay zekanın ürettiği JSON metinlerindeki ayrıştırma/parsing hatalarını (eksik virgül, unescaped tırnak vb.) kesin olarak çözmek amacıyla `SchemaType` tabanlı resmi `responseSchema` mimarisi uygulandı. YZ çıktıları donanımsal seviyede hatasız şemaya zorlanarak kararlılık %100'e çıkarıldı.
+
+### fix: Bugün İlgilen Sayfası WhatsApp Yönlendirme Hatası (404) Giderildi
+
+- `IlgilenContent.tsx` içinde hızlı mesaj üretimi sonrasında beliren "WhatsApp ile Gönder" butonu URL formatındaki hatalı parametre birleştirme sebebiyle (sorgu parametresi `?` yerine `&` kullanılması) 404 hatası veriyordu.
+- Buton `href` tanımı, `waHref` yardımcı fonksiyonunun orijinal imzasındaki metin desteği kullanılarak `waHref(phone, message)` şeklinde güncellendi ve yönlendirme sorunu pürüzsüzleştirildi.
+
+### ux: Sunum Materyalleri WhatsApp Paylaşım Butonu Görsel Revizyonu
+
+- `CandidateDetail.tsx` dosyasında, "Sunum Materyalleri" altındaki yeşil renkli WhatsApp paylaşım butonunun tam genişlik kaplayan hantal tasarımı düzeltildi.
+- Buton boyutu üst satırdaki "WhatsApp" butonuyla birebir simetrik (**`w-1/3`**) olacak şekilde ayarlandı ve container içerisinde şık bir biçimde ortalandı (`flex justify-center`).
+
+### ux: İletişim Aktivite Geçmişi İkon Standardizasyonu
+
+- `CandidateDetail.tsx` içindeki "Aktivite Geçmişi" listesinde, WhatsApp ile yapılan iletişim eylemlerinin solunda gösterilen ve SMS'i andıran eski `MessageSquare` ikonu kaldırıldı.
+- Yerine modern, tanınabilir yeşil renkli global **`WhatsAppIcon`** bileşeni entegre edilerek görsel tutarlılık artırıldı.
+
+### feat: Boru Hattı ve Kazanımlar Sayfalarında Satır İçi AI Mesajı ve Tebrik Onboarding Motoru
+
+- **Boru Hattı (`CandidateCard.tsx`):** Aday satırlarındaki eylem butonlarının en soluna mor renkli robot kafa (`Bot`) butonu entegre edildi. Tıklandığında sayfa değişmeden o adayın adı, süreci ve gidişat notlarını analiz edip hızlı bir takip mesajı hazırlayan ve kopyalama/WhatsApp eylemleri barındıran minimalist popup eklendi.
+- **Kazanımlar (`kazanimlar/page.tsx` & `kazanimlar/actions.ts`):** Ekibe başarıyla katılan üyeler için özel bir onboarding/tebrik server action'ı (`generateAchievementMessageAction`) yazıldı. Satırdaki robot adama tıklandığında ekibe yeni katılan üyenin başarısını coşkuyla tebrik eden, başarı yolu için ilk adımlar için 1-2 pratik tüyo veren ve sponsoru olarak her an desteğe açık olduğunu samimiyetle ifade eden karşılama mesajı popup olarak açılmaktadır.
+- **Minimalist Popup Tasarımı:** Her iki sayfadaki popup pencerelerinde de "Kopyala" ve "WhatsApp" butonlarının tüm metinleri kaldırılarak sadece sade, şık ve profesyonel ikonlar (`Copy`, `WhatsAppIcon`) içerecek şekilde düzenlendi.

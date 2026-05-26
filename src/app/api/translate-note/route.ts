@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient()
@@ -18,22 +18,29 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 512,
-      messages: [
-        {
-          role: 'user',
-          content: `Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks:\n\n${text}`,
-        },
-      ],
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: 'Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks.'
     })
 
-    const translated = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: text
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 512,
+        temperature: 0.3,
+      }
+    })
+
+    const translated = result.response.text().trim()
 
     return NextResponse.json({ translated: translated || text })
   } catch {

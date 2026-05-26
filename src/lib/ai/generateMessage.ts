@@ -1,8 +1,8 @@
 'use server'
 
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 const STAGE_CONTEXT: Record<string, string> = {
   yeni:        'İlk kez iletişim kurulacak kişi.',
@@ -90,13 +90,9 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const noteStr  = cleanNote    ? `Notlar: ${cleanNote}\n`      : ''
   const ctxStr   = cleanContext ? `Ek bilgi: ${cleanContext}\n` : ''
 
-  const response = await client.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 400,
-    system: [
-      {
-        type: 'text',
-        text: `Sen bir network marketing danışmanısın. Üç görevin var:
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-flash',
+    systemInstruction: `Sen bir network marketing danışmanısın. Üç görevin var:
 
 1. MESAJ ÜRETME: Kişi adı, boru hattı aşaması, ilişki sıcaklığı ve ek bilgiler verildiğinde o kişiye WhatsApp'tan gönderilecek Türkçe mesaj yaz. Kısa (max 3 paragraf), samimi, 2-3 emoji, satış baskısı yok.
 
@@ -104,23 +100,27 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
 
 3. KONU DIŞI: Ek Bilgi'de yukarıdakilerle tamamen ilgisiz bir istek varsa (haberler, tarih, yemek, yazılım, matematik vb.) sadece şunu yaz: "Bu konuda yardımcı olamıyorum 😊 Network marketing ile ilgili sorularında veya mesaj hazırlamanda her zaman buradayım!"
 
-Her durumda sadece yanıtı veya mesajı yaz, başka açıklama ekleme.`,
-        cache_control: { type: 'ephemeral' },
-      },
-    ],
-    messages: [
-      {
-        role: 'user',
-        content: `Alıcı: ${name}\n${stageStr}${warmthStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone} — ${toneInfo}`,
-      },
-    ],
+Her durumda sadece yanıtı veya mesajı yaz, başka açıklama ekleme.`
   })
 
-  const message = response.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('')
-    .trim()
+  const result = await model.generateContent({
+    contents: [
+      {
+        role: 'user',
+        parts: [
+          {
+            text: `Alıcı: ${name}\n${stageStr}${warmthStr}Mesaj Türü: ${messageType} — ${typeInfo}\n${noteStr}${ctxStr}Ton: ${tone} — ${toneInfo}`
+          }
+        ]
+      }
+    ],
+    generationConfig: {
+      maxOutputTokens: 400,
+      temperature: 0.7,
+    }
+  })
+
+  const message = result.response.text().trim()
 
   if (!message) throw new Error('Boş yanıt döndü.')
   return message

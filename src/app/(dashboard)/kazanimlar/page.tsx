@@ -1,12 +1,19 @@
 'use client'
 
+import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Trophy, Calendar, Award, ExternalLink } from 'lucide-react'
+import { Trophy, Calendar, Award, ExternalLink, Bot, Sparkles, X, Copy } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { parseNote } from '@/lib/noteParser'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
+import { isAILimitReached, incrementAIUsage } from '@/lib/aiUsage'
+import { waHref } from '@/lib/waLink'
+import { generateAchievementMessageAction } from './actions'
 
 function formatDate(iso: string, lang: string): string {
   return new Date(iso).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
@@ -21,6 +28,23 @@ export default function KazanimlarPage() {
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { lang, t } = useTranslation()
 
+  const [generatingFor, setGeneratingFor] = useState<string | null>(null)
+  const [activeMessage, setActiveMessage] = useState<{
+    candidateId: string;
+    candidateName: string;
+    candidatePhone: string | null;
+    message: string;
+  } | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null)
+    })
+  }, [])
+
   const kazananlar = candidates.filter(c => c.stage === 'katildi')
 
   // Calculate this month's conversions
@@ -31,13 +55,6 @@ export default function KazanimlarPage() {
     const date = new Date(c.last_contact_at)
     return date.getMonth() === currentMonth && date.getFullYear() === currentYear
   }).length
-
-  // Find the latest joined candidate
-  const latestJoined = [...kazananlar].sort((a, b) => {
-    const aTime = a.last_contact_at ? new Date(a.last_contact_at).getTime() : 0
-    const bTime = b.last_contact_at ? new Date(b.last_contact_at).getTime() : 0
-    return bTime - aTime
-  })[0]
 
   // Ranks configuration based on conversions count
   const count = kazananlar.length
@@ -89,6 +106,37 @@ export default function KazanimlarPage() {
       rankBadge = '👑'
       rankColorClass = 'text-amber-600 bg-amber-500/10 border-amber-500/20 shadow-[0_0_12px_rgba(217,119,6,0.15)]'
       rankDesc = 'İnanılmaz liderlik! Master düzeyde ekip kurdunuz.'
+    }
+  }
+
+  async function handleAIMessage(c: any) {
+    if (isAILimitReached(isSuperAdmin)) {
+      toast.error(`Günlük limitinize ulaştınız. Yarın yenilenir.`)
+      return
+    }
+    setGeneratingFor(c.id)
+    try {
+      const parsed = parseNote(c.note)
+      const result = await generateAchievementMessageAction({
+        name: c.full_name,
+        note: parsed.tr ?? ''
+      })
+      if (result.error || !result.message) {
+        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        return
+      }
+      incrementAIUsage(isSuperAdmin)
+      setActiveMessage({
+        candidateId: c.id,
+        candidateName: c.full_name,
+        candidatePhone: c.phone ?? null,
+        message: result.message
+      })
+    } catch (err) {
+      console.error(err)
+      toast.error('Mesaj oluşturulamadı.')
+    } finally {
+      setGeneratingFor(null)
     }
   }
 
@@ -238,17 +286,34 @@ export default function KazanimlarPage() {
                       )}
                     </div>
 
-                    {/* Action buttons (WhatsApp + Joined Badge) */}
+                    {/* Action buttons (Bot + WhatsApp + Joined Badge) */}
                     <div className="flex items-center gap-2 shrink-0">
                       
+                      {/* Bot Button (congratulations message) */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleAIMessage(c)
+                        }}
+                        disabled={generatingFor === c.id}
+                        className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] hover:bg-[#534AB7] hover:text-white transition-all active:scale-90 disabled:opacity-50"
+                        title={lang === 'en' ? 'Generate AI Welcoming Message' : 'YZ Tebrik Mesajı Üret'}
+                      >
+                        {generatingFor === c.id ? (
+                          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+                        ) : (
+                          <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
+                        )}
+                      </button>
+
                       {/* WhatsApp Button (Only shown if phone number exists) */}
                       {c.phone && (
                         <a
-                          href={`https://api.whatsapp.com/send?phone=${c.phone.replace(/\D/g, '')}&text=${encodeURIComponent(
-                            lang === 'en'
-                              ? `Hi ${c.full_name}, welcome to our team! We will achieve great things together. 🚀`
-                              : `Merhaba ${c.full_name}, ekibe hoş geldin! Seninle birlikte harika şeyler başaracağız. 🚀`
-                          )}`}
+                          href={waHref(c.phone, lang === 'en'
+                            ? `Hi ${c.full_name}, welcome to our team! We will achieve great things together. 🚀`
+                            : `Merhaba ${c.full_name}, ekibe hoş geldin! Seninle birlikte harika şeyler başaracağız. 🚀`
+                          )!}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366] hover:text-white transition-all active:scale-90"
@@ -272,6 +337,76 @@ export default function KazanimlarPage() {
             })}
           </ul>
         </>
+      )}
+
+      {/* AI Message Result Modal */}
+      {activeMessage && createPortal(
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveMessage(null)} />
+          
+          <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600">
+                  <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[var(--text-1)]">Yapay Zeka Mesajı</h2>
+                  <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{activeMessage.candidateName} için üretildi</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveMessage(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition-colors cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Textarea */}
+            <div className="relative mb-5">
+              <textarea
+                value={activeMessage.message}
+                readOnly
+                rows={6}
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] leading-relaxed outline-none resize-none"
+              />
+            </div>
+
+            {/* Actions: ONLY Copy and WhatsApp icons, WITHOUT ANY text */}
+            <div className="flex justify-end gap-2.5">
+              {/* Copy Button (Only Icon) */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(activeMessage.message)
+                  toast.success('Mesaj kopyalandı!')
+                }}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-amber-50 hover:text-amber-600 active:scale-95 cursor-pointer"
+                title="Kopyala"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+
+              {/* WhatsApp Button (Only Icon) */}
+              {activeMessage.candidatePhone && waHref(activeMessage.candidatePhone, activeMessage.message) && (
+                <a
+                  href={waHref(activeMessage.candidatePhone, activeMessage.message)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setActiveMessage(null)
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
+                  title="WhatsApp ile Gönder"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </main>
   )

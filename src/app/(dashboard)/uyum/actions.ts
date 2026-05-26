@@ -2,9 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { DAILY_COMPLIANCE_LIMIT } from '@/lib/aiUsage'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
-const anthropicClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
 
@@ -15,36 +15,6 @@ export interface ComplianceAuditState {
   improved_text?: string
   remaining?: number
   error?: string
-}
-
-function parseSafeJSON(text: string): any {
-  let clean = text.trim()
-  
-  // 1. Extract JSON object block using regex
-  const jsonMatch = clean.match(/\{[\s\S]*\}/)
-  if (jsonMatch) {
-    clean = jsonMatch[0]
-  }
-
-  // 2. Fix missing commas between adjacent JSON objects inside arrays:
-  // e.g. } {  or }   {  => },{
-  clean = clean.replace(/\}\s*\{/g, '},{')
-
-  // 3. Fix missing commas between adjacent JSON arrays inside arrays:
-  // e.g. ] [  or ]   [  => ],[
-  clean = clean.replace(/\]\s*\[/g, '],[')
-
-  // 4. Remove trailing commas before closing braces/brackets (invalid in standard JSON)
-  clean = clean.replace(/,(\s*[\]}])/g, '$1')
-
-  // 5. Try parsing standard JSON
-  try {
-    return JSON.parse(clean)
-  } catch (err: any) {
-    console.error('Failed to parse JSON directly. Raw text:', text)
-    console.error('Cleaned text before parse:', clean)
-    throw new Error(`JSON ayrıştırma hatası (${err.message}). Lütfen tekrar deneyin.`)
-  }
 }
 
 export async function auditComplianceMessageAction(
@@ -96,7 +66,7 @@ Görevin, kullanıcının girdiği pazarlama metnini, reklam ve tüketici koruma
 ÇIKTI FORMATI VE DİL KURALI:
 - Eğer dil (language) 'en' ise tüm ihlaller, açıklamalar, kategoriler ve improved_text tamamen İNGİLİZCE olmalıdır.
 - Eğer dil 'tr' ise tüm içerik tamamen TÜRKÇE olmalıdır.
-- Kesinlikle sadece geçerli bir JSON objesi döndür. Başında veya sonunda hiçbir açıklama, giriş veya sonuç ekleme. JSON içinde asla yorum satırları (//) kullanma.
+- Kesinlikle sadece geçerli bir JSON objesi döndür.
 
 JSON ŞABLONU (Bu yapıyı tam olarak takip et, asla yorum satırı veya açıklama ekleme):
 {
@@ -114,34 +84,74 @@ JSON ŞABLONU (Bu yapıyı tam olarak takip et, asla yorum satırı veya açıkl
 
 Not: Eğer hiç ihlal yoksa score 100 olmalı, safety_level "safe" olmalı and violations dizisi boş kalmalıdır ( [] ).
 safety_level değeri: score >= 90 ise "safe", score 65-89 arası ise "warning", score < 65 ise "danger" olmalıdır.
-category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Gelir İddiası", "Yanıltıcı/Agresif Tanıtım".
-`;
+category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Gelir İddiası", "Yanıltıcı/Agresif Tanıtım" (veya İngilizce dilinde karşılığı).`
 
   try {
-    const response = await anthropicClient.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 800,
-      system: [
-        {
-          type: 'text',
-          text: systemPrompt,
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Denetlenecek Metin:\n"${textToAudit}"\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`,
-        }
-      ]
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      systemInstruction: systemPrompt,
     })
 
-    let text = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Denetlenecek Metin:\n"${textToAudit}"\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 800,
+        temperature: 0.1,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            score: {
+              type: SchemaType.INTEGER,
+              description: "Metnin mevzuata uyumluluk puanı (0-100)."
+            },
+            safety_level: {
+              type: SchemaType.STRING,
+              description: "Metnin güvenli olup olmadığını belirten seviye: 'safe', 'warning' veya 'danger'."
+            },
+            violations: {
+              type: SchemaType.ARRAY,
+              description: "Tespit edilen yasal mevzuat ihlalleri listesi.",
+              items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  phrase: {
+                    type: SchemaType.STRING,
+                    description: "Metinde geçen riskli veya yasaklı kelime/cümle öbeği."
+                  },
+                  category: {
+                    type: SchemaType.STRING,
+                    description: "İhlal kategorisi: 'Sağlık İddiası', 'Gelir İddiası' veya 'Yanıltıcı/Agresif Tanıtım'."
+                  },
+                  reason: {
+                    type: SchemaType.STRING,
+                    description: "Bu ifadenin neden riskli olduğuna dair yasal ve kısa açıklama."
+                  }
+                },
+                required: ["phrase", "category", "reason"]
+              }
+            },
+            improved_text: {
+              type: SchemaType.STRING,
+              description: "Kullanıcının girdiği metnin yasalara %100 uyumlu hale getirilmiş, onaylı ifadeler içeren düzeltilmiş versiyonu."
+            }
+          },
+          required: ["score", "safety_level", "violations", "improved_text"]
+        }
+      }
+    })
 
-    const parsed = parseSafeJSON(text)
+    const text = result.response.text().trim()
+    const parsed = JSON.parse(text)
 
     // Save action usage in Supabase
     const { data: membership } = await supabase

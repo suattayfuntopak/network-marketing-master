@@ -300,7 +300,7 @@ export function IlgilenContent() {
               {/* WhatsApp Button */}
               {activeMessage.candidatePhone && waHref(activeMessage.candidatePhone) && (
                 <a
-                  href={`${waHref(activeMessage.candidatePhone)}&text=${encodeURIComponent(activeMessage.message)}`}
+                  href={waHref(activeMessage.candidatePhone, activeMessage.message)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {

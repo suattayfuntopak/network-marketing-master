@@ -3,10 +3,10 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface CoachState {
   message?: string
@@ -132,38 +132,38 @@ export async function generateDownlineCoachingMessage(
     .maybeSingle()
 
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 400,
-      system: [
-        {
-          type: 'text',
-          text: `Sen bir network marketing lideri ve takım koçusun. Ekibindeki downline (alt hat) distribütörlerin sahadaki aktiflik durumuna göre onlara göndermek üzere motive edici, suçlayıcı olmayan, yapıcı ve doğrudan aksiyona yönlendiren mentörlük mesajları hazırlıyorsun.
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      systemInstruction: `Sen bir network marketing lideri ve takım koçusun. Ekibindeki downline (alt hat) distribütörlerin sahadaki aktiflik durumuna göre onlara göndermek üzere motive edici, suçlayıcı olmayan, yapıcı ve doğrudan aksiyona yönlendiren mentörlük mesajları hazırlıyorsun.
 Sana distribütörün adı, toplam aday sayısı, aşama dağılımı (yeni aday, sunum, takip, katıldı) ve kaç gündür inaktif (sisteme kayıt girmemiş veya eylem yapmamış) olduğu verilecek.
 Amacın:
 1. Onun durumunu anladığını belirtmek ve empatik olmak (suçlamadan).
 2. İstatistiklerine göre (örneğin: sunum sayısı iyi ama takip yoksa takip yapmasını hatırlatmak; hiç aday yoksa aday listesi yapmayı önermek gibi) nokta atışı pratik saha tavsiyesi vermek.
 3. Onu birebir bir kahve görüşmesine veya yardımlaşma aramasına davet etmek.
-Kısa, samimi, 2-3 emoji içeren ve WhatsApp'tan gönderilmeye uygun Türkçe bir koçluk mesajı yaz. Başka açıklama ekleme.`,
-          cache_control: { type: 'ephemeral' }
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Distribütör Adı: ${memberName}
-Toplam Aday: ${candidateCount}
-Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katildiCount} Katıldı
-İnaktif Gün: ${daysInactive} gündür sisteme veri girişi yapılmadı.`,
-        }
-      ]
+Kısa, samimi, 2-3 emoji içeren ve WhatsApp'tan gönderilmeye uygun Türkçe bir koçluk mesajı yaz. Başka açıklama ekleme.`
     })
 
-    const message = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Distribütör Adı: ${memberName}
+Toplam Aday: ${candidateCount}
+Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katildiCount} Katıldı
+İnaktif Gün: ${daysInactive} gündür sisteme veri girişi yapılmadı.`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 400,
+        temperature: 0.7,
+      }
+    })
+
+    const message = result.response.text().trim()
 
     if (!message) throw new Error('Boş yanıt döndü.')
 
@@ -192,13 +192,9 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
   if (!notes || notes.length === 0) return { error: 'Not bulunamadı.' }
   
   try {
-    const response = await client.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 300,
-      system: [
-        {
-          type: 'text',
-          text: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-pro',
+      systemInstruction: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
 Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net bir özet ve hemen atılması gereken 1 cümlelik aksiyon planı üreteceksin.
 Ürettiğin yanıtı hem Türkçe hem İngilizce olarak hazırlayacak ve tam olarak şu formatta döneceksin:
 [Türkçe Özet + Aksiyon Planı] ||| [English Summary + Action Plan]
@@ -207,21 +203,26 @@ Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net 
 Aday ürünlere çok ilgili ancak bütçe kısıtı var. Takip planı yapıldı. Ürün paketlerinin detaylarını ve ödeme kolaylıklarını içeren kısa bir WhatsApp mesajı atın. ||| The candidate is very interested in products but has budget constraints. Follow-up plan completed. Send a short WhatsApp message explaining product package details and flexible payment terms.
 
 Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.`
-        }
-      ],
-      messages: [
-        {
-          role: 'user',
-          content: `Lider Notları:\n${notes.map((n, i) => `${i + 1}. ${n}`).join('\n')}`
-        }
-      ]
     })
 
-    const summary = response.content
-      .filter(b => b.type === 'text')
-      .map(b => b.text)
-      .join('')
-      .trim()
+    const result = await model.generateContent({
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              text: `Lider Notları:\n${notes.map((n, i) => `${i + 1}. ${n}`).join('\n')}`
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        maxOutputTokens: 300,
+        temperature: 0.3,
+      }
+    })
+
+    const summary = result.response.text().trim()
 
     return { summary }
   } catch (err: any) {

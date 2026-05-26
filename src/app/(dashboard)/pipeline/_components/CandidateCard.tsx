@@ -1,8 +1,9 @@
 'use client'
 
-import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState, useCallback, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
@@ -15,6 +16,10 @@ import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/stag
 import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 import { Z } from '@/lib/zIndex'
+import { toast } from 'sonner'
+import { createClient } from '@/lib/supabase/client'
+import { isAILimitReached, incrementAIUsage } from '@/lib/aiUsage'
+import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
 
 function daysSince(iso: string | null, t: (k: string, v?: Record<string, string | number>) => string): string {
   if (!iso) return t('common.noContact')
@@ -58,6 +63,44 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const del = useDeleteCandidate(workspaceId)
   const parsed = parseNote(candidate.note)
   const profilePhoto = parsed.avatarUrl || null
+
+  const [generating, setGenerating] = useState(false)
+  const [activeMessage, setActiveMessage] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserEmail(user?.email ?? null)
+    })
+  }, [])
+
+  async function handleAIMessage() {
+    if (isAILimitReached(isSuperAdmin)) {
+      toast.error(`Günlük limitinize ulaştınız. Yarın yenilenir.`)
+      return
+    }
+    setGenerating(true)
+    try {
+      const result = await generateQuickMessageAction({
+        name: candidate.full_name,
+        stage: candidate.stage,
+        note: parsed.tr ?? ''
+      })
+      if (result.error || !result.message) {
+        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        return
+      }
+      incrementAIUsage(isSuperAdmin)
+      setActiveMessage(result.message)
+    } catch (err) {
+      console.error(err)
+      toast.error('Mesaj oluşturulamadı.')
+    } finally {
+      setGenerating(false)
+    }
+  }
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -143,8 +186,21 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </div>
           </Link>
 
-          {/* Eylemler: Düzenle | Sil | WhatsApp */}
-          <div className="flex shrink-0 items-center gap-1.5">
+          {/* Eylemler: YZ | Düzenle | Sil | WhatsApp */}
+          <div className="flex shrink-0 items-center gap-1.5" onClick={e => e.stopPropagation()}>
+            <button
+              onClick={handleAIMessage}
+              disabled={generating}
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:shadow-md disabled:opacity-50 cursor-pointer animate-all duration-200 active:scale-95"
+              aria-label="AI Mesaj Üret"
+              title="AI Mesaj Üret"
+            >
+              {generating ? (
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+              ) : (
+                <Bot className="h-4 w-4" strokeWidth={1.75} />
+              )}
+            </button>
             <button onClick={() => setEditOpen(true)}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:shadow-md"
               aria-label="Düzenle"
@@ -354,6 +410,74 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             </ul>
           </div>
         </>
+      )}
+      {activeMessage && createPortal(
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveMessage(null)} />
+          
+          <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                  <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
+                </div>
+                <div>
+                  <h2 className="text-base font-bold text-[var(--text-1)]">Yapay Zeka Mesajı</h2>
+                  <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{candidate.full_name} için üretildi</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveMessage(null)}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition-colors cursor-pointer animate-all duration-200 active:scale-90"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Textarea */}
+            <div className="relative mb-5">
+              <textarea
+                value={activeMessage}
+                readOnly
+                rows={6}
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] leading-relaxed outline-none resize-none"
+              />
+            </div>
+
+            {/* Actions: ONLY Copy and WhatsApp icons, WITHOUT ANY text */}
+            <div className="flex justify-end gap-2.5">
+              {/* Copy Button (Only Icon) */}
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(activeMessage)
+                  toast.success('Mesaj kopyalandı!')
+                }}
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
+                title="Kopyala"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+
+              {/* WhatsApp Button (Only Icon) */}
+              {candidate.phone && waHref(candidate.phone, activeMessage) && (
+                <a
+                  href={waHref(candidate.phone, activeMessage)!}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => {
+                    setActiveMessage(null)
+                  }}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
+                  title="WhatsApp ile Gönder"
+                >
+                  <WhatsAppIcon className="h-4 w-4" />
+                </a>
+              )}
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
     </>
   )
