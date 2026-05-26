@@ -18,6 +18,10 @@ export async function generateMessageAction(
   _prev: YazarFormState,
   formData: FormData
 ): Promise<YazarFormState> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   const name        = (formData.get('name')        as string | null)?.trim() ?? ''
   const stage       = (formData.get('stage')       as string | null)?.trim() ?? ''
   const context     = (formData.get('context')     as string | null)?.trim() ?? ''
@@ -72,8 +76,8 @@ export async function generateMessageAction(
     }
 
     return { message, remaining: isSuperAdmin ? undefined : remaining }
-  } catch {
-    return { error: 'Mesaj oluşturulamadı.' }
+  } catch (err: any) {
+    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
   }
 }
 
@@ -92,6 +96,10 @@ export async function generateRoleplayResponseAction(
   userReply: string,
   lang: string
 ): Promise<RoleplayResponseState> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return { error: 'Oturum gerekli.' }
@@ -247,6 +255,10 @@ export async function askCoachAction(
   const question = (formData.get('question') as string | null)?.trim() ?? ''
   const lang     = (formData.get('lang')     as string | null)?.trim() ?? 'tr'
 
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   if (!question) return { error: 'Lütfen bir soru yazın.' }
 
   const supabase = await createClient()
@@ -334,6 +346,10 @@ Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türk�
 }
 
 export async function translateTextAction(text: string, targetLang: 'tr' | 'en'): Promise<{ translatedText?: string; error?: string }> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: targetLang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin.' }
+  }
+
   if (!text) return {}
 
   const supabase = await createClient()

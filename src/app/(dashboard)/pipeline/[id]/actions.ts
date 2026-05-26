@@ -17,6 +17,10 @@ export async function generateCoachMessage(
   _prev: CoachState,
   formData: FormData,
 ): Promise<CoachState> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   const candidateId = (formData.get('candidateId') as string | null)?.trim() ?? ''
   const name        = (formData.get('name')        as string | null)?.trim() ?? ''
   const stage       = (formData.get('stage')       as string | null)?.trim() ?? ''
@@ -65,10 +69,10 @@ export async function generateCoachMessage(
   }
 
   const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
+     .from('nmm_workspace_members')
+     .select('workspace_id')
+     .eq('user_id', user.id)
+     .maybeSingle()
 
   try {
     const message = await generateMessage({ name, stage, note, messageType })
@@ -84,8 +88,8 @@ export async function generateCoachMessage(
     }
 
     return { message }
-  } catch {
-    return { error: 'Mesaj oluşturulamadı.' }
+  } catch (err: any) {
+    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
   }
 }
 
@@ -93,6 +97,10 @@ export async function generateDownlineCoachingMessage(
   _prev: CoachState,
   formData: FormData
 ): Promise<CoachState> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   const memberName     = (formData.get('memberName')     as string | null)?.trim() ?? ''
   const candidateCount = parseInt(formData.get('candidateCount') as string ?? '0')
   const yeniCount      = parseInt(formData.get('yeniCount')      as string ?? '0')
@@ -189,6 +197,10 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
 }
 
 export async function generateNotesSummary(notes: string[]): Promise<{ summary?: string; error?: string }> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   if (!notes || notes.length === 0) return { error: 'Not bulunamadı.' }
   
   try {

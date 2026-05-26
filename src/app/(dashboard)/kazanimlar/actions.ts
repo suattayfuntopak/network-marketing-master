@@ -8,6 +8,9 @@ export async function generateAchievementMessageAction(input: {
   name: string
   note?: string | null
 }): Promise<{ message?: string; error?: string }> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
   if (!input.name) return { error: 'Kişi adı eksik.' }
   try {
     const model = genAI.getGenerativeModel({
@@ -37,8 +40,8 @@ Ton: Samimi, sıcak, lider duruşlu, güven verici ve heyecanlandırıcı (2-3 e
 
     const message = result.response.text().trim()
     return { message }
-  } catch (err) {
+  } catch (err: any) {
     console.error(err)
-    return { error: 'Mesaj oluşturulamadı.' }
+    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
   }
 }

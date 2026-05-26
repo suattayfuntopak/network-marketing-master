@@ -64,6 +64,10 @@ const WARMTH_CONTEXT: Record<string, string> = {
 }
 
 export async function generateMessage(input: GenerateMessageInput): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.')
+  }
+
   const {
     name,
     stage = '',

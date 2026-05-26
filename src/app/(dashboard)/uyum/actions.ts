@@ -21,6 +21,10 @@ export async function auditComplianceMessageAction(
   textToAudit: string,
   lang: string
 ): Promise<ComplianceAuditState> {
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+  }
+
   if (!textToAudit.trim()) {
     return { error: lang === 'en' ? 'Please enter a message to audit.' : 'Lütfen denetlenecek bir metin girin.' }
   }
