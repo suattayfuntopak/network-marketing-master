@@ -27,9 +27,12 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
   }
 
   function handleWhatsApp() {
-    const defaultPhone = '' // We don't have direct phone field inside workspace members, but if they have it we can pass, else leader will copy-paste or open blank. Wait, let's see if we can open a blank WhatsApp or let them copy. Yes, leader can copy-paste or we can use waHref(null, state.message).
-    const href = waHref(null, state.message)
-    if (href) window.open(href, '_blank')
+    const href = waHref(member.phone, state.message)
+    if (href) {
+      window.open(href, '_blank')
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(state.message || '')}`, '_blank')
+    }
   }
 
   return (

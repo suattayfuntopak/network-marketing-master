@@ -19,6 +19,7 @@ import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
+import { waHref } from '@/lib/waLink'
 
 export interface MemberRow {
   user_id: string
@@ -32,6 +33,7 @@ export interface MemberRow {
   katildi_count: number
   last_activity_at: string | null
   onboarding_steps?: string[]
+  phone?: string | null
 }
 
 export interface OnboardingStep {
@@ -93,7 +95,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
-      .select('owner_id, stage')
+      .select('id, owner_id, stage, full_name, phone')
       .in('workspace_id', allWorkspaceIds),
     supabase
       .from('nmm_daily_actions')
@@ -145,6 +147,13 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         .filter((o: any) => o.user_id === m.user_id)
         .map((o: any) => o.step_id)
 
+      // Try to find a phone number for this member in the leader's candidates list where full_name matches
+      const candidateMatch = candidates.find(c =>
+        c.owner_id === ownWs.owner_id &&
+        c.full_name?.toLowerCase().trim() === m.full_name?.toLowerCase().trim()
+      )
+      const phone = candidateMatch?.phone ?? null
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -157,6 +166,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         katildi_count: mc.filter(c => c.stage === 'katildi').length,
         last_activity_at: lastActionMap[m.user_id] ?? null,
         onboarding_steps: completedSteps,
+        phone: phone,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
@@ -183,6 +193,7 @@ export function EkipPanel() {
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
     stepId: string
+    phone?: string | null
   } | null>(null)
 
   const toggleOnboardingStep = useCallback(async (userId: string, stepId: string, isStepDone: boolean) => {
@@ -657,7 +668,8 @@ export function EkipPanel() {
                                         e.stopPropagation()
                                         setOnboardingCoachData({
                                           memberName: m.full_name || '',
-                                          stepId: step.id
+                                          stepId: step.id,
+                                          phone: m.phone ?? null
                                         })
                                       }}
                                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
@@ -790,6 +802,7 @@ export function EkipPanel() {
         <YZOnboardingKocuModal
           memberName={onboardingCoachData.memberName}
           stepId={onboardingCoachData.stepId}
+          phone={onboardingCoachData.phone}
           lang={lang as 'tr' | 'en'}
           onClose={() => setOnboardingCoachData(null)}
         />
@@ -825,11 +838,12 @@ const ONBOARDING_STEPS_EN: Record<string, string> = {
 interface YZOnboardingKocuModalProps {
   memberName: string
   stepId: string
+  phone?: string | null
   lang: 'tr' | 'en'
   onClose: () => void
 }
 
-function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardingKocuModalProps) {
+function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZOnboardingKocuModalProps) {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -869,7 +883,12 @@ function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardi
 
   const handleSendWhatsApp = () => {
     if (!message) return
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+    const href = waHref(phone, message)
+    if (href) {
+      window.open(href, '_blank')
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+    }
   }
 
   const stepLabel = lang === 'en'

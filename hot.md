@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-26 — MLM Ekip Doğru Başlangıç Rehberi & YZ Koçu Doğrudan WhatsApp Sohbet Entegrasyonu
+
+### feat/fix: Ekip / Doğru Başlangıç Rehberi Doğrudan WhatsApp Sohbet Yönlendirmesi
+
+- **Doğrudan Kişiye Özel WhatsApp Mesajlaşma Entegrasyonu:**
+  - **Sorun:** Distribütör Doğru Başlangıç Rehberi YZ Robotu veya YZ Ekip Koçu butonlarından harika koçluk mesajları üretilmesine rağmen, lider bu mesajı WhatsApp ile göndermek istediğinde WhatsApp doğrudan ilgili downline üyenin sohbet penceresini açmak yerine boş bir kişi arama/listeleme ekranı getiriyordu.
+  - **Çözüm:** Telefon numarasının bilindiği tüm ekip paneli senaryolarında, WhatsApp butonuna tıklanıldığında doğrudan o üyenin sohbet penceresinin mesaj doldurulmuş şekilde açılması (`https://wa.me/numara?text=mesaj`) sağlandı.
+  - **Dinamik Eşleştirme:** Ekip üyeleri tablosunda telefon numarası bulunmadığı için, liderin `nmm_candidates` listesindeki `full_name` eşleşmesi üzerinden dinamik olarak üyenin telefon numarası (`m.phone`) çözümlendi.
+  - **Güvenli Fallback:** Telefon numarasının bulunamadığı durumlarda ise lideri kesinlikle engellememek adına, üretilen mesajı taşıyıp genel WhatsApp gönderme ekranına (`https://api.whatsapp.com/send?text=...`) yönlendirecek şekilde akıllı bir geriye düşme (fallback) mimarisi kuruldu.
+  - Entegrasyon uygulamanın 3 can alıcı alanına uygulandı:
+    1. **Doğru Başlangıç Rehberi YZ Robotu Popup'ı (`EkipPanel.tsx`):** Robot butonuna tıklanınca üyenin telefonu modal durumuna (state) taşındı ve modal içindeki WhatsApp gönderme butonu doğrudan o kişiye yönelecek şekilde güncellendi.
+    2. **YZ Ekip Koçu Mentörlük Paneli (`YZEkipKocuSheet.tsx`):** Lider, ekip üyesinin inaktifliğini analiz edip koçluk mesajı ürettiğinde, WhatsApp butonu doğrudan o üyenin sohbetine yönlenecek şekilde güncellendi.
+    3. **Ekibe Toplu Gönder Paneli Tekli Gönderimleri (`BroadcastPanel.tsx`):** Seçili ekip üyelerine tekli satır bazında gönderim yapılan WhatsApp butonlarının tamamı doğrudan hedeflenen numaraya sohbet açacak şekilde `waHref` entegrasyonuyla geliştirildi.
+
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
 ### fix/feat: Eski Kayıtlı Distribütörlerin MLM Bağımsız Lider Modeline Otomatik Geçişi (Migration 013)

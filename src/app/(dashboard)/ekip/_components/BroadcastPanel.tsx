@@ -5,6 +5,7 @@ import { Send, FileText, MessageSquare, Users, CheckSquare, Square } from 'lucid
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from './EkipPanel'
+import { waHref } from '@/lib/waLink'
 
 interface BroadcastPanelProps {
   members: MemberRow[]
@@ -233,7 +234,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
                         </span>
                         {selected && (
                           <a
-                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastPreviewText || '')}`}
+                            href={waHref(m.phone, broadcastPreviewText || '') || `https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastPreviewText || '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => { if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')) } }}
