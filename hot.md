@@ -2,6 +2,19 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### fix/feat: Eski Kayıtlı Distribütörlerin MLM Bağımsız Lider Modeline Otomatik Geçişi (Migration 013)
+
+- **Eski Üyeliklerin Sıkışma/Kayma Hatası %100 Çözüldü:**
+  - **Teşhis:** Bağımsız Lider Modelimizden (Migration 009) önce kaydolan downline distribütörlerin doğrudan liderin `nmm_workspace_members` tablosuna `member` rolüyle kaydedildiği belirlendi. Bu durumda downline distribütörlerin kendi uygulamaları liderin çalışma alanına bağlandığı için hem temiz bir sıfır kilometre sayfa göremiyorlardı hem de davet kodunu girdiklerinde *"Zaten Ekibe Kayıtlısınız"* uyarısı alıp veritabanındaki yeni parent-child MLM bağını kuramıyorlardı.
+  - **Çözüm:** Eski model üzerinden doğrudan liderin ekibine kaydedilmiş olan tüm distribütörleri otomatik olarak **Bağımsız Lider** statüsüne yükselten ve hiyerarşik bağı pürüzsüzce kuran SQL göç işlemi kodlandı.
+  - Bu işlem otomatik olarak:
+    1. Üyenin liderin workspace'indeki eski doğrudan üyeliğini siler.
+    2. Üyeyi kendi workspace'inde **Leader** rütbesine atar (böylece Elif Hanım sıfır kilometre, tertemiz ve bağımsız kendi ekibine kavuşur).
+    3. Üyenin workspace `parent_id` (sponsor) alanını liderin `owner_id` değerine bağlar (sizi sponsor olarak kaydeder ve sizde anında görünmesini sağlar).
+    4. Üyenin o ana kadar oluşturduğu adayları ve aksiyonları liderin alanından kendi bağımsız alanına taşır.
+    5. Lidere anında realtime *"Ekibinize yeni ortak katıldı"* bildirimi fırlatır!
+  - Supabase Dashboard üzerinde çalıştırılmak üzere `supabase/migrations/013_migrate_old_memberships.sql` göç dosyası hazırlandı.
+
 ### feat: Downline (Alt Ekip) Metrik & Aday Güncelleme Bildirimleri (Migration 012)
 
 - **Otomatik Aday & Aşama Bildirim Tetikleyicisi Entegre Edildi:**
