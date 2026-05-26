@@ -93,7 +93,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   ] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
-      .select('user_id, full_name, role, joined_at, avatar_url')
+      .select('user_id, full_name, role, joined_at, avatar_url' as any)
       .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
@@ -115,14 +115,14 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const onboarding = onboardingRaw ?? []
 
   // Create clean map of members to remove duplicates that could happen during migration
-  const uniqueMembersMap: Record<string, typeof members[0]> = {}
+  const uniqueMembersMap: Record<string, any> = {}
   if (ownWs.owner_id) {
     uniqueMembersMap[ownWs.owner_id] = {
       user_id: ownWs.owner_id,
       full_name: members?.find(m => m.user_id === ownWs.owner_id)?.full_name ?? 'Lider',
       role: 'leader',
       joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString(),
-      avatar_url: members?.find(m => m.user_id === ownWs.owner_id)?.avatar_url ?? null
+      avatar_url: (members as any)?.find((m: any) => m.user_id === ownWs.owner_id)?.avatar_url ?? null
     }
   }
   members?.forEach(m => {
