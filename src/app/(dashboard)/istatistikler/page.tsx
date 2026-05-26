@@ -3,14 +3,14 @@
 import { useState, useMemo } from 'react'
 import {
   TrendingUp, Users, Target, Activity, Flame,
-  BarChart2, Award, Clock
+  BarChart2, Award, Clock, Crown, Sparkles
 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
-import { Sparkles } from 'lucide-react'
+import { useTeamMembers } from '@/hooks/useTeamMembers'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -19,8 +19,16 @@ export default function AnalyticsPage() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()
+  const { data: members = [], isLoading: membersLoading } = useTeamMembers(ws?.workspaceId)
   
   const [period, setPeriod] = useState<PeriodOption>('30d')
+
+  // Sort team members: Leader (Me) first, followed by downline members
+  const sortedMembers = useMemo(() => {
+    const leader = members.find(m => m.role === 'leader')
+    const downlines = members.filter(m => m.role === 'member')
+    return leader ? [leader, ...downlines] : members
+  }, [members])
 
   // 1. Adayları seçilen periyoda göre filtrele
   const filteredCandidates = useMemo(() => {
@@ -441,6 +449,80 @@ export default function AnalyticsPage() {
             </div>
 
           </div>
+
+          {/* Ekip Performans Tablosu (Excel tarzı) */}
+          <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
+            <div>
+              <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                <Users className="h-4 w-4 text-brand" />
+                {lang === 'en' ? 'Team Performance Excel Spreadsheet' : 'Ekip Performans Dağılım Tablosu'}
+              </h2>
+              <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                {lang === 'en' 
+                  ? 'Detailed excel-style summary of your pipeline distribution including direct team downline partners.'
+                  : 'Alt ekibinizdeki davet kodu ile girmiş distribütörler ve kendinizin tüm huni aşamalarındaki güncel aday dağılım tablosu.'}
+              </p>
+            </div>
+
+            {membersLoading ? (
+              <div className="h-32 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
+            ) : sortedMembers.length === 0 ? (
+              <div className="py-10 text-center text-xs text-[var(--text-3)] italic">
+                {lang === 'en' ? 'No team members registered' : 'Henüz ekibe kayıtlı üye bulunmamaktadır.'}
+              </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+                  <thead>
+                    <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
+                      <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
+                      <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
+                      <th className="p-3 font-semibold text-center bg-blue-50/20 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{lang === 'en' ? 'Total' : 'Toplam'}</th>
+                      <th className="p-3 font-semibold text-center bg-indigo-50/20 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400">{lang === 'en' ? 'New' : 'Yeni'}</th>
+                      <th className="p-3 font-semibold text-center bg-sky-50/20 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400">{lang === 'en' ? 'Contact' : 'İletişim'}</th>
+                      <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">{lang === 'en' ? 'Invite' : 'Davet'}</th>
+                      <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400">{lang === 'en' ? 'Presentation' : 'Sunum'}</th>
+                      <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{lang === 'en' ? 'Follow-up' : 'Takip'}</th>
+                      <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{lang === 'en' ? 'Joined' : 'Katıldı'}</th>
+                      <th className="p-3 font-semibold text-right">{lang === 'en' ? 'Last Active' : 'Son Aktiflik'}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
+                    {sortedMembers.map(m => {
+                      const isLeader = m.role === 'leader'
+                      const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
+                      return (
+                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
+                          <td className="p-3 flex items-center gap-2 truncate max-w-[160px]">
+                            {isLeader ? (
+                              <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
+                            ) : (
+                              <span className="h-2 w-2 rounded-full bg-zinc-300" />
+                            )}
+                            <span className="truncate">{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
+                            {isLeader && <span className="text-[10px] text-[var(--text-3)] font-normal font-sans">({lang === 'en' ? 'Me' : 'Ben'})</span>}
+                          </td>
+                          <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                            {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
+                          </td>
+                          <td className="p-3 text-center font-black tabular-nums bg-blue-50/10 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{m.candidate_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-indigo-50/10 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400 font-semibold">{m.yeni_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-sky-50/10 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400 font-semibold">{m.iletisim_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">{m.davetli_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-cyan-50/10 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400 font-semibold">{m.sunum_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{m.takip_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{m.katildi_count}</td>
+                          <td className="p-3 text-right text-[11px] text-[var(--text-2)] font-medium truncate">
+                            {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '-'}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </section>
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">

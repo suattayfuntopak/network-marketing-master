@@ -149,6 +149,7 @@ export function EkipPanel() {
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [coachingMember, setCoachingMember] = useState<{ member: MemberRow; days: number } | null>(null)
   const [scorecardOpen, setScorecardOpen] = useState(true)
+  const [expandedMembers, setExpandedMembers] = useState<Record<string, boolean>>({})
 
   const [expandedOnboardingId, setExpandedOnboardingId] = useState<string | null>(null)
   const [onboardingWeekTab, setOnboardingWeekTab] = useState<1 | 2 | 3 | 4>(1)
@@ -278,68 +279,68 @@ export function EkipPanel() {
   const activeRatio = members.length > 0 ? Math.round((activePartnersCount / members.length) * 100) : 0
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
 
       {/* ─── 1. EKİP PERFORMANS PANELİ ─── */}
-      <section className="space-y-4">
-        <h2 className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
-          <BarChart2 className="h-4 w-4" />
+      <section className="space-y-5">
+        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
+          <BarChart2 className="h-5 w-5" />
           {t('team.performancePanel')}
         </h2>
 
         {/* Özet istatistik kartları */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5">
-            <p className="text-3xl font-extrabold text-[#D4A017]">{members.length}</p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="rounded-2xl border border-[#F5D76E]/30 bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-6 shadow-sm">
+            <p className="text-4xl font-black text-[#D4A017]">{members.length}</p>
+            <p className="mt-1 text-sm font-bold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
           </div>
-          <div className="rounded-2xl border border-accent-blue/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5">
-            <p className="text-3xl font-extrabold text-accent-blue">
+          <div className="rounded-2xl border border-accent-blue/20 bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-6 shadow-sm">
+            <p className="text-4xl font-black text-accent-blue">
               {totalCandidates}
             </p>
-            <p className="mt-1 text-xs font-semibold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
+            <p className="mt-1 text-sm font-bold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
           </div>
         </div>
 
         {/* Haftalık Organizasyon Performans Durumu Kartı */}
         {isLeader && (
-          <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5 dark:border-indigo-950/20 dark:bg-indigo-950/5 space-y-4 animate-in fade-in duration-300">
+          <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/40 p-6 dark:border-indigo-950/20 dark:bg-indigo-950/5 space-y-5 shadow-sm animate-in fade-in duration-300">
             <button
               type="button"
               onClick={() => setScorecardOpen(!scorecardOpen)}
-              className="flex w-full items-center justify-between"
+              className="flex w-full items-center justify-between cursor-pointer"
             >
-              <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400">
-                  <TrendingUp className="h-4 w-4" />
+              <div className="flex items-center gap-2.5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400">
+                  <TrendingUp className="h-5 w-5" />
                 </div>
-                <span className="text-sm font-bold text-indigo-950 dark:text-indigo-200">
+                <span className="text-base font-extrabold text-indigo-950 dark:text-indigo-200">
                   {lang === 'en' ? 'Weekly Team Performance Scorecard' : 'Haftalık Organizasyon Performans Durumu'}
                 </span>
               </div>
               {scorecardOpen ? (
-                <ChevronUp className="h-4 w-4 text-indigo-500" />
+                <ChevronUp className="h-5 w-5 text-indigo-500" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-indigo-500" />
+                <ChevronDown className="h-5 w-5 text-indigo-500" />
               )}
             </button>
 
             {scorecardOpen && (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
                 {/* Metrik 1: Aktif Partner Oranı */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {lang === 'en' ? 'Active Partner Ratio' : 'Aktif Distribütör Oranı'}
                   </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
                       %{activeRatio}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium">
+                    <span className="text-xs text-zinc-500 font-semibold">
                       ({activePartnersCount}/{members.length})
                     </span>
                   </div>
-                  <p className="text-[10px] text-zinc-500 leading-tight">
+                  <p className="text-xs text-zinc-500 leading-tight font-medium">
                     {lang === 'en' 
                       ? 'Partners active in the last 7 days.' 
                       : 'Son 7 günde sahada aktif olan ekip üyeleriniz.'}
@@ -347,19 +348,19 @@ export function EkipPanel() {
                 </div>
 
                 {/* Metrik 2: Sıcak Huni Potansiyeli */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {lang === 'en' ? 'Warm Pipeline Potential' : 'Sıcak Aday Potansiyeli'}
                   </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
                       {warmPipelinePotentials}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium">
+                    <span className="text-xs text-zinc-500 font-semibold">
                       {lang === 'en' ? 'Leads' : 'Aday'}
                     </span>
                   </div>
-                  <p className="text-[10px] text-zinc-500 leading-tight">
+                  <p className="text-xs text-zinc-500 leading-tight font-medium">
                     {lang === 'en'
                       ? 'Total active presentation and follow-up candidates.'
                       : 'Sunum yapılmış ve takibi devam eden sıcak adaylar.'}
@@ -367,19 +368,19 @@ export function EkipPanel() {
                 </div>
 
                 {/* Metrik 3: Kayıt Hunisi Momentumu */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-4 space-y-1 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-[10px] font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {lang === 'en' ? 'Onboarding Momentum' : 'Kayıt Hunisi Momentumu'}
                   </span>
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-2xl font-black text-indigo-950 dark:text-indigo-100">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
                       {totalJoined}
                     </span>
-                    <span className="text-[10px] text-zinc-500 font-medium">
+                    <span className="text-xs text-zinc-500 font-semibold">
                       {lang === 'en' ? 'Joined' : 'Katıldı'}
                     </span>
                   </div>
-                  <p className="text-[10px] text-zinc-500 leading-tight">
+                  <p className="text-xs text-zinc-500 leading-tight font-medium">
                     {lang === 'en'
                       ? 'Total candidates successfully registered as partners.'
                       : 'Huniden başarıyla ekibe dahil edilen iş ortakları.'}
@@ -391,190 +392,232 @@ export function EkipPanel() {
         )}
 
         {/* Üye performans listesi */}
-        <ul className="space-y-3">
+        <ul className="space-y-5">
           {members.map(m => {
             const isCurrentUser = m.user_id === currentUser?.id
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
             const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
             const isInactive = daysInactive >= 7 && !isCurrentUser
+            const isCardExpanded = isCurrentUser || !!expandedMembers[m.user_id]
 
             return (
               <li
                 key={m.user_id}
-                className={`overflow-hidden rounded-2xl border transition-all duration-200 p-4 shadow-sm hover:shadow-md space-y-4 ${
+                className={`relative overflow-hidden rounded-2xl border transition-all duration-200 p-6 shadow-sm hover:shadow-md space-y-5 ${
                   isInactive
                     ? 'border-amber-200/50 bg-amber-50/5 dark:border-amber-900/20 dark:bg-amber-950/5'
                     : 'border-[var(--border)] bg-[var(--bg-card)]'
                 }`}
               >
-                <div className="flex min-w-0 items-center gap-3">
-                  <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-base font-bold ${
-                    isInactive
-                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                      : 'bg-[#EEEDFE] text-brand'
-                  }`}>
-                    {(m.full_name ?? '?').charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1 overflow-hidden">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="truncate text-sm font-bold text-[var(--text-1)]">
-                        {m.full_name ?? 'İsimsiz Üye'}
-                        {isCurrentUser && <span className="ml-1.5 text-[10px] font-normal text-[var(--text-3)]">({t('common.you')})</span>}
-                      </p>
-                      {m.role === 'leader' && (
-                        <Crown className="h-3.5 w-3.5 shrink-0 text-[#854F0B]" strokeWidth={2} />
-                      )}
-                      {isInactive && (
-                        <button
-                          onClick={() => setCoachingMember({ member: m, days: daysInactive })}
-                          className="shrink-0 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[9px] font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1 animate-pulse hover:scale-105 active:scale-95 transition-all"
-                          title={lang === 'en' ? 'Get AI Coaching Message' : 'YZ Koçluk Mesajı Al'}
-                        >
-                          <span>⚠️</span>
-                          <span>{lang === 'en' ? 'Needs Support' : 'Destek Gerekebilir'}</span>
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-xs text-[var(--text-3)] capitalize mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                      <span>{m.role === 'leader' ? t('common.leader') : t('common.member')}</span>
-                      {m.joined_at && (
-                        <span className="text-[10px] text-[var(--text-3)]/70">
-                          · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
-                        </span>
-                      )}
-                      {lastActiveDate && (
-                        <span className={`text-[10px] ${isInactive ? 'text-amber-600 dark:text-amber-400 font-semibold' : 'text-[var(--text-3)]/70'}`}>
-                          · {lang === 'en' ? 'Last active:' : 'Son aktiflik:'} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? (lang === 'en' ? 'today' : 'bugün') : `${daysInactive} ${lang === 'en' ? 'd ago' : 'gün önce'}`})
-                        </span>
-                      )}
-                    </p>
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <p className="text-xl font-black text-accent-blue">{m.candidate_count}</p>
-                    <p className="text-[10px] text-[var(--text-3)] font-semibold uppercase">{t('team.totalCandidates')}</p>
-                  </div>
-                  {isLeader && m.role !== 'leader' && (
-                    <button
-                      onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? t('common.member') })}
-                      disabled={removingId === m.user_id}
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 transition active:scale-95 disabled:opacity-50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40"
-                      title={t('team.removeFromTeam')}
-                    >
-                      {removingId === m.user_id
-                        ? <Loader2 className="h-4 w-4 animate-spin" />
-                        : <Trash2 className="h-4 w-4" />}
-                    </button>
-                  )}
-                </div>
-                <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
-                  <div className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-2)]">
-                    <TrendingUp className="h-3.5 w-3.5 shrink-0 text-brand" />
-                    <span>{t('team.funnelDistribution')}</span>
-                  </div>
-                  {m.candidate_count === 0 ? (
-                    <p className="text-[11px] text-[var(--text-3)] italic py-1">{t('team.noTeamCandidates')}</p>
-                  ) : (
-                    <div className="grid grid-cols-2 gap-2 pt-1 text-center sm:grid-cols-4">
-                      <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/10 p-2 border border-blue-100/30 dark:border-blue-900/10">
-                        <span className="block text-xs font-bold text-blue-600 dark:text-blue-400">{m.yeni_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.yeni')}</span>
-                      </div>
-                      <div className="rounded-xl bg-emerald-50/50 dark:bg-emerald-950/10 p-2 border border-emerald-100/30 dark:border-emerald-900/10">
-                        <span className="block text-xs font-bold text-emerald-600 dark:text-emerald-400">{m.sunum_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.sunum')}</span>
-                      </div>
-                      <div className="rounded-xl bg-amber-50/50 dark:bg-amber-950/10 p-2 border border-amber-100/30 dark:border-amber-900/10">
-                        <span className="block text-xs font-bold text-amber-600 dark:text-amber-400">{m.takip_count}</span>
-                        <span className="text-[9px] text-[var(--text-3)] font-medium">{t('stages.takip')}</span>
-                      </div>
-                      <div className="rounded-xl bg-[#FAEEDA]/50 dark:bg-[#FAEEDA]/5 p-2 border border-[#FAEEDA]/30 dark:border-[#FAEEDA]/10">
-                        <span className="block text-xs font-bold text-[#854F0B] dark:text-[#fcd34d]">{m.katildi_count}</span>
-                        <span className="text-[9px] font-semibold text-[#854F0B] dark:text-[#fcd34d]">{t('stages.katildi')}</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
-                {m.role === 'member' && (
-                  <div className="border-t border-[var(--border)] pt-3.5 space-y-2">
+                {/* Kart Sağ Üst Buton Grubu - Sleek, Absolute Positioned */}
+                {!isCurrentUser && (
+                  <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                    {/* Chevron Açma/Kapama Butonu */}
                     <button
                       type="button"
-                      onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
-                      className="flex w-full items-center justify-between text-xs font-semibold text-[var(--text-2)] hover:text-brand transition cursor-pointer"
+                      onClick={() => {
+                        setExpandedMembers(prev => ({
+                          ...prev,
+                          [m.user_id]: !prev[m.user_id]
+                        }))
+                      }}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] hover:text-[var(--text-1)] transition active:scale-95 cursor-pointer border border-[var(--border)] shadow-sm"
+                      title={isCardExpanded ? 'Detayları Kapat' : 'Detayları Göster'}
                     >
-                      <span className="flex items-center gap-1.5">
-                        <Rocket className="h-3.5 w-3.5 text-[#854F0B] dark:text-[#fbbf24]" />
-                        <span>{lang === 'en' ? 'Distributor Onboarding Progress' : 'Distribütör Başlatma Süreci'}</span>
-                      </span>
-                      <span className="flex items-center gap-2">
-                        {(() => {
-                          const doneCount = ONBOARDING_STEPS.filter(s => onboardingState[m.user_id]?.[s.id]).length
-                          const totalCount = ONBOARDING_STEPS.length
-                          const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
-                          return (
-                            <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-2 py-0.5 text-[10px] font-bold text-[#854F0B] dark:text-[#fbbf24]">
-                              %{pct}
-                            </span>
-                          )
-                        })()}
-                        {expandedOnboardingId === m.user_id ? (
-                          <ChevronUp className="h-3.5 w-3.5" />
-                        ) : (
-                          <ChevronDown className="h-3.5 w-3.5" />
-                        )}
-                      </span>
+                      {isCardExpanded ? <ChevronUp className="h-4.5 w-4.5" /> : <ChevronDown className="h-4.5 w-4.5" />}
                     </button>
 
-                    {expandedOnboardingId === m.user_id && (
-                      <div className="pt-2 border-t border-dashed border-[var(--border)] space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
-                        {/* 4 Weekly Tabs */}
-                        <div className="flex gap-1.5 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-0.5 rounded-lg border border-[var(--border)]">
-                          {([1, 2, 3, 4] as const).map(w => (
-                            <button
-                              key={w}
-                              type="button"
-                              onClick={() => setOnboardingWeekTab(w)}
-                              className={`flex-1 text-[10px] font-bold py-1 rounded-md transition-all cursor-pointer ${
-                                onboardingWeekTab === w
-                                  ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
-                                  : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
-                              }`}
-                            >
-                              {lang === 'en' ? `W${w}` : `${w}. Hafta`}
-                            </button>
-                          ))}
-                        </div>
+                    {/* Silme Çöp Kutusu Butonu */}
+                    {isLeader && (
+                      <button
+                        type="button"
+                        onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? t('common.member') })}
+                        disabled={removingId === m.user_id}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition active:scale-95 disabled:opacity-50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 cursor-pointer border border-red-200/20 dark:border-red-900/10 shadow-sm"
+                        title={t('team.removeFromTeam')}
+                      >
+                        {removingId === m.user_id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                )}
 
-                        {/* Steps list */}
-                        <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-1">
-                          {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
-                            const isStepDone = onboardingState[m.user_id]?.[step.id] ?? false
-                            return (
-                              <button
-                                key={step.id}
-                                type="button"
-                                onClick={() => toggleOnboardingStep(m.user_id, step.id)}
-                                className={`w-full flex items-center gap-2.5 rounded-xl border p-2.5 text-left transition-all active:scale-[0.99] cursor-pointer ${
-                                  isStepDone
-                                    ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)] font-semibold'
-                                    : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 hover:bg-[var(--bg-card)] text-[var(--text-2)]'
-                                }`}
-                              >
-                                <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border transition-all ${
-                                  isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
-                                }`}>
-                                  {isStepDone && <Check className="h-2.5 w-2.5 text-white" strokeWidth={3} />}
-                                </span>
-                                <span className="text-[11px] leading-tight">
-                                  {lang === 'en' ? step.label_en : step.label_tr}
-                                </span>
-                              </button>
-                            )
-                          })}
+                {/* Kart Üst Bölümü */}
+                <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
+                  {/* Sol Taraf: Avatar ve İsim Detayları */}
+                  <div className="flex min-w-0 flex-1 items-center gap-4">
+                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black ${
+                      isInactive
+                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                        : 'bg-[#EEEDFE] text-brand'
+                    }`}>
+                      {(m.full_name ?? '?').charAt(0).toUpperCase()}
+                    </div>
+                    
+                    <div className="min-w-0 flex-1 overflow-hidden space-y-1.5">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="truncate text-lg font-black text-[var(--text-1)]">
+                          {m.full_name ?? 'İsimsiz Üye'}
+                          {isCurrentUser && <span className="ml-2 text-sm font-normal text-[var(--text-3)]">({t('common.you')})</span>}
+                        </p>
+                        {m.role === 'leader' && (
+                          <Crown className="h-5 w-5 shrink-0 text-[#854F0B]" strokeWidth={2.5} />
+                        )}
+                        {isInactive && (
+                          <button
+                            onClick={() => setCoachingMember({ member: m, days: daysInactive })}
+                            className="shrink-0 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-3 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1.5 animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm"
+                            title={lang === 'en' ? 'Get AI Coaching Message' : 'YZ Koçluk Mesajı Al'}
+                          >
+                            <span>⚠️</span>
+                            <span>{lang === 'en' ? 'Needs Support' : 'Destek Gerekebilir'}</span>
+                          </button>
+                        )}
+                      </div>
+                      
+                      <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="font-extrabold text-[var(--text-1)]">{m.role === 'leader' ? t('common.leader') : t('common.member')}</span>
+                        {m.joined_at && (
+                          <span className="text-xs text-[var(--text-3)]/90">
+                            · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
+                          </span>
+                        )}
+                        {lastActiveDate && (
+                          <span className={`text-xs ${isInactive ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-[var(--text-3)]/90'}`}>
+                            · {lang === 'en' ? 'Last active:' : 'Son aktiflik:'} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? (lang === 'en' ? 'today' : 'bugün') : `${daysInactive} ${lang === 'en' ? 'd ago' : 'gün önce'}`})
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Sağ Taraf: Toplam Aday Göstergesi */}
+                  <div className="flex items-center gap-3 shrink-0 ml-auto md:ml-0 pr-20 sm:pr-0">
+                    <div className="text-right mr-2">
+                      <p className="text-3xl font-black text-accent-blue tabular-nums">{m.candidate_count}</p>
+                      <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider">{t('team.totalCandidates')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Kart Alt Bölümü: Huni Dağılımı ve Onboarding (Collapsible) */}
+                {isCardExpanded && (
+                  <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
+                    
+                    {/* Aday Hunisi Dağılım Kutusu (Sıfır Bile Olsa Her Zaman Görünür!) */}
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
+                        <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
+                        <span>{t('team.funnelDistribution')}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
+                        <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                          <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
+                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
+                        </div>
+                        <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                          <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
+                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
+                        </div>
+                        <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                          <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
+                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
+                        </div>
+                        <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                          <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
+                          <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
                         </div>
                       </div>
+                    </div>
+
+                    {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
+                    {m.role === 'member' && (
+                      <div className="border-t border-[var(--border)] pt-5 space-y-3">
+                        <button
+                          type="button"
+                          onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
+                          className="flex w-full items-center justify-between text-sm font-extrabold text-[var(--text-2)] hover:text-brand transition cursor-pointer uppercase tracking-wider"
+                        >
+                          <span className="flex items-center gap-2">
+                            <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
+                            <span>{lang === 'en' ? 'Distributor Onboarding Progress' : 'Distribütör Başlatma Süreci'}</span>
+                          </span>
+                          <span className="flex items-center gap-2.5">
+                            {(() => {
+                              const doneCount = ONBOARDING_STEPS.filter(s => onboardingState[m.user_id]?.[s.id]).length
+                              const totalCount = ONBOARDING_STEPS.length
+                              const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
+                              return (
+                                <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-3 py-1 text-xs font-black text-[#854F0B] dark:text-[#fbbf24] shadow-sm">
+                                  %{pct}
+                                </span>
+                              )
+                            })()}
+                            {expandedOnboardingId === m.user_id ? (
+                              <ChevronUp className="h-5 w-5" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5" />
+                            )}
+                          </span>
+                        </button>
+
+                        {expandedOnboardingId === m.user_id && (
+                          <div className="pt-3 border-t border-dashed border-[var(--border)] space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                            {/* 4 Weekly Tabs */}
+                            <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
+                              {([1, 2, 3, 4] as const).map(w => (
+                                <button
+                                  key={w}
+                                  type="button"
+                                  onClick={() => setOnboardingWeekTab(w)}
+                                  className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all cursor-pointer ${
+                                    onboardingWeekTab === w
+                                      ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
+                                      : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                                  }`}
+                                >
+                                  {lang === 'en' ? `W${w}` : `${w}. Hafta`}
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Steps list */}
+                            <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+                              {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
+                                const isStepDone = onboardingState[m.user_id]?.[step.id] ?? false
+                                return (
+                                  <button
+                                    key={step.id}
+                                    type="button"
+                                    onClick={() => toggleOnboardingStep(m.user_id, step.id)}
+                                    className={`w-full flex items-center gap-3 rounded-xl border p-4 text-left transition-all active:scale-[0.99] cursor-pointer ${
+                                      isStepDone
+                                        ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)] font-semibold shadow-sm'
+                                        : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 hover:bg-[var(--bg-card)] text-[var(--text-2)]'
+                                    }`}
+                                  >
+                                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
+                                      isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
+                                    }`}>
+                                      {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
+                                    </span>
+                                    <span className="text-sm font-semibold leading-tight">
+                                      {lang === 'en' ? step.label_en : step.label_tr}
+                                    </span>
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     )}
+
                   </div>
                 )}
               </li>
@@ -583,12 +626,12 @@ export function EkipPanel() {
         </ul>
 
         {isSolo && isLeader && (
-          <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
+          <p className="rounded-xl bg-[var(--bg-subtle)] px-5 py-4 text-center text-sm font-semibold text-[var(--text-2)] leading-relaxed border border-[var(--border)]">
             {t('team.soloHint')}
           </p>
         )}
         {!isLeader && (
-          <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)] leading-relaxed">
+          <p className="rounded-xl bg-[var(--bg-subtle)] px-5 py-4 text-center text-sm font-semibold text-[var(--text-2)] leading-relaxed border border-[var(--border)]">
             {t('team.memberHint')}
           </p>
         )}
@@ -596,23 +639,23 @@ export function EkipPanel() {
 
       {/* ─── 2. EKİP ARKADAŞI DAVET ET ─── */}
       {isLeader && (
-        <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
-            <UserPlus className="h-4 w-4" />
+        <section className="space-y-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
             {t('team.inviteTeammate')}
           </h2>
-          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
-            <p className="text-xs text-[var(--text-2)] leading-relaxed">
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 space-y-4 shadow-sm">
+            <p className="text-sm text-[var(--text-2)] font-medium leading-relaxed">
               {t('team.inviteTeammateDesc')}
             </p>
-            <div className="flex min-w-0 items-center gap-2 overflow-hidden">
+            <div className="flex min-w-0 items-center gap-3 overflow-hidden">
               <SpoilerCode code={ws?.inviteCode ?? ''} />
               <button
                 onClick={handleCopyInviteCode}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-[#433a9f] transition active:scale-95"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-[#433a9f] transition active:scale-95 shadow-sm cursor-pointer"
                 title={lang === 'en' ? 'Copy Code' : 'Kodu Kopyala'}
               >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
               </button>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
@@ -622,10 +665,10 @@ export function EkipPanel() {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white hover:bg-[#20ba56] transition active:scale-95"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white hover:bg-[#20ba56] transition active:scale-95 shadow-sm cursor-pointer"
                 title="WhatsApp ile Paylaş"
               >
-                <WhatsAppIcon className="h-4 w-4" />
+                <WhatsAppIcon className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -634,30 +677,30 @@ export function EkipPanel() {
 
       {/* ─── 3. BİR LİDERİN EKİBİNE KATIL ─── */}
       {(isSolo || !isLeader) && (
-        <section>
-          <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-1.5">
-            <LogIn className="h-4 w-4" />
+        <section className="space-y-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
+            <LogIn className="h-5 w-5" />
             {t('team.joinATeam')}
           </h2>
-          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
-            <p className="text-xs text-[var(--text-2)] leading-relaxed">
+          <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 space-y-4 shadow-sm">
+            <p className="text-sm text-[var(--text-2)] font-medium leading-relaxed">
               {t('team.joinATeamDesc')}
             </p>
-            <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-2 overflow-hidden">
+            <form onSubmit={handleJoinWorkspace} className="flex min-w-0 gap-3 overflow-hidden">
               <input
                 type="text"
                 required
                 value={inviteCodeInput}
                 onChange={e => setInviteCodeInput(e.target.value)}
                 placeholder={lang === 'en' ? 'Paste invite code...' : 'Davet kodunu yapıştırın...'}
-                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-xs text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all"
+                className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all font-medium"
               />
               <button
                 type="submit"
                 disabled={joining}
-                className="flex h-10 px-4 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-[#0F6E56] text-sm font-semibold text-white hover:bg-[#0a5a44] transition active:scale-95 disabled:opacity-50"
+                className="flex h-11 px-5 shrink-0 items-center justify-center gap-2 rounded-xl bg-[#0F6E56] text-base font-bold text-white hover:bg-[#0a5a44] transition active:scale-95 disabled:opacity-50 shadow-sm cursor-pointer"
               >
-                {joining ? <Loader2 className="h-4 w-4 animate-spin" /> : t('team.joinBtn')}
+                {joining ? <Loader2 className="h-5 w-5 animate-spin" /> : t('team.joinBtn')}
               </button>
             </form>
           </div>
