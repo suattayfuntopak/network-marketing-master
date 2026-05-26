@@ -896,10 +896,10 @@ function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardi
           </div>
           <div>
             <h3 className="text-lg font-black text-[var(--text-1)]">
-              {lang === 'en' ? 'AI Onboarding Coach' : 'Yapay Zeka Onboarding Koçu'}
+              {lang === 'en' ? 'AI Correct Start Coach' : 'Yapay Zeka Doğru Başlangıç Koçu'}
             </h3>
             <p className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
-              {lang === 'en' ? 'Step Coaching' : 'Adım Koçluk Rehberi'}
+              {lang === 'en' ? 'STEP-BY-STEP GUIDANCE' : 'ADIM ADIM REHBERLİK'}
             </p>
           </div>
         </div>
@@ -971,16 +971,18 @@ function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardi
 
         {/* Footer */}
         <div className="flex flex-col items-center justify-center border-t border-[var(--border)] pt-4 text-center">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)]">
-            <span>{lang === 'en' ? 'Daily Coaching Quota:' : 'Günlük Koçluk Kotası:'}</span>
-            <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
-              {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'remaining' : 'kalan'}
-            </span>
-          </div>
+          {!usage?.isSuperAdmin && (
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)] mb-4">
+              <span>{lang === 'en' ? 'Daily Coaching Quota:' : 'Günlük Koçluk Kotası:'}</span>
+              <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
+                {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'remaining' : 'kalan'}
+              </span>
+            </div>
+          )}
           <button
             type="button"
             onClick={onClose}
-            className="mt-4 w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-black uppercase tracking-wider text-[var(--text-2)] hover:text-[var(--text-1)] transition active:scale-[0.98] cursor-pointer"
+            className="w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-black uppercase tracking-wider text-[var(--text-2)] hover:text-[var(--text-1)] transition active:scale-[0.98] cursor-pointer"
           >
             {lang === 'en' ? 'Close' : 'Kapat'}
           </button>
