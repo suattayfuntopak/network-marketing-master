@@ -16,6 +16,7 @@ export interface TeamMember {
   takip_count: number
   katildi_count: number
   last_activity_at: string | null
+  onboarding_steps?: string[]
 }
 
 async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
@@ -43,7 +44,12 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
   const allUserIds = [ownWs.owner_id, ...downlineUserIds].filter(Boolean) as string[]
 
-  const [{ data: members, error }, { data: candidatesRaw }, { data: recentActions }] = await Promise.all([
+  const [
+    { data: members, error },
+    { data: candidatesRaw },
+    { data: recentActions },
+    { data: onboardingRaw }
+  ] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
       .select('user_id, full_name, role, joined_at')
@@ -57,14 +63,27 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
       .select('user_id, created_at')
       .in('workspace_id', allWorkspaceIds)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+    supabase
+      .from('nmm_onboarding_progress' as any)
+      .select('user_id, step_id')
+      .in('user_id', allUserIds)
   ])
 
   if (error) throw error
   const candidates = candidatesRaw ?? []
   const actions = recentActions ?? []
+  const onboarding = onboardingRaw ?? []
 
   // Create clean map of members to remove duplicates
   const uniqueMembersMap: Record<string, typeof members[0]> = {}
+  if (ownWs.owner_id) {
+    uniqueMembersMap[ownWs.owner_id] = {
+      user_id: ownWs.owner_id,
+      full_name: members?.find(m => m.user_id === ownWs.owner_id)?.full_name ?? 'Lider',
+      role: 'leader',
+      joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString()
+    }
+  }
   members?.forEach(m => {
     uniqueMembersMap[m.user_id] = m
   })
@@ -86,6 +105,10 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   return uniqueMembers
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
+      const completedSteps = onboarding
+        .filter((o: any) => o.user_id === m.user_id)
+        .map((o: any) => o.step_id)
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -99,6 +122,7 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
         takip_count:     mc.filter(c => c.stage === 'takip').length,
         katildi_count:   mc.filter(c => c.stage === 'katildi').length,
         last_activity_at: lastActionMap[m.user_id] ?? null,
+        onboarding_steps: completedSteps,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)

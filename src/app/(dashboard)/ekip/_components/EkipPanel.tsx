@@ -582,7 +582,7 @@ export function EkipPanel() {
                         >
                           <span className="flex items-center gap-2">
                             <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
-                            <span>{lang === 'en' ? 'Distributor Onboarding Progress' : 'Distribütör Başlatma Süreci'}</span>
+                            <span>{lang === 'en' ? 'Distributor Correct Start Guide' : 'Distribütör Doğru Başlangıç Rehberi'}</span>
                           </span>
                           <span className="flex items-center gap-2.5">
                             {(() => {
@@ -915,7 +915,7 @@ function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardi
           <div className="h-px bg-[var(--border)]" />
           <div>
             <p className="text-[10px] text-[var(--text-3)] font-extrabold uppercase tracking-widest">
-              {lang === 'en' ? 'Target Onboarding Step' : 'Hedef Onboarding Adımı'}
+              {lang === 'en' ? 'Target Correct Start Step' : 'Hedef Doğru Başlangıç Adımı'}
             </p>
             <p className="text-sm font-bold text-brand mt-0.5">
               {stepLabel}

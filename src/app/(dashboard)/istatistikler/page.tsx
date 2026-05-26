@@ -485,6 +485,9 @@ export default function AnalyticsPage() {
                       <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400">{lang === 'en' ? 'Presentation' : 'Sunum'}</th>
                       <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{lang === 'en' ? 'Follow-up' : 'Takip'}</th>
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{lang === 'en' ? 'Joined' : 'Katıldı'}</th>
+                      <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
+                        DDBY<sup>*</sup>
+                      </th>
                       <th className="p-3 font-semibold text-right">{lang === 'en' ? 'Last Active' : 'Son Aktiflik'}</th>
                     </tr>
                   </thead>
@@ -492,6 +495,8 @@ export default function AnalyticsPage() {
                     {sortedMembers.map(m => {
                       const isLeader = m.role === 'leader'
                       const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
+                      const doneCount = m.onboarding_steps?.length ?? 0
+                      const onboardingPct = isLeader ? 100 : Math.min(100, Math.round((doneCount / 9) * 100))
                       return (
                         <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
                           <td className="p-3 flex items-center gap-2 whitespace-nowrap">
@@ -512,6 +517,7 @@ export default function AnalyticsPage() {
                           <td className="p-3 text-center tabular-nums bg-cyan-50/10 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400 font-semibold">{m.sunum_count}</td>
                           <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{m.takip_count}</td>
                           <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{m.katildi_count}</td>
+                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-black">%{onboardingPct}</td>
                           <td className="p-3 text-right text-[11px] text-[var(--text-2)] font-medium truncate">
                             {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '-'}
                           </td>
@@ -522,6 +528,9 @@ export default function AnalyticsPage() {
                 </table>
               </div>
             )}
+            <div className="text-[10px] font-bold text-[var(--text-3)] select-none pl-1 mt-1">
+              * DİSTRİBÜTÖR DOĞRU BAŞLANGIÇ REHBERİ
+            </div>
           </section>
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
