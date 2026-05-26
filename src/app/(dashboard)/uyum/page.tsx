@@ -400,7 +400,7 @@ export default function CompliancePage() {
                       <div className="absolute right-4 top-4 flex items-center gap-2">
                         <button
                           onClick={() => handleCopyImproved(auditResult.improved_text!)}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/40 text-orange-800 dark:text-orange-400 transition active:scale-95 cursor-pointer"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 transition active:scale-95 cursor-pointer"
                           title={lang === 'en' ? 'Copy Text' : 'Metni Kopyala'}
                         >
                           {copiedImproved ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
