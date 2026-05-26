@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -12,7 +12,7 @@ function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan
   if (c.next_follow_up_at) {
     const d = new Date(c.next_follow_up_at)
-    d.setHours(0, 0, 0, 0)
+    d.setHours(12, 0, 0, 0)
     return d
   }
   // Yoksa aşama bazlı formülle hesapla
@@ -21,7 +21,7 @@ function followUpDate(c: NmmCandidate): Date | null {
   const base = new Date(c.last_contact_at ?? c.created_at)
   const d = new Date(base)
   d.setDate(d.getDate() + days)
-  d.setHours(0, 0, 0, 0)
+  d.setHours(12, 0, 0, 0)
   return d
 }
 
@@ -39,13 +39,22 @@ const DAYS   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
 export function TakvimClient() {
   const router = useRouter()
   const { data: ws } = useWorkspace()
-  const { candidates } = useCandidates(ws?.workspaceId)
+  const { candidates = [] } = useCandidates(ws?.workspaceId)
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  const [mounted, setMounted] = useState(false)
 
-  const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
+  const today = useMemo(() => {
+    const d = new Date()
+    d.setHours(12, 0, 0, 0)
+    return d
+  }, [])
+
+  const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1, 12, 0, 0))
   const [selected, setSelected] = useState<string>(toKey(today))
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Her aday için takip tarihi hesapla → tarihe göre gruplama
   const byDate = useMemo(() => {
@@ -63,16 +72,24 @@ export function TakvimClient() {
   const { days, startPad } = useMemo(() => {
     const year = view.getFullYear()
     const month = view.getMonth()
-    const firstDay = new Date(year, month, 1)
-    const lastDay = new Date(year, month + 1, 0)
+    const firstDay = new Date(year, month, 1, 12, 0, 0)
+    const lastDay = new Date(year, month + 1, 0, 12, 0, 0)
     // Pazartesi = 0 başlangıç (JS: 0=Pazar → dönüştür)
     const pad = (firstDay.getDay() + 6) % 7
     const total = lastDay.getDate()
     return { days: total, startPad: pad }
   }, [view])
 
-  function prevMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() - 1, 1)) }
-  function nextMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() + 1, 1)) }
+  function prevMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() - 1, 1, 12, 0, 0)) }
+  function nextMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() + 1, 1, 12, 0, 0)) }
+
+  if (!mounted) {
+    return (
+      <div className="flex h-48 flex-col items-center justify-center gap-2">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+      </div>
+    )
+  }
 
   const selectedCandidates = byDate[selected] ?? []
 
@@ -107,7 +124,7 @@ export function TakvimClient() {
 
           {Array.from({ length: days }).map((_, i) => {
             const day = i + 1
-            const date = new Date(view.getFullYear(), view.getMonth(), day)
+            const date = new Date(view.getFullYear(), view.getMonth(), day, 12, 0, 0)
             const key = toKey(date)
             const isToday = key === toKey(today)
             const isSelected = key === selected
@@ -214,13 +231,13 @@ export function TakvimClient() {
 
       {/* Yaklaşan takipler özeti: Önümüzdeki Ay */}
       {(() => {
-        const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1)
+        const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1, 12, 0, 0)
         const nmYear = nextMonthDate.getFullYear()
         const nmMonth = nextMonthDate.getMonth()
         const daysInNm = new Date(nmYear, nmMonth + 1, 0).getDate()
         
         const nextMonthKeys = Array.from({ length: daysInNm }, (_, i) => {
-          const d = new Date(nmYear, nmMonth, i + 1)
+          const d = new Date(nmYear, nmMonth, i + 1, 12, 0, 0)
           return toKey(d)
         }).filter(k => byDate[k])
 

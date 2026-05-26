@@ -171,12 +171,12 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
     : '?'
 
   return (
-    <>
+    <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
       {/* Backdrop */}
-      <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/50 backdrop-blur-sm`} onClick={onClose} />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Modal */}
-      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all`} style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
+      <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all" style={{ maxHeight: 'calc(100dvh - 2rem)', overflowY: 'auto' }}>
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -317,6 +317,6 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
           </form>
         )}
       </div>
-    </>
+    </div>
   )
 }
