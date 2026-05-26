@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Trophy, Calendar, Award, ExternalLink, Bot, Sparkles, X, Copy } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
+import { useTeamMembers } from '@/hooks/useTeamMembers'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { parseNote } from '@/lib/noteParser'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -26,6 +27,7 @@ function formatDate(iso: string, lang: string): string {
 export default function KazanimlarPage() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
+  const { data: members, isLoading: mLoading } = useTeamMembers(ws?.workspaceId)
   const { lang, t } = useTranslation()
 
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
@@ -158,7 +160,7 @@ export default function KazanimlarPage() {
         </div>
       </header>
 
-      {wsLoading || cLoading ? (
+      {wsLoading || cLoading || mLoading ? (
         <div className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -251,6 +253,10 @@ export default function KazanimlarPage() {
           <ul className="space-y-3">
             {kazananlar.map(c => {
               const parsed = parseNote(c.note)
+              const isTeamMember = members?.some(m =>
+                m.role === 'member' &&
+                m.full_name?.toLowerCase().trim() === c.full_name.toLowerCase().trim()
+              )
               return (
                 <li key={c.id} className="relative group">
                   <Link
@@ -275,8 +281,13 @@ export default function KazanimlarPage() {
 
                     {/* Member Details */}
                     <div className="min-w-0 flex-1 pr-12">
-                      <p className="truncate text-sm font-semibold text-[var(--text-1)] group-hover:text-amber-600 transition-colors flex items-center gap-1.5">
+                      <p className="truncate text-sm font-semibold text-[var(--text-1)] group-hover:text-amber-600 transition-colors flex items-center gap-1.5 flex-wrap">
                         {c.full_name}
+                        {isTeamMember && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-[#EEEDFE] dark:bg-[#534AB7]/10 border border-[#d4d0f7] dark:border-[#534AB7]/20 px-2 py-0.5 text-[9px] font-extrabold text-[#534AB7] dark:text-[#c4b5fd] uppercase tracking-wider">
+                            💎 {lang === 'en' ? 'IN MY TEAM' : 'EKİBİMDE'}
+                          </span>
+                        )}
                         <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-60 transition-opacity" />
                       </p>
                       {c.last_contact_at && (

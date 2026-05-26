@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-05-26 — Kazanımlar Sayfası "Ekibimde" İş Ortağı Rozeti Entegrasyonu
+
+### feat: Kazanımlar Sayfası "Ekibimde" İş Ortağı Rozeti Entegrasyonu
+
+- **Prestijli ve Premium "💎 EKİBİMDE" Rozet Tasarımı:**
+  - **Geliştirme:** Boru hattında başarıyla "Katıldı" aşamasına gelmiş olan adaylar arasından, davet kodunu girerek alt ekibe (`nmm_workspace_members` tablosunda downline üye) dahil olmuş ve distribütör olarak uygulamayı kullanmaya başlamış kişilerin Kazanımlar sayfasında belirginleştirilmesi sağlandı.
+  - **Tasarım Bütünlüğü:** Downline üye ile eşleşen adayların isimlerinin hemen yanına (`flex items-center gap-1.5 flex-wrap` düzeninde) mor renk temasına sahip, solunda elmas emojisi bulunan şık ve dinamik bir **"💎 EKİBİMDE"** (İngilizce dil seçeneğinde **"💎 IN MY TEAM"**) rozeti yerleştirildi.
+  - **Akıllı Eşleştirme & Yükleme Kontrolü:** `useTeamMembers` kancası entegre edilerek, sayfa yüklenmeden önce hem aday verileri hem de ekip üye verilerinin getirilmesi beklendi. Birebir büyük-küçük harf duyarsız isim eşleştirmesiyle üye eşleşmesi saptandı.
+
 ## 2026-05-26 — MLM Ekip Doğru Başlangıç Rehberi & YZ Koçu Doğrudan WhatsApp Sohbet Entegrasyonu
 
 ### feat/fix: Ekip / Doğru Başlangıç Rehberi Doğrudan WhatsApp Sohbet Yönlendirmesi
