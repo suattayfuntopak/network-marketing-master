@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Zap, Loader2 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
@@ -12,6 +13,7 @@ interface QuickAddModalProps {
 }
 
 export function QuickAddModal({ onClose }: QuickAddModalProps) {
+  const [mounted, setMounted] = useState(false)
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const addCandidate = useAddCandidate(ws?.workspaceId || '')
@@ -22,6 +24,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    setMounted(true)
     const originalScrollY = window.scrollY
     
     // Focus the input automatically on mount without scrolling viewport Y
@@ -57,16 +60,18 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
     }
   }
 
-  return (
-    <>
+  if (!mounted) return null
+
+  return createPortal(
+    <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in`}
+        className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 animate-in fade-in`}
         onClick={onClose}
       />
 
       {/* Modal Card */}
-      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-md -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all animate-in fade-in zoom-in-95 duration-200`} style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
+      <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] transition-all animate-in fade-in zoom-in-95 duration-200" style={{ maxHeight: 'calc(100dvh - 2rem)', overflowY: 'auto' }}>
         
         {/* Header */}
         <div className="mb-5 flex items-center justify-between">
@@ -150,6 +155,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
         </form>
 
       </div>
-    </>
+    </div>,
+    document.body
   )
 }

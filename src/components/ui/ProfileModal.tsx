@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -16,6 +17,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -30,6 +32,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
+    setMounted(true)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
@@ -170,7 +173,9 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
     ? fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
@@ -317,6 +322,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
           </form>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

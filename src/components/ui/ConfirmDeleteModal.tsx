@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Z } from '@/lib/zIndex'
 
@@ -11,8 +12,10 @@ interface ConfirmDeleteModalProps {
 }
 
 export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDeleteModalProps) {
+  const [mounted, setMounted] = useState(false)
   // Escape tuşuyla kapat
   useEffect(() => {
+    setMounted(true)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onCancel()
     }
@@ -20,16 +23,18 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
     return () => document.removeEventListener('keydown', onKey)
   }, [onCancel])
 
-  return (
-    <>
+  if (!mounted) return null
+
+  return createPortal(
+    <div className={`fixed inset-0 ${Z.confirm} flex items-center justify-center p-4`}>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/50 backdrop-blur-sm`}
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onCancel}
       />
 
       {/* Modal */}
-      <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)]`}>
+      <div className="relative w-full max-w-xs rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
         {/* İkon */}
         <div className="mb-4 flex justify-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEAF0]">
@@ -62,6 +67,7 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
           </button>
         </div>
       </div>
-    </>
+    </div>,
+    document.body
   )
 }

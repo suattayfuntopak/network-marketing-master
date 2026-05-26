@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserPlus, CalendarClock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/zIndex'
@@ -90,6 +91,7 @@ function NotifIconBg({ type }: { type: NotificationItem['icon'] }) {
 }
 
 export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
+  const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
   const [soundAlerts, setSoundAlerts]   = useState(false)
@@ -103,6 +105,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
   }, [notifications, onUnreadCountChange])
 
   useEffect(() => {
+    setMounted(true)
     const emailPref = localStorage.getItem('nmm_notif_email')
     const pushPref  = localStorage.getItem('nmm_notif_push')
     const soundPref = localStorage.getItem('nmm_notif_sound')
@@ -148,7 +151,9 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   const unreadCount = notifications.filter(n => !n.read).length
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
@@ -318,6 +323,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
           </div>
         </>
       )}
-    </div>
+    </div>,
+    document.body
   )
 }

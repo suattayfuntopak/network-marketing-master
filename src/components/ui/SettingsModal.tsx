@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Settings, Layout, Sun, Moon, Monitor, Loader2, Save } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -18,11 +19,13 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
   
+  const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [workspaceName, setWorkspaceName] = useState('')
 
   useEffect(() => {
+    setMounted(true)
     // Escape key
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
@@ -84,7 +87,9 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     }
   }
 
-  return (
+  if (!mounted) return null
+
+  return createPortal(
     <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
       {/* Backdrop */}
       <div
@@ -198,6 +203,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
