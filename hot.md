@@ -2,6 +2,20 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: Kendi İtirazını Ekle ve Kendi Eğitim İçeriğini Ekle Sistemleri Entegre Edildi
+
+- **"Bu İş (Network Marketing) Caiz mi?" İtirazı Eklendi:** YZ Koçu tarafından üretilen ve vicdani/ticari değerlendirme kriterleri (ürün varlığı, ciro tabanlı kazanç, şeffaflık) içeren meşru ticari açıklama, özetlenerek İtirazlara Cevaplar (`itirazlar/page.tsx`) sayfasına **"Bu iş (Network Marketing) caiz mi / yasal mı?"** başlığıyla 35. madde (Güven & Şüphe kategorisi) olarak eklendi.
+- **Kendi İtirazını Ekle Pop-up Formu (`itirazlar/page.tsx`):**
+  - İtirazlar sayfasına basıldığında pürüzsüzce açılan asil bordo tonlu bir **Kendi İtirazını Ekle** butonu (`+`) ve glassmorphic popup form katmanı entegre edildi.
+  - Form; İtiraz (Soru), Kategori (Dropdown), Kısa Saha Cevabı, Detaylı Cevap, Yaklaşım, Örnek Konuşma, Emoji Seçimi ve Etiketler alanlarını barındırmaktadır.
+  - Eklenen özel itirazlar `localStorage`'da (`nmm_custom_objections_v1`) güvenli bir şekilde depolanır ve sayfa yenilense dahi statik kütüphanenin en başında listelenmeye devam eder. Kategoriler filtresi yeni eklenen kategorilere göre anlık güncellenir.
+  - Özel eklenen itirazlar için satırda bir **Silme (Trash2)** butonu belirir ve kullanıcı dilerse kendi itirazını silebilir.
+- **Kendi Eğitim İçeriğini Ekle Pop-up Formu (`egitim/page.tsx`):**
+  - Eğitim (NMU Akademisi / İçerik Havuzu) sayfasına estetik ve modern bir **Kendi İçeriğini Ekle** butonu ve form katmanı eklendi.
+  - Form; Başlık, Özet, Kategori (Dropdown), Tür (Ders notu/script/rehber), Seviye (Başlangıç/orta/ileri), Madde Madde İçerik (her satır bir madde olacak şekilde textarea), Emoji ve Etiketler alanlarını barındırmaktadır.
+  - Eklenen dersler, kütüphanenin en üstünde listelenir, okundu/okunmadı ve favori işaretleme özellikleri built-in sistemle tam entegre çalışır.
+  - Eklenen özel eğitimler için bir **Silme (Trash2)** butonu eklendi, böylece kullanıcılar ekledikleri notları kolayca yönetebilirler.
+
 ### style/feat: Uyum Denetleyicisi Önerilen Versiyon Kopyalama ve Paylaşma Butonları İyileştirmesi
 
 - **Kopyala Butonu Turuncu Renk Dönüşümü:** Uyum Merkezi (`uyum/page.tsx`) sayfasındaki YZ denetiminden sonra en altta çıkan "Önerilen Uyumlu ve Etkili Versiyon" kartının sağ üst köşesindeki yeşil renkli kopyala butonu, sayfanın genel renk paletine (terrakota/kızıl-turuncu) ve kullanıcı talebine uyumlu tatlı bir turuncu renge (`bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-400`) dönüştürüldü.

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, Suspense } from 'react'
-import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star, CheckCircle2, Circle, MessageSquare } from 'lucide-react'
+import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star, CheckCircle2, Circle, MessageSquare, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
@@ -364,6 +364,16 @@ export const ITIRAZLAR: Itiraz[] = [
     },
     emoji: '🎯',
   },
+  {
+    id: 35,
+    kategori: { tr: 'Güven & Şüphe', en: 'Trust & Skepticism' },
+    soru: { tr: 'Bu iş (Network Marketing) caiz mi / yasal mı?', en: 'Is this business (Network Marketing) permissible / legitimate?' },
+    cevap: {
+      tr: 'Harika bir soru. Burada bizim görevimiz fetva vermek değil, işin şeffaf ticaret modelini sunmaktır. Kriterler: (1) Ortada faydalı ve gerçek bir ürün var mı? (2) Kazanç sadece üye kaydından mı, yoksa ürün satış cirosundan mı doğuyor? (3) Sistem adil ve şeffaf mı? Kazancımız ürün satış cirosuna dayandığı için dürüst bir ticarettir; nihai vicdani değerlendirme kararını kendi araştırmanıza bırakıyorum.',
+      en: 'A great question. Our role is not to issue rulings, but to present the business model transparently. Criteria: (1) Is there a real, valuable product? (2) Does income come from product sales revenue rather than just recruiting? (3) Is the system fair and transparent? Since our earnings are based on actual product sales, it is a legitimate trade; the final decision is left to your own research and conscience.',
+    },
+    emoji: '⚖️',
+  },
 ]
 
 const PAGE_SIZE = 10
@@ -391,7 +401,36 @@ function ItirazlarPageContent() {
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
 
-  const KATEGORILER = getKategoriler(lang)
+  // Custom objections state & form variables
+  const [customItirazlar, setCustomItirazlar] = useState<any[]>([])
+  const [formOpen, setFormOpen] = useState(false)
+  const [newSoru, setNewSoru] = useState('')
+  const [newKategori, setNewKategori] = useState('Genel')
+  const [newKisaCevap, setNewKisaCevap] = useState('')
+  const [newDetayliCevap, setNewDetayliCevap] = useState('')
+  const [newYaklasim, setNewYaklasim] = useState('')
+  const [newOrnekDiyalog, setNewOrnekDiyalog] = useState('')
+  const [newEmoji, setNewEmoji] = useState('🛡️')
+  const [newTags, setNewTags] = useState('')
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('nmm_custom_objections_v1')
+      if (stored) {
+        setCustomItirazlar(JSON.parse(stored))
+      }
+    } catch {}
+  }, [])
+
+  const tumItirazlar = useMemo(() => {
+    return [...ITIRAZLAR, ...customItirazlar]
+  }, [customItirazlar])
+
+  const KATEGORILER = useMemo(() => {
+    const base = lang === 'en' ? ['All', 'Favorites'] : ['Tümü', 'Favoriler']
+    const uniq = Array.from(new Set(tumItirazlar.map(i => lang === 'en' ? i.kategori.en : i.kategori.tr)))
+    return [...base, ...uniq]
+  }, [tumItirazlar, lang])
 
   useEffect(() => { setPage(1) }, [search, aktifKategori, lang])
 
@@ -421,22 +460,58 @@ function ItirazlarPageContent() {
     setAcikId(prev => (prev === id ? null : id))
   }
 
+  function handleAddObjection(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newSoru.trim()) return
+
+    const newObj: any = {
+      id: Date.now(),
+      kategori: { tr: newKategori, en: newKategori },
+      soru: { tr: newSoru, en: newSoru },
+      emoji: newEmoji || '🛡️',
+      kisaCevap: newKisaCevap,
+      detayliCevap: newDetayliCevap,
+      yaklasim: newYaklasim,
+      ornekDiyalog: newOrnekDiyalog,
+      tags: newTags.split(',').map(t => t.trim()).filter(Boolean)
+    }
+
+    const updated = [newObj, ...customItirazlar]
+    setCustomItirazlar(updated)
+    localStorage.setItem('nmm_custom_objections_v1', JSON.stringify(updated))
+    
+    // Reset form
+    setNewSoru('')
+    setNewKisaCevap('')
+    setNewDetayliCevap('')
+    setNewYaklasim('')
+    setNewOrnekDiyalog('')
+    setNewTags('')
+    setNewEmoji('🛡️')
+    setFormOpen(false)
+    toast.success(lang === 'en' ? 'Objection added successfully!' : 'İtiraz başarıyla eklendi!')
+  }
+
   const filtrelenmis = useMemo(() => {
     const q = search.toLowerCase().trim()
     const label = KATEGORILER[aktifKategori]
     const isFavFilter = label === 'Favoriler' || label === 'Favorites'
     const isAll = label === 'Tümü' || label === 'All'
 
-    return ITIRAZLAR.filter(i => {
+    return tumItirazlar.filter(i => {
       if (isFavFilter) return favs.has(i.id)
       const kategoriEslesti = isAll || i.kategori.tr === label || i.kategori.en === label
       if (!kategoriEslesti) return false
       if (!q) return true
       const soru = lang === 'en' ? i.soru.en : i.soru.tr
-      const cevap = lang === 'en' ? i.cevap.en : i.cevap.tr
-      return soru.toLowerCase().includes(q) || cevap.toLowerCase().includes(q)
+      const cevap = lang === 'en' ? i.cevap?.en || i.cevap || '' : i.cevap?.tr || i.cevap || ''
+      const kisa = i.kisaCevap || ''
+      const detay = i.detayliCevap || ''
+      const yakl = i.yaklasim || ''
+      const diyalog = i.ornekDiyalog || ''
+      return soru.toLowerCase().includes(q) || cevap.toLowerCase().includes(q) || kisa.toLowerCase().includes(q) || detay.toLowerCase().includes(q) || yakl.toLowerCase().includes(q) || diyalog.toLowerCase().includes(q)
     })
-  }, [search, aktifKategori, favs, lang, KATEGORILER])
+  }, [search, aktifKategori, favs, lang, KATEGORILER, tumItirazlar])
 
   useEffect(() => {
     const topicIdStr = searchParams.get('id')
@@ -467,24 +542,33 @@ function ItirazlarPageContent() {
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       {/* Başlık */}
       <header className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1F3] dark:bg-[#3d0a1a]">
-            <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1F3] dark:bg-[#3d0a1a]">
+              <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-[var(--text-1)]">
+                {lang === 'en' ? 'Objection Answers' : 'İtirazlara Cevaplar'}
+              </h1>
+              <p className="text-sm text-[var(--text-3)]">
+                {lang === 'en' ? 'Great answers to the most common objections you face in the field' : 'Sahada en sık karşılaştığın itirazlara verilecek harika cevaplar'}
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {lang === 'en' ? 'Objection Answers' : 'İtirazlara Cevaplar'}
-            </h1>
-            <p className="text-sm text-[var(--text-3)]">
-              {lang === 'en' ? 'Great answers to the most common objections you face in the field' : 'Sahada en sık karşılaştığın itirazlara verilecek harika cevaplar'}
-            </p>
-          </div>
+          <button
+            onClick={() => setFormOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>{lang === 'en' ? 'Add Objection' : 'Kendi İtirazını Ekle'}</span>
+          </button>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
           <span className="text-2xl">🛡️</span>
           <div className="flex-1">
             <p className="text-xs font-semibold text-[#9B1D47] dark:text-[#fda4af]">
-              {ITIRAZLAR.length} {lang === 'en' ? 'objections' : 'itiraz'} · {KATEGORILER.length - 2} {lang === 'en' ? 'categories' : 'kategori'}
+              {tumItirazlar.length} {lang === 'en' ? 'objections' : 'itiraz'} · {KATEGORILER.length - 2} {lang === 'en' ? 'categories' : 'kategori'}
             </p>
             <p className="text-[11px] text-[#9B1D47]/70 dark:text-[#fda4af]/70">
               {lang === 'en' ? '⭐ pin it, 📋 copy it, ✅ mark as read' : '⭐ ile sabitle, 📋 ile kopyala, ✅ okundu işaretle'}
@@ -499,7 +583,7 @@ function ItirazlarPageContent() {
             {readCount > 0 && (
               <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white dark:bg-emerald-500">
                 <CheckCircle2 className="h-3 w-3" />
-                {readCount}/{ITIRAZLAR.length}
+                {readCount}/{tumItirazlar.length}
               </span>
             )}
           </div>
@@ -589,8 +673,9 @@ function ItirazlarPageContent() {
               const isRead = read.has(itiraz.id)
               const copied = copiedId === itiraz.id
               const soru = lang === 'en' ? itiraz.soru.en : itiraz.soru.tr
-              const cevap = lang === 'en' ? itiraz.cevap.en : itiraz.cevap.tr
+              const cevap = lang === 'en' ? itiraz.cevap?.en || itiraz.cevap || '' : itiraz.cevap?.tr || itiraz.cevap || ''
               const kategori = lang === 'en' ? itiraz.kategori.en : itiraz.kategori.tr
+              const isCustom = customItirazlar.some(c => c.id === itiraz.id)
               return (
                 <li key={itiraz.id} id={`konu-${itiraz.id}`}>
                   <div
@@ -613,6 +698,7 @@ function ItirazlarPageContent() {
                           "{soru}"
                         </p>
                       </div>
+                      
                       {/* Okundu toggle */}
                       <button
                         onClick={e => toggleRead(itiraz.id, e)}
@@ -625,6 +711,26 @@ function ItirazlarPageContent() {
                       >
                         {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
                       </button>
+
+                      {/* Silme Butonu (Sadece Custom İtirazlar için) */}
+                      {isCustom && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this objection?' : 'Bu itirazı silmek istediğinize emin misiniz?')) {
+                              const updated = customItirazlar.filter(c => c.id !== itiraz.id)
+                              setCustomItirazlar(updated)
+                              localStorage.setItem('nmm_custom_objections_v1', JSON.stringify(updated))
+                              toast.success(lang === 'en' ? 'Objection deleted.' : 'İtiraz silindi.')
+                            }
+                          }}
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--text-3)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all hover:scale-105"
+                          title={lang === 'en' ? 'Delete Objection' : 'İtirazı Sil'}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+
                       {/* Favori butonu */}
                       <button
                         onClick={e => toggleFav(itiraz.id, e)}
@@ -645,44 +751,80 @@ function ItirazlarPageContent() {
 
                     {/* Cevap — açılır panel */}
                     {acik && (
-                      <div className="border-t border-[#9B1D47]/10 dark:border-[#fda4af]/10 px-4 pb-4 pt-3">
+                      <div className="border-t border-[#9B1D47]/10 dark:border-[#fda4af]/10 px-4 pb-4 pt-3 bg-[var(--bg-subtle)]/10 rounded-b-2xl animate-in fade-in duration-200">
                         <div className="flex gap-2">
                           <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF1F3] dark:bg-[#3d0a1a]">
                             <span className="text-[10px]">💡</span>
                           </div>
-                          <p className="flex-1 text-sm leading-relaxed text-[var(--text-2)]">{cevap}</p>
+                          <div className="flex-1 text-sm leading-relaxed text-[var(--text-2)] space-y-3">
+                            {itiraz.cevap ? (
+                              <p>{cevap}</p>
+                            ) : (
+                              <>
+                                {itiraz.kisaCevap && (
+                                  <div>
+                                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Kısa Saha Cevabı</h5>
+                                    <p className="italic font-medium">"{itiraz.kisaCevap}"</p>
+                                  </div>
+                                )}
+                                {itiraz.detayliCevap && (
+                                  <div>
+                                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Detaylı Cevap</h5>
+                                    <p className="whitespace-pre-wrap">{itiraz.detayliCevap}</p>
+                                  </div>
+                                )}
+                                {itiraz.yaklasim && (
+                                  <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
+                                    <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ Yaklaşım</h5>
+                                    <p className="text-xs text-[var(--text-3)] leading-relaxed">{itiraz.yaklasim}</p>
+                                  </div>
+                                )}
+                                {itiraz.ornekDiyalog && (
+                                  <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
+                                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 Örnek Diyalog</h5>
+                                    <p className="text-xs italic leading-relaxed whitespace-pre-wrap">"{itiraz.ornekDiyalog}"</p>
+                                  </div>
+                                )}
+                              </>
+                            )}
+                          </div>
                         </div>
-                        <div className="mt-3 ml-7 flex flex-wrap items-center gap-2">
-                          {/* Kopyala */}
-                          <button
-                            onClick={e => copyCevap(cevap, itiraz.id, e)}
-                            className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
-                              copied
-                                ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
-                                : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#FFF1F3] hover:text-[#9B1D47] dark:hover:bg-[#3d0a1a] dark:hover:text-[#fda4af]'
-                            }`}
-                          >
-                            {copied
-                              ? <><Check className="h-3 w-3" /> {lang === 'en' ? 'Copied!' : 'Kopyalandı!'}</>
-                              : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala'}</>
-                            }
-                          </button>
+                        {(() => {
+                          const copyValue = itiraz.cevap ? cevap : `${itiraz.kisaCevap ? `Kısa Cevap:\n${itiraz.kisaCevap}\n\n` : ''}${itiraz.detayliCevap ? `Detaylı Cevap:\n${itiraz.detayliCevap}\n\n` : ''}${itiraz.ornekDiyalog ? `Örnek Diyalog:\n${itiraz.ornekDiyalog}` : ''}`.trim()
+                          return (
+                            <div className="mt-3 ml-7 flex flex-wrap items-center gap-2">
+                              {/* Kopyala */}
+                              <button
+                                onClick={e => copyCevap(copyValue, itiraz.id, e)}
+                                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                                  copied
+                                    ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
+                                    : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#FFF1F3] hover:text-[#9B1D47] dark:hover:bg-[#3d0a1a] dark:hover:text-[#fda4af]'
+                                }`}
+                              >
+                                {copied
+                                  ? <><Check className="h-3 w-3" /> {lang === 'en' ? 'Copied!' : 'Kopyalandı!'}</>
+                                  : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala'}</>
+                                }
+                              </button>
 
-                          {/* WhatsApp ile Gönder */}
-                          <a
-                            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(cevap)}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={e => e.stopPropagation()}
-                            className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-xs font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
-                          >
-                            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
-                              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
-                            </svg>
-                            {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp İle Gönder'}
-                          </a>
-                        </div>
+                              {/* WhatsApp ile Gönder */}
+                              <a
+                                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(copyValue)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-xs font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
+                              >
+                                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+                                </svg>
+                                {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp İle Gönder'}
+                              </a>
+                            </div>
+                          )
+                        })()}
                       </div>
                     )}
                   </div>
@@ -710,6 +852,162 @@ function ItirazlarPageContent() {
             </div>
           )}
         </>
+      )}
+
+      {/* Kendi İtirazını Ekle Pop-up Formu */}
+      {formOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+              <div>
+                <h2 className="text-base font-bold text-[var(--text-1)]">Kendi İtirazını Ekle</h2>
+                <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
+                  Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormOpen(false)}
+                className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+                <span>Formu Kapat</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleAddObjection} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* İtiraz Soru */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
+                  <input
+                    type="text"
+                    required
+                    value={newSoru}
+                    onChange={e => setNewSoru(e.target.value)}
+                    placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  />
+                </div>
+                {/* Kategori */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                  <select
+                    value={newKategori}
+                    onChange={e => setNewKategori(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  >
+                    <option value="Para & Kazanç">Para & Kazanç</option>
+                    <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
+                    <option value="Güven & Şüphe">Güven & Şüphe</option>
+                    <option value="Yetenek & Kimlik">Yetenek & Kimlik</option>
+                    <option value="Aile & Çevre">Aile & Çevre</option>
+                    <option value="Ürün & Sistem">Ürün & Sistem</option>
+                    <option value="Genel">Genel</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Kısa Cevap */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
+                <textarea
+                  rows={2}
+                  value={newKisaCevap}
+                  onChange={e => setNewKisaCevap(e.target.value)}
+                  placeholder="Kısa ve hızlı saha cevabı..."
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                />
+              </div>
+
+              {/* Detaylı Cevap */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
+                <textarea
+                  rows={3}
+                  value={newDetayliCevap}
+                  onChange={e => setNewDetayliCevap(e.target.value)}
+                  placeholder="Detaylı cevap metni..."
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Yaklaşım */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
+                  <textarea
+                    rows={2}
+                    value={newYaklasim}
+                    onChange={e => setNewYaklasim(e.target.value)}
+                    placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  />
+                </div>
+                {/* Örnek Diyalog */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
+                  <textarea
+                    rows={2}
+                    value={newOrnekDiyalog}
+                    onChange={e => setNewOrnekDiyalog(e.target.value)}
+                    placeholder="Kısa örnek konuşma..."
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Emoji Seçimi */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                  <select
+                    value={newEmoji}
+                    onChange={e => setNewEmoji(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  >
+                    <option value="🛡️">🛡️ Kalkan</option>
+                    <option value="⚖️">⚖️ Terazi</option>
+                    <option value="💰">💰 Para Torbası</option>
+                    <option value="⏳">⏳ Kum Saati</option>
+                    <option value="🤝">🤝 El Sıkışma</option>
+                    <option value="🗣️">🗣️ Konuşma</option>
+                    <option value="🚪">🚪 Kapı</option>
+                    <option value="🕌">🕌 Cami</option>
+                  </select>
+                </div>
+
+                {/* Etiketler */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                  <input
+                    type="text"
+                    value={newTags}
+                    onChange={e => setNewTags(e.target.value)}
+                    placeholder="örn. güven, fiyat, zamanlama"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={() => setFormOpen(false)}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                >
+                  + Ekle
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </main>
   )

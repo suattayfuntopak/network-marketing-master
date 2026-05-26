@@ -1,11 +1,11 @@
 'use client'
 
 import { useState, useEffect, useMemo, Suspense } from 'react'
-import { BookOpen, ChevronDown, Clock, Star, CheckCircle2, Circle, Copy, Check, MessageSquare, Search, X } from 'lucide-react'
+import { BookOpen, ChevronDown, Clock, Star, CheckCircle2, Circle, Copy, Check, MessageSquare, Search, X, Plus, Trash2 } from 'lucide-react'
 import { getTrainingData } from '@/lib/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
-
+import { toast } from 'sonner'
 import { useProgressSync } from '@/hooks/useProgressSync'
 
 const SEVIYE_RENK: Record<string, string> = {
@@ -36,16 +36,28 @@ function EgitimPageContent() {
   } = useProgressSync()
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  const KATEGORILER_DATA = getTrainingData(lang)
+  // Custom trainings state & form variables
+  const [customTrainings, setCustomTrainings] = useState<any[]>([])
+  const [formOpen, setFormOpen] = useState(false)
+  const [newBaslik, setNewBaslik] = useState('')
+  const [newOzet, setNewOzet] = useState('')
+  const [newKategori, setNewKategori] = useState('Zihniyet')
+  const [newTur, setNewTur] = useState('Ders Notu')
+  const [newSeviye, setNewSeviye] = useState('Başlangıç')
+  const [newIcerik, setNewIcerik] = useState('')
+  const [newEmoji, setNewEmoji] = useState('📖')
+  const [newTags, setNewTags] = useState('')
 
-  // Category array (Tümü, Favoriler, and individual categories)
-  const KATEGORILER = useMemo(() => {
-    const base = lang === 'en'
-      ? ['All', 'Favorites']
-      : ['Tümü', 'Favoriler']
-    const unique = KATEGORILER_DATA.map(c => c.baslik)
-    return [...base, ...unique]
-  }, [lang, KATEGORILER_DATA])
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('nmm_custom_training_v1')
+      if (stored) {
+        setCustomTrainings(JSON.parse(stored))
+      }
+    } catch {}
+  }, [])
+
+  const KATEGORILER_DATA = getTrainingData(lang)
 
   // Flattened training topics
   const ALL_TOPICS = useMemo(() => {
@@ -60,6 +72,7 @@ function EgitimPageContent() {
       kategoriId: string
       kategoriBaslik: string
       kategoriRenk: string
+      isCustom?: boolean
     }[] = []
     
     KATEGORILER_DATA.forEach(cat => {
@@ -75,6 +88,19 @@ function EgitimPageContent() {
     return list
   }, [KATEGORILER_DATA])
 
+  const allTopicsMerged = useMemo(() => {
+    return [...ALL_TOPICS, ...customTrainings]
+  }, [ALL_TOPICS, customTrainings])
+
+  // Category array (Tümü, Favoriler, and individual categories)
+  const KATEGORILER = useMemo(() => {
+    const base = lang === 'en'
+      ? ['All', 'Favorites']
+      : ['Tümü', 'Favoriler']
+    const unique = Array.from(new Set(allTopicsMerged.map(c => c.kategoriBaslik)))
+    return [...base, ...unique]
+  }, [lang, allTopicsMerged])
+
   // Filtered topics
   const filtrelenmis = useMemo(() => {
     const activeLabel = KATEGORILER[aktifKategori]
@@ -82,7 +108,7 @@ function EgitimPageContent() {
     const isFavFilter = activeLabel === 'Favoriler' || activeLabel === 'Favorites'
     const q = search.trim().toLowerCase()
 
-    return ALL_TOPICS.filter(konu => {
+    return allTopicsMerged.filter(konu => {
       if (isFavFilter) return favs.has(konu.id)
       const matchesCategory = isAll || konu.kategoriBaslik === activeLabel
       if (!matchesCategory) return false
@@ -90,10 +116,43 @@ function EgitimPageContent() {
       if (!q) return true
       const baslikMatch = konu.baslik.toLowerCase().includes(q)
       const ozetMatch = konu.ozet.toLowerCase().includes(q)
-      const maddelerMatch = konu.maddeler.some(m => m.toLowerCase().includes(q))
+      const maddelerMatch = konu.maddeler.some((m: string) => m.toLowerCase().includes(q))
       return baslikMatch || ozetMatch || maddelerMatch
     })
-  }, [search, aktifKategori, favs, ALL_TOPICS, KATEGORILER])
+  }, [search, aktifKategori, favs, allTopicsMerged, KATEGORILER])
+
+  function handleAddTraining(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newBaslik.trim() || !newIcerik.trim()) return
+
+    const newObj = {
+      id: `custom_${Date.now()}`,
+      baslik: newBaslik,
+      emoji: newEmoji || '📖',
+      sure: '5 dk',
+      seviye: newSeviye,
+      ozet: newOzet || newIcerik.slice(0, 100) + '...',
+      maddeler: newIcerik.split('\n').map(l => l.trim()).filter(Boolean),
+      kategoriId: newKategori.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'),
+      kategoriBaslik: newKategori,
+      kategoriRenk: 'bg-purple-100 text-purple-700',
+      tags: newTags.split(',').map(t => t.trim()).filter(Boolean),
+      isCustom: true
+    }
+
+    const updated = [newObj, ...customTrainings]
+    setCustomTrainings(updated)
+    localStorage.setItem('nmm_custom_training_v1', JSON.stringify(updated))
+
+    // Reset
+    setNewBaslik('')
+    setNewOzet('')
+    setNewIcerik('')
+    setNewTags('')
+    setNewEmoji('📖')
+    setFormOpen(false)
+    toast.success(lang === 'en' ? 'Content added successfully!' : 'İçerik başarıyla eklendi!')
+  }
 
   // Load state & query param & auto pagination & scroll to it
   useEffect(() => {
@@ -158,14 +217,23 @@ function EgitimPageContent() {
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       {/* Başlık */}
       <header className="mb-6">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
-            <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+        <div className="flex items-center justify-between gap-3 mb-1">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
+              <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
+              <p className="text-sm text-[var(--text-3)]">{t('training.subtitle')}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
-            <p className="text-sm text-[var(--text-3)]">{t('training.subtitle')}</p>
-          </div>
+          <button
+            onClick={() => setFormOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>{lang === 'en' ? 'Add Content' : 'Kendi İçeriğini Ekle'}</span>
+          </button>
         </div>
 
         {/* Hero bilgi kutusu */}
@@ -188,7 +256,7 @@ function EgitimPageContent() {
             {readCount > 0 && (
               <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold text-white dark:bg-emerald-500">
                 <CheckCircle2 className="h-2.5 w-2.5" />
-                {readCount}/{ALL_TOPICS.length}
+                {readCount}/{allTopicsMerged.length}
               </span>
             )}
           </div>
@@ -281,32 +349,32 @@ function EgitimPageContent() {
               // Custom category specific styles
               const catTextColor = 
                 konu.kategoriId === 'zihniyet' ? 'text-[#3730A3] dark:text-[#a5b4fc]' :
-                konu.kategoriId === 'iletisim' ? 'text-[#0F6E56] dark:text-[#4ade80]' :
-                konu.kategoriId === 'davet' ? 'text-[#0369A1] dark:text-[#38bdf8]' :
-                konu.kategoriId === 'sunum' ? 'text-[#9A3412] dark:text-[#fb923c]' :
-                konu.kategoriId === 'ekip' ? 'text-[#854F0B] dark:text-[#fbbf24]' :
-                konu.kategoriId === 'strateji' ? 'text-[#72243E] dark:text-[#f9a8d4]' :
-                konu.kategoriId === 'uyum' ? 'text-[#166534] dark:text-[#86efac]' :
+                konu.kategoriId === 'iletisim' || konu.kategoriId === 'iletisim-&-yaklasim' ? 'text-[#0F6E56] dark:text-[#4ade80]' :
+                konu.kategoriId === 'davet' || konu.kategoriId === 'davet-pratigi' ? 'text-[#0369A1] dark:text-[#38bdf8]' :
+                konu.kategoriId === 'sunum' || konu.kategoriId === 'sunum-&-kapanis' ? 'text-[#9A3412] dark:text-[#fb923c]' :
+                konu.kategoriId === 'ekip' || konu.kategoriId === 'ekip-&-liderlik' ? 'text-[#854F0B] dark:text-[#fbbf24]' :
+                konu.kategoriId === 'strateji' || konu.kategoriId === 'strateji-&-plan' ? 'text-[#72243E] dark:text-[#f9a8d4]' :
+                konu.kategoriId === 'uyum' || konu.kategoriId === 'yasal-uyum' ? 'text-[#166534] dark:text-[#86efac]' :
                 'text-[#6B21A8] dark:text-[#d8b4fe]'
 
               const catBorderColorHover = 
                 konu.kategoriId === 'zihniyet' ? 'hover:border-[#3730A3]/30 dark:hover:border-[#a5b4fc]/30' :
-                konu.kategoriId === 'iletisim' ? 'hover:border-[#0F6E56]/30 dark:hover:border-[#4ade80]/30' :
-                konu.kategoriId === 'davet' ? 'hover:border-[#0369A1]/30 dark:hover:border-[#38bdf8]/30' :
-                konu.kategoriId === 'sunum' ? 'hover:border-[#9A3412]/30 dark:hover:border-[#fb923c]/30' :
-                konu.kategoriId === 'ekip' ? 'hover:border-[#854F0B]/30 dark:hover:border-[#fbbf24]/30' :
-                konu.kategoriId === 'strateji' ? 'hover:border-[#72243E]/30 dark:hover:border-[#f9a8d4]/30' :
-                konu.kategoriId === 'uyum' ? 'hover:border-[#166534]/30 dark:hover:border-[#86efac]/30' :
+                konu.kategoriId === 'iletisim' || konu.kategoriId === 'iletisim-&-yaklasim' ? 'hover:border-[#0F6E56]/30 dark:hover:border-[#4ade80]/30' :
+                konu.kategoriId === 'davet' || konu.kategoriId === 'davet-pratigi' ? 'hover:border-[#0369A1]/30 dark:hover:border-[#38bdf8]/30' :
+                konu.kategoriId === 'sunum' || konu.kategoriId === 'sunum-&-kapanis' ? 'hover:border-[#9A3412]/30 dark:hover:border-[#fb923c]/30' :
+                konu.kategoriId === 'ekip' || konu.kategoriId === 'ekip-&-liderlik' ? 'hover:border-[#854F0B]/30 dark:hover:border-[#fbbf24]/30' :
+                konu.kategoriId === 'strateji' || konu.kategoriId === 'strateji-&-plan' ? 'hover:border-[#72243E]/30 dark:hover:border-[#f9a8d4]/30' :
+                konu.kategoriId === 'uyum' || konu.kategoriId === 'yasal-uyum' ? 'hover:border-[#166534]/30 dark:hover:border-[#86efac]/30' :
                 'hover:border-[#6B21A8]/30 dark:hover:border-[#d8b4fe]/30'
 
               const catBorderColorActive = 
                 konu.kategoriId === 'zihniyet' ? 'border-[#3730A3]/25 dark:border-[#a5b4fc]/25 shadow-[#3730A3]/5' :
-                konu.kategoriId === 'iletisim' ? 'border-[#0F6E56]/25 dark:border-[#4ade80]/25 shadow-[#0F6E56]/5' :
-                konu.kategoriId === 'davet' ? 'border-[#0369A1]/25 dark:border-[#38bdf8]/25 shadow-[#0369A1]/5' :
-                konu.kategoriId === 'sunum' ? 'border-[#9A3412]/25 dark:border-[#fb923c]/25 shadow-[#9A3412]/5' :
-                konu.kategoriId === 'ekip' ? 'border-[#854F0B]/25 dark:border-[#fbbf24]/25 shadow-[#854F0B]/5' :
-                konu.kategoriId === 'strateji' ? 'border-[#72243E]/25 dark:border-[#f9a8d4]/25 shadow-[#72243E]/5' :
-                konu.kategoriId === 'uyum' ? 'border-[#166534]/25 dark:border-[#86efac]/25 shadow-[#166534]/5' :
+                konu.kategoriId === 'iletisim' || konu.kategoriId === 'iletisim-&-yaklasim' ? 'border-[#0F6E56]/25 dark:border-[#4ade80]/25 shadow-[#0F6E56]/5' :
+                konu.kategoriId === 'davet' || konu.kategoriId === 'davet-pratigi' ? 'border-[#0369A1]/25 dark:border-[#38bdf8]/25 shadow-[#0369A1]/5' :
+                konu.kategoriId === 'sunum' || konu.kategoriId === 'sunum-&-kapanis' ? 'border-[#9A3412]/25 dark:border-[#fb923c]/25 shadow-[#9A3412]/5' :
+                konu.kategoriId === 'ekip' || konu.kategoriId === 'ekip-&-liderlik' ? 'border-[#854F0B]/25 dark:border-[#fbbf24]/25 shadow-[#854F0B]/5' :
+                konu.kategoriId === 'strateji' || konu.kategoriId === 'strateji-&-plan' ? 'border-[#72243E]/25 dark:border-[#f9a8d4]/25 shadow-[#72243E]/5' :
+                konu.kategoriId === 'uyum' || konu.kategoriId === 'yasal-uyum' ? 'border-[#166534]/25 dark:border-[#86efac]/25 shadow-[#166534]/5' :
                 'border-[#6B21A8]/25 dark:border-[#d8b4fe]/25 shadow-[#6B21A8]/5'
 
               return (
@@ -360,6 +428,25 @@ function EgitimPageContent() {
                         {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
                       </button>
 
+                      {/* Silme Butonu (Sadece Custom Eğitimler için) */}
+                      {konu.isCustom && (
+                        <button
+                          onClick={e => {
+                            e.stopPropagation()
+                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this training content?' : 'Bu eğitim içeriğini silmek istediğinize emin misiniz?')) {
+                              const updated = customTrainings.filter(t => t.id !== konu.id)
+                              setCustomTrainings(updated)
+                              localStorage.setItem('nmm_custom_training_v1', JSON.stringify(updated))
+                              toast.success(lang === 'en' ? 'Content deleted.' : 'İçerik silindi.')
+                            }
+                          }}
+                          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--text-3)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all hover:scale-105"
+                          title={lang === 'en' ? 'Delete Content' : 'İçeriği Sil'}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+
                       {/* Favori butonu */}
                       <button
                         onClick={e => toggleFav(konu.id, e)}
@@ -383,21 +470,21 @@ function EgitimPageContent() {
                     {acik && (
                       <div className="border-t border-[var(--border)] px-4 pb-4 pt-3 bg-[var(--bg-subtle)]/30 rounded-b-2xl animate-in fade-in duration-200">
                         <ul className="space-y-2.5">
-                          {konu.maddeler.map((madde, idx) => (
+                          {konu.maddeler.map((madde: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2.5">
                               <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${
                                 konu.kategoriId === 'zihniyet' ? 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc]' :
-                                konu.kategoriId === 'iletisim' ? 'bg-[#E1F5EE] dark:bg-[#0d3d2e] text-[#0F6E56] dark:text-[#4ade80]' :
-                                konu.kategoriId === 'davet' ? 'bg-[#F0F9FF] dark:bg-[#0c1a2e] text-[#0369A1] dark:text-[#38bdf8]' :
-                                konu.kategoriId === 'sunum' ? 'bg-[#FFF7ED] dark:bg-[#2a1500] text-[#9A3412] dark:text-[#fb923c]' :
-                                konu.kategoriId === 'ekip' ? 'bg-[#FAEEDA] dark:bg-[#3a2200] text-[#854F0B] dark:text-[#fbbf24]' :
-                                konu.kategoriId === 'strateji' ? 'bg-[#FBEAF0] dark:bg-[#3d0f1f] text-[#72243E] dark:text-[#f9a8d4]' :
-                                konu.kategoriId === 'uyum' ? 'bg-[#F0FDF4] dark:bg-[#052e16] text-[#166534] dark:text-[#86efac]' :
+                                konu.kategoriId === 'iletisim' || konu.kategoriId === 'iletisim-&-yaklasim' ? 'bg-[#E1F5EE] dark:bg-[#0d3d2e] text-[#0F6E56] dark:text-[#4ade80]' :
+                                konu.kategoriId === 'davet' || konu.kategoriId === 'davet-pratigi' ? 'bg-[#F0F9FF] dark:bg-[#0c1a2e] text-[#0369A1] dark:text-[#38bdf8]' :
+                                konu.kategoriId === 'sunum' || konu.kategoriId === 'sunum-&-kapanis' ? 'bg-[#FFF7ED] dark:bg-[#2a1500] text-[#9A3412] dark:text-[#fb923c]' :
+                                konu.kategoriId === 'ekip' || konu.kategoriId === 'ekip-&-liderlik' ? 'bg-[#FAEEDA] dark:bg-[#3a2200] text-[#854F0B] dark:text-[#fbbf24]' :
+                                konu.kategoriId === 'strateji' || konu.kategoriId === 'strateji-&-plan' ? 'bg-[#FBEAF0] dark:bg-[#3d0f1f] text-[#72243E] dark:text-[#f9a8d4]' :
+                                konu.kategoriId === 'uyum' || konu.kategoriId === 'yasal-uyum' ? 'bg-[#F0FDF4] dark:bg-[#052e16] text-[#166534] dark:text-[#86efac]' :
                                 'bg-[#FAF5FF] dark:bg-[#1a0030] text-[#6B21A8] dark:text-[#d8b4fe]'
                               }`}>
                                 {idx + 1}
                               </span>
-                              <p className="text-sm leading-relaxed text-[var(--text-2)]">{madde}</p>
+                              <p className="text-sm leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{madde}</p>
                             </li>
                           ))}
                         </ul>
@@ -418,7 +505,6 @@ function EgitimPageContent() {
                               : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Content' : 'İçeriği Kopyala'}</>
                             }
                           </button>
-
 
                           {/* WhatsApp ile Gönder */}
                           <a
@@ -462,6 +548,166 @@ function EgitimPageContent() {
             </div>
           )}
         </>
+      )}
+
+      {/* Kendi İçeriğini Ekle Pop-up Formu */}
+      {formOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+              <div>
+                <h2 className="text-base font-bold text-[var(--text-1)]">Kendi İçeriğini Ekle</h2>
+                <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
+                  Master kütüphanenin üstüne kendi script, ders notu veya rehberini ekleyebilirsin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormOpen(false)}
+                className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-3)] hover:text-[#3730A3] dark:hover:text-[#a5b4fc] transition cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+                <span>Formu Kapat</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleAddTraining} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Başlık */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Başlık</label>
+                  <input
+                    type="text"
+                    required
+                    value={newBaslik}
+                    onChange={e => setNewBaslik(e.target.value)}
+                    placeholder="Örn. İlk sunum sonrası mini takip planı"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  />
+                </div>
+                {/* Özet */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Özet</label>
+                  <input
+                    type="text"
+                    required
+                    value={newOzet}
+                    onChange={e => setNewOzet(e.target.value)}
+                    placeholder="İçeriğin ne iş gördüğünü kısa anlat."
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Kategori */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                  <select
+                    value={newKategori}
+                    onChange={e => setNewKategori(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  >
+                    <option value="Zihniyet">Zihniyet</option>
+                    <option value="İletişim & Yaklaşım">İletişim & Yaklaşım</option>
+                    <option value="Davet Pratiği">Davet Pratiği</option>
+                    <option value="Sunum & Kapanış">Sunum & Kapanış</option>
+                    <option value="Ekip & Liderlik">Ekip & Liderlik</option>
+                    <option value="Strateji & Plan">Strateji & Plan</option>
+                    <option value="Yasal Uyum">Yasal Uyum</option>
+                  </select>
+                </div>
+                {/* Tür */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Tür</label>
+                  <select
+                    value={newTur}
+                    onChange={e => setNewTur(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  >
+                    <option value="Ders Notu">Ders Notu</option>
+                    <option value="Script">Script</option>
+                    <option value="Rehber">Rehber</option>
+                  </select>
+                </div>
+                {/* Seviye */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Seviye</label>
+                  <select
+                    value={newSeviye}
+                    onChange={e => setNewSeviye(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  >
+                    <option value="Başlangıç">Başlangıç</option>
+                    <option value="Orta">Orta</option>
+                    <option value="İleri">İleri</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* İçerik (Textarea - Split by Newline) */}
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">İçerik (Her Maddeyi Yeni Satıra Yazın)</label>
+                <textarea
+                  rows={5}
+                  required
+                  value={newIcerik}
+                  onChange={e => setNewIcerik(e.target.value)}
+                  placeholder="Her bir adım veya maddeyi yeni bir satıra yazarak tam içerik metnini buraya ekleyin..."
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Emoji Seçimi */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                  <select
+                    value={newEmoji}
+                    onChange={e => setNewEmoji(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  >
+                    <option value="📖">📖 Kitap</option>
+                    <option value="💡">💡 Ampul</option>
+                    <option value="🧠">🧠 Beyin</option>
+                    <option value="🚀">🚀 Roket</option>
+                    <option value="🎯">🎯 Hedef</option>
+                    <option value="🤝">🤝 El Sıkışma</option>
+                    <option value="💎">💎 Elmas</option>
+                  </select>
+                </div>
+
+                {/* Etiketler */}
+                <div className="space-y-1">
+                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                  <input
+                    type="text"
+                    value={newTags}
+                    onChange={e => setNewTags(e.target.value)}
+                    placeholder="örn. takip, whatsapp, kapanış"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={() => setFormOpen(false)}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                >
+                  + Ekle
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </main>
   )
