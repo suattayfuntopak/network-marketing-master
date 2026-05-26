@@ -486,7 +486,7 @@ export default function AnalyticsPage() {
                       <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{lang === 'en' ? 'Follow-up' : 'Takip'}</th>
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{lang === 'en' ? 'Joined' : 'Katıldı'}</th>
                       <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
-                        DDBY<sup>*</sup>
+                        {lang === 'en' ? 'DQSG' : 'DDBR'}<sup>*</sup>
                       </th>
                       <th className="p-3 font-semibold text-right">{lang === 'en' ? 'Last Active' : 'Son Aktiflik'}</th>
                     </tr>
@@ -529,7 +529,7 @@ export default function AnalyticsPage() {
               </div>
             )}
             <div className="text-[10px] font-bold text-[var(--text-3)] select-none pl-1 mt-1">
-              * DİSTRİBÜTÖR DOĞRU BAŞLANGIÇ REHBERİ
+              * {lang === 'en' ? 'DISTRIBUTOR QUICK START GUIDE' : 'DİSTRİBÜTÖR DOĞRU BAŞLANGIÇ REHBERİ'}
             </div>
           </section>
 

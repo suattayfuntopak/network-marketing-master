@@ -21,7 +21,6 @@ export const tr = {
     today: "Bugün",
     yesterday: "Dün",
     daysAgo: "{days} gün önce",
-    operatingSystem: "İŞLETİM SİSTEMİ",
     inviteCode: "Davet Kodu",
     role: "Rol",
     leader: "Lider",

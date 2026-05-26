@@ -1,12 +1,17 @@
+'use client'
+
+import * as React from 'react'
 import { Bot } from 'lucide-react'
 import { YzKocuContainer } from './_components/YzKocuContainer'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 interface PageProps {
   searchParams: Promise<{ name?: string; note?: string; warmth?: string }>
 }
 
-export default async function YazarPage({ searchParams }: PageProps) {
-  const { name, note, warmth } = await searchParams
+export default function YazarPage({ searchParams }: PageProps) {
+  const { lang } = useTranslation()
+  const { name, note, warmth } = React.use(searchParams)
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -16,8 +21,12 @@ export default async function YazarPage({ searchParams }: PageProps) {
             <Bot className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">Yapay Zeka Koçu</h1>
-            <p className="text-sm text-[var(--text-2)]">Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap</p>
+            <h1 className="text-xl font-bold text-[var(--text-1)]">
+              {lang === 'en' ? 'AI Coach' : 'Yapay Zeka Koçu'}
+            </h1>
+            <p className="text-sm text-[var(--text-2)]">
+              {lang === 'en' ? 'Generate AI messages, get leadership coaching, and practice simulations' : 'Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap'}
+            </p>
           </div>
         </header>
         <YzKocuContainer initialName={name ?? ''} initialNote={note ?? ''} initialWarmth={warmth ?? 'ilik'} />
@@ -25,3 +34,4 @@ export default async function YazarPage({ searchParams }: PageProps) {
     </main>
   )
 }
+

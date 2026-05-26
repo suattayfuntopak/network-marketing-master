@@ -7,7 +7,8 @@ import { generateMessageAction, translateTextAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { STAGE_LABEL } from '@/lib/stages'
+import { getStageLabel } from '@/lib/stages'
+
 import { waHref } from '@/lib/waLink'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
@@ -97,6 +98,69 @@ interface Props {
 
 export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 'ilik' }: Props) {
   const { lang } = useTranslation()
+
+  const getMessageTypeLabel = (val: string) => {
+    const trMap: Record<string, string> = {
+      genel: 'Genel',
+      ilk_temas: 'İlk Temas',
+      bag_kurma: 'Bağ Kurma',
+      deger_paylasimi: 'Değer Paylaşımı',
+      davet: 'Davet',
+      sunum: 'Sunum',
+      takip: 'Takip',
+      itiraz_yonetimi: 'İtiraz Yönetimi',
+      karar_asamasi: 'Karar Aşaması',
+      hayir_sonrasi: 'Hayır Sonrası',
+      yeniden_bag: 'Yeniden Bağ',
+      dogum_gunu: 'Doğum Günü',
+      evlilik_yildonumu: 'Evlilik Yıldönümü',
+      tesekkur: 'Teşekkür',
+      yeni_uye_karsilama: 'Yeni Üye Karşılama'
+    }
+    const enMap: Record<string, string> = {
+      genel: 'General',
+      ilk_temas: 'First Contact',
+      bag_kurma: 'Connecting',
+      deger_paylasimi: 'Sharing Value',
+      davet: 'Invite',
+      sunum: 'Presentation',
+      takip: 'Follow-up',
+      itiraz_yonetimi: 'Objection Handling',
+      karar_asamasi: 'Decision Phase',
+      hayir_sonrasi: 'Post-Rejection',
+      yeniden_bag: 'Reconnecting',
+      dogum_gunu: 'Birthday',
+      evlilik_yildonumu: 'Wedding Anniversary',
+      tesekkur: 'Thank You',
+      yeni_uye_karsilama: 'New Member Welcome'
+    }
+    return lang === 'en' ? enMap[val] || val : trMap[val] || val
+  }
+
+  const getToneLabel = (val: string) => {
+    const trMap: Record<string, string> = {
+      samimi: 'Samimi',
+      profesyonel: 'Profesyonel',
+      merakli: 'Meraklı',
+      empatik: 'Empatik',
+      kendinden_emin: 'Kendinden Emin',
+      esprili: 'Esprili',
+      net: 'Net',
+      motive_edici: 'Motive Edici'
+    }
+    const enMap: Record<string, string> = {
+      samimi: 'Warm',
+      profesyonel: 'Professional',
+      merakli: 'Curious',
+      empatik: 'Empathetic',
+      kendinden_emin: 'Confident',
+      esprili: 'Humorous',
+      net: 'Direct',
+      motive_edici: 'Motivating'
+    }
+    return lang === 'en' ? enMap[val] || val : trMap[val] || val
+  }
+
   const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : ''
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
@@ -139,14 +203,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     setDropdownOpen(false)
 
     const parsed = parseNote(c.note)
-    const parsedNote = parsed.tr
+    const parsedNote = lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr
     setWarmth(parsed.warmth || 'ilik')
-    const stageName = STAGE_LABEL[c.stage] || c.stage
+    const stageName = getStageLabel(c.stage, lang) || c.stage
 
     const warmthMap: Record<string, string> = {
-      sicak: 'Sıcak (Hot) 🔥',
-      ilik: 'Ilık (Warm) ☀️',
-      soguk: 'Soğuk (Cold) ❄️'
+      sicak: lang === 'en' ? 'Hot 🔥' : 'Sıcak (Hot) 🔥',
+      ilik: lang === 'en' ? 'Warm ☀️' : 'Ilık (Warm) ☀️',
+      soguk: lang === 'en' ? 'Cold ❄️' : 'Soğuk (Cold) ❄️'
     }
     const warmthText = warmthMap[parsed.warmth || 'ilik']
 
@@ -165,31 +229,34 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         const activities = rawActions.slice(0, 5)
 
         const notesText = leaderNotes.length > 0
-          ? '\n\nLider Notları:\n' + leaderNotes.map(n => `- ${n.note}`).join('\n')
+          ? (lang === 'en' ? '\n\nLeader Notes:\n' : '\n\nLider Notları:\n') + leaderNotes.map(n => `- ${n.note}`).join('\n')
           : ''
 
         const activityLines = activities.map(a => {
-          const dateStr = new Date(a.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
-          const actionText = a.action_type === 'call' ? 'Telefon Araması'
-            : a.action_type === 'whatsapp' ? 'WhatsApp Mesajı'
-            : a.action_type === 'ai_generate' ? 'YZ Mesajı Üretildi'
-            : a.action_type === 'stage_change' ? `Aşama değişti: ${STAGE_LABEL[a.note as CandidateStage] || a.note}`
-            : a.note?.startsWith('system_note:candidate_created') ? 'Aday profili oluşturuldu'
-            : a.note?.startsWith('system_note:profile_update') ? 'Profil güncellendi'
-            : a.note?.startsWith('system_note:warmth_change:') ? 'Sıcaklık derecesi güncellendi'
-            : a.note?.startsWith('system_note:follow_up_change:') ? 'Takip tarihi güncellendi'
-            : a.note || 'Not Eklendi'
+          const dateStr = new Date(a.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' })
+          const actionText = a.action_type === 'call' ? (lang === 'en' ? 'Phone Call' : 'Telefon Araması')
+            : a.action_type === 'whatsapp' ? (lang === 'en' ? 'WhatsApp Message' : 'WhatsApp Mesajı')
+            : a.action_type === 'ai_generate' ? (lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi')
+            : a.action_type === 'stage_change' ? (lang === 'en' ? `Stage changed: ${getStageLabel(a.note as CandidateStage, lang) || a.note}` : `Aşama değişti: ${getStageLabel(a.note as CandidateStage, lang) || a.note}`)
+            : a.note?.startsWith('system_note:candidate_created') ? (lang === 'en' ? 'Candidate profile created' : 'Aday profili oluşturuldu')
+            : a.note?.startsWith('system_note:profile_update') ? (lang === 'en' ? 'Profile updated' : 'Profil güncellendi')
+            : a.note?.startsWith('system_note:warmth_change:') ? (lang === 'en' ? 'Relationship level updated' : 'Sıcaklık derecesi güncellendi')
+            : a.note?.startsWith('system_note:follow_up_change:') ? (lang === 'en' ? 'Follow-up date updated' : 'Takip tarihi güncellendi')
+            : a.note || (lang === 'en' ? 'Note Added' : 'Not Eklendi')
           return `- ${dateStr}: ${actionText}`
         }).join('\n')
 
         const activitiesText = activities.length > 0
-          ? '\n\nSon Aktiviteler:\n' + activityLines
+          ? (lang === 'en' ? '\n\nRecent Activities:\n' : '\n\nSon Aktiviteler:\n') + activityLines
           : ''
 
-        const infoText = `Aday: ${c.full_name}\nİlişki Derecesi: ${warmthText}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
+        const infoText = lang === 'en'
+          ? `Candidate: ${c.full_name}\nRelationship: ${warmthText}\nStage: ${stageName}${parsedNote ? `\nNotes: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
+          : `Aday: ${c.full_name}\nİlişki Derecesi: ${warmthText}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
         setContext(infoText)
       })
-  }, [])
+  }, [lang])
+
 
   // Sayfa yüklenince localStorage'dan history al
   useEffect(() => {
@@ -309,7 +376,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
-              Mesaj Türü
+              {lang === 'en' ? 'Message Type' : 'Mesaj Türü'}
             </label>
             <div className="relative">
               <select
@@ -320,7 +387,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               >
                 {MESSAGE_TYPES.map(t => (
                   <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {t.label}
+                    {getMessageTypeLabel(t.value)}
                   </option>
                 ))}
               </select>
@@ -330,7 +397,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="toneSelect">
-              Ton
+              {lang === 'en' ? 'Tone' : 'Ton'}
             </label>
             <div className="relative">
               <select
@@ -341,7 +408,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               >
                 {TONES.map(t => (
                   <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {t.label}
+                    {getToneLabel(t.value)}
                   </option>
                 ))}
               </select>
@@ -353,14 +420,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         {/* Kişi — inline combobox */}
         <div ref={containerRef} className="relative">
           <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]">
-            Kişi
+            {lang === 'en' ? 'Candidate' : 'Kişi'}
           </label>
 
           {selected ? (
             <div className="flex items-center justify-between rounded-xl border border-[#0F6E56] bg-[var(--bg-card)] px-4 py-3 ring-2 ring-[#E1F5EE]">
               <div>
                 <p className="text-sm font-semibold text-[var(--text-1)]">{selected.full_name}</p>
-                <p className="text-xs text-[var(--text-3)]">{STAGE_LABEL[selected.stage]}</p>
+                <p className="text-xs text-[var(--text-3)]">{getStageLabel(selected.stage, lang)}</p>
               </div>
               <button
                 type="button"
@@ -379,7 +446,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                 setDropdownOpen(true)
               }}
               onFocus={() => { if (query) setDropdownOpen(true) }}
-              placeholder="Kişi adını yaz..."
+              placeholder={lang === 'en' ? 'Type candidate name...' : 'Kişi adını yaz...'}
               autoComplete="off"
               className={inputClass}
             />
@@ -391,7 +458,9 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               style={{ maxHeight: '240px', overflowY: 'auto' }}
             >
               {filtered.length === 0 ? (
-                <p className="py-6 text-center text-sm text-[var(--text-3)]">Kişi bulunamadı</p>
+                <p className="py-6 text-center text-sm text-[var(--text-3)]">
+                  {lang === 'en' ? 'No candidates found' : 'Kişi bulunamadı'}
+                </p>
               ) : (
                 filtered.map(c => (
                   <button
@@ -408,7 +477,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                       {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
                     </div>
                     <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
-                      {STAGE_LABEL[c.stage as CandidateStage]}
+                      {getStageLabel(c.stage as CandidateStage, lang)}
                     </span>
                   </button>
                 ))
@@ -420,8 +489,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         {/* Ek bilgi */}
         <div>
           <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="context">
-            Ek Bilgi{' '}
-            <span className="text-xs font-normal text-[var(--text-3)]">(isteğe bağlı)</span>
+            {lang === 'en' ? 'Extra Context' : 'Ek Bilgi'}{' '}
+            <span className="text-xs font-normal text-[var(--text-3)]">({lang === 'en' ? 'optional' : 'isteğe bağlı'})</span>
           </label>
           <textarea
             id="context"
@@ -430,7 +499,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             maxLength={1500}
             value={context}
             onChange={e => setContext(e.target.value)}
-            placeholder="Geçen hafta konuştuk, ürünü merak ediyordu..."
+            placeholder={lang === 'en' ? 'We talked last week, they were curious about the products...' : 'Geçen hafta konuştuk, ürünü merak ediyordu...'}
             className={`${inputClass} resize-none`}
           />
         </div>
@@ -441,7 +510,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
         {limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            Günlük {DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
+            {lang === 'en' ? `You have reached your daily limit of ${DAILY_MESSAGE_LIMIT} AI messages. Resets tomorrow.` : `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.`}
           </div>
         ) : (
           <button
@@ -450,8 +519,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E56] py-3.5 text-sm font-semibold text-white transition hover:bg-[#0a5a44] disabled:opacity-60"
           >
             {isPending
-              ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(Kalan: ${remaining} / ${DAILY_MESSAGE_LIMIT})`}</>
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> {lang === 'en' ? 'Writing...' : 'Yazıyor...'}</>
+              : <><Bot className="h-4 w-4" /> {lang === 'en' ? 'Generate' : 'Üret'} {isSuperAdmin ? (lang === 'en' ? '(Unlimited)' : '(Sınırsız)') : `(Kalan: ${remaining} / ${DAILY_MESSAGE_LIMIT})`}</>
             }
           </button>
         )}
@@ -460,14 +529,16 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       {displayedMessage && (
         <div className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-[#0F6E56]">Oluşturulan Mesaj</p>
+            <p className="text-sm font-semibold text-[#0F6E56]">
+              {lang === 'en' ? 'Generated Message' : 'Oluşturulan Mesaj'}
+            </p>
             <div className="flex gap-2">
               <button
                 onClick={handleCopy}
                 className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)]"
               >
                 <Copy className="h-3.5 w-3.5" />
-                Kopyala
+                {lang === 'en' ? 'Copy' : 'Kopyala'}
               </button>
               {waLink && (
                 <button
@@ -504,7 +575,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-2)]">
               <Clock className="h-4 w-4" />
-              Son Mesajlar ({history.length})
+              {lang === 'en' ? 'Recent Messages' : 'Son Mesajlar'} ({history.length})
             </span>
             {historyOpen ? <ChevronUp className="h-4 w-4 text-[var(--text-3)]" /> : <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />}
           </button>
@@ -516,7 +587,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-semibold text-[var(--text-1)]">{entry.candidateName}</span>
                       <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[10px] font-medium text-[#0F6E56]">
-                        {MESSAGE_TYPES.find(t => t.value === entry.messageType)?.label ?? entry.messageType}
+                        {getMessageTypeLabel(entry.messageType)}
                       </span>
                     </div>
                     <button
@@ -524,12 +595,12 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                       className="flex items-center gap-1 rounded-lg bg-[var(--bg-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)]"
                     >
                       <Copy className="h-2.5 w-2.5" />
-                      Kopyala
+                      {lang === 'en' ? 'Copy' : 'Kopyala'}
                     </button>
                   </div>
                   <p className="line-clamp-2 text-xs leading-relaxed text-[var(--text-3)]">{entry.message}</p>
                   <p className="mt-1 text-[10px] text-[var(--text-3)]">
-                    {new Date(entry.timestamp).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                    {new Date(entry.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </li>
               ))}
@@ -540,3 +611,4 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     </div>
   )
 }
+

@@ -10,19 +10,20 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
+import { getStageLabel, STAGE_COLOR } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
 import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
 import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-function formatDaysAgo(days: number): string {
-  if (!isFinite(days)) return 'Hiç aranmadı'
-  if (days < 1) return 'Bugün'
-  if (days < 2) return '1 gün önce'
-  return `${Math.floor(days)} gün önce`
+function formatDaysAgo(days: number, lang: string): string {
+  if (!isFinite(days)) return lang === 'en' ? 'Never contacted' : 'Hiç aranmadı'
+  if (days < 1) return lang === 'en' ? 'Today' : 'Bugün'
+  if (days < 2) return lang === 'en' ? '1 day ago' : '1 gün önce'
+  return lang === 'en' ? `${Math.floor(days)} days ago` : `${Math.floor(days)} gün önce`
 }
+
 
 export function IlgilenContent() {
   const { lang, t } = useTranslation()
@@ -55,14 +56,14 @@ export function IlgilenContent() {
 
   async function handleAIMessage(id: string, name: string, stage: string, note: string | null, phone: string | null) {
     if (isAILimitReached(isSuperAdmin)) {
-      toast.error(`Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
+      toast.error(lang === 'en' ? `You have reached your daily limit of ${DAILY_AI_LIMIT} AI messages. Resets tomorrow.` : `Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
       return
     }
     setGeneratingFor(id)
     try {
       const result = await generateQuickMessageAction({ name, stage, note })
       if (result.error || !result.message) {
-        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        toast.error(result.error ?? (lang === 'en' ? 'Could not generate message.' : 'Mesaj oluşturulamadı.'))
         return
       }
       incrementAIUsage(isSuperAdmin)
@@ -75,7 +76,7 @@ export function IlgilenContent() {
       })
     } catch (err) {
       console.error(err)
-      toast.error('Mesaj oluşturulamadı.')
+      toast.error(lang === 'en' ? 'Could not generate message.' : 'Mesaj oluşturulamadı.')
     } finally {
       setGeneratingFor(null)
     }
@@ -95,8 +96,12 @@ export function IlgilenContent() {
     return (
       <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
         <p className="mb-2 text-3xl">🎉</p>
-        <p className="text-sm font-semibold text-[var(--text-1)]">Bugün için bekleyen eylem yok</p>
-        <p className="mt-1 text-xs text-[var(--text-2)]">Harika iş çıkardın!</p>
+        <p className="text-sm font-semibold text-[var(--text-1)]">
+          {lang === 'en' ? 'No pending follow-ups today' : 'Bugün için bekleyen eylem yok'}
+        </p>
+        <p className="mt-1 text-xs text-[var(--text-2)]">
+          {lang === 'en' ? 'Great job!' : 'Harika iş çıkardın!'}
+        </p>
       </div>
     )
   }
@@ -108,9 +113,9 @@ export function IlgilenContent() {
           {/* Başlık + görünüm toggle */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-[var(--text-2)]">
-              <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> kişi öncelikli
+              <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> {lang === 'en' ? 'priorities' : 'kişi öncelikli'}
               {remaining > 0 && !showAll && (
-                <span className="ml-1 text-[var(--text-3)]">+{remaining} daha bekliyor</span>
+                <span className="ml-1 text-[var(--text-3)]">+{remaining} {lang === 'en' ? 'more waiting' : 'daha bekliyor'}</span>
               )}
             </p>
             <div className="flex overflow-hidden rounded-xl border border-[var(--border)]">
@@ -150,9 +155,9 @@ export function IlgilenContent() {
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{c.full_name}</p>
                 <div className="mt-0.5 flex items-center gap-2">
                   <span className={clsx('rounded-full px-2 py-0.5 text-xs font-medium', STAGE_COLOR[c.stage])}>
-                    {STAGE_LABEL[c.stage]}
+                    {getStageLabel(c.stage, lang)}
                   </span>
-                  <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact)}</span>
+                  <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, lang)}</span>
                 </div>
               </div>
               {/* Eylem butonları — tıklama propagasyonu engelle */}
@@ -162,8 +167,8 @@ export function IlgilenContent() {
                   onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null, c.phone ?? null)}
                   disabled={generatingFor === c.id}
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition hover:opacity-80 disabled:opacity-50"
-                  aria-label="AI Mesaj Üret"
-                  title="AI Mesaj Üret ve Kopyala"
+                  aria-label={lang === 'en' ? 'Generate AI Message' : 'AI Mesaj Üret'}
+                  title={lang === 'en' ? 'Generate and Copy AI Message' : 'AI Mesaj Üret ve Kopyala'}
                 >
                   {generatingFor === c.id ? (
                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
@@ -190,7 +195,7 @@ export function IlgilenContent() {
                     href={`tel:${c.phone}`}
                     onClick={() => markContacted.mutate({ id: c.id, actionType: 'call' })}
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]"
-                    aria-label="Ara"
+                    aria-label={lang === 'en' ? 'Call' : 'Ara'}
                   >
                     <Phone className="h-4 w-4" strokeWidth={1.75} />
                   </a>
@@ -215,9 +220,9 @@ export function IlgilenContent() {
                 </div>
                 <p className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
                 <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
-                  {STAGE_LABEL[c.stage]}
+                  {getStageLabel(c.stage, lang)}
                 </span>
-                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact)}</span>
+                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, lang)}</span>
               </div>
             ))}
           </div>
@@ -261,8 +266,12 @@ export function IlgilenContent() {
                   <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-[var(--text-1)]">Yapay Zeka Mesajı</h2>
-                  <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">{activeMessage.candidateName} için üretildi</p>
+                  <h2 className="text-base font-bold text-[var(--text-1)]">
+                    {lang === 'en' ? 'AI Message' : 'Yapay Zeka Mesajı'}
+                  </h2>
+                  <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
+                    {lang === 'en' ? `Generated for ${activeMessage.candidateName}` : `${activeMessage.candidateName} için üretildi`}
+                  </p>
                 </div>
               </div>
               <button
@@ -289,12 +298,12 @@ export function IlgilenContent() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(activeMessage.message)
-                  toast.success('Mesaj kopyalandı!')
+                  toast.success(lang === 'en' ? 'Message copied!' : 'Mesaj kopyalandı!')
                 }}
                 className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
               >
                 <Copy className="h-3.5 w-3.5" />
-                Kopyala
+                {lang === 'en' ? 'Copy' : 'Kopyala'}
               </button>
 
               {/* WhatsApp Button */}
@@ -305,14 +314,14 @@ export function IlgilenContent() {
                   rel="noopener noreferrer"
                   onClick={() => {
                     if (ws?.workspaceId && activeMessage.candidateId) {
-                      markContacted.mutate({ id: activeMessage.candidateId, actionType: 'whatsapp' })
+                       markContacted.mutate({ id: activeMessage.candidateId, actionType: 'whatsapp' })
                     }
                     setActiveMessage(null)
                   }}
                   className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
-                  WhatsApp ile Gönder
+                  {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp ile Gönder'}
                 </a>
               )}
             </div>

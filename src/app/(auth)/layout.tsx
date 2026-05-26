@@ -20,9 +20,6 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <h1 className="text-2xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-transparent drop-shadow-sm">
             Network Marketing Master
           </h1>
-          <p className="mt-1 text-[10px] font-bold tracking-[0.25em] uppercase text-cyan-400/80">
-            {t('common.operatingSystem')}
-          </p>
         </div>
 
         {children}

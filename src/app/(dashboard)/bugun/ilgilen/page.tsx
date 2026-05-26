@@ -1,7 +1,12 @@
+'use client'
+
 import { Zap } from 'lucide-react'
 import { IlgilenContent } from './_components/IlgilenContent'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function IlgilenPage() {
+  const { lang } = useTranslation()
+
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <header className="mb-6 flex items-center gap-3">
@@ -9,11 +14,16 @@ export default function IlgilenPage() {
           <Zap className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">Bugün İlgilen</h1>
-          <p className="text-sm text-[var(--text-2)]">Takip edilmesi gereken adaylar</p>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">
+            {lang === 'en' ? "Today's Priorities" : "Bugün İlgilen"}
+          </h1>
+          <p className="text-sm text-[var(--text-2)]">
+            {lang === 'en' ? "Prospects to follow up today" : "Takip edilmesi gereken adaylar"}
+          </p>
         </div>
       </header>
       <IlgilenContent />
     </main>
   )
 }
+

@@ -13,9 +13,13 @@ import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate } from '@/types/database.types'
 
-const WEEK_DAYS_SHORT = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
 function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
+  const { lang } = useTranslation()
+  const daysShort = lang === 'en'
+    ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
+
   const bars = useMemo(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -29,9 +33,9 @@ function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
         return t >= d && t < next
       }).length
       const dayIdx = (d.getDay() + 6) % 7 // Mon=0
-      return { label: WEEK_DAYS_SHORT[dayIdx], count, isToday: i === 6 }
+      return { label: daysShort[dayIdx], count, isToday: i === 6 }
     })
-  }, [candidates])
+  }, [candidates, daysShort])
 
   const max = Math.max(...bars.map(b => b.count), 1)
 
@@ -39,10 +43,10 @@ function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-          Son 7 Gün — Yeni Aday Trendi
+          {lang === 'en' ? 'Last 7 Days — New Candidate Trend' : 'Son 7 Gün — Yeni Aday Trendi'}
         </p>
         <span className="text-xs font-bold text-[#534AB7]">
-          {bars.reduce((s, b) => s + b.count, 0)} aday
+          {bars.reduce((s, b) => s + b.count, 0)} {lang === 'en' ? 'candidates' : 'aday'}
         </span>
       </div>
       <div className="flex items-end gap-1.5 h-16">

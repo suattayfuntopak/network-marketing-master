@@ -21,7 +21,6 @@ export const en = {
     today: "Today",
     yesterday: "Yesterday",
     daysAgo: "{days} days ago",
-    operatingSystem: "OPERATING SYSTEM",
     inviteCode: "Invite Code",
     role: "Role",
     leader: "Leader",

@@ -232,7 +232,7 @@ function EgitimPageContent() {
             className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>{lang === 'en' ? 'Add Content' : 'Kendi İçeriğini Ekle'}</span>
+            <span>{lang === 'en' ? 'Add Content' : 'İçerik Ekle'}</span>
           </button>
         </div>
 
@@ -556,9 +556,13 @@ function EgitimPageContent() {
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">Kendi İçeriğini Ekle</h2>
+                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">
+                  {lang === 'en' ? 'Add Content' : 'İçerik Ekle'}
+                </h2>
                 <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
-                  NM Master kütüphanesine kendi script, ders notu ya da rehberini ekleyebilirsin
+                  {lang === 'en'
+                    ? 'You can add your own script, lecture notes or guides to the NM Master library'
+                    : 'NM Master kütüphanesine kendi script, ders notu ya da rehberini ekleyebilirsin'}
                 </p>
               </div>
               <button
@@ -567,7 +571,7 @@ function EgitimPageContent() {
                 className="flex items-center gap-1 text-[11px] md:text-xs font-bold text-[var(--text-3)] hover:text-[#3730A3] dark:hover:text-[#a5b4fc] transition cursor-pointer"
               >
                 <X className="h-4 w-4" />
-                <span>Formu Kapat</span>
+                <span>{lang === 'en' ? 'Close Form' : 'Formu Kapat'}</span>
               </button>
             </div>
 
@@ -575,25 +579,37 @@ function EgitimPageContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Başlık */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Başlık</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Title' : 'Başlık'}
+                  </label>
                   <input
                     type="text"
                     required
                     value={newBaslik}
                     onChange={e => setNewBaslik(e.target.value)}
-                    placeholder="Örn. İlk sunum sonrası mini takip planı"
+                    placeholder={
+                      lang === 'en'
+                        ? 'e.g. Mini follow-up plan after first presentation'
+                        : 'Örn. İlk sunum sonrası mini takip planı'
+                    }
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
                 {/* Özet */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Özet</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Summary' : 'Özet'}
+                  </label>
                   <input
                     type="text"
                     required
                     value={newOzet}
                     onChange={e => setNewOzet(e.target.value)}
-                    placeholder="İçeriğin ne iş gördüğünü kısa anlat."
+                    placeholder={
+                      lang === 'en'
+                        ? 'Briefly describe what the content is for.'
+                        : 'İçeriğin ne iş gördüğünü kısa anlat.'
+                    }
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
@@ -602,58 +618,70 @@ function EgitimPageContent() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Kategori */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Category' : 'Kategori'}
+                  </label>
                   <select
                     value={newKategori}
                     onChange={e => setNewKategori(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Zihniyet">Zihniyet</option>
-                    <option value="İletişim & Yaklaşım">İletişim & Yaklaşım</option>
-                    <option value="Davet Pratiği">Davet Pratiği</option>
-                    <option value="Sunum & Kapanış">Sunum & Kapanış</option>
-                    <option value="Ekip & Liderlik">Ekip & Liderlik</option>
-                    <option value="Strateji & Plan">Strateji & Plan</option>
-                    <option value="Yasal Uyum">Yasal Uyum</option>
+                    <option value="Zihniyet">{lang === 'en' ? 'Mindset' : 'Zihniyet'}</option>
+                    <option value="İletişim & Yaklaşım">{lang === 'en' ? 'Communication & Approach' : 'İletişim & Yaklaşım'}</option>
+                    <option value="Davet Pratiği">{lang === 'en' ? 'Invitation Practice' : 'Davet Pratiği'}</option>
+                    <option value="Sunum & Kapanış">{lang === 'en' ? 'Presentation & Closing' : 'Sunum & Kapanış'}</option>
+                    <option value="Ekip & Liderlik">{lang === 'en' ? 'Team & Leadership' : 'Ekip & Liderlik'}</option>
+                    <option value="Strateji & Plan">{lang === 'en' ? 'Strategy & Plan' : 'Strateji & Plan'}</option>
+                    <option value="Yasal Uyum">{lang === 'en' ? 'Compliance' : 'Yasal Uyum'}</option>
                   </select>
                 </div>
                 {/* Tür */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Tür</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Type' : 'Tür'}
+                  </label>
                   <select
                     value={newTur}
                     onChange={e => setNewTur(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Ders Notu">Ders Notu</option>
+                    <option value="Ders Notu">{lang === 'en' ? 'Lecture Note' : 'Ders Notu'}</option>
                     <option value="Script">Script</option>
-                    <option value="Rehber">Rehber</option>
+                    <option value="Rehber">{lang === 'en' ? 'Guide' : 'Rehber'}</option>
                   </select>
                 </div>
                 {/* Seviye */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Seviye</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Level' : 'Seviye'}
+                  </label>
                   <select
                     value={newSeviye}
                     onChange={e => setNewSeviye(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Başlangıç">Başlangıç</option>
-                    <option value="Orta">Orta</option>
-                    <option value="İleri">İleri</option>
+                    <option value="Başlangıç">{lang === 'en' ? 'Beginner' : 'Başlangıç'}</option>
+                    <option value="Orta">{lang === 'en' ? 'Intermediate' : 'Orta'}</option>
+                    <option value="İleri">{lang === 'en' ? 'Advanced' : 'İleri'}</option>
                   </select>
                 </div>
               </div>
 
               {/* İçerik (Textarea - Split by Newline) */}
               <div className="space-y-1">
-                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">İçerik (Her Maddeyi Yeni Satıra Yazın)</label>
+                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                  {lang === 'en' ? 'Content (Write Each Item on a New Line)' : 'İçerik (Her Maddeyi Yeni Satıra Yazın)'}
+                </label>
                 <textarea
                   rows={5}
                   required
                   value={newIcerik}
                   onChange={e => setNewIcerik(e.target.value)}
-                  placeholder="Her bir adım veya maddeyi yeni bir satıra yazarak tam içerik metnini buraya ekleyin..."
+                  placeholder={
+                    lang === 'en'
+                      ? 'Add the full content text here, writing each step or item on a new line...'
+                      : 'Her bir adım veya maddeyi yeni bir satıra yazarak tam içerik metnini buraya ekleyin...'
+                  }
                   className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition resize-none"
                 />
               </div>
@@ -661,30 +689,36 @@ function EgitimPageContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Emoji Seçimi */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Emoji' : 'Emoji'}
+                  </label>
                   <select
                     value={newEmoji}
                     onChange={e => setNewEmoji(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="📖">📖 Kitap</option>
-                    <option value="💡">💡 Ampul</option>
-                    <option value="🧠">🧠 Beyin</option>
-                    <option value="🚀">🚀 Roket</option>
-                    <option value="🎯">🎯 Hedef</option>
-                    <option value="🤝">🤝 El Sıkışma</option>
-                    <option value="💎">💎 Elmas</option>
+                    <option value="📖">{lang === 'en' ? '📖 Book' : '📖 Kitap'}</option>
+                    <option value="💡">{lang === 'en' ? '💡 Bulb' : '💡 Ampul'}</option>
+                    <option value="🧠">{lang === 'en' ? '🧠 Brain' : '🧠 Beyin'}</option>
+                    <option value="🚀">{lang === 'en' ? '🚀 Rocket' : '🚀 Roket'}</option>
+                    <option value="🎯">{lang === 'en' ? '🎯 Target' : '🎯 Hedef'}</option>
+                    <option value="🤝">{lang === 'en' ? '🤝 Handshake' : '🤝 El Sıkışma'}</option>
+                    <option value="💎">{lang === 'en' ? '💎 Diamond' : '💎 Elmas'}</option>
                   </select>
                 </div>
 
                 {/* Etiketler */}
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
+                    {lang === 'en' ? 'Tags (Comma Separated)' : 'Etiketler (Virgülle Ayır)'}
+                  </label>
                   <input
                     type="text"
                     value={newTags}
                     onChange={e => setNewTags(e.target.value)}
-                    placeholder="örn. takip, whatsapp, kapanış"
+                    placeholder={
+                      lang === 'en' ? 'e.g. follow-up, whatsapp, closing' : 'örn. takip, whatsapp, kapanış'
+                    }
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
@@ -696,13 +730,13 @@ function EgitimPageContent() {
                   onClick={() => setFormOpen(false)}
                   className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold transition active:scale-95 cursor-pointer"
                 >
-                  İptal
+                  {lang === 'en' ? 'Cancel' : 'İptal'}
                 </button>
                 <button
                   type="submit"
                   className="rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
                 >
-                  + Ekle
+                  {lang === 'en' ? '+ Add' : '+ Ekle'}
                 </button>
               </div>
             </form>

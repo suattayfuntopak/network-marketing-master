@@ -4,9 +4,10 @@ import { useState, useMemo, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
-import { STAGE_LABEL, STAGE_COLOR, FOLLOW_DAYS } from '@/lib/stages'
+import { getStageLabel, STAGE_COLOR, FOLLOW_DAYS } from '@/lib/stages'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useRouter } from 'next/navigation'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan
@@ -32,9 +33,13 @@ function toKey(d: Date) {
   return `${y}-${m}-${day}`
 }
 
-const MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
+const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
                  'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
-const DAYS   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
+const MONTHS_EN = ['January','February','March','April','May','June',
+                 'July','August','September','October','November','December']
+const DAYS_TR   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
+const DAYS_EN   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
+
 
 export function TakvimClient() {
   const router = useRouter()
@@ -91,6 +96,7 @@ export function TakvimClient() {
     )
   }
 
+  const { lang } = useTranslation()
   const selectedCandidates = byDate[selected] ?? []
 
   return (
@@ -101,7 +107,7 @@ export function TakvimClient() {
           <ChevronLeft className="h-4 w-4" />
         </button>
         <span className="text-sm font-bold text-[var(--text-1)]">
-          {MONTHS[view.getMonth()]} {view.getFullYear()}
+          {(lang === 'en' ? MONTHS_EN : MONTHS_TR)[view.getMonth()]} {view.getFullYear()}
         </span>
         <button onClick={nextMonth} className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:text-[var(--text-1)]">
           <ChevronRight className="h-4 w-4" />
@@ -112,7 +118,7 @@ export function TakvimClient() {
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
         {/* Gün başlıkları */}
         <div className="mb-1 grid grid-cols-7">
-          {DAYS.map(d => (
+          {(lang === 'en' ? DAYS_EN : DAYS_TR).map(d => (
             <div key={d} className="py-1 text-center text-[10px] font-semibold text-[var(--text-3)]">{d}</div>
           ))}
         </div>
@@ -160,22 +166,26 @@ export function TakvimClient() {
       {/* Seçilen güne ait adaylar */}
       <div>
         <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-          {selected === toKey(today) ? 'Bugün' : selected.split('-').reverse().join('.')} — Takip Listesi
+          {selected === toKey(today) ? (lang === 'en' ? 'Today' : 'Bugün') : selected.split('-').reverse().join('.')} — {lang === 'en' ? 'Follow-up List' : 'Takip Listesi'}
         </p>
 
         {selected < toKey(today) && selectedCandidates.length > 0 && (
           <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2">
             <span className="h-2 w-2 rounded-full bg-[#72243E]" />
             <p className="text-xs font-semibold text-[#72243E]">
-              {selectedCandidates.length} takip kaçırıldı — hemen iletlen
+              {lang === 'en' ? `${selectedCandidates.length} follow-ups missed — act now` : `${selectedCandidates.length} takip kaçırıldı — hemen ilgilen`}
             </p>
           </div>
         )}
         {selectedCandidates.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[var(--border)] py-10 text-center">
             <p className="text-2xl mb-1">✅</p>
-            <p className="text-sm font-semibold text-[var(--text-1)]">Bu gün için takip yok</p>
-            <p className="mt-1 text-xs text-[var(--text-2)]">Başka bir güne bak</p>
+            <p className="text-sm font-semibold text-[var(--text-1)]">
+              {lang === 'en' ? 'No follow-ups for this day' : 'Bu gün için takip yok'}
+            </p>
+            <p className="mt-1 text-xs text-[var(--text-2)]">
+              {lang === 'en' ? 'Check another day' : 'Başka bir güne bak'}
+            </p>
           </div>
         ) : (
           <ul className="space-y-2">
@@ -194,7 +204,7 @@ export function TakvimClient() {
                 </div>
                 {c.stage && STAGE_COLOR[c.stage] && (
                   <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold ${STAGE_COLOR[c.stage]}`}>
-                    {STAGE_LABEL[c.stage]}
+                    {getStageLabel(c.stage, lang)}
                   </span>
                 )}
               </li>
@@ -213,14 +223,16 @@ export function TakvimClient() {
         if (!next7.length) return null
         return (
           <div>
-            <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">Önümüzdeki 7 gün</p>
+            <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
+              {lang === 'en' ? 'Next 7 days' : 'Önümüzdeki 7 gün'}
+            </p>
             <ul className="space-y-1.5">
               {next7.map(k => (
                 <button key={k} onClick={() => setSelected(k)}
                   className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
                   <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
                   <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
-                    {byDate[k].length} aday
+                    {byDate[k].length} {lang === 'en' ? (byDate[k].length === 1 ? 'prospect' : 'prospects') : 'aday'}
                   </span>
                 </button>
               ))}
@@ -246,7 +258,7 @@ export function TakvimClient() {
         return (
           <div className="mt-4 border-t border-[var(--border)] pt-4">
             <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-              Önümüzdeki Ay ({MONTHS[nmMonth]} {nmYear})
+              {lang === 'en' ? 'Next Month' : 'Önümüzdeki Ay'} ({(lang === 'en' ? MONTHS_EN : MONTHS_TR)[nmMonth]} {nmYear})
             </p>
             <ul className="space-y-1.5">
               {nextMonthKeys.map(k => (
@@ -257,7 +269,7 @@ export function TakvimClient() {
                   className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
                   <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
                   <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
-                    {byDate[k].length} aday
+                    {byDate[k].length} {lang === 'en' ? (byDate[k].length === 1 ? 'prospect' : 'prospects') : 'aday'}
                   </span>
                 </button>
               ))}
@@ -268,3 +280,4 @@ export function TakvimClient() {
     </div>
   )
 }
+

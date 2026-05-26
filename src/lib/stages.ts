@@ -52,3 +52,32 @@ export const HOT_STAGES: CandidateStage[] = ['davetli', 'takip', 'sunum']
 export const STAGE_CARD_BG: Record<CandidateStage, string> = Object.fromEntries(
   Object.entries(STAGE_THEME).map(([k, v]) => [k, v.card])
 ) as Record<CandidateStage, string>
+
+export function getStageLabel(stage: CandidateStage, lang: string): string {
+  const enLabel: Record<CandidateStage, string> = {
+    yeni:        'New Prospect',
+    iletisim:    'Contacted',
+    davetli:     'Invited',
+    sunum:       'Presentation Done',
+    takip:       'Follow-up',
+    kararsiz:    'Undecided',
+    katildi:     'Joined',
+    ilgilenmedi: 'Not Interested',
+    kayboldu:    'Lost',
+    pasif:       'Passive',
+  }
+  const trLabel: Record<CandidateStage, string> = {
+    yeni:        'Yeni Aday',
+    iletisim:    'İletişime Geçildi',
+    davetli:     'Davet Edildi',
+    sunum:       'Sunum Yapıldı',
+    takip:       'Takipte',
+    kararsiz:    'Kararsız',
+    katildi:     'Katıldı',
+    ilgilenmedi: 'İlgilenmedi',
+    kayboldu:    'Kaybedildi',
+    pasif:       'Pasif',
+  }
+  return lang === 'en' ? enLabel[stage] || stage : trLabel[stage] || stage
+}
+

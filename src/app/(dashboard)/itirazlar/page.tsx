@@ -561,7 +561,7 @@ function ItirazlarPageContent() {
             className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>{lang === 'en' ? 'Add Objection' : 'Kendi İtirazını Ekle'}</span>
+            <span>{lang === 'en' ? 'Add Objection' : 'İtiraz Ekle'}</span>
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
@@ -860,7 +860,7 @@ function ItirazlarPageContent() {
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">Kendi İtirazını Ekle</h2>
+                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{lang === 'en' ? 'Add Objection' : 'İtiraz Ekle'}</h2>
                 <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
                   Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
                 </p>

@@ -1193,3 +1193,21 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Ekip Yapay Zeka Limit & Kullanım Kontrol Masası (Süper Admin Özel):** İstatistikler sayfasında yer alan ve sadece Süper Admin olan sizin ekranınızda render edilen **Ekip Yapay Zeka Kullanım & Limit Kontrol Masası** spreadsheet tablosu geliştirildi. Tabloda tüm ekip üyelerinin bugünkü YZ Koçu (Rol Provası), YZ Mesaj Yazarı ve Uyum Denetimi özellikleri için kullanılan/limit hakları listelenmektedir. Süper admin/lider olan hesabınız için tüm bu sütunlarda tam şeffaflıkla **Sınırsız** ibaresi sergilenerek diğer tüm ekip üyelerinin günlük kullanım kotaları gerçek zamanlı takip edilebilir kılınmıştır.
 - **Ekip YZ Limit Masası Sütun Swap:** Süper Admin özel YZ Limit Kontrol Masasında yer alan "YZ Koçu" ile "YZ Mesajı" sütunlarının yerleri kullanıcının talebi doğrultusunda birbirleriyle değiştirildi. Yeni düzende YZ Mesajı kolonu solda (birinci sırada), YZ Koçu kolonu ise ortada (ikinci sırada) listelenmektedir.
 
+---
+
+## 2026-05-26 (tur 2)
+
+### feat: Arayüz Temizliği, Sadeleştirme ve Eksiksiz İngilizce Dil Desteği
+
+- **Marka Sadeleştirmesi (Network Marketing Master):** Uygulamadaki tüm "İşletim Sistemi" / "Operating System" ifadeleri (giriş/kayıt ekranları logo alt başlıkları, pano header'ı ve yerelleştirme dosyalarındaki ilgili anahtarlar dahil) tamamen temizlendi. Uygulamanın adı saf haliyle "Network Marketing Master" olarak belirlendi.
+- **Eksiksiz İngilizce Dil Desteği:** İngilizce dil toggle'ı aktif edildiğinde daha önce Türkçe kalan tüm dinamik alanlar tamamen yerelleştirildi:
+  - **Pano (Dashboard):** "Son 7 Gün — Yeni Aday Trendi" başlığı, chart içi gün adları (`Mon` - `Sun`), aday sayacı son eki (`candidates`) dinamik dil durumuna bağlandı.
+  - **Bugün İlgilen (Today's Priorities):** Sayfa `use-client` yapıldı, tüm sayfa başlıkları, aday hunisi aşama adları (getStageLabel), boş durum kartı, limit uyarı pencereleri, kopyalama ve WhatsApp yönlendirme metinleri dinamik hale getirildi.
+  - **Takvim (Calendar):** Sayfa `use-client` yapıldı, ay ve gün isimleri, yaklaşan 7 günlük/aylık plan bölümleri, boş durum bildirimleri, zaman aşımı uyarı şeritleri tamamen İngilizceye yerelleştirildi.
+  - **Yapay Zeka Koçu (AI Coach):** Sayfa `use-client` yapıldı, ton ve mesaj türü seçimleri, sistem aktivite/lider notu bilgileri, günlük limit rozetleri ve geçmiş listesi dinamik dile bağlandı.
+  - **Ekibim (My Team):** Sayfa `use-client` yapıldı, sayfa başlığı ve alt başlığı dile göre dinamikleşti.
+  - **İstatistikler (Statistics):** Excel tablosundaki **DDBY*** sütunu dile göre dinamik olarak **DDBR** (TR) ve **DQSG** (EN) arasında değiştirildi. Altındaki açıklayıcı dipnot tamamen yerelleştirildi.
+- **Buton İsimlerinin Sadeleştirilmesi:**
+  - İtirazlar sayfasındaki "Kendi İtirazını Ekle" butonu ve modal başlığı **"İtiraz Ekle"** olarak sadeleştirildi.
+  - Eğitim sayfasındaki "Kendi İçeriğini Ekle" butonu ve modal başlığı **"İçerik Ekle"** olarak sadeleştirildi.
+- **Mobil Arayüz Dil Seçim Butonları (UserMenu):** Masaüstündeki bayrak butonlarının mobilde gizlenmesi sebebiyle, kullanıcı profili (`UserMenu`) dropdown menüsünün içerisine şık, minimal HSL renk uyumlu, responsive **TR / EN** dil seçicisi butonları entegre edilerek mobil erişilebilirlik zirveye çıkarıldı.

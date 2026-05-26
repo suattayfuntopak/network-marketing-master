@@ -136,9 +136,6 @@ export function Header({ visible = true }: { visible?: boolean }) {
             <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-xs font-black tracking-tight text-transparent">
               Network Marketing Master
             </span>
-            <span className="text-[8px] font-bold tracking-[0.2em] text-[var(--text-3)] uppercase">
-              {t('common.operatingSystem')}
-            </span>
           </div>
         </Link>
 
