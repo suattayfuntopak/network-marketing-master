@@ -2,6 +2,13 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### style/refactor: Boru Hattı Aday Kartı Eylemleri İyileştirmesi (Düzenle ve Sil Butonlarının Zap Popup'ına Taşınması)
+
+- **Açıklama:** Boru Hattı sayfasındaki her bir aday satırının (kartının) en sağında yer alan 4 butondan (Bot, Düzenle, Sil, WhatsApp) görsel karmaşayı azaltmak amacıyla **Düzenle (Pencil)** ve **Sil (Trash2)** butonları satırdan kaldırıldı.
+- **Zap (Hızlı Eylemler) Popup Entegrasyonu:** Kaldırılan Düzenle ve Sil eylemleri, satırdaki **Zap (Şimşek)** ikonuna tıklandığında açılan premium **Hızlı Eylemler** popup penceresinin içerisine son derece estetik, responsive ve modern butonlar şeklinde eklendi.
+- **Kusursuz Akış:** Popup içerisindeki Düzenle veya Sil butonlarına tıklandığında, Quick Action popup'ı otomatik olarak kapanıp ilgili Düzenleme formu sayfasını (EditCandidateSheet) veya Silme onay modalını (ConfirmDeleteModal) pürüzsüz şekilde tetiklemektedir.
+- **Erişilebilirlik ve Tasarım:** Satır üstünde yalnızca en kritik YZ Mesaj Üret (Bot) ve WhatsApp butonları bırakılarak sadelik ve okunabilirlik en üst seviyeye taşındı.
+
 ### fix: YZ Modüllerinde API Key Kontrolleri ve Hata Mesajı İyileştirmesi
 
 - **Hata Tanımlama:** Gemini API entegrasyonuna geçiş sonrasında, kullanıcının yerel `.env.local` dosyasında `GEMINI_API_KEY` değişkeninin tanımlanmamış olması sebebiyle Boru Hattı robot kafası, Kazanımlar tebrik butonu ve Uyum Denetleyicisi süreçlerinde yaşanan 403 (Method doesn't allow unregistered callers) hatalarının asıl nedeni tespit edildi.
