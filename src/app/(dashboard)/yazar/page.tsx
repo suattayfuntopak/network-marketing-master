@@ -17,7 +17,7 @@ export default async function YazarPage({ searchParams }: PageProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text-1)]">Yapay Zeka Koçu</h1>
-            <p className="text-sm text-[var(--text-2)]">Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap.</p>
+            <p className="text-sm text-[var(--text-2)]">Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap</p>
           </div>
         </header>
         <YzKocuContainer initialName={name ?? ''} initialNote={note ?? ''} initialWarmth={warmth ?? 'ilik'} />

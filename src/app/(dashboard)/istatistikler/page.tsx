@@ -186,10 +186,10 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'Statistics & Analytics' : 'İstatistikler & Analiz'}
+                {lang === 'en' ? 'Statistics' : 'İstatistikler'}
               </h1>
               <p className="text-sm text-[var(--text-3)]">
-                {lang === 'en' ? 'Lightweight candidate and pipeline performance insights' : 'Hafif aday hunisi ve organizasyonel ivme analizleri'}
+                {lang === 'en' ? 'Candidate, pipeline and AI usage insights' : 'Aday, süreç ve yapay zeka kullanım istatistikleri'}
               </p>
             </div>
           </div>

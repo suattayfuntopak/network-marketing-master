@@ -88,6 +88,9 @@ export default function PipelinePage() {
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>
+          <p className="text-xs text-[var(--text-3)]">
+            {lang === 'en' ? 'Contact list and process pipeline information' : 'Kişi listesi ve süreç bilgileri'}
+          </p>
         </div>
         <button
           onClick={() => setSheetOpen(true)}

@@ -221,3 +221,101 @@ Format kuralına kesinlikle uy. Sadece ve sadece geçerli bir JSON objesi dönd�
     return { error: (lang === 'en' ? 'Simulation failed: ' : 'Simülasyon yanıtı oluşturulamadı: ') + (err?.message || String(err)) }
   }
 }
+
+export interface KoclukFormState {
+  answer?: string
+  error?: string
+  remaining?: number
+}
+
+export async function askCoachAction(
+  _prev: KoclukFormState,
+  formData: FormData
+): Promise<KoclukFormState> {
+  const question = (formData.get('question') as string | null)?.trim() ?? ''
+  const lang     = (formData.get('lang')     as string | null)?.trim() ?? 'tr'
+
+  if (!question) return { error: 'Lütfen bir soru yazın.' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Oturum gerekli.' }
+
+  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
+
+  let remaining = DAILY_MESSAGE_LIMIT
+  if (!isSuperAdmin) {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const { count } = await supabase
+      .from('nmm_daily_actions')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('action_type', 'ai_generate')
+      .or('note.is.null,note.eq.message')
+      .gte('created_at', today.toISOString())
+
+    const used = count ?? 0
+    if (used >= DAILY_MESSAGE_LIMIT) {
+      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    }
+    remaining = DAILY_MESSAGE_LIMIT - used - 1
+  }
+
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  const systemPrompt = `Sen bir Network Marketing Uzmanı ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
+Kullanıcı sana network marketing sektörü, aday ilişkileri, takım kurma, sponsorluk, liderlik, satış teknikleri, zaman yönetimi veya bu sektörle doğrudan ilgili herhangi bir konuda soru soruyor.
+
+GÖREVİN:
+1. Kullanıcıya son derece profesyonel, yapıcı, ilham verici ve eyleme dökülebilir tavsiyeler ver. Cevapların kısa, net ve anlaşılır olsun.
+2. GÜVENLİK FİLTRESİ / KAPSAM DIŞI KURALI:
+Kullanıcının sorusu network marketing (ağ pazarlaması), doğrudan satış, liderlik, kişisel gelişim, aday ilişkileri, takım yönetimi vb. ile ilgili DEĞİLSE, nazik, son derece profesyonel ve samimi bir dille bu konunun ilgi alanının dışında olduğunu belirt. Sadece Network Marketing ve ilgili konularla ilgili soruları cevaplayabileceğini söyle. Başka hiçbir genel kültüre, kod yazmaya, ilgisiz akademik konuya vb. cevap verme.
+
+DİL POLİTİKASI:
+Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.`;
+
+  try {
+    const response = await anthropicClient.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 800,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+        }
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: `Kullanıcı Sorusu: ${question}\n\nDil Parametresi: ${lang}`,
+        }
+      ]
+    })
+
+    const answer = response.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim()
+
+    if (membership && !isSuperAdmin) {
+      await supabase.from('nmm_daily_actions').insert({
+        workspace_id: membership.workspace_id,
+        user_id: user.id,
+        candidate_id: null,
+        action_type: 'ai_generate' as const,
+        note: 'message',
+      })
+    }
+
+    return { answer, remaining: isSuperAdmin ? undefined : remaining }
+  } catch (err: any) {
+    console.error('Yapay Zeka Koçu Hatası:', err)
+    return { error: 'Yanıt oluşturulurken bir hata oluştu.' }
+  }
+}

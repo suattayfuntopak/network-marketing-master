@@ -476,7 +476,7 @@ function ItirazlarPageContent() {
               {lang === 'en' ? 'Objection Answers' : 'İtirazlara Cevaplar'}
             </h1>
             <p className="text-sm text-[var(--text-3)]">
-              {lang === 'en' ? 'Ready answers for the most common field objections' : 'Sahadaki en sık sorulara hazır cevaplar'}
+              {lang === 'en' ? 'Great answers to the most common objections you face in the field' : 'Sahada en sık karşılaştığın itirazlara verilecek harika cevaplar'}
             </p>
           </div>
         </div>
