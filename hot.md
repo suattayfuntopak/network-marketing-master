@@ -2,6 +2,12 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### style/feat: Uyum Denetleyicisi Önerilen Versiyon Kopyalama ve Paylaşma Butonları İyileştirmesi
+
+- **Kopyala Butonu Turuncu Renk Dönüşümü:** Uyum Merkezi (`uyum/page.tsx`) sayfasındaki YZ denetiminden sonra en altta çıkan "Önerilen Uyumlu ve Etkili Versiyon" kartının sağ üst köşesindeki yeşil renkli kopyala butonu, sayfanın genel renk paletine (terrakota/kızıl-turuncu) ve kullanıcı talebine uyumlu tatlı bir turuncu renge (`bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-400`) dönüştürüldü.
+- **Global WhatsApp Paylaşım Desteği:** Kopyalama butonunun hemen sağına global yeşil **WhatsApp** paylaşım butonu (`WhatsAppIcon`) eklendi. Buton tıklandığında, denetçi tarafından üretilen yasal alternatif metin `https://api.whatsapp.com/send?text=...` api'si kullanılarak doğrudan WhatsApp Web veya WhatsApp Mobil uygulamasına aktarılır. Bu sayede kullanıcı, alıcı telefon numarası belirtmeden mesajını rehberinden dilediği kişiye kolayca iletebilir.
+- **Taşma Koruması:** Butonlar yan yana yerleştirildiğinde başlık metniyle çakışma yaşanmaması için başlığın sağ padding değeri (`pr-20`) artırılarak görsel kalite güvence altına alındı.
+
 ### style/refactor: Boru Hattı Aday Kartı Eylemleri İyileştirmesi (Düzenle ve Sil Butonlarının Zap Popup'ına Taşınması)
 
 - **Açıklama:** Boru Hattı sayfasındaki her bir aday satırının (kartının) en sağında yer alan 4 butondan (Bot, Düzenle, Sil, WhatsApp) görsel karmaşayı azaltmak amacıyla **Düzenle (Pencil)** ve **Sil (Trash2)** butonları satırdan kaldırıldı.

@@ -10,6 +10,7 @@ import { auditComplianceMessageAction, type ComplianceAuditState } from './actio
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 const APPROVED_CLAIMS = {
   tr: [
@@ -396,16 +397,25 @@ export default function CompliancePage() {
                   {/* Improved Text Panel */}
                   {auditResult.improved_text && (
                     <div className="rounded-2xl border border-emerald-100 dark:border-emerald-950/20 bg-emerald-50/20 dark:bg-emerald-950/5 p-5 space-y-3 relative overflow-hidden">
-                      <div className="absolute right-4 top-4">
+                      <div className="absolute right-4 top-4 flex items-center gap-2">
                         <button
                           onClick={() => handleCopyImproved(auditResult.improved_text!)}
-                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 transition active:scale-95 cursor-pointer"
-                          title={lang === 'en' ? 'Copy Metin' : 'Metni Kopyala'}
+                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-orange-100 hover:bg-orange-200 dark:bg-orange-950/40 text-orange-800 dark:text-orange-400 transition active:scale-95 cursor-pointer"
+                          title={lang === 'en' ? 'Copy Text' : 'Metni Kopyala'}
                         >
                           {copiedImproved ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                         </button>
+                        <a
+                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(auditResult.improved_text!)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition active:scale-95 hover:scale-105 hover:shadow-md cursor-pointer"
+                          title={lang === 'en' ? 'Share via WhatsApp' : 'WhatsApp ile Paylaş'}
+                        >
+                          <WhatsAppIcon className="h-4.5 w-4.5" />
+                        </a>
                       </div>
-                      <div className="max-w-[85%]">
+                      <div className="pr-20">
                         <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <CheckCircle2 className="h-4 w-4" />
                           {lang === 'en' ? 'RECOMMENDED COMPLIANT VERSION' : 'ÖNERİLEN UYUMLU VE ETKİLİ VERSİYON'}
