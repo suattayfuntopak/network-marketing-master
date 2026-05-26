@@ -651,12 +651,12 @@ export default function AnalyticsPage() {
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
                       
-                      <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
-                        {lang === 'en' ? 'AI Coach (Used / Limit)' : 'YZ Koçu (Kullanılan / Limit)'}
-                      </th>
-                      
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
                         {lang === 'en' ? 'AI Message (Used / Limit)' : 'YZ Mesajı (Kullanılan / Limit)'}
+                      </th>
+                      
+                      <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
+                        {lang === 'en' ? 'AI Coach (Used / Limit)' : 'YZ Koçu (Kullanılan / Limit)'}
                       </th>
                       
                       <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
@@ -681,21 +681,21 @@ export default function AnalyticsPage() {
                             {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
                           </td>
                           
-                          {/* 1. YZ Koçu */}
-                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                            {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
-                            ) : (
-                              `${m.today_roleplay ?? 0} / 20`
-                            )}
-                          </td>
-                          
-                          {/* 2. YZ Mesajı */}
+                          {/* 1. YZ Mesajı */}
                           <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
                             {isLeader ? (
                               lang === 'en' ? 'Unlimited' : 'Sınırsız'
                             ) : (
                               `${m.today_message ?? 0} / 25`
+                            )}
+                          </td>
+                          
+                          {/* 2. YZ Koçu */}
+                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
+                            {isLeader ? (
+                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                            ) : (
+                              `${m.today_roleplay ?? 0} / 20`
                             )}
                           </td>
                           
