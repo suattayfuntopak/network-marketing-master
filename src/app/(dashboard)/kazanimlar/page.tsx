@@ -253,10 +253,18 @@ export default function KazanimlarPage() {
           <ul className="space-y-3">
             {kazananlar.map(c => {
               const parsed = parseNote(c.note)
-              const isTeamMember = members?.some(m =>
-                m.role === 'member' &&
-                m.full_name?.toLowerCase().trim() === c.full_name.toLowerCase().trim()
-              )
+              const cleanStr = (s: string | null | undefined) => (s ?? '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '')
+
+              const isTeamMember = members?.some(m => {
+                if (m.role !== 'member') return false
+                const mf = cleanStr(m.full_name)
+                const cf = cleanStr(c.full_name)
+                return mf && cf && (mf.includes(cf) || cf.includes(mf))
+              })
               return (
                 <li key={c.id} className="relative group">
                   <Link

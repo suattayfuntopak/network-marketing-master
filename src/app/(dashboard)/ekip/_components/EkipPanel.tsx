@@ -147,11 +147,19 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         .filter((o: any) => o.user_id === m.user_id)
         .map((o: any) => o.step_id)
 
-      // Try to find a phone number for this member in the leader's candidates list where full_name matches
-      const candidateMatch = candidates.find(c =>
-        c.owner_id === ownWs.owner_id &&
-        c.full_name?.toLowerCase().trim() === m.full_name?.toLowerCase().trim()
-      )
+      // Try to find a phone number for this member in the leader's candidates list where full_name matches robustly
+      const cleanStr = (s: string | null | undefined) => (s ?? '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]/g, '')
+
+      const candidateMatch = candidates.find(c => {
+        if (c.owner_id !== ownWs.owner_id) return false
+        const cf = cleanStr(c.full_name)
+        const mf = cleanStr(m.full_name)
+        return cf && mf && (cf.includes(mf) || mf.includes(cf))
+      })
       const phone = candidateMatch?.phone ?? null
 
       return {
