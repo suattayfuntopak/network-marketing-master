@@ -447,7 +447,7 @@ export function EkipPanel() {
                 )}
 
                 {/* Kart Üst Bölümü */}
-                <div className="flex flex-wrap md:flex-nowrap items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Sol Taraf: Avatar ve İsim Detayları */}
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black ${
@@ -458,9 +458,9 @@ export function EkipPanel() {
                       {(m.full_name ?? '?').charAt(0).toUpperCase()}
                     </div>
                     
-                    <div className="min-w-0 flex-1 overflow-hidden space-y-1.5">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <p className="truncate text-lg font-black text-[var(--text-1)]">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
+                        <p className="text-lg font-black text-[var(--text-1)] break-words leading-tight">
                           {m.full_name ?? 'İsimsiz Üye'}
                           {isCurrentUser && <span className="ml-2 text-sm font-normal text-[var(--text-3)]">({t('common.you')})</span>}
                         </p>
@@ -479,7 +479,7 @@ export function EkipPanel() {
                         )}
                       </div>
                       
-                      <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
                         <span className="font-extrabold text-[var(--text-1)]">{m.role === 'leader' ? t('common.leader') : t('common.member')}</span>
                         {m.joined_at && (
                           <span className="text-xs text-[var(--text-3)]/90">
@@ -496,10 +496,10 @@ export function EkipPanel() {
                   </div>
 
                   {/* Sağ Taraf: Toplam Aday Göstergesi */}
-                  <div className="flex items-center gap-3 shrink-0 ml-auto md:ml-0 pr-20 sm:pr-0">
-                    <div className="text-right mr-2">
-                      <p className="text-3xl font-black text-accent-blue tabular-nums">{m.candidate_count}</p>
-                      <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider">{t('team.totalCandidates')}</p>
+                  <div className="flex items-center justify-between sm:justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0">
+                    <div className="text-left sm:text-right">
+                      <p className="text-3xl font-black text-accent-blue tabular-nums leading-none">{m.candidate_count}</p>
+                      <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider mt-1">{t('team.totalCandidates')}</p>
                     </div>
                   </div>
                 </div>

@@ -493,14 +493,13 @@ export default function AnalyticsPage() {
                       const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
                       return (
                         <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
-                          <td className="p-3 flex items-center gap-2 truncate max-w-[160px]">
+                          <td className="p-3 flex items-center gap-2 whitespace-nowrap">
                             {isLeader ? (
                               <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
                             ) : (
                               <span className="h-2 w-2 rounded-full bg-zinc-300" />
                             )}
-                            <span className="truncate">{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
-                            {isLeader && <span className="text-[10px] text-[var(--text-3)] font-normal font-sans">({lang === 'en' ? 'Me' : 'Ben'})</span>}
+                            <span>{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
                           </td>
                           <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
                             {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
