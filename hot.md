@@ -1211,3 +1211,11 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
   - İtirazlar sayfasındaki "Kendi İtirazını Ekle" butonu ve modal başlığı **"İtiraz Ekle"** olarak sadeleştirildi.
   - Eğitim sayfasındaki "Kendi İçeriğini Ekle" butonu ve modal başlığı **"İçerik Ekle"** olarak sadeleştirildi.
 - **Mobil Arayüz Dil Seçim Butonları (UserMenu):** Masaüstündeki bayrak butonlarının mobilde gizlenmesi sebebiyle, kullanıcı profili (`UserMenu`) dropdown menüsünün içerisine şık, minimal HSL renk uyumlu, responsive **TR / EN** dil seçicisi butonları entegre edilerek mobil erişilebilirlik zirveye çıkarıldı.
+
+### fix: Ekip sayfasındaki Saha Distribütörlerinin (Saha Ortağı) profil resimlerinin yüklenmeme sorunu çözüldü
+- **Teşhis:** Ekip listesindeki (My Team) Saha Distribütörleri (Saha Ortakları), liderin boru hattında "Katıldı" aşamasına ulaştırdığı ama henüz NMM uygulamasını kendi davet koduyla satın alıp kurmamış olan gerçek adaylardır. Boru hattı listesinde bu adayların profil resimleri (avatar) kendi aday notlarının (`note` kolonu) sonuna kodlanmış durumdadır. Ancak, Ekip sayfasındaki verileri besleyen `fetchMembers` metodunda `nmm_candidates` tablosundan adaylar sorgulanırken `note` kolonu çekilmediği için `avatar_url` boş kalıyordu.
+- **Çözüm:** 
+  1. `src/app/(dashboard)/ekip/_components/EkipPanel.tsx` dosyasındaki `fetchMembers` içerisindeki `nmm_candidates` tablosunun `select` sorgusuna `note` kolonu eklendi.
+  2. `nonAppMembers` dizisi oluşturulurken, adayın `note` bilgisi `parseNote(c.note)` ile çözümlenerek `avatar_url: parsedNote.avatarUrl || null` şeklinde nesneye aktarıldı.
+  3. `parseNote` fonksiyonu dosyanın başına import edilerek TypeScript uyumluluğu sağlandı.
+
