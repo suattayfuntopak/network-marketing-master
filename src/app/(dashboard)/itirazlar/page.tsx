@@ -856,46 +856,46 @@ function ItirazlarPageContent() {
 
       {/* Kendi İtirazını Ekle Pop-up Formu */}
       {formOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 shadow-2xl overflow-y-auto max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+          <div className="relative w-full max-w-xl md:max-w-3xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-8 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-5 md:space-y-6">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-4">
               <div>
-                <h2 className="text-base font-bold text-[var(--text-1)]">Kendi İtirazını Ekle</h2>
-                <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
+                <h2 className="text-lg md:text-xl font-bold text-[var(--text-1)]">Kendi İtirazını Ekle</h2>
+                <p className="text-xs md:text-sm text-[var(--text-3)] font-medium mt-1">
                   Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setFormOpen(false)}
-                className="flex items-center gap-1 text-[11px] font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
+                className="flex items-center gap-1.5 text-xs md:text-sm font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
               >
-                <X className="h-4 w-4" />
+                <X className="h-4 w-4 md:h-5 md:w-5" />
                 <span>Formu Kapat</span>
               </button>
             </div>
 
-            <form onSubmit={handleAddObjection} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleAddObjection} className="space-y-4 md:space-y-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 {/* İtiraz Soru */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
                   <input
                     type="text"
                     required
                     value={newSoru}
                     onChange={e => setNewSoru(e.target.value)}
                     placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
                 {/* Kategori */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
                   <select
                     value={newKategori}
                     onChange={e => setNewKategori(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="Para & Kazanç">Para & Kazanç</option>
                     <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
@@ -909,62 +909,62 @@ function ItirazlarPageContent() {
               </div>
 
               {/* Kısa Cevap */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
+              <div className="space-y-1.5">
+                <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
                 <textarea
-                  rows={2}
+                  rows={3}
                   value={newKisaCevap}
                   onChange={e => setNewKisaCevap(e.target.value)}
                   placeholder="Kısa ve hızlı saha cevabı..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
               {/* Detaylı Cevap */}
-              <div className="space-y-1">
-                <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
+              <div className="space-y-1.5">
+                <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
                 <textarea
-                  rows={3}
+                  rows={4}
                   value={newDetayliCevap}
                   onChange={e => setNewDetayliCevap(e.target.value)}
                   placeholder="Detaylı cevap metni..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 {/* Yaklaşım */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={newYaklasim}
                     onChange={e => setNewYaklasim(e.target.value)}
                     placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
                 {/* Örnek Diyalog */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
                   <textarea
-                    rows={2}
+                    rows={3}
                     value={newOrnekDiyalog}
                     onChange={e => setNewOrnekDiyalog(e.target.value)}
                     placeholder="Kısa örnek konuşma..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
                 {/* Emoji Seçimi */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
                   <select
                     value={newEmoji}
                     onChange={e => setNewEmoji(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="🛡️">🛡️ Kalkan</option>
                     <option value="⚖️">⚖️ Terazi</option>
@@ -978,29 +978,29 @@ function ItirazlarPageContent() {
                 </div>
 
                 {/* Etiketler */}
-                <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                <div className="space-y-1.5">
+                  <label className="text-xs md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
                   <input
                     type="text"
                     value={newTags}
                     onChange={e => setNewTags(e.target.value)}
                     placeholder="örn. güven, fiyat, zamanlama"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
+              <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border)]">
                 <button
                   type="button"
                   onClick={() => setFormOpen(false)}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 text-xs font-bold transition active:scale-95 cursor-pointer"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-5 py-3 text-sm md:text-base font-bold transition active:scale-95 cursor-pointer"
                 >
                   İptal
                 </button>
                 <button
                   type="submit"
-                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-6 py-3 text-sm md:text-base font-bold shadow-sm transition active:scale-95 cursor-pointer"
                 >
                   + Ekle
                 </button>

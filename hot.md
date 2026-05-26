@@ -2,6 +2,23 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### style/feat: Kendi Eğitim İçeriği ve İtiraz Ekleme Popup Formlarının Okunabilirlik, Boyut ve Mobil Centering İyileştirmesi
+
+- **Masaüstü Ekranlar için Genişletilmiş ve Ferah Popup Kart Tasarımı:**
+  - `itirazlar/page.tsx` ve `egitim/page.tsx` sayfalarındaki "Kendi İtirazını Ekle" ve "Kendi İçeriğini Ekle" popup formlarının genişliği masaüstü ekranlar için `max-w-xl`'den `md:max-w-3xl` (768px) boyutuna çıkartılarak daha ferah bir form yerleşimi elde edildi.
+  - İç paddingler `p-6`'dan masaüstü için `md:p-8`'e, dikey form elemanları arası boşluklar ise `space-y-4`'ten `space-y-5 md:space-y-6`'ya yükseltildi.
+- **Yazı Okunabilirliği ve Punto Büyütme:**
+  - Form alan etiketleri (labels) `text-[10px]`'ten `text-xs md:text-sm` boyutuna çekilerek belirginleştirildi.
+  - Form girdileri (input, select, textarea) `text-xs`'ten `text-sm md:text-base` boyutuna büyütüldü.
+  - Popup ana başlığı `text-base`'den `text-lg md:text-xl` seviyesine, açıklama alt yazısı ise `text-[11px]`'ten `text-xs md:text-sm` boyutuna getirilerek mükemmel bir okunabilirlik sağlandı.
+  - İptal / Ekle eylem butonları da orantılı şekilde `text-sm md:text-base px-6 py-3` boyutlarına genişletildi.
+  - Textarea alanlarındaki satır sayıları (rows) artırılarak yazım konforu yükseltildi.
+- **Mobil ve Tablet Ekranlarda Kusursuz Dikey/Yatay Centering ve Z-Index:**
+  - Popup overlay bileşenlerinin `z-index` katmanı `z-[9999]` değerine yükseltilerek tüm diğer arayüz bileşenlerinin en üstünde yer alması kesinleştirildi.
+  - Mobil cihazlarda ve tabletlerde popup penceresinin ekranın sağdan soldan, yukarıdan aşağıdan tam ortasında konumlanması için `flex items-center justify-center` yapısıyla birlikte popup kartına `my-auto` ve `max-h-[85vh]` dikey scroll desteği entegre edildi. Bu sayede her türlü cihaz ekranında kusursuz ve taşma yapmayan bir görünüm elde edildi.
+- **NM Master Kütüphanesi Alt Başlık İfadesi Güncellendi:**
+  - Eğitim popup'ındaki eski alt başlık metni, talep doğrultusunda `"NM Master kütüphanesine kendi script, ders notu ya da rehberini ekleyebilirsin"` ifadesiyle güncellendi.
+
 ### feat: Kendi İtirazını Ekle ve Kendi Eğitim İçeriğini Ekle Sistemleri Entegre Edildi
 
 - **"Bu İş (Network Marketing) Caiz mi?" İtirazı Eklendi:** YZ Koçu tarafından üretilen ve vicdani/ticari değerlendirme kriterleri (ürün varlığı, ciro tabanlı kazanç, şeffaflık) içeren meşru ticari açıklama, özetlenerek İtirazlara Cevaplar (`itirazlar/page.tsx`) sayfasına **"Bu iş (Network Marketing) caiz mi / yasal mı?"** başlığıyla 35. madde (Güven & Şüphe kategorisi) olarak eklendi.
