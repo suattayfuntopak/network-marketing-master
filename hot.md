@@ -2,7 +2,22 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
-### style/feat: Kendi Eğitim İçeriği ve İtiraz Ekleme Popup Formlarının Okunabilirlik, Boyut ve Mobil Centering İyileştirmesi
+### style/feat: Kendi Eğitim İçeriği ve İtiraz Ekleme Popup Formlarının Okunabilirlik, Boyut ve Mobil Centering İyileştirmesi (Optimizasyon & Dengeli Orta Yol)
+
+- **Popup Kart Boyutlarının Altın Oran Dengesine Çekilmesi:**
+  - `itirazlar/page.tsx` ve `egitim/page.tsx` sayfalarındaki popup genişliği, eski küçük hal (`max-w-xl` - 576px) ile yeni çok büyük hal (`md:max-w-3xl` - 768px) arasındaki tam dengeli orta nokta olan **`md:max-w-2xl`** (672px) boyutuna getirildi.
+  - Kart içi padding ve spacing değerleri daha kompakt, zarif ve ideal bir seviye olan `p-6 md:p-7` ve `space-y-4 md:space-y-5` olarak güncellendi.
+- **Yazı Boyutlarının 1 Punto Düşürülerek Orta Karar Yapılması:**
+  - Yazı boyutları eski aşırı küçük durum ile yeni çok büyük durumun tam ortasında konumlandırıldı:
+    - Popup Başlığı: `text-base md:text-lg`
+    - Alt Açıklamalar ve Kapat Butonu: `text-[11px] md:text-xs`
+    - Form Alanı Etiketleri (Labels): `text-[11px] md:text-xs font-bold`
+    - Form Girdileri (Inputs, Selects, Textareas): `text-xs md:text-sm px-3.5 py-2`
+    - İşlem Butonları (İptal/Ekle): `text-xs md:text-sm px-4 md:px-5 py-2 md:py-2.5`
+- **Tüm Cihazlarda Kusursuz Centering, Scroll ve Z-Index:**
+  - `z-[9999]` katman seviyesi ve mobil dikey/yatay tam ortalama (`flex items-center justify-center`, `my-auto`, `max-h-[85vh] overflow-y-auto`) özellikleri tamamen korunarak her boyuttaki ekranda kusursuz bir deneyim sağlandı.
+
+### style/feat: Kendi Eğitim İçeriği ve İtiraz Ekleme Popup Formlarının Okunabilirlik, Boyut ve Mobil Centering İyileştirmesi (İlk Versiyon)
 
 - **Masaüstü Ekranlar için Genişletilmiş ve Ferah Popup Kart Tasarımı:**
   - `itirazlar/page.tsx` ve `egitim/page.tsx` sayfalarındaki "Kendi İtirazını Ekle" ve "Kendi İçeriğini Ekle" popup formlarının genişliği masaüstü ekranlar için `max-w-xl`'den `md:max-w-3xl` (768px) boyutuna çıkartılarak daha ferah bir form yerleşimi elde edildi.
