@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-05-27 — Özel Fiyatlandırma / Paket Seçim Sayfası (`/odeme`) & Dinamik Ödeme Yönlendirmesi (Phase 3)
+
+### feat: Özel Fiyatlandırma / Paket Seçim Sayfası & Dinamik Ödeme Yönlendirmesi
+
+- **Güvenli Shopier Signature Generator Server Action (`actions.ts`):**
+  - İstemci tarafından seçilen plana göre (`leader` - 299 TL / `master` - 899 TL) benzersiz bir `platform_order_id` ve `random_nr` üreten server action kodlandı.
+  - Shopier ödeme geçidinin beklediği dynamic signature (`random_nr + platform_order_id + total_order_value + currency`) değeri, HMAC-SHA256 ve Base64 algoritmalarıyla tamamen güvenli sunucu ortamında imzalanarak derlendi.
+- **Mor Degrade & Cam-Morfin Paket Karşılaştırma Sayfası (`/odeme` & `OdemeClient.tsx`):**
+  - Giriş yapmış olan liderin veya ortağın görebileceği, asil koyu temamıza, HSL renklerimize ve dikey/yatay hizalama kılavuzlarımıza %100 uyumlu premium bir fiyatlandırma/seçim arayüzü yazıldı.
+  - Sayfa TR / EN dil durumuna göre anlık olarak yerelleşmekte; kullanıcının mevcut aktif planını (`licenseType`) ve lisans bitiş tarihini (`licenseExpiresAt`) şık kartlarla raporlamaktadır.
+  - Paketlerin "Satın Al / Yenile" butonlarına basıldığında, sunucudan gelen güvenli form parametrelerini toplayıp arka planda geçici bir `<form>` üzerinden Shopier API'sine (`api_pay4.php`) otomatik form POST sevk etme mekanizması kodlandı.
+  - Bu yönlendirme esnasında kullanıcıyı parıldayan neon mor yükleme çemberiyle bilgilendiren profesyonel bir ara geçiş (loading) arayüzü entegre edildi.
+- **Sistem İçi Satın Alma Linklerinin Güncellenmesi:**
+  - `EkipPanel.tsx` içerisinde lisansı bittiğinde liderin alt ekibini izlemesini kısıtlayan premium yükseltme butonu, artık doğrudan SPA router (`router.push('/odeme')`) üzerinden bu yeni sayfaya sevk etmektedir.
+  - `Header.tsx` en üst uyarı şeridindeki "Hemen Yenileyin" butonu da `/odeme` rotasına bağlanarak satın alma sürtünmesi sıfıra indirildi.
+
 ## 2026-05-27 — Shopier Webhook Entegrasyonu & Veritabanı Lisanslama Sistemi (Phase 2)
 
 ### feat: Shopier Webhook Entegrasyonu & Veritabanı Lisanslama Sistemi

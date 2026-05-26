@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -238,6 +239,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
 }
 
 export function EkipPanel() {
+  const router = useRouter()
   const queryClient = useQueryClient()
   const supabase = createClient()
   const { lang, t } = useTranslation()
@@ -715,7 +717,7 @@ export function EkipPanel() {
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation()
-                              window.open(`https://www.shopier.com/NMMasterMaster?order_id=${ws?.workspaceId}_${Date.now()}`, '_blank')
+                              router.push('/odeme')
                             }}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
                           >

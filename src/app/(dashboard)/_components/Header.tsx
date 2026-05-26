@@ -115,7 +115,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
       <div className={`fixed left-0 right-0 top-0 z-40 transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} md:translate-y-0`}>
         {showWarningBar && (
           <div 
-            onClick={() => window.open(`https://www.shopier.com/NMMasterMaster?order_id=${ws?.workspaceId}_${Date.now()}`, '_blank')}
+            onClick={() => router.push('/odeme')}
             className="flex h-8 w-full items-center justify-center bg-gradient-to-r from-red-600 to-amber-600 hover:opacity-95 transition text-[10px] sm:text-xs font-bold text-white cursor-pointer px-4 select-none"
           >
             {warningBarText}
