@@ -141,7 +141,7 @@ export async function generateDownlineCoachingMessage(
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-pro',
       systemInstruction: `Sen bir network marketing lideri ve takım koçusun. Ekibindeki downline (alt hat) distribütörlerin sahadaki aktiflik durumuna göre onlara göndermek üzere motive edici, suçlayıcı olmayan, yapıcı ve doğrudan aksiyona yönlendiren mentörlük mesajları hazırlıyorsun.
 Sana distribütörün adı, toplam aday sayısı, aşama dağılımı (yeni aday, sunum, takip, katıldı) ve kaç gündür inaktif (sisteme kayıt girmemiş veya eylem yapmamış) olduğu verilecek.
 Amacın:
@@ -205,7 +205,7 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
   
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-pro',
       systemInstruction: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
 Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net bir özet ve hemen atılması gereken 1 cümlelik aksiyon planı üreteceksin.
 Ürettiğin yanıtı hem Türkçe hem İngilizce olarak hazırlayacak ve tam olarak şu formatta döneceksin:

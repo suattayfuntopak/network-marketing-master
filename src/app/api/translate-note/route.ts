@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: 'Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks.'
     })
 

@@ -95,7 +95,7 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const ctxStr   = cleanContext ? `Ek bilgi: ${cleanContext}\n` : ''
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: `Sen bir network marketing danışmanısın. Üç görevin var:
 
 1. MESAJ ÜRETME: Kişi adı, boru hattı aşaması, ilişki sıcaklığı ve ek bilgiler verildiğinde o kişiye WhatsApp'tan gönderilecek Türkçe mesaj yaz. Kısa (max 3 paragraf), samimi, 2-3 emoji, satış baskısı yok.

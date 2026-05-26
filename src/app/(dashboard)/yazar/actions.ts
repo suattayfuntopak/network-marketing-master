@@ -160,7 +160,7 @@ JSON yapısı şu şekilde olmalıdır:
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-pro',
       systemInstruction: systemPrompt,
     })
 
@@ -305,7 +305,7 @@ Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türk�
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-pro',
+      model: 'gemini-2.5-pro',
       systemInstruction: systemPrompt,
     })
 
@@ -363,7 +363,7 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: systemPrompt,
     })
 

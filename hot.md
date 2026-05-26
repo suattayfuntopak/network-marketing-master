@@ -15,6 +15,21 @@
   dosyalarındaki tüm server action ve YZ fonksiyonlarının en başına `GEMINI_API_KEY` varlık kontrolü eklendi.
 - **Anlaşılır Kullanıcı Bilgilendirmesi:** Eğer API key tanımlı değilse, kullanıcıya `"GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın."` şeklinde yönlendirici, açıklayıcı ve son derece net Türkçe (veya dil seçeneğine göre İngilizce) bir hata mesajı dönülmesi sağlandı. Böylece hata oluştuğunda "Mesaj oluşturulamadı." gibi genel hatalar yerine doğrudan çözüme odaklı mesajlar üretilmesi sağlandı.
 
+### feat: Google Gemini 2.5 Sürümüne (Masaüstü/Mobil YZ Kararlılığı) Büyük Yükseltme
+
+- **Sorun:** Yeni oluşturulan veya belirli Gemini API anahtarlarıyla yapılan v1beta isteklerinde `gemini-1.5-flash` ve `gemini-1.5-pro` modelleri için Google sunucularından `404 Not Found (models/gemini-1.5-flash is not found for API version v1beta)` hatası döndüğü gözlemlendi. Bu durum Google'ın v1beta üzerinde model desteğini ve varsayılanları modern `gemini-2.5` serisine taşımış olmasından kaynaklanıyordu.
+- **Model Yükseltmeleri:** Projedeki tüm Gemini model tanımları en güncel, desteklenen ve stabil `gemini-2.5` sürümlerine yükseltildi:
+  - `gemini-1.5-flash` ➔ `gemini-2.5-flash` (Yüksek hız, düşük maliyet, uyum denetimleri, mesaj hazırlama ve çeviriler için)
+  - `gemini-1.5-pro` ➔ `gemini-2.5-pro` (Derin analiz, akıl yürütme, koçluk ve saha provası için)
+- **Etkilenen ve Güncellenen Dosyalar:**
+  - `src/lib/ai/generateMessage.ts`
+  - `src/app/api/translate-note/route.ts`
+  - `src/app/(dashboard)/kazanimlar/actions.ts`
+  - `src/app/(dashboard)/uyum/actions.ts`
+  - `src/app/(dashboard)/pipeline/[id]/actions.ts`
+  - `src/app/(dashboard)/yazar/actions.ts`
+- **Doğrulama:** API anahtarı ile yapılan testlerde yeni nesil `gemini-2.5-flash` modelinin Türkçe yanıtları milisaniyeler içerisinde hatasız şekilde ürettiği ve entegrasyonun kusursuz çalıştığı onaylandı.
+
 ### feat: Mobilde Sağa Sola Kaydırılabilir (Swipeable) 11 Kapsamlı Alt Menü Entegre Edildi
 - `BottomNav.tsx`: Mobil alt gezinti barı baştan aşağı yenilenerek, 5 kısıtlı öğe yerine **tüm 11 panel/özellik modülüne** tek tıkla ve kaydırarak erişebileceğimiz premium bir "Swipeable Tab Strip" altyapısına kavuşturuldu.
 - **Kusursuz Otomatik Ortalama (Scroll-Centering):** Navigasyon barına akıllı bir `useEffect` ve `DOM scrollIntoView` motoru eklenerek, kullanıcı hangi sayfaya giderse gitsin, alt menünün o aktif sekmeyi **pürüzsüzce yatayda ortalayacak şekilde kayması** sağlandı.

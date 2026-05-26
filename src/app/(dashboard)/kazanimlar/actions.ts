@@ -14,7 +14,7 @@ export async function generateAchievementMessageAction(input: {
   if (!input.name) return { error: 'Kişi adı eksik.' }
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: `Sen bir Network Marketing lideri ve sponsorusun. Ekibine başarıyla yeni katılmış (onboarding aşamasındaki) bir iş ortağını kutlamak ve desteklemek için samimi, motive edici ve yol gösterici bir Türkçe karşılama ve tebrik mesajı yazıyorsun.
       
 Mesajın Amacı:
