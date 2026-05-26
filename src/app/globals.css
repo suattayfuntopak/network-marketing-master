@@ -5,23 +5,23 @@
 
 /* ── Tema token'ları ── */
 :root {
-  --bg:          #ffffff;
-  --bg-subtle:   #f9fafb;
-  --bg-card:     #ffffff;
-  --border:      #f3f4f6;
-  --text-1:      #111827;
-  --text-2:      #6b7280;
-  --text-3:      #9ca3af;
+  --bg:          #f8fafc; /* Premium off-white slate background */
+  --bg-subtle:   #f1f5f9; /* Soft grey-slate accent background */
+  --bg-card:     #ffffff; /* Pure white card background (pops out with shadow) */
+  --border:      #cbd5e1; /* High-contrast crisp border for perfect boundaries */
+  --text-1:      #0f172a; /* Slate 900 for extremely readable, high-contrast headings */
+  --text-2:      #334155; /* Slate 700 for readable body texts */
+  --text-3:      #64748b; /* Slate 500 for captions and secondary labels */
 }
 
 .dark {
-  --bg:          #0f1117;
-  --bg-subtle:   #1a1f2e;
-  --bg-card:     #1a1f2e;
-  --border:      #2d3748;
-  --text-1:      #f9fafb;
-  --text-2:      #9ca3af;
-  --text-3:      #6b7280;
+  --bg:          #090d16; /* Obsidian deep navy-black background */
+  --bg-subtle:   #1e293b; /* Premium slate-blue accent container background */
+  --bg-card:     #131926; /* Sleek navy-obsidian card background */
+  --border:      #2e3a52; /* Crisp steel-blue borders for high definition */
+  --text-1:      #f8fafc; /* Pure slate-white high-contrast text */
+  --text-2:      #cbd5e1; /* Silver slate-gray text */
+  --text-3:      #94a3b8; /* Muted steel-slate text */
 }
 
 /* iOS notch / home indicator safe area */
