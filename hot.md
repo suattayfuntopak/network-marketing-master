@@ -1219,3 +1219,28 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
   2. `nonAppMembers` dizisi oluşturulurken, adayın `note` bilgisi `parseNote(c.note)` ile çözümlenerek `avatar_url: parsedNote.avatarUrl || null` şeklinde nesneye aktarıldı.
   3. `parseNote` fonksiyonu dosyanın başına import edilerek TypeScript uyumluluğu sağlandı.
 
+---
+
+## 2026-05-27
+
+### feat: Faz 1 — Premium Landing Page (Karşılama Sayfası) Entegrasyonu
+
+- **Root Rota Dönüşümü (`/`):** 
+  - Uygulamanın ana giriş rotası (`/`) tamamen sıfırdan yazılarak son derece şık, göz alıcı (wow efektli) bir **Karşılama Sayfasına (Landing Page)** dönüştürüldü.
+  - **Akıllı Oturum Kontrolü (Session Gate):** Kullanıcı giriş yaptığında arka planda milisaniyeler süren Supabase session kontrolü gerçekleşir ve oturum aktifse kullanıcıyı doğrudan `/pano` adresine yönlendirir. Giriş yapmamış kullanıcılar ise pürüzsüzce bu premium landing page arayüzü ile karşılanır.
+- **Göz Alıcı Arayüz Tasarımı & Tasarım Sistemi:**
+  - Derin kozmik koyu arka plan (`bg-[#0A0B10]`), neon parıltılı asil mor gradyanlar ve cam morfin (glassmorphic) panellerle donatılmış fütüristik bir tema uygulandı.
+  - Sol köşede parıldayan neon logo, sağ köşede ise responsive dil seçicisi (**TR / EN**), **Giriş Yap** ve **Hemen Başla** butonlarını barındıran şık bir yapışkan (sticky) header entegre edildi.
+  - Sayfa tamamen iki dilli (Türkçe ve İngilizce) olarak tasarlandı, sağ üstteki dil butonuna tıklandığı an tüm başlıklar, kartlar, slider ve fiyatlar anında hedef dile çevrilir.
+- **6 Temel Güç Özellik Kartları (Features Grid):**
+  - Boru Hattı, YZ Koçu, Doğru Başlangıç Rehberi, Saha Provası, Uyum Denetimi ve Ekip Analitiği gibi NMM'in 6 ana gücünü temsil eden, üzerine gelindiğinde neon çerçeve parlaması sunan modern hover efektli kartlar tasarlandı.
+- **İnteraktif ROI (Yatırım Getirisi) Hesaplayıcı:**
+  - Liderlerin alt ekibindeki aktif distribütör sayısını (10 ile 200 arası) seçebilecekleri premium, kaydırılabilir bir slider bileşeni eklendi.
+  - Sürgü hareket ettikçe NMM kullanıldığında ekibin aylık üreteceği aday hacmini (geleneksel yöntemlerdeki 3 adaya karşı NMM'deki 15 aday gücüyle), kazanılan sponsor lider saatini (distribütör başına haftalık 4 saat tasarruf) ve onboarding aktiflik oranını (%88) canlı hesaplayan matematiksel formüllere dayalı interaktif panel entegre edildi.
+- **Dinamik Fiyatlandırma Kartları (Pricing Cards):**
+  - **Saha Distribütörü Planı (Plan A - ₺299/Ay):** Bireysel takip, günlük 25 YZ mesaj yazarı kredisi, 20 saha provası simülatörü kredisi.
+  - **Ekip Master'ı Planı (Plan B - ₺899/Ay - Popüler Lider Planı):** Downline hunisi takibi, onboarding senkronizasyonu, süper lider sınırsız YZ kredisi, özel itiraz/eğitim ekleme ve realtime bildirim motoru.
+- **Sosyal Kanıt (Testimonials) ve Footer:**
+  - Başarılı sponsor ve liderlerin dairesel sembollü avatarları, samimi başarı yorumları ve sade telif hakları footer'ı ile karşılama sayfası tamamlandı.
+
+
