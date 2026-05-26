@@ -9,6 +9,8 @@ export interface WorkspaceContext {
   role: 'leader' | 'member'
   fullName: string | null
   avatarUrl: string | null
+  licenseType: 'free' | 'leader' | 'master'
+  licenseExpiresAt: string | null
 }
 
 function generateInviteCode(): string {
@@ -36,11 +38,13 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
 
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
 
+  const isSuperAdmin = user.email === 'suattayfuntopak@gmail.com'
+
   if (membership) {
-    // Workspace'in invite_code'unu çek
+    // Workspace'in invite_code'unu ve lisans alanlarını çek
     const { data: ws } = await supabase
       .from('nmm_workspaces')
-      .select('invite_code')
+      .select('invite_code, license_type, license_expires_at')
       .eq('id', membership.workspace_id)
       .single()
 
@@ -50,6 +54,8 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
       role: membership.role,
       fullName: membership.full_name,
       avatarUrl,
+      licenseType: isSuperAdmin ? 'master' : (ws?.license_type ?? 'free'),
+      licenseExpiresAt: isSuperAdmin ? null : (ws?.license_expires_at ?? null),
     }
   }
 
@@ -80,7 +86,15 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
   }
 
-  return { workspaceId: ws.id, inviteCode: ws.invite_code ?? inviteCode, role: 'leader', fullName, avatarUrl }
+  return {
+    workspaceId: ws.id,
+    inviteCode: ws.invite_code ?? inviteCode,
+    role: 'leader',
+    fullName,
+    avatarUrl,
+    licenseType: isSuperAdmin ? 'master' : 'free',
+    licenseExpiresAt: null
+  }
 }
 
 export function useWorkspace() {

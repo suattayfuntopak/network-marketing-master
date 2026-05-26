@@ -75,6 +75,19 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
   const unreadCount = dbUnreadCount + localUnread
 
+  const licenseType = ws?.licenseType ?? 'free'
+  const licenseExpiresAt = ws?.licenseExpiresAt ?? null
+  const isLicenseExpired = licenseExpiresAt
+    ? new Date(licenseExpiresAt) < new Date()
+    : false
+  const remainingDays = licenseExpiresAt
+    ? Math.ceil((new Date(licenseExpiresAt).getTime() - Date.now()) / 86400000)
+    : 999
+  const showWarningBar = (licenseType !== 'free') && (isLicenseExpired || (remainingDays >= 0 && remainingDays <= 3))
+  const warningBarText = isLicenseExpired
+    ? (lang === 'en' ? '⚠️ Your Ekip Master license has expired. Downline tracking is paused. [Renew License]' : '⚠️ Ekip Master lisansınızın süresi dolmuştur. Ekip takibi durduruldu. [Şimdi Yenile]')
+    : (lang === 'en' ? `⚠️ Your Ekip Master license expires in ${remainingDays} day(s). [Renew License]` : `⚠️ Ekip Master lisans süreniz ${remainingDays} gün sonra doluyor. [Lisansı Yenile]`)
+
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -99,7 +112,16 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
   return (
     <>
-      <header className={`fixed left-0 right-0 top-0 z-40 flex h-16 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} md:translate-y-0`}>
+      <div className={`fixed left-0 right-0 top-0 z-40 transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} md:translate-y-0`}>
+        {showWarningBar && (
+          <div 
+            onClick={() => window.open(`https://www.shopier.com/NMMasterMaster?order_id=${ws?.workspaceId}_${Date.now()}`, '_blank')}
+            className="flex h-8 w-full items-center justify-center bg-gradient-to-r from-red-600 to-amber-600 hover:opacity-95 transition text-[10px] sm:text-xs font-bold text-white cursor-pointer px-4 select-none"
+          >
+            {warningBarText}
+          </div>
+        )}
+        <header className="flex h-16 w-full items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-4 backdrop-blur-md">
         
         {/* Mobil Tam Ekran Arama Çubuğu Popup */}
         {isMobileSearchOpen && (
@@ -223,6 +245,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
         </div>
       </header>
+      </div>
 
       {/* Modallar */}
       {notificationsOpen && (

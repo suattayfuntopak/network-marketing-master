@@ -244,6 +244,13 @@ export function EkipPanel() {
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const [currentUser, setCurrentUser] = useState<User | null>(null)
 
+  const licenseType = ws?.licenseType ?? 'free'
+  const licenseExpiresAt = ws?.licenseExpiresAt ?? null
+  const isLicenseExpired = licenseExpiresAt
+    ? new Date(licenseExpiresAt) < new Date()
+    : false
+  const hasMasterAccess = licenseType === 'master' && !isLicenseExpired
+
   const [copied, setCopied] = useState(false)
   const [inviteCodeInput, setInviteCodeInput] = useState('')
   const [joining, setJoining] = useState(false)
@@ -688,134 +695,166 @@ export function EkipPanel() {
                 {isCardExpanded && m.isAppUser !== false && (
                   <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
                     
-                    {/* Aday Hunisi Dağılım Kutusu (Sıfır Bile Olsa Her Zaman Görünür!) */}
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
-                        <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
-                        <span>{t('team.funnelDistribution')}</span>
+                    {!hasMasterAccess && m.user_id !== currentUser?.id ? (
+                      <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
+                          <Crown className="h-5 w-5 animate-bounce" />
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-extrabold text-white">
+                            {lang === 'en' ? 'Ekip Master Plan Required' : 'Ekip Master Lisansı Gereklidir'}
+                          </h4>
+                          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                            {lang === 'en'
+                              ? 'To track your downline’s candidate funnels, view onboarding progress, and receive real-time updates, you need an active Ekip Master license.'
+                              : 'Alt ekibinizin aday hunilerini izlemek, 4 haftalık Doğru Başlangıç süreçlerini gerçek zamanlı takip etmek ve koçluk yapmak için aktif bir Ekip Master lisansı gereklidir.'}
+                          </p>
+                        </div>
+                        <div>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              window.open(`https://www.shopier.com/NMMasterMaster?order_id=${ws?.workspaceId}_${Date.now()}`, '_blank')
+                            }}
+                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
+                          >
+                            <span>{lang === 'en' ? 'Upgrade to Ekip Master' : 'Ekip Master\'ına Yükselt 🚀'}</span>
+                          </button>
+                        </div>
                       </div>
-                      
-                      <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
-                        <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                          <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
-                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
-                        </div>
-                        <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                          <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
-                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
-                        </div>
-                        <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                          <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
-                          <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
-                        </div>
-                        <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                          <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
-                          <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
-                    {m.role === 'member' && (
-                      <div className="border-t border-[var(--border)] pt-5 space-y-3">
-                        <button
-                          type="button"
-                          onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
-                          className="flex w-full items-center justify-between text-sm font-extrabold text-[var(--text-2)] hover:text-brand transition cursor-pointer uppercase tracking-wider"
-                        >
-                          <span className="flex items-center gap-2">
-                            <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
-                            <span>{lang === 'en' ? 'Distributor Correct Start Guide' : 'Distribütör Doğru Başlangıç Rehberi'}</span>
-                          </span>
-                          <span className="flex items-center gap-2.5">
-                            {(() => {
-                              const doneCount = ONBOARDING_STEPS.filter(s => m.onboarding_steps?.includes(s.id)).length
-                              const totalCount = ONBOARDING_STEPS.length
-                              const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
-                              return (
-                                <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-3 py-1 text-xs font-black text-[#854F0B] dark:text-[#fbbf24] shadow-sm">
-                                  %{pct}
-                                </span>
-                              )
-                            })()}
-                            {expandedOnboardingId === m.user_id ? (
-                              <ChevronUp className="h-5 w-5" />
-                            ) : (
-                              <ChevronDown className="h-5 w-5" />
-                            )}
-                          </span>
-                        </button>
-
-                        {expandedOnboardingId === m.user_id && (
-                          <div className="pt-3 border-t border-dashed border-[var(--border)] space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                            {/* 4 Weekly Tabs */}
-                            <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
-                              {([1, 2, 3, 4] as const).map(w => (
-                                <button
-                                  key={w}
-                                  type="button"
-                                  onClick={() => setOnboardingWeekTab(w)}
-                                  className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all cursor-pointer ${
-                                    onboardingWeekTab === w
-                                      ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
-                                      : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
-                                  }`}
-                                >
-                                  {lang === 'en' ? `W${w}` : `${w}. Hafta`}
-                                </button>
-                              ))}
+                    ) : (
+                      <>
+                        {/* Aday Hunisi Dağılım Kutusu (Sıfır Bile Olsa Her Zaman Görünür!) */}
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
+                            <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
+                            <span>{t('team.funnelDistribution')}</span>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
+                            <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                              <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
+                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
                             </div>
-
-                            {/* Steps list */}
-                            <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                              {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
-                                const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
-                                return (
-                                  <div
-                                    key={step.id}
-                                    className={`w-full flex items-center justify-between gap-3 rounded-xl border p-3.5 transition-all ${
-                                      isStepDone
-                                        ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)]'
-                                        : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 text-[var(--text-2)]'
-                                    }`}
-                                  >
-                                    <button
-                                      type="button"
-                                      onClick={() => toggleOnboardingStep(m.user_id, step.id, isStepDone)}
-                                      className="flex-1 flex items-center gap-3 text-left cursor-pointer active:scale-[0.99] transition-all"
-                                    >
-                                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
-                                        isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
-                                      }`}>
-                                        {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
-                                      </span>
-                                      <span className="text-sm font-semibold leading-tight pr-2">
-                                        {lang === 'en' ? step.label_en : step.label_tr}
-                                      </span>
-                                    </button>
-
-                                    <button
-                                      type="button"
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setOnboardingCoachData({
-                                          memberName: m.full_name || '',
-                                          stepId: step.id,
-                                          phone: m.phone ?? null
-                                        })
-                                      }}
-                                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
-                                      title={lang === 'en' ? 'Get AI Coaching Script' : 'Yapay Zeka Koçluk Mesajı Al'}
-                                    >
-                                      <Bot className="h-5 w-5" />
-                                    </button>
-                                  </div>
-                                )
-                              })}
+                            <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                              <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
+                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
+                            </div>
+                            <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                              <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
+                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
+                            </div>
+                            <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                              <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
+                              <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
                             </div>
                           </div>
+                        </div>
+
+                        {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
+                        {m.role === 'member' && (
+                          <div className="border-t border-[var(--border)] pt-5 space-y-3">
+                            <button
+                              type="button"
+                              onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
+                              className="flex w-full items-center justify-between text-sm font-extrabold text-[var(--text-2)] hover:text-brand transition cursor-pointer uppercase tracking-wider"
+                            >
+                              <span className="flex items-center gap-2">
+                                <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
+                                <span>{lang === 'en' ? 'Distributor Correct Start Guide' : 'Distribütör Doğru Başlangıç Rehberi'}</span>
+                              </span>
+                              <span className="flex items-center gap-2.5">
+                                {(() => {
+                                  const doneCount = ONBOARDING_STEPS.filter(s => m.onboarding_steps?.includes(s.id)).length
+                                  const totalCount = ONBOARDING_STEPS.length
+                                  const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
+                                  return (
+                                    <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-3 py-1 text-xs font-black text-[#854F0B] dark:text-[#fbbf24] shadow-sm">
+                                      %{pct}
+                                    </span>
+                                  )
+                                })()}
+                                {expandedOnboardingId === m.user_id ? (
+                                  <ChevronUp className="h-5 w-5" />
+                                ) : (
+                                  <ChevronDown className="h-5 w-5" />
+                                )}
+                              </span>
+                            </button>
+
+                            {expandedOnboardingId === m.user_id && (
+                              <div className="pt-3 border-t border-dashed border-[var(--border)] space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                                {/* 4 Weekly Tabs */}
+                                <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
+                                  {([1, 2, 3, 4] as const).map(w => (
+                                    <button
+                                      key={w}
+                                      type="button"
+                                      onClick={() => setOnboardingWeekTab(w)}
+                                      className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all cursor-pointer ${
+                                        onboardingWeekTab === w
+                                          ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
+                                          : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                                      }`}
+                                    >
+                                      {lang === 'en' ? `W${w}` : `${w}. Hafta`}
+                                    </button>
+                                  ))}
+                                </div>
+
+                                {/* Steps list */}
+                                <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                                  {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
+                                    const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
+                                    return (
+                                      <div
+                                        key={step.id}
+                                        className={`w-full flex items-center justify-between gap-3 rounded-xl border p-3.5 transition-all ${
+                                          isStepDone
+                                            ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)]'
+                                            : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 text-[var(--text-2)]'
+                                        }`}
+                                      >
+                                        <button
+                                          type="button"
+                                          onClick={() => toggleOnboardingStep(m.user_id, step.id, isStepDone)}
+                                          className="flex-1 flex items-center gap-3 text-left cursor-pointer active:scale-[0.99] transition-all"
+                                        >
+                                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
+                                            isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
+                                          }`}>
+                                            {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
+                                          </span>
+                                          <span className="text-sm font-semibold leading-tight pr-2">
+                                            {lang === 'en' ? step.label_en : step.label_tr}
+                                          </span>
+                                        </button>
+
+                                        <button
+                                          type="button"
+                                          onClick={(e) => {
+                                            e.stopPropagation()
+                                            setOnboardingCoachData({
+                                              memberName: m.full_name || '',
+                                              stepId: step.id,
+                                              phone: m.phone ?? null
+                                            })
+                                          }}
+                                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
+                                          title={lang === 'en' ? 'Get AI Coaching Script' : 'Yapay Zeka Koçluk Mesajı Al'}
+                                        >
+                                          <Bot className="h-5 w-5" />
+                                        </button>
+                                      </div>
+                                    )
+                                  })}
+                                </div>
+                              </div>
+                            )}
+                          </div>
                         )}
-                      </div>
+                      </>
                     )}
 
                   </div>

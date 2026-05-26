@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-05-27 — Shopier Webhook Entegrasyonu & Veritabanı Lisanslama Sistemi (Phase 2)
+
+### feat: Shopier Webhook Entegrasyonu & Veritabanı Lisanslama Sistemi
+
+- **Veritabanı Lisans Şeması (`016_workspace_licensing.sql`):**
+  - `nmm_workspaces` tablosuna `license_type` ('free', 'leader', 'master') ve `license_expires_at` (timestamp with time zone) kolonları eklendi. Varsayılan olarak her yeni takım ücretsiz (`free`) plan ile başlar.
+- **useWorkspace Kancası Güncellemesi (`useWorkspace.ts`):**
+  - Supabase üzerindeki `nmm_workspaces` lisans bilgileri çekilerek çalışma alanı durumuna (`WorkspaceContext`) eklendi.
+  - Süper yönetici olan `suattayfuntopak@gmail.com` e-postası için süresiz `master` lisansı tanımlayan özel bir muafiyet (super-admin bypass) uygulandı.
+- **Shopier Webhook API Ucu (`/api/payment/shopier/route.ts`):**
+  - HMAC-SHA256 imzası doğrulama mantığı ile donatılmış, tamamen güvenli ve sahte ödeme saldırılarına karşı korumalı bir webhook uç noktası kodlandı.
+  - Başarılı Shopier ödemelerinde, ödenen miktara göre `leader` (299 TL) veya `master` (899 TL) lisansı belirlenip mevcut lisans süresi (veya lisans bittiyse bugünün tarihi) üzerine +30 gün ekleme yapılması sağlandı.
+  - Webhook unauthenticated olduğu için veritabanını güncellemede `SUPABASE_SERVICE_ROLE_KEY` (Supabase Service Client) bypass mekanizması kullanıldı.
+- **Ekip Paneli Lisans Kısıtlama Arayüzü (`EkipPanel.tsx`):**
+  - Lisansı bitmiş veya `free` planda olan kullanıcılar için alt ekip üyelerinin detaylarını (onboarding check listesi, aday hunisi metrikleri) görüntüleme yetkisi kısıtlandı.
+  - Kısıtlama yerine şık glassmorphic, mor degrade tasarımlı bir "Premium Master Plana Yükselt" çağrısı ve doğrudan Shopier ödeme sayfasına giden bir buton entegre edildi.
+- **Header Üst Lisans Uyarı Şeridi (`Header.tsx`):**
+  - Lisansı biten veya bitmesine 3 günden az kalan kullanıcıları yumuşak animasyonlu, sabit (fixed), pürüzsüzce geçiş yapan kırmızı-turuncu tonlarında bir üst uyarı şeridi ile bilgilendiren şık bir arayüz geliştirildi.
+  - Header ile uyarı şeridi tek bir üst sabit sarmalayıcıya (`fixed top-0 left-0 w-full`) alınarak sayfa elemanlarıyla çakışması önlendi.
+- **TypeScript Derleme & Tip Entegrasyonu (`database.types.ts`):**
+  - Supabase şema tipleri `nmm_workspaces` tablosu için güncellenerek TypeScript derleyicisinin projeyi hatasız derlemesi sağlandı.
+
 ## 2026-05-26 — Ekibim Sayfası Üye Profil Fotoğrafları Senkronizasyonu (Avatar Sync)
 
 ### feat: Ekibim Sayfası Üye Profil Fotoğrafları Senkronizasyonu
