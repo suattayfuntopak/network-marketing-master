@@ -10,7 +10,7 @@ export default function EkipPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">Ekibim</h1>
-          <p className="text-sm text-[var(--text-3)]">Ekip performans paneli</p>
+          <p className="text-sm text-[var(--text-3)]">Ekibini uygulamaya davet et, yönet, değerlendir</p>
         </div>
       </header>
       <EkipPanel />
