@@ -2,6 +2,14 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: Downline (Alt Ekip) Metrik & Aday Güncelleme Bildirimleri (Migration 012)
+
+- **Otomatik Aday & Aşama Bildirim Tetikleyicisi Entegre Edildi:**
+  - Downline ekip üyeleriniz kendi çalışma alanlarında yeni bir aday eklediğinde veya mevcut adayın aşamasını (Yeni, Sunum, Takip, Katıldı vb.) güncellediğinde, sponsor liderin ekranına **anlık, gerçek zamanlı sesli ve görsel bildirim** akışı sağlayan PostgreSQL veritabanı tetikleyicisi (`nmm_candidates_notification_trigger`) kuruldu.
+  - Bildirim metinlerinin Türkçe ve İngilizce dil çevirilerini otomatik olarak yönetebilmek için `nmm_get_stage_name_tr` ve `nmm_get_stage_name_en` veritabanı fonksiyonları kodlandı.
+  - **Sessize Alma Desteği:** Liderler dilediklerinde bildirim penceresindeki "Tercihler" kısmından **"Sesli Uyarılar"** butonunu kapatarak bu bildirimlerin sesini tamamen sessize alabilirler.
+  - Supabase Dashboard üzerinde çalıştırılmak üzere `supabase/migrations/012_downline_metric_notifications.sql` göç dosyası hazırlandı.
+
 ### feat: Gerçek Zamanlı (Realtime) Sesli ve Yazılı Bildirim Sistemi Entegre Edildi (Migration 011)
 
 - **Otomatik Downline Bildirim Motoru kuruldu:**
