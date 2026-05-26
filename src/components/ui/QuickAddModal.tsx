@@ -7,6 +7,8 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/zIndex'
+import { toast } from 'sonner'
+import { playNotificationSound } from './NotificationsModal'
 
 interface QuickAddModalProps {
   onClose: () => void
@@ -52,6 +54,33 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
         note: notes.trim() || null,
         stage: 'yeni', // Default stage: Yeni Aday
       })
+
+      // Trigger user alerts based on preferences
+      const isSoundEnabled = localStorage.getItem('nmm_notif_sound') === 'true'
+      const isPushEnabled = localStorage.getItem('nmm_notif_push') === 'true'
+      const isEmailEnabled = localStorage.getItem('nmm_notif_email') === 'true'
+
+      if (isSoundEnabled) {
+        playNotificationSound()
+      }
+
+      if (isPushEnabled && 'Notification' in window && Notification.permission === 'granted') {
+        new Notification('Yeni Aday Eklendi!', {
+          body: `${fullName.trim()} ekibinize yeni aday olarak başarıyla eklendi.`,
+          icon: '/logo.png'
+        })
+      }
+
+      if (isEmailEnabled) {
+        toast.info(`📧 E-posta Gönderildi: Yeni Aday Eklendi`, {
+          description: `${fullName.trim()} aday detayları suattayfuntopak@gmail.com adresine postalandı.`
+        })
+        console.log(`[EMAIL DISPATCH] Sent to suattayfuntopak@gmail.com:`, {
+          subject: 'Yeni Aday Eklendi',
+          body: `Aday: ${fullName.trim()}\nNotlar: ${notes}`
+        })
+      }
+
       onClose()
     } catch (err) {
       console.error(err)

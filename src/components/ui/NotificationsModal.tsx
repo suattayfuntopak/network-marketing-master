@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserPlus, CalendarClock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 interface NotificationsModalProps {
   onClose: () => void
@@ -90,7 +91,46 @@ function NotifIconBg({ type }: { type: NotificationItem['icon'] }) {
   return 'bg-[#EEEDFE]'
 }
 
+export function playNotificationSound() {
+  if (typeof window === 'undefined') return
+  try {
+    const AudioContext = window.AudioContext || (window as any).webkitAudioContext
+    if (!AudioContext) return
+    const ctx = new AudioContext()
+    
+    // Note 1 (C5)
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(523.25, ctx.currentTime)
+    gain.gain.setValueAtTime(0, ctx.currentTime)
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.05)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.3)
+    
+    // Note 2 (E5) delayed
+    const osc2 = ctx.createOscillator()
+    const gain2 = ctx.createGain()
+    osc2.connect(gain2)
+    gain2.connect(ctx.destination)
+    osc2.type = 'sine'
+    osc2.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1)
+    gain2.gain.setValueAtTime(0, ctx.currentTime)
+    gain2.gain.setValueAtTime(0, ctx.currentTime + 0.1)
+    gain2.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.15)
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+    osc2.start(ctx.currentTime + 0.1)
+    osc2.stop(ctx.currentTime + 0.4)
+  } catch (err) {
+    console.error('Audio synthesis failed:', err)
+  }
+}
+
 export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
+  const { lang } = useTranslation()
   const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
@@ -128,9 +168,37 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   function handleToggle(type: 'email' | 'push' | 'sound', current: boolean) {
     const next = !current
-    if (type === 'email')  { setEmailAlerts(next);  localStorage.setItem('nmm_notif_email', String(next)) }
-    if (type === 'push')   { setPushAlerts(next);   localStorage.setItem('nmm_notif_push',  String(next)) }
-    if (type === 'sound')  { setSoundAlerts(next);  localStorage.setItem('nmm_notif_sound', String(next)) }
+    if (type === 'email')  { 
+      setEmailAlerts(next);  
+      localStorage.setItem('nmm_notif_email', String(next));
+      if (next) {
+        toast.info(lang === 'en' ? 'Email alerts enabled for suattayfuntopak@gmail.com' : 'E-posta bildirimleri suattayfuntopak@gmail.com için aktif edildi')
+      }
+    }
+    if (type === 'push')   { 
+      setPushAlerts(next);   
+      localStorage.setItem('nmm_notif_push',  String(next));
+      if (next && 'Notification' in window) {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            toast.success(lang === 'en' ? 'Browser notifications enabled!' : 'Tarayıcı bildirimleri aktif edildi!')
+            new Notification('Network Marketing Master', {
+              body: lang === 'en' ? 'System notifications successfully enabled.' : 'Sistem bildirimleri başarıyla aktif edildi.',
+              icon: '/logo.png'
+            })
+          } else {
+            toast.warning(lang === 'en' ? 'Permission denied by browser.' : 'Tarayıcı izni reddedildi.')
+          }
+        })
+      }
+    }
+    if (type === 'sound')  { 
+      setSoundAlerts(next);  
+      localStorage.setItem('nmm_notif_sound', String(next));
+      if (next) {
+        playNotificationSound()
+      }
+    }
     toast.success('Tercihleriniz güncellendi')
   }
 
@@ -141,6 +209,12 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       persistRead(updated)
       return updated
     })
+
+    // Play chime sound if enabled
+    const soundEnabled = localStorage.getItem('nmm_notif_sound') === 'true'
+    if (soundEnabled) {
+      playNotificationSound()
+    }
   }
 
   function markAllRead() {

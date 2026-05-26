@@ -125,18 +125,18 @@ export function PanoContent() {
       {/* ── 10 hızlı erişim karesi — mobil 2 sütun (5 satır), masaüstü 5 sütun (2 satır) ── */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
         {/* Üst Sıra */}
-        <SquareButton icon={Zap}                    label={t('nav.todayFocus')}     color="purple" href="/bugun/ilgilen" />
-        <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="teal"   href="/pipeline"      />
-        <SquareButton icon={CalendarDays}           label={t('nav.takvim')}           color="pink"   href="/takvim"        />
-        <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  href="/ekip"          />
-        <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="teal"   href="/egitim"        />
+        <SquareButton icon={Zap}                    label={t('nav.todayFocus')}     color="purple" desktopColor="purple" href="/bugun/ilgilen" />
+        <SquareButton icon={TrendingUp}             label={t('nav.pipeline')}        color="teal"   desktopColor="teal"   href="/pipeline"      />
+        <SquareButton icon={CalendarDays}           label={t('nav.takvim')}           color="pink"   desktopColor="pink"   href="/takvim"        />
+        <SquareButton icon={Users}                  label={t('nav.ekip')}            color="amber"  desktopColor="amber"  href="/ekip"          />
+        <SquareButton icon={BookOpen}               label={t('nav.egitim')}      color="teal"   desktopColor="cyan"   href="/egitim"        />
 
         {/* Alt Sıra */}
-        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="purple" href="/itirazlar"     />
-        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="amber"  href="/yazar"         />
-        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="pink"   href="/kazanimlar"    />
-        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" href="/uyum"          />
-        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   href="/istatistikler" />
+        <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="purple" desktopColor="pink"   href="/itirazlar"     />
+        <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="amber"  desktopColor="cyan"   href="/yazar"         />
+        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="pink"   desktopColor="yellow" href="/kazanimlar"    />
+        <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" desktopColor="purple" href="/uyum"          />
+        <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   desktopColor="teal"   href="/istatistikler" />
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
