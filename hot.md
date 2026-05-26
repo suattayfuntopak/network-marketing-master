@@ -2,6 +2,19 @@
 
 ## 2026-05-26 — Çoklu Kullanıcı Veri Güvenliği, Bağımsız Aday Boru Hattı & AI Günlük Limiti Altyapı Düzeltmeleri
 
+### feat: Gerçek Zamanlı (Realtime) Sesli ve Yazılı Bildirim Sistemi Entegre Edildi (Migration 011)
+
+- **Otomatik Downline Bildirim Motoru kuruldu:**
+  - Bir ortak (downline), liderin davet kodunu girerek sisteme katıldığı anda (`nmm_join_workspace` RPC) liderin (sponsorun) hesabına otomatik olarak **gerçek zamanlı in-app bildirim** gönderen PostgreSQL tetikleyici mekanizması kuruldu.
+  - Supabase veritabanında bildirimlerin dil desteğiyle (`title_tr`, `title_en`, `description_tr`, `description_en`) kalıcı olarak tutulmasını ve anlık yayınlanmasını sağlayan `nmm_notifications` tablosu oluşturuldu.
+- **Supabase Realtime Postgres Changes Entegrasyonu:**
+  - `src/hooks/useNotifications.ts`: Yeni bildirimleri dinleyen ve anında tetiklenen bir Supabase Realtime kanalı (`supabase.channel`) entegre edildi.
+  - Lider paneline yeni bir ortak katıldığı anda tarayıcıda **sesli uyarı (synthesized chiming sound)** çalması ve ekranın sağ üstünde **görsel/etkileşimli bir Toast bildirim** (`sonner` ile) belirmesi sağlandı.
+- **Kusursuz Geriye Dönük Uyumlu Panel Entegrasyonu:**
+  - `Header.tsx` ve `NotificationsModal.tsx` yeni `useNotifications` hook'una bağlanarak gerçek zamanlı veritabanı bildirimleri ile yerel tarayıcı bildirimlerini (takip hatırlatıcıları, güncellemeler) tek bir akışta birleştirdi.
+  - Okunmamış bildirim sayısı ve detay kartları, sayfa yenilenmesine gerek kalmadan **anlık ve pürüzsüzce** güncellenir.
+  - Supabase Dashboard üzerinde çalıştırılmak üzere `supabase/migrations/011_add_real_notifications.sql` göç dosyası hazırlandı.
+
 ### feat/fix: MLM Ekibim Sayfası Downline (Alt Ekip) Veri Gösterim RLS Güvenlik Yetkilendirmesi (Migration 010)
 
 - **Doğrudan Davet Edilen Distribütörlerin (Direct Downlines) Görünürlüğü Kökten Çözüldü:**

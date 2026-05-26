@@ -6,6 +6,7 @@ import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserP
 import { toast } from 'sonner'
 import { Z } from '@/lib/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useNotifications } from '@/hooks/useNotifications'
 
 interface NotificationsModalProps {
   onClose: () => void
@@ -129,20 +130,65 @@ export function playNotificationSound() {
   }
 }
 
+function formatTimeAgo(dateString: string, lang: string): string {
+  const now = new Date()
+  const date = new Date(dateString)
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+  const minutes = Math.floor(seconds / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+
+  if (seconds < 60) {
+    return lang === 'en' ? 'just now' : 'az önce'
+  } else if (minutes < 60) {
+    return lang === 'en' ? `${minutes}m ago` : `${minutes} dk önce`
+  } else if (hours < 24) {
+    return lang === 'en' ? `${hours}h ago` : `${hours} saat önce`
+  } else {
+    return lang === 'en' ? `${days}d ago` : `${days} gün önce`
+  }
+}
+
 export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
   const { lang } = useTranslation()
   const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
   const [soundAlerts, setSoundAlerts]   = useState(false)
-  const [notifications, setNotifications] = useState<NotificationItem[]>(DEFAULT_NOTIFICATIONS)
-  const [selected, setSelected] = useState<NotificationItem | null>(null)
+  const [localNotifs, setLocalNotifs]   = useState<any[]>([])
+  const [selected, setSelected]         = useState<any | null>(null)
 
-  // Bildirim sayısı değişince üst bileşeni bildir
+  const {
+    notifications: dbNotifications,
+    unreadCount: dbUnreadCount,
+    markAllRead: dbMarkAllRead,
+    markAsRead: dbMarkAsRead,
+    deleteNotification: dbDeleteNotification
+  } = useNotifications()
+
+  // Derive notifications from DB and Local Storage
+  const mappedDbNotifications = dbNotifications.map(n => ({
+    id: n.id,
+    title: lang === 'en' ? n.title_en : n.title_tr,
+    description: lang === 'en' ? n.description_en : n.description_tr,
+    time: formatTimeAgo(n.created_at, lang),
+    read: n.read,
+    icon: n.type as 'bell' | 'alert' | 'info' | 'user' | 'calendar',
+    isDb: true
+  }))
+
+  const notifications = [
+    ...mappedDbNotifications,
+    ...localNotifs.map(n => ({ ...n, isDb: false }))
+  ]
+
+  const unreadCount = dbUnreadCount + localNotifs.filter(n => !n.read).length
+
+  // Report local unread count changes to Header so total matches
   useEffect(() => {
-    const count = notifications.filter(n => !n.read).length
-    onUnreadCountChange?.(count)
-  }, [notifications, onUnreadCountChange])
+    const localCount = localNotifs.filter(n => !n.read).length
+    onUnreadCountChange?.(localCount)
+  }, [localNotifs, onUnreadCountChange])
 
   useEffect(() => {
     setMounted(true)
@@ -154,7 +200,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     if (soundPref !== null) setSoundAlerts(soundPref === 'true')
 
     // Restore persisted read/dismissed state
-    setNotifications(loadNotifications())
+    setLocalNotifs(loadNotifications())
 
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
@@ -202,28 +248,35 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     toast.success('Tercihleriniz güncellendi')
   }
 
-  function openNotification(n: NotificationItem) {
+  function openNotification(n: any) {
     setSelected(n)
-    setNotifications(prev => {
-      const updated = prev.map(x => x.id === n.id ? { ...x, read: true } : x)
-      persistRead(updated)
-      return updated
-    })
+    if (n.isDb) {
+      dbMarkAsRead(n.id)
+    } else {
+      setLocalNotifs(prev => {
+        const updated = prev.map(x => x.id === n.id ? { ...x, read: true } : x)
+        persistRead(updated)
+        return updated
+      })
+    }
 
     // Play chime sound if enabled
-    const soundEnabled = localStorage.getItem('nmm_notif_sound') === 'true'
+    const soundEnabled = localStorage.getItem('nmm_notif_sound') !== 'false'
     if (soundEnabled) {
       playNotificationSound()
     }
   }
 
   function markAllRead() {
-    persistDismissed(notifications.map(n => n.id))
-    setNotifications([])
-    toast.success('Tüm bildirimler temizlendi')
-  }
+    // Clear local storage notifications
+    persistDismissed(localNotifs.map(n => n.id))
+    setLocalNotifs([])
 
-  const unreadCount = notifications.filter(n => !n.read).length
+    // Mark database notifications as read
+    dbMarkAllRead()
+
+    toast.success(lang === 'en' ? 'All notifications marked as read' : 'Tüm bildirimler okundu yapıldı')
+  }
 
   if (!mounted) return null
 

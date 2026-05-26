@@ -10,6 +10,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
 import { NotificationsModal, loadNotifications } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
+import { useNotifications } from '@/hooks/useNotifications'
 
 export const TRFlag = () => (
   <svg viewBox="0 0 1200 800" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">
@@ -63,13 +64,16 @@ export function Header({ visible = true }: { visible?: boolean }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
+  const { unreadCount: dbUnreadCount } = useNotifications()
+  const [localUnread, setLocalUnread] = useState(0)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
 
   // Sayfa yüklendiğinde localStorage'dan okunmamış bildirim sayısını al
   useEffect(() => {
-    setUnreadCount(loadNotifications().filter(n => !n.read).length)
+    setLocalUnread(loadNotifications().filter(n => !n.read).length)
   }, [])
+
+  const unreadCount = dbUnreadCount + localUnread
 
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {
@@ -227,7 +231,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
       {notificationsOpen && (
         <NotificationsModal
           onClose={() => setNotificationsOpen(false)}
-          onUnreadCountChange={(count) => setUnreadCount(count)}
+          onUnreadCountChange={(count) => setLocalUnread(count)}
         />
       )}
 
