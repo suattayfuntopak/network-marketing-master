@@ -20,6 +20,7 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref } from '@/lib/waLink'
+import { parseNote } from '@/lib/noteParser'
 
 export interface MemberRow {
   user_id: string
@@ -97,7 +98,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
-      .select('id, owner_id, stage, full_name, phone, created_at')
+      .select('id, owner_id, stage, full_name, phone, created_at, note')
       .in('workspace_id', allWorkspaceIds),
     supabase
       .from('nmm_daily_actions')
@@ -201,6 +202,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     })
 
     if (!isMatched) {
+      const parsedNote = parseNote(c.note)
       nonAppMembers.push({
         user_id: c.id,
         full_name: c.full_name,
@@ -214,7 +216,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         last_activity_at: null,
         onboarding_steps: [],
         phone: c.phone || null,
-        isAppUser: false
+        isAppUser: false,
+        avatar_url: parsedNote.avatarUrl || null
       })
     }
   })
