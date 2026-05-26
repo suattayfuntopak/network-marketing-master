@@ -113,22 +113,25 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const candidates = candidatesRaw ?? []
   const actions = recentActions ?? []
   const onboarding = onboardingRaw ?? []
+  const membersAny = (members ?? []) as any[]
 
   // Create clean map of members to remove duplicates that could happen during migration
   const uniqueMembersMap: Record<string, any> = {}
   if (ownWs.owner_id) {
+    const leaderRow = membersAny.find(m => m.user_id === ownWs.owner_id)
     uniqueMembersMap[ownWs.owner_id] = {
       user_id: ownWs.owner_id,
-      full_name: members?.find(m => m.user_id === ownWs.owner_id)?.full_name ?? 'Lider',
+      full_name: leaderRow?.full_name ?? 'Lider',
       role: 'leader',
-      joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString(),
-      avatar_url: (members as any)?.find((m: any) => m.user_id === ownWs.owner_id)?.avatar_url ?? null
+      joined_at: leaderRow?.joined_at ?? new Date().toISOString(),
+      avatar_url: leaderRow?.avatar_url ?? null
     }
   }
-  members?.forEach(m => {
+  membersAny.forEach(m => {
     uniqueMembersMap[m.user_id] = m
   })
   const uniqueMembers = Object.values(uniqueMembersMap)
+
 
   const lastActionMap: Record<string, string> = {}
   uniqueMembers.forEach(m => {
