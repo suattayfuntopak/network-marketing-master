@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2 } from 'lucide-react'
+import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2, Target } from 'lucide-react'
 import { clsx } from 'clsx'
 
 const NAV_ITEMS = [
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen                 },
   { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion    },
   { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                      },
-  { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                   },
+  { href: '/saha-provasi',  translationKey: 'nav.sahaProvasi',   icon: Target                   },
   { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                   },
   { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
 ]

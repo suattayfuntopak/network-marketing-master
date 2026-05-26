@@ -15,7 +15,7 @@ const NAV_ROUTES = [
   '/egitim',
   '/itirazlar',
   '/yazar',
-  '/kazanimlar',
+  '/saha-provasi',
   '/uyum',
   '/istatistikler'
 ]

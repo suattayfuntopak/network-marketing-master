@@ -7,7 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, Shield, BarChart2 } from 'lucide-react'
+import { Zap, TrendingUp, Bot, Users, CalendarDays, Target, MessageCircleQuestion, BookOpen, Shield, BarChart2 } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -134,7 +134,7 @@ export function PanoContent() {
         {/* Alt Sıra */}
         <SquareButton icon={MessageCircleQuestion}  label={t('nav.itirazlar')} color="purple" desktopColor="pink"   href="/itirazlar"     />
         <SquareButton icon={Bot}                    label={t('nav.yazar')}    color="amber"  desktopColor="cyan"   href="/yazar"         />
-        <SquareButton icon={Trophy}                 label={t('nav.kazanimlar')}        color="pink"   desktopColor="yellow" href="/kazanimlar"    />
+        <SquareButton icon={Target}                 label={t('nav.sahaProvasi')}        color="pink"   desktopColor="yellow" href="/saha-provasi"    />
         <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" desktopColor="purple" href="/uyum"          />
         <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   desktopColor="teal"   href="/istatistikler" />
       </div>

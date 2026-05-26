@@ -5,7 +5,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useEffect, useRef } from 'react'
 import { 
   LayoutDashboard, Zap, TrendingUp, Bot, Users, 
-  CalendarDays, MessageCircleQuestion, BookOpen, Trophy, Shield, BarChart2 
+  CalendarDays, MessageCircleQuestion, BookOpen, Target, Shield, BarChart2 
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
@@ -19,7 +19,7 @@ const NAV_ITEMS = [
   { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen               },
   { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion  },
   { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                    },
-  { href: '/kazanimlar',    translationKey: 'nav.kazanimlar',    icon: Trophy                 },
+  { href: '/saha-provasi',  translationKey: 'nav.sahaProvasi',   icon: Target                 },
   { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                 },
   { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
 ]
@@ -80,8 +80,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
           label = lang === 'en' ? 'Objections' : 'İtirazlar'
         } else if (translationKey === 'nav.egitim') {
           label = lang === 'en' ? 'Training' : 'Vaktin Varsa'
-        } else if (translationKey === 'nav.kazanimlar') {
-          label = lang === 'en' ? 'Awards' : 'Kazanımlar'
+        } else if (translationKey === 'nav.sahaProvasi') {
+          label = lang === 'en' ? 'Rehearsal' : 'Saha Provası'
         } else if (translationKey === 'nav.uyum') {
           label = lang === 'en' ? 'Compliance' : 'Uyum Merkezi'
         } else if (translationKey === 'nav.istatistikler') {

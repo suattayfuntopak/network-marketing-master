@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-26 — Seçenek A (Birleşik Ekip Merkezi) & Saha Provası Sayfası Entegrasyonu
+
+### feat: Seçenek A (Birleşik Ekip Merkezi) & Saha Provası Standalone Sayfası Entegrasyonu
+
+- **Birleşik Ekip Merkezi (Unified Team Center) Arayüz İyileştirmeleri:**
+  - **Premium Rozetler:** Ekip listesinde (`EkipPanel.tsx`) yer alan üyelere statülerine göre şık, mor renk şemalı **`💎 NMM ORTAĞI`** (TR) / **`💎 NMM PARTNER`** (EN) ve yumuşak gri renk şemalı **`🤝 SAHA ORTAĞI`** (TR) / **`🤝 FIELD PARTNER`** (EN) rozetleri entegre edildi.
+  - **Saha Distribütörleri Avatar & Rol Tasarımı:** Uygulamaya henüz kaydolmamış ama sahada kazanılmış olan saha ortaklarının avatarları soft gri renge çekildi ve rol etiketleri "Saha Distribütörü" olarak güncellendi.
+  - **Davet Akışları & WhatsApp Davet Butonu:** Saha ortaklarının kartlarının detay açma chevronları gizlendi. Bunun yerine sağ taraflarına doğrudan sponsor davet kodunu ve `/kayit` linkini içeren WhatsApp davet şablonunu hazırlayan yeşil **`NMM'e Davet Et 🚀`** butonu eklendi.
+- **Saha Provası (Field Rehearsal) Modülü Taşınması:**
+  - **Kazanımlar Sayfası Silindi:** `/kazanimlar` rotası ve ilgili tüm kodları sistemden tamamen kaldırıldı.
+  - **Yeni Standalone Saha Provası Sayfası (`/saha-provasi`):** Yapay Zeka Koçu (`/yazar`) altındaki 3. sekme olan "Saha Provası" sökülerek tamamen kendine ait, bağımsız bir sayfa olarak `/saha-provasi` altına taşındı.
+  - **Yapay Zeka Koçu:** Sadece "YZ Mesajı Üret" ve "Koçluk Al" olmak üzere sadeleşmiş 2 sekmeli yapısına kavuşturuldu.
+  - **Panolar & Global Navigasyon:** Pano üzerindeki 10. kutu (Kazanımlar kutusu) Saha Provası olarak güncellendi, sol sidebar ve mobil alt navigasyondaki kupa ikonlu Kazanımlar butonu hedef ikonlu Saha Provası butonuyla değiştirildi.
+
 ## 2026-05-26 — Kazanımlar Sayfası "Ekibimde" İş Ortağı Rozeti Entegrasyonu
 
 ### feat: Kazanımlar Sayfası "Ekibimde" İş Ortağı Rozeti Entegrasyonu

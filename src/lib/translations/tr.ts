@@ -68,6 +68,7 @@ export const tr = {
     itirazlar: "İtirazlara Cevaplar",
     egitim: "Vaktin Varsa",
     kazanimlar: "Kazanımlar",
+    sahaProvasi: "Saha Provası",
     collapse: "Daralt",
     expand: "Genişlet",
     todayFocus: "Bugün İlgilen",

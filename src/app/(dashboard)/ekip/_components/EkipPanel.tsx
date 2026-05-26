@@ -34,6 +34,7 @@ export interface MemberRow {
   last_activity_at: string | null
   onboarding_steps?: string[]
   phone?: string | null
+  isAppUser?: boolean
 }
 
 export interface OnboardingStep {
@@ -95,7 +96,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
-      .select('id, owner_id, stage, full_name, phone')
+      .select('id, owner_id, stage, full_name, phone, created_at')
       .in('workspace_id', allWorkspaceIds),
     supabase
       .from('nmm_daily_actions')
@@ -140,44 +141,91 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     }
   })
 
-  return uniqueMembers
-    .map(m => {
-      const mc = candidates.filter(c => c.owner_id === m.user_id)
-      const completedSteps = onboarding
-        .filter((o: any) => o.user_id === m.user_id)
-        .map((o: any) => o.step_id)
+  const cleanStr = (s: string | null | undefined) => (s ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '')
 
-      // Try to find a phone number for this member in the leader's candidates list where full_name matches robustly
-      const cleanStr = (s: string | null | undefined) => (s ?? '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]/g, '')
+  // 1. Map registered NMM App users
+  const registeredMemberRows = uniqueMembers.map(m => {
+    const mc = candidates.filter(c => c.owner_id === m.user_id)
+    const completedSteps = onboarding
+      .filter((o: any) => o.user_id === m.user_id)
+      .map((o: any) => o.step_id)
 
-      const candidateMatch = candidates.find(c => {
-        if (c.owner_id !== ownWs.owner_id) return false
-        const cf = cleanStr(c.full_name)
-        const mf = cleanStr(m.full_name)
-        return cf && mf && (cf.includes(mf) || mf.includes(cf))
-      })
-      const phone = candidateMatch?.phone ?? null
-
-      return {
-        user_id: m.user_id,
-        full_name: m.full_name,
-        role: (m.user_id === ownWs.owner_id ? 'leader' : 'member') as 'leader' | 'member',
-        joined_at: m.joined_at ?? null,
-        candidate_count: mc.length,
-        yeni_count:    mc.filter(c => c.stage === 'yeni').length,
-        sunum_count:   mc.filter(c => c.stage === 'sunum').length,
-        takip_count:   mc.filter(c => c.stage === 'takip').length,
-        katildi_count: mc.filter(c => c.stage === 'katildi').length,
-        last_activity_at: lastActionMap[m.user_id] ?? null,
-        onboarding_steps: completedSteps,
-        phone: phone,
-      }
+    const candidateMatch = candidates.find(c => {
+      if (c.owner_id !== ownWs.owner_id) return false
+      const cf = cleanStr(c.full_name)
+      const mf = cleanStr(m.full_name)
+      return cf && mf && (cf.includes(mf) || mf.includes(cf))
     })
-    .sort((a, b) => b.candidate_count - a.candidate_count)
+    const phone = candidateMatch?.phone ?? null
+
+    return {
+      user_id: m.user_id,
+      full_name: m.full_name,
+      role: (m.user_id === ownWs.owner_id ? 'leader' : 'member') as 'leader' | 'member',
+      joined_at: m.joined_at ?? null,
+      candidate_count: mc.length,
+      yeni_count:    mc.filter(c => c.stage === 'yeni').length,
+      sunum_count:   mc.filter(c => c.stage === 'sunum').length,
+      takip_count:   mc.filter(c => c.stage === 'takip').length,
+      katildi_count: mc.filter(c => c.stage === 'katildi').length,
+      last_activity_at: lastActionMap[m.user_id] ?? null,
+      onboarding_steps: completedSteps,
+      phone: phone,
+      isAppUser: true
+    }
+  })
+
+  // 2. Find all candidates of the leader where stage is 'katildi' ( MLM joined )
+  const leaderWonCandidates = candidates.filter(c =>
+    c.owner_id === ownWs.owner_id &&
+    c.stage === 'katildi'
+  )
+
+  // 3. For each won candidate, if not matched with an active NMM member, add as Saha Distribütörü
+  const nonAppMembers: MemberRow[] = []
+  leaderWonCandidates.forEach(c => {
+    const isMatched = registeredMemberRows.some(m => {
+      const mf = cleanStr(m.full_name)
+      const cf = cleanStr(c.full_name)
+      return mf && cf && (mf.includes(cf) || cf.includes(mf))
+    })
+
+    if (!isMatched) {
+      nonAppMembers.push({
+        user_id: c.id,
+        full_name: c.full_name,
+        role: 'member',
+        joined_at: c.created_at || null,
+        candidate_count: 0,
+        yeni_count: 0,
+        sunum_count: 0,
+        takip_count: 0,
+        katildi_count: 0,
+        last_activity_at: null,
+        onboarding_steps: [],
+        phone: c.phone || null,
+        isAppUser: false
+      })
+    }
+  })
+
+  // 4. Combine and sort
+  const combined = [...registeredMemberRows, ...nonAppMembers]
+
+  return combined.sort((a, b) => {
+    if (a.role === 'leader') return -1
+    if (b.role === 'leader') return 1
+    
+    // NMM App Users come before Field Partners
+    if (a.isAppUser && !b.isAppUser) return -1
+    if (!a.isAppUser && b.isAppUser) return 1
+    
+    return b.candidate_count - a.candidate_count
+  })
 }
 
 export function EkipPanel() {
@@ -203,6 +251,21 @@ export function EkipPanel() {
     stepId: string
     phone?: string | null
   } | null>(null)
+
+  const handleInviteMember = (member: MemberRow) => {
+    const code = ws?.inviteCode || ''
+    const link = `https://nmmaster.com/kayit`
+    const message = lang === 'en'
+      ? `Hello ${member.full_name}, I registered you in my Network Marketing Master system! 🚀\n\nDownload/register here: ${link}\nUse my Sponsor Invite Code: *${code}*\n\nThis will allow us to track your list, correct start steps, and build your business together using AI! Let's get started!`
+      : `Merhaba ${member.full_name}, seni Network Marketing Master sistemime iş ortağım olarak ekledim! 🚀\n\nBuradan kayıt olabilirsin: ${link}\nSponsor Davet Kodun: *${code}*\n\nBu sayede isim listeni, doğru başlangıç adımlarını ve aday takibini yapay zeka desteğiyle ortaklaşa yönetebileceğiz. Aramıza hoş geldin!`
+    
+    const href = waHref(member.phone, message)
+    if (href) {
+      window.open(href, '_blank')
+    } else {
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+    }
+  }
 
   const toggleOnboardingStep = useCallback(async (userId: string, stepId: string, isStepDone: boolean) => {
     try {
@@ -466,7 +529,7 @@ export function EkipPanel() {
                 }`}
               >
                 {/* Kart Sağ Üst Buton Grubu - Sleek, Absolute Positioned */}
-                {!isCurrentUser && (
+                {!isCurrentUser && m.isAppUser !== false && (
                   <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
                     {/* Chevron Açma/Kapama Butonu */}
                     <button
@@ -509,19 +572,31 @@ export function EkipPanel() {
                     <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black ${
                       isInactive
                         ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
+                        : m.isAppUser === false
+                        ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400'
                         : 'bg-[#EEEDFE] text-brand'
                     }`}>
                       {(m.full_name ?? '?').charAt(0).toUpperCase()}
                     </div>
                     
                     <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
+                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pr-16 sm:pr-0">
                         <p className="text-lg font-black text-[var(--text-1)] break-words leading-tight">
                           {m.full_name ?? 'İsimsiz Üye'}
                           {isCurrentUser && <span className="ml-2 text-sm font-normal text-[var(--text-3)]">({t('common.you')})</span>}
                         </p>
-                        {m.role === 'leader' && (
+                        {m.role === 'leader' ? (
                           <Crown className="h-5 w-5 shrink-0 text-[#854F0B]" strokeWidth={2.5} />
+                        ) : m.isAppUser !== false ? (
+                          <span className="shrink-0 rounded-full bg-purple-100 dark:bg-purple-950/40 border border-purple-200/30 dark:border-purple-900/20 px-2.5 py-0.5 text-[10px] font-black text-purple-700 dark:text-purple-400 flex items-center gap-1 shadow-sm leading-none">
+                            <span>💎</span>
+                            <span>{lang === 'en' ? 'NMM PARTNER' : 'NMM ORTAĞI'}</span>
+                          </span>
+                        ) : (
+                          <span className="shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/30 dark:border-zinc-700/20 px-2.5 py-0.5 text-[10px] font-black text-zinc-600 dark:text-zinc-400 flex items-center gap-1 shadow-sm leading-none">
+                            <span>🤝</span>
+                            <span>{lang === 'en' ? 'FIELD PARTNER' : 'SAHA ORTAĞI'}</span>
+                          </span>
                         )}
                         {isInactive && (
                           <button
@@ -536,7 +611,11 @@ export function EkipPanel() {
                       </div>
                       
                       <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
-                        <span className="font-extrabold text-[var(--text-1)]">{m.role === 'leader' ? t('common.leader') : t('common.member')}</span>
+                        <span className="font-extrabold text-[var(--text-1)]">
+                          {m.isAppUser === false
+                            ? (lang === 'en' ? 'Field Distributor' : 'Saha Distribütörü')
+                            : (m.role === 'leader' ? t('common.leader') : t('common.member'))}
+                        </span>
                         {m.joined_at && (
                           <span className="text-xs text-[var(--text-3)]/90">
                             · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
@@ -551,17 +630,31 @@ export function EkipPanel() {
                     </div>
                   </div>
 
-                  {/* Sağ Taraf: Toplam Aday Göstergesi */}
+                  {/* Sağ Taraf: Toplam Aday Göstergesi veya NMM'e Davet Et Butonu */}
                   <div className="flex items-center justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0 sm:pr-24 w-full sm:w-auto">
-                    <div className="text-right">
-                      <p className="text-3xl font-black text-accent-blue tabular-nums leading-none">{m.candidate_count}</p>
-                      <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider mt-1">{t('team.totalCandidates')}</p>
-                    </div>
+                    {m.isAppUser === false ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleInviteMember(m)
+                        }}
+                        className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-4 py-2.5 text-sm font-black shadow-md cursor-pointer shrink-0"
+                      >
+                        <WhatsAppIcon className="h-4.5 w-4.5 fill-current text-white" />
+                        <span>{lang === 'en' ? "Invite to NMM 🚀" : "NMM'e Davet Et 🚀"}</span>
+                      </button>
+                    ) : (
+                      <div className="text-right">
+                        <p className="text-3xl font-black text-accent-blue tabular-nums leading-none">{m.candidate_count}</p>
+                        <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider mt-1">{t('team.totalCandidates')}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 {/* Kart Alt Bölümü: Huni Dağılımı ve Onboarding (Collapsible) */}
-                {isCardExpanded && (
+                {isCardExpanded && m.isAppUser !== false && (
                   <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
                     
                     {/* Aday Hunisi Dağılım Kutusu (Sıfır Bile Olsa Her Zaman Görünür!) */}

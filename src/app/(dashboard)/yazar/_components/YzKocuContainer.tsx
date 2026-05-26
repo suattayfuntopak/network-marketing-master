@@ -14,13 +14,13 @@ interface YzKocuContainerProps {
 }
 
 export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzKocuContainerProps) {
-  const [activeTab, setActiveTab] = useState<'yazar' | 'kocluk' | 'prova'>('yazar')
+  const [activeTab, setActiveTab] = useState<'yazar' | 'kocluk'>('yazar')
   const { lang } = useTranslation()
 
   return (
     <div className="space-y-6">
       {/* Premium Segmented Tab Selector */}
-      <div className="flex rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm max-w-lg mx-auto w-full">
+      <div className="flex rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm max-w-md mx-auto w-full">
         <button
           onClick={() => setActiveTab('yazar')}
           className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-3 text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
@@ -43,17 +43,6 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
           <HelpCircle className="h-3.5 w-3.5 shrink-0" />
           <span>{lang === 'en' ? 'Get Coaching' : 'Koçluk Al'}</span>
         </button>
-        <button
-          onClick={() => setActiveTab('prova')}
-          className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-3 text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
-            activeTab === 'prova'
-              ? 'bg-[#D97706] text-white shadow-md'
-              : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-          }`}
-        >
-          <Target className="h-3.5 w-3.5 shrink-0" />
-          <span>{lang === 'en' ? 'Rehearsal' : 'Saha Provası'}</span>
-        </button>
       </div>
 
       {/* Render Active Component */}
@@ -63,9 +52,6 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
         )}
         {activeTab === 'kocluk' && (
           <KoclukForm />
-        )}
-        {activeTab === 'prova' && (
-          <ProvaForm />
         )}
       </div>
     </div>

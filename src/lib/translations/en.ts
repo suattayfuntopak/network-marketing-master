@@ -68,6 +68,7 @@ export const en = {
     itirazlar: "Objection Handling",
     egitim: "If You Have Time",
     kazanimlar: "Achievements",
+    sahaProvasi: "Field Rehearsal",
     collapse: "Collapse",
     expand: "Expand",
     todayFocus: "Today's Focus",
