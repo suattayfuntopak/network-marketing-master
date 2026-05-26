@@ -8,6 +8,7 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 export function KoclukForm() {
   const { lang } = useTranslation()
@@ -176,27 +177,33 @@ export function KoclukForm() {
                 {lang === 'en' ? 'AI Coach Answer' : 'Yapay Zeka Koçunun Yanıtı'}
               </span>
             </div>
-            <button
-              onClick={handleCopy}
-              className={clsx(
-                "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all border",
-                copied
-                  ? "bg-[#E1F5EE] text-[#0F6E56] border-[#E1F5EE] dark:bg-[#0d3d2e]/30 dark:text-[#4ade80] dark:border-[#0d3d2e]/40"
-                  : "bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3] border-[var(--border)] dark:hover:bg-[#1e1b4b] dark:hover:text-[#a5b4fc]"
-              )}
-            >
-              {copied ? (
-                <>
-                  <Check className="h-3.5 w-3.5" />
-                  <span>{lang === 'en' ? 'Copied' : 'Kopyalandı'}</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5" />
-                  <span>{lang === 'en' ? 'Copy' : 'Kopyala'}</span>
-                </>
-              )}
-            </button>
+            <div className="flex items-center gap-1.5">
+              {/* Copy Button */}
+              <button
+                type="button"
+                onClick={handleCopy}
+                title={copied ? (lang === 'en' ? 'Copied' : 'Kopyalandı') : (lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala')}
+                className={clsx(
+                  "flex h-8 w-8 items-center justify-center rounded-lg transition-all border cursor-pointer",
+                  copied
+                    ? "bg-[#E1F5EE] text-[#0F6E56] border-[#E1F5EE] dark:bg-[#0d3d2e]/30 dark:text-[#4ade80] dark:border-[#0d3d2e]/40"
+                    : "bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3] border-[var(--border)] dark:hover:bg-[#1e1b4b] dark:hover:text-[#a5b4fc]"
+                )}
+              >
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              </button>
+
+              {/* WhatsApp Share Button */}
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(displayedAnswer)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={lang === 'en' ? 'Share on WhatsApp' : 'WhatsApp ile Paylaş'}
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[#25D366] hover:bg-[#E8F8EF] dark:hover:bg-[#0d3d2e]/20 transition-all cursor-pointer"
+              >
+                <WhatsAppIcon className="h-4.5 w-4.5" />
+              </a>
+            </div>
           </div>
           <div className="relative text-sm text-[var(--text-2)] leading-relaxed whitespace-pre-line border-t border-[var(--border)] pt-4">
             {translating ? (

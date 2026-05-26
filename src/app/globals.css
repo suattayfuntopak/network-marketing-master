@@ -35,15 +35,15 @@
   --color-whatsapp: #25D366;
   --color-accent-blue: #4169E1;
 
-  /* Scale all font sizes up by 1px globally for testing readability */
-  --font-size-xs: 0.8125rem;    /* 12px -> 13px */
-  --font-size-sm: 0.9375rem;    /* 14px -> 15px */
-  --font-size-base: 1.0625rem;  /* 16px -> 17px */
-  --font-size-lg: 1.1875rem;    /* 18px -> 19px */
-  --font-size-xl: 1.3125rem;    /* 20px -> 21px */
-  --font-size-2xl: 1.5625rem;   /* 24px -> 25px */
-  --font-size-3xl: 1.9375rem;   /* 30px -> 31px */
-  --font-size-4xl: 2.3125rem;   /* 36px -> 37px */
+  /* Scale all font sizes up by another 1px globally for improved readability */
+  --font-size-xs: 0.875rem;     /* 13px -> 14px */
+  --font-size-sm: 1.0rem;       /* 15px -> 16px */
+  --font-size-base: 1.125rem;   /* 17px -> 18px */
+  --font-size-lg: 1.25rem;      /* 19px -> 20px */
+  --font-size-xl: 1.375rem;     /* 21px -> 22px */
+  --font-size-2xl: 1.625rem;    /* 25px -> 26px */
+  --font-size-3xl: 2.0rem;      /* 31px -> 32px */
+  --font-size-4xl: 2.375rem;    /* 37px -> 38px */
 }
 
 html, body {
