@@ -35,6 +35,7 @@ export interface MemberRow {
   onboarding_steps?: string[]
   phone?: string | null
   isAppUser?: boolean
+  avatar_url?: string | null
 }
 
 export interface OnboardingStep {
@@ -92,7 +93,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   ] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
-      .select('user_id, full_name, role, joined_at')
+      .select('user_id, full_name, role, joined_at, avatar_url')
       .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
@@ -120,7 +121,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       user_id: ownWs.owner_id,
       full_name: members?.find(m => m.user_id === ownWs.owner_id)?.full_name ?? 'Lider',
       role: 'leader',
-      joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString()
+      joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString(),
+      avatar_url: members?.find(m => m.user_id === ownWs.owner_id)?.avatar_url ?? null
     }
   }
   members?.forEach(m => {
@@ -175,7 +177,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       last_activity_at: lastActionMap[m.user_id] ?? null,
       onboarding_steps: completedSteps,
       phone: phone,
-      isAppUser: true
+      isAppUser: true,
+      avatar_url: (m as any).avatar_url ?? null
     }
   })
 
@@ -569,14 +572,36 @@ export function EkipPanel() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Sol Taraf: Avatar ve İsim Detayları */}
                   <div className="flex min-w-0 flex-1 items-center gap-4">
-                    <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black ${
-                      isInactive
+                    <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black overflow-hidden ${
+                      m.avatar_url
+                        ? ''
+                        : isInactive
                         ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
                         : m.isAppUser === false
                         ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400'
                         : 'bg-[#EEEDFE] text-brand'
                     }`}>
-                      {(m.full_name ?? '?').charAt(0).toUpperCase()}
+                      {m.avatar_url ? (
+                        <img
+                          src={m.avatar_url}
+                          alt={m.full_name ?? ''}
+                          className="h-full w-full object-cover"
+                          onError={(e) => {
+                            // Resim yüklenemezse baş harfe fallback
+                            const target = e.target as HTMLImageElement
+                            target.style.display = 'none'
+                            const parent = target.parentElement
+                            if (parent) {
+                              parent.classList.add(m.isAppUser === false ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400' : 'bg-[#EEEDFE] text-brand')
+                              const span = document.createElement('span')
+                              span.textContent = (m.full_name ?? '?').charAt(0).toUpperCase()
+                              parent.appendChild(span)
+                            }
+                          }}
+                        />
+                      ) : (
+                        (m.full_name ?? '?').charAt(0).toUpperCase()
+                      )}
                     </div>
                     
                     <div className="min-w-0 flex-1 space-y-1">

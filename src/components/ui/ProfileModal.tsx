@@ -107,9 +107,16 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       })
       if (metaError) throw metaError
 
+      // Also update nmm_workspace_members so EkipPanel syncs immediately
+      await supabase
+        .from('nmm_workspace_members')
+        .update({ avatar_url: publicUrl } as any)
+        .eq('user_id', userId)
+
       setAvatarUrl(publicUrl)
       setAvatarPreview(publicUrl)
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      queryClient.invalidateQueries({ queryKey: ['members'] })
       toast.success('Profil fotoğrafı güncellendi!')
     } catch (err: any) {
       console.error(err)
