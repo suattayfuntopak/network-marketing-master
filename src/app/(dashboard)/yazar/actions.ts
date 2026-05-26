@@ -319,3 +319,46 @@ Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türk�
     return { error: 'Yanıt oluşturulurken bir hata oluştu.' }
   }
 }
+
+export async function translateTextAction(text: string, targetLang: 'tr' | 'en'): Promise<{ translatedText?: string; error?: string }> {
+  if (!text) return {}
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Oturum gerekli.' }
+
+  const systemPrompt = `Sen profesyonel bir çevirmensin. Görevin, verilen metni anlamını ve tonunu koruyarak ${
+    targetLang === 'en' ? 'İngilizceye' : 'Türkçeye'
+  } çevirmektir.
+Herhangi bir açıklama, giriş veya sonuç ekleme. Sadece çeviriyi döndür.`;
+
+  try {
+    const response = await anthropicClient.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1200,
+      system: [
+        {
+          type: 'text',
+          text: systemPrompt,
+        }
+      ],
+      messages: [
+        {
+          role: 'user',
+          content: text,
+        }
+      ]
+    })
+
+    const translatedText = response.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('')
+      .trim()
+
+    return { translatedText }
+  } catch (err) {
+    console.error('Translation error:', err)
+    return { error: 'Çeviri başarısız oldu.' }
+  }
+}

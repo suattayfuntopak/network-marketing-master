@@ -3,7 +3,7 @@
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
 import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
 import { clsx } from 'clsx'
-import { generateMessageAction } from '../actions'
+import { generateMessageAction, translateTextAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -13,6 +13,7 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { parseNote } from '@/lib/noteParser'
 
@@ -94,6 +95,7 @@ interface Props {
 }
 
 export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 'ilik' }: Props) {
+  const { lang } = useTranslation()
   const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : ''
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
@@ -110,6 +112,12 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   })
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
+
+  // Real-time automatic translation state
+  const [displayedMessage, setDisplayedMessage] = useState('')
+  const [generatedLang, setGeneratedLang] = useState<'tr' | 'en'>(lang)
+  const [translating, setTranslating] = useState(false)
+
   const { data: usage } = useAIUsage()
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
@@ -215,6 +223,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   useEffect(() => {
     if (state.message && state.message !== prevMessageRef.current) {
       prevMessageRef.current = state.message
+      setDisplayedMessage(state.message)
+      setGeneratedLang(lang)
       qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
       const entry: HistoryEntry = {
         message: state.message,
@@ -225,7 +235,33 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       saveToHistory(entry)
       setHistory(loadHistory())
     }
-  }, [state.message, selected, query, messageType, qc])
+  }, [state.message, selected, query, messageType, qc, lang])
+
+  // Handle global language toggle auto-translation
+  useEffect(() => {
+    if (displayedMessage && lang !== generatedLang) {
+      let active = true
+      setTranslating(true)
+      
+      translateTextAction(displayedMessage, lang)
+        .then(res => {
+          if (active && res.translatedText) {
+            setDisplayedMessage(res.translatedText)
+            setGeneratedLang(lang)
+          }
+        })
+        .catch(err => {
+          console.error('Auto-translation failed:', err)
+        })
+        .finally(() => {
+          if (active) setTranslating(false)
+        })
+
+      return () => {
+        active = false
+      }
+    }
+  }, [lang, displayedMessage, generatedLang])
 
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
@@ -246,8 +282,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   }
 
   function handleCopy() {
-    if (state.message) {
-      navigator.clipboard.writeText(state.message)
+    if (displayedMessage) {
+      navigator.clipboard.writeText(displayedMessage)
       toast.success('Mesaj kopyalandı!')
     }
   }
@@ -257,7 +293,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     toast.success('Mesaj kopyalandı!')
   }
 
-  const waLink = waHref(selected?.phone, state.message)
+  const waLink = waHref(selected?.phone, displayedMessage)
 
   return (
     <div className="space-y-5">
@@ -420,7 +456,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         )}
       </form>
 
-      {state.message && (
+      {displayedMessage && (
         <div className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-[#0F6E56]">Oluşturulan Mesaj</p>
@@ -443,7 +479,18 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               )}
             </div>
           </div>
-          <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)]">{state.message}</p>
+          <div className="relative whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)]">
+            {translating ? (
+              <div className="flex flex-col items-center justify-center py-6 gap-2">
+                <Loader2 className="h-5 w-5 animate-spin text-[#0F6E56]" />
+                <span className="text-xs font-semibold text-[#0F6E56]/70 animate-pulse">
+                  {lang === 'en' ? 'Translating message...' : 'Mesaj çevriliyor...'}
+                </span>
+              </div>
+            ) : (
+              displayedMessage
+            )}
+          </div>
         </div>
       )}
 

@@ -3,7 +3,7 @@
 import { useActionState, useState, useRef, useEffect } from 'react'
 import { Copy, Loader2, Bot, HelpCircle, Check, Send } from 'lucide-react'
 import { clsx } from 'clsx'
-import { askCoachAction } from '../actions'
+import { askCoachAction, translateTextAction } from '../actions'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -14,6 +14,11 @@ export function KoclukForm() {
   const [state, action, isPending] = useActionState(askCoachAction, {})
   const [question, setQuestion] = useState('')
   const [copied, setCopied] = useState(false)
+
+  // Real-time automatic translation state
+  const [displayedAnswer, setDisplayedAnswer] = useState('')
+  const [generatedLang, setGeneratedLang] = useState<'tr' | 'en'>(lang)
+  const [translating, setTranslating] = useState(false)
   
   const { data: usage } = useAIUsage()
   const qc = useQueryClient()
@@ -32,19 +37,53 @@ export function KoclukForm() {
     }
   }, [state.answer, qc])
 
-  function handleCopy() {
+  // Sync displayed answer when new response is generated
+  useEffect(() => {
     if (state.answer) {
-      navigator.clipboard.writeText(state.answer)
+      setDisplayedAnswer(state.answer)
+      setGeneratedLang(lang)
+    }
+  }, [state.answer])
+
+  // Handle global language toggle auto-translation
+  useEffect(() => {
+    if (displayedAnswer && lang !== generatedLang) {
+      let active = true
+      setTranslating(true)
+      
+      translateTextAction(displayedAnswer, lang)
+        .then(res => {
+          if (active && res.translatedText) {
+            setDisplayedAnswer(res.translatedText)
+            setGeneratedLang(lang)
+          }
+        })
+        .catch(err => {
+          console.error('Auto-translation failed:', err)
+        })
+        .finally(() => {
+          if (active) setTranslating(false)
+        })
+
+      return () => {
+        active = false
+      }
+    }
+  }, [lang, displayedAnswer, generatedLang])
+
+  function handleCopy() {
+    if (displayedAnswer) {
+      navigator.clipboard.writeText(displayedAnswer)
       setCopied(true)
       toast.success(lang === 'en' ? 'Answer copied!' : 'Cevap kopyalandı!')
-      setTimeout(() => setCopied(null as any), 2000)
+      setTimeout(() => setCopied(false), 2000)
     }
   }
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 w-full animate-in fade-in duration-300">
       {/* Limit & Bilgilendirme Kartı */}
-      <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[#EEF2FF]/60 dark:bg-[#1e1b4b]/40 p-4 flex items-center justify-between gap-3 animate-in fade-in duration-300">
+      <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[#EEF2FF]/60 dark:bg-[#1e1b4b]/40 p-4 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E0E7FF] dark:bg-[#2e2a75]">
             <HelpCircle className="h-4 w-4 text-[#3730A3] dark:text-[#c7d2fe]" />
@@ -126,7 +165,7 @@ export function KoclukForm() {
       </form>
 
       {/* AI Answer Display */}
-      {state.answer && (
+      {displayedAnswer && (
         <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[var(--bg-card)] p-5 shadow-lg animate-in slide-in-from-bottom-3 duration-300">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -159,8 +198,17 @@ export function KoclukForm() {
               )}
             </button>
           </div>
-          <div className="text-sm text-[var(--text-2)] leading-relaxed whitespace-pre-line border-t border-[var(--border)] pt-4">
-            {state.answer}
+          <div className="relative text-sm text-[var(--text-2)] leading-relaxed whitespace-pre-line border-t border-[var(--border)] pt-4">
+            {translating ? (
+              <div className="flex flex-col items-center justify-center py-8 gap-2">
+                <Loader2 className="h-6 w-6 animate-spin text-[#3730A3]" />
+                <span className="text-xs font-semibold text-[var(--text-3)] animate-pulse">
+                  {lang === 'en' ? 'Translating answer...' : 'Cevap çevriliyor...'}
+                </span>
+              </div>
+            ) : (
+              displayedAnswer
+            )}
           </div>
         </div>
       )}
