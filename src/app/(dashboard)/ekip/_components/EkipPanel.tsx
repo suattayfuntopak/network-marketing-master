@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
-  TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket
+  TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -16,6 +16,9 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { SpoilerCode } from './SpoilerCode'
 import { BroadcastPanel } from './BroadcastPanel'
 import { YZEkipKocuSheet } from './YZEkipKocuSheet'
+import { useAIUsage } from '@/hooks/useAIUsage'
+import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { generateOnboardingGuidanceAction } from '../actions'
 
 export interface MemberRow {
   user_id: string
@@ -28,6 +31,7 @@ export interface MemberRow {
   takip_count: number
   katildi_count: number
   last_activity_at: string | null
+  onboarding_steps?: string[]
 }
 
 export interface OnboardingStep {
@@ -77,7 +81,12 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
   const allUserIds = [ownWs.owner_id, ...downlineUserIds].filter(Boolean) as string[]
 
-  const [{ data: members, error }, { data: candidatesRaw }, { data: recentActions }] = await Promise.all([
+  const [
+    { data: members, error },
+    { data: candidatesRaw },
+    { data: recentActions },
+    { data: onboardingRaw }
+  ] = await Promise.all([
     supabase
       .from('nmm_workspace_members')
       .select('user_id, full_name, role, joined_at')
@@ -91,13 +100,26 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .select('user_id, created_at')
       .in('workspace_id', allWorkspaceIds)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+    supabase
+      .from('nmm_onboarding_progress' as any)
+      .select('user_id, step_id')
+      .in('user_id', allUserIds)
   ])
   if (error) throw error
   const candidates = candidatesRaw ?? []
   const actions = recentActions ?? []
+  const onboarding = onboardingRaw ?? []
 
   // Create clean map of members to remove duplicates that could happen during migration
   const uniqueMembersMap: Record<string, typeof members[0]> = {}
+  if (ownWs.owner_id) {
+    uniqueMembersMap[ownWs.owner_id] = {
+      user_id: ownWs.owner_id,
+      full_name: members?.find(m => m.user_id === ownWs.owner_id)?.full_name ?? 'Lider',
+      role: 'leader',
+      joined_at: members?.find(m => m.user_id === ownWs.owner_id)?.joined_at ?? new Date().toISOString()
+    }
+  }
   members?.forEach(m => {
     uniqueMembersMap[m.user_id] = m
   })
@@ -119,6 +141,10 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   return uniqueMembers
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
+      const completedSteps = onboarding
+        .filter((o: any) => o.user_id === m.user_id)
+        .map((o: any) => o.step_id)
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -130,6 +156,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         takip_count:   mc.filter(c => c.stage === 'takip').length,
         katildi_count: mc.filter(c => c.stage === 'katildi').length,
         last_activity_at: lastActionMap[m.user_id] ?? null,
+        onboarding_steps: completedSteps,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
@@ -153,27 +180,37 @@ export function EkipPanel() {
 
   const [expandedOnboardingId, setExpandedOnboardingId] = useState<string | null>(null)
   const [onboardingWeekTab, setOnboardingWeekTab] = useState<1 | 2 | 3 | 4>(1)
-  const [onboardingState, setOnboardingState] = useState<Record<string, Record<string, boolean>>>(() => {
-    if (typeof window === 'undefined') return {}
-    try {
-      const stored = localStorage.getItem('nmm_onboarding_v1')
-      return stored ? JSON.parse(stored) : {}
-    } catch {
-      return {}
-    }
-  })
+  const [onboardingCoachData, setOnboardingCoachData] = useState<{
+    memberName: string
+    stepId: string
+  } | null>(null)
 
-  const toggleOnboardingStep = useCallback((userId: string, stepId: string) => {
-    setOnboardingState(prev => {
-      const userState = prev[userId] ?? {}
-      const nextUserState = { ...userState, [stepId]: !userState[stepId] }
-      const next = { ...prev, [userId]: nextUserState }
-      try {
-        localStorage.setItem('nmm_onboarding_v1', JSON.stringify(next))
-      } catch {}
-      return next
-    })
-  }, [])
+  const toggleOnboardingStep = useCallback(async (userId: string, stepId: string, isStepDone: boolean) => {
+    try {
+      if (isStepDone) {
+        const { error } = await supabase
+          .from('nmm_onboarding_progress' as any)
+          .delete()
+          .eq('user_id', userId)
+          .eq('step_id', stepId)
+        if (error) throw error
+        toast.success(lang === 'en' ? 'Step marked as incomplete' : 'Adım tamamlanmadı olarak işaretlendi')
+      } else {
+        const { error } = await supabase
+          .from('nmm_onboarding_progress' as any)
+          .insert({
+            user_id: userId,
+            step_id: stepId
+          })
+        if (error) throw error
+        toast.success(lang === 'en' ? 'Step marked as completed!' : 'Adım başarıyla tamamlandı olarak işaretlendi!')
+      }
+      queryClient.invalidateQueries({ queryKey: ['members', ws?.workspaceId] })
+    } catch (err: any) {
+      console.error('[toggleOnboardingStep] error:', err)
+      toast.error(lang === 'en' ? 'Failed to update progress: ' + err.message : 'İlerleme güncellenemedi: ' + err.message)
+    }
+  }, [supabase, queryClient, ws?.workspaceId, lang])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['members', ws?.workspaceId],
@@ -549,7 +586,7 @@ export function EkipPanel() {
                           </span>
                           <span className="flex items-center gap-2.5">
                             {(() => {
-                              const doneCount = ONBOARDING_STEPS.filter(s => onboardingState[m.user_id]?.[s.id]).length
+                              const doneCount = ONBOARDING_STEPS.filter(s => m.onboarding_steps?.includes(s.id)).length
                               const totalCount = ONBOARDING_STEPS.length
                               const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
                               return (
@@ -587,29 +624,48 @@ export function EkipPanel() {
                             </div>
 
                             {/* Steps list */}
-                            <div className="space-y-2 max-h-[260px] overflow-y-auto pr-1">
+                            <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
                               {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
-                                const isStepDone = onboardingState[m.user_id]?.[step.id] ?? false
+                                const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
                                 return (
-                                  <button
+                                  <div
                                     key={step.id}
-                                    type="button"
-                                    onClick={() => toggleOnboardingStep(m.user_id, step.id)}
-                                    className={`w-full flex items-center gap-3 rounded-xl border p-4 text-left transition-all active:scale-[0.99] cursor-pointer ${
+                                    className={`w-full flex items-center justify-between gap-3 rounded-xl border p-3.5 transition-all ${
                                       isStepDone
-                                        ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)] font-semibold shadow-sm'
-                                        : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 hover:bg-[var(--bg-card)] text-[var(--text-2)]'
+                                        ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)]'
+                                        : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 text-[var(--text-2)]'
                                     }`}
                                   >
-                                    <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
-                                      isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
-                                    }`}>
-                                      {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
-                                    </span>
-                                    <span className="text-sm font-semibold leading-tight">
-                                      {lang === 'en' ? step.label_en : step.label_tr}
-                                    </span>
-                                  </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleOnboardingStep(m.user_id, step.id, isStepDone)}
+                                      className="flex-1 flex items-center gap-3 text-left cursor-pointer active:scale-[0.99] transition-all"
+                                    >
+                                      <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
+                                        isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
+                                      }`}>
+                                        {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
+                                      </span>
+                                      <span className="text-sm font-semibold leading-tight pr-2">
+                                        {lang === 'en' ? step.label_en : step.label_tr}
+                                      </span>
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        setOnboardingCoachData({
+                                          memberName: m.full_name || '',
+                                          stepId: step.id
+                                        })
+                                      }}
+                                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
+                                      title={lang === 'en' ? 'Get AI Coaching Script' : 'Yapay Zeka Koçluk Mesajı Al'}
+                                    >
+                                      <Bot className="h-5 w-5" />
+                                    </button>
+                                  </div>
                                 )
                               })}
                             </div>
@@ -728,6 +784,209 @@ export function EkipPanel() {
           onClose={() => setCoachingMember(null)}
         />
       )}
+
+      {/* YZ Onboarding Koçu Popup Modalı */}
+      {onboardingCoachData && (
+        <YZOnboardingKocuModal
+          memberName={onboardingCoachData.memberName}
+          stepId={onboardingCoachData.stepId}
+          lang={lang as 'tr' | 'en'}
+          onClose={() => setOnboardingCoachData(null)}
+        />
+      )}
     </div>
   )
 }
+
+const ONBOARDING_STEPS_TR: Record<string, string> = {
+  'step_why': 'Başlangıç Görüşmesi & "Neden?" Belirleme',
+  'step_list': '20-50 Kişilik Liste Oluşturma',
+  'step_first_5': 'İlk 5 Adayı Belirleme',
+  'step_3way': 'Sponsorla İlk 3\'lü Görüşme (3-Way Call)',
+  'step_social': 'Sosyal Medyada İlk Ürün Paylaşımı',
+  'step_independent': 'Sponsorsuz İlk Bağımsız Sunum',
+  'step_objections': 'İtirazlara Cevaplar Modülü Eğitimi',
+  'step_90day': '90 Günlük Saha Aksiyon Planı Yazımı',
+  'step_complete': '30. Gün Kapanış & Değerlendirme',
+}
+
+const ONBOARDING_STEPS_EN: Record<string, string> = {
+  'step_why': 'Kickoff Meeting & Define "Why"',
+  'step_list': 'Create a list of 20-50 Names',
+  'step_first_5': 'Identify first 5 and send messages',
+  'step_3way': 'First 3-Way Call with Sponsor',
+  'step_social': 'First Product Post on Social Media',
+  'step_independent': 'First Independent Presentation',
+  'step_objections': 'Study Objection Handling Module',
+  'step_90day': 'Write 90-Day Field Action Plan',
+  'step_complete': 'Day 30 Review & Reflection',
+}
+
+interface YZOnboardingKocuModalProps {
+  memberName: string
+  stepId: string
+  lang: 'tr' | 'en'
+  onClose: () => void
+}
+
+function YZOnboardingKocuModal({ memberName, stepId, lang, onClose }: YZOnboardingKocuModalProps) {
+  const [loading, setLoading] = useState(true)
+  const [message, setMessage] = useState('')
+  const [error, setError] = useState('')
+  const { data: usage, refetch: refetchUsage } = useAIUsage()
+
+  useEffect(() => {
+    let active = true
+    async function generate() {
+      try {
+        const res = await generateOnboardingGuidanceAction(memberName, stepId, lang)
+        if (!active) return
+        if (res.error) {
+          setError(res.error)
+        } else if (res.message) {
+          setMessage(res.message)
+          refetchUsage()
+        }
+      } catch (err: any) {
+        if (active) {
+          setError(lang === 'en' ? 'Failed to generate guidance script: ' + err.message : 'Rehberlik yazısı üretilemedi: ' + err.message)
+        }
+      } finally {
+        if (active) setLoading(false)
+      }
+    }
+    generate()
+    return () => {
+      active = false
+    }
+  }, [memberName, stepId, lang, refetchUsage])
+
+  const handleCopy = () => {
+    if (!message) return
+    navigator.clipboard.writeText(message)
+    toast.success(lang === 'en' ? 'Coaching script copied to clipboard!' : 'Koçluk mesajı panoya kopyalandı!')
+  }
+
+  const handleSendWhatsApp = () => {
+    if (!message) return
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+  }
+
+  const stepLabel = lang === 'en'
+    ? (ONBOARDING_STEPS_EN[stepId] || stepId)
+    : (ONBOARDING_STEPS_TR[stepId] || stepId)
+
+  return (
+    <div 
+      className="fixed inset-0 z-[99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+      onClick={onClose}
+    >
+      <div 
+        className="relative w-full max-w-lg rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 shadow-2xl overflow-hidden flex flex-col gap-5 animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 border-b border-[var(--border)] pb-4">
+          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500">
+            <Bot className="h-6 w-6" />
+            <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+            </span>
+          </div>
+          <div>
+            <h3 className="text-lg font-black text-[var(--text-1)]">
+              {lang === 'en' ? 'AI Onboarding Coach' : 'Yapay Zeka Onboarding Koçu'}
+            </h3>
+            <p className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
+              {lang === 'en' ? 'Step Coaching' : 'Adım Koçluk Rehberi'}
+            </p>
+          </div>
+        </div>
+
+        {/* Member & Step Details */}
+        <div className="rounded-2xl bg-[var(--bg-subtle)] p-4 border border-[var(--border)] space-y-2">
+          <div>
+            <p className="text-[10px] text-[var(--text-3)] font-extrabold uppercase tracking-widest">
+              {lang === 'en' ? 'Downline Member' : 'Ekip Arkadaşı'}
+            </p>
+            <p className="text-sm font-extrabold text-[var(--text-1)] mt-0.5">{memberName}</p>
+          </div>
+          <div className="h-px bg-[var(--border)]" />
+          <div>
+            <p className="text-[10px] text-[var(--text-3)] font-extrabold uppercase tracking-widest">
+              {lang === 'en' ? 'Target Onboarding Step' : 'Hedef Onboarding Adımı'}
+            </p>
+            <p className="text-sm font-bold text-brand mt-0.5">
+              {stepLabel}
+            </p>
+          </div>
+        </div>
+
+        {/* AI Output Box */}
+        <div className="min-h-[140px] flex flex-col justify-center">
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-8 gap-3">
+              <Loader2 className="h-8 w-8 animate-spin text-brand" />
+              <p className="text-xs font-bold text-[var(--text-3)] animate-pulse">
+                {lang === 'en' ? 'AI Coach is drafting your script...' : 'Yapay Zeka Koçu mesajınızı hazırlıyor...'}
+              </p>
+            </div>
+          ) : error ? (
+            <div className="rounded-2xl border border-red-200/50 bg-red-50/5 p-4 text-center">
+              <p className="text-sm font-bold text-red-600 dark:text-red-400">
+                {error}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 max-h-[220px] overflow-y-auto">
+                <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap text-[var(--text-2)] select-text">
+                  {message}
+                </p>
+              </div>
+
+              {/* Action Buttons (Strictly Icon Only) */}
+              <div className="flex gap-4 justify-center items-center">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-card)] hover:text-brand transition shadow-sm active:scale-95 cursor-pointer"
+                  title={lang === 'en' ? 'Copy message to clipboard' : 'Mesajı panoya kopyala'}
+                >
+                  <Copy className="h-5 w-5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSendWhatsApp}
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#25D366] text-white hover:bg-[#20ba59] transition shadow-md hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                  title={lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp ile Gönder'}
+                >
+                  <WhatsAppIcon className="h-5 w-5 fill-white" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="flex flex-col items-center justify-center border-t border-[var(--border)] pt-4 text-center">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)]">
+            <span>{lang === 'en' ? 'Daily Coaching Quota:' : 'Günlük Koçluk Kotası:'}</span>
+            <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
+              {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'remaining' : 'kalan'}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-4 w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-black uppercase tracking-wider text-[var(--text-2)] hover:text-[var(--text-1)] transition active:scale-[0.98] cursor-pointer"
+          >
+            {lang === 'en' ? 'Close' : 'Kapat'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+

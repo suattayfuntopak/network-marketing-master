@@ -11,6 +11,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers } from '@/hooks/useTeamMembers'
+import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -586,13 +587,13 @@ export default function AnalyticsPage() {
                       {lang === 'en' ? 'Write Message (AI Writer)' : 'YZ Mesajı Üret'}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, 15 - (usage?.messageUsed ?? 0))} / 15 {lang === 'en' ? 'left' : 'kalan'}
+                      {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'left' : 'kalan'}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#0F6E56] transition-all duration-500"
-                      style={{ width: `${Math.min(100, (Math.max(0, 15 - (usage?.messageUsed ?? 0)) / 15) * 100)}%` }}
+                      style={{ width: `${Math.min(100, (Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0)) / DAILY_MESSAGE_LIMIT) * 100)}%` }}
                     />
                   </div>
                 </div>

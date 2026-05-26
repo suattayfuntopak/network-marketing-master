@@ -10,6 +10,8 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
+import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+
 export function KoclukForm() {
   const { lang } = useTranslation()
   const [state, action, isPending] = useActionState(askCoachAction, {})
@@ -25,7 +27,7 @@ export function KoclukForm() {
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
   const used = usage?.messageUsed ?? 0
-  const remaining = Math.max(0, 15 - used)
+  const remaining = Math.max(0, DAILY_MESSAGE_LIMIT - used)
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
@@ -102,7 +104,7 @@ export function KoclukForm() {
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-            {isSuperAdmin ? (lang === 'en' ? 'Unlimited' : 'Sınırsız') : `${remaining} / 15`}
+            {isSuperAdmin ? (lang === 'en' ? 'Unlimited' : 'Sınırsız') : `${remaining} / ${DAILY_MESSAGE_LIMIT}`}
           </p>
           <p className="text-[9px] text-[#3730A3]/60 dark:text-[#c7d2fe]/60 font-semibold uppercase tracking-wider">
             {lang === 'en' ? 'Daily AI Quota' : 'Günlük Limit'}

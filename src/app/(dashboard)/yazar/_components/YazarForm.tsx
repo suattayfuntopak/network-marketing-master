@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { parseNote } from '@/lib/noteParser'
 
@@ -122,7 +123,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
   const used = usage?.messageUsed ?? 0
-  const remaining = Math.max(0, 15 - used)
+  const remaining = Math.max(0, DAILY_MESSAGE_LIMIT - used)
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -440,7 +441,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
         {limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            Günlük 15 mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
+            Günlük {DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.
           </div>
         ) : (
           <button
@@ -450,7 +451,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             {isPending
               ? <><Loader2 className="h-4 w-4 animate-spin" /> Yazıyor...</>
-              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(Kalan: ${remaining} / 15)`}</>
+              : <><Bot className="h-4 w-4" /> Üret {isSuperAdmin ? '(Sınırsız)' : `(Kalan: ${remaining} / ${DAILY_MESSAGE_LIMIT})`}</>
             }
           </button>
         )}

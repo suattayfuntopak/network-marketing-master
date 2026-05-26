@@ -4,7 +4,7 @@ const KEY_PREFIX = 'nmm_ai_usage_'
 export const DAILY_AI_LIMIT = 20
 export const DAILY_ROLEPLAY_LIMIT = 20
 export const DAILY_COMPLIANCE_LIMIT = 5
-export const DAILY_MESSAGE_LIMIT = 15
+export const DAILY_MESSAGE_LIMIT = 25
 
 function todayKey(): string {
   return KEY_PREFIX + new Date().toISOString().slice(0, 10)
