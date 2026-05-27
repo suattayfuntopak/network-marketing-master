@@ -809,7 +809,7 @@ export default function RootPage() {
             0% { transform: translateX(-50%); }
             100% { transform: translateX(0); }
           }
-          .animate-marquee-left {
+                    .animate-marquee-left {
             display: flex;
             width: max-content;
             animation: marquee-left 45s linear infinite;
@@ -818,9 +818,6 @@ export default function RootPage() {
             display: flex;
             width: max-content;
             animation: marquee-right 45s linear infinite;
-          }
-          .animate-marquee-left:hover, .animate-marquee-right:hover {
-            animation-play-state: paused;
           }
         `}} />
 

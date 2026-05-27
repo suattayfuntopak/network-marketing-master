@@ -1355,7 +1355,7 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
   - Arayüzde son derece premium, akıcı ve yormayan bir hareket hissi yaratmak için **iki bağımsız yatay satır** halinde akan bir Marquee yapısı kuruldu:
     - **1. Satır (Sol Akış):** İlk 5 kullanıcının yorum kartları pürüzsüzce sağdan sola akacak şekilde kurgulandı.
     - **2. Satır (Sağ Akış):** Diğer 5 kullanıcının yorum kartları, zıt (soldan sağa) yönde pürüzsüzce akacak şekilde kurgulandı.
-  - Kartların üzerine fareyle gelindiğinde (`hover`) hareketin durmasını sağlayan `pause-on-hover` özelliği CSS keyframe animasyonları yardımıyla optimize edildi.
+  - Kullanıcı kartların üzerine fareyle geldiğinde (`hover`) dahi akışın duraklamasını engelleyen strictly kesintisiz hareket yapısı kuruldu; böylece iki sıra da hiçbir zaman durmaksızın, pürüzsüzce ters yönlerde ve aynı hızda dönmeye devam etmektedir.
   - Carousel alanının sağından ve solundan asil koyu temayla bütünleşen şık mor-siyah degrade maskeleme katmanları (`before:bg-gradient-to-r`, `after:bg-gradient-to-l`) eklenerek kartların kenarlardan yumuşak bir şekilde sönümlenerek kaybolması sağlandı.
 - **Kusursuz Çift Dil Yerelleştirmesi:**
   - 10 yorum kartının tamamı hem Türkçe hem de İngilizce metinleri içerecek şekilde veri yapısında (`TESTIMONIALS`) tanımlandı ve dil toggle butonuna tıklandığında anlık olarak pürüzsüzce yerelleşmesi sağlandı.
