@@ -6,8 +6,8 @@ import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import {
-  Zap, TrendingUp, CalendarDays, Users, BookOpen, Bot, Shield, BarChart2,
-  ArrowRight, Play, CheckCircle2, Sparkles, UserCheck, Flame, Layers,
+  TrendingUp, Users, Bot, Shield, BarChart2,
+  ArrowRight, Play, CheckCircle2, Sparkles,
   Sun, Moon, Monitor, LogIn, UserPlus
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -196,8 +196,8 @@ export default function RootPage() {
           {/* Glowing pulse ring */}
           <div className="absolute h-16 w-16 animate-ping rounded-full bg-[#534AB7]/20" />
           <div className="absolute h-12 w-12 animate-pulse rounded-full bg-[#534AB7]/40" />
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-[#534AB7]">
-            <Zap className="h-4 w-4 text-white animate-bounce" />
+          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+            <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
           </div>
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[var(--text-3)] animate-pulse">
@@ -220,8 +220,8 @@ export default function RootPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
           {/* Logo */}
           <div className="flex flex-1 min-w-0 items-center gap-2">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#534AB7] to-[#7c3aed] shadow-[0_0_20px_0_rgba(83,74,183,0.3)] sm:h-9 sm:w-9 sm:rounded-xl">
-              <Zap className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" />
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] sm:h-9 sm:w-9">
+              <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
             </div>
             <span className="truncate text-xs font-extrabold tracking-tight bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent sm:text-base">
               Network Marketing Master
