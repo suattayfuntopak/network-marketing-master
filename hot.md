@@ -1,5 +1,34 @@
 # Hot Log
 
+## 2026-05-27 — Platform Yönetim Masası: Bağımsız Üyeler (Issue #6)
+
+### feat: Bağımsız kayıtları yönetmek için Platform Yönetim Masası tamamlandı
+
+- **Bağımsız Üyeler Bölümü (`platform-yonetim/page.tsx`):**
+  - KPI kartlarının altında yeni bir "Bağımsız Kayıtlar" kart grid'i eklendi.
+  - Her kart: üye ismi / e-posta, WhatsApp davet gönder butonu, pipeline'a aday ekle butonu.
+  - `buildInviteWaLink()`: Admin'in davet kodunu içeren WhatsApp paylaşım mesajı üretir.
+  - `handleAddAsCandidate()`: Bağımsız üyeyi `addIndependentAsCandidateAction` ile admin'in pipeline'ına "yeni" stage'de ekler; eklenen kayıt yeşil tik gösterir.
+  - TypeScript syntax hatası düzeltildi: `data: ws: wsData` → `data: wsData`.
+
+- **Ana Tablo WhatsApp Butonu Düzeltildi:**
+  - E-postayı telefon numarası olarak kullanan hatalı `api.whatsapp.com/send?phone=email` linki kaldırıldı.
+  - Artık `wa.me/?text=...` formatında admin'in davet linkini içeren mesaj açılıyor.
+
+- **Navigasyon Güncellemeleri:**
+  - `BottomNav.tsx`, `Sidebar.tsx`, `DashboardShell.tsx`: Süper Admin için Crown ikonlu "Platform Yönetimi" navigasyon öğesi eklendi (amber renk teması, `useAIUsage` ile koşullu görünüm).
+  - `en.ts` / `tr.ts`: `nav.platformYonetim` çeviri anahtarı eklendi.
+
+- **`sendAdminNewUserEmail()` (`mail.ts`):**
+  - Yeni kayıt anında admin e-postasına gönderilen "Yeni Kullanıcı Kaydı" bildirimi fonksiyonu eklendi.
+
+- **Migration 017 & 018:** Önceki session'da commit edilmiş — workspace trigger kaldırıldı, signupAction tek bildirim noktası.
+
+- **Süper Admin Migration Talimatı:**
+  - Migration 018 (`DROP TRIGGER IF EXISTS nmm_on_new_workspace_signup ON nmm_workspaces;`) Supabase SQL Editor'da çalıştırılmalı (duplicate bildirim önlemek için).
+
+---
+
 ## 2026-05-27 — Responsive UX İyileştirmeleri & Kritik Güvenlik / Bildirim Düzeltmeleri
 
 ### fix: 6 kritik responsive UX & güvenlik sorunu giderildi
