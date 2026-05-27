@@ -1,5 +1,30 @@
 # Hot Log
 
+## 2026-05-27 — Responsive UX İyileştirmeleri & Kritik Güvenlik / Bildirim Düzeltmeleri
+
+### fix: 6 kritik responsive UX & güvenlik sorunu giderildi
+
+- **#1 – YZ Mesajı Sekmesi Otomatik Scroll:**
+  - `YazarForm.tsx`: Mesaj üretilince `scrollIntoView` `block: 'nearest'` → `block: 'start'` olarak değiştirildi; mesajın üst kısmı viewport'a hizalanıyor.
+  - `KoclukForm.tsx`: Yanıt kutusu için `answerRef` eklendi, yanıt üretilince ekran otomatik olarak yanıt başına kayıyor. WhatsApp paylaşım ikonu zaten mevcuttu.
+
+- **#2 – İstatistikler Tablosu Swipe Çakışması:**
+  - `istatistikler/page.tsx`: Her iki tablo wrapper'ına `onTouchStart={(e) => e.stopPropagation()}` eklendi. Tabloya parmakla dokunulduğunda touch eventi DashboardShell'in swipe-navigation handler'ına ulaşmıyor; tablo yatay kaydırılırken artık sayfa değişmiyor.
+
+- **#3 – Yeni Kayıt Bildirimi (Admin E-posta + In-App) Çalışmıyordu:**
+  - `src/lib/supabase/admin.ts` oluşturuldu: Service role key kullanan admin Supabase client.
+  - `signupAction` güncellendi: Kayıt sırasında (workspace oluşmadan önce) admin kullanıcısı `listUsers()` ile bulunup `nmm_notifications`'a doğrudan servis rolüyle bildirim ekleniyor.
+  - `018_drop_signup_notification_trigger.sql` migration'ı eklendi: Migration 017'deki workspace trigger'ı kaldırıldı; artık signupAction tek yetkili kayıt bildirim noktasıdır (duplicate önlendi).
+
+- **#4 – Bildirim Güvenliği (Yeni Kullanıcı Yanlış Bildirim Görüyor):**
+  - Veritabanı RLS politikası (`user_id = auth.uid()`) zaten doğru — DB seviyesinde güvenli.
+  - Sorun: Test sırasında aynı tarayıcıda (aynı localStorage/session) admin oturumu açıkken yeni hesap oluşturulması → Supabase session karışıklığı. Çözüm: Yeni kullanıcı testlerinde mutlaka farklı tarayıcı/incognito kullanın. "Ahmet Yılmaz" ghost bildirimi de Supabase dashboard'undan silinmeli.
+
+- **#5 – Sesli Bildirim Ayarı Kalıcı Çalışmıyordu:**
+  - `NotificationsModal.tsx`'te **eksik `createClient` import** tespit edildi ve eklendi. Bu eksik import, `useEffect` içindeki tercih yükleme kodunun (`soundAlerts`, e-posta, push) tamamen çökmesine ve `soundAlerts`'in varsayılan `true` kalmasına yol açıyordu. Import eklenmesiyle Supabase `user_metadata.preferences` doğru okunuyor ve ses tercihi artık oturumlar arası korunuyor.
+
+---
+
 ## 2026-05-27 — Özel Fiyatlandırma / Paket Seçim Sayfası (`/odeme`) & Dinamik Ödeme Yönlendirmesi (Phase 3)
 
 ### feat: Özel Fiyatlandırma / Paket Seçim Sayfası & Dinamik Ödeme Yönlendirmesi

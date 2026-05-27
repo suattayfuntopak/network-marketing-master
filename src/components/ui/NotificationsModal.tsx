@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
+import { createClient } from '@/lib/supabase/client'
 
 interface NotificationsModalProps {
   onClose: () => void
@@ -22,32 +23,7 @@ export interface NotificationItem {
   icon: 'bell' | 'alert' | 'info' | 'user' | 'calendar'
 }
 
-const DEFAULT_NOTIFICATIONS: NotificationItem[] = [
-  {
-    id: '1',
-    title: 'Takip zamanı geldi',
-    description: 'Ahmet Yılmaz ile bugün yapmanız gereken sunum takibi var. Son görüşmenizden bu yana 3 gün geçti. Hemen iletişime geçin!',
-    time: '2 saat önce',
-    read: false,
-    icon: 'calendar',
-  },
-  {
-    id: '2',
-    title: 'Yeni aday eklendi',
-    description: 'Selda Kıratlı ekibinize yeni aday olarak katıldı. Profil sayfasını ziyaret ederek ilk görüşme notlarınızı ekleyebilirsiniz.',
-    time: '10 dakika önce',
-    read: false,
-    icon: 'user',
-  },
-  {
-    id: '3',
-    title: 'Sistem Güncellemesi',
-    description: 'Geri Al özellikli silme mekanizması aktif edildi. Artık adayları silerken 5 saniyelik geri alma süresi tanınıyor.',
-    time: '1 gün önce',
-    read: true,
-    icon: 'info',
-  },
-]
+const DEFAULT_NOTIFICATIONS: NotificationItem[] = []
 
 const NOTIF_DISMISSED_KEY = 'nmm_notif_dismissed_ids'
 const NOTIF_READ_KEY = 'nmm_notif_read_ids'
@@ -154,7 +130,8 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
   const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
-  const [soundAlerts, setSoundAlerts]   = useState(false)
+  const [soundAlerts, setSoundAlerts]   = useState(true)
+  const [userEmail, setUserEmail]       = useState('suattayfuntopak@gmail.com')
   const [localNotifs, setLocalNotifs]   = useState<any[]>([])
   const [selected, setSelected]         = useState<any | null>(null)
 
@@ -192,12 +169,37 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   useEffect(() => {
     setMounted(true)
-    const emailPref = localStorage.getItem('nmm_notif_email')
-    const pushPref  = localStorage.getItem('nmm_notif_push')
-    const soundPref = localStorage.getItem('nmm_notif_sound')
-    if (emailPref !== null) setEmailAlerts(emailPref === 'true')
-    if (pushPref  !== null) setPushAlerts(pushPref   === 'true')
-    if (soundPref !== null) setSoundAlerts(soundPref === 'true')
+    
+    // Fetch authenticated user session to sync preferences persistently
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserEmail(user.email ?? 'suattayfuntopak@gmail.com')
+        const prefs = user.user_metadata?.preferences
+        if (prefs) {
+          if (prefs.email !== undefined) {
+            setEmailAlerts(prefs.email)
+            localStorage.setItem('nmm_notif_email', String(prefs.email))
+          }
+          if (prefs.push !== undefined) {
+            setPushAlerts(prefs.push)
+            localStorage.setItem('nmm_notif_push', String(prefs.push))
+          }
+          if (prefs.sound !== undefined) {
+            setSoundAlerts(prefs.sound)
+            localStorage.setItem('nmm_notif_sound', String(prefs.sound))
+          }
+        } else {
+          // If no cloud metadata, load from localStorage with fallback to true
+          const emailPref = localStorage.getItem('nmm_notif_email')
+          const pushPref  = localStorage.getItem('nmm_notif_push')
+          const soundPref = localStorage.getItem('nmm_notif_sound')
+          setEmailAlerts(emailPref !== 'false')
+          setPushAlerts(pushPref !== 'false')
+          setSoundAlerts(soundPref !== 'false')
+        }
+      }
+    })
 
     // Restore persisted read/dismissed state
     setLocalNotifs(loadNotifications())
@@ -212,17 +214,25 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose, selected])
 
-  function handleToggle(type: 'email' | 'push' | 'sound', current: boolean) {
+  async function handleToggle(type: 'email' | 'push' | 'sound', current: boolean) {
     const next = !current
+    let nextEmail = emailAlerts
+    let nextPush = pushAlerts
+    let nextSound = soundAlerts
+
+    const supabase = createClient()
+
     if (type === 'email')  { 
       setEmailAlerts(next);  
+      nextEmail = next;
       localStorage.setItem('nmm_notif_email', String(next));
       if (next) {
-        toast.info(lang === 'en' ? 'Email alerts enabled for suattayfuntopak@gmail.com' : 'E-posta bildirimleri suattayfuntopak@gmail.com için aktif edildi')
+        toast.info(lang === 'en' ? `Email alerts enabled for ${userEmail}` : `E-posta bildirimleri ${userEmail} için aktif edildi`)
       }
     }
     if (type === 'push')   { 
       setPushAlerts(next);   
+      nextPush = next;
       localStorage.setItem('nmm_notif_push',  String(next));
       if (next && 'Notification' in window) {
         Notification.requestPermission().then(perm => {
@@ -240,11 +250,28 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     }
     if (type === 'sound')  { 
       setSoundAlerts(next);  
+      nextSound = next;
       localStorage.setItem('nmm_notif_sound', String(next));
       if (next) {
         playNotificationSound()
       }
     }
+
+    // Persist preferences in Supabase Auth user_metadata
+    try {
+      await supabase.auth.updateUser({
+        data: {
+          preferences: {
+            email: nextEmail,
+            push: nextPush,
+            sound: nextSound
+          }
+        }
+      })
+    } catch (err) {
+      console.error('[NotificationsModal] Failed to sync preferences to auth metadata:', err)
+    }
+
     toast.success('Tercihleriniz güncellendi')
   }
 
@@ -260,9 +287,8 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       })
     }
 
-    // Play chime sound if enabled
-    const soundEnabled = localStorage.getItem('nmm_notif_sound') !== 'false'
-    if (soundEnabled) {
+    // Play chime sound directly matching React state soundAlerts
+    if (soundAlerts) {
       playNotificationSound()
     }
   }

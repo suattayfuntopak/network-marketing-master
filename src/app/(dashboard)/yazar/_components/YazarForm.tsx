@@ -194,6 +194,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const messageBoxRef = useRef<HTMLDivElement>(null)
   const prefilledRef = useRef(false)
   const prevMessageRef = useRef<string | undefined>(undefined)
 
@@ -333,6 +334,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     }
   }, [lang, displayedMessage, generatedLang])
 
+  useEffect(() => {
+    if (displayedMessage) {
+      setTimeout(() => {
+        messageBoxRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [displayedMessage])
+
   const sorted = [...candidates].sort((a, b) =>
     a.full_name.localeCompare(b.full_name, 'tr')
   )
@@ -363,7 +372,9 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     toast.success('Mesaj kopyalandı!')
   }
 
-  const waLink = waHref(selected?.phone, displayedMessage)
+  const waLink = selected?.phone 
+    ? waHref(selected.phone, displayedMessage) 
+    : `https://api.whatsapp.com/send?text=${encodeURIComponent(displayedMessage)}`
 
   return (
     <div className="space-y-5">
@@ -529,7 +540,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       </form>
 
       {displayedMessage && (
-        <div className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
+        <div ref={messageBoxRef} className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-[#0F6E56]">
               {lang === 'en' ? 'Generated Message' : 'Oluşturulan Mesaj'}

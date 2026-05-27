@@ -38,12 +38,42 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     return { error: friendly }
   }
 
-  // Trigger welcome onboarding email in the background asynchronously
+  // Trigger welcome onboarding email, admin notification email, and in-app notification
   if (data.user) {
-    const { sendWelcomeEmail } = require('@/lib/mail')
+    const { sendWelcomeEmail, sendAdminNewUserEmail } = require('@/lib/mail')
+
+    // Welcome email to user
     sendWelcomeEmail(email, fullName, 'tr').catch((err: any) => {
       console.error('[signupAction] Welcome email failed in background:', err)
     })
+
+    // Alert email to admin
+    sendAdminNewUserEmail('suattayfuntopak@gmail.com', email, fullName).catch((err: any) => {
+      console.error('[signupAction] Admin notification email failed in background:', err)
+    })
+
+    // In-app DB notification to admin (service role bypasses RLS)
+    ;(async () => {
+      try {
+        const { createAdminClient } = await import('@/lib/supabase/admin')
+        const adminSupa = createAdminClient()
+        const ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
+        const { data: usersPage } = await adminSupa.auth.admin.listUsers({ page: 1, perPage: 200 })
+        const adminUser = usersPage?.users?.find((u: any) => u.email === ADMIN_EMAIL)
+        if (adminUser?.id && adminUser.id !== data.user!.id) {
+          await (adminSupa.from('nmm_notifications' as any).insert({
+            user_id: adminUser.id,
+            title_tr: 'Yeni Platform Kaydı 🚀',
+            title_en: 'New Platform Signup 🚀',
+            description_tr: `${fullName} (${email}) platforma yeni bağımsız üye olarak kaydoldu!`,
+            description_en: `${fullName} (${email}) signed up as a new independent member!`,
+            type: 'user',
+          }) as any)
+        }
+      } catch (err) {
+        console.error('[signupAction] Admin in-app notification failed:', err)
+      }
+    })()
   }
 
   // E-posta onayı zorunlu değilse identities boş gelir (zaten kayıtlı kullanıcı gibi davranır)

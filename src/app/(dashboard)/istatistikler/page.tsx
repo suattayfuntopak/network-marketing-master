@@ -472,7 +472,7 @@ export default function AnalyticsPage() {
                 {lang === 'en' ? 'No team members registered' : 'Henüz ekibe kayıtlı üye bulunmamaktadır.'}
               </div>
             ) : (
-              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true" onTouchStart={(e) => e.stopPropagation()}>
                 <table className="w-full text-left border-collapse text-xs min-w-[800px]">
                   <thead>
                     <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
@@ -644,13 +644,13 @@ export default function AnalyticsPage() {
                 </p>
               </div>
 
-              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]" onTouchStart={(e) => e.stopPropagation()}>
                 <table className="w-full text-left border-collapse text-xs min-w-[800px]">
                   <thead>
                     <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
-                      
+
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
                         {lang === 'en' ? 'AI Message (Used / Limit)' : 'YZ Mesajı (Kullanılan / Limit)'}
                       </th>

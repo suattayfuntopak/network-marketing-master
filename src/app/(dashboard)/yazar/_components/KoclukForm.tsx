@@ -31,6 +31,7 @@ export function KoclukForm() {
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
+  const answerRef = useRef<HTMLDivElement>(null)
 
   // Invalidate queries when answer changes successfully
   useEffect(() => {
@@ -40,11 +41,14 @@ export function KoclukForm() {
     }
   }, [state.answer, qc])
 
-  // Sync displayed answer when new response is generated
+  // Sync displayed answer when new response is generated + auto-scroll
   useEffect(() => {
     if (state.answer) {
       setDisplayedAnswer(state.answer)
       setGeneratedLang(lang)
+      setTimeout(() => {
+        answerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
     }
   }, [state.answer])
 
@@ -169,7 +173,7 @@ export function KoclukForm() {
 
       {/* AI Answer Display */}
       {displayedAnswer && (
-        <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[var(--bg-card)] p-5 shadow-lg animate-in slide-in-from-bottom-3 duration-300">
+        <div ref={answerRef} className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[var(--bg-card)] p-5 shadow-lg animate-in slide-in-from-bottom-3 duration-300">
           <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF2FF] dark:bg-[#1e1b4b]">
