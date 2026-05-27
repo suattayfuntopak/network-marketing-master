@@ -77,8 +77,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     })
   }
 
-  // 4. Fetch all team members count (downlines count)
-  // Let's count how many leaders have this workspace owner as their parent_id
+  // 4. Count downlines per workspace (parent_id is a workspace UUID)
   const parentCountMap = new Map<string, number>()
   workspaces.forEach(w => {
     if (w.parent_id) {
@@ -86,21 +85,29 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     }
   })
 
-  // Map workspaces by owner_id to lookup sponsors
-  const workspaceMapByOwner = new Map<string, typeof workspaces[0]>()
-  workspaces.forEach(w => { if (w.owner_id) workspaceMapByOwner.set(w.owner_id, w) })
+  // Build workspace lookup by ID for sponsor resolution
+  const workspaceById = new Map<string, typeof workspaces[0]>()
+  workspaces.forEach(w => workspaceById.set(w.id, w))
 
-  // 5. Combine and build result
-  const result: PlatformWorkspaceItem[] = workspaces.map(w => {
+  // 5. Combine and build result — deduplicate by owner_id (keep most recent workspace per user)
+  const seenOwners = new Set<string>()
+  const result: PlatformWorkspaceItem[] = []
+
+  for (const w of workspaces) {
+    // Skip duplicate workspaces for the same owner (list is ordered by created_at DESC)
+    if (w.owner_id && seenOwners.has(w.owner_id)) continue
+    if (w.owner_id) seenOwners.add(w.owner_id)
+
     const ownerUser = w.owner_id ? userMap.get(w.owner_id) : null
     const ownerEmail = ownerUser?.email ?? 'Bilinmiyor'
     const ownerName = (ownerUser?.user_metadata?.full_name as string | undefined) ?? ownerUser?.email?.split('@')[0] ?? 'İsimsiz Üye'
-    
-    // Find sponsor details if workspace has parent_id
+
+    // Resolve sponsor via workspace chain: parent workspace → owner user
     let sponsorName: string | null = null
     let sponsorEmail: string | null = null
     if (w.parent_id) {
-      const sponsorUser = userMap.get(w.parent_id)
+      const parentWorkspace = workspaceById.get(w.parent_id)
+      const sponsorUser = parentWorkspace?.owner_id ? userMap.get(parentWorkspace.owner_id) : null
       if (sponsorUser) {
         sponsorEmail = sponsorUser.email ?? null
         sponsorName = (sponsorUser.user_metadata?.full_name as string | undefined) ?? sponsorUser.email?.split('@')[0] ?? 'Lider'
@@ -108,9 +115,10 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     }
 
     const candidateCount = candidateCountMap.get(w.id) ?? 0
-    const downlineCount = w.owner_id ? (parentCountMap.get(w.owner_id) ?? 0) : 0
+    // downlineCount: how many workspaces have parent_id pointing to THIS workspace
+    const downlineCount = parentCountMap.get(w.id) ?? 0
 
-    return {
+    result.push({
       workspaceId: w.id,
       workspaceName: w.name,
       ownerId: w.owner_id ?? '',
@@ -123,9 +131,9 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       downlineCount,
       sponsorName,
       sponsorEmail,
-      isIndependent: !w.parent_id
-    }
-  })
+      isIndependent: !w.parent_id,
+    })
+  }
 
   return result
 }

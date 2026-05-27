@@ -74,29 +74,48 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
 
   if (wsErr || !ownWs) throw new Error(wsErr?.message || 'Workspace not found')
 
-  // 2. Fetch all direct downlines who have set their parent_id to this leader's owner_id
-  const { data: downlines } = await supabase
-    .from('nmm_workspaces')
-    .select('id, owner_id')
-    .eq('parent_id' as any, ownWs.owner_id)
+  // 2. Get all members in this workspace — nmm_join_workspace RPC adds downlines here
+  const { data: membersRaw, error } = await supabase
+    .from('nmm_workspace_members')
+    .select('user_id, full_name, role, joined_at, avatar_url' as any)
+    .eq('workspace_id', workspaceId)
 
-  const downlineUserIds = (downlines?.map(d => d.owner_id).filter(Boolean) as string[]) || []
-  const downlineWsIds = (downlines?.map(d => d.id).filter(Boolean) as string[]) || []
+  if (error) throw error
+  const membersAny = (membersRaw ?? []) as any[]
 
-  // Combine workspace IDs and owner user IDs (own workspace + downlines)
+  // Build deduped members map (leader always present)
+  const uniqueMembersMap: Record<string, any> = {}
+  if (ownWs.owner_id) {
+    const leaderRow = membersAny.find((m: any) => m.user_id === ownWs.owner_id)
+    uniqueMembersMap[ownWs.owner_id] = {
+      user_id: ownWs.owner_id,
+      full_name: leaderRow?.full_name ?? 'Lider',
+      role: 'leader',
+      joined_at: leaderRow?.joined_at ?? new Date().toISOString(),
+      avatar_url: leaderRow?.avatar_url ?? null
+    }
+  }
+  membersAny.forEach((m: any) => { uniqueMembersMap[m.user_id] = m })
+  const uniqueMembers = Object.values(uniqueMembersMap)
+  const allUserIds = uniqueMembers.map((m: any) => m.user_id)
+
+  // 3. Derive downline workspace IDs from member user_ids (handles both old & new parent_id formats)
+  const downlineUserIds = allUserIds.filter(id => id !== ownWs.owner_id)
+  let downlineWsIds: string[] = []
+  if (downlineUserIds.length > 0) {
+    const { data: dlWs } = await supabase
+      .from('nmm_workspaces')
+      .select('id')
+      .in('owner_id', downlineUserIds)
+    downlineWsIds = dlWs?.map((w: any) => w.id) ?? []
+  }
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
-  const allUserIds = [ownWs.owner_id, ...downlineUserIds].filter(Boolean) as string[]
 
   const [
-    { data: members, error },
     { data: candidatesRaw },
     { data: recentActions },
     { data: onboardingRaw }
   ] = await Promise.all([
-    supabase
-      .from('nmm_workspace_members')
-      .select('user_id, full_name, role, joined_at, avatar_url' as any)
-      .in('user_id', allUserIds),
     supabase
       .from('nmm_candidates')
       .select('id, owner_id, stage, full_name, phone, created_at, note')
@@ -111,28 +130,10 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .select('user_id, step_id')
       .in('user_id', allUserIds)
   ])
-  if (error) throw error
+
   const candidates = candidatesRaw ?? []
   const actions = recentActions ?? []
   const onboarding = onboardingRaw ?? []
-  const membersAny = (members ?? []) as any[]
-
-  // Create clean map of members to remove duplicates that could happen during migration
-  const uniqueMembersMap: Record<string, any> = {}
-  if (ownWs.owner_id) {
-    const leaderRow = membersAny.find(m => m.user_id === ownWs.owner_id)
-    uniqueMembersMap[ownWs.owner_id] = {
-      user_id: ownWs.owner_id,
-      full_name: leaderRow?.full_name ?? 'Lider',
-      role: 'leader',
-      joined_at: leaderRow?.joined_at ?? new Date().toISOString(),
-      avatar_url: leaderRow?.avatar_url ?? null
-    }
-  }
-  membersAny.forEach(m => {
-    uniqueMembersMap[m.user_id] = m
-  })
-  const uniqueMembers = Object.values(uniqueMembersMap)
 
 
   const lastActionMap: Record<string, string> = {}
