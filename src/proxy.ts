@@ -2,7 +2,15 @@ import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database.types'
 
-const PUBLIC_PATHS = ['/giris', '/kayit', '/sifre-sifirla', '/sifre-guncelle', '/auth/callback', '/auth/reset-password']
+const PUBLIC_PATHS = [
+  '/giris', 
+  '/kayit', 
+  '/sifre-sifirla', 
+  '/sifre-guncelle', 
+  '/auth/callback', 
+  '/auth/reset-password',
+  '/api/payment/shopier' // Shopier webhook is whitelisted so it is fully public
+]
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
