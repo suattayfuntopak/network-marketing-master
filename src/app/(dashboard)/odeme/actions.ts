@@ -18,7 +18,10 @@ export interface ShopierFormData {
   signature: string
 }
 
-export async function initiateShopierPayment(plan: 'leader' | 'master' | 'pro'): Promise<ShopierFormData> {
+export async function initiateShopierPayment(
+  plan: 'leader' | 'master' | 'pro',
+  period: 'monthly' | 'yearly' = 'monthly'
+): Promise<ShopierFormData> {
   const supabase = await createClient()
 
   // 1. Get active authenticated user
@@ -38,16 +41,33 @@ export async function initiateShopierPayment(plan: 'leader' | 'master' | 'pro'):
     throw new Error('Çalışma alanı (Workspace) bulunamadı. Lütfen bir ekibe katılın veya yeni bir tane oluşturun.')
   }
 
-  // 3. Define pricing and product details based on selected plan
-  let amount = '499'
+  // 3. Define pricing and product details based on selected plan and period
+  let amount = '399'
   let productName = 'Network Marketing Master - Basic Plan'
 
-  if (plan === 'pro') {
-    amount = '2499'
-    productName = 'Network Marketing Master - Pro Lider Planı'
-  } else if (plan === 'master') {
-    amount = '1499'
-    productName = 'Network Marketing Master - Plus Lider Planı'
+  if (period === 'yearly') {
+    if (plan === 'pro') {
+      amount = '19999'
+      productName = 'Network Marketing Master - Yıllık Pro Lider Planı'
+    } else if (plan === 'master') {
+      amount = '9999'
+      productName = 'Network Marketing Master - Yıllık Plus Lider Planı'
+    } else {
+      amount = '3499'
+      productName = 'Network Marketing Master - Yıllık Basic Planı'
+    }
+  } else {
+    // monthly
+    if (plan === 'pro') {
+      amount = '2499'
+      productName = 'Network Marketing Master - Pro Lider Planı'
+    } else if (plan === 'master') {
+      amount = '1199'
+      productName = 'Network Marketing Master - Plus Lider Planı'
+    } else {
+      amount = '399'
+      productName = 'Network Marketing Master - Basic Plan'
+    }
   }
 
   const workspaceId = membership.workspace_id

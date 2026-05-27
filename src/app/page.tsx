@@ -15,6 +15,7 @@ export default function RootPage() {
   const { lang, setLang } = useTranslation()
   const [checkingSession, setCheckingSession] = useState(true)
   const [teamSize, setTeamSize] = useState(25)
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
 
   useEffect(() => {
     const supabase = createClient()
@@ -401,7 +402,7 @@ export default function RootPage() {
 
       {/* ── PRICING SECTION ── */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
             {lang === 'en' ? 'Sponsor-Aligned Pricing' : 'Ekibiniz Büyürken Kazanın'}
           </h2>
@@ -410,6 +411,37 @@ export default function RootPage() {
               ? 'Choose the plan that fits your MLM organization goals.'
               : 'MLM organizasyonel hedeflerinize ve ekibinize uygun lisansı seçin.'}
           </p>
+
+          {/* Monthly / Yearly Toggler */}
+          <div className="flex flex-col items-center pt-4">
+            <div className="inline-flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] p-1 rounded-2xl relative shadow-inner backdrop-blur-sm">
+              <button
+                type="button"
+                onClick={() => setBillingPeriod('monthly')}
+                className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
+                  billingPeriod === 'monthly'
+                    ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                {lang === 'en' ? 'Monthly Billing' : 'Aylık Ödeme'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setBillingPeriod('yearly')}
+                className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
+                  billingPeriod === 'yearly'
+                    ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                    : 'text-zinc-400 hover:text-zinc-200'
+                }`}
+              >
+                <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
+                <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+                  {lang === 'en' ? '-3 Months!' : '-3 Ay Fırsatı!'}
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Three Pricing Cards */}
@@ -434,9 +466,22 @@ export default function RootPage() {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">₺499</span>
-                <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white">
+                    {billingPeriod === 'monthly' ? '₺399' : '₺3,499'}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    / {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'month' : 'ay')
+                      : (lang === 'en' ? 'year' : 'yıl')}
+                  </span>
+                </div>
+                {billingPeriod === 'yearly' && (
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                    {lang === 'en' ? "₺291 / month equivalent (3 Months Free!)" : "₺291 / ay'a denk gelir (3 Ay Bedava!)"}
+                  </span>
+                )}
               </div>
 
               {/* Bullet Features */}
@@ -476,7 +521,7 @@ export default function RootPage() {
 
           {/* Plan B: Plus Plan */}
           <div className="rounded-3xl border border-[#534AB7]/40 bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
-            <div className="absolute right-6 top-6">
+            <div className="absolute right-6 top-6 animate-pulse">
               <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {lang === 'en' ? 'Popular' : 'En Çok Satan'}
               </span>
@@ -496,9 +541,22 @@ export default function RootPage() {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">₺1,499</span>
-                <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white">
+                    {billingPeriod === 'monthly' ? '₺1,199' : '₺9,999'}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    / {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'month' : 'ay')
+                      : (lang === 'en' ? 'year' : 'yıl')}
+                  </span>
+                </div>
+                {billingPeriod === 'yearly' && (
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
+                    {lang === 'en' ? "₺833 / month equivalent (3 Months Free!)" : "₺833 / ay'a denk gelir (3 Ay Bedava!)"}
+                  </span>
+                )}
               </div>
 
               {/* Bullet Features */}
@@ -566,9 +624,22 @@ export default function RootPage() {
               </div>
 
               {/* Price */}
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">₺2,499</span>
-                <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+              <div className="flex flex-col">
+                <div className="flex items-baseline gap-1">
+                  <span className="text-4xl font-black text-white">
+                    {billingPeriod === 'monthly' ? '₺2,499' : '₺19,999'}
+                  </span>
+                  <span className="text-xs text-zinc-500">
+                    / {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'month' : 'ay')
+                      : (lang === 'en' ? 'year' : 'yıl')}
+                  </span>
+                </div>
+                {billingPeriod === 'yearly' && (
+                  <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                    {lang === 'en' ? "₺1,666 / month equivalent (3 Months Free!)" : "₺1,666 / ay'a denk gelir (3 Ay Bedava!)"}
+                  </span>
+                )}
               </div>
 
               {/* Bullet Features */}

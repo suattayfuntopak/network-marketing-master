@@ -66,25 +66,60 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Workspace not found' }, { status: 404 })
     }
     
-    // Determine license type based on payment amount:
-    // Plan A (Basic Plan - 499 TL) ➔ 'leader'
-    // Plan B (Plus Plan - 1499 TL) ➔ 'master'
-    // Plan C (Pro Plan - 2499 TL) ➔ 'pro'
-    const amountVal = parseFloat(total_amount)
+    // Determine license type and duration based on payment amount:
+    const amountVal = Math.round(parseFloat(total_amount))
     let newLicenseType: 'leader' | 'master' | 'pro' = 'leader'
-    if (amountVal >= 2000) {
-      newLicenseType = 'pro'
-    } else if (amountVal >= 1000) {
+    let daysToAdd = 30
+
+    // Match exact sweet-spot amounts or apply robust fallbacks
+    if (amountVal === 399) {
+      newLicenseType = 'leader'
+      daysToAdd = 30
+    } else if (amountVal === 1199) {
       newLicenseType = 'master'
+      daysToAdd = 30
+    } else if (amountVal === 2499) {
+      newLicenseType = 'pro'
+      daysToAdd = 30
+    } else if (amountVal === 3499) {
+      newLicenseType = 'leader'
+      daysToAdd = 365
+    } else if (amountVal === 9999) {
+      newLicenseType = 'master'
+      daysToAdd = 365
+    } else if (amountVal === 19999) {
+      newLicenseType = 'pro'
+      daysToAdd = 365
+    } else {
+      // Fallbacks
+      if (amountVal >= 15000) {
+        newLicenseType = 'pro'
+        daysToAdd = 365
+      } else if (amountVal >= 8000) {
+        newLicenseType = 'master'
+        daysToAdd = 365
+      } else if (amountVal >= 3000) {
+        newLicenseType = 'leader'
+        daysToAdd = 365
+      } else if (amountVal >= 2000) {
+        newLicenseType = 'pro'
+        daysToAdd = 30
+      } else if (amountVal >= 1000) {
+        newLicenseType = 'master'
+        daysToAdd = 30
+      } else {
+        newLicenseType = 'leader'
+        daysToAdd = 30
+      }
     }
     
-    // Calculate new expiry (+30 days from current expiry if it is in the future, or today + 30 days if expired)
+    // Calculate new expiry (from current expiry if in the future, or today if expired)
     const currentExpiry = ws.license_expires_at ? new Date(ws.license_expires_at) : new Date()
     const now = new Date()
     
     const baseDate = currentExpiry > now ? currentExpiry : now
     const newExpiry = new Date(baseDate)
-    newExpiry.setDate(newExpiry.getDate() + 30)
+    newExpiry.setDate(newExpiry.getDate() + daysToAdd)
     
     const { error: updateError } = await supabase
       .from('nmm_workspaces')

@@ -12,6 +12,7 @@ export function OdemeClient() {
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   
   const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
+  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<ShopierFormData | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -33,8 +34,8 @@ export function OdemeClient() {
           : 'Güvenli ödeme oturumu hazırlanıyor...'
       )
 
-      // Fetch the verified parameters & HMAC-SHA256 signature from our server action
-      const data = await initiateShopierPayment(plan)
+      // Fetch the verified parameters & HMAC-SHA256 signature from our server action with chosen period
+      const data = await initiateShopierPayment(plan, billingPeriod)
       setFormData(data)
     } catch (err: any) {
       console.error('[OdemeClient] error initiating payment:', err)
@@ -99,7 +100,7 @@ export function OdemeClient() {
 
             <div className="rounded-xl border border-white/[0.05] bg-white/[0.02] p-4 text-[10px] text-zinc-500 font-mono text-left w-full space-y-1.5">
               <div>OrderID: {formData.platform_order_id}</div>
-              <div>Plan: {selectedPlan === 'pro' ? 'Pro Lider' : selectedPlan === 'master' ? 'Plus Lider' : 'Basic Partner'}</div>
+              <div>Plan: {selectedPlan === 'pro' ? 'Pro Lider' : selectedPlan === 'master' ? 'Plus Lider' : 'Basic Partner'} ({billingPeriod === 'yearly' ? 'Yıllık' : 'Aylık'})</div>
               <div>Amount: {formData.total_order_value} TRY</div>
             </div>
           </div>
@@ -162,6 +163,37 @@ export function OdemeClient() {
         </div>
       )}
 
+      {/* Monthly / Yearly Toggler */}
+      <div className="flex flex-col items-center pt-2">
+        <div className="inline-flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] p-1 rounded-2xl relative shadow-inner backdrop-blur-sm">
+          <button
+            type="button"
+            onClick={() => setBillingPeriod('monthly')}
+            className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
+              billingPeriod === 'monthly'
+                ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            {lang === 'en' ? 'Monthly Billing' : 'Aylık Ödeme'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setBillingPeriod('yearly')}
+            className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
+              billingPeriod === 'yearly'
+                ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                : 'text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
+            <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+              {lang === 'en' ? '-3 Months!' : '-3 Ay Fırsatı!'}
+            </span>
+          </button>
+        </div>
+      </div>
+
       {/* ── Three Pricing Cards ── */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
         
@@ -189,9 +221,22 @@ export function OdemeClient() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-white">₺499</span>
-              <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">
+                  {billingPeriod === 'monthly' ? '₺399' : '₺3,499'}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  / {billingPeriod === 'monthly'
+                    ? (lang === 'en' ? 'month' : 'ay')
+                    : (lang === 'en' ? 'year' : 'yıl')}
+                </span>
+              </div>
+              {billingPeriod === 'yearly' && (
+                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                  {lang === 'en' ? "₺291 / month equivalent (3 Months Free!)" : "₺291 / ay'a denk gelir (3 Ay Bedava!)"}
+                </span>
+              )}
             </div>
 
             {/* Bullet Features */}
@@ -222,16 +267,20 @@ export function OdemeClient() {
           <div className="pt-8">
             <button
               onClick={() => handlePayment('leader')}
-              disabled={loading || isLeaderActive}
+              disabled={loading || (billingPeriod === 'monthly' ? isLeaderActive : false)}
               className={`w-full text-center rounded-xl border border-white/[0.08] hover:bg-white/[0.03] text-white py-3 text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 ${
-                isLeaderActive ? 'opacity-50 cursor-not-allowed border-emerald-500/20 text-emerald-400 hover:bg-transparent' : 'cursor-pointer'
+                isLeaderActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed border-emerald-500/20 text-emerald-400 hover:bg-transparent' : 'cursor-pointer'
               }`}
             >
-              {isLeaderActive ? (
+              {isLeaderActive && billingPeriod === 'monthly' ? (
                 lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
               ) : (
                 <>
-                  <span>{lang === 'en' ? 'Buy 30 Days Access' : '30 Günlük Erişim Satın Al'}</span>
+                  <span>
+                    {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'Buy 30 Days Access' : '30 Günlük Erişim Satın Al')
+                      : (lang === 'en' ? 'Buy Yearly Access' : 'Yıllık Erişim Satın Al')}
+                  </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
               )}
@@ -266,9 +315,22 @@ export function OdemeClient() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-white">₺1,499</span>
-              <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">
+                  {billingPeriod === 'monthly' ? '₺1,199' : '₺9,999'}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  / {billingPeriod === 'monthly'
+                    ? (lang === 'en' ? 'month' : 'ay')
+                    : (lang === 'en' ? 'year' : 'yıl')}
+                </span>
+              </div>
+              {billingPeriod === 'yearly' && (
+                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
+                  {lang === 'en' ? "₺833 / month equivalent (3 Months Free!)" : "₺833 / ay'a denk gelir (3 Ay Bedava!)"}
+                </span>
+              )}
             </div>
 
             {/* Bullet Features */}
@@ -307,16 +369,20 @@ export function OdemeClient() {
           <div className="pt-8">
             <button
               onClick={() => handlePayment('master')}
-              disabled={loading || isMasterActive}
+              disabled={loading || (billingPeriod === 'monthly' ? isMasterActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isMasterActive ? 'opacity-50 cursor-not-allowed bg-none bg-zinc-800 text-zinc-500 hover:shadow-none' : 'cursor-pointer'
+                isMasterActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed bg-none bg-zinc-800 text-zinc-500 hover:shadow-none' : 'cursor-pointer'
               }`}
             >
-              {isMasterActive ? (
+              {isMasterActive && billingPeriod === 'monthly' ? (
                 lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
               ) : (
                 <>
-                  <span>{lang === 'en' ? 'Buy 30 Days Plus Access' : '30 Günlük Plus Erişimini Başlat'}</span>
+                  <span>
+                    {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'Buy 30 Days Plus Access' : '30 Günlük Plus Erişimini Başlat')
+                      : (lang === 'en' ? 'Buy Yearly Plus Access' : 'Yıllık Plus Erişimini Başlat')}
+                  </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
               )}
@@ -351,9 +417,22 @@ export function OdemeClient() {
             </div>
 
             {/* Price */}
-            <div className="flex items-baseline gap-1">
-              <span className="text-4xl font-black text-white">₺2,499</span>
-              <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+            <div className="flex flex-col">
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">
+                  {billingPeriod === 'monthly' ? '₺2,499' : '₺19,999'}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  / {billingPeriod === 'monthly'
+                    ? (lang === 'en' ? 'month' : 'ay')
+                    : (lang === 'en' ? 'year' : 'yıl')}
+                </span>
+              </div>
+              {billingPeriod === 'yearly' && (
+                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                  {lang === 'en' ? "₺1,666 / month equivalent (3 Months Free!)" : "₺1,666 / ay'a denk gelir (3 Ay Bedava!)"}
+                </span>
+              )}
             </div>
 
             {/* Bullet Features */}
@@ -392,16 +471,20 @@ export function OdemeClient() {
           <div className="pt-8">
             <button
               onClick={() => handlePayment('pro')}
-              disabled={loading || isProActive}
+              disabled={loading || (billingPeriod === 'monthly' ? isProActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isProActive ? 'opacity-50 cursor-not-allowed bg-none bg-zinc-800 text-zinc-500 hover:shadow-none' : 'cursor-pointer'
+                isProActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed bg-none bg-zinc-800 text-zinc-500 hover:shadow-none' : 'cursor-pointer'
               }`}
             >
-              {isProActive ? (
+              {isProActive && billingPeriod === 'monthly' ? (
                 lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
               ) : (
                 <>
-                  <span>{lang === 'en' ? 'Buy 30 Days Pro Access' : '30 Günlük Pro Erişimini Başlat'}</span>
+                  <span>
+                    {billingPeriod === 'monthly'
+                      ? (lang === 'en' ? 'Buy 30 Days Pro Access' : '30 Günlük Pro Erişimini Başlat')
+                      : (lang === 'en' ? 'Buy Yearly Pro Access' : 'Yıllık Pro Erişimini Başlat')}
+                  </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
               )}
