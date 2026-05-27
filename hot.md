@@ -1332,6 +1332,16 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Derleme ve Kod Kalitesi:**
   - TypeScript derleme doğrulaması `npx tsc --noEmit` ile başarıyla doğrulandı; 0 hata ve 0 uyarı alındı.
 
+### feat: Plus Planı Alt Ekip Takip Limitinin 50 Üyeye Yükseltilmesi
 
-
-
+- **Alt Ekip Takip Sınırı Genişletildi:**
+  - Plus (`'master'`) planı için önceden belirlenmiş olan 20-üye alt ekip takip sınırı, liderlere daha geniş bir ölçeklenebilirlik alanı tanımak amacıyla **Maksimum 50 Üyeye** yükseltildi.
+- **Arayüz & Metin Güncellemeleri:**
+  - **Landing Page (`src/app/page.tsx`):** Plus plan kartındaki özellik açıklaması *"Alt Ekip Takibi (Maksimum 50 Üye)"* ve *"Direct Downline Tracking (Max 50 Members)"* şeklinde güncellendi.
+  - **Dashboard Ödeme Ekranı (`OdemeClient.tsx`):** Plus plan kartı maddesindeki sınır ifadesi **50 Üye** olarak revize edildi.
+  - **Ekip Sayfası Kontrolleri (`EkipPanel.tsx`):**
+    - Plus plan üyelerinin alt ekip üye sayısının 50'yi aşıp aşmadığını denetleyen `isPlusCapReached` koşulu `totalDownlineCount > 50` olarak değiştirildi.
+    - Sadece ilk 50 üyenin görüntülenmesini sağlayan liste dilimleme (slice) motoru `slice(0, 50)` olarak güncellendi.
+    - Sınır aşıldığında gösterilen premium neon mor gradyanlı yükseltme uyarı kartındaki metinler ve sayaç **"50/50"** ve **"50'den fazla"** olarak güncellendi.
+- **TypeScript & Derleme:**
+  - Tüm güncellemeler sonrasında `npx tsc --noEmit` testi 0 hata ile başarıyla tamamlandı.

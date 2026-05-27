@@ -320,10 +320,10 @@ export function EkipPanel() {
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
-  const isPlusCapReached = licenseType === 'master' && totalDownlineCount > 20
+  const isPlusCapReached = licenseType === 'master' && totalDownlineCount > 50
 
   const visibleMembers = licenseType === 'master'
-    ? [members[0], ...downlineMembers.slice(0, 20)].filter(Boolean)
+    ? [members[0], ...downlineMembers.slice(0, 50)].filter(Boolean)
     : members
 
   useEffect(() => {
@@ -881,12 +881,12 @@ export function EkipPanel() {
             </div>
             <div className="max-w-md mx-auto space-y-2">
               <h4 className="text-base font-bold text-white">
-                {lang === 'en' ? 'Team Limit Reached (20/20)' : 'Takım Limiti Aşıldı (20/20)'}
+                {lang === 'en' ? 'Team Limit Reached (50/50)' : 'Takım Limiti Aşıldı (50/50)'}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
                 {lang === 'en'
-                  ? 'You have more than 20 downline members in your organization. Upgrade to Pro Plan for unlimited tracking, AI downline coaching, and professional analytics.'
-                  : 'Ekibinizde 20\'den fazla iş ortağı bulunuyor. Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve gelişmiş analizler için Pro Plana yükseltin.'}
+                  ? 'You have more than 50 downline members in your organization. Upgrade to Pro Plan for unlimited tracking, AI downline coaching, and professional analytics.'
+                  : 'Ekibinizde 50\'den fazla iş ortağı bulunuyor. Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve gelişmiş analizler için Pro Plana yükseltin.'}
               </p>
             </div>
             <div className="pt-2">

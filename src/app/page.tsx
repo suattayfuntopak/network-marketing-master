@@ -567,7 +567,7 @@ export default function RootPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Direct Downline Tracking (Max 20 Members)' : 'Alt Ekip Takibi (Maksimum 20 Üye)'}</span>
+                  <span>{lang === 'en' ? 'Direct Downline Tracking (Max 50 Members)' : 'Alt Ekip Takibi (Maksimum 50 Üye)'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
