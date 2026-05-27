@@ -138,11 +138,11 @@ export default function RootPage() {
         <h1 className="mx-auto max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
           {lang === 'en' ? (
             <>
-              Build a <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">High-Performance</span> & Active MLM Team.
+              Build a <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">High-Performance</span> & Active Network Marketing Team!
             </>
           ) : (
             <>
-              Aktif ve <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">Yüksek Performanslı</span> Bir MLM Ekibi İnşa Edin.
+              Aktif ve <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">Yüksek Performanslı</span> Bir Network Marketing Ekibi İnşa Edin!
             </>
           )}
         </h1>
