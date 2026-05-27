@@ -1345,3 +1345,18 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
     - Sınır aşıldığında gösterilen premium neon mor gradyanlı yükseltme uyarı kartındaki metinler ve sayaç **"50/50"** ve **"50'den fazla"** olarak güncellendi.
 - **TypeScript & Derleme:**
   - Tüm güncellemeler sonrasında `npx tsc --noEmit` testi 0 hata ile başarıyla tamamlandı.
+
+### feat: Landing Page Kullanıcı Yorumları Premium Çift Yönlü Akış Carousel Entegrasyonu
+
+- **10 Mock Kullanıcı Yorumu (Sosyal Kanıt):**
+  - Kurucuların ("Suat Tayfun T." ve "Elif Sinem T.") gerçek isimleri gizlendi; yerlerine rastgele ad-soyad kısaltmaları (örneğin Ahmet K., Elif B., Murat C.) ve "Independent Leader", "Ekip Koordinatörü" gibi profesyonel MLM ünvanları eklendi.
+  - Yorum metinleri; abartılı kazanç veya ciro iddialarından strictly uzak durularak, NMM'in farklı yönlerine (4 haftalık Doğru Başlangıç takibi, YZ Saha Provası Simülatörü, Uyum Denetimi, Aday Boru Hattı, İtiraz Karşılama, Çift Dil Senkronizasyonu, Mobil Swipe, Performans Masası vb.) ve genel kullanıcı memnuniyetine odaklandı.
+- **Premium Çift Yönlü Sonsuz Marquee Tasarımı:**
+  - Arayüzde son derece premium, akıcı ve yormayan bir hareket hissi yaratmak için **iki bağımsız yatay satır** halinde akan bir Marquee yapısı kuruldu:
+    - **1. Satır (Sol Akış):** İlk 5 kullanıcının yorum kartları pürüzsüzce sağdan sola akacak şekilde kurgulandı.
+    - **2. Satır (Sağ Akış):** Diğer 5 kullanıcının yorum kartları, zıt (soldan sağa) yönde pürüzsüzce akacak şekilde kurgulandı.
+  - Kartların üzerine fareyle gelindiğinde (`hover`) hareketin durmasını sağlayan `pause-on-hover` özelliği CSS keyframe animasyonları yardımıyla optimize edildi.
+  - Carousel alanının sağından ve solundan asil koyu temayla bütünleşen şık mor-siyah degrade maskeleme katmanları (`before:bg-gradient-to-r`, `after:bg-gradient-to-l`) eklenerek kartların kenarlardan yumuşak bir şekilde sönümlenerek kaybolması sağlandı.
+- **Kusursuz Çift Dil Yerelleştirmesi:**
+  - 10 yorum kartının tamamı hem Türkçe hem de İngilizce metinleri içerecek şekilde veri yapısında (`TESTIMONIALS`) tanımlandı ve dil toggle butonuna tıklandığında anlık olarak pürüzsüzce yerelleşmesi sağlandı.
+
