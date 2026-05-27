@@ -89,7 +89,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
 
   // Map workspaces by owner_id to lookup sponsors
   const workspaceMapByOwner = new Map<string, typeof workspaces[0]>()
-  workspaces.forEach(w => workspaceMapByOwner.set(w.owner_id, w))
+  workspaces.forEach(w => { if (w.owner_id) workspaceMapByOwner.set(w.owner_id, w) })
 
   // 5. Combine and build result
   const result: PlatformWorkspaceItem[] = workspaces.map(w => {

@@ -32,6 +32,7 @@ export interface Database {
           created_at: string
           license_type: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at: string | null
+          parent_id: string | null
         }
         Insert: {
           id?: string
@@ -41,6 +42,7 @@ export interface Database {
           created_at?: string
           license_type?: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at?: string | null
+          parent_id?: string | null
         }
         Update: {
           id?: string
@@ -50,6 +52,7 @@ export interface Database {
           created_at?: string
           license_type?: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at?: string | null
+          parent_id?: string | null
         }
         Relationships: []
       }
