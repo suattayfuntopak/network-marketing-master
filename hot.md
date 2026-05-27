@@ -1281,4 +1281,27 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Sosyal Kanıt (Testimonials) ve Footer:**
   - Başarılı sponsor ve liderlerin dairesel sembollü avatarları, samimi başarı yorumları ve sade telif hakları footer'ı ile karşılama sayfası tamamlandı.
 
+### feat: Faz 3 — Premium Paket Seçim `/odeme` Ekranı ve Canlı Shopier Webhook Entegrasyonu
+
+- **Premium Paket Seçim & Karşılaştırma Ekranı (`/odeme`):**
+  - **Premium Tasarım Sistemi:** Asil koyu temayla %100 uyumlu, göz alıcı mor-pembe renk degradeli, cam-morfin (glassmorphism) plan kartları tasarlandı. Plan A (Saha Distribütörü - ₺299/Ay) ve Plan B (Ekip Master'ı - ₺899/Ay) için tüm özellikler ve limitler detaylandırıldı.
+  - **TR / EN Dil Desteği:** Dil seçimine göre dinamik olarak plan açıklamaları, butonlar, ve anlık sipariş durumları anında yerelleştirilir.
+  - **Aktif Plan Takibi:** Üyenin o anki aktif lisans tipi ve lisansının bitişine kalan gün sayısı panelin üstünde parıldayan şık bir rozetle gösterilir.
+- **Güvenli Server-Side Shopier İmza Motoru (`actions.ts`):**
+  - NodeJS yerel `crypto` kütüphanesi kullanılarak Shopier Checkout API entegrasyonu (base64/HMAC-SHA256) server-side güvenliğine taşındı.
+  - Kullanıcı "Plan Seç" butonuna bastığı an, arka planda üyenin aktif `workspaceId`'sini taşıyan benzersiz ve güvenli bir `platform_order_id` oluşturularak Shopier ödeme form parametreleri üretilir.
+- **Sleek İstemci Yönlendirme Arayüzü (`OdemeClient.tsx`):**
+  - Kullanıcıyı harici bir link yerine, ödeme parametrelerini otomatik olarak taşıyan dinamik bir form POST arayüzü ile Shopier'e yönlendiren motor kodlandı.
+  - Yönlendirme esnasında arayüzde asil mor renkte parıldayan premium bir **"Ödeme Sayfasına Yönlendiriliyorsunuz..." / "Redirecting to Payment..."** yükleme animasyonu (loading overlay) gösterilerek kullanıcı deneyimi en üst düzeye çıkarıldı.
+- **Sistem İçi Derin Satın Alma Bağlantıları (Deep-Linking):**
+  - Paneldeki tüm kısıtlama pencereleri, `EkipPanel.tsx` yükseltme butonları ve `Header.tsx` üzerinde beliren süresi dolmuş/deneme süresinde uyarısı şeritleri doğrudan `/odeme` rotasına bağlandı.
+- **Next.js 16 Proxy Middleware Çözümü & Shopier Webhook Whitelist (`src/proxy.ts`):**
+  - Next.js 16 standartlarına uygun olarak `src/proxy.ts` dosyası yapılandırıldı.
+  - Vercel sunucusunda ödeme bildirimi geldiğinde oturumsuz/anonim isteklerin oturum kontrolüne takılmasını önlemek amacıyla `/api/payment/shopier` webhook rotası `PUBLIC_PATHS` listesine dahil edilerek whitelisted yapıldı. Böylece Vercel'in `405 Method Not Allowed` / `308 redirect` fırlatması engellendi.
+- **Geliştirici Güvenliği `.gitignore` Güncellemesi:**
+  - Yerel test/simülasyon scriptlerinin hassas API şifreleri içermesi durumunda git ortamına kazara itilmesini önlemek amacıyla `/scratch/` dizini `.gitignore` dosyasına eklenerek güvenli hale getirildi.
+- **Canlı Webhook Test Başarısı (`test_live_webhook.js`):**
+  - Hazırlanan `scratch/test_live_webhook.js` canlı test scripti üzerinden `nmm.suattayfuntopak.com` sunucusuna gönderilen HMAC-SHA256 imzalı POST isteği, canlı sunucuda **200 OK** ve `License updated successfully` yanıtı alarak lisansın veritabanında +30 gün boyunca 'master' statüsüyle başarıyla uzatıldığını kanıtlamıştır.
+
+
 
