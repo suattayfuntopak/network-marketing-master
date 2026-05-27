@@ -18,7 +18,7 @@ export interface ShopierFormData {
   signature: string
 }
 
-export async function initiateShopierPayment(plan: 'leader' | 'master'): Promise<ShopierFormData> {
+export async function initiateShopierPayment(plan: 'leader' | 'master' | 'pro'): Promise<ShopierFormData> {
   const supabase = await createClient()
 
   // 1. Get active authenticated user
@@ -39,10 +39,16 @@ export async function initiateShopierPayment(plan: 'leader' | 'master'): Promise
   }
 
   // 3. Define pricing and product details based on selected plan
-  const amount = plan === 'master' ? '899' : '299'
-  const productName = plan === 'master'
-    ? 'Network Marketing Master - Ekip Master\'ı (Lider Planı)'
-    : 'Network Marketing Master - Saha Distribütörü (Bireysel Plan)'
+  let amount = '499'
+  let productName = 'Network Marketing Master - Basic Plan'
+
+  if (plan === 'pro') {
+    amount = '2499'
+    productName = 'Network Marketing Master - Pro Lider Planı'
+  } else if (plan === 'master') {
+    amount = '1499'
+    productName = 'Network Marketing Master - Plus Lider Planı'
+  }
 
   const workspaceId = membership.workspace_id
   const platformOrderId = `${workspaceId}_${Date.now()}`

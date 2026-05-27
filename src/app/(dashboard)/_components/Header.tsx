@@ -84,9 +84,16 @@ export function Header({ visible = true }: { visible?: boolean }) {
     ? Math.ceil((new Date(licenseExpiresAt).getTime() - Date.now()) / 86400000)
     : 999
   const showWarningBar = (licenseType !== 'free') && (isLicenseExpired || (remainingDays >= 0 && remainingDays <= 3))
+
+  const getPlanLabel = (type: string) => {
+    if (type === 'pro') return lang === 'en' ? 'Pro Lider' : 'Pro Lider'
+    if (type === 'master') return lang === 'en' ? 'Plus Lider' : 'Plus Lider'
+    return lang === 'en' ? 'Basic Partner' : 'Basic Partner'
+  }
+
   const warningBarText = isLicenseExpired
-    ? (lang === 'en' ? '⚠️ Your Ekip Master license has expired. Downline tracking is paused. [Renew License]' : '⚠️ Ekip Master lisansınızın süresi dolmuştur. Ekip takibi durduruldu. [Şimdi Yenile]')
-    : (lang === 'en' ? `⚠️ Your Ekip Master license expires in ${remainingDays} day(s). [Renew License]` : `⚠️ Ekip Master lisans süreniz ${remainingDays} gün sonra doluyor. [Lisansı Yenile]`)
+    ? (lang === 'en' ? `⚠️ Your ${getPlanLabel(licenseType)} license has expired. [Renew License]` : `⚠️ ${getPlanLabel(licenseType)} lisansınızın süresi dolmuştur. [Şimdi Yenile]`)
+    : (lang === 'en' ? `⚠️ Your ${getPlanLabel(licenseType)} license expires in ${remainingDays} day(s). [Renew License]` : `⚠️ ${getPlanLabel(licenseType)} lisans süreniz ${remainingDays} gün sonra doluyor. [Lisansı Yenile]`)
 
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {

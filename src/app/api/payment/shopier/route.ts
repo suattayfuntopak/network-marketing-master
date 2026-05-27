@@ -67,10 +67,16 @@ export async function POST(request: NextRequest) {
     }
     
     // Determine license type based on payment amount:
-    // Plan A (Saha Distribütörü - 299 TL) ➔ 'leader'
-    // Plan B (Ekip Master'ı - 899 TL) ➔ 'master'
+    // Plan A (Basic Plan - 499 TL) ➔ 'leader'
+    // Plan B (Plus Plan - 1499 TL) ➔ 'master'
+    // Plan C (Pro Plan - 2499 TL) ➔ 'pro'
     const amountVal = parseFloat(total_amount)
-    const newLicenseType = amountVal >= 500 ? 'master' : 'leader'
+    let newLicenseType: 'leader' | 'master' | 'pro' = 'leader'
+    if (amountVal >= 2000) {
+      newLicenseType = 'pro'
+    } else if (amountVal >= 1000) {
+      newLicenseType = 'master'
+    }
     
     // Calculate new expiry (+30 days from current expiry if it is in the future, or today + 30 days if expired)
     const currentExpiry = ws.license_expires_at ? new Date(ws.license_expires_at) : new Date()
@@ -93,6 +99,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database update failed' }, { status: 500 })
     }
     
+    // Fetch leader's email and details to send invoice/success notification email
+    try {
+      const { data: leaderMember } = await supabase
+        .from('nmm_workspace_members')
+        .select('user_id, full_name')
+        .eq('workspace_id', workspaceId)
+        .eq('role', 'leader')
+        .maybeSingle()
+
+      if (leaderMember) {
+        const { data: authUser } = await supabase.auth.admin.getUserById(leaderMember.user_id)
+        if (authUser?.user?.email) {
+          const userEmail = authUser.user.email
+          const userFullName = leaderMember.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak'
+          
+          const { sendPaymentSuccessEmail } = require('@/lib/mail')
+          sendPaymentSuccessEmail(
+            userEmail,
+            userFullName,
+            newLicenseType,
+            total_amount,
+            newExpiry.toISOString(),
+            'tr'
+          ).catch((err: any) => {
+            console.error('[Shopier Webhook] Failed to send payment success email in background:', err)
+          })
+        }
+      }
+    } catch (mailErr) {
+      console.error('[Shopier Webhook] Error resolving mail recipient or sending email:', mailErr)
+    }
+
     console.log(`[Shopier Webhook] Success! Workspace ${workspaceId} upgraded to ${newLicenseType} until ${newExpiry.toISOString()}`)
     return NextResponse.json({ success: true, message: 'License updated successfully' })
     

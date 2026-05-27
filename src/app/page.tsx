@@ -412,27 +412,30 @@ export default function RootPage() {
           </p>
         </div>
 
-        {/* Two Pricing Cards */}
-        <div className="grid grid-cols-1 gap-8 max-w-4xl mx-auto sm:grid-cols-2 items-stretch">
+        {/* Three Pricing Cards */}
+        <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto lg:grid-cols-3 items-stretch">
           
-          {/* Plan A: Saha Distribütörü */}
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300">
+          {/* Plan A: Basic Plan */}
+          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
             <div className="space-y-6">
-              <div>
-                <span className="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg">
-                  {lang === 'en' ? 'INDEPENDENT' : 'BİREYSEL ORTAK'}
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                  {lang === 'en' ? 'SOLO BUILDER' : 'BİREYSEL ORTAK'}
                 </span>
-                <h3 className="mt-4 text-xl font-bold text-white">
-                  {lang === 'en' ? 'Field Partner' : 'Saha Distribütörü'}
+              </div>
+
+              <div>
+                <h3 className="text-xl font-extrabold text-white">
+                  {lang === 'en' ? 'Basic Plan' : 'Basic Plan'}
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1">
-                  {lang === 'en' ? 'Manage your personal pipeline.' : 'Kişisel aday hunisini yönetmek isteyenler için.'}
+                  {lang === 'en' ? 'Manage your personal candidate pipeline.' : 'Kişisel aday hunisini yönetmek ve provasını yapmak isteyenler için.'}
                 </p>
               </div>
 
               {/* Price */}
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">₺299</span>
+                <span className="text-4xl font-black text-white">₺499</span>
                 <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
               </div>
 
@@ -444,15 +447,19 @@ export default function RootPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 25 AI Message Creator Credits' : 'Günlük 25 YZ Mesaj Yazarı Kredisi'}</span>
+                  <span>{lang === 'en' ? 'Daily 15 AI Message Credits' : 'Günlük 15 YZ Mesaj Yazarı Kredisi'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 20 Interactive Rehearsal Credits' : 'Günlük 20 Rol Provası Simülatörü'}</span>
+                  <span>{lang === 'en' ? 'Daily 10 Interactive Rehearsal Credits' : 'Günlük 10 Saha Provası Simülatörü'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Excel Statistics & Reports' : 'Excel İstatistik Raporu & Grafikler'}</span>
+                  <span>{lang === 'en' ? 'Daily 2 Compliance Control Credits' : 'Günlük 2 Uyum Denetim Hakkı'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Solo Statistics & Reports' : 'Bireysel İstatistik Raporu & Grafikler'}</span>
                 </li>
               </ul>
             </div>
@@ -467,30 +474,30 @@ export default function RootPage() {
             </div>
           </div>
 
-          {/* Plan B: Ekip Master'ı */}
+          {/* Plan B: Plus Plan */}
           <div className="rounded-3xl border border-[#534AB7]/40 bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
             <div className="absolute right-6 top-6">
-              <span className="text-[10px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {lang === 'en' ? 'Popular' : 'En Çok Satan'}
               </span>
             </div>
 
             <div className="space-y-6">
               <div>
-                <span className="text-xs font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg">
-                  {lang === 'en' ? 'LEADER' : 'LİDER VE SPONSOR'}
+                <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                  {lang === 'en' ? 'GROWING TEAMS' : 'TAKIM LİDERLERİ'}
                 </span>
-                <h3 className="mt-4 text-xl font-bold text-white">
-                  {lang === 'en' ? 'Organizer Master' : 'Ekip Master\'ı'}
+                <h3 className="mt-4 text-xl font-extrabold text-white">
+                  {lang === 'en' ? 'Plus Plan' : 'Plus Plan'}
                 </h3>
                 <p className="text-xs text-zinc-400 mt-1">
-                  {lang === 'en' ? 'Track downlines and sync onboarding.' : 'Alt ekibini izlemek ve onboarding yönetmek isteyenler.'}
+                  {lang === 'en' ? 'Track downlines and sync onboarding.' : 'Alt ekibini izlemek, onboarding sürecini takip etmek ve gerçek zamanlı analiz etmek isteyen liderler.'}
                 </p>
               </div>
 
               {/* Price */}
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-white">₺899</span>
+                <span className="text-4xl font-black text-white">₺1,499</span>
                 <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
               </div>
 
@@ -498,27 +505,31 @@ export default function RootPage() {
               <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span className="font-bold text-white">{lang === 'en' ? 'All Field Partner Features' : 'Saha Distribütörü Planındaki TÜM Özellikler'}</span>
+                  <span className="font-bold text-white">{lang === 'en' ? 'All Basic Plan Features' : 'Basic Planındaki TÜM Özellikler'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Direct Downline Funnel Tracking' : 'Alt Ekip Aday Hunisi İzleme'}</span>
+                  <span>{lang === 'en' ? 'Direct Downline Tracking (Max 20 Members)' : 'Alt Ekip Takibi (Maksimum 20 Üye)'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? '4-Week Automated Onboarding Sync' : '4 Haftalık Otomatik Doğru Başlangıç Takibi'}</span>
+                  <span>{lang === 'en' ? '4-Week Onboarding Sync' : '4 Haftalık Doğru Başlangıç Rehberi Takibi'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span className="text-white font-bold">{lang === 'en' ? 'Super-Lider: Unlimited AI Credits' : 'Süper Lider: Sınırsız Yapay Zeka Kredisi'}</span>
+                  <span>{lang === 'en' ? 'Daily 40 AI Message Credits' : 'Günlük 40 YZ Mesaj Yazarı Kredisi'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Custom Objection & Training Modules' : 'Kişisel İtiraz ve Eğitim Ekleme Modülleri'}</span>
+                  <span>{lang === 'en' ? 'Daily 25 Interactive Rehearsal Credits' : 'Günlük 25 Saha Provası Kredisi'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Real-Time Downline Metric Notifications' : 'Gerçek Zamanlı Downline Bildirim Motoru'}</span>
+                  <span>{lang === 'en' ? 'Daily 5 Compliance Control Credits' : 'Günlük 5 Uyum Denetim Hakkı'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Real-Time Downline Push Notifications' : 'Gerçek Zamanlı Takım Bildirim Motoru'}</span>
                 </li>
               </ul>
             </div>
@@ -529,6 +540,76 @@ export default function RootPage() {
                 className="block text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 cursor-pointer"
               >
                 {lang === 'en' ? 'Get Started Now' : 'Ekibi Güçlendir'}
+              </Link>
+            </div>
+          </div>
+
+          {/* Plan C: Pro Plan */}
+          <div className="rounded-3xl border border-pink-500/30 bg-gradient-to-b from-[#1c0f1e] to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
+            <div className="absolute right-6 top-6 flex items-center gap-2">
+              <span className="text-[9px] font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+                👑 {lang === 'en' ? 'Diamond Pro' : 'Diamond Pro'}
+              </span>
+            </div>
+
+            <div className="space-y-6">
+              <div className="space-y-1">
+                <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+                  {lang === 'en' ? 'TOP ORGANIZATIONS' : 'BÜYÜK LİDERLER'}
+                </span>
+                <h3 className="mt-4 text-xl font-extrabold text-white">
+                  {lang === 'en' ? 'Pro Plan' : 'Pro Plan'}
+                </h3>
+                <p className="text-xs text-zinc-400 mt-1">
+                  {lang === 'en' ? 'Unlimited downlines, coaching & Excel analytics.' : 'Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve Excel tarzı performans masası.'}
+                </p>
+              </div>
+
+              {/* Price */}
+              <div className="flex items-baseline gap-1">
+                <span className="text-4xl font-black text-white">₺2,499</span>
+                <span className="text-xs text-zinc-500">/ {lang === 'en' ? 'month' : 'ay'}</span>
+              </div>
+
+              {/* Bullet Features */}
+              <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span className="font-bold text-white">{lang === 'en' ? 'All Plus Plan Features' : 'Plus Planındaki TÜM Özellikler'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span className="font-bold text-pink-300">{lang === 'en' ? 'Sınırsız Alt Ekip Takibi' : 'Sınırsız Alt Ekip Takibi'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'AI Downline Performance Coaching' : 'Yapay Zeka Alt Ekip Koçu'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Super Admin AI Control Desk' : 'Süper Admin AI Kontrol Masası'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Daily 100 AI Message Credits' : 'Günlük 100 YZ Mesaj Yazarı Kredisi'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Daily 60 Interactive Rehearsal Credits' : 'Günlük 60 Saha Provası Kredisi'}</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Daily 15 Compliance Control Credits' : 'Günlük 15 Uyum Denetim Hakkı'}</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="pt-8">
+              <Link
+                href="/kayit"
+                className="block text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 cursor-pointer"
+              >
+                {lang === 'en' ? 'Get Started Now' : 'Zirveye Ulaş'}
               </Link>
             </div>
           </div>

@@ -251,7 +251,7 @@ export function EkipPanel() {
   const isLicenseExpired = licenseExpiresAt
     ? new Date(licenseExpiresAt) < new Date()
     : false
-  const hasMasterAccess = licenseType === 'master' && !isLicenseExpired
+  const hasMasterAccess = (licenseType === 'master' || licenseType === 'pro') && !isLicenseExpired
 
   const [copied, setCopied] = useState(false)
   const [inviteCodeInput, setInviteCodeInput] = useState('')
@@ -317,6 +317,14 @@ export function EkipPanel() {
     queryFn: () => fetchMembers(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
   })
+
+  const downlineMembers = members.filter(m => m.role !== 'leader')
+  const totalDownlineCount = downlineMembers.length
+  const isPlusCapReached = licenseType === 'master' && totalDownlineCount > 20
+
+  const visibleMembers = licenseType === 'master'
+    ? [members[0], ...downlineMembers.slice(0, 20)].filter(Boolean)
+    : members
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => setCurrentUser(user))
@@ -530,7 +538,7 @@ export function EkipPanel() {
 
         {/* Üye performans listesi */}
         <ul className="space-y-5">
-          {members.map(m => {
+          {visibleMembers.map(m => {
             const isCurrentUser = m.user_id === currentUser?.id
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
             const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
@@ -866,6 +874,32 @@ export function EkipPanel() {
           })}
         </ul>
 
+        {isPlusCapReached && (
+          <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-r from-pink-500/5 to-rose-500/5 p-8 text-center space-y-4 shadow-lg my-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-pink-500/10 text-pink-400 text-xl">
+              👑
+            </div>
+            <div className="max-w-md mx-auto space-y-2">
+              <h4 className="text-base font-bold text-white">
+                {lang === 'en' ? 'Team Limit Reached (20/20)' : 'Takım Limiti Aşıldı (20/20)'}
+              </h4>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                {lang === 'en'
+                  ? 'You have more than 20 downline members in your organization. Upgrade to Pro Plan for unlimited tracking, AI downline coaching, and professional analytics.'
+                  : 'Ekibinizde 20\'den fazla iş ortağı bulunuyor. Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve gelişmiş analizler için Pro Plana yükseltin.'}
+              </p>
+            </div>
+            <div className="pt-2">
+              <button
+                onClick={() => router.push('/odeme')}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-2.5 text-xs font-bold text-white hover:opacity-90 transition active:scale-95 cursor-pointer shadow-lg shadow-pink-500/15"
+              >
+                <span>{lang === 'en' ? 'Upgrade to Pro' : 'Pro Plana Yükselt 🚀'}</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         {isSolo && isLeader && (
           <p className="rounded-xl bg-[var(--bg-subtle)] px-5 py-4 text-center text-sm font-semibold text-[var(--text-2)] leading-relaxed border border-[var(--border)]">
             {t('team.soloHint')}
@@ -949,7 +983,7 @@ export function EkipPanel() {
       )}
 
       {/* ─── 4. EKİBE TOPLU GÖNDER ─── */}
-      <BroadcastPanel members={members} lang={lang} t={t} />
+      <BroadcastPanel members={visibleMembers} lang={lang} t={t} />
 
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (

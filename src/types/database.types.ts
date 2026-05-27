@@ -30,7 +30,7 @@ export interface Database {
           owner_id: string | null
           invite_code: string
           created_at: string
-          license_type: 'free' | 'leader' | 'master'
+          license_type: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at: string | null
         }
         Insert: {
@@ -39,7 +39,7 @@ export interface Database {
           owner_id?: string | null
           invite_code?: string
           created_at?: string
-          license_type?: 'free' | 'leader' | 'master'
+          license_type?: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at?: string | null
         }
         Update: {
@@ -48,7 +48,7 @@ export interface Database {
           owner_id?: string | null
           invite_code?: string
           created_at?: string
-          license_type?: 'free' | 'leader' | 'master'
+          license_type?: 'free' | 'leader' | 'master' | 'pro'
           license_expires_at?: string | null
         }
         Relationships: []

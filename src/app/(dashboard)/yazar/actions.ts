@@ -2,7 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_MESSAGE_LIMIT, DAILY_ROLEPLAY_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -37,7 +37,31 @@ export async function generateMessageAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
-  let remaining = DAILY_MESSAGE_LIMIT
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let licenseType = 'free'
+  if (membership) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership.workspace_id)
+      .single()
+    if (ws) {
+      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
+      if (!isExpired) {
+        licenseType = ws.license_type ?? 'free'
+      }
+    }
+  }
+
+  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
+  const activeMessageLimit = limits.messageLimit
+
+  let remaining = activeMessageLimit
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -50,17 +74,11 @@ export async function generateMessageAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_MESSAGE_LIMIT) {
-      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    if (used >= activeMessageLimit) {
+      return { error: `Günlük ${activeMessageLimit} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
     }
-    remaining = DAILY_MESSAGE_LIMIT - used - 1
+    remaining = activeMessageLimit - used - 1
   }
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
 
   try {
     const message = await generateMessage({ name, stage, context, tone, messageType, warmth })
@@ -106,7 +124,31 @@ export async function generateRoleplayResponseAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
-  let remaining = DAILY_ROLEPLAY_LIMIT
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let licenseType = 'free'
+  if (membership) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership.workspace_id)
+      .single()
+    if (ws) {
+      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
+      if (!isExpired) {
+        licenseType = ws.license_type ?? 'free'
+      }
+    }
+  }
+
+  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
+  const activeRoleplayLimit = limits.roleplayLimit
+
+  let remaining = activeRoleplayLimit
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -119,10 +161,10 @@ export async function generateRoleplayResponseAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_ROLEPLAY_LIMIT) {
-      return { error: `Günlük ${DAILY_ROLEPLAY_LIMIT} prova limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    if (used >= activeRoleplayLimit) {
+      return { error: `Günlük ${activeRoleplayLimit} prova limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
     }
-    remaining = DAILY_ROLEPLAY_LIMIT - used - 1
+    remaining = activeRoleplayLimit - used - 1
   }
 
   // Construct message history string
@@ -136,7 +178,7 @@ export async function generateRoleplayResponseAction(
     }
   }).join('\n')
 
-  const systemPrompt = `Sen bir Network Marketing simülatörü ve lider gelişim koçusun (Yapay Zeka Koçu).
+  const systemPrompt = `Sen bir Network Marketing simülatörü ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
 
 GÖREVİN:
 1. ADAY ROLÜ (SIMÜLASYON): Seçilen senaryoya (${scenarioId}) uygun olarak davran. Distribütörün en son yazdığı yanıta (${userReply}) karşılık, gerçek bir adaymışsın gibi bir sonraki yanıtını Türkçe olarak yaz. Gerçekçi, hafif itiraz eden, sohbete açık bir duruş sergile. Cevabı JSON'daki "candidate_reply" alanına yerleştir.
@@ -208,13 +250,6 @@ JSON yapısı şu şekilde olmalıdır:
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    // Save action usage in Supabase
-    const { data: membership } = await supabase
-      .from('nmm_workspace_members')
-      .select('workspace_id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-
     if (membership && !isSuperAdmin) {
       try {
         await supabase.from('nmm_daily_actions').insert({
@@ -267,7 +302,31 @@ export async function askCoachAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
-  let remaining = DAILY_MESSAGE_LIMIT
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let licenseType = 'free'
+  if (membership) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership.workspace_id)
+      .single()
+    if (ws) {
+      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
+      if (!isExpired) {
+        licenseType = ws.license_type ?? 'free'
+      }
+    }
+  }
+
+  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
+  const activeMessageLimit = limits.messageLimit
+
+  let remaining = activeMessageLimit
   if (!isSuperAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -280,17 +339,11 @@ export async function askCoachAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_MESSAGE_LIMIT) {
-      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
+    if (used >= activeMessageLimit) {
+      return { error: `Günlük ${activeMessageLimit} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
     }
-    remaining = DAILY_MESSAGE_LIMIT - used - 1
+    remaining = activeMessageLimit - used - 1
   }
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
 
   const systemPrompt = `Sen bir Network Marketing Uzmanı ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
 Kullanıcı sana network marketing sektörü, aday ilişkileri, takım kurma, sponsorluk, liderlik, satış teknikleri, zaman yönetimi veya bu sektörle doğrudan ilgili herhangi bir konuda soru soruyor.
@@ -301,7 +354,7 @@ GÖREVİN:
 Kullanıcının sorusu network marketing (ağ pazarlaması), doğrudan satış, liderlik, kişisel gelişim, aday ilişkileri, takım yönetimi vb. ile ilgili DEĞİLSE, nazik, son derece profesyonel ve samimi bir dille bu konunun ilgi alanının dışında olduğunu belirt. Sadece Network Marketing ve ilgili konularla ilgili soruları cevaplayabileceğini söyle. Başka hiçbir genel kültüre, kod yazmaya, ilgisiz akademik konuya vb. cevap verme.
 
 DİL POLİTİKASI:
-Eğer dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.`;
+Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.`;
 
   try {
     const model = genAI.getGenerativeModel({

@@ -9,7 +9,7 @@ export interface WorkspaceContext {
   role: 'leader' | 'member'
   fullName: string | null
   avatarUrl: string | null
-  licenseType: 'free' | 'leader' | 'master'
+  licenseType: 'free' | 'leader' | 'master' | 'pro'
   licenseExpiresAt: string | null
 }
 
@@ -54,7 +54,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
       role: membership.role,
       fullName: membership.full_name,
       avatarUrl,
-      licenseType: isSuperAdmin ? 'master' : (ws?.license_type ?? 'free'),
+      licenseType: isSuperAdmin ? 'pro' : (ws?.license_type ?? 'free') as any,
       licenseExpiresAt: isSuperAdmin ? null : (ws?.license_expires_at ?? null),
     }
   }
@@ -92,7 +92,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     role: 'leader',
     fullName,
     avatarUrl,
-    licenseType: isSuperAdmin ? 'master' : 'free',
+    licenseType: isSuperAdmin ? 'pro' : 'free',
     licenseExpiresAt: null
   }
 }

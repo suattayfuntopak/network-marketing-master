@@ -38,6 +38,14 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     return { error: friendly }
   }
 
+  // Trigger welcome onboarding email in the background asynchronously
+  if (data.user) {
+    const { sendWelcomeEmail } = require('@/lib/mail')
+    sendWelcomeEmail(email, fullName, 'tr').catch((err: any) => {
+      console.error('[signupAction] Welcome email failed in background:', err)
+    })
+  }
+
   // E-posta onayı zorunlu değilse identities boş gelir (zaten kayıtlı kullanıcı gibi davranır)
   if (data.user && data.user.identities?.length === 0) {
     return { error: 'Bu e-posta adresi zaten kayıtlı.' }

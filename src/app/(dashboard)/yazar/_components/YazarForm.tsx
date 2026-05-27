@@ -15,7 +15,7 @@ import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { parseNote } from '@/lib/noteParser'
 
@@ -184,17 +184,19 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const [translating, setTranslating] = useState(false)
 
   const { data: usage } = useAIUsage()
+  const { data: ws } = useWorkspace()
+  const limits = getLimitsForLicense(ws?.licenseType)
+  const activeMessageLimit = limits.messageLimit
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
   const used = usage?.messageUsed ?? 0
-  const remaining = Math.max(0, DAILY_MESSAGE_LIMIT - used)
+  const remaining = Math.max(0, activeMessageLimit - used)
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const containerRef = useRef<HTMLDivElement>(null)
   const prefilledRef = useRef(false)
   const prevMessageRef = useRef<string | undefined>(undefined)
 
-  const { data: ws } = useWorkspace()
   const { candidates = [] } = useCandidates(ws?.workspaceId)
 
   const fetchAndFormatCandidateContext = useCallback((c: NmmCandidate) => {
@@ -510,7 +512,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
         {limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            {lang === 'en' ? `You have reached your daily limit of ${DAILY_MESSAGE_LIMIT} AI messages. Resets tomorrow.` : `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.`}
+            {lang === 'en' ? `You have reached your daily limit of ${activeMessageLimit} AI messages. Resets tomorrow.` : `Günlük ${activeMessageLimit} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.`}
           </div>
         ) : (
           <button
@@ -520,7 +522,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             {isPending
               ? <><Loader2 className="h-4 w-4 animate-spin" /> {lang === 'en' ? 'Writing...' : 'Yazıyor...'}</>
-              : <><Bot className="h-4 w-4" /> {lang === 'en' ? 'Generate' : 'Üret'} {isSuperAdmin ? (lang === 'en' ? '(Unlimited)' : '(Sınırsız)') : `(Kalan: ${remaining} / ${DAILY_MESSAGE_LIMIT})`}</>
+              : <><Bot className="h-4 w-4" /> {lang === 'en' ? 'Generate' : 'Üret'} {isSuperAdmin ? (lang === 'en' ? '(Unlimited)' : '(Sınırsız)') : `(Kalan: ${remaining} / ${activeMessageLimit})`}</>
             }
           </button>
         )}
