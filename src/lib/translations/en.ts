@@ -73,6 +73,7 @@ export const en = {
     todayFocus: "Today's Focus",
     uyum: "Compliance Center",
     istatistikler: "Statistics",
+    platformYonetim: "Platform Admin",
   },
   stages: {
     yeni: "New Prospect",

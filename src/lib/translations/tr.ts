@@ -73,6 +73,7 @@ export const tr = {
     todayFocus: "Bugün İlgilen",
     uyum: "Uyum Merkezi",
     istatistikler: "İstatistikler",
+    platformYonetim: "Platform Yönetimi",
   },
   stages: {
     yeni: "Yeni Aday",

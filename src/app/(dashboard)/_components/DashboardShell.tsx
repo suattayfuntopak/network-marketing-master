@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
+import { useAIUsage } from '@/hooks/useAIUsage'
 
 const NAV_ROUTES = [
   '/pano',
@@ -19,10 +20,6 @@ const NAV_ROUTES = [
   '/uyum',
   '/istatistikler'
 ]
-
-function getRouteIndex(pathname: string) {
-  return NAV_ROUTES.findIndex(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))
-}
 
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
@@ -44,6 +41,17 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const touchStart = useRef<{ x: number; y: number } | null>(null)
+
+  const { data: usage } = useAIUsage()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
+
+  const routes = isSuperAdmin
+    ? [...NAV_ROUTES, '/platform-yonetim']
+    : NAV_ROUTES
+
+  function getRouteIndex(path: string) {
+    return routes.findIndex(r => path === r || (r !== '/pano' && path.startsWith(r)))
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -103,7 +111,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     }
     const idx = getRouteIndex(pathname)
     if (idx === -1) { setPendingHref(null); return }
-    const target = dx < 0 ? NAV_ROUTES[idx + 1] : NAV_ROUTES[idx - 1]
+    const target = dx < 0 ? routes[idx + 1] : routes[idx - 1]
     setPendingHref(target ?? null)
   }
 
@@ -116,12 +124,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return
     const idx = getRouteIndex(pathname)
     if (idx === -1) return
-    if (dx < 0 && idx < NAV_ROUTES.length - 1) {
+    if (dx < 0 && idx < routes.length - 1) {
       setNavDir('forward')
-      router.push(NAV_ROUTES[idx + 1])
+      router.push(routes[idx + 1])
     } else if (dx > 0 && idx > 0) {
       setNavDir('back')
-      router.push(NAV_ROUTES[idx - 1])
+      router.push(routes[idx - 1])
     }
   }
 

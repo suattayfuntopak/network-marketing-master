@@ -5,10 +5,11 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useEffect, useRef } from 'react'
 import { 
   LayoutDashboard, Zap, TrendingUp, Bot, Users, 
-  CalendarDays, MessageCircleQuestion, BookOpen, Target, Shield, BarChart2 
+  CalendarDays, MessageCircleQuestion, BookOpen, Target, Shield, BarChart2, Crown
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
+import { useAIUsage } from '@/hooks/useAIUsage'
 
 const NAV_ITEMS = [
   { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard        },
@@ -34,6 +35,12 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const router = useRouter()
   const { lang, t } = useTranslation()
   const activeRef = useRef<HTMLButtonElement | null>(null)
+  const { data: usage } = useAIUsage()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
+
+  const items = isSuperAdmin
+    ? [...NAV_ITEMS, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+    : NAV_ITEMS
 
   // Automatically scroll & center active item horizontally
   useEffect(() => {
@@ -47,8 +54,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   }, [pathname])
 
   function navigate(targetHref: string) {
-    const currentIdx = NAV_ITEMS.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
-    const targetIdx = NAV_ITEMS.findIndex(({ href }) => href === targetHref)
+    const currentIdx = items.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
+    const targetIdx = items.findIndex(({ href }) => href === targetHref)
     if (currentIdx !== -1 && targetIdx !== -1 && currentIdx !== targetIdx) {
       setNavDir(targetIdx > currentIdx ? 'forward' : 'back')
     }
@@ -60,9 +67,10 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
       "fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform overflow-x-auto scrollbar-none",
       visible ? 'translate-y-0' : 'translate-y-full'
     )}>
-      {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
+      {items.map(({ href, translationKey, icon: Icon }) => {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
+        const isCrown = href === '/platform-yonetim'
 
         // Dynamic premium labels to fit perfectly
         let label = t(translationKey)
@@ -86,6 +94,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
           label = lang === 'en' ? 'Compliance' : 'Uyum Merkezi'
         } else if (translationKey === 'nav.istatistikler') {
           label = lang === 'en' ? 'Stats' : 'İstatistikler'
+        } else if (translationKey === 'nav.platformYonetim') {
+          label = lang === 'en' ? 'Platform' : 'Yönetim'
         }
 
         return (
@@ -95,13 +105,27 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             onClick={() => navigate(href)}
             className={clsx(
               'flex flex-col items-center gap-1 py-3 text-[10px] font-bold transition-all duration-150 shrink-0 px-2 min-w-[76px] sm:min-w-[84px] text-center cursor-pointer',
-              active ? 'text-[#534AB7] dark:text-[#FACC15]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400',
-              pending && 'scale-110 text-[#534AB7] dark:text-[#FACC15]'
+              active
+                ? isCrown
+                  ? 'text-amber-500'
+                  : 'text-[#534AB7] dark:text-[#FACC15]'
+                : isCrown
+                  ? 'text-amber-600/80 hover:text-amber-700 dark:text-amber-400/80 dark:hover:text-amber-300 font-medium'
+                  : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400',
+              pending && (
+                isCrown
+                  ? 'scale-110 text-amber-500 dark:text-amber-400'
+                  : 'scale-110 text-[#534AB7] dark:text-[#FACC15]'
+              )
             )}
           >
             <Icon
-              className={clsx('h-5 w-5', active && 'drop-shadow-sm')}
-              strokeWidth={active || pending ? 2.25 : 1.75}
+              className={clsx(
+                'h-5 w-5',
+                active && 'drop-shadow-sm',
+                isCrown && !active && 'animate-pulse'
+              )}
+              strokeWidth={active || pending || isCrown ? 2.25 : 1.75}
             />
             <span className="whitespace-nowrap">{label}</span>
           </button>

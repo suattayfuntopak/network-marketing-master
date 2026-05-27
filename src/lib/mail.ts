@@ -278,3 +278,46 @@ export async function sendPaymentSuccessEmail(
     return false
   }
 }
+
+/**
+ * Sends a registration notification email to the platform administrator.
+ */
+export async function sendAdminNewUserEmail(
+  adminEmail: string,
+  newUserEmail: string,
+  newUserName: string
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendAdminNewUserEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const subject = `Yeni Kullanıcı Kaydı: ${newUserName} 🚀`
+  const content = `
+    <h1>Platforma Yeni Kayıt!</h1>
+    <p>Network Marketing Master platformuna yeni bir bağımsız lider/ortak kaydoldu:</p>
+    
+    <div class="receipt-box">
+      <div class="receipt-row"><strong>İsim Soyad:</strong> <span>${newUserName}</span></div>
+      <div class="receipt-row"><strong>E-posta:</strong> <span>${newUserEmail}</span></div>
+      <div class="receipt-row"><strong>Kayıt Zamanı:</strong> <span>${new Date().toLocaleString('tr-TR')}</span></div>
+    </div>
+    
+    <p>Kullanıcının detaylarını ve kullanım istatistiklerini takip etmek için Platform Yönetim Masasını ziyaret edebilirsiniz.</p>
+  `
+
+  try {
+    const data = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [adminEmail],
+      subject,
+      html: getEmailTemplate(content, 'tr'),
+    })
+
+    console.log('[Resend] Admin signup alert email sent successfully:', data)
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send admin signup alert email:', err)
+    return false
+  }
+}

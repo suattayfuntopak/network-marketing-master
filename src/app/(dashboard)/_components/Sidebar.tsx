@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2, Target } from 'lucide-react'
+import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2, Target, Crown } from 'lucide-react'
 import { clsx } from 'clsx'
+import { useAIUsage } from '@/hooks/useAIUsage'
 
 const NAV_ITEMS = [
   { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard          },
@@ -28,6 +29,12 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const { t } = useTranslation()
+  const { data: usage } = useAIUsage()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
+
+  const items = isSuperAdmin
+    ? [...NAV_ITEMS, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+    : NAV_ITEMS
 
   return (
     <aside
@@ -42,9 +49,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
       {/* Nav */}
       <nav className={clsx('flex-1 space-y-1 py-1', collapsed ? 'px-2' : 'px-3')}>
-        {NAV_ITEMS.map(({ href, translationKey, icon: Icon }) => {
+        {items.map(({ href, translationKey, icon: Icon }) => {
           const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
           const label = t(translationKey)
+          const isCrown = href === '/platform-yonetim'
+
           return (
             <Link
               key={href}
@@ -54,12 +63,22 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 'flex items-center rounded-xl transition-colors',
                 collapsed ? 'h-10 w-10 justify-center' : 'gap-3 px-3 py-2.5',
                 'text-sm font-medium',
-                active
-                  ? 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]'
-                  : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]'
+                isCrown
+                  ? active
+                    ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold border border-amber-500/20'
+                    : 'text-amber-600/90 dark:text-amber-400/90 hover:bg-amber-500/10 hover:text-amber-700 dark:hover:text-amber-300 font-bold'
+                  : active
+                    ? 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]'
+                    : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]'
               )}
             >
-              <Icon className="h-4 w-4 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
+              <Icon 
+                className={clsx(
+                  'h-4 w-4 shrink-0',
+                  isCrown && !active && 'animate-pulse'
+                )} 
+                strokeWidth={active || isCrown ? 2.25 : 1.75} 
+              />
               {!collapsed && label}
             </Link>
           )
