@@ -188,7 +188,7 @@ export function OdemeClient() {
           >
             <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
             <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
-              {lang === 'en' ? '-3 Months!' : '-3 Ay Fırsatı!'}
+              {lang === 'en' ? 'Best Value' : 'En İyi Fiyat'}
             </span>
           </button>
         </div>
@@ -497,12 +497,12 @@ export function OdemeClient() {
       {/* ── Extra Disclaimers ── */}
       <div className="max-w-2xl mx-auto text-center rounded-2xl border border-white/[0.03] bg-white/[0.01] p-6 space-y-2">
         <h4 className="text-xs font-bold text-zinc-300">
-          {lang === 'en' ? 'About Shopier & Subscription Sim' : 'Güvenli Altyapı ve Abonelik Simülasyonu Hakkında'}
+          {lang === 'en' ? 'Secure Payment & License' : 'Güvenli Ödeme & Lisans Bilgisi'}
         </h4>
         <p className="text-[10px] leading-relaxed text-zinc-500">
           {lang === 'en'
-            ? 'Payments are securely processed via Shopier. We do not store your credit card details. Since native recurring billing is limited in Turkey for non-incorporated businesses, we employ an "Abonelik Simülasyonu" where each transaction manually extends your expiration date by 30 days.'
-            : 'Ödemeleriniz Türkiye\'nin en güvenli bireysel ödeme altyapısı olan Shopier aracılığıyla 256-bit SSL şifrelemeyle gerçekleşir. Kart bilgileriniz kesinlikle kaydedilmez. Her satın alımınız mevcut lisans sürenizin üzerine otomatik olarak +30 gün ekleme yapar.'}
+            ? 'Payments are securely processed via Shopier with 256-bit SSL encryption. We do not store your credit card details. Each purchase extends your active license period by 30 days, allowing you to renew or upgrade at any time.'
+            : 'Ödemeleriniz 256-bit SSL şifrelemeyle Shopier altyapısı üzerinden güvenle gerçekleşir. Kart bilgileriniz kesinlikle kaydedilmez. Her satın alım mevcut lisans sürenizi 30 gün uzatır; istediğiniz zaman yenileyebilir veya üst plana geçebilirsiniz.'}
         </p>
       </div>
     </div>

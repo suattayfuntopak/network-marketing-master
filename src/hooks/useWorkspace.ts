@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 
 export interface WorkspaceContext {
   workspaceId: string
@@ -38,7 +39,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
 
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
 
-  const isSuperAdmin = user.email === 'suattayfuntopak@gmail.com'
+  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
   if (membership) {
     // Workspace'in invite_code'unu ve lisans alanlarını çek

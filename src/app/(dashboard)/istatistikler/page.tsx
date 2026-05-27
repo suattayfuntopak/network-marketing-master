@@ -11,7 +11,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers } from '@/hooks/useTeamMembers'
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -21,7 +21,8 @@ export default function AnalyticsPage() {
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()
   const { data: members = [], isLoading: membersLoading } = useTeamMembers(ws?.workspaceId)
-  
+  const { messageLimit, roleplayLimit, complianceLimit } = getLimitsForLicense(ws?.licenseType)
+
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
   // Sort team members: Leader (Me) first, followed by downline members
@@ -577,13 +578,13 @@ export default function AnalyticsPage() {
                       {lang === 'en' ? 'AI Coach (Roleplay)' : 'Yapay Zeka Koçu (Rol Provası)'}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, 20 - (usage?.roleplayUsed ?? 0))} / 20 {lang === 'en' ? 'left' : 'kalan'}
+                      {Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0))} / {roleplayLimit} {lang === 'en' ? 'left' : 'kalan'}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#534AB7] transition-all duration-500"
-                      style={{ width: `${Math.min(100, (Math.max(0, 20 - (usage?.roleplayUsed ?? 0)) / 20) * 100)}%` }}
+                      style={{ width: `${roleplayLimit > 0 ? Math.min(100, (Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0)) / roleplayLimit) * 100) : 0}%` }}
                     />
                   </div>
                 </div>
@@ -596,13 +597,13 @@ export default function AnalyticsPage() {
                       {lang === 'en' ? 'Write Message (AI Writer)' : 'YZ Mesajı Üret'}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'left' : 'kalan'}
+                      {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {lang === 'en' ? 'left' : 'kalan'}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#0F6E56] transition-all duration-500"
-                      style={{ width: `${Math.min(100, (Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0)) / DAILY_MESSAGE_LIMIT) * 100)}%` }}
+                      style={{ width: `${messageLimit > 0 ? Math.min(100, (Math.max(0, messageLimit - (usage?.messageUsed ?? 0)) / messageLimit) * 100) : 0}%` }}
                     />
                   </div>
                 </div>
@@ -615,13 +616,13 @@ export default function AnalyticsPage() {
                       {lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi'}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, 5 - (usage?.complianceUsed ?? 0))} / 5 {lang === 'en' ? 'left' : 'kalan'}
+                      {complianceLimit > 0 ? `${Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0))} / ${complianceLimit}` : (lang === 'en' ? 'Upgrade required' : 'Plan gerekli')} {complianceLimit > 0 ? (lang === 'en' ? 'left' : 'kalan') : ''}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#C03E1F] transition-all duration-500"
-                      style={{ width: `${Math.min(100, (Math.max(0, 5 - (usage?.complianceUsed ?? 0)) / 5) * 100)}%` }}
+                      style={{ width: `${complianceLimit > 0 ? Math.min(100, (Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0)) / complianceLimit) * 100) : 0}%` }}
                     />
                   </div>
                 </div>

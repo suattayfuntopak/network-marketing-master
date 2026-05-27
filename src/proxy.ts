@@ -51,7 +51,7 @@ export async function proxy(request: NextRequest) {
 
   if (user && isPublic && !isPasswordReset) {
     const url = request.nextUrl.clone()
-    url.pathname = '/bugun'
+    url.pathname = '/bugun/ilgilen'
     return NextResponse.redirect(url)
   }
 

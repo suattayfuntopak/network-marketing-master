@@ -7,10 +7,11 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { Zap, TrendingUp, Bot, Users, CalendarDays, Target, MessageCircleQuestion, BookOpen, Shield, BarChart2 } from 'lucide-react'
+import { Zap, TrendingUp, Bot, Users, CalendarDays, Target, MessageCircleQuestion, BookOpen, Shield, BarChart2, ArrowRight } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 import type { NmmCandidate } from '@/types/database.types'
 
 
@@ -80,6 +81,7 @@ export function PanoContent() {
 
   const activeCount = candidates.filter(c => ACTIVE_STAGES.includes(c.stage)).length
   const joinedCount = candidates.filter(c => c.stage === 'katildi').length
+  const { complianceLimit } = getLimitsForLicense(ws?.licenseType)
 
   const hour = new Date().getHours()
   const greeting = hour < 5
@@ -142,6 +144,50 @@ export function PanoContent() {
         <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" desktopColor="purple" href="/uyum"          />
         <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   desktopColor="teal"   href="/istatistikler" />
       </div>
+
+      {/* ── Compliance CTA — free plan upsell / paid plan quick access ── */}
+      <Link
+        href="/uyum"
+        className={clsx(
+          'flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 transition-all hover:opacity-90 active:scale-[0.99]',
+          complianceLimit === 0
+            ? 'border-[#C03E1F]/30 bg-[#FEF0EC] dark:bg-[#47221A]/40 dark:border-[#C03E1F]/20'
+            : 'border-[#E8F0FE] bg-[#E8F0FE] dark:bg-[#222E4D]/60 dark:border-[#1e3a5f]'
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={clsx(
+            'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+            complianceLimit === 0
+              ? 'bg-[#C03E1F]/10 text-[#C03E1F]'
+              : 'bg-[#1A56DB]/10 text-[#1A56DB] dark:text-[#93c5fd]'
+          )}>
+            <Shield className="h-4.5 w-4.5" strokeWidth={2} />
+          </div>
+          <div>
+            <p className={clsx(
+              'text-xs font-bold',
+              complianceLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
+            )}>
+              {complianceLimit === 0
+                ? (lang === 'en' ? 'Unlock Compliance Audit' : 'Uyum Denetimini Aç')
+                : (lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi')}
+            </p>
+            <p className={clsx(
+              'text-[11px] mt-0.5',
+              complianceLimit === 0 ? 'text-[#C03E1F]/70' : 'text-[#1A56DB]/70 dark:text-[#93c5fd]/70'
+            )}>
+              {complianceLimit === 0
+                ? (lang === 'en' ? 'Check your messages for legal compliance — paid plans only.' : 'Mesajlarınızı yasal uyum açısından denetleyin — ücretli plan gerekli.')
+                : (lang === 'en' ? `Audit your marketing messages for FTC & legal compliance. ${complianceLimit} daily credits.` : `Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Günlük ${complianceLimit} hak.`)}
+            </p>
+          </div>
+        </div>
+        <ArrowRight className={clsx(
+          'h-4 w-4 shrink-0',
+          complianceLimit === 0 ? 'text-[#C03E1F]/60' : 'text-[#1A56DB]/60 dark:text-[#93c5fd]/60'
+        )} />
+      </Link>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
       <div className="grid grid-cols-3 gap-3 md:gap-4">

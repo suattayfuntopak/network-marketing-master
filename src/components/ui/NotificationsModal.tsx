@@ -131,7 +131,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
   const [soundAlerts, setSoundAlerts]   = useState(true)
-  const [userEmail, setUserEmail]       = useState('suattayfuntopak@gmail.com')
+  const [userEmail, setUserEmail]       = useState('')
   const [localNotifs, setLocalNotifs]   = useState<any[]>([])
   const [selected, setSelected]         = useState<any | null>(null)
 
@@ -174,7 +174,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) {
-        setUserEmail(user.email ?? 'suattayfuntopak@gmail.com')
+        setUserEmail(user.email ?? '')
         const prefs = user.user_metadata?.preferences
         if (prefs) {
           if (prefs.email !== undefined) {

@@ -2,10 +2,9 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-
-const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface CoachState {
@@ -52,7 +51,21 @@ export async function generateCoachMessage(
     if ((count ?? 0) === 0) return { error: 'Erişim reddedildi.' }
   }
 
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   if (!isSuperAdmin) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership?.workspace_id ?? '')
+      .maybeSingle()
+    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
+    const { messageLimit } = getLimitsForLicense(licenseType)
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const { count } = await supabase
@@ -63,16 +76,10 @@ export async function generateCoachMessage(
       .or('note.is.null,note.eq.message')
       .gte('created_at', today.toISOString())
 
-    if ((count ?? 0) >= DAILY_MESSAGE_LIMIT) {
-      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
+    if ((count ?? 0) >= messageLimit) {
+      return { error: `Günlük ${messageLimit} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
     }
   }
-
-  const { data: membership } = await supabase
-     .from('nmm_workspace_members')
-     .select('workspace_id')
-     .eq('user_id', user.id)
-     .maybeSingle()
 
   try {
     const message = await generateMessage({ name, stage, note, messageType })
@@ -117,7 +124,21 @@ export async function generateDownlineCoachingMessage(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   if (!isSuperAdmin) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership?.workspace_id ?? '')
+      .maybeSingle()
+    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
+    const { messageLimit } = getLimitsForLicense(licenseType)
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const { count } = await supabase
@@ -128,16 +149,10 @@ export async function generateDownlineCoachingMessage(
       .or('note.is.null,note.eq.message')
       .gte('created_at', today.toISOString())
 
-    if ((count ?? 0) >= DAILY_MESSAGE_LIMIT) {
-      return { error: `Günlük ${DAILY_MESSAGE_LIMIT} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
+    if ((count ?? 0) >= messageLimit) {
+      return { error: `Günlük ${messageLimit} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
     }
   }
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
 
   try {
     const model = genAI.getGenerativeModel({

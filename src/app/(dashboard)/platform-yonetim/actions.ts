@@ -3,8 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-
-const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 
 // Initialize Supabase Admin Client using Service Role Key to bypass RLS safely
 function createAdminClient() {

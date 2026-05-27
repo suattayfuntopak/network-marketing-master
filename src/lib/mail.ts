@@ -280,6 +280,73 @@ export async function sendPaymentSuccessEmail(
 }
 
 /**
+ * Sends a license expiry reminder email (7, 3, or 1 day before expiry).
+ */
+export async function sendLicenseExpiryEmail(
+  email: string,
+  name: string,
+  plan: 'leader' | 'master' | 'pro',
+  expiresAt: string,
+  daysRemaining: number,
+  lang: 'tr' | 'en' = 'tr'
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendLicenseExpiryEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const planLabel = plan === 'pro'
+    ? 'Diamond Pro Lider'
+    : plan === 'master'
+      ? 'Plus Lider'
+      : 'Basic Partner'
+
+  const dateFormatted = new Date(expiresAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  })
+
+  const subject = lang === 'en'
+    ? `Your license expires in ${daysRemaining} day${daysRemaining > 1 ? 's' : ''}! ⏳`
+    : `Lisansınız ${daysRemaining} gün içinde sona eriyor! ⏳`
+
+  const urgencyColor = daysRemaining === 1 ? '#EF4444' : daysRemaining === 3 ? '#F97316' : '#EAB308'
+
+  const content = lang === 'en'
+    ? `
+      <h1>License Expiry Reminder</h1>
+      <p>Hi ${name}, your <span class="highlight">${planLabel}</span> license on Network Marketing Master expires in <span style="color: ${urgencyColor}; font-weight: 800;">${daysRemaining} day${daysRemaining > 1 ? 's' : ''}</span> (${dateFormatted}).</p>
+      <p>Renewing your license ensures uninterrupted access to all your AI credits, pipeline tracking, and analytics tools. Don't lose your progress!</p>
+      <div class="button-container">
+        <a href="https://nmmaster.com/odeme" class="button">Renew Now →</a>
+      </div>
+      <p>The NMM Team</p>
+    `
+    : `
+      <h1>Lisans Sona Erme Hatırlatması</h1>
+      <p>Merhaba ${name}, <span class="highlight">${planLabel}</span> lisansınız Network Marketing Master üzerinde <span style="color: ${urgencyColor}; font-weight: 800;">${daysRemaining} gün</span> içinde sona eriyor (${dateFormatted}).</p>
+      <p>Lisansınızı yenilemeniz, tüm yapay zeka kredilerinize, aday takibinize ve analiz araçlarınıza kesintisiz erişim sağlar. İlerlemenizi kaybetmeyin!</p>
+      <div class="button-container">
+        <a href="https://nmmaster.com/odeme" class="button">Hemen Yenile →</a>
+      </div>
+      <p>NMM Ekibi</p>
+    `
+
+  try {
+    const data = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject,
+      html: getEmailTemplate(content, lang),
+    })
+    console.log('[Resend] License expiry email sent:', data)
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send license expiry email:', err)
+    return false
+  }
+}
+
+/**
  * Sends a registration notification email to the platform administrator.
  */
 export async function sendAdminNewUserEmail(

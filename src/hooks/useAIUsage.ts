@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 
 export interface AIUsageData {
   roleplayUsed: number
@@ -25,7 +26,7 @@ export function useAIUsage() {
         }
       }
 
-      const isSuperAdmin = user.email === 'suattayfuntopak@gmail.com'
+      const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
       const today = new Date()
       today.setHours(0, 0, 0, 0)

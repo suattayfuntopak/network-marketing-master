@@ -1,11 +1,11 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
 
 const ONBOARDING_STEPS_TR: Record<string, string> = {
   'step_why': 'Başlangıç Görüşmesi & "Neden?" Belirleme',
@@ -60,9 +60,23 @@ export async function generateOnboardingGuidanceAction(
 
   const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
 
+  const { data: membership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
   // Quota verification
-  let remaining = DAILY_MESSAGE_LIMIT
+  let remaining = 0
   if (!isSuperAdmin) {
+    const { data: ws } = await supabase
+      .from('nmm_workspaces')
+      .select('license_type, license_expires_at')
+      .eq('id', membership?.workspace_id ?? '')
+      .maybeSingle()
+    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
+    const { messageLimit } = getLimitsForLicense(licenseType)
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     const { count } = await supabase
@@ -74,23 +88,16 @@ export async function generateOnboardingGuidanceAction(
       .gte('created_at', today.toISOString())
 
     const used = count ?? 0
-    if (used >= DAILY_MESSAGE_LIMIT) {
+    if (used >= messageLimit) {
       return {
         error: lang === 'en'
-          ? `You have reached the daily AI coaching limit of ${DAILY_MESSAGE_LIMIT} messages. Please try again tomorrow.`
-          : `Günlük ${DAILY_MESSAGE_LIMIT} yapay zeka mesaj/koçluk limitinize ulaştınız. Yarın tekrar deneyebilirsiniz.`,
+          ? `You have reached the daily AI coaching limit of ${messageLimit} messages. Please try again tomorrow.`
+          : `Günlük ${messageLimit} yapay zeka mesaj/koçluk limitinize ulaştınız. Yarın tekrar deneyebilirsiniz.`,
         remaining: 0,
       }
     }
-    remaining = DAILY_MESSAGE_LIMIT - used - 1
+    remaining = messageLimit - used - 1
   }
-
-  // Get active workspace membership
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
 
   const stepLabel = lang === 'en'
     ? (ONBOARDING_STEPS_EN[stepId] || stepId)

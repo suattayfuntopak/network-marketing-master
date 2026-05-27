@@ -17,8 +17,6 @@ import { deleteWithUndo } from '@/lib/deleteWithUndo'
 import { waHref } from '@/lib/waLink'
 import { Z } from '@/lib/zIndex'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
-import { isAILimitReached, incrementAIUsage } from '@/lib/aiUsage'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
 
 function daysSince(iso: string | null, t: (k: string, v?: Record<string, string | number>) => string): string {
@@ -66,21 +64,8 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   const [generating, setGenerating] = useState(false)
   const [activeMessage, setActiveMessage] = useState<string | null>(null)
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserEmail(user?.email ?? null)
-    })
-  }, [])
 
   async function handleAIMessage() {
-    if (isAILimitReached(isSuperAdmin)) {
-      toast.error(`Günlük limitinize ulaştınız. Yarın yenilenir.`)
-      return
-    }
     setGenerating(true)
     try {
       const result = await generateQuickMessageAction({
@@ -92,7 +77,6 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         toast.error(result.error ?? 'Mesaj oluşturulamadı.')
         return
       }
-      incrementAIUsage(isSuperAdmin)
       setActiveMessage(result.message)
     } catch (err) {
       console.error(err)

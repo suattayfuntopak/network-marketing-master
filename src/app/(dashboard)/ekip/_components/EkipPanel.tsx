@@ -18,7 +18,7 @@ import { SpoilerCode } from './SpoilerCode'
 import { BroadcastPanel } from './BroadcastPanel'
 import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 import { useAIUsage } from '@/hooks/useAIUsage'
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref } from '@/lib/waLink'
 import { parseNote } from '@/lib/noteParser'
@@ -1055,6 +1055,8 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const { data: usage, refetch: refetchUsage } = useAIUsage()
+  const { data: modalWs } = useWorkspace()
+  const { messageLimit } = getLimitsForLicense(modalWs?.licenseType)
 
   useEffect(() => {
     let active = true
@@ -1201,7 +1203,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
             <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)] mb-4">
               <span>{lang === 'en' ? 'Daily Coaching Quota:' : 'Günlük Koçluk Kotası:'}</span>
               <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
-                {Math.max(0, DAILY_MESSAGE_LIMIT - (usage?.messageUsed ?? 0))} / {DAILY_MESSAGE_LIMIT} {lang === 'en' ? 'remaining' : 'kalan'}
+                {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {lang === 'en' ? 'remaining' : 'kalan'}
               </span>
             </div>
           )}

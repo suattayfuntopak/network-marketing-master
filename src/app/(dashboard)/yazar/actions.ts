@@ -3,10 +3,10 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { getLimitsForLicense } from '@/lib/aiUsage'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
-const SUPER_ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
 
 export interface YazarFormState {
   message?: string

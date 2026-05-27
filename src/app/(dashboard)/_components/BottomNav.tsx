@@ -10,6 +10,7 @@ import {
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 import { useAIUsage } from '@/hooks/useAIUsage'
+import { useWorkspace } from '@/hooks/useWorkspace'
 
 const NAV_ITEMS = [
   { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard        },
@@ -36,11 +37,15 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const { lang, t } = useTranslation()
   const activeRef = useRef<HTMLButtonElement | null>(null)
   const { data: usage } = useAIUsage()
+  const { data: ws } = useWorkspace()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const licenseType = ws?.licenseType ?? 'free'
+  const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
 
+  const baseItems = hasTeamAccess ? NAV_ITEMS : NAV_ITEMS.filter(i => i.href !== '/ekip')
   const items = isSuperAdmin
-    ? [...NAV_ITEMS, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
-    : NAV_ITEMS
+    ? [...baseItems, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+    : baseItems
 
   // Automatically scroll & center active item horizontally
   useEffect(() => {

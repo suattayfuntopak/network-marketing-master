@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
+import { sendPaymentSuccessEmail } from '@/lib/mail'
 
 export async function POST(request: NextRequest) {
   try {
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     // Fetch current license details
     const { data: ws, error: wsError } = await supabase
       .from('nmm_workspaces')
-      .select('license_expires_at, license_type')
+      .select('license_expires_at, license_type, parent_id')
       .eq('id', workspaceId)
       .single()
       
@@ -134,7 +135,34 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Database update failed' }, { status: 500 })
     }
     
-    // Fetch leader's email and details to send invoice/success notification email
+    // Referral bonus: extend upline (parent) workspace license by 7 days
+    if (ws.parent_id) {
+      try {
+        const { data: parentWs } = await supabase
+          .from('nmm_workspaces')
+          .select('license_expires_at, license_type')
+          .eq('id', ws.parent_id)
+          .maybeSingle()
+
+        if (parentWs && parentWs.license_type !== 'free') {
+          const parentExpiry = parentWs.license_expires_at ? new Date(parentWs.license_expires_at) : new Date()
+          const parentBase = parentExpiry > now ? parentExpiry : now
+          const parentNewExpiry = new Date(parentBase)
+          parentNewExpiry.setDate(parentNewExpiry.getDate() + 7)
+
+          await supabase
+            .from('nmm_workspaces')
+            .update({ license_expires_at: parentNewExpiry.toISOString() })
+            .eq('id', ws.parent_id)
+
+          console.log(`[Shopier Webhook] Referral bonus: +7 days added to parent workspace ${ws.parent_id}`)
+        }
+      } catch (refErr) {
+        console.error('[Shopier Webhook] Referral bonus failed (non-critical):', refErr)
+      }
+    }
+
+    // Fetch leader's email and send invoice/success notification email
     try {
       const { data: leaderMember } = await supabase
         .from('nmm_workspace_members')
@@ -148,8 +176,7 @@ export async function POST(request: NextRequest) {
         if (authUser?.user?.email) {
           const userEmail = authUser.user.email
           const userFullName = leaderMember.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak'
-          
-          const { sendPaymentSuccessEmail } = require('@/lib/mail')
+
           sendPaymentSuccessEmail(
             userEmail,
             userFullName,

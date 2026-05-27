@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 
 interface FormState {
   error?: string
@@ -48,7 +49,7 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     })
 
     // Alert email to admin
-    sendAdminNewUserEmail('suattayfuntopak@gmail.com', email, fullName).catch((err: any) => {
+    sendAdminNewUserEmail(SUPER_ADMIN_EMAIL, email, fullName).catch((err: any) => {
       console.error('[signupAction] Admin notification email failed in background:', err)
     })
 
@@ -57,9 +58,8 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
       try {
         const { createAdminClient } = await import('@/lib/supabase/admin')
         const adminSupa = createAdminClient()
-        const ADMIN_EMAIL = 'suattayfuntopak@gmail.com'
         const { data: usersPage } = await adminSupa.auth.admin.listUsers({ page: 1, perPage: 200 })
-        const adminUser = usersPage?.users?.find((u: any) => u.email === ADMIN_EMAIL)
+        const adminUser = usersPage?.users?.find((u: any) => u.email === SUPER_ADMIN_EMAIL)
         if (adminUser?.id && adminUser.id !== data.user!.id) {
           await (adminSupa.from('nmm_notifications' as any).insert({
             user_id: adminUser.id,

@@ -7,6 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/zIndex'
+import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { toast } from 'sonner'
 import { playNotificationSound } from './NotificationsModal'
 
@@ -73,9 +74,9 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
 
       if (isEmailEnabled) {
         toast.info(`📧 E-posta Gönderildi: Yeni Aday Eklendi`, {
-          description: `${fullName.trim()} aday detayları suattayfuntopak@gmail.com adresine postalandı.`
+          description: `${fullName.trim()} aday detayları ${SUPER_ADMIN_EMAIL} adresine postalandı.`
         })
-        console.log(`[EMAIL DISPATCH] Sent to suattayfuntopak@gmail.com:`, {
+        console.log(`[EMAIL DISPATCH] Sent to ${SUPER_ADMIN_EMAIL}:`, {
           subject: 'Yeni Aday Eklendi',
           body: `Aday: ${fullName.trim()}\nNotlar: ${notes}`
         })

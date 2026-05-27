@@ -1,8 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { List, LayoutList, Phone, Bot, Copy, Check, Sparkles, X } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -14,7 +13,6 @@ import { getStageLabel, STAGE_COLOR } from '@/lib/stages'
 import { waHref } from '@/lib/waLink'
 import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
-import { isAILimitReached, incrementAIUsage, remainingAIUsage, DAILY_AI_LIMIT } from '@/lib/aiUsage'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 function formatDaysAgo(days: number, lang: string): string {
@@ -44,21 +42,7 @@ export function IlgilenContent() {
   const { daily, remaining, all } = useDailyActions(candidates)
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
-  const [userEmail, setUserEmail] = useState<string | null>(null)
-  const isSuperAdmin = userEmail === 'suattayfuntopak@gmail.com'
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUserEmail(user?.email ?? null)
-    })
-  }, [])
-
   async function handleAIMessage(id: string, name: string, stage: string, note: string | null, phone: string | null) {
-    if (isAILimitReached(isSuperAdmin)) {
-      toast.error(lang === 'en' ? `You have reached your daily limit of ${DAILY_AI_LIMIT} AI messages. Resets tomorrow.` : `Günlük ${DAILY_AI_LIMIT} AI mesaj limitine ulaştınız. Yarın yenilenir.`)
-      return
-    }
     setGeneratingFor(id)
     try {
       const result = await generateQuickMessageAction({ name, stage, note })
@@ -66,8 +50,6 @@ export function IlgilenContent() {
         toast.error(result.error ?? (lang === 'en' ? 'Could not generate message.' : 'Mesaj oluşturulamadı.'))
         return
       }
-      incrementAIUsage(isSuperAdmin)
-      
       setActiveMessage({
         candidateId: id,
         candidateName: name,

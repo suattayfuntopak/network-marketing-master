@@ -5,12 +5,12 @@ import { Copy, Loader2, Bot, HelpCircle, Check, Send } from 'lucide-react'
 import { clsx } from 'clsx'
 import { askCoachAction, translateTextAction } from '../actions'
 import { useAIUsage } from '@/hooks/useAIUsage'
+import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-
-import { DAILY_MESSAGE_LIMIT } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/aiUsage'
 
 export function KoclukForm() {
   const { lang } = useTranslation()
@@ -22,12 +22,14 @@ export function KoclukForm() {
   const [displayedAnswer, setDisplayedAnswer] = useState('')
   const [generatedLang, setGeneratedLang] = useState<'tr' | 'en'>(lang)
   const [translating, setTranslating] = useState(false)
-  
+
   const { data: usage } = useAIUsage()
+  const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
   const used = usage?.messageUsed ?? 0
-  const remaining = Math.max(0, DAILY_MESSAGE_LIMIT - used)
+  const messageLimit = getLimitsForLicense(ws?.licenseType).messageLimit
+  const remaining = Math.max(0, messageLimit - used)
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
@@ -108,7 +110,7 @@ export function KoclukForm() {
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-            {isSuperAdmin ? (lang === 'en' ? 'Unlimited' : 'Sınırsız') : `${remaining} / ${DAILY_MESSAGE_LIMIT}`}
+            {isSuperAdmin ? (lang === 'en' ? 'Unlimited' : 'Sınırsız') : `${remaining} / ${messageLimit}`}
           </p>
           <p className="text-[9px] text-[#3730A3]/60 dark:text-[#c7d2fe]/60 font-semibold uppercase tracking-wider">
             {lang === 'en' ? 'Daily AI Quota' : 'Günlük Limit'}
