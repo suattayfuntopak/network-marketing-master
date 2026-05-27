@@ -1303,5 +1303,35 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Canlı Webhook Test Başarısı (`test_live_webhook.js`):**
   - Hazırlanan `scratch/test_live_webhook.js` canlı test scripti üzerinden `nmm.suattayfuntopak.com` sunucusuna gönderilen HMAC-SHA256 imzalı POST isteği, canlı sunucuda **200 OK** ve `License updated successfully` yanıtı alarak lisansın veritabanında +30 gün boyunca 'master' statüsüyle başarıyla uzatıldığını kanıtlamıştır.
 
+### feat: Türkiye Yaşam Standartlarına Uyumlu Sweet-Spot Fiyatlar ve Yıllık Lisans Entegrasyonu
+
+- **Dönüşüm Oranı Optimizasyonu ve Yeni Sweet-Spot Fiyatları:**
+  - Yapay zeka Gemini API token maliyet analizleri ile Türkiye pazarının satın alma eşikleri (sürtünme noktaları) gözetilerek Basic, Plus ve Pro paketlerinin fiyatları güncellendi.
+  - **Basic Plan (Bireysel Ortak):** ₺499'dan **₺399 / Ay**'a indirilerek ₺400 altındaki "düşünmeden alım" eşiği hedeflendi.
+  - **Plus Plan (Takım Lideri):** ₺1,499'dan **₺1,199 / Ay**'a çekilerek takımını büyüten sponsorlara daha cazip hale getirildi.
+  - **Pro Plan (Diamond Lider):** Fiyatı çıpalama görevi de görecek şekilde premium **₺2,499 / Ay** olarak korundu.
+- **Stratejik Yıllık Peşin Ödeme Modeli Entegrasyonu:**
+  - SaaS platformlarının nakit akışını ve kullanıcı bağlılığını (LTV) maksimize edecek şekilde **Yıllık Lisans** modelleri sisteme kazandırıldı:
+    - **Yıllık Basic:** Peşin **₺3,499 / Yıl** *(Aylık ₺291'a denk gelir - 3 Ay Bedava Avantajı)*
+    - **Yıllık Plus:** Peşin **₺9,999 / Yıl** *(Aylık ₺833'e denk gelir - 3 Ay Bedava Avantajı)*
+    - **Yıllık Pro:** Peşin **₺19,999 / Yıl** *(Aylık ₺1,666'ya denk gelir - 3 Ay Bedava Avantajı)*
+- **Landing Page Fiyat Geçiş Butonu (Toggler - `page.tsx`):**
+  - Fiyat tablosunun üstüne cam-morfin tasarımlı, yumuşak geçiş efektine sahip bir **Aylık / Yıllık Fiyat Geçiş Butonu** eklendi.
+  - Yıllık butona parıldayan yeşil neon animasyonlu **"-3 Ay Fırsatı!"** rozeti yerleştirilerek dönüşümler teşvik edildi.
+  - Fiyatlar ve açıklama metinleri seçilen periyoda göre anında ve dinamik olarak değişir.
+- **Dashboard Ödeme Ekranı Yıllık Plan Butonları (`OdemeClient.tsx`):**
+  - Panel içerisindeki `/odeme` sayfasına da aynı **Aylık / Yıllık** geçiş toggler'ı entegre edildi.
+  - Satın alma butonları dinamikleşti (örn: aylıkta `"30 Günlük Plus Erişimini Başlat"`, yıllıkta `"Yıllık Plus Erişimini Başlat"`).
+  - Shopier yönlendirme panelindeki neon yükleme katmanına periyot detayı yansıtıldı (örn: `Plus Lider (Yıllık) - Amount: 9999 TRY`).
+- **Ödeme Altyapısı Server Action Genişletmesi (`actions.ts`):**
+  - `initiateShopierPayment` Server Action metodu `period: 'monthly' | 'yearly'` parametresini alacak şekilde güncellendi.
+  - HMAC-SHA256 imzası, seçilen plana ve periyoda denk gelen net tutar (₺399, ₺1,199, ₺2,499, ₺3,499, ₺9,999, ₺19,999) üzerinden hatasız hesaplanarak Shopier'e POST edilir.
+- **Shopier Webhook Rota Entegrasyonu (`route.ts`):**
+  - Gelen `total_amount` parametresine göre satın alınan paketi ve lisans süresini (+30 Gün vs +365 Gün) dinamik olarak ayıran akıllı haritalama yapısı kuruldu.
+  - Lisans uzatma işlemi, eğer üyenin aktif lisansı varsa o tarihin sonuna, yoksa bugünün sonuna ilgili gün miktarını ekleyecek şekilde pürüzsüzleştirildi.
+- **Derleme ve Kod Kalitesi:**
+  - TypeScript derleme doğrulaması `npx tsc --noEmit` ile başarıyla doğrulandı; 0 hata ve 0 uyarı alındı.
+
+
 
 
