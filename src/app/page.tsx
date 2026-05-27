@@ -191,7 +191,7 @@ export default function RootPage() {
 
   if (checkingSession) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[#0A0B10] text-[var(--text-1)]">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-[#0A0B10] text-[var(--text-1)]">
         <div className="relative flex items-center justify-center">
           {/* Glowing pulse ring */}
           <div className="absolute h-16 w-16 animate-ping rounded-full bg-[#534AB7]/20" />
@@ -208,22 +208,22 @@ export default function RootPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-[#0A0B10] text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white overflow-x-hidden font-sans">
+    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white overflow-x-hidden font-sans">
       
       {/* ── BACKGROUND NEON ORBS ── */}
-      <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full bg-[#534AB7]/10 blur-[130px] pointer-events-none" />
-      <div className="absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full bg-blue-600/5 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[10%] left-[20%] h-[450px] w-[450px] rounded-full bg-pink-600/5 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full dark:bg-[#534AB7]/10 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full dark:bg-blue-600/5 blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[20%] h-[450px] w-[450px] rounded-full dark:bg-pink-600/5 blur-[130px] pointer-events-none" />
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#0A0B10]/70 border-b border-white/[0.04]">
+      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
           {/* Logo */}
           <div className="flex flex-1 min-w-0 items-center gap-2">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] sm:h-9 sm:w-9">
               <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
             </div>
-            <span className="truncate text-xs font-extrabold tracking-tight bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent sm:text-base">
+            <span className="truncate text-xs font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-indigo-700 dark:from-white dark:to-indigo-100 bg-clip-text text-transparent sm:text-base">
               Network Marketing Master
             </span>
           </div>
@@ -235,7 +235,7 @@ export default function RootPage() {
               <button
                 onClick={() => setTheme(NEXT_THEME[currentTheme])}
                 title={NEXT_THEME_LABEL[currentTheme]}
-                className="flex h-7 w-7 items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-white/50 transition hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
               >
                 {THEME_ICON[currentTheme]}
               </button>
@@ -267,7 +267,7 @@ export default function RootPage() {
             <Link
               href="/giris"
               title={lang === 'en' ? 'Log In' : 'Giriş Yap'}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3.5 sm:py-1.5"
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 dark:text-white/60 transition hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3.5 sm:py-1.5"
             >
               <LogIn className="h-3.5 w-3.5 sm:hidden" />
               <span className="hidden text-xs font-bold sm:inline">{lang === 'en' ? 'Log In' : 'Giriş Yap'}</span>
@@ -296,7 +296,7 @@ export default function RootPage() {
         </div>
 
         {/* Title */}
-        <h1 className="mx-auto max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-white">
+        <h1 className="mx-auto max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
           {lang === 'en' ? (
             <>
               Build a <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">High-Performance</span> & Active Network Marketing Team!
@@ -309,7 +309,7 @@ export default function RootPage() {
         </h1>
 
         {/* Subtitle */}
-        <p className="mx-auto max-w-2xl text-sm sm:text-base text-zinc-400 font-medium leading-relaxed">
+        <p className="mx-auto max-w-2xl text-sm sm:text-base text-slate-500 dark:text-zinc-400 font-medium leading-relaxed">
           {lang === 'en' 
             ? 'Stop chasing cold leads. Standardize candidate pipelines, simulate interactive AI roleplay, and track your entire downline’s progress on autopilot.'
             : 'Adayların peşinden koşmayı bırakın. Aday huninizi standartlaştırın, yapay zekayla interaktif rol provası yapın ve tüm alt ekibinizin gelişimini otomatik pilotta izleyin.'}
@@ -326,7 +326,7 @@ export default function RootPage() {
           </Link>
           <a
             href="#roi-calculator"
-            className="flex items-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.01] hover:bg-white/[0.03] text-zinc-300 px-6 py-3.5 text-sm font-bold transition cursor-pointer"
+            className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-zinc-300 px-6 py-3.5 text-sm font-bold transition cursor-pointer"
           >
             <Play className="h-3.5 w-3.5 text-indigo-400" />
             <span>{lang === 'en' ? 'How it Works' : 'Nasıl Çalışır?'}</span>
@@ -337,10 +337,10 @@ export default function RootPage() {
       {/* ── MAIN PRODUCT FEATURES GRID ── */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {lang === 'en' ? 'The Ultimate Command Center' : 'Eksiksiz Yönetim Merkezi'}
           </h2>
-          <p className="mx-auto max-w-xl text-xs sm:text-sm text-zinc-400 font-medium">
+          <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
             {lang === 'en'
               ? 'Every feature meticulously designed for professional network marketers and leaders.'
               : 'Profesyonel ağ pazarlamacıları ve liderler için cerrah titizliğiyle tasarlanmış araçlar.'}
@@ -351,14 +351,14 @@ export default function RootPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           
           {/* Card 1: Pipeline */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-indigo-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-indigo-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 transition duration-300">
               <TrendingUp className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'Candidate Pipeline' : 'Aday Boru Hattı'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Visualize and track candidates from cold list to presentation, follow-ups, and registration.'
                 : 'Adaylarınızı ilk listeden davete, sunumdan takibe ve ekibe kayıt aşamasına kadar görsel olarak yönetin.'}
@@ -366,14 +366,14 @@ export default function RootPage() {
           </div>
 
           {/* Card 2: AI Coach */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-purple-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-purple-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 transition duration-300">
               <Bot className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'AI Copywriter & Coach' : 'Yapay Zeka Koçu & Mesaj Yazarı'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Generate tailored WhatsApp follow-up messages based on client history. Ask the coach MLM strategic questions.'
                 : 'Adayın durumuna özel kişiselleştirilmiş takip mesajları hazırlayın. Liderlik ve MLM strateji sorularınızı sorun.'}
@@ -381,14 +381,14 @@ export default function RootPage() {
           </div>
 
           {/* Card 3: Quick Start */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-pink-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-pink-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-pink-500/10 text-pink-400 group-hover:bg-pink-500/20 transition duration-300">
               <Sparkles className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'Quick Start Onboarding' : 'Doğru Başlangıç Rehberi'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Ensure new distributors follow the perfect 4-week checklist. Database-persistent and sponsor sync.'
                 : 'Yeni distribütörlerin ilk 4 haftalık kritik başlangıç listesini adım adım tiklemesini sağlayın. Sponsor ekranıyla senkronize.'}
@@ -396,14 +396,14 @@ export default function RootPage() {
           </div>
 
           {/* Card 4: Field Rehearsal */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-amber-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-amber-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition duration-300">
               <Users className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'Interactive Roleplay Rehearsal' : 'Yapay Zeka Saha Provası'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Choose candidate warmth and simulate real chats. Practice presentation closing before going to the field.'
                 : 'Aday sıcaklığını seçip YZ simülasyonunda canlı sohbet edin. Sahaya inmeden önce kapanış provanızı tamamlayın.'}
@@ -411,14 +411,14 @@ export default function RootPage() {
           </div>
 
           {/* Card 5: Compliance */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-teal-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-teal-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 group-hover:bg-teal-500/20 transition duration-300">
               <Shield className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'Advertising & Compliance' : 'Uyum Denetleme Merkezi'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Instantly scan advertising and social posts for consumer-protection compliance and prohibited words.'
                 : 'Sosyal medya paylaşımlarınızı ve reklam metinlerinizi tüketici koruma kanunlarına ve MLM yasaklı kelimelerine göre denetleyin.'}
@@ -426,14 +426,14 @@ export default function RootPage() {
           </div>
 
           {/* Card 6: Team Analaytics */}
-          <div className="group relative rounded-2xl border border-white/[0.04] bg-white/[0.01] p-6 hover:border-blue-500/30 hover:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-blue-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition duration-300">
               <BarChart2 className="h-5 w-5" />
             </div>
-            <h3 className="mt-4 text-base font-bold text-white">
+            <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
               {lang === 'en' ? 'Direct Downline RLS Dashboard' : 'Ekibim Aday Dağılım Paneli'}
             </h3>
-            <p className="mt-2 text-xs text-zinc-400 leading-relaxed">
+            <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
               {lang === 'en'
                 ? 'Track downlines’ active pipeline metrics and last activity without invading their candidate privacy.'
                 : 'Alt ekibinizin toplam aday sayılarını, huni dağılımlarını ve aktifliğini gizliliklerini bozmadan izleyin.'}
@@ -446,10 +446,10 @@ export default function RootPage() {
       {/* ── INTERACTIVE ROI CALCULATOR ── */}
       <section id="roi-calculator" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-3">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {lang === 'en' ? 'See the Network Master Effect' : 'Network Master Etkisini Hesaplayın'}
           </h2>
-          <p className="mx-auto max-w-xl text-xs sm:text-sm text-zinc-400 font-medium">
+          <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
             {lang === 'en'
               ? 'Slide your downline size to estimate team momentum and sponsor hours saved.'
               : 'Ekip büyüklüğünüzü kaydırarak organizasyon momentumunuzu ve kazanacağınız zamanı görün.'}
@@ -460,13 +460,13 @@ export default function RootPage() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-center">
           
           {/* Slider input control - left */}
-          <div className="lg:col-span-5 rounded-3xl border border-white/[0.05] bg-white/[0.02] backdrop-blur-xl p-6 sm:p-8 space-y-6">
+          <div className="lg:col-span-5 rounded-3xl border border-slate-200 dark:border-white/[0.05] bg-slate-50 dark:bg-white/[0.02] backdrop-blur-xl p-6 sm:p-8 space-y-6">
             <div className="space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
                 {lang === 'en' ? 'Active Distributors' : 'Aktif Distribütör Sayısı'}
               </label>
               <div className="flex items-center justify-between">
-                <span className="text-3xl font-black text-white">{teamSize}</span>
+                <span className="text-3xl font-black text-slate-900 dark:text-white">{teamSize}</span>
                 <span className="text-xs font-bold text-[#534AB7] bg-[#EEEDFE]/10 px-2.5 py-1 rounded-lg">
                   {lang === 'en' ? 'PARTNERS' : 'ORTAK'}
                 </span>
@@ -485,12 +485,12 @@ export default function RootPage() {
             />
 
             {/* Info lists */}
-            <div className="border-t border-white/[0.05] pt-4 space-y-3">
-              <div className="flex items-center gap-2 text-xs text-zinc-400">
+            <div className="border-t border-slate-200 dark:border-white/[0.05] pt-4 space-y-3">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span>{lang === 'en' ? 'Assuming 15 candidates/month per active user' : 'Aktif kişi başına ayda 15 aday ekleme varsayımı'}</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-zinc-400">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
                 <span>{lang === 'en' ? '4 hours saved/week per onboarding downline' : 'Rehberi tamamlayan üye başına sponsor için haftalık 4 saat tasarruf'}</span>
               </div>
@@ -501,55 +501,55 @@ export default function RootPage() {
           <div className="lg:col-span-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
             
             {/* Stat 1: Candidate count */}
-            <div className="rounded-3xl border border-white/[0.05] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 p-6 space-y-2 relative overflow-hidden">
+            <div className="rounded-3xl border border-slate-200 dark:border-white/[0.05] bg-gradient-to-br from-indigo-500/5 to-purple-500/5 p-6 space-y-2 relative overflow-hidden">
               <div className="absolute -right-6 -bottom-6 text-indigo-500/10 text-8xl font-black select-none pointer-events-none">
                 #
               </div>
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
                 {lang === 'en' ? 'Team Candidates / Month' : 'Ekibin Aylık Toplam Adayı'}
               </p>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-white">{calculatedCandidatesNMM}</span>
+                <span className="text-3xl font-black text-slate-900 dark:text-white">{calculatedCandidatesNMM}</span>
                 <span className="text-xs text-emerald-400 font-bold">
                   {lang === 'en' ? `vs ${calculatedCandidatesTrad} (Manual)` : `${calculatedCandidatesTrad} Adaya Karşı`}
                 </span>
               </div>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-slate-500 dark:text-zinc-500">
                 {lang === 'en' ? 'Standardized digital pipelines maximize prospecting actions.' : 'Dijital huniler aday ekleme ve takip aksiyonlarını maksimize eder.'}
               </p>
             </div>
 
             {/* Stat 2: Hours Saved */}
-            <div className="rounded-3xl border border-white/[0.05] bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-6 space-y-2 relative overflow-hidden">
+            <div className="rounded-3xl border border-slate-200 dark:border-white/[0.05] bg-gradient-to-br from-purple-500/5 to-pink-500/5 p-6 space-y-2 relative overflow-hidden">
               <div className="absolute -right-6 -bottom-6 text-purple-500/10 text-8xl font-black select-none pointer-events-none">
                 H
               </div>
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
                 {lang === 'en' ? 'Sponsor Hours Saved / Month' : 'Kazanılan Sponsor Zamanı / Ay'}
               </p>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} saat</span>
               </div>
-              <p className="text-[11px] text-zinc-500">
+              <p className="text-[11px] text-slate-500 dark:text-zinc-500">
                 {lang === 'en' ? 'Checklists and dynamic guidance handle direct training.' : 'Doğru başlangıç rehberleri ekibin eğitim ve takip takibini üstlenir.'}
               </p>
             </div>
 
             {/* Stat 3: Active downline rate */}
-            <div className="rounded-3xl border border-white/[0.05] bg-gradient-to-br from-teal-500/5 to-blue-500/5 p-6 space-y-2 col-span-1 sm:col-span-2 relative overflow-hidden">
+            <div className="rounded-3xl border border-slate-200 dark:border-white/[0.05] bg-gradient-to-br from-teal-500/5 to-blue-500/5 p-6 space-y-2 col-span-1 sm:col-span-2 relative overflow-hidden">
               <div className="absolute -right-6 -bottom-6 text-teal-500/10 text-8xl font-black select-none pointer-events-none">
                 %
               </div>
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+              <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
                 {lang === 'en' ? 'Team Onboarding Active Rate' : 'Doğru Başlangıç Aktif Distribütör Oranı'}
               </p>
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-black text-teal-400">{calculatedActiveRate}</span>
-                <span className="text-xs text-zinc-500 font-semibold line-through">
+                <span className="text-xs text-slate-500 dark:text-zinc-500 font-semibold line-through">
                   {lang === 'en' ? 'vs 15% (Traditional lists)' : 'Geleneksel Kağıt/Excel listelerinde %15'}
                 </span>
               </div>
-              <p className="text-xs text-zinc-400">
+              <p className="text-xs text-slate-500 dark:text-zinc-400">
                 {lang === 'en'
                   ? 'Gamified, step-by-step checklists keep partners engaged and accountable.'
                   : 'Oyunlaştırılmış, 4 haftalık takip listesi ekip ortaklarını sürekli aksiyonda tutar.'}
@@ -563,10 +563,10 @@ export default function RootPage() {
       {/* ── PRICING SECTION ── */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {lang === 'en' ? 'Sponsor-Aligned Pricing' : 'Ekibiniz Büyürken Kazanın'}
           </h2>
-          <p className="mx-auto max-w-xl text-xs sm:text-sm text-zinc-400 font-medium">
+          <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
             {lang === 'en'
               ? 'Choose the plan that fits your MLM organization goals.'
               : 'MLM organizasyonel hedeflerinize ve ekibinize uygun lisansı seçin.'}
@@ -574,14 +574,14 @@ export default function RootPage() {
 
           {/* Monthly / Yearly Toggler */}
           <div className="flex flex-col items-center pt-4">
-            <div className="inline-flex items-center gap-1 bg-white/[0.02] border border-white/[0.06] p-1 rounded-2xl relative shadow-inner backdrop-blur-sm">
+            <div className="inline-flex items-center gap-1 bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.06] p-1 rounded-2xl relative shadow-inner backdrop-blur-sm">
               <button
                 type="button"
                 onClick={() => setBillingPeriod('monthly')}
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
                   billingPeriod === 'monthly'
                     ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 {lang === 'en' ? 'Monthly Billing' : 'Aylık Ödeme'}
@@ -592,7 +592,7 @@ export default function RootPage() {
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
                   billingPeriod === 'yearly'
                     ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
@@ -608,7 +608,7 @@ export default function RootPage() {
         <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto lg:grid-cols-3 items-stretch">
           
           {/* Plan A: Basic Plan */}
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
+          <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -617,10 +617,10 @@ export default function RootPage() {
               </div>
 
               <div>
-                <h3 className="text-xl font-extrabold text-white">
+                <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
                   {lang === 'en' ? 'Basic Plan' : 'Basic Plan'}
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                   {lang === 'en' ? 'Manage your personal candidate pipeline.' : 'Kişisel aday hunisini yönetmek ve provasını yapmak isteyenler için.'}
                 </p>
               </div>
@@ -628,10 +628,10 @@ export default function RootPage() {
               {/* Price */}
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">
+                  <span className="text-4xl font-black text-slate-900 dark:text-white">
                     {billingPeriod === 'monthly' ? '₺399' : '₺3,499'}
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
                       ? (lang === 'en' ? 'month' : 'ay')
                       : (lang === 'en' ? 'year' : 'yıl')}
@@ -645,7 +645,7 @@ export default function RootPage() {
               </div>
 
               {/* Bullet Features */}
-              <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
+              <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
                   <span>{lang === 'en' ? 'Full Candidate Pipeline Management' : 'Tam Aday Boru Hattı Yönetimi'}</span>
@@ -672,7 +672,7 @@ export default function RootPage() {
             <div className="pt-8">
               <Link
                 href="/kayit"
-                className="block text-center rounded-xl border border-white/[0.08] hover:bg-white/[0.03] text-white py-3 text-xs font-bold transition cursor-pointer"
+                className="block text-center rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.03] text-white py-3 text-xs font-bold transition cursor-pointer"
               >
                 {lang === 'en' ? 'Start 7-Day Free Trial' : '7 Günlük Denemeyi Başlat'}
               </Link>
@@ -680,7 +680,7 @@ export default function RootPage() {
           </div>
 
           {/* Plan B: Plus Plan */}
-          <div className="rounded-3xl border border-[#534AB7]/40 bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
+          <div className="rounded-3xl border border-[#534AB7]/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
             <div className="absolute right-6 top-6 animate-pulse">
               <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {lang === 'en' ? 'Popular' : 'En Çok Satan'}
@@ -692,10 +692,10 @@ export default function RootPage() {
                 <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                   {lang === 'en' ? 'GROWING TEAMS' : 'TAKIM LİDERLERİ'}
                 </span>
-                <h3 className="mt-4 text-xl font-extrabold text-white">
+                <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
                   {lang === 'en' ? 'Plus Plan' : 'Plus Plan'}
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                   {lang === 'en' ? 'Track downlines and sync onboarding.' : 'Alt ekibini izlemek, onboarding sürecini takip etmek ve gerçek zamanlı analiz etmek isteyen liderler.'}
                 </p>
               </div>
@@ -703,10 +703,10 @@ export default function RootPage() {
               {/* Price */}
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">
+                  <span className="text-4xl font-black text-slate-900 dark:text-white">
                     {billingPeriod === 'monthly' ? '₺1,199' : '₺9,999'}
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
                       ? (lang === 'en' ? 'month' : 'ay')
                       : (lang === 'en' ? 'year' : 'yıl')}
@@ -720,10 +720,10 @@ export default function RootPage() {
               </div>
 
               {/* Bullet Features */}
-              <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
+              <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span className="font-bold text-white">{lang === 'en' ? 'All Basic Plan Features' : 'Basic Planındaki TÜM Özellikler'}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{lang === 'en' ? 'All Basic Plan Features' : 'Basic Planındaki TÜM Özellikler'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
@@ -763,7 +763,7 @@ export default function RootPage() {
           </div>
 
           {/* Plan C: Pro Plan */}
-          <div className="rounded-3xl border border-pink-500/30 bg-gradient-to-b from-[#1c0f1e] to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
+          <div className="rounded-3xl border border-pink-500/30 bg-pink-50 dark:bg-gradient-to-b dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
             <div className="absolute right-6 top-6 flex items-center gap-2">
               <span className="text-[9px] font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
                 👑 {lang === 'en' ? 'Diamond Pro' : 'Diamond Pro'}
@@ -775,10 +775,10 @@ export default function RootPage() {
                 <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                   {lang === 'en' ? 'TOP ORGANIZATIONS' : 'BÜYÜK LİDERLER'}
                 </span>
-                <h3 className="mt-4 text-xl font-extrabold text-white">
+                <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
                   {lang === 'en' ? 'Pro Plan' : 'Pro Plan'}
                 </h3>
-                <p className="text-xs text-zinc-400 mt-1">
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                   {lang === 'en' ? 'Unlimited downlines, coaching & Excel analytics.' : 'Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve Excel tarzı performans masası.'}
                 </p>
               </div>
@@ -786,10 +786,10 @@ export default function RootPage() {
               {/* Price */}
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-black text-white">
+                  <span className="text-4xl font-black text-slate-900 dark:text-white">
                     {billingPeriod === 'monthly' ? '₺2,499' : '₺19,999'}
                   </span>
-                  <span className="text-xs text-zinc-500">
+                  <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
                       ? (lang === 'en' ? 'month' : 'ay')
                       : (lang === 'en' ? 'year' : 'yıl')}
@@ -803,10 +803,10 @@ export default function RootPage() {
               </div>
 
               {/* Bullet Features */}
-              <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
+              <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span className="font-bold text-white">{lang === 'en' ? 'All Plus Plan Features' : 'Plus Planındaki TÜM Özellikler'}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{lang === 'en' ? 'All Plus Plan Features' : 'Plus Planındaki TÜM Özellikler'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
@@ -869,10 +869,10 @@ export default function RootPage() {
         `}} />
 
         <div className="text-center space-y-3 px-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {lang === 'en' ? 'Trusted by Independent Leaders' : 'Liderlerin Başarı Hikayeleri'}
           </h2>
-          <p className="mx-auto max-w-xl text-xs sm:text-sm text-zinc-400 font-medium">
+          <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
             {lang === 'en'
               ? 'See how top sponsors automated candidate lists and onboarding.'
               : 'Sponsorların aday listelerini ve doğru başlangıç adımlarını nasıl otomatikleştirdiğini görün.'}
@@ -880,14 +880,14 @@ export default function RootPage() {
         </div>
 
         {/* Fading Glass Overlay Outer Container */}
-        <div className="relative w-full overflow-hidden space-y-6 before:absolute before:left-0 before:top-0 before:h-full before:w-16 sm:before:w-32 before:bg-gradient-to-r before:from-[#0A0B10] before:to-transparent before:z-10 after:absolute after:right-0 after:top-0 after:h-full after:w-16 sm:after:w-32 after:bg-gradient-to-l after:from-[#0A0B10] after:to-transparent after:z-10">
+        <div className="relative w-full overflow-hidden space-y-6 before:absolute before:left-0 before:top-0 before:h-full before:w-16 sm:before:w-32 before:bg-gradient-to-r before:from-white dark:before:from-[#0A0B10] before:to-transparent before:z-10 after:absolute after:right-0 after:top-0 after:h-full after:w-16 sm:after:w-32 after:bg-gradient-to-l after:from-white dark:after:from-[#0A0B10] after:to-transparent after:z-10">
           
           {/* Row 1 - scrolling left */}
           <div className="flex w-max gap-6 py-2">
             <div className="animate-marquee-left gap-6 flex">
               {TESTIMONIALS.slice(0, 5).map((item, idx) => (
-                <div key={`row1-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
-                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                <div key={`row1-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
                   <div className="flex items-center gap-3">
@@ -895,8 +895,8 @@ export default function RootPage() {
                       {item.initials}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
-                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-slate-500 dark:text-zinc-500 mt-1 leading-none">
                         {lang === 'en' ? item.title.en : item.title.tr}
                       </p>
                     </div>
@@ -905,8 +905,8 @@ export default function RootPage() {
               ))}
               {/* Duplicate for infinite effect */}
               {TESTIMONIALS.slice(0, 5).map((item, idx) => (
-                <div key={`row1-dup-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
-                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                <div key={`row1-dup-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
                   <div className="flex items-center gap-3">
@@ -914,8 +914,8 @@ export default function RootPage() {
                       {item.initials}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
-                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-slate-500 dark:text-zinc-500 mt-1 leading-none">
                         {lang === 'en' ? item.title.en : item.title.tr}
                       </p>
                     </div>
@@ -929,8 +929,8 @@ export default function RootPage() {
           <div className="flex w-max gap-6 py-2">
             <div className="animate-marquee-right gap-6 flex">
               {TESTIMONIALS.slice(5, 10).map((item, idx) => (
-                <div key={`row2-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
-                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                <div key={`row2-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
                   <div className="flex items-center gap-3">
@@ -938,8 +938,8 @@ export default function RootPage() {
                       {item.initials}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
-                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-slate-500 dark:text-zinc-500 mt-1 leading-none">
                         {lang === 'en' ? item.title.en : item.title.tr}
                       </p>
                     </div>
@@ -948,8 +948,8 @@ export default function RootPage() {
               ))}
               {/* Duplicate for infinite effect */}
               {TESTIMONIALS.slice(5, 10).map((item, idx) => (
-                <div key={`row2-dup-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
-                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                <div key={`row2-dup-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
                   <div className="flex items-center gap-3">
@@ -957,8 +957,8 @@ export default function RootPage() {
                       {item.initials}
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
-                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-slate-500 dark:text-zinc-500 mt-1 leading-none">
                         {lang === 'en' ? item.title.en : item.title.tr}
                       </p>
                     </div>
@@ -972,12 +972,12 @@ export default function RootPage() {
       </section>
 
       {/* ── FOOTER ── */}
-      <footer className="border-t border-white/[0.04] py-8 mt-12 bg-[#06070B]">
+      <footer className="border-t border-slate-200 dark:border-white/[0.04] py-8 mt-12 bg-slate-50 dark:bg-[#06070B]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-[10px] sm:text-xs text-zinc-500">
+          <p className="text-[10px] sm:text-xs text-slate-500 dark:text-zinc-500">
             &copy; {new Date().getFullYear()} Network Marketing Master. {lang === 'en' ? 'All rights reserved.' : 'Tüm hakları saklıdır.'}
           </p>
-          <div className="flex gap-4 text-[10px] sm:text-xs text-zinc-500">
+          <div className="flex gap-4 text-[10px] sm:text-xs text-slate-500 dark:text-zinc-500">
             <Link href="/giris" className="hover:text-white transition">{lang === 'en' ? 'Log In' : 'Giriş Yap'}</Link>
             <Link href="/kayit" className="hover:text-white transition">{lang === 'en' ? 'Sign Up' : 'Kayıt Ol'}</Link>
           </div>
