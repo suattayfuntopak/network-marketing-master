@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { 
+import {
   Zap, TrendingUp, CalendarDays, Users, BookOpen, Bot, Shield, BarChart2,
-  ArrowRight, Play, CheckCircle2, Globe, Sparkles, UserCheck, Flame, Layers
+  ArrowRight, Play, CheckCircle2, Sparkles, UserCheck, Flame, Layers,
+  Sun, Moon, Monitor, LogIn, UserPlus
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
+
+const NEXT_THEME: Record<string, string> = { dark: 'light', light: 'system', system: 'dark' }
+const NEXT_THEME_LABEL: Record<string, string> = {
+  dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',
+}
 
 const TESTIMONIALS = [
   {
@@ -126,9 +134,20 @@ const TESTIMONIALS = [
 export default function RootPage() {
   const router = useRouter()
   const { lang, setLang } = useTranslation()
+  const { theme, setTheme } = useTheme()
   const [checkingSession, setCheckingSession] = useState(true)
+  const [themeMounted, setThemeMounted] = useState(false)
   const [teamSize, setTeamSize] = useState(25)
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+
+  useEffect(() => setThemeMounted(true), [])
+
+  const currentTheme = themeMounted && theme && theme in NEXT_THEME ? theme : 'system'
+  const THEME_ICON: Record<string, React.ReactNode> = {
+    dark:   <Sun     className="h-3.5 w-3.5" strokeWidth={1.75} />,
+    light:  <Monitor className="h-3.5 w-3.5" strokeWidth={1.75} />,
+    system: <Moon    className="h-3.5 w-3.5" strokeWidth={1.75} />,
+  }
 
   useEffect(() => {
     const supabase = createClient()
@@ -198,43 +217,71 @@ export default function RootPage() {
 
       {/* ── HEADER ── */}
       <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#0A0B10]/70 border-b border-white/[0.04]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
           {/* Logo */}
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#534AB7] to-[#7c3aed] shadow-[0_0_20px_0_rgba(83,74,183,0.3)]">
-              <Zap className="h-4 w-4 text-white" />
+          <div className="flex flex-1 min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#534AB7] to-[#7c3aed] shadow-[0_0_20px_0_rgba(83,74,183,0.3)] sm:h-9 sm:w-9 sm:rounded-xl">
+              <Zap className="h-3.5 w-3.5 text-white sm:h-4 sm:w-4" />
             </div>
-            <span className="text-base font-extrabold tracking-tight bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent">
+            <span className="truncate text-xs font-extrabold tracking-tight bg-gradient-to-r from-white to-indigo-100 bg-clip-text text-transparent sm:text-base">
               Network Marketing Master
             </span>
           </div>
 
           {/* Navigation & Auth */}
-          <div className="flex items-center gap-3">
-            {/* Lang Switch */}
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            {/* Theme Toggle */}
+            {themeMounted && (
+              <button
+                onClick={() => setTheme(NEXT_THEME[currentTheme])}
+                title={NEXT_THEME_LABEL[currentTheme]}
+                className="flex h-7 w-7 items-center justify-center rounded-lg text-white/50 transition hover:bg-white/10 hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
+              >
+                {THEME_ICON[currentTheme]}
+              </button>
+            )}
+
+            {/* TR Flag */}
             <button
-              onClick={() => setLang(lang === 'en' ? 'tr' : 'en')}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-white/[0.06] hover:bg-white/[0.03] text-xs font-bold text-[#E2E8F0] transition cursor-pointer"
+              onClick={() => setLang('tr')}
+              title="Türkçe"
+              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
+                lang === 'tr' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
+              }`}
             >
-              <Globe className="h-3 w-3 text-indigo-400" />
-              <span>{lang === 'en' ? 'TR' : 'EN'}</span>
+              <TRFlag />
             </button>
 
-            {/* Login */}
+            {/* US Flag */}
+            <button
+              onClick={() => setLang('en')}
+              title="English"
+              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
+                lang === 'en' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
+              }`}
+            >
+              <USFlag />
+            </button>
+
+            {/* Login — icon only on mobile, text on sm+ */}
             <Link
               href="/giris"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-[#A0AEC0] hover:text-white transition cursor-pointer"
+              title={lang === 'en' ? 'Log In' : 'Giriş Yap'}
+              className="flex h-7 w-7 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3.5 sm:py-1.5"
             >
-              {lang === 'en' ? 'Log In' : 'Giriş Yap'}
+              <LogIn className="h-3.5 w-3.5 sm:hidden" />
+              <span className="hidden text-xs font-bold sm:inline">{lang === 'en' ? 'Log In' : 'Giriş Yap'}</span>
             </Link>
 
-            {/* Register */}
+            {/* Register — icon only on mobile, text+arrow on sm+ */}
             <Link
               href="/kayit"
-              className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-3.5 py-1.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 hover:opacity-90 transition active:scale-95 cursor-pointer shrink-0"
+              title={lang === 'en' ? 'Get Started' : 'Hemen Başla'}
+              className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md transition hover:opacity-90 active:scale-95 sm:h-auto sm:w-auto sm:gap-1 sm:rounded-lg sm:px-3.5 sm:py-1.5"
             >
-              <span>{lang === 'en' ? 'Get Started' : 'Hemen Başla'}</span>
-              <ArrowRight className="h-3 w-3" />
+              <UserPlus className="h-3.5 w-3.5 sm:hidden" />
+              <span className="hidden text-xs font-bold sm:inline">{lang === 'en' ? 'Get Started' : 'Hemen Başla'}</span>
+              <ArrowRight className="hidden h-3 w-3 sm:inline" />
             </Link>
           </div>
         </div>
