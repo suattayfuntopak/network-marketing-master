@@ -10,6 +10,119 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
+const TESTIMONIALS = [
+  {
+    initials: 'AK',
+    name: 'Ahmet K.',
+    title: { en: 'Independent Leader', tr: 'Bağımsız Lider' },
+    text: {
+      en: 'No more wondering what new partners should do in their first weeks. As they complete steps in the 4-week Onboarding Guide, I get notifications on my panel, keeping the process under control.',
+      tr: 'Ekibime yeni katılan ortakların ilk haftalarda ne yapacağını düşünme derdi bitti. 4 haftalık Doğru Başlangıç rehberindeki adımları tamamladıkça panelime bildirim geliyor, süreç tamamen kontrolümde.'
+    },
+    bg: 'bg-indigo-500/10',
+    color: 'text-indigo-400'
+  },
+  {
+    initials: 'EB',
+    name: 'Elif B.',
+    title: { en: 'Team Coordinator', tr: 'Ekip Koordinatörü' },
+    text: {
+      en: 'The AI Field Rehearsal simulator is a revolution. My partners practice on AI candidates before meeting real prospects. No more fear of burning leads.',
+      tr: 'YZ Saha Provası simülatörü adeta bir devrim. Distribütörlerim, gerçek adayların karşısına çıkmadan önce YZ üzerinde pratik yaparak kendilerini geliştiriyor. Aday kaybetme korkumuz bitti.'
+    },
+    bg: 'bg-pink-500/10',
+    color: 'text-pink-400'
+  },
+  {
+    initials: 'MC',
+    name: 'Murat C.',
+    title: { en: 'Platinum Sponsor', tr: 'Platin Sponsor' },
+    text: {
+      en: 'We analyze our social media marketing posts in seconds with the Compliance Control module. Achieving total alignment with regulations and policies is a relief.',
+      tr: 'Sosyal medyada paylaşacağımız pazarlama metinlerini Uyum Denetimi modülüyle saniyeler içinde analiz ediyoruz. Yasal kurallara ve firma politikalarına tam uyum sağlamak çok rahatlatıcı.'
+    },
+    bg: 'bg-blue-500/10',
+    color: 'text-blue-400'
+  },
+  {
+    initials: 'SD',
+    name: 'Selin D.',
+    title: { en: 'Independent Master', tr: 'Bağımsız Master' },
+    text: {
+      en: 'Candidate tracking used to get lost in notebooks. Now, thanks to the Pipeline, I see who is at which stage (new, presentation, follow-up) in one glance. Nobody is forgotten.',
+      tr: 'Aday takibi eskiden defterlerde kayboluyordu. Şimdi Boru Hattı sayesinde hangi adayın hangi aşamada (yeni, sunum, takip) olduğunu tek bakışta görüyorum. Kimseyi unutmuyorum.'
+    },
+    bg: 'bg-amber-500/10',
+    color: 'text-amber-400'
+  },
+  {
+    initials: 'HY',
+    name: 'Hakan Y.',
+    title: { en: 'Organization Leader', tr: 'Organizasyon Lideri' },
+    text: {
+      en: 'We use the Objection Resolution module for tough prospect questions. Smart, sincere, and persuasive responses give my field partners incredible confidence.',
+      tr: 'Adaylardan gelen zorlu itirazlara karşı İtirazlara Cevaplar modülünü kullanıyoruz. Akılcı, samimi ve ikna edici hazır şablonlar sahadaki distribütörlerimin elini inanılmaz güçlendiriyor.'
+    },
+    bg: 'bg-emerald-500/10',
+    color: 'text-emerald-400'
+  },
+  {
+    initials: 'ZO',
+    name: 'Zeynep O.',
+    title: { en: 'Sapphire Leader', tr: 'Safir Lider' },
+    text: {
+      en: 'Whenever someone in my downline adds a prospect or updates a stage, I get instant visual and sound alerts. Keeping the pulse of the team alive feels great.',
+      tr: 'Alt ekibimde kim yeni bir aday eklese veya bir aşamayı güncellese panelimde anlık sesli ve görsel bildirim alıyorum. Ekibin nabzını canlı tutmak harika bir duygu.'
+    },
+    bg: 'bg-purple-500/10',
+    color: 'text-purple-400'
+  },
+  {
+    initials: 'KB',
+    name: 'Kerem B.',
+    title: { en: 'Global Coordinator', tr: 'Küresel Koordinatör' },
+    text: {
+      en: 'Managing teams across borders is seamless with the dual-language sync. One click translates the UI and AI suggestions to English for my international partners.',
+      tr: 'Farklı ülkelerdeki ekiplerimi yönetirken çift dil desteği can kurtarıyor. Sağ üstten tek tıkla tüm arayüzü ve yapay zeka çıktılarını İngilizceye çevirip yabancı ortaklarımla paylaşabiliyorum.'
+    },
+    bg: 'bg-cyan-500/10',
+    color: 'text-cyan-400'
+  },
+  {
+    initials: 'MY',
+    name: 'Merve Y.',
+    title: { en: 'Field Director', tr: 'Saha Direktörü' },
+    text: {
+      en: 'Swiping between tabs on my smartphone is extremely practical. I manage my entire candidate pipeline and calendar with one hand while on the move.',
+      tr: 'Akıllı telefonlarda sağa sola kaydırarak sekmeler arasında gezinebilmek çok pratik. Sahada koştururken tüm aday boru hattımı ve takvimimi tek elle pürüzsüzce yönetiyorum.'
+    },
+    bg: 'bg-rose-500/10',
+    color: 'text-rose-400'
+  },
+  {
+    initials: 'TA',
+    name: 'Tarık A.',
+    title: { en: 'Regional Sponsor', tr: 'Bölge Sponsoru' },
+    text: {
+      en: 'Network Marketing Master saves me at least 10 hours a week. Team coordination and onboarding run automatically, letting me focus entirely on strategic growth.',
+      tr: 'Network Marketing Master bana haftada en az 10 saat kazandırdı. Ekip koordinasyonu ve onboarding takibi kendiliğinden işliyor, ben sadece stratejik büyümeye odaklanıyorum.'
+    },
+    bg: 'bg-violet-500/10',
+    color: 'text-violet-400'
+  },
+  {
+    initials: 'ND',
+    name: 'Nilgün D.',
+    title: { en: 'Diamond Leader', tr: 'Diamond Lider' },
+    text: {
+      en: 'The Excel-style performance desk in the Statistics tab is a true leader tool. I analyze the downline distribution and activity in one view to provide mentorship.',
+      tr: 'İstatistikler sayfasındaki Excel tarzı performans tablosu tam bir lider masası. Tüm ekibin aday dağılımlarını ve aktifliğini tek ekranda analiz edip mentörlük yapabiliyorum.'
+    },
+    bg: 'bg-teal-500/10',
+    color: 'text-teal-400'
+  }
+]
+
 export default function RootPage() {
   const router = useRouter()
   const { lang, setLang } = useTranslation()
@@ -668,10 +781,6 @@ export default function RootPage() {
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
                   <span>{lang === 'en' ? 'Daily 60 Interactive Rehearsal Credits' : 'Günlük 60 Saha Provası Kredisi'}</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 15 Compliance Control Credits' : 'Günlük 15 Uyum Denetim Hakkı'}</span>
-                </li>
               </ul>
             </div>
 
@@ -689,8 +798,33 @@ export default function RootPage() {
       </section>
 
       {/* ── TESTIMONIALS ── */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
-        <div className="text-center space-y-3">
+      <section className="py-16 space-y-12 overflow-hidden relative">
+        {/* Custom CSS for continuous horizontal marquee scrolling */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes marquee-left {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+          }
+          @keyframes marquee-right {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0); }
+          }
+          .animate-marquee-left {
+            display: flex;
+            width: max-content;
+            animation: marquee-left 45s linear infinite;
+          }
+          .animate-marquee-right {
+            display: flex;
+            width: max-content;
+            animation: marquee-right 45s linear infinite;
+          }
+          .animate-marquee-left:hover, .animate-marquee-right:hover {
+            animation-play-state: paused;
+          }
+        `}} />
+
+        <div className="text-center space-y-3 px-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
             {lang === 'en' ? 'Trusted by Independent Leaders' : 'Liderlerin Başarı Hikayeleri'}
           </h2>
@@ -701,40 +835,92 @@ export default function RootPage() {
           </p>
         </div>
 
-        {/* 2 Big Testimonial grids */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 max-w-4xl mx-auto">
+        {/* Fading Glass Overlay Outer Container */}
+        <div className="relative w-full overflow-hidden space-y-6 before:absolute before:left-0 before:top-0 before:h-full before:w-16 sm:before:w-32 before:bg-gradient-to-r before:from-[#0A0B10] before:to-transparent before:z-10 after:absolute after:right-0 after:top-0 after:h-full after:w-16 sm:after:w-32 after:bg-gradient-to-l after:from-[#0A0B10] after:to-transparent after:z-10">
           
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] p-6 sm:p-8 space-y-4">
-            <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
-              &ldquo;{lang === 'en' 
-                ? 'Network Marketing Master changed everything for my downlines. When a new partner joins, they follow the 4-week onboarding plan, which triggers live push notifications on my panel when completed. Total game changer.'
-                : 'Network Marketing Master alt ekibim için her şeyi değiştirdi. Yeni bir distribütör katıldığında, 4 haftalık Doğru Başlangıç adımlarını takip ediyor ve tamamladığında panelime anlık bildirim fırlatıyor. Muhteşem bir otomasyon.'}&rdquo;
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-indigo-500/10 flex items-center justify-center font-bold text-indigo-400">
-                ST
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-white">Suat Tayfun T.</h4>
-                <p className="text-[10px] text-zinc-500">{lang === 'en' ? 'Independent Master Sponsor' : 'Bağımsız Master Sponsor'}</p>
-              </div>
+          {/* Row 1 - scrolling left */}
+          <div className="flex w-max gap-6 py-2">
+            <div className="animate-marquee-left gap-6 flex">
+              {TESTIMONIALS.slice(0, 5).map((item, idx) => (
+                <div key={`row1-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                    &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-9 w-9 rounded-full ${item.bg} flex items-center justify-center font-black text-xs ${item.color}`}>
+                      {item.initials}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                        {lang === 'en' ? item.title.en : item.title.tr}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* Duplicate for infinite effect */}
+              {TESTIMONIALS.slice(0, 5).map((item, idx) => (
+                <div key={`row1-dup-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                    &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-9 w-9 rounded-full ${item.bg} flex items-center justify-center font-black text-xs ${item.color}`}>
+                      {item.initials}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                        {lang === 'en' ? item.title.en : item.title.tr}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/[0.04] bg-white/[0.02] p-6 sm:p-8 space-y-4">
-            <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
-              &ldquo;{lang === 'en'
-                ? 'The AI Rehearsal Simulator is a lifesaver. My new field partners practice presentation closures on the AI candidates before having real conversations on the field. Sepet abandonment rates dropped massively!'
-                : 'YZ Saha Provası simülatörü can kurtarıcı. Yeni distribütörlerim, sahada gerçek görüşmelere başlamadan önce YZ adayları üzerinde interaktif rol provası yapıyorlar. Aday kaybetme oranlarımız ciddi miktarda azaldı!'}&rdquo;
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-full bg-pink-500/10 flex items-center justify-center font-bold text-pink-400">
-                ES
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-white">Elif Sinem T.</h4>
-                <p className="text-[10px] text-zinc-500">{lang === 'en' ? 'Executive Team Leader' : 'Ekip Lideri'}</p>
-              </div>
+          {/* Row 2 - scrolling right */}
+          <div className="flex w-max gap-6 py-2">
+            <div className="animate-marquee-right gap-6 flex">
+              {TESTIMONIALS.slice(5, 10).map((item, idx) => (
+                <div key={`row2-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                    &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-9 w-9 rounded-full ${item.bg} flex items-center justify-center font-black text-xs ${item.color}`}>
+                      {item.initials}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                        {lang === 'en' ? item.title.en : item.title.tr}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {/* Duplicate for infinite effect */}
+              {TESTIMONIALS.slice(5, 10).map((item, idx) => (
+                <div key={`row2-dup-${idx}`} className="rounded-3xl border border-white/[0.04] bg-white/[0.01] hover:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                  <p className="text-xs sm:text-sm italic text-zinc-300 leading-relaxed">
+                    &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <div className={`h-9 w-9 rounded-full ${item.bg} flex items-center justify-center font-black text-xs ${item.color}`}>
+                      {item.initials}
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white leading-none">{item.name}</h4>
+                      <p className="text-[9px] text-zinc-500 mt-1 leading-none">
+                        {lang === 'en' ? item.title.en : item.title.tr}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
