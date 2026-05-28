@@ -1528,3 +1528,15 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - `src/app/(dashboard)/platform-yonetim/actions.ts` dosyasına Supabase Admin Client (`admin.auth.admin.deleteUser`) aracılığıyla kullanıcının Auth veritabanından kalıcı olarak silinmesini sağlayan uç nokta (endpoint) eklendi. Bu eylem yalnızca Süper Admin yetkisiyle çalışacak şekilde sıkı güvenlik kontrolüne alındı.
 - `src/app/(dashboard)/platform-yonetim/page.tsx` sayfasına, çalışma alanı listesindeki her satırın "Yönetim" sütununa kırmızı renkli bir "Sil" (Trash2) butonu eklendi. Yanlışlıkla silinmeleri önlemek için kullanıcı silme öncesinde güvenlik onay kutusu (confirm) çıkarılması sağlandı ve işlem bitiminde tablo verilerinin otomatik yeniden yüklenmesi (loadData) ayarlandı.
 
+
+### fix: Ekibim Sayfası Downline Üye Getirme (Fetch Members) Düzeltmesi
+- Yeni bağımsız modelde, alt üyeler liderin `nmm_workspace_members` tablosuna direkt eklenmek yerine kendi workspace'lerini açıp `parent_id` bağını kuruyorlar. `EkipPanel.tsx`'teki eski `fetchMembers` fonksiyonu, sadece liderin kendi workspace'indeki `nmm_workspace_members` tablosunu okuyarak downline çalışma alanlarını tespit etmeye çalışıyordu.
+- Çözüm olarak sorgu tersten yazıldı: Doğrudan liderin `workspace_id`sini (ya da geriye dönük uyumluluk için liderin `owner_id`sini) `parent_id` olarak referans gösteren tüm downline çalışma alanları (`nmm_workspaces`) tarandı. Bu çalışma alanlarının sahipleri (owners) tespit edilerek `uniqueMembersMap` içerisine dahil edildi. 
+- Bu sayede Elif Sinem Topak gibi kendi bağımsız alanını oluşturup liderin davet kodunu girerek ( `parent_id` bağını kurarak) takıma katılan tüm distribütörlerin istatistikleri ve bilgileri anında Ekibim ve İstatistikler paneline düşmesi sağlandı.
+
+### feat: Geri Sayımlı Kullanıcı Silme Onay Mekanizması
+- Platform Yönetim sayfasındaki "Kullanıcı Silme (Delete User)" eylemi daha korumalı ve kullanıcı dostu bir hale getirildi. 
+- Sil (Çöp Kutusu) butonuna ve onaya (confirm) tıklandığında hemen silme işlemi yapmak yerine, buton kırmızı bir **"Geri Al (Undo)"** butonuna dönüşür ve 5 saniyelik bir geri sayım başlar.
+- Geri sayım (5...4...3...2...1) esnasında kullanıcı "Geri Al" butonuna basarsa işlem iptal edilir ve silme gerçekleşmez.
+- Süre dolduğunda ise (`countdown <= 1`) `executeDeleteUser` tetiklenerek kullanıcı `deleteUserAction` ile Supabase'den kalıcı olarak silinir.
+
