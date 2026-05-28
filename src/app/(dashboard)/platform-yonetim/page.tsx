@@ -39,6 +39,8 @@ export default function PlatformAdminPage() {
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
+  const [deleteTimerId, setDeleteTimerId] = useState<NodeJS.Timeout | null>(null)
+  const [deleteCountdown, setDeleteCountdown] = useState<number>(0)
 
   // Extension Modal states
   const [licenseType, setLicenseType] = useState<'free' | 'leader' | 'master' | 'pro'>('master')
@@ -137,6 +139,31 @@ export default function PlatformAdminPage() {
     if (!confirm(lang === 'en' ? `Are you sure you want to permanently delete user ${email}?` : `E-posta adresi ${email} olan kullanıcıyı kalıcı olarak silmek istediğinize emin misiniz?`)) return
     
     setDeletingUserId(ownerId)
+    setDeleteCountdown(5)
+
+    const timer = setInterval(() => {
+      setDeleteCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(timer)
+          executeDeleteUser(ownerId, email)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    setDeleteTimerId(timer)
+  }
+
+  function handleCancelDeleteUser() {
+    if (deleteTimerId) clearInterval(deleteTimerId)
+    setDeletingUserId(null)
+    setDeleteCountdown(0)
+    setDeleteTimerId(null)
+    toast.info(lang === 'en' ? 'User deletion cancelled.' : 'Kullanıcı silme işlemi iptal edildi.')
+  }
+
+  async function executeDeleteUser(ownerId: string, email: string) {
     try {
       await deleteUserAction(ownerId, email)
       toast.success(lang === 'en' ? 'User deleted successfully.' : 'Kullanıcı başarıyla silindi.')
@@ -145,6 +172,8 @@ export default function PlatformAdminPage() {
       toast.error(err.message || (lang === 'en' ? 'Delete failed.' : 'Silme işlemi başarısız.'))
     } finally {
       setDeletingUserId(null)
+      setDeleteCountdown(0)
+      setDeleteTimerId(null)
     }
   }
 
@@ -459,18 +488,24 @@ export default function PlatformAdminPage() {
                               <Plus className="h-4 w-4" />
                             </button>
                             {/* Delete User trigger */}
-                            <button
-                              onClick={() => handleDeleteUser(w.ownerId, w.ownerEmail)}
-                              disabled={deletingUserId === w.ownerId}
-                              title={lang === 'en' ? 'Delete User' : 'Kullanıcıyı Sil'}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
-                            >
-                              {deletingUserId === w.ownerId ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
+                            {deletingUserId === w.ownerId ? (
+                              <button
+                                onClick={handleCancelDeleteUser}
+                                title={lang === 'en' ? 'Cancel Deletion' : 'Silmeyi İptal Et'}
+                                className="flex h-7 px-2 items-center justify-center rounded-lg bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition min-w-[4rem]"
+                              >
+                                {lang === 'en' ? 'Undo ' : 'Geri Al '} ({deleteCountdown})
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleDeleteUser(w.ownerId, w.ownerEmail)}
+                                disabled={deletingUserId !== null}
+                                title={lang === 'en' ? 'Delete User' : 'Kullanıcıyı Sil'}
+                                className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
+                              >
                                 <Trash2 className="h-4 w-4" />
-                              )}
                             </button>
+                            )}
                           </div>
                         </td>
                       </tr>
