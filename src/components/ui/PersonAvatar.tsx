@@ -8,6 +8,8 @@ const SIZE_CLASS = {
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
   lg: 'h-14 w-14 text-xl',
+  xl: 'h-16 w-16 text-xl',
+  '2xl': 'h-20 w-20 text-2xl',
 } as const
 
 export type PersonAvatarSize = keyof typeof SIZE_CLASS

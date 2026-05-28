@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-05-28 — PersonAvatar: Takvim + Pipeline
+
+### fix(ui): boru hattı kart/detay ve takvim listesi avatarları
+
+- `CandidateCard`, `CandidateDetail`, `TakvimClient` → `PersonAvatar` + pastel baş harf / `avatar_url`
+- `PersonAvatar` boyutları: `xl` (16), `2xl` (20) eklendi
+
+---
+
 ## 2026-05-28 — Avatar + Ekibim rol kartları (UI)
 
 ### fix(ui): pano / bugün ilgilen avatarları + ekip rol çerçeveleri

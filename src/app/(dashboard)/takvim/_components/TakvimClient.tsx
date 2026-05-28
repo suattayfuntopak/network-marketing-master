@@ -8,6 +8,8 @@ import { getStageLabel, STAGE_COLOR, FOLLOW_DAYS } from '@/lib/domain/stages'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan
@@ -195,9 +197,11 @@ export function TakvimClient() {
                 onClick={() => router.push(`/pipeline/${c.id}`)}
                 className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition hover:border-[#534AB7]/30 hover:shadow-sm active:scale-[0.99]"
               >
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-                  {c.full_name.charAt(0).toUpperCase()}
-                </div>
+                <PersonAvatar
+                  name={c.full_name}
+                  imageUrl={resolveCandidateFields(c).avatarUrl}
+                  size="md"
+                />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-semibold text-[var(--text-1)]">{c.full_name}</p>
                   {c.phone && <p className="text-xs text-[var(--text-2)]">{c.phone}</p>}

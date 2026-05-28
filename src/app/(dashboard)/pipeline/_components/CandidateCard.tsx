@@ -10,6 +10,7 @@ import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/domain/stages'
@@ -60,7 +61,6 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
   const parsed = resolveCandidateFields(candidate)
-  const profilePhoto = parsed.avatarUrl || null
 
   const [generating, setGenerating] = useState(false)
   const [activeMessage, setActiveMessage] = useState<string | null>(null)
@@ -135,17 +135,11 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         <div className="flex items-start gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
           <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
-            {profilePhoto ? (
-              <img
-                src={profilePhoto}
-                alt={candidate.full_name}
-                className="h-10 w-10 shrink-0 rounded-full object-cover border border-[#EEEDFE]"
-              />
-            ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-                {candidate.full_name.charAt(0).toUpperCase()}
-              </div>
-            )}
+            <PersonAvatar
+              name={candidate.full_name}
+              imageUrl={parsed.avatarUrl}
+              size="md"
+            />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>

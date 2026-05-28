@@ -27,6 +27,7 @@ import {
   resolveCandidateFields,
   mergeCandidateContentUpdate,
 } from '@/lib/domain/candidateFields'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { generateNotesSummary } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -221,7 +222,6 @@ export function CandidateDetail({ candidateId }: Props) {
   const parsed = c
     ? resolveCandidateFields(c)
     : { noteTr: '', noteEn: '', avatarUrl: null as string | null, warmth: 'ilik' as const }
-  const profilePhoto = parsed.avatarUrl || null
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
   const attemptedActionUpdates = useRef<Record<string, boolean>>({})
@@ -467,17 +467,11 @@ export function CandidateDetail({ candidateId }: Props) {
           {/* Profil kartı */}
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
               <div className="flex items-center gap-4">
-                {profilePhoto ? (
-                  <img
-                    src={profilePhoto}
-                    alt={c.full_name}
-                    className="h-16 w-16 shrink-0 rounded-full object-cover border-2 border-[#EEEDFE]"
-                  />
-                ) : (
-                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xl font-bold text-[#534AB7]">
-                    {c.full_name.charAt(0).toUpperCase()}
-                  </div>
-                )}
+                <PersonAvatar
+                  name={c.full_name}
+                  imageUrl={parsed.avatarUrl}
+                  size="xl"
+                />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
