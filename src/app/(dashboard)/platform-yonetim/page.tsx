@@ -383,10 +383,7 @@ export default function PlatformAdminPage() {
                               💎 {lang === 'en' ? 'Independent / Direct' : 'Dış Kayıt / Bağımsız'}
                             </span>
                           ) : (
-                            <div className="max-w-[160px] truncate">
-                              <span className="text-[var(--text-3)]">{lang === 'en' ? 'Sponsor:' : 'Sponsor:'} </span>
-                              <span className="text-[var(--text-1)]">{w.sponsorName}</span>
-                            </div>
+                            <span className="max-w-[160px] truncate block text-[var(--text-1)]">{w.sponsorName}</span>
                           )}
                         </td>
 
