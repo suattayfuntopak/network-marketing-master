@@ -45,11 +45,20 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
     if (uploadingPhoto) return
 
     const fd = new FormData(e.currentTarget)
-    const phone = (fd.get('phone') as string).trim()
-    if (phone && !PHONE_RE.test(phone)) {
+    const rawPhone = (fd.get('phone') as string).trim()
+
+    // Sadece Türkçe telefon numarasını boşluksuz ve harfsiz yakala
+    const digitsOnly = rawPhone.replace(/\D/g, '')
+    
+    // Telefon numarası boş değilse ancak 10 haneden kısaysa hata ver
+    if (rawPhone && digitsOnly.length < 10) {
       setPhoneError('Geçerli bir numara girin (ör. 05xx xxx xx xx)')
       return
     }
+    
+    // Telefon numarasını standart formata dönüştür (varsa +90 ekleyebilirsin veya sadece digits olarak bırakabilirsin)
+    // Şimdilik hatasız kaydetmesi için digits formatını tercih ediyoruz (veya orijinal raw formunu)
+    const phone = rawPhone ? rawPhone : ''
     setPhoneError('')
 
     setUploadingPhoto(true)
