@@ -1515,3 +1515,16 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - Vercel dağıtımı (build) sırasında ortaya çıkan `Both middleware file "./src/middleware.ts" and proxy file "./src/proxy.ts" are detected.` hatası giderildi.
 - Next.js 16.x Turbopack ve Vercel derleme ortamının gerektirdiği üzere, sistemdeki `src/middleware.ts` dosyası silinerek (çünkü zaten `proxy.ts` üzerinden export ediliyordu) yalnızca `src/proxy.ts` dosyasının kalması sağlandı. Çift dosya çakışması engellendi.
 
+
+## 2026-05-28 — Arayüz İyileştirmeleri ve Platform Yönetimi Silme Özelliği
+
+### feat: Header Dil Seçici İyileştirmesi (Mobil ve Masaüstü)
+- `src/app/(dashboard)/_components/Header.tsx` dosyasında yer alan Header bileşeni güncellendi.
+- Mobil görünümde, tema seçici ile bildirim çanı arasına sadece seçili olmayan dili temsil eden tek bir bayrak ikonu (örneğin Türkçe seçiliyken İngiliz bayrağı, İngilizce seçiliyken Türk bayrağı) eklendi. Bu sayede mobildeki dar alanda ikonların sıkışması önlendi.
+- Masaüstü (bilgisayar) görünümünde, aynı alana iki bayrak (Türk ve Amerikan bayrakları) yan yana yerleştirildi. Seçili olan dilin bayrağı tam opak (aktif), seçili olmayan dilin bayrağı ise yarı şeffaf (pasif) olarak gösterilecek şekilde stilize edildi.
+
+### feat: Platform Yönetim Sayfası İçin Kullanıcı Silme (Delete User) Özelliği
+- Platform Yöneticisi (`/platform-yonetim`) tablosunda istenmeyen veya test amaçlı açılmış bağımsız kayıtların tamamen silinebilmesi için `deleteUserAction` oluşturuldu.
+- `src/app/(dashboard)/platform-yonetim/actions.ts` dosyasına Supabase Admin Client (`admin.auth.admin.deleteUser`) aracılığıyla kullanıcının Auth veritabanından kalıcı olarak silinmesini sağlayan uç nokta (endpoint) eklendi. Bu eylem yalnızca Süper Admin yetkisiyle çalışacak şekilde sıkı güvenlik kontrolüne alındı.
+- `src/app/(dashboard)/platform-yonetim/page.tsx` sayfasına, çalışma alanı listesindeki her satırın "Yönetim" sütununa kırmızı renkli bir "Sil" (Trash2) butonu eklendi. Yanlışlıkla silinmeleri önlemek için kullanıcı silme öncesinde güvenlik onay kutusu (confirm) çıkarılması sağlandı ve işlem bitiminde tablo verilerinin otomatik yeniden yüklenmesi (loadData) ayarlandı.
+
