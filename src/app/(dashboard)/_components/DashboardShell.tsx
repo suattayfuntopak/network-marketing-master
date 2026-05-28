@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
@@ -32,9 +32,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
 
-  const routes = isSuperAdmin
-    ? [...NAV_ROUTES, '/platform-yonetim']
-    : NAV_ROUTES
+  const routes = useMemo(
+    () => isSuperAdmin ? [...NAV_ROUTES, '/platform-yonetim'] : NAV_ROUTES,
+    [isSuperAdmin]
+  )
+
+  useEffect(() => {
+    routes.forEach(href => router.prefetch(href))
+  }, [routes, router])
 
   function getRouteIndex(path: string) {
     return routes.findIndex(r => path === r || (r !== '/pano' && path.startsWith(r)))

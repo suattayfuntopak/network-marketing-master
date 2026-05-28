@@ -49,6 +49,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             <Link
               key={href}
               href={href}
+              prefetch
               title={collapsed ? label : undefined}
               className={clsx(
                 'flex items-center rounded-xl transition-colors',

@@ -34,7 +34,7 @@ export function useCandidates(workspaceId: string | undefined, filter: Candidate
     queryKey: ['candidates', workspaceId],
     queryFn: () => fetchCandidates(workspaceId!),
     enabled: !!workspaceId,
-    staleTime: 30_000,
+    staleTime: 60_000,
   })
 
   const filtered = (query.data ?? []).filter(c => {

@@ -61,7 +61,7 @@ export const platformSection = {
       extendAccessHint: '— mevcut bitiş tarihine eklenir',
       saving: 'Kaydediliyor...',
       upgradeSave: 'Lisansı Güncelle & Kaydet',
-      inviteWaMessage: 'Merhaba {name},\n\nNetwork Marketing Master uygulaması vesilesiyle sizinle iletişime geçmek istedim. Sektördeki duruşunuz ve vizyonunuz oldukça dikkat çekici. Güçlerimizi birleştirerek ortak bir başarı hikayesi yazabileceğimize inanıyorum.\n\nEkibimize katılmak ve süreci başlatmak isterseniz, aşağıdaki bağlantıdan kaydınızı tamamlayıp "Ekibim" sayfasından {code} kodunu girerek aramıza anında katılabilirsiniz:\n\nKayıt Linki: {link}\n\nGörüşmek dileğiyle!',
+      inviteWaMessage: 'Merhaba {name},\n\nNetwork Marketing Master uygulaması vesilesiyle sizinle iletişime geçmek istedim. Sektördeki duruşunuz ve vizyonunuz oldukça dikkat çekici. Güçlerimizi birleştirerek ortak bir başarı hikayesi yazabileceğimize inanıyorum.\n\nEkibimize katılmak ve süreci başlatmak isterseniz, aşağıdaki linkten kaydınızı tamamlayıp "Ekibim" sayfasındaki \'Davet Kodunu Gir\' kutusuna {code} kodunu girmeniz yeterli olacaktır:\n\nKayıt Linki: {link}\n\nGörüşmek dileğiyle!',
     },
   },
   en: {
@@ -126,7 +126,7 @@ export const platformSection = {
       extendAccessHint: '— added on top of current expiry',
       saving: 'Saving...',
       upgradeSave: 'Upgrade & Save',
-      inviteWaMessage: 'Hello {name},\n\nI wanted to reach out through the Network Marketing Master app. Your presence and vision in the industry are quite striking. I believe we can write a shared success story together.\n\nIf you would like to join our team, complete your registration via the link below, then enter the code {code} on the "My Team" page to join instantly:\n\nRegistration Link: {link}\n\nLooking forward to connecting!',
+      inviteWaMessage: 'Hello {name},\n\nI wanted to reach out through the Network Marketing Master app. Your presence and vision in the industry are quite striking. I believe we can write a shared success story together.\n\nIf you would like to join our team, complete your registration via the link below, then enter the code {code} in the \'Enter Invite Code\' box on the "My Team" page:\n\nRegistration Link: {link}\n\nLooking forward to connecting!',
     },
   },
 } as const

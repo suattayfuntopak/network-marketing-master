@@ -14,6 +14,8 @@ export interface WorkspaceContext {
   licenseType: 'free' | 'leader' | 'master' | 'pro'
   licenseExpiresAt: string | null
   isSuperAdmin: boolean
+  /** true when this user's workspace is linked to an upline sponsor */
+  hasUpline: boolean
 }
 
 export function useWorkspace() {

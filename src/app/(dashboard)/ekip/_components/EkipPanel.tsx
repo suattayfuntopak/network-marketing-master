@@ -703,8 +703,8 @@ export function EkipPanel() {
         </section>
       )}
 
-      {/* ─── 3. BİR LİDERİN EKİBİNE KATIL ─── */}
-      {(isSolo || !isLeader) && (
+      {/* ─── 3. DAVET KODUNU GİR ─── */}
+      {!ws.hasUpline && (
         <section className="space-y-4">
           <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
             <LogIn className="h-5 w-5" />

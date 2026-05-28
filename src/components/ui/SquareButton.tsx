@@ -75,7 +75,7 @@ export function SquareButton({
 
   if (href) {
     return (
-      <Link href={href} className={sharedClass(activeColor, compact, className)}>
+      <Link href={href} prefetch className={sharedClass(activeColor, compact, className)}>
         {content}
       </Link>
     )

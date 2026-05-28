@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useMemo } from 'react'
 import { Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
@@ -25,10 +25,16 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const licenseType = ws?.licenseType ?? 'free'
   const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
 
-  const baseItems = hasTeamAccess ? NAV_ITEMS : NAV_ITEMS.filter(i => i.href !== '/ekip')
-  const items = isSuperAdmin
-    ? [...baseItems, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
-    : baseItems
+  const items = useMemo(() => {
+    const base = hasTeamAccess ? NAV_ITEMS : NAV_ITEMS.filter(i => i.href !== '/ekip')
+    return isSuperAdmin
+      ? [...base, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+      : base
+  }, [hasTeamAccess, isSuperAdmin])
+
+  useEffect(() => {
+    items.forEach(({ href }) => router.prefetch(href))
+  }, [items, router])
 
   // Automatically scroll & center active item horizontally
   useEffect(() => {
@@ -47,6 +53,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
     if (currentIdx !== -1 && targetIdx !== -1 && currentIdx !== targetIdx) {
       setNavDir(targetIdx > currentIdx ? 'forward' : 'back')
     }
+    router.prefetch(targetHref)
     router.push(targetHref)
   }
 

@@ -32,7 +32,7 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
 
   const { data: ws } = await supabase
     .from('nmm_workspaces')
-    .select('invite_code, license_type, license_expires_at')
+    .select('invite_code, license_type, license_expires_at, parent_id')
     .eq('id', membership.workspace_id)
     .single()
 
@@ -48,6 +48,7 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
     licenseType: license.licenseType,
     licenseExpiresAt: license.licenseExpiresAt,
     isSuperAdmin: admin,
+    hasUpline: !!ws?.parent_id,
   }
 }
 
@@ -99,5 +100,6 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     licenseType: license.licenseType,
     licenseExpiresAt: license.licenseExpiresAt,
     isSuperAdmin: admin,
+    hasUpline: false,
   }
 }

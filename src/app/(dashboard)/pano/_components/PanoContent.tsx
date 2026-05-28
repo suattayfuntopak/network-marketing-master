@@ -97,7 +97,7 @@ export function PanoContent() {
   const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
-  if (wsLoading || cLoading) {
+  if (wsLoading) {
     return (
       <div className="w-full space-y-4">
         <div className="h-4 w-24 animate-pulse rounded bg-[var(--bg-subtle)]" />
@@ -117,10 +117,22 @@ export function PanoContent() {
     )
   }
 
+  const statsSkeleton = (
+    <div className="grid grid-cols-3 gap-3 md:gap-4">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+      ))}
+    </div>
+  )
+
+  const prioritiesSkeleton = (
+    <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+  )
+
   return (
     <div className="w-full space-y-5">
       {/* Onboarding — sadece hiç aday yoksa göster */}
-      {candidates.length === 0 && ws && (
+      {!cLoading && candidates.length === 0 && ws && (
         <OnboardingModal workspaceId={ws.workspaceId} inviteCode={ws.inviteCode} />
       )}
       {/* Selamlama */}
@@ -146,6 +158,7 @@ export function PanoContent() {
       </div>
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
+      {cLoading ? statsSkeleton : (
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
           <p className="text-2xl font-bold text-[var(--text-1)] md:text-3xl">{candidates.length}</p>
@@ -160,8 +173,10 @@ export function PanoContent() {
           <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.joined')}</p>
         </div>
       </div>
+      )}
 
       {/* ── Bugün Öncelikliler — karelerle aynı genişlik ── */}
+      {cLoading ? prioritiesSkeleton : (
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
@@ -212,9 +227,14 @@ export function PanoContent() {
           </ul>
         )}
       </div>
+      )}
 
       {/* ── Mini trend (son 7 gün yeni aday) ── */}
-      <MiniTrend candidates={candidates} />
+      {cLoading ? (
+        <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+      ) : (
+        <MiniTrend candidates={candidates} />
+      )}
     </div>
   )
 }

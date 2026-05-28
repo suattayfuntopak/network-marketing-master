@@ -1,23 +1,46 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { loginAction } from '../actions'
-
-interface FormState {
-  error?: string
-}
+import { createClient } from '@/lib/supabase/client'
 
 export function LoginForm() {
   const { t } = useTranslation()
-  const [state, action, pending] = useActionState<FormState, FormData>(
-    loginAction,
-    {}
-  )
+  const router = useRouter()
+  const [error, setError] = useState<string>()
+  const [pending, setPending] = useState(false)
+
+  useEffect(() => {
+    router.prefetch('/pano')
+  }, [router])
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    if (pending) return
+
+    const form = e.currentTarget
+    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim()
+    const password = (form.elements.namedItem('password') as HTMLInputElement).value
+
+    setPending(true)
+    setError(undefined)
+
+    const supabase = createClient()
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+
+    if (signInError) {
+      setError('E-posta veya şifre hatalı.')
+      setPending(false)
+      return
+    }
+
+    router.push('/pano')
+  }
 
   return (
-    <form action={action} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
         <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-300" htmlFor="email">
           {t('auth.emailLabel')}
@@ -48,9 +71,9 @@ export function LoginForm() {
         />
       </div>
 
-      {state.error && (
+      {error && (
         <p className="rounded-xl bg-[#FBEAF0]/10 border border-[#72243E]/20 px-4 py-2.5 text-sm text-rose-300">
-          {state.error}
+          {error}
         </p>
       )}
 
@@ -79,4 +102,3 @@ export function LoginForm() {
     </form>
   )
 }
-

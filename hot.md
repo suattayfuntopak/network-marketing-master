@@ -1,6 +1,28 @@
 # Hot Log
 
-## 2026-05-28 — Council #6 (itirazlar + egitim) + fiyatlandırma UX
+## 2026-05-28 — Performans UX + Davet Kodu + Council #6 istatistikler
+
+### Hız / geçiş UX
+- **Giriş:** Client-side Supabase sign-in + `router.push('/pano')` (server redirect yerine); `/pano` prefetch
+- **Navigasyon:** Sidebar, BottomNav, SquareButton `prefetch`; dashboard mount'ta tüm rotalar prefetch
+- **Pano:** Workspace yüklenince kareler hemen görünür; aday verisi arka planda skeleton ile gelir
+- **React Query:** `staleTime` 60s, `refetchOnWindowFocus: false`
+
+### Ekibim
+- **Ekip Arkadaşını Davet Et** başlık düzeltmesi
+- **Davet Kodunu Gir** modülü davet bölümünün altında; `hasUpline` yoksa gösterilir (bağımsız liderler dahil)
+- `WorkspaceContext.hasUpline` — `parent_id` ile upline kontrolü
+
+### Platform Yönetim WA
+- Bağımsız kayıt mesajı: "Ekibim" → **'Davet Kodunu Gir' kutusuna {code}**
+
+### Council #6 (3/5)
+- **istatistikler:** `IstatistiklerContent.tsx` extract — `page.tsx` ~5 satır
+
+**Sıradaki #6:** `platform-yonetim` → `EkipPanel` → landing extract
+
+---
+
 
 ### Council backlog #6 (2/5 sayfa)
 - **itirazlar:** `data/itirazlar.ts`, `ItirazCard`, `AddObjectionModal`, `ItirazlarContent` — `page.tsx` ~12 satır
