@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/components/ui/NotificationsModal'
@@ -42,7 +42,7 @@ async function fetchNotifications(): Promise<NotificationItem[]> {
 
 export function useNotifications() {
   const queryClient = useQueryClient()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
   const { lang } = useTranslation()
   const router = useRouter()
 

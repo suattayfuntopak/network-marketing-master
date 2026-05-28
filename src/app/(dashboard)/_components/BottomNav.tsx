@@ -3,28 +3,12 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useEffect, useRef } from 'react'
-import { 
-  LayoutDashboard, Zap, TrendingUp, Bot, Users, 
-  CalendarDays, MessageCircleQuestion, BookOpen, Target, Shield, BarChart2, Crown
-} from 'lucide-react'
+import { Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
-
-const NAV_ITEMS = [
-  { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard        },
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus',    icon: Zap                    },
-  { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp             },
-  { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays           },
-  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                  },
-  { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen               },
-  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion  },
-  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                    },
-  { href: '/saha-provasi',  translationKey: 'nav.sahaProvasi',   icon: Target                 },
-  { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                 },
-  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
-]
+import { NAV_ITEMS } from '@/lib/navigation'
+import { Z } from '@/lib/zIndex'
 
 interface BottomNavProps {
   pendingHref?: string | null
@@ -34,11 +18,10 @@ interface BottomNavProps {
 export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
-  const { lang, t } = useTranslation()
+  const { t } = useTranslation()
   const activeRef = useRef<HTMLButtonElement | null>(null)
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const isSuperAdmin = ws?.isSuperAdmin ?? false
   const licenseType = ws?.licenseType ?? 'free'
   const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
 
@@ -69,7 +52,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
 
   return (
     <nav className={clsx(
-      "fixed bottom-0 left-0 right-0 z-50 flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform overflow-x-auto scrollbar-none",
+      `fixed bottom-0 left-0 right-0 ${Z.bottomNav} flex border-t border-[var(--border)] bg-[var(--bg-card)] pb-safe md:hidden transition-transform duration-300 ease-in-out transform overflow-x-auto scrollbar-none`,
       visible ? 'translate-y-0' : 'translate-y-full'
     )}>
       {items.map(({ href, translationKey, icon: Icon }) => {
@@ -77,31 +60,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         const pending = pendingHref === href
         const isCrown = href === '/platform-yonetim'
 
-        // Dynamic premium labels to fit perfectly
-        let label = t(translationKey)
-        if (translationKey === 'nav.todayFocus') {
-          label = lang === 'en' ? 'Today' : 'Bugün İlgilen'
-        } else if (translationKey === 'nav.pipeline') {
-          label = lang === 'en' ? 'Pipeline' : 'Boru Hattı'
-        } else if (translationKey === 'nav.yazar') {
-          label = lang === 'en' ? 'AI Coach' : 'YZ Koçu'
-        } else if (translationKey === 'nav.ekip') {
-          label = lang === 'en' ? 'Team' : 'Ekibim'
-        } else if (translationKey === 'nav.takvim') {
-          label = lang === 'en' ? 'Calendar' : 'Takvim'
-        } else if (translationKey === 'nav.itirazlar') {
-          label = lang === 'en' ? 'Objections' : 'İtirazlar'
-        } else if (translationKey === 'nav.egitim') {
-          label = lang === 'en' ? 'Training' : 'Vaktin Varsa'
-        } else if (translationKey === 'nav.sahaProvasi') {
-          label = lang === 'en' ? 'Rehearsal' : 'Saha Provası'
-        } else if (translationKey === 'nav.uyum') {
-          label = lang === 'en' ? 'Compliance' : 'Uyum Merkezi'
-        } else if (translationKey === 'nav.istatistikler') {
-          label = lang === 'en' ? 'Stats' : 'İstatistikler'
-        } else if (translationKey === 'nav.platformYonetim') {
-          label = lang === 'en' ? 'Platform' : 'Yönetim'
-        }
+        const label = t(translationKey.replace('nav.', 'navMobile.'))
 
         return (
           <button

@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { getLang } from '@/lib/getLang'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
@@ -77,9 +78,9 @@ export function useAddCandidate(workspaceId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
-      toast.success('Aday eklendi')
+      toast.success(getLang() === 'en' ? 'Candidate added' : 'Aday eklendi')
     },
-    onError: (e: Error) => toast.error(`Eklenemedi: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to add: ${e.message}` : `Eklenemedi: ${e.message}`),
   })
 }
 
@@ -166,9 +167,9 @@ export function useUpdateCandidate(workspaceId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
       qc.invalidateQueries({ queryKey: ['activity'] })
-      toast.success('Güncellendi')
+      toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
     },
-    onError: (e: Error) => toast.error(`Güncellenemedi: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to update: ${e.message}` : `Güncellenemedi: ${e.message}`),
   })
 }
 
@@ -182,9 +183,9 @@ export function useDeleteCandidate(workspaceId: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
-      toast.success('Aday silindi')
+      toast.success(getLang() === 'en' ? 'Candidate deleted' : 'Aday silindi')
     },
-    onError: (e: Error) => toast.error(`Silinemedi: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete: ${e.message}` : `Silinemedi: ${e.message}`),
   })
 }
 
@@ -211,7 +212,7 @@ export function useMarkContacted(workspaceId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
     },
-    onError: (e: Error) => toast.error(`Kayıt hatası: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
   })
 }
 
@@ -271,9 +272,9 @@ export function useAddCandidateNote(workspaceId: string) {
     onSuccess: (_, { candidateId }) => {
       qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
       qc.invalidateQueries({ queryKey: ['activity', candidateId] })
-      toast.success('Not kaydedildi')
+      toast.success(getLang() === 'en' ? 'Note saved' : 'Not kaydedildi')
     },
-    onError: (e: Error) => toast.error(`Not kaydedilemedi: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to save note: ${e.message}` : `Not kaydedilemedi: ${e.message}`),
   })
 }
 
@@ -292,6 +293,6 @@ export function useDeleteActivity(workspaceId: string) {
       qc.invalidateQueries({ queryKey: ['activity'] })
       qc.invalidateQueries({ queryKey: ['candidate-notes'] })
     },
-    onError: (e: Error) => toast.error(`Aktivite silinemedi: ${e.message}`),
+    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`),
   })
 }

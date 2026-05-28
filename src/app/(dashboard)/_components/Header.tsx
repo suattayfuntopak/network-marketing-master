@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
+import { Z } from '@/lib/zIndex'
 import { NotificationsModal, loadNotifications } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -119,7 +120,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
   return (
     <>
-      <div className={`fixed left-0 right-0 top-0 z-40 transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} md:translate-y-0`}>
+      <div className={`fixed left-0 right-0 top-0 ${Z.header} transition-transform duration-300 ease-in-out transform ${isHeaderVisible ? 'translate-y-0' : '-translate-y-full'} md:translate-y-0`}>
         {showWarningBar && (
           <div 
             onClick={() => router.push('/odeme')}
@@ -132,7 +133,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
         
         {/* Mobil Tam Ekran Arama Çubuğu Popup */}
         {isMobileSearchOpen && (
-          <div className="absolute inset-0 z-50 flex items-center bg-[var(--bg-card)] px-4 animate-in fade-in slide-in-from-top duration-200">
+          <div className={`absolute inset-0 ${Z.headerSearch} flex items-center bg-[var(--bg-card)] px-4 animate-in fade-in slide-in-from-top duration-200`}>
             <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2">
               <Search className="h-4.5 w-4.5 text-[var(--text-3)]" />
               <input

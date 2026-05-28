@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Z } from '@/lib/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 interface ConfirmDeleteModalProps {
   message?: string
@@ -12,6 +13,7 @@ interface ConfirmDeleteModalProps {
 }
 
 export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDeleteModalProps) {
+  const { t } = useTranslation()
   const [mounted, setMounted] = useState(false)
   // Escape tuşuyla kapat
   useEffect(() => {
@@ -44,7 +46,7 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
 
         {/* Başlık */}
         <h2 className={`text-center text-base font-bold text-[var(--text-1)] ${message ? 'mb-2' : 'mb-6'}`}>
-          Silmek istediğinizden emin misiniz?
+          {t('common.confirmDeleteTitle')}
         </h2>
         {message && (
           <p className="mb-6 text-center text-sm text-[var(--text-2)]">{message}</p>
@@ -56,14 +58,14 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
             onClick={onCancel}
             className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 text-sm font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)]"
           >
-            İptal
+            {t('common.cancel')}
           </button>
           <button
             onClick={onConfirm}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#72243E] py-3 text-sm font-semibold text-white transition hover:bg-[#5a1c31] active:scale-95"
           >
             <Trash2 className="h-4 w-4" />
-            Evet, Sil
+            {t('common.confirmYes')}
           </button>
         </div>
       </div>
@@ -71,3 +73,4 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
     document.body
   )
 }
+

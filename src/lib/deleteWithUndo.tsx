@@ -1,6 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
+import { getLang } from '@/lib/getLang'
 
 function DeleteToast({
   name,
@@ -9,6 +10,7 @@ function DeleteToast({
   name: string
   onUndo: () => void
 }) {
+  const lang = getLang()
   const r = 14
   const circ = 2 * Math.PI * r
 
@@ -27,18 +29,21 @@ function DeleteToast({
             style={{ animation: 'stroke-countdown 5s linear forwards' }}
           />
         </svg>
-        <span className="text-[9px] font-bold text-red-500">SİL</span>
+        <span className="text-[9px] font-bold text-red-500">
+          {lang === 'en' ? 'DEL' : 'SİL'}
+        </span>
       </div>
 
       <p className="flex-1 min-w-0 truncate text-sm font-medium text-[var(--text-1)]">
-        <span className="font-semibold">{name}</span> siliniyor
+        <span className="font-semibold">{name}</span>{' '}
+        {lang === 'en' ? 'deleting' : 'siliniyor'}
       </p>
 
       <button
         onClick={onUndo}
         className="shrink-0 rounded-xl bg-[var(--bg-subtle)] px-3 py-1.5 text-xs font-semibold text-[var(--text-1)] transition hover:bg-[var(--border)]"
       >
-        Geri Al
+        {lang === 'en' ? 'Undo' : 'Geri Al'}
       </button>
     </div>
   )
@@ -69,3 +74,4 @@ export function deleteWithUndo(
     { duration: 5200 }
   )
 }
+

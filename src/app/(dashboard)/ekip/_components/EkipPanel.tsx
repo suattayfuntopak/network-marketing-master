@@ -151,6 +151,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
 
   const cleanStr = (s: string | null | undefined) => (s ?? '')
     .toLowerCase()
+    .replace(/\u0131/g, 'i').replace(/\u011f/g, 'g')
     .normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]/g, '')
@@ -200,7 +201,11 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     const isMatched = registeredMemberRows.some(m => {
       const mf = cleanStr(m.full_name)
       const cf = cleanStr(c.full_name)
-      return mf && cf && (mf.includes(cf) || cf.includes(mf))
+      if (!mf || !cf) return false
+      if (mf.includes(cf) || cf.includes(mf)) return true
+      // Token fallback: any word (≥3 chars) from the workspace member name found in the candidate name
+      const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
+      return mWords.some((w: string) => cf.includes(w))
     })
 
     if (!isMatched) {

@@ -357,7 +357,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
               </div>
             ) : (
               <ul className="space-y-2">
-                {notifications.map(n => (
+                {notifications.slice(0, 5).map(n => (
                   <li key={n.id}>
                     <button
                       onClick={() => openNotification(n)}
@@ -395,6 +395,11 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
                     </button>
                   </li>
                 ))}
+                {notifications.length > 5 && (
+                  <li className="pt-1 text-center text-[10px] font-semibold text-[var(--text-3)]">
+                    Son 5 bildirim gösteriliyor
+                  </li>
+                )}
               </ul>
             )}
           </div>

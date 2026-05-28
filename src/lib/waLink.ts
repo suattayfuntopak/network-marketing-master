@@ -1,5 +1,8 @@
 function toWaNumber(phone: string): string {
   const digits = phone.replace(/\D/g, '')
+  // International format (+XX...): strip the + and use directly
+  if (phone.trimStart().startsWith('+')) return digits
+  // Turkish local formats
   if (digits.startsWith('90') && digits.length >= 11) return digits
   if (digits.startsWith('0') && digits.length === 11) return '9' + digits
   return '90' + digits

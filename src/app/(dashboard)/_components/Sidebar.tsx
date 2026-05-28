@@ -3,24 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { LayoutDashboard, Zap, TrendingUp, Bot, Users, CalendarDays, Trophy, MessageCircleQuestion, BookOpen, ChevronLeft, ChevronRight, Shield, BarChart2, Target, Crown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
-
-const NAV_ITEMS = [
-  { href: '/pano',          translationKey: 'nav.pano',          icon: LayoutDashboard          },
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus',    icon: Zap                      },
-  { href: '/pipeline',      translationKey: 'nav.pipeline',      icon: TrendingUp               },
-  { href: '/takvim',        translationKey: 'nav.takvim',        icon: CalendarDays             },
-  { href: '/ekip',          translationKey: 'nav.ekip',          icon: Users                    },
-  { href: '/egitim',        translationKey: 'nav.egitim',        icon: BookOpen                 },
-  { href: '/itirazlar',     translationKey: 'nav.itirazlar',     icon: MessageCircleQuestion    },
-  { href: '/yazar',         translationKey: 'nav.yazar',         icon: Bot                      },
-  { href: '/saha-provasi',  translationKey: 'nav.sahaProvasi',   icon: Target                   },
-  { href: '/uyum',          translationKey: 'nav.uyum',          icon: Shield                   },
-  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2                },
-]
+import { NAV_ITEMS } from '@/lib/navigation'
+import { Z } from '@/lib/zIndex'
 
 interface SidebarProps {
   collapsed: boolean
@@ -30,9 +17,8 @@ interface SidebarProps {
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
   const { t } = useTranslation()
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const isSuperAdmin = ws?.isSuperAdmin ?? false
   const licenseType = ws?.licenseType ?? 'free'
   const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
 
@@ -45,7 +31,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
     <aside
       className={clsx(
         'fixed left-0 top-16 hidden h-[calc(100vh-4rem)] flex-col border-r border-[var(--border)] bg-[var(--bg-card)] md:flex',
-        'transition-all duration-300 z-35',
+        `transition-all duration-300 ${Z.sidebar}`,
         collapsed ? 'w-[72px]' : 'w-64'
       )}
     >

@@ -248,8 +248,8 @@ export default function RootPage() {
             <button
               onClick={() => setLang('tr')}
               title="Türkçe"
-              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
-                lang === 'tr' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
+              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-slate-100 dark:hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
+                lang === 'tr' ? 'bg-slate-100 dark:bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
               }`}
             >
               <TRFlag />
@@ -259,8 +259,8 @@ export default function RootPage() {
             <button
               onClick={() => setLang('en')}
               title="English"
-              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
-                lang === 'en' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
+              className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-slate-100 dark:hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
+                lang === 'en' ? 'bg-slate-100 dark:bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
               }`}
             >
               <USFlag />
@@ -531,7 +531,7 @@ export default function RootPage() {
                 {lang === 'en' ? 'Sponsor Hours Saved / Month' : 'Kazanılan Sponsor Zamanı / Ay'}
               </p>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} saat</span>
+                <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} {lang === 'en' ? 'hours' : 'saat'}</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-zinc-500">
                 {lang === 'en' ? 'Checklists and dynamic guidance handle direct training.' : 'Doğru başlangıç rehberleri ekibin eğitim ve takip takibini üstlenir.'}
@@ -813,7 +813,7 @@ export default function RootPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span className="font-bold text-pink-300">{lang === 'en' ? 'Sınırsız Alt Ekip Takibi' : 'Sınırsız Alt Ekip Takibi'}</span>
+                  <span className="font-bold text-pink-300">{lang === 'en' ? 'Unlimited Downline Tracking' : 'Sınırsız Alt Ekip Takibi'}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
@@ -853,28 +853,6 @@ export default function RootPage() {
 
       {/* ── TESTIMONIALS ── */}
       <section className="py-16 space-y-12 overflow-hidden relative">
-        {/* Custom CSS for continuous horizontal marquee scrolling */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes marquee-left {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-          @keyframes marquee-right {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
-          }
-                    .animate-marquee-left {
-            display: flex;
-            width: max-content;
-            animation: marquee-left 45s linear infinite;
-          }
-          .animate-marquee-right {
-            display: flex;
-            width: max-content;
-            animation: marquee-right 45s linear infinite;
-          }
-        `}} />
-
         <div className="text-center space-y-3 px-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
             {lang === 'en' ? 'Trusted by Independent Leaders' : 'Liderlerin Başarı Hikayeleri'}

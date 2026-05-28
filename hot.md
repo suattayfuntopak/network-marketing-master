@@ -1,5 +1,48 @@
 # Hot Log
 
+## 2026-05-28 — Council Triad Raporu Uygulaması (Faz 1-4 Tamamlandı)
+
+### refactor + fix + i18n: 14 maddelik kapsamlı temizlik
+
+**Kritik (C serisi):**
+- **`src/hooks/useCandidates.ts` — 9 hardcoded TR toast → çift dil:**
+  - `getLang` import edildi, tüm `toast.success/error` çağrıları `getLang() === 'en' ? 'EN' : 'TR'` formatına çevrildi.
+  - Etkilenen mutasyonlar: `useAddCandidate`, `useUpdateCandidate`, `useDeleteCandidate`, `useMarkContacted`, `useAddCandidateNote`, `useDeleteActivity`.
+- **`src/hooks/useNotifications.ts` — `createClient()` her render yerine `useMemo` singleton:**
+  - `const supabase = useMemo(() => createClient(), [])` — stale closure ve duplicate realtime subscription riski giderildi.
+- **`src/app/(dashboard)/search/page.tsx` + `translations/*.ts` — boş durum alt yazısı i18n:**
+  - Yeni key: `common.searchNoResultsDesc` (TR + EN), `{query}` placeholder ile dinamik.
+
+**Yüksek (H serisi):**
+- **`src/app/page.tsx` + `src/app/globals.css` — `dangerouslySetInnerHTML` kaldırıldı:**
+  - Marquee `@keyframes` ve `.animate-marquee-*` sınıfları `globals.css`'e taşındı, XSS vektör prensibi kapatıldı.
+- **`src/app/globals.css` — Font çelişkisi düzeltildi:**
+  - `body { font-family: Arial, Helvetica, sans-serif }` → `var(--font-geist-sans), sans-serif`. Geist artık gerçekten render ediliyor.
+- **`src/lib/navigation.ts` (YENİ) — `NAV_ITEMS` üçlü tekrarı tek dosyaya:**
+  - `Sidebar.tsx`, `BottomNav.tsx`, `DashboardShell.tsx` artık `@/lib/navigation`'dan import ediyor.
+  - `NAV_ROUTES = NAV_ITEMS.map(i => i.href)` türetilmiş — yeni sayfa için sadece bir dosya değişir.
+- **H-12 değerlendirildi:** `hot.md` kalıcı dev log olarak kullanılıyor (commit edilmeye devam) — `.gitignore` değişikliği geri alındı.
+
+**Orta (M serisi):**
+- **`src/app/(dashboard)/_components/UserMenu.tsx` — Logout dark mode hover:** `dark:text-[#e87fa3] dark:hover:bg-[#3d0f1f]` eklendi.
+- **`src/app/(dashboard)/_components/BottomNav.tsx` — 20 satırlık if-else zinciri silindi:**
+  - Tek satırlık `t(translationKey.replace('nav.', 'navMobile.'))` — mevcut `navMobile.*` çeviri grubu kullanılıyor.
+  - Kullanılmayan `lang` destrüktürelemesi de kaldırıldı.
+- **`src/hooks/useWorkspace.ts` — `staleTime: Infinity` → `5 * 60 * 1000`:** lisans yükseltmesi sonrası refresh garantisi.
+- **`src/lib/zIndex.ts` — Eksik katmanlar eklendi:**
+  - `sidebar: 'z-[35]'`, `header: 'z-40'`, `bottomNav: 'z-50'`, `headerSearch: 'z-50'`.
+  - `Sidebar.tsx`, `Header.tsx`, `BottomNav.tsx` artık inline `z-*` yerine `Z.*` kullanıyor.
+- **`src/lib/waLink.ts` — Uluslararası numara desteği:** `+` ile başlayan numaralar artık ülke kodu zorlanmadan kullanılıyor.
+- **`src/lib/validation.ts` — `PHONE_RE`:** `/^(\+90|0)5\d{9}$/` → `/^\+?[1-9]\d{6,14}$/` (E.164 uyumlu).
+
+**Düşük (L serisi):**
+- **`Sidebar` + `BottomNav` + `DashboardShell` — gereksiz `useAIUsage` çağrıları kaldırıldı:**
+  - `ws?.isSuperAdmin` (önceki refactor'da eklenmişti) kullanılıyor; tek hook yetiyor.
+
+**Doğrulama:** `npx tsc --noEmit` temiz çalıştı, sıfır TypeScript hatası.
+
+---
+
 ## 2026-05-28 — getLimitsForLicense Mimarisi + WorkspaceContext.isSuperAdmin + Landing Page Tek Kaynak
 
 ### refactor: 3 mimari iyileştirme

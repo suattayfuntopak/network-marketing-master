@@ -105,7 +105,7 @@ export function useWorkspace() {
   return useQuery({
     queryKey: ['workspace'],
     queryFn: fetchOrCreateWorkspace,
-    staleTime: Infinity,
+    staleTime: 5 * 60 * 1000,
     retry: false,
   })
 }

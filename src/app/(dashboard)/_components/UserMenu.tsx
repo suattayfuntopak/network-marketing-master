@@ -106,7 +106,7 @@ export function UserMenu() {
           <form action={logoutAction}>
             <button
               type="submit"
-              className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] transition hover:bg-[#FBEAF0] cursor-pointer"
+              className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] dark:text-[#e87fa3] transition hover:bg-[#FBEAF0] dark:hover:bg-[#3d0f1f] cursor-pointer"
             >
               <LogOut className="h-4 w-4" strokeWidth={1.75} />
               {lang === 'en' ? 'Log Out' : 'Çıkış Yap'}

@@ -113,7 +113,7 @@ function SearchPageContent() {
           type="submit"
           className="rounded-xl bg-[#534AB7] px-6 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
         >
-          {t('nav.pano')}
+          {t('common.search')}
         </button>
       </form>
 
@@ -272,7 +272,9 @@ function SearchPageContent() {
             <Search className="h-10 w-10 text-[var(--text-3)]" />
             <div>
               <p className="text-sm font-bold text-[var(--text-1)]">{t('common.searchNoResults')}</p>
-              <p className="text-xs text-[var(--text-3)] mt-0.5">"{query}" terimiyle eşleşen aday veya eğitim konusu bulunamadı.</p>
+              <p className="text-xs text-[var(--text-3)] mt-0.5">
+                {t('common.searchNoResultsDesc').replace('{query}', query)}
+              </p>
             </div>
           </div>
         )}

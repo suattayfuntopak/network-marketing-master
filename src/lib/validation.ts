@@ -1,1 +1,1 @@
-export const PHONE_RE = /^(\+90|0)5\d{9}$/
+export const PHONE_RE = /^\+?[1-9]\d{6,14}$/

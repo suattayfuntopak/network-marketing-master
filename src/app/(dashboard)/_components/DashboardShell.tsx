@@ -5,21 +5,8 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
-import { useAIUsage } from '@/hooks/useAIUsage'
-
-const NAV_ROUTES = [
-  '/pano',
-  '/bugun/ilgilen',
-  '/pipeline',
-  '/takvim',
-  '/ekip',
-  '/egitim',
-  '/itirazlar',
-  '/yazar',
-  '/saha-provasi',
-  '/uyum',
-  '/istatistikler'
-]
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { NAV_ROUTES } from '@/lib/navigation'
 
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
@@ -42,8 +29,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const touchStart = useRef<{ x: number; y: number } | null>(null)
 
-  const { data: usage } = useAIUsage()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
+  const { data: ws } = useWorkspace()
+  const isSuperAdmin = ws?.isSuperAdmin ?? false
 
   const routes = isSuperAdmin
     ? [...NAV_ROUTES, '/platform-yonetim']

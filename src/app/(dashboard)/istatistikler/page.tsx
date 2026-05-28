@@ -32,6 +32,51 @@ export default function AnalyticsPage() {
     return leader ? [leader, ...downlines] : members
   }, [members])
 
+  // Turkish-aware name normalizer — must match EkipPanel's cleanStr
+  const cleanStr = (s: string | null | undefined) => (s ?? '')
+    .toLowerCase()
+    .replace(/ı/g, 'i').replace(/ğ/g, 'g')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/g, '')
+
+  // Non-NMM "Saha Ortakları": katildi candidates not matched to any workspace member
+  const sahaOrtaklari = useMemo(() => {
+    return candidates
+      .filter(c => c.stage === 'katildi')
+      .filter(c => !sortedMembers.some(m => {
+        const mf = cleanStr(m.full_name)
+        const cf = cleanStr(c.full_name)
+        if (!mf || !cf) return false
+        if (mf.includes(cf) || cf.includes(mf)) return true
+        const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
+        return mWords.some((w: string) => cf.includes(w))
+      }))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candidates, sortedMembers])
+
+  // Combined performance table rows: NMM members + Saha Ortakları
+  const performanceRows = useMemo(() => {
+    const nmmRows = sortedMembers.map(m => ({ ...m, isAppUser: true as const }))
+    const sahaRows = sahaOrtaklari.map(c => ({
+      user_id: c.id,
+      full_name: c.full_name,
+      role: 'member' as const,
+      joined_at: null,
+      candidate_count: 0,
+      yeni_count: 0,
+      iletisim_count: 0,
+      davetli_count: 0,
+      sunum_count: 0,
+      takip_count: 0,
+      katildi_count: 0,
+      last_activity_at: null,
+      onboarding_steps: [] as string[],
+      isAppUser: false as const,
+    }))
+    return [...nmmRows, ...sahaRows]
+  }, [sortedMembers, sahaOrtaklari])
+
   // 1. Adayları seçilen periyoda göre filtrele
   const filteredCandidates = useMemo(() => {
     if (period === 'all') return candidates
@@ -460,15 +505,15 @@ export default function AnalyticsPage() {
                 {lang === 'en' ? 'Team Performance Excel Spreadsheet' : 'Ekip Performans Dağılım Tablosu'}
               </h2>
               <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                {lang === 'en' 
-                  ? 'Detailed excel-style summary of your pipeline distribution including direct team downline partners.'
-                  : 'Alt ekibinizdeki davet kodu ile girmiş distribütörler ve kendinizin tüm huni aşamalarındaki güncel aday dağılım tablosu.'}
+                {lang === 'en'
+                  ? 'Detailed excel-style summary including NMM app partners (💎) and field distributors at katildi stage (🤝).'
+                  : 'NMM uygulama ortakları (💎) ve katıldı aşamasındaki saha distribütörlerini (🤝) birlikte gösteren huni dağılım tablosu.'}
               </p>
             </div>
 
-            {membersLoading ? (
+            {membersLoading || cLoading ? (
               <div className="h-32 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-            ) : sortedMembers.length === 0 ? (
+            ) : performanceRows.length === 0 ? (
               <div className="py-10 text-center text-xs text-[var(--text-3)] italic">
                 {lang === 'en' ? 'No team members registered' : 'Henüz ekibe kayıtlı üye bulunmamaktadır.'}
               </div>
@@ -479,11 +524,12 @@ export default function AnalyticsPage() {
                     <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
                       <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
+                      <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Type' : 'Tür'}</th>
                       <th className="p-3 font-semibold text-center bg-blue-50/20 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{lang === 'en' ? 'Total' : 'Toplam'}</th>
                       <th className="p-3 font-semibold text-center bg-indigo-50/20 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400">{lang === 'en' ? 'New' : 'Yeni'}</th>
                       <th className="p-3 font-semibold text-center bg-sky-50/20 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400">{lang === 'en' ? 'Contact' : 'İletişim'}</th>
                       <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">{lang === 'en' ? 'Invite' : 'Davet'}</th>
-                      <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400">{lang === 'en' ? 'Presentation' : 'Sunum'}</th>
+                      <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-sky-950/5 text-cyan-600 dark:text-cyan-400">{lang === 'en' ? 'Presentation' : 'Sunum'}</th>
                       <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{lang === 'en' ? 'Follow-up' : 'Takip'}</th>
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{lang === 'en' ? 'Joined' : 'Katıldı'}</th>
                       <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
@@ -493,13 +539,14 @@ export default function AnalyticsPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
-                    {sortedMembers.map(m => {
+                    {performanceRows.map(m => {
                       const isLeader = m.role === 'leader'
+                      const isAppUser = (m as any).isAppUser !== false
                       const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
                       const doneCount = m.onboarding_steps?.length ?? 0
                       const onboardingPct = isLeader ? 100 : Math.min(100, Math.round((doneCount / 9) * 100))
                       return (
-                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
+                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''} ${!isAppUser ? 'opacity-70' : ''}`}>
                           <td className="p-3 flex items-center gap-2 whitespace-nowrap">
                             {isLeader ? (
                               <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
@@ -511,16 +558,27 @@ export default function AnalyticsPage() {
                           <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
                             {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
                           </td>
-                          <td className="p-3 text-center font-black tabular-nums bg-blue-50/10 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{m.candidate_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-indigo-50/10 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400 font-semibold">{m.yeni_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-sky-50/10 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400 font-semibold">{m.iletisim_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">{m.davetli_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-cyan-50/10 dark:bg-cyan-950/5 text-cyan-600 dark:text-cyan-400 font-semibold">{m.sunum_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{m.takip_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{m.katildi_count}</td>
-                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-black">%{onboardingPct}</td>
+                          <td className="p-3 text-center">
+                            {isLeader ? null : isAppUser ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[9px] font-black text-purple-700 dark:text-purple-400 whitespace-nowrap">
+                                💎 {lang === 'en' ? 'NMM' : 'NMM'}
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800/60 px-2 py-0.5 text-[9px] font-black text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
+                                🤝 {lang === 'en' ? 'Field' : 'Saha'}
+                              </span>
+                            )}
+                          </td>
+                          <td className="p-3 text-center font-black tabular-nums bg-blue-50/10 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{isAppUser ? m.candidate_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-indigo-50/10 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400 font-semibold">{isAppUser ? m.yeni_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-sky-50/10 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400 font-semibold">{isAppUser ? m.iletisim_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">{isAppUser ? m.davetli_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-cyan-50/10 dark:bg-sky-950/5 text-cyan-600 dark:text-cyan-400 font-semibold">{isAppUser ? m.sunum_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{isAppUser ? m.takip_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{isAppUser ? m.katildi_count : '—'}</td>
+                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-black">{isAppUser ? `%${onboardingPct}` : '—'}</td>
                           <td className="p-3 text-right text-[11px] text-[var(--text-2)] font-medium truncate">
-                            {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '-'}
+                            {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—'}
                           </td>
                         </tr>
                       )
