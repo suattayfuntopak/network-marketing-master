@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-28 — Ekibim: saha ortağı kart çerçevesi güçlendirildi
+
+- `teamMemberCard.ts` — saha ortağı (`isAppUser === false`) border/ring/arka plan NMM ortağı seviyesinde belirgin (amber ton)
+
+---
+
 ## 2026-05-28 — PersonAvatar: Takvim + Pipeline
 
 ### fix(ui): boru hattı kart/detay ve takvim listesi avatarları

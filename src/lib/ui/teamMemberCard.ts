@@ -12,7 +12,12 @@ export function getTeamMemberCardClasses(
     return 'border-sky-200/90 bg-sky-50/35 dark:border-sky-800/50 dark:bg-sky-950/18'
   }
   if (m.isAppUser === false) {
-    return 'border-amber-200/85 bg-amber-50/30 dark:border-amber-800/45 dark:bg-amber-950/14'
+    // Saha ortağı — NMM ortağı kadar belirgin çerçeve (hafif amber ton)
+    return [
+      'border-amber-300 bg-amber-50/50',
+      'ring-1 ring-amber-200/80',
+      'dark:border-amber-600/70 dark:bg-amber-950/22 dark:ring-amber-800/40',
+    ].join(' ')
   }
   return 'border-violet-200/85 bg-violet-50/28 dark:border-violet-800/45 dark:bg-violet-950/14'
 }
