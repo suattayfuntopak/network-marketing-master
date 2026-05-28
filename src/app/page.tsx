@@ -828,6 +828,10 @@ export default function RootPage() {
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
                   <span>{lang === 'en' ? 'Daily 60 Interactive Rehearsal Credits' : 'Günlük 60 Saha Provası Kredisi'}</span>
                 </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                  <span>{lang === 'en' ? 'Daily 20 Compliance Audit Credits' : 'Günlük 20 Uyum Denetim Hakkı'}</span>
+                </li>
               </ul>
             </div>
 

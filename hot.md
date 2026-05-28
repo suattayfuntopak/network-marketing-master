@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-28 — Landing Page Pro Plan Güncelleme
+
+### feat: Pro plan fiyatlandırmasına Günlük 20 Uyum Denetim Hakkı eklendi
+
+- **`src/app/page.tsx` (Diamond Pro / Pro Plan kartı):**
+  - Özellik listesinin en altına "Günlük 20 Uyum Denetim Hakkı" (`Daily 20 Compliance Audit Credits`) maddesi eklendi.
+  - Diğer plan özellikleriyle aynı `CheckCircle2` ikonu ve `text-pink-400` renk stili kullanıldı.
+  - TR/EN ikidilli destek sağlandı.
+
+---
+
 ## 2026-05-27 — Platform Yönetim Masası: Bağımsız Üyeler (Issue #6)
 
 ### feat: Bağımsız kayıtları yönetmek için Platform Yönetim Masası tamamlandı
