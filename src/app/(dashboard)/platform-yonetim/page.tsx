@@ -17,8 +17,10 @@ import {
   getPlatformWorkspacesAction,
   adminExtendLicenseAction,
   addIndependentAsCandidateAction,
+  deleteUserAction,
   type PlatformWorkspaceItem
 } from './actions'
+import { Trash2 } from 'lucide-react'
 
 export default function PlatformAdminPage() {
   const { lang } = useTranslation()
@@ -36,6 +38,7 @@ export default function PlatformAdminPage() {
   // Independent users — add as candidate state
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
 
   // Extension Modal states
   const [licenseType, setLicenseType] = useState<'free' | 'leader' | 'master' | 'pro'>('master')
@@ -127,6 +130,21 @@ export default function PlatformAdminPage() {
       toast.error(err.message || (lang === 'en' ? 'Operation failed.' : 'İşlem başarısız.'))
     } finally {
       setAddingId(null)
+    }
+  }
+
+  async function handleDeleteUser(ownerId: string, email: string) {
+    if (!confirm(lang === 'en' ? `Are you sure you want to permanently delete user ${email}?` : `E-posta adresi ${email} olan kullanıcıyı kalıcı olarak silmek istediğinize emin misiniz?`)) return
+    
+    setDeletingUserId(ownerId)
+    try {
+      await deleteUserAction(ownerId, email)
+      toast.success(lang === 'en' ? 'User deleted successfully.' : 'Kullanıcı başarıyla silindi.')
+      loadData()
+    } catch (err: any) {
+      toast.error(err.message || (lang === 'en' ? 'Delete failed.' : 'Silme işlemi başarısız.'))
+    } finally {
+      setDeletingUserId(null)
     }
   }
 
@@ -439,6 +457,19 @@ export default function PlatformAdminPage() {
                               className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#534AB7]/10 text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white"
                             >
                               <Plus className="h-4 w-4" />
+                            </button>
+                            {/* Delete User trigger */}
+                            <button
+                              onClick={() => handleDeleteUser(w.ownerId, w.ownerEmail)}
+                              disabled={deletingUserId === w.ownerId}
+                              title={lang === 'en' ? 'Delete User' : 'Kullanıcıyı Sil'}
+                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
+                            >
+                              {deletingUserId === w.ownerId ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <Trash2 className="h-4 w-4" />
+                              )}
                             </button>
                           </div>
                         </td>

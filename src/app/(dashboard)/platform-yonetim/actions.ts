@@ -261,3 +261,22 @@ export async function addIndependentAsCandidateAction(
 
   return { success: true }
 }
+export async function deleteUserAction(ownerId: string, email: string): Promise<{ success: boolean }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
+    throw new Error('Yetkisiz erişim: Bu işlemi sadece Süper Admin gerçekleştirebilir.')
+  }
+
+  const admin = createAdminClient()
+
+  const { error: delErr } = await admin.auth.admin.deleteUser(ownerId)
+  if (delErr) {
+    console.error('[deleteUserAction] Error deleting user:', delErr)
+    throw new Error('Kullanıcı silinemedi: ' + delErr.message)
+  }
+
+  return { success: true }
+}
+
