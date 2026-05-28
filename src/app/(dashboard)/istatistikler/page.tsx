@@ -12,11 +12,13 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
-import { useTeamMembers } from '@/hooks/useTeamMembers'
+import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 type PeriodOption = '7d' | '30d' | 'all'
+
+type PerformanceRow = TeamMember & { isAppUser: boolean }
 
 export default function AnalyticsPage() {
   const { t, lang } = useTranslation()
@@ -60,7 +62,7 @@ export default function AnalyticsPage() {
   }, [candidates, sortedMembers])
 
   // Combined performance table rows: NMM members + Saha Ortakları
-  const performanceRows = useMemo(() => {
+  const performanceRows = useMemo((): PerformanceRow[] => {
     const nmmRows = sortedMembers.map(m => ({ ...m, isAppUser: true as const }))
     const sahaRows = sahaOrtaklari.map(c => ({
       user_id: c.id,
@@ -556,7 +558,7 @@ export default function AnalyticsPage() {
                   <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
                     {performanceRows.map(m => {
                       const isLeader = m.role === 'leader'
-                      const isAppUser = (m as any).isAppUser !== false
+                      const isAppUser = m.isAppUser !== false
                       const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
                       const doneCount = m.onboarding_steps?.length ?? 0
                       const onboardingPct = isLeader ? 100 : Math.min(100, Math.round((doneCount / 9) * 100))

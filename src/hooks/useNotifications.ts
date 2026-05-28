@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/components/ui/NotificationsModal'
 import { toast } from 'sonner'
@@ -54,7 +55,7 @@ export function useNotifications() {
 
   // Realtime subscriber for in-app written and audio alerts
   useEffect(() => {
-    let channel: any
+    let channel: RealtimeChannel | null = null
 
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
@@ -62,15 +63,15 @@ export function useNotifications() {
       channel = supabase
         .channel(`nmm_notifications_realtime:${user.id}`)
         .on(
-          'postgres_changes' as any,
+          'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'nmm_notifications',
             filter: `user_id=eq.${user.id}`,
           },
-          (payload: any) => {
-            const newNotif = payload.new as NotificationItem
+          (payload: RealtimePostgresInsertPayload<NotificationItem>) => {
+            const newNotif = payload.new
             if (!newNotif) return
 
             // 1. Invalidate query to refresh UI lists and badge count instantly

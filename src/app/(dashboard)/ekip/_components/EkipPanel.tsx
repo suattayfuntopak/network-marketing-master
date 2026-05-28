@@ -178,7 +178,11 @@ export function EkipPanel() {
         setJoining(false)
         return
       }
-      toast.success(t('team.joinSuccess', { name: (data as any)?.workspace_name ?? '' }))
+      const joinResult =
+        data && typeof data === 'object' && 'workspace_name' in data
+          ? String((data as { workspace_name?: string }).workspace_name ?? '')
+          : ''
+      toast.success(t('team.joinSuccess', { name: joinResult }))
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import { assertSuperAdmin } from '@/lib/auth'
+import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 
 // Initialize Supabase Admin Client using Service Role Key to bypass RLS safely
@@ -273,15 +274,13 @@ export async function addIndependentAsCandidateAction(
 
   const note = `[Platform Üyesi] ${targetEmail}`.slice(0, 200)
 
-  const { error: insertErr } = await (admin
-    .from('nmm_candidates')
-    .insert({
-      workspace_id: ws.id,
-      owner_id: user.id,
-      full_name: targetName,
-      stage: 'yeni',
-      note,
-    }) as any)
+  const { error: insertErr } = await admin.from('nmm_candidates').insert({
+    workspace_id: ws.id,
+    owner_id: user.id,
+    full_name: targetName,
+    stage: 'yeni',
+    ...buildCandidateContentFields({ noteTr: note, noteEn: '' }),
+  })
 
   if (insertErr) {
     if (insertErr.code === '23505') {

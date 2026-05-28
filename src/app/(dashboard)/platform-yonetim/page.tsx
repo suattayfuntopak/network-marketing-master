@@ -525,7 +525,14 @@ export default function PlatformAdminPage() {
                             <button
                               onClick={() => {
                                 setSelectedWorkspace(w)
-                                setLicenseType(w.licenseType as any)
+                                setLicenseType(
+                                  w.licenseType === 'free' ||
+                                    w.licenseType === 'leader' ||
+                                    w.licenseType === 'master' ||
+                                    w.licenseType === 'pro'
+                                    ? w.licenseType
+                                    : 'free'
+                                )
                                 setIsUnlimited(w.licenseType !== 'free' && w.licenseExpiresAt === null)
                                 setExtensionDays(30)
                               }}

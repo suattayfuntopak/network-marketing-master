@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { X, Camera, Upload, Trash2, Loader2 } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/domain/stages'
+import type { CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
@@ -105,7 +106,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
         id: candidateId,
         full_name: fullName,
         phone: phone || null,
-        stage: stage as any,
+        stage: stage as CandidateStage,
         last_contact_at: null,
         ...buildCandidateContentFields({
           noteTr: note,

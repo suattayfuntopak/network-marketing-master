@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-05-28 — Ekibim saha ortağı avatarları + Council backlog #3
+
+### fix: saha ortağı (katildi aday) profil fotoğrafları Ekibim'de
+
+**Kök neden:** `nmm_fetch_team_with_downlines` RPC `leader_candidates` içinde yalnızca `note` dönüyordu; Y-9 sonrası `avatar_url` ayrı kolonda — `resolveCandidateFields` boş kalıyordu.
+
+**Çözüm:**
+- Migration `025_team_rpc_candidate_avatar.sql` — RPC'ye `avatar_url`, `note_tr`, `note_en`, `warmth`
+- `enrichLeaderCandidates` — RPC öncesi/sonrası ek sorgu ile typed kolonları garanti (025 uygulanmadan da çalışır)
+- Legacy fetch: `nmm_candidates` select'e typed kolonlar eklendi
+
+### Council backlog #3: `as any` temizliği (src'de 0)
+
+EkipPanel join, platform insert, istatistikler PerformanceRow, notifications realtime, LanguageProvider, AddCandidateSheet stage.
+
+**Deploy:** Migration `025` Supabase'de uygulanmalı (enrich fallback zaten aktif).
+
+---
+
 ## 2026-05-28 — Council backlog #2: Aday ekle/düzenle PersonAvatar
 
 - `AddCandidateSheet`, `EditCandidateSheet` — profil önizlemesi pastel baş harf / yükleme; kamera butonu korundu

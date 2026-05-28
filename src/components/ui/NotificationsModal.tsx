@@ -71,9 +71,10 @@ function NotifIconBg({ type }: { type: NotificationItem['icon'] }) {
 export function playNotificationSound() {
   if (typeof window === 'undefined') return
   try {
-    const AudioContext = window.AudioContext || (window as any).webkitAudioContext
-    if (!AudioContext) return
-    const ctx = new AudioContext()
+    type WindowWithWebkit = Window & { webkitAudioContext?: typeof AudioContext }
+    const AudioCtx = window.AudioContext ?? (window as WindowWithWebkit).webkitAudioContext
+    if (!AudioCtx) return
+    const ctx = new AudioCtx()
     
     // Note 1 (C5)
     const osc = ctx.createOscillator()

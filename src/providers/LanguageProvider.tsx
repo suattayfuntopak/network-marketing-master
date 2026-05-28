@@ -35,12 +35,16 @@ const sections = [
   pagesSection,
 ]
 
-function mergeSections(base: Record<string, any>, langKey: LangType): Record<string, any> {
-  const merged: Record<string, any> = { ...base }
-  for (const section of sections) {
-    const ns = (section as any)[langKey] ?? {}
+type TranslationNamespace = Record<string, string>
+type TranslationRoot = Record<string, TranslationNamespace>
+type SectionBundle = Record<LangType, TranslationRoot>
+
+function mergeSections(base: TranslationRoot, langKey: LangType): TranslationRoot {
+  const merged: TranslationRoot = { ...base }
+  for (const section of sections as SectionBundle[]) {
+    const ns = section[langKey] ?? {}
     for (const [namespace, entries] of Object.entries(ns)) {
-      merged[namespace] = { ...(merged[namespace] ?? {}), ...(entries as object) }
+      merged[namespace] = { ...(merged[namespace] ?? {}), ...entries }
     }
   }
   return merged
@@ -77,15 +81,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }
 
   function t(keyPath: string, variables?: Record<string, string | number>): string {
-    const dict = dictionaries[lang] as any
     const keys = keyPath.split('.')
-    let current = dict
+    let current: unknown = dictionaries[lang]
 
     for (const key of keys) {
-      if (current === undefined || current === null) {
+      if (current === undefined || current === null || typeof current !== 'object') {
         return keyPath
       }
-      current = current[key]
+      current = (current as Record<string, unknown>)[key]
     }
 
     if (typeof current !== 'string') {

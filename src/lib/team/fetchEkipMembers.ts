@@ -4,6 +4,7 @@ import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 import { resolveTeamAvatarsAction } from '@/app/(dashboard)/ekip/actions'
 import type { MemberRow } from '@/lib/team/types'
+import { enrichLeaderCandidates } from '@/lib/team/enrichLeaderCandidates'
 
 /**
  * Builds the Ekibim team list (leader + downlines + field distributors).
@@ -18,7 +19,8 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
   if (rpcBundle) {
     const allUserIds = rpcBundle.members.map(m => m.user_id)
     const authAvatars = await resolveTeamAvatarsAction(workspaceId, allUserIds)
-    const { members, leaderCandidates: candidates, leaderOwnerId } = rpcBundle
+    const candidates = await enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates)
+    const { members, leaderOwnerId } = rpcBundle
     const ownWs = { owner_id: leaderOwnerId }
 
     const registeredMemberRows = members.map(m => {
@@ -194,7 +196,7 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
   ] = await Promise.all([
     supabase
       .from('nmm_candidates')
-      .select('id, owner_id, stage, full_name, phone, created_at, note')
+      .select('id, owner_id, stage, full_name, phone, created_at, note, note_tr, note_en, avatar_url, warmth')
       .in('workspace_id', allWorkspaceIds),
     supabase
       .from('nmm_daily_actions')

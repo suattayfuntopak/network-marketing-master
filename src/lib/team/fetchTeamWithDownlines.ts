@@ -22,15 +22,9 @@ type RpcMember = {
   today_message: number
 }
 
-type RpcCandidate = {
-  id: string
-  owner_id: string
-  full_name: string | null
-  phone: string | null
-  note: string | null
-  stage: string
-  created_at: string | null
-}
+import type { LeaderCandidateRow } from '@/lib/team/enrichLeaderCandidates'
+
+type RpcCandidate = LeaderCandidateRow
 
 export interface TeamWithDownlinesBundle {
   members: TeamMember[]
