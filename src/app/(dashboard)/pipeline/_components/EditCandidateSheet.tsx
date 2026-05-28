@@ -11,6 +11,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
 import { resolveCandidateFields, buildCandidateContentFields } from '@/lib/domain/candidateFields'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
 
@@ -175,21 +176,15 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           <label className={labelClass}>Profil Fotoğrafı</label>
           <div className="flex items-center gap-4">
             <div className="relative h-20 w-20 shrink-0">
-              {photo ? (
-                <img
-                  src={photo}
-                  alt="Profil"
-                  className="h-20 w-20 rounded-full object-cover border-2 border-[#EEEDFE]"
-                />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EEEDFE] text-2xl font-bold text-[#534AB7]">
-                  {candidate.full_name.charAt(0).toUpperCase()}
-                </div>
-              )}
+              <PersonAvatar
+                name={candidate.full_name}
+                imageUrl={photo}
+                size="2xl"
+              />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]"
+                className="absolute bottom-0 right-0 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]"
                 title="Fotoğraf Yükle"
               >
                 <Camera className="h-3.5 w-3.5" />

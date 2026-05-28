@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-28 — Council backlog #2: Aday ekle/düzenle PersonAvatar
+
+- `AddCandidateSheet`, `EditCandidateSheet` — profil önizlemesi pastel baş harf / yükleme; kamera butonu korundu
+
+---
+
 ## 2026-05-28 — Council backlog #1: Arama sayfası PersonAvatar
 
 - `search/page.tsx` — aday sonuçlarında fotoğraf + pastel baş harf (pano/pipeline ile uyumlu)

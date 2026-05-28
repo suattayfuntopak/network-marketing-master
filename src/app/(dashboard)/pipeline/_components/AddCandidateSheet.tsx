@@ -8,6 +8,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
@@ -27,6 +28,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [draftName, setDraftName] = useState('')
 
   const add = useAddCandidate(workspaceId)
 
@@ -138,22 +140,16 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
           <label className={labelClass}>Profil Fotoğrafı</label>
           <div className="flex items-center gap-4">
             <div className="relative h-20 w-20 shrink-0">
-              {photoPreview ? (
-                <img
-                  src={photoPreview}
-                  alt="Aday Önizleme"
-                  className="h-20 w-20 rounded-full object-cover border-2 border-[#EEEDFE]"
-                />
-              ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EEEDFE] text-2xl font-bold text-[#534AB7]">
-                  ?
-                </div>
-              )}
+              <PersonAvatar
+                name={draftName.trim() || '?'}
+                imageUrl={photoPreview}
+                size="2xl"
+              />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60"
+                className="absolute bottom-0 right-0 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60"
                 title="Fotoğraf Yükle"
               >
                 {uploadingPhoto ? (
@@ -199,7 +195,15 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
         <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className={labelClass} htmlFor="fullName">Ad Soyad *</label>
-            <input id="fullName" name="fullName" type="text" required placeholder="Adı Soyadı" className={inputClass} />
+            <input
+              id="fullName"
+              name="fullName"
+              type="text"
+              required
+              placeholder="Adı Soyadı"
+              className={inputClass}
+              onChange={e => setDraftName(e.target.value)}
+            />
           </div>
           <div>
             <label className={labelClass} htmlFor="phone">Telefon</label>
