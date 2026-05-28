@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-05-28 — UX düzeltmeleri + Council #5 + platform WA davet linki
+
+### Çıkış / Açılış / Ödeme
+- **UserMenu:** Çıkış onayı `logoutAction()` doğrudan çağrılıyor (form unmount bug fix)
+- **`/acilis`:** Giriş yapmış kullanıcı landing’i görebilir; Platform Yönetim butonu TR **Açılış Sayfası** → `/acilis`
+- **Ödeme sayfası:** Light mode — kartlar/metinler `var(--text-*)` / `var(--bg-card)` ile okunabilir
+
+### Platform Yönetim — WhatsApp
+- **Bağımsız kayıt:** Davet metni + `REGISTER_URL` (`https://nmm.suattayfuntopak.com/kayit`); kod metinde `{code}`, URL’de `?ref=` yok (antivirüs/spam riski)
+- **NMM ekibi:** Önceden doldurulmuş mesaj yok — doğrudan `wa.me/{telefon}`
+
+### Council backlog #5 (tamamlandı)
+- ESLint: ham `z-[NN]` / `z-50` yasak (`eslint.config.mjs`); ihlaller `Z.*` ile düzeltildi
+
+**Deploy:** Ek migration yok.
+
+---
+
 ## 2026-05-28 — Platform admin UX + ESLint + çıkış onayı (Council #4 kısmi)
 
 ### Platform Yönetim Masası

@@ -13,6 +13,7 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { Z } from '@/lib/ui/zIndex'
 
 const PRO_LIMITS = getLimitsForLicense('pro')
 
@@ -157,7 +158,8 @@ export default function RootPage() {
 
     // 1. Initial active session check
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      const onLandingPreview = window.location.pathname.startsWith('/acilis')
+      if (session && !onLandingPreview) {
         router.push('/pano')
       } else {
         // Look for recovery or tokens in hash
@@ -174,7 +176,7 @@ export default function RootPage() {
         router.push('/sifre-guncelle')
         return
       }
-      if (session) {
+      if (session && !window.location.pathname.startsWith('/acilis')) {
         router.push('/pano')
       } else {
         setCheckingSession(false)
@@ -219,7 +221,7 @@ export default function RootPage() {
       <div className="absolute bottom-[10%] left-[20%] h-[450px] w-[450px] rounded-full dark:bg-pink-600/5 blur-[130px] pointer-events-none" />
 
       {/* ── HEADER ── */}
-      <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]">
+      <header className={`sticky top-0 ${Z.header} w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
           {/* Logo */}
           <div className="flex flex-1 min-w-0 items-center gap-2">

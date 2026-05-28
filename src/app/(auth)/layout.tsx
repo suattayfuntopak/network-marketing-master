@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes'
 import { Sun, Moon, Monitor } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
+import { Z } from '@/lib/ui/zIndex'
 
 const NEXT_THEME: Record<string, string> = { dark: 'light', light: 'system', system: 'dark' }
 const THEME_ICON: Record<string, React.ReactNode> = {
@@ -26,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#0a0b10] bg-radial-[circle_at_top,_var(--tw-gradient-stops)] from-[#1a1c2e] via-[#0a0b10] to-[#050508] px-4 text-white">
 
       {/* Top-right controls: theme + language flags */}
-      <div className="fixed top-3 right-3 z-50 flex items-center gap-1">
+      <div className={`fixed top-3 right-3 ${Z.bottomNav} flex items-center gap-1`}>
         {mounted && (
           <button
             onClick={() => setTheme(NEXT_THEME[currentTheme])}

@@ -17,6 +17,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { Z } from '@/lib/ui/zIndex'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { displayDailyActionNote, isLeaderUserNote } from '@/lib/domain/dailyActionNote'
@@ -472,7 +473,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
           {dropdownOpen && !selected && query.length > 0 && (
             <div
-              className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-xl"
+              className={`absolute left-0 right-0 top-full ${Z.dropdown} mt-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-xl`}
               style={{ maxHeight: '240px', overflowY: 'auto' }}
             >
               {filtered.length === 0 ? (

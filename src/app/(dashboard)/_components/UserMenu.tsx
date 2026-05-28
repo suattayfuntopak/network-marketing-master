@@ -9,6 +9,7 @@ import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { Z } from '@/lib/ui/zIndex'
 
 export function UserMenu() {
   const { t } = useTranslation()
@@ -19,7 +20,6 @@ export function UserMenu() {
   const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   const ref = useRef<HTMLDivElement>(null)
-  const logoutFormRef = useRef<HTMLFormElement>(null)
   const { data: ws } = useWorkspace()
 
   useEffect(() => {
@@ -62,7 +62,7 @@ export function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-11 z-50 w-60 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className={`absolute right-0 top-11 ${Z.dropdown} w-60 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-2 shadow-xl animate-in fade-in slide-in-from-top-2 duration-150`}>
           {/* Kullanıcı bilgisi */}
           <div className="border-b border-[var(--border)] px-4 pb-3 pt-1">
             <p className="truncate text-sm font-semibold text-[var(--text-1)]">{ws?.fullName}</p>
@@ -117,7 +117,6 @@ export function UserMenu() {
             <LogOut className="h-4 w-4" strokeWidth={1.75} />
             {t('shellUi.logout')}
           </button>
-          <form ref={logoutFormRef} action={logoutAction} className="hidden" />
         </div>
       )}
 
@@ -135,7 +134,10 @@ export function UserMenu() {
       {logoutConfirmOpen && (
         <ConfirmDialog
           message={t('shellUi.confirmLogout')}
-          onConfirm={() => logoutFormRef.current?.requestSubmit()}
+          onConfirm={() => {
+            setLogoutConfirmOpen(false)
+            void logoutAction()
+          }}
           onCancel={() => setLogoutConfirmOpen(false)}
         />
       )}

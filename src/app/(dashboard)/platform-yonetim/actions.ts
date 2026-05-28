@@ -32,6 +32,7 @@ export interface PlatformWorkspaceItem {
   isIndependent: boolean
   /** Candidate id in the super admin's OWN pipeline, if this user is also their candidate. */
   pipelineCandidateId: string | null
+  ownerPhone: string | null
 }
 
 /**
@@ -114,11 +115,15 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     })
   }
 
-  // Super admin's OWN candidates — to link a platform user to their candidate detail page.
   const { data: adminCandidates } = await admin
     .from('nmm_candidates')
-    .select('id, owner_id, full_name')
+    .select('id, owner_id, full_name, phone')
     .eq('owner_id', user.id)
+
+  const phoneByCandidateId = new Map<string, string>()
+  adminCandidates?.forEach(c => {
+    if (c.phone) phoneByCandidateId.set(c.id, c.phone)
+  })
 
   // 5. Combine and build result — deduplicate by owner_id (keep most recent workspace per user)
   const seenOwners = new Set<string>()
@@ -158,6 +163,12 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     // downlineCount: how many workspaces have parent_id pointing to THIS workspace
     const downlineCount = parentCountMap.get(w.id) ?? 0
 
+    const pipelineCandidateId = findLeaderCandidateForMember(adminCandidates ?? [], user.id, ownerName)
+    const ownerPhone =
+      (pipelineCandidateId ? phoneByCandidateId.get(pipelineCandidateId) : null) ??
+      ownerUser?.phone ??
+      ((ownerUser?.user_metadata?.phone as string | undefined) ?? null)
+
     result.push({
       workspaceId: w.id,
       workspaceName: w.name,
@@ -173,7 +184,8 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       sponsorName,
       sponsorEmail,
       isIndependent: !w.parent_id,
-      pipelineCandidateId: findLeaderCandidateForMember(adminCandidates ?? [], user.id, ownerName),
+      pipelineCandidateId,
+      ownerPhone,
     })
   }
 

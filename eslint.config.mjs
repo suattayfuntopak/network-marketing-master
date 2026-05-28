@@ -37,11 +37,30 @@ const supabaseClientTsxLegacy = {
   },
 };
 
+const noRawZIndex = {
+  files: ["src/**/*.{ts,tsx}"],
+  ignores: ["src/lib/ui/zIndex.ts"],
+  rules: {
+    "no-restricted-syntax": [
+      "error",
+      {
+        selector: "Literal[value=/\\bz-\\[/]",
+        message: "Use Z.* from @/lib/ui/zIndex instead of raw z-[NN].",
+      },
+      {
+        selector: "Literal[value=/\\bz-(?!\\[)\\d+\\b/]",
+        message: "Use Z.* from @/lib/ui/zIndex instead of raw z-NN.",
+      },
+    ],
+  },
+};
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   noSupabaseClientInTsx,
   supabaseClientTsxLegacy,
+  noRawZIndex,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

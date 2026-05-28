@@ -13,6 +13,7 @@ import {
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { waHref } from '@/lib/utils/waLink'
 import {
   getPlatformWorkspacesAction,
   adminExtendLicenseAction,
@@ -22,6 +23,7 @@ import {
 } from './actions'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { REGISTER_URL } from '@/lib/constants'
 
 const getAvatarColor = (name: string) => {
   const colors = [
@@ -133,10 +135,15 @@ export default function PlatformAdminPage() {
   })
 
   function buildInviteWaLink(code: string, name: string): string {
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://nmm.app'
-    const inviteUrl = `${appUrl}/kayit?ref=${code}`
-    const msg = t('platformPage.inviteWaMessage', { name, link: inviteUrl })
+    const msg = t('platformPage.inviteWaMessage', { name, link: REGISTER_URL, code })
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
+  }
+
+  function buildPlatformWaLink(w: PlatformWorkspaceItem, code: string): string | null {
+    if (w.isIndependent) {
+      return buildInviteWaLink(code, w.ownerName)
+    }
+    return waHref(w.ownerPhone)
   }
 
   async function handleAddAsCandidate(workspaceId: string, email: string, name: string) {
@@ -353,15 +360,21 @@ export default function PlatformAdminPage() {
                       <div className="text-[10px] text-[var(--text-3)] truncate">{w.ownerEmail}</div>
                     </div>
                     <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <a
-                        href={buildInviteWaLink(inviteCode, w.ownerName)}
-                        target="_blank"
-                        rel="noreferrer"
-                        title={t('platformPage.sendInviteWhatsApp')}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
-                      >
-                        <WhatsAppIcon className="h-3.5 w-3.5" />
-                      </a>
+                      {(() => {
+                        const waLink = buildPlatformWaLink(w, inviteCode)
+                        if (!waLink) return null
+                        return (
+                          <a
+                            href={waLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            title={t('platformPage.shareInviteWhatsApp')}
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
+                          >
+                            <WhatsAppIcon className="h-3.5 w-3.5" />
+                          </a>
+                        )
+                      })()}
                       <button
                         onClick={() => handleAddAsCandidate(w.workspaceId, w.ownerEmail, w.ownerName)}
                         disabled={addingId === w.workspaceId || isAdded}
@@ -528,16 +541,25 @@ export default function PlatformAdminPage() {
                         {/* 9. Actions */}
                         <td className="p-3 whitespace-nowrap text-right">
                           <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
-                            {/* WhatsApp — share invite link */}
-                            <a
-                              href={buildInviteWaLink(inviteCode, w.ownerName)}
-                              target="_blank"
-                              rel="noreferrer"
-                              title={t('platformPage.shareInviteWhatsApp')}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
-                            >
-                              <WhatsAppIcon className="h-4 w-4" />
-                            </a>
+                            {(() => {
+                              const waLink = buildPlatformWaLink(w, inviteCode)
+                              if (!waLink) return null
+                              return (
+                                <a
+                                  href={waLink}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  title={
+                                    w.isIndependent
+                                      ? t('platformPage.shareInviteWhatsApp')
+                                      : t('platformPage.openWhatsAppChat')
+                                  }
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
+                                >
+                                  <WhatsAppIcon className="h-4 w-4" />
+                                </a>
+                              )
+                            })()}
 
                             {/* License adjustment trigger */}
                             <button
@@ -722,7 +744,7 @@ export default function PlatformAdminPage() {
           message={t('platformPage.confirmGoLanding')}
           onConfirm={() => {
             setNavConfirm(null)
-            router.push('/')
+            router.push('/acilis')
           }}
           onCancel={() => setNavConfirm(null)}
         />
