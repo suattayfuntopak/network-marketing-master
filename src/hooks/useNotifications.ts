@@ -86,13 +86,24 @@ export function useNotifications() {
             const title = lang === 'en' ? newNotif.title_en : newNotif.title_tr
             const description = lang === 'en' ? newNotif.description_en : newNotif.description_tr
 
+            // Route notifications to the screen most relevant to their type.
+            // Defaults to /pano (dashboard home) for unknown types.
+            const routeByType: Record<NotificationItem['type'], string> = {
+              user: '/ekip',
+              calendar: '/takvim',
+              alert: '/odeme',
+              bell: '/pano',
+              info: '/pano',
+            }
+            const targetHref = routeByType[newNotif.type] ?? '/pano'
+
             toast(title, {
               description,
               duration: 6000,
               action: {
                 label: lang === 'en' ? 'View' : 'Görüntüle',
                 onClick: () => {
-                  router.push('/ekip')
+                  router.push(targetHref)
                 },
               },
             })
@@ -106,7 +117,7 @@ export function useNotifications() {
         supabase.removeChannel(channel)
       }
     }
-  }, [queryClient, supabase, lang])
+  }, [queryClient, supabase, lang, router])
 
   // Mutation: Mark all notifications as read
   const markAllReadMutation = useMutation({

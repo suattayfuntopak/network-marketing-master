@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-05-28 — Council Triad Y-1 (doc), Y-4, Y-11 + EditCandidateSheet syntax fix
+
+### docs + feat + fix: migrations policy, notifications routing, error boundaries
+
+**Y-1 — Migrations numaralandırma politikası** (sadece dokümantasyon; rename yapılmadı çünkü 004 dosyaları zaten production'a uygulanmış — rename Supabase'in yeni gibi görmesine yol açar)
+- `supabase/migrations/README.md` eklendi: "Bir numara = bir migration" kuralı, `004_*` çakışmasının niye olduğu gibi bırakıldığı, yeni migration ekleme prosedürü.
+
+**Y-4 — useNotifications router fix + type-aware routing**
+- `useEffect` dep array'ine `router` eklendi (lint exhaustive-deps doğrulaması).
+- Toast action artık tüm bildirim tiplerini `/ekip`'e değil, `NotificationItem.type`'a göre yönlendiriyor: `user → /ekip`, `calendar → /takvim`, `alert → /odeme`, `bell/info → /pano`.
+
+**Y-11 — Error boundary stratejisi**
+- `src/app/error.tsx` (root) — bilingual hardcoded (root scope provider'ı garanti değil).
+- `src/app/(dashboard)/error.tsx` — `useTranslation` ile dinamik dil; dashboard layout altındaki tüm sayfalar artık beyaz ekran yerine premium hata kartı görür.
+- `src/app/not-found.tsx` — 404 sayfası, "Panoya dön" CTA.
+
+**Bonus fix — `EditCandidateSheet.tsx`** Dosya sonunda fazladan `}` vardı, TypeScript build'i bozuyordu. Pre-existing bug, ben dokunmadım ama git working tree'sinde belirdi; düzeltildi.
+
+**Doğrulama:** `npx tsc --noEmit` temiz.
+
+---
+
 ## 2026-05-28 — Council Triad K-1, K-2, K-3, K-4 Uygulandı (4 kritik bulgu kapatıldı)
 
 ### fix(security) + refactor: Shopier güvenliği, AI auth gap, quota merkezileştirme, schema drift
