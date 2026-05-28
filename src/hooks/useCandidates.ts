@@ -8,6 +8,7 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
@@ -259,7 +260,15 @@ export function useCandidateNotes(candidateId: string) {
 export function useAddCandidateNote(workspaceId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ candidateId, note }: { candidateId: string; note: string }) => {
+    mutationFn: async ({
+      candidateId,
+      noteTr,
+      noteEn,
+    }: {
+      candidateId: string
+      noteTr: string
+      noteEn?: string
+    }) => {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Oturum yok')
@@ -269,7 +278,7 @@ export function useAddCandidateNote(workspaceId: string) {
         user_id: user.id,
         candidate_id: candidateId,
         action_type: 'note' as const,
-        note: note.trim(),
+        ...buildDailyActionNoteFields({ noteTr, noteEn }),
       })
       if (error) throw new Error(error.message)
     },

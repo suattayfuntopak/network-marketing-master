@@ -42,6 +42,7 @@ export interface ParsedSimpleNote {
   en: string
 }
 
+/** @deprecated Prefer `resolveDailyActionNote` for DB rows; still used for in-memory AI strings. */
 export function parseSimpleNote(raw: string | null): ParsedSimpleNote {
   if (!raw) return { tr: '', en: '' }
   if (raw.startsWith('system_note:')) return { tr: raw, en: raw }
@@ -52,6 +53,7 @@ export function parseSimpleNote(raw: string | null): ParsedSimpleNote {
   }
 }
 
+/** @deprecated Prefer `buildDailyActionNoteFields` for DB writes. */
 export function formatSimpleNote(tr: string, en?: string): string {
   if (!en || !en.trim()) return tr.trim()
   return `${tr.trim()} ||| ${en.trim()}`

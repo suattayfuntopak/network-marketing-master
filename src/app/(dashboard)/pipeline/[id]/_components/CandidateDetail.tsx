@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -16,7 +16,13 @@ import { waHref } from '@/lib/utils/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { parseSimpleNote, formatSimpleNote } from '@/lib/utils/noteParser'
+import {
+  resolveDailyActionNote,
+  mergeDailyActionNoteUpdate,
+  displayDailyActionNote,
+  parseBilingualText,
+  isLeaderUserNote,
+} from '@/lib/domain/dailyActionNote'
 import {
   resolveCandidateFields,
   mergeCandidateContentUpdate,
@@ -136,9 +142,7 @@ function renderActivityText(a: any, lang: string, t: any): string {
       return t('pipelinePage.followUpDateChanged', { old: formatD(parts[0]), new: formatD(parts[1]) })
     }
     
-    // Parse Lider Note (TR ||| EN)
-    const parsed = parseSimpleNote(a.note || '')
-    const displayNote = lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr
+    const displayNote = displayDailyActionNote(a, lang === 'en' ? 'en' : 'tr')
     return `${t('pipelinePage.leaderNoteAdded')}: "${displayNote}"`
   }
   return a.note || ''
@@ -169,28 +173,6 @@ export function CandidateDetail({ candidateId }: Props) {
   const [aiSummary, setAiSummary] = useState<string | null>(null)
   const [isSummaryPending, setIsSummaryPending] = useState(false)
 
-  const handleGenerateSummary = async () => {
-    if (notes.length === 0) return
-    setIsSummaryPending(true)
-    try {
-      const rawNotes = notes.map(n => {
-        const parsedN = parseSimpleNote(n.note)
-        return parsedN.tr
-      })
-      const res = await generateNotesSummary(rawNotes)
-      if (res.error) {
-        toast.error(res.error)
-      } else if (res.summary) {
-        setAiSummary(res.summary)
-      }
-    } catch {
-      toast.error(t('pipelinePage.couldNotGenerateSummary'))
-    } finally {
-      setIsSummaryPending(false)
-    }
-  }
-
-
   const queryClient = useQueryClient()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -214,7 +196,26 @@ export function CandidateDetail({ candidateId }: Props) {
   
   // Fetch leader notes and declare add note mutation
   const { data: notes = [] } = useCandidateNotes(candidateId)
+  const leaderNotes = useMemo(() => notes.filter(isLeaderUserNote), [notes])
   const addNoteMutation = useAddCandidateNote(ws?.workspaceId ?? '')
+
+  const handleGenerateSummary = async () => {
+    if (leaderNotes.length === 0) return
+    setIsSummaryPending(true)
+    try {
+      const rawNotes = leaderNotes.map(n => resolveDailyActionNote(n).noteTr)
+      const res = await generateNotesSummary(rawNotes)
+      if (res.error) {
+        toast.error(res.error)
+      } else if (res.summary) {
+        setAiSummary(res.summary)
+      }
+    } catch {
+      toast.error(t('pipelinePage.couldNotGenerateSummary'))
+    } finally {
+      setIsSummaryPending(false)
+    }
+  }
 
   const c = candidates.find(x => x.id === candidateId)
   const parsed = c
@@ -227,28 +228,27 @@ export function CandidateDetail({ candidateId }: Props) {
 
   // Lider notları otomatik geriye dönük çeviri ve kalıcı saklama tetikleyicisi
   useEffect(() => {
-    if (lang !== 'en' || notes.length === 0) return
+    if (lang !== 'en' || leaderNotes.length === 0) return
 
-    notes.forEach(n => {
-      const parsedN = parseSimpleNote(n.note)
-      if (!parsedN.en && parsedN.tr && !attemptedActionUpdates.current[n.id]) {
+    leaderNotes.forEach(n => {
+      const parsedN = resolveDailyActionNote(n)
+      if (!parsedN.isSystem && !parsedN.noteEn && parsedN.noteTr && !attemptedActionUpdates.current[n.id]) {
         attemptedActionUpdates.current[n.id] = true
-        
+
         fetch('/api/translate-note', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: parsedN.tr }),
+          body: JSON.stringify({ text: parsedN.noteTr }),
         })
           .then(r => r.json())
           .then(async ({ translated }: { translated: string }) => {
             if (translated) {
-              const formatted = formatSimpleNote(parsedN.tr, translated)
               const supabase = createClient()
               await supabase
                 .from('nmm_daily_actions')
-                .update({ note: formatted })
+                .update(mergeDailyActionNoteUpdate(n, { noteEn: translated }))
                 .eq('id', n.id)
-                
+
               queryClient.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
               queryClient.invalidateQueries({ queryKey: ['activity', candidateId] })
             }
@@ -256,7 +256,7 @@ export function CandidateDetail({ candidateId }: Props) {
           .catch(err => console.error('Lider notu otomatik çeviri hatası:', err))
       }
     })
-  }, [lang, notes, candidateId, queryClient])
+  }, [lang, leaderNotes, candidateId, queryClient])
 
   // Popup açıldığında arka plan kaymasını önleme (body scroll-lock)
   useEffect(() => {
@@ -431,11 +431,13 @@ export function CandidateDetail({ candidateId }: Props) {
         body: JSON.stringify({ text: textToSave }),
       })
       const { translated } = await res.json()
-      const formatted = formatSimpleNote(textToSave, translated)
-      addNoteMutation.mutate({ candidateId, note: formatted })
+      addNoteMutation.mutate({
+        candidateId,
+        noteTr: textToSave,
+        noteEn: translated,
+      })
     } catch {
-      // Fallback: save raw if translation fails
-      addNoteMutation.mutate({ candidateId, note: textToSave })
+      addNoteMutation.mutate({ candidateId, noteTr: textToSave })
     }
   }
 
@@ -590,9 +592,9 @@ export function CandidateDetail({ candidateId }: Props) {
                   <span className="text-sm font-bold text-[var(--text-1)]">
                     {t('pipelinePage.leaderNote')}
                   </span>
-                  {notes.length > 0 && (
+                  {leaderNotes.length > 0 && (
                     <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
-                      {notes.length}
+                      {leaderNotes.length}
                     </span>
                   )}
                 </div>
@@ -604,14 +606,14 @@ export function CandidateDetail({ candidateId }: Props) {
               </button>
               {notesOpen && (
                 <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                  {notes.length === 0 ? (
+                  {leaderNotes.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-[var(--border)] p-5 text-center text-xs text-[var(--text-3)]">
                       {t('pipelinePage.noLeaderNotes')}
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {/* YZ Özet & Aksiyon Planı Kartı */}
-                      {notes.length > 0 && (
+                      {leaderNotes.length > 0 && (
                         <div className="rounded-xl border border-indigo-100 bg-indigo-50/60 p-3.5 dark:border-indigo-950/40 dark:bg-indigo-950/15 space-y-2.5 transition-all duration-300">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 dark:text-indigo-300">
@@ -642,8 +644,11 @@ export function CandidateDetail({ candidateId }: Props) {
                           {aiSummary && (
                             <div className="text-xs leading-relaxed text-indigo-950 dark:text-indigo-200 animate-in fade-in duration-300 space-y-2">
                               {(() => {
-                                const parsedSummary = parseSimpleNote(aiSummary)
-                                const displaySummary = lang === 'en' ? (parsedSummary.en || parsedSummary.tr) : parsedSummary.tr
+                                const parsedSummary = parseBilingualText(aiSummary)
+                                const displaySummary =
+                                  lang === 'en'
+                                    ? parsedSummary.en || parsedSummary.tr
+                                    : parsedSummary.tr
                                 return <p className="font-medium whitespace-pre-wrap">{displaySummary}</p>
                               })()}
                               <div className="flex justify-end pt-1">
@@ -668,9 +673,11 @@ export function CandidateDetail({ candidateId }: Props) {
                       )}
 
                       <div className="max-h-[350px] overflow-y-auto space-y-2.5 pr-1 scrollbar-thin">
-                        {(showAllNotes ? notes : notes.slice(0, 5)).map(n => {
-                          const parsedN = parseSimpleNote(n.note)
-                          const displayText = lang === 'en' ? (parsedN.en || parsedN.tr) : parsedN.tr
+                        {(showAllNotes ? leaderNotes : leaderNotes.slice(0, 5)).map(n => {
+                          const displayText = displayDailyActionNote(
+                            n,
+                            lang === 'en' ? 'en' : 'tr'
+                          )
                           return (
                             <div
                               key={n.id}
@@ -687,7 +694,7 @@ export function CandidateDetail({ candidateId }: Props) {
                           )
                         })}
                       </div>
-                      {notes.length > 5 && (
+                      {leaderNotes.length > 5 && (
                         <button
                           type="button"
                           onClick={() => setShowAllNotes(!showAllNotes)}

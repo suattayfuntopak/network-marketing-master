@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-05-28 — Council Y-9 (Faz 2): `nmm_daily_actions` lider notları typed columns
+
+### feat(db): günlük aksiyon lider notları — `note_tr` / `note_en`
+
+**Kapsam:** Yalnızca lider/kullanıcı notları (`action_type = 'note'`, `system_note:*` hariç). Sistem notları (`system_note:candidate_created`, `warmth_change`, vb.) yalnızca `note` kolonunda kalır.
+
+**Migration `024_daily_action_typed_notes.sql`:**
+- Yeni kolonlar: `note_tr`, `note_en`
+- Backfill: mevcut `TR ||| EN` notları kolonlara ayrıştırıldı; tek dilli notlar `note_tr`'ye
+- `note` kolonu lider notları için yalnızca çeviri formatı (`TR ||| EN`) — sistem notları değişmez
+
+**Kod:**
+- `src/lib/domain/dailyActionNote.ts` — resolve/build/merge/display, `isLeaderUserNote`
+- `useAddCandidateNote` → `{ candidateId, noteTr, noteEn? }` + `buildDailyActionNoteFields`
+- `CandidateDetail` — lider notları UI/özet/aktivite; kayıt typed kolonlara
+- `YazarForm` — AI bağlamında `displayDailyActionNote`
+- `noteParser` `parseSimpleNote`/`formatSimpleNote` @deprecated (legacy fallback)
+- 6 unit test (`dailyActionNote.test.ts`); toplam 32 test yeşil
+
+**Deploy:** Migration `023` (adaylar) ile birlikte `024` uygulanmalı. Uygulanmadan önce legacy `note` parse devam eder.
+
+---
+
 ## 2026-05-28 — Council Y-9 (Faz 1): `nmm_candidates` typed columns
 
 ### feat(db): aday notu/avatar/sıcaklık — `|||` yerine ayrı kolonlar

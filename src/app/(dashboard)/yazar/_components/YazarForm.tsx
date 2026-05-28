@@ -19,6 +19,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { displayDailyActionNote, isLeaderUserNote } from '@/lib/domain/dailyActionNote'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -221,19 +222,22 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     const supabase = createClient()
     supabase
       .from('nmm_daily_actions')
-      .select('action_type, note, created_at')
+      .select('action_type, note, note_tr, note_en, created_at')
       .eq('candidate_id', c.id)
       .order('created_at', { ascending: false })
       .limit(10)
       .then(({ data }) => {
         const rawActions = data ?? []
         // Leader notes (non-system notes)
-        const leaderNotes = rawActions.filter(a => a.action_type === 'note' && !a.note?.startsWith('system_note:'))
+        const leaderNotes = rawActions.filter(a => isLeaderUserNote(a))
         // Activities
         const activities = rawActions.slice(0, 5)
 
         const notesText = leaderNotes.length > 0
-          ? (lang === 'en' ? '\n\nLeader Notes:\n' : '\n\nLider Notları:\n') + leaderNotes.map(n => `- ${n.note}`).join('\n')
+          ? (lang === 'en' ? '\n\nLeader Notes:\n' : '\n\nLider Notları:\n') +
+            leaderNotes
+              .map(n => `- ${displayDailyActionNote(n, lang === 'en' ? 'en' : 'tr')}`)
+              .join('\n')
           : ''
 
         const activityLines = activities.map(a => {
