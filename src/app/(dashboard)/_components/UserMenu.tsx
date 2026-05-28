@@ -8,11 +8,9 @@ import { ProfileModal } from '@/components/ui/ProfileModal'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { TRFlag, USFlag } from './Header'
 
 export function UserMenu() {
-  const { lang, setLang, t } = useTranslation()
+  const { lang } = useTranslation()
   const [open, setOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -102,39 +100,6 @@ export function UserMenu() {
             <Settings className="h-4 w-4" strokeWidth={1.75} />
             {lang === 'en' ? 'Settings' : 'Ayarlar'}
           </button>
-
-          {/* Dil Seçimi */}
-          <div className="px-4 py-2 border-t border-[var(--border)] mt-1">
-            <p className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider mb-2">
-              {lang === 'en' ? 'Language' : 'Dil Seçimi'}
-            </p>
-            <div className="grid grid-cols-2 gap-1.5">
-              <button
-                type="button"
-                onClick={() => setLang('tr')}
-                className={`flex items-center justify-center gap-2 rounded-lg border px-2 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                  lang === 'tr'
-                    ? 'bg-[#EEEDFE] dark:bg-[#1e1b4b] border-[#534AB7] text-[#534AB7]'
-                    : 'bg-transparent border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-                }`}
-              >
-                <TRFlag />
-                <span>TR</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang('en')}
-                className={`flex items-center justify-center gap-2 rounded-lg border px-2 py-1.5 text-xs font-semibold transition cursor-pointer ${
-                  lang === 'en'
-                    ? 'bg-[#EEEDFE] dark:bg-[#1e1b4b] border-[#534AB7] text-[#534AB7]'
-                    : 'bg-transparent border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-                }`}
-              >
-                <USFlag />
-                <span>EN</span>
-              </button>
-            </div>
-          </div>
 
           <div className="my-1 border-t border-[var(--border)]" />
 

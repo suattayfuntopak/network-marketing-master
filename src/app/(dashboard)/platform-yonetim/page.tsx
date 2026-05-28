@@ -311,7 +311,7 @@ export default function PlatformAdminPage() {
         {/* Workspaces Spreadsheet Grid */}
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
           <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true">
-            <table className="w-full text-left border-collapse text-xs min-w-[1000px]">
+            <table className="w-full text-left border-collapse text-sm min-w-[1000px]">
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                   <th className="p-3 font-semibold">{lang === 'en' ? 'Leader Name' : 'Kullanıcı / Lider'}</th>
@@ -328,17 +328,17 @@ export default function PlatformAdminPage() {
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-8 text-center text-xs text-[var(--text-3)] italic">
+                    <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-3)] italic">
                       {lang === 'en' ? 'No registered leaders found.' : 'Kayıtlı hiçbir kullanıcı bulunamadı.'}
                     </td>
                   </tr>
                 ) : (
                   filtered.map(w => {
                     const regDate = new Date(w.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-                    const expDate = w.licenseExpiresAt 
+                    const expDate = w.licenseExpiresAt
                       ? new Date(w.licenseExpiresAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
                       : '-'
-                    
+
                     const isExpired = w.licenseExpiresAt ? new Date(w.licenseExpiresAt) < new Date() : false
 
                     return (
@@ -346,7 +346,7 @@ export default function PlatformAdminPage() {
                         {/* 1. Leader */}
                         <td className="p-3 whitespace-nowrap">
                           <div className="font-bold text-[var(--text-1)]">{w.ownerName}</div>
-                          <div className="text-[10px] text-[var(--text-3)] font-semibold flex items-center gap-1">
+                          <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1">
                             <Mail className="h-3 w-3 shrink-0" />
                             {w.ownerEmail}
                           </div>
@@ -357,7 +357,7 @@ export default function PlatformAdminPage() {
 
                         {/* 3. License type */}
                         <td className="p-3 whitespace-nowrap font-bold">
-                          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${
+                          <span className={`rounded-full px-2.5 py-0.5 text-xs font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                               : w.licenseType === 'master'
@@ -379,11 +379,11 @@ export default function PlatformAdminPage() {
                         {/* 6. Sponsor linkage */}
                         <td className="p-3 whitespace-nowrap font-semibold">
                           {w.isIndependent ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400">
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2 py-0.5 text-[10px] font-black text-purple-600 dark:text-purple-400">
                               💎 {lang === 'en' ? 'Independent / Direct' : 'Dış Kayıt / Bağımsız'}
                             </span>
                           ) : (
-                            <div className="max-w-[150px] truncate">
+                            <div className="max-w-[160px] truncate">
                               <span className="text-[var(--text-3)]">{lang === 'en' ? 'Sponsor:' : 'Sponsor:'} </span>
                               <span className="text-[var(--text-1)]">{w.sponsorName}</span>
                             </div>
@@ -394,14 +394,14 @@ export default function PlatformAdminPage() {
                         <td className={`p-3 text-center tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
                           {expDate}
                           {isExpired && (
-                            <span className="ml-1 text-[8px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
+                            <span className="ml-1 text-[9px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
                               {lang === 'en' ? 'Expired' : 'Süresi Doldu'}
                             </span>
                           )}
                         </td>
 
                         {/* 8. Registration Date */}
-                        <td className="p-3 text-center text-[10px] text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
+                        <td className="p-3 text-center text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
 
                         {/* 9. Actions */}
                         <td className="p-3 whitespace-nowrap text-right">

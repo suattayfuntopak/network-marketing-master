@@ -54,11 +54,11 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   const userMap = new Map<string, typeof users[0]>()
   users.forEach(u => userMap.set(u.id, u))
 
-  // 2. Fetch all workspaces
+  // 2. Fetch all workspaces (oldest first → primary workspace per user kept after dedup)
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
     .select('*')
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
 
   if (wsError || !workspaces) {
     console.error('[getPlatformWorkspacesAction] workspaces error:', wsError)
@@ -94,7 +94,10 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   const result: PlatformWorkspaceItem[] = []
 
   for (const w of workspaces) {
-    // Skip duplicate workspaces for the same owner (list is ordered by created_at DESC)
+    // Skip the super admin's own workspaces — admin views the page, not a regular user entry
+    if (w.owner_id === user.id) continue
+
+    // Deduplicate: keep oldest workspace per owner (ascending order → first occurrence is primary)
     if (w.owner_id && seenOwners.has(w.owner_id)) continue
     if (w.owner_id) seenOwners.add(w.owner_id)
 
@@ -103,11 +106,14 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     const ownerName = (ownerUser?.user_metadata?.full_name as string | undefined) ?? ownerUser?.email?.split('@')[0] ?? 'İsimsiz Üye'
 
     // Resolve sponsor via workspace chain: parent workspace → owner user
+    // Supports both formats: parent_id as workspace UUID (new) and as user UUID (legacy)
     let sponsorName: string | null = null
     let sponsorEmail: string | null = null
     if (w.parent_id) {
       const parentWorkspace = workspaceById.get(w.parent_id)
-      const sponsorUser = parentWorkspace?.owner_id ? userMap.get(parentWorkspace.owner_id) : null
+      const sponsorUser = parentWorkspace?.owner_id
+        ? userMap.get(parentWorkspace.owner_id)
+        : userMap.get(w.parent_id) // legacy format: parent_id was stored as user UUID
       if (sponsorUser) {
         sponsorEmail = sponsorUser.email ?? null
         sponsorName = (sponsorUser.user_metadata?.full_name as string | undefined) ?? sponsorUser.email?.split('@')[0] ?? 'Lider'
