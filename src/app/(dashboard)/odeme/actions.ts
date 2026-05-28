@@ -22,6 +22,11 @@ export async function initiateShopierPayment(
   plan: 'leader' | 'master' | 'pro',
   period: 'monthly' | 'yearly' = 'monthly'
 ): Promise<ShopierFormData> {
+  // Defense-in-depth maintenance gate (UI is also gated in odeme/page.tsx).
+  if (process.env.PAYMENT_MAINTENANCE === 'true') {
+    throw new Error('Ödeme sistemi şu anda bakımda, lütfen birkaç dakika sonra tekrar deneyin.')
+  }
+
   const supabase = await createClient()
 
   // 1. Get active authenticated user
@@ -71,14 +76,20 @@ export async function initiateShopierPayment(
   }
 
   const workspaceId = membership.workspace_id
-  const platformOrderId = `${workspaceId}_${Date.now()}`
-  
+  // Encode license details into order_id so the webhook can grant the correct
+  // license without trusting the (forgeable-without-signature) amount field.
+  const platformOrderId = `${workspaceId}_${plan}_${period}_${Date.now()}`
+
   // 4. Generate random 6-digit number
   const randomNr = Math.floor(100000 + Math.random() * 900000).toString()
 
-  // 5. Read API keys from environment
-  const apiKey = process.env.SHOPIER_API_KEY || 'shopier_test_api_key'
-  const apiSecret = process.env.SHOPIER_API_SECRET || 'shopier_test_secret_key'
+  // 5. Read API keys from environment — fail loudly if missing rather than
+  // signing with a public-knowable test secret.
+  const apiKey = process.env.SHOPIER_API_KEY
+  const apiSecret = process.env.SHOPIER_API_SECRET
+  if (!apiKey || !apiSecret) {
+    throw new Error('Shopier credentials missing: SHOPIER_API_KEY and SHOPIER_API_SECRET must be set')
+  }
 
   // 6. Calculate payment initiation signature: random_nr + platform_order_id + total_order_value + currency
   const currency = 'TRY'

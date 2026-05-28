@@ -1,18 +1,20 @@
 /**
  * Shopier Webhook Yerel Simülasyon Script'i
- * 
- * Bu script, yerel geliştirme sunucunuz (http://localhost:3000) çalışırken, 
- * gerçek ödeme yapmadan ve imza doğrulamasını (HMAC-SHA256) kırmadan 
+ *
+ * Bu script, yerel geliştirme sunucunuz (http://localhost:3000) çalışırken,
+ * gerçek ödeme yapmadan ve imza doğrulamasını (HMAC-SHA256) kırmadan
  * lisans satın alma/süre uzatma senaryolarını test etmenizi sağlar.
- * 
+ *
  * Çalıştırma Talimatı:
- * 1. Yerel sunucunuzu başlatın: npm run dev
- * 2. Yeni bir terminal açın ve bu script'i çalıştırın:
- *    node scratch/simulate_shopier_webhook.js <WORKSPACE_ID> [leader|master] [success|fail]
- * 
+ * 1. .env.local içine SHOPIER_API_SECRET ekleyin (zorunlu — webhook artık fallback kullanmıyor).
+ * 2. Yerel sunucunuzu başlatın: SHOPIER_API_SECRET=... npm run dev
+ * 3. Yeni bir terminal açın ve aynı değişkenle script'i çalıştırın:
+ *    SHOPIER_API_SECRET=... node scratch/simulate_shopier_webhook.js \
+ *      <WORKSPACE_ID> [leader|master|pro] [monthly|yearly] [success|fail]
+ *
  * Örnekler:
- * - node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab master
- * - node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab leader
+ * - SHOPIER_API_SECRET=test node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab master monthly
+ * - SHOPIER_API_SECRET=test node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab pro yearly
  */
 
 const crypto = require('crypto');
@@ -21,25 +23,47 @@ const crypto = require('crypto');
 const args = process.argv.slice(2);
 const workspaceId = args[0];
 const plan = args[1] || 'master'; // varsayılan: master
-const status = args[2] || 'success'; // varsayılan: success
+const period = args[2] || 'monthly'; // varsayılan: monthly
+const status = args[3] || 'success'; // varsayılan: success
+
+const VALID_PLANS = ['leader', 'master', 'pro'];
+const VALID_PERIODS = ['monthly', 'yearly'];
 
 if (!workspaceId) {
   console.log('\n❌ Hata: Lütfen test etmek istediğiniz Workspace ID\'yi belirtin.');
   console.log('\nKullanım Şablonu:');
-  console.log('  node scratch/simulate_shopier_webhook.js <workspace_id> [leader|master] [success|failed]');
+  console.log('  node scratch/simulate_shopier_webhook.js <workspace_id> [leader|master|pro] [monthly|yearly] [success|failed]');
   console.log('\nÖrnekler:');
-  console.log('  node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab master');
-  console.log('  node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab leader failed\n');
+  console.log('  node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab master monthly');
+  console.log('  node scratch/simulate_shopier_webhook.js 12345678-abcd-efgh-ijkl-1234567890ab pro yearly\n');
   process.exit(1);
 }
 
-// Plan fiyatı belirleme
-const totalAmount = plan === 'master' ? '899.00' : '299.00';
-const platformOrderId = `${workspaceId}_${Date.now()}`;
+if (!VALID_PLANS.includes(plan)) {
+  console.log(`\n❌ Hata: Geçersiz plan "${plan}". Geçerli: ${VALID_PLANS.join(', ')}\n`);
+  process.exit(1);
+}
+if (!VALID_PERIODS.includes(period)) {
+  console.log(`\n❌ Hata: Geçersiz period "${period}". Geçerli: ${VALID_PERIODS.join(', ')}\n`);
+  process.exit(1);
+}
+
+// Plan + period fiyatı belirleme (odeme/actions.ts ile aynı tablo)
+const PRICE_TABLE = {
+  leader: { monthly: '399', yearly: '3499' },
+  master: { monthly: '1199', yearly: '9999' },
+  pro: { monthly: '2499', yearly: '19999' },
+};
+const totalAmount = PRICE_TABLE[plan][period];
+const platformOrderId = `${workspaceId}_${plan}_${period}_${Date.now()}`;
 const randomNumber = Math.floor(100000 + Math.random() * 900000).toString();
 
-// .env.local içerisindeki SHOPIER_API_SECRET'ı okumaya çalış, yoksa test değerini kullan
-const apiSecret = process.env.SHOPIER_API_SECRET || 'shopier_test_secret_key';
+const apiSecret = process.env.SHOPIER_API_SECRET;
+if (!apiSecret) {
+  console.log('\n❌ Hata: SHOPIER_API_SECRET ortam değişkeni gerekli. Webhook artık fallback secret kullanmıyor.');
+  console.log('   Örnek: SHOPIER_API_SECRET=shopier_test_secret_key node scratch/simulate_shopier_webhook.js ...\n');
+  process.exit(1);
+}
 const localApiUrl = 'http://localhost:3000/api/payment/shopier';
 
 // Webhook imza verisi: platform_order_id + random_number + total_amount + status
@@ -63,7 +87,7 @@ console.log('──────────────────────�
 console.log(`📍 Hedef API URL  : ${localApiUrl}`);
 console.log(`🔑 API Secret     : ${apiSecret === 'shopier_test_secret_key' ? 'shopier_test_secret_key (TEST MODU)' : '*** (ÖZEL)'}`);
 console.log(`📦 Workspace ID   : ${workspaceId}`);
-console.log(`💎 Seçilen Plan   : ${plan === 'master' ? 'Ekip Master\'ı (899 TL)' : 'Saha Distribütörü (299 TL)'}`);
+console.log(`💎 Seçilen Plan   : ${plan} (${period}, ${totalAmount} TL)`);
 console.log(`📊 Ödeme Durumu   : ${status.toUpperCase()}`);
 console.log(`🆔 Order ID       : ${platformOrderId}`);
 console.log(`✍️ Üretilen İmza  : ${expectedSignature}`);
