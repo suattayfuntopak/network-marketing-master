@@ -12,6 +12,7 @@ import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getLimitsForLicense } from '@/lib/aiUsage'
+import { useAIUsage } from '@/hooks/useAIUsage'
 import type { NmmCandidate } from '@/types/database.types'
 
 
@@ -78,6 +79,9 @@ export function PanoContent() {
     if (days < 2) return t('common.yesterday')
     return t('common.daysAgo', { days: Math.floor(days) })
   }
+
+  const { data: usage } = useAIUsage()
+  const isSuperAdmin = usage?.isSuperAdmin ?? false
 
   const activeCount = candidates.filter(c => ACTIVE_STAGES.includes(c.stage)).length
   const joinedCount = candidates.filter(c => c.stage === 'katildi').length
@@ -179,7 +183,9 @@ export function PanoContent() {
             )}>
               {complianceLimit === 0
                 ? (lang === 'en' ? 'Check your messages for legal compliance — paid plans only.' : 'Mesajlarınızı yasal uyum açısından denetleyin — ücretli plan gerekli.')
-                : (lang === 'en' ? `Audit your marketing messages for FTC & legal compliance. ${complianceLimit} daily credits.` : `Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Günlük ${complianceLimit} hak.`)}
+                : isSuperAdmin
+                  ? (lang === 'en' ? 'Audit your marketing messages for FTC & legal compliance. Unlimited credits.' : 'Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Sınırsız hak.')
+                  : (lang === 'en' ? `Audit your marketing messages for FTC & legal compliance. ${complianceLimit} daily credits.` : `Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Günlük ${complianceLimit} hak.`)}
             </p>
           </div>
         </div>
