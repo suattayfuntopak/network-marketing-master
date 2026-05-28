@@ -96,19 +96,44 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     }
   }
   membersAny.forEach((m: any) => { uniqueMembersMap[m.user_id] = m })
-  const uniqueMembers = Object.values(uniqueMembersMap)
-  const allUserIds = uniqueMembers.map((m: any) => m.user_id)
 
-  // 3. Derive downline workspace IDs from member user_ids (handles both old & new parent_id formats)
-  const downlineUserIds = allUserIds.filter(id => id !== ownWs.owner_id)
-  let downlineWsIds: string[] = []
-  if (downlineUserIds.length > 0) {
-    const { data: dlWs } = await supabase
-      .from('nmm_workspaces')
-      .select('id')
-      .in('owner_id', downlineUserIds)
-    downlineWsIds = dlWs?.map((w: any) => w.id) ?? []
+
+
+
+
+
+
+
+
+
+
+
+  // 3. Find all downline workspaces that have parent_id = leader's workspaceId
+  // Also support legacy where parent_id = leader's owner_id
+  const { data: downlineWs } = await supabase
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+
+  const downlineWsIds = downlineWs?.map(w => w.id) ?? []
+  const downlineOwnerIds = downlineWs?.map(w => w.owner_id).filter(Boolean) ?? []
+
+  // Add the downline owners to uniqueMembers if they aren't there yet
+  if (downlineOwnerIds.length > 0) {
+    const { data: dlMembers } = await supabase
+      .from('nmm_workspace_members')
+      .select('user_id, full_name, role, joined_at, avatar_url' as any)
+      .in('user_id', downlineOwnerIds)
+
+    dlMembers?.forEach((m: any) => {
+      if (!uniqueMembersMap[m.user_id]) {
+        uniqueMembersMap[m.user_id] = m
+      }
+    })
   }
+
+  const allUserIds = Object.keys(uniqueMembersMap)
+  const uniqueMembers = Object.values(uniqueMembersMap)
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
 
   const [
