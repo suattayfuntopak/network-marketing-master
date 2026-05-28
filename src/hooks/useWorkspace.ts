@@ -12,6 +12,7 @@ export interface WorkspaceContext {
   avatarUrl: string | null
   licenseType: 'free' | 'leader' | 'master' | 'pro'
   licenseExpiresAt: string | null
+  isSuperAdmin: boolean
 }
 
 function generateInviteCode(): string {
@@ -57,6 +58,7 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
       avatarUrl,
       licenseType: isSuperAdmin ? 'pro' : (ws?.license_type ?? 'free') as any,
       licenseExpiresAt: isSuperAdmin ? null : (ws?.license_expires_at ?? null),
+      isSuperAdmin,
     }
   }
 
@@ -94,7 +96,8 @@ async function fetchOrCreateWorkspace(): Promise<WorkspaceContext> {
     fullName,
     avatarUrl,
     licenseType: isSuperAdmin ? 'pro' : 'free',
-    licenseExpiresAt: null
+    licenseExpiresAt: null,
+    isSuperAdmin,
   }
 }
 

@@ -6,10 +6,16 @@ export interface AILimits {
   complianceLimit: number
 }
 
-export function getLimitsForLicense(licenseType: string | null | undefined): AILimits {
+export function getLimitsForLicense(
+  licenseType: string | null | undefined,
+  isSuperAdmin?: boolean
+): AILimits {
+  if (isSuperAdmin) {
+    return { messageLimit: Infinity, roleplayLimit: Infinity, complianceLimit: Infinity }
+  }
   switch (licenseType) {
     case 'pro':
-      return { messageLimit: 100, roleplayLimit: 60, complianceLimit: 15 }
+      return { messageLimit: 100, roleplayLimit: 60, complianceLimit: 20 }
     case 'master': // Plus Plan
       return { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 }
     case 'leader': // Basic Plan

@@ -12,6 +12,9 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
+import { getLimitsForLicense } from '@/lib/aiUsage'
+
+const PRO_LIMITS = getLimitsForLicense('pro')
 
 const NEXT_THEME: Record<string, string> = { dark: 'light', light: 'system', system: 'dark' }
 const NEXT_THEME_LABEL: Record<string, string> = {
@@ -830,7 +833,7 @@ export default function RootPage() {
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 20 Compliance Audit Credits' : 'Günlük 20 Uyum Denetim Hakkı'}</span>
+                  <span>{lang === 'en' ? `Daily ${PRO_LIMITS.complianceLimit} Compliance Audit Credits` : `Günlük ${PRO_LIMITS.complianceLimit} Uyum Denetim Hakkı`}</span>
                 </li>
               </ul>
             </div>
