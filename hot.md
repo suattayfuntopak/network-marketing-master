@@ -1546,3 +1546,9 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - Hata, `.filter(Boolean)` işleminin çalışma zamanında `null` değerleri temizlemesine rağmen, TypeScript'in tip seviyesinde bunun `string[]` olduğunu kestirememesinden kaynaklanıyordu.
 - Diziye `as string[]` tip ataması yapılarak TypeScript derleyicisinin (tsc) ve dolayısıyla Vercel build işleminin kusursuz çalışması sağlandı.
 
+
+### fix: İstatistikler Sayfası Downline Üye Getirme ve Avatar Düzeltmesi
+- NMM Sistemine yeni bağımsız kayıt ile (kendi workspace'i üzerinden) katılan üyelerin (Elif Sinem vb.) istatistikler tablosunda görünmeme sorunu `useTeamMembers.ts` kancası içindeki sorgu düzeltilerek giderildi (tıpkı `EkipPanel.tsx`'te yapıldığı gibi, `parent_id` üzerinden downline taraması yapıldı).
+- İstatistikler performans tablosundaki (Member listesi) her üyenin ismi yanına, eğer üyenin sistemde (`nmm_workspace_members` veya aday notu bulutundan okunabilen) yüklenmiş profil fotoğrafı (`avatar_url`) mevcutsa gri baş harf dairesi yerine bu fotoğrafı şık bir yuvarlak ile yansıtan arayüz eklendi.
+- TypeScript `GenericStringError` build hatası ( `members` dizisine atılan `any` türünden nesnenin özelliklerine erişilememesi ) `as any[]` type assertion kullanılarak kökten çözüldü ve Vercel derlemesi başarıyla çalıştırıldı.
+
