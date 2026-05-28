@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-05-28 — Council #6 (itirazlar + egitim) + fiyatlandırma UX
+
+### Council backlog #6 (2/5 sayfa)
+- **itirazlar:** `data/itirazlar.ts`, `ItirazCard`, `AddObjectionModal`, `ItirazlarContent` — `page.tsx` ~12 satır
+- **egitim:** `constants.ts`, `TrainingCard`, `AddTrainingModal`, `EgitimContent` — `page.tsx` ~12 satır
+- Görünür UI değişikliği yok; yalnızca kod organizasyonu
+
+### Ödeme + landing fiyatlandırma
+- Aylık: Basic ₺399, Plus **₺999**, Pro **₺1.699**
+- Yıllık görünüm: **%25 indirimli aylık** fiyat (₺299 / ₺749 / ₺1.274) + **3 ay bedava** rozeti
+- Tek seferde tahsil: 12 × indirimli aylık (`lib/domain/pricing.ts` + Shopier tutarları)
+- Yıllık seçilince açıklama metni (12 ay tek çekim)
+- **Mevcut Aktif Planınız** butonu: light siyah / dark beyaz (okunabilir)
+
+**Sıradaki #6:** `istatistikler` → `platform-yonetim` → `EkipPanel` → landing extract
+
+---
+
 ## 2026-05-28 — UX düzeltmeleri + Council #5 + platform WA davet linki
 
 ### Çıkış / Açılış / Ödeme

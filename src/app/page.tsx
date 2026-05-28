@@ -13,6 +13,12 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import {
+  formatTryPrice,
+  getDisplayPrice,
+  YEARLY_MONTHS_FREE,
+  type BillingPeriod,
+} from '@/lib/domain/pricing'
 import { Z } from '@/lib/ui/zIndex'
 
 const PRO_LIMITS = getLimitsForLicense('pro')
@@ -142,7 +148,7 @@ export default function RootPage() {
   const [checkingSession, setCheckingSession] = useState(true)
   const [themeMounted, setThemeMounted] = useState(false)
   const [teamSize, setTeamSize] = useState(25)
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
 
   useEffect(() => setThemeMounted(true), [])
 
@@ -584,6 +590,11 @@ export default function RootPage() {
                 </span>
               </button>
             </div>
+            {billingPeriod === 'yearly' && (
+              <p className="text-center text-[11px] text-slate-500 dark:text-zinc-400 max-w-lg mx-auto mt-3 leading-relaxed">
+                {t('landingPage.yearlyBillingDisclaimer')}
+              </p>
+            )}
           </div>
         </div>
 
@@ -612,17 +623,15 @@ export default function RootPage() {
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-slate-900 dark:text-white">
-                    {billingPeriod === 'monthly' ? '₺399' : '₺3,499'}
+                    {formatTryPrice(getDisplayPrice('leader', billingPeriod))}
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
-                    / {billingPeriod === 'monthly'
-                      ? t('landingPage.priceMonth')
-                      : t('landingPage.priceYear')}
+                    / {t('landingPage.priceMonth')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                    {t('landingPage.planBasicYearlyNote')}
+                    {t('landingPage.planBasicYearlyNote', { months: YEARLY_MONTHS_FREE })}
                   </span>
                 )}
               </div>
@@ -687,17 +696,15 @@ export default function RootPage() {
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-slate-900 dark:text-white">
-                    {billingPeriod === 'monthly' ? '₺1,199' : '₺9,999'}
+                    {formatTryPrice(getDisplayPrice('master', billingPeriod))}
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
-                    / {billingPeriod === 'monthly'
-                      ? t('landingPage.priceMonth')
-                      : t('landingPage.priceYear')}
+                    / {t('landingPage.priceMonth')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
-                    {t('landingPage.planPlusYearlyNote')}
+                    {t('landingPage.planPlusYearlyNote', { months: YEARLY_MONTHS_FREE })}
                   </span>
                 )}
               </div>
@@ -770,17 +777,15 @@ export default function RootPage() {
               <div className="flex flex-col">
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-black text-slate-900 dark:text-white">
-                    {billingPeriod === 'monthly' ? '₺2,499' : '₺19,999'}
+                    {formatTryPrice(getDisplayPrice('pro', billingPeriod))}
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
-                    / {billingPeriod === 'monthly'
-                      ? t('landingPage.priceMonth')
-                      : t('landingPage.priceYear')}
+                    / {t('landingPage.priceMonth')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                    {t('landingPage.planProYearlyNote')}
+                    {t('landingPage.planProYearlyNote', { months: YEARLY_MONTHS_FREE })}
                   </span>
                 )}
               </div>

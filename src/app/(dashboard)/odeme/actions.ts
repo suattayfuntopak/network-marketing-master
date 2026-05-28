@@ -2,6 +2,7 @@
 
 import crypto from 'crypto'
 import { createClient } from '@/lib/supabase/server'
+import { getShopierAmount } from '@/lib/domain/pricing'
 
 export interface ShopierFormData {
   API_key: string
@@ -47,32 +48,21 @@ export async function initiateShopierPayment(
   }
 
   // 3. Define pricing and product details based on selected plan and period
-  let amount = '399'
+  const amount = getShopierAmount(plan, period)
   let productName = 'Network Marketing Master - Basic Plan'
 
   if (period === 'yearly') {
     if (plan === 'pro') {
-      amount = '19999'
       productName = 'Network Marketing Master - Yıllık Pro Lider Planı'
     } else if (plan === 'master') {
-      amount = '9999'
       productName = 'Network Marketing Master - Yıllık Plus Lider Planı'
     } else {
-      amount = '3499'
       productName = 'Network Marketing Master - Yıllık Basic Planı'
     }
-  } else {
-    // monthly
-    if (plan === 'pro') {
-      amount = '2499'
-      productName = 'Network Marketing Master - Pro Lider Planı'
-    } else if (plan === 'master') {
-      amount = '1199'
-      productName = 'Network Marketing Master - Plus Lider Planı'
-    } else {
-      amount = '399'
-      productName = 'Network Marketing Master - Basic Plan'
-    }
+  } else if (plan === 'pro') {
+    productName = 'Network Marketing Master - Pro Lider Planı'
+  } else if (plan === 'master') {
+    productName = 'Network Marketing Master - Plus Lider Planı'
   }
 
   const workspaceId = membership.workspace_id

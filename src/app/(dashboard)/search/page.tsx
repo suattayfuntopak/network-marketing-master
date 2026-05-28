@@ -11,7 +11,7 @@ import { getTrainingData } from '@/lib/domain/trainingData'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/domain/stages'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
-import { ITIRAZLAR } from '../itirazlar/page'
+import { ITIRAZLAR } from '../itirazlar/data/itirazlar'
 
 function SearchPageContent() {
   const { lang, t } = useTranslation()
@@ -66,7 +66,7 @@ function SearchPageContent() {
     ? ITIRAZLAR.filter(i => {
         const term = query.toLowerCase()
         const question = lang === 'en' ? i.soru.en : i.soru.tr
-        const answer = lang === 'en' ? i.cevap.en : i.cevap.tr
+        const answer = lang === 'en' ? i.cevap?.en ?? '' : i.cevap?.tr ?? ''
         const category = lang === 'en' ? i.kategori.en : i.kategori.tr
         return (
           question.toLowerCase().includes(term) ||
@@ -227,7 +227,7 @@ function SearchPageContent() {
             <div className="grid gap-2.5">
               {filteredObjections.map(objection => {
                 const question = lang === 'en' ? objection.soru.en : objection.soru.tr
-                const answer = lang === 'en' ? objection.cevap.en : objection.cevap.tr
+                const answer = lang === 'en' ? objection.cevap?.en ?? '' : objection.cevap?.tr ?? ''
                 const category = lang === 'en' ? objection.kategori.en : objection.kategori.tr
                 return (
                   <Link

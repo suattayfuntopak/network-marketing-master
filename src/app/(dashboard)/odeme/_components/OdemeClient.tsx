@@ -7,13 +7,22 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { initiateShopierPayment, ShopierFormData } from '../actions'
 import { Z } from '@/lib/ui/zIndex'
+import {
+  formatTryPrice,
+  getDisplayPrice,
+  YEARLY_MONTHS_FREE,
+  type BillingPeriod,
+} from '@/lib/domain/pricing'
+
+const ACTIVE_PLAN_BTN =
+  'opacity-100 cursor-not-allowed !bg-neutral-100 dark:!bg-neutral-900 !text-black dark:!text-white hover:shadow-none border border-[var(--border)]'
 
 export function OdemeClient() {
   const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   
   const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
-  const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>('monthly')
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState<ShopierFormData | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -180,6 +189,11 @@ export function OdemeClient() {
             </span>
           </button>
         </div>
+        {billingPeriod === 'yearly' && (
+          <p className="text-center text-[11px] text-[var(--text-3)] max-w-lg mx-auto mt-3 leading-relaxed">
+            {t('paymentPage.yearlyBillingDisclaimer')}
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
@@ -210,17 +224,15 @@ export function OdemeClient() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-[var(--text-1)]">
-                  {billingPeriod === 'monthly' ? '₺399' : '₺3,499'}
+                  {formatTryPrice(getDisplayPrice('leader', billingPeriod))}
                 </span>
                 <span className="text-xs text-[var(--text-3)]">
-                  / {billingPeriod === 'monthly'
-                    ? t('paymentPage.monthUnit')
-                    : t('paymentPage.yearUnit')}
+                  / {t('paymentPage.monthUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                  {t('paymentPage.basicYearlyEquivalent')}
+                  {t('paymentPage.basicYearlyEquivalent', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
             </div>
@@ -254,7 +266,7 @@ export function OdemeClient() {
               onClick={() => handlePayment('leader')}
               disabled={loading || (billingPeriod === 'monthly' ? isLeaderActive : false)}
               className={`w-full text-center rounded-xl border border-[var(--border)] hover:bg-[var(--bg-subtle)] text-[var(--text-1)] py-3 text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 ${
-                isLeaderActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-transparent' : 'cursor-pointer'
+                isLeaderActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
               {isLeaderActive && billingPeriod === 'monthly' ? (
@@ -302,17 +314,15 @@ export function OdemeClient() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-[var(--text-1)]">
-                  {billingPeriod === 'monthly' ? '₺1,199' : '₺9,999'}
+                  {formatTryPrice(getDisplayPrice('master', billingPeriod))}
                 </span>
                 <span className="text-xs text-[var(--text-3)]">
-                  / {billingPeriod === 'monthly'
-                    ? t('paymentPage.monthUnit')
-                    : t('paymentPage.yearUnit')}
+                  / {t('paymentPage.monthUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
-                  {t('paymentPage.plusYearlyEquivalent')}
+                  {t('paymentPage.plusYearlyEquivalent', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
             </div>
@@ -354,7 +364,7 @@ export function OdemeClient() {
               onClick={() => handlePayment('master')}
               disabled={loading || (billingPeriod === 'monthly' ? isMasterActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isMasterActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed !bg-[var(--bg-subtle)] !text-[var(--text-3)] hover:shadow-none' : 'cursor-pointer'
+                isMasterActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
               {isMasterActive && billingPeriod === 'monthly' ? (
@@ -402,17 +412,15 @@ export function OdemeClient() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-[var(--text-1)]">
-                  {billingPeriod === 'monthly' ? '₺2,499' : '₺19,999'}
+                  {formatTryPrice(getDisplayPrice('pro', billingPeriod))}
                 </span>
                 <span className="text-xs text-[var(--text-3)]">
-                  / {billingPeriod === 'monthly'
-                    ? t('paymentPage.monthUnit')
-                    : t('paymentPage.yearUnit')}
+                  / {t('paymentPage.monthUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                  {t('paymentPage.proYearlyEquivalent')}
+                  {t('paymentPage.proYearlyEquivalent', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
             </div>
@@ -454,7 +462,7 @@ export function OdemeClient() {
               onClick={() => handlePayment('pro')}
               disabled={loading || (billingPeriod === 'monthly' ? isProActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isProActive && billingPeriod === 'monthly' ? 'opacity-50 cursor-not-allowed !bg-[var(--bg-subtle)] !text-[var(--text-3)] hover:shadow-none' : 'cursor-pointer'
+                isProActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
               {isProActive && billingPeriod === 'monthly' ? (
