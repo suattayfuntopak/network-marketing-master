@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-28 — Council Faz E (başladı): EkipPanel god component parçalama (K-5)
+
+### refactor(ekip): extract data layer + shared types out of EkipPanel
+
+- `src/lib/team/types.ts`: `MemberRow`, `OnboardingStep`, `ONBOARDING_STEPS` (artık tek kaynak).
+- `src/lib/team/fetchEkipMembers.ts`: ~325 satırlık `fetchMembers` veri katmanı (RPC + legacy fallback) bileşenden çıkarıldı.
+- `EkipPanel.tsx` bu modülleri import ediyor; `MemberRow`/`ONBOARDING_STEPS` geriye dönük uyum için re-export. Davranış birebir aynı (build + tip doğrulandı).
+- Kalan Faz E: Y-12 (custom objection/training kalıcılık), O-4 (`nmm_user_progress`), O-7 (`lib/` reorganizasyonu).
+
+---
+
 ## 2026-05-28 — 4 cerrahi düzeltme (downline rol, tıklama, avatar, tablo)
 
 ### fix: invited member role, person-detail click, İstatistikler+Platform clickable
