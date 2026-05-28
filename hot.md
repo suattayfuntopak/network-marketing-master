@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-05-28 — 4 cerrahi düzeltme (downline rol, tıklama, avatar, tablo)
+
+### fix: invited member role, person-detail click, İstatistikler+Platform clickable
+
+**1. Davet kodu ile katılan kişi rolü (migration 021)**
+- `nmm_fetch_team_with_downlines` downline üyeyi kendi workspace'inde 'leader' döndürüyordu → sponsor görünümünde 'Lider' etiketi, liderin üstünde sıralanma ve İstatistikler `role==='member'` filtresinden düşme.
+- `021_fix_downline_member_role.sql`: sadece sorgulanan workspace sahibi 'leader', diğer herkes 'member'.
+
+**2. Ekibim kart tıklaması — eski hale**
+- Tıklama tekrar `/pipeline/[id]` (kişi/aday detay sayfası); `findLeaderCandidateForMember` (skor ≥ 80) artık Elif'i doğru adaya eşliyor (Şenol değil).
+- Kendi başıma eklediğim `/ekip/uye/[userId]` "Distribütör Doğru Başlangıç Rehberi" sayfası kaldırıldı (route + `getTeamMemberDetailAction` + `TeamMemberDetailData`).
+- İki kademeli chevron (ilk ok → Aday Hunisi Dağılımı, sağdaki ok → 4 haftalık rehber) DEĞİŞMEDİ; sadece tıklama hedefi düzeltildi.
+
+**3. İstatistikler tabloları (migration 021 ile)**
+- Davet kodu ile katılan üye artık hem Ekip Performans Dağılım hem Ekip YZ Kullanım tablosunda görünür.
+
+**4. Tıklayınca kişi detayına gitme**
+- İstatistikler: satır (isim/avatar/kutu) → `/pipeline/[id]`. Saha satırı = adayın kendisi; NMM üyesi ad eşleşmesiyle.
+- Platform Yönetim: satır YALNIZCA o kişi süper admin'in kendi adayıysa `/pipeline/[id]`'ye gider (yeni sayfa uydurulmadı); aksi halde tıklanamaz. Aksiyon butonları `stopPropagation`.
+
+**Deploy:** Migration `021` production'a uygulanmalı.
+
+---
+
 ## 2026-05-28 — Ara düzeltmeler + Council Sprint 3 / Faz D (tamamlandı)
 
 ### fix + perf: Ekibim, davet, avatarlar, İstatistikler + Council Faz D

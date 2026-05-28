@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import { assertSuperAdmin } from '@/lib/auth'
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 
 // Initialize Supabase Admin Client using Service Role Key to bypass RLS safely
 function createAdminClient() {
@@ -28,6 +29,8 @@ export interface PlatformWorkspaceItem {
   sponsorName: string | null
   sponsorEmail: string | null
   isIndependent: boolean
+  /** Candidate id in the super admin's OWN pipeline, if this user is also their candidate. */
+  pipelineCandidateId: string | null
 }
 
 /**
@@ -110,6 +113,12 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     })
   }
 
+  // Super admin's OWN candidates — to link a platform user to their candidate detail page.
+  const { data: adminCandidates } = await admin
+    .from('nmm_candidates')
+    .select('id, owner_id, full_name')
+    .eq('owner_id', user.id)
+
   // 5. Combine and build result — deduplicate by owner_id (keep most recent workspace per user)
   const seenOwners = new Set<string>()
   const result: PlatformWorkspaceItem[] = []
@@ -163,6 +172,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       sponsorName,
       sponsorEmail,
       isIndependent: !w.parent_id,
+      pipelineCandidateId: findLeaderCandidateForMember(adminCandidates ?? [], user.id, ownerName),
     })
   }
 

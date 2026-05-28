@@ -317,8 +317,13 @@ export default function PlatformAdminPage() {
             <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
               {independentMembers.map(w => {
                 const isAdded = addedIds.has(w.workspaceId)
+                const detailHref = w.pipelineCandidateId ? `/pipeline/${w.pipelineCandidateId}` : null
                 return (
-                  <div key={w.workspaceId} className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+                  <div
+                    key={w.workspaceId}
+                    onClick={detailHref ? () => router.push(detailHref) : undefined}
+                    className={`flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm ${detailHref ? 'cursor-pointer hover:bg-[var(--bg-subtle)]/75 transition-colors' : ''}`}
+                  >
 
 
 
@@ -335,7 +340,7 @@ export default function PlatformAdminPage() {
                       <div className="font-bold text-xs text-[var(--text-1)] truncate">{w.ownerName}</div>
                       <div className="text-[10px] text-[var(--text-3)] truncate">{w.ownerEmail}</div>
                     </div>
-                    <div className="flex gap-1.5 shrink-0">
+                    <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                       <a
                         href={buildInviteWaLink(inviteCode)}
                         target="_blank"
@@ -418,9 +423,14 @@ export default function PlatformAdminPage() {
                         : '-'
 
                     const isExpired = !isPaidUnlimited && w.licenseExpiresAt ? new Date(w.licenseExpiresAt) < new Date() : false
+                    const detailHref = w.pipelineCandidateId ? `/pipeline/${w.pipelineCandidateId}` : null
 
                     return (
-                      <tr key={w.workspaceId} className="hover:bg-[var(--bg-subtle)]/75 transition-colors">
+                      <tr
+                        key={w.workspaceId}
+                        onClick={detailHref ? () => router.push(detailHref) : undefined}
+                        className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''}`}
+                      >
                         {/* 1. Leader */}
                         <td className="p-3 whitespace-nowrap">
 
@@ -505,7 +515,7 @@ export default function PlatformAdminPage() {
 
                         {/* 9. Actions */}
                         <td className="p-3 whitespace-nowrap text-right">
-                          <div className="inline-flex gap-2.5">
+                          <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
                             {/* WhatsApp — share invite link */}
                             <a
                               href={buildInviteWaLink(inviteCode)}

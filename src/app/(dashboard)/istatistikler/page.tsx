@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import {
   TrendingUp, Users, Target, Activity, Flame,
   BarChart2, Award, Clock, Crown, Sparkles
@@ -17,6 +19,7 @@ type PeriodOption = '7d' | '30d' | 'all'
 
 export default function AnalyticsPage() {
   const { lang } = useTranslation()
+  const router = useRouter()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()
@@ -77,6 +80,20 @@ export default function AnalyticsPage() {
     }))
     return [...nmmRows, ...sahaRows]
   }, [sortedMembers, sahaOrtaklari])
+
+  // Person detail page = candidate detail (/pipeline/[id]). Saha rows ARE candidates;
+  // NMM members are matched to the leader's own candidate by name.
+  const leaderOwnerId = useMemo(
+    () => sortedMembers.find(m => m.role === 'leader')?.user_id ?? null,
+    [sortedMembers]
+  )
+  const getMemberHref = (row: { user_id: string; full_name: string | null; isAppUser?: boolean }): string | null => {
+    if (row.isAppUser === false) return `/pipeline/${row.user_id}`
+    const matchedId = leaderOwnerId
+      ? findLeaderCandidateForMember(candidates, leaderOwnerId, row.full_name)
+      : null
+    return matchedId ? `/pipeline/${matchedId}` : null
+  }
 
   // 1. Adayları seçilen periyoda göre filtrele
   const filteredCandidates = useMemo(() => {
@@ -546,8 +563,13 @@ export default function AnalyticsPage() {
                       const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null
                       const doneCount = m.onboarding_steps?.length ?? 0
                       const onboardingPct = isLeader ? 100 : Math.min(100, Math.round((doneCount / 9) * 100))
+                      const detailHref = getMemberHref(m)
                       return (
-                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''} ${!isAppUser ? 'opacity-70' : ''}`}>
+                        <tr
+                          key={m.user_id}
+                          onClick={detailHref ? () => router.push(detailHref) : undefined}
+                          className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''} ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''} ${!isAppUser ? 'opacity-70' : ''}`}
+                        >
                           <td className="p-3 flex items-center gap-2 whitespace-nowrap">
 
                             {m.avatar_url ? (
@@ -637,8 +659,13 @@ export default function AnalyticsPage() {
                   <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
                     {sortedMembers.map(m => {
                       const isLeader = m.role === 'leader'
+                      const detailHref = getMemberHref(m)
                       return (
-                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
+                        <tr
+                          key={m.user_id}
+                          onClick={detailHref ? () => router.push(detailHref) : undefined}
+                          className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''} ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}
+                        >
                           <td className="p-3 flex items-center gap-2 whitespace-nowrap">
                             {m.avatar_url ? (
                               <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
