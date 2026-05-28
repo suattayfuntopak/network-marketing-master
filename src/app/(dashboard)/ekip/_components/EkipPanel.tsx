@@ -116,7 +116,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
 
   const downlineWsIds = downlineWs?.map(w => w.id) ?? []
-  const downlineOwnerIds = downlineWs?.map(w => w.owner_id).filter(Boolean) ?? []
+  const downlineOwnerIds = (downlineWs?.map(w => w.owner_id).filter(Boolean) ?? []) as string[]
 
   // Add the downline owners to uniqueMembers if they aren't there yet
   if (downlineOwnerIds.length > 0) {
