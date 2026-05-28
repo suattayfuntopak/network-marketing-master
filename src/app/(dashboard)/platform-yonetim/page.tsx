@@ -22,6 +22,23 @@ import {
 } from './actions'
 import { Trash2 } from 'lucide-react'
 
+const getAvatarColor = (name: string) => {
+  const colors = [
+    'from-red-500 to-rose-500',
+    'from-orange-500 to-amber-500',
+    'from-green-500 to-emerald-500',
+    'from-teal-500 to-cyan-500',
+    'from-blue-500 to-indigo-500',
+    'from-violet-500 to-purple-500',
+    'from-fuchsia-500 to-pink-500'
+  ]
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return colors[Math.abs(hash) % colors.length]
+}
+
 export default function PlatformAdminPage() {
   const { lang } = useTranslation()
   const router = useRouter()
@@ -302,9 +319,18 @@ export default function PlatformAdminPage() {
                 const isAdded = addedIds.has(w.workspaceId)
                 return (
                   <div key={w.workspaceId} className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 text-sm font-black text-white shadow">
-                      {w.ownerName.charAt(0).toUpperCase()}
-                    </div>
+
+
+
+                    {w.avatarUrl ? (
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden shadow">
+                        <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-sm font-black text-white shadow`}>
+                        {w.ownerName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-xs text-[var(--text-1)] truncate">{w.ownerName}</div>
                       <div className="text-[10px] text-[var(--text-3)] truncate">{w.ownerEmail}</div>
@@ -397,10 +423,27 @@ export default function PlatformAdminPage() {
                       <tr key={w.workspaceId} className="hover:bg-[var(--bg-subtle)]/75 transition-colors">
                         {/* 1. Leader */}
                         <td className="p-3 whitespace-nowrap">
-                          <div className="font-bold text-[var(--text-1)]">{w.ownerName}</div>
-                          <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1">
-                            <Mail className="h-3 w-3 shrink-0" />
-                            {w.ownerEmail}
+
+
+
+
+                          <div className="flex items-center gap-3">
+                            {w.avatarUrl ? (
+                              <div className="h-8 w-8 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
+                                <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-[10px] font-black text-white shadow-sm`}>
+                                {w.ownerName.charAt(0).toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-bold text-[var(--text-1)]">{w.ownerName}</div>
+                              <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1">
+                                <Mail className="h-3 w-3 shrink-0" />
+                                {w.ownerEmail}
+                              </div>
+                            </div>
                           </div>
                         </td>
 

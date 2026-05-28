@@ -19,6 +19,7 @@ export interface PlatformWorkspaceItem {
   ownerId: string
   ownerEmail: string
   ownerName: string
+  avatarUrl: string | null
   createdAt: string
   licenseType: string
   licenseExpiresAt: string | null
@@ -104,6 +105,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     const ownerUser = w.owner_id ? userMap.get(w.owner_id) : null
     const ownerEmail = ownerUser?.email ?? 'Bilinmiyor'
     const ownerName = (ownerUser?.user_metadata?.full_name as string | undefined) ?? ownerUser?.email?.split('@')[0] ?? 'İsimsiz Üye'
+    const avatarUrl = (ownerUser?.user_metadata?.avatar_url as string | undefined) ?? null
 
     // Resolve sponsor via workspace chain: parent workspace → owner user
     // Supports both formats: parent_id as workspace UUID (new) and as user UUID (legacy)
@@ -130,6 +132,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       ownerId: w.owner_id ?? '',
       ownerEmail,
       ownerName,
+      avatarUrl,
       createdAt: w.created_at,
       licenseType: w.license_type ?? 'free',
       licenseExpiresAt: w.license_expires_at ?? null,
