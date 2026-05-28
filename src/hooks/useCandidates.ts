@@ -7,7 +7,7 @@ import { getLang } from '@/lib/utils/getLang'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
-import { parseNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
@@ -121,10 +121,10 @@ export function useUpdateCandidate(workspaceId: string) {
             })
           }
 
-          // Warmth change
-          if (patch.note !== undefined && patch.note !== currentCandidate.note) {
-            const currentWarmth = parseNote(currentCandidate.note).warmth || 'ilik'
-            const newWarmth = parseNote(patch.note).warmth || 'ilik'
+          // Warmth change (typed column or legacy note fallback)
+          if (patch.warmth !== undefined && patch.warmth !== currentCandidate.warmth) {
+            const currentWarmth = resolveCandidateFields(currentCandidate).warmth
+            const newWarmth = patch.warmth
             if (currentWarmth !== newWarmth) {
               inserts.push({
                 workspace_id: workspaceId,

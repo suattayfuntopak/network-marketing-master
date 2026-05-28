@@ -20,6 +20,7 @@ export function parseNote(rawNote: string | null): ParsedNote {
   return result
 }
 
+/** @deprecated Use `buildCandidateContentFields` — stores avatar/warmth in typed DB columns. */
 export function formatNote(tr: string, en?: string, avatarUrl?: string, warmth?: 'sicak' | 'ilik' | 'soguk'): string {
   const parts = [
     tr.trim(),

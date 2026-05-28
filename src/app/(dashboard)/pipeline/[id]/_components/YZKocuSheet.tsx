@@ -8,6 +8,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import type { NmmCandidate } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 const MESSAGE_TYPES = [
   { value: 'davet',    label: 'Davet' },
@@ -25,6 +26,7 @@ interface Props {
 export function YZKocuSheet({ candidate, onClose }: Props) {
   const [state, action, isPending] = useActionState(generateCoachMessage, {})
   const [messageType, setMessageType] = useState('takip')
+  const candidateNoteTr = resolveCandidateFields(candidate).noteTr
 
   function handleCopy() {
     if (state.message) navigator.clipboard.writeText(state.message)
@@ -63,7 +65,7 @@ export function YZKocuSheet({ candidate, onClose }: Props) {
           <input type="hidden" name="candidateId" value={candidate.id} />
           <input type="hidden" name="name" value={candidate.full_name} />
           <input type="hidden" name="stage" value={candidate.stage} />
-          <input type="hidden" name="note" value={candidate.note ? candidate.note.split('|||')[0].trim() : ''} />
+          <input type="hidden" name="note" value={candidateNoteTr} />
           <input type="hidden" name="messageType" value={messageType} />
 
           {/* Mesaj türü */}

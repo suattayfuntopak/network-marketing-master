@@ -16,7 +16,11 @@ import { waHref } from '@/lib/utils/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { parseNote, formatNote, parseSimpleNote, formatSimpleNote } from '@/lib/utils/noteParser'
+import { parseSimpleNote, formatSimpleNote } from '@/lib/utils/noteParser'
+import {
+  resolveCandidateFields,
+  mergeCandidateContentUpdate,
+} from '@/lib/domain/candidateFields'
 import { generateNotesSummary } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -140,8 +144,6 @@ function renderActivityText(a: any, lang: string, t: any): string {
   return a.note || ''
 }
 
-// parseNote is now imported from @/lib/noteParser
-
 interface Props {
   candidateId: string
 }
@@ -215,7 +217,9 @@ export function CandidateDetail({ candidateId }: Props) {
   const addNoteMutation = useAddCandidateNote(ws?.workspaceId ?? '')
 
   const c = candidates.find(x => x.id === candidateId)
-  const parsed = c ? parseNote(c.note) : { tr: '', en: '', avatarUrl: '', warmth: 'ilik' as const }
+  const parsed = c
+    ? resolveCandidateFields(c)
+    : { noteTr: '', noteEn: '', avatarUrl: null as string | null, warmth: 'ilik' as const }
   const profilePhoto = parsed.avatarUrl || null
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
@@ -270,19 +274,24 @@ export function CandidateDetail({ candidateId }: Props) {
 
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {
-    if (lang !== 'en' || !c?.note) {
+    if (lang !== 'en' || !c) {
       setTranslatedNote(null)
       return
     }
 
-    const parsedLocal = parseNote(c.note)
-    if (parsedLocal.en) {
-      setTranslatedNote(parsedLocal.en)
+    const parsedLocal = resolveCandidateFields(c)
+    if (parsedLocal.noteEn) {
+      setTranslatedNote(parsedLocal.noteEn)
+      return
+    }
+
+    if (!parsedLocal.noteTr) {
+      setTranslatedNote(null)
       return
     }
 
     let h = 0
-    const rawText = parsedLocal.tr
+    const rawText = parsedLocal.noteTr
     for (let i = 0; i < rawText.length; i++) h = (Math.imul(31, h) + rawText.charCodeAt(i)) | 0
     const cacheKey = `nmm_note_en_${candidateId}_${(h >>> 0).toString(36)}`
     const cached = localStorage.getItem(cacheKey)
@@ -291,7 +300,10 @@ export function CandidateDetail({ candidateId }: Props) {
       // Veritabanına da kaydet ki diğer cihazlarda veya localstorage temizlendiğinde çalışsın
       if (!attemptedUpdates.current[candidateId]) {
         attemptedUpdates.current[candidateId] = true
-        update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, cached, parsedLocal.avatarUrl) })
+        update.mutate({
+          id: c.id,
+          ...mergeCandidateContentUpdate(c, { noteEn: cached }),
+        })
       }
       return
     }
@@ -304,7 +316,7 @@ export function CandidateDetail({ candidateId }: Props) {
     fetch('/api/translate-note', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: parsedLocal.tr }),
+      body: JSON.stringify({ text: parsedLocal.noteTr }),
     })
       .then(r => r.json())
       .then(({ translated }: { translated: string }) => {
@@ -313,12 +325,15 @@ export function CandidateDetail({ candidateId }: Props) {
         // Veritabanına kalıcı olarak kaydet
         if (!attemptedUpdates.current[candidateId]) {
           attemptedUpdates.current[candidateId] = true
-          update.mutate({ id: c.id, note: formatNote(parsedLocal.tr, translated, parsedLocal.avatarUrl) })
+          update.mutate({
+            id: c.id,
+            ...mergeCandidateContentUpdate(c, { noteEn: translated }),
+          })
         }
       })
-      .catch(() => setTranslatedNote(parsedLocal.tr))
+      .catch(() => setTranslatedNote(parsedLocal.noteTr))
       .finally(() => setIsTranslating(false))
-  }, [lang, c?.note, candidateId, update, isTranslating])
+  }, [lang, c, candidateId, update, isTranslating])
 
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
   const senderName = ws?.fullName || t('pipelinePage.yourAdvisor')
@@ -482,7 +497,7 @@ export function CandidateDetail({ candidateId }: Props) {
 
               {c.note && (
                 <p className={`mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed transition-opacity ${isTranslating ? 'opacity-50' : 'opacity-100'}`}>
-                  {lang === 'en' ? (translatedNote || parsed.en || parsed.tr) : parsed.tr}
+                  {lang === 'en' ? (translatedNote || parsed.noteEn || parsed.noteTr) : parsed.noteTr}
                   {isTranslating && (
                     <span className="ml-2 text-[10px] text-[var(--text-3)] animate-pulse">
                       {t('pipeline.noteTranslating')}
@@ -495,7 +510,7 @@ export function CandidateDetail({ candidateId }: Props) {
             {/* Aksiyon butonları */}
             <div className="grid grid-cols-3 gap-3">
               <button
-                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.tr)}&warmth=${parsed.warmth}`)}
+                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.noteTr)}&warmth=${parsed.warmth}`)}
                 className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
               >
                 <Bot className="h-4 w-4" strokeWidth={1.75} />

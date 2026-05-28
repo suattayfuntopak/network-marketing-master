@@ -9,7 +9,7 @@ import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { parseNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/domain/stages'
@@ -59,7 +59,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [quickActionOpen, setQuickActionOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
-  const parsed = parseNote(candidate.note)
+  const parsed = resolveCandidateFields(candidate)
   const profilePhoto = parsed.avatarUrl || null
 
   const [generating, setGenerating] = useState(false)
@@ -71,7 +71,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
       const result = await generateQuickMessageAction({
         name: candidate.full_name,
         stage: candidate.stage,
-        note: parsed.tr ?? ''
+        note: parsed.noteTr ?? ''
       })
       if (result.error || !result.message) {
         toast.error(result.error ?? 'Mesaj oluşturulamadı.')
@@ -162,9 +162,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               {candidate.phone && (
                 <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
               )}
-              {candidate.note && (
+              {(parsed.noteTr || parsed.noteEn) && (
                 <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">
-                  {lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr}
+                  {lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr}
                 </p>
               )}
             </div>

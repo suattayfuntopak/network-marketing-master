@@ -109,6 +109,10 @@ export interface Database {
           stage: CandidateStage
           last_contact_at: string | null
           note: string | null
+          note_tr: string | null
+          note_en: string | null
+          avatar_url: string | null
+          warmth: string
           next_follow_up_at: string | null
           created_at: string
           updated_at: string
@@ -122,6 +126,10 @@ export interface Database {
           stage?: CandidateStage
           last_contact_at?: string | null
           note?: string | null
+          note_tr?: string | null
+          note_en?: string | null
+          avatar_url?: string | null
+          warmth?: string
           next_follow_up_at?: string | null
           created_at?: string
           updated_at?: string
@@ -135,6 +143,10 @@ export interface Database {
           stage?: CandidateStage
           last_contact_at?: string | null
           note?: string | null
+          note_tr?: string | null
+          note_en?: string | null
+          avatar_url?: string | null
+          warmth?: string
           next_follow_up_at?: string | null
           created_at?: string
           updated_at?: string

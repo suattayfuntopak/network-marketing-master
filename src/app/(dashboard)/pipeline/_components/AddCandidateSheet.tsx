@@ -7,7 +7,7 @@ import { STAGES_FORM } from '@/lib/domain/stages'
 import { Z } from '@/lib/ui/zIndex'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
-import { formatNote } from '@/lib/utils/noteParser'
+import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { toast } from 'sonner'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
@@ -99,16 +99,17 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
         avatarUrl = publicUrl
       }
 
-      // If a photo was uploaded, format note as Delimited (tr ||| en ||| avatarUrl ||| warmth)
-      const finalNote = formatNote(note, '', avatarUrl, warmth)
-
       await add.mutateAsync({
         id: candidateId,
         full_name: fullName,
         phone: phone || null,
-        note: finalNote || null,
         stage: stage as any,
-        last_contact_at: null
+        last_contact_at: null,
+        ...buildCandidateContentFields({
+          noteTr: note,
+          avatarUrl: avatarUrl || null,
+          warmth,
+        }),
       })
 
       formRef.current?.reset()

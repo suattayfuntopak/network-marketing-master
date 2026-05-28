@@ -9,7 +9,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/domain/stages'
-import { parseNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { ITIRAZLAR } from '../itirazlar/page'
 
 function SearchPageContent() {
@@ -129,7 +129,7 @@ function SearchPageContent() {
             </h2>
             <div className="grid gap-2.5">
               {filteredCandidates.map(c => {
-                const parsed = parseNote(c.note)
+                const parsed = resolveCandidateFields(c)
                 return (
                   <Link
                     key={c.id}
@@ -158,7 +158,7 @@ function SearchPageContent() {
                             <>
                               <span className="hidden sm:inline">•</span>
                               <span className="truncate block max-w-[200px] sm:max-w-[400px]">
-                                {lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr}
+                                {lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr}
                               </span>
                             </>
                           )}

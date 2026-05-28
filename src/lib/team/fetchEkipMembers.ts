@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { parseNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 import { resolveTeamAvatarsAction } from '@/app/(dashboard)/ekip/actions'
@@ -30,7 +30,7 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
         ? candidates.find(c => c.id === matchedPipelineId)
         : undefined
       const phone = candidateMatch?.phone ?? null
-      const noteAvatar = candidateMatch?.note ? parseNote(candidateMatch.note).avatarUrl : ''
+      const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
       const resolvedAvatar = m.avatar_url ?? authAvatars[m.user_id] ?? (noteAvatar || null)
 
       return {
@@ -73,7 +73,7 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
             return mWords.some((w: string) => cf.includes(w))
           })
           if (!isMatched) {
-            const parsedNote = parseNote(c.note)
+            const parsedNote = resolveCandidateFields(c)
             nonAppMembers.push({
               user_id: c.id,
               full_name: c.full_name,
@@ -247,7 +247,7 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
       ? candidates.find(c => c.id === matchedPipelineId)
       : undefined
     const phone = candidateMatch?.phone ?? null
-    const noteAvatar = candidateMatch?.note ? parseNote(candidateMatch.note).avatarUrl : ''
+    const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
     const resolvedAvatar = m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
 
     return {
@@ -289,7 +289,7 @@ export async function fetchEkipMembers(workspaceId: string): Promise<MemberRow[]
     })
 
     if (!isMatched) {
-      const parsedNote = parseNote(c.note)
+      const parsedNote = resolveCandidateFields(c)
       nonAppMembers.push({
         user_id: c.id,
         full_name: c.full_name,

@@ -10,7 +10,7 @@ import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
-import { parseNote, formatNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields, buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
 
@@ -32,7 +32,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const [phoneError, setPhoneError] = useState('')
   
   // central note parsing
-  const parsed = parseNote(candidate.note)
+  const parsed = resolveCandidateFields(candidate)
   const [photo, setPhoto] = useState<string | null>(parsed.avatarUrl || null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
@@ -97,14 +97,18 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       // Format note combining tr, en, new/existing avatarUrl and warmth
       const rawNoteInput = (fd.get('note') as string).trim()
       const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'
-      const finalNote = formatNote(rawNoteInput, parsed.en, avatarUrl, warmth)
 
       await update.mutateAsync({
         id: candidate.id,
         full_name: (fd.get('fullName') as string).trim(),
         phone: phone || null,
-        note: finalNote || null,
         stage: fd.get('stage') as CandidateStage,
+        ...buildCandidateContentFields({
+          noteTr: rawNoteInput,
+          noteEn: parsed.noteEn,
+          avatarUrl: avatarUrl || null,
+          warmth,
+        }),
       })
       onClose()
     } catch (err: any) {
@@ -255,7 +259,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <label className={labelClass} htmlFor="edit-note">
               Not <span className="font-normal text-[var(--text-3)]">(max 1000 karakter)</span>
             </label>
-            <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={candidate.note ? candidate.note.split('|||')[0].trim() : ''} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
+            <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={parsed.noteTr} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           <div className="flex gap-3 pt-1">
             <button type="submit" disabled={update.isPending || uploadingPhoto} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">

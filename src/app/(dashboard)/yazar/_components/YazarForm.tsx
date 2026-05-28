@@ -18,7 +18,7 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-import { parseNote } from '@/lib/utils/noteParser'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -162,7 +162,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     return lang === 'en' ? enMap[val] || val : trMap[val] || val
   }
 
-  const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : ''
+  const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : '' // URL param: plain TR text
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
   const [selected, setSelected] = useState<NmmCandidate | null>(null)
@@ -206,8 +206,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     setQuery('')
     setDropdownOpen(false)
 
-    const parsed = parseNote(c.note)
-    const parsedNote = lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr
+    const parsed = resolveCandidateFields(c)
+    const parsedNote = lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr
     setWarmth(parsed.warmth || 'ilik')
     const stageName = getStageLabel(c.stage, lang) || c.stage
 

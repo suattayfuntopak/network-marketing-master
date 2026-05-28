@@ -14,6 +14,7 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -76,7 +77,7 @@ export default function AnalyticsPage() {
       last_activity_at: null,
       onboarding_steps: [] as string[],
       isAppUser: false as const,
-      avatar_url: c.note ? (c.note.includes('|||') && c.note.split('|||')[2] ? c.note.split('|||')[2].trim() : null) : null,
+      avatar_url: resolveCandidateFields(c).avatarUrl,
     }))
     return [...nmmRows, ...sahaRows]
   }, [sortedMembers, sahaOrtaklari])

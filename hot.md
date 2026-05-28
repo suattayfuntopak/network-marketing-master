@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-05-28 — Council Y-9 (Faz 1): `nmm_candidates` typed columns
+
+### feat(db): aday notu/avatar/sıcaklık — `|||` yerine ayrı kolonlar
+
+**Kapsam (güvenli faz):** Sadece `nmm_candidates`. Lider notları (`nmm_daily_actions`) ve diğer tablolar **Faz 2** — hâlâ `TR ||| EN` formatında.
+
+**Migration `023_candidate_typed_columns.sql`:**
+- Yeni kolonlar: `note_tr`, `note_en`, `avatar_url`, `warmth` (sicak|ilik|soguk)
+- Backfill: mevcut `note` içindeki 4 parçalı `|||` verisi kolonlara ayrıştırıldı
+- `note` kolonu artık yalnızca çeviri formatı (`TR ||| EN`) — avatar/sıcaklık içermez
+
+**Kod:**
+- `src/lib/domain/candidateFields.ts` — `resolveCandidateFields` (kolon öncelikli + legacy fallback), `buildCandidateContentFields`, `mergeCandidateContentUpdate`
+- Yazma: Add/Edit aday, QuickAdd, CandidateDetail çeviri kaydı
+- Okuma: kart, detay, istatistikler, ekip fetch, arama, yazar formu, YZ koçu
+- `useCandidates` sıcaklık değişimi artık `patch.warmth` ile
+- 4 unit test (`candidateFields.test.ts`); toplam 26 test yeşil
+
+**Deploy:** `supabase db push` veya migration `023` uygulanmalı. Uygulanmadan önce kod legacy `note` parse ile çalışmaya devam eder; uygulandıktan sonra typed kolonlar aktif olur.
+
+---
+
 ## 2026-05-28 — Council Y-8: i18n bimodal → t() (tamamlandı) + Platform WhatsApp davet metni
 
 ### i18n: convert ~600 hardcoded `lang === 'en'` ternaries to central dictionary

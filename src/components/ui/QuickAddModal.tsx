@@ -10,6 +10,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { toast } from 'sonner'
 import { playNotificationSound } from './NotificationsModal'
+import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 
 interface QuickAddModalProps {
   onClose: () => void
@@ -52,8 +53,8 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
     try {
       await addCandidate.mutateAsync({
         full_name: fullName.trim(),
-        note: notes.trim() || null,
-        stage: 'yeni', // Default stage: Yeni Aday
+        stage: 'yeni',
+        ...buildCandidateContentFields({ noteTr: notes.trim() }),
       })
 
       // Trigger user alerts based on preferences
