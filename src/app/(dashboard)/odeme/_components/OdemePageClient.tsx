@@ -17,9 +17,6 @@ export function OdemePageClient() {
           <h1 className="text-xl font-bold text-[var(--text-1)]">
             {t('paymentPage.headerTitle')}
           </h1>
-          <p className="text-sm text-[var(--text-3)]">
-            {t('paymentPage.headerSubtitle')}
-          </p>
         </div>
       </header>
 

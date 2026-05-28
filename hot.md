@@ -1,6 +1,14 @@
 # Hot Log
 
-## 2026-05-29 — ACİL: giriş → Pano yönlendirme düzeltmesi
+## 2026-05-29 — /odeme sayfa metinleri + UX düzeltmeleri
+
+- Başlık: **Lisans ve Mevcut Planlar**; alt açıklama kaldırıldı
+- Plan açıklamaları (Basic / Plus / Pro) güncellendi
+- Yıllık disclaimer tek satır; %25 rozeti emerald/beyaz (her iki temada okunaklı)
+- Aktif Plus/Pro butonu: gradient korunur, **!text-white** (light dahil)
+
+---
+
 
 ### Kök neden
 - `src/proxy.ts`: Oturum açık kullanıcıyı public sayfalardan **`/bugun/ilgilen`**'e yönlendiriyordu (yanlış hedef)

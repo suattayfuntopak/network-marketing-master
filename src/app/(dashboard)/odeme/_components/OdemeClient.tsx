@@ -17,6 +17,13 @@ import {
 const ACTIVE_PLAN_BTN =
   'opacity-100 cursor-not-allowed !bg-neutral-100 dark:!bg-neutral-900 !text-black dark:!text-white hover:shadow-none border border-[var(--border)]'
 
+/** Gradient plan cards — keep brand colors + white label when active */
+const GRADIENT_ACTIVE_PLAN_BTN =
+  'opacity-100 cursor-not-allowed !text-white hover:shadow-none brightness-[0.92]'
+
+const YEARLY_DISCOUNT_BADGE =
+  'text-[9px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full border border-emerald-700 shadow-sm shrink-0'
+
 export function OdemeClient() {
   const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
@@ -184,13 +191,13 @@ export function OdemeClient() {
             }`}
           >
             <span>{t('paymentPage.yearlyBilling')}</span>
-            <span className="text-[9px] bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/25 animate-pulse">
+            <span className={YEARLY_DISCOUNT_BADGE}>
               {t('paymentPage.bestValue')}
             </span>
           </button>
         </div>
         {billingPeriod === 'yearly' && (
-          <p className="text-center text-[11px] text-[var(--text-3)] max-w-lg mx-auto mt-3 leading-relaxed">
+          <p className="text-center text-[11px] text-[var(--text-3)] max-w-3xl mx-auto mt-3 whitespace-nowrap overflow-x-auto scrollbar-none px-2">
             {t('paymentPage.yearlyBillingDisclaimer')}
           </p>
         )}
@@ -364,7 +371,7 @@ export function OdemeClient() {
               onClick={() => handlePayment('master')}
               disabled={loading || (billingPeriod === 'monthly' ? isMasterActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isMasterActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
+                isMasterActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
               {isMasterActive && billingPeriod === 'monthly' ? (
@@ -462,7 +469,7 @@ export function OdemeClient() {
               onClick={() => handlePayment('pro')}
               disabled={loading || (billingPeriod === 'monthly' ? isProActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isProActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
+                isProActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
               {isProActive && billingPeriod === 'monthly' ? (
