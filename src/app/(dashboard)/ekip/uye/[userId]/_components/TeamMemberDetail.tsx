@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Crown, TrendingUp, Loader2 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { getTeamMemberDetailAction, type TeamMemberDetailData } from '../../../actions'
 import { ONBOARDING_STEPS } from '../../../_components/EkipPanel'
 
@@ -32,8 +33,17 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
 
   if (wsLoading || loading) {
     return (
-      <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 flex items-center justify-center md:pb-8">
-        <Loader2 className="h-8 w-8 animate-spin text-brand" />
+      <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 space-y-5">
+        <Skeleton className="h-5 w-32" />
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-20 w-20 rounded-full shrink-0" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-36" />
+          </div>
+        </div>
+        <Skeleton className="h-40 rounded-2xl" />
+        <Skeleton className="h-64 rounded-2xl" />
       </main>
     )
   }
@@ -47,9 +57,9 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
           className="mb-6 flex items-center gap-2 text-sm font-bold text-[var(--text-2)] hover:text-brand"
         >
           <ArrowLeft className="h-4 w-4" />
-          {lang === 'en' ? 'Back to My Team' : 'Ekibime Dön'}
+          {t('team.backToTeam')}
         </button>
-        <p className="text-center text-sm text-[var(--text-2)]">{error ?? (lang === 'en' ? 'Member not found' : 'Üye bulunamadı')}</p>
+        <p className="text-center text-sm text-[var(--text-2)]">{error ?? t('team.memberNotFound')}</p>
       </main>
     )
   }
@@ -65,7 +75,7 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
         className="mb-6 flex items-center gap-2 text-sm font-bold text-[var(--text-2)] hover:text-brand transition"
       >
         <ArrowLeft className="h-4 w-4" />
-        {lang === 'en' ? 'Back to My Team' : 'Ekibime Dön'}
+        {t('team.backToTeam')}
       </button>
 
       <div className="mx-auto max-w-2xl space-y-6">
@@ -80,12 +90,12 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-black text-[var(--text-1)] break-words">
-                {member.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}
+                {member.full_name ?? t('team.unnamedMember')}
               </h1>
               {member.role === 'leader' && <Crown className="h-6 w-6 text-[#854F0B]" />}
             </div>
             <p className="text-sm text-[var(--text-2)] mt-1">
-              {lang === 'en' ? 'NMM Partner' : 'NMM Ortağı'}
+              {t('team.nmmPartner')}
               {member.joined_at && (
                 <span className="text-[var(--text-3)]">
                   {' '}· {new Date(member.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
@@ -97,7 +107,7 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
                 href={`/pipeline/${member.pipeline_id}`}
                 className="inline-block mt-2 text-sm font-bold text-brand hover:underline"
               >
-                {lang === 'en' ? 'View pipeline profile →' : 'Huni profilini gör →'}
+                {t('team.viewPipelineProfile')}
               </Link>
             )}
           </div>
@@ -135,7 +145,7 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-extrabold uppercase tracking-wider text-[var(--text-2)]">
-              {lang === 'en' ? '4-Week Right Start' : '4 Haftalık Doğru Başlangıç'}
+              {t('team.fourWeekStart')}
             </h2>
             <span className="text-sm font-black text-brand">{onboardingPct}%</span>
           </div>
@@ -160,7 +170,7 @@ export function TeamMemberDetail({ memberUserId }: { memberUserId: string }) {
 
         {member.last_activity_at && (
           <p className="text-xs text-center text-[var(--text-3)]">
-            {lang === 'en' ? 'Last activity:' : 'Son aktivite:'}{' '}
+            {t('team.lastActive')}{' '}
             {new Date(member.last_activity_at).toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         )}

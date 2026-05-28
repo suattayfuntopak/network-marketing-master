@@ -6,6 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { initiateShopierPayment, ShopierFormData } from '../actions'
+import { Z } from '@/lib/zIndex'
 
 export function OdemeClient() {
   const { lang } = useTranslation()
@@ -79,7 +80,7 @@ export function OdemeClient() {
     <div className="mx-auto max-w-7xl space-y-12 py-4">
       {/* ── Dynamic Loader Page / Redirecting Overlay ── */}
       {loading && formData && (
-        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0A0B10]/95 backdrop-blur-md">
+        <div className={`fixed inset-0 ${Z.fullscreen} flex flex-col items-center justify-center bg-[#0A0B10]/95 backdrop-blur-md`}>
           <div className="relative flex flex-col items-center max-w-md p-8 text-center space-y-6">
             <div className="absolute -top-12 h-40 w-40 rounded-full bg-indigo-500/10 blur-2xl animate-pulse"></div>
             

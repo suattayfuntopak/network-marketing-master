@@ -14,6 +14,7 @@ import { waHref } from '@/lib/waLink'
 import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { Z } from '@/lib/zIndex'
 
 function formatDaysAgo(days: number, lang: string): string {
   if (!isFinite(days)) return lang === 'en' ? 'Never contacted' : 'Hiç aranmadı'
@@ -237,7 +238,7 @@ export function IlgilenContent() {
         )}
       {/* AI Message Result Modal */}
       {activeMessage && createPortal(
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+        <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveMessage(null)} />
           
           <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">

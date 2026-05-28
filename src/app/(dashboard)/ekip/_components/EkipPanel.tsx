@@ -23,6 +23,8 @@ import { getLimitsForLicense } from '@/lib/aiUsage'
 import { generateOnboardingGuidanceAction, resolveTeamAvatarsAction } from '../actions'
 import { waHref } from '@/lib/waLink'
 import { parseNote } from '@/lib/noteParser'
+import { Skeleton } from '@/components/ui/Skeleton'
+import { Z } from '@/lib/zIndex'
 
 export interface MemberRow {
   user_id: string
@@ -338,9 +340,11 @@ export function EkipPanel() {
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
     const link = `https://nmmaster.com/kayit`
-    const message = lang === 'en'
-      ? `Hello ${member.full_name}, I registered you in my Network Marketing Master system! 🚀\n\nDownload/register here: ${link}\nUse my Sponsor Invite Code: *${code}*\n\nThis will allow us to track your list, correct start steps, and build your business together using AI! Let's get started!`
-      : `Merhaba ${member.full_name}, seni Network Marketing Master sistemime iş ortağım olarak ekledim! 🚀\n\nBuradan kayıt olabilirsin: ${link}\nSponsor Davet Kodun: *${code}*\n\nBu sayede isim listeni, doğru başlangıç adımlarını ve aday takibini yapay zeka desteğiyle ortaklaşa yönetebileceğiz. Aramıza hoş geldin!`
+    const message = t('team.inviteWaMessage', {
+      name: member.full_name ?? t('common.member'),
+      link,
+      code,
+    })
     
     const href = waHref(member.phone, message)
     if (href) {
@@ -359,7 +363,7 @@ export function EkipPanel() {
           .eq('user_id', userId)
           .eq('step_id', stepId)
         if (error) throw error
-        toast.success(lang === 'en' ? 'Step marked as incomplete' : 'Adım tamamlanmadı olarak işaretlendi')
+        toast.success(t('team.stepIncomplete'))
       } else {
         const { error } = await supabase
           .from('nmm_onboarding_progress')
@@ -368,15 +372,15 @@ export function EkipPanel() {
             step_id: stepId
           })
         if (error) throw error
-        toast.success(lang === 'en' ? 'Step marked as completed!' : 'Adım başarıyla tamamlandı olarak işaretlendi!')
+        toast.success(t('team.stepComplete'))
       }
       queryClient.invalidateQueries({ queryKey: ['ekip-panel', ws?.workspaceId] })
       queryClient.invalidateQueries({ queryKey: ['members', ws?.workspaceId] })
     } catch (err: any) {
       console.error('[toggleOnboardingStep] error:', err)
-      toast.error(lang === 'en' ? 'Failed to update progress: ' + err.message : 'İlerleme güncellenemedi: ' + err.message)
+      toast.error(t('team.progressUpdateError', { message: err.message }))
     }
-  }, [supabase, queryClient, ws?.workspaceId, lang])
+  }, [supabase, queryClient, ws?.workspaceId, t])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['ekip-panel', ws?.workspaceId],
@@ -403,7 +407,7 @@ export function EkipPanel() {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+          <Skeleton key={i} className="h-20 rounded-2xl" />
         ))}
       </div>
     )
@@ -529,7 +533,7 @@ export function EkipPanel() {
                   <TrendingUp className="h-5 w-5" />
                 </div>
                 <span className="text-base font-extrabold text-indigo-950 dark:text-indigo-200">
-                  {lang === 'en' ? 'Weekly Team Performance Scorecard' : 'Haftalık Organizasyon Performans Durumu'}
+                  {t('team.scorecardTitle')}
                 </span>
               </div>
               {scorecardOpen ? (
@@ -544,7 +548,7 @@ export function EkipPanel() {
                 {/* Metrik 1: Aktif Partner Oranı */}
                 <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {lang === 'en' ? 'Active Partner Ratio' : 'Aktif Distribütör Oranı'}
+                    {t('team.activePartnerRatio')}
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
@@ -555,49 +559,43 @@ export function EkipPanel() {
                     </span>
                   </div>
                   <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {lang === 'en' 
-                      ? 'Partners active in the last 7 days.' 
-                      : 'Son 7 günde sahada aktif olan ekip üyeleriniz.'}
+                    {t('team.activePartnerDesc')}
                   </p>
                 </div>
 
                 {/* Metrik 2: Sıcak Huni Potansiyeli */}
                 <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {lang === 'en' ? 'Warm Pipeline Potential' : 'Sıcak Aday Potansiyeli'}
+                    {t('team.warmPipeline')}
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
                       {warmPipelinePotentials}
                     </span>
                     <span className="text-xs text-zinc-500 font-semibold">
-                      {lang === 'en' ? 'Leads' : 'Aday'}
+                      {t('team.leads')}
                     </span>
                   </div>
                   <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {lang === 'en'
-                      ? 'Total active presentation and follow-up candidates.'
-                      : 'Sunum yapılmış ve takibi devam eden sıcak adaylar.'}
+                    {t('team.warmPipelineDesc')}
                   </p>
                 </div>
 
                 {/* Metrik 3: Kayıt Hunisi Momentumu */}
                 <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {lang === 'en' ? 'Onboarding Momentum' : 'Kayıt Hunisi Momentumu'}
+                    {t('team.onboardingMomentum')}
                   </span>
                   <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
                       {totalJoined}
                     </span>
                     <span className="text-xs text-zinc-500 font-semibold">
-                      {lang === 'en' ? 'Joined' : 'Katıldı'}
+                      {t('team.joinedLabel')}
                     </span>
                   </div>
                   <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {lang === 'en'
-                      ? 'Total candidates successfully registered as partners.'
-                      : 'Huniden başarıyla ekibe dahil edilen iş ortakları.'}
+                    {t('team.onboardingMomentumDesc')}
                   </p>
                 </div>
               </div>
@@ -636,7 +634,7 @@ export function EkipPanel() {
                         }))
                       }}
                       className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] hover:text-[var(--text-1)] transition active:scale-95 cursor-pointer border border-[var(--border)] shadow-sm"
-                      title={isCardExpanded ? 'Detayları Kapat' : 'Detayları Göster'}
+                      title={isCardExpanded ? t('team.collapseDetails') : t('team.expandDetails')}
                     >
                       {isCardExpanded ? <ChevronUp className="h-4.5 w-4.5" /> : <ChevronDown className="h-4.5 w-4.5" />}
                     </button>
@@ -710,22 +708,22 @@ export function EkipPanel() {
                         ) : m.isAppUser !== false ? (
                           <span className="shrink-0 rounded-full bg-purple-100 dark:bg-purple-950/40 border border-purple-200/30 dark:border-purple-900/20 px-2.5 py-0.5 text-[10px] font-black text-purple-700 dark:text-purple-400 flex items-center gap-1 shadow-sm leading-none">
                             <span>💎</span>
-                            <span>{lang === 'en' ? 'NMM PARTNER' : 'NMM ORTAĞI'}</span>
+                            <span>{t('team.nmmPartner')}</span>
                           </span>
                         ) : (
                           <span className="shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/30 dark:border-zinc-700/20 px-2.5 py-0.5 text-[10px] font-black text-zinc-600 dark:text-zinc-400 flex items-center gap-1 shadow-sm leading-none">
                             <span>🤝</span>
-                            <span>{lang === 'en' ? 'FIELD PARTNER' : 'SAHA ORTAĞI'}</span>
+                            <span>{t('team.fieldPartner')}</span>
                           </span>
                         )}
                         {isInactive && (
                           <button
                             onClick={() => setCoachingMember({ member: m, days: daysInactive })}
                             className="shrink-0 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-3 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1.5 animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm"
-                            title={lang === 'en' ? 'Get AI Coaching Message' : 'YZ Koçluk Mesajı Al'}
+                            title={t('team.aiCoachingScript')}
                           >
                             <span>⚠️</span>
-                            <span>{lang === 'en' ? 'Needs Support' : 'Destek Gerekebilir'}</span>
+                            <span>{t('team.needsSupport')}</span>
                           </button>
                         )}
                       </div>
@@ -733,7 +731,7 @@ export function EkipPanel() {
                       <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
                         <span className="font-extrabold text-[var(--text-1)]">
                           {m.isAppUser === false
-                            ? (lang === 'en' ? 'Field Distributor' : 'Saha Distribütörü')
+                            ? t('team.fieldDistributor')
                             : (m.role === 'leader' ? t('common.leader') : t('common.member'))}
                         </span>
                         {m.joined_at && (
@@ -743,7 +741,7 @@ export function EkipPanel() {
                         )}
                         {lastActiveDate && (
                           <span className={`text-xs ${isInactive ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-[var(--text-3)]/90'}`}>
-                            · {lang === 'en' ? 'Last active:' : 'Son aktiflik:'} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? (lang === 'en' ? 'today' : 'bugün') : `${daysInactive} ${lang === 'en' ? 'd ago' : 'gün önce'}`})
+                            · {t('team.lastActive')} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? t('team.todayShort') : t('team.daysAgoShort', { days: daysInactive })})
                           </span>
                         )}
                       </p>
@@ -776,7 +774,7 @@ export function EkipPanel() {
                         className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-4 py-2.5 text-sm font-black shadow-md cursor-pointer shrink-0"
                       >
                         <WhatsAppIcon className="h-4.5 w-4.5 fill-current text-white" />
-                        <span>{lang === 'en' ? "Invite to NMM 🚀" : "NMM'e Davet Et 🚀"}</span>
+                        <span>{t('team.inviteToNmm')}</span>
                       </button>
                     ) : (
                       <div className="text-right">
@@ -798,12 +796,10 @@ export function EkipPanel() {
                         </div>
                         <div>
                           <h4 className="text-sm font-extrabold text-white">
-                            {lang === 'en' ? 'Ekip Master Plan Required' : 'Ekip Master Lisansı Gereklidir'}
+                            {t('team.masterRequired')}
                           </h4>
                           <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                            {lang === 'en'
-                              ? 'To track your downline’s candidate funnels, view onboarding progress, and receive real-time updates, you need an active Ekip Master license.'
-                              : 'Alt ekibinizin aday hunilerini izlemek, 4 haftalık Doğru Başlangıç süreçlerini gerçek zamanlı takip etmek ve koçluk yapmak için aktif bir Ekip Master lisansı gereklidir.'}
+                            {t('team.masterRequiredDesc')}
                           </p>
                         </div>
                         <div>
@@ -815,7 +811,7 @@ export function EkipPanel() {
                             }}
                             className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
                           >
-                            <span>{lang === 'en' ? 'Upgrade to Ekip Master' : 'Ekip Master\'ına Yükselt 🚀'}</span>
+                            <span>{t('team.upgradeToMaster')}</span>
                           </button>
                         </div>
                       </div>
@@ -858,7 +854,7 @@ export function EkipPanel() {
                             >
                               <span className="flex items-center gap-2">
                                 <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
-                                <span>{lang === 'en' ? 'Distributor Correct Start Guide' : 'Distribütör Doğru Başlangıç Rehberi'}</span>
+                                <span>{t('team.correctStartGuide')}</span>
                               </span>
                               <span className="flex items-center gap-2.5">
                                 {(() => {
@@ -894,7 +890,7 @@ export function EkipPanel() {
                                           : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
                                       }`}
                                     >
-                                      {lang === 'en' ? `W${w}` : `${w}. Hafta`}
+                                      {t('team.weekLabel', { w })}
                                     </button>
                                   ))}
                                 </div>
@@ -938,7 +934,7 @@ export function EkipPanel() {
                                             })
                                           }}
                                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
-                                          title={lang === 'en' ? 'Get AI Coaching Script' : 'Yapay Zeka Koçluk Mesajı Al'}
+                                          title={t('team.aiCoachingScript')}
                                         >
                                           <Bot className="h-5 w-5" />
                                         </button>
@@ -967,12 +963,10 @@ export function EkipPanel() {
             </div>
             <div className="max-w-md mx-auto space-y-2">
               <h4 className="text-base font-bold text-white">
-                {lang === 'en' ? 'Team Limit Reached (50/50)' : 'Takım Limiti Aşıldı (50/50)'}
+                {t('team.teamLimitReached')}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                {lang === 'en'
-                  ? 'You have more than 50 downline members in your organization. Upgrade to Pro Plan for unlimited tracking, AI downline coaching, and professional analytics.'
-                  : 'Ekibinizde 50\'den fazla iş ortağı bulunuyor. Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve gelişmiş analizler için Pro Plana yükseltin.'}
+                {t('team.teamLimitDescPro')}
               </p>
             </div>
             <div className="pt-2">
@@ -980,7 +974,7 @@ export function EkipPanel() {
                 onClick={() => router.push('/odeme')}
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-2.5 text-xs font-bold text-white hover:opacity-90 transition active:scale-95 cursor-pointer shadow-lg shadow-pink-500/15"
               >
-                <span>{lang === 'en' ? 'Upgrade to Pro' : 'Pro Plana Yükselt 🚀'}</span>
+                <span>{t('team.upgradeToPro')}</span>
               </button>
             </div>
           </div>
@@ -1014,15 +1008,13 @@ export function EkipPanel() {
               <button
                 onClick={handleCopyInviteCode}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand text-white hover:bg-[#433a9f] transition active:scale-95 shadow-sm cursor-pointer"
-                title={lang === 'en' ? 'Copy Code' : 'Kodu Kopyala'}
+                title={t('team.copyCode')}
               >
                 {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
               </button>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  lang === 'en'
-                    ? `Hi! You are invited to our Network Marketing Master team!\n\nComplete your registration from the link below, and enter the code *${ws?.inviteCode}* on the "My Team" page to join us instantly:\n\n🔗 https://network-marketing-master.vercel.app/kayit`
-                    : `Merhaba! Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp "Ekibim" sayfasından *${ws?.inviteCode}* kodunu girerek aramıza anında katılabilirsin:\n\n🔗 https://network-marketing-master.vercel.app/kayit`
+                  t('team.waInviteGroup', { code: ws?.inviteCode ?? '' })
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -1053,7 +1045,7 @@ export function EkipPanel() {
                 required
                 value={inviteCodeInput}
                 onChange={e => setInviteCodeInput(e.target.value)}
-                placeholder={lang === 'en' ? 'Paste invite code...' : 'Davet kodunu yapıştırın...'}
+                placeholder={t('team.pasteInvitePlaceholder')}
                 className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all font-medium"
               />
               <button
@@ -1096,7 +1088,6 @@ export function EkipPanel() {
           memberName={onboardingCoachData.memberName}
           stepId={onboardingCoachData.stepId}
           phone={onboardingCoachData.phone}
-          lang={lang as 'tr' | 'en'}
           onClose={() => setOnboardingCoachData(null)}
         />
       )}
@@ -1132,14 +1123,14 @@ interface YZOnboardingKocuModalProps {
   memberName: string
   stepId: string
   phone?: string | null
-  lang: 'tr' | 'en'
   onClose: () => void
 }
 
-function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZOnboardingKocuModalProps) {
+function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZOnboardingKocuModalProps) {
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const { lang, t } = useTranslation()
   const { data: usage, refetch: refetchUsage } = useAIUsage()
   const { data: modalWs } = useWorkspace()
   const { messageLimit } = getLimitsForLicense(modalWs?.licenseType)
@@ -1158,7 +1149,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
         }
       } catch (err: any) {
         if (active) {
-          setError(lang === 'en' ? 'Failed to generate guidance script: ' + err.message : 'Rehberlik yazısı üretilemedi: ' + err.message)
+          setError(t('team.guidanceError', { message: err.message }))
         }
       } finally {
         if (active) setLoading(false)
@@ -1173,7 +1164,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
   const handleCopy = () => {
     if (!message) return
     navigator.clipboard.writeText(message)
-    toast.success(lang === 'en' ? 'Coaching script copied to clipboard!' : 'Koçluk mesajı panoya kopyalandı!')
+    toast.success(t('team.coachingCopied'))
   }
 
   const handleSendWhatsApp = () => {
@@ -1192,7 +1183,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
 
   return (
     <div 
-      className="fixed inset-0 z-[99] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+      className={`fixed inset-0 ${Z.coachModal} flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200`}
       onClick={onClose}
     >
       <div 
@@ -1210,10 +1201,10 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
           </div>
           <div>
             <h3 className="text-lg font-black text-[var(--text-1)]">
-              {lang === 'en' ? 'AI Correct Start Coach' : 'Yapay Zeka Doğru Başlangıç Koçu'}
+              {t('team.aiCoachTitle')}
             </h3>
             <p className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
-              {lang === 'en' ? 'STEP-BY-STEP GUIDANCE' : 'ADIM ADIM REHBERLİK'}
+              {t('team.aiCoachSubtitle')}
             </p>
           </div>
         </div>
@@ -1222,14 +1213,14 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
         <div className="rounded-2xl bg-[var(--bg-subtle)] p-4 border border-[var(--border)] space-y-2">
           <div>
             <p className="text-[10px] text-[var(--text-3)] font-extrabold uppercase tracking-widest">
-              {lang === 'en' ? 'Downline Member' : 'Ekip Arkadaşı'}
+              {t('team.downlineMember')}
             </p>
             <p className="text-sm font-extrabold text-[var(--text-1)] mt-0.5">{memberName}</p>
           </div>
           <div className="h-px bg-[var(--border)]" />
           <div>
             <p className="text-[10px] text-[var(--text-3)] font-extrabold uppercase tracking-widest">
-              {lang === 'en' ? 'Target Correct Start Step' : 'Hedef Doğru Başlangıç Adımı'}
+              {t('team.targetStep')}
             </p>
             <p className="text-sm font-bold text-brand mt-0.5">
               {stepLabel}
@@ -1243,7 +1234,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <Loader2 className="h-8 w-8 animate-spin text-brand" />
               <p className="text-xs font-bold text-[var(--text-3)] animate-pulse">
-                {lang === 'en' ? 'AI Coach is drafting your script...' : 'Yapay Zeka Koçu mesajınızı hazırlıyor...'}
+                {t('team.aiDrafting')}
               </p>
             </div>
           ) : error ? (
@@ -1266,7 +1257,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
                   type="button"
                   onClick={handleCopy}
                   className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-card)] hover:text-brand transition shadow-sm active:scale-95 cursor-pointer"
-                  title={lang === 'en' ? 'Copy message to clipboard' : 'Mesajı panoya kopyala'}
+                  title={t('team.copyCoaching')}
                 >
                   <Copy className="h-5 w-5" />
                 </button>
@@ -1274,7 +1265,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
                   type="button"
                   onClick={handleSendWhatsApp}
                   className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#25D366] text-white hover:bg-[#20ba59] transition shadow-md hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
-                  title={lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp ile Gönder'}
+                  title={t('team.sendWhatsApp')}
                 >
                   <WhatsAppIcon className="h-5 w-5 fill-white" />
                 </button>
@@ -1287,9 +1278,12 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
         <div className="flex flex-col items-center justify-center border-t border-[var(--border)] pt-4 text-center">
           {!usage?.isSuperAdmin && (
             <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)] mb-4">
-              <span>{lang === 'en' ? 'Daily Coaching Quota:' : 'Günlük Koçluk Kotası:'}</span>
+              <span>{t('team.dailyCoachingQuota')}</span>
               <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
-                {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {lang === 'en' ? 'remaining' : 'kalan'}
+                {t('team.remainingQuota', {
+                  remaining: Math.max(0, messageLimit - (usage?.messageUsed ?? 0)),
+                  limit: messageLimit,
+                })}
               </span>
             </div>
           )}
@@ -1298,7 +1292,7 @@ function YZOnboardingKocuModal({ memberName, stepId, phone, lang, onClose }: YZO
             onClick={onClose}
             className="w-full h-11 rounded-xl bg-zinc-200 hover:bg-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-xs font-black uppercase tracking-wider text-[var(--text-2)] hover:text-[var(--text-1)] transition active:scale-[0.98] cursor-pointer"
           >
-            {lang === 'en' ? 'Close' : 'Kapat'}
+            {t('common.close')}
           </button>
         </div>
       </div>

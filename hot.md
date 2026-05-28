@@ -1,5 +1,26 @@
 # Hot Log
 
+## 2026-05-28 — Council Sprint 2 (UX Tutarlılık)
+
+### feat: loading.tsx, Skeleton primitifi, z-index disiplini, i18n (Ekibim + Header)
+
+**Route-level loading**
+- `src/app/(dashboard)/loading.tsx` + `DashboardLoading` / `Skeleton` bileşenleri eklendi.
+- Dashboard segmentleri yüklenirken tutarlı iskelet gösterimi (beyaz flash azaltıldı).
+
+**z-index (`src/lib/zIndex.ts`)**
+- Ölçek genişletildi: `cardOverlay`, `cardPopover`, `coachModal`, `fullscreen`.
+- Ham `z-[NN]` kullanımları migrate edildi: `EkipPanel`, `CandidateCard`, `OnboardingModal`, `IlgilenContent`, `OdemeClient`, `egitim`, `itirazlar`.
+- `AGENTS.md` — UI conventions (loading, z-index, i18n) bölümü eklendi.
+
+**i18n**
+- `team.*` ve `header.*` sözlük anahtarları (~50 yeni key).
+- `EkipPanel.tsx`: kullanıcıya dönük metinlerin büyük çoğunluğu `t()` ile (onboarding adım etiketleri yapısal `label_tr`/`label_en` kaldı).
+- `Header.tsx`: lisans uyarı çubuğu `t('header.*')`.
+- `ekip/page.tsx`, `TeamMemberDetail.tsx`: `t()` geçişi.
+
+---
+
 ## 2026-05-28 — 4 Öncelikli Öneri + Council Sprint 1 (Tek Kaynak)
 
 ### feat + refactor: Downline RLS, avatar sync, ekip üye detayı, lib/auth, useWorkspace

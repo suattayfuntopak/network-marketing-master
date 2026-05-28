@@ -5,7 +5,7 @@ import { EkipPanel } from './_components/EkipPanel'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function EkipPage() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -15,10 +15,10 @@ export default function EkipPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">
-            {lang === 'en' ? 'My Team' : 'Ekibim'}
+            {t('team.title')}
           </h1>
           <p className="text-sm text-[var(--text-3)]">
-            {lang === 'en' ? 'Invite, manage, and evaluate your team members in the app' : 'Ekibini uygulamaya davet et, yönet, değerlendir'}
+            {t('team.subtitle')}
           </p>
         </div>
       </header>

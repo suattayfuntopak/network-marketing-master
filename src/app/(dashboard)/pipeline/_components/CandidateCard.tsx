@@ -130,7 +130,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
       <li className={clsx(
         'relative rounded-2xl border border-[var(--border)] p-4 shadow-sm transition-colors',
         STAGE_CARD_BG[candidate.stage],
-        (quickActionOpen || stageOpen || editOpen || confirmOpen) && 'z-[60]'
+        (quickActionOpen || stageOpen || editOpen || confirmOpen) && Z.cardOverlay
       )}>
         <div className="flex items-start gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
@@ -223,8 +223,8 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
               {quickActionOpen && (
                 <>
-                  <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" onClick={() => setQuickActionOpen(false)} />
-                  <div className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[65] w-[calc(100%-2rem)] max-w-xs rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl animate-in fade-in zoom-in duration-200">
+                  <div className={`fixed inset-0 ${Z.cardOverlay} bg-black/40 backdrop-blur-sm`} onClick={() => setQuickActionOpen(false)} />
+                  <div className={`fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 ${Z.cardPopover} w-[calc(100%-2rem)] max-w-xs rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl animate-in fade-in zoom-in duration-200`}>
                     <div className="flex items-center justify-between border-b border-[var(--border)] pb-3.5 mb-3.5">
                       <div className="flex items-center gap-2">
                         <Zap className="h-4 w-4 text-amber-500 animate-pulse" />
@@ -410,7 +410,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         </>
       )}
       {activeMessage && createPortal(
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+        <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setActiveMessage(null)} />
           
           <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">

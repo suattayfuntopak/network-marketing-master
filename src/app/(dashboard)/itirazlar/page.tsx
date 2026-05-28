@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useSearchParams } from 'next/navigation'
+import { Z } from '@/lib/zIndex'
 
 interface Itiraz {
   id: number
@@ -856,7 +857,7 @@ function ItirazlarPageContent() {
 
       {/* Kendi İtirazını Ekle Pop-up Formu */}
       {formOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200">
+        <div className={`fixed inset-0 ${Z.fullscreen} flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200`}>
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>

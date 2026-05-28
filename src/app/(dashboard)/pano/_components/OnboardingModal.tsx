@@ -6,6 +6,7 @@ import { useAddCandidate } from '@/hooks/useCandidates'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { Z } from '@/lib/zIndex'
 
 const STORAGE_KEY = 'nmm_onboarding_done'
 
@@ -80,8 +81,8 @@ export function OnboardingModal({ workspaceId, inviteCode }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 z-[80] bg-black/40 backdrop-blur-sm" onClick={dismiss} />
-      <div className="fixed left-1/2 top-1/2 z-[90] w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl overflow-hidden">
+      <div className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/40 backdrop-blur-sm`} onClick={dismiss} />
+      <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl overflow-hidden`}>
         {/* Adım göstergesi */}
         <div className="flex border-b border-[var(--border)]">
           {steps.map(s => (

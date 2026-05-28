@@ -88,14 +88,15 @@ export function Header({ visible = true }: { visible?: boolean }) {
   const showWarningBar = (licenseType !== 'free') && (isLicenseExpired || (remainingDays >= 0 && remainingDays <= 3))
 
   const getPlanLabel = (type: string) => {
-    if (type === 'pro') return lang === 'en' ? 'Pro Lider' : 'Pro Lider'
-    if (type === 'master') return lang === 'en' ? 'Plus Lider' : 'Plus Lider'
-    return lang === 'en' ? 'Basic Partner' : 'Basic Partner'
+    if (type === 'pro') return t('header.planPro')
+    if (type === 'master') return t('header.planPlus')
+    return t('header.planBasic')
   }
 
+  const plan = getPlanLabel(licenseType)
   const warningBarText = isLicenseExpired
-    ? (lang === 'en' ? `⚠️ Your ${getPlanLabel(licenseType)} license has expired. [Renew License]` : `⚠️ ${getPlanLabel(licenseType)} lisansınızın süresi dolmuştur. [Şimdi Yenile]`)
-    : (lang === 'en' ? `⚠️ Your ${getPlanLabel(licenseType)} license expires in ${remainingDays} day(s). [Renew License]` : `⚠️ ${getPlanLabel(licenseType)} lisans süreniz ${remainingDays} gün sonra doluyor. [Lisansı Yenile]`)
+    ? t('header.licenseExpired', { plan })
+    : t('header.licenseExpiring', { plan, days: remainingDays })
 
   // Handle Command + K / Ctrl + K shortcut
   useEffect(() => {
