@@ -6,8 +6,8 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { NAV_ITEMS } from '@/lib/navigation'
-import { Z } from '@/lib/zIndex'
+import { NAV_ITEMS } from '@/lib/domain/navigation'
+import { Z } from '@/lib/ui/zIndex'
 
 interface SidebarProps {
   collapsed: boolean

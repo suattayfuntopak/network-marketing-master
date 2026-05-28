@@ -8,7 +8,7 @@ import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/customContent'
 import { useSearchParams } from 'next/navigation'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 interface Itiraz {
   id: number

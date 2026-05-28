@@ -3,11 +3,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { getLang } from '@/lib/getLang'
-import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
+import { getLang } from '@/lib/utils/getLang'
+import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
-import { parseNote } from '@/lib/noteParser'
+import { parseNote } from '@/lib/utils/noteParser'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'

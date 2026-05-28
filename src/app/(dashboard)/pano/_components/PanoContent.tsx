@@ -8,10 +8,10 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { SquareButton } from '@/components/ui/SquareButton'
 import { Zap, TrendingUp, Bot, Users, CalendarDays, Target, MessageCircleQuestion, BookOpen, Shield, BarChart2, ArrowRight } from 'lucide-react'
-import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/stages'
+import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/domain/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import type { NmmCandidate } from '@/types/database.types'
 
 

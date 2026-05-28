@@ -5,9 +5,9 @@ import { X, Bot, Copy, Loader2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { generateCoachMessage } from '../actions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { waHref } from '@/lib/waLink'
+import { waHref } from '@/lib/utils/waLink'
 import type { NmmCandidate } from '@/types/database.types'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 const MESSAGE_TYPES = [
   { value: 'davet',    label: 'Davet' },

@@ -4,10 +4,10 @@ import { useActionState } from 'react'
 import { X, Bot, Copy, Loader2 } from 'lucide-react'
 import { generateDownlineCoachingMessage } from '@/app/(dashboard)/pipeline/[id]/actions'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { waHref } from '@/lib/waLink'
+import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from './EkipPanel'
 import { toast } from 'sonner'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 interface Props {
   member: MemberRow

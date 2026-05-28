@@ -41,7 +41,7 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
 
   // Trigger welcome onboarding email, admin notification email, and in-app notification
   if (data.user) {
-    const { sendWelcomeEmail, sendAdminNewUserEmail } = require('@/lib/mail')
+    const { sendWelcomeEmail, sendAdminNewUserEmail } = require('@/lib/infra/mail')
 
     // Welcome email to user
     sendWelcomeEmail(email, fullName, 'tr').catch((err: any) => {

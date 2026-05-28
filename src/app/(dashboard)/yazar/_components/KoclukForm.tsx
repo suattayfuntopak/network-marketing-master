@@ -11,7 +11,7 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 export function KoclukForm() {
   const { lang } = useTranslation()

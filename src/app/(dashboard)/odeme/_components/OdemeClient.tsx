@@ -6,7 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { initiateShopierPayment, ShopierFormData } from '../actions'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 export function OdemeClient() {
   const { lang } = useTranslation()

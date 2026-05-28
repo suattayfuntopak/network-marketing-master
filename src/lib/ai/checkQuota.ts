@@ -3,7 +3,7 @@
 // block previously duplicated across 7+ action files.
 
 import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/auth'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'

@@ -7,18 +7,18 @@ import { generateMessageAction, translateTextAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { getStageLabel } from '@/lib/stages'
+import { getStageLabel } from '@/lib/domain/stages'
 
-import { waHref } from '@/lib/waLink'
+import { waHref } from '@/lib/utils/waLink'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-import { parseNote } from '@/lib/noteParser'
+import { parseNote } from '@/lib/utils/noteParser'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },

@@ -1,7 +1,7 @@
 'use client'
 
 import { toast } from 'sonner'
-import { getLang } from '@/lib/getLang'
+import { getLang } from '@/lib/utils/getLang'
 
 function DeleteToast({
   name,

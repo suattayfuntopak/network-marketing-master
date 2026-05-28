@@ -6,7 +6,7 @@ import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { NAV_ROUTES } from '@/lib/navigation'
+import { NAV_ROUTES } from '@/lib/domain/navigation'
 
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir

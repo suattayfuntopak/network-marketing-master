@@ -6,7 +6,7 @@ import { useAddCandidate } from '@/hooks/useCandidates'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 const STORAGE_KEY = 'nmm_onboarding_done'
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2 } from 'lucide-react'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface ConfirmDeleteModalProps {

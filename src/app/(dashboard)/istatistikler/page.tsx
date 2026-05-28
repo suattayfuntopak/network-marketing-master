@@ -10,10 +10,10 @@ import {
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
+import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers } from '@/hooks/useTeamMembers'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 type PeriodOption = '7d' | '30d' | 'all'
 

@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 interface SettingsModalProps {
   workspaceId: string

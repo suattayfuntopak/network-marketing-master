@@ -7,9 +7,9 @@ import { Search, Users, BookOpen, ChevronRight, CornerDownRight, ArrowLeft, Mess
 import { useCandidates } from '@/hooks/useCandidates'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getTrainingData } from '@/lib/trainingData'
-import { STAGE_LABEL, STAGE_COLOR } from '@/lib/stages'
-import { parseNote } from '@/lib/noteParser'
+import { getTrainingData } from '@/lib/domain/trainingData'
+import { STAGE_LABEL, STAGE_COLOR } from '@/lib/domain/stages'
+import { parseNote } from '@/lib/utils/noteParser'
 import { ITIRAZLAR } from '../itirazlar/page'
 
 function SearchPageContent() {

@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import { parseNote } from '@/lib/noteParser'
+import { parseNote } from '@/lib/utils/noteParser'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 import { resolveTeamAvatarsAction } from '@/app/(dashboard)/ekip/actions'

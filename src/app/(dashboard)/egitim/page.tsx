@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react'
 import { BookOpen, ChevronDown, Clock, Star, CheckCircle2, Circle, Copy, Check, MessageSquare, Search, X, Plus, Trash2 } from 'lucide-react'
-import { getTrainingData } from '@/lib/trainingData'
+import { getTrainingData } from '@/lib/domain/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/customContent'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 const SEVIYE_RENK: Record<string, string> = {
   'Temel': 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-900/20',

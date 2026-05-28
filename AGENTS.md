@@ -11,7 +11,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **In-page:** Prefer `<Skeleton className="..." />` from `@/components/ui/Skeleton` over ad-hoc `animate-pulse` divs.
 
 ### z-index
-- Use `import { Z } from '@/lib/zIndex'` and `Z.confirm`, `Z.sheet`, `Z.fullscreen`, etc.
+- Use `import { Z } from '@/lib/ui/zIndex'` and `Z.confirm`, `Z.sheet`, `Z.fullscreen`, etc.
 - Do **not** add new raw Tailwind `z-[NN]` classes; extend `zIndex.ts` if a new layer is needed.
 
 ### i18n

@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-28 — Council Faz E: O-7 lib/ reorganizasyonu
+
+### refactor(lib): group flat lib utilities into ui/utils/domain/infra
+
+- `lib/ui/`: `zIndex`, `deleteWithUndo`
+- `lib/utils/`: `noteParser`, `validation`, `waLink`, `getLang`
+- `lib/domain/`: `stages`, `aiUsage`, `navigation`, `trainingData`
+- `lib/infra/`: `mail`
+- ~38 dosyada import yolları codemod ile güncellendi; build + tipler yeşil.
+- `supabase/` ve `ai/` zaten kohezyonlu klasör olduğu için (ve import yüzeyi çok geniş olduğu için) yerinde bırakıldı — gereksiz/riskli churn'den kaçınıldı.
+- AGENTS.md / CLAUDE.md'deki `@/lib/zIndex` → `@/lib/ui/zIndex` güncellendi.
+- **Council Faz E tamamlandı** (K-5, Y-12, O-4, O-7).
+
+---
+
 ## 2026-05-28 — Council Faz E: Y-12 (custom içerik DB) + O-4 (user_progress)
 
 ### feat: persist custom content & user progress in DB (migration 022)

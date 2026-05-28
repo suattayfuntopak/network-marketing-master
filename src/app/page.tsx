@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
-import { getLimitsForLicense } from '@/lib/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 const PRO_LIMITS = getLimitsForLicense('pro')
 

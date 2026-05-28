@@ -11,7 +11,7 @@ import {
   Plus, Loader2, X, ArrowUpRight, CheckCircle2
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import {
   getPlatformWorkspacesAction,

@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
-import { Z } from '@/lib/zIndex'
+import { Z } from '@/lib/ui/zIndex'
 
 interface ProfileModalProps {
   onClose: () => void

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
-import { sendPaymentSuccessEmail } from '@/lib/mail'
+import { sendPaymentSuccessEmail } from '@/lib/infra/mail'
 
 export async function POST(request: NextRequest) {
   try {

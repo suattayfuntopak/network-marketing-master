@@ -7,8 +7,8 @@ import { Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { NAV_ITEMS } from '@/lib/navigation'
-import { Z } from '@/lib/zIndex'
+import { NAV_ITEMS } from '@/lib/domain/navigation'
+import { Z } from '@/lib/ui/zIndex'
 
 interface BottomNavProps {
   pendingHref?: string | null

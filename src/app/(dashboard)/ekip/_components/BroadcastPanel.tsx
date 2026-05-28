@@ -5,7 +5,7 @@ import { Send, FileText, MessageSquare, Users, CheckSquare, Square } from 'lucid
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from './EkipPanel'
-import { waHref } from '@/lib/waLink'
+import { waHref } from '@/lib/utils/waLink'
 
 interface BroadcastPanelProps {
   members: MemberRow[]
