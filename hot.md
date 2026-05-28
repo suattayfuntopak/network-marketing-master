@@ -1585,3 +1585,14 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - İstatistikler performans tablosundaki (Member listesi) her üyenin ismi yanına, eğer üyenin sistemde (`nmm_workspace_members` veya aday notu bulutundan okunabilen) yüklenmiş profil fotoğrafı (`avatar_url`) mevcutsa gri baş harf dairesi yerine bu fotoğrafı şık bir yuvarlak ile yansıtan arayüz eklendi.
 - TypeScript `GenericStringError` build hatası ( `members` dizisine atılan `any` türünden nesnenin özelliklerine erişilememesi ) `as any[]` type assertion kullanılarak kökten çözüldü ve Vercel derlemesi başarıyla çalıştırıldı.
 
+
+### feat: Ekibim Sayfası Üye Kartı Tıklama (Link) Entegrasyonu
+- `EkipPanel.tsx`'te yer alan ekip üyeleri listesindeki her üye satırı/kartı pürüzsüzce Next.js `<Link>` bileşeniyle sarıldı.
+- Sadece boşluğa veya isme/avatara tıklamak, kullanıcının doğrudan o üyenin (eğer o üye uygulamanın abonesiyse `user_id`si ile, dış saha ortağıysa `aday id`si ile) aday profil sayfasına (`/pipeline/[id]`) gitmesini sağlıyor.
+- Bu işlem masaüstünde rahat, mobilde ise geniş ve esnek bir dokunma alanı (touch target) sunarak liderlerin alt ekiplerinin aday performanslarına anında dalış yapmalarına olanak tanıdı.
+
+### feat: Platform Yönetimi ve İstatistikler İçin Yeni Nesil Avatarlar
+- **İstatistikler Sayfası (`istatistikler/page.tsx`):** Az önceki hatadan arındırılarak resimlerin başarılı bir şekilde tabloda yer alması tekrar aktif hale getirildi ve doğrulandı.
+- **Platform Yönetimi Sayfası (`platform-yonetim/page.tsx`):** Süper adminin izlediği `workspaces` tablosuna yeni bir veritabanı alanı (`avatarUrl`) sorgusu eklendi (`actions.ts`). Eğer kayıt olan grubun sahibinin/liderinin bir profil fotoğrafı varsa tabloda ve mobil kart görünümünde bu resim kullanıldı.
+- Resmi (avatarı) olmayan kullanıcıların profil baş harfleri tek renk (mor) yerine isminin koduna göre (hash) dinamik belirlenen çok renkli, enerjik arka planlar (Yeşil, Kırmızı, Mavi, Pembe, Turuncu vb.) ve degradeler (gradients) ile sunularak tablonun göz alıcılığı zirveye çıkarıldı.
+
