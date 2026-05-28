@@ -179,7 +179,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       try {
         await supabase.from('nmm_daily_actions').insert({
           workspace_id: membership.workspace_id,

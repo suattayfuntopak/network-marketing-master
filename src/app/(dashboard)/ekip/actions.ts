@@ -126,7 +126,7 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
 
     const generatedText = result.response.text()?.trim() || ''
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       await supabase.from('nmm_daily_actions').insert({
         workspace_id: membership.workspace_id,
         user_id: user.id,

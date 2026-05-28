@@ -83,7 +83,7 @@ export async function generateMessageAction(
   try {
     const message = await generateMessage({ name, stage, context, tone, messageType, warmth })
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       await supabase.from('nmm_daily_actions').insert({
         workspace_id: membership.workspace_id,
         user_id: user.id,
@@ -250,7 +250,7 @@ JSON yapısı şu şekilde olmalıdır:
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       try {
         await supabase.from('nmm_daily_actions').insert({
           workspace_id: membership.workspace_id,
@@ -381,7 +381,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
 
     const answer = result.response.text().trim()
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       await supabase.from('nmm_daily_actions').insert({
         workspace_id: membership.workspace_id,
         user_id: user.id,

@@ -139,5 +139,6 @@ export function useTeamMembers(workspaceId: string | undefined) {
     queryKey: ['members', workspaceId],
     queryFn: () => fetchTeamMembers(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 2 * 60 * 1000,
   })
 }

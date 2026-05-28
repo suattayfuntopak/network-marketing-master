@@ -84,7 +84,7 @@ export async function generateCoachMessage(
   try {
     const message = await generateMessage({ name, stage, note, messageType })
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       await supabase.from('nmm_daily_actions').insert({
         workspace_id: membership.workspace_id,
         user_id: user.id,
@@ -190,7 +190,7 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
 
     if (!message) throw new Error('Boş yanıt döndü.')
 
-    if (membership && !isSuperAdmin) {
+    if (membership) {
       try {
         await supabase.from('nmm_daily_actions').insert({
           workspace_id: membership.workspace_id,

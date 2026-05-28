@@ -306,6 +306,7 @@ export function EkipPanel() {
         if (error) throw error
         toast.success(lang === 'en' ? 'Step marked as completed!' : 'Adım başarıyla tamamlandı olarak işaretlendi!')
       }
+      queryClient.invalidateQueries({ queryKey: ['ekip-panel', ws?.workspaceId] })
       queryClient.invalidateQueries({ queryKey: ['members', ws?.workspaceId] })
     } catch (err: any) {
       console.error('[toggleOnboardingStep] error:', err)
@@ -314,9 +315,10 @@ export function EkipPanel() {
   }, [supabase, queryClient, ws?.workspaceId, lang])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
-    queryKey: ['members', ws?.workspaceId],
+    queryKey: ['ekip-panel', ws?.workspaceId],
     queryFn: () => fetchMembers(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
+    staleTime: 2 * 60 * 1000,
   })
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
@@ -381,6 +383,7 @@ export function EkipPanel() {
       toast.success(t('team.joinSuccess', { name: (data as any)?.workspace_name ?? '' }))
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
       queryClient.invalidateQueries({ queryKey: ['members'] })
       queryClient.invalidateQueries({ queryKey: ['candidates'] })
     } catch (err: any) {
@@ -401,6 +404,7 @@ export function EkipPanel() {
       const { error: rpcError } = await supabase.rpc('nmm_remove_member', { p_member_id: memberId, p_member_name: memberName })
       if (rpcError) throw rpcError
       toast.success(t('team.removeSuccess', { name: memberName }))
+      queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
       queryClient.invalidateQueries({ queryKey: ['members'] })
     } catch (err: any) {
       console.error(err)
