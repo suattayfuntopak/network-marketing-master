@@ -7,6 +7,8 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { useProgressSync } from '@/hooks/useProgressSync'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/customContent'
 import { Z } from '@/lib/zIndex'
 
 const SEVIYE_RENK: Record<string, string> = {
@@ -23,6 +25,7 @@ const PAGE_SIZE = 10
 function EgitimPageContent() {
   const { lang, t } = useTranslation()
   const searchParams = useSearchParams()
+  const { data: ws } = useWorkspace()
   
   const [search, setSearch] = useState('')
   const [aktifKategori, setAktifKategori] = useState(0)
@@ -50,13 +53,12 @@ function EgitimPageContent() {
   const [newTags, setNewTags] = useState('')
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('nmm_custom_training_v1')
-      if (stored) {
-        setCustomTrainings(JSON.parse(stored))
-      }
-    } catch {}
-  }, [])
+    let cancelled = false
+    loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', ws?.workspaceId ?? null)
+      .then(items => { if (!cancelled) setCustomTrainings(items) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [ws?.workspaceId])
 
   const KATEGORILER_DATA = getTrainingData(lang)
 
@@ -143,7 +145,7 @@ function EgitimPageContent() {
 
     const updated = [newObj, ...customTrainings]
     setCustomTrainings(updated)
-    localStorage.setItem('nmm_custom_training_v1', JSON.stringify(updated))
+    addCustomContent('nmm_custom_trainings', ws?.workspaceId ?? null, newObj).catch(() => {})
 
     // Reset
     setNewBaslik('')
@@ -437,7 +439,7 @@ function EgitimPageContent() {
                             if (confirm(lang === 'en' ? 'Are you sure you want to delete this training content?' : 'Bu eğitim içeriğini silmek istediğinize emin misiniz?')) {
                               const updated = customTrainings.filter(t => t.id !== konu.id)
                               setCustomTrainings(updated)
-                              localStorage.setItem('nmm_custom_training_v1', JSON.stringify(updated))
+                              deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
                               toast.success(lang === 'en' ? 'Content deleted.' : 'İçerik silindi.')
                             }
                           }}

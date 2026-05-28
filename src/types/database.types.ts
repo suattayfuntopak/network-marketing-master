@@ -251,6 +251,90 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_custom_trainings: {
+        Row: {
+          id: string
+          user_id: string
+          workspace_id: string | null
+          item_key: string
+          data: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          workspace_id?: string | null
+          item_key: string
+          data: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          workspace_id?: string | null
+          item_key?: string
+          data?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      nmm_custom_objections: {
+        Row: {
+          id: string
+          user_id: string
+          workspace_id: string | null
+          item_key: string
+          data: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          workspace_id?: string | null
+          item_key: string
+          data: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          workspace_id?: string | null
+          item_key?: string
+          data?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      nmm_user_progress: {
+        Row: {
+          user_id: string
+          workspace_id: string | null
+          read_trainings: Json
+          fav_trainings: Json
+          read_objections: Json
+          fav_objections: Json
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          workspace_id?: string | null
+          read_trainings?: Json
+          fav_trainings?: Json
+          read_objections?: Json
+          fav_objections?: Json
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          workspace_id?: string | null
+          read_trainings?: Json
+          fav_trainings?: Json
+          read_objections?: Json
+          fav_objections?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: { [_ in never]: never }
     Functions: {

@@ -39,7 +39,6 @@ export function useProgressSync() {
   const [favObjections, setFavObjections] = useState<Set<number>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const isLoadedRef = useRef(false)
-  const syncRowIdRef = useRef<string | null>(null)
 
   // Load from local storage immediately for fast UI
   useEffect(() => {
@@ -63,16 +62,11 @@ export function useProgressSync() {
       }
 
       try {
-        // Fetch the progress row
-        const { data, error } = await supabase
-          .from('nmm_daily_actions')
-          .select('id, note')
+        // Fetch the dedicated progress row (O-4: no longer abuses nmm_daily_actions)
+        const { data } = await supabase
+          .from('nmm_user_progress')
+          .select('read_trainings, fav_trainings, read_objections, fav_objections')
           .eq('user_id', user.id)
-          .is('candidate_id', null)
-          .eq('action_type', 'note')
-          .like('note', 'nmm_progress_v1:%')
-          .order('created_at', { ascending: false })
-          .limit(1)
           .maybeSingle()
 
         let remoteProgress: ProgressData = {
@@ -82,13 +76,31 @@ export function useProgressSync() {
           favObjections: [],
         }
 
-        if (data && data.note) {
-          syncRowIdRef.current = data.id
-          try {
-            const jsonStr = data.note.replace('nmm_progress_v1:', '')
-            remoteProgress = JSON.parse(jsonStr)
-          } catch (e) {
-            console.error('Failed to parse remote progress JSON', e)
+        if (data) {
+          remoteProgress = {
+            readTrainings: (data.read_trainings as string[]) ?? [],
+            favTrainings: (data.fav_trainings as string[]) ?? [],
+            readObjections: (data.read_objections as number[]) ?? [],
+            favObjections: (data.fav_objections as number[]) ?? [],
+          }
+        } else {
+          // One-time migration from the legacy nmm_daily_actions progress row.
+          const { data: legacy } = await supabase
+            .from('nmm_daily_actions')
+            .select('note')
+            .eq('user_id', user.id)
+            .is('candidate_id', null)
+            .eq('action_type', 'note')
+            .like('note', 'nmm_progress_v1:%')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          if (legacy?.note) {
+            try {
+              remoteProgress = JSON.parse(legacy.note.replace('nmm_progress_v1:', ''))
+            } catch (e) {
+              console.error('Failed to parse legacy progress JSON', e)
+            }
           }
         }
 
@@ -153,35 +165,20 @@ export function useProgressSync() {
     fo: Set<number>
   ) => {
     const supabase = createClient()
-    const progressObj: ProgressData = {
-      readTrainings: Array.from(rt),
-      favTrainings: Array.from(ft),
-      readObjections: Array.from(ro),
-      favObjections: Array.from(fo),
-    }
-    const noteContent = 'nmm_progress_v1:' + JSON.stringify(progressObj)
-
-    if (syncRowIdRef.current) {
-      await supabase
-        .from('nmm_daily_actions')
-        .update({ note: noteContent })
-        .eq('id', syncRowIdRef.current)
-    } else {
-      const { data, error } = await supabase
-        .from('nmm_daily_actions')
-        .insert({
-          workspace_id: workspaceId,
+    await supabase
+      .from('nmm_user_progress')
+      .upsert(
+        {
           user_id: userId,
-          candidate_id: null,
-          action_type: 'note',
-          note: noteContent,
-        })
-        .select('id')
-        .single()
-      if (data) {
-        syncRowIdRef.current = data.id
-      }
-    }
+          workspace_id: workspaceId,
+          read_trainings: Array.from(rt),
+          fav_trainings: Array.from(ft),
+          read_objections: Array.from(ro),
+          fav_objections: Array.from(fo),
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
   }
 
   const handleUpdate = (

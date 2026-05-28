@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-05-28 — Council Faz E: Y-12 (custom içerik DB) + O-4 (user_progress)
+
+### feat: persist custom content & user progress in DB (migration 022)
+
+**Y-12 — custom training/objection kalıcılığı**
+- `nmm_custom_trainings` + `nmm_custom_objections` tabloları (jsonb `data`, RLS: kendi satırın).
+- `src/lib/customContent.ts`: load/add/delete + **localStorage'dan tek seferlik migrasyon** (veri kaybı yok, sonra local key temizlenir).
+- `egitim/page.tsx` ve `itirazlar/page.tsx` artık DB kullanıyor (tarayıcı değişse de içerik kalıcı).
+
+**O-4 — nmm_user_progress**
+- `nmm_user_progress` tablosu (read/fav trainings & objections, tek satır/kullanıcı, upsert).
+- `useProgressSync` artık `nmm_daily_actions`'ı istismar etmiyor; eski progress satırından tek seferlik migrasyon yapıyor.
+
+**Deploy:** Migration `022` production'a uygulanmalı.
+
+---
+
 ## 2026-05-28 — Council Faz E (başladı): EkipPanel god component parçalama (K-5)
 
 ### refactor(ekip): extract data layer + shared types out of EkipPanel

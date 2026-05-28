@@ -5,6 +5,8 @@ import { MessageCircleQuestion, Search, X, ChevronDown, Copy, Check, Star, Check
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/customContent'
 import { useSearchParams } from 'next/navigation'
 import { Z } from '@/lib/zIndex'
 
@@ -388,6 +390,7 @@ function getKategoriler(lang: 'tr' | 'en') {
 
 function ItirazlarPageContent() {
   const { lang } = useTranslation()
+  const { data: ws } = useWorkspace()
   const searchParams = useSearchParams()
   const {
     readObjections: read,
@@ -415,13 +418,12 @@ function ItirazlarPageContent() {
   const [newTags, setNewTags] = useState('')
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('nmm_custom_objections_v1')
-      if (stored) {
-        setCustomItirazlar(JSON.parse(stored))
-      }
-    } catch {}
-  }, [])
+    let cancelled = false
+    loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', ws?.workspaceId ?? null)
+      .then(items => { if (!cancelled) setCustomItirazlar(items) })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [ws?.workspaceId])
 
   const tumItirazlar = useMemo(() => {
     return [...ITIRAZLAR, ...customItirazlar]
@@ -479,7 +481,7 @@ function ItirazlarPageContent() {
 
     const updated = [newObj, ...customItirazlar]
     setCustomItirazlar(updated)
-    localStorage.setItem('nmm_custom_objections_v1', JSON.stringify(updated))
+    addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, newObj).catch(() => {})
     
     // Reset form
     setNewSoru('')
@@ -721,7 +723,7 @@ function ItirazlarPageContent() {
                             if (confirm(lang === 'en' ? 'Are you sure you want to delete this objection?' : 'Bu itirazı silmek istediğinize emin misiniz?')) {
                               const updated = customItirazlar.filter(c => c.id !== itiraz.id)
                               setCustomItirazlar(updated)
-                              localStorage.setItem('nmm_custom_objections_v1', JSON.stringify(updated))
+                              deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
                               toast.success(lang === 'en' ? 'Objection deleted.' : 'İtiraz silindi.')
                             }
                           }}
