@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQuery } from '@tanstack/react-query'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import {
   TrendingUp, Users, Target, Activity, Flame,
@@ -15,6 +16,7 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { getIndependentSignupAIUsageAction } from '../actions'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -28,8 +30,36 @@ export function IstatistiklerContent() {
   const { data: usage } = useAIUsage()
   const { data: members = [], isLoading: membersLoading } = useTeamMembers(ws?.workspaceId)
   const { messageLimit, roleplayLimit, complianceLimit } = getLimitsForLicense(ws?.licenseType)
+  const { data: independentUsage = [], isLoading: independentLoading } = useQuery({
+    queryKey: ['independent-ai-usage'],
+    queryFn: getIndependentSignupAIUsageAction,
+    enabled: !!usage?.isSuperAdmin,
+    staleTime: 60_000,
+  })
 
   const [period, setPeriod] = useState<PeriodOption>('30d')
+
+  const formatUsageLimit = useCallback(
+    (used: number, limit: number) =>
+      Number.isFinite(limit) ? `${used} / ${limit}` : t('statsPage.unlimited'),
+    [t]
+  )
+
+  const licenseLabel = useCallback(
+    (licenseType: string) => {
+      switch (licenseType) {
+        case 'pro':
+          return t('statsPage.licensePlanPro')
+        case 'master':
+          return t('statsPage.licensePlanMaster')
+        case 'leader':
+          return t('statsPage.licensePlanLeader')
+        default:
+          return t('statsPage.licensePlanFree')
+      }
+    },
+    [t]
+  )
 
   // Sort team members: Leader (Me) first, followed by downline members
   const sortedMembers = useMemo(() => {
@@ -620,8 +650,9 @@ export function IstatistiklerContent() {
             </div>
           </section>
 
-          {/* Ekip Yapay Zeka Limit & Kullanım Kontrol Masası (SADECE SÜPER ADMİN GÖREBİLİR) — moved above personal quota */}
+          {/* Ekip + Dış Kayıt YZ masaları (SADECE SÜPER ADMİN) */}
           {usage?.isSuperAdmin && (
+            <>
             <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
               <div>
                 <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
@@ -710,6 +741,81 @@ export function IstatistiklerContent() {
                 </table>
               </div>
             </section>
+
+            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
+              <div>
+                <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-brand animate-pulse" />
+                  {t('statsPage.aiIndependentTitle')}
+                </h2>
+                <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                  {t('statsPage.aiIndependentSubtitle')}
+                </p>
+              </div>
+
+              {independentLoading ? (
+                <p className="text-xs text-[var(--text-3)] py-4 text-center">…</p>
+              ) : independentUsage.length === 0 ? (
+                <p className="text-xs text-[var(--text-3)] py-4 text-center">{t('statsPage.aiIndependentEmpty')}</p>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]" onTouchStart={(e) => e.stopPropagation()}>
+                  <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+                    <thead>
+                      <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
+                        <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
+                        <th className="p-3 font-semibold">{t('statsPage.colLicense')}</th>
+                        <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
+                          {t('statsPage.aiColMessage')}
+                        </th>
+                        <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
+                          {t('statsPage.aiColCoach')}
+                        </th>
+                        <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
+                          {t('statsPage.aiColCompliance')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
+                      {independentUsage.map(row => (
+                        <tr
+                          key={row.userId}
+                          className="hover:bg-[var(--bg-subtle)]/75 transition-colors"
+                        >
+                          <td className="p-3 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              {row.avatarUrl ? (
+                                <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
+                                  <img src={row.avatarUrl} alt={row.fullName ?? ''} className="h-full w-full object-cover" />
+                                </div>
+                              ) : (
+                                <span className="h-2 w-2 rounded-full bg-zinc-300" />
+                              )}
+                              <div className="min-w-0">
+                                <div className="font-semibold truncate">{row.fullName ?? t('statsPage.unnamedMember')}</div>
+                                <div className="text-[10px] text-[var(--text-3)] truncate">{row.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                            {licenseLabel(row.licenseType)}
+                          </td>
+                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
+                            {formatUsageLimit(row.todayMessage, row.messageLimit)}
+                          </td>
+                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
+                            {formatUsageLimit(row.todayRoleplay, row.roleplayLimit)}
+                          </td>
+                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
+                            {formatUsageLimit(row.todayCompliance, row.complianceLimit)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+            </>
           )}
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}

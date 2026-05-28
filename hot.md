@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-05-29 — İstatistikler: Dış Kayıt YZ masası
+
+### Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası
+- Süper admin İstatistikler sayfasında, ekip YZ masasının altında yeni tablo
+- `parent_id` olmayan bağımsız kayıtlar (Platform Yönetim ile aynı havuz); bugünkü `nmm_daily_actions` kullanımı
+- Plan bazlı limitler (`getLimitsForLicense`); lisans sütunu + e-posta
+- `istatistikler/actions.ts` — `getIndependentSignupAIUsageAction`
+- Çeviri: `stats.ts` (`aiIndependentTitle` vb.)
+
+**Council #6:** landing `page.tsx` extract (sıradaki)
+
+---
+
 ## 2026-05-29 — Shopier 501 fix + Council #6 EkipPanel
 
 ### Shopier ödeme (Hata 501)

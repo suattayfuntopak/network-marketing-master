@@ -68,6 +68,15 @@ export const statsSection = {
       aiColCompliance: 'Uyum Denetimi (Kullanılan / Limit)',
       unlimited: 'Sınırsız',
 
+      aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
+      aiIndependentSubtitle: 'Platforma bağımsız kayıt olan liderlerin (üst lider olmadan) bugünkü yapay zeka kullanımı ve plan limitleri.',
+      aiIndependentEmpty: 'Henüz bağımsız dış kayıt bulunmuyor.',
+      colLicense: 'Lisans',
+      licensePlanFree: 'Ücretsiz',
+      licensePlanLeader: 'Basic',
+      licensePlanMaster: 'Plus',
+      licensePlanPro: 'Pro',
+
       quotaTitle: 'Yapay Zeka Günlük Kullanım Kotası',
       quotaSubtitle: 'Özellik bazlı dinamik günlük yapay zeka haklarınız',
       quotaSuperTitle: 'SINIRSIZ SÜPER ADMİN HESABI',
@@ -149,6 +158,15 @@ export const statsSection = {
       aiColCoach: 'AI Coach (Used / Limit)',
       aiColCompliance: 'Compliance (Used / Limit)',
       unlimited: 'Unlimited',
+
+      aiIndependentTitle: 'Independent Signup AI Usage & Quotas Control Spread',
+      aiIndependentSubtitle: 'Daily AI usage and plan limits for leaders who signed up independently (no upline).',
+      aiIndependentEmpty: 'No independent signups yet.',
+      colLicense: 'License',
+      licensePlanFree: 'Free',
+      licensePlanLeader: 'Basic',
+      licensePlanMaster: 'Plus',
+      licensePlanPro: 'Pro',
 
       quotaTitle: 'AI Daily Usage Quotas',
       quotaSubtitle: 'Your feature-specific dynamic daily message rights',
