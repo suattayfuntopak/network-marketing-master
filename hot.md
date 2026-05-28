@@ -1,5 +1,26 @@
 # Hot Log
 
+## 2026-05-28 — Council Faz F: Hijyen (tamamlandı)
+
+### chore: route cleanup, naming, docs + first test suite
+
+- **O-14 (`bugun` rota kararı):** `/bugun` sadece `/pano`'ya redirect eden kabuktu. Login/signup/şifre-güncelle yönlendirmeleri doğrudan `/pano`'ya çevrildi, `bugun/page.tsx` silindi. Gerçek odak sayfası `/bugun/ilgilen` korundu.
+- **O-8:** `(dashboard)/actions.ts` → `_shared-actions.ts` (sadece `logoutAction`); tek importer `UserMenu.tsx` güncellendi.
+- **O-15:** AGENTS.md'ye "API rotaları vs Server Actions", `lib/` taksonomisi ve migration kuralları eklendi.
+- **O-16:** README boilerplate yerine gerçek NMM tanıtımı (stack, domain, super-admin dualizmi, env, yapı, konvansiyonlar).
+- **Test minimum seti:** Vitest kuruldu (`npm test`). 3 dosya / 22 test:
+  - `getLimitsForLicense` (tüm planlar + super admin + fallback)
+  - Shopier HMAC + order_id — pure logic `lib/domain/shopierWebhook.ts`'e çıkarıldı (constant-time compare), route refactor edildi
+  - `checkAIQuota` (no_auth / super admin / free compliance gate / expired license / limit_reached / ok+remaining) — Supabase mock'lu
+- tsc temiz, yeni dosyalarda lint temiz. **Council Faz F tamamlandı.**
+
+### Değişen / yeni dosyalar
+- yeni: `src/lib/domain/shopierWebhook.ts`, `vitest.config.ts`, 3 `*.test.ts`
+- sil: `src/app/(dashboard)/bugun/page.tsx`; rename: `actions.ts` → `_shared-actions.ts`
+- düzenlenen: shopier `route.ts`, `giris/actions.ts`, `SignupForm.tsx`, `PasswordResetGate.tsx`, `UserMenu.tsx`, `AGENTS.md`, `README.md`, `package.json`
+
+---
+
 ## 2026-05-28 — Council Faz E: O-7 lib/ reorganizasyonu
 
 ### refactor(lib): group flat lib utilities into ui/utils/domain/infra

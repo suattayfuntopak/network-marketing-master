@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import crypto from 'crypto'
 import { createClient } from '@supabase/supabase-js'
 import { sendPaymentSuccessEmail } from '@/lib/infra/mail'
+import { verifyShopierSignature, parseShopierOrderId } from '@/lib/domain/shopierWebhook'
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,15 +28,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
     }
 
-    // Verify signature to prevent fake webhook attacks
-    const signatureData = platform_order_id + random_number + total_amount + status
-    const expectedSignature = crypto
-      .createHmac('sha256', apiSecret)
-      .update(signatureData)
-      .digest('base64')
-
-    if (signature !== expectedSignature) {
-      console.warn('[Shopier Webhook] Invalid signature received:', { received: signature, expected: expectedSignature })
+    // Verify signature to prevent fake webhook attacks (constant-time compare).
+    const validSignature = verifyShopierSignature(
+      { platform_order_id, random_number, total_amount, status, signature },
+      apiSecret
+    )
+    if (!validSignature) {
+      console.warn('[Shopier Webhook] Invalid signature received for order:', platform_order_id)
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
     }
 
@@ -45,34 +43,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Payment status is not success' }, { status: 200 })
     }
 
-    // platform_order_id format (set during initiation): `<workspaceId>_<plan>_<period>_<timestamp>`.
     // License type and duration are read from the signed order_id, not from
     // total_amount — currency drift or price changes can't grant the wrong tier.
-    const parts = platform_order_id.split('_')
-    if (parts.length < 4) {
-      console.error('[Shopier Webhook] Invalid order_id format (expected <ws>_<plan>_<period>_<ts>):', platform_order_id)
+    const parsed = parseShopierOrderId(platform_order_id)
+    if (!parsed) {
+      console.error('[Shopier Webhook] Invalid order_id (expected <ws>_<plan>_<period>_<ts>):', platform_order_id)
       return NextResponse.json({ error: 'Invalid order id format' }, { status: 400 })
     }
-    const workspaceId = parts[0]
-    const plan = parts[1]
-    const period = parts[2]
-
-    const VALID_PLANS = ['leader', 'master', 'pro'] as const
-    const VALID_PERIODS = ['monthly', 'yearly'] as const
-    type Plan = (typeof VALID_PLANS)[number]
-    type Period = (typeof VALID_PERIODS)[number]
-
-    if (!workspaceId || workspaceId.length < 10) {
-      console.error('[Shopier Webhook] Invalid workspace ID in order_id:', platform_order_id)
-      return NextResponse.json({ error: 'Invalid workspace id' }, { status: 400 })
-    }
-    if (!VALID_PLANS.includes(plan as Plan) || !VALID_PERIODS.includes(period as Period)) {
-      console.error('[Shopier Webhook] Invalid plan/period in order_id:', { plan, period, platform_order_id })
-      return NextResponse.json({ error: 'Invalid plan or period' }, { status: 400 })
-    }
-
-    const newLicenseType = plan as Plan
-    const daysToAdd = (period as Period) === 'yearly' ? 365 : 30
+    const { workspaceId, plan: newLicenseType, daysToAdd } = parsed
 
     // supabase admin client using service role key to bypass row level security (RLS)
     const supabase = createClient(

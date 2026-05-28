@@ -21,7 +21,7 @@ export function SignupForm() {
   useEffect(() => {
     if (state.success && state.shouldRedirect) {
       const timer = setTimeout(() => {
-        window.location.href = '/bugun'
+        window.location.href = '/pano'
       }, 1000)
       return () => clearTimeout(timer)
     }

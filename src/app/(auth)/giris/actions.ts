@@ -18,5 +18,5 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
     return { error: 'E-posta veya şifre hatalı.' }
   }
 
-  redirect('/bugun')
+  redirect('/pano')
 }

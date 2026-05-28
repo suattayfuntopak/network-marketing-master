@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { LogOut, User, Settings, Bell, ChevronDown } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { logoutAction } from '../actions'
+import { logoutAction } from '../_shared-actions'
 import { ProfileModal } from '@/components/ui/ProfileModal'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'

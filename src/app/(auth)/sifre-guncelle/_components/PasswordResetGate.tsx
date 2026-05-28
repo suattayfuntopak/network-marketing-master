@@ -64,7 +64,7 @@ export function PasswordResetGate() {
       setSaving(false)
       return
     }
-    router.push('/bugun')
+    router.push('/pano')
   }
 
   if (status === 'loading') {
