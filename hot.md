@@ -1,6 +1,18 @@
 # Hot Log
 
-## 2026-05-29 — Landing testimonial dark hover + Council #6 platform-yonetim
+## 2026-05-29 — ACİL: giriş → Pano yönlendirme düzeltmesi
+
+### Kök neden
+- `src/proxy.ts`: Oturum açık kullanıcıyı public sayfalardan **`/bugun/ilgilen`**'e yönlendiriyordu (yanlış hedef)
+- `LoginForm`: `router.push('/pano')` soft navigation — SSR proxy oturum çerezlerini henüz göremeyince giriş sayfasında takılma
+
+### Düzeltme
+- Proxy post-login hedefi → **`/pano`**
+- Giriş sonrası `window.location.assign('/pano')` (tam sayfa, çerezler senkron)
+- Zaten oturum açıksa giriş sayfasında otomatik `/pano` yönlendirmesi
+
+---
+
 
 ### Landing — Liderlerin Başarı Hikayeleri
 - Dark modda hover: `hover:bg-slate-50` kaldırıldı → `dark:hover:bg-white/[0.06]` (hafif vurgu, okunaklı metin)

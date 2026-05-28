@@ -16,6 +16,16 @@ export function LoginForm() {
     router.prefetch('/pano')
   }, [router])
 
+  // Zaten oturum açıksa (ör. yarım kalmış giriş) doğrudan panoya gönder
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        window.location.replace('/pano')
+      }
+    })
+  }, [])
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     if (pending) return
@@ -36,7 +46,8 @@ export function LoginForm() {
       return
     }
 
-    router.push('/pano')
+    // Tam sayfa yüklemesi: SSR proxy oturum çerezlerini okuyabilsin (router.push yeterli değil)
+    window.location.assign('/pano')
   }
 
   return (
