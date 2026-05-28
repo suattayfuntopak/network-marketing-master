@@ -20,6 +20,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Architecture conventions (NMM)
 
+### Supabase client in components
+- **Do not** import `@/lib/supabase/client` in `.tsx` files (ESLint enforced). Mutations → server actions; reads → TanStack hooks or server actions.
+- Legacy exceptions are listed in `eslint.config.mjs` (`supabaseClientTsxLegacy`) until migrated.
+
 ### API routes vs Server Actions
 - **Server Actions (default):** all in-app mutations/queries triggered by the UI. Co-locate as `actions.ts` in the route folder (e.g. `src/app/(dashboard)/<route>/actions.ts`). Shared dashboard actions live in `src/app/(dashboard)/_shared-actions.ts`.
 - **API routes (`src/app/api/**`) are ONLY for external HTTP callers:** webhooks (Shopier), cron jobs, and public/unauthenticated AI endpoints. If something has no external caller, it must be a server action, not an API route.

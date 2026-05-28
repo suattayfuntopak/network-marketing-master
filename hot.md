@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-28 — Platform admin UX + ESLint + çıkış onayı (Council #4 kısmi)
+
+### Platform Yönetim Masası
+- Sağ üst: **Ödeme Sayfası** (yeşil) / **Landing Page** (mor) — onay diyaloğu sonrası `/odeme` ve `/`
+- Erişim: yalnızca `suattayfuntopak@gmail.com` (nav + client redirect + server `assertSuperAdmin`)
+
+### Council backlog #4 (başlangıç)
+- ESLint: `@/lib/supabase/client` `.tsx` içinde yasak; legacy dosyalar `eslint.config.mjs` istisna listesinde
+- `EkipPanel`: onboarding/join/remove → `ekip/actions.ts` server actions; `userId` workspace context’te
+
+### UX
+- `ConfirmDialog` — Platform sayfa geçişleri + UserMenu çıkış onayı
+
+---
+
 ## 2026-05-28 — Ekibim saha ortağı avatarları + Council backlog #3
 
 ### fix: saha ortağı (katildi aday) profil fotoğrafları Ekibim'de

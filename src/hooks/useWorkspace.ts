@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchWorkspaceAction, ensureWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 
 export interface WorkspaceContext {
+  userId: string
   workspaceId: string
   inviteCode: string
   role: 'leader' | 'member'

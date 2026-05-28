@@ -22,6 +22,7 @@ export const tr = {
     deleteLabel: "SİL",
     confirmDeleteTitle: "Silmek istediğinizden emin misiniz?",
     confirmYes: "Evet, Sil",
+    yes: "Evet",
     noContact: "Hiç temas yok",
     today: "Bugün",
     yesterday: "Dün",

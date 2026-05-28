@@ -39,6 +39,7 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
   const license = resolveWorkspaceLicense(user, ws)
 
   return {
+    userId: user.id,
     workspaceId: membership.workspace_id,
     inviteCode: ws?.invite_code ?? membership.workspace_id.slice(0, 8).toUpperCase(),
     role: membership.role,
@@ -89,6 +90,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const license = resolveWorkspaceLicense(user, { license_type: 'free', license_expires_at: null })
 
   return {
+    userId: user.id,
     workspaceId: ws.id,
     inviteCode: ws.invite_code ?? inviteCode,
     role: 'leader',

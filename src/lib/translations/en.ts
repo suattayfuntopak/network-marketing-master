@@ -22,6 +22,7 @@ export const en = {
     deleteLabel: "DEL",
     confirmDeleteTitle: "Are you sure you want to delete?",
     confirmYes: "Yes, Delete",
+    yes: "Yes",
     noContact: "No contact yet",
     today: "Today",
     yesterday: "Yesterday",

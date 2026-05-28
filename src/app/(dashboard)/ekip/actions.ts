@@ -64,6 +64,64 @@ export async function resolveTeamAvatarsAction(
   return result
 }
 
+export async function toggleOnboardingStepAction(
+  userId: string,
+  stepId: string,
+  markDone: boolean
+): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  if (markDone) {
+    const { error } = await supabase.from('nmm_onboarding_progress').insert({
+      user_id: userId,
+      step_id: stepId,
+    })
+    if (error) throw new Error(error.message)
+  } else {
+    const { error } = await supabase
+      .from('nmm_onboarding_progress')
+      .delete()
+      .eq('user_id', userId)
+      .eq('step_id', stepId)
+    if (error) throw new Error(error.message)
+  }
+}
+
+export async function joinWorkspaceByInviteAction(
+  inviteCode: string
+): Promise<{ workspace_name?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const { data, error } = await supabase.rpc('nmm_join_workspace', {
+    p_invite_code: inviteCode.trim().toUpperCase(),
+  })
+  if (error) throw new Error(error.message)
+
+  if (data && typeof data === 'object' && 'workspace_name' in data) {
+    return { workspace_name: String((data as { workspace_name?: string }).workspace_name ?? '') }
+  }
+  return {}
+}
+
+export async function removeTeamMemberAction(
+  memberId: string,
+  memberName: string
+): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const { error } = await supabase.rpc('nmm_remove_member', {
+    p_member_id: memberId,
+    p_member_name: memberName,
+  })
+  if (error) throw new Error(error.message)
+}
+
 export async function syncMemberAvatarAction(avatarUrl: string): Promise<void> {
   const supabase = await createClient()
   const { error } = await supabase.rpc('nmm_sync_member_avatar', { p_avatar_url: avatarUrl })

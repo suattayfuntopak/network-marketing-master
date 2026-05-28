@@ -7,6 +7,7 @@ import { logoutAction } from '../_shared-actions'
 import { ProfileModal } from '@/components/ui/ProfileModal'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function UserMenu() {
@@ -15,8 +16,10 @@ export function UserMenu() {
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false)
 
   const ref = useRef<HTMLDivElement>(null)
+  const logoutFormRef = useRef<HTMLFormElement>(null)
   const { data: ws } = useWorkspace()
 
   useEffect(() => {
@@ -103,15 +106,18 @@ export function UserMenu() {
 
           <div className="my-1 border-t border-[var(--border)]" />
 
-          <form action={logoutAction}>
-            <button
-              type="submit"
-              className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] dark:text-[#e87fa3] transition hover:bg-[#FBEAF0] dark:hover:bg-[#3d0f1f] cursor-pointer"
-            >
-              <LogOut className="h-4 w-4" strokeWidth={1.75} />
-              {t('shellUi.logout')}
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={() => {
+              setLogoutConfirmOpen(true)
+              setOpen(false)
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] dark:text-[#e87fa3] transition hover:bg-[#FBEAF0] dark:hover:bg-[#3d0f1f] cursor-pointer"
+          >
+            <LogOut className="h-4 w-4" strokeWidth={1.75} />
+            {t('shellUi.logout')}
+          </button>
+          <form ref={logoutFormRef} action={logoutAction} className="hidden" />
         </div>
       )}
 
@@ -124,6 +130,14 @@ export function UserMenu() {
       )}
       {settingsOpen && (
         <SettingsModal workspaceId={ws?.workspaceId || ''} onClose={() => setSettingsOpen(false)} />
+      )}
+
+      {logoutConfirmOpen && (
+        <ConfirmDialog
+          message={t('shellUi.confirmLogout')}
+          onConfirm={() => logoutFormRef.current?.requestSubmit()}
+          onCancel={() => setLogoutConfirmOpen(false)}
+        />
       )}
     </div>
   )

@@ -21,6 +21,7 @@ import {
   type PlatformWorkspaceItem
 } from './actions'
 import { Trash2 } from 'lucide-react'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const getAvatarColor = (name: string) => {
   const colors = [
@@ -64,6 +65,7 @@ export default function PlatformAdminPage() {
   const [extensionDays, setExtensionDays] = useState(30)
   const [isUnlimited, setIsUnlimited] = useState(false)
   const [isUpdating, startUpdateTransition] = useTransition()
+  const [navConfirm, setNavConfirm] = useState<'payment' | 'landing' | null>(null)
 
   const isSuperAdmin = usage?.isSuperAdmin ?? false
 
@@ -217,7 +219,7 @@ export default function PlatformAdminPage() {
       <div className="w-full space-y-6">
         
         {/* Header */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md">
               <Crown className="h-5 w-5 text-white" strokeWidth={2.25} />
@@ -233,6 +235,22 @@ export default function PlatformAdminPage() {
                 {t('platformPage.consoleSubtitle')}
               </p>
             </div>
+          </div>
+          <div className="flex shrink-0 gap-2 self-end sm:self-auto">
+            <button
+              type="button"
+              onClick={() => setNavConfirm('payment')}
+              className="rounded-lg border border-emerald-300/80 bg-emerald-50 px-3 py-2 text-[11px] font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60"
+            >
+              {t('platformPage.openPaymentPage')}
+            </button>
+            <button
+              type="button"
+              onClick={() => setNavConfirm('landing')}
+              className="rounded-lg border border-violet-300/80 bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60"
+            >
+              {t('platformPage.openLandingPage')}
+            </button>
           </div>
         </header>
 
@@ -688,6 +706,27 @@ export default function PlatformAdminPage() {
         )}
 
       </div>
+
+      {navConfirm === 'payment' && (
+        <ConfirmDialog
+          message={t('platformPage.confirmGoPayment')}
+          onConfirm={() => {
+            setNavConfirm(null)
+            router.push('/odeme')
+          }}
+          onCancel={() => setNavConfirm(null)}
+        />
+      )}
+      {navConfirm === 'landing' && (
+        <ConfirmDialog
+          message={t('platformPage.confirmGoLanding')}
+          onConfirm={() => {
+            setNavConfirm(null)
+            router.push('/')
+          }}
+          onCancel={() => setNavConfirm(null)}
+        />
+      )}
     </main>
   )
 }

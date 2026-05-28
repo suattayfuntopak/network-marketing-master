@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { createClient } from '@/lib/supabase/client'
-import type { User } from '@supabase/supabase-js'
 import {
   Crown, Copy, Check, UserPlus, LogIn, Loader2, Trash2,
   TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot
@@ -21,7 +19,12 @@ import { BroadcastPanel } from './BroadcastPanel'
 import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
-import { generateOnboardingGuidanceAction } from '../actions'
+import {
+  generateOnboardingGuidanceAction,
+  joinWorkspaceByInviteAction,
+  removeTeamMemberAction,
+  toggleOnboardingStepAction,
+} from '../actions'
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Z } from '@/lib/ui/zIndex'
@@ -38,10 +41,8 @@ export type { MemberRow, OnboardingStep }
 export function EkipPanel() {
   const router = useRouter()
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
-  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   const licenseType = ws?.licenseType ?? 'free'
   const licenseExpiresAt = ws?.licenseExpiresAt ?? null
@@ -86,31 +87,16 @@ export function EkipPanel() {
 
   const toggleOnboardingStep = useCallback(async (userId: string, stepId: string, isStepDone: boolean) => {
     try {
-      if (isStepDone) {
-        const { error } = await supabase
-          .from('nmm_onboarding_progress')
-          .delete()
-          .eq('user_id', userId)
-          .eq('step_id', stepId)
-        if (error) throw error
-        toast.success(t('team.stepIncomplete'))
-      } else {
-        const { error } = await supabase
-          .from('nmm_onboarding_progress')
-          .insert({
-            user_id: userId,
-            step_id: stepId
-          })
-        if (error) throw error
-        toast.success(t('team.stepComplete'))
-      }
+      await toggleOnboardingStepAction(userId, stepId, !isStepDone)
+      toast.success(isStepDone ? t('team.stepIncomplete') : t('team.stepComplete'))
       queryClient.invalidateQueries({ queryKey: ['ekip-panel', ws?.workspaceId] })
       queryClient.invalidateQueries({ queryKey: ['members', ws?.workspaceId] })
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err)
       console.error('[toggleOnboardingStep] error:', err)
-      toast.error(t('team.progressUpdateError', { message: err.message }))
+      toast.error(t('team.progressUpdateError', { message }))
     }
-  }, [supabase, queryClient, ws?.workspaceId, t])
+  }, [queryClient, ws?.workspaceId, t])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
     queryKey: ['ekip-panel', ws?.workspaceId],
@@ -126,10 +112,6 @@ export function EkipPanel() {
   const visibleMembers = licenseType === 'master'
     ? [members[0], ...downlineMembers.slice(0, 50)].filter(Boolean)
     : members
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => setCurrentUser(user))
-  }, [supabase])
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
@@ -172,17 +154,8 @@ export function EkipPanel() {
     if (code === ws?.inviteCode) { toast.error(t('team.alreadyInTeam')); return }
     setJoining(true)
     try {
-      const { data, error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
-      if (rpcError) {
-        toast.error(rpcError.message?.includes('invalid_invite_code') ? t('team.invalidCode') : t('team.joinError'))
-        setJoining(false)
-        return
-      }
-      const joinResult =
-        data && typeof data === 'object' && 'workspace_name' in data
-          ? String((data as { workspace_name?: string }).workspace_name ?? '')
-          : ''
-      toast.success(t('team.joinSuccess', { name: joinResult }))
+      const result = await joinWorkspaceByInviteAction(code)
+      toast.success(t('team.joinSuccess', { name: result.workspace_name ?? '' }))
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
@@ -203,8 +176,7 @@ export function EkipPanel() {
     setMemberToRemove(null)
     setRemovingId(memberId)
     try {
-      const { error: rpcError } = await supabase.rpc('nmm_remove_member', { p_member_id: memberId, p_member_name: memberName })
-      if (rpcError) throw rpcError
+      await removeTeamMemberAction(memberId, memberName)
       toast.success(t('team.removeSuccess', { name: memberName }))
       queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
       queryClient.invalidateQueries({ queryKey: ['members'] })
@@ -340,7 +312,7 @@ export function EkipPanel() {
         {/* Üye performans listesi */}
         <ul className="space-y-5">
           {visibleMembers.map(m => {
-            const isCurrentUser = m.user_id === currentUser?.id
+            const isCurrentUser = m.user_id === ws.userId
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
             const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
             const isInactive = daysInactive >= 7 && !isCurrentUser
@@ -492,7 +464,7 @@ export function EkipPanel() {
                 {isCardExpanded && m.isAppUser !== false && (
                   <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
                     
-                    {!hasMasterAccess && m.user_id !== currentUser?.id ? (
+                    {!hasMasterAccess && m.user_id !== ws.userId ? (
                       <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
                           <Crown className="h-5 w-5 animate-bounce" />
