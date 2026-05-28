@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-28 — Council backlog #1: Arama sayfası PersonAvatar
+
+- `search/page.tsx` — aday sonuçlarında fotoğraf + pastel baş harf (pano/pipeline ile uyumlu)
+
+---
+
 ## 2026-05-28 — Ekibim: saha ortağı kart çerçevesi güçlendirildi
 
 - `teamMemberCard.ts` — saha ortağı (`isAppUser === false`) border/ring/arka plan NMM ortağı seviyesinde belirgin (amber ton)

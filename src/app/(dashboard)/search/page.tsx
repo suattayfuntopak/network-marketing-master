@@ -10,6 +10,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { STAGE_LABEL, STAGE_COLOR } from '@/lib/domain/stages'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { ITIRAZLAR } from '../itirazlar/page'
 
 function SearchPageContent() {
@@ -137,17 +138,12 @@ function SearchPageContent() {
                     className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-[#534AB7]/30 hover:shadow-md"
                   >
                     <div className="flex items-center gap-3 min-w-0">
-                      {parsed.avatarUrl ? (
-                        <img
-                          src={parsed.avatarUrl}
-                          alt={c.full_name}
-                          className="h-9 w-9 shrink-0 rounded-full object-cover border border-[#EEEDFE]"
-                        />
-                      ) : (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-                          {c.full_name?.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                      <PersonAvatar
+                        name={c.full_name ?? '?'}
+                        imageUrl={parsed.avatarUrl}
+                        size="sm"
+                        className="h-9 w-9 text-sm"
+                      />
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-1)] group-hover:text-[#534AB7] transition-colors truncate">
                           {c.full_name}
