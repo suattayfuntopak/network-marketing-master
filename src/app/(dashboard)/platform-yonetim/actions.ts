@@ -151,7 +151,8 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
 export async function adminExtendLicenseAction(
   workspaceId: string,
   licenseType: 'free' | 'leader' | 'master' | 'pro',
-  days: number
+  days: number,
+  unlimited: boolean = false
 ): Promise<{ success: boolean; expiresAt: string | null }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -162,35 +163,45 @@ export async function adminExtendLicenseAction(
 
   const admin = createAdminClient()
 
-  // Find existing license expires date
+  // Free plan → always no expiry
+  if (licenseType === 'free') {
+    const { error: updateErr } = await admin
+      .from('nmm_workspaces')
+      .update({ license_type: 'free', license_expires_at: null })
+      .eq('id', workspaceId)
+    if (updateErr) throw new Error('Lisans güncellenemedi.')
+    return { success: true, expiresAt: null }
+  }
+
+  // Paid + unlimited → null expiry (indefinite access)
+  if (unlimited) {
+    const { error: updateErr } = await admin
+      .from('nmm_workspaces')
+      .update({ license_type: licenseType, license_expires_at: null })
+      .eq('id', workspaceId)
+    if (updateErr) throw new Error('Lisans güncellenemedi.')
+    return { success: true, expiresAt: null }
+  }
+
+  // Paid + time-limited → extend from current expiry (or today if already expired)
   const { data: current, error: fetchErr } = await admin
     .from('nmm_workspaces')
-    .select('license_type, license_expires_at')
+    .select('license_expires_at')
     .eq('id', workspaceId)
     .single()
 
-  if (fetchErr || !current) {
-    throw new Error('Çalışma alanı bulunamadı.')
-  }
+  if (fetchErr || !current) throw new Error('Çalışma alanı bulunamadı.')
 
-  let expiresAt: Date
-  if (current.license_expires_at && new Date(current.license_expires_at) > new Date()) {
-    expiresAt = new Date(current.license_expires_at)
-  } else {
-    expiresAt = new Date()
-  }
+  const base = current.license_expires_at && new Date(current.license_expires_at) > new Date()
+    ? new Date(current.license_expires_at)
+    : new Date()
 
-  // Add days
-  expiresAt.setDate(expiresAt.getDate() + days)
-  const expiresIso = expiresAt.toISOString()
+  base.setDate(base.getDate() + days)
+  const expiresIso = base.toISOString()
 
-  // Update in database bypassing RLS
   const { error: updateErr } = await admin
     .from('nmm_workspaces')
-    .update({
-      license_type: licenseType,
-      license_expires_at: licenseType === 'free' ? null : expiresIso
-    })
+    .update({ license_type: licenseType, license_expires_at: expiresIso })
     .eq('id', workspaceId)
 
   if (updateErr) {
@@ -198,10 +209,7 @@ export async function adminExtendLicenseAction(
     throw new Error('Lisans güncellenemedi.')
   }
 
-  return {
-    success: true,
-    expiresAt: licenseType === 'free' ? null : expiresIso
-  }
+  return { success: true, expiresAt: expiresIso }
 }
 
 /**

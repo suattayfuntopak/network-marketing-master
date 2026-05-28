@@ -40,6 +40,7 @@ export default function PlatformAdminPage() {
   // Extension Modal states
   const [licenseType, setLicenseType] = useState<'free' | 'leader' | 'master' | 'pro'>('master')
   const [extensionDays, setExtensionDays] = useState(30)
+  const [isUnlimited, setIsUnlimited] = useState(false)
   const [isUpdating, startUpdateTransition] = useTransition()
 
   const isSuperAdmin = usage?.isSuperAdmin ?? false
@@ -80,7 +81,8 @@ export default function PlatformAdminPage() {
         const res = await adminExtendLicenseAction(
           selectedWorkspace.workspaceId,
           licenseType,
-          Number(extensionDays)
+          Number(extensionDays),
+          isUnlimited
         )
         if (res.success) {
           toast.success(lang === 'en' ? 'License updated successfully!' : 'Lisans başarıyla güncellendi!')
@@ -335,11 +337,14 @@ export default function PlatformAdminPage() {
                 ) : (
                   filtered.map(w => {
                     const regDate = new Date(w.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-                    const expDate = w.licenseExpiresAt
-                      ? new Date(w.licenseExpiresAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-                      : '-'
+                    const isPaidUnlimited = w.licenseType !== 'free' && !w.licenseExpiresAt
+                    const expDate = isPaidUnlimited
+                      ? null
+                      : w.licenseExpiresAt
+                        ? new Date(w.licenseExpiresAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+                        : '-'
 
-                    const isExpired = w.licenseExpiresAt ? new Date(w.licenseExpiresAt) < new Date() : false
+                    const isExpired = !isPaidUnlimited && w.licenseExpiresAt ? new Date(w.licenseExpiresAt) < new Date() : false
 
                     return (
                       <tr key={w.workspaceId} className="hover:bg-[var(--bg-subtle)]/75 transition-colors">
@@ -389,11 +394,19 @@ export default function PlatformAdminPage() {
 
                         {/* 7. Expiry */}
                         <td className={`p-3 text-center tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
-                          {expDate}
-                          {isExpired && (
-                            <span className="ml-1 text-[9px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
-                              {lang === 'en' ? 'Expired' : 'Süresi Doldu'}
+                          {isPaidUnlimited ? (
+                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
+                              ♾ {lang === 'en' ? 'Unlimited' : 'Süresiz'}
                             </span>
+                          ) : (
+                            <>
+                              {expDate}
+                              {isExpired && (
+                                <span className="ml-1 text-[9px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
+                                  {lang === 'en' ? 'Expired' : 'Süresi Doldu'}
+                                </span>
+                              )}
+                            </>
                           )}
                         </td>
 
@@ -419,6 +432,8 @@ export default function PlatformAdminPage() {
                               onClick={() => {
                                 setSelectedWorkspace(w)
                                 setLicenseType(w.licenseType as any)
+                                setIsUnlimited(w.licenseType !== 'free' && w.licenseExpiresAt === null)
+                                setExtensionDays(30)
                               }}
                               title={lang === 'en' ? 'Manage License & Trial' : 'Lisans ve Süre Ayarla'}
                               className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#534AB7]/10 text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white"
@@ -465,9 +480,11 @@ export default function PlatformAdminPage() {
                   <div><strong>{lang === 'en' ? 'User:' : 'Kullanıcı:'}</strong> {selectedWorkspace.ownerName}</div>
                   <div className="mt-1"><strong>{lang === 'en' ? 'Email:' : 'E-posta:'}</strong> {selectedWorkspace.ownerEmail}</div>
                   <div className="mt-1"><strong>{lang === 'en' ? 'Current Expiry:' : 'Mevcut Son Kullanım:'}</strong> {
-                    selectedWorkspace.licenseExpiresAt 
-                      ? new Date(selectedWorkspace.licenseExpiresAt).toLocaleString() 
-                      : '-'
+                    selectedWorkspace.licenseType !== 'free' && !selectedWorkspace.licenseExpiresAt
+                      ? (lang === 'en' ? '♾ Unlimited' : '♾ Süresiz')
+                      : selectedWorkspace.licenseExpiresAt
+                        ? new Date(selectedWorkspace.licenseExpiresAt).toLocaleString()
+                        : '-'
                   }</div>
                 </div>
 
@@ -478,32 +495,59 @@ export default function PlatformAdminPage() {
                   </label>
                   <select
                     value={licenseType}
-                    onChange={e => setLicenseType(e.target.value as any)}
+                    onChange={e => {
+                      const v = e.target.value as typeof licenseType
+                      setLicenseType(v)
+                      if (v === 'free') setIsUnlimited(false)
+                    }}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   >
-                    <option value="free">free</option>
-                    <option value="leader">leader</option>
-                    <option value="master">master</option>
-                    <option value="pro">pro (Süper Lider)</option>
+                    <option value="free">{lang === 'en' ? 'Free (revoke paid)' : 'Free — Lisansı İptal Et'}</option>
+                    <option value="leader">Leader</option>
+                    <option value="master">Master</option>
+                    <option value="pro">Pro (Süper Lider)</option>
                   </select>
                 </div>
 
-                {/* Extend Days */}
+                {/* Süresiz toggle + Gün girişi */}
                 {licenseType !== 'free' && (
-                  <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[var(--text-1)]">
-                      {lang === 'en' ? 'Extend Trial / Access (Days)' : 'Süre Uzatımı (Gün Sayısı)'}
-                    </label>
-                    <input
-                      type="number"
-                      required
-                      min={1}
-                      max={365}
-                      value={extensionDays}
-                      onChange={e => setExtensionDays(Number(e.target.value))}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                    />
-                  </div>
+                  <>
+                    {/* Süresiz toggle */}
+                    <button
+                      type="button"
+                      onClick={() => setIsUnlimited(v => !v)}
+                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                        isUnlimited
+                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                          : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]'
+                      }`}
+                    >
+                      <span>{lang === 'en' ? '♾ Unlimited Access (no expiry)' : '♾ Süresiz Erişim (son kullanım yok)'}</span>
+                      <span className={`h-4 w-8 rounded-full transition-colors ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'} relative`}>
+                        <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${isUnlimited ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      </span>
+                    </button>
+
+                    {/* Gün girişi — sadece süreli seçiliyse */}
+                    {!isUnlimited && (
+                      <div className="space-y-1.5">
+                        <label className="text-xs font-bold text-[var(--text-1)]">
+                          {lang === 'en' ? 'Extend Access (Days)' : 'Erişim Süresi (Gün)'}
+                          <span className="ml-1 font-normal text-[var(--text-3)]">
+                            {lang === 'en' ? '— added on top of current expiry' : '— mevcut bitiş tarihine eklenir'}
+                          </span>
+                        </label>
+                        <input
+                          type="number"
+                          required
+                          min={1}
+                          value={extensionDays}
+                          onChange={e => setExtensionDays(Number(e.target.value))}
+                          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {/* Submit button */}
