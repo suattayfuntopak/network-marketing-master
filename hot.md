@@ -1540,3 +1540,9 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - Geri sayım (5...4...3...2...1) esnasında kullanıcı "Geri Al" butonuna basarsa işlem iptal edilir ve silme gerçekleşmez.
 - Süre dolduğunda ise (`countdown <= 1`) `executeDeleteUser` tetiklenerek kullanıcı `deleteUserAction` ile Supabase'den kalıcı olarak silinir.
 
+
+### fix: Vercel TypeScript Build Hatası Giderildi
+- Vercel sunucusunda build alınırken `EkipPanel.tsx` dosyasında yer alan `downlineOwnerIds` dizisine `string | null` tipi sızdığı için TypeScript kural ihlali oluştu (Argument of type '(string | null)[]' is not assignable to parameter of type 'readonly string[]').
+- Hata, `.filter(Boolean)` işleminin çalışma zamanında `null` değerleri temizlemesine rağmen, TypeScript'in tip seviyesinde bunun `string[]` olduğunu kestirememesinden kaynaklanıyordu.
+- Diziye `as string[]` tip ataması yapılarak TypeScript derleyicisinin (tsc) ve dolayısıyla Vercel build işleminin kusursuz çalışması sağlandı.
+
