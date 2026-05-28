@@ -1,7 +1,81 @@
 'use server'
 
+import { createClient } from '@/lib/supabase/server'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import type { Database } from '@/types/database.types'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+
+function createAdminClient() {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
+
+/**
+ * Resolves profile photo URLs for team members (downlines + workspace members).
+ * Uses auth metadata when workspace_members.avatar_url is null on the sponsor side.
+ */
+export async function resolveTeamAvatarsAction(
+  workspaceId: string,
+  userIds: string[]
+): Promise<Record<string, string>> {
+  if (!userIds.length) return {}
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return {}
+
+  const { data: ownWs } = await supabase
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (!ownWs || ownWs.owner_id !== user.id) return {}
+
+  const allowedIds = new Set<string>([ownWs.owner_id])
+  const { data: wsMembers } = await supabase
+    .from('nmm_workspace_members')
+    .select('user_id')
+    .eq('workspace_id', workspaceId)
+  wsMembers?.forEach(m => allowedIds.add(m.user_id))
+
+  const { data: downlineWs } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+
+  downlineWs?.forEach(w => {
+    if (w.owner_id) allowedIds.add(w.owner_id)
+  })
+
+  const requested = userIds.filter(id => allowedIds.has(id))
+  if (!requested.length) return {}
+
+  const admin = createAdminClient()
+  const result: Record<string, string> = {}
+
+  const { data: memberRows } = await admin
+    .from('nmm_workspace_members')
+    .select('user_id, avatar_url')
+    .in('user_id', requested)
+    .not('avatar_url', 'is', null)
+
+  memberRows?.forEach(row => {
+    if (row.avatar_url) result[row.user_id] = row.avatar_url
+  })
+
+  for (const id of requested) {
+    if (result[id]) continue
+    const { data: authUser } = await admin.auth.admin.getUserById(id)
+    const url = authUser?.user?.user_metadata?.avatar_url as string | undefined
+    if (url) result[id] = url
+  }
+
+  return result
+}
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 

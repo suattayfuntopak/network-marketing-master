@@ -78,13 +78,28 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
       .in('user_id', downlineOwnerIds)
 
     dlMembers?.forEach(m => {
-      if (!uniqueMembersMap[m.user_id]) {
+      const existing = uniqueMembersMap[m.user_id]
+      if (!existing) {
         uniqueMembersMap[m.user_id] = m
+      } else if (!existing.avatar_url && m.avatar_url) {
+        uniqueMembersMap[m.user_id] = { ...existing, avatar_url: m.avatar_url }
       }
     })
   }
 
   const finalAllUserIds = Object.keys(uniqueMembersMap)
+
+  const avatarByUser: Record<string, string> = {}
+  if (finalAllUserIds.length > 0) {
+    const { data: avatarRows } = await supabase
+      .from('nmm_workspace_members')
+      .select('user_id, avatar_url')
+      .in('user_id', finalAllUserIds)
+      .not('avatar_url', 'is', null)
+    avatarRows?.forEach(row => {
+      if (row.avatar_url) avatarByUser[row.user_id] = row.avatar_url
+    })
+  }
   const finalUniqueMembers = Object.values(uniqueMembersMap)
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
 
@@ -145,7 +160,7 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
         today_roleplay: todayRoleplay,
         today_compliance: todayCompliance,
         today_message: todayMessage,
-        avatar_url: m.avatar_url ?? null,
+        avatar_url: m.avatar_url ?? avatarByUser[m.user_id] ?? null,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)

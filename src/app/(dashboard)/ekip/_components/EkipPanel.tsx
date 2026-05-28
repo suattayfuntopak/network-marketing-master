@@ -20,7 +20,7 @@ import { BroadcastPanel } from './BroadcastPanel'
 import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { getLimitsForLicense } from '@/lib/aiUsage'
-import { generateOnboardingGuidanceAction } from '../actions'
+import { generateOnboardingGuidanceAction, resolveTeamAvatarsAction } from '../actions'
 import { waHref } from '@/lib/waLink'
 import { parseNote } from '@/lib/noteParser'
 
@@ -39,6 +39,8 @@ export interface MemberRow {
   phone?: string | null
   isAppUser?: boolean
   avatar_url?: string | null
+  /** Candidate id for /pipeline/[id] — never use auth user_id for app users */
+  pipeline_id?: string | null
 }
 
 export interface OnboardingStep {
@@ -134,13 +136,29 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .in('user_id', downlineOwnerIds)
 
     dlMembers?.forEach(m => {
-      if (!uniqueMembersMap[m.user_id]) {
+      const existing = uniqueMembersMap[m.user_id]
+      if (!existing) {
         uniqueMembersMap[m.user_id] = m
+      } else if (!existing.avatar_url && m.avatar_url) {
+        uniqueMembersMap[m.user_id] = { ...existing, avatar_url: m.avatar_url }
       }
     })
   }
 
   const allUserIds = Object.keys(uniqueMembersMap)
+
+  // Avatar may live on the member's own workspace row while sponsor workspace has null
+  const avatarByUser: Record<string, string> = {}
+  if (allUserIds.length > 0) {
+    const { data: avatarRows } = await supabase
+      .from('nmm_workspace_members')
+      .select('user_id, avatar_url')
+      .in('user_id', allUserIds)
+      .not('avatar_url', 'is', null)
+    avatarRows?.forEach(row => {
+      if (row.avatar_url) avatarByUser[row.user_id] = row.avatar_url
+    })
+  }
   const uniqueMembers = Object.values(uniqueMembersMap)
   const allWorkspaceIds = [workspaceId, ...downlineWsIds]
 
@@ -189,6 +207,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
     .replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z0-9]/g, '')
 
+  const authAvatars = await resolveTeamAvatarsAction(workspaceId, allUserIds)
+
   // 1. Map registered NMM App users
   const registeredMemberRows = uniqueMembers.map(m => {
     const mc = candidates.filter(c => c.owner_id === m.user_id)
@@ -200,9 +220,13 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       if (c.owner_id !== ownWs.owner_id) return false
       const cf = cleanStr(c.full_name)
       const mf = cleanStr(m.full_name)
-      return cf && mf && (cf.includes(mf) || mf.includes(cf))
+      if (cf && mf && (cf.includes(mf) || mf.includes(cf))) return true
+      const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
+      return mWords.some((w: string) => cf.includes(w))
     })
     const phone = candidateMatch?.phone ?? null
+    const noteAvatar = candidateMatch?.note ? parseNote(candidateMatch.note).avatarUrl : ''
+    const resolvedAvatar = m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
 
     return {
       user_id: m.user_id,
@@ -218,7 +242,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       onboarding_steps: completedSteps,
       phone: phone,
       isAppUser: true,
-      avatar_url: m.avatar_url ?? null
+      avatar_url: resolvedAvatar,
+      pipeline_id: candidateMatch?.id ?? null,
     }
   })
 
@@ -257,7 +282,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
         onboarding_steps: [],
         phone: c.phone || null,
         isAppUser: false,
-        avatar_url: parsedNote.avatarUrl || null
+        avatar_url: parsedNote.avatarUrl || null,
+        pipeline_id: c.id,
       })
     }
   })
@@ -637,7 +663,10 @@ export function EkipPanel() {
                 {/* Kart Üst Bölümü */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Sol Taraf: Avatar ve İsim Detayları */}
-                  <Link href={`/pipeline/${m.user_id}`} className="flex min-w-0 flex-1 items-center gap-4 hover:opacity-80 transition cursor-pointer">
+                  {(() => {
+                    const profileClass = 'flex min-w-0 flex-1 items-center gap-4'
+                    const profileInner = (
+                      <>
                     <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black overflow-hidden ${
                       m.avatar_url
                         ? ''
@@ -719,7 +748,16 @@ export function EkipPanel() {
                         )}
                       </p>
                     </div>
-                  </Link>
+                      </>
+                    )
+                    return m.pipeline_id ? (
+                      <Link href={`/pipeline/${m.pipeline_id}`} className={`${profileClass} hover:opacity-80 transition cursor-pointer`}>
+                        {profileInner}
+                      </Link>
+                    ) : (
+                      <div className={profileClass}>{profileInner}</div>
+                    )
+                  })()}
 
                   {/* Sağ Taraf: Toplam Aday Göstergesi veya NMM'e Davet Et Butonu */}
                   <div className="flex items-center justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0 sm:pr-24 w-full sm:w-auto">

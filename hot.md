@@ -1665,3 +1665,13 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Profil Modal (`ProfileModal.tsx`)**: Kullanıcı profil resmi yüklerken artık `maxSizeMB: 0.5` (Maksimum 500KB) ve `maxWidthOrHeight: 1024` seçenekleriyle tarayıcı bazlı sıkıştırma uygulanır.
 - **Aday Ekleme/Düzenleme (`EditCandidateSheet.tsx`)**: Liderlerin boru hattına adayların fotoğraflarını yüklerken (özellikle yüksek megapikselli kamera çekimlerinde) yaşadığı donma / geç yüklenme sorununu engellemek amacıyla aynı mantıkta Client-side Image Compression eklendi.
 - Dosyalar veritabanına her zaman standart optimize edilmiş `.jpg` (`image/jpeg`) MIME Type formatında yüklenir.
+
+
+## 2026-05-28 — Ekibim: Downline Detay Linki ve Avatar Senkronizasyonu
+
+### fix: Elif Sinem Topak (ve bağımsız downline üyeler) için boş detay sayfası ve eksik avatar
+- **Kök neden (link):** `EkipPanel.tsx` üye kartlarında `/pipeline/[id]` bağlantısı NMM ortakları için `auth user_id` kullanıyordu; aday detay sayfası ise `nmm_candidates.id` bekliyor. Bağımsız workspace ile katılan üyelerde (ör. Elif Sinem Topak) bu UUID eşleşmediği için boş sayfa açılıyordu.
+- **Çözüm (link):** `MemberRow` tipine `pipeline_id` eklendi. Liderin hunisindeki aday kaydı isim eşleşmesiyle (token fallback dahil) bulunuyor; link yalnızca geçerli `pipeline_id` varken tıklanabilir. Saha ortakları için `pipeline_id` zaten aday `id`si.
+- **Kök neden (avatar):** Downline üyeler sponsor workspace'inde `avatar_url = null` satırla listeleniyor; fotoğraf çoğunlukla kendi workspace satırında veya `auth.users` metadata'sında. Platform Yönetimi metadata'dan okuduğu için orada görünüyordu, Ekibim ise yalnızca sponsor satırına bakıyordu.
+- **Çözüm (avatar):** Tüm `nmm_workspace_members` satırlarından avatar birleştirme, downline merge'de null üzerine yazma, aday notundan `parseNote` avatarı, ve `resolveTeamAvatarsAction` (service role ile yetkili downline'lar için auth metadata) eklendi.
+- `useTeamMembers.ts` içinde aynı çoklu-kaynak avatar birleştirmesi istatistikler tablosuyla tutarlılık için güncellendi.
