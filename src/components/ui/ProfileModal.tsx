@@ -119,11 +119,8 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       })
       if (metaError) throw metaError
 
-      // Also update nmm_workspace_members so EkipPanel syncs immediately
-      await supabase
-        .from('nmm_workspace_members')
-        .update({ avatar_url: publicUrl })
-        .eq('user_id', userId)
+      const { syncMemberAvatarAction } = await import('@/app/(dashboard)/ekip/actions')
+      await syncMemberAvatarAction(publicUrl)
 
       setAvatarUrl(publicUrl)
       setAvatarPreview(publicUrl)

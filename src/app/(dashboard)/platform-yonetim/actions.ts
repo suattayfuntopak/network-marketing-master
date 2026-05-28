@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { assertSuperAdmin } from '@/lib/auth'
 
 // Initialize Supabase Admin Client using Service Role Key to bypass RLS safely
 function createAdminClient() {
@@ -38,9 +38,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   
-  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
-    throw new Error('Yetkisiz erişim: Bu işlemi sadece Süper Admin gerçekleştirebilir.')
-  }
+  assertSuperAdmin(user)
 
   const admin = createAdminClient()
 
@@ -160,9 +158,7 @@ export async function adminExtendLicenseAction(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
-    throw new Error('Yetkisiz erişim: Bu işlemi sadece Süper Admin gerçekleştirebilir.')
-  }
+  assertSuperAdmin(user)
 
   const admin = createAdminClient()
 
@@ -226,9 +222,7 @@ export async function addIndependentAsCandidateAction(
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
-    throw new Error('Yetkisiz erişim.')
-  }
+  assertSuperAdmin(user)
 
   const admin = createAdminClient()
 
@@ -268,9 +262,7 @@ export async function deleteUserAction(ownerId: string, email: string): Promise<
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user || user.email !== SUPER_ADMIN_EMAIL) {
-    throw new Error('Yetkisiz erişim: Bu işlemi sadece Süper Admin gerçekleştirebilir.')
-  }
+  assertSuperAdmin(user)
 
   const admin = createAdminClient()
 

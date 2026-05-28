@@ -750,8 +750,13 @@ export function EkipPanel() {
                     </div>
                       </>
                     )
-                    return m.pipeline_id ? (
-                      <Link href={`/pipeline/${m.pipeline_id}`} className={`${profileClass} hover:opacity-80 transition cursor-pointer`}>
+                    const detailHref = m.pipeline_id
+                      ? `/pipeline/${m.pipeline_id}`
+                      : m.isAppUser !== false
+                        ? `/ekip/uye/${m.user_id}`
+                        : null
+                    return detailHref ? (
+                      <Link href={detailHref} className={`${profileClass} hover:opacity-80 transition cursor-pointer`}>
                         {profileInner}
                       </Link>
                     ) : (

@@ -262,6 +262,14 @@ export interface Database {
         Args: { p_member_id: string; p_member_name: string }
         Returns: Json
       }
+      nmm_sync_member_avatar: {
+        Args: { p_avatar_url: string }
+        Returns: undefined
+      }
+      nmm_resolve_team_avatars: {
+        Args: { p_workspace_id: string; p_user_ids: string[] }
+        Returns: Json
+      }
     }
     Enums: { [_ in never]: never }
   }

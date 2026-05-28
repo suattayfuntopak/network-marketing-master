@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { isSuperAdmin } from '@/lib/auth'
 
 export interface AIUsageData {
   roleplayUsed: number
@@ -26,7 +26,7 @@ export function useAIUsage() {
         }
       }
 
-      const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
+      const superAdmin = isSuperAdmin(user)
 
       const today = new Date()
       today.setHours(0, 0, 0, 0)
@@ -64,7 +64,7 @@ export function useAIUsage() {
         roleplayUsed,
         complianceUsed,
         messageUsed,
-        isSuperAdmin,
+        isSuperAdmin: superAdmin,
       }
     },
     refetchOnWindowFocus: true,

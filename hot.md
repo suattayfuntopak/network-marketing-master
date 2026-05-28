@@ -1,5 +1,35 @@
 # Hot Log
 
+## 2026-05-28 — 4 Öncelikli Öneri + Council Sprint 1 (Tek Kaynak)
+
+### feat + refactor: Downline RLS, avatar sync, ekip üye detayı, lib/auth, useWorkspace
+
+**Öneri 1 — RLS `parent_id` çift format (`019_downline_rls_avatar_sync.sql`)**
+- `nmm_leader_downline_workspace_ids()` helper: `parent_id = auth.uid()` VEYA sponsor workspace UUID.
+- Downline SELECT politikaları (`members`, `candidates`, `daily_actions`) bu helper ile yenilendi.
+
+**Öneri 2 — Avatar senkronizasyonu**
+- `nmm_sync_member_avatar(p_avatar_url)` — profil güncellemesinde tüm `nmm_workspace_members` satırları.
+- `nmm_join_workspace` güncellendi: join sırasında auth metadata'dan avatar kopyalanır; `parent_id` artık sponsor **workspace id** (legacy user id hâlâ RLS'te desteklenir).
+- `ProfileModal` → `syncMemberAvatarAction` RPC çağırıyor.
+
+**Öneri 3 — `/ekip/uye/[userId]` NMM ortak detay sayfası**
+- Hunide aday kaydı olmayan NMM ortakları için: huni dağılımı, onboarding checklist, opsiyonel pipeline linki.
+- `EkipPanel` link mantığı: `pipeline_id` varsa `/pipeline/[id]`, yoksa `/ekip/uye/[userId]`.
+
+**Öneri 4 — Batch avatar RPC**
+- `nmm_resolve_team_avatars(workspace_id, user_ids[])` tek roundtrip; `resolveTeamAvatarsAction` artık N×`getUserById` döngüsü kullanmıyor.
+
+**Council Sprint 1 — Tek kaynak**
+- **Yeni:** `src/lib/auth.ts` — `isSuperAdmin`, `assertSuperAdmin`, `resolveWorkspaceLicense`.
+- `checkAIQuota`, `useAIUsage`, `platform-yonetim/actions` → merkezi auth helper.
+- **Yeni:** `src/app/(dashboard)/actions/workspace.ts` — `fetchWorkspaceAction` (salt okuma) + `ensureWorkspaceAction` (oluşturma).
+- `useWorkspace` hook: INSERT artık `queryFn` içinde değil; üyelik yoksa `useMutation` ile `ensureWorkspaceAction` (Strict Mode duplicate workspace riski azaltıldı).
+
+**Deploy notu:** `supabase db push` veya migration `019` production'a uygulanmalı (RPC + RLS + join güncellemesi).
+
+---
+
 ## 2026-05-28 — Council Triad Y-1 (doc), Y-4, Y-11 + EditCandidateSheet syntax fix
 
 ### docs + feat + fix: migrations policy, notifications routing, error boundaries

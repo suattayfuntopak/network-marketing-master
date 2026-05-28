@@ -1,17 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-
-function createAdminClient() {
-  return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 /**
  * Resolves profile photo URLs for team members (downlines + workspace members).
@@ -54,27 +45,164 @@ export async function resolveTeamAvatarsAction(
   const requested = userIds.filter(id => allowedIds.has(id))
   if (!requested.length) return {}
 
-  const admin = createAdminClient()
-  const result: Record<string, string> = {}
-
-  const { data: memberRows } = await admin
-    .from('nmm_workspace_members')
-    .select('user_id, avatar_url')
-    .in('user_id', requested)
-    .not('avatar_url', 'is', null)
-
-  memberRows?.forEach(row => {
-    if (row.avatar_url) result[row.user_id] = row.avatar_url
+  const { data: avatarMap, error: rpcError } = await supabase.rpc('nmm_resolve_team_avatars', {
+    p_workspace_id: workspaceId,
+    p_user_ids: requested,
   })
 
-  for (const id of requested) {
-    if (result[id]) continue
-    const { data: authUser } = await admin.auth.admin.getUserById(id)
-    const url = authUser?.user?.user_metadata?.avatar_url as string | undefined
-    if (url) result[id] = url
+  if (rpcError) {
+    console.error('[resolveTeamAvatarsAction] rpc error:', rpcError)
+    return {}
   }
 
+  if (!avatarMap || typeof avatarMap !== 'object') return {}
+
+  const result: Record<string, string> = {}
+  for (const [userId, url] of Object.entries(avatarMap as Record<string, unknown>)) {
+    if (typeof url === 'string' && url.trim()) result[userId] = url
+  }
   return result
+}
+
+export async function syncMemberAvatarAction(avatarUrl: string): Promise<void> {
+  const supabase = await createClient()
+  const { error } = await supabase.rpc('nmm_sync_member_avatar', { p_avatar_url: avatarUrl })
+  if (error) throw new Error(error.message)
+}
+
+export interface TeamMemberDetailData {
+  user_id: string
+  full_name: string | null
+  avatar_url: string | null
+  joined_at: string | null
+  role: 'leader' | 'member'
+  candidate_count: number
+  yeni_count: number
+  sunum_count: number
+  takip_count: number
+  katildi_count: number
+  onboarding_steps: string[]
+  last_activity_at: string | null
+  pipeline_id: string | null
+  license_type: string | null
+}
+
+export async function getTeamMemberDetailAction(
+  sponsorWorkspaceId: string,
+  memberUserId: string
+): Promise<{ data?: TeamMemberDetailData; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Oturum gerekli.' }
+
+  const { data: ownWs } = await supabase
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .eq('id', sponsorWorkspaceId)
+    .single()
+
+  if (!ownWs || ownWs.owner_id !== user.id) {
+    return { error: 'Yetkisiz erişim.' }
+  }
+
+  const { data: downlineWs } = await supabase
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .or(`parent_id.eq.${sponsorWorkspaceId},parent_id.eq.${ownWs.owner_id}`)
+
+  const allowedIds = new Set<string>([ownWs.owner_id])
+  downlineWs?.forEach(w => { if (w.owner_id) allowedIds.add(w.owner_id) })
+
+  const { data: wsMembers } = await supabase
+    .from('nmm_workspace_members')
+    .select('user_id')
+    .eq('workspace_id', sponsorWorkspaceId)
+  wsMembers?.forEach(m => allowedIds.add(m.user_id))
+
+  if (!allowedIds.has(memberUserId)) {
+    return { error: 'Üye bulunamadı.' }
+  }
+
+  const { data: memberRows } = await supabase
+    .from('nmm_workspace_members')
+    .select('user_id, full_name, role, joined_at, avatar_url, workspace_id')
+    .eq('user_id', memberUserId)
+    .order('joined_at', { ascending: false })
+    .limit(1)
+
+  const memberRow = memberRows?.[0]
+  if (!memberRow) return { error: 'Üye bulunamadı.' }
+
+  const memberWorkspaceId =
+    downlineWs?.find(w => w.owner_id === memberUserId)?.id ?? memberRow.workspace_id
+
+  const { data: memberWs } = await supabase
+    .from('nmm_workspaces')
+    .select('license_type')
+    .eq('id', memberWorkspaceId)
+    .maybeSingle()
+
+  const allWorkspaceIds = [
+    sponsorWorkspaceId,
+    ...(downlineWs?.map(w => w.id) ?? []),
+  ]
+
+  const [
+    { data: candidates },
+    { data: actions },
+    { data: onboarding },
+    avatarMap,
+  ] = await Promise.all([
+    supabase.from('nmm_candidates').select('id, owner_id, stage, full_name, note').in('workspace_id', allWorkspaceIds),
+    supabase.from('nmm_daily_actions').select('user_id, created_at').eq('user_id', memberUserId)
+      .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+    supabase.from('nmm_onboarding_progress').select('step_id').eq('user_id', memberUserId),
+    resolveTeamAvatarsAction(sponsorWorkspaceId, [memberUserId]),
+  ])
+
+  const mc = (candidates ?? []).filter(c => c.owner_id === memberUserId)
+
+  const cleanStr = (s: string | null | undefined) => (s ?? '')
+    .toLowerCase()
+    .replace(/\u0131/g, 'i').replace(/\u011f/g, 'g')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '')
+
+  const candidateMatch = (candidates ?? []).find(c => {
+    if (c.owner_id !== ownWs.owner_id) return false
+    const cf = cleanStr(c.full_name)
+    const mf = cleanStr(memberRow.full_name)
+    if (cf && mf && (cf.includes(mf) || mf.includes(cf))) return true
+    const mWords = (memberRow.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
+    return mWords.some((w: string) => cf.includes(w))
+  })
+
+  let lastActivity = memberRow.joined_at
+  actions?.forEach(act => {
+    if (!lastActivity || new Date(act.created_at) > new Date(lastActivity)) {
+      lastActivity = act.created_at
+    }
+  })
+
+  return {
+    data: {
+      user_id: memberUserId,
+      full_name: memberRow.full_name,
+      avatar_url: memberRow.avatar_url ?? avatarMap[memberUserId] ?? null,
+      joined_at: memberRow.joined_at,
+      role: memberUserId === ownWs.owner_id ? 'leader' : 'member',
+      candidate_count: mc.length,
+      yeni_count: mc.filter(c => c.stage === 'yeni').length,
+      sunum_count: mc.filter(c => c.stage === 'sunum').length,
+      takip_count: mc.filter(c => c.stage === 'takip').length,
+      katildi_count: mc.filter(c => c.stage === 'katildi').length,
+      onboarding_steps: onboarding?.map(o => o.step_id) ?? [],
+      last_activity_at: lastActivity,
+      pipeline_id: candidateMatch?.id ?? null,
+      license_type: memberWs?.license_type ?? null,
+    },
+  }
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')

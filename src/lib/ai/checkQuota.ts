@@ -4,7 +4,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getLimitsForLicense } from '@/lib/aiUsage'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { isSuperAdmin } from '@/lib/auth'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'
 
@@ -50,7 +50,7 @@ export async function checkAIQuota(
     }
   }
 
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
+  const superAdmin = isSuperAdmin(user)
 
   const { data: membership } = await supabase
     .from('nmm_workspace_members')
@@ -73,14 +73,14 @@ export async function checkAIQuota(
     }
   }
 
-  const limits = getLimitsForLicense(licenseType, isSuperAdmin)
+  const limits = getLimitsForLicense(licenseType, superAdmin)
   const limit =
     actionType === 'roleplay' ? limits.roleplayLimit
     : actionType === 'compliance' ? limits.complianceLimit
     : limits.messageLimit
 
   // Compliance with limit === 0 means the feature is gated behind paid plans.
-  if (!isSuperAdmin && actionType === 'compliance' && limit === 0) {
+  if (!superAdmin && actionType === 'compliance' && limit === 0) {
     return {
       ok: false,
       reason: 'feature_unavailable',
@@ -92,7 +92,7 @@ export async function checkAIQuota(
   }
 
   let used = 0
-  if (!isSuperAdmin) {
+  if (!superAdmin) {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
 
@@ -136,12 +136,12 @@ export async function checkAIQuota(
   return {
     ok: true,
     user: { id: user.id, email: user.email ?? null },
-    isSuperAdmin,
+    isSuperAdmin: superAdmin,
     workspaceId: membership?.workspace_id ?? null,
     licenseType,
     limit,
     used,
-    remaining: isSuperAdmin ? Infinity : limit - used - 1,
+    remaining: superAdmin ? Infinity : limit - used - 1,
   }
 }
 
