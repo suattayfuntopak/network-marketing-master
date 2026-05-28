@@ -12,6 +12,8 @@ import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/domain/stages'
 import { OnboardingModal } from './OnboardingModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate } from '@/types/database.types'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 
 function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
@@ -187,9 +189,11 @@ export function PanoContent() {
                   href={`/pipeline/${c.id}`}
                   className="flex items-center gap-3 py-2.5 px-2 rounded-xl transition hover:bg-[var(--bg-subtle)]"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
-                    {c.full_name.charAt(0).toUpperCase()}
-                  </div>
+                  <PersonAvatar
+                    name={c.full_name}
+                    imageUrl={resolveCandidateFields(c).avatarUrl}
+                    size="sm"
+                  />
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
                     <p className="text-xs text-[var(--text-3)]">{daysAgoLabel(c.daysSinceContact)}</p>

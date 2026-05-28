@@ -1,5 +1,6 @@
 'use client'
 
+import { clsx } from 'clsx'
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
@@ -28,6 +29,8 @@ import { REGISTER_URL } from '@/lib/constants'
 import { fetchEkipMembers } from '@/lib/team/fetchEkipMembers'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
@@ -342,11 +345,10 @@ export function EkipPanel() {
             return (
               <li
                 key={m.user_id}
-                className={`relative overflow-hidden rounded-2xl border transition-all duration-200 p-6 shadow-sm hover:shadow-md space-y-5 ${
-                  isInactive
-                    ? 'border-amber-200/50 bg-amber-50/5 dark:border-amber-900/20 dark:bg-amber-950/5'
-                    : 'border-[var(--border)] bg-[var(--bg-card)]'
-                }`}
+                className={clsx(
+                  'relative overflow-hidden rounded-2xl border transition-all duration-200 p-6 shadow-sm hover:shadow-md space-y-5',
+                  getTeamMemberCardClasses(m, isInactive)
+                )}
               >
                 {/* Kart Sağ Üst Buton Grubu - Sleek, Absolute Positioned */}
                 {!isCurrentUser && m.isAppUser !== false && (
@@ -392,37 +394,12 @@ export function EkipPanel() {
                     const profileClass = 'flex min-w-0 flex-1 items-center gap-4'
                     const profileInner = (
                       <>
-                    <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black overflow-hidden ${
-                      m.avatar_url
-                        ? ''
-                        : isInactive
-                        ? 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400'
-                        : m.isAppUser === false
-                        ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400'
-                        : 'bg-[#EEEDFE] text-brand'
-                    }`}>
-                      {m.avatar_url ? (
-                        <img
-                          src={m.avatar_url}
-                          alt={m.full_name ?? ''}
-                          className="h-full w-full object-cover"
-                          onError={(e) => {
-                            // Resim yüklenemezse baş harfe fallback
-                            const target = e.target as HTMLImageElement
-                            target.style.display = 'none'
-                            const parent = target.parentElement
-                            if (parent) {
-                              parent.classList.add(m.isAppUser === false ? 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800/40 dark:text-zinc-400' : 'bg-[#EEEDFE] text-brand')
-                              const span = document.createElement('span')
-                              span.textContent = (m.full_name ?? '?').charAt(0).toUpperCase()
-                              parent.appendChild(span)
-                            }
-                          }}
-                        />
-                      ) : (
-                        (m.full_name ?? '?').charAt(0).toUpperCase()
-                      )}
-                    </div>
+                    <PersonAvatar
+                      name={m.full_name ?? '?'}
+                      imageUrl={m.avatar_url}
+                      size="lg"
+                      className="font-black"
+                    />
                     
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pr-16 sm:pr-0">

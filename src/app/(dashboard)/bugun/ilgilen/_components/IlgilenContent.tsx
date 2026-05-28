@@ -15,6 +15,8 @@ import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 function formatDaysAgo(days: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
   if (!isFinite(days)) return t('pagesUi.neverContacted')
@@ -131,9 +133,11 @@ export function IlgilenContent() {
               onClick={() => router.push(`/pipeline/${c.id}`)}
               className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition-colors hover:border-[#534AB7]/30 active:scale-[0.99]"
             >
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-sm font-bold text-[#534AB7]">
-                {c.full_name.charAt(0).toUpperCase()}
-              </div>
+              <PersonAvatar
+                name={c.full_name}
+                imageUrl={resolveCandidateFields(c).avatarUrl}
+                size="md"
+              />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{c.full_name}</p>
                 <div className="mt-0.5 flex items-center gap-2">
@@ -198,9 +202,11 @@ export function IlgilenContent() {
                   i > 0 && 'border-t border-[var(--border)]'
                 )}
               >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
-                  {c.full_name.charAt(0).toUpperCase()}
-                </div>
+                <PersonAvatar
+                  name={c.full_name}
+                  imageUrl={resolveCandidateFields(c).avatarUrl}
+                  size="sm"
+                />
                 <p className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
                 <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
                   {getStageLabel(c.stage, lang)}

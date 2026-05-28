@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-05-28 — Avatar + Ekibim rol kartları (UI)
+
+### fix(ui): pano / bugün ilgilen avatarları + ekip rol çerçeveleri
+
+**Pano & Bugün İlgilen:**
+- `PersonAvatar` bileşeni — `resolveCandidateFields` ile `avatar_url`; fotoğraf varsa gösterilir, yoksa isim baş harfi
+- Baş harf arka planları: isme göre deterministik pastel palet (`avatarColors.ts`), light/dark uyumlu
+
+**Ekibim:**
+- Üye kartları rol tonu: Lider açık mavi, NMM ortağı hafif mor, Saha ortağı hafif sarı/amber (`teamMemberCard.ts`)
+- Saha ortakları artık NMM ortakları kadar belirgin çerçeve/arka plan (önceden soluk `border-[var(--border)]`)
+- Üye avatarları `PersonAvatar` ile aynı pastel mantık
+
+**Y-9 Faz 3:** DB’de kalan `|||` yok; onboarding adım etiketleri kod içi `label_tr`/`label_en` — ayrı sprint (typed kolon gerekmez).
+
+---
+
 ## 2026-05-28 — Council Y-9 (Faz 2): `nmm_daily_actions` lider notları typed columns
 
 ### feat(db): günlük aksiyon lider notları — `note_tr` / `note_en`
