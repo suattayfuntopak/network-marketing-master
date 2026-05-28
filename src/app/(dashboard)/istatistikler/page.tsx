@@ -73,6 +73,7 @@ export default function AnalyticsPage() {
       last_activity_at: null,
       onboarding_steps: [] as string[],
       isAppUser: false as const,
+      avatar_url: c.note ? (c.note.includes('|||') && c.note.split('|||')[2] ? c.note.split('|||')[2].trim() : null) : null,
     }))
     return [...nmmRows, ...sahaRows]
   }, [sortedMembers, sahaOrtaklari])
@@ -548,7 +549,13 @@ export default function AnalyticsPage() {
                       return (
                         <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''} ${!isAppUser ? 'opacity-70' : ''}`}>
                           <td className="p-3 flex items-center gap-2 whitespace-nowrap">
-                            {isLeader ? (
+
+                            {m.avatar_url ? (
+                              <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
+                                <img src={m.avatar_url} alt={m.full_name ?? ''} className="h-full w-full object-cover" />
+                                {isLeader && <Crown className="absolute -top-1 -right-1 h-3 w-3 text-[#854F0B] bg-white rounded-full p-[1px]" strokeWidth={2.5} />}
+                              </div>
+                            ) : isLeader ? (
                               <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
                             ) : (
                               <span className="h-2 w-2 rounded-full bg-zinc-300" />
