@@ -1,5 +1,38 @@
 # Hot Log
 
+## 2026-05-28 — Council Triad Genel Değerlendirme Raporu (analiz, henüz uygulanmadı)
+
+### docs: Council of High Intelligence — 3 perspektif paralel analizi
+
+**Yöntem:** [council-of-high-intelligence](https://github.com/0xNyk/council-of-high-intelligence) triad stratejisi — `council-torvalds` (pragmatik kod kalitesi), `council-aristotle` (mimari/kategorizasyon), `council-socrates` (varsayım yıkıcı) paralel olarak çağrıldı. Her biri 50-60 tool kullanımı ile bağımsız analiz üretti.
+
+**Rapor:** [docs/council-triad-2026-05-28.md](docs/council-triad-2026-05-28.md) (~9 KB, 4 kritik + 12 yüksek + 16 orta + 5 düşük = **37 bulgu**)
+
+**Üçlü yakınsama (≥2 council üyesinin bağımsız tespiti — en güvenilir bulgular):**
+- 🔴 Shopier webhook secret fallback + amount-based license mapping (Torvalds + Sokrates)
+- 🔴 Quota check 5 dosyada duplicate; tri-modal data access (Torvalds + Aristoteles)
+- 🔴 God components (EkipPanel 1257 satır, itirazlar 1022, vb.) + doğrudan Supabase çağrıları (Torvalds + Aristoteles)
+- 🔴 Schema drift — 3 tablo `database.types.ts`'te yok, 28 `as any` (Torvalds + Aristoteles)
+- 🟠 Migration `004_` numara çakışması (Aristoteles + Sokrates)
+- 🟠 SUPER_ADMIN_EMAIL 83 yerde tekrar; `yazar/actions.ts:61` dualism leak (Aristoteles + Sokrates)
+- 🟠 `bugun/page.tsx` redirect kabuğu + boş `_components/` (Aristoteles + Sokrates)
+- 🟠 i18n bimodal: `useTranslation` vs raw `lang === 'en' ?` (Torvalds + Aristoteles)
+- 🟡 Test stratejisi yok — bilinçli değil, belgelenmemiş (Torvalds + Sokrates)
+
+**Öneri eylem sırası (Fazlar A → F, ~7-10 gün tek geliştirici):**
+- **Faz A — Güvenlik (~2 saat):** Shopier secret fallback sil, K-2 auth gaps kapat, `supabase gen types`, migration 004 rename.
+- **Faz B — Tek kaynak (1-2 gün):** `lib/ai/checkQuota.ts` + `lib/auth.ts` merkezi fonksiyonlar.
+- **Faz C — UX (1 gün):** error.tsx / loading.tsx / Z disiplin / i18n unify.
+- **Faz D — Performans (1 gün):** `fetch_team_with_downlines` RPC, single-roundtrip update.
+- **Faz E — Refactor (2-3 gün):** God component parçalanması, `|||` typed columns migration.
+- **Faz F — Hijyen (1 gün):** README, AGENTS.md kurallar, test minimum seti.
+
+**Slogan denetimi:** "Basit, kullanıcı dostu, profesyonel, premium" — 4 kritik açık kapatılana kadar "premium" iddiası sessiz şekilde ihlal ediliyor.
+
+**Bu commit:** Sadece rapor + hot.md notu. Kod değişikliği yok — proje sahibi onay verdikten sonra Faz A'dan başlanacak.
+
+---
+
 ## 2026-05-28 — Council Triad Raporu Uygulaması (Faz 1-4 Tamamlandı)
 
 ### refactor + fix + i18n: 14 maddelik kapsamlı temizlik
