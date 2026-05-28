@@ -28,6 +28,9 @@ const NEXT_THEME_LABEL: Record<string, string> = {
   dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',
 }
 
+const TESTIMONIAL_CARD =
+  'rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.02] hover:bg-slate-100 dark:hover:bg-white/[0.06] hover:border-slate-300 dark:hover:border-white/10 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between'
+
 const TESTIMONIALS = [
   {
     initials: 'AK',
@@ -358,7 +361,7 @@ export default function RootPage() {
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           
           {/* Card 1: Pipeline */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-indigo-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-indigo-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400 group-hover:bg-indigo-500/20 transition duration-300">
               <TrendingUp className="h-5 w-5" />
             </div>
@@ -371,7 +374,7 @@ export default function RootPage() {
           </div>
 
           {/* Card 2: AI Coach */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-purple-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-purple-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-500/10 text-purple-400 group-hover:bg-purple-500/20 transition duration-300">
               <Bot className="h-5 w-5" />
             </div>
@@ -384,7 +387,7 @@ export default function RootPage() {
           </div>
 
           {/* Card 3: Quick Start */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-pink-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-pink-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-pink-500/10 text-pink-400 group-hover:bg-pink-500/20 transition duration-300">
               <Sparkles className="h-5 w-5" />
             </div>
@@ -397,7 +400,7 @@ export default function RootPage() {
           </div>
 
           {/* Card 4: Field Rehearsal */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-amber-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-amber-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 group-hover:bg-amber-500/20 transition duration-300">
               <Users className="h-5 w-5" />
             </div>
@@ -410,7 +413,7 @@ export default function RootPage() {
           </div>
 
           {/* Card 5: Compliance */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-teal-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-teal-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-500/10 text-teal-400 group-hover:bg-teal-500/20 transition duration-300">
               <Shield className="h-5 w-5" />
             </div>
@@ -423,7 +426,7 @@ export default function RootPage() {
           </div>
 
           {/* Card 6: Team Analaytics */}
-          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-blue-500/30 hover:bg-slate-50 dark:bg-white/[0.02] transition duration-300">
+          <div className="group relative rounded-2xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-6 hover:border-blue-500/30 hover:bg-slate-100 dark:hover:bg-white/[0.06] transition duration-300">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 group-hover:bg-blue-500/20 transition duration-300">
               <BarChart2 className="h-5 w-5" />
             </div>
@@ -854,7 +857,7 @@ export default function RootPage() {
           <div className="flex w-max gap-6 py-2">
             <div className="animate-marquee-left gap-6 flex">
               {TESTIMONIALS.slice(0, 5).map((item, idx) => (
-                <div key={`row1-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                <div key={`row1-${idx}`} className={TESTIMONIAL_CARD}>
                   <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
@@ -873,7 +876,7 @@ export default function RootPage() {
               ))}
               {/* Duplicate for infinite effect */}
               {TESTIMONIALS.slice(0, 5).map((item, idx) => (
-                <div key={`row1-dup-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                <div key={`row1-dup-${idx}`} className={TESTIMONIAL_CARD}>
                   <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
@@ -897,7 +900,7 @@ export default function RootPage() {
           <div className="flex w-max gap-6 py-2">
             <div className="animate-marquee-right gap-6 flex">
               {TESTIMONIALS.slice(5, 10).map((item, idx) => (
-                <div key={`row2-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                <div key={`row2-${idx}`} className={TESTIMONIAL_CARD}>
                   <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>
@@ -916,7 +919,7 @@ export default function RootPage() {
               ))}
               {/* Duplicate for infinite effect */}
               {TESTIMONIALS.slice(5, 10).map((item, idx) => (
-                <div key={`row2-dup-${idx}`} className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-50 dark:bg-white/[0.02] hover:border-zinc-700/60 transition duration-300 p-6 w-[290px] sm:w-[360px] shrink-0 space-y-4 flex flex-col justify-between">
+                <div key={`row2-dup-${idx}`} className={TESTIMONIAL_CARD}>
                   <p className="text-xs sm:text-sm italic text-slate-600 dark:text-zinc-300 leading-relaxed">
                     &ldquo;{lang === 'en' ? item.text.en : item.text.tr}&rdquo;
                   </p>

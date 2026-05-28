@@ -1,6 +1,18 @@
 # Hot Log
 
-## 2026-05-28 — Performans UX + Davet Kodu + Council #6 istatistikler
+## 2026-05-29 — Landing testimonial dark hover + Council #6 platform-yonetim
+
+### Landing — Liderlerin Başarı Hikayeleri
+- Dark modda hover: `hover:bg-slate-50` kaldırıldı → `dark:hover:bg-white/[0.06]` (hafif vurgu, okunaklı metin)
+- Özellik kartlarında aynı hover düzeltmesi
+
+### Council #6 (4/5)
+- **platform-yonetim:** `PlatformYonetimContent.tsx` extract — `page.tsx` ~5 satır
+
+**Sıradaki #6:** `EkipPanel` → landing extract
+
+---
+
 
 ### Hız / geçiş UX
 - **Giriş:** Client-side Supabase sign-in + `router.push('/pano')` (server redirect yerine); `/pano` prefetch
