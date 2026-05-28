@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import { clsx } from 'clsx'
 import {
   Shield, CheckCircle2, AlertTriangle, XCircle, Copy, Info,
-  Sparkles, Check, RefreshCw, ChevronRight, HelpCircle
+  Sparkles, Check, RefreshCw, ChevronRight, HelpCircle, ArrowRight
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { auditComplianceMessageAction, type ComplianceAuditState } from './actions'
@@ -12,6 +14,7 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 const APPROVED_CLAIMS = {
@@ -201,6 +204,8 @@ export default function CompliancePage() {
   const checklist = SHARE_CHECKLIST[currentLang]
   const checkedCount = checklist.filter(item => checkedItems[item.id]).length
   const isAllChecked = checkedCount === checklist.length
+
+  const { complianceLimit } = getLimitsForLicense(ws?.licenseType, ws?.isSuperAdmin ?? false)
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
@@ -563,6 +568,58 @@ export default function CompliancePage() {
               </section>
             </>
           )}
+
+          {/* Uyum Denetimi kutusu — Pano'dan taşındı. Free: ödeme upsell, ücretli/super: bilgi */}
+          {(() => {
+            const content = (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className={clsx(
+                    'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
+                    complianceLimit === 0
+                      ? 'bg-[#C03E1F]/10 text-[#C03E1F]'
+                      : 'bg-[#1A56DB]/10 text-[#1A56DB] dark:text-[#93c5fd]'
+                  )}>
+                    <Shield className="h-4.5 w-4.5" strokeWidth={2} />
+                  </div>
+                  <div>
+                    <p className={clsx(
+                      'text-xs font-bold',
+                      complianceLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
+                    )}>
+                      {complianceLimit === 0
+                        ? (lang === 'en' ? 'Unlock Compliance Audit' : 'Uyum Denetimini Aç')
+                        : (lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi')}
+                    </p>
+                    <p className={clsx(
+                      'text-[11px] mt-0.5',
+                      complianceLimit === 0 ? 'text-[#C03E1F]/70' : 'text-[#1A56DB]/70 dark:text-[#93c5fd]/70'
+                    )}>
+                      {complianceLimit === 0
+                        ? (lang === 'en' ? 'Check your messages for legal compliance — paid plans only.' : 'Mesajlarınızı yasal uyum açısından denetleyin — ücretli plan gerekli.')
+                        : complianceLimit === Infinity
+                          ? (lang === 'en' ? 'Audit your marketing messages for FTC & legal compliance. Unlimited credits.' : 'Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Sınırsız hak.')
+                          : (lang === 'en' ? `Audit your marketing messages for FTC & legal compliance. ${complianceLimit} daily credits.` : `Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Günlük ${complianceLimit} hak.`)}
+                    </p>
+                  </div>
+                </div>
+                {complianceLimit === 0 && (
+                  <ArrowRight className="h-4 w-4 shrink-0 text-[#C03E1F]/60" />
+                )}
+              </>
+            )
+            const boxClass = clsx(
+              'flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5',
+              complianceLimit === 0
+                ? 'border-[#C03E1F]/30 bg-[#FEF0EC] dark:bg-[#47221A]/40 dark:border-[#C03E1F]/20 transition-all hover:opacity-90 active:scale-[0.99]'
+                : 'border-[#E8F0FE] bg-[#E8F0FE] dark:bg-[#222E4D]/60 dark:border-[#1e3a5f]'
+            )
+            return complianceLimit === 0 ? (
+              <Link href="/odeme" className={boxClass}>{content}</Link>
+            ) : (
+              <div className={boxClass}>{content}</div>
+            )
+          })()}
 
           {/* Yasal Sorumluluk Reddi (Disclaimer) */}
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">

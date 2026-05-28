@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-28 — Uyum Denetimi kutusu Pano → Uyum Merkezi
+
+### ui: move compliance box from dashboard to compliance page footer
+
+- Pano'daki "Uyum Denetimi / Uyum Denetimini Aç" CTA kutusu `PanoContent.tsx`'ten kaldırıldı (kullanılmayan `getLimitsForLicense`, `ArrowRight`, `complianceLimit`, `isSuperAdmin` da temizlendi).
+- Aynı kutu `uyum/page.tsx`'te yasal sorumluluk reddi (disclaimer) metninin hemen üzerine taşındı — her iki sekmede de sayfanın en altında görünür.
+- Self-link önlendi: free plan (`complianceLimit===0`) kutusu artık `/odeme`'ye (upsell) gider; ücretli/super admin için bilgi amaçlı `<div>` (link yok, ok ikonu yok).
+- tsc temiz, lint temiz.
+
+---
+
 ## 2026-05-28 — Council Faz F: Hijyen (tamamlandı)
 
 ### chore: route cleanup, naming, docs + first test suite
