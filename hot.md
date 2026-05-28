@@ -1,5 +1,30 @@
 # Hot Log
 
+## 2026-05-28 — getLimitsForLicense Mimarisi + WorkspaceContext.isSuperAdmin + Landing Page Tek Kaynak
+
+### refactor: 3 mimari iyileştirme
+
+- **`src/lib/aiUsage.ts` — `isSuperAdmin` parametresi & pro complianceLimit güncellendi:**
+  - `getLimitsForLicense(licenseType, isSuperAdmin?)` imzasına geçildi.
+  - `isSuperAdmin === true` olduğunda `{ messageLimit: Infinity, roleplayLimit: Infinity, complianceLimit: Infinity }` döner; artık sunucu action'ları ve UI bileşenleri aynı fonksiyonla süper admin bypass'ını otomatik alır.
+  - Pro plan `complianceLimit` 15 → **20** olarak güncellendi (landing page ile hizalama).
+
+- **`src/hooks/useWorkspace.ts` — `WorkspaceContext`'e `isSuperAdmin: boolean` eklendi:**
+  - `fetchOrCreateWorkspace`'in her iki dönüş yoluna `isSuperAdmin` alanı eklendi.
+  - Artık herhangi bir bileşen `useWorkspace` → `ws.isSuperAdmin` ile süper admin durumunu okuyabilir; sadece bu iş için `useAIUsage` import etmeye gerek kalmadı.
+
+- **`src/app/(dashboard)/pano/_components/PanoContent.tsx` — `useAIUsage` bağımlılığı kaldırıldı:**
+  - `useAIUsage` import ve çağrısı silindi.
+  - `isSuperAdmin = ws?.isSuperAdmin ?? false` olarak alınıyor.
+  - `getLimitsForLicense(ws?.licenseType, isSuperAdmin)` → super admin için `complianceLimit = Infinity`.
+  - Display: `complianceLimit === Infinity` → "Sınırsız hak" / "Unlimited credits".
+
+- **`src/app/page.tsx` — Landing page pro compliance değeri tek kaynaktan okunuyor:**
+  - `const PRO_LIMITS = getLimitsForLicense('pro')` modül seviyesinde tanımlandı.
+  - Pro plan uyum denetimi satırı `${PRO_LIMITS.complianceLimit}` şeklinde dinamikleştirildi — `aiUsage.ts` değiştiğinde landing page otomatik güncellenir.
+
+---
+
 ## 2026-05-28 — Süper Admin Pano Uyum Denetimi Limiti Düzeltmesi
 
 ### fix: Pano ekranında süper admin için "Günlük 15 hak" yerine "Sınırsız hak" gösterildi
