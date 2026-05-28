@@ -1,0 +1,18 @@
+---
+description: Oturum sonunda otomatik commit, push ve hot.md güncellemesi
+alwaysApply: true
+---
+
+# Oturum sonu — Git & Hot Log (zorunlu)
+
+Kullanıcı açıkça "commit yapma" demedikçe, **anlamlı kod veya dokümantasyon değişikliği yaptığın her oturumun sonunda** şunları kullanıcıya sormadan uygula:
+
+1. **`hot.md`** — En üste kısa bir bölüm ekle: tarih, özet, değişen dosyalar / deploy notları.
+2. **`git commit`** — Staged değişiklikleri anlamlı Türkçe veya İngilizce commit mesajıyla kaydet (HEREDOC). Gizli dosya (.env) ekleme.
+3. **`git push`** — `origin` üzerindeki mevcut branch’e push et (`-u` gerekirse).
+
+Kullanıcıdan "commit/push yap" beklenmez; bu iş akışının varsayılan parçasıdır.
+
+**İstisnalar:** Sadece soru-cevap / inceleme (dosya değişikliği yok); commit başarısız ve hook düzeltmesi gerekiyor; kullanıcı açıkça commit/push istemediğini söyledi.
+
+**Council sprint:** Bir fazı bitirdiğinde hot.md’de fazı **tamamlandı** olarak işaretle; kısmi bırakma — kalan maddeler varsa aynı oturumda veya hemen sonraki adımda tamamla.

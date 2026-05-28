@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
+import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 
 export interface TeamMember {
   user_id: string
@@ -23,7 +24,7 @@ export interface TeamMember {
   avatar_url?: string | null
 }
 
-async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
+async function fetchTeamMembersLegacy(workspaceId: string): Promise<TeamMember[]> {
   const supabase = createClient()
 
   // 1. Get the workspace owner_id
@@ -164,6 +165,13 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
+}
+
+async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
+  const supabase = createClient()
+  const bundle = await fetchTeamWithDownlines(supabase, workspaceId)
+  if (bundle) return bundle.members
+  return fetchTeamMembersLegacy(workspaceId)
 }
 
 export function useTeamMembers(workspaceId: string | undefined) {

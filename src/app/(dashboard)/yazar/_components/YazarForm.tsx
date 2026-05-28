@@ -14,6 +14,7 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getLimitsForLicense } from '@/lib/aiUsage'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
@@ -296,7 +297,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       prevMessageRef.current = state.message
       setDisplayedMessage(state.message)
       setGeneratedLang(lang)
-      qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
+      invalidateTeamAndAIUsage(qc, ws?.workspaceId)
       const entry: HistoryEntry = {
         message: state.message,
         candidateName: selected?.full_name ?? query ?? 'Kişisiz',

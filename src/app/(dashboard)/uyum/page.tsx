@@ -10,6 +10,8 @@ import { auditComplianceMessageAction, type ComplianceAuditState } from './actio
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 const APPROVED_CLAIMS = {
@@ -126,6 +128,7 @@ export default function CompliancePage() {
   const [activeTab, setActiveTab] = useState<'auditor' | 'library'>('auditor')
 
   const { data: usage } = useAIUsage()
+  const { data: ws } = useWorkspace()
   const qc = useQueryClient()
 
   const [auditResult, setAuditResult] = useState<ComplianceAuditState | null>(null)
@@ -185,7 +188,7 @@ export default function CompliancePage() {
         toast.error(res.error)
       } else {
         setAuditResult(res)
-        qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
+        invalidateTeamAndAIUsage(qc, ws?.workspaceId)
         toast.success(lang === 'en' ? 'Audit completed successfully!' : 'Denetim başarıyla tamamlandı!')
       }
     } catch {

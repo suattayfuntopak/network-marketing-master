@@ -7,6 +7,7 @@ import { askCoachAction, translateTextAction } from '../actions'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQueryClient } from '@tanstack/react-query'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -39,7 +40,7 @@ export function KoclukForm() {
   useEffect(() => {
     if (state.answer && state.answer !== prevAnswerRef.current) {
       prevAnswerRef.current = state.answer
-      qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
+      invalidateTeamAndAIUsage(qc, ws?.workspaceId)
     }
   }, [state.answer, qc])
 

@@ -1,5 +1,35 @@
 # Hot Log
 
+## 2026-05-28 — Ara düzeltmeler + Council Sprint 3 / Faz D (tamamlandı)
+
+### fix + perf: Ekibim, davet, avatarlar, İstatistikler + Council Faz D
+
+**Ekibim — yanlış detay sayfası (Elif → Şenol)**
+- NMM ortakları için link her zaman `/ekip/uye/[userId]`.
+- `src/lib/team/matchCandidate.ts` — `findLeaderCandidateForMember` (skor ≥ 80).
+
+**WhatsApp davet**
+- `REGISTER_URL` = `https://nmm.suattayfuntopak.com/kayit`; TR+EN `inviteWaMessage` / `waInviteGroup`.
+
+**Platform Yönetim**
+- Avatar: auth metadata + batch `nmm_workspace_members.avatar_url`.
+- Aday sayımı: `nmm_count_candidates_per_workspace()` RPC (fallback: eski satır sayımı).
+
+**İstatistikler**
+- Ekip YZ tablosunda foto avatarlar; kota kutusu en altta.
+
+**Council Faz D — Performans (tam)**
+- **Y-2:** `020_team_fetch_and_platform_counts.sql` → `nmm_fetch_team_with_downlines(p_workspace_id)`; `useTeamMembers` + `EkipPanel` tek RPC (legacy fallback).
+- **Y-5:** `nmm_count_candidates_per_workspace()` platform admin.
+- **Y-6:** `useUpdateCandidate` önbellek-önce + `.update().select('id')`.
+- **O-2/O-3:** `useCandidates` `staleTime: 30s`; `invalidateTeamAndAIUsage` (YZ formları + aday güncelleme); `useDeleteActivity` aday bazlı invalidate.
+
+**Kural:** `.cursor/rules/session-end-git.mdc` — oturum sonu commit + push + hot.md (kullanıcı sormadan).
+
+**Deploy:** Migration `020` production'a uygulanmalı (`supabase db push` veya SQL). `019` zaten uygulandı.
+
+---
+
 ## 2026-05-28 — Council Sprint 2 (UX Tutarlılık)
 
 ### feat: loading.tsx, Skeleton primitifi, z-index disiplini, i18n (Ekibim + Header)

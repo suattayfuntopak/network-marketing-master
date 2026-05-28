@@ -210,7 +210,9 @@ export function CandidateDetail({ candidateId }: Props) {
     const id = activityToDelete.id
     const typeLabel = lang === 'en' ? 'Activity Log' : 'Aktivite Kaydı'
     setActivityToDelete(null)
-    deleteWithUndo(typeLabel, () => deleteActivityMutation.mutate(id))
+    deleteWithUndo(typeLabel, () =>
+      deleteActivityMutation.mutate({ activityId: id, candidateId })
+    )
   }
 
   

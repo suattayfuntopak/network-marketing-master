@@ -11,6 +11,8 @@ import { generateRoleplayResponseAction } from '../actions'
 import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 interface Scenario {
   id: string
@@ -261,6 +263,7 @@ export function ProvaForm() {
   const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
 
   const { data: usage } = useAIUsage()
+  const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const isSuperAdmin = usage?.isSuperAdmin ?? false
   const roleplayUsed = usage?.roleplayUsed ?? 0
@@ -334,7 +337,7 @@ export function ProvaForm() {
         // Rollback user message on quota failure
         setMessages(messages)
       } else if (result.candidate_reply) {
-        qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
+        invalidateTeamAndAIUsage(qc, ws?.workspaceId)
 
         // Set remaining limits if returned
         if (typeof result.remaining === 'number') {

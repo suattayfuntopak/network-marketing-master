@@ -270,6 +270,14 @@ export interface Database {
         Args: { p_workspace_id: string; p_user_ids: string[] }
         Returns: Json
       }
+      nmm_fetch_team_with_downlines: {
+        Args: { p_workspace_id: string }
+        Returns: Json
+      }
+      nmm_count_candidates_per_workspace: {
+        Args: Record<string, never>
+        Returns: Json
+      }
     }
     Enums: { [_ in never]: never }
   }

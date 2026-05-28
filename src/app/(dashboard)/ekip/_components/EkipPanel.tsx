@@ -25,6 +25,9 @@ import { waHref } from '@/lib/waLink'
 import { parseNote } from '@/lib/noteParser'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Z } from '@/lib/zIndex'
+import { REGISTER_URL } from '@/lib/constants'
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
+import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 
 export interface MemberRow {
   user_id: string
@@ -69,6 +72,96 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
 
 async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const supabase = createClient()
+
+  const rpcBundle = await fetchTeamWithDownlines(supabase, workspaceId)
+  if (rpcBundle) {
+    const allUserIds = rpcBundle.members.map(m => m.user_id)
+    const authAvatars = await resolveTeamAvatarsAction(workspaceId, allUserIds)
+    const { members, leaderCandidates: candidates, leaderOwnerId } = rpcBundle
+    const ownWs = { owner_id: leaderOwnerId }
+
+    const registeredMemberRows = members.map(m => {
+      const mc = candidates.filter(c => c.owner_id === m.user_id)
+      const matchedPipelineId = ownWs.owner_id
+        ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
+        : null
+      const candidateMatch = matchedPipelineId
+        ? candidates.find(c => c.id === matchedPipelineId)
+        : undefined
+      const phone = candidateMatch?.phone ?? null
+      const noteAvatar = candidateMatch?.note ? parseNote(candidateMatch.note).avatarUrl : ''
+      const resolvedAvatar = m.avatar_url ?? authAvatars[m.user_id] ?? (noteAvatar || null)
+
+      return {
+        user_id: m.user_id,
+        full_name: m.full_name,
+        role: m.role,
+        joined_at: m.joined_at,
+        candidate_count: mc.length || m.candidate_count,
+        yeni_count: m.yeni_count,
+        sunum_count: m.sunum_count,
+        takip_count: m.takip_count,
+        katildi_count: m.katildi_count,
+        last_activity_at: m.last_activity_at,
+        onboarding_steps: m.onboarding_steps,
+        phone,
+        isAppUser: true as const,
+        avatar_url: resolvedAvatar,
+        pipeline_id: matchedPipelineId,
+      }
+    })
+
+    const cleanStr = (s: string | null | undefined) => (s ?? '')
+      .toLowerCase()
+      .replace(/\u0131/g, 'i').replace(/\u011f/g, 'g')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]/g, '')
+
+    const nonAppMembers: MemberRow[] = []
+    if (ownWs.owner_id) {
+      candidates
+        .filter(c => c.owner_id === ownWs.owner_id && c.stage === 'katildi')
+        .forEach(c => {
+          const isMatched = registeredMemberRows.some(m => {
+            const mf = cleanStr(m.full_name)
+            const cf = cleanStr(c.full_name)
+            if (!mf || !cf) return false
+            if (mf.includes(cf) || cf.includes(mf)) return true
+            const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
+            return mWords.some((w: string) => cf.includes(w))
+          })
+          if (!isMatched) {
+            const parsedNote = parseNote(c.note)
+            nonAppMembers.push({
+              user_id: c.id,
+              full_name: c.full_name,
+              role: 'member',
+              joined_at: c.created_at || null,
+              candidate_count: 0,
+              yeni_count: 0,
+              sunum_count: 0,
+              takip_count: 0,
+              katildi_count: 0,
+              last_activity_at: null,
+              onboarding_steps: [],
+              phone: c.phone || null,
+              isAppUser: false,
+              avatar_url: parsedNote.avatarUrl || null,
+              pipeline_id: c.id,
+            })
+          }
+        })
+    }
+
+    return [...registeredMemberRows, ...nonAppMembers].sort((a, b) => {
+      if (a.role === 'leader') return -1
+      if (b.role === 'leader') return 1
+      if (a.isAppUser && !b.isAppUser) return -1
+      if (!a.isAppUser && b.isAppUser) return 1
+      return b.candidate_count - a.candidate_count
+    })
+  }
 
   // 1. Get the workspace owner_id
   const { data: ownWs, error: wsErr } = await supabase
@@ -218,14 +311,12 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .filter(o => o.user_id === m.user_id)
       .map(o => o.step_id)
 
-    const candidateMatch = candidates.find(c => {
-      if (c.owner_id !== ownWs.owner_id) return false
-      const cf = cleanStr(c.full_name)
-      const mf = cleanStr(m.full_name)
-      if (cf && mf && (cf.includes(mf) || mf.includes(cf))) return true
-      const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
-      return mWords.some((w: string) => cf.includes(w))
-    })
+    const matchedPipelineId = ownWs.owner_id
+      ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
+      : null
+    const candidateMatch = matchedPipelineId
+      ? candidates.find(c => c.id === matchedPipelineId)
+      : undefined
     const phone = candidateMatch?.phone ?? null
     const noteAvatar = candidateMatch?.note ? parseNote(candidateMatch.note).avatarUrl : ''
     const resolvedAvatar = m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
@@ -339,7 +430,7 @@ export function EkipPanel() {
 
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
-    const link = `https://nmmaster.com/kayit`
+    const link = REGISTER_URL
     const message = t('team.inviteWaMessage', {
       name: member.full_name ?? t('common.member'),
       link,
@@ -748,10 +839,10 @@ export function EkipPanel() {
                     </div>
                       </>
                     )
-                    const detailHref = m.pipeline_id
-                      ? `/pipeline/${m.pipeline_id}`
-                      : m.isAppUser !== false
-                        ? `/ekip/uye/${m.user_id}`
+                    const detailHref = m.isAppUser !== false
+                      ? `/ekip/uye/${m.user_id}`
+                      : m.pipeline_id
+                        ? `/pipeline/${m.pipeline_id}`
                         : null
                     return detailHref ? (
                       <Link href={detailHref} className={`${profileClass} hover:opacity-80 transition cursor-pointer`}>
@@ -1014,7 +1105,7 @@ export function EkipPanel() {
               </button>
               <a
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                  t('team.waInviteGroup', { code: ws?.inviteCode ?? '' })
+                  t('team.waInviteGroup', { code: ws?.inviteCode ?? '', link: REGISTER_URL })
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"

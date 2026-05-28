@@ -8,6 +8,7 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
 import { parseNote } from '@/lib/noteParser'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
@@ -32,6 +33,7 @@ export function useCandidates(workspaceId: string | undefined, filter: Candidate
     queryKey: ['candidates', workspaceId],
     queryFn: () => fetchCandidates(workspaceId!),
     enabled: !!workspaceId,
+    staleTime: 30_000,
   })
 
   const filtered = (query.data ?? []).filter(c => {
@@ -89,17 +91,18 @@ export function useUpdateCandidate(workspaceId: string) {
   return useMutation({
     mutationFn: async ({ id, ...patch }: NmmCandidateUpdate & { id: string }) => {
       const supabase = createClient()
-      
-      const { data: currentCandidate } = await supabase
-        .from('nmm_candidates')
-        .select('*')
-        .eq('id', id)
-        .single()
+
+      const cached = qc.getQueryData<NmmCandidate[]>(['candidates', workspaceId])
+      const currentCandidate =
+        cached?.find(c => c.id === id) ??
+        (await supabase.from('nmm_candidates').select('*').eq('id', id).single()).data
 
       const { error } = await supabase
         .from('nmm_candidates')
         .update(patch)
         .eq('id', id)
+        .select('id')
+        .single()
       if (error) throw new Error(error.message)
 
       if (currentCandidate) {
@@ -167,6 +170,7 @@ export function useUpdateCandidate(workspaceId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
       qc.invalidateQueries({ queryKey: ['activity'] })
+      invalidateTeamAndAIUsage(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to update: ${e.message}` : `Güncellenemedi: ${e.message}`),
@@ -281,7 +285,7 @@ export function useAddCandidateNote(workspaceId: string) {
 export function useDeleteActivity(workspaceId: string) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async (activityId: string) => {
+    mutationFn: async ({ activityId }: { activityId: string; candidateId: string }) => {
       const supabase = createClient()
       const { error } = await supabase
         .from('nmm_daily_actions')
@@ -289,9 +293,10 @@ export function useDeleteActivity(workspaceId: string) {
         .eq('id', activityId)
       if (error) throw new Error(error.message)
     },
-    onSuccess: (_, activityId) => {
-      qc.invalidateQueries({ queryKey: ['activity'] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes'] })
+    onSuccess: (_, { candidateId }) => {
+      qc.invalidateQueries({ queryKey: ['activity', candidateId] })
+      qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
+      invalidateTeamAndAIUsage(qc, workspaceId)
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`),
   })

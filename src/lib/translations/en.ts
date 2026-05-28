@@ -298,7 +298,7 @@ export const en = {
     teamLimitReached: "Team Limit Reached (50/50)",
     teamLimitDesc: "Free plan allows up to 50 team members. Upgrade to Pro to grow your organization.",
     teamLimitDescPro: "You have more than 50 downline members in your organization. Upgrade to Pro Plan for unlimited tracking, AI downline coaching, and professional analytics.",
-    waInviteGroup: "Hi! You are invited to our Network Marketing Master team!\n\nComplete your registration from the link below, and enter the code *{code}* on the \"My Team\" page to join us instantly:\n\n🔗 https://network-marketing-master.vercel.app/kayit",
+    waInviteGroup: "Hello! You are invited to our Network Marketing Master team!\n\nComplete your registration using the link below, then enter the code {code} on the \"My Team\" page to join us instantly:\n\nRegistration Link: {link}",
     upgradeToPro: "Upgrade to Pro 🚀",
     copyCode: "Copy Code",
     copyCodeToast: "Invite message copied! Share via WhatsApp.",
@@ -333,7 +333,7 @@ export const en = {
     backToTeam: "Back to My Team",
     memberNotFound: "Member not found",
     unnamedMember: "Unnamed Member",
-    inviteWaMessage: "Hello {name}, I registered you in my Network Marketing Master system! 🚀\n\nDownload/register here: {link}\nUse my Sponsor Invite Code: *{code}*\n\nThis will allow us to track your list, correct start steps, and build your business together using AI! Let's get started!",
+    inviteWaMessage: "Hello {name}, you are invited to our Network Marketing Master team!\n\nComplete your registration using the link below, then enter the code {code} on the \"My Team\" page to join us instantly:\n\nRegistration Link: {link}",
   },
   header: {
     planPro: "Pro Leader",

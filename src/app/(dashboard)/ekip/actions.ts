@@ -1,5 +1,6 @@
 'use server'
 
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -162,21 +163,11 @@ export async function getTeamMemberDetailAction(
 
   const mc = (candidates ?? []).filter(c => c.owner_id === memberUserId)
 
-  const cleanStr = (s: string | null | undefined) => (s ?? '')
-    .toLowerCase()
-    .replace(/\u0131/g, 'i').replace(/\u011f/g, 'g')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]/g, '')
-
-  const candidateMatch = (candidates ?? []).find(c => {
-    if (c.owner_id !== ownWs.owner_id) return false
-    const cf = cleanStr(c.full_name)
-    const mf = cleanStr(memberRow.full_name)
-    if (cf && mf && (cf.includes(mf) || mf.includes(cf))) return true
-    const mWords = (memberRow.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
-    return mWords.some((w: string) => cf.includes(w))
-  })
+  const matchedPipelineId = findLeaderCandidateForMember(
+    candidates ?? [],
+    ownWs.owner_id,
+    memberRow.full_name
+  )
 
   let lastActivity = memberRow.joined_at
   actions?.forEach(act => {
@@ -199,7 +190,7 @@ export async function getTeamMemberDetailAction(
       katildi_count: mc.filter(c => c.stage === 'katildi').length,
       onboarding_steps: onboarding?.map(o => o.step_id) ?? [],
       last_activity_at: lastActivity,
-      pipeline_id: candidateMatch?.id ?? null,
+      pipeline_id: matchedPipelineId,
       license_type: memberWs?.license_type ?? null,
     },
   }

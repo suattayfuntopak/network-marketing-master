@@ -298,7 +298,6 @@ export const tr = {
     teamLimitReached: "Takım Limiti Aşıldı (50/50)",
     teamLimitDesc: "Ücretsiz planda en fazla 50 ekip üyesi ekleyebilirsiniz. Ekibinizi büyütmek için Pro plana geçin.",
     teamLimitDescPro: "Ekibinizde 50'den fazla iş ortağı bulunuyor. Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve gelişmiş analizler için Pro Plana yükseltin.",
-    waInviteGroup: "Merhaba! Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp \"Ekibim\" sayfasından *{code}* kodunu girerek aramıza anında katılabilirsin:\n\n🔗 https://network-marketing-master.vercel.app/kayit",
     upgradeToPro: "Pro Plana Yükselt 🚀",
     copyCode: "Kodu Kopyala",
     copyCodeToast: "Davet mesajı panoya kopyalandı! WhatsApp'tan paylaşabilirsiniz.",
@@ -333,7 +332,8 @@ export const tr = {
     backToTeam: "Ekibime Dön",
     memberNotFound: "Üye bulunamadı",
     unnamedMember: "İsimsiz Üye",
-    inviteWaMessage: "Merhaba {name}, seni Network Marketing Master sistemime iş ortağım olarak ekledim! 🚀\n\nBuradan kayıt olabilirsin: {link}\nSponsor Davet Kodun: *{code}*\n\nBu sayede isim listeni, doğru başlangıç adımlarını ve aday takibini yapay zeka desteğiyle ortaklaşa yönetebileceğiz. Aramıza hoş geldin!",
+    inviteWaMessage: "Merhaba {name}, Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp \"Ekibim\" sayfasından {code} kodunu girerek aramıza anında katılabilirsin:\n\nKayıt Linki: {link}",
+    waInviteGroup: "Merhaba! Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp \"Ekibim\" sayfasından {code} kodunu girerek aramıza anında katılabilirsin:\n\nKayıt Linki: {link}",
   },
   header: {
     planPro: "Pro Lider",

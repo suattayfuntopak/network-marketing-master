@@ -599,6 +599,95 @@ export default function AnalyticsPage() {
             </div>
           </section>
 
+          {/* Ekip Yapay Zeka Limit & Kullanım Kontrol Masası (SADECE SÜPER ADMİN GÖREBİLİR) — moved above personal quota */}
+          {usage?.isSuperAdmin && (
+            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
+              <div>
+                <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 text-brand animate-pulse" />
+                  {lang === 'en' ? 'Team AI Usage & Quotas Control Spread' : 'Ekip Yapay Zeka Kullanım & Limit Kontrol Masası'}
+                </h2>
+                <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                  {lang === 'en'
+                    ? 'Exclusive administrative spreadsheet showing today\'s artificial intelligence usage counts for all team partners.'
+                    : 'Sadece Süper Admin olarak sizin görebileceğiniz, tüm ekibinizin bugünkü yapay zeka limit kullanım verilerini içeren yönetimsel kontrol tablosu.'}
+                </p>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]" onTouchStart={(e) => e.stopPropagation()}>
+                <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+                  <thead>
+                    <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
+                      <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
+                      <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
+
+                      <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
+                        {lang === 'en' ? 'AI Message (Used / Limit)' : 'YZ Mesajı (Kullanılan / Limit)'}
+                      </th>
+                      
+                      <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
+                        {lang === 'en' ? 'AI Coach (Used / Limit)' : 'YZ Koçu (Kullanılan / Limit)'}
+                      </th>
+                      
+                      <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
+                        {lang === 'en' ? 'Compliance (Used / Limit)' : 'Uyum Denetimi (Kullanılan / Limit)'}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
+                    {sortedMembers.map(m => {
+                      const isLeader = m.role === 'leader'
+                      return (
+                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
+                          <td className="p-3 flex items-center gap-2 whitespace-nowrap">
+                            {m.avatar_url ? (
+                              <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
+                                <img src={m.avatar_url} alt={m.full_name ?? ''} className="h-full w-full object-cover" />
+                                {isLeader && <Crown className="absolute -top-1 -right-1 h-3 w-3 text-[#854F0B] bg-white rounded-full p-[1px]" strokeWidth={2.5} />}
+                              </div>
+                            ) : isLeader ? (
+                              <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
+                            ) : (
+                              <span className="h-2 w-2 rounded-full bg-zinc-300" />
+                            )}
+                            <span>{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
+                          </td>
+                          <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                            {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
+                          </td>
+                          
+                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
+                            {isLeader ? (
+                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                            ) : (
+                              `${m.today_message ?? 0} / 25`
+                            )}
+                          </td>
+                          
+                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
+                            {isLeader ? (
+                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                            ) : (
+                              `${m.today_roleplay ?? 0} / 20`
+                            )}
+                          </td>
+                          
+                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
+                            {isLeader ? (
+                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                            ) : (
+                              `${m.today_compliance ?? 0} / 5`
+                            )}
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
             <div className="flex items-center gap-2">
@@ -694,93 +783,6 @@ export default function AnalyticsPage() {
               </div>
             )}
           </section>
-
-          {/* Ekip Yapay Zeka Limit & Kullanım Kontrol Masası (SADECE SÜPER ADMİN GÖREBİLİR) */}
-          {usage?.isSuperAdmin && (
-            <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
-              <div>
-                <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
-                  <Sparkles className="h-4 w-4 text-brand animate-pulse" />
-                  {lang === 'en' ? 'Team AI Usage & Quotas Control Spread' : 'Ekip Yapay Zeka Kullanım & Limit Kontrol Masası'}
-                </h2>
-                <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                  {lang === 'en'
-                    ? 'Exclusive administrative spreadsheet showing today\'s artificial intelligence usage counts for all team partners.'
-                    : 'Sadece Süper Admin olarak sizin görebileceğiniz, tüm ekibinizin bugünkü yapay zeka limit kullanım verilerini içeren yönetimsel kontrol tablosu.'}
-                </p>
-              </div>
-
-              <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]" onTouchStart={(e) => e.stopPropagation()}>
-                <table className="w-full text-left border-collapse text-xs min-w-[800px]">
-                  <thead>
-                    <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
-
-                      <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
-                        {lang === 'en' ? 'AI Message (Used / Limit)' : 'YZ Mesajı (Kullanılan / Limit)'}
-                      </th>
-                      
-                      <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
-                        {lang === 'en' ? 'AI Coach (Used / Limit)' : 'YZ Koçu (Kullanılan / Limit)'}
-                      </th>
-                      
-                      <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
-                        {lang === 'en' ? 'Compliance (Used / Limit)' : 'Uyum Denetimi (Kullanılan / Limit)'}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
-                    {sortedMembers.map(m => {
-                      const isLeader = m.role === 'leader'
-                      return (
-                        <tr key={m.user_id} className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${isLeader ? 'font-bold bg-amber-50/5 dark:bg-amber-950/5' : ''}`}>
-                          <td className="p-3 flex items-center gap-2 whitespace-nowrap">
-                            {isLeader ? (
-                              <Crown className="h-4 w-4 text-[#854F0B]" strokeWidth={2.5} />
-                            ) : (
-                              <span className="h-2 w-2 rounded-full bg-zinc-300" />
-                            )}
-                            <span>{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
-                          </td>
-                          <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
-                            {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
-                          </td>
-                          
-                          {/* 1. YZ Mesajı */}
-                          <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                            {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
-                            ) : (
-                              `${m.today_message ?? 0} / 25`
-                            )}
-                          </td>
-                          
-                          {/* 2. YZ Koçu */}
-                          <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                            {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
-                            ) : (
-                              `${m.today_roleplay ?? 0} / 20`
-                            )}
-                          </td>
-                          
-                          {/* 3. Uyum Denetimi */}
-                          <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                            {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
-                            ) : (
-                              `${m.today_compliance ?? 0} / 5`
-                            )}
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
 
           {/* Bilgi Notu */}
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">

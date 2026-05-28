@@ -64,16 +64,21 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     throw new Error('Çalışma alanları çekilemedi.')
   }
 
-  // 3. Fetch all candidate counts grouped by workspace
-  const { data: candidates, error: cError } = await admin
-    .from('nmm_candidates')
-    .select('workspace_id')
-
   const candidateCountMap = new Map<string, number>()
-  if (!cError && candidates) {
-    candidates.forEach(c => {
-      candidateCountMap.set(c.workspace_id, (candidateCountMap.get(c.workspace_id) ?? 0) + 1)
+  const { data: countJson, error: countRpcError } = await admin.rpc('nmm_count_candidates_per_workspace')
+  if (!countRpcError && countJson && typeof countJson === 'object') {
+    Object.entries(countJson as Record<string, number>).forEach(([wsId, cnt]) => {
+      candidateCountMap.set(wsId, cnt)
     })
+  } else {
+    const { data: candidates, error: cError } = await admin
+      .from('nmm_candidates')
+      .select('workspace_id')
+    if (!cError && candidates) {
+      candidates.forEach(c => {
+        candidateCountMap.set(c.workspace_id, (candidateCountMap.get(c.workspace_id) ?? 0) + 1)
+      })
+    }
   }
 
   // 4. Count downlines per workspace (parent_id is a workspace UUID)
@@ -87,6 +92,23 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   // Build workspace lookup by ID for sponsor resolution
   const workspaceById = new Map<string, typeof workspaces[0]>()
   workspaces.forEach(w => workspaceById.set(w.id, w))
+
+  const ownerIdsForAvatars = [
+    ...new Set(workspaces.map(w => w.owner_id).filter((id): id is string => !!id)),
+  ]
+  const avatarByOwnerId = new Map<string, string>()
+  if (ownerIdsForAvatars.length > 0) {
+    const { data: memberAvatars } = await admin
+      .from('nmm_workspace_members')
+      .select('user_id, avatar_url')
+      .in('user_id', ownerIdsForAvatars)
+      .not('avatar_url', 'is', null)
+    memberAvatars?.forEach(row => {
+      if (row.avatar_url && !avatarByOwnerId.has(row.user_id)) {
+        avatarByOwnerId.set(row.user_id, row.avatar_url)
+      }
+    })
+  }
 
   // 5. Combine and build result — deduplicate by owner_id (keep most recent workspace per user)
   const seenOwners = new Set<string>()
@@ -103,7 +125,9 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     const ownerUser = w.owner_id ? userMap.get(w.owner_id) : null
     const ownerEmail = ownerUser?.email ?? 'Bilinmiyor'
     const ownerName = (ownerUser?.user_metadata?.full_name as string | undefined) ?? ownerUser?.email?.split('@')[0] ?? 'İsimsiz Üye'
-    const avatarUrl = (ownerUser?.user_metadata?.avatar_url as string | undefined) ?? null
+    const avatarUrl =
+      (ownerUser?.user_metadata?.avatar_url as string | undefined) ??
+      (w.owner_id ? avatarByOwnerId.get(w.owner_id) ?? null : null)
 
     // Resolve sponsor via workspace chain: parent workspace → owner user
     // Supports both formats: parent_id as workspace UUID (new) and as user UUID (legacy)
