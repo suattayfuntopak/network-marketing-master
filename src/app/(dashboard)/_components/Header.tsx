@@ -57,7 +57,8 @@ export const USFlag = () => (
 )
 
 export function Header({ visible = true }: { visible?: boolean }) {
-  const { lang, t } = useTranslation()
+
+  const { lang, setLang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const router = useRouter()
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -212,6 +213,56 @@ export function Header({ visible = true }: { visible?: boolean }) {
           {/* Tema Butonu */}
           <div className="shrink-0">
             <ThemeToggle />
+          </div>
+
+          {/* Dil Seçici (Mobil için tekli, Desktop için çiftli) */}
+          <div className="flex items-center">
+            {/* Mobil Görünüm (Sadece diğer dil gösterilir) */}
+            <div className="flex md:hidden shrink-0 items-center justify-center">
+              {lang === 'tr' ? (
+                <button
+                  onClick={() => setLang('en')}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                  title="Switch to English"
+                >
+                  <USFlag />
+                </button>
+              ) : (
+                <button
+                  onClick={() => setLang('tr')}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                  title="Türkçe'ye Geç"
+                >
+                  <TRFlag />
+                </button>
+              )}
+            </div>
+
+            {/* Masaüstü Görünüm (İki dil de yan yana gösterilir) */}
+            <div className="hidden md:flex shrink-0 items-center gap-1 rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)] ml-1">
+              <button
+                onClick={() => setLang('tr')}
+                className={`flex h-7 w-9 items-center justify-center rounded-lg transition-all ${
+                  lang === 'tr' 
+                    ? 'bg-white shadow-sm dark:bg-[var(--bg-card)]' 
+                    : 'opacity-50 hover:opacity-100'
+                }`}
+                title="Türkçe"
+              >
+                <TRFlag />
+              </button>
+              <button
+                onClick={() => setLang('en')}
+                className={`flex h-7 w-9 items-center justify-center rounded-lg transition-all ${
+                  lang === 'en' 
+                    ? 'bg-white shadow-sm dark:bg-[var(--bg-card)]' 
+                    : 'opacity-50 hover:opacity-100'
+                }`}
+                title="English"
+              >
+                <USFlag />
+              </button>
+            </div>
           </div>
 
           {/* Bildirim Çanı */}
