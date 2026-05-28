@@ -1508,3 +1508,10 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Kusursuz Çift Dil Yerelleştirmesi:**
   - 10 yorum kartının tamamı hem Türkçe hem de İngilizce metinleri içerecek şekilde veri yapısında (`TESTIMONIALS`) tanımlandı ve dil toggle butonuna tıklandığında anlık olarak pürüzsüzce yerelleşmesi sağlandı.
 
+
+## 2026-05-28 — Vercel Build Hatası Çözümü (Middleware / Proxy)
+
+### fix: resolve proxy/middleware conflict for vercel build
+- Vercel dağıtımı (build) sırasında ortaya çıkan `Both middleware file "./src/middleware.ts" and proxy file "./src/proxy.ts" are detected.` hatası giderildi.
+- Next.js 16.x Turbopack ve Vercel derleme ortamının gerektirdiği üzere, sistemdeki `src/middleware.ts` dosyası silinerek (çünkü zaten `proxy.ts` üzerinden export ediliyordu) yalnızca `src/proxy.ts` dosyasının kalması sağlandı. Çift dosya çakışması engellendi.
+
