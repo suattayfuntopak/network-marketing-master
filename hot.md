@@ -1,6 +1,21 @@
 # Hot Log
 
-## 2026-05-29 — /odeme sayfa metinleri + UX düzeltmeleri
+## 2026-05-29 — Shopier 501 fix + Council #6 EkipPanel
+
+### Shopier ödeme (Hata 501)
+- **Kök neden:** `api_pay4.php` formunda zorunlu alanlar eksikti; `currency` yanlışlıkla `"TRY"` string (doğrusu `"0"`)
+- **Düzeltme:** `lib/domain/shopierCheckout.ts` — billing/shipping, `product_type`, `callback`, imza payload; tutar `1699.00` formatında
+- Test: `shopierCheckout.test.ts` (+4 test)
+
+### Council #6 (5/5 EkipPanel)
+- `EkipPanel.tsx` ~240 satır orchestrator
+- `TeamPerformanceSection`, `InviteTeammateSection`, `JoinByInviteSection`, `YZOnboardingKocuModal` extract
+- Görünür UI değişikliği yok
+
+**Sıradaki #6:** landing `page.tsx` extract
+
+---
+
 
 - Başlık: **Lisans ve Mevcut Planlar**; alt açıklama kaldırıldı
 - Plan açıklamaları (Basic / Plus / Pro) güncellendi

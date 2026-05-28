@@ -31,7 +31,7 @@ export function getYearlyChargeAmount(plan: PlanId): number {
 
 export function getShopierAmount(plan: PlanId, period: BillingPeriod): string {
   const amount = period === 'yearly' ? getYearlyChargeAmount(plan) : getMonthlyPrice(plan)
-  return String(amount)
+  return amount.toFixed(2)
 }
 
 export function formatTryPrice(amount: number): string {
