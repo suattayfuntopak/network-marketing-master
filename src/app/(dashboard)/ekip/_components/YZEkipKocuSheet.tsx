@@ -8,21 +8,22 @@ import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from './EkipPanel'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 interface Props {
   member: MemberRow
   daysInactive: number
-  lang: string
   onClose: () => void
 }
 
-export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) {
+export function YZEkipKocuSheet({ member, daysInactive, onClose }: Props) {
+  const { t } = useTranslation()
   const [state, action, isPending] = useActionState(generateDownlineCoachingMessage, {})
 
   function handleCopy() {
     if (state.message) {
       navigator.clipboard.writeText(state.message)
-      toast.success(lang === 'en' ? 'Coaching message copied!' : 'Koçluk mesajı kopyalandı!')
+      toast.success(t('coachUi.coachingCopied'))
     }
   }
 
@@ -52,10 +53,10 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
             </div>
             <div>
               <p className="text-sm font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'YZ Team Coach' : 'YZ Ekip Koçu'}
+                {t('coachUi.teamCoach')}
               </p>
               <p className="text-xs text-[var(--text-3)]">
-                {member.full_name ?? 'İsimsiz Üye'} · {daysInactive} {lang === 'en' ? 'days inactive' : 'gündür inaktif'}
+                {member.full_name ?? 'İsimsiz Üye'} · {daysInactive} {t('coachUi.daysInactive')}
               </p>
             </div>
           </div>
@@ -70,24 +71,24 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
         {/* Üye istatistikleri özet gösterimi */}
         <div className="mb-5 rounded-2xl bg-[var(--bg-subtle)] p-4 border border-[var(--border)] space-y-2">
           <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
-            {lang === 'en' ? 'Member Stats' : 'Üye Dağılım İstatistikleri'}
+            {t('coachUi.memberStats')}
           </p>
           <div className="grid grid-cols-4 gap-2 pt-1 text-center">
             <div className="rounded-xl bg-blue-50/50 dark:bg-blue-950/10 p-2 border border-blue-100/30">
               <span className="block text-xs font-bold text-blue-600 dark:text-blue-400">{member.yeni_count}</span>
-              <span className="text-[8px] text-[var(--text-3)] font-medium">{lang === 'en' ? 'New' : 'Yeni'}</span>
+              <span className="text-[8px] text-[var(--text-3)] font-medium">{t('coachUi.statNew')}</span>
             </div>
             <div className="rounded-xl bg-emerald-50/50 dark:bg-emerald-950/10 p-2 border border-emerald-100/30">
               <span className="block text-xs font-bold text-emerald-600 dark:text-emerald-400">{member.sunum_count}</span>
-              <span className="text-[8px] text-[var(--text-3)] font-medium">{lang === 'en' ? 'Pres.' : 'Sunum'}</span>
+              <span className="text-[8px] text-[var(--text-3)] font-medium">{t('coachUi.statPresentation')}</span>
             </div>
             <div className="rounded-xl bg-amber-50/50 dark:bg-amber-950/10 p-2 border border-amber-100/30">
               <span className="block text-xs font-bold text-amber-600 dark:text-amber-400">{member.takip_count}</span>
-              <span className="text-[8px] text-[var(--text-3)] font-medium">{lang === 'en' ? 'Follow' : 'Takip'}</span>
+              <span className="text-[8px] text-[var(--text-3)] font-medium">{t('coachUi.statFollowUp')}</span>
             </div>
             <div className="rounded-xl bg-purple-50/50 dark:bg-purple-950/10 p-2 border border-purple-100/30">
               <span className="block text-xs font-bold text-purple-600 dark:text-purple-400">{member.katildi_count}</span>
-              <span className="text-[8px] text-[var(--text-3)] font-medium">{lang === 'en' ? 'Joined' : 'Katıldı'}</span>
+              <span className="text-[8px] text-[var(--text-3)] font-medium">{t('coachUi.statJoined')}</span>
             </div>
           </div>
         </div>
@@ -112,9 +113,9 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-semibold text-white transition hover:bg-amber-600 active:scale-95 disabled:opacity-60 shadow-md shadow-amber-500/10"
           >
             {isPending ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> {lang === 'en' ? 'Generating...' : 'Analiz Ediliyor...'}</>
+              <><Loader2 className="h-4 w-4 animate-spin" /> {t('coachUi.generating')}</>
             ) : (
-              <><Bot className="h-4.5 w-4.5" /> {lang === 'en' ? 'Generate Coaching Message' : 'Koçluk Mesajı Üret'}</>
+              <><Bot className="h-4.5 w-4.5" /> {t('coachUi.generateCoaching')}</>
             )}
           </button>
         </form>
@@ -123,7 +124,7 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
         {state.message && (
           <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50/5 dark:border-amber-900/30 dark:bg-amber-950/5 p-4 animate-in fade-in duration-300">
             <p className="mb-3 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
-              {lang === 'en' ? 'Suggested Mentoring Message' : 'Önerilen Destek Mesajı'}
+              {t('coachUi.suggestedMessage')}
             </p>
             <p className="mb-4 whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)] border-b border-[var(--border)] pb-3">
               {state.message}
@@ -134,7 +135,7 @@ export function YZEkipKocuSheet({ member, daysInactive, lang, onClose }: Props) 
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] active:scale-95"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {lang === 'en' ? 'Copy' : 'Kopyala'}
+                {t('coachUi.copy')}
               </button>
               <button
                 onClick={handleWhatsApp}

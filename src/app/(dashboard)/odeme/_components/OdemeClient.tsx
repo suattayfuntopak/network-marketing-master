@@ -9,7 +9,7 @@ import { initiateShopierPayment, ShopierFormData } from '../actions'
 import { Z } from '@/lib/ui/zIndex'
 
 export function OdemeClient() {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   
   const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
@@ -29,11 +29,7 @@ export function OdemeClient() {
     try {
       setLoading(true)
       setSelectedPlan(plan)
-      toast.info(
-        lang === 'en'
-          ? 'Preparing secure checkout session...'
-          : 'Güvenli ödeme oturumu hazırlanıyor...'
-      )
+      toast.info(t('paymentPage.preparingCheckout'))
 
       // Fetch the verified parameters & HMAC-SHA256 signature from our server action with chosen period
       const data = await initiateShopierPayment(plan, billingPeriod)
@@ -41,9 +37,9 @@ export function OdemeClient() {
     } catch (err: any) {
       console.error('[OdemeClient] error initiating payment:', err)
       toast.error(
-        lang === 'en'
-          ? `Could not start checkout: ${err?.message || 'Unknown error'}`
-          : `Ödeme başlatılamadı: ${err?.message || 'Bilinmeyen hata'}`
+        t('paymentPage.checkoutError', {
+          message: err?.message || t('paymentPage.unknownError'),
+        })
       )
       setLoading(false)
       setSelectedPlan(null)
@@ -65,7 +61,7 @@ export function OdemeClient() {
       <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4">
         <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
         <p className="text-sm text-[var(--text-3)]">
-          {lang === 'en' ? 'Loading plans...' : 'Paketler yükleniyor...'}
+          {t('paymentPage.loadingPlans')}
         </p>
       </div>
     )
@@ -90,12 +86,10 @@ export function OdemeClient() {
 
             <div className="space-y-2">
               <h3 className="text-lg font-bold text-white">
-                {lang === 'en' ? 'Redirecting to Shopier...' : 'Shopier\'e Yönlendiriliyorsunuz...'}
+                {t('paymentPage.redirectingShopier')}
               </h3>
               <p className="text-xs text-zinc-400">
-                {lang === 'en'
-                  ? 'Establishing a secure payment gateway session. Please do not close this window.'
-                  : 'Güvenli ödeme geçidi bağlantısı kuruluyor. Lütfen pencereyi kapatmayın.'}
+                {t('paymentPage.establishingGateway')}
               </p>
             </div>
 
@@ -129,18 +123,18 @@ export function OdemeClient() {
             </div>
             <div>
               <h3 className="text-base font-bold text-white">
-                {lang === 'en' ? 'Active Premium License Found' : 'Aktif Premium Lisansınız Mevcut'}
+                {t('paymentPage.activeLicenseFound')}
               </h3>
               <p className="text-xs text-zinc-400 mt-1">
-                {lang === 'en' ? 'You are currently on the ' : 'Şu anda '}
+                {t('paymentPage.currentPlanPrefix')}
                 <span className="font-extrabold text-indigo-300">
                   {workspace.licenseType === 'pro'
-                    ? (lang === 'en' ? 'Pro Lider' : 'Pro Lider')
+                    ? t('paymentPage.planPro')
                     : workspace.licenseType === 'master'
-                      ? (lang === 'en' ? 'Plus Lider' : 'Plus Lider')
-                      : (lang === 'en' ? 'Basic Partner' : 'Basic Partner')}
+                      ? t('paymentPage.planPlus')
+                      : t('paymentPage.planBasic')}
                 </span>
-                {lang === 'en' ? ' plan.' : ' planındasınız.'}
+                {t('paymentPage.currentPlanSuffix')}
               </p>
             </div>
           </div>
@@ -149,7 +143,7 @@ export function OdemeClient() {
             <div className="flex items-center gap-2 rounded-xl bg-zinc-800/40 border border-zinc-700/50 px-4 py-2 text-xs font-semibold text-zinc-300">
               <Calendar className="h-4 w-4 text-zinc-400 shrink-0" />
               <span>
-                {lang === 'en' ? 'Expires on: ' : 'Geçerlilik tarihi: '}
+                {t('paymentPage.expiresOn')}
                 <span className="text-white font-bold">{formatDate(workspace.licenseExpiresAt)}</span>
               </span>
             </div>
@@ -158,7 +152,7 @@ export function OdemeClient() {
           {!workspace.licenseExpiresAt && (
             <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2 text-xs font-bold text-amber-400 animate-pulse">
               <Sparkles className="h-4 w-4 shrink-0" />
-              <span>{lang === 'en' ? 'Unlimited Admin License' : 'Süresiz Yönetici Lisansı'}</span>
+              <span>{t('paymentPage.unlimitedAdminLicense')}</span>
             </div>
           )}
         </div>
@@ -176,7 +170,7 @@ export function OdemeClient() {
                 : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            {lang === 'en' ? 'Monthly Billing' : 'Aylık Ödeme'}
+            {t('paymentPage.monthlyBilling')}
           </button>
           <button
             type="button"
@@ -187,9 +181,9 @@ export function OdemeClient() {
                 : 'text-zinc-400 hover:text-zinc-200'
             }`}
           >
-            <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
+            <span>{t('paymentPage.yearlyBilling')}</span>
             <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
-              {lang === 'en' ? 'Best Value' : 'En İyi Fiyat'}
+              {t('paymentPage.bestValue')}
             </span>
           </button>
         </div>
@@ -203,21 +197,21 @@ export function OdemeClient() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                {lang === 'en' ? 'SOLO BUILDER' : 'BİREYSEL ORTAK'}
+                {t('paymentPage.soloBuilderTag')}
               </span>
               {isLeaderActive && (
                 <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  {lang === 'en' ? 'Active' : 'Aktif'}
+                  {t('paymentPage.active')}
                 </span>
               )}
             </div>
 
             <div>
               <h3 className="text-xl font-extrabold text-white">
-                {lang === 'en' ? 'Basic Plan' : 'Basic Plan'}
+                {t('paymentPage.basicPlanName')}
               </h3>
               <p className="text-xs text-zinc-400 mt-1">
-                {lang === 'en' ? 'Manage your personal candidate pipeline.' : 'Kişisel aday hunisini yönetmek ve provasını yapmak isteyenler için.'}
+                {t('paymentPage.basicPlanDesc')}
               </p>
             </div>
 
@@ -229,13 +223,13 @@ export function OdemeClient() {
                 </span>
                 <span className="text-xs text-zinc-500">
                   / {billingPeriod === 'monthly'
-                    ? (lang === 'en' ? 'month' : 'ay')
-                    : (lang === 'en' ? 'year' : 'yıl')}
+                    ? t('paymentPage.monthUnit')
+                    : t('paymentPage.yearUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                  {lang === 'en' ? "₺291 / month equivalent (3 Months Free!)" : "₺291 / ay'a denk gelir (3 Ay Bedava!)"}
+                  {t('paymentPage.basicYearlyEquivalent')}
                 </span>
               )}
             </div>
@@ -244,23 +238,23 @@ export function OdemeClient() {
             <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                <span>{lang === 'en' ? 'Full Candidate Pipeline Management' : 'Tam Aday Boru Hattı Yönetimi'}</span>
+                <span>{t('paymentPage.basicFeature1')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 15 AI Message Credits' : 'Günlük 15 YZ Mesaj Yazarı Kredisi'}</span>
+                <span>{t('paymentPage.basicFeature2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 10 Interactive Rehearsal Credits' : 'Günlük 10 Saha Provası Simülatörü'}</span>
+                <span>{t('paymentPage.basicFeature3')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 2 Compliance Control Credits' : 'Günlük 2 Uyum Denetim Hakkı'}</span>
+                <span>{t('paymentPage.basicFeature4')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                <span>{lang === 'en' ? 'Solo Statistics & Reports' : 'Bireysel İstatistik Raporu & Grafikler'}</span>
+                <span>{t('paymentPage.basicFeature5')}</span>
               </li>
             </ul>
           </div>
@@ -274,13 +268,13 @@ export function OdemeClient() {
               }`}
             >
               {isLeaderActive && billingPeriod === 'monthly' ? (
-                lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
+                t('paymentPage.currentActivePlan')
               ) : (
                 <>
                   <span>
                     {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'Buy 30 Days Access' : '30 Günlük Erişim Satın Al')
-                      : (lang === 'en' ? 'Buy Yearly Access' : 'Yıllık Erişim Satın Al')}
+                      ? t('paymentPage.basicBuyMonthly')
+                      : t('paymentPage.basicBuyYearly')}
                   </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
@@ -294,24 +288,24 @@ export function OdemeClient() {
           <div className="absolute right-6 top-6 flex items-center gap-2">
             {isMasterActive && (
               <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                {lang === 'en' ? 'Active' : 'Aktif'}
+                {t('paymentPage.active')}
               </span>
             )}
             <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              {lang === 'en' ? 'Popular' : 'En Çok Satan'}
+              {t('paymentPage.popular')}
             </span>
           </div>
 
           <div className="space-y-6">
             <div>
               <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                {lang === 'en' ? 'GROWING TEAMS' : 'TAKIM LİDERLERİ'}
+                {t('paymentPage.growingTeamsTag')}
               </span>
               <h3 className="mt-4 text-xl font-extrabold text-white">
-                {lang === 'en' ? 'Plus Plan' : 'Plus Plan'}
+                {t('paymentPage.plusPlanName')}
               </h3>
               <p className="text-xs text-zinc-400 mt-1">
-                {lang === 'en' ? 'Track downlines and sync onboarding.' : 'Alt ekibini izlemek, onboarding sürecini takip etmek ve gerçek zamanlı analiz etmek isteyen liderler.'}
+                {t('paymentPage.plusPlanDesc')}
               </p>
             </div>
 
@@ -323,13 +317,13 @@ export function OdemeClient() {
                 </span>
                 <span className="text-xs text-zinc-500">
                   / {billingPeriod === 'monthly'
-                    ? (lang === 'en' ? 'month' : 'ay')
-                    : (lang === 'en' ? 'year' : 'yıl')}
+                    ? t('paymentPage.monthUnit')
+                    : t('paymentPage.yearUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
-                  {lang === 'en' ? "₺833 / month equivalent (3 Months Free!)" : "₺833 / ay'a denk gelir (3 Ay Bedava!)"}
+                  {t('paymentPage.plusYearlyEquivalent')}
                 </span>
               )}
             </div>
@@ -338,31 +332,31 @@ export function OdemeClient() {
             <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span className="font-bold text-white">{lang === 'en' ? 'All Basic Plan Features' : 'Basic Planındaki TÜM Özellikler'}</span>
+                <span className="font-bold text-white">{t('paymentPage.plusFeature1')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? 'Direct Downline Tracking (Max 50 Members)' : 'Alt Ekip Takibi (Maksimum 50 Üye)'}</span>
+                <span>{t('paymentPage.plusFeature2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? '4-Week Onboarding Sync' : '4 Haftalık Doğru Başlangıç Rehberi Takibi'}</span>
+                <span>{t('paymentPage.plusFeature3')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 40 AI Message Credits' : 'Günlük 40 YZ Mesaj Yazarı Kredisi'}</span>
+                <span>{t('paymentPage.plusFeature4')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 25 Interactive Rehearsal Credits' : 'Günlük 25 Saha Provası Kredisi'}</span>
+                <span>{t('paymentPage.plusFeature5')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 5 Compliance Control Credits' : 'Günlük 5 Uyum Denetim Hakkı'}</span>
+                <span>{t('paymentPage.plusFeature6')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>{lang === 'en' ? 'Real-Time Downline Push Notifications' : 'Gerçek Zamanlı Takım Bildirim Motoru'}</span>
+                <span>{t('paymentPage.plusFeature7')}</span>
               </li>
             </ul>
           </div>
@@ -376,13 +370,13 @@ export function OdemeClient() {
               }`}
             >
               {isMasterActive && billingPeriod === 'monthly' ? (
-                lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
+                t('paymentPage.currentActivePlan')
               ) : (
                 <>
                   <span>
                     {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'Buy 30 Days Plus Access' : '30 Günlük Plus Erişimini Başlat')
-                      : (lang === 'en' ? 'Buy Yearly Plus Access' : 'Yıllık Plus Erişimini Başlat')}
+                      ? t('paymentPage.plusBuyMonthly')
+                      : t('paymentPage.plusBuyYearly')}
                   </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
@@ -396,24 +390,24 @@ export function OdemeClient() {
           <div className="absolute right-6 top-6 flex items-center gap-2">
             {isProActive && (
               <span className="text-[9px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                {lang === 'en' ? 'Active' : 'Aktif'}
+                {t('paymentPage.active')}
               </span>
             )}
             <span className="text-[9px] font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-              👑 {lang === 'en' ? 'Diamond Pro' : 'Diamond Pro'}
+              👑 {t('paymentPage.diamondPro')}
             </span>
           </div>
 
           <div className="space-y-6">
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                {lang === 'en' ? 'TOP ORGANIZATIONS' : 'BÜYÜK LİDERLER'}
+                {t('paymentPage.topOrgsTag')}
               </span>
               <h3 className="mt-4 text-xl font-extrabold text-white">
-                {lang === 'en' ? 'Pro Plan' : 'Pro Plan'}
+                {t('paymentPage.proPlanName')}
               </h3>
               <p className="text-xs text-zinc-400 mt-1">
-                {lang === 'en' ? 'Unlimited downlines, coaching & Excel analytics.' : 'Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve Excel tarzı performans masası.'}
+                {t('paymentPage.proPlanDesc')}
               </p>
             </div>
 
@@ -425,13 +419,13 @@ export function OdemeClient() {
                 </span>
                 <span className="text-xs text-zinc-500">
                   / {billingPeriod === 'monthly'
-                    ? (lang === 'en' ? 'month' : 'ay')
-                    : (lang === 'en' ? 'year' : 'yıl')}
+                    ? t('paymentPage.monthUnit')
+                    : t('paymentPage.yearUnit')}
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
                 <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                  {lang === 'en' ? "₺1,666 / month equivalent (3 Months Free!)" : "₺1,666 / ay'a denk gelir (3 Ay Bedava!)"}
+                  {t('paymentPage.proYearlyEquivalent')}
                 </span>
               )}
             </div>
@@ -440,31 +434,31 @@ export function OdemeClient() {
             <ul className="space-y-3 border-t border-white/[0.05] pt-5 text-xs text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span className="font-bold text-white">{lang === 'en' ? 'All Plus Plan Features' : 'Plus Planındaki TÜM Özellikler'}</span>
+                <span className="font-bold text-white">{t('paymentPage.proFeature1')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span className="font-bold text-pink-300">{lang === 'en' ? 'Sınırsız Alt Ekip Takibi' : 'Sınırsız Alt Ekip Takibi'}</span>
+                <span className="font-bold text-pink-300">{t('paymentPage.proFeature2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{lang === 'en' ? 'AI Downline Performance Coaching' : 'Yapay Zeka Alt Ekip Koçu'}</span>
+                <span>{t('paymentPage.proFeature3')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{lang === 'en' ? 'Super Admin AI Control Desk' : 'Süper Admin AI Kontrol Masası'}</span>
+                <span>{t('paymentPage.proFeature4')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 100 AI Message Credits' : 'Günlük 100 YZ Mesaj Yazarı Kredisi'}</span>
+                <span>{t('paymentPage.proFeature5')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 60 Interactive Rehearsal Credits' : 'Günlük 60 Saha Provası Kredisi'}</span>
+                <span>{t('paymentPage.proFeature6')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{lang === 'en' ? 'Daily 15 Compliance Control Credits' : 'Günlük 15 Uyum Denetim Hakkı'}</span>
+                <span>{t('paymentPage.proFeature7')}</span>
               </li>
             </ul>
           </div>
@@ -478,13 +472,13 @@ export function OdemeClient() {
               }`}
             >
               {isProActive && billingPeriod === 'monthly' ? (
-                lang === 'en' ? 'Your Current Active Plan' : 'Mevcut Aktif Planınız'
+                t('paymentPage.currentActivePlan')
               ) : (
                 <>
                   <span>
                     {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'Buy 30 Days Pro Access' : '30 Günlük Pro Erişimini Başlat')
-                      : (lang === 'en' ? 'Buy Yearly Pro Access' : 'Yıllık Pro Erişimini Başlat')}
+                      ? t('paymentPage.proBuyMonthly')
+                      : t('paymentPage.proBuyYearly')}
                   </span>
                   <ArrowRight className="h-3.5 w-3.5" />
                 </>
@@ -498,12 +492,10 @@ export function OdemeClient() {
       {/* ── Extra Disclaimers ── */}
       <div className="max-w-2xl mx-auto text-center rounded-2xl border border-white/[0.03] bg-white/[0.01] p-6 space-y-2">
         <h4 className="text-xs font-bold text-zinc-300">
-          {lang === 'en' ? 'Secure Payment & License' : 'Güvenli Ödeme & Lisans Bilgisi'}
+          {t('paymentPage.securePaymentTitle')}
         </h4>
         <p className="text-[10px] leading-relaxed text-zinc-500">
-          {lang === 'en'
-            ? 'Payments are securely processed via Shopier with 256-bit SSL encryption. We do not store your credit card details. Each purchase extends your active license period by 30 days, allowing you to renew or upgrade at any time.'
-            : 'Ödemeleriniz 256-bit SSL şifrelemeyle Shopier altyapısı üzerinden güvenle gerçekleşir. Kart bilgileriniz kesinlikle kaydedilmez. Her satın alım mevcut lisans sürenizi 30 gün uzatır; istediğiniz zaman yenileyebilir veya üst plana geçebilirsiniz.'}
+          {t('paymentPage.securePaymentDesc')}
         </p>
       </div>
     </div>

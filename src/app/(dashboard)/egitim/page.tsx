@@ -154,7 +154,7 @@ function EgitimPageContent() {
     setNewTags('')
     setNewEmoji('📖')
     setFormOpen(false)
-    toast.success(lang === 'en' ? 'Content added successfully!' : 'İçerik başarıyla eklendi!')
+    toast.success(t('trainingPage.contentAdded'))
   }
 
   // Load state & query param & auto pagination & scroll to it
@@ -235,7 +235,7 @@ function EgitimPageContent() {
             className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>{lang === 'en' ? 'Add Content' : 'İçerik Ekle'}</span>
+            <span>{t('trainingPage.addContent')}</span>
           </button>
         </div>
 
@@ -253,7 +253,7 @@ function EgitimPageContent() {
           <div className="flex flex-col items-end gap-1 shrink-0">
             {favCount > 0 && (
               <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[9px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
-                {favCount} {lang === 'en' ? 'fav' : 'favori'}
+                {favCount} {t('trainingPage.fav')}
               </span>
             )}
             {readCount > 0 && (
@@ -273,7 +273,7 @@ function EgitimPageContent() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder={lang === 'en' ? 'Search training topics or content...' : 'Eğitim konusu veya içeriği ara...'}
+          placeholder={t('trainingPage.searchPlaceholder')}
           className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition-all"
         />
         {search && (
@@ -312,7 +312,7 @@ function EgitimPageContent() {
       {/* Sonuç Sayısı */}
       {search && (
         <p className="mb-3 text-xs text-[var(--text-3)]">
-          {filtrelenmis.length} {lang === 'en' ? 'topics found' : 'konu bulundu'}
+          {filtrelenmis.length} {t('trainingPage.topicsFound')}
         </p>
       )}
 
@@ -321,10 +321,10 @@ function EgitimPageContent() {
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">⭐</p>
           <p className="text-sm font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'No favorites yet' : 'Henüz favori yok'}
+            {t('trainingPage.noFavorites')}
           </p>
           <p className="mt-1 text-xs text-[var(--text-2)]">
-            {lang === 'en' ? 'Tap ⭐ next to a topic to save it' : 'Eğitim konularının yanındaki ⭐ ile sabitleyebilirsin'}
+            {t('trainingPage.noFavoritesDesc')}
           </p>
         </div>
       )}
@@ -334,10 +334,10 @@ function EgitimPageContent() {
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">🔍</p>
           <p className="text-sm font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'No matching topics' : 'Eşleşen eğitim konusu bulunamadı'}
+            {t('trainingPage.noMatchingTopics')}
           </p>
           <p className="mt-1 text-xs text-[var(--text-2)]">
-            {lang === 'en' ? 'Try different keywords' : 'Farklı kelimelerle arama yap'}
+            {t('trainingPage.tryDifferentKeywords')}
           </p>
         </div>
       ) : !isFavoritesEmpty && (
@@ -436,15 +436,15 @@ function EgitimPageContent() {
                         <button
                           onClick={e => {
                             e.stopPropagation()
-                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this training content?' : 'Bu eğitim içeriğini silmek istediğinize emin misiniz?')) {
+                            if (confirm(t('trainingPage.confirmDelete'))) {
                               const updated = customTrainings.filter(t => t.id !== konu.id)
                               setCustomTrainings(updated)
                               deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
-                              toast.success(lang === 'en' ? 'Content deleted.' : 'İçerik silindi.')
+                              toast.success(t('trainingPage.contentDeleted'))
                             }
                           }}
                           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--text-3)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all hover:scale-105"
-                          title={lang === 'en' ? 'Delete Content' : 'İçeriği Sil'}
+                          title={t('trainingPage.deleteContent')}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -504,8 +504,8 @@ function EgitimPageContent() {
                             }`}
                           >
                             {copied
-                              ? <><Check className="h-3 w-3" /> {lang === 'en' ? 'Copied!' : 'Kopyalandı!'}</>
-                              : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Content' : 'İçeriği Kopyala'}</>
+                              ? <><Check className="h-3 w-3" /> {t('trainingPage.copied')}</>
+                              : <><Copy className="h-3 w-3" /> {t('trainingPage.copyContent')}</>
                             }
                           </button>
 
@@ -521,7 +521,7 @@ function EgitimPageContent() {
                               <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                               <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
                             </svg>
-                            {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp İle Gönder'}
+                            {t('trainingPage.sendViaWhatsApp')}
                           </a>
                         </div>
                       </div>
@@ -560,12 +560,10 @@ function EgitimPageContent() {
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
                 <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">
-                  {lang === 'en' ? 'Add Content' : 'İçerik Ekle'}
+                  {t('trainingPage.addContent')}
                 </h2>
                 <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
-                  {lang === 'en'
-                    ? 'You can add your own script, lecture notes or guides to the NM Master library'
-                    : 'NM Master kütüphanesine kendi script, ders notu ya da rehberini ekleyebilirsin'}
+                  {t('trainingPage.addContentDesc')}
                 </p>
               </div>
               <button
@@ -574,7 +572,7 @@ function EgitimPageContent() {
                 className="flex items-center gap-1 text-[11px] md:text-xs font-bold text-[var(--text-3)] hover:text-[#3730A3] dark:hover:text-[#a5b4fc] transition cursor-pointer"
               >
                 <X className="h-4 w-4" />
-                <span>{lang === 'en' ? 'Close Form' : 'Formu Kapat'}</span>
+                <span>{t('trainingPage.closeForm')}</span>
               </button>
             </div>
 
@@ -583,36 +581,28 @@ function EgitimPageContent() {
                 {/* Başlık */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Title' : 'Başlık'}
+                    {t('trainingPage.fieldTitle')}
                   </label>
                   <input
                     type="text"
                     required
                     value={newBaslik}
                     onChange={e => setNewBaslik(e.target.value)}
-                    placeholder={
-                      lang === 'en'
-                        ? 'e.g. Mini follow-up plan after first presentation'
-                        : 'Örn. İlk sunum sonrası mini takip planı'
-                    }
+                    placeholder={t('trainingPage.titlePlaceholder')}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
                 {/* Özet */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Summary' : 'Özet'}
+                    {t('trainingPage.fieldSummary')}
                   </label>
                   <input
                     type="text"
                     required
                     value={newOzet}
                     onChange={e => setNewOzet(e.target.value)}
-                    placeholder={
-                      lang === 'en'
-                        ? 'Briefly describe what the content is for.'
-                        : 'İçeriğin ne iş gördüğünü kısa anlat.'
-                    }
+                    placeholder={t('trainingPage.summaryPlaceholder')}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
@@ -622,50 +612,50 @@ function EgitimPageContent() {
                 {/* Kategori */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Category' : 'Kategori'}
+                    {t('trainingPage.fieldCategory')}
                   </label>
                   <select
                     value={newKategori}
                     onChange={e => setNewKategori(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Zihniyet">{lang === 'en' ? 'Mindset' : 'Zihniyet'}</option>
-                    <option value="İletişim & Yaklaşım">{lang === 'en' ? 'Communication & Approach' : 'İletişim & Yaklaşım'}</option>
-                    <option value="Davet Pratiği">{lang === 'en' ? 'Invitation Practice' : 'Davet Pratiği'}</option>
-                    <option value="Sunum & Kapanış">{lang === 'en' ? 'Presentation & Closing' : 'Sunum & Kapanış'}</option>
-                    <option value="Ekip & Liderlik">{lang === 'en' ? 'Team & Leadership' : 'Ekip & Liderlik'}</option>
-                    <option value="Strateji & Plan">{lang === 'en' ? 'Strategy & Plan' : 'Strateji & Plan'}</option>
-                    <option value="Yasal Uyum">{lang === 'en' ? 'Compliance' : 'Yasal Uyum'}</option>
+                    <option value="Zihniyet">{t('trainingPage.catMindset')}</option>
+                    <option value="İletişim & Yaklaşım">{t('trainingPage.catCommunication')}</option>
+                    <option value="Davet Pratiği">{t('trainingPage.catInvitation')}</option>
+                    <option value="Sunum & Kapanış">{t('trainingPage.catPresentation')}</option>
+                    <option value="Ekip & Liderlik">{t('trainingPage.catTeam')}</option>
+                    <option value="Strateji & Plan">{t('trainingPage.catStrategy')}</option>
+                    <option value="Yasal Uyum">{t('trainingPage.catCompliance')}</option>
                   </select>
                 </div>
                 {/* Tür */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Type' : 'Tür'}
+                    {t('trainingPage.fieldType')}
                   </label>
                   <select
                     value={newTur}
                     onChange={e => setNewTur(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Ders Notu">{lang === 'en' ? 'Lecture Note' : 'Ders Notu'}</option>
+                    <option value="Ders Notu">{t('trainingPage.typeLectureNote')}</option>
                     <option value="Script">Script</option>
-                    <option value="Rehber">{lang === 'en' ? 'Guide' : 'Rehber'}</option>
+                    <option value="Rehber">{t('trainingPage.typeGuide')}</option>
                   </select>
                 </div>
                 {/* Seviye */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Level' : 'Seviye'}
+                    {t('trainingPage.fieldLevel')}
                   </label>
                   <select
                     value={newSeviye}
                     onChange={e => setNewSeviye(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="Başlangıç">{lang === 'en' ? 'Beginner' : 'Başlangıç'}</option>
-                    <option value="Orta">{lang === 'en' ? 'Intermediate' : 'Orta'}</option>
-                    <option value="İleri">{lang === 'en' ? 'Advanced' : 'İleri'}</option>
+                    <option value="Başlangıç">{t('trainingPage.levelBeginner')}</option>
+                    <option value="Orta">{t('trainingPage.levelIntermediate')}</option>
+                    <option value="İleri">{t('trainingPage.levelAdvanced')}</option>
                   </select>
                 </div>
               </div>
@@ -673,18 +663,14 @@ function EgitimPageContent() {
               {/* İçerik (Textarea - Split by Newline) */}
               <div className="space-y-1">
                 <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                  {lang === 'en' ? 'Content (Write Each Item on a New Line)' : 'İçerik (Her Maddeyi Yeni Satıra Yazın)'}
+                  {t('trainingPage.fieldContent')}
                 </label>
                 <textarea
                   rows={5}
                   required
                   value={newIcerik}
                   onChange={e => setNewIcerik(e.target.value)}
-                  placeholder={
-                    lang === 'en'
-                      ? 'Add the full content text here, writing each step or item on a new line...'
-                      : 'Her bir adım veya maddeyi yeni bir satıra yazarak tam içerik metnini buraya ekleyin...'
-                  }
+                  placeholder={t('trainingPage.contentPlaceholder')}
                   className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition resize-none"
                 />
               </div>
@@ -693,35 +679,33 @@ function EgitimPageContent() {
                 {/* Emoji Seçimi */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Emoji' : 'Emoji'}
+                    {t('trainingPage.fieldEmoji')}
                   </label>
                   <select
                     value={newEmoji}
                     onChange={e => setNewEmoji(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
-                    <option value="📖">{lang === 'en' ? '📖 Book' : '📖 Kitap'}</option>
-                    <option value="💡">{lang === 'en' ? '💡 Bulb' : '💡 Ampul'}</option>
-                    <option value="🧠">{lang === 'en' ? '🧠 Brain' : '🧠 Beyin'}</option>
-                    <option value="🚀">{lang === 'en' ? '🚀 Rocket' : '🚀 Roket'}</option>
-                    <option value="🎯">{lang === 'en' ? '🎯 Target' : '🎯 Hedef'}</option>
-                    <option value="🤝">{lang === 'en' ? '🤝 Handshake' : '🤝 El Sıkışma'}</option>
-                    <option value="💎">{lang === 'en' ? '💎 Diamond' : '💎 Elmas'}</option>
+                    <option value="📖">{t('trainingPage.emojiBook')}</option>
+                    <option value="💡">{t('trainingPage.emojiBulb')}</option>
+                    <option value="🧠">{t('trainingPage.emojiBrain')}</option>
+                    <option value="🚀">{t('trainingPage.emojiRocket')}</option>
+                    <option value="🎯">{t('trainingPage.emojiTarget')}</option>
+                    <option value="🤝">{t('trainingPage.emojiHandshake')}</option>
+                    <option value="💎">{t('trainingPage.emojiDiamond')}</option>
                   </select>
                 </div>
 
                 {/* Etiketler */}
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {lang === 'en' ? 'Tags (Comma Separated)' : 'Etiketler (Virgülle Ayır)'}
+                    {t('trainingPage.fieldTags')}
                   </label>
                   <input
                     type="text"
                     value={newTags}
                     onChange={e => setNewTags(e.target.value)}
-                    placeholder={
-                      lang === 'en' ? 'e.g. follow-up, whatsapp, closing' : 'örn. takip, whatsapp, kapanış'
-                    }
+                    placeholder={t('trainingPage.tagsPlaceholder')}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   />
                 </div>
@@ -733,13 +717,13 @@ function EgitimPageContent() {
                   onClick={() => setFormOpen(false)}
                   className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold transition active:scale-95 cursor-pointer"
                 >
-                  {lang === 'en' ? 'Cancel' : 'İptal'}
+                  {t('trainingPage.cancel')}
                 </button>
                 <button
                   type="submit"
                   className="rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
                 >
-                  {lang === 'en' ? '+ Add' : '+ Ekle'}
+                  {t('trainingPage.addButton')}
                 </button>
               </div>
             </form>

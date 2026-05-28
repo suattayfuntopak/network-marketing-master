@@ -18,7 +18,7 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 type PeriodOption = '7d' | '30d' | 'all'
 
 export default function AnalyticsPage() {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
@@ -178,12 +178,12 @@ export default function AnalyticsPage() {
     const step6 = filteredCandidates.filter(c => c.stage === 'katildi').length
 
     const steps = [
-      { key: 'yeni',      label: lang === 'en' ? 'Total Leads' : 'Yeni Aday',          count: step1, color: '#534AB7' },
-      { key: 'iletisim',  label: lang === 'en' ? 'Contacted' : 'İletişim Kurulan',     count: step2, color: '#4169E1' },
-      { key: 'davetli',   label: lang === 'en' ? 'Invited' : 'Davet Edilen',         count: step3, color: '#C03E1F' },
-      { key: 'sunum',     label: lang === 'en' ? 'Presented' : 'Sunum Yapılan',        count: step4, color: '#0369A1' },
-      { key: 'takip',     label: lang === 'en' ? 'Follow-up' : 'Takip Edilen',         count: step5, color: '#854F0B' },
-      { key: 'katildi',   label: lang === 'en' ? 'Joined Partner' : 'İş Ortağı (Katıldı)',  count: step6, color: '#065F46' },
+      { key: 'yeni',      label: t('statsPage.funnelTotalLeads'),          count: step1, color: '#534AB7' },
+      { key: 'iletisim',  label: t('statsPage.funnelContacted'),     count: step2, color: '#4169E1' },
+      { key: 'davetli',   label: t('statsPage.funnelInvited'),         count: step3, color: '#C03E1F' },
+      { key: 'sunum',     label: t('statsPage.funnelPresented'),        count: step4, color: '#0369A1' },
+      { key: 'takip',     label: t('statsPage.funnelFollowUp'),         count: step5, color: '#854F0B' },
+      { key: 'katildi',   label: t('statsPage.funnelJoinedPartner'),  count: step6, color: '#065F46' },
     ]
 
     return steps.map((step, idx) => {
@@ -259,10 +259,10 @@ export default function AnalyticsPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'Statistics' : 'İstatistikler'}
+                {t('statsPage.title')}
               </h1>
               <p className="text-sm text-[var(--text-3)]">
-                {lang === 'en' ? 'Candidate, pipeline and AI usage insights' : 'Aday, süreç ve yapay zeka kullanım istatistikleri'}
+                {t('statsPage.subtitle')}
               </p>
             </div>
           </div>
@@ -279,9 +279,9 @@ export default function AnalyticsPage() {
                     : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
                 }`}
               >
-                {p === '7d' && (lang === 'en' ? 'Last 7 Days' : 'Son 7 Gün')}
-                {p === '30d' && (lang === 'en' ? 'Last 30 Days' : 'Son 30 Gün')}
-                {p === 'all' && (lang === 'en' ? 'All Time' : 'Tüm Zamanlar')}
+                {p === '7d' && t('statsPage.period7d')}
+                {p === '30d' && t('statsPage.period30d')}
+                {p === 'all' && t('statsPage.periodAll')}
               </button>
             ))}
           </div>
@@ -292,53 +292,53 @@ export default function AnalyticsPage() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 relative overflow-hidden">
               <span className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-                {lang === 'en' ? 'TOTAL LEADS' : 'TOPLAM ADAY'}
+                {t('statsPage.kpiTotalLeads')}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-[var(--text-1)]">{metrics.total}</span>
                 <Users className="h-4 w-4 text-[var(--text-3)] ml-auto" />
               </div>
               <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-                {lang === 'en' ? 'Candidates in period' : 'Filtreye uyan aday sayısı'}
+                {t('statsPage.kpiTotalLeadsDesc')}
               </p>
             </div>
 
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
               <span className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-                {lang === 'en' ? 'ACTIVE LEADS' : 'AKTİF SÜREÇ'}
+                {t('statsPage.kpiActiveLeads')}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-[#534AB7]">{metrics.active}</span>
                 <Activity className="h-4 w-4 text-[#534AB7] ml-auto" />
               </div>
               <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-                {lang === 'en' ? 'Moving candidates' : 'İlişkisi canlı adaylar'}
+                {t('statsPage.kpiActiveLeadsDesc')}
               </p>
             </div>
 
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
               <span className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-                {lang === 'en' ? 'CONVERSION RATE' : 'DÖNÜŞÜM ORANI'}
+                {t('statsPage.kpiConversionRate')}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-[#065F46]">%{metrics.conversionRate}</span>
                 <Award className="h-4 w-4 text-[#065F46] ml-auto" />
               </div>
               <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold text-emerald-600 dark:text-emerald-400">
-                {metrics.joined} {lang === 'en' ? 'became member' : 'distribütör oldu'}
+                {metrics.joined} {t('statsPage.kpiBecameMember')}
               </p>
             </div>
 
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
               <span className="text-[10px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-                {lang === 'en' ? 'PRESENTATION RATE' : 'SUNUM ORANI'}
+                {t('statsPage.kpiPresentationRate')}
               </span>
               <div className="mt-1 flex items-baseline gap-2">
                 <span className="text-2xl font-black text-[#0369A1]">%{metrics.presentationRate}</span>
                 <Target className="h-4 w-4 text-[#0369A1] ml-auto" />
               </div>
               <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-                {lang === 'en' ? 'Completed pitches' : 'Yapılan fırsat sunumu'}
+                {t('statsPage.kpiPresentationRateDesc')}
               </p>
             </div>
           </div>
@@ -351,18 +351,16 @@ export default function AnalyticsPage() {
               <div>
                 <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                   <Target className="h-4 w-4 text-[#1A56DB]" />
-                  {lang === 'en' ? 'Candidate Conversion Funnel' : 'Aday Dönüşüm Hunisi'}
+                  {t('statsPage.funnelTitle')}
                 </h2>
                 <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                  {lang === 'en'
-                    ? 'Cumulative waterfall representing step-by-step conversion of your contact list.'
-                    : 'Aday listendeki kişilerin aşama aşama organizasyonuna katılım sürecini gör.'}
+                  {t('statsPage.funnelSubtitle')}
                 </p>
               </div>
 
               {metrics.total === 0 ? (
                 <div className="py-16 text-center text-xs text-[var(--text-3)] italic">
-                  {lang === 'en' ? 'No candidates found in this period' : 'Bu periyotta veri bulunamadı'}
+                  {t('statsPage.funnelEmpty')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -391,7 +389,7 @@ export default function AnalyticsPage() {
                       </div>
                       {step.dropFromPrev !== null && step.dropFromPrev > 0 && (
                         <p className="mt-1 pl-28 text-[9px] text-[var(--text-3)] font-medium">
-                          ↓ {step.dropFromPrev} {lang === 'en' ? 'prospects remained in the previous step' : 'kişi önceki aşamada kaldı'}
+                          ↓ {step.dropFromPrev} {t('statsPage.funnelDropSuffix')}
                         </p>
                       )}
                     </div>
@@ -408,16 +406,16 @@ export default function AnalyticsPage() {
                 <div>
                   <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <Flame className="h-4 w-4 text-orange-500" />
-                    {lang === 'en' ? 'Pipeline Temperature' : 'Süreç Sıcaklık Dağılımı'}
+                    {t('statsPage.tempTitle')}
                   </h2>
                   <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                    {lang === 'en' ? 'Warmth levels calculated based on their active process stages.' : 'Adayların süreçteki aktifliklerine göre boru hattı sıcaklıkları.'}
+                    {t('statsPage.tempSubtitle')}
                   </p>
                 </div>
 
                 {metrics.total === 0 ? (
                   <div className="py-12 text-center text-xs text-[var(--text-3)] italic">
-                    {lang === 'en' ? 'No candidates to analyze' : 'Analiz edilecek aday yok'}
+                    {t('statsPage.tempEmpty')}
                   </div>
                 ) : (
                   <div className="flex items-center gap-6 py-4 md:py-6">
@@ -449,7 +447,7 @@ export default function AnalyticsPage() {
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5 font-bold">
                           <span className="h-2.5 w-2.5 rounded-full bg-[#C03E1F]" />
-                          <span>{lang === 'en' ? 'Hot Market' : 'Sıcak (Arama/Sunum)'}</span>
+                          <span>{t('statsPage.tempHot')}</span>
                         </div>
                         <span className="text-[var(--text-3)] font-bold tabular-nums">%{temperatureData.hotPct} ({temperatureData.hot})</span>
                       </div>
@@ -457,7 +455,7 @@ export default function AnalyticsPage() {
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5 font-bold">
                           <span className="h-2.5 w-2.5 rounded-full bg-[#534AB7]" />
-                          <span>{lang === 'en' ? 'Warm Market' : 'Ilık (Yeni/İletişim)'}</span>
+                          <span>{t('statsPage.tempWarm')}</span>
                         </div>
                         <span className="text-[var(--text-3)] font-bold tabular-nums">%{temperatureData.warmPct} ({temperatureData.warm})</span>
                       </div>
@@ -465,7 +463,7 @@ export default function AnalyticsPage() {
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-1.5 font-bold">
                           <span className="h-2.5 w-2.5 rounded-full bg-[#6B7280]" />
-                          <span>{lang === 'en' ? 'Cold/Lost' : 'Soğuk (İlgilenmedi)'}</span>
+                          <span>{t('statsPage.tempCold')}</span>
                         </div>
                         <span className="text-[var(--text-3)] font-bold tabular-nums">%{temperatureData.coldPct} ({temperatureData.cold})</span>
                       </div>
@@ -480,20 +478,20 @@ export default function AnalyticsPage() {
                   <div>
                     <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                       <BarChart2 className="h-4 w-4 text-[#4169E1]" />
-                      {lang === 'en' ? 'Acquisition Velocity' : 'Aday Kazanım İvmesi'}
+                      {t('statsPage.velocityTitle')}
                     </h2>
                     <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                      {lang === 'en' ? 'Growth trend representing new candidate creations.' : 'Seçilen periyotta organizasyonuna yeni katılan adayların trendi.'}
+                      {t('statsPage.velocitySubtitle')}
                     </p>
                   </div>
                   <span className="text-xs font-bold text-[#4169E1] bg-[#EEF2FF] dark:bg-[#0a0f2e] border border-blue-100/50 dark:border-blue-900/10 px-2 py-0.5 rounded-full">
-                    {metrics.total} {lang === 'en' ? 'new' : 'yeni'}
+                    {metrics.total} {t('statsPage.velocityNew')}
                   </span>
                 </div>
 
                 {metrics.total === 0 ? (
                   <div className="py-12 text-center text-xs text-[var(--text-3)] italic">
-                    {lang === 'en' ? 'No recent trend data' : 'Kayıt trendi verisi yok'}
+                    {t('statsPage.velocityEmpty')}
                   </div>
                 ) : (
                   <div className="flex items-end gap-2 flex-1 pt-6 min-h-[130px] pb-2">
@@ -520,12 +518,10 @@ export default function AnalyticsPage() {
             <div>
               <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-brand" />
-                {lang === 'en' ? 'Team Performance Excel Spreadsheet' : 'Ekip Performans Dağılım Tablosu'}
+                {t('statsPage.teamTitle')}
               </h2>
               <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                {lang === 'en'
-                  ? 'Detailed excel-style summary including NMM app partners (💎) and field distributors at katildi stage (🤝).'
-                  : 'NMM uygulama ortakları (💎) ve katıldı aşamasındaki saha distribütörlerini (🤝) birlikte gösteren huni dağılım tablosu.'}
+                {t('statsPage.teamSubtitle')}
               </p>
             </div>
 
@@ -533,27 +529,27 @@ export default function AnalyticsPage() {
               <div className="h-32 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
             ) : performanceRows.length === 0 ? (
               <div className="py-10 text-center text-xs text-[var(--text-3)] italic">
-                {lang === 'en' ? 'No team members registered' : 'Henüz ekibe kayıtlı üye bulunmamaktadır.'}
+                {t('statsPage.teamEmpty')}
               </div>
             ) : (
               <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true" onTouchStart={(e) => e.stopPropagation()}>
                 <table className="w-full text-left border-collapse text-xs min-w-[800px]">
                   <thead>
                     <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
-                      <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Type' : 'Tür'}</th>
-                      <th className="p-3 font-semibold text-center bg-blue-50/20 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{lang === 'en' ? 'Total' : 'Toplam'}</th>
-                      <th className="p-3 font-semibold text-center bg-indigo-50/20 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400">{lang === 'en' ? 'New' : 'Yeni'}</th>
-                      <th className="p-3 font-semibold text-center bg-sky-50/20 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400">{lang === 'en' ? 'Contact' : 'İletişim'}</th>
-                      <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">{lang === 'en' ? 'Invite' : 'Davet'}</th>
-                      <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-sky-950/5 text-cyan-600 dark:text-cyan-400">{lang === 'en' ? 'Presentation' : 'Sunum'}</th>
-                      <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{lang === 'en' ? 'Follow-up' : 'Takip'}</th>
-                      <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{lang === 'en' ? 'Joined' : 'Katıldı'}</th>
+                      <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
+                      <th className="p-3 font-semibold">{t('statsPage.colRole')}</th>
+                      <th className="p-3 font-semibold text-center">{t('statsPage.colType')}</th>
+                      <th className="p-3 font-semibold text-center bg-blue-50/20 dark:bg-blue-950/5 text-blue-600 dark:text-blue-400">{t('statsPage.colTotal')}</th>
+                      <th className="p-3 font-semibold text-center bg-indigo-50/20 dark:bg-indigo-950/5 text-indigo-600 dark:text-indigo-400">{t('statsPage.colNew')}</th>
+                      <th className="p-3 font-semibold text-center bg-sky-50/20 dark:bg-sky-950/5 text-sky-600 dark:text-sky-400">{t('statsPage.colContact')}</th>
+                      <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">{t('statsPage.colInvite')}</th>
+                      <th className="p-3 font-semibold text-center bg-cyan-50/20 dark:bg-sky-950/5 text-cyan-600 dark:text-cyan-400">{t('statsPage.colPresentation')}</th>
+                      <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{t('statsPage.colFollowUp')}</th>
+                      <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{t('statsPage.colJoined')}</th>
                       <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
-                        {lang === 'en' ? 'DQSG' : 'DDBR'}<sup>*</sup>
+                        {t('statsPage.colDqsg')}<sup>*</sup>
                       </th>
-                      <th className="p-3 font-semibold text-right">{lang === 'en' ? 'Last Active' : 'Son Aktiflik'}</th>
+                      <th className="p-3 font-semibold text-right">{t('statsPage.colLastActive')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
@@ -582,19 +578,19 @@ export default function AnalyticsPage() {
                             ) : (
                               <span className="h-2 w-2 rounded-full bg-zinc-300" />
                             )}
-                            <span>{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
+                            <span>{m.full_name ?? t('statsPage.unnamedMember')}</span>
                           </td>
                           <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
-                            {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
+                            {isLeader ? t('statsPage.roleLeader') : t('statsPage.rolePartner')}
                           </td>
                           <td className="p-3 text-center">
                             {isLeader ? null : isAppUser ? (
                               <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[9px] font-black text-purple-700 dark:text-purple-400 whitespace-nowrap">
-                                💎 {lang === 'en' ? 'NMM' : 'NMM'}
+                                💎 {t('statsPage.typeNmm')}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800/60 px-2 py-0.5 text-[9px] font-black text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
-                                🤝 {lang === 'en' ? 'Field' : 'Saha'}
+                                🤝 {t('statsPage.typeField')}
                               </span>
                             )}
                           </td>
@@ -617,7 +613,7 @@ export default function AnalyticsPage() {
               </div>
             )}
             <div className="text-[10px] font-bold text-[var(--text-3)] select-none pl-1 mt-1">
-              * {lang === 'en' ? 'DISTRIBUTOR QUICK START GUIDE' : 'DİSTRİBÜTÖR DOĞRU BAŞLANGIÇ REHBERİ'}
+              * {t('statsPage.dqsgFootnote')}
             </div>
           </section>
 
@@ -627,12 +623,10 @@ export default function AnalyticsPage() {
               <div>
                 <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                   <Sparkles className="h-4 w-4 text-brand animate-pulse" />
-                  {lang === 'en' ? 'Team AI Usage & Quotas Control Spread' : 'Ekip Yapay Zeka Kullanım & Limit Kontrol Masası'}
+                  {t('statsPage.aiAdminTitle')}
                 </h2>
                 <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                  {lang === 'en'
-                    ? 'Exclusive administrative spreadsheet showing today\'s artificial intelligence usage counts for all team partners.'
-                    : 'Sadece Süper Admin olarak sizin görebileceğiniz, tüm ekibinizin bugünkü yapay zeka limit kullanım verilerini içeren yönetimsel kontrol tablosu.'}
+                  {t('statsPage.aiAdminSubtitle')}
                 </p>
               </div>
 
@@ -640,19 +634,19 @@ export default function AnalyticsPage() {
                 <table className="w-full text-left border-collapse text-xs min-w-[800px]">
                   <thead>
                     <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Partner Name' : 'Ortak Adı'}</th>
-                      <th className="p-3 font-semibold">{lang === 'en' ? 'Role' : 'Rol'}</th>
+                      <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
+                      <th className="p-3 font-semibold">{t('statsPage.colRole')}</th>
 
                       <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
-                        {lang === 'en' ? 'AI Message (Used / Limit)' : 'YZ Mesajı (Kullanılan / Limit)'}
+                        {t('statsPage.aiColMessage')}
                       </th>
                       
                       <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
-                        {lang === 'en' ? 'AI Coach (Used / Limit)' : 'YZ Koçu (Kullanılan / Limit)'}
+                        {t('statsPage.aiColCoach')}
                       </th>
                       
                       <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
-                        {lang === 'en' ? 'Compliance (Used / Limit)' : 'Uyum Denetimi (Kullanılan / Limit)'}
+                        {t('statsPage.aiColCompliance')}
                       </th>
                     </tr>
                   </thead>
@@ -677,15 +671,15 @@ export default function AnalyticsPage() {
                             ) : (
                               <span className="h-2 w-2 rounded-full bg-zinc-300" />
                             )}
-                            <span>{m.full_name ?? (lang === 'en' ? 'Unnamed Member' : 'İsimsiz Üye')}</span>
+                            <span>{m.full_name ?? t('statsPage.unnamedMember')}</span>
                           </td>
                           <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
-                            {isLeader ? (lang === 'en' ? 'Leader' : 'Lider') : (lang === 'en' ? 'Partner' : 'Distribütör')}
+                            {isLeader ? t('statsPage.roleLeader') : t('statsPage.rolePartner')}
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
                             {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                              t('statsPage.unlimited')
                             ) : (
                               `${m.today_message ?? 0} / 25`
                             )}
@@ -693,7 +687,7 @@ export default function AnalyticsPage() {
                           
                           <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
                             {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                              t('statsPage.unlimited')
                             ) : (
                               `${m.today_roleplay ?? 0} / 20`
                             )}
@@ -701,7 +695,7 @@ export default function AnalyticsPage() {
                           
                           <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
                             {isLeader ? (
-                              lang === 'en' ? 'Unlimited' : 'Sınırsız'
+                              t('statsPage.unlimited')
                             ) : (
                               `${m.today_compliance ?? 0} / 5`
                             )}
@@ -723,10 +717,10 @@ export default function AnalyticsPage() {
               </div>
               <div>
                 <h2 className="text-sm font-bold text-[var(--text-1)]">
-                  {lang === 'en' ? 'AI Daily Usage Quotas' : 'Yapay Zeka Günlük Kullanım Kotası'}
+                  {t('statsPage.quotaTitle')}
                 </h2>
                 <p className="text-[11px] text-[var(--text-3)]">
-                  {lang === 'en' ? 'Your feature-specific dynamic daily message rights' : 'Özellik bazlı dinamik günlük yapay zeka haklarınız'}
+                  {t('statsPage.quotaSubtitle')}
                 </p>
               </div>
             </div>
@@ -738,12 +732,10 @@ export default function AnalyticsPage() {
                   <div className="text-2xl mt-0.5 animate-bounce">👑</div>
                   <div className="space-y-1">
                     <h3 className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                      {lang === 'en' ? 'UNLIMITED DEVELOPER ACCOUNT' : 'SINIRSIZ SÜPER ADMİN HESABI'}
+                      {t('statsPage.quotaSuperTitle')}
                     </h3>
                     <p className="text-xs leading-relaxed text-[var(--text-2)] font-semibold">
-                      {lang === 'en'
-                        ? 'All artificial intelligence action limits and usage quotas are fully bypassed for your account. Happy testing!'
-                        : 'Network Marketing Master geliştirici hesabınız için tüm yapay zeka limitleri ve kullanım kotaları kaldırılmıştır. Keyifli testler dileriz!'}
+                      {t('statsPage.quotaSuperDesc')}
                     </p>
                   </div>
                 </div>
@@ -756,10 +748,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
                     <span className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-[#534AB7]" />
-                      {lang === 'en' ? 'AI Coach (Roleplay)' : 'Yapay Zeka Koçu (Rol Provası)'}
+                      {t('statsPage.quotaCoach')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0))} / {roleplayLimit} {lang === 'en' ? 'left' : 'kalan'}
+                      {Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0))} / {roleplayLimit} {t('statsPage.quotaLeft')}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
@@ -775,10 +767,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
                     <span className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-[#0F6E56]" />
-                      {lang === 'en' ? 'Write Message (AI Writer)' : 'YZ Mesajı Üret'}
+                      {t('statsPage.quotaWriter')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {lang === 'en' ? 'left' : 'kalan'}
+                      {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {t('statsPage.quotaLeft')}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
@@ -794,10 +786,10 @@ export default function AnalyticsPage() {
                   <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
                     <span className="flex items-center gap-1.5">
                       <span className="h-2 w-2 rounded-full bg-[#C03E1F]" />
-                      {lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi'}
+                      {t('statsPage.quotaCompliance')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {complianceLimit > 0 ? `${Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0))} / ${complianceLimit}` : (lang === 'en' ? 'Upgrade required' : 'Plan gerekli')} {complianceLimit > 0 ? (lang === 'en' ? 'left' : 'kalan') : ''}
+                      {complianceLimit > 0 ? `${Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0))} / ${complianceLimit}` : t('statsPage.quotaUpgrade')} {complianceLimit > 0 ? t('statsPage.quotaLeft') : ''}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
@@ -815,9 +807,7 @@ export default function AnalyticsPage() {
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">
             <Clock className="h-4 w-4 shrink-0 text-[var(--text-3)] mt-0.5" />
             <p className="text-[11px] leading-relaxed text-[var(--text-3)] font-semibold">
-              {lang === 'en'
-                ? 'Calculations are processed client-side based on your active candidates pipeline database. Keep candidate stages updated in Pipeline to ensure precise data.'
-                : 'İstatistikler, Boru Hattınızdaki adayların güncel durumuna göre anlık olarak cihazınızda hesaplanır. Verilerinizin doğru olması için Aday Detaylarındaki aşama güncellemelerini aksatmayın.'}
+              {t('statsPage.infoNote')}
             </p>
           </section>
 

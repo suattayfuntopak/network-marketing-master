@@ -136,7 +136,7 @@ const TESTIMONIALS = [
 
 export default function RootPage() {
   const router = useRouter()
-  const { lang, setLang } = useTranslation()
+  const { t, lang, setLang } = useTranslation()
   const { theme, setTheme } = useTheme()
   const [checkingSession, setCheckingSession] = useState(true)
   const [themeMounted, setThemeMounted] = useState(false)
@@ -204,7 +204,7 @@ export default function RootPage() {
           </div>
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[var(--text-3)] animate-pulse">
-          {lang === 'en' ? 'Verifying Session...' : 'Oturum Doğrulanıyor...'}
+          {t('landingPage.verifyingSession')}
         </p>
       </div>
     )
@@ -269,21 +269,21 @@ export default function RootPage() {
             {/* Login — icon only on mobile, text on sm+ */}
             <Link
               href="/giris"
-              title={lang === 'en' ? 'Log In' : 'Giriş Yap'}
+              title={t('landingPage.logIn')}
               className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 dark:text-white/60 transition hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white sm:h-auto sm:w-auto sm:rounded-lg sm:px-3.5 sm:py-1.5"
             >
               <LogIn className="h-3.5 w-3.5 sm:hidden" />
-              <span className="hidden text-xs font-bold sm:inline">{lang === 'en' ? 'Log In' : 'Giriş Yap'}</span>
+              <span className="hidden text-xs font-bold sm:inline">{t('landingPage.logIn')}</span>
             </Link>
 
             {/* Register — icon only on mobile, text+arrow on sm+ */}
             <Link
               href="/kayit"
-              title={lang === 'en' ? 'Get Started' : 'Hemen Başla'}
+              title={t('landingPage.getStarted')}
               className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md transition hover:opacity-90 active:scale-95 sm:h-auto sm:w-auto sm:gap-1 sm:rounded-lg sm:px-3.5 sm:py-1.5"
             >
               <UserPlus className="h-3.5 w-3.5 sm:hidden" />
-              <span className="hidden text-xs font-bold sm:inline">{lang === 'en' ? 'Get Started' : 'Hemen Başla'}</span>
+              <span className="hidden text-xs font-bold sm:inline">{t('landingPage.getStarted')}</span>
               <ArrowRight className="hidden h-3 w-3 sm:inline" />
             </Link>
           </div>
@@ -295,7 +295,7 @@ export default function RootPage() {
         {/* Glow badge */}
         <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/20 bg-indigo-500/5 px-3 py-1 text-[11px] font-bold text-indigo-300 animate-pulse">
           <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
-          <span>{lang === 'en' ? 'AI-POWERED MLM ACCELERATOR' : 'YAPAY ZEKA DESTEKLİ MLM HIZLANDIRICI'}</span>
+          <span>{t('landingPage.heroBadge')}</span>
         </div>
 
         {/* Title */}
@@ -313,9 +313,7 @@ export default function RootPage() {
 
         {/* Subtitle */}
         <p className="mx-auto max-w-2xl text-sm sm:text-base text-slate-500 dark:text-zinc-400 font-medium leading-relaxed">
-          {lang === 'en' 
-            ? 'Stop chasing cold leads. Standardize candidate pipelines, simulate interactive AI roleplay, and track your entire downline’s progress on autopilot.'
-            : 'Adayların peşinden koşmayı bırakın. Aday huninizi standartlaştırın, yapay zekayla interaktif rol provası yapın ve tüm alt ekibinizin gelişimini otomatik pilotta izleyin.'}
+          {t('landingPage.heroSubtitle')}
         </p>
 
         {/* Action Buttons */}
@@ -324,7 +322,7 @@ export default function RootPage() {
             href="/kayit"
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-6 py-3.5 text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
           >
-            <span>{lang === 'en' ? 'Start Free Trial' : 'Hemen Ücretsiz Dene'}</span>
+            <span>{t('landingPage.startFreeTrial')}</span>
             <ArrowRight className="h-4 w-4" />
           </Link>
           <a
@@ -332,7 +330,7 @@ export default function RootPage() {
             className="flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-white/[0.08] bg-slate-50 dark:bg-white/[0.01] hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-600 dark:text-zinc-300 px-6 py-3.5 text-sm font-bold transition cursor-pointer"
           >
             <Play className="h-3.5 w-3.5 text-indigo-400" />
-            <span>{lang === 'en' ? 'How it Works' : 'Nasıl Çalışır?'}</span>
+            <span>{t('landingPage.howItWorks')}</span>
           </a>
         </div>
       </section>
@@ -341,12 +339,10 @@ export default function RootPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-3">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {lang === 'en' ? 'The Ultimate Command Center' : 'Eksiksiz Yönetim Merkezi'}
+            {t('landingPage.featuresTitle')}
           </h2>
           <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-            {lang === 'en'
-              ? 'Every feature meticulously designed for professional network marketers and leaders.'
-              : 'Profesyonel ağ pazarlamacıları ve liderler için cerrah titizliğiyle tasarlanmış araçlar.'}
+            {t('landingPage.featuresSubtitle')}
           </p>
         </div>
 
@@ -359,12 +355,10 @@ export default function RootPage() {
               <TrendingUp className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'Candidate Pipeline' : 'Aday Boru Hattı'}
+              {t('landingPage.feature1Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Visualize and track candidates from cold list to presentation, follow-ups, and registration.'
-                : 'Adaylarınızı ilk listeden davete, sunumdan takibe ve ekibe kayıt aşamasına kadar görsel olarak yönetin.'}
+              {t('landingPage.feature1Desc')}
             </p>
           </div>
 
@@ -374,12 +368,10 @@ export default function RootPage() {
               <Bot className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'AI Copywriter & Coach' : 'Yapay Zeka Koçu & Mesaj Yazarı'}
+              {t('landingPage.feature2Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Generate tailored WhatsApp follow-up messages based on client history. Ask the coach MLM strategic questions.'
-                : 'Adayın durumuna özel kişiselleştirilmiş takip mesajları hazırlayın. Liderlik ve MLM strateji sorularınızı sorun.'}
+              {t('landingPage.feature2Desc')}
             </p>
           </div>
 
@@ -389,12 +381,10 @@ export default function RootPage() {
               <Sparkles className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'Quick Start Onboarding' : 'Doğru Başlangıç Rehberi'}
+              {t('landingPage.feature3Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Ensure new distributors follow the perfect 4-week checklist. Database-persistent and sponsor sync.'
-                : 'Yeni distribütörlerin ilk 4 haftalık kritik başlangıç listesini adım adım tiklemesini sağlayın. Sponsor ekranıyla senkronize.'}
+              {t('landingPage.feature3Desc')}
             </p>
           </div>
 
@@ -404,12 +394,10 @@ export default function RootPage() {
               <Users className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'Interactive Roleplay Rehearsal' : 'Yapay Zeka Saha Provası'}
+              {t('landingPage.feature4Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Choose candidate warmth and simulate real chats. Practice presentation closing before going to the field.'
-                : 'Aday sıcaklığını seçip YZ simülasyonunda canlı sohbet edin. Sahaya inmeden önce kapanış provanızı tamamlayın.'}
+              {t('landingPage.feature4Desc')}
             </p>
           </div>
 
@@ -419,12 +407,10 @@ export default function RootPage() {
               <Shield className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'Advertising & Compliance' : 'Uyum Denetleme Merkezi'}
+              {t('landingPage.feature5Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Instantly scan advertising and social posts for consumer-protection compliance and prohibited words.'
-                : 'Sosyal medya paylaşımlarınızı ve reklam metinlerinizi tüketici koruma kanunlarına ve MLM yasaklı kelimelerine göre denetleyin.'}
+              {t('landingPage.feature5Desc')}
             </p>
           </div>
 
@@ -434,12 +420,10 @@ export default function RootPage() {
               <BarChart2 className="h-5 w-5" />
             </div>
             <h3 className="mt-4 text-base font-bold text-slate-900 dark:text-white">
-              {lang === 'en' ? 'Direct Downline RLS Dashboard' : 'Ekibim Aday Dağılım Paneli'}
+              {t('landingPage.feature6Title')}
             </h3>
             <p className="mt-2 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {lang === 'en'
-                ? 'Track downlines’ active pipeline metrics and last activity without invading their candidate privacy.'
-                : 'Alt ekibinizin toplam aday sayılarını, huni dağılımlarını ve aktifliğini gizliliklerini bozmadan izleyin.'}
+              {t('landingPage.feature6Desc')}
             </p>
           </div>
 
@@ -450,12 +434,10 @@ export default function RootPage() {
       <section id="roi-calculator" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-3">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {lang === 'en' ? 'See the Network Master Effect' : 'Network Master Etkisini Hesaplayın'}
+            {t('landingPage.roiTitle')}
           </h2>
           <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-            {lang === 'en'
-              ? 'Slide your downline size to estimate team momentum and sponsor hours saved.'
-              : 'Ekip büyüklüğünüzü kaydırarak organizasyon momentumunuzu ve kazanacağınız zamanı görün.'}
+            {t('landingPage.roiSubtitle')}
           </p>
         </div>
 
@@ -466,12 +448,12 @@ export default function RootPage() {
           <div className="lg:col-span-5 rounded-3xl border border-slate-200 dark:border-white/[0.05] bg-slate-50 dark:bg-white/[0.02] backdrop-blur-xl p-6 sm:p-8 space-y-6">
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400">
-                {lang === 'en' ? 'Active Distributors' : 'Aktif Distribütör Sayısı'}
+                {t('landingPage.roiActiveDistributors')}
               </label>
               <div className="flex items-center justify-between">
                 <span className="text-3xl font-black text-slate-900 dark:text-white">{teamSize}</span>
                 <span className="text-xs font-bold text-[#534AB7] bg-[#EEEDFE]/10 px-2.5 py-1 rounded-lg">
-                  {lang === 'en' ? 'PARTNERS' : 'ORTAK'}
+                  {t('landingPage.roiPartners')}
                 </span>
               </div>
             </div>
@@ -491,11 +473,11 @@ export default function RootPage() {
             <div className="border-t border-slate-200 dark:border-white/[0.05] pt-4 space-y-3">
               <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>{lang === 'en' ? 'Assuming 15 candidates/month per active user' : 'Aktif kişi başına ayda 15 aday ekleme varsayımı'}</span>
+                <span>{t('landingPage.roiAssumption1')}</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400">
                 <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>{lang === 'en' ? '4 hours saved/week per onboarding downline' : 'Rehberi tamamlayan üye başına sponsor için haftalık 4 saat tasarruf'}</span>
+                <span>{t('landingPage.roiAssumption2')}</span>
               </div>
             </div>
           </div>
@@ -509,16 +491,16 @@ export default function RootPage() {
                 #
               </div>
               <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
-                {lang === 'en' ? 'Team Candidates / Month' : 'Ekibin Aylık Toplam Adayı'}
+                {t('landingPage.roiCandidatesLabel')}
               </p>
               <div className="flex items-baseline gap-2">
                 <span className="text-3xl font-black text-slate-900 dark:text-white">{calculatedCandidatesNMM}</span>
                 <span className="text-xs text-emerald-400 font-bold">
-                  {lang === 'en' ? `vs ${calculatedCandidatesTrad} (Manual)` : `${calculatedCandidatesTrad} Adaya Karşı`}
+                  {t('landingPage.roiVsManual', { count: calculatedCandidatesTrad })}
                 </span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-zinc-500">
-                {lang === 'en' ? 'Standardized digital pipelines maximize prospecting actions.' : 'Dijital huniler aday ekleme ve takip aksiyonlarını maksimize eder.'}
+                {t('landingPage.roiCandidatesDesc')}
               </p>
             </div>
 
@@ -528,13 +510,13 @@ export default function RootPage() {
                 H
               </div>
               <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
-                {lang === 'en' ? 'Sponsor Hours Saved / Month' : 'Kazanılan Sponsor Zamanı / Ay'}
+                {t('landingPage.roiHoursLabel')}
               </p>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} {lang === 'en' ? 'hours' : 'saat'}</span>
+                <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} {t('landingPage.roiHoursUnit')}</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-zinc-500">
-                {lang === 'en' ? 'Checklists and dynamic guidance handle direct training.' : 'Doğru başlangıç rehberleri ekibin eğitim ve takip takibini üstlenir.'}
+                {t('landingPage.roiHoursDesc')}
               </p>
             </div>
 
@@ -544,18 +526,16 @@ export default function RootPage() {
                 %
               </div>
               <p className="text-xs font-semibold text-slate-500 dark:text-zinc-400 uppercase tracking-widest">
-                {lang === 'en' ? 'Team Onboarding Active Rate' : 'Doğru Başlangıç Aktif Distribütör Oranı'}
+                {t('landingPage.roiActiveRateLabel')}
               </p>
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-black text-teal-400">{calculatedActiveRate}</span>
                 <span className="text-xs text-slate-500 dark:text-zinc-500 font-semibold line-through">
-                  {lang === 'en' ? 'vs 15% (Traditional lists)' : 'Geleneksel Kağıt/Excel listelerinde %15'}
+                  {t('landingPage.roiVsTraditional')}
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-zinc-400">
-                {lang === 'en'
-                  ? 'Gamified, step-by-step checklists keep partners engaged and accountable.'
-                  : 'Oyunlaştırılmış, 4 haftalık takip listesi ekip ortaklarını sürekli aksiyonda tutar.'}
+                {t('landingPage.roiActiveRateDesc')}
               </p>
             </div>
 
@@ -567,12 +547,10 @@ export default function RootPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
         <div className="text-center space-y-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {lang === 'en' ? 'Sponsor-Aligned Pricing' : 'Ekibiniz Büyürken Kazanın'}
+            {t('landingPage.pricingTitle')}
           </h2>
           <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-            {lang === 'en'
-              ? 'Choose the plan that fits your MLM organization goals.'
-              : 'MLM organizasyonel hedeflerinize ve ekibinize uygun lisansı seçin.'}
+            {t('landingPage.pricingSubtitle')}
           </p>
 
           {/* Monthly / Yearly Toggler */}
@@ -587,7 +565,7 @@ export default function RootPage() {
                     : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
                 }`}
               >
-                {lang === 'en' ? 'Monthly Billing' : 'Aylık Ödeme'}
+                {t('landingPage.pricingMonthly')}
               </button>
               <button
                 type="button"
@@ -598,9 +576,9 @@ export default function RootPage() {
                     : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
                 }`}
               >
-                <span>{lang === 'en' ? 'Yearly Billing' : 'Yıllık Ödeme'}</span>
+                <span>{t('landingPage.pricingYearly')}</span>
                 <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
-                  {lang === 'en' ? '-3 Months!' : '-3 Ay Fırsatı!'}
+                  {t('landingPage.pricingYearlyBadge')}
                 </span>
               </button>
             </div>
@@ -615,16 +593,16 @@ export default function RootPage() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                  {lang === 'en' ? 'SOLO BUILDER' : 'BİREYSEL ORTAK'}
+                  {t('landingPage.planBasicTag')}
                 </span>
               </div>
 
               <div>
                 <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
-                  {lang === 'en' ? 'Basic Plan' : 'Basic Plan'}
+                  {t('landingPage.planBasicName')}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  {lang === 'en' ? 'Manage your personal candidate pipeline.' : 'Kişisel aday hunisini yönetmek ve provasını yapmak isteyenler için.'}
+                  {t('landingPage.planBasicDesc')}
                 </p>
               </div>
 
@@ -636,13 +614,13 @@ export default function RootPage() {
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'month' : 'ay')
-                      : (lang === 'en' ? 'year' : 'yıl')}
+                      ? t('landingPage.priceMonth')
+                      : t('landingPage.priceYear')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                    {lang === 'en' ? "₺291 / month equivalent (3 Months Free!)" : "₺291 / ay'a denk gelir (3 Ay Bedava!)"}
+                    {t('landingPage.planBasicYearlyNote')}
                   </span>
                 )}
               </div>
@@ -651,23 +629,23 @@ export default function RootPage() {
               <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Full Candidate Pipeline Management' : 'Tam Aday Boru Hattı Yönetimi'}</span>
+                  <span>{t('landingPage.planBasicFeat1')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 15 AI Message Credits' : 'Günlük 15 YZ Mesaj Yazarı Kredisi'}</span>
+                  <span>{t('landingPage.planBasicFeat2')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 10 Interactive Rehearsal Credits' : 'Günlük 10 Saha Provası Simülatörü'}</span>
+                  <span>{t('landingPage.planBasicFeat3')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 2 Compliance Control Credits' : 'Günlük 2 Uyum Denetim Hakkı'}</span>
+                  <span>{t('landingPage.planBasicFeat4')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Solo Statistics & Reports' : 'Bireysel İstatistik Raporu & Grafikler'}</span>
+                  <span>{t('landingPage.planBasicFeat5')}</span>
                 </li>
               </ul>
             </div>
@@ -677,7 +655,7 @@ export default function RootPage() {
                 href="/kayit"
                 className="block text-center rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.03] text-white py-3 text-xs font-bold transition cursor-pointer"
               >
-                {lang === 'en' ? 'Start 7-Day Free Trial' : '7 Günlük Denemeyi Başlat'}
+                {t('landingPage.planBasicCta')}
               </Link>
             </div>
           </div>
@@ -686,20 +664,20 @@ export default function RootPage() {
           <div className="rounded-3xl border border-[#534AB7]/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
             <div className="absolute right-6 top-6 animate-pulse">
               <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                {lang === 'en' ? 'Popular' : 'En Çok Satan'}
+                {t('landingPage.planPopularBadge')}
               </span>
             </div>
 
             <div className="space-y-6">
               <div>
                 <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                  {lang === 'en' ? 'GROWING TEAMS' : 'TAKIM LİDERLERİ'}
+                  {t('landingPage.planPlusTag')}
                 </span>
                 <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
-                  {lang === 'en' ? 'Plus Plan' : 'Plus Plan'}
+                  {t('landingPage.planPlusName')}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  {lang === 'en' ? 'Track downlines and sync onboarding.' : 'Alt ekibini izlemek, onboarding sürecini takip etmek ve gerçek zamanlı analiz etmek isteyen liderler.'}
+                  {t('landingPage.planPlusDesc')}
                 </p>
               </div>
 
@@ -711,13 +689,13 @@ export default function RootPage() {
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'month' : 'ay')
-                      : (lang === 'en' ? 'year' : 'yıl')}
+                      ? t('landingPage.priceMonth')
+                      : t('landingPage.priceYear')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
-                    {lang === 'en' ? "₺833 / month equivalent (3 Months Free!)" : "₺833 / ay'a denk gelir (3 Ay Bedava!)"}
+                    {t('landingPage.planPlusYearlyNote')}
                   </span>
                 )}
               </div>
@@ -726,31 +704,31 @@ export default function RootPage() {
               <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span className="font-bold text-slate-900 dark:text-white">{lang === 'en' ? 'All Basic Plan Features' : 'Basic Planındaki TÜM Özellikler'}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planPlusFeat1')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Direct Downline Tracking (Max 50 Members)' : 'Alt Ekip Takibi (Maksimum 50 Üye)'}</span>
+                  <span>{t('landingPage.planPlusFeat2')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? '4-Week Onboarding Sync' : '4 Haftalık Doğru Başlangıç Rehberi Takibi'}</span>
+                  <span>{t('landingPage.planPlusFeat3')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 40 AI Message Credits' : 'Günlük 40 YZ Mesaj Yazarı Kredisi'}</span>
+                  <span>{t('landingPage.planPlusFeat4')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 25 Interactive Rehearsal Credits' : 'Günlük 25 Saha Provası Kredisi'}</span>
+                  <span>{t('landingPage.planPlusFeat5')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 5 Compliance Control Credits' : 'Günlük 5 Uyum Denetim Hakkı'}</span>
+                  <span>{t('landingPage.planPlusFeat6')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Real-Time Downline Push Notifications' : 'Gerçek Zamanlı Takım Bildirim Motoru'}</span>
+                  <span>{t('landingPage.planPlusFeat7')}</span>
                 </li>
               </ul>
             </div>
@@ -760,7 +738,7 @@ export default function RootPage() {
                 href="/kayit"
                 className="block text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 cursor-pointer"
               >
-                {lang === 'en' ? 'Get Started Now' : 'Ekibi Güçlendir'}
+                {t('landingPage.planPlusCta')}
               </Link>
             </div>
           </div>
@@ -769,20 +747,20 @@ export default function RootPage() {
           <div className="rounded-3xl border border-pink-500/30 bg-pink-50 dark:bg-gradient-to-b dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
             <div className="absolute right-6 top-6 flex items-center gap-2">
               <span className="text-[9px] font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-                👑 {lang === 'en' ? 'Diamond Pro' : 'Diamond Pro'}
+                👑 {t('landingPage.planProBadge')}
               </span>
             </div>
 
             <div className="space-y-6">
               <div className="space-y-1">
                 <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
-                  {lang === 'en' ? 'TOP ORGANIZATIONS' : 'BÜYÜK LİDERLER'}
+                  {t('landingPage.planProTag')}
                 </span>
                 <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
-                  {lang === 'en' ? 'Pro Plan' : 'Pro Plan'}
+                  {t('landingPage.planProName')}
                 </h3>
                 <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  {lang === 'en' ? 'Unlimited downlines, coaching & Excel analytics.' : 'Sınırsız organizasyon takibi, yapay zeka ekip koçluğu ve Excel tarzı performans masası.'}
+                  {t('landingPage.planProDesc')}
                 </p>
               </div>
 
@@ -794,13 +772,13 @@ export default function RootPage() {
                   </span>
                   <span className="text-xs text-slate-500 dark:text-zinc-500">
                     / {billingPeriod === 'monthly'
-                      ? (lang === 'en' ? 'month' : 'ay')
-                      : (lang === 'en' ? 'year' : 'yıl')}
+                      ? t('landingPage.priceMonth')
+                      : t('landingPage.priceYear')}
                   </span>
                 </div>
                 {billingPeriod === 'yearly' && (
                   <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
-                    {lang === 'en' ? "₺1,666 / month equivalent (3 Months Free!)" : "₺1,666 / ay'a denk gelir (3 Ay Bedava!)"}
+                    {t('landingPage.planProYearlyNote')}
                   </span>
                 )}
               </div>
@@ -809,31 +787,31 @@ export default function RootPage() {
               <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span className="font-bold text-slate-900 dark:text-white">{lang === 'en' ? 'All Plus Plan Features' : 'Plus Planındaki TÜM Özellikler'}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planProFeat1')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span className="font-bold text-pink-300">{lang === 'en' ? 'Unlimited Downline Tracking' : 'Sınırsız Alt Ekip Takibi'}</span>
+                  <span className="font-bold text-pink-300">{t('landingPage.planProFeat2')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'AI Downline Performance Coaching' : 'Yapay Zeka Alt Ekip Koçu'}</span>
+                  <span>{t('landingPage.planProFeat3')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Super Admin AI Control Desk' : 'Süper Admin AI Kontrol Masası'}</span>
+                  <span>{t('landingPage.planProFeat4')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 100 AI Message Credits' : 'Günlük 100 YZ Mesaj Yazarı Kredisi'}</span>
+                  <span>{t('landingPage.planProFeat5')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? 'Daily 60 Interactive Rehearsal Credits' : 'Günlük 60 Saha Provası Kredisi'}</span>
+                  <span>{t('landingPage.planProFeat6')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                  <span>{lang === 'en' ? `Daily ${PRO_LIMITS.complianceLimit} Compliance Audit Credits` : `Günlük ${PRO_LIMITS.complianceLimit} Uyum Denetim Hakkı`}</span>
+                  <span>{t('landingPage.planProFeat7', { count: PRO_LIMITS.complianceLimit })}</span>
                 </li>
               </ul>
             </div>
@@ -843,7 +821,7 @@ export default function RootPage() {
                 href="/kayit"
                 className="block text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 cursor-pointer"
               >
-                {lang === 'en' ? 'Get Started Now' : 'Zirveye Ulaş'}
+                {t('landingPage.planProCta')}
               </Link>
             </div>
           </div>
@@ -855,12 +833,10 @@ export default function RootPage() {
       <section className="py-16 space-y-12 overflow-hidden relative">
         <div className="text-center space-y-3 px-4">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-            {lang === 'en' ? 'Trusted by Independent Leaders' : 'Liderlerin Başarı Hikayeleri'}
+            {t('landingPage.testimonialsTitle')}
           </h2>
           <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-            {lang === 'en'
-              ? 'See how top sponsors automated candidate lists and onboarding.'
-              : 'Sponsorların aday listelerini ve doğru başlangıç adımlarını nasıl otomatikleştirdiğini görün.'}
+            {t('landingPage.testimonialsSubtitle')}
           </p>
         </div>
 
@@ -960,11 +936,11 @@ export default function RootPage() {
       <footer className="border-t border-slate-200 dark:border-white/[0.04] py-8 mt-12 bg-slate-50 dark:bg-[#06070B]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-[10px] sm:text-xs text-slate-500 dark:text-zinc-500">
-            &copy; {new Date().getFullYear()} Network Marketing Master. {lang === 'en' ? 'All rights reserved.' : 'Tüm hakları saklıdır.'}
+            &copy; {new Date().getFullYear()} Network Marketing Master. {t('landingPage.footerRights')}
           </p>
           <div className="flex gap-4 text-[10px] sm:text-xs text-slate-500 dark:text-zinc-500">
-            <Link href="/giris" className="hover:text-white transition">{lang === 'en' ? 'Log In' : 'Giriş Yap'}</Link>
-            <Link href="/kayit" className="hover:text-white transition">{lang === 'en' ? 'Sign Up' : 'Kayıt Ol'}</Link>
+            <Link href="/giris" className="hover:text-white transition">{t('landingPage.logIn')}</Link>
+            <Link href="/kayit" className="hover:text-white transition">{t('landingPage.footerSignUp')}</Link>
           </div>
         </div>
       </footer>

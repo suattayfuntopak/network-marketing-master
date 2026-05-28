@@ -10,7 +10,7 @@ import { SettingsModal } from '@/components/ui/SettingsModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function UserMenu() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
@@ -37,7 +37,7 @@ export function UserMenu() {
       <button
         onClick={() => setOpen(v => !v)}
         className="flex items-center gap-2 rounded-xl bg-[var(--bg-card)] border border-[var(--border)] px-2.5 py-1.5 transition hover:bg-[var(--bg-subtle)]"
-        title={lang === 'en' ? 'Profile Menu' : 'Profil Menüsü'}
+        title={t('shellUi.profileMenu')}
       >
         {avatarUrl ? (
           <img
@@ -64,9 +64,9 @@ export function UserMenu() {
           <div className="border-b border-[var(--border)] px-4 pb-3 pt-1">
             <p className="truncate text-sm font-semibold text-[var(--text-1)]">{ws?.fullName}</p>
             <p className="text-xs capitalize text-[var(--text-3)]">
-              {ws?.role === 'leader' 
-                ? (lang === 'en' ? 'Leader' : 'Lider') 
-                : (lang === 'en' ? 'Member' : 'Üye')}
+              {ws?.role === 'leader'
+                ? t('shellUi.roleLeader')
+                : t('shellUi.roleMember')}
             </p>
           </div>
 
@@ -78,7 +78,7 @@ export function UserMenu() {
             className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] cursor-pointer"
           >
             <User className="h-4 w-4" strokeWidth={1.75} />
-            {lang === 'en' ? 'Profile' : 'Profil'}
+            {t('shellUi.profile')}
           </button>
           <button
             onClick={() => {
@@ -88,7 +88,7 @@ export function UserMenu() {
             className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] cursor-pointer"
           >
             <Bell className="h-4 w-4" strokeWidth={1.75} />
-            {lang === 'en' ? 'Notifications' : 'Bildirimler'}
+            {t('shellUi.notifications')}
           </button>
           <button
             onClick={() => {
@@ -98,7 +98,7 @@ export function UserMenu() {
             className="flex w-full items-center gap-3 px-4 py-2 text-sm text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] cursor-pointer"
           >
             <Settings className="h-4 w-4" strokeWidth={1.75} />
-            {lang === 'en' ? 'Settings' : 'Ayarlar'}
+            {t('shellUi.settings')}
           </button>
 
           <div className="my-1 border-t border-[var(--border)]" />
@@ -109,7 +109,7 @@ export function UserMenu() {
               className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] dark:text-[#e87fa3] transition hover:bg-[#FBEAF0] dark:hover:bg-[#3d0f1f] cursor-pointer"
             >
               <LogOut className="h-4 w-4" strokeWidth={1.75} />
-              {lang === 'en' ? 'Log Out' : 'Çıkış Yap'}
+              {t('shellUi.logout')}
             </button>
           </form>
         </div>

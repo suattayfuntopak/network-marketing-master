@@ -783,7 +783,7 @@ export function EkipPanel() {
       )}
 
       {/* ─── 4. EKİBE TOPLU GÖNDER ─── */}
-      <BroadcastPanel members={visibleMembers} lang={lang} t={t} />
+      <BroadcastPanel members={visibleMembers} t={t} />
 
       {/* Ekipten Çıkarma Onay Modalı */}
       {memberToRemove && (
@@ -799,7 +799,6 @@ export function EkipPanel() {
         <YZEkipKocuSheet
           member={coachingMember.member}
           daysInactive={coachingMember.days}
-          lang={lang}
           onClose={() => setCoachingMember(null)}
         />
       )}

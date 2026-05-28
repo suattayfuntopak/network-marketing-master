@@ -9,11 +9,10 @@ import { waHref } from '@/lib/utils/waLink'
 
 interface BroadcastPanelProps {
   members: MemberRow[]
-  lang: string
   t: (key: string, vars?: Record<string, string | number>) => string
 }
 
-export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
+export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
   const [broadcastMode, setBroadcastMode] = useState<'doc' | 'motiv'>('motiv')
   const [broadcastLink, setBroadcastLink] = useState('')
   const [broadcastNote, setBroadcastNote] = useState('')
@@ -25,7 +24,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
     if (broadcastMode === 'doc') {
       const linkLine = broadcastLink.trim()
       const noteLine = broadcastNote.trim()
-      const header = lang === 'en' ? '📄 *Document / Link*' : '📄 *Doküman / Link*'
+      const header = t('pagesUi.broadcastDocHeader')
       return [header, linkLine, noteLine].filter(Boolean).join('\n\n')
     }
     return broadcastMessage.trim()
@@ -79,7 +78,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
           {/* İçerik türü seçici */}
           <div className="space-y-2">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {lang === 'en' ? 'Content Type' : 'İçerik Türü'}
+              {t('pagesUi.contentType')}
             </p>
             <div className="flex gap-2">
               <button
@@ -153,7 +152,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
           {/* Alıcı seçimi */}
           <div className="space-y-2.5">
             <p className="text-[11px] font-semibold uppercase tracking-widest text-[var(--text-3)]">
-              {lang === 'en' ? 'Recipients' : 'Alıcılar'}
+              {t('pagesUi.recipients')}
             </p>
             <div className="flex gap-2">
               <button
@@ -200,7 +199,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
                     <span className="text-[11px] text-[var(--text-3)]">
                       {selectedCount > 0
                         ? t('team.broadcastMembersSelected', { count: String(selectedCount) })
-                        : lang === 'en' ? 'Select recipients' : 'Kişileri seçin'}
+                        : t('pagesUi.selectRecipients')}
                     </span>
                     <div className="flex gap-2">
                       <button onClick={selectAllMembers} className="text-[11px] font-semibold text-brand hover:underline">
@@ -250,7 +249,7 @@ export function BroadcastPanel({ members, lang, t }: BroadcastPanelProps) {
                 </ul>
                 {members.length <= 1 && (
                   <p className="rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-center text-xs text-[var(--text-2)]">
-                    {lang === 'en' ? 'No other team members yet.' : 'Henüz başka ekip üyeniz yok.'}
+                    {t('pagesUi.noOtherMembers')}
                   </p>
                 )}
               </div>

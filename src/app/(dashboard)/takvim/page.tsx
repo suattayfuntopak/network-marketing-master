@@ -5,7 +5,7 @@ import { TakvimClient } from './_components/TakvimClient'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function TakvimPage() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -15,10 +15,10 @@ export default function TakvimPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">
-            {lang === 'en' ? 'Calendar' : 'Takvim'}
+            {t('pagesUi.calendarTitle')}
           </h1>
           <p className="text-sm text-[var(--text-2)]">
-            {lang === 'en' ? 'Scheduled follow-up days' : 'Planlı takip günleri'}
+            {t('pagesUi.calendarSubtitle')}
           </p>
         </div>
       </header>

@@ -15,7 +15,7 @@ interface YzKocuContainerProps {
 
 export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzKocuContainerProps) {
   const [activeTab, setActiveTab] = useState<'yazar' | 'kocluk'>('yazar')
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <div className="space-y-6">
@@ -30,7 +30,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
           }`}
         >
           <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-          <span>{lang === 'en' ? 'AI Message' : 'YZ Mesajı'}</span>
+          <span>{t('coachUi.tabMessage')}</span>
         </button>
         <button
           onClick={() => setActiveTab('kocluk')}
@@ -41,7 +41,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
           }`}
         >
           <HelpCircle className="h-3.5 w-3.5 shrink-0" />
-          <span>{lang === 'en' ? 'Get Coaching' : 'Koçluk Al'}</span>
+          <span>{t('coachUi.tabCoaching')}</span>
         </button>
       </div>
 

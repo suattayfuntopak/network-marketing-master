@@ -5,7 +5,7 @@ import { IlgilenContent } from './_components/IlgilenContent'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function IlgilenPage() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -15,10 +15,10 @@ export default function IlgilenPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">
-            {lang === 'en' ? "Today's Priorities" : "Bugün İlgilen"}
+            {t('pagesUi.todayPrioritiesTitle')}
           </h1>
           <p className="text-sm text-[var(--text-2)]">
-            {lang === 'en' ? "Prospects to follow up today" : "Takip edilmesi gereken adaylar"}
+            {t('pagesUi.todayPrioritiesSubtitle')}
           </p>
         </div>
       </header>

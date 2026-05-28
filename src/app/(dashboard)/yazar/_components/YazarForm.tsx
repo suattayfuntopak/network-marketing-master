@@ -98,7 +98,7 @@ interface Props {
 }
 
 export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 'ilik' }: Props) {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
 
   const getMessageTypeLabel = (val: string) => {
     const trMap: Record<string, string> = {
@@ -390,7 +390,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
-              {lang === 'en' ? 'Message Type' : 'Mesaj Türü'}
+              {t('coachUi.messageType')}
             </label>
             <div className="relative">
               <select
@@ -411,7 +411,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
           <div>
             <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="toneSelect">
-              {lang === 'en' ? 'Tone' : 'Ton'}
+              {t('coachUi.tone')}
             </label>
             <div className="relative">
               <select
@@ -434,7 +434,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         {/* Kişi — inline combobox */}
         <div ref={containerRef} className="relative">
           <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'Candidate' : 'Kişi'}
+            {t('coachUi.candidate')}
           </label>
 
           {selected ? (
@@ -460,7 +460,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                 setDropdownOpen(true)
               }}
               onFocus={() => { if (query) setDropdownOpen(true) }}
-              placeholder={lang === 'en' ? 'Type candidate name...' : 'Kişi adını yaz...'}
+              placeholder={t('coachUi.candidatePlaceholder')}
               autoComplete="off"
               className={inputClass}
             />
@@ -473,7 +473,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             >
               {filtered.length === 0 ? (
                 <p className="py-6 text-center text-sm text-[var(--text-3)]">
-                  {lang === 'en' ? 'No candidates found' : 'Kişi bulunamadı'}
+                  {t('coachUi.noCandidates')}
                 </p>
               ) : (
                 filtered.map(c => (
@@ -503,8 +503,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         {/* Ek bilgi */}
         <div>
           <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="context">
-            {lang === 'en' ? 'Extra Context' : 'Ek Bilgi'}{' '}
-            <span className="text-xs font-normal text-[var(--text-3)]">({lang === 'en' ? 'optional' : 'isteğe bağlı'})</span>
+            {t('coachUi.extraContext')}{' '}
+            <span className="text-xs font-normal text-[var(--text-3)]">({t('coachUi.optional')})</span>
           </label>
           <textarea
             id="context"
@@ -513,7 +513,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             maxLength={1500}
             value={context}
             onChange={e => setContext(e.target.value)}
-            placeholder={lang === 'en' ? 'We talked last week, they were curious about the products...' : 'Geçen hafta konuştuk, ürünü merak ediyordu...'}
+            placeholder={t('coachUi.extraContextPlaceholder')}
             className={`${inputClass} resize-none`}
           />
         </div>
@@ -524,7 +524,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
         {limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            {lang === 'en' ? `You have reached your daily limit of ${activeMessageLimit} AI messages. Resets tomorrow.` : `Günlük ${activeMessageLimit} mesaj limitine ulaştınız. Limit yarın gece yarısı sıfırlanır.`}
+            {t('coachUi.dailyLimitMessage', { limit: activeMessageLimit })}
           </div>
         ) : (
           <button
@@ -533,8 +533,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E56] py-3.5 text-sm font-semibold text-white transition hover:bg-[#0a5a44] disabled:opacity-60"
           >
             {isPending
-              ? <><Loader2 className="h-4 w-4 animate-spin" /> {lang === 'en' ? 'Writing...' : 'Yazıyor...'}</>
-              : <><Bot className="h-4 w-4" /> {lang === 'en' ? 'Generate' : 'Üret'} {isSuperAdmin ? (lang === 'en' ? '(Unlimited)' : '(Sınırsız)') : `(Kalan: ${remaining} / ${activeMessageLimit})`}</>
+              ? <><Loader2 className="h-4 w-4 animate-spin" /> {t('coachUi.writing')}</>
+              : <><Bot className="h-4 w-4" /> {t('coachUi.generate')} {isSuperAdmin ? t('coachUi.unlimitedParens') : `(Kalan: ${remaining} / ${activeMessageLimit})`}</>
             }
           </button>
         )}
@@ -544,7 +544,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         <div ref={messageBoxRef} className="rounded-2xl border border-[#D2EFE4] bg-[#F4FBF8] dark:border-[#2d5a47] dark:bg-[#1a2e28] p-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-[#0F6E56]">
-              {lang === 'en' ? 'Generated Message' : 'Oluşturulan Mesaj'}
+              {t('coachUi.generatedMessage')}
             </p>
             <div className="flex gap-2">
               <button
@@ -552,7 +552,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                 className="flex items-center gap-1.5 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 py-1.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)]"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {lang === 'en' ? 'Copy' : 'Kopyala'}
+                {t('coachUi.copy')}
               </button>
               {waLink && (
                 <button
@@ -570,7 +570,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               <div className="flex flex-col items-center justify-center py-6 gap-2">
                 <Loader2 className="h-5 w-5 animate-spin text-[#0F6E56]" />
                 <span className="text-xs font-semibold text-[#0F6E56]/70 animate-pulse">
-                  {lang === 'en' ? 'Translating message...' : 'Mesaj çevriliyor...'}
+                  {t('coachUi.translatingMessage')}
                 </span>
               </div>
             ) : (
@@ -589,7 +589,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-2)]">
               <Clock className="h-4 w-4" />
-              {lang === 'en' ? 'Recent Messages' : 'Son Mesajlar'} ({history.length})
+              {t('coachUi.recentMessages')} ({history.length})
             </span>
             {historyOpen ? <ChevronUp className="h-4 w-4 text-[var(--text-3)]" /> : <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />}
           </button>
@@ -609,7 +609,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                       className="flex items-center gap-1 rounded-lg bg-[var(--bg-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)]"
                     >
                       <Copy className="h-2.5 w-2.5" />
-                      {lang === 'en' ? 'Copy' : 'Kopyala'}
+                      {t('coachUi.copy')}
                     </button>
                   </div>
                   <p className="line-clamp-2 text-xs leading-relaxed text-[var(--text-3)]">{entry.message}</p>

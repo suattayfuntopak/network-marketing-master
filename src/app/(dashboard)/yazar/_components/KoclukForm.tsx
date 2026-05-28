@@ -14,7 +14,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 export function KoclukForm() {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
   const [state, action, isPending] = useActionState(askCoachAction, {})
   const [question, setQuestion] = useState('')
   const [copied, setCopied] = useState(false)
@@ -85,7 +85,7 @@ export function KoclukForm() {
     if (displayedAnswer) {
       navigator.clipboard.writeText(displayedAnswer)
       setCopied(true)
-      toast.success(lang === 'en' ? 'Answer copied!' : 'Cevap kopyalandı!')
+      toast.success(t('coachUi.answerCopied'))
       setTimeout(() => setCopied(false), 2000)
     }
   }
@@ -100,21 +100,19 @@ export function KoclukForm() {
           </div>
           <div>
             <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-              {lang === 'en' ? 'Ask Your AI Coach' : 'Yapay Zeka Koçuna Sor'}
+              {t('coachUi.askYourCoachTitle')}
             </p>
             <p className="text-[11px] text-[#3730A3]/70 dark:text-[#c7d2fe]/70 mt-0.5 font-medium">
-              {lang === 'en' 
-                ? 'Ask anything related to Network Marketing and strategy.' 
-                : 'Network marketing ve liderlikle ilgili merak ettiğin her şeyi sor.'}
+              {t('coachUi.askYourCoachDesc')}
             </p>
           </div>
         </div>
         <div className="shrink-0 text-right">
           <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-            {isSuperAdmin ? (lang === 'en' ? 'Unlimited' : 'Sınırsız') : `${remaining} / ${messageLimit}`}
+            {isSuperAdmin ? t('coachUi.unlimited') : `${remaining} / ${messageLimit}`}
           </p>
           <p className="text-[9px] text-[#3730A3]/60 dark:text-[#c7d2fe]/60 font-semibold uppercase tracking-wider">
-            {lang === 'en' ? 'Daily AI Quota' : 'Günlük Limit'}
+            {t('coachUi.dailyQuota')}
           </p>
         </div>
       </div>
@@ -124,7 +122,7 @@ export function KoclukForm() {
         
         <div>
           <label htmlFor="questionText" className="block text-sm font-semibold text-[var(--text-1)] mb-1.5">
-            {lang === 'en' ? 'Your Question' : 'Sorunuz'}
+            {t('coachUi.yourQuestion')}
           </label>
           <textarea
             id="questionText"
@@ -132,9 +130,7 @@ export function KoclukForm() {
             value={question}
             onChange={e => setQuestion(e.target.value)}
             disabled={isPending || limitReached}
-            placeholder={lang === 'en' 
-              ? 'e.g. How can I increase candidate retention in the follow-up stage?' 
-              : 'Örn: Takip aşamasında adayların sürece sadık kalmasını nasıl sağlayabilirim?'}
+            placeholder={t('coachUi.questionPlaceholder')}
             rows={4}
             className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#3730A3] focus:ring-2 focus:ring-[#EEF2FF] dark:focus:ring-[#1e1b4b] disabled:opacity-50"
           />
@@ -159,15 +155,15 @@ export function KoclukForm() {
           {isPending ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              <span>{lang === 'en' ? 'Thinking...' : 'Koç Düşünüyor...'}</span>
+              <span>{t('coachUi.thinking')}</span>
             </>
           ) : (
             <>
               <Send className="h-4 w-4" />
               <span>
                 {limitReached 
-                  ? (lang === 'en' ? 'Daily Limit Reached' : 'Günlük Limite Ulaştınız')
-                  : (lang === 'en' ? 'Ask Coach' : 'Koç’a Sor')}
+                  ? t('coachUi.dailyLimitReached')
+                  : t('coachUi.askCoach')}
               </span>
             </>
           )}
@@ -183,7 +179,7 @@ export function KoclukForm() {
                 <Bot className="h-4 w-4 text-[#3730A3] dark:text-[#a5b4fc]" />
               </div>
               <span className="text-xs font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'AI Coach Answer' : 'Yapay Zeka Koçunun Yanıtı'}
+                {t('coachUi.coachAnswer')}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
@@ -191,7 +187,7 @@ export function KoclukForm() {
               <button
                 type="button"
                 onClick={handleCopy}
-                title={copied ? (lang === 'en' ? 'Copied' : 'Kopyalandı') : (lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala')}
+                title={copied ? t('coachUi.copied') : t('coachUi.copyAnswer')}
                 className={clsx(
                   "flex h-8 w-8 items-center justify-center rounded-lg transition-all border cursor-pointer",
                   copied
@@ -207,7 +203,7 @@ export function KoclukForm() {
                 href={`https://api.whatsapp.com/send?text=${encodeURIComponent(displayedAnswer)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                title={lang === 'en' ? 'Share on WhatsApp' : 'WhatsApp ile Paylaş'}
+                title={t('coachUi.shareWhatsApp')}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[#25D366] hover:bg-[#E8F8EF] dark:hover:bg-[#0d3d2e]/20 transition-all cursor-pointer"
               >
                 <WhatsAppIcon className="h-4.5 w-4.5" />
@@ -219,7 +215,7 @@ export function KoclukForm() {
               <div className="flex flex-col items-center justify-center py-8 gap-2">
                 <Loader2 className="h-6 w-6 animate-spin text-[#3730A3]" />
                 <span className="text-xs font-semibold text-[var(--text-3)] animate-pulse">
-                  {lang === 'en' ? 'Translating answer...' : 'Cevap çevriliyor...'}
+                  {t('coachUi.translatingAnswer')}
                 </span>
               </div>
             ) : (

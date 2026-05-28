@@ -226,7 +226,7 @@ function SearchPageContent() {
           <section className="space-y-3">
             <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--text-3)]">
               <MessageCircleQuestion className="h-4 w-4 text-[#9B1D47]" />
-              {lang === 'en' ? 'Objections & Answers' : 'İtirazlar ve Cevaplar'} ({filteredObjections.length})
+              {t('pagesUi.objectionsAndAnswers')} ({filteredObjections.length})
             </h2>
             <div className="grid gap-2.5">
               {filteredObjections.map(objection => {
@@ -257,7 +257,7 @@ function SearchPageContent() {
                     </p>
                     <div className="flex items-center gap-1.5 pl-8 text-[11px] font-semibold text-[#9B1D47] dark:text-[#fda4af] mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <CornerDownRight className="h-3.5 w-3.5" />
-                      <span>{lang === 'en' ? 'Read Answer ➔' : 'Cevabı oku ➔'}</span>
+                      <span>{t('pagesUi.readAnswer')}</span>
                     </div>
                   </Link>
                 )

@@ -43,7 +43,7 @@ async function fetchNotifications(): Promise<NotificationItem[]> {
 export function useNotifications() {
   const queryClient = useQueryClient()
   const supabase = useMemo(() => createClient(), [])
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const router = useRouter()
 
   const query = useQuery({
@@ -101,7 +101,7 @@ export function useNotifications() {
               description,
               duration: 6000,
               action: {
-                label: lang === 'en' ? 'View' : 'Görüntüle',
+                label: t('shellUi.view'),
                 onClick: () => {
                   router.push(targetHref)
                 },

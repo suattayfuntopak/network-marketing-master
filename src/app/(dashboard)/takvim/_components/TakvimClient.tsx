@@ -43,6 +43,7 @@ const DAYS_EN   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 export function TakvimClient() {
   const router = useRouter()
+  const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const { candidates = [] } = useCandidates(ws?.workspaceId)
 
@@ -96,7 +97,6 @@ export function TakvimClient() {
     )
   }
 
-  const { lang } = useTranslation()
   const selectedCandidates = byDate[selected] ?? []
 
   return (
@@ -166,14 +166,14 @@ export function TakvimClient() {
       {/* Seçilen güne ait adaylar */}
       <div>
         <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-          {selected === toKey(today) ? (lang === 'en' ? 'Today' : 'Bugün') : selected.split('-').reverse().join('.')} — {lang === 'en' ? 'Follow-up List' : 'Takip Listesi'}
+          {selected === toKey(today) ? t('pagesUi.today') : selected.split('-').reverse().join('.')} — {t('pagesUi.followUpList')}
         </p>
 
         {selected < toKey(today) && selectedCandidates.length > 0 && (
           <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2">
             <span className="h-2 w-2 rounded-full bg-[#72243E]" />
             <p className="text-xs font-semibold text-[#72243E]">
-              {lang === 'en' ? `${selectedCandidates.length} follow-ups missed — act now` : `${selectedCandidates.length} takip kaçırıldı — hemen ilgilen`}
+              {t('pagesUi.followUpsMissed', { count: selectedCandidates.length })}
             </p>
           </div>
         )}
@@ -181,10 +181,10 @@ export function TakvimClient() {
           <div className="rounded-2xl border border-dashed border-[var(--border)] py-10 text-center">
             <p className="text-2xl mb-1">✅</p>
             <p className="text-sm font-semibold text-[var(--text-1)]">
-              {lang === 'en' ? 'No follow-ups for this day' : 'Bu gün için takip yok'}
+              {t('pagesUi.noFollowUpsThisDay')}
             </p>
             <p className="mt-1 text-xs text-[var(--text-2)]">
-              {lang === 'en' ? 'Check another day' : 'Başka bir güne bak'}
+              {t('pagesUi.checkAnotherDay')}
             </p>
           </div>
         ) : (
@@ -224,7 +224,7 @@ export function TakvimClient() {
         return (
           <div>
             <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-              {lang === 'en' ? 'Next 7 days' : 'Önümüzdeki 7 gün'}
+              {t('pagesUi.next7Days')}
             </p>
             <ul className="space-y-1.5">
               {next7.map(k => (
@@ -232,7 +232,7 @@ export function TakvimClient() {
                   className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
                   <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
                   <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
-                    {byDate[k].length} {lang === 'en' ? (byDate[k].length === 1 ? 'prospect' : 'prospects') : 'aday'}
+                    {byDate[k].length} {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
                   </span>
                 </button>
               ))}
@@ -258,7 +258,7 @@ export function TakvimClient() {
         return (
           <div className="mt-4 border-t border-[var(--border)] pt-4">
             <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-              {lang === 'en' ? 'Next Month' : 'Önümüzdeki Ay'} ({(lang === 'en' ? MONTHS_EN : MONTHS_TR)[nmMonth]} {nmYear})
+              {t('pagesUi.nextMonth')} ({(lang === 'en' ? MONTHS_EN : MONTHS_TR)[nmMonth]} {nmYear})
             </p>
             <ul className="space-y-1.5">
               {nextMonthKeys.map(k => (
@@ -269,7 +269,7 @@ export function TakvimClient() {
                   className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
                   <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
                   <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
-                    {byDate[k].length} {lang === 'en' ? (byDate[k].length === 1 ? 'prospect' : 'prospects') : 'aday'}
+                    {byDate[k].length} {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
                   </span>
                 </button>
               ))}

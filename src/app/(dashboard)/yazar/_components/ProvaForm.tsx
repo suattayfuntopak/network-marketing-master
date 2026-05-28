@@ -255,7 +255,7 @@ interface Message {
 }
 
 export function ProvaForm() {
-  const { lang } = useTranslation()
+  const { t, lang } = useTranslation()
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
@@ -362,7 +362,7 @@ export function ProvaForm() {
       }
     } catch (err) {
       console.error(err)
-      toast.error(lang === 'en' ? 'Something went wrong.' : 'Bir hata oluştu.')
+      toast.error(t('coachUi.somethingWrong'))
       setMessages(messages)
     } finally {
       setIsPending(false)
@@ -384,7 +384,7 @@ export function ProvaForm() {
             className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-3)] hover:text-[#D97706] transition"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{lang === 'en' ? 'Change Scenario' : 'Senaryoyu Değiştir'}</span>
+            <span>{t('coachUi.changeScenario')}</span>
           </button>
           
           <div className="flex items-center gap-2">
@@ -394,7 +394,7 @@ export function ProvaForm() {
             </span>
             <button 
               onClick={resetSession}
-              title={lang === 'en' ? 'Reset Simulation' : 'Sıfırla'}
+              title={t('coachUi.resetSimulation')}
               className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition active:scale-90"
             >
               <RefreshCw className="h-3.5 w-3.5" />
@@ -437,7 +437,7 @@ export function ProvaForm() {
                   <div className="flex-1 rounded-2xl border-2 border-amber-200 bg-amber-500/5 dark:border-amber-900/40 p-4 shadow-sm max-w-[90%] space-y-3">
                     <div className="flex items-center justify-between border-b border-amber-200/50 dark:border-amber-900/30 pb-2">
                       <p className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400">
-                        {lang === 'en' ? 'AI COACH MENTOR NOTE' : 'YAPAY ZEKA KOÇU DEĞERLENDİRME NOTU'}
+                        {t('coachUi.mentorNote')}
                       </p>
                       <span className="rounded-full bg-[#D97706] text-white px-2 py-0.5 text-xs font-black shadow-md animate-pulse">
                         {m.score}/100
@@ -448,7 +448,7 @@ export function ProvaForm() {
                       {m.strengths && m.strengths.length > 0 && (
                         <div>
                           <p className="font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">
-                            ✅ {lang === 'en' ? 'Strengths:' : 'Güçlü Yönlerin:'}
+                            ✅ {t('coachUi.strengths')}
                           </p>
                           <ul className="list-disc pl-4 space-y-0.5 text-[var(--text-2)] font-medium">
                             {m.strengths.map((str, sIdx) => <li key={sIdx}>{str}</li>)}
@@ -459,7 +459,7 @@ export function ProvaForm() {
                       {m.improvements && (
                         <div>
                           <p className="font-bold text-amber-700 dark:text-amber-400 mb-0.5">
-                            💡 {lang === 'en' ? 'Mentorship Advice:' : 'Liderlik Tavsiyesi:'}
+                            💡 {t('coachUi.mentorshipAdvice')}
                           </p>
                           <p className="pl-4 text-[var(--text-2)] font-medium border-l-2 border-amber-300 dark:border-amber-800">
                             {m.improvements}
@@ -481,7 +481,7 @@ export function ProvaForm() {
               </div>
               <div className="flex items-center gap-2 rounded-2xl bg-amber-500/5 border border-amber-200/50 dark:border-amber-900/20 px-4 py-3 text-xs font-semibold text-amber-700 dark:text-amber-400 shadow-sm animate-pulse">
                 <Loader2 className="h-4.5 w-4.5 animate-spin" />
-                <span>{lang === 'en' ? 'AI Coach is analyzing your message...' : 'Koçunuz yazınızı analiz ediyor ve hazırlanıyor...'}</span>
+                <span>{t('coachUi.analyzingMessage')}</span>
               </div>
             </div>
           )}
@@ -496,7 +496,7 @@ export function ProvaForm() {
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             disabled={isPending}
-            placeholder={lang === 'en' ? 'Type your practice response...' : 'Pratik yanıtını buraya yaz...'}
+            placeholder={t('coachUi.practiceInputPlaceholder')}
             className="flex-1 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#D97706] focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-950/20 disabled:opacity-60"
           />
           <button
@@ -511,7 +511,7 @@ export function ProvaForm() {
         {/* Usage notification */}
         {!isSuperAdmin && usage && (
           <p className="mt-2 text-center text-[10px] font-semibold text-[var(--text-3)] animate-pulse">
-            {lang === 'en' ? `Remaining AI Roleplay Credits: ${remaining} / 20` : `Kalan Günlük Simülasyon Krediniz: ${remaining} / 20`}
+            {t('coachUi.remainingCredits', { remaining })}
           </p>
         )}
       </div>
@@ -525,18 +525,14 @@ export function ProvaForm() {
       <div className="rounded-2xl border border-dashed border-[var(--border)] p-5 text-center bg-[var(--bg-card)] w-full shadow-sm animate-in fade-in duration-300">
         <span className="text-3xl leading-none block mb-2">🎭</span>
         <h2 className="text-sm font-bold text-[var(--text-1)]">
-          {lang === 'en' ? 'Select Scenario, Start Rehearsing!' : 'Senaryo seç, prova başlasın!'}
+          {t('coachUi.selectScenarioTitle')}
         </h2>
         <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed max-w-md mx-auto">
-          {lang === 'en'
-            ? 'The AI acts as a realistic prospect or team member. Type your replies, receive direct mentor scores, strengths, and leadership tips.'
-            : 'YZ aday veya yeni ortak rolüne girer; distribütörü zorlayan gerçekçi itirazlar sunar. Yazdığınız her yanıttan sonra net YZK notu ve puan kazanırsınız.'}
+          {t('coachUi.introDesc')}
         </p>
         {!isSuperAdmin && usage && (
           <p className="mt-2.5 text-xs font-bold text-[var(--text-3)] animate-pulse">
-            {lang === 'en'
-              ? `Daily Roleplay Quota: ${remaining} / 20 remaining today`
-              : `Kalan Günlük Simülasyon Krediniz: ${remaining} / 20`}
+            {t('coachUi.dailyRoleplayQuota', { remaining })}
           </p>
         )}
       </div>
@@ -558,7 +554,7 @@ export function ProvaForm() {
               </div>
               <div className="min-w-0 flex-1">
                 <p className="text-[10px] font-black tracking-widest text-[#D97706] uppercase mb-0.5">
-                  {s.emoji} {lang === 'en' ? 'SIMULATION' : 'SİMÜLASYON'}
+                  {s.emoji} {t('coachUi.simulation')}
                 </p>
                 <h3 className="text-sm font-bold text-[var(--text-1)] group-hover:text-[#D97706] transition-colors truncate">
                   {title}

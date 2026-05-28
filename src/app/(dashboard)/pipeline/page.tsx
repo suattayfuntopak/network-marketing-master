@@ -31,7 +31,7 @@ function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | nu
 }
 
 export default function PipelinePage() {
-  const { lang, t } = useTranslation()
+  const { t } = useTranslation()
   const [filter, setFilter] = useState<CandidateFilter>('tumü')
   const [sheetOpen, setSheetOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -89,7 +89,7 @@ export default function PipelinePage() {
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>
           <p className="text-xs text-[var(--text-3)]">
-            {lang === 'en' ? 'Contact list and process pipeline information' : 'Kişi listesi ve süreç bilgileri'}
+            {t('pipelinePage.pipelineSubtitle')}
           </p>
         </div>
         <button
@@ -148,7 +148,7 @@ export default function PipelinePage() {
           }`}
         >
           <p className={clsx('text-xl font-bold transition-colors', filter === 'takip_zamani' ? 'text-white' : 'text-red-500 dark:text-red-400')}>{counts.takip_zamani}</p>
-          <p className={clsx('text-xs transition-colors font-semibold', filter === 'takip_zamani' ? 'text-white' : 'text-red-600 dark:text-red-400')}>{lang === 'en' ? 'Follow-up Due' : 'Takip Zamanı'}</p>
+          <p className={clsx('text-xs transition-colors font-semibold', filter === 'takip_zamani' ? 'text-white' : 'text-red-600 dark:text-red-400')}>{t('pipelinePage.followUpDue')}</p>
         </button>
       </div>
 

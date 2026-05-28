@@ -11,7 +11,7 @@ export default function DashboardError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   useEffect(() => {
     console.error('[Dashboard error boundary]', error)
@@ -26,12 +26,10 @@ export default function DashboardError({
 
         <div className="space-y-2">
           <h1 className="text-lg font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'Something went wrong on this page' : 'Bu sayfada bir hata oluştu'}
+            {t('shellUi.errorTitle')}
           </h1>
           <p className="text-sm text-[var(--text-3)]">
-            {lang === 'en'
-              ? 'The issue has been logged. Other sections of the app are unaffected — feel free to navigate elsewhere or retry.'
-              : 'Hata kayıt altına alındı. Uygulamanın diğer bölümleri etkilenmedi — başka bir sayfaya geçebilir veya tekrar deneyebilirsin.'}
+            {t('shellUi.errorBody')}
           </p>
         </div>
 
@@ -39,7 +37,7 @@ export default function DashboardError({
           onClick={reset}
           className="mt-2 inline-flex items-center justify-center rounded-lg bg-rose-500/15 px-4 py-2 text-sm font-medium text-rose-300 hover:bg-rose-500/25 transition-colors"
         >
-          {lang === 'en' ? 'Try again' : 'Tekrar dene'}
+          {t('shellUi.tryAgain')}
         </button>
       </div>
     </main>

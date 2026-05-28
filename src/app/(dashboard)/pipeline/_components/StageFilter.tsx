@@ -25,10 +25,10 @@ interface StageFilterProps {
 }
 
 export function StageFilter({ active, onChange, counts }: StageFilterProps) {
-  const { t, lang } = useTranslation()
+  const { t } = useTranslation()
 
   function getLabel(key: CandidateFilter): string {
-    if (key === 'tumü') return lang === 'en' ? 'All' : 'Tümü'
+    if (key === 'tumü') return t('pipelinePage.all')
     return t(`stages.${key}`)
   }
 

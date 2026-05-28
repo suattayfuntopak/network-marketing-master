@@ -121,7 +121,7 @@ const SHARE_CHECKLIST = {
 const CHECKLIST_KEY = 'nmm_compliance_checklist_v1'
 
 export default function CompliancePage() {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const currentLang = lang === 'en' ? 'en' : 'tr'
 
   const [inputText, setInputText] = useState('')
@@ -165,7 +165,7 @@ export default function CompliancePage() {
     try {
       await navigator.clipboard.writeText(text)
       setCopiedId(id)
-      toast.success(lang === 'en' ? 'Copied to clipboard!' : 'Panoya kopyalandı!')
+      toast.success(t('compliancePage.copiedToClipboard'))
       setTimeout(() => setCopiedId(null), 2000)
     } catch {}
   }
@@ -174,7 +174,7 @@ export default function CompliancePage() {
     try {
       await navigator.clipboard.writeText(text)
       setCopiedImproved(true)
-      toast.success(lang === 'en' ? 'Copied improved text!' : 'Düzeltilmiş metin kopyalandı!')
+      toast.success(t('compliancePage.copiedImprovedText'))
       setTimeout(() => setCopiedImproved(false), 2000)
     } catch {}
   }
@@ -192,10 +192,10 @@ export default function CompliancePage() {
       } else {
         setAuditResult(res)
         invalidateTeamAndAIUsage(qc, ws?.workspaceId)
-        toast.success(lang === 'en' ? 'Audit completed successfully!' : 'Denetim başarıyla tamamlandı!')
+        toast.success(t('compliancePage.auditCompleted'))
       }
     } catch {
-      toast.error(lang === 'en' ? 'An unexpected error occurred.' : 'Beklenmedik bir hata oluştu.')
+      toast.error(t('compliancePage.unexpectedError'))
     } finally {
       setIsAuditing(false)
     }
@@ -218,10 +218,10 @@ export default function CompliancePage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {lang === 'en' ? 'Compliance Center' : 'Uyum Merkezi'}
+              {t('compliancePage.complianceCenter')}
             </h1>
             <p className="text-sm text-[var(--text-3)]">
-              {lang === 'en' ? 'AI-powered social media compliance auditor' : 'Yapay zeka destekli reklam ve paylaşım yasal uyum rehberi'}
+              {t('compliancePage.complianceSubtitle')}
             </p>
           </div>
         </header>
@@ -237,7 +237,7 @@ export default function CompliancePage() {
             }`}
           >
             <Sparkles className="h-4 w-4" />
-            {lang === 'en' ? 'AI Compliance Auditor' : 'YZ Uyum Denetleyicisi'}
+            {t('compliancePage.aiComplianceAuditor')}
           </button>
           <button
             onClick={() => setActiveTab('library')}
@@ -248,7 +248,7 @@ export default function CompliancePage() {
             }`}
           >
             <HelpCircle className="h-4 w-4" />
-            {lang === 'en' ? 'Guidelines Library' : 'Kurallar Kütüphanesi'}
+            {t('compliancePage.guidelinesLibrary')}
           </button>
         </div>
 
@@ -261,12 +261,10 @@ export default function CompliancePage() {
                 <div>
                   <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-[#C03E1F]" />
-                    {lang === 'en' ? 'Audit Your Message' : 'Metnini Yapay Zekaya Denetlet'}
+                    {t('compliancePage.auditYourMessage')}
                   </h2>
                   <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                    {lang === 'en'
-                      ? 'Paste your drafted message, ad script, or post description here. AI will scan for medical guarantees, income promises, and aggressive language.'
-                      : 'Sosyal medyada paylaşmak veya adayına göndermek istediğin metni yapıştır. YZ bunu yasal mevzuatlara ve sağlık/gelir iddialarına göre denetlesin.'}
+                    {t('compliancePage.auditYourMessageDesc')}
                   </p>
                 </div>
 
@@ -275,19 +273,13 @@ export default function CompliancePage() {
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
                     required
-                    placeholder={
-                      lang === 'en'
-                        ? 'e.g., "This amazing product completely cures migraines and promises a guaranteed $5,000 monthly passive income by working 2 hours a day!..."'
-                        : 'Örn: "Bu harika takviye migreni tamamen iyileştiriyor! Ayrıca günde 2 saat çalışarak ayda 50.000 TL garanti gelir elde edebilirsiniz!..."'
-                    }
+                    placeholder={t('compliancePage.auditPlaceholder')}
                     className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
                   />
                   <div className="flex justify-end items-center gap-4">
                     {!usage?.isSuperAdmin && usage && (
                       <span className="text-xs font-semibold text-[var(--text-3)]">
-                        {lang === 'en'
-                          ? `Daily Audits: ${Math.max(0, 5 - usage.complianceUsed)} / 5`
-                          : `Kalan Günlük Denetim: ${Math.max(0, 5 - usage.complianceUsed)} / 5`}
+                        {t('compliancePage.dailyAudits', { count: Math.max(0, 5 - usage.complianceUsed) })}
                       </span>
                     )}
                     <button
@@ -298,12 +290,12 @@ export default function CompliancePage() {
                       {isAuditing ? (
                         <>
                           <RefreshCw className="h-4 w-4 animate-spin" />
-                          {lang === 'en' ? 'Auditing...' : 'Denetleniyor...'}
+                          {t('compliancePage.auditing')}
                         </>
                       ) : (
                         <>
                           <Shield className="h-4 w-4" />
-                          {lang === 'en' ? 'Start AI Audit' : 'Uyum Denetimini Başlat'}
+                          {t('compliancePage.startAiAudit')}
                         </>
                       )}
                     </button>
@@ -318,7 +310,7 @@ export default function CompliancePage() {
                     {/* Gauge / Score Card */}
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 flex flex-col items-center justify-center text-center space-y-3">
                       <span className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
-                        {lang === 'en' ? 'COMPLIANCE SCORE' : 'UYUM PUANI'}
+                        {t('compliancePage.complianceScore')}
                       </span>
                       
                       {/* Custom Circular SVG Gauge */}
@@ -364,24 +356,22 @@ export default function CompliancePage() {
                             ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
                             : 'bg-red-50 text-red-700 dark:bg-red-950/20 dark:text-red-400'
                       }`}>
-                        {auditResult.safety_level === 'safe' && (lang === 'en' ? 'SAFE TO SHARE' : 'GÜVENLİ PAYLAŞIM')}
-                        {auditResult.safety_level === 'warning' && (lang === 'en' ? 'NEEDS WARNINGS' : 'RİSKLİ UYARI')}
-                        {auditResult.safety_level === 'danger' && (lang === 'en' ? 'HIGH RISK' : 'TEHLİKELİ METİN')}
+                        {auditResult.safety_level === 'safe' && t('compliancePage.safeToShare')}
+                        {auditResult.safety_level === 'warning' && t('compliancePage.needsWarnings')}
+                        {auditResult.safety_level === 'danger' && t('compliancePage.highRisk')}
                       </span>
                     </div>
 
                     {/* Violations List */}
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3 justify-center flex flex-col">
                       <h3 className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
-                        {lang === 'en' ? 'DETECTED YASAL RISKS' : 'TESPİT EDİLEN YASAL RİSKLER'}
+                        {t('compliancePage.detectedRisks')}
                       </h3>
                       {(!auditResult.violations || auditResult.violations.length === 0) ? (
                         <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 py-3">
                           <CheckCircle2 className="h-5 w-5 shrink-0" />
                           <span className="text-sm font-semibold">
-                            {lang === 'en'
-                              ? 'No regulatory claims or risks detected in this text. Great job!'
-                              : 'Metinde hiçbir mevzuat dışı veya yanıltıcı ifade tespit edilmedi. Tebrikler!'}
+                            {t('compliancePage.noRisksDetected')}
                           </span>
                         </div>
                       ) : (
@@ -409,7 +399,7 @@ export default function CompliancePage() {
                         <button
                           onClick={() => handleCopyImproved(auditResult.improved_text!)}
                           className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-400 transition active:scale-95 cursor-pointer"
-                          title={lang === 'en' ? 'Copy Text' : 'Metni Kopyala'}
+                          title={t('compliancePage.copyText')}
                         >
                           {copiedImproved ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                         </button>
@@ -418,7 +408,7 @@ export default function CompliancePage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition active:scale-95 hover:scale-105 hover:shadow-md cursor-pointer"
-                          title={lang === 'en' ? 'Share via WhatsApp' : 'WhatsApp ile Paylaş'}
+                          title={t('compliancePage.shareViaWhatsApp')}
                         >
                           <WhatsAppIcon className="h-4.5 w-4.5" />
                         </a>
@@ -426,7 +416,7 @@ export default function CompliancePage() {
                       <div className="pr-20">
                         <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <CheckCircle2 className="h-4 w-4" />
-                          {lang === 'en' ? 'RECOMMENDED COMPLIANT VERSION' : 'ÖNERİLEN UYUMLU VE ETKİLİ VERSİYON'}
+                          {t('compliancePage.recommendedVersion')}
                         </h4>
                         <p className="text-sm leading-relaxed text-[var(--text-1)] italic whitespace-pre-wrap font-medium">
                           {auditResult.improved_text}
@@ -443,12 +433,10 @@ export default function CompliancePage() {
                   <div>
                     <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                       <Shield className="h-4 w-4 text-[#C03E1F]" />
-                      {lang === 'en' ? 'Pre-Share Checklist' : 'Paylaşım Öncesi Kontrol Listesi'}
+                      {t('compliancePage.preShareChecklist')}
                     </h2>
                     <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                      {lang === 'en'
-                        ? 'Quickly tick off these checks to ensure your marketing complies with company standards.'
-                        : 'Paylaşımlarının şirket ve yasal uyum standartlarına uymasını sağlamak için bu çeklisti doldur.'}
+                      {t('compliancePage.preShareChecklistDesc')}
                     </p>
                   </div>
                   <div className="flex items-center gap-2.5 text-xs text-[var(--text-3)] shrink-0">
@@ -458,7 +446,7 @@ export default function CompliancePage() {
                         onClick={resetChecklist}
                         className="font-bold hover:text-[var(--text-1)] transition cursor-pointer"
                       >
-                        {lang === 'en' ? 'Reset' : 'Sıfırla'}
+                        {t('compliancePage.reset')}
                       </button>
                     )}
                   </div>
@@ -488,9 +476,7 @@ export default function CompliancePage() {
                     <div className="flex items-center gap-2 rounded-xl bg-emerald-500 text-white px-4 py-3 shadow-md mt-3 animate-in fade-in zoom-in-95 duration-200">
                       <CheckCircle2 className="h-5 w-5 shrink-0" />
                       <span className="text-xs sm:text-sm font-bold">
-                        {lang === 'en'
-                          ? 'All compliance checks passed! You can safely share your content.'
-                          : 'Harika! Tüm kontroller tamam, bu metni güvenle paylaşabilirsin.'}
+                        {t('compliancePage.allChecksPassed')}
                       </span>
                     </div>
                   )}
@@ -506,12 +492,10 @@ export default function CompliancePage() {
                 <div>
                   <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                    {lang === 'en' ? 'Approved Templates & Statements' : 'Güvenli ve Onaylı Kalıplar'}
+                    {t('compliancePage.approvedTemplates')}
                   </h2>
                   <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                    {lang === 'en'
-                      ? 'The following templates can be shared directly. Tap to copy and adapt to your products.'
-                      : 'Aşağıdaki ifade kalıplarını güvenle kullanabilirsin. Kopyala butonuna bas ve kendi ürünlerine uyarla.'}
+                    {t('compliancePage.approvedTemplatesDesc')}
                   </p>
                 </div>
 
@@ -524,7 +508,7 @@ export default function CompliancePage() {
                       <button
                         onClick={() => handleCopyText(claim.id, claim.text.split(' — ')[0].replace(/^"|"$/g, ''))}
                         className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-2)] hover:bg-emerald-100 hover:text-emerald-800 dark:hover:bg-emerald-950/20 dark:hover:text-emerald-400 transition active:scale-95 cursor-pointer"
-                        title={lang === 'en' ? 'Copy Template' : 'Şablonu Kopyala'}
+                        title={t('compliancePage.copyTemplate')}
                       >
                         {copiedId === claim.id ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
                       </button>
@@ -538,12 +522,10 @@ export default function CompliancePage() {
                 <div>
                   <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <XCircle className="h-4 w-4 text-red-500" />
-                    {lang === 'en' ? 'Strictly Prohibited Claims to Avoid' : 'Kaçınılması Gereken Yasaklı İfadeler'}
+                    {t('compliancePage.prohibitedClaims')}
                   </h2>
                   <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
-                    {lang === 'en'
-                      ? 'Sharing the following triggers strict legal actions. Study these examples to protect your team.'
-                      : 'Aşağıdaki ifadelerin paylaşılması ciddi yasal yaptırımlar doğurur. Ekibini korumak için bu örnekleri incele.'}
+                    {t('compliancePage.prohibitedClaimsDesc')}
                   </p>
                 </div>
 
@@ -588,18 +570,18 @@ export default function CompliancePage() {
                       complianceLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
                     )}>
                       {complianceLimit === 0
-                        ? (lang === 'en' ? 'Unlock Compliance Audit' : 'Uyum Denetimini Aç')
-                        : (lang === 'en' ? 'Compliance Audit' : 'Uyum Denetimi')}
+                        ? t('compliancePage.unlockComplianceAudit')
+                        : t('compliancePage.complianceAudit')}
                     </p>
                     <p className={clsx(
                       'text-[11px] mt-0.5',
                       complianceLimit === 0 ? 'text-[#C03E1F]/70' : 'text-[#1A56DB]/70 dark:text-[#93c5fd]/70'
                     )}>
                       {complianceLimit === 0
-                        ? (lang === 'en' ? 'Check your messages for legal compliance — paid plans only.' : 'Mesajlarınızı yasal uyum açısından denetleyin — ücretli plan gerekli.')
+                        ? t('compliancePage.complianceAuditUpsell')
                         : complianceLimit === Infinity
-                          ? (lang === 'en' ? 'Audit your marketing messages for FTC & legal compliance. Unlimited credits.' : 'Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Sınırsız hak.')
-                          : (lang === 'en' ? `Audit your marketing messages for FTC & legal compliance. ${complianceLimit} daily credits.` : `Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Günlük ${complianceLimit} hak.`)}
+                          ? t('compliancePage.complianceAuditUnlimited')
+                          : t('compliancePage.creditsInfo', { count: complianceLimit })}
                     </p>
                   </div>
                 </div>
@@ -625,9 +607,7 @@ export default function CompliancePage() {
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">
             <Info className="h-4 w-4 shrink-0 text-[var(--text-3)] mt-0.5" />
             <p className="text-[11px] leading-relaxed text-[var(--text-3)] font-semibold">
-              {lang === 'en'
-                ? 'This guide is for educational purposes. Always prioritize your company\'s official Compliance Policy and regional legal regulations (FTC, local laws). When in doubt, consult company legal council.'
-                : 'Bu Uyum Merkezi ve AI Denetim paneli rehberlik amaçlıdır. Her zaman şirketinin resmi Uyum El Kitabını ve ülkendeki yasal mevzuatları (TKHK, KVKK vb.) birinci kaynak olarak al. Şüphe durumunda şirket yetkililerine danış.'}
+              {t('compliancePage.disclaimer')}
             </p>
           </section>
 

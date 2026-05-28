@@ -40,7 +40,7 @@ const getAvatarColor = (name: string) => {
 }
 
 export default function PlatformAdminPage() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
   const router = useRouter()
   const { data: usage, isLoading: usageLoading } = useAIUsage()
   
@@ -71,9 +71,9 @@ export default function PlatformAdminPage() {
     // If loading finishes and user is not super admin, bounce them out!
     if (!usageLoading && !isSuperAdmin) {
       router.push('/pano')
-      toast.error(lang === 'en' ? 'Unauthorized access.' : 'Yetkisiz erişim denemesi engellendi.')
+      toast.error(t('platformPage.unauthorizedAccess'))
     }
-  }, [isSuperAdmin, usageLoading, router, lang])
+  }, [isSuperAdmin, usageLoading, router, t])
 
   const loadData = useCallback(async () => {
     try {
@@ -107,7 +107,7 @@ export default function PlatformAdminPage() {
           isUnlimited
         )
         if (res.success) {
-          toast.success(lang === 'en' ? 'License updated successfully!' : 'Lisans başarıyla güncellendi!')
+          toast.success(t('platformPage.licenseUpdated'))
           setSelectedWorkspace(null)
           loadData() // Reload table
         }
@@ -130,12 +130,10 @@ export default function PlatformAdminPage() {
     )
   })
 
-  function buildInviteWaLink(code: string): string {
+  function buildInviteWaLink(code: string, name: string): string {
     const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://nmm.app'
     const inviteUrl = `${appUrl}/kayit?ref=${code}`
-    const msg = lang === 'en'
-      ? `Hi! I'd like to invite you to join my team on Network Marketing Master. Click here to register: ${inviteUrl}`
-      : `Merhaba! Network Marketing Master'da ekibime katılmana vesile olmak istiyorum. Kayıt olmak için: ${inviteUrl}`
+    const msg = t('platformPage.inviteWaMessage', { name, link: inviteUrl })
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 
@@ -144,16 +142,16 @@ export default function PlatformAdminPage() {
     try {
       await addIndependentAsCandidateAction(email, name)
       setAddedIds(prev => new Set(prev).add(workspaceId))
-      toast.success(lang === 'en' ? `${name} added to your pipeline!` : `${name} pipeline'ına eklendi!`)
+      toast.success(t('platformPage.addedToPipeline', { name }))
     } catch (err: any) {
-      toast.error(err.message || (lang === 'en' ? 'Operation failed.' : 'İşlem başarısız.'))
+      toast.error(err.message || t('platformPage.operationFailed'))
     } finally {
       setAddingId(null)
     }
   }
 
   async function handleDeleteUser(ownerId: string, email: string) {
-    if (!confirm(lang === 'en' ? `Are you sure you want to permanently delete user ${email}?` : `E-posta adresi ${email} olan kullanıcıyı kalıcı olarak silmek istediğinize emin misiniz?`)) return
+    if (!confirm(t('platformPage.confirmDeleteUser', { email }))) return
     
     setDeletingUserId(ownerId)
     setDeleteCountdown(5)
@@ -177,16 +175,16 @@ export default function PlatformAdminPage() {
     setDeletingUserId(null)
     setDeleteCountdown(0)
     setDeleteTimerId(null)
-    toast.info(lang === 'en' ? 'User deletion cancelled.' : 'Kullanıcı silme işlemi iptal edildi.')
+    toast.info(t('platformPage.userDeletionCancelled'))
   }
 
   async function executeDeleteUser(ownerId: string, email: string) {
     try {
       await deleteUserAction(ownerId, email)
-      toast.success(lang === 'en' ? 'User deleted successfully.' : 'Kullanıcı başarıyla silindi.')
+      toast.success(t('platformPage.userDeleted'))
       loadData()
     } catch (err: any) {
-      toast.error(err.message || (lang === 'en' ? 'Delete failed.' : 'Silme işlemi başarısız.'))
+      toast.error(err.message || t('platformPage.deleteFailed'))
     } finally {
       setDeletingUserId(null)
       setDeleteCountdown(0)
@@ -206,7 +204,7 @@ export default function PlatformAdminPage() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--bg)] text-[var(--text-1)]">
         <Loader2 className="h-10 w-10 animate-spin text-[#534AB7]" />
         <p className="mt-3 text-sm text-[var(--text-2)] font-semibold animate-pulse">
-          {lang === 'en' ? 'Loading Platform Admin Grid...' : 'Platform Yönetim Masası Yükleniyor...'}
+          {t('platformPage.loadingGrid')}
         </p>
       </div>
     )
@@ -226,15 +224,13 @@ export default function PlatformAdminPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-[var(--text-1)] flex items-center gap-2">
-                {lang === 'en' ? 'Platform Management Console' : 'Platform Yönetim Masası'}
+                {t('platformPage.consoleTitle')}
                 <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                  {lang === 'en' ? 'Super Admin' : 'Süper Admin'}
+                  {t('platformPage.superAdmin')}
                 </span>
               </h1>
               <p className="text-sm text-[var(--text-3)] font-medium">
-                {lang === 'en' 
-                  ? 'Audit independent signups, team sizes, manage billing limits and manual extensions.' 
-                  : 'Dış kayıtları izleyin, lisans tiplerini denetleyin ve manuel süre uzatımlarını yönetin.'}
+                {t('platformPage.consoleSubtitle')}
               </p>
             </div>
           </div>
@@ -245,56 +241,56 @@ export default function PlatformAdminPage() {
           {/* KPI 1 */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
             <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-              {lang === 'en' ? 'TOTAL LEADERS' : 'TOPLAM LİDER / ÜYE'}
+              {t('platformPage.kpiTotalLeaders')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-black text-[var(--text-1)]">{totalUsersCount}</span>
               <Users className="h-4.5 w-4.5 text-[var(--text-3)] ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-              {lang === 'en' ? 'Total workspaces on NMM' : 'Kayıtlı toplam bağımsız çalışma alanı'}
+              {t('platformPage.kpiTotalLeadersDesc')}
             </p>
           </div>
 
           {/* KPI 2 */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
             <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-purple-600 dark:text-purple-400">
-              {lang === 'en' ? 'INDEPENDENT SIGNUPS' : 'DIŞ KAYIT / BAĞIMSIZLAR'}
+              {t('platformPage.kpiIndependent')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-black text-purple-600 dark:text-purple-400">{independentCount}</span>
               <Sparkles className="h-4.5 w-4.5 text-purple-600 dark:text-purple-400 ml-auto animate-pulse" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-              {lang === 'en' ? 'Registered directly from web' : 'Doğrudan Landing Page ile gelenler'}
+              {t('platformPage.kpiIndependentDesc')}
             </p>
           </div>
 
           {/* KPI 3 */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
             <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-emerald-600 dark:text-emerald-400">
-              {lang === 'en' ? 'PAID LICENSES' : 'AKTİF LİSANSLAR (PAID)'}
+              {t('platformPage.kpiPaid')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{totalPaidCount}</span>
               <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400 ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-              {lang === 'en' ? 'Leader/Master/Pro plans active' : 'Basic, Plus ve Pro paket sahipleri'}
+              {t('platformPage.kpiPaidDesc')}
             </p>
           </div>
 
           {/* KPI 4 */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
             <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-blue-600 dark:text-blue-400">
-              {lang === 'en' ? 'TOTAL PROSPECTS' : 'TOPLAM ADAY HACMİ'}
+              {t('platformPage.kpiProspects')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{totalCandidatesCount}</span>
               <ArrowUpRight className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400 ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
-              {lang === 'en' ? 'Leads tracked by entire platform' : 'Sistem genelinde takip edilen adaylar'}
+              {t('platformPage.kpiProspectsDesc')}
             </p>
           </div>
         </div>
@@ -305,13 +301,11 @@ export default function PlatformAdminPage() {
             <div className="flex flex-wrap items-center gap-2">
               <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
               <h2 className="text-sm font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'Independent Signups' : 'Bağımsız Kayıtlar'}
+                {t('platformPage.independentSignupsTitle')}
                 <span className="ml-2 text-purple-600 dark:text-purple-400">({independentMembers.length})</span>
               </h2>
               <span className="text-[10px] text-[var(--text-3)] font-medium ml-auto hidden sm:block">
-                {lang === 'en'
-                  ? 'Discovered your platform organically — reach out to recruit them.'
-                  : 'Platformu bağımsız keşfettiler — iletişime geçip ekibine davet edebilirsin.'}
+                {t('platformPage.independentSignupsHint')}
               </span>
             </div>
             <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -342,10 +336,10 @@ export default function PlatformAdminPage() {
                     </div>
                     <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
                       <a
-                        href={buildInviteWaLink(inviteCode)}
+                        href={buildInviteWaLink(inviteCode, w.ownerName)}
                         target="_blank"
                         rel="noreferrer"
-                        title={lang === 'en' ? 'Send Invite via WhatsApp' : 'WhatsApp ile Davet Gönder'}
+                        title={t('platformPage.sendInviteWhatsApp')}
                         className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
                       >
                         <WhatsAppIcon className="h-3.5 w-3.5" />
@@ -353,7 +347,7 @@ export default function PlatformAdminPage() {
                       <button
                         onClick={() => handleAddAsCandidate(w.workspaceId, w.ownerEmail, w.ownerName)}
                         disabled={addingId === w.workspaceId || isAdded}
-                        title={lang === 'en' ? 'Add to My Pipeline as Prospect' : "Pipeline'ıma Aday Olarak Ekle"}
+                        title={t('platformPage.addToPipelineTitle')}
                         className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
                           isAdded
                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
@@ -383,7 +377,7 @@ export default function PlatformAdminPage() {
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder={lang === 'en' ? 'Search by name, email, sponsor...' : 'İsim, e-posta ya da sponsor ile ara...'}
+            placeholder={t('platformPage.searchPlaceholder')}
             className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
           />
         </div>
@@ -394,22 +388,22 @@ export default function PlatformAdminPage() {
             <table className="w-full text-left border-collapse text-sm min-w-[1000px]">
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                  <th className="p-3 font-semibold">{lang === 'en' ? 'Leader Name' : 'Kullanıcı / Lider'}</th>
-                  <th className="p-3 font-semibold">{lang === 'en' ? 'Workspace Name' : 'Grup / Çalışma Alanı'}</th>
-                  <th className="p-3 font-semibold">{lang === 'en' ? 'License Plan' : 'Lisans Paketi'}</th>
-                  <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Candidates' : 'Aday Sayısı'}</th>
-                  <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Downlines' : 'Ekip Boyutu'}</th>
-                  <th className="p-3 font-semibold">{lang === 'en' ? 'Sponsor / Parent' : 'Sponsorluk Bağı'}</th>
-                  <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Expiry Date' : 'Lisans Bitiş Tarihi'}</th>
-                  <th className="p-3 font-semibold text-center">{lang === 'en' ? 'Registration' : 'Kayıt Tarihi'}</th>
-                  <th className="p-3 font-semibold text-right">{lang === 'en' ? 'Actions' : 'Yönetim'}</th>
+                  <th className="p-3 font-semibold">{t('platformPage.thLeaderName')}</th>
+                  <th className="p-3 font-semibold">{t('platformPage.thWorkspaceName')}</th>
+                  <th className="p-3 font-semibold">{t('platformPage.thLicensePlan')}</th>
+                  <th className="p-3 font-semibold text-center">{t('platformPage.thCandidates')}</th>
+                  <th className="p-3 font-semibold text-center">{t('platformPage.thDownlines')}</th>
+                  <th className="p-3 font-semibold">{t('platformPage.thSponsor')}</th>
+                  <th className="p-3 font-semibold text-center">{t('platformPage.thExpiry')}</th>
+                  <th className="p-3 font-semibold text-center">{t('platformPage.thRegistration')}</th>
+                  <th className="p-3 font-semibold text-right">{t('platformPage.thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
                 {filtered.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-3)] italic">
-                      {lang === 'en' ? 'No registered leaders found.' : 'Kayıtlı hiçbir kullanıcı bulunamadı.'}
+                      {t('platformPage.noLeadersFound')}
                     </td>
                   </tr>
                 ) : (
@@ -485,7 +479,7 @@ export default function PlatformAdminPage() {
                         <td className="p-3 whitespace-nowrap font-semibold">
                           {w.isIndependent ? (
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2 py-0.5 text-[10px] font-black text-purple-600 dark:text-purple-400">
-                              💎 {lang === 'en' ? 'Independent / Direct' : 'Dış Kayıt / Bağımsız'}
+                              💎 {t('platformPage.independentDirect')}
                             </span>
                           ) : (
                             <span className="max-w-[160px] truncate block text-[var(--text-1)]">{w.sponsorName}</span>
@@ -496,14 +490,14 @@ export default function PlatformAdminPage() {
                         <td className={`p-3 text-center tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
                           {isPaidUnlimited ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
-                              ♾ {lang === 'en' ? 'Unlimited' : 'Süresiz'}
+                              ♾ {t('platformPage.unlimited')}
                             </span>
                           ) : (
                             <>
                               {expDate}
                               {isExpired && (
                                 <span className="ml-1 text-[9px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
-                                  {lang === 'en' ? 'Expired' : 'Süresi Doldu'}
+                                  {t('platformPage.expired')}
                                 </span>
                               )}
                             </>
@@ -518,10 +512,10 @@ export default function PlatformAdminPage() {
                           <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
                             {/* WhatsApp — share invite link */}
                             <a
-                              href={buildInviteWaLink(inviteCode)}
+                              href={buildInviteWaLink(inviteCode, w.ownerName)}
                               target="_blank"
                               rel="noreferrer"
-                              title={lang === 'en' ? 'Share Invite Link via WhatsApp' : 'WhatsApp ile Davet Linki Gönder'}
+                              title={t('platformPage.shareInviteWhatsApp')}
                               className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
                             >
                               <WhatsAppIcon className="h-4 w-4" />
@@ -535,7 +529,7 @@ export default function PlatformAdminPage() {
                                 setIsUnlimited(w.licenseType !== 'free' && w.licenseExpiresAt === null)
                                 setExtensionDays(30)
                               }}
-                              title={lang === 'en' ? 'Manage License & Trial' : 'Lisans ve Süre Ayarla'}
+                              title={t('platformPage.manageLicenseTitle')}
                               className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#534AB7]/10 text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white"
                             >
                               <Plus className="h-4 w-4" />
@@ -544,16 +538,16 @@ export default function PlatformAdminPage() {
                             {deletingUserId === w.ownerId ? (
                               <button
                                 onClick={handleCancelDeleteUser}
-                                title={lang === 'en' ? 'Cancel Deletion' : 'Silmeyi İptal Et'}
+                                title={t('platformPage.cancelDeletion')}
                                 className="flex h-7 px-2 items-center justify-center rounded-lg bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition min-w-[4rem]"
                               >
-                                {lang === 'en' ? 'Undo ' : 'Geri Al '} ({deleteCountdown})
+                                {t('platformPage.undoLabel')} ({deleteCountdown})
                               </button>
                             ) : (
                               <button
                                 onClick={() => handleDeleteUser(w.ownerId, w.ownerEmail)}
                                 disabled={deletingUserId !== null}
-                                title={lang === 'en' ? 'Delete User' : 'Kullanıcıyı Sil'}
+                                title={t('platformPage.deleteUserTitle')}
                                 className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
                               >
                                 <Trash2 className="h-4 w-4" />
@@ -584,7 +578,7 @@ export default function PlatformAdminPage() {
               <form onSubmit={handleSaveLicense} className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-base font-bold text-[var(--text-1)]">
-                    {lang === 'en' ? 'Manage Workspace License' : 'Çalışma Alanı Lisans Yönetimi'}
+                    {t('platformPage.manageWorkspaceLicense')}
                   </h3>
                   <button 
                     type="button" 
@@ -596,11 +590,11 @@ export default function PlatformAdminPage() {
                 </div>
 
                 <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)]">
-                  <div><strong>{lang === 'en' ? 'User:' : 'Kullanıcı:'}</strong> {selectedWorkspace.ownerName}</div>
-                  <div className="mt-1"><strong>{lang === 'en' ? 'Email:' : 'E-posta:'}</strong> {selectedWorkspace.ownerEmail}</div>
-                  <div className="mt-1"><strong>{lang === 'en' ? 'Current Expiry:' : 'Mevcut Son Kullanım:'}</strong> {
+                  <div><strong>{t('platformPage.userLabel')}</strong> {selectedWorkspace.ownerName}</div>
+                  <div className="mt-1"><strong>{t('platformPage.emailLabel')}</strong> {selectedWorkspace.ownerEmail}</div>
+                  <div className="mt-1"><strong>{t('platformPage.currentExpiryLabel')}</strong> {
                     selectedWorkspace.licenseType !== 'free' && !selectedWorkspace.licenseExpiresAt
-                      ? (lang === 'en' ? '♾ Unlimited' : '♾ Süresiz')
+                      ? t('platformPage.unlimitedWithIcon')
                       : selectedWorkspace.licenseExpiresAt
                         ? new Date(selectedWorkspace.licenseExpiresAt).toLocaleString()
                         : '-'
@@ -610,7 +604,7 @@ export default function PlatformAdminPage() {
                 {/* Plan select */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[var(--text-1)]">
-                    {lang === 'en' ? 'License Level' : 'Lisans Paketi Seviyesi'}
+                    {t('platformPage.licenseLevel')}
                   </label>
                   <select
                     value={licenseType}
@@ -621,7 +615,7 @@ export default function PlatformAdminPage() {
                     }}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   >
-                    <option value="free">{lang === 'en' ? 'Free (revoke paid)' : 'Free — Lisansı İptal Et'}</option>
+                    <option value="free">{t('platformPage.freeRevoke')}</option>
                     <option value="leader">Leader</option>
                     <option value="master">Master</option>
                     <option value="pro">Pro (Süper Lider)</option>
@@ -641,7 +635,7 @@ export default function PlatformAdminPage() {
                           : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]'
                       }`}
                     >
-                      <span>{lang === 'en' ? '♾ Unlimited Access (no expiry)' : '♾ Süresiz Erişim (son kullanım yok)'}</span>
+                      <span>{t('platformPage.unlimitedAccess')}</span>
                       <span className={`h-4 w-8 rounded-full transition-colors ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'} relative`}>
                         <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${isUnlimited ? 'translate-x-4' : 'translate-x-0.5'}`} />
                       </span>
@@ -651,9 +645,9 @@ export default function PlatformAdminPage() {
                     {!isUnlimited && (
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-[var(--text-1)]">
-                          {lang === 'en' ? 'Extend Access (Days)' : 'Erişim Süresi (Gün)'}
+                          {t('platformPage.extendAccessDays')}
                           <span className="ml-1 font-normal text-[var(--text-3)]">
-                            {lang === 'en' ? '— added on top of current expiry' : '— mevcut bitiş tarihine eklenir'}
+                            {t('platformPage.extendAccessHint')}
                           </span>
                         </label>
                         <input
@@ -676,9 +670,9 @@ export default function PlatformAdminPage() {
                   className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
                 >
                   {isUpdating ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> {lang === 'en' ? 'Saving...' : 'Kaydediliyor...'}</>
+                    <><Loader2 className="h-4 w-4 animate-spin" /> {t('platformPage.saving')}</>
                   ) : (
-                    <><Sparkles className="h-4 w-4" /> {lang === 'en' ? 'Upgrade & Save' : 'Lisansı Güncelle & Kaydet'}</>
+                    <><Sparkles className="h-4 w-4" /> {t('platformPage.upgradeSave')}</>
                   )}
                 </button>
               </form>

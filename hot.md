@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-05-28 — Council Y-8: i18n bimodal → t() (tamamlandı) + Platform WhatsApp davet metni
+
+### i18n: convert ~600 hardcoded `lang === 'en'` ternaries to central dictionary
+
+**Mimari:** Çeviri sözlüğü modülerleştirildi. `tr.ts`/`en.ts`'e dokunulmadı; bunun yerine her ekran grubu için `src/lib/translations/sections/*.ts` bölüm dosyaları eklendi ve `LanguageProvider` içindeki `mergeSections` ile temel sözlüğe birleştirildi. Yeni namespace'ler: `statsPage`, `paymentPage`, `landingPage`, `trainingPage`, `objectionsPage`, `pipelinePage`, `compliancePage`, `platformPage`, `coachUi`, `shellUi`, `pagesUi`.
+
+**Dönüştürülen ekranlar (paralel alt-ajanlarla):**
+- istatistikler (76), açılış sayfası `app/page.tsx` (~92), ödeme (OdemeClient+OdemePageClient ~70), platform-yonetim (49), eğitim (49), itirazlar (23), candidate detay+kart+pipeline+StageFilter (42), uyum (36), coach/yazar bileşenleri (61), shell/nav bileşenleri (21), takvim/search/ilgilen/saha-provası/broadcast (39).
+- Toplam ~600 sabit ikidilli `lang === 'en'` UI metni `t('<ns>.key')`'e taşındı. Dinamik değerler `{var}` placeholder ile.
+
+**Bilinçli bırakılanlar (kural gereği):** veri seçimi ternary'leri (`x.title_en`/`title_tr`, `obj[lang]`, `[currentLang]` ile indekslenen `APPROVED_CLAIMS`/`SCENARIOS`/`TESTIMONIALS` vb.), locale kodları (`'en-US'`/`'tr-TR'`), `className` mantığı, sunucu/AI prompt + e-posta dosyaları, ve `deleteWithUndo.tsx` (`getLang()` helper'ı — `t` kapsamda değil).
+
+**Doğrulama:** `tsc --noEmit` temiz; geçici anahtar-bütünlüğü testi tüm statik `t('...')` çağrılarının hem tr hem en'de string'e çözüldüğünü doğruladı (ham anahtar/eksik çeviri yok); 22 birim testi geçiyor. Kullanıcıya görünen metinler değişmedi.
+
+### feat: Platform Yönetim WhatsApp davet mesajı kişiselleştirildi
+
+- `buildInviteWaLink(code, name)` artık alıcının adıyla (`w.ownerName`) kişiselleştirilmiş yeni metni kullanıyor; metin `platformPage.inviteWaMessage` altında `{name}`/`{link}` ile tr+en olarak saklanıyor. Her iki çağrı yeri (bağımsız üye kartı + ana tablo) güncellendi.
+
+---
+
 ## 2026-05-28 — Uyum Denetimi kutusu Pano → Uyum Merkezi
 
 ### ui: move compliance box from dashboard to compliance page footer

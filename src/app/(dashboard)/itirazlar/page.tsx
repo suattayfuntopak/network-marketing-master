@@ -389,7 +389,7 @@ function getKategoriler(lang: 'tr' | 'en') {
 }
 
 function ItirazlarPageContent() {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const searchParams = useSearchParams()
   const {
@@ -452,10 +452,10 @@ function ItirazlarPageContent() {
     try {
       await navigator.clipboard.writeText(cevap)
       setCopiedId(id)
-      toast.success(lang === 'en' ? 'Answer copied!' : 'Cevap kopyalandı!')
+      toast.success(t('objectionsPage.answerCopied'))
       setTimeout(() => setCopiedId(null), 2000)
     } catch {
-      toast.error(lang === 'en' ? 'Copy failed' : 'Kopyalama başarısız')
+      toast.error(t('objectionsPage.copyFailed'))
     }
   }
 
@@ -492,7 +492,7 @@ function ItirazlarPageContent() {
     setNewTags('')
     setNewEmoji('🛡️')
     setFormOpen(false)
-    toast.success(lang === 'en' ? 'Objection added successfully!' : 'İtiraz başarıyla eklendi!')
+    toast.success(t('objectionsPage.objectionAdded'))
   }
 
   const filtrelenmis = useMemo(() => {
@@ -552,10 +552,10 @@ function ItirazlarPageContent() {
             </div>
             <div>
               <h1 className="text-xl font-bold text-[var(--text-1)]">
-                {lang === 'en' ? 'Objection Answers' : 'İtirazlara Cevaplar'}
+                {t('objectionsPage.title')}
               </h1>
               <p className="text-sm text-[var(--text-3)]">
-                {lang === 'en' ? 'Great answers to the most common objections you face in the field' : 'Sahada en sık karşılaştığın itirazlara verilecek harika cevaplar'}
+                {t('objectionsPage.subtitle')}
               </p>
             </div>
           </div>
@@ -564,23 +564,23 @@ function ItirazlarPageContent() {
             className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
-            <span>{lang === 'en' ? 'Add Objection' : 'İtiraz Ekle'}</span>
+            <span>{t('objectionsPage.addObjection')}</span>
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
           <span className="text-2xl">🛡️</span>
           <div className="flex-1">
             <p className="text-xs font-semibold text-[#9B1D47] dark:text-[#fda4af]">
-              {tumItirazlar.length} {lang === 'en' ? 'objections' : 'itiraz'} · {KATEGORILER.length - 2} {lang === 'en' ? 'categories' : 'kategori'}
+              {tumItirazlar.length} {t('objectionsPage.objections')} · {KATEGORILER.length - 2} {t('objectionsPage.categories')}
             </p>
             <p className="text-[11px] text-[#9B1D47]/70 dark:text-[#fda4af]/70">
-              {lang === 'en' ? '⭐ pin it, 📋 copy it, ✅ mark as read' : '⭐ ile sabitle, 📋 ile kopyala, ✅ okundu işaretle'}
+              {t('objectionsPage.heroHint')}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1">
             {favCount > 0 && (
               <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
-                {favCount} {lang === 'en' ? 'fav' : 'favori'}
+                {favCount} {t('objectionsPage.fav')}
               </span>
             )}
             {readCount > 0 && (
@@ -600,7 +600,7 @@ function ItirazlarPageContent() {
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder={lang === 'en' ? 'Search objections or answers...' : 'İtiraz veya cevap içinde ara...'}
+          placeholder={t('objectionsPage.searchPlaceholder')}
           className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition-all"
         />
         {search && (
@@ -639,7 +639,7 @@ function ItirazlarPageContent() {
       {/* Sonuç sayısı */}
       {search && (
         <p className="mb-3 text-xs text-[var(--text-3)]">
-          {filtrelenmis.length} {lang === 'en' ? 'results found' : 'sonuç bulundu'}
+          {filtrelenmis.length} {t('objectionsPage.resultsFound')}
         </p>
       )}
 
@@ -648,10 +648,10 @@ function ItirazlarPageContent() {
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">⭐</p>
           <p className="text-sm font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'No favorites yet' : 'Henüz favori yok'}
+            {t('objectionsPage.noFavorites')}
           </p>
           <p className="mt-1 text-xs text-[var(--text-2)]">
-            {lang === 'en' ? 'Tap ⭐ next to an objection to save it' : 'İtirazların yanındaki ⭐ ile sabitleyebilirsin'}
+            {t('objectionsPage.noFavoritesDesc')}
           </p>
         </div>
       )}
@@ -661,10 +661,10 @@ function ItirazlarPageContent() {
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">🔍</p>
           <p className="text-sm font-semibold text-[var(--text-1)]">
-            {lang === 'en' ? 'No matching objections' : 'Eşleşen itiraz bulunamadı'}
+            {t('objectionsPage.noMatchingObjections')}
           </p>
           <p className="mt-1 text-xs text-[var(--text-2)]">
-            {lang === 'en' ? 'Try different keywords' : 'Farklı kelimelerle arama yap'}
+            {t('objectionsPage.tryDifferentKeywords')}
           </p>
         </div>
       ) : !isFavoritesEmpty && (
@@ -705,7 +705,7 @@ function ItirazlarPageContent() {
                       {/* Okundu toggle */}
                       <button
                         onClick={e => toggleRead(itiraz.id, e)}
-                        title={isRead ? (lang === 'en' ? 'Mark as unread' : 'Okunmadı olarak işaretle') : (lang === 'en' ? 'Mark as read' : 'Okundu olarak işaretle')}
+                        title={isRead ? t('objectionsPage.markAsUnread') : t('objectionsPage.markAsRead')}
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
                           isRead
                             ? 'text-emerald-600 dark:text-emerald-400'
@@ -720,15 +720,15 @@ function ItirazlarPageContent() {
                         <button
                           onClick={e => {
                             e.stopPropagation()
-                            if (confirm(lang === 'en' ? 'Are you sure you want to delete this objection?' : 'Bu itirazı silmek istediğinize emin misiniz?')) {
+                            if (confirm(t('objectionsPage.confirmDelete'))) {
                               const updated = customItirazlar.filter(c => c.id !== itiraz.id)
                               setCustomItirazlar(updated)
                               deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
-                              toast.success(lang === 'en' ? 'Objection deleted.' : 'İtiraz silindi.')
+                              toast.success(t('objectionsPage.objectionDeleted'))
                             }
                           }}
                           className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--text-3)] hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all hover:scale-105"
-                          title={lang === 'en' ? 'Delete Objection' : 'İtirazı Sil'}
+                          title={t('objectionsPage.deleteObjection')}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -737,7 +737,7 @@ function ItirazlarPageContent() {
                       {/* Favori butonu */}
                       <button
                         onClick={e => toggleFav(itiraz.id, e)}
-                        title={isFav ? (lang === 'en' ? 'Remove from favorites' : 'Favorilerden çıkar') : (lang === 'en' ? 'Add to favorites' : 'Favorilere ekle')}
+                        title={isFav ? t('objectionsPage.removeFromFavorites') : t('objectionsPage.addToFavorites')}
                         className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
                           isFav
                             ? 'bg-[#9B1D47]/10 text-[#9B1D47] dark:bg-[#fda4af]/10 dark:text-[#fda4af]'
@@ -806,8 +806,8 @@ function ItirazlarPageContent() {
                                 }`}
                               >
                                 {copied
-                                  ? <><Check className="h-3 w-3" /> {lang === 'en' ? 'Copied!' : 'Kopyalandı!'}</>
-                                  : <><Copy className="h-3 w-3" /> {lang === 'en' ? 'Copy Answer' : 'Cevabı Kopyala'}</>
+                                  ? <><Check className="h-3 w-3" /> {t('objectionsPage.copied')}</>
+                                  : <><Copy className="h-3 w-3" /> {t('objectionsPage.copyAnswer')}</>
                                 }
                               </button>
 
@@ -823,7 +823,7 @@ function ItirazlarPageContent() {
                                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                                   <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
                                 </svg>
-                                {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp İle Gönder'}
+                                {t('objectionsPage.sendViaWhatsApp')}
                               </a>
                             </div>
                           )
@@ -863,7 +863,7 @@ function ItirazlarPageContent() {
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{lang === 'en' ? 'Add Objection' : 'İtiraz Ekle'}</h2>
+                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
                 <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
                   Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
                 </p>

@@ -150,13 +150,13 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <div className="flex items-center gap-1.5 min-w-0">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
                 {parsed.warmth === 'sicak' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {lang === 'en' ? 'Hot' : 'Sıcak'}</span>
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
                 )}
                 {parsed.warmth === 'ilik' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {lang === 'en' ? 'Warm' : 'Ilık'}</span>
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {t('pipelinePage.warmthWarm')}</span>
                 )}
                 {parsed.warmth === 'soguk' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {lang === 'en' ? 'Cold' : 'Soğuk'}</span>
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
                 )}
               </div>
               {candidate.phone && (
@@ -216,7 +216,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <button
                 onClick={() => setQuickActionOpen(!quickActionOpen)}
                 className="flex h-6 w-6 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all active:scale-95 border border-[var(--border)]"
-                title={lang === 'en' ? 'Quick Actions' : 'Hızlı Aksiyonlar'}
+                title={t('pipelinePage.quickActions')}
               >
                 <Zap className="h-3 w-3 shrink-0" />
               </button>
@@ -229,7 +229,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                       <div className="flex items-center gap-2">
                         <Zap className="h-4 w-4 text-amber-500 animate-pulse" />
                         <p className="text-sm font-bold text-[var(--text-1)]">
-                          {lang === 'en' ? 'Quick Actions' : 'Hızlı Eylemler'}
+                          {t('pipelinePage.quickActionsTitle')}
                         </p>
                       </div>
                       <button
@@ -251,14 +251,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                           className="flex w-full items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-left text-xs font-semibold text-[var(--text-1)] hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:border-[#534AB7]/30 transition"
                         >
                           <Zap className="h-4 w-4 text-amber-500" />
-                          <span>{lang === 'en' ? 'Change Stage ➔' : 'Aşama Değiştir ➔'}</span>
+                          <span>{t('pipelinePage.changeStageAction')}</span>
                         </button>
                       )}
 
                       {/* Takip Ertele */}
                       <div className="pt-1.5">
                         <p className="px-1 pb-2 text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider">
-                          {lang === 'en' ? 'Reschedule Contact' : 'Teması Planla'}
+                          {t('pipelinePage.rescheduleContact')}
                         </p>
                         <div className="grid grid-cols-3 gap-2">
                           <button
@@ -266,21 +266,21 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                             className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
                           >
                             <Calendar className="h-4 w-4 text-blue-500" />
-                            <span>+1 {lang === 'en' ? 'Day' : 'Gün'}</span>
+                            <span>+1 {t('pipelinePage.day')}</span>
                           </button>
                           <button
                             onClick={() => addFollowUpDays(3)}
                             className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
                           >
                             <Calendar className="h-4 w-4 text-blue-500" />
-                            <span>+3 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                            <span>+3 {t('pipelinePage.days')}</span>
                           </button>
                           <button
                             onClick={() => addFollowUpDays(7)}
                             className="flex flex-col items-center justify-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-2 text-xs font-medium text-[var(--text-1)] hover:bg-[#E8F0FE] hover:text-[#1A56DB] hover:border-[#1A56DB]/30 transition"
                           >
                             <Calendar className="h-4 w-4 text-blue-500" />
-                            <span>+7 {lang === 'en' ? 'Days' : 'Gün'}</span>
+                            <span>+7 {t('pipelinePage.days')}</span>
                           </button>
                         </div>
                       </div>
@@ -293,7 +293,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                             className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-100 bg-red-50 px-3 py-2.5 text-center text-xs font-bold text-red-600 dark:border-red-950/20 dark:bg-red-950/10 dark:text-red-400 hover:bg-red-100 transition"
                           >
                             <X className="h-4 w-4 shrink-0" />
-                            <span>{lang === 'en' ? 'Remove Follow-up' : 'Takibi İptal Et'}</span>
+                            <span>{t('pipelinePage.removeFollowUp')}</span>
                           </button>
                         </div>
                       )}
@@ -347,14 +347,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               if (status === 'past') {
                 return (
                   <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/20 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:text-red-300 border border-red-200/50 dark:border-red-900/30">
-                    ⚠️ {lang === 'en' ? 'Follow-up Overdue' : 'Takip Gecikti'}
+                    ⚠️ {t('pipelinePage.followUpOverdue')}
                   </span>
                 )
               }
               if (status === 'today') {
                 return (
                   <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/20 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:text-amber-300 border border-amber-200/50 dark:border-amber-900/30 animate-pulse">
-                    🔔 {lang === 'en' ? 'Follow-up Today' : 'Bugün Takip'}
+                    🔔 {t('pipelinePage.followUpTodayBadge')}
                   </span>
                 )
               }

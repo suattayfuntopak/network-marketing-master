@@ -16,11 +16,11 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 
-function formatDaysAgo(days: number, lang: string): string {
-  if (!isFinite(days)) return lang === 'en' ? 'Never contacted' : 'Hiç aranmadı'
-  if (days < 1) return lang === 'en' ? 'Today' : 'Bugün'
-  if (days < 2) return lang === 'en' ? '1 day ago' : '1 gün önce'
-  return lang === 'en' ? `${Math.floor(days)} days ago` : `${Math.floor(days)} gün önce`
+function formatDaysAgo(days: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
+  if (!isFinite(days)) return t('pagesUi.neverContacted')
+  if (days < 1) return t('pagesUi.today')
+  if (days < 2) return t('pagesUi.oneDayAgo')
+  return t('pagesUi.daysAgo', { days: Math.floor(days) })
 }
 
 
@@ -48,7 +48,7 @@ export function IlgilenContent() {
     try {
       const result = await generateQuickMessageAction({ name, stage, note })
       if (result.error || !result.message) {
-        toast.error(result.error ?? (lang === 'en' ? 'Could not generate message.' : 'Mesaj oluşturulamadı.'))
+        toast.error(result.error ?? t('pagesUi.couldNotGenerateMessage'))
         return
       }
       setActiveMessage({
@@ -59,7 +59,7 @@ export function IlgilenContent() {
       })
     } catch (err) {
       console.error(err)
-      toast.error(lang === 'en' ? 'Could not generate message.' : 'Mesaj oluşturulamadı.')
+      toast.error(t('pagesUi.couldNotGenerateMessage'))
     } finally {
       setGeneratingFor(null)
     }
@@ -80,10 +80,10 @@ export function IlgilenContent() {
       <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
         <p className="mb-2 text-3xl">🎉</p>
         <p className="text-sm font-semibold text-[var(--text-1)]">
-          {lang === 'en' ? 'No pending follow-ups today' : 'Bugün için bekleyen eylem yok'}
+          {t('pagesUi.noPendingFollowUps')}
         </p>
         <p className="mt-1 text-xs text-[var(--text-2)]">
-          {lang === 'en' ? 'Great job!' : 'Harika iş çıkardın!'}
+          {t('pagesUi.greatJob')}
         </p>
       </div>
     )
@@ -96,9 +96,9 @@ export function IlgilenContent() {
           {/* Başlık + görünüm toggle */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-[var(--text-2)]">
-              <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> {lang === 'en' ? 'priorities' : 'kişi öncelikli'}
+              <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> {t('pagesUi.prioritiesLabel')}
               {remaining > 0 && !showAll && (
-                <span className="ml-1 text-[var(--text-3)]">+{remaining} {lang === 'en' ? 'more waiting' : 'daha bekliyor'}</span>
+                <span className="ml-1 text-[var(--text-3)]">+{remaining} {t('pagesUi.moreWaiting')}</span>
               )}
             </p>
             <div className="flex overflow-hidden rounded-xl border border-[var(--border)]">
@@ -140,7 +140,7 @@ export function IlgilenContent() {
                   <span className={clsx('rounded-full px-2 py-0.5 text-xs font-medium', STAGE_COLOR[c.stage])}>
                     {getStageLabel(c.stage, lang)}
                   </span>
-                  <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, lang)}</span>
+                  <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
                 </div>
               </div>
               {/* Eylem butonları — tıklama propagasyonu engelle */}
@@ -150,8 +150,8 @@ export function IlgilenContent() {
                   onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null, c.phone ?? null)}
                   disabled={generatingFor === c.id}
                   className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition hover:opacity-80 disabled:opacity-50"
-                  aria-label={lang === 'en' ? 'Generate AI Message' : 'AI Mesaj Üret'}
-                  title={lang === 'en' ? 'Generate and Copy AI Message' : 'AI Mesaj Üret ve Kopyala'}
+                  aria-label={t('pagesUi.generateAiMessage')}
+                  title={t('pagesUi.generateAndCopyAiMessage')}
                 >
                   {generatingFor === c.id ? (
                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
@@ -178,7 +178,7 @@ export function IlgilenContent() {
                     href={`tel:${c.phone}`}
                     onClick={() => markContacted.mutate({ id: c.id, actionType: 'call' })}
                     className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]"
-                    aria-label={lang === 'en' ? 'Call' : 'Ara'}
+                    aria-label={t('pagesUi.call')}
                   >
                     <Phone className="h-4 w-4" strokeWidth={1.75} />
                   </a>
@@ -205,7 +205,7 @@ export function IlgilenContent() {
                 <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
                   {getStageLabel(c.stage, lang)}
                 </span>
-                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, lang)}</span>
+                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
               </div>
             ))}
           </div>
@@ -250,10 +250,10 @@ export function IlgilenContent() {
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-[var(--text-1)]">
-                    {lang === 'en' ? 'AI Message' : 'Yapay Zeka Mesajı'}
+                    {t('pagesUi.aiMessage')}
                   </h2>
                   <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
-                    {lang === 'en' ? `Generated for ${activeMessage.candidateName}` : `${activeMessage.candidateName} için üretildi`}
+                    {t('pagesUi.generatedFor', { name: activeMessage.candidateName })}
                   </p>
                 </div>
               </div>
@@ -281,12 +281,12 @@ export function IlgilenContent() {
               <button
                 onClick={() => {
                   navigator.clipboard.writeText(activeMessage.message)
-                  toast.success(lang === 'en' ? 'Message copied!' : 'Mesaj kopyalandı!')
+                  toast.success(t('pagesUi.messageCopied'))
                 }}
                 className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {lang === 'en' ? 'Copy' : 'Kopyala'}
+                {t('pagesUi.copy')}
               </button>
 
               {/* WhatsApp Button */}
@@ -304,7 +304,7 @@ export function IlgilenContent() {
                   className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
-                  {lang === 'en' ? 'Send via WhatsApp' : 'WhatsApp ile Gönder'}
+                  {t('pagesUi.sendViaWhatsApp')}
                 </a>
               )}
             </div>

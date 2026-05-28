@@ -5,7 +5,7 @@ import { ProvaForm } from '../yazar/_components/ProvaForm'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export default function SahaProvasiPage() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -16,10 +16,10 @@ export default function SahaProvasiPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {lang === 'en' ? 'Field Rehearsal' : 'Saha Provası'}
+              {t('pagesUi.fieldRehearsalTitle')}
             </h1>
             <p className="text-sm text-[var(--text-2)]">
-              {lang === 'en' ? 'Practice objection handling, invitations, and closing scenarios dynamically' : 'İtiraz karşılama, davet ve kapanış senaryolarını dinamik olarak deneyimle'}
+              {t('pagesUi.fieldRehearsalSubtitle')}
             </p>
           </div>
         </header>

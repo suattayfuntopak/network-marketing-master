@@ -5,7 +5,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { OdemeClient } from './OdemeClient'
 
 export function OdemePageClient() {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -15,12 +15,10 @@ export function OdemePageClient() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">
-            {lang === 'en' ? 'Licensing & Premium Plans' : 'Lisans ve Premium Paketler'}
+            {t('paymentPage.headerTitle')}
           </h1>
           <p className="text-sm text-[var(--text-3)]">
-            {lang === 'en'
-              ? 'Select your plan, extend your license and unlock premium Organizer features'
-              : 'Ekip planınızı seçin, lisans sürenizi uzatın ve premium Lider özelliklerini aktif edin'}
+            {t('paymentPage.headerSubtitle')}
           </p>
         </div>
       </header>

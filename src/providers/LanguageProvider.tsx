@@ -3,6 +3,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import { tr } from '@/lib/translations/tr'
 import { en } from '@/lib/translations/en'
+import { platformSection } from '@/lib/translations/sections/platform'
+import { shellSection } from '@/lib/translations/sections/shell'
+import { trainingSection } from '@/lib/translations/sections/training'
+import { landingSection } from '@/lib/translations/sections/landing'
+import { pipelineSection } from '@/lib/translations/sections/pipeline'
+import { statsSection } from '@/lib/translations/sections/stats'
+import { paymentSection } from '@/lib/translations/sections/payment'
+import { coachSection } from '@/lib/translations/sections/coach'
+import { pagesSection } from '@/lib/translations/sections/pages'
 
 type LangType = 'tr' | 'en'
 
@@ -14,7 +23,33 @@ interface LanguageContextType {
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
 
-const dictionaries = { tr, en }
+const sections = [
+  platformSection,
+  shellSection,
+  trainingSection,
+  landingSection,
+  pipelineSection,
+  statsSection,
+  paymentSection,
+  coachSection,
+  pagesSection,
+]
+
+function mergeSections(base: Record<string, any>, langKey: LangType): Record<string, any> {
+  const merged: Record<string, any> = { ...base }
+  for (const section of sections) {
+    const ns = (section as any)[langKey] ?? {}
+    for (const [namespace, entries] of Object.entries(ns)) {
+      merged[namespace] = { ...(merged[namespace] ?? {}), ...(entries as object) }
+    }
+  }
+  return merged
+}
+
+const dictionaries = {
+  tr: mergeSections(tr, 'tr'),
+  en: mergeSections(en, 'en'),
+}
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<LangType>('tr')

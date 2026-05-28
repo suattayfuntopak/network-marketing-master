@@ -80,7 +80,7 @@ function renderActivityText(a: any, lang: string, t: any): string {
     return 'WhatsApp'
   }
   if (a.action_type === 'ai_generate') {
-    return lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi'
+    return t('pipelinePage.aiMessageGenerated')
   }
   if (a.action_type === 'stage_change') {
     const rawNote = (a.note || '').toLowerCase().trim()
@@ -106,42 +106,36 @@ function renderActivityText(a: any, lang: string, t: any): string {
     }
     const resolvedKey = stageKeyMap[rawNote] || rawNote
     const stageName = t(`stages.${resolvedKey}`) || a.note || ''
-    return lang === 'en'
-      ? `Stage changed to ${stageName}`
-      : `Aşama değiştirildi: ${stageName}`
+    return t('pipelinePage.stageChangedTo', { stage: stageName })
   }
   if (a.action_type === 'note') {
     if (a.note?.startsWith('system_note:candidate_created')) {
-      return lang === 'en' ? 'Candidate profile created' : 'Aday profili oluşturuldu'
+      return t('pipelinePage.candidateProfileCreated')
     }
     if (a.note?.startsWith('system_note:profile_update')) {
-      return lang === 'en' ? 'Profile details updated' : 'Profil bilgileri güncellendi'
+      return t('pipelinePage.profileDetailsUpdated')
     }
     if (a.note?.startsWith('system_note:warmth_change:')) {
       const parts = a.note.replace('system_note:warmth_change:', '').split('->')
       const oldW = warmthMap[parts[0]] ? warmthMap[parts[0]][lang === 'en' ? 'en' : 'tr'] : parts[0]
       const newW = warmthMap[parts[1]] ? warmthMap[parts[1]][lang === 'en' ? 'en' : 'tr'] : parts[1]
-      return lang === 'en'
-        ? `Relationship warmth updated: ${oldW} ➔ ${newW}`
-        : `İlişki sıcaklığı güncellendi: ${oldW} ➔ ${newW}`
+      return t('pipelinePage.warmthUpdated', { old: oldW, new: newW })
     }
     if (a.note?.startsWith('system_note:follow_up_change:')) {
       const parts = a.note.replace('system_note:follow_up_change:', '').split('->')
       const formatD = (val: string) => {
-        if (val === 'none' || !val) return lang === 'en' ? 'None' : 'Yok'
+        if (val === 'none' || !val) return t('pipelinePage.none')
         try {
           return new Date(val).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
         } catch { return val }
       }
-      return lang === 'en'
-        ? `Next follow-up date changed: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
-        : `Sonraki takip tarihi değiştirildi: ${formatD(parts[0])} ➔ ${formatD(parts[1])}`
+      return t('pipelinePage.followUpDateChanged', { old: formatD(parts[0]), new: formatD(parts[1]) })
     }
     
     // Parse Lider Note (TR ||| EN)
     const parsed = parseSimpleNote(a.note || '')
     const displayNote = lang === 'en' ? (parsed.en || parsed.tr) : parsed.tr
-    return `${lang === 'en' ? 'Leader note added' : 'Lider notu eklendi'}: "${displayNote}"`
+    return `${t('pipelinePage.leaderNoteAdded')}: "${displayNote}"`
   }
   return a.note || ''
 }
@@ -188,7 +182,7 @@ export function CandidateDetail({ candidateId }: Props) {
         setAiSummary(res.summary)
       }
     } catch {
-      toast.error(lang === 'en' ? 'Could not generate summary' : 'Özet oluşturulamadı')
+      toast.error(t('pipelinePage.couldNotGenerateSummary'))
     } finally {
       setIsSummaryPending(false)
     }
@@ -208,7 +202,7 @@ export function CandidateDetail({ candidateId }: Props) {
   function handleActivityDeleteConfirmed() {
     if (!activityToDelete) return
     const id = activityToDelete.id
-    const typeLabel = lang === 'en' ? 'Activity Log' : 'Aktivite Kaydı'
+    const typeLabel = t('pipelinePage.activityLog')
     setActivityToDelete(null)
     deleteWithUndo(typeLabel, () =>
       deleteActivityMutation.mutate({ activityId: id, candidateId })
@@ -327,11 +321,11 @@ export function CandidateDetail({ candidateId }: Props) {
   }, [lang, c?.note, candidateId, update, isTranslating])
 
   const GREENLEAF_PRESENTATION_URL = 'https://www.suattayfuntopak.com/greenleaf-sunumu'
-  const senderName = ws?.fullName || (lang === 'en' ? 'Your Advisor' : 'Danışmanınız')
+  const senderName = ws?.fullName || t('pipelinePage.yourAdvisor')
   const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
 
   const getPresentationMessage = useCallback(() => {
-    const name = c?.full_name?.trim() || (lang === 'en' ? 'Customer' : 'Müşteri')
+    const name = c?.full_name?.trim() || t('pipelinePage.customer')
     return t('pipeline.presentationMessageTemplate', { name, url: GREENLEAF_PRESENTATION_URL, sender: senderName })
   }, [c, lang, senderName, t])
 
@@ -471,13 +465,13 @@ export function CandidateDetail({ candidateId }: Props) {
                   <div className="flex items-center gap-2 flex-wrap">
                     <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
                     {parsed.warmth === 'sicak' && (
-                      <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/30 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {lang === 'en' ? 'Hot' : 'Sıcak'}</span>
+                      <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/30 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
                     )}
                     {parsed.warmth === 'ilik' && (
-                      <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {lang === 'en' ? 'Warm' : 'Ilık'}</span>
+                      <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {t('pipelinePage.warmthWarm')}</span>
                     )}
                     {parsed.warmth === 'soguk' && (
-                      <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {lang === 'en' ? 'Cold' : 'Soğuk'}</span>
+                      <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
                     )}
                   </div>
                   {c.phone && (
@@ -579,7 +573,7 @@ export function CandidateDetail({ candidateId }: Props) {
                     <StickyNote className="h-4.5 w-4.5" />
                   </div>
                   <span className="text-sm font-bold text-[var(--text-1)]">
-                    {lang === 'en' ? 'Leader Note' : 'Lider Notu'}
+                    {t('pipelinePage.leaderNote')}
                   </span>
                   {notes.length > 0 && (
                     <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
@@ -597,7 +591,7 @@ export function CandidateDetail({ candidateId }: Props) {
                 <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
                   {notes.length === 0 ? (
                     <div className="rounded-xl border border-dashed border-[var(--border)] p-5 text-center text-xs text-[var(--text-3)]">
-                      {lang === 'en' ? 'No leader notes recorded yet. Write your first note below!' : 'Henüz lider notu kaydedilmemiş. İlk notu aşağıdan yazabilirsiniz!'}
+                      {t('pipelinePage.noLeaderNotes')}
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -607,7 +601,7 @@ export function CandidateDetail({ candidateId }: Props) {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-900 dark:text-indigo-300">
                               <Bot className="h-4 w-4 text-indigo-600 dark:text-indigo-400 animate-pulse" />
-                              <span>{lang === 'en' ? 'AI Mentor Analysis' : 'YZ Mentör Analizi'}</span>
+                              <span>{t('pipelinePage.aiMentorAnalysis')}</span>
                             </div>
                             {!aiSummary && (
                               <button
@@ -616,7 +610,7 @@ export function CandidateDetail({ candidateId }: Props) {
                                 onClick={handleGenerateSummary}
                                 className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 transition disabled:opacity-50 active:scale-95"
                               >
-                                {isSummaryPending ? (lang === 'en' ? 'Analyzing...' : 'Analiz ediliyor...') : (lang === 'en' ? 'Analyze & Summarize ✨' : 'Analiz Et & Özetle ✨')}
+                                {isSummaryPending ? t('pipelinePage.analyzing') : t('pipelinePage.analyzeSummarize')}
                               </button>
                             )}
                           </div>
@@ -625,7 +619,7 @@ export function CandidateDetail({ candidateId }: Props) {
                             <div className="flex items-center gap-2 py-1">
                               <div className="h-1.5 w-1.5 animate-ping rounded-full bg-indigo-600 dark:bg-indigo-400"></div>
                               <span className="text-[10px] text-indigo-600/70 dark:text-indigo-400/70 font-semibold">
-                                {lang === 'en' ? 'Claude is reviewing all notes...' : 'Claude tüm notları inceliyor...'}
+                                {t('pipelinePage.claudeReviewing')}
                               </span>
                             </div>
                           )}
@@ -644,7 +638,7 @@ export function CandidateDetail({ candidateId }: Props) {
                                   disabled={isSummaryPending}
                                   className="text-[9px] font-bold text-indigo-600/80 hover:text-indigo-800 dark:text-indigo-400/80 dark:hover:text-indigo-300 transition"
                                 >
-                                  {lang === 'en' ? 'Re-Analyze 🔄' : 'Yeniden Analiz Et 🔄'}
+                                  {t('pipelinePage.reAnalyze')}
                                 </button>
                               </div>
                             </div>
@@ -652,9 +646,7 @@ export function CandidateDetail({ candidateId }: Props) {
                           
                           {!aiSummary && !isSummaryPending && (
                             <p className="text-[10px] leading-relaxed text-indigo-800/80 dark:text-indigo-300/80">
-                              {lang === 'en' 
-                                ? 'Let AI analyze all notes to extract a summary and a dynamic action plan.' 
-                                : 'Notların özetini çıkarmak ve dinamik aksiyon planı üretmek için YZ analizi başlatın.'}
+                              {t('pipelinePage.letAiAnalyze')}
                             </p>
                           )}
                         </div>
@@ -687,8 +679,8 @@ export function CandidateDetail({ candidateId }: Props) {
                           className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline py-1 transition active:scale-95"
                         >
                           {showAllNotes
-                            ? (lang === 'en' ? 'Show Less' : 'Kapat')
-                            : (lang === 'en' ? 'Show All' : 'Tümünü Gör')}
+                            ? t('pipelinePage.showLess')
+                            : t('pipelinePage.showAll')}
                         </button>
                       )}
                     </div>
@@ -697,7 +689,7 @@ export function CandidateDetail({ candidateId }: Props) {
                     <textarea
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
-                      placeholder={lang === 'en' ? `Write a leader note for ${c.full_name}...` : `${c.full_name} için lider notunu yaz...`}
+                      placeholder={t('pipelinePage.writeLeaderNotePlaceholder', { name: c.full_name })}
                       className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
                       rows={3}
                       maxLength={1000}
@@ -710,7 +702,7 @@ export function CandidateDetail({ candidateId }: Props) {
                         className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
                       >
                         <Check className="h-3.5 w-3.5" />
-                        {lang === 'en' ? 'Save Note' : 'Notu Kaydet'}
+                        {t('pipelinePage.saveNote')}
                       </button>
                     </div>
                   </div>
@@ -746,7 +738,7 @@ export function CandidateDetail({ candidateId }: Props) {
                       <button
                         onClick={() => setActivityToDelete(a)}
                         className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 dark:hover:bg-red-950/20 active:scale-95 mt-1"
-                        title={lang === 'en' ? 'Delete activity' : 'Aktiviteyi sil'}
+                        title={t('pipelinePage.deleteActivity')}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
                       </button>
@@ -760,8 +752,8 @@ export function CandidateDetail({ candidateId }: Props) {
                     className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline pt-2 border-t border-[var(--border)] transition active:scale-95"
                   >
                     {showAllActivity
-                      ? (lang === 'en' ? 'Show Less' : 'Kapat')
-                      : (lang === 'en' ? 'Show All' : 'Tümünü Gör')}
+                      ? t('pipelinePage.showLess')
+                      : t('pipelinePage.showAll')}
                   </button>
                 )}
               </div>
@@ -882,7 +874,7 @@ export function CandidateDetail({ candidateId }: Props) {
 
       {activityToDelete && (
         <ConfirmDeleteModal
-          message={lang === 'en' ? 'Are you sure you want to delete this activity log?' : 'Bu aktivite kaydını silmek istediğinize emin misiniz?'}
+          message={t('pipelinePage.confirmDeleteActivity')}
           onConfirm={handleActivityDeleteConfirmed}
           onCancel={() => setActivityToDelete(null)}
         />

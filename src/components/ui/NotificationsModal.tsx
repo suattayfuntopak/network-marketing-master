@@ -106,7 +106,10 @@ export function playNotificationSound() {
   }
 }
 
-function formatTimeAgo(dateString: string, lang: string): string {
+function formatTimeAgo(
+  dateString: string,
+  t: (keyPath: string, variables?: Record<string, string | number>) => string,
+): string {
   const now = new Date()
   const date = new Date(dateString)
   const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
@@ -115,18 +118,18 @@ function formatTimeAgo(dateString: string, lang: string): string {
   const days = Math.floor(hours / 24)
 
   if (seconds < 60) {
-    return lang === 'en' ? 'just now' : 'az önce'
+    return t('shellUi.justNow')
   } else if (minutes < 60) {
-    return lang === 'en' ? `${minutes}m ago` : `${minutes} dk önce`
+    return t('shellUi.minutesAgo', { count: minutes })
   } else if (hours < 24) {
-    return lang === 'en' ? `${hours}h ago` : `${hours} saat önce`
+    return t('shellUi.hoursAgo', { count: hours })
   } else {
-    return lang === 'en' ? `${days}d ago` : `${days} gün önce`
+    return t('shellUi.daysAgo', { count: days })
   }
 }
 
 export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
@@ -148,7 +151,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     id: n.id,
     title: lang === 'en' ? n.title_en : n.title_tr,
     description: lang === 'en' ? n.description_en : n.description_tr,
-    time: formatTimeAgo(n.created_at, lang),
+    time: formatTimeAgo(n.created_at, t),
     read: n.read,
     icon: n.type as 'bell' | 'alert' | 'info' | 'user' | 'calendar',
     isDb: true
@@ -227,7 +230,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       nextEmail = next;
       localStorage.setItem('nmm_notif_email', String(next));
       if (next) {
-        toast.info(lang === 'en' ? `Email alerts enabled for ${userEmail}` : `E-posta bildirimleri ${userEmail} için aktif edildi`)
+        toast.info(t('shellUi.emailAlertsEnabled', { email: userEmail }))
       }
     }
     if (type === 'push')   { 
@@ -237,13 +240,13 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       if (next && 'Notification' in window) {
         Notification.requestPermission().then(perm => {
           if (perm === 'granted') {
-            toast.success(lang === 'en' ? 'Browser notifications enabled!' : 'Tarayıcı bildirimleri aktif edildi!')
+            toast.success(t('shellUi.browserNotifEnabled'))
             new Notification('Network Marketing Master', {
-              body: lang === 'en' ? 'System notifications successfully enabled.' : 'Sistem bildirimleri başarıyla aktif edildi.',
+              body: t('shellUi.systemNotifEnabled'),
               icon: '/logo.png'
             })
           } else {
-            toast.warning(lang === 'en' ? 'Permission denied by browser.' : 'Tarayıcı izni reddedildi.')
+            toast.warning(t('shellUi.permissionDenied'))
           }
         })
       }
@@ -301,7 +304,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     // Mark database notifications as read
     dbMarkAllRead()
 
-    toast.success(lang === 'en' ? 'All notifications marked as read' : 'Tüm bildirimler okundu yapıldı')
+    toast.success(t('shellUi.allMarkedRead'))
   }
 
   if (!mounted) return null

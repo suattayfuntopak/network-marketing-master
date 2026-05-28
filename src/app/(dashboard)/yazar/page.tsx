@@ -10,7 +10,7 @@ interface PageProps {
 }
 
 export default function YazarPage({ searchParams }: PageProps) {
-  const { lang } = useTranslation()
+  const { t } = useTranslation()
   const { name, note, warmth } = React.use(searchParams)
 
   return (
@@ -22,10 +22,10 @@ export default function YazarPage({ searchParams }: PageProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {lang === 'en' ? 'AI Coach' : 'Yapay Zeka Koçu'}
+              {t('coachUi.pageTitle')}
             </h1>
             <p className="text-sm text-[var(--text-2)]">
-              {lang === 'en' ? 'Generate AI messages, get leadership coaching, and practice simulations' : 'Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap'}
+              {t('coachUi.pageSubtitle')}
             </p>
           </div>
         </header>

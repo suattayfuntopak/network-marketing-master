@@ -15,7 +15,7 @@ import type { NmmCandidate } from '@/types/database.types'
 
 
 function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const daysShort = lang === 'en'
     ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
     : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
@@ -43,10 +43,10 @@ function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
       <div className="mb-4 flex items-center justify-between">
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-          {lang === 'en' ? 'Last 7 Days — New Candidate Trend' : 'Son 7 Gün — Yeni Aday Trendi'}
+          {t('shellUi.last7DaysTrend')}
         </p>
         <span className="text-xs font-bold text-[#534AB7]">
-          {bars.reduce((s, b) => s + b.count, 0)} {lang === 'en' ? 'candidates' : 'aday'}
+          {bars.reduce((s, b) => s + b.count, 0)} {t('shellUi.candidatesLabel')}
         </span>
       </div>
       <div className="flex items-end gap-1.5 h-16">
@@ -66,7 +66,7 @@ function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
 }
 
 export function PanoContent() {
-  const { lang, t } = useTranslation()
+  const { t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { daily, remaining } = useDailyActions(candidates)
