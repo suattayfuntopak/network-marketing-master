@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-28 — Süper Admin Pano Uyum Denetimi Limiti Düzeltmesi
+
+### fix: Pano ekranında süper admin için "Günlük 15 hak" yerine "Sınırsız hak" gösterildi
+
+- **`PanoContent.tsx`:**
+  - `useAIUsage` hook'u import edildi ve bileşen içinde `isSuperAdmin` bilgisi alındı.
+  - Uyum Denetimi CTA kartındaki açıklama metni; `isSuperAdmin === true` olduğunda
+    TR: `"Pazarlama metinlerinizi yasal uyumluluk açısından denetleyin. Sınırsız hak."`
+    EN: `"Audit your marketing messages for FTC & legal compliance. Unlimited credits."`
+    olarak güncellendi.
+  - Normal kullanıcılar için `Günlük ${complianceLimit} hak` gösterimi aynen korundu.
+- **Kök neden:** `getLimitsForLicense('pro')` → `complianceLimit: 15` döndürüyor; `useWorkspace`, super admin için `licenseType: 'pro'` set ettiğinden pano sayısal limiti gösteriyordu. Server-side bypass (`uyum/actions.ts`) zaten doğruydu, sadece UI gösterimi eksikti.
+
+---
+
 ## 2026-05-28 — Landing Page Pro Plan Güncelleme
 
 ### feat: Pro plan fiyatlandırmasına Günlük 20 Uyum Denetim Hakkı eklendi
