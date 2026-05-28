@@ -1656,3 +1656,12 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Platform Yönetimi Sayfası (`platform-yonetim/page.tsx`):** Süper adminin izlediği `workspaces` tablosuna yeni bir veritabanı alanı (`avatarUrl`) sorgusu eklendi (`actions.ts`). Eğer kayıt olan grubun sahibinin/liderinin bir profil fotoğrafı varsa tabloda ve mobil kart görünümünde bu resim kullanıldı.
 - Resmi (avatarı) olmayan kullanıcıların profil baş harfleri tek renk (mor) yerine isminin koduna göre (hash) dinamik belirlenen çok renkli, enerjik arka planlar (Yeşil, Kırmızı, Mavi, Pembe, Turuncu vb.) ve degradeler (gradients) ile sunularak tablonun göz alıcılığı zirveye çıkarıldı.
 
+
+
+## 2026-05-28 — İstemci Tarafı Resim Sıkıştırma (Client-side Image Compression) Entegrasyonu
+
+### feat: Profil ve Aday Resimleri Artık Otomatik Sıkıştırılıyor
+- Platform maliyetlerini (Supabase Storage Bandwidth & Storage) düşürmek ve yükleme hızını mobil dahil kat ve kat artırmak amacıyla projeye `browser-image-compression` paketi eklendi.
+- **Profil Modal (`ProfileModal.tsx`)**: Kullanıcı profil resmi yüklerken artık `maxSizeMB: 0.5` (Maksimum 500KB) ve `maxWidthOrHeight: 1024` seçenekleriyle tarayıcı bazlı sıkıştırma uygulanır.
+- **Aday Ekleme/Düzenleme (`EditCandidateSheet.tsx`)**: Liderlerin boru hattına adayların fotoğraflarını yüklerken (özellikle yüksek megapikselli kamera çekimlerinde) yaşadığı donma / geç yüklenme sorununu engellemek amacıyla aynı mantıkta Client-side Image Compression eklendi.
+- Dosyalar veritabanına her zaman standart optimize edilmiş `.jpg` (`image/jpeg`) MIME Type formatında yüklenir.
