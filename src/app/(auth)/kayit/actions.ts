@@ -61,14 +61,14 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
         const { data: usersPage } = await adminSupa.auth.admin.listUsers({ page: 1, perPage: 200 })
         const adminUser = usersPage?.users?.find((u: any) => u.email === SUPER_ADMIN_EMAIL)
         if (adminUser?.id && adminUser.id !== data.user!.id) {
-          await (adminSupa.from('nmm_notifications' as any).insert({
+          await adminSupa.from('nmm_notifications').insert({
             user_id: adminUser.id,
             title_tr: 'Yeni Platform Kaydı 🚀',
             title_en: 'New Platform Signup 🚀',
             description_tr: `${fullName} (${email}) platforma yeni bağımsız üye olarak kaydoldu!`,
             description_en: `${fullName} (${email}) signed up as a new independent member!`,
             type: 'user',
-          }) as any)
+          })
         }
       } catch (err) {
         console.error('[signupAction] Admin in-app notification failed:', err)

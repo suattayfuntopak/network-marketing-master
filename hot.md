@@ -1,5 +1,43 @@
 # Hot Log
 
+## 2026-05-28 — Council Triad K-1, K-2, K-3, K-4 Uygulandı (4 kritik bulgu kapatıldı)
+
+### fix(security) + refactor: Shopier güvenliği, AI auth gap, quota merkezileştirme, schema drift
+
+**K-1 — Shopier ödeme güvenliği** (önceki commit: 51cafb3, c0e49b1)
+- `SHOPIER_API_SECRET` ve `SHOPIER_API_KEY` fallback'leri (hardcoded test secret) kaldırıldı; env yoksa fail-loud.
+- `platform_order_id` formatı `<workspaceId>_<plan>_<period>_<ts>` oldu — lisans tipi imzalı orderId'den okunuyor, `total_amount` üzerinden tahmin yapılmıyor.
+- Bakım modu: `PAYMENT_MAINTENANCE=true` env → `/odeme` sayfası bilingual `MaintenanceNotice` render eder, server action defense-in-depth gate eklendi.
+- `force-dynamic` ile env toggle artık redeploy gerektirmiyor — anlık yansır.
+
+**K-2 — AI server action'larında auth/kota check'i eklendi**
+- `bugun/ilgilen/actions.ts:generateQuickMessageAction` ve `pipeline/[id]/actions.ts:generateNotesSummary` artık auth + kota kontrolü yapıyor.
+- Bot loop tehdidi kapandı: oturum açmamış bot bu endpoint'leri kullanıp Gemini API'sini bizim hesabımıza yakamaz.
+- (K-3'le birlikte merkezi fonksiyona dönüştü.)
+
+**K-3 — Merkezi `checkAIQuota` fonksiyonu**
+- **Yeni:** `src/lib/ai/checkQuota.ts` (168 satır) — `checkAIQuota(actionType, { lang? })` discriminated union döner; `logAIGeneration({ workspaceId, userId, note })` helper.
+- 7 dosyada duplicate olan `getUser → membership → workspace → license expiry → count → compare` bloğu tek satıra düştü.
+- Refactor edilen dosyalar (~330 satır duplicate kod kaldırıldı):
+  - `yazar/actions.ts` (3 fonksiyon): **448 → 292** satır.
+  - `uyum/actions.ts`: **210 → 149**. Compliance paid-plan gate korundu.
+  - `ekip/actions.ts`: **152 → 99**.
+  - `pipeline/[id]/actions.ts` (3 fonksiyon): **259 → 185**. `generateCoachMessage` ownership check'i korundu (`quota.workspaceId` + `quota.user.id` üzerinden).
+  - `bugun/ilgilen/actions.ts`: K-2'deki 30 satır → 1 satır.
+
+**K-4 — Schema drift kapatıldı**
+- `src/types/database.types.ts`: `nmm_notifications` ve `nmm_onboarding_progress` tabloları + `nmm_workspace_members.avatar_url` kolonu eklendi.
+- `src/lib/supabase/admin.ts`: `createClient<Database>()` ile tiplendi (admin client artık `nmm_notifications` tipini biliyor).
+- 28 `as any` → 9'a düştü; **19 schema-drift cast'i silindi**.
+- Kalan 9 cast farklı sebeplerden (enum mismatch, browser API, Supabase realtime, RPC return types) — başka bulgular.
+- Etkilenen dosyalar: `useNotifications.ts`, `useTeamMembers.ts`, `EkipPanel.tsx`, `kayit/actions.ts`, `ProfileModal.tsx`.
+
+**Doğrulama:** `npx tsc --noEmit` temiz, sıfır hata.
+
+**Bekleyen:** 33 council bulgusu daha var (12 yüksek, 16 orta, 5 düşük). Faz A tamam; Faz B-F sırayla.
+
+---
+
 ## 2026-05-28 — Council Triad Genel Değerlendirme Raporu (analiz, henüz uygulanmadı)
 
 ### docs: Council of High Intelligence — 3 perspektif paralel analizi

@@ -20,6 +20,8 @@ export type WorkspaceMemberRole = 'leader' | 'member'
 
 export type ActionType = 'call' | 'whatsapp' | 'note' | 'stage_change' | 'ai_generate'
 
+export type NotificationType = 'bell' | 'alert' | 'info' | 'user' | 'calendar'
+
 export interface Database {
   public: {
     Tables: {
@@ -65,6 +67,7 @@ export interface Database {
           full_name: string | null
           created_at: string
           joined_at: string | null
+          avatar_url: string | null
         }
         Insert: {
           id?: string
@@ -74,6 +77,7 @@ export interface Database {
           full_name?: string | null
           created_at?: string
           joined_at?: string | null
+          avatar_url?: string | null
         }
         Update: {
           id?: string
@@ -83,6 +87,7 @@ export interface Database {
           full_name?: string | null
           created_at?: string
           joined_at?: string | null
+          avatar_url?: string | null
         }
         Relationships: [
           {
@@ -189,6 +194,63 @@ export interface Database {
           }
         ]
       }
+      nmm_notifications: {
+        Row: {
+          id: string
+          user_id: string
+          title_tr: string
+          title_en: string
+          description_tr: string
+          description_en: string
+          type: NotificationType
+          read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title_tr: string
+          title_en: string
+          description_tr: string
+          description_en: string
+          type?: NotificationType
+          read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title_tr?: string
+          title_en?: string
+          description_tr?: string
+          description_en?: string
+          type?: NotificationType
+          read?: boolean
+          created_at?: string
+        }
+        Relationships: []
+      }
+      nmm_onboarding_progress: {
+        Row: {
+          id: string
+          user_id: string
+          step_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          step_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          step_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: { [_ in never]: never }
     Functions: {
@@ -210,7 +272,11 @@ export type NmmWorkspace = Database['public']['Tables']['nmm_workspaces']['Row']
 export type NmmWorkspaceMember = Database['public']['Tables']['nmm_workspace_members']['Row']
 export type NmmCandidate = Database['public']['Tables']['nmm_candidates']['Row']
 export type NmmDailyAction = Database['public']['Tables']['nmm_daily_actions']['Row']
+export type NmmNotification = Database['public']['Tables']['nmm_notifications']['Row']
+export type NmmOnboardingProgress = Database['public']['Tables']['nmm_onboarding_progress']['Row']
 
 export type NmmCandidateInsert = Database['public']['Tables']['nmm_candidates']['Insert']
 export type NmmCandidateUpdate = Database['public']['Tables']['nmm_candidates']['Update']
 export type NmmDailyActionInsert = Database['public']['Tables']['nmm_daily_actions']['Insert']
+export type NmmNotificationInsert = Database['public']['Tables']['nmm_notifications']['Insert']
+export type NmmOnboardingProgressInsert = Database['public']['Tables']['nmm_onboarding_progress']['Insert']

@@ -1,8 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/aiUsage'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -50,54 +48,8 @@ export async function generateOnboardingGuidanceAction(
     }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return {
-      error: lang === 'en' ? 'Authentication required.' : 'Oturum açmanız gerekmektedir.',
-    }
-  }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  // Quota verification
-  let remaining = 0
-  if (!isSuperAdmin) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership?.workspace_id ?? '')
-      .maybeSingle()
-    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
-    const { messageLimit } = getLimitsForLicense(licenseType)
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .or('note.is.null,note.eq.message')
-      .gte('created_at', today.toISOString())
-
-    const used = count ?? 0
-    if (used >= messageLimit) {
-      return {
-        error: lang === 'en'
-          ? `You have reached the daily AI coaching limit of ${messageLimit} messages. Please try again tomorrow.`
-          : `Günlük ${messageLimit} yapay zeka mesaj/koçluk limitinize ulaştınız. Yarın tekrar deneyebilirsiniz.`,
-        remaining: 0,
-      }
-    }
-    remaining = messageLimit - used - 1
-  }
+  const quota = await checkAIQuota('message', { lang })
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   const stepLabel = lang === 'en'
     ? (ONBOARDING_STEPS_EN[stepId] || stepId)
@@ -126,19 +78,15 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
 
     const generatedText = result.response.text()?.trim() || ''
 
-    if (membership) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate',
-        note: 'message',
-      })
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
     return {
       message: generatedText,
-      remaining: isSuperAdmin ? undefined : remaining,
+      remaining: quota.isSuperAdmin ? undefined : quota.remaining,
     }
   } catch (err: any) {
     console.error('[generateOnboardingGuidanceAction] error:', err)

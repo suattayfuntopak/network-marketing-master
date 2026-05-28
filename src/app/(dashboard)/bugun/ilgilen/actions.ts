@@ -1,6 +1,7 @@
 'use server'
 
 import { generateMessage } from '@/lib/ai/generateMessage'
+import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 
 export async function generateQuickMessageAction(input: {
   name: string
@@ -11,6 +12,10 @@ export async function generateQuickMessageAction(input: {
     return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
   }
   if (!input.name) return { error: 'Kişi adı eksik.' }
+
+  const quota = await checkAIQuota('message')
+  if (!quota.ok) return { error: quota.message }
+
   try {
     const message = await generateMessage({
       name: input.name,
@@ -19,6 +24,13 @@ export async function generateQuickMessageAction(input: {
       tone: 'samimi',
       messageType: 'takip',
     })
+
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
+
     return { message }
   } catch (err: any) {
     return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }

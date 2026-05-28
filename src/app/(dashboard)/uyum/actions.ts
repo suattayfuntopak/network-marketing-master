@@ -1,8 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/aiUsage'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -28,58 +26,8 @@ export async function auditComplianceMessageAction(
     return { error: lang === 'en' ? 'Please enter a message to audit.' : 'Lütfen denetlenecek bir metin girin.' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: lang === 'en' ? 'Session required.' : 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  let remaining = 0
-  if (!isSuperAdmin) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership?.workspace_id ?? '')
-      .maybeSingle()
-    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
-    const { complianceLimit } = getLimitsForLicense(licenseType)
-
-    if (complianceLimit === 0) {
-      return {
-        error: lang === 'en'
-          ? 'Compliance auditing requires a paid plan. Please upgrade to access this feature.'
-          : 'Uyum denetimi özelliği ücretli planlarda kullanılabilir. Bu özelliğe erişmek için planınızı yükseltin.',
-        remaining: 0
-      }
-    }
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .eq('note', 'compliance')
-      .gte('created_at', today.toISOString())
-
-    const used = count ?? 0
-    if (used >= complianceLimit) {
-      return {
-        error: lang === 'en'
-          ? `You have reached your daily ${complianceLimit} compliance audit limit. Try again tomorrow.`
-          : `Günlük ${complianceLimit} uyum denetleme limitine ulaştınız. Yarın tekrar deneyin.`,
-        remaining: 0
-      }
-    }
-    remaining = complianceLimit - used - 1
-  }
+  const quota = await checkAIQuota('compliance', { lang: lang === 'en' ? 'en' : 'tr' })
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   const systemPrompt = `Sen bir Network Marketing ve Doğrudan Satış yasal mevzuat uyum denetleyicisisin (Compliance Officer).
 Görevin, kullanıcının girdiği pazarlama metnini, reklam ve tüketici koruma kanunlarına (FTC standartları, TKHK ve yasal mevzuatlar) göre analiz etmek.
@@ -179,26 +127,18 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    if (membership) {
-      try {
-        await supabase.from('nmm_daily_actions').insert({
-          workspace_id: membership.workspace_id,
-          user_id: user.id,
-          candidate_id: null,
-          action_type: 'ai_generate' as const,
-          note: 'compliance',
-        })
-      } catch (dbErr) {
-        console.error('Failed to insert compliance daily action log (constraint issues):', dbErr)
-      }
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'compliance',
+    })
 
     return {
       score: parsed.score,
       safety_level: parsed.safety_level,
       violations: parsed.violations,
       improved_text: parsed.improved_text,
-      remaining: isSuperAdmin ? undefined : remaining
+      remaining: quota.isSuperAdmin ? undefined : quota.remaining
     }
   } catch (err: any) {
     console.error('Uyum Denetimi Hatası:', err)

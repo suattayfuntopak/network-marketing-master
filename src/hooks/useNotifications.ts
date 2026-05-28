@@ -25,12 +25,12 @@ async function fetchNotifications(): Promise<NotificationItem[]> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data, error } = await (supabase
-    .from('nmm_notifications' as any)
+  const { data, error } = await supabase
+    .from('nmm_notifications')
     .select('*')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
-    .limit(50) as any)
+    .limit(50)
 
   if (error) {
     console.error('[useNotifications] fetch error:', error)
@@ -115,7 +115,7 @@ export function useNotifications() {
       if (!user) return
 
       await supabase
-        .from('nmm_notifications' as any)
+        .from('nmm_notifications')
         .update({ read: true })
         .eq('user_id', user.id)
     },
@@ -128,7 +128,7 @@ export function useNotifications() {
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {
       await supabase
-        .from('nmm_notifications' as any)
+        .from('nmm_notifications')
         .update({ read: true })
         .eq('id', id)
     },
@@ -141,7 +141,7 @@ export function useNotifications() {
   const deleteNotificationMutation = useMutation({
     mutationFn: async (id: string) => {
       await supabase
-        .from('nmm_notifications' as any)
+        .from('nmm_notifications')
         .delete()
         .eq('id', id)
     },

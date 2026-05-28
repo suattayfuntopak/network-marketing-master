@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -77,16 +78,23 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   // 2. Get all members in this workspace — nmm_join_workspace RPC adds downlines here
   const { data: membersRaw, error } = await supabase
     .from('nmm_workspace_members')
-    .select('user_id, full_name, role, joined_at, avatar_url' as any)
+    .select('user_id, full_name, role, joined_at, avatar_url')
     .eq('workspace_id', workspaceId)
 
   if (error) throw error
-  const membersAny = (membersRaw ?? []) as any[]
+  const members = membersRaw ?? []
 
   // Build deduped members map (leader always present)
-  const uniqueMembersMap: Record<string, any> = {}
+  type MemberMapEntry = {
+    user_id: string
+    full_name: string | null
+    role: string
+    joined_at: string | null
+    avatar_url: string | null
+  }
+  const uniqueMembersMap: Record<string, MemberMapEntry> = {}
   if (ownWs.owner_id) {
-    const leaderRow = membersAny.find((m: any) => m.user_id === ownWs.owner_id)
+    const leaderRow = members.find(m => m.user_id === ownWs.owner_id)
     uniqueMembersMap[ownWs.owner_id] = {
       user_id: ownWs.owner_id,
       full_name: leaderRow?.full_name ?? 'Lider',
@@ -95,7 +103,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       avatar_url: leaderRow?.avatar_url ?? null
     }
   }
-  membersAny.forEach((m: any) => { uniqueMembersMap[m.user_id] = m })
+  members.forEach(m => { uniqueMembersMap[m.user_id] = m })
 
 
 
@@ -122,10 +130,10 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   if (downlineOwnerIds.length > 0) {
     const { data: dlMembers } = await supabase
       .from('nmm_workspace_members')
-      .select('user_id, full_name, role, joined_at, avatar_url' as any)
+      .select('user_id, full_name, role, joined_at, avatar_url')
       .in('user_id', downlineOwnerIds)
 
-    dlMembers?.forEach((m: any) => {
+    dlMembers?.forEach(m => {
       if (!uniqueMembersMap[m.user_id]) {
         uniqueMembersMap[m.user_id] = m
       }
@@ -151,7 +159,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       .in('workspace_id', allWorkspaceIds)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
     supabase
-      .from('nmm_onboarding_progress' as any)
+      .from('nmm_onboarding_progress')
       .select('user_id, step_id')
       .in('user_id', allUserIds)
   ])
@@ -185,8 +193,8 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
   const registeredMemberRows = uniqueMembers.map(m => {
     const mc = candidates.filter(c => c.owner_id === m.user_id)
     const completedSteps = onboarding
-      .filter((o: any) => o.user_id === m.user_id)
-      .map((o: any) => o.step_id)
+      .filter(o => o.user_id === m.user_id)
+      .map(o => o.step_id)
 
     const candidateMatch = candidates.find(c => {
       if (c.owner_id !== ownWs.owner_id) return false
@@ -210,7 +218,7 @@ async function fetchMembers(workspaceId: string): Promise<MemberRow[]> {
       onboarding_steps: completedSteps,
       phone: phone,
       isAppUser: true,
-      avatar_url: (m as any).avatar_url ?? null
+      avatar_url: m.avatar_url ?? null
     }
   })
 
@@ -320,7 +328,7 @@ export function EkipPanel() {
     try {
       if (isStepDone) {
         const { error } = await supabase
-          .from('nmm_onboarding_progress' as any)
+          .from('nmm_onboarding_progress')
           .delete()
           .eq('user_id', userId)
           .eq('step_id', stepId)
@@ -328,7 +336,7 @@ export function EkipPanel() {
         toast.success(lang === 'en' ? 'Step marked as incomplete' : 'Adım tamamlanmadı olarak işaretlendi')
       } else {
         const { error } = await supabase
-          .from('nmm_onboarding_progress' as any)
+          .from('nmm_onboarding_progress')
           .insert({
             user_id: userId,
             step_id: stepId
@@ -629,7 +637,7 @@ export function EkipPanel() {
                 {/* Kart Üst Bölümü */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Sol Taraf: Avatar ve İsim Detayları */}
-                  <div className="flex min-w-0 flex-1 items-center gap-4">
+                  <Link href={`/pipeline/${m.user_id}`} className="flex min-w-0 flex-1 items-center gap-4 hover:opacity-80 transition cursor-pointer">
                     <div className={`relative flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-xl font-black overflow-hidden ${
                       m.avatar_url
                         ? ''
@@ -711,7 +719,7 @@ export function EkipPanel() {
                         )}
                       </p>
                     </div>
-                  </div>
+                  </Link>
 
                   {/* Sağ Taraf: Toplam Aday Göstergesi veya NMM'e Davet Et Butonu */}
                   <div className="flex items-center justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0 sm:pr-24 w-full sm:w-auto">

@@ -2,8 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/aiUsage'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -28,71 +27,29 @@ export async function generateCoachMessage(
 
   if (!name || !stage) return { error: 'Kişi bilgisi eksik.' }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
+  const quota = await checkAIQuota('message')
+  if (!quota.ok) return { error: quota.message }
 
   // Ownership check: candidate must belong to caller's workspace
-  if (candidateId && !isSuperAdmin) {
-    const { data: membership } = await supabase
-      .from('nmm_workspace_members')
-      .select('workspace_id')
-      .eq('user_id', user.id)
-      .maybeSingle()
-    if (!membership) return { error: 'Çalışma alanı bulunamadı.' }
+  if (candidateId && !quota.isSuperAdmin && quota.workspaceId) {
+    const supabase = await createClient()
     const { count } = await supabase
       .from('nmm_candidates')
       .select('*', { count: 'exact', head: true })
       .eq('id', candidateId)
-      .eq('workspace_id', membership.workspace_id)
-      .eq('owner_id', user.id)
+      .eq('workspace_id', quota.workspaceId)
+      .eq('owner_id', quota.user.id)
     if ((count ?? 0) === 0) return { error: 'Erişim reddedildi.' }
-  }
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!isSuperAdmin) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership?.workspace_id ?? '')
-      .maybeSingle()
-    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
-    const { messageLimit } = getLimitsForLicense(licenseType)
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .or('note.is.null,note.eq.message')
-      .gte('created_at', today.toISOString())
-
-    if ((count ?? 0) >= messageLimit) {
-      return { error: `Günlük ${messageLimit} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
-    }
   }
 
   try {
     const message = await generateMessage({ name, stage, note, messageType })
 
-    if (membership) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-        note: 'message',
-      })
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
     return { message }
   } catch (err: any) {
@@ -118,41 +75,8 @@ export async function generateDownlineCoachingMessage(
 
   if (!memberName) return { error: 'Üye bilgisi eksik.' }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  if (!isSuperAdmin) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership?.workspace_id ?? '')
-      .maybeSingle()
-    const licenseType = ws?.license_expires_at && new Date(ws.license_expires_at) < new Date() ? 'free' : (ws?.license_type ?? 'free')
-    const { messageLimit } = getLimitsForLicense(licenseType)
-
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .or('note.is.null,note.eq.message')
-      .gte('created_at', today.toISOString())
-
-    if ((count ?? 0) >= messageLimit) {
-      return { error: `Günlük ${messageLimit} mesaj limitine ulaştınız. Yarın tekrar deneyin.` }
-    }
-  }
+  const quota = await checkAIQuota('message')
+  if (!quota.ok) return { error: quota.message }
 
   try {
     const model = genAI.getGenerativeModel({
@@ -190,19 +114,11 @@ Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katil
 
     if (!message) throw new Error('Boş yanıt döndü.')
 
-    if (membership) {
-      try {
-        await supabase.from('nmm_daily_actions').insert({
-          workspace_id: membership.workspace_id,
-          user_id: user.id,
-          candidate_id: null,
-          action_type: 'ai_generate' as const,
-          note: 'message',
-        })
-      } catch (dbErr) {
-        console.error('Failed to insert coaching daily action log (constraint issues):', dbErr)
-      }
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
     return { message }
   } catch (err: any) {
@@ -217,7 +133,10 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
   }
 
   if (!notes || notes.length === 0) return { error: 'Not bulunamadı.' }
-  
+
+  const quota = await checkAIQuota('message')
+  if (!quota.ok) return { error: quota.message }
+
   try {
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-pro',
@@ -250,6 +169,12 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
     })
 
     const summary = result.response.text().trim()
+
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
     return { summary }
   } catch (err: any) {

@@ -110,7 +110,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       // Also update nmm_workspace_members so EkipPanel syncs immediately
       await supabase
         .from('nmm_workspace_members')
-        .update({ avatar_url: publicUrl } as any)
+        .update({ avatar_url: publicUrl })
         .eq('user_id', userId)
 
       setAvatarUrl(publicUrl)

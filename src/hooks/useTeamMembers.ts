@@ -39,18 +39,17 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   todayStart.setHours(0, 0, 0, 0)
 
   // 2. Get all members in this workspace — nmm_join_workspace RPC adds downlines here
-  const { data: membersRaw, error } = await supabase
+  const { data: members, error } = await supabase
     .from('nmm_workspace_members')
-    .select('user_id, full_name, role, joined_at, avatar_url' as any)
+    .select('user_id, full_name, role, joined_at, avatar_url')
     .eq('workspace_id', workspaceId)
 
   if (error) throw error
-  const members = membersRaw as any[]
 
   // Build deduped members map (leader always present)
   const uniqueMembersMap: Record<string, { user_id: string; full_name: string | null; role: string; joined_at: string | null; avatar_url: string | null }> = {}
   if (ownWs.owner_id) {
-    const leaderRow = members?.find((m: any) => m.user_id === ownWs.owner_id)
+    const leaderRow = members?.find(m => m.user_id === ownWs.owner_id)
     uniqueMembersMap[ownWs.owner_id] = {
       user_id: ownWs.owner_id,
       full_name: leaderRow?.full_name ?? 'Lider',
@@ -59,7 +58,7 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
       avatar_url: leaderRow?.avatar_url ?? null
     }
   }
-  members?.forEach((m: any) => { uniqueMembersMap[m.user_id] = m })
+  members?.forEach(m => { uniqueMembersMap[m.user_id] = m })
 
   // 3. Find all downline workspaces that have parent_id = leader's workspaceId
   // Also support legacy where parent_id = leader's owner_id
@@ -75,10 +74,10 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   if (downlineOwnerIds.length > 0) {
     const { data: dlMembers } = await supabase
       .from('nmm_workspace_members')
-      .select('user_id, full_name, role, joined_at, avatar_url' as any)
+      .select('user_id, full_name, role, joined_at, avatar_url')
       .in('user_id', downlineOwnerIds)
 
-    dlMembers?.forEach((m: any) => {
+    dlMembers?.forEach(m => {
       if (!uniqueMembersMap[m.user_id]) {
         uniqueMembersMap[m.user_id] = m
       }
@@ -99,7 +98,7 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
     supabase.from('nmm_candidates').select('owner_id, stage').in('workspace_id', allWorkspaceIds),
     supabase.from('nmm_daily_actions').select('user_id, created_at').in('workspace_id', allWorkspaceIds)
       .gte('created_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
-    (supabase.from('nmm_onboarding_progress' as any).select('user_id, step_id').in('user_id', finalAllUserIds)),
+    supabase.from('nmm_onboarding_progress').select('user_id, step_id').in('user_id', finalAllUserIds),
     supabase.from('nmm_daily_actions').select('user_id, note').in('user_id', finalAllUserIds)
       .eq('action_type', 'ai_generate').gte('created_at', todayStart.toISOString()),
   ])
@@ -119,7 +118,7 @@ async function fetchTeamMembers(workspaceId: string): Promise<TeamMember[]> {
   return finalUniqueMembers
     .map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
-      const completedSteps = onboarding.filter((o: any) => o.user_id === m.user_id).map((o: any) => o.step_id)
+      const completedSteps = onboarding.filter(o => o.user_id === m.user_id).map(o => o.step_id)
 
       const memberTodayActions = todayActions.filter(act => act.user_id === m.user_id)
       let todayRoleplay = 0, todayCompliance = 0, todayMessage = 0

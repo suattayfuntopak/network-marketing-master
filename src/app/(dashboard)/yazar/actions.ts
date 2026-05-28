@@ -2,8 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/aiUsage'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -31,69 +30,19 @@ export async function generateMessageAction(
 
   if (!name) return { error: 'Kişi adı zorunlu.' }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  let licenseType = 'free'
-  if (membership) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership.workspace_id)
-      .single()
-    if (ws) {
-      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
-      if (!isExpired) {
-        licenseType = ws.license_type ?? 'free'
-      }
-    }
-  }
-
-  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
-  const activeMessageLimit = limits.messageLimit
-
-  let remaining = activeMessageLimit
-  if (!isSuperAdmin) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .or('note.is.null,note.eq.message')
-      .gte('created_at', today.toISOString())
-
-    const used = count ?? 0
-    if (used >= activeMessageLimit) {
-      return { error: `Günlük ${activeMessageLimit} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
-    }
-    remaining = activeMessageLimit - used - 1
-  }
+  const quota = await checkAIQuota('message')
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   try {
     const message = await generateMessage({ name, stage, context, tone, messageType, warmth })
 
-    if (membership) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-        note: 'message',
-      })
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
-    return { message, remaining: isSuperAdmin ? undefined : remaining }
+    return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: any) {
     return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
   }
@@ -118,54 +67,8 @@ export async function generateRoleplayResponseAction(
     return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  let licenseType = 'free'
-  if (membership) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership.workspace_id)
-      .single()
-    if (ws) {
-      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
-      if (!isExpired) {
-        licenseType = ws.license_type ?? 'free'
-      }
-    }
-  }
-
-  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
-  const activeRoleplayLimit = limits.roleplayLimit
-
-  let remaining = activeRoleplayLimit
-  if (!isSuperAdmin) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .eq('note', 'roleplay')
-      .gte('created_at', today.toISOString())
-
-    const used = count ?? 0
-    if (used >= activeRoleplayLimit) {
-      return { error: `Günlük ${activeRoleplayLimit} prova limitine ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
-    }
-    remaining = activeRoleplayLimit - used - 1
-  }
+  const quota = await checkAIQuota('roleplay', { lang: lang === 'en' ? 'en' : 'tr' })
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   // Construct message history string
   const promptHistory = messageHistory.map(m => {
@@ -250,26 +153,18 @@ JSON yapısı şu şekilde olmalıdır:
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    if (membership) {
-      try {
-        await supabase.from('nmm_daily_actions').insert({
-          workspace_id: membership.workspace_id,
-          user_id: user.id,
-          candidate_id: null,
-          action_type: 'ai_generate' as const,
-          note: 'roleplay',
-        })
-      } catch (dbErr) {
-        console.error('Failed to insert roleplay daily action log (constraint issues):', dbErr)
-      }
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'roleplay',
+    })
 
     return {
       candidate_reply: parsed.candidate_reply,
       yzk_score: parsed.yzk_score,
       yzk_strengths: parsed.yzk_strengths,
       yzk_improvements: parsed.yzk_improvements,
-      remaining: isSuperAdmin ? undefined : remaining
+      remaining: quota.isSuperAdmin ? undefined : quota.remaining
     }
   } catch (err: any) {
     console.error('YZK Simülasyon Hatası:', err)
@@ -296,54 +191,8 @@ export async function askCoachAction(
 
   if (!question) return { error: 'Lütfen bir soru yazın.' }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
-
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-
-  const { data: membership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  let licenseType = 'free'
-  if (membership) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
-      .eq('id', membership.workspace_id)
-      .single()
-    if (ws) {
-      const isExpired = ws.license_expires_at ? new Date(ws.license_expires_at) < new Date() : false
-      if (!isExpired) {
-        licenseType = ws.license_type ?? 'free'
-      }
-    }
-  }
-
-  const limits = getLimitsForLicense(isSuperAdmin ? 'pro' : licenseType)
-  const activeMessageLimit = limits.messageLimit
-
-  let remaining = activeMessageLimit
-  if (!isSuperAdmin) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    const { count } = await supabase
-      .from('nmm_daily_actions')
-      .select('*', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'ai_generate')
-      .or('note.is.null,note.eq.message')
-      .gte('created_at', today.toISOString())
-
-    const used = count ?? 0
-    if (used >= activeMessageLimit) {
-      return { error: `Günlük ${activeMessageLimit} limitinize ulaştınız. Yarın tekrar deneyin.`, remaining: 0 }
-    }
-    remaining = activeMessageLimit - used - 1
-  }
+  const quota = await checkAIQuota('message', { lang: lang === 'en' ? 'en' : 'tr' })
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   const systemPrompt = `Sen bir Network Marketing Uzmanı ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
 Kullanıcı sana network marketing sektörü, aday ilişkileri, takım kurma, sponsorluk, liderlik, satış teknikleri, zaman yönetimi veya bu sektörle doğrudan ilgili herhangi bir konuda soru soruyor.
@@ -381,17 +230,13 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
 
     const answer = result.response.text().trim()
 
-    if (membership) {
-      await supabase.from('nmm_daily_actions').insert({
-        workspace_id: membership.workspace_id,
-        user_id: user.id,
-        candidate_id: null,
-        action_type: 'ai_generate' as const,
-        note: 'message',
-      })
-    }
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+    })
 
-    return { answer, remaining: isSuperAdmin ? undefined : remaining }
+    return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: any) {
     console.error('Yapay Zeka Koçu Hatası:', err)
     return { error: 'Yanıt oluşturulurken bir hata oluştu.' }
