@@ -6,6 +6,7 @@ import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import imageCompression from 'browser-image-compression'
 import { Z } from '@/lib/zIndex'
 
 interface ProfileModalProps {
@@ -88,12 +89,23 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
     setUploadingAvatar(true)
     try {
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const path = `avatars/${userId}.${ext}`
+      // 1. Resmi tarayıcı tarafında (Client-side) sıkıştır
+      const compressionOptions = {
+        maxSizeMB: 0.5, // 500KB maksimum dosya boyutu
+        maxWidthOrHeight: 1024, // Genişlik veya yükseklik maksimum 1024px olsun
+        useWebWorker: true,
+        fileType: 'image/jpeg' // Hızlı ve boyut açısından verimli olan formata dönüştür
+      }
+
+      toast.info('Fotoğraf sıkıştırılıyor...')
+      const compressedFile = await imageCompression(file, compressionOptions)
+      
+      const ext = 'jpg'
+      const path = `avatars/${userId}_${Date.now()}.${ext}` // Cache busting için Date.now eklendi
 
       const { error: uploadError } = await supabase.storage
         .from('nmm-avatars')
-        .upload(path, file, { upsert: true, contentType: file.type })
+        .upload(path, compressedFile, { upsert: true, contentType: 'image/jpeg' })
 
       if (uploadError) throw uploadError
 

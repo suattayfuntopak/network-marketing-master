@@ -12,6 +12,7 @@ import { PHONE_RE } from '@/lib/validation'
 import { createClient } from '@/lib/supabase/client'
 import { parseNote, formatNote } from '@/lib/noteParser'
 import { toast } from 'sonner'
+import imageCompression from 'browser-image-compression'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
@@ -56,14 +57,24 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       let avatarUrl = photo || ''
 
       if (photoFile) {
+        // 1. Resmi tarayıcı tarafında (Client-side) sıkıştır
+        const compressionOptions = {
+          maxSizeMB: 0.5, // 500KB maksimum dosya boyutu
+          maxWidthOrHeight: 1024, // Genişlik veya yükseklik maksimum 1024px olsun
+          useWebWorker: true,
+          fileType: 'image/jpeg' // Hızlı ve boyut açısından verimli olan formata dönüştür
+        }
+
+        toast.info('Fotoğraf sıkıştırılıyor...')
+        const compressedFile = await imageCompression(photoFile, compressionOptions)
+
         const supabase = createClient()
-        const ext = photoFile.name.split('.').pop() ?? 'jpg'
-        const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
-        const path = `avatars/candidate_${candidate.id}_${Date.now()}.${cleanExt}`
+        const ext = 'jpg'
+        const path = `avatars/candidate_${candidate.id}_${Date.now()}.${ext}`
 
         const { error: uploadError } = await supabase.storage
           .from('nmm-avatars')
-          .upload(path, photoFile, { contentType: photoFile.type })
+          .upload(path, compressedFile, { contentType: 'image/jpeg' })
 
         if (uploadError) throw uploadError
 
