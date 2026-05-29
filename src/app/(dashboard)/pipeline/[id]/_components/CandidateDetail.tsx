@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity, useLogPresentationWhatsApp } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { toast } from 'sonner'
@@ -22,6 +22,7 @@ import {
   displayDailyActionNote,
   parseBilingualText,
   isLeaderUserNote,
+  getWhatsAppActivityDisplay,
 } from '@/lib/domain/dailyActionNote'
 import {
   resolveCandidateFields,
@@ -91,7 +92,9 @@ function renderActivityText(a: any, lang: string, t: any): string {
     return t('pipeline.activityCall')
   }
   if (a.action_type === 'whatsapp') {
-    return 'WhatsApp'
+    const labeled = getWhatsAppActivityDisplay(a, lang === 'en' ? 'en' : 'tr')
+    if (labeled) return labeled
+    return t('pipeline.activityWhatsApp')
   }
   if (a.action_type === 'ai_generate') {
     return t('pipelinePage.aiMessageGenerated')
@@ -188,6 +191,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
   const deleteActivityMutation = useDeleteActivity(ws?.workspaceId ?? '')
+  const logPresentationWhatsApp = useLogPresentationWhatsApp(ws?.workspaceId ?? '')
   const { data: activityLog = [] } = useActivityHistory(candidateId)
   
   const [activityToDelete, setActivityToDelete] = useState<any | null>(null)
@@ -372,11 +376,15 @@ export function CandidateDetail({ candidateId }: Props) {
   }, [c, activeMaterial, senderName, t])
 
   const handleSendWhatsApp = useCallback(() => {
-    if (!candidatePhoneClean || !activeMaterial) return
+    if (!candidatePhoneClean || !activeMaterial || !c) return
     const msg = getPresentationMessage()
     navigator.clipboard.writeText(msg).then(() => toast.success(t('pipeline.presentationCopied'))).catch(() => {})
     window.open(`https://wa.me/${candidatePhoneClean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
-  }, [candidatePhoneClean, activeMaterial, getPresentationMessage, t])
+    logPresentationWhatsApp.mutate({
+      candidateId: c.id,
+      materialTitle: activeMaterial.title,
+    })
+  }, [candidatePhoneClean, activeMaterial, c, getPresentationMessage, t, logPresentationWhatsApp])
 
   const handleSendSms = useCallback(() => {
     if (!candidatePhoneClean || !activeMaterial) return

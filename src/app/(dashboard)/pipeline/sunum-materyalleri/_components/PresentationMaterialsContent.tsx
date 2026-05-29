@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useRef, useCallback, useMemo, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -62,6 +62,8 @@ export function PresentationMaterialsContent() {
   const [saving, setSaving] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<PresentationMaterial | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const templateRef = useRef<HTMLTextAreaElement>(null)
+  const pendingCursorRef = useRef<number | null>(null)
 
   const canAddMore = materials.length < MAX_PRESENTATION_MATERIALS
 
@@ -156,14 +158,25 @@ export function PresentationMaterialsContent() {
     }
   }
 
-  function insertToken(token: string) {
-    setForm(f => ({
-      ...f,
-      whatsappTemplate: f.whatsappTemplate.trim()
-        ? `${f.whatsappTemplate}${f.whatsappTemplate.endsWith('\n') ? '' : '\n'}${token}`
-        : token,
-    }))
-  }
+  const insertToken = useCallback((token: string) => {
+    const el = templateRef.current
+    setForm(f => {
+      const text = f.whatsappTemplate
+      const start = el?.selectionStart ?? text.length
+      const end = el?.selectionEnd ?? start
+      pendingCursorRef.current = start + token.length
+      return { ...f, whatsappTemplate: text.slice(0, start) + token + text.slice(end) }
+    })
+  }, [])
+
+  useEffect(() => {
+    const pos = pendingCursorRef.current
+    if (pos == null || !templateRef.current) return
+    pendingCursorRef.current = null
+    const el = templateRef.current
+    el.focus()
+    el.setSelectionRange(pos, pos)
+  }, [form.whatsappTemplate])
 
   const previewMessage = useMemo(() => {
     const sampleName = lang === 'en' ? 'Ayşe' : 'Ayşe'
@@ -368,6 +381,7 @@ export function PresentationMaterialsContent() {
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
+                  onMouseDown={e => e.preventDefault()}
                   onClick={() => insertToken('{name}')}
                   className="rounded-full border border-[#534AB7]/30 bg-[#534AB7]/10 px-3 py-1 text-xs font-bold text-[#534AB7] hover:bg-[#534AB7]/15 transition"
                 >
@@ -375,6 +389,7 @@ export function PresentationMaterialsContent() {
                 </button>
                 <button
                   type="button"
+                  onMouseDown={e => e.preventDefault()}
                   onClick={() => insertToken('{url}')}
                   className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15 transition"
                 >
@@ -382,6 +397,7 @@ export function PresentationMaterialsContent() {
                 </button>
                 <button
                   type="button"
+                  onMouseDown={e => e.preventDefault()}
                   onClick={() => insertToken('{sender}')}
                   className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/15 transition"
                 >
@@ -389,6 +405,7 @@ export function PresentationMaterialsContent() {
                 </button>
               </div>
               <textarea
+                ref={templateRef}
                 value={form.whatsappTemplate}
                 onChange={e => setForm(f => ({ ...f, whatsappTemplate: e.target.value }))}
                 rows={5}
@@ -396,7 +413,7 @@ export function PresentationMaterialsContent() {
                 required
                 className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15 resize-y min-h-[120px]"
               />
-              <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-2.5">
+              <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-2.5 select-none">
                 <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)] mb-1">
                   {t('presentationMaterialsPage.livePreview')}
                 </p>

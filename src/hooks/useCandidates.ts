@@ -8,7 +8,7 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
+import { buildDailyActionNoteFields, buildPresentationWhatsAppActivityFields } from '@/lib/domain/dailyActionNote'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
@@ -218,6 +218,52 @@ export function useMarkContacted(workspaceId: string) {
       qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
+  })
+}
+
+export function useLogPresentationWhatsApp(workspaceId: string) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({
+      candidateId,
+      materialTitle,
+    }: {
+      candidateId: string
+      materialTitle: string
+    }) => {
+      const supabase = createClient()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) throw new Error('Oturum yok')
+
+      const noteFields = buildPresentationWhatsAppActivityFields(materialTitle)
+
+      await Promise.all([
+        supabase
+          .from('nmm_candidates')
+          .update({ last_contact_at: new Date().toISOString() })
+          .eq('id', candidateId),
+        supabase.from('nmm_daily_actions').insert({
+          workspace_id: workspaceId,
+          user_id: user.id,
+          candidate_id: candidateId,
+          action_type: 'whatsapp',
+          ...noteFields,
+        }),
+      ])
+    },
+    onSuccess: (_data, vars) => {
+      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      qc.invalidateQueries({ queryKey: ['activity', vars.candidateId] })
+      invalidateTeamAndAIUsage(qc, workspaceId)
+    },
+    onError: (e: Error) =>
+      toast.error(
+        getLang() === 'en'
+          ? `Could not log activity: ${e.message}`
+          : `Aktivite kaydedilemedi: ${e.message}`
+      ),
   })
 }
 

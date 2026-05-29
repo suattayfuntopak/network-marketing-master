@@ -95,6 +95,33 @@ export type LeaderNoteAction = Pick<
   'id' | 'note' | 'note_tr' | 'note_en' | 'created_at' | 'action_type'
 >
 
+/** WhatsApp sunum materyali gönderimi — aktivite geçmişi + YZ bağlamı. */
+export const WHATSAPP_PRESENTATION_NOTE = 'whatsapp:presentation'
+
+export function buildPresentationWhatsAppActivityFields(materialTitle: string): Pick<
+  NmmDailyActionInsert,
+  'note' | 'note_tr' | 'note_en'
+> {
+  const title = materialTitle.trim() || 'Sunum'
+  return {
+    note: WHATSAPP_PRESENTATION_NOTE,
+    ...buildDailyActionNoteFields({
+      noteTr: `WhatsApp · Sunum materyali gönderildi (${title})`,
+      noteEn: `WhatsApp · Presentation material sent (${title})`,
+    }),
+  }
+}
+
+export function getWhatsAppActivityDisplay(
+  row: DailyActionNoteRow,
+  lang: 'tr' | 'en'
+): string | null {
+  if (row.note === WHATSAPP_PRESENTATION_NOTE) {
+    return displayDailyActionNote(row, lang)
+  }
+  return null
+}
+
 export function isLeaderUserNote(action: { action_type: string; note: string | null }): boolean {
   return action.action_type === 'note' && !!action.note && !isSystemActionNote(action.note)
 }

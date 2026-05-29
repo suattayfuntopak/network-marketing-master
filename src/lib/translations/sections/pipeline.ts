@@ -44,8 +44,8 @@ export const pipelineSection = {
       all: "Tümü",
     },
     presentationMaterialsPage: {
-      title: 'Sunum Materyallerim',
-      subtitle: 'Aday detayından WhatsApp ile göndereceğiniz link ve mesaj şablonları. En fazla {max} materyal.',
+      title: 'Sunum Materyalleri',
+      subtitle: 'Aday detayından WhatsApp ile göndereceğiniz link ve mesaj şablonları. En fazla {max} materyal ekleyebilirsiniz.',
       backToPipeline: 'Boru Hattına Dön',
       templateHintTitle: 'WhatsApp mesajı nasıl çalışır?',
       templateHintSimple: 'Mesajınızı normal Türkçe yazın. Aşağıdaki üç bilgi gönderirken adayın adı, link ve sizin adınızla otomatik doldurulur:',
@@ -76,7 +76,7 @@ export const pipelineSection = {
       manageLink: 'Materyalleri düzenle',
       selectMaterial: 'Gönderilecek materyal',
       addFirst: 'Önce sunum materyali ekleyin',
-      addFirstHint: 'Boru Hattı → Sunum Materyallerim sayfasından link ve mesaj şablonunuzu tanımlayın.',
+      addFirstHint: 'Boru Hattı → Sunum Materyalleri sayfasından link ve mesaj şablonunuzu tanımlayın.',
       previewLabel: 'Mesaj önizlemesi',
     },
     compliancePage: {

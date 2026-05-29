@@ -21,7 +21,7 @@ import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { Z } from '@/lib/ui/zIndex'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { displayDailyActionNote, isLeaderUserNote } from '@/lib/domain/dailyActionNote'
+import { displayDailyActionNote, isLeaderUserNote, getWhatsAppActivityDisplay } from '@/lib/domain/dailyActionNote'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -246,7 +246,9 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         const activityLines = activities.map(a => {
           const dateStr = new Date(a.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' })
           const actionText = a.action_type === 'call' ? (lang === 'en' ? 'Phone Call' : 'Telefon Araması')
-            : a.action_type === 'whatsapp' ? (lang === 'en' ? 'WhatsApp Message' : 'WhatsApp Mesajı')
+            : a.action_type === 'whatsapp'
+              ? getWhatsAppActivityDisplay(a, lang === 'en' ? 'en' : 'tr')
+                ?? (lang === 'en' ? 'WhatsApp · Message sent' : 'WhatsApp · Mesaj gönderildi')
             : a.action_type === 'ai_generate' ? (lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi')
             : a.action_type === 'stage_change' ? (lang === 'en' ? `Stage changed: ${getStageLabel(a.note as CandidateStage, lang) || a.note}` : `Aşama değişti: ${getStageLabel(a.note as CandidateStage, lang) || a.note}`)
             : a.note?.startsWith('system_note:candidate_created') ? (lang === 'en' ? 'Candidate profile created' : 'Aday profili oluşturuldu')

@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-29 — Sunum şablon imleç ekleme, metinler, WhatsApp aktivite kaydı
+
+### UX
+- Chip butonlar (`{name}` vb.) imleç konumuna eklenir; `mousedown` ile odak kaybı önlendi
+- Başlık/açıklama metinleri güncellendi (Sunum Materyalleri, kısa aday detay açıklaması)
+- Sunum WhatsApp gönderiminde aktivite: `WhatsApp · Sunum materyali gönderildi (Başlık)` — YZ mesaj bağlamına da düşer
+
+**Dosyalar:** `PresentationMaterialsContent.tsx`, `CandidateDetail.tsx`, `dailyActionNote.ts`, `useCandidates.ts`, `YazarForm.tsx`, çeviriler
+
+---
+
 ## 2026-05-29 — YZ arşivi UX, super admin lisans, sunum sayfası genişlik/font
 
 ### İstatistikler
