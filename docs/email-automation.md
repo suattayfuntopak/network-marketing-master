@@ -70,4 +70,18 @@ Daha az parça, tamamen repoda:
 1. **Faz 1:** n8n ile hızlı prototip (JSON’u `docs/local/n8n/` altına koyun, birlikte uyarlarız).  
 2. **Faz 2:** İşe yarayan şablonları isteğe bağlı cron route’a taşıyın.
 
-Shopier ödeme sonrası zaten `sendPaymentSuccessEmail` var; trial hatırlatmaları eksik parça.
+Shopier ödeme sonrası zaten `sendPaymentSuccessEmail` var.
+
+## Repoda uygulandı (Resend + cron)
+
+| E-posta | Ne zaman |
+|---------|----------|
+| Hoş geldin | Kayıt (`sendWelcomeEmail`) |
+| Deneme 3 / 1 gün kala | Cron `trial-emails` |
+| Deneme bitti | Cron (bitiş +1 gün) |
+| **15 gün sonra** | Cron — NMU “ekibini büyüt” benzeri, **açık tema** |
+| Lisans yenileme 7/3/1 | Cron `license-reminder` (ücretli planlar) |
+
+Şablonlar: `src/lib/infra/emailTemplate.ts`, `trialEmails.ts` — karanlık tema ve harici resim yok.
+
+n8n uyarlaması: [`n8n-nmm-adaptation.md`](./n8n-nmm-adaptation.md)

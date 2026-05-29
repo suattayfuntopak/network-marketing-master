@@ -7,6 +7,7 @@ import {
   Compass
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { pickLangField } from '@/lib/utils/pickLang'
 import { generateRoleplayResponseAction } from '../actions'
 import { toast } from 'sonner'
 import { useAILimits } from '@/hooks/useAILimits'
@@ -241,9 +242,9 @@ function getInitialPrompt(s: Scenario, lang: string): string {
   const dynamics = DYNAMIC_PROMPTS[s.id]
   if (dynamics && dynamics.length > 0) {
     const randomPrompt = dynamics[Math.floor(Math.random() * dynamics.length)]
-    return lang === 'en' ? randomPrompt.en : randomPrompt.tr
+    return pickLangField(randomPrompt.tr, randomPrompt.en, lang as 'tr' | 'en')
   }
-  return lang === 'en' ? s.initialPromptEn : s.initialPromptTr
+  return pickLangField(s.initialPromptTr, s.initialPromptEn, lang as 'tr' | 'en')
 }
 
 interface Message {
@@ -368,7 +369,7 @@ export function ProvaForm() {
   }
 
   if (activeScenario) {
-    const scTitle = lang === 'en' ? activeScenario.titleEn : activeScenario.titleTr
+    const scTitle = pickLangField(activeScenario.titleTr, activeScenario.titleEn, lang as 'tr' | 'en')
     return (
       <div className="w-full bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl p-5 shadow-xl animate-in fade-in zoom-in duration-200">
         
@@ -534,8 +535,8 @@ export function ProvaForm() {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 w-full">
         {SCENARIOS.map(s => {
           const Icon = s.icon
-          const title = lang === 'en' ? s.titleEn : s.titleTr
-          const desc = lang === 'en' ? s.descEn : s.descTr
+          const title = pickLangField(s.titleTr, s.titleEn, lang as 'tr' | 'en')
+          const desc = pickLangField(s.descTr, s.descEn, lang as 'tr' | 'en')
           return (
             <button
               key={s.id}

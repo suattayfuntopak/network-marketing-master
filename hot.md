@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-05-29 — Council E/G/H + trial e-posta (15 gün dahil)
+
+### E-posta (açık tema, resimsiz)
+- `emailTemplate.ts` — premium açık HTML; tüm Resend şablonları güncellendi
+- `trialEmails.ts` + cron `GET /api/cron/trial-emails` (3g, 1g, bitti, **+15g**)
+- `vercel.json` crons; `docs/n8n-nmm-adaptation.md` (NMU JSON → NMM SQL)
+
+### Council
+- **E:** ProvaForm `pickLangField`; Takvim önceden tamam
+- **G:** `RouteError` + pano/odeme/ekip/pipeline `error.tsx`
+- **H:** Playwright `e2e/landing.spec.ts` (`npm run test:e2e`)
+
+**Deploy:** Vercel’de `CRON_SECRET` + cron path’ler; ilk gün 09:00 TR’de trial mailleri.
+
+---
+
 ## 2026-05-29 — Popup masaüstü + Ekibim konum + e-posta rehberi
 
 ### UX
