@@ -85,6 +85,21 @@ body {
 }
 
 /* Delete countdown SVG animation */
+@keyframes account-status-breathe {
+  0%, 100% {
+    box-shadow: 0 4px 14px rgba(185, 28, 28, 0.35);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 6px 22px rgba(220, 38, 38, 0.5);
+    transform: scale(1.008);
+  }
+}
+
+.account-status-breathe {
+  animation: account-status-breathe 2.8s ease-in-out infinite;
+}
+
 @keyframes stroke-countdown {
   from { stroke-dashoffset: 0; }
   to   { stroke-dashoffset: 88; }

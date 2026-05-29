@@ -1,18 +1,16 @@
-import { isTrialPeriodActive } from '@/lib/domain/aiUsage'
+import { isTrialPeriodActive, TRIAL_DAYS } from '@/lib/domain/aiUsage'
 
-export const POST_TRIAL_GRACE_DAYS = 30
-
-export type AccountPhase = 'paid' | 'trial' | 'limited_free' | 'access_locked'
+export type AccountPhase = 'paid' | 'trial' | 'access_locked'
 
 export interface AccountLifecycle {
   phase: AccountPhase
   registeredAt: Date
-  trialEndsAt: Date
-  graceEndsAt: Date
+  /** 14 günlük ücretsiz erişim bitişi */
+  freeAccessEndsAt: Date
   isAccessBlocked: boolean
 }
 
-function resolveTrialEnd(
+function resolveFreeAccessEnd(
   licenseType: string,
   licenseExpiresAt: string | null | undefined,
   workspaceCreatedAt: string | null | undefined
@@ -26,10 +24,11 @@ function resolveTrialEnd(
   }
 
   const end = new Date(registeredAt)
-  end.setDate(end.getDate() + 7)
+  end.setDate(end.getDate() + TRIAL_DAYS)
   return end
 }
 
+/** SaaS tek dönem: 14 gün Basic kredileri, sonra plan yoksa erişim kilidi. */
 export function getAccountLifecycle(params: {
   licenseType: string | null | undefined
   licenseExpiresAt?: string | null
@@ -41,48 +40,31 @@ export function getAccountLifecycle(params: {
     ? new Date(params.workspaceCreatedAt)
     : new Date()
 
-  if (params.isSuperAdmin || licenseType !== 'free') {
-    const trialEndsAt = resolveTrialEnd(licenseType, params.licenseExpiresAt, params.workspaceCreatedAt)
-    const graceEndsAt = new Date(trialEndsAt)
-    graceEndsAt.setDate(graceEndsAt.getDate() + POST_TRIAL_GRACE_DAYS)
-    return {
-      phase: 'paid',
-      registeredAt,
-      trialEndsAt,
-      graceEndsAt,
-      isAccessBlocked: false,
-    }
-  }
-
-  const trialEndsAt = resolveTrialEnd(
+  const freeAccessEndsAt = resolveFreeAccessEnd(
     licenseType,
     params.licenseExpiresAt,
     params.workspaceCreatedAt
   )
-  const graceEndsAt = new Date(trialEndsAt)
-  graceEndsAt.setDate(graceEndsAt.getDate() + POST_TRIAL_GRACE_DAYS)
+
+  if (params.isSuperAdmin || licenseType !== 'free') {
+    return {
+      phase: 'paid',
+      registeredAt,
+      freeAccessEndsAt,
+      isAccessBlocked: false,
+    }
+  }
 
   const trialActive = isTrialPeriodActive(
     licenseType,
     params.licenseExpiresAt,
     params.workspaceCreatedAt
   )
-  const now = Date.now()
-
-  let phase: AccountPhase
-  if (trialActive) {
-    phase = 'trial'
-  } else if (now < graceEndsAt.getTime()) {
-    phase = 'limited_free'
-  } else {
-    phase = 'access_locked'
-  }
 
   return {
-    phase,
+    phase: trialActive ? 'trial' : 'access_locked',
     registeredAt,
-    trialEndsAt,
-    graceEndsAt,
-    isAccessBlocked: phase === 'access_locked',
+    freeAccessEndsAt,
+    isAccessBlocked: !trialActive,
   }
 }

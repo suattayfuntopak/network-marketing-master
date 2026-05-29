@@ -80,7 +80,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const admin = isSuperAdmin(user)
 
   const trialExpires = new Date()
-  trialExpires.setDate(trialExpires.getDate() + 7)
+  trialExpires.setDate(trialExpires.getDate() + 14)
 
   const { data: ws, error: wsError } = await supabase
     .from('nmm_workspaces')

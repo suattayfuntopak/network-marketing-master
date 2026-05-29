@@ -37,15 +37,22 @@ export const shellSection = {
         'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Basic plan bireysel liderlik araçlarını kapsar.',
       featureGateTitle: 'Bu özellik planınızda yer almıyor',
       featureGateDesc: 'Devam etmek için planınızı yükseltin.',
-      lifecycleTitle: 'Hesap durumunuz',
-      lifecycleRegistered: 'Kayıt: {date}',
-      lifecycleTrialEnd: '7 günlük tam deneme bitişi: {date}',
-      lifecycleTrialBody:
-        'Deneme süresince Basic plan günlük kredilerini (15 mesaj / 10 prova / 2 uyum) kullanırsınız. Plus veya Pro ile Ekibim ve daha yüksek limitlere geçebilirsiniz.',
-      lifecycleLimitedBody:
-        '{date} tarihine kadar sınırlı ücretsiz kullanım (günlük 5 mesaj / 3 prova) devam eder. Bu tarihten sonra hesabınıza erişmek için Basic, Plus veya Pro plan satın almanız gerekir.',
-      lifecycleLockedBody:
-        'Ücretsiz kullanım süreniz sona erdi. Hesabınıza yeniden erişmek ve yapay zeka özelliklerini kullanmaya devam etmek için lütfen bir plan seçin.',
+      accountAlertEyebrow: 'Önemli',
+      accountAlertTitle: 'Hesap durumu ile ilgili önemli duyuru!',
+      accountAlertTap: 'Detayları gör',
+      accountAlertClose: 'Kapat',
+      accountModalTitle: 'Hesap bilgileriniz',
+      accountModalSectionInfo: 'Hesap bilgileriniz',
+      accountModalSectionPlan: 'Plan ve kullanım detayları',
+      accountModalRegistered: 'Üyelik başlangıcı: {date}',
+      accountModalFreeAccess:
+        'Ücretsiz erişim süresi: Tüm özelliklerin açık olduğu 14 günlük deneme hakkınız {date} tarihine kadar geçerlidir.',
+      accountModalTrialBullets:
+        '14 günlük ücretsiz deneme: Deneme süreniz boyunca günlük 15 Yapay Zeka Koçu, 10 Saha Provası ve 2 Uyum Denetimi mesaj hakkı ile Basic plan özelliklerini eksiksiz deneyimleyebilirsiniz.',
+      accountModalTeamBullets:
+        'Ekibim sayfası ve yüksek limitler: Plus veya Pro planlarından birine geçiş yaptığınızda Ekibim sayfası erişiminiz aktif hale gelir. İhtiyacınıza göre daha yüksek yapay zeka mesaj limitleri için bu planları tercih edebilirsiniz.',
+      accountModalFootnote:
+        'Önemli not: 14 günlük deneme sürecinin sonunda bir abonelik başlatılmaması durumunda hesap kullanımına geçici olarak ara verilecektir. ({date})',
     },
   },
   en: {
@@ -86,15 +93,22 @@ export const shellSection = {
         'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. Basic covers individual leader tools.',
       featureGateTitle: 'This feature is not on your plan',
       featureGateDesc: 'Upgrade your plan to continue.',
-      lifecycleTitle: 'Your account status',
-      lifecycleRegistered: 'Registered: {date}',
-      lifecycleTrialEnd: 'Full trial ends: {date}',
-      lifecycleTrialBody:
-        'During the trial you use Basic daily credits (15 messages / 10 roleplay / 2 compliance). Upgrade to Plus or Pro for Team and higher limits.',
-      lifecycleLimitedBody:
-        'Limited free use (5 messages / 3 roleplay per day) continues until {date}. After that, purchase Basic, Plus, or Pro to access your account.',
-      lifecycleLockedBody:
-        'Your free period has ended. Choose a plan to access your account and AI features again.',
+      accountAlertEyebrow: 'Important',
+      accountAlertTitle: 'Important notice about your account!',
+      accountAlertTap: 'View details',
+      accountAlertClose: 'Close',
+      accountModalTitle: 'Your account information',
+      accountModalSectionInfo: 'Account information',
+      accountModalSectionPlan: 'Plan and usage details',
+      accountModalRegistered: 'Membership started: {date}',
+      accountModalFreeAccess:
+        'Free access: Your 14-day trial with all features is valid until {date}.',
+      accountModalTrialBullets:
+        '14-day free trial: Enjoy Basic plan features with 15 AI Coach, 10 roleplay, and 2 compliance messages per day throughout your trial.',
+      accountModalTeamBullets:
+        'Team hub and higher limits: Upgrade to Plus or Pro to unlock the Team page and higher daily AI limits.',
+      accountModalFootnote:
+        'Important: If you do not start a subscription when your 14-day trial ends, account access will be paused until you choose a plan. ({date})',
     },
   },
 } as const

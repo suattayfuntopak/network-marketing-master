@@ -8,7 +8,7 @@ export interface AILimits {
   complianceLimit: number
 }
 
-const TRIAL_DAYS = 7
+export const TRIAL_DAYS = 14
 
 const PAID_LIMITS: Record<Exclude<LicenseTier, 'free'>, AILimits> = {
   pro: { messageLimit: 100, roleplayLimit: 60, complianceLimit: 15 },
@@ -22,7 +22,7 @@ const POST_TRIAL_FREE_LIMITS: AILimits = {
   complianceLimit: 0,
 }
 
-/** 7-day signup trial uses Basic (leader) daily credits while license_type stays `free`. */
+/** 14-day signup trial uses Basic (leader) daily credits while license_type stays `free`. */
 export function isTrialPeriodActive(
   licenseType: string | null | undefined,
   licenseExpiresAt: string | null | undefined,

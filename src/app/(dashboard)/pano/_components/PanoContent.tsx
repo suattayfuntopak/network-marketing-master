@@ -14,6 +14,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate } from '@/types/database.types'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { AccountStatusAlert } from './AccountStatusAlert'
 
 
 function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
@@ -135,6 +136,8 @@ export function PanoContent() {
       {!cLoading && candidates.length === 0 && ws && (
         <OnboardingModal workspaceId={ws.workspaceId} inviteCode={ws.inviteCode} />
       )}
+      <AccountStatusAlert />
+
       {/* Selamlama */}
       <header>
         <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>

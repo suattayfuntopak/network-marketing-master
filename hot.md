@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-29 — Pano hesap duyurusu + 14 gün tek deneme
+
+### UX
+- Hesap durumu kutusu **yalnızca Pano**; kırmızı-beyaz nefes animasyonlu banner → tıklanınca ortalı popup
+- Popup: Kapat + Planları Gör & Yükselt; metin 14 günlük tek dönem SaaS kurgusu
+
+### Ürün
+- Deneme **14 gün** (7+7 ve 30 gün sınırlı ücretsiz kaldırıldı); süre bitince erişim kilidi → `/odeme`
+- `TRIAL_DAYS=14`, migration `027_trial_14_days.sql` (Yusuf vb. için süreyi uzatır)
+
+**Deploy:** 027 Supabase’e uygula.
+
+---
+
 ## 2026-05-29 — Ekibim kapısı, hesap yaşam döngüsü, plan metinleri
 
 ### Plan metinleri
