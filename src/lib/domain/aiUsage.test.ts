@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  formatCreditButtonLabel,
   getEffectiveLicenseType,
   getLimitsForLicense,
   isTrialPeriodActive,
@@ -67,5 +68,23 @@ describe('getLimitsForLicense', () => {
       roleplayLimit: 10,
       complianceLimit: 2,
     })
+  })
+})
+
+describe('formatCreditButtonLabel', () => {
+  it('uses compact Turkish credit text without colon', () => {
+    expect(formatCreditButtonLabel('Uyum Denetimi Yap', 2, 2, false, 'tr')).toBe(
+      'Uyum Denetimi Yap (Kalan 2/2)'
+    )
+  })
+
+  it('uses English remaining label when lang is en', () => {
+    expect(formatCreditButtonLabel('Generate', 5, 15, false, 'en')).toBe(
+      'Generate (Remaining 5/15)'
+    )
+  })
+
+  it('shows infinity for super admin', () => {
+    expect(formatCreditButtonLabel('Üret', 99, 15, true, 'tr')).toBe('Üret (∞)')
   })
 })

@@ -29,6 +29,9 @@ export const shellSection = {
       upgradeBannerExpiredTitle: 'Deneme süreniz sona erdi',
       upgradeBannerExpiredDesc: 'Basic, Plus veya Pro planlardan birini seçerek tüm özelliklere ve günlük YZ kredilerine devam edin.',
       upgradeBannerCta: 'Planları Gör & Yükselt',
+      upgradeMenuTrialTitle: 'Planı Yükselt',
+      upgradeMenuExpiredTitle: 'Planı Yükselt',
+      upgradeMenuDesc: 'Basic, Plus veya Pro — daha yüksek günlük YZ kredileri',
     },
   },
   en: {
@@ -61,6 +64,9 @@ export const shellSection = {
       upgradeBannerExpiredTitle: 'Your trial has ended',
       upgradeBannerExpiredDesc: 'Choose Basic, Plus, or Pro to continue with full features and daily AI credits.',
       upgradeBannerCta: 'View Plans & Upgrade',
+      upgradeMenuTrialTitle: 'Upgrade plan',
+      upgradeMenuExpiredTitle: 'Upgrade plan',
+      upgradeMenuDesc: 'Basic, Plus, or Pro — higher daily AI credits',
     },
   },
 } as const

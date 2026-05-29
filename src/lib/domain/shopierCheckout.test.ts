@@ -3,18 +3,24 @@ import {
   SHOPIER_CURRENCY_TRY,
   buildShopierCheckoutForm,
   buildShopierLaunchHtml,
+  buildShopierPlatformOrderId,
   buildShopierSignaturePayload,
   formatShopierOrderValue,
   normalizeShopierPhone,
   signShopierCheckout,
   toShopierBuyerId,
 } from './shopierCheckout'
+import { parseShopierOrderId } from './shopierWebhook'
 
 describe('shopierCheckout', () => {
-  it('formats order value like official SDK (integer → .0)', () => {
-    expect(formatShopierOrderValue(1699)).toBe('1699.0')
-    expect(formatShopierOrderValue(399)).toBe('399.0')
-    expect(formatShopierOrderValue(8991)).toBe('8991.0')
+  it('formats whole-lira amounts without decimal suffix (Shopier signature match)', () => {
+    expect(formatShopierOrderValue(1699)).toBe('1699')
+    expect(formatShopierOrderValue(399)).toBe('399')
+    expect(formatShopierOrderValue(8991)).toBe('8991')
+  })
+
+  it('formats fractional amounts with two decimals', () => {
+    expect(formatShopierOrderValue(399.5)).toBe('399.50')
   })
 
   it('builds signature payload with TRY currency code 0', () => {
@@ -22,9 +28,9 @@ describe('shopierCheckout', () => {
       buildShopierSignaturePayload({
         randomNr: '123456',
         platformOrderId: 'ws-abc_pro_monthly_1',
-        totalOrderValue: '1699.0',
+        totalOrderValue: '1699',
       })
-    ).toBe('123456ws-abc_pro_monthly_11699.00')
+    ).toBe('123456ws-abc_pro_monthly_116990')
   })
 
   it('signs checkout payload deterministically', () => {
@@ -61,7 +67,7 @@ describe('shopierCheckout', () => {
       order: {
         platformOrderId: 'ws-abc_pro_monthly_1',
         productName: 'Pro Plan',
-        totalOrderValue: '1699.0',
+        totalOrderValue: '1699',
         randomNr: '654321',
       },
     })
@@ -72,8 +78,19 @@ describe('shopierCheckout', () => {
     expect(form.billing_address).toBeTruthy()
     expect(form.shipping_address).toBeTruthy()
     expect(form.signature).toBeTruthy()
-    expect(form.total_order_value).toBe('1699.0')
+    expect(form.total_order_value).toBe('1699')
+    expect(form.modul_version).toBe('1.0.8')
     expect(form.buyer_id_nr).toMatch(/^\d+$/)
+  })
+
+  it('builds parseable platform order ids for webhooks', () => {
+    const orderId = buildShopierPlatformOrderId(
+      '999311ea-4e69-4b84-97b5-a1468ffd083e',
+      'leader',
+      'monthly'
+    )
+    expect(orderId).toMatch(/^999311ea-4e69-4b84-97b5-a1468ffd083e_leader_monthly_\d+$/)
+    expect(parseShopierOrderId(orderId)?.plan).toBe('leader')
   })
 
   it('builds multipart auto-submit launch html', () => {

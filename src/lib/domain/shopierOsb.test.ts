@@ -18,6 +18,18 @@ describe('shopierOsb', () => {
     expect(parsed?.email).toBe(payload.email)
   })
 
+  it('verifies OSB hash when Shopier sends hex digest', () => {
+    const username = '806b8c21b50603a9386f80926a8c10b0'
+    const password = 'db736131a1d9a73af1cbe7b505cb7c43'
+    const res = Buffer.from(JSON.stringify({ orderid: 'order-hex' })).toString('base64')
+    const hex = crypto
+      .createHmac('sha256', password)
+      .update(res + username)
+      .digest('hex')
+
+    expect(verifyShopierOsbHash(res, hex, { username, password })).toBe(true)
+  })
+
   it('verifies OSB hash (res + username, secret as key)', () => {
     const username = '806b8c21b50603a9386f80926a8c10b0'
     const password = 'db736131a1d9a73af1cbe7b505cb7c43'

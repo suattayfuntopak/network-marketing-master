@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getShopierAmount, type BillingPeriod, type PlanId } from '@/lib/domain/pricing'
 import {
   buildShopierCheckoutForm,
+  buildShopierPlatformOrderId,
   getShopierCallbackUrl,
   getShopierCredentials,
   normalizeShopierPhone,
@@ -47,7 +48,7 @@ export async function createShopierPaymentSession(
   const { apiKey, apiSecret, websiteIndex } = getShopierCredentials()
   const amount = getShopierAmount(plan, period)
   const workspaceId = membership.workspace_id
-  const platformOrderId = `${workspaceId}_${plan}_${period}_${Date.now()}`
+  const platformOrderId = buildShopierPlatformOrderId(workspaceId, plan, period)
   const randomNr = Math.floor(100000 + Math.random() * 900000).toString()
 
   const fullName = membership.full_name || user.user_metadata?.full_name || 'Degerli Lider'

@@ -8,7 +8,7 @@ export const SHOPIER_PRODUCT_TYPE_VIRTUAL = '1'
 
 export const SHOPIER_PAYMENT_ENDPOINT = 'https://www.shopier.com/ShowProduct/api_pay4.php'
 
-export const SHOPIER_MODULE_VERSION = '1.0.4'
+export const SHOPIER_MODULE_VERSION = '1.0.8'
 
 export interface ShopierCredentials {
   apiKey: string
@@ -36,10 +36,25 @@ export function getShopierCredentials(): ShopierCredentials {
   return { apiKey, apiSecret, websiteIndex }
 }
 
-/** Matches official PHP SDK (`10.0`, `999.0`) — signature must use the exact submitted string. */
+/**
+ * Shopier imzası, forma yazdığınız `total_order_value` ile birebir aynı olmalı.
+ * Tam lira tutarları için ondalıksız string (ör. `399`) — bazı mağazalarda `.0` 501 üretebiliyor.
+ */
 export function formatShopierOrderValue(amount: number): string {
   const rounded = Math.round(amount * 100) / 100
-  return Number.isInteger(rounded) ? `${rounded}.0` : rounded.toFixed(2)
+  if (Number.isInteger(rounded)) {
+    return String(rounded)
+  }
+  return rounded.toFixed(2)
+}
+
+/** `<workspaceUuid>_<plan>_<period>_<timestamp>` — webhook/OSB parse ile uyumlu. */
+export function buildShopierPlatformOrderId(
+  workspaceId: string,
+  plan: string,
+  period: string
+): string {
+  return `${workspaceId}_${plan}_${period}_${Date.now()}`
 }
 
 /** Shopier expects a numeric buyer id — derive a stable positive int from UUID. */
@@ -161,7 +176,7 @@ export function buildShopierCheckoutForm(input: {
 
   const addressLine = 'Dijital abonelik'
   const city = 'Istanbul'
-  const country = 'Turkey'
+  const country = 'Turkiye'
   const postcode = '34000'
 
   return {
@@ -174,7 +189,7 @@ export function buildShopierCheckoutForm(input: {
     buyer_surname: input.buyer.buyerSurname,
     buyer_email: input.buyer.buyerEmail,
     buyer_account_age: '0',
-    buyer_id_nr: input.buyer.userId.replace(/\D/g, '').slice(0, 15) || '0',
+    buyer_id_nr: input.buyer.userId,
     buyer_phone: input.buyer.buyerPhone,
     billing_address: addressLine,
     billing_city: city,

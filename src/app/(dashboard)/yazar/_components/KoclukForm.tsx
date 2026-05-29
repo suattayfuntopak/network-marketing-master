@@ -153,7 +153,8 @@ export function KoclukForm() {
                       t('coachUi.askCoach'),
                       remaining,
                       messageLimit,
-                      isSuperAdmin
+                      isSuperAdmin,
+                      lang
                     )}
               </span>
             </>

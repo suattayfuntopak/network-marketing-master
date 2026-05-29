@@ -290,7 +290,7 @@ export default function CompliancePage() {
                         (!limitsSuperAdmin && complianceLimit === 0) ||
                         (!limitsSuperAdmin && complianceRemaining <= 0)
                       }
-                      className="flex items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-5 py-2.5 text-sm font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
+                      className="flex max-w-full items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-4 py-2.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer whitespace-nowrap"
                     >
                       {isAuditing ? (
                         <>
@@ -304,7 +304,8 @@ export default function CompliancePage() {
                             t('compliancePage.startAiAudit'),
                             complianceRemaining,
                             complianceLimit,
-                            limitsSuperAdmin
+                            limitsSuperAdmin,
+                            lang
                           )}
                         </>
                       )}

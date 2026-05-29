@@ -78,10 +78,15 @@ export function formatCreditButtonLabel(
   actionLabel: string,
   remaining: number,
   limit: number,
-  isSuperAdmin?: boolean
+  isSuperAdmin?: boolean,
+  lang: 'tr' | 'en' = 'tr'
 ): string {
   if (isSuperAdmin || !Number.isFinite(limit)) {
     return `${actionLabel} (∞)`
   }
-  return `${actionLabel} (Kalan: ${remaining} / ${limit})`
+  const credit =
+    lang === 'en'
+      ? `Remaining ${remaining}/${limit}`
+      : `Kalan ${remaining}/${limit}`
+  return `${actionLabel} (${credit})`
 }

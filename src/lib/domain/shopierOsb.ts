@@ -42,14 +42,24 @@ export function verifyShopierOsbHash(
   hash: string,
   credentials: ShopierOsbCredentials
 ): boolean {
-  const expected = crypto
+  const data = res + credentials.username
+  const expectedRaw = crypto
     .createHmac('sha256', credentials.password)
-    .update(res + credentials.username)
+    .update(data)
     .digest()
 
   const received = decodeShopierHash(hash)
-  if (!received || received.length !== expected.length) return false
-  return crypto.timingSafeEqual(received, expected)
+  if (received && received.length === expectedRaw.length) {
+    return crypto.timingSafeEqual(received, expectedRaw)
+  }
+
+  const expectedHex = expectedRaw.toString('hex')
+  const normalized = hash.trim().toLowerCase()
+  if (/^[0-9a-f]+$/.test(normalized) && normalized.length === expectedHex.length) {
+    return crypto.timingSafeEqual(Buffer.from(normalized, 'hex'), expectedRaw)
+  }
+
+  return false
 }
 
 function decodeShopierHash(hash: string): Buffer | null {

@@ -125,6 +125,23 @@ describe('checkAIQuota', () => {
     }
   })
 
+  it('infers trial limits from workspace created_at when expiry is missing', async () => {
+    const recent = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    setup({
+      user: { id: 'u1', email: null },
+      membership: { workspace_id: 'w1' },
+      workspace: {
+        license_type: 'free',
+        license_expires_at: null,
+        created_at: recent,
+      },
+      dailyCount: 0,
+    })
+    const res = await checkAIQuota('compliance')
+    expect(res.ok).toBe(true)
+    if (res.ok) expect(res.limit).toBe(2)
+  })
+
   it('returns ok with correct remaining when under the limit', async () => {
     setup({ user: { id: 'u1', email: 'u@x.com' }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'pro', license_expires_at: future }, dailyCount: 10 })
     const res = await checkAIQuota('message')

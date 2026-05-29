@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { LogOut, User, Settings, Bell, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
+import { LogOut, User, Settings, Bell, ChevronDown, Sparkles } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { logoutAction } from '../_shared-actions'
 import { ProfileModal } from '@/components/ui/ProfileModal'
@@ -34,6 +35,7 @@ export function UserMenu() {
     ? ws.fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
   const avatarUrl = ws?.avatarUrl ?? null
+  const showUpgrade = ws && !ws.isSuperAdmin && ws.licenseType === 'free'
 
   return (
     <div ref={ref} className="relative">
@@ -72,6 +74,26 @@ export function UserMenu() {
                 : t('shellUi.roleMember')}
             </p>
           </div>
+
+          {showUpgrade && (
+            <Link
+              href="/odeme"
+              onClick={() => setOpen(false)}
+              className="mx-2 mb-2 flex items-start gap-3 rounded-xl border border-indigo-500/25 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 px-3 py-2.5 transition hover:from-indigo-500/15 hover:to-purple-500/15"
+            >
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-indigo-500 dark:text-indigo-300" />
+              <div className="min-w-0">
+                <p className="text-xs font-bold text-[var(--text-1)]">
+                  {ws.isTrialActive
+                    ? t('shellUi.upgradeMenuTrialTitle')
+                    : t('shellUi.upgradeMenuExpiredTitle')}
+                </p>
+                <p className="mt-0.5 text-[10px] leading-snug text-[var(--text-3)]">
+                  {t('shellUi.upgradeMenuDesc')}
+                </p>
+              </div>
+            </Link>
+          )}
 
           <button
             onClick={() => {

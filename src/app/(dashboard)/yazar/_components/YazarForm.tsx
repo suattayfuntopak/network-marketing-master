@@ -547,7 +547,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                     t('coachUi.generate'),
                     remaining,
                     activeMessageLimit,
-                    isSuperAdmin
+                    isSuperAdmin,
+                    lang
                   )}
                 </>
               )

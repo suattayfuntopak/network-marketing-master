@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-05-29 — Council #7 testler, yükseltme menüde, Shopier tutar formatı
+
+### Council #7 (genişletildi) ✅
+- `aiUsage` — `formatCreditButtonLabel`, deneme limitleri
+- `checkQuota` — deneme + `created_at` yedek
+- `shopierCheckout` / `pricing` — tutar string, platform order id
+- `shopierOsb` — hex hash
+- `POST /odeme/launch` — route test
+- `POST /api/payment/shopier` — OSB route test
+- **58 test** geçiyor
+
+### UX
+- `UpgradePlanBanner` kaldırıldı → **Profil menüsü** üstünde “Planı Yükselt” kartı (sayfa içeriğini itmez)
+- Kredi butonları: `Uyum Denetimi Yap (Kalan 2/2)` — iki nokta üst üste yok, mobil `whitespace-nowrap`
+
+### Shopier 501 (tekrar deneme)
+- `total_order_value`: tam lira → `399` (`.0` yok); imza aynı string
+- `modul_version` 1.0.8, ülke `Turkiye`
+- Deploy sonrası Yusuf ile Basic ödeme tekrar test
+
+---
+
 ## 2026-05-29 — Deneme kredileri, OSB webhook, UI kredi butonları, yükseltme banner
 
 ### 7 günlük ücretsiz deneme = Basic günlük krediler (15 / 10 / 2)
