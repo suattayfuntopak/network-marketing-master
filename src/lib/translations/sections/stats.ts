@@ -73,7 +73,7 @@ export const statsSection = {
 
       aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
       aiIndependentSubtitle:
-        'Focus Team dışında, ücretsiz deneme (free) ile kayıt olan liderlerin bugünkü YZ kullanımı ve plan limitleri — örn. dış kayıt test kullanıcıları.',
+        'Platformu kendi başına keşfeden, davet kodu kullanmamış (parent_id boş) ve hâlâ ücretsiz denemede olan liderler — örn. Yusuf gibi dış test kullanıcıları. Davetle ekibe katılanlar yalnızca Ekip YZ tablosunda görünür.',
       aiIndependentEmpty: 'Henüz bağımsız dış kayıt bulunmuyor.',
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',
@@ -167,7 +167,8 @@ export const statsSection = {
       unlimited: 'Unlimited',
 
       aiIndependentTitle: 'Independent Signup AI Usage & Quotas Control Spread',
-      aiIndependentSubtitle: 'Daily AI usage and plan limits for leaders who signed up independently (no upline).',
+      aiIndependentSubtitle:
+        'Leaders still on free trial who discovered NMM on their own (no invite code, parent_id empty) — e.g. external test users. Invite-based downlines appear only in the Team AI table.',
       aiIndependentEmpty: 'No independent signups yet.',
       colLicense: 'License',
       licensePlanFree: 'Free',

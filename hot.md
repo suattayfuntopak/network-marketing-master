@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-29 — Dış Kayıt tablosu: davetli downline hariç (parent_id)
+
+### Fix
+- **İstatistikler / Dış Kayıt YZ:** `parent_id` dolu workspace sahipleri listeden çıkar (Elif gibi davet kodu ile katılanlar)
+- Mantık: bağımsız = `license_type=free` **ve** `parent_id IS NULL`; davetliler yalnızca **Ekip YZ** tablosunda
+- Plan satın alınca `license_type` ≠ free → Dış Kayıt’tan otomatik düşer (zaten free filtresi)
+
+**Dosya:** `istatistikler/actions.ts`, `stats.ts`
+
+---
+
 ## 2026-05-29 — Sunum Materyalleri (workspace bazlı WhatsApp)
 
 ### Özellik

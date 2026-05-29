@@ -47,7 +47,8 @@ function isInvitedTeamMember(
 }
 
 /**
- * Super-admin only: dış kayıt / ücretsiz deneme liderleri (Focus Team dışı, başka ekibe katılmamış).
+ * Super-admin only: bağımsız dış kayıt — free lisans, sponsor bağlantısı yok (parent_id null).
+ * Davet kodu ile katılan downline'lar kendi workspace'lerinde kalır; Ekip YZ tablosunda listelenir.
  */
 export async function getIndependentSignupAIUsageAction(): Promise<IndependentAIUsageRow[]> {
   const supabase = await createClient()
@@ -69,7 +70,7 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
 
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
-    .select('id, owner_id, license_type, license_expires_at, created_at')
+    .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
     .eq('license_type', 'free')
     .order('created_at', { ascending: false })
 
@@ -105,6 +106,8 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
 
   const independentOwners = workspaces
     .filter(ws => ws.id !== excludeWorkspaceId && ws.owner_id && ws.owner_id !== user!.id)
+    // Davet kodu ile katılanlar: kendi workspace'inde parent_id = sponsor workspace id
+    .filter(ws => !ws.parent_id)
     .filter(ws => {
       const owned = ownedByUser.get(ws.owner_id!) ?? new Set<string>()
       return !isInvitedTeamMember(ws.owner_id!, owned, membershipsByUser)
