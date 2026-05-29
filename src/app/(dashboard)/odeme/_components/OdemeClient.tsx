@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { CheckCircle2, Sparkles, Loader2, Calendar, ArrowRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
-import { initiateShopierPayment, ShopierFormData } from '../actions'
 import { Z } from '@/lib/ui/zIndex'
 import {
   formatTryPrice,
@@ -31,28 +30,37 @@ export function OdemeClient() {
   const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState<ShopierFormData | null>(null)
-  const formRef = useRef<HTMLFormElement>(null)
 
-  useEffect(() => {
-    if (formData && formRef.current) {
-      formRef.current.submit()
-    }
-  }, [formData])
-
-  const handlePayment = async (plan: 'leader' | 'master' | 'pro') => {
+  const handlePayment = (plan: 'leader' | 'master' | 'pro') => {
     try {
       setLoading(true)
       setSelectedPlan(plan)
       toast.info(t('paymentPage.preparingCheckout'))
 
-      const data = await initiateShopierPayment(plan, billingPeriod)
-      setFormData(data)
-    } catch (err: any) {
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/odeme/launch'
+      form.style.display = 'none'
+
+      const planInput = document.createElement('input')
+      planInput.type = 'hidden'
+      planInput.name = 'plan'
+      planInput.value = plan
+      form.appendChild(planInput)
+
+      const periodInput = document.createElement('input')
+      periodInput.type = 'hidden'
+      periodInput.name = 'period'
+      periodInput.value = billingPeriod
+      form.appendChild(periodInput)
+
+      document.body.appendChild(form)
+      form.submit()
+    } catch (err: unknown) {
       console.error('[OdemeClient] error initiating payment:', err)
       toast.error(
         t('paymentPage.checkoutError', {
-          message: err?.message || t('paymentPage.unknownError'),
+          message: err instanceof Error ? err.message : t('paymentPage.unknownError'),
         })
       )
       setLoading(false)
@@ -87,15 +95,13 @@ export function OdemeClient() {
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 py-4">
-      {loading && formData && (
+      {loading && (
         <div className={`fixed inset-0 ${Z.fullscreen} flex flex-col items-center justify-center bg-[var(--bg)]/95 backdrop-blur-md`}>
           <div className="relative flex flex-col items-center max-w-md p-8 text-center space-y-6">
             <div className="absolute -top-12 h-40 w-40 rounded-full bg-indigo-500/10 blur-2xl animate-pulse" />
-            
             <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/20 shadow-[0_0_50px_rgba(99,102,241,0.15)]">
               <Loader2 className="h-8 w-8 animate-spin text-indigo-500 dark:text-indigo-400" />
             </div>
-
             <div className="space-y-2">
               <h3 className="text-lg font-bold text-[var(--text-1)]">
                 {t('paymentPage.redirectingShopier')}
@@ -104,24 +110,7 @@ export function OdemeClient() {
                 {t('paymentPage.establishingGateway')}
               </p>
             </div>
-
-            <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4 text-[10px] text-[var(--text-3)] font-mono text-left w-full space-y-1.5">
-              <div>OrderID: {formData.platform_order_id}</div>
-              <div>Plan: {selectedPlan === 'pro' ? 'Pro Lider' : selectedPlan === 'master' ? 'Plus Lider' : 'Basic Partner'} ({billingPeriod === 'yearly' ? 'Yıllık' : 'Aylık'})</div>
-              <div>Amount: {formData.total_order_value} TRY</div>
-            </div>
           </div>
-
-          <form
-            ref={formRef}
-            method="post"
-            action="https://www.shopier.com/ShowProduct/api_pay4.php"
-            className="hidden"
-          >
-            {Object.entries(formData).map(([key, val]) => (
-              <input key={key} type="hidden" name={key} value={val} />
-            ))}
-          </form>
         </div>
       )}
 

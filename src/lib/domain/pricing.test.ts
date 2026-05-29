@@ -23,6 +23,7 @@ describe('pricing', () => {
     expect(getYearlyChargeAmount('leader')).toBe(3588)
     expect(getYearlyChargeAmount('master')).toBe(8988)
     expect(getYearlyChargeAmount('pro')).toBe(15288)
-    expect(getShopierAmount('pro', 'yearly')).toBe('15288.00')
+    expect(getShopierAmount('pro', 'yearly')).toBe('15288.0')
+    expect(getShopierAmount('master', 'monthly')).toBe('999.0')
   })
 })

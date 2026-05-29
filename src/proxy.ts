@@ -39,7 +39,12 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
-  const isPublic = pathname === '/' || PUBLIC_PATHS.some(p => pathname.startsWith(p))
+  const isShopierWebhook =
+    pathname === '/api/payment/shopier' || pathname === '/api/payment/shopier/'
+  const isPublic =
+    pathname === '/' ||
+    isShopierWebhook ||
+    PUBLIC_PATHS.some(p => p !== '/api/payment/shopier' && pathname.startsWith(p))
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()

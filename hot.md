@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-05-29 — Shopier 501 (v2) + Council #6 landing tamamlandı
+
+### Shopier 501 — kök neden ve düzeltme
+- **501 = Shopier imza doğrulama hatası** (`/s/pay`); geçersiz HMAC veya yanlış API secret
+- **Yeni akış:** `POST /odeme/launch` → sunucuda imzalı HTML → `multipart/form-data` ile `api_pay4.php` (base64 `+` bozulması önlendi)
+- Tutar formatı SDK uyumu: `999.0` (`.00` değil); `buyer_id_nr` sayısal; telefon 10 hane
+- Env: `SHOPIER_API_KEY` veya `SHOPIER_API_USER`, `SHOPIER_API_SECRET`, opsiyonel `SHOPIER_WEBSITE_INDEX`
+- **Vercel kontrol:** Panel API Key + Secret birebir; callback `https://nmm.suattayfuntopak.com/api/payment/shopier`
+
+### Council #6 (6/6) — landing extract ✅
+- `page.tsx` → 1 satır re-export
+- `src/app/_components/landing/*` — Header, Hero, Features, ROI, Pricing, Testimonials, Footer
+
+**Sıradaki council:** #7 test coverage
+
+---
+
 ## 2026-05-29 — İstatistikler: Dış Kayıt YZ masası
 
 ### Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası

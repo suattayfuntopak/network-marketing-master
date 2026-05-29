@@ -1,3 +1,5 @@
+import { formatShopierOrderValue } from '@/lib/domain/shopierCheckout'
+
 export type PlanId = 'leader' | 'master' | 'pro'
 export type BillingPeriod = 'monthly' | 'yearly'
 
@@ -31,7 +33,7 @@ export function getYearlyChargeAmount(plan: PlanId): number {
 
 export function getShopierAmount(plan: PlanId, period: BillingPeriod): string {
   const amount = period === 'yearly' ? getYearlyChargeAmount(plan) : getMonthlyPrice(plan)
-  return amount.toFixed(2)
+  return formatShopierOrderValue(amount)
 }
 
 export function formatTryPrice(amount: number): string {
