@@ -16,7 +16,8 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { useAILimits } from '@/hooks/useAILimits'
+import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { Z } from '@/lib/ui/zIndex'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
@@ -186,14 +187,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const [generatedLang, setGeneratedLang] = useState<'tr' | 'en'>(lang)
   const [translating, setTranslating] = useState(false)
 
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
-  const limits = getLimitsForLicense(ws?.licenseType)
+  const {
+    limits,
+    isSuperAdmin,
+    messageRemaining: remaining,
+  } = useAILimits()
   const activeMessageLimit = limits.messageLimit
   const qc = useQueryClient()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
-  const used = usage?.messageUsed ?? 0
-  const remaining = Math.max(0, activeMessageLimit - used)
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const containerRef = useRef<HTMLDivElement>(null)
@@ -539,7 +540,17 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           >
             {isPending
               ? <><Loader2 className="h-4 w-4 animate-spin" /> {t('coachUi.writing')}</>
-              : <><Bot className="h-4 w-4" /> {t('coachUi.generate')} {isSuperAdmin ? t('coachUi.unlimitedParens') : `(Kalan: ${remaining} / ${activeMessageLimit})`}</>
+              : (
+                <>
+                  <Bot className="h-4 w-4" />{' '}
+                  {formatCreditButtonLabel(
+                    t('coachUi.generate'),
+                    remaining,
+                    activeMessageLimit,
+                    isSuperAdmin
+                  )}
+                </>
+              )
             }
           </button>
         )}

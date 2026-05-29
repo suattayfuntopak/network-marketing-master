@@ -18,7 +18,12 @@ export interface ShopierCredentials {
 
 /** Reads trimmed Shopier credentials — supports SHOPIER_API_KEY or legacy SHOPIER_API_USER. */
 export function getShopierCredentials(): ShopierCredentials {
-  const apiKey = (process.env.SHOPIER_API_KEY ?? process.env.SHOPIER_API_USER ?? '').trim()
+  const apiKey = (
+    process.env.SHOPIER_CHECKOUT_API_KEY ??
+    process.env.SHOPIER_API_KEY ??
+    process.env.SHOPIER_API_USER ??
+    ''
+  ).trim()
   const apiSecret = (process.env.SHOPIER_API_SECRET ?? '').trim()
   const websiteIndex = (process.env.SHOPIER_WEBSITE_INDEX ?? '1').trim()
 

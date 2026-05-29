@@ -1,28 +1,87 @@
 // Günlük AI mesaj limitleri — tek kaynak, tüm server action'lar ve UI bu fonksiyonu kullanır.
 
+export type LicenseTier = 'free' | 'leader' | 'master' | 'pro'
+
 export interface AILimits {
   messageLimit: number
   roleplayLimit: number
   complianceLimit: number
 }
 
+const TRIAL_DAYS = 7
+
+const PAID_LIMITS: Record<Exclude<LicenseTier, 'free'>, AILimits> = {
+  pro: { messageLimit: 100, roleplayLimit: 60, complianceLimit: 15 },
+  master: { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 },
+  leader: { messageLimit: 15, roleplayLimit: 10, complianceLimit: 2 },
+}
+
+const POST_TRIAL_FREE_LIMITS: AILimits = {
+  messageLimit: 5,
+  roleplayLimit: 3,
+  complianceLimit: 0,
+}
+
+/** 7-day signup trial uses Basic (leader) daily credits while license_type stays `free`. */
+export function isTrialPeriodActive(
+  licenseType: string | null | undefined,
+  licenseExpiresAt: string | null | undefined,
+  workspaceCreatedAt?: string | null
+): boolean {
+  if ((licenseType ?? 'free') !== 'free') return false
+  const now = Date.now()
+  if (licenseExpiresAt) {
+    return new Date(licenseExpiresAt).getTime() > now
+  }
+  if (workspaceCreatedAt) {
+    const trialEnd = new Date(workspaceCreatedAt)
+    trialEnd.setDate(trialEnd.getDate() + TRIAL_DAYS)
+    return trialEnd.getTime() > now
+  }
+  return false
+}
+
+export function getEffectiveLicenseType(
+  licenseType: string | null | undefined,
+  licenseExpiresAt?: string | null,
+  workspaceCreatedAt?: string | null
+): LicenseTier {
+  const type = (licenseType ?? 'free') as LicenseTier
+  if (type !== 'free') return type
+  return isTrialPeriodActive(type, licenseExpiresAt, workspaceCreatedAt) ? 'leader' : 'free'
+}
+
 export function getLimitsForLicense(
   licenseType: string | null | undefined,
-  isSuperAdmin?: boolean
+  isSuperAdmin?: boolean,
+  licenseExpiresAt?: string | null,
+  workspaceCreatedAt?: string | null
 ): AILimits {
   if (isSuperAdmin) {
-    return { messageLimit: Infinity, roleplayLimit: Infinity, complianceLimit: Infinity }
+    return {
+      messageLimit: Infinity,
+      roleplayLimit: Infinity,
+      complianceLimit: Infinity,
+    }
   }
-  switch (licenseType) {
-    case 'pro':
-      return { messageLimit: 100, roleplayLimit: 60, complianceLimit: 20 }
-    case 'master': // Plus Plan
-      return { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 }
-    case 'leader': // Basic Plan
-      return { messageLimit: 15, roleplayLimit: 10, complianceLimit: 2 }
-    case 'free':
-    default:
-      // Free plan — gerçek kısıt, paid plan değerini hissettirmek için
-      return { messageLimit: 5, roleplayLimit: 3, complianceLimit: 0 }
+
+  const effective = getEffectiveLicenseType(licenseType, licenseExpiresAt, workspaceCreatedAt)
+
+  if (effective === 'free') {
+    return POST_TRIAL_FREE_LIMITS
   }
+
+  return PAID_LIMITS[effective]
+}
+
+export function formatCreditButtonLabel(
+  actionLabel: string,
+  remaining: number,
+  limit: number,
+  isSuperAdmin?: boolean
+): string {
+  if (isSuperAdmin || !Number.isFinite(limit)) {
+    return `${actionLabel} (∞)`
+  }
+  return `${actionLabel} (Kalan: ${remaining} / ${limit})`
 }

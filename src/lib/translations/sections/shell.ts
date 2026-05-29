@@ -24,6 +24,11 @@ export const shellSection = {
       view: 'Görüntüle',
       last7DaysTrend: 'Son 7 Gün — Yeni Aday Trendi',
       candidatesLabel: 'aday',
+      upgradeBannerTrialTitle: 'Deneme süreniz aktif — planınızı yükseltin',
+      upgradeBannerTrialDesc: 'Plus veya Pro ile ekibinizi büyütün, daha yüksek günlük YZ kredileri ve uyum denetimi limitlerine geçin.',
+      upgradeBannerExpiredTitle: 'Deneme süreniz sona erdi',
+      upgradeBannerExpiredDesc: 'Basic, Plus veya Pro planlardan birini seçerek tüm özelliklere ve günlük YZ kredilerine devam edin.',
+      upgradeBannerCta: 'Planları Gör & Yükselt',
     },
   },
   en: {
@@ -51,6 +56,11 @@ export const shellSection = {
       view: 'View',
       last7DaysTrend: 'Last 7 Days — New Candidate Trend',
       candidatesLabel: 'candidates',
+      upgradeBannerTrialTitle: 'Your trial is active — upgrade your plan',
+      upgradeBannerTrialDesc: 'Move to Plus or Pro for team tools, higher daily AI credits, and compliance limits.',
+      upgradeBannerExpiredTitle: 'Your trial has ended',
+      upgradeBannerExpiredDesc: 'Choose Basic, Plus, or Pro to continue with full features and daily AI credits.',
+      upgradeBannerCta: 'View Plans & Upgrade',
     },
   },
 } as const

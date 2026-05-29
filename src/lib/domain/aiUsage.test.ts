@@ -1,5 +1,13 @@
 import { describe, it, expect } from 'vitest'
-import { getLimitsForLicense } from './aiUsage'
+import {
+  getEffectiveLicenseType,
+  getLimitsForLicense,
+  isTrialPeriodActive,
+} from './aiUsage'
+
+const future = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+const past = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+const createdRecently = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
 
 describe('getLimitsForLicense', () => {
   it('grants unlimited quota to super admin regardless of license', () => {
@@ -13,7 +21,7 @@ describe('getLimitsForLicense', () => {
     expect(getLimitsForLicense('pro')).toEqual({
       messageLimit: 100,
       roleplayLimit: 60,
-      complianceLimit: 20,
+      complianceLimit: 15,
     })
   })
 
@@ -33,18 +41,31 @@ describe('getLimitsForLicense', () => {
     })
   })
 
-  it('returns free plan limits with compliance gated to 0', () => {
-    expect(getLimitsForLicense('free')).toEqual({
+  it('returns post-trial free limits when trial expired', () => {
+    expect(getLimitsForLicense('free', false, past)).toEqual({
       messageLimit: 5,
       roleplayLimit: 3,
       complianceLimit: 0,
     })
   })
 
-  it('falls back to free limits for unknown / null / undefined license', () => {
-    const free = { messageLimit: 5, roleplayLimit: 3, complianceLimit: 0 }
-    expect(getLimitsForLicense('garbage')).toEqual(free)
-    expect(getLimitsForLicense(null)).toEqual(free)
-    expect(getLimitsForLicense(undefined)).toEqual(free)
+  it('returns basic trial credits while free license is in trial window', () => {
+    expect(getLimitsForLicense('free', false, future)).toEqual({
+      messageLimit: 15,
+      roleplayLimit: 10,
+      complianceLimit: 2,
+    })
+  })
+
+  it('infers trial from workspace created_at when expiry not set', () => {
+    expect(
+      isTrialPeriodActive('free', null, createdRecently)
+    ).toBe(true)
+    expect(getEffectiveLicenseType('free', null, createdRecently)).toBe('leader')
+    expect(getLimitsForLicense('free', false, null, createdRecently)).toEqual({
+      messageLimit: 15,
+      roleplayLimit: 10,
+      complianceLimit: 2,
+    })
   })
 })

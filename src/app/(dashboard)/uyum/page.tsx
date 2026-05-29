@@ -14,7 +14,8 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { useAILimits } from '@/hooks/useAILimits'
+import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 
 const APPROVED_CLAIMS = {
@@ -205,7 +206,11 @@ export default function CompliancePage() {
   const checkedCount = checklist.filter(item => checkedItems[item.id]).length
   const isAllChecked = checkedCount === checklist.length
 
-  const { complianceLimit } = getLimitsForLicense(ws?.licenseType, ws?.isSuperAdmin ?? false)
+  const {
+    limits: { complianceLimit },
+    complianceRemaining,
+    isSuperAdmin: limitsSuperAdmin,
+  } = useAILimits()
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
@@ -276,15 +281,15 @@ export default function CompliancePage() {
                     placeholder={t('compliancePage.auditPlaceholder')}
                     className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
                   />
-                  <div className="flex justify-end items-center gap-4">
-                    {!usage?.isSuperAdmin && usage && (
-                      <span className="text-xs font-semibold text-[var(--text-3)]">
-                        {t('compliancePage.dailyAudits', { count: Math.max(0, 5 - usage.complianceUsed) })}
-                      </span>
-                    )}
+                  <div className="flex justify-end">
                     <button
                       type="submit"
-                      disabled={isAuditing || !inputText.trim()}
+                      disabled={
+                        isAuditing ||
+                        !inputText.trim() ||
+                        (!limitsSuperAdmin && complianceLimit === 0) ||
+                        (!limitsSuperAdmin && complianceRemaining <= 0)
+                      }
                       className="flex items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-5 py-2.5 text-sm font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer"
                     >
                       {isAuditing ? (
@@ -295,7 +300,12 @@ export default function CompliancePage() {
                       ) : (
                         <>
                           <Shield className="h-4 w-4" />
-                          {t('compliancePage.startAiAudit')}
+                          {formatCreditButtonLabel(
+                            t('compliancePage.startAiAudit'),
+                            complianceRemaining,
+                            complianceLimit,
+                            limitsSuperAdmin
+                          )}
                         </>
                       )}
                     </button>

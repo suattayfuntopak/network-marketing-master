@@ -3,7 +3,7 @@
 // block previously duplicated across 7+ action files.
 
 import { createClient } from '@/lib/supabase/server'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { getEffectiveLicenseType, getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/auth'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'
@@ -59,21 +59,35 @@ export async function checkAIQuota(
     .maybeSingle()
 
   let licenseType = 'free'
+  let licenseExpiresAt: string | null = null
+  let workspaceCreatedAt: string | null = null
   if (membership) {
     const { data: ws } = await supabase
       .from('nmm_workspaces')
-      .select('license_type, license_expires_at')
+      .select('license_type, license_expires_at, created_at')
       .eq('id', membership.workspace_id)
       .maybeSingle()
     if (ws) {
-      const isExpired = ws.license_expires_at
-        ? new Date(ws.license_expires_at) < new Date()
-        : false
-      licenseType = isExpired ? 'free' : (ws.license_type ?? 'free')
+      licenseType = ws.license_type ?? 'free'
+      licenseExpiresAt = ws.license_expires_at ?? null
+      workspaceCreatedAt = ws.created_at ?? null
+      if (licenseType !== 'free' && licenseExpiresAt && new Date(licenseExpiresAt) < new Date()) {
+        licenseType = 'free'
+      }
     }
   }
 
-  const limits = getLimitsForLicense(licenseType, superAdmin)
+  const effectiveLicense = getEffectiveLicenseType(
+    licenseType,
+    licenseExpiresAt,
+    workspaceCreatedAt
+  )
+  const limits = getLimitsForLicense(
+    licenseType,
+    superAdmin,
+    licenseExpiresAt,
+    workspaceCreatedAt
+  )
   const limit =
     actionType === 'roleplay' ? limits.roleplayLimit
     : actionType === 'compliance' ? limits.complianceLimit
@@ -138,7 +152,7 @@ export async function checkAIQuota(
     user: { id: user.id, email: user.email ?? null },
     isSuperAdmin: superAdmin,
     workspaceId: membership?.workspace_id ?? null,
-    licenseType,
+    licenseType: effectiveLicense,
     limit,
     used,
     remaining: superAdmin ? Infinity : limit - used - 1,

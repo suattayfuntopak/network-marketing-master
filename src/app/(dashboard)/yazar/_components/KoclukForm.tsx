@@ -4,14 +4,14 @@ import { useActionState, useState, useRef, useEffect } from 'react'
 import { Copy, Loader2, Bot, HelpCircle, Check, Send } from 'lucide-react'
 import { clsx } from 'clsx'
 import { askCoachAction, translateTextAction } from '../actions'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { useAILimits } from '@/hooks/useAILimits'
+import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 
 export function KoclukForm() {
   const { t, lang } = useTranslation()
@@ -24,13 +24,10 @@ export function KoclukForm() {
   const [generatedLang, setGeneratedLang] = useState<'tr' | 'en'>(lang)
   const [translating, setTranslating] = useState(false)
 
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
-  const used = usage?.messageUsed ?? 0
-  const messageLimit = getLimitsForLicense(ws?.licenseType).messageLimit
-  const remaining = Math.max(0, messageLimit - used)
+  const { limits, isSuperAdmin, messageRemaining: remaining } = useAILimits()
+  const messageLimit = limits.messageLimit
   const limitReached = !isSuperAdmin && remaining <= 0
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
@@ -92,27 +89,16 @@ export function KoclukForm() {
 
   return (
     <div className="space-y-6 w-full animate-in fade-in duration-300">
-      {/* Limit & Bilgilendirme Kartı */}
-      <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[#EEF2FF]/60 dark:bg-[#1e1b4b]/40 p-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E0E7FF] dark:bg-[#2e2a75]">
-            <HelpCircle className="h-4 w-4 text-[#3730A3] dark:text-[#c7d2fe]" />
-          </div>
-          <div>
-            <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-              {t('coachUi.askYourCoachTitle')}
-            </p>
-            <p className="text-[11px] text-[#3730A3]/70 dark:text-[#c7d2fe]/70 mt-0.5 font-medium">
-              {t('coachUi.askYourCoachDesc')}
-            </p>
-          </div>
+      <div className="rounded-2xl border border-[#EEF2FF] dark:border-[#1e1b4b] bg-[#EEF2FF]/60 dark:bg-[#1e1b4b]/40 p-4 flex items-center gap-3">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#E0E7FF] dark:bg-[#2e2a75]">
+          <HelpCircle className="h-4 w-4 text-[#3730A3] dark:text-[#c7d2fe]" />
         </div>
-        <div className="shrink-0 text-right">
+        <div>
           <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-            {isSuperAdmin ? t('coachUi.unlimited') : `${remaining} / ${messageLimit}`}
+            {t('coachUi.askYourCoachTitle')}
           </p>
-          <p className="text-[9px] text-[#3730A3]/60 dark:text-[#c7d2fe]/60 font-semibold uppercase tracking-wider">
-            {t('coachUi.dailyQuota')}
+          <p className="text-[11px] text-[#3730A3]/70 dark:text-[#c7d2fe]/70 mt-0.5 font-medium">
+            {t('coachUi.askYourCoachDesc')}
           </p>
         </div>
       </div>
@@ -161,9 +147,14 @@ export function KoclukForm() {
             <>
               <Send className="h-4 w-4" />
               <span>
-                {limitReached 
+                {limitReached
                   ? t('coachUi.dailyLimitReached')
-                  : t('coachUi.askCoach')}
+                  : formatCreditButtonLabel(
+                      t('coachUi.askCoach'),
+                      remaining,
+                      messageLimit,
+                      isSuperAdmin
+                    )}
               </span>
             </>
           )}

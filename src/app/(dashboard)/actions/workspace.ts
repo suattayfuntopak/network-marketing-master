@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin, resolveWorkspaceLicense } from '@/lib/auth'
+import { getEffectiveLicenseType, isTrialPeriodActive } from '@/lib/domain/aiUsage'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
 function generateInviteCode(): string {
@@ -32,11 +33,16 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
 
   const { data: ws } = await supabase
     .from('nmm_workspaces')
-    .select('invite_code, license_type, license_expires_at, parent_id')
+    .select('invite_code, license_type, license_expires_at, parent_id, created_at')
     .eq('id', membership.workspace_id)
     .single()
 
   const license = resolveWorkspaceLicense(user, ws)
+  const effectiveLicenseType = getEffectiveLicenseType(
+    license.licenseType,
+    license.licenseExpiresAt,
+    ws?.created_at
+  )
 
   return {
     userId: user.id,
@@ -46,7 +52,14 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
     fullName: membership.full_name,
     avatarUrl,
     licenseType: license.licenseType,
+    effectiveLicenseType,
     licenseExpiresAt: license.licenseExpiresAt,
+    workspaceCreatedAt: ws?.created_at ?? null,
+    isTrialActive: isTrialPeriodActive(
+      license.licenseType,
+      license.licenseExpiresAt,
+      ws?.created_at
+    ),
     isSuperAdmin: admin,
     hasUpline: !!ws?.parent_id,
   }
@@ -66,10 +79,19 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
   const admin = isSuperAdmin(user)
 
+  const trialExpires = new Date()
+  trialExpires.setDate(trialExpires.getDate() + 7)
+
   const { data: ws, error: wsError } = await supabase
     .from('nmm_workspaces')
-    .insert({ name: `${fullName}'in Ekibi`, owner_id: user.id, invite_code: inviteCode })
-    .select('id, invite_code')
+    .insert({
+      name: `${fullName}'in Ekibi`,
+      owner_id: user.id,
+      invite_code: inviteCode,
+      license_type: 'free',
+      license_expires_at: trialExpires.toISOString(),
+    })
+    .select('id, invite_code, created_at, license_expires_at')
     .single()
 
   if (wsError || !ws) {
@@ -88,7 +110,15 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
   }
 
-  const license = resolveWorkspaceLicense(user, { license_type: 'free', license_expires_at: null })
+  const license = resolveWorkspaceLicense(user, {
+    license_type: 'free',
+    license_expires_at: ws.license_expires_at,
+  })
+  const effectiveLicenseType = getEffectiveLicenseType(
+    license.licenseType,
+    license.licenseExpiresAt,
+    ws.created_at
+  )
 
   return {
     userId: user.id,
@@ -98,7 +128,10 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     fullName,
     avatarUrl,
     licenseType: license.licenseType,
+    effectiveLicenseType,
     licenseExpiresAt: license.licenseExpiresAt,
+    workspaceCreatedAt: ws.created_at ?? null,
+    isTrialActive: true,
     isSuperAdmin: admin,
     hasUpline: false,
   }

@@ -112,7 +112,12 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
       const authUser = userMap.get(owner.userId)
       const member = memberByUser.get(owner.userId)
       const usage = usageByUser.get(owner.userId) ?? { message: 0, roleplay: 0, compliance: 0 }
-      const limits = getLimitsForLicense(owner.licenseType)
+      const limits = getLimitsForLicense(
+        owner.licenseType,
+        false,
+        owner.licenseExpiresAt,
+        owner.registeredAt
+      )
 
       const email = authUser?.email ?? '—'
       const fullName =

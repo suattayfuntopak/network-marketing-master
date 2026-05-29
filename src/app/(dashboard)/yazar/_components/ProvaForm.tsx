@@ -9,7 +9,7 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateRoleplayResponseAction } from '../actions'
 import { toast } from 'sonner'
-import { useAIUsage } from '@/hooks/useAIUsage'
+import { useAILimits } from '@/hooks/useAILimits'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
@@ -262,12 +262,10 @@ export function ProvaForm() {
   const [isPending, setIsPending] = useState(false)
   const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
 
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
-  const roleplayUsed = usage?.roleplayUsed ?? 0
-  const remaining = Math.max(0, 20 - roleplayUsed)
+  const { isSuperAdmin, roleplayRemaining: remaining, limits } = useAILimits()
+  const roleplayLimit = limits.roleplayLimit
 
   const chatEndRef = useRef<HTMLDivElement>(null)
 
@@ -509,11 +507,6 @@ export function ProvaForm() {
         </form>
 
         {/* Usage notification */}
-        {!isSuperAdmin && usage && (
-          <p className="mt-2 text-center text-[10px] font-semibold text-[var(--text-3)] animate-pulse">
-            {t('coachUi.remainingCredits', { remaining })}
-          </p>
-        )}
       </div>
     )
   }
@@ -530,9 +523,9 @@ export function ProvaForm() {
         <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed max-w-md mx-auto">
           {t('coachUi.introDesc')}
         </p>
-        {!isSuperAdmin && usage && (
-          <p className="mt-2.5 text-xs font-bold text-[var(--text-3)] animate-pulse">
-            {t('coachUi.dailyRoleplayQuota', { remaining })}
+        {!isSuperAdmin && (
+          <p className="mt-2.5 text-xs font-bold text-[var(--text-3)]">
+            {t('coachUi.dailyRoleplayQuota', { remaining, limit: roleplayLimit })}
           </p>
         )}
       </div>

@@ -1,5 +1,33 @@
 # Hot Log
 
+## 2026-05-29 — Deneme kredileri, OSB webhook, UI kredi butonları, yükseltme banner
+
+### 7 günlük ücretsiz deneme = Basic günlük krediler (15 / 10 / 2)
+- `aiUsage.ts`: `isTrialPeriodActive`, `getEffectiveLicenseType`, deneme bitince 5/3/0
+- Yeni kayıt: `ensureWorkspaceAction` → `license_expires_at` +7 gün
+- Mevcut kullanıcılar: `created_at` + 7 gün yedek; migration `026_free_trial_expires_backfill.sql`
+- `checkAIQuota`, `useAILimits`, İstatistikler + süper admin dış kayıt masası senkron
+
+### UI
+- Kredi sayacı aksiyon butonlarında: YZ Mesajı, Koçluk, Uyum Denetimi (`formatCreditButtonLabel`)
+- `UpgradePlanBanner` → `/odeme` (ücretsiz/deneme kullanıcıları)
+- Landing/ödeme metinleri: YZ Mesajı / Saha Provası / Uyum Denetimi Kredisi
+- İstatistikler kota etiketleri landing ile hizalı
+
+### Shopier
+- OSB: `res` + `hash` HMAC (`shopierOsb.ts`), route hem OSB hem legacy callback
+- OSB yanıtı düz metin `success` zorunlu
+- **Panel:** Bildirim URL tam olmalı: `https://nmm.suattayfuntopak.com/api/payment/shopier` (…/shop değil)
+- **501 checkout:** Vercel’de `SHOPIER_API_KEY` + `SHOPIER_API_SECRET` = panel OSB kullanıcı adı/şifre; `SHOPIER_WEBSITE_INDEX` mağaza sırası
+
+### Council
+- **#6 landing extract:** ✅ (önceki commit)
+- **#7 test coverage:** `aiUsage`, `checkQuota` (deneme), `shopierOsb` testleri eklendi
+
+**Deploy:** migration 026 Supabase’e uygula; Vercel env + Shopier OSB URL doğrula.
+
+---
+
 ## 2026-05-29 — Shopier 501 (v2) + Council #6 landing tamamlandı
 
 ### Shopier 501 — kök neden ve düzeltme

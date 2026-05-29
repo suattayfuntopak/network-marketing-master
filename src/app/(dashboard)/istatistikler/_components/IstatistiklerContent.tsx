@@ -29,7 +29,12 @@ export function IstatistiklerContent() {
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()
   const { data: members = [], isLoading: membersLoading } = useTeamMembers(ws?.workspaceId)
-  const { messageLimit, roleplayLimit, complianceLimit } = getLimitsForLicense(ws?.licenseType)
+  const { messageLimit, roleplayLimit, complianceLimit } = getLimitsForLicense(
+    ws?.licenseType,
+    ws?.isSuperAdmin,
+    ws?.licenseExpiresAt,
+    ws?.workspaceCreatedAt
+  )
   const { data: independentUsage = [], isLoading: independentLoading } = useQuery({
     queryKey: ['independent-ai-usage'],
     queryFn: getIndependentSignupAIUsageAction,

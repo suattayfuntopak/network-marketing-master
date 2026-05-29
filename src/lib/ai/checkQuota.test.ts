@@ -11,7 +11,11 @@ import { isSuperAdmin } from '@/lib/auth'
 interface MockState {
   user: { id: string; email: string | null } | null
   membership: { workspace_id: string } | null
-  workspace: { license_type: string | null; license_expires_at: string | null } | null
+  workspace: {
+    license_type: string | null
+    license_expires_at: string | null
+    created_at?: string | null
+  } | null
   dailyCount: number
 }
 
@@ -76,8 +80,18 @@ describe('checkAIQuota', () => {
     }
   })
 
-  it('gates compliance behind paid plans for free users', async () => {
+  it('allows compliance during active free trial', async () => {
     setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: future }, dailyCount: 0 })
+    const res = await checkAIQuota('compliance')
+    expect(res.ok).toBe(true)
+    if (res.ok) {
+      expect(res.licenseType).toBe('leader')
+      expect(res.limit).toBe(2)
+    }
+  })
+
+  it('gates compliance after trial ends', async () => {
+    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: past }, dailyCount: 0 })
     const res = await checkAIQuota('compliance')
     expect(res.ok).toBe(false)
     if (!res.ok) expect(res.reason).toBe('feature_unavailable')
@@ -91,9 +105,18 @@ describe('checkAIQuota', () => {
     if (!res.ok) expect(res.reason).toBe('feature_unavailable')
   })
 
-  it('returns limit_reached when daily usage meets the limit', async () => {
-    // free message limit is 5
-    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: future }, dailyCount: 5 })
+  it('returns limit_reached when daily usage meets the trial limit', async () => {
+    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: future }, dailyCount: 15 })
+    const res = await checkAIQuota('message')
+    expect(res.ok).toBe(false)
+    if (!res.ok) {
+      expect(res.reason).toBe('limit_reached')
+      expect(res.limit).toBe(15)
+    }
+  })
+
+  it('returns post-trial free message limit when trial expired', async () => {
+    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: past }, dailyCount: 5 })
     const res = await checkAIQuota('message')
     expect(res.ok).toBe(false)
     if (!res.ok) {

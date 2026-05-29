@@ -12,7 +12,11 @@ export interface WorkspaceContext {
   fullName: string | null
   avatarUrl: string | null
   licenseType: 'free' | 'leader' | 'master' | 'pro'
+  /** Basic trial credits while license_type is free and trial window active */
+  effectiveLicenseType: 'free' | 'leader' | 'master' | 'pro'
   licenseExpiresAt: string | null
+  workspaceCreatedAt: string | null
+  isTrialActive: boolean
   isSuperAdmin: boolean
   /** true when this user's workspace is linked to an upline sponsor */
   hasUpline: boolean

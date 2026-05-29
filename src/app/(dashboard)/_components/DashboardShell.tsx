@@ -7,6 +7,7 @@ import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
+import { UpgradePlanBanner } from './UpgradePlanBanner'
 
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
@@ -151,6 +152,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Spacer to clear the fixed h-16 Header */}
         <div className="h-16" />
         <div className="mx-auto max-w-[1360px] w-full">
+          <UpgradePlanBanner />
           {children}
         </div>
       </div>
