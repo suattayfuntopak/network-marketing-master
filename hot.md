@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-05-30 — Varsayılan WhatsApp sunum şablonu ([Firma İsmi])
+
+- `defaultWhatsappTemplate`: Merhaba {name}, + [Firma İsmi] metni (yeni materyal formu + süper admin fallback)
+- Migration **031**: DB’de hâlâ eski fabrika varsayılanı olan kayıtlar güncellenir; özelleştirilmiş şablonlara dokunulmaz
+
+**Deploy:** Supabase’de `031_presentation_template_default.sql` uygula.
+
+---
+
 ## 2026-05-30 — Sunum materyali boş uyarı metni kısaltıldı
 
 - Aday detay: yalnızca **"Önce sunum materyali ekleyin!"** (alt açıklama kaldırıldı)

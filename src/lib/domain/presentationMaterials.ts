@@ -4,6 +4,28 @@ export const SUPER_ADMIN_GREENLEAF_URL = 'https://www.suattayfuntopak.com/greenl
 
 export const FALLBACK_MATERIAL_ID = '__greenleaf_fallback__'
 
+/** Factory-default WhatsApp template (TR). Kept in sync with migration 031 backfill. */
+export const DEFAULT_WHATSAPP_TEMPLATE_TR = `Merhaba {name},
+
+[Firma İsmi]'in global vizyonunu, ürün ekosistemini ve sunduğu harika iş fırsatını detaylıca inceleyebileceğiniz bağlantıyı aşağıda sizinle paylaşıyorum:
+
+{url}
+
+Merak ettiğiniz noktalar veya üzerine konuşmak istediğiniz detaylar olursa, bana dilediğiniz zaman ulaşabilirsiniz.
+
+Görüşmek dileğiyle.`
+
+/** Factory-default WhatsApp template (EN). Kept in sync with migration 031 backfill. */
+export const DEFAULT_WHATSAPP_TEMPLATE_EN = `Hi {name},
+
+Below you can explore [Company Name]'s global vision, product ecosystem and the great business opportunity it offers:
+
+{url}
+
+If you have questions or details you'd like to discuss, feel free to reach me anytime.
+
+Best regards.`
+
 export interface PresentationMaterial {
   id: string
   workspace_id: string
@@ -17,17 +39,7 @@ export interface PresentationMaterial {
 }
 
 export function defaultWhatsappTemplate(lang: 'tr' | 'en'): string {
-  return lang === 'en'
-    ? 'Hi {name}, you can view my presentation here:\n\n{url}\n\nQuestions? Reach out to {sender}.'
-    : `Merhaba {name} Bey / Hanım,
-
-Greenleaf'in global vizyonunu, ürün ekosistemini ve sunduğu harika iş fırsatını detaylıca inceleyebileceğiniz bağlantıyı aşağıda sizinle paylaşıyorum:
-
-{url}
-
-Merak ettiğiniz noktalar veya üzerine konuşmak istediğiniz detaylar olursa, bana dilediğiniz zaman ulaşabilirsiniz.
-
-Görüşmek dileğiyle.`
+  return lang === 'en' ? DEFAULT_WHATSAPP_TEMPLATE_EN : DEFAULT_WHATSAPP_TEMPLATE_TR
 }
 
 export function renderPresentationMessage(
