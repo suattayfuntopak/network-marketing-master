@@ -31,33 +31,43 @@ export function OdemeClient() {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
 
-  const handlePayment = (plan: 'leader' | 'master' | 'pro') => {
+  const handlePayment = async (plan: 'leader' | 'master' | 'pro') => {
+    setLoading(true)
+    setSelectedPlan(plan)
+    toast.info(t('paymentPage.preparingCheckout'))
+
     try {
-      setLoading(true)
-      setSelectedPlan(plan)
-      toast.info(t('paymentPage.preparingCheckout'))
+      const body = new FormData()
+      body.set('plan', plan)
+      body.set('period', billingPeriod)
 
-      const form = document.createElement('form')
-      form.method = 'POST'
-      form.action = '/odeme/launch'
-      form.style.display = 'none'
+      const res = await fetch('/odeme/launch', {
+        method: 'POST',
+        body,
+        credentials: 'include',
+      })
 
-      const planInput = document.createElement('input')
-      planInput.type = 'hidden'
-      planInput.name = 'plan'
-      planInput.value = plan
-      form.appendChild(planInput)
+      const contentType = res.headers.get('content-type') ?? ''
 
-      const periodInput = document.createElement('input')
-      periodInput.type = 'hidden'
-      periodInput.name = 'period'
-      periodInput.value = billingPeriod
-      form.appendChild(periodInput)
+      const bodyText = await res.text()
 
-      document.body.appendChild(form)
-      form.submit()
+      if (!res.ok || !contentType.includes('text/html')) {
+        let message = t('paymentPage.unknownError')
+        try {
+          const data = JSON.parse(bodyText) as { error?: string }
+          if (data.error) message = data.error
+        } catch {
+          if (bodyText) message = bodyText.slice(0, 200)
+        }
+        throw new Error(message)
+      }
+
+      const html = bodyText
+      document.open()
+      document.write(html)
+      document.close()
     } catch (err: unknown) {
-      console.error('[OdemeClient] error initiating payment:', err)
+      console.error('[OdemeClient] checkout launch failed:', err)
       toast.error(
         t('paymentPage.checkoutError', {
           message: err instanceof Error ? err.message : t('paymentPage.unknownError'),
@@ -445,10 +455,6 @@ export function OdemeClient() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
                 <span>{t('paymentPage.proFeature6')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
-                <span>{t('paymentPage.proFeature7')}</span>
               </li>
             </ul>
           </div>

@@ -3,6 +3,11 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { serverError } from '@/lib/utils/serverError'
+
+function toLang(lang: string): 'tr' | 'en' {
+  return lang === 'en' ? 'en' : 'tr'
+}
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -63,11 +68,12 @@ export async function generateRoleplayResponseAction(
   userReply: string,
   lang: string
 ): Promise<RoleplayResponseState> {
+  const l = toLang(lang)
   if (!process.env.GEMINI_API_KEY) {
-    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+    return { error: serverError('geminiMissing', l) }
   }
 
-  const quota = await checkAIQuota('roleplay', { lang: lang === 'en' ? 'en' : 'tr' })
+  const quota = await checkAIQuota('roleplay', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   // Construct message history string
@@ -168,7 +174,11 @@ JSON yapısı şu şekilde olmalıdır:
     }
   } catch (err: any) {
     console.error('YZK Simülasyon Hatası:', err)
-    return { error: (lang === 'en' ? 'Simulation failed: ' : 'Simülasyon yanıtı oluşturulamadı: ') + (err?.message || String(err)) }
+    return {
+      error: serverError('simulationFailed', l, {
+        detail: err?.message || String(err),
+      }),
+    }
   }
 }
 
@@ -185,13 +195,14 @@ export async function askCoachAction(
   const question = (formData.get('question') as string | null)?.trim() ?? ''
   const lang     = (formData.get('lang')     as string | null)?.trim() ?? 'tr'
 
+  const l = toLang(lang)
   if (!process.env.GEMINI_API_KEY) {
-    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+    return { error: serverError('geminiMissing', l) }
   }
 
-  if (!question) return { error: 'Lütfen bir soru yazın.' }
+  if (!question) return { error: l === 'en' ? 'Please enter a question.' : 'Lütfen bir soru yazın.' }
 
-  const quota = await checkAIQuota('message', { lang: lang === 'en' ? 'en' : 'tr' })
+  const quota = await checkAIQuota('message', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   const systemPrompt = `Sen bir Network Marketing Uzmanı ve Lider Gelişim Koçusun (Yapay Zeka Koçu).

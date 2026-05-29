@@ -1,6 +1,11 @@
 'use server'
 
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { serverError } from '@/lib/utils/serverError'
+
+function toLang(lang: string): 'tr' | 'en' {
+  return lang === 'en' ? 'en' : 'tr'
+}
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
@@ -18,15 +23,16 @@ export async function auditComplianceMessageAction(
   textToAudit: string,
   lang: string
 ): Promise<ComplianceAuditState> {
+  const l = toLang(lang)
   if (!process.env.GEMINI_API_KEY) {
-    return { error: lang === 'en' ? 'GEMINI_API_KEY is missing! Please add GEMINI_API_KEY=your_key to your .env.local file and restart Next.js server.' : 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+    return { error: serverError('geminiMissing', l) }
   }
 
   if (!textToAudit.trim()) {
-    return { error: lang === 'en' ? 'Please enter a message to audit.' : 'Lütfen denetlenecek bir metin girin.' }
+    return { error: serverError('auditInputRequired', l) }
   }
 
-  const quota = await checkAIQuota('compliance', { lang: lang === 'en' ? 'en' : 'tr' })
+  const quota = await checkAIQuota('compliance', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   const systemPrompt = `Sen bir Network Marketing ve Doğrudan Satış yasal mevzuat uyum denetleyicisisin (Compliance Officer).
@@ -142,8 +148,8 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
     }
   } catch (err: any) {
     console.error('Uyum Denetimi Hatası:', err)
-    return { 
-      error: (lang === 'en' ? 'Audit failed: ' : 'Metin denetlenirken hata oluştu: ') + (err?.message || String(err))
+    return {
+      error: serverError('auditFailed', l, { detail: err?.message || String(err) }),
     }
   }
 }

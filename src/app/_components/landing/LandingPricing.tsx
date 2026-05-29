@@ -279,11 +279,7 @@ export function LandingPricing() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{t('landingPage.planProFeat6')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span>{t('landingPage.planProFeat7', { count: PRO_LIMITS.complianceLimit })}</span>
+                <span>{t('landingPage.planProFeat6', { count: PRO_LIMITS.complianceLimit })}</span>
               </li>
             </ul>
           </div>

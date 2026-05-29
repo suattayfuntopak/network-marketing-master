@@ -1,0 +1,23 @@
+# Vercel Hobby'de cron yok — günlük trial/lisans e-postaları buradan tetiklenir.
+name: NMM scheduled emails
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # 09:00 TR (UTC+3 yaz saati yaklaşık)
+  workflow_dispatch:
+
+jobs:
+  trial-and-license-emails:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trial lifecycle emails
+        run: |
+          curl -fsS -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.NMM_APP_URL }}/api/cron/trial-emails"
+
+      - name: Paid license renewal reminders
+        run: |
+          curl -fsS -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.NMM_APP_URL }}/api/cron/license-reminder"

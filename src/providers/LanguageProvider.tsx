@@ -12,6 +12,7 @@ import { statsSection } from '@/lib/translations/sections/stats'
 import { paymentSection } from '@/lib/translations/sections/payment'
 import { coachSection } from '@/lib/translations/sections/coach'
 import { pagesSection } from '@/lib/translations/sections/pages'
+import { errorsSection } from '@/lib/translations/sections/errors'
 
 type LangType = 'tr' | 'en'
 
@@ -33,6 +34,7 @@ const sections = [
   paymentSection,
   coachSection,
   pagesSection,
+  errorsSection,
 ]
 
 type TranslationNamespace = Record<string, string>

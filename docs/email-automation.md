@@ -85,3 +85,14 @@ Shopier ödeme sonrası zaten `sendPaymentSuccessEmail` var.
 Şablonlar: `src/lib/infra/emailTemplate.ts`, `trialEmails.ts` — karanlık tema ve harici resim yok.
 
 n8n uyarlaması: [`n8n-nmm-adaptation.md`](./n8n-nmm-adaptation.md)
+
+## Vercel Hobby — cron ücretsiz alternatif
+
+Vercel **ücretsiz (Hobby)** planda “her gün saat 09:00’da şu URL’yi çağır” özelliği yok. Bu yüzden repoda **GitHub Actions** workflow var: `.github/workflows/cron-emails.yml`
+
+GitHub → repo **Settings → Secrets → Actions**:
+
+- `CRON_SECRET` — Vercel’deki ile aynı gizli anahtar
+- `NMM_APP_URL` — `https://nmm.suattayfuntopak.com`
+
+Kurulumdan sonra **Actions** sekmesinden workflow’u manuel çalıştırarak test edin. Ek ücret: GitHub public repo’da Actions kotası genelde yeterlidir.

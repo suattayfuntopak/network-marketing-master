@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-05-29 — Dil bayrağı, Pro plan metni, dış kayıt YZ, Shopier UX, GitHub cron
+
+### UX / ürün
+- Header: tek bayrak (TR iken 🇹🇷 → EN; EN iken 🇺🇸 → TR)
+- Pro plan: Süper Admin satırı kaldırıldı; Alt Ekip Koçu açıklaması güncellendi
+- İstatistikler: Ekip YZ masası gerçek plan limitleri; dış kayıt tablosu tüm `free` workspace’ler (Focus Team hariç)
+
+### Shopier
+- Ödeme: `fetch` + HTML redirect (milisaniyelik JSON hatası giderildi)
+- Launch log: `buyer_id_nr`, `signature_len`
+- 501: Shopier secret/panel — kod tarafı; destek yanıtı bekleniyor
+
+### Council E + cron
+- `serverError` + yazar/uyum actions i18n
+- E-posta cron: GitHub Actions (Vercel Hobby uyumlu); `vercel.json` crons kaldırıldı
+
+**Deploy:** GitHub secrets `CRON_SECRET`, `NMM_APP_URL`
+
+---
+
 ## 2026-05-29 — Council E/G/H + trial e-posta (15 gün dahil)
 
 ### E-posta (açık tema, resimsiz)

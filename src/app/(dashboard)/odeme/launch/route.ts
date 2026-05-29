@@ -35,6 +35,8 @@ export async function POST(request: NextRequest) {
       platform_order_id: checkoutForm.platform_order_id,
       total_order_value: checkoutForm.total_order_value,
       website_index: checkoutForm.website_index,
+      buyer_id_nr: checkoutForm.buyer_id_nr,
+      signature_len: checkoutForm.signature?.length ?? 0,
     })
     const html = buildShopierLaunchHtml(checkoutForm)
 

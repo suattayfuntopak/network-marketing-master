@@ -51,8 +51,16 @@ export async function createShopierPaymentSession(
   const platformOrderId = buildShopierPlatformOrderId(workspaceId, plan, period)
   const randomNr = Math.floor(100000 + Math.random() * 900000).toString()
 
-  const fullName = membership.full_name || user.user_metadata?.full_name || 'Degerli Lider'
-  const nameParts = fullName.trim().split(/\s+/)
+  const ascii = (s: string) =>
+    s
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^A-Za-z0-9\s]/g, '')
+      .trim()
+
+  const fullName =
+    ascii(membership.full_name || (user.user_metadata?.full_name as string) || '') || 'Degerli Lider'
+  const nameParts = fullName.split(/\s+/).filter(Boolean)
   const buyerName = nameParts[0] || 'Degerli'
   const buyerSurname = nameParts.slice(1).join(' ') || 'Lider'
   const buyerEmail = user.email || 'nmm_buyer@example.com'

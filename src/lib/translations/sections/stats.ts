@@ -69,7 +69,8 @@ export const statsSection = {
       unlimited: 'Sınırsız',
 
       aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
-      aiIndependentSubtitle: 'Platforma bağımsız kayıt olan liderlerin (üst lider olmadan) bugünkü yapay zeka kullanımı ve plan limitleri.',
+      aiIndependentSubtitle:
+        'Focus Team dışında, ücretsiz deneme (free) ile kayıt olan liderlerin bugünkü YZ kullanımı ve plan limitleri — örn. dış kayıt test kullanıcıları.',
       aiIndependentEmpty: 'Henüz bağımsız dış kayıt bulunmuyor.',
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',

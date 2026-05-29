@@ -30,50 +30,51 @@ export interface IndependentAIUsageRow {
 }
 
 /**
- * Super-admin only: independent signups (no upline / parent_id) and their today's AI usage.
+ * Super-admin only: dış kayıt / ücretsiz deneme liderleri (Focus Team dışındaki free workspace'ler).
  */
 export async function getIndependentSignupAIUsageAction(): Promise<IndependentAIUsageRow[]> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
 
+  const { data: myMembership } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user!.id)
+    .eq('role', 'leader')
+    .maybeSingle()
+
+  const excludeWorkspaceId = myMembership?.workspace_id ?? null
+
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
-    .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
-    .is('parent_id', null)
-    .order('created_at', { ascending: true })
+    .select('id, owner_id, license_type, license_expires_at, created_at')
+    .eq('license_type', 'free')
+    .order('created_at', { ascending: false })
 
   if (wsError || !workspaces) {
-    throw new Error('Bağımsız kayıtlar okunamadı.')
+    throw new Error('Dış kayıt listesi okunamadı.')
   }
 
-  const seenOwners = new Set<string>()
-  const independentOwners: Array<{
-    userId: string
-    licenseType: string
-    licenseExpiresAt: string | null
-    registeredAt: string
-  }> = []
-
-  for (const ws of workspaces) {
-    if (!ws.owner_id || ws.owner_id === user.id) continue
-    if (seenOwners.has(ws.owner_id)) continue
-    seenOwners.add(ws.owner_id)
-    independentOwners.push({
-      userId: ws.owner_id,
+  const independentOwners = workspaces
+    .filter(ws => ws.id !== excludeWorkspaceId && ws.owner_id && ws.owner_id !== user!.id)
+    .map(ws => ({
+      userId: ws.owner_id!,
       licenseType: ws.license_type ?? 'free',
       licenseExpiresAt: ws.license_expires_at ?? null,
       registeredAt: ws.created_at,
-    })
-  }
+    }))
 
   if (independentOwners.length === 0) return []
 
   const ownerIds = independentOwners.map(o => o.userId)
 
-  const { data: { users = [] } } = await admin.auth.admin.listUsers()
+  const { data: listData } = await admin.auth.admin.listUsers({ perPage: 200 })
+  const users = listData?.users ?? []
   const userMap = new Map(users.map(u => [u.id, u]))
 
   const { data: memberRows } = await admin
@@ -81,9 +82,7 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
     .select('user_id, full_name, avatar_url')
     .in('user_id', ownerIds)
 
-  const memberByUser = new Map(
-    (memberRows ?? []).map(m => [m.user_id, m])
-  )
+  const memberByUser = new Map((memberRows ?? []).map(m => [m.user_id, m]))
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)

@@ -29,12 +29,13 @@ export function IstatistiklerContent() {
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()
   const { data: members = [], isLoading: membersLoading } = useTeamMembers(ws?.workspaceId)
-  const { messageLimit, roleplayLimit, complianceLimit } = getLimitsForLicense(
+  const teamLimits = getLimitsForLicense(
     ws?.licenseType,
     ws?.isSuperAdmin,
     ws?.licenseExpiresAt,
     ws?.workspaceCreatedAt
   )
+  const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
   const { data: independentUsage = [], isLoading: independentLoading } = useQuery({
     queryKey: ['independent-ai-usage'],
     queryFn: getIndependentSignupAIUsageAction,
@@ -717,27 +718,21 @@ export function IstatistiklerContent() {
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                            {isLeader ? (
-                              t('statsPage.unlimited')
-                            ) : (
-                              `${m.today_message ?? 0} / 25`
-                            )}
+                            {isLeader
+                              ? t('statsPage.unlimited')
+                              : formatUsageLimit(m.today_message ?? 0, teamLimits.messageLimit)}
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                            {isLeader ? (
-                              t('statsPage.unlimited')
-                            ) : (
-                              `${m.today_roleplay ?? 0} / 20`
-                            )}
+                            {isLeader
+                              ? t('statsPage.unlimited')
+                              : formatUsageLimit(m.today_roleplay ?? 0, teamLimits.roleplayLimit)}
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                            {isLeader ? (
-                              t('statsPage.unlimited')
-                            ) : (
-                              `${m.today_compliance ?? 0} / 5`
-                            )}
+                            {isLeader
+                              ? t('statsPage.unlimited')
+                              : formatUsageLimit(m.today_compliance ?? 0, teamLimits.complianceLimit)}
                           </td>
                         </tr>
                       )
