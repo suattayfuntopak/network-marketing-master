@@ -35,10 +35,10 @@ export const coachSection = {
       mentorshipAdvice: 'Liderlik Tavsiyesi:',
       analyzingMessage: 'Koçunuz yazınızı analiz ediyor ve hazırlanıyor...',
       practiceInputPlaceholder: 'Pratik yanıtını buraya yaz...',
-      remainingCredits: 'Kalan Günlük Simülasyon Krediniz: {remaining} / 20',
+      remainingCredits: 'Günlük simülasyon kullanımı: {used} / {limit}',
       selectScenarioTitle: 'Senaryo seç, prova başlasın!',
       introDesc: 'YZ aday veya yeni ortak rolüne girer; distribütörü zorlayan gerçekçi itirazlar sunar. Yazdığınız her yanıttan sonra net YZK notu ve puan kazanırsınız.',
-      dailyRoleplayQuota: 'Kalan Günlük Simülasyon Krediniz: {remaining} / {limit}',
+      dailyRoleplayQuota: 'Günlük simülasyon kullanımı: {used} / {limit}',
       simulation: 'SİMÜLASYON',
 
       // YazarForm.tsx
@@ -109,10 +109,10 @@ export const coachSection = {
       mentorshipAdvice: 'Mentorship Advice:',
       analyzingMessage: 'AI Coach is analyzing your message...',
       practiceInputPlaceholder: 'Type your practice response...',
-      remainingCredits: 'Remaining AI Roleplay Credits: {remaining} / 20',
+      remainingCredits: 'Daily roleplay usage: {used} / {limit}',
       selectScenarioTitle: 'Select Scenario, Start Rehearsing!',
       introDesc: 'The AI acts as a realistic prospect or team member. Type your replies, receive direct mentor scores, strengths, and leadership tips.',
-      dailyRoleplayQuota: 'Daily roleplay credits: {remaining} / {limit}',
+      dailyRoleplayQuota: 'Daily roleplay usage: {used} / {limit}',
       simulation: 'SIMULATION',
 
       // YazarForm.tsx

@@ -197,8 +197,8 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
             <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--text-3)] mb-4">
               <span>{t('team.dailyCoachingQuota')}</span>
               <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
-                {t('team.remainingQuota', {
-                  remaining: Math.max(0, messageLimit - (usage?.messageUsed ?? 0)),
+                {t('team.usedQuota', {
+                  used: usage?.messageUsed ?? 0,
                   limit: messageLimit,
                 })}
               </span>

@@ -74,13 +74,13 @@ describe('getLimitsForLicense', () => {
 describe('formatCreditButtonLabel', () => {
   it('uses compact Turkish credit text without colon', () => {
     expect(formatCreditButtonLabel('Uyum Denetimi Yap', 2, 2, false, 'tr')).toBe(
-      'Uyum Denetimi Yap (Kalan 2/2)'
+      'Uyum Denetimi Yap (Kullanılan 2/2)'
     )
   })
 
-  it('uses English remaining label when lang is en', () => {
+  it('uses English used label when lang is en', () => {
     expect(formatCreditButtonLabel('Generate', 5, 15, false, 'en')).toBe(
-      'Generate (Remaining 5/15)'
+      'Generate (Used 5/15)'
     )
   })
 

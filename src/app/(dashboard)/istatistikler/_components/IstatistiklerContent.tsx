@@ -15,10 +15,11 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { formatAIUsageDisplay, aiUsageProgressPercent, getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { getIndependentSignupAIUsageAction, getMemberLicenseProfilesAction } from '../actions'
+import { AIUsageArchiveSection } from './AIUsageArchiveSection'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -91,9 +92,8 @@ export function IstatistiklerContent() {
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
   const formatUsageLimit = useCallback(
-    (used: number, limit: number) =>
-      Number.isFinite(limit) ? `${used} / ${limit}` : t('statsPage.unlimited'),
-    [t]
+    (used: number, limit: number) => formatAIUsageDisplay(used, limit, lang),
+    [lang]
   )
 
   const licenseLabel = useCallback(
@@ -884,6 +884,8 @@ export function IstatistiklerContent() {
                 </div>
               )}
             </section>
+
+            <AIUsageArchiveSection />
             </>
           )}
 
@@ -929,13 +931,13 @@ export function IstatistiklerContent() {
                       {t('statsPage.quotaCoach')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0))} / {roleplayLimit} {t('statsPage.quotaLeft')}
+                      {formatAIUsageDisplay(usage?.roleplayUsed ?? 0, roleplayLimit, lang)} {t('statsPage.quotaUsed')}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#534AB7] transition-all duration-500"
-                      style={{ width: `${roleplayLimit > 0 ? Math.min(100, (Math.max(0, roleplayLimit - (usage?.roleplayUsed ?? 0)) / roleplayLimit) * 100) : 0}%` }}
+                      style={{ width: `${aiUsageProgressPercent(usage?.roleplayUsed ?? 0, roleplayLimit)}%` }}
                     />
                   </div>
                 </div>
@@ -948,13 +950,13 @@ export function IstatistiklerContent() {
                       {t('statsPage.quotaWriter')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {Math.max(0, messageLimit - (usage?.messageUsed ?? 0))} / {messageLimit} {t('statsPage.quotaLeft')}
+                      {formatAIUsageDisplay(usage?.messageUsed ?? 0, messageLimit, lang)} {t('statsPage.quotaUsed')}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#0F6E56] transition-all duration-500"
-                      style={{ width: `${messageLimit > 0 ? Math.min(100, (Math.max(0, messageLimit - (usage?.messageUsed ?? 0)) / messageLimit) * 100) : 0}%` }}
+                      style={{ width: `${aiUsageProgressPercent(usage?.messageUsed ?? 0, messageLimit)}%` }}
                     />
                   </div>
                 </div>
@@ -967,13 +969,15 @@ export function IstatistiklerContent() {
                       {t('statsPage.quotaCompliance')}
                     </span>
                     <span className="font-extrabold text-[var(--text-2)] tabular-nums">
-                      {complianceLimit > 0 ? `${Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0))} / ${complianceLimit}` : t('statsPage.quotaUpgrade')} {complianceLimit > 0 ? t('statsPage.quotaLeft') : ''}
+                      {complianceLimit > 0
+                        ? `${formatAIUsageDisplay(usage?.complianceUsed ?? 0, complianceLimit, lang)} ${t('statsPage.quotaUsed')}`
+                        : t('statsPage.quotaUpgrade')}
                     </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
                     <div
                       className="h-full rounded-full bg-[#C03E1F] transition-all duration-500"
-                      style={{ width: `${complianceLimit > 0 ? Math.min(100, (Math.max(0, complianceLimit - (usage?.complianceUsed ?? 0)) / complianceLimit) * 100) : 0}%` }}
+                      style={{ width: `${complianceLimit > 0 ? aiUsageProgressPercent(usage?.complianceUsed ?? 0, complianceLimit) : 0}%` }}
                     />
                   </div>
                 </div>

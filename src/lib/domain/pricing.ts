@@ -8,9 +8,9 @@ export const YEARLY_DISCOUNT_RATE = 0.25
 export const YEARLY_MONTHS_FREE = 3
 
 const MONTHLY_PRICES: Record<PlanId, number> = {
-  leader: 399,
+  leader: 499,
   master: 999,
-  pro: 1699,
+  pro: 1799,
 }
 
 export function getMonthlyPrice(plan: PlanId): number {

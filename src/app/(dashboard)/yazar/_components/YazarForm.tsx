@@ -191,6 +191,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const {
     limits,
     isSuperAdmin,
+    messageUsed,
     messageRemaining: remaining,
   } = useAILimits()
   const activeMessageLimit = limits.messageLimit
@@ -545,7 +546,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                   <Bot className="h-4 w-4" />{' '}
                   {formatCreditButtonLabel(
                     t('coachUi.generate'),
-                    remaining,
+                    messageUsed,
                     activeMessageLimit,
                     isSuperAdmin,
                     lang

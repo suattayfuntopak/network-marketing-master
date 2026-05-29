@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-05-29 — YZ kota senkronu, kullanım arşivi, fiyat güncelleme, sunum UX
+
+### YZ kota gösterimi (kullanılan / limit)
+- Tüm sayaçlar **kullanılan/limit** formatına çekildi: İstatistikler, Yazar/Koçluk/Prova, Uyum, buton etiketleri
+- `formatAIUsageDisplay`, `formatCreditButtonLabel` tek kaynak
+
+### Super admin — kalıcı YZ arşivi
+- **Migration 029:** `nmm_ai_usage_daily` + `nmm_increment_ai_usage_daily` RPC; `nmm_daily_actions` backfill
+- Her AI üretiminde roll-up (`checkQuota.logAIGeneration`)
+- İstatistikler sayfasında **YZ Kullanım Arşivi** bölümü (7g / 30g / 12 ay / tümü)
+
+### Sunum materyalleri
+- Kayıt hataları artık toast ile (`PresentationMaterialResult`); migration 028 yoksa anlaşılır mesaj
+- Şablon alanı: chip butonlar + canlı önizleme; `{name}`/`{sender}` jargonu kaldırıldı
+
+### Fiyatlandırma
+- Basic (leader): **₺499**, Pro: **₺1.799**, Plus (master): **₺999** (aynı)
+
+**Deploy:** Supabase’de `028_presentation_materials.sql` ve `029_ai_usage_daily_rollups.sql` uygula.
+
+**Dosyalar:** `aiUsage.ts`, `checkQuota.ts`, `pricing.ts`, `istatistikler/*`, `sunum-materyalleri/*`, `coach.ts`, `stats.ts`, `database.types.ts`
+
+---
+
 ## 2026-05-29 — Dış Kayıt tablosu: davetli downline hariç (parent_id)
 
 ### Fix

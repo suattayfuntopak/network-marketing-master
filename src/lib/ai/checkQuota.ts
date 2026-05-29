@@ -176,6 +176,14 @@ export async function logAIGeneration(params: {
       action_type: 'ai_generate' as const,
       note: params.note,
     })
+
+    const usageDate = new Date().toISOString().slice(0, 10)
+    await supabase.rpc('nmm_increment_ai_usage_daily', {
+      p_user_id: params.userId,
+      p_workspace_id: params.workspaceId,
+      p_usage_date: usageDate,
+      p_kind: params.note,
+    })
   } catch (err) {
     console.error('[logAIGeneration] insert failed:', err)
   }

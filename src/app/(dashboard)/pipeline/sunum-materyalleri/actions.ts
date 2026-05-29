@@ -1,12 +1,30 @@
 'use server'
 
-import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import {
   MAX_PRESENTATION_MATERIALS,
   normalizePresentationUrl,
   type PresentationMaterial,
 } from '@/lib/domain/presentationMaterials'
+
+export type PresentationMaterialResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string }
+
+function mapDbError(error: { code?: string; message?: string }): string {
+  const msg = error.message ?? ''
+  if (
+    error.code === '42P01' ||
+    msg.includes('nmm_presentation_materials') ||
+    msg.includes('schema cache')
+  ) {
+    return 'Sunum materyalleri henüz veritabanında kurulmadı. Lütfen migration 028 uygulayın.'
+  }
+  if (error.code === '23505') {
+    return 'Bu materyal zaten kayıtlı. Sayfayı yenileyip tekrar deneyin.'
+  }
+  return msg || 'Kayıt sırasında bir hata oluştu.'
+}
 
 async function requireWorkspaceAccess(workspaceId: string) {
   const supabase = await createClient()
@@ -37,18 +55,21 @@ async function requireWorkspaceAccess(workspaceId: string) {
 
 export async function listPresentationMaterialsAction(
   workspaceId: string
-): Promise<PresentationMaterial[]> {
-  const { supabase } = await requireWorkspaceAccess(workspaceId)
+): Promise<PresentationMaterialResult<PresentationMaterial[]>> {
+  try {
+    const { supabase } = await requireWorkspaceAccess(workspaceId)
+    const { data, error } = await supabase
+      .from('nmm_presentation_materials')
+      .select('*')
+      .eq('workspace_id', workspaceId)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
 
-  const { data, error } = await supabase
-    .from('nmm_presentation_materials')
-    .select('*')
-    .eq('workspace_id', workspaceId)
-    .order('sort_order', { ascending: true })
-    .order('created_at', { ascending: true })
-
-  if (error) throw new Error(error.message)
-  return (data ?? []) as PresentationMaterial[]
+    if (error) return { ok: false, error: mapDbError(error) }
+    return { ok: true, data: (data ?? []) as PresentationMaterial[] }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Liste alınamadı.' }
+  }
 }
 
 export async function savePresentationMaterialAction(input: {
@@ -58,162 +79,172 @@ export async function savePresentationMaterialAction(input: {
   url: string
   whatsappTemplate: string
   isDefault?: boolean
-}): Promise<PresentationMaterial> {
-  const { supabase } = await requireWorkspaceAccess(input.workspaceId)
+}): Promise<PresentationMaterialResult<PresentationMaterial>> {
+  try {
+    const { supabase } = await requireWorkspaceAccess(input.workspaceId)
 
-  const title = input.title.trim()
-  const whatsapp_template = input.whatsappTemplate.trim()
-  if (!title) throw new Error('Başlık gerekli.')
-  if (!whatsapp_template) throw new Error('WhatsApp şablonu gerekli.')
-  const url = normalizePresentationUrl(input.url)
+    const title = input.title.trim()
+    const whatsapp_template = input.whatsappTemplate.trim()
+    if (!title) return { ok: false, error: 'Başlık gerekli.' }
+    if (!whatsapp_template) return { ok: false, error: 'WhatsApp mesajı gerekli.' }
 
-  if (input.id) {
-    const { data: existing, error: fetchErr } = await supabase
-      .from('nmm_presentation_materials')
-      .select('id, workspace_id')
-      .eq('id', input.id)
-      .maybeSingle()
-
-    if (fetchErr || !existing || existing.workspace_id !== input.workspaceId) {
-      throw new Error('Materyal bulunamadı.')
+    let url: string
+    try {
+      url = normalizePresentationUrl(input.url)
+    } catch {
+      return { ok: false, error: 'Link http:// veya https:// ile başlamalı.' }
     }
 
-    const { data, error } = await supabase
+    if (input.id) {
+      const { data: existing, error: fetchErr } = await supabase
+        .from('nmm_presentation_materials')
+        .select('id, workspace_id')
+        .eq('id', input.id)
+        .maybeSingle()
+
+      if (fetchErr) return { ok: false, error: mapDbError(fetchErr) }
+      if (!existing || existing.workspace_id !== input.workspaceId) {
+        return { ok: false, error: 'Materyal bulunamadı.' }
+      }
+
+      if (input.isDefault) {
+        await supabase
+          .from('nmm_presentation_materials')
+          .update({ is_default: false, updated_at: new Date().toISOString() })
+          .eq('workspace_id', input.workspaceId)
+          .neq('id', input.id)
+      }
+
+      const { data, error } = await supabase
+        .from('nmm_presentation_materials')
+        .update({
+          title,
+          url,
+          whatsapp_template,
+          is_default: !!input.isDefault,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', input.id)
+        .select('*')
+        .single()
+
+      if (error) return { ok: false, error: mapDbError(error) }
+      return { ok: true, data: data as PresentationMaterial }
+    }
+
+    const { count } = await supabase
       .from('nmm_presentation_materials')
-      .update({
-        title,
-        url,
-        whatsapp_template,
-        is_default: !!input.isDefault,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', input.id)
-      .select('*')
-      .single()
+      .select('*', { count: 'exact', head: true })
+      .eq('workspace_id', input.workspaceId)
 
-    if (error) throw new Error(error.message)
+    if ((count ?? 0) >= MAX_PRESENTATION_MATERIALS) {
+      return { ok: false, error: `En fazla ${MAX_PRESENTATION_MATERIALS} materyal ekleyebilirsiniz.` }
+    }
 
-    if (input.isDefault) {
+    const makeDefault = !!input.isDefault || (count ?? 0) === 0
+
+    if (makeDefault) {
       await supabase
         .from('nmm_presentation_materials')
         .update({ is_default: false, updated_at: new Date().toISOString() })
         .eq('workspace_id', input.workspaceId)
-        .neq('id', input.id)
     }
 
-    revalidatePath('/pipeline/sunum-materyalleri')
-    revalidatePath('/pipeline')
-    return data as PresentationMaterial
-  }
-
-  const { count } = await supabase
-    .from('nmm_presentation_materials')
-    .select('*', { count: 'exact', head: true })
-    .eq('workspace_id', input.workspaceId)
-
-  if ((count ?? 0) >= MAX_PRESENTATION_MATERIALS) {
-    throw new Error(`En fazla ${MAX_PRESENTATION_MATERIALS} materyal ekleyebilirsiniz.`)
-  }
-
-  const makeDefault = !!input.isDefault || (count ?? 0) === 0
-
-  if (makeDefault) {
-    await supabase
+    const { data, error } = await supabase
       .from('nmm_presentation_materials')
-      .update({ is_default: false, updated_at: new Date().toISOString() })
-      .eq('workspace_id', input.workspaceId)
+      .insert({
+        workspace_id: input.workspaceId,
+        title,
+        url,
+        whatsapp_template,
+        sort_order: count ?? 0,
+        is_default: makeDefault,
+      })
+      .select('*')
+      .single()
+
+    if (error) return { ok: false, error: mapDbError(error) }
+    return { ok: true, data: data as PresentationMaterial }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Kayıt başarısız.' }
   }
-
-  const { data, error } = await supabase
-    .from('nmm_presentation_materials')
-    .insert({
-      workspace_id: input.workspaceId,
-      title,
-      url,
-      whatsapp_template,
-      sort_order: count ?? 0,
-      is_default: makeDefault,
-    })
-    .select('*')
-    .single()
-
-  if (error) throw new Error(error.message)
-
-  revalidatePath('/pipeline/sunum-materyalleri')
-  revalidatePath('/pipeline')
-  return data as PresentationMaterial
 }
 
 export async function deletePresentationMaterialAction(
   workspaceId: string,
   materialId: string
-): Promise<void> {
-  const { supabase } = await requireWorkspaceAccess(workspaceId)
+): Promise<PresentationMaterialResult<null>> {
+  try {
+    const { supabase } = await requireWorkspaceAccess(workspaceId)
 
-  const { data: row } = await supabase
-    .from('nmm_presentation_materials')
-    .select('id, is_default')
-    .eq('id', materialId)
-    .eq('workspace_id', workspaceId)
-    .maybeSingle()
-
-  if (!row) throw new Error('Materyal bulunamadı.')
-
-  const { error } = await supabase
-    .from('nmm_presentation_materials')
-    .delete()
-    .eq('id', materialId)
-
-  if (error) throw new Error(error.message)
-
-  if (row.is_default) {
-    const { data: nextDefault } = await supabase
+    const { data: row } = await supabase
       .from('nmm_presentation_materials')
-      .select('id')
+      .select('id, is_default')
+      .eq('id', materialId)
       .eq('workspace_id', workspaceId)
-      .order('sort_order', { ascending: true })
-      .limit(1)
       .maybeSingle()
 
-    if (nextDefault) {
-      await supabase
-        .from('nmm_presentation_materials')
-        .update({ is_default: true, updated_at: new Date().toISOString() })
-        .eq('id', nextDefault.id)
-    }
-  }
+    if (!row) return { ok: false, error: 'Materyal bulunamadı.' }
 
-  revalidatePath('/pipeline/sunum-materyalleri')
-  revalidatePath('/pipeline')
+    const { error } = await supabase
+      .from('nmm_presentation_materials')
+      .delete()
+      .eq('id', materialId)
+
+    if (error) return { ok: false, error: mapDbError(error) }
+
+    if (row.is_default) {
+      const { data: nextDefault } = await supabase
+        .from('nmm_presentation_materials')
+        .select('id')
+        .eq('workspace_id', workspaceId)
+        .order('sort_order', { ascending: true })
+        .limit(1)
+        .maybeSingle()
+
+      if (nextDefault) {
+        await supabase
+          .from('nmm_presentation_materials')
+          .update({ is_default: true, updated_at: new Date().toISOString() })
+          .eq('id', nextDefault.id)
+      }
+    }
+
+    return { ok: true, data: null }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Silinemedi.' }
+  }
 }
 
 export async function setDefaultPresentationMaterialAction(
   workspaceId: string,
   materialId: string
-): Promise<void> {
-  const { supabase } = await requireWorkspaceAccess(workspaceId)
+): Promise<PresentationMaterialResult<null>> {
+  try {
+    const { supabase } = await requireWorkspaceAccess(workspaceId)
 
-  const { data: row } = await supabase
-    .from('nmm_presentation_materials')
-    .select('id')
-    .eq('id', materialId)
-    .eq('workspace_id', workspaceId)
-    .maybeSingle()
+    const { data: row } = await supabase
+      .from('nmm_presentation_materials')
+      .select('id')
+      .eq('id', materialId)
+      .eq('workspace_id', workspaceId)
+      .maybeSingle()
 
-  if (!row) throw new Error('Materyal bulunamadı.')
+    if (!row) return { ok: false, error: 'Materyal bulunamadı.' }
 
-  await supabase
-    .from('nmm_presentation_materials')
-    .update({ is_default: false, updated_at: new Date().toISOString() })
-    .eq('workspace_id', workspaceId)
+    await supabase
+      .from('nmm_presentation_materials')
+      .update({ is_default: false, updated_at: new Date().toISOString() })
+      .eq('workspace_id', workspaceId)
 
-  const { error } = await supabase
-    .from('nmm_presentation_materials')
-    .update({ is_default: true, updated_at: new Date().toISOString() })
-    .eq('id', materialId)
+    const { error } = await supabase
+      .from('nmm_presentation_materials')
+      .update({ is_default: true, updated_at: new Date().toISOString() })
+      .eq('id', materialId)
 
-  if (error) throw new Error(error.message)
-
-  revalidatePath('/pipeline/sunum-materyalleri')
-  revalidatePath('/pipeline')
+    if (error) return { ok: false, error: mapDbError(error) }
+    return { ok: true, data: null }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Güncellenemedi.' }
+  }
 }

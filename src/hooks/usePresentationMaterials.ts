@@ -18,7 +18,14 @@ export function usePresentationMaterials(
   return useQuery({
     queryKey: ['presentation-materials', workspaceId, includeFallback, isSuperAdmin, lang],
     queryFn: async (): Promise<PresentationMaterial[]> => {
-      const rows = await listPresentationMaterialsAction(workspaceId!)
+      const result = await listPresentationMaterialsAction(workspaceId!)
+      if (!result.ok) {
+        if (includeFallback && isSuperAdmin && workspaceId) {
+          return [buildGreenleafFallbackMaterial(lang, workspaceId)]
+        }
+        throw new Error(result.error)
+      }
+      const rows = result.data
       if (rows.length === 0 && includeFallback && isSuperAdmin && workspaceId) {
         return [buildGreenleafFallbackMaterial(lang, workspaceId)]
       }

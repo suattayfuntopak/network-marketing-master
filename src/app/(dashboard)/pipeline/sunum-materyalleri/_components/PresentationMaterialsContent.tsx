@@ -105,7 +105,7 @@ export function PresentationMaterialsContent() {
     if (!ws?.workspaceId || saving) return
     setSaving(true)
     try {
-      await savePresentationMaterialAction({
+      const result = await savePresentationMaterialAction({
         workspaceId: ws.workspaceId,
         id: editingId ?? undefined,
         title: form.title,
@@ -113,6 +113,10 @@ export function PresentationMaterialsContent() {
         whatsappTemplate: form.whatsappTemplate,
         isDefault: form.isDefault,
       })
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
       toast.success(t('presentationMaterialsPage.saved'))
       invalidate()
       closeForm()
@@ -125,30 +129,51 @@ export function PresentationMaterialsContent() {
 
   async function handleSetDefault(materialId: string) {
     if (!ws?.workspaceId) return
-    try {
-      await setDefaultPresentationMaterialAction(ws.workspaceId, materialId)
-      toast.success(t('presentationMaterialsPage.defaultSet'))
-      invalidate()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('common.error'))
+    const result = await setDefaultPresentationMaterialAction(ws.workspaceId, materialId)
+    if (!result.ok) {
+      toast.error(result.error)
+      return
     }
+    toast.success(t('presentationMaterialsPage.defaultSet'))
+    invalidate()
   }
 
   async function handleDeleteConfirm() {
     if (!ws?.workspaceId || !deleteTarget || deleting) return
     setDeleting(true)
     try {
-      await deletePresentationMaterialAction(ws.workspaceId, deleteTarget.id)
+      const result = await deletePresentationMaterialAction(ws.workspaceId, deleteTarget.id)
+      if (!result.ok) {
+        toast.error(result.error)
+        return
+      }
       toast.success(t('presentationMaterialsPage.deleted'))
       invalidate()
       setDeleteTarget(null)
       if (editingId === deleteTarget.id) closeForm()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('common.error'))
     } finally {
       setDeleting(false)
     }
   }
+
+  function insertToken(token: string) {
+    setForm(f => ({
+      ...f,
+      whatsappTemplate: f.whatsappTemplate.trim()
+        ? `${f.whatsappTemplate}${f.whatsappTemplate.endsWith('\n') ? '' : '\n'}${token}`
+        : token,
+    }))
+  }
+
+  const previewMessage = useMemo(() => {
+    const sampleName = lang === 'en' ? 'Ayşe' : 'Ayşe'
+    const sampleSender = ws?.fullName ?? (lang === 'en' ? 'Your name' : 'Adınız')
+    const sampleUrl = form.url.trim() || 'https://ornek-sunum-linki.com'
+    return form.whatsappTemplate
+      .replace(/\{name\}/g, sampleName)
+      .replace(/\{url\}/g, sampleUrl)
+      .replace(/\{sender\}/g, sampleSender)
+  }, [form.whatsappTemplate, form.url, ws?.fullName, lang])
 
   if (wsLoading || isLoading) {
     return (
@@ -188,14 +213,33 @@ export function PresentationMaterialsContent() {
           </div>
         </header>
 
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 text-xs leading-relaxed text-[var(--text-2)]">
-          <p className="font-semibold text-[var(--text-1)] mb-1">
+        <div className="rounded-2xl border border-[#534AB7]/20 bg-gradient-to-br from-[#534AB7]/8 to-transparent p-4 space-y-3">
+          <p className="text-sm font-bold text-[var(--text-1)]">
             {t('presentationMaterialsPage.templateHintTitle')}
           </p>
-          <p>{t('presentationMaterialsPage.templateHint')}</p>
-          <code className="mt-2 block rounded-lg bg-[var(--bg-subtle)] px-3 py-2 text-[11px] text-[var(--text-2)]">
-            {'{name}'} · {'{url}'} · {'{sender}'}
-          </code>
+          <p className="text-xs leading-relaxed text-[var(--text-2)]">
+            {t('presentationMaterialsPage.templateHintSimple')}
+          </p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            {[
+              { token: '{name}', label: t('presentationMaterialsPage.chipName'), example: 'Ayşe' },
+              { token: '{url}', label: t('presentationMaterialsPage.chipLink'), example: t('presentationMaterialsPage.chipLinkExample') },
+              { token: '{sender}', label: t('presentationMaterialsPage.chipYou'), example: ws?.fullName?.split(' ')[0] ?? 'Suat' },
+            ].map(chip => (
+              <div
+                key={chip.token}
+                className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-center"
+              >
+                <p className="text-[11px] font-bold text-[#534AB7]">{chip.label}</p>
+                <p className="mt-0.5 text-[10px] text-[var(--text-3)]">
+                  {t('presentationMaterialsPage.chipExample', { example: chip.example })}
+                </p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[11px] text-[var(--text-3)] leading-relaxed">
+            {t('presentationMaterialsPage.templateHintFooter')}
+          </p>
         </div>
 
         {materials.length === 0 && !formOpen && (
@@ -317,10 +361,33 @@ export function PresentationMaterialsContent() {
               />
             </label>
 
-            <label className="block space-y-1.5">
+            <label className="block space-y-2">
               <span className="text-xs font-semibold text-[var(--text-2)]">
                 {t('presentationMaterialsPage.fieldTemplate')}
               </span>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => insertToken('{name}')}
+                  className="rounded-full border border-[#534AB7]/30 bg-[#534AB7]/10 px-3 py-1 text-[11px] font-bold text-[#534AB7] hover:bg-[#534AB7]/15 transition"
+                >
+                  + {t('presentationMaterialsPage.chipName')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertToken('{url}')}
+                  className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15 transition"
+                >
+                  + {t('presentationMaterialsPage.chipLink')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => insertToken('{sender}')}
+                  className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/15 transition"
+                >
+                  + {t('presentationMaterialsPage.chipYou')}
+                </button>
+              </div>
               <textarea
                 value={form.whatsappTemplate}
                 onChange={e => setForm(f => ({ ...f, whatsappTemplate: e.target.value }))}
@@ -329,6 +396,12 @@ export function PresentationMaterialsContent() {
                 required
                 className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15 resize-y min-h-[120px]"
               />
+              <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-2.5">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)] mb-1">
+                  {t('presentationMaterialsPage.livePreview')}
+                </p>
+                <p className="text-xs leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{previewMessage}</p>
+              </div>
             </label>
 
             <label className="flex items-center gap-2 text-xs text-[var(--text-2)] cursor-pointer">

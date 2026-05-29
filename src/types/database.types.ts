@@ -359,6 +359,44 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_ai_usage_daily: {
+        Row: {
+          user_id: string
+          workspace_id: string | null
+          usage_date: string
+          message_count: number
+          roleplay_count: number
+          compliance_count: number
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          workspace_id?: string | null
+          usage_date: string
+          message_count?: number
+          roleplay_count?: number
+          compliance_count?: number
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          workspace_id?: string | null
+          usage_date?: string
+          message_count?: number
+          roleplay_count?: number
+          compliance_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_ai_usage_daily_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          }
+        ]
+      }
       nmm_user_progress: {
         Row: {
           user_id: string
@@ -416,6 +454,15 @@ export interface Database {
         Args: Record<string, never>
         Returns: Json
       }
+      nmm_increment_ai_usage_daily: {
+        Args: {
+          p_user_id: string
+          p_workspace_id: string
+          p_usage_date: string
+          p_kind: string
+        }
+        Returns: undefined
+      }
     }
     Enums: { [_ in never]: never }
   }
@@ -426,6 +473,7 @@ export type NmmWorkspace = Database['public']['Tables']['nmm_workspaces']['Row']
 export type NmmWorkspaceMember = Database['public']['Tables']['nmm_workspace_members']['Row']
 export type NmmCandidate = Database['public']['Tables']['nmm_candidates']['Row']
 export type NmmDailyAction = Database['public']['Tables']['nmm_daily_actions']['Row']
+export type NmmAiUsageDaily = Database['public']['Tables']['nmm_ai_usage_daily']['Row']
 export type NmmNotification = Database['public']['Tables']['nmm_notifications']['Row']
 export type NmmOnboardingProgress = Database['public']['Tables']['nmm_onboarding_progress']['Row']
 

@@ -208,6 +208,7 @@ export default function CompliancePage() {
 
   const {
     limits: { complianceLimit },
+    complianceUsed,
     complianceRemaining,
     isSuperAdmin: limitsSuperAdmin,
   } = useAILimits()
@@ -302,7 +303,7 @@ export default function CompliancePage() {
                           <Shield className="h-4 w-4" />
                           {formatCreditButtonLabel(
                             t('compliancePage.startAiAudit'),
-                            complianceRemaining,
+                            complianceUsed,
                             complianceLimit,
                             limitsSuperAdmin,
                             lang

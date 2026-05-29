@@ -265,7 +265,7 @@ export function ProvaForm() {
 
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
-  const { isSuperAdmin, roleplayRemaining: remaining, limits } = useAILimits()
+  const { isSuperAdmin, roleplayUsed, limits } = useAILimits()
   const roleplayLimit = limits.roleplayLimit
 
   const chatEndRef = useRef<HTMLDivElement>(null)
@@ -526,7 +526,7 @@ export function ProvaForm() {
         </p>
         {!isSuperAdmin && (
           <p className="mt-2.5 text-xs font-bold text-[var(--text-3)]">
-            {t('coachUi.dailyRoleplayQuota', { remaining, limit: roleplayLimit })}
+            {t('coachUi.dailyRoleplayQuota', { used: roleplayUsed, limit: roleplayLimit })}
           </p>
         )}
       </div>

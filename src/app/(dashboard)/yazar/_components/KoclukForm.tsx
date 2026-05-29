@@ -26,9 +26,9 @@ export function KoclukForm() {
 
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
-  const { limits, isSuperAdmin, messageRemaining: remaining } = useAILimits()
+  const { limits, isSuperAdmin, messageUsed } = useAILimits()
   const messageLimit = limits.messageLimit
-  const limitReached = !isSuperAdmin && remaining <= 0
+  const limitReached = !isSuperAdmin && messageUsed >= messageLimit
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
   const answerRef = useRef<HTMLDivElement>(null)
@@ -151,7 +151,7 @@ export function KoclukForm() {
                   ? t('coachUi.dailyLimitReached')
                   : formatCreditButtonLabel(
                       t('coachUi.askCoach'),
-                      remaining,
+                      messageUsed,
                       messageLimit,
                       isSuperAdmin,
                       lang

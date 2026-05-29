@@ -74,9 +74,25 @@ export function getLimitsForLicense(
   return PAID_LIMITS[effective]
 }
 
+export function formatAIUsageDisplay(
+  used: number,
+  limit: number,
+  lang: 'tr' | 'en' = 'tr'
+): string {
+  if (!Number.isFinite(limit)) {
+    return lang === 'en' ? 'Unlimited' : 'Sınırsız'
+  }
+  return `${used} / ${limit}`
+}
+
+export function aiUsageProgressPercent(used: number, limit: number): number {
+  if (!Number.isFinite(limit) || limit <= 0) return 0
+  return Math.min(100, Math.round((used / limit) * 100))
+}
+
 export function formatCreditButtonLabel(
   actionLabel: string,
-  remaining: number,
+  used: number,
   limit: number,
   isSuperAdmin?: boolean,
   lang: 'tr' | 'en' = 'tr'
@@ -86,7 +102,7 @@ export function formatCreditButtonLabel(
   }
   const credit =
     lang === 'en'
-      ? `Remaining ${remaining}/${limit}`
-      : `Kalan ${remaining}/${limit}`
+      ? `Used ${used}/${limit}`
+      : `Kullanılan ${used}/${limit}`
   return `${actionLabel} (${credit})`
 }
