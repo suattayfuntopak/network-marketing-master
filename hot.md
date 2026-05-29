@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-05-30 — Lansman fiyat güncellemesi (Plus / Pro)
+
+- **Basic:** ₺499 (aynı)
+- **Plus (master):** ₺999 → **₺1.099** / yıllık ₺9.888 (₺824/ay efektif)
+- **Pro:** ₺1.799 → **₺1.999** / yıllık ₺17.988 (₺1.499/ay efektif)
+- Tek kaynak: `src/lib/domain/pricing.ts` (Shopier, ödeme, landing)
+
+---
+
+## 2026-05-29 — YZ kota isimleri senkronize (YZ Mesajı / YZ Koçu / Uyum Denetimi)
+
+- Kişisel istatistik progress bar etiketleri admin tablolarıyla aynı; sıra: Mesaj → Koç → Uyum
+- Saha Provası = **YZ Koçu** kotası (roleplay), Yazar/Koçluk sor = **YZ Mesajı** kotası (message)
+- "Claude tüm notları..." → Yapay Zeka Koçu tüm notları inceliyor...
+- Ödeme/landing plan maddeleri güncellendi
+
+---
+
 ## 2026-05-29 — Sunum şablon imleç ekleme, metinler, WhatsApp aktivite kaydı
 
 ### UX
