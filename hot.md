@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-05-29 — Ekibim kapı, istatistik blur, YZ tablo düzeltmesi
+
+### UX
+- **Ekibim:** çizgili placeholder kaldırıldı; portal + flu arka plan (ilk açılış ve X sonrası); kilitliyken `EkipPanel` mount edilmez
+- **Pano:** hesap bilgileri popup masaüstünde biraz büyük + font +1 (`md:`); mobil aynı
+- **İstatistikler:** deneme/Basic’te Ekip Performans tablosu buzlu cam overlay; Plus/Pro’da açılır
+- **Ödeme:** Pro `proFeature3` → sadece «Yapay Zeka Alt Ekip Koçu»
+
+### İstatistikler / süper admin
+- **Dış Kayıt YZ masası:** davet koduyla başka ekibe katılanlar listeden çıkar (Elif çift kayıt giderildi)
+- **Ekip YZ masası:** her üyenin kendi lisans limiti (`getMemberLicenseProfilesAction`); Süper Admin dışında ∞ yok
+
+**Dosyalar:** `FeatureUpgradeGate.tsx`, `ekip/page.tsx`, `IstatistiklerContent.tsx`, `istatistikler/actions.ts`, `AccountStatusAlert.tsx`, `payment.ts`, `stats.ts`
+
+---
+
 ## 2026-05-29 — Dil bayrağı, Pro plan metni, dış kayıt YZ, Shopier UX, GitHub cron
 
 ### UX / ürün

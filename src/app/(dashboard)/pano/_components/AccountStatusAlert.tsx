@@ -66,7 +66,7 @@ export function AccountStatusAlert() {
           <div
             role="dialog"
             aria-labelledby="account-status-title"
-            className={`relative flex w-full max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl sm:max-w-md sm:rounded-3xl max-h-[min(88vh,520px)] md:max-h-none ${Z.confirm}`}
+            className={`relative flex w-full max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl sm:max-w-md sm:rounded-3xl max-h-[min(88vh,520px)] md:max-w-lg md:max-h-none ${Z.confirm}`}
             onClick={e => e.stopPropagation()}
           >
             <button
@@ -78,16 +78,16 @@ export function AccountStatusAlert() {
               <X className="h-4 w-4" strokeWidth={2.25} />
             </button>
 
-            <div className="border-b border-[var(--border)] px-4 pt-4 pb-3 pr-11 sm:px-5 sm:pt-5 sm:pb-4">
+            <div className="border-b border-[var(--border)] px-4 pt-4 pb-3 pr-11 sm:px-5 sm:pt-5 sm:pb-4 md:px-6 md:pt-6 md:pb-4">
               <h2
                 id="account-status-title"
-                className="text-sm sm:text-base font-black uppercase tracking-wide text-[var(--text-1)]"
+                className="text-sm sm:text-base md:text-lg font-black uppercase tracking-wide text-[var(--text-1)]"
               >
                 {t('shellUi.accountModalTitle')}
               </h2>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3.5 text-xs leading-relaxed text-[var(--text-2)] sm:px-5 sm:py-4 sm:text-sm md:flex-none md:overflow-visible md:space-y-2 md:py-3">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3.5 text-xs leading-relaxed text-[var(--text-2)] sm:px-5 sm:py-4 sm:text-sm md:flex-none md:overflow-visible md:space-y-2 md:px-6 md:py-4 md:text-base">
               <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
                 <li>{t('shellUi.accountModalRegistered', { date: registered })}</li>
                 <li className="md:hidden">
@@ -99,7 +99,7 @@ export function AccountStatusAlert() {
               </ul>
 
               <div>
-                <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-[var(--text-1)] mb-1.5 md:mb-1">
+                <h3 className="text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wide text-[var(--text-1)] mb-1.5 md:mb-1">
                   {t('shellUi.accountModalSectionPlan')}
                 </h3>
                 <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
@@ -114,7 +114,7 @@ export function AccountStatusAlert() {
                 </ul>
               </div>
 
-              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)] md:py-2 md:text-xs">
+              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)] md:py-2.5 md:text-sm">
                 <span className="md:hidden">
                   {t('shellUi.accountModalFootnote', { date: accessEnd })}
                 </span>
@@ -124,18 +124,18 @@ export function AccountStatusAlert() {
               </p>
             </div>
 
-            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:px-5 sm:py-3.5">
+            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:px-5 sm:py-3.5 md:px-6 md:py-4">
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="flex-1 rounded-xl border border-[var(--border)] px-3 py-2 text-xs sm:text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                className="flex-1 rounded-xl border border-[var(--border)] px-3 py-2 text-xs sm:text-sm md:text-base font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
               >
                 {t('shellUi.accountAlertClose')}
               </button>
               <Link
                 href="/odeme"
                 onClick={() => setOpen(false)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-3 py-2 text-xs sm:text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
               >
                 <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 {t('shellUi.upgradeBannerCta')}

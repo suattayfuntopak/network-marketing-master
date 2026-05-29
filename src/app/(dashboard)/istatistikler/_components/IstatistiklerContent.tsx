@@ -2,11 +2,12 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import {
   TrendingUp, Users, Target, Activity, Flame,
-  BarChart2, Award, Clock, Crown, Sparkles
+  BarChart2, Award, Clock, Crown, Sparkles, Lock
 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -15,8 +16,9 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { getIndependentSignupAIUsageAction } from '../actions'
+import { getIndependentSignupAIUsageAction, getMemberLicenseProfilesAction } from '../actions'
 
 type PeriodOption = '7d' | '30d' | 'all'
 
@@ -42,6 +44,49 @@ export function IstatistiklerContent() {
     enabled: !!usage?.isSuperAdmin,
     staleTime: 60_000,
   })
+
+  const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
+
+  const memberUserIds = useMemo(
+    () => members.map(m => m.user_id),
+    [members]
+  )
+
+  const { data: memberLicenses = {} } = useQuery({
+    queryKey: ['member-license-profiles', memberUserIds],
+    queryFn: () => getMemberLicenseProfilesAction(memberUserIds),
+    enabled: !!usage?.isSuperAdmin && memberUserIds.length > 0,
+    staleTime: 60_000,
+  })
+
+  const limitsForMember = useCallback(
+    (member: TeamMember) => {
+      const profile = memberLicenses[member.user_id]
+      if (!profile) {
+        return getLimitsForLicense(
+          ws?.licenseType,
+          false,
+          ws?.licenseExpiresAt,
+          ws?.workspaceCreatedAt
+        )
+      }
+      return getLimitsForLicense(
+        profile.licenseType,
+        profile.isSuperAdmin,
+        profile.licenseExpiresAt,
+        profile.workspaceCreatedAt
+      )
+    },
+    [memberLicenses, ws?.licenseType, ws?.licenseExpiresAt, ws?.workspaceCreatedAt]
+  )
+
+  const memberShowsUnlimited = useCallback(
+    (member: TeamMember) => {
+      const profile = memberLicenses[member.user_id]
+      return !!profile?.isSuperAdmin
+    },
+    [memberLicenses]
+  )
 
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
@@ -553,7 +598,7 @@ export function IstatistiklerContent() {
           </div>
 
           {/* Ekip Performans Tablosu (Excel tarzı) */}
-          <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
+          <section className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200 overflow-hidden">
             <div>
               <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
                 <Users className="h-4 w-4 text-brand" />
@@ -654,6 +699,28 @@ export function IstatistiklerContent() {
             <div className="text-[10px] font-bold text-[var(--text-3)] select-none pl-1 mt-1">
               * {t('statsPage.dqsgFootnote')}
             </div>
+
+            {teamStatsLocked && performanceRows.length > 0 && (
+              <div
+                className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-[#534AB7]/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+                aria-hidden={false}
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-indigo-200 shadow-lg">
+                  <Lock className="h-6 w-6" strokeWidth={1.75} />
+                </div>
+                <div className="max-w-sm space-y-1">
+                  <p className="text-sm font-bold text-[var(--text-1)]">{t('statsPage.teamLockedTitle')}</p>
+                  <p className="text-xs leading-relaxed text-[var(--text-2)]">{t('statsPage.teamLockedDesc')}</p>
+                </div>
+                <Link
+                  href="/odeme"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {t('statsPage.teamLockedCta')}
+                </Link>
+              </div>
+            )}
           </section>
 
           {/* Ekip + Dış Kayıt YZ masaları (SADECE SÜPER ADMİN) */}
@@ -694,6 +761,8 @@ export function IstatistiklerContent() {
                     {sortedMembers.map(m => {
                       const isLeader = m.role === 'leader'
                       const detailHref = getMemberHref(m)
+                      const memberLimits = limitsForMember(m)
+                      const unlimited = memberShowsUnlimited(m)
                       return (
                         <tr
                           key={m.user_id}
@@ -718,21 +787,21 @@ export function IstatistiklerContent() {
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                            {isLeader
+                            {unlimited
                               ? t('statsPage.unlimited')
-                              : formatUsageLimit(m.today_message ?? 0, teamLimits.messageLimit)}
+                              : formatUsageLimit(m.today_message ?? 0, memberLimits.messageLimit)}
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                            {isLeader
+                            {unlimited
                               ? t('statsPage.unlimited')
-                              : formatUsageLimit(m.today_roleplay ?? 0, teamLimits.roleplayLimit)}
+                              : formatUsageLimit(m.today_roleplay ?? 0, memberLimits.roleplayLimit)}
                           </td>
                           
                           <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                            {isLeader
+                            {unlimited
                               ? t('statsPage.unlimited')
-                              : formatUsageLimit(m.today_compliance ?? 0, teamLimits.complianceLimit)}
+                              : formatUsageLimit(m.today_compliance ?? 0, memberLimits.complianceLimit)}
                           </td>
                         </tr>
                       )

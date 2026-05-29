@@ -27,9 +27,13 @@ export default function EkipPage() {
           </p>
         </div>
       </header>
-      <FeatureUpgradeGate feature="team" locked={locked}>
+      {locked ? (
+        <FeatureUpgradeGate feature="team" locked>
+          {null}
+        </FeatureUpgradeGate>
+      ) : (
         <EkipPanel />
-      </FeatureUpgradeGate>
+      )}
     </main>
   )
 }

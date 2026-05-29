@@ -56,8 +56,7 @@ export const paymentSection = {
       proYearlyEquivalent: '{months} ay bedava!',
       proFeature1: 'Plus Planındaki TÜM Özellikler',
       proFeature2: 'Sınırsız Alt Ekip Takibi',
-      proFeature3:
-        'Yapay Zeka Alt Ekip Koçu: Ekibinizdeki ortakların günlük YZ kullanımını ve onboarding adımlarını tek panelden izleyin (Ekibim — Plus/Pro).',
+      proFeature3: 'Yapay Zeka Alt Ekip Koçu',
       proFeature4: 'Günlük 100 Yapay Zeka Koçu Kredisi',
       proFeature5: 'Günlük 60 Saha Provası Kredisi',
       proFeature6: 'Günlük 15 Uyum Denetimi Kredisi',
@@ -126,8 +125,7 @@ export const paymentSection = {
       proYearlyEquivalent: '{months} months free!',
       proFeature1: 'All Plus Plan Features',
       proFeature2: 'Sınırsız Alt Ekip Takibi',
-      proFeature3:
-        'AI team coaching view: monitor downline daily AI usage and onboarding from one dashboard (Team hub on Plus/Pro).',
+      proFeature3: 'AI Sub-Team Coach',
       proFeature4: 'Daily 100 AI Coach Credits',
       proFeature5: 'Daily 60 Interactive Rehearsal Credits',
       proFeature6: 'Daily 15 Compliance Control Credits',
