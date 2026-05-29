@@ -18,8 +18,42 @@ NMU’daki n8n akışına benzer bir yapı **NMM’de henüz yok**. Uygulama iç
 
 ## n8n JSON nereye koyulur (git’e girmez)
 
-`docs/local/n8n/` — bu klasör `.gitignore` ile hariç tutulur.  
-Örnek: `docs/local/n8n/trial-reminders.json` (NMU akışınızdan uyarlayın).
+`docs/local/n8n/trial-reminders.json` — `.gitignore` sayesinde GitHub’a push edilmez.
+
+### Adım adım (Mac)
+
+1. **Terminal** (proje kökünde):
+
+   ```bash
+   cd /Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master
+   mkdir -p docs/local/n8n
+   ```
+
+2. **n8n’den dışa aktar:** NMU workflow → sağ üst menü → **Download** → `.json` dosyası iner.
+
+3. **Dosyayı taşı / yeniden adlandır:**
+   - Finder: İnen dosyayı `docs/local/n8n/` içine sürükleyin.
+   - Adı: `trial-reminders.json` (tam yol örnek):
+
+     `/Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/local/n8n/trial-reminders.json`
+
+   - Terminal alternatifi (İndirilenler’de `NMU-Trial.json` ise):
+
+     ```bash
+     cp ~/Downloads/"NMU-Trial-....json" docs/local/n8n/trial-reminders.json
+     ```
+
+4. **Doğrula:**
+
+   ```bash
+   ls -la docs/local/n8n/
+   ```
+
+   `trial-reminders.json` görünmeli. `git status` bu dosyayı **göstermemeli** (ignore).
+
+5. **Cursor’da aç:** Sol dosya ağacında `docs/local/n8n/trial-reminders.json` — sohbette “JSON’u koydum” yazmanız yeterli; birlikte NMM alanlarına uyarlarız.
+
+**Not:** Klasör ilk kez boşsa Cursor ağacında görünmeyebilir; Terminal’de `mkdir` sonrası **Reload Window** veya dosyayı Cursor’da **File → Open** ile açın.
 
 ## Alternatif: Vercel Cron + API route
 

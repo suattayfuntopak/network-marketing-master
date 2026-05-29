@@ -42,13 +42,13 @@ export function AccountStatusAlert() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="account-status-breathe group w-full rounded-2xl border-2 border-white/90 bg-gradient-to-r from-[#DC2626] to-[#B91C1C] px-3.5 py-3 sm:px-4 sm:py-3.5 text-left shadow-lg shadow-red-900/25 transition hover:brightness-105 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+        className="account-status-breathe group w-full rounded-2xl border-2 border-white bg-gradient-to-r from-[#DC2626] to-[#B91C1C] px-3.5 py-3 sm:px-4 sm:py-3.5 text-left shadow-lg shadow-red-900/40 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
             <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.25} />
           </span>
-          <p className="text-xs sm:text-sm font-bold text-white leading-snug flex-1">
+          <p className="flex-1 text-[11px] sm:text-xs font-black uppercase tracking-wide text-white leading-snug">
             {t('shellUi.accountAlertTitle')}
           </p>
           <span className="hidden sm:inline text-[11px] font-semibold text-white/90 underline-offset-2 group-hover:underline shrink-0">
