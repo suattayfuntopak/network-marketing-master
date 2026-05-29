@@ -83,7 +83,7 @@ export const statsSection = {
       quotaSuperDesc: 'Network Marketing Master geliştirici hesabınız için tüm yapay zeka limitleri ve kullanım kotaları kaldırılmıştır. Keyifli testler dileriz!',
       quotaCoach: 'Günlük Saha Provası Kredisi',
       quotaLeft: 'kalan',
-      quotaWriter: 'Günlük YZ Mesajı Kredisi',
+      quotaWriter: 'Günlük Yapay Zeka Koçu Kredisi',
       quotaCompliance: 'Günlük Uyum Denetimi Kredisi',
       quotaUpgrade: 'Plan gerekli',
 
@@ -174,7 +174,7 @@ export const statsSection = {
       quotaSuperDesc: 'All artificial intelligence action limits and usage quotas are fully bypassed for your account. Happy testing!',
       quotaCoach: 'Daily roleplay credits',
       quotaLeft: 'left',
-      quotaWriter: 'Daily AI message credits',
+      quotaWriter: 'Daily AI coach credits',
       quotaCompliance: 'Daily compliance audit credits',
       quotaUpgrade: 'Upgrade required',
 

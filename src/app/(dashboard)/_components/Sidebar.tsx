@@ -3,10 +3,11 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Crown, Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ITEMS } from '@/lib/domain/navigation'
+import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { Z } from '@/lib/ui/zIndex'
 
 interface SidebarProps {
@@ -19,13 +20,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const licenseType = ws?.licenseType ?? 'free'
-  const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
+  const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
 
-  const baseItems = hasTeamAccess ? NAV_ITEMS : NAV_ITEMS.filter(i => i.href !== '/ekip')
   const items = isSuperAdmin
-    ? [...baseItems, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
-    : baseItems
+    ? [...NAV_ITEMS, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+    : NAV_ITEMS
 
   return (
     <aside
@@ -44,6 +43,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
           const label = t(translationKey)
           const isCrown = href === '/platform-yonetim'
+          const isTeamLocked = href === '/ekip' && teamLocked
 
           return (
             <Link
@@ -71,7 +71,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
                 )} 
                 strokeWidth={active || isCrown ? 2.25 : 1.75} 
               />
-              {!collapsed && label}
+              {!collapsed && (
+                <span className="flex items-center gap-1.5 min-w-0">
+                  <span className="truncate">{label}</span>
+                  {isTeamLocked && (
+                    <Lock className="h-3 w-3 shrink-0 opacity-50" aria-hidden />
+                  )}
+                </span>
+              )}
             </Link>
           )
         })}

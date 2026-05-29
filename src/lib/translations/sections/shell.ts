@@ -32,6 +32,20 @@ export const shellSection = {
       upgradeMenuTrialTitle: 'Planı Yükselt',
       upgradeMenuExpiredTitle: 'Planı Yükselt',
       upgradeMenuDesc: 'Basic, Plus veya Pro — daha yüksek günlük YZ kredileri',
+      teamGateTitle: 'Ekibim Plus veya Pro planlarda',
+      teamGateDesc:
+        'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Basic plan bireysel liderlik araçlarını kapsar.',
+      featureGateTitle: 'Bu özellik planınızda yer almıyor',
+      featureGateDesc: 'Devam etmek için planınızı yükseltin.',
+      lifecycleTitle: 'Hesap durumunuz',
+      lifecycleRegistered: 'Kayıt: {date}',
+      lifecycleTrialEnd: '7 günlük tam deneme bitişi: {date}',
+      lifecycleTrialBody:
+        'Deneme süresince Basic plan günlük kredilerini (15 mesaj / 10 prova / 2 uyum) kullanırsınız. Plus veya Pro ile Ekibim ve daha yüksek limitlere geçebilirsiniz.',
+      lifecycleLimitedBody:
+        '{date} tarihine kadar sınırlı ücretsiz kullanım (günlük 5 mesaj / 3 prova) devam eder. Bu tarihten sonra hesabınıza erişmek için Basic, Plus veya Pro plan satın almanız gerekir.',
+      lifecycleLockedBody:
+        'Ücretsiz kullanım süreniz sona erdi. Hesabınıza yeniden erişmek ve yapay zeka özelliklerini kullanmaya devam etmek için lütfen bir plan seçin.',
     },
   },
   en: {
@@ -67,6 +81,20 @@ export const shellSection = {
       upgradeMenuTrialTitle: 'Upgrade plan',
       upgradeMenuExpiredTitle: 'Upgrade plan',
       upgradeMenuDesc: 'Basic, Plus, or Pro — higher daily AI credits',
+      teamGateTitle: 'Team hub is on Plus or Pro',
+      teamGateDesc:
+        'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. Basic covers individual leader tools.',
+      featureGateTitle: 'This feature is not on your plan',
+      featureGateDesc: 'Upgrade your plan to continue.',
+      lifecycleTitle: 'Your account status',
+      lifecycleRegistered: 'Registered: {date}',
+      lifecycleTrialEnd: 'Full trial ends: {date}',
+      lifecycleTrialBody:
+        'During the trial you use Basic daily credits (15 messages / 10 roleplay / 2 compliance). Upgrade to Plus or Pro for Team and higher limits.',
+      lifecycleLimitedBody:
+        'Limited free use (5 messages / 3 roleplay per day) continues until {date}. After that, purchase Basic, Plus, or Pro to access your account.',
+      lifecycleLockedBody:
+        'Your free period has ended. Choose a plan to access your account and AI features again.',
     },
   },
 } as const

@@ -22,15 +22,11 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const activeRef = useRef<HTMLButtonElement | null>(null)
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const licenseType = ws?.licenseType ?? 'free'
-  const hasTeamAccess = isSuperAdmin || licenseType === 'master' || licenseType === 'pro'
-
   const items = useMemo(() => {
-    const base = hasTeamAccess ? NAV_ITEMS : NAV_ITEMS.filter(i => i.href !== '/ekip')
     return isSuperAdmin
-      ? [...base, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
-      : base
-  }, [hasTeamAccess, isSuperAdmin])
+      ? [...NAV_ITEMS, { href: '/platform-yonetim', translationKey: 'nav.platformYonetim', icon: Crown }]
+      : NAV_ITEMS
+  }, [isSuperAdmin])
 
   useEffect(() => {
     items.forEach(({ href }) => router.prefetch(href))

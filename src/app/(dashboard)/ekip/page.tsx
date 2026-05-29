@@ -3,9 +3,14 @@
 import { Users } from 'lucide-react'
 import { EkipPanel } from './_components/EkipPanel'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
 
 export default function EkipPage() {
   const { t } = useTranslation()
+  const { data: ws } = useWorkspace()
+  const locked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -22,7 +27,9 @@ export default function EkipPage() {
           </p>
         </div>
       </header>
-      <EkipPanel />
+      <FeatureUpgradeGate feature="team" locked={locked}>
+        <EkipPanel />
+      </FeatureUpgradeGate>
     </main>
   )
 }

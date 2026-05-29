@@ -29,6 +29,13 @@ export async function POST(request: NextRequest) {
     }
 
     const checkoutForm = await createShopierPaymentSession(plan, period)
+    console.info('[Shopier Launch] ok', {
+      plan,
+      period,
+      platform_order_id: checkoutForm.platform_order_id,
+      total_order_value: checkoutForm.total_order_value,
+      website_index: checkoutForm.website_index,
+    })
     const html = buildShopierLaunchHtml(checkoutForm)
 
     return new NextResponse(html, {

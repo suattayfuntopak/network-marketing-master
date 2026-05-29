@@ -7,6 +7,8 @@ import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
+import { AccountLifecycleBanner } from './AccountLifecycleBanner'
+import { AccountAccessGuard } from './AccountAccessGuard'
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
   setTimeout(() => { delete document.documentElement.dataset.navDir }, 500)
@@ -150,7 +152,10 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Spacer to clear the fixed h-16 Header */}
         <div className="h-16" />
         <div className="mx-auto max-w-[1360px] w-full">
-          {children}
+          <AccountAccessGuard>
+            <AccountLifecycleBanner />
+            {children}
+          </AccountAccessGuard>
         </div>
       </div>
       <BottomNav pendingHref={pendingHref} visible={visible} />

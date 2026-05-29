@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-05-29 — Ekibim kapısı, hesap yaşam döngüsü, plan metinleri
+
+### Plan metinleri
+- Ödeme + landing: `Günlük … Yapay Zeka Koçu Kredisi` (YZ Mesajı → Koçu)
+
+### Ekibim (Plus/Pro)
+- Menüde her zaman görünür; Basic/denemede kilit ikonu
+- `/ekip`: flu arka plan + yükseltme popup (`FeatureUpgradeGate`)
+
+### Hesap yaşam döngüsü (ücretsiz)
+- Banner: kayıt tarihi, deneme bitişi, sınırlı ücretsiz bitiş (+30 gün)
+- Sonrasında yalnızca `/odeme` (grace bitince erişim kilidi)
+- `accountLifecycle.ts` + testler
+
+### Shopier log
+- `[Shopier Launch] ok` — **POST** `/odeme/launch` satırında (GET /odeme değil)
+
+---
+
 ## 2026-05-29 — Council #7 testler, yükseltme menüde, Shopier tutar formatı
 
 ### Council #7 (genişletildi) ✅
