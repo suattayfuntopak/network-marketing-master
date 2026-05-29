@@ -1,10 +1,25 @@
 # Hot Log
 
+## 2026-05-29 — YZ arşivi UX, super admin lisans, sunum sayfası genişlik/font
+
+### İstatistikler
+- Arşiv: başlık/alt başlık sadeleştirildi; sütunlarda yalnızca kullanım adedi (limit yok)
+- Super admin listede her zaman ilk sırada; lisans **Pro · Sınırsız** (DB'deki Plus/master override)
+- TR: Davetli alt ekip
+
+### Sunum materyalleri
+- Sayfa tam genişlik + font +1; varsayılan WhatsApp şablonu Greenleaf metni
+- Aday detay kutusu font +1; dark temada "Materyalleri düzenle" pearl beyaz
+
+**Dosyalar:** `stats.ts`, `istatistikler/actions.ts`, `AIUsageArchiveSection.tsx`, `PresentationMaterialsContent.tsx`, `CandidateDetail.tsx`, `presentationMaterials.ts`
+
+---
+
 ## 2026-05-29 — Migration 029 backfill: MAX(uuid) düzeltmesi
 
 ### Fix
 - **029 backfill:** `MAX(workspace_id)` → `array_agg(... ORDER BY created_at DESC)[1]` (PostgreSQL uuid için MAX yok)
-- **030:** Kısmi uygulanmış prod için yalnızca backfill patch’i (`030_ai_usage_daily_backfill_fix.sql`)
+- **030:** Tam kurulum scripti (tablo + RPC + backfill) — 029 transaction rollback sonrası tablo yoksa **030'un tamamını** çalıştır
 
 ---
 

@@ -95,9 +95,9 @@ export function AIUsageArchiveSection() {
                 <th className="p-3">{t('statsPage.colPartnerName')}</th>
                 <th className="p-3">{t('statsPage.colLicense')}</th>
                 <th className="p-3 text-center">{t('statsPage.archiveColDays')}</th>
-                <th className="p-3 text-center">{t('statsPage.aiColMessage')}</th>
-                <th className="p-3 text-center">{t('statsPage.aiColCoach')}</th>
-                <th className="p-3 text-center">{t('statsPage.aiColCompliance')}</th>
+                <th className="p-3 text-center">{t('statsPage.archiveColMessage')}</th>
+                <th className="p-3 text-center">{t('statsPage.archiveColCoach')}</th>
+                <th className="p-3 text-center">{t('statsPage.archiveColCompliance')}</th>
                 <th className="p-3 text-center">{t('statsPage.archiveColTotal')}</th>
               </tr>
             </thead>
@@ -116,7 +116,9 @@ export function AIUsageArchiveSection() {
                       )}
                     </td>
                     <td className="p-3 text-[10px] font-bold uppercase text-[var(--text-2)]">
-                      {row.licenseType === 'free'
+                      {row.isSuperAdmin
+                        ? t('statsPage.licensePlanSuperAdmin')
+                        : row.licenseType === 'free'
                         ? t('statsPage.licensePlanFree')
                         : row.licenseType === 'pro'
                         ? t('statsPage.licensePlanPro')

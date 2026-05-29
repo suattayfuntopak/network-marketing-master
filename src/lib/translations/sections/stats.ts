@@ -70,6 +70,7 @@ export const statsSection = {
       aiColCoach: 'YZ Koçu (Kullanılan / Limit)',
       aiColCompliance: 'Uyum Denetimi (Kullanılan / Limit)',
       unlimited: 'Sınırsız',
+      licensePlanSuperAdmin: 'Pro · Sınırsız',
 
       aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
       aiIndependentSubtitle:
@@ -93,8 +94,8 @@ export const statsSection = {
 
       infoNote: 'İstatistikler, Boru Hattınızdaki adayların güncel durumuna göre anlık olarak cihazınızda hesaplanır. Verilerinizin doğru olması için Aday Detaylarındaki aşama güncellemelerini aksatmayın.',
 
-      archiveTitle: 'YZ Kullanım Arşivi (Kalıcı)',
-      archiveSubtitle: 'Tüm kullanıcıların günlük, aylık ve yıllık yapay zeka tüketimi — fiyatlandırma ve kapasite planlaması için Supabase\'de saklanır.',
+      archiveTitle: 'YZ Kullanım Arşivi',
+      archiveSubtitle: 'Tüm kullanıcıların günlük, aylık ve yıllık yapay zeka tüketimini gösterir.',
       archivePeriod7d: '7 Gün',
       archivePeriod30d: '30 Gün',
       archivePeriod365d: '12 Ay',
@@ -104,8 +105,11 @@ export const statsSection = {
       archiveStatCoach: 'YZ koçu',
       archiveStatCompliance: 'Uyum denetimi',
       archiveColDays: 'Aktif gün',
+      archiveColMessage: 'YZ Mesajı',
+      archiveColCoach: 'YZ Koçu',
+      archiveColCompliance: 'Uyum Denetimi',
       archiveColTotal: 'Toplam',
-      archiveTagInvited: 'Davetli downline',
+      archiveTagInvited: 'Davetli alt ekip',
       archiveEmpty: 'Seçilen dönemde kayıtlı YZ kullanımı yok.',
       archiveRange: '{from} — {to} arası',
       archiveRangeAll: 'Tüm kayıtlar ({to} tarihine kadar)',
@@ -182,6 +186,7 @@ export const statsSection = {
       aiColCoach: 'AI Coach (Used / Limit)',
       aiColCompliance: 'Compliance (Used / Limit)',
       unlimited: 'Unlimited',
+      licensePlanSuperAdmin: 'Pro · Unlimited',
 
       aiIndependentTitle: 'Independent Signup AI Usage & Quotas Control Spread',
       aiIndependentSubtitle:
@@ -205,8 +210,8 @@ export const statsSection = {
 
       infoNote: 'Calculations are processed client-side based on your active candidates pipeline database. Keep candidate stages updated in Pipeline to ensure precise data.',
 
-      archiveTitle: 'AI Usage Archive (Persistent)',
-      archiveSubtitle: 'Daily, monthly and yearly AI consumption for all users — stored in Supabase for pricing and capacity planning.',
+      archiveTitle: 'AI Usage Archive',
+      archiveSubtitle: 'Shows daily, monthly and yearly AI consumption for all users.',
       archivePeriod7d: '7 Days',
       archivePeriod30d: '30 Days',
       archivePeriod365d: '12 Months',
@@ -216,6 +221,9 @@ export const statsSection = {
       archiveStatCoach: 'AI coach',
       archiveStatCompliance: 'Compliance',
       archiveColDays: 'Active days',
+      archiveColMessage: 'AI Messages',
+      archiveColCoach: 'AI Coach',
+      archiveColCompliance: 'Compliance',
       archiveColTotal: 'Total',
       archiveTagInvited: 'Invited downline',
       archiveEmpty: 'No AI usage recorded for this period.',

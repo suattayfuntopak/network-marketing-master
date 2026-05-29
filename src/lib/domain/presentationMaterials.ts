@@ -19,7 +19,15 @@ export interface PresentationMaterial {
 export function defaultWhatsappTemplate(lang: 'tr' | 'en'): string {
   return lang === 'en'
     ? 'Hi {name}, you can view my presentation here:\n\n{url}\n\nQuestions? Reach out to {sender}.'
-    : 'Merhaba {name}, sunum linkim:\n\n{url}\n\nSorularınız olursa {sender} ile iletişime geçebilirsiniz.'
+    : `Merhaba {name} Bey / Hanım,
+
+Greenleaf'in global vizyonunu, ürün ekosistemini ve sunduğu harika iş fırsatını detaylıca inceleyebileceğiniz bağlantıyı aşağıda sizinle paylaşıyorum:
+
+{url}
+
+Merak ettiğiniz noktalar veya üzerine konuşmak istediğiniz detaylar olursa, bana dilediğiniz zaman ulaşabilirsiniz.
+
+Görüşmek dileğiyle.`
 }
 
 export function renderPresentationMessage(

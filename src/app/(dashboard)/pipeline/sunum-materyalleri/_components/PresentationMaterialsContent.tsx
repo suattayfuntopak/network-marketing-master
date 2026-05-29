@@ -178,7 +178,7 @@ export function PresentationMaterialsContent() {
   if (wsLoading || isLoading) {
     return (
       <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-        <div className="space-y-3 max-w-2xl mx-auto">
+        <div className="space-y-3">
           <Skeleton className="h-10 w-48" />
           <Skeleton className="h-32 rounded-2xl" />
           <Skeleton className="h-32 rounded-2xl" />
@@ -189,11 +189,11 @@ export function PresentationMaterialsContent() {
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <div className="mx-auto max-w-2xl space-y-5">
+      <div className="space-y-5">
         <button
           type="button"
           onClick={() => router.push('/pipeline')}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--text-2)] hover:text-[var(--text-1)] transition"
+          className="inline-flex items-center gap-1.5 text-base font-semibold text-[var(--text-2)] hover:text-[var(--text-1)] transition"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('presentationMaterialsPage.backToPipeline')}
@@ -204,20 +204,20 @@ export function PresentationMaterialsContent() {
             <Presentation className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
           </div>
           <div className="flex-1 min-w-0">
-            <h1 className="text-xl font-bold text-[var(--text-1)]">
+            <h1 className="text-2xl font-bold text-[var(--text-1)]">
               {t('presentationMaterialsPage.title')}
             </h1>
-            <p className="mt-1 text-xs leading-relaxed text-[var(--text-3)]">
+            <p className="mt-1 text-sm leading-relaxed text-[var(--text-3)]">
               {t('presentationMaterialsPage.subtitle', { max: MAX_PRESENTATION_MATERIALS })}
             </p>
           </div>
         </header>
 
         <div className="rounded-2xl border border-[#534AB7]/20 bg-gradient-to-br from-[#534AB7]/8 to-transparent p-4 space-y-3">
-          <p className="text-sm font-bold text-[var(--text-1)]">
+          <p className="text-base font-bold text-[var(--text-1)]">
             {t('presentationMaterialsPage.templateHintTitle')}
           </p>
-          <p className="text-xs leading-relaxed text-[var(--text-2)]">
+          <p className="text-sm leading-relaxed text-[var(--text-2)]">
             {t('presentationMaterialsPage.templateHintSimple')}
           </p>
           <div className="grid gap-2 sm:grid-cols-3">
@@ -230,24 +230,24 @@ export function PresentationMaterialsContent() {
                 key={chip.token}
                 className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-center"
               >
-                <p className="text-[11px] font-bold text-[#534AB7]">{chip.label}</p>
-                <p className="mt-0.5 text-[10px] text-[var(--text-3)]">
+                <p className="text-xs font-bold text-[#534AB7]">{chip.label}</p>
+                <p className="mt-0.5 text-xs text-[var(--text-3)]">
                   {t('presentationMaterialsPage.chipExample', { example: chip.example })}
                 </p>
               </div>
             ))}
           </div>
-          <p className="text-[11px] text-[var(--text-3)] leading-relaxed">
+          <p className="text-xs text-[var(--text-3)] leading-relaxed">
             {t('presentationMaterialsPage.templateHintFooter')}
           </p>
         </div>
 
         {materials.length === 0 && !formOpen && (
           <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-12 px-6 text-center">
-            <p className="text-sm font-semibold text-[var(--text-1)]">
+            <p className="text-base font-semibold text-[var(--text-1)]">
               {t('presentationMaterialsPage.emptyTitle')}
             </p>
-            <p className="mt-2 text-xs text-[var(--text-3)]">{t('presentationMaterialsPage.emptyDesc')}</p>
+            <p className="mt-2 text-sm text-[var(--text-3)]">{t('presentationMaterialsPage.emptyDesc')}</p>
           </div>
         )}
 
@@ -261,9 +261,9 @@ export function PresentationMaterialsContent() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h2 className="text-sm font-bold text-[var(--text-1)] truncate">{material.title}</h2>
+                      <h2 className="text-base font-bold text-[var(--text-1)] truncate">{material.title}</h2>
                       {material.is_default && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-[10px] font-black uppercase text-amber-800 dark:text-amber-300">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-xs font-black uppercase text-amber-800 dark:text-amber-300">
                           <Star className="h-3 w-3 fill-current" />
                           {t('presentationMaterialsPage.defaultBadge')}
                         </span>
@@ -273,7 +273,7 @@ export function PresentationMaterialsContent() {
                       href={material.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-1 inline-flex items-center gap-1 text-xs text-[#534AB7] hover:underline truncate max-w-full"
+                      className="mt-1 inline-flex items-center gap-1 text-sm text-[#534AB7] hover:underline truncate max-w-full"
                     >
                       <Link2 className="h-3.5 w-3.5 shrink-0" />
                       <span className="truncate">{material.url}</span>
@@ -319,7 +319,7 @@ export function PresentationMaterialsContent() {
             className="rounded-2xl border border-[#534AB7]/30 bg-[var(--bg-card)] p-5 space-y-4 shadow-md"
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-[var(--text-1)]">
+              <h3 className="text-base font-bold text-[var(--text-1)]">
                 {editingMaterial
                   ? t('presentationMaterialsPage.editTitle')
                   : t('presentationMaterialsPage.addTitle')}
@@ -334,7 +334,7 @@ export function PresentationMaterialsContent() {
             </div>
 
             <label className="block space-y-1.5">
-              <span className="text-xs font-semibold text-[var(--text-2)]">
+              <span className="text-sm font-semibold text-[var(--text-2)]">
                 {t('presentationMaterialsPage.fieldTitle')}
               </span>
               <input
@@ -342,13 +342,13 @@ export function PresentationMaterialsContent() {
                 onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                 maxLength={120}
                 required
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
                 placeholder={t('presentationMaterialsPage.fieldTitlePlaceholder')}
               />
             </label>
 
             <label className="block space-y-1.5">
-              <span className="text-xs font-semibold text-[var(--text-2)]">
+              <span className="text-sm font-semibold text-[var(--text-2)]">
                 {t('presentationMaterialsPage.fieldUrl')}
               </span>
               <input
@@ -356,34 +356,34 @@ export function PresentationMaterialsContent() {
                 onChange={e => setForm(f => ({ ...f, url: e.target.value }))}
                 type="url"
                 required
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
                 placeholder="https://"
               />
             </label>
 
             <label className="block space-y-2">
-              <span className="text-xs font-semibold text-[var(--text-2)]">
+              <span className="text-sm font-semibold text-[var(--text-2)]">
                 {t('presentationMaterialsPage.fieldTemplate')}
               </span>
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => insertToken('{name}')}
-                  className="rounded-full border border-[#534AB7]/30 bg-[#534AB7]/10 px-3 py-1 text-[11px] font-bold text-[#534AB7] hover:bg-[#534AB7]/15 transition"
+                  className="rounded-full border border-[#534AB7]/30 bg-[#534AB7]/10 px-3 py-1 text-xs font-bold text-[#534AB7] hover:bg-[#534AB7]/15 transition"
                 >
                   + {t('presentationMaterialsPage.chipName')}
                 </button>
                 <button
                   type="button"
                   onClick={() => insertToken('{url}')}
-                  className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15 transition"
+                  className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/15 transition"
                 >
                   + {t('presentationMaterialsPage.chipLink')}
                 </button>
                 <button
                   type="button"
                   onClick={() => insertToken('{sender}')}
-                  className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/15 transition"
+                  className="rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-bold text-amber-800 dark:text-amber-300 hover:bg-amber-500/15 transition"
                 >
                   + {t('presentationMaterialsPage.chipYou')}
                 </button>
@@ -394,17 +394,17 @@ export function PresentationMaterialsContent() {
                 rows={5}
                 maxLength={2000}
                 required
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15 resize-y min-h-[120px]"
+                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15 resize-y min-h-[120px]"
               />
               <div className="rounded-xl bg-[var(--bg-subtle)] border border-[var(--border)] px-3 py-2.5">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)] mb-1">
+                <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)] mb-1">
                   {t('presentationMaterialsPage.livePreview')}
                 </p>
-                <p className="text-xs leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{previewMessage}</p>
+                <p className="text-sm leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{previewMessage}</p>
               </div>
             </label>
 
-            <label className="flex items-center gap-2 text-xs text-[var(--text-2)] cursor-pointer">
+            <label className="flex items-center gap-2 text-sm text-[var(--text-2)] cursor-pointer">
               <input
                 type="checkbox"
                 checked={form.isDefault}
@@ -418,7 +418,7 @@ export function PresentationMaterialsContent() {
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 disabled:opacity-60 transition"
+                className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-base font-bold text-white shadow-md hover:opacity-95 disabled:opacity-60 transition"
               >
                 <Check className="h-4 w-4" />
                 {saving ? t('common.loading') : t('common.save')}
@@ -426,7 +426,7 @@ export function PresentationMaterialsContent() {
               <button
                 type="button"
                 onClick={closeForm}
-                className="rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+                className="rounded-xl border border-[var(--border)] px-4 py-2.5 text-base font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
               >
                 {t('common.cancel')}
               </button>
@@ -437,7 +437,7 @@ export function PresentationMaterialsContent() {
             <button
               type="button"
               onClick={openCreateForm}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#534AB7]/40 bg-[#534AB7]/5 px-4 py-4 text-sm font-bold text-[#534AB7] hover:bg-[#534AB7]/10 transition"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#534AB7]/40 bg-[#534AB7]/5 px-4 py-4 text-base font-bold text-[#534AB7] hover:bg-[#534AB7]/10 transition"
             >
               <Plus className="h-4 w-4" />
               {t('presentationMaterialsPage.addButton')}
@@ -446,7 +446,7 @@ export function PresentationMaterialsContent() {
         )}
 
         {!canAddMore && !formOpen && (
-          <p className="text-center text-xs text-[var(--text-3)]">
+          <p className="text-center text-sm text-[var(--text-3)]">
             {t('presentationMaterialsPage.limitReached', { max: MAX_PRESENTATION_MATERIALS })}
           </p>
         )}

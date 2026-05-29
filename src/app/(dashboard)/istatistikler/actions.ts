@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-import { assertSuperAdmin, isSuperAdmin } from '@/lib/auth'
+import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/auth'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 function createAdminClient() {
@@ -232,11 +232,12 @@ export async function getMemberLicenseProfilesAction(
   workspaces?.forEach(ws => {
     if (!ws.owner_id || profileByOwner.has(ws.owner_id)) return
     const email = emailById.get(ws.owner_id) ?? ''
+    const adminUser = isSuperAdmin({ email })
     profileByOwner.set(ws.owner_id, {
-      licenseType: ws.license_type ?? 'free',
-      licenseExpiresAt: ws.license_expires_at ?? null,
+      licenseType: adminUser ? superAdminLicenseOverride().licenseType : (ws.license_type ?? 'free'),
+      licenseExpiresAt: adminUser ? null : (ws.license_expires_at ?? null),
       workspaceCreatedAt: ws.created_at,
-      isSuperAdmin: isSuperAdmin({ email }),
+      isSuperAdmin: adminUser,
     })
   })
 
@@ -260,6 +261,7 @@ export interface AIUsageArchiveRow {
   fullName: string | null
   email: string
   licenseType: string
+  isSuperAdmin: boolean
   isInvitedDownline: boolean
   messageTotal: number
   roleplayTotal: number
@@ -386,11 +388,14 @@ export async function getAIUsageArchiveAction(
 
   const rows: AIUsageArchiveRow[] = userIds.map(userId => {
     const agg = byUser.get(userId)!
+    const email = emailById.get(userId) ?? '—'
+    const superAdmin = isSuperAdmin({ email })
     return {
       userId,
       fullName: nameById.get(userId) ?? null,
-      email: emailById.get(userId) ?? '—',
-      licenseType: licenseByOwner.get(userId) ?? 'free',
+      email,
+      licenseType: superAdmin ? superAdminLicenseOverride().licenseType : (licenseByOwner.get(userId) ?? 'free'),
+      isSuperAdmin: superAdmin,
       isInvitedDownline: invitedOwners.has(userId),
       messageTotal: agg.message,
       roleplayTotal: agg.roleplay,
@@ -398,6 +403,8 @@ export async function getAIUsageArchiveAction(
       activeDays: agg.days.size,
     }
   }).sort((a, b) => {
+    if (a.isSuperAdmin && !b.isSuperAdmin) return -1
+    if (!a.isSuperAdmin && b.isSuperAdmin) return 1
     const totalA = a.messageTotal + a.roleplayTotal + a.complianceTotal
     const totalB = b.messageTotal + b.roleplayTotal + b.complianceTotal
     return totalB - totalA
