@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-29 — Migration 029 backfill: MAX(uuid) düzeltmesi
+
+### Fix
+- **029 backfill:** `MAX(workspace_id)` → `array_agg(... ORDER BY created_at DESC)[1]` (PostgreSQL uuid için MAX yok)
+- **030:** Kısmi uygulanmış prod için yalnızca backfill patch’i (`030_ai_usage_daily_backfill_fix.sql`)
+
+---
+
 ## 2026-05-29 — YZ kota senkronu, kullanım arşivi, fiyat güncelleme, sunum UX
 
 ### YZ kota gösterimi (kullanılan / limit)
@@ -18,7 +26,7 @@
 ### Fiyatlandırma
 - Basic (leader): **₺499**, Pro: **₺1.799**, Plus (master): **₺999** (aynı)
 
-**Deploy:** Supabase’de `028_presentation_materials.sql` ve `029_ai_usage_daily_rollups.sql` uygula.
+**Deploy:** Supabase’de `028_presentation_materials.sql`, `029_ai_usage_daily_rollups.sql` (+ gerekirse `030_ai_usage_daily_backfill_fix.sql`) uygula.
 
 **Dosyalar:** `aiUsage.ts`, `checkQuota.ts`, `pricing.ts`, `istatistikler/*`, `sunum-materyalleri/*`, `coach.ts`, `stats.ts`, `database.types.ts`
 

@@ -75,10 +75,11 @@ $$;
 GRANT EXECUTE ON FUNCTION public.nmm_increment_ai_usage_daily(uuid, uuid, date, text) TO authenticated;
 
 -- Geçmiş nmm_daily_actions verisinden backfill
+-- workspace_id: o günün en son kaydı (MAX uuid PostgreSQL'de yok)
 INSERT INTO public.nmm_ai_usage_daily (user_id, workspace_id, usage_date, message_count, roleplay_count, compliance_count)
 SELECT
   da.user_id,
-  MAX(da.workspace_id) AS workspace_id,
+  (array_agg(da.workspace_id ORDER BY da.created_at DESC) FILTER (WHERE da.workspace_id IS NOT NULL))[1] AS workspace_id,
   (da.created_at AT TIME ZONE 'UTC')::date AS usage_date,
   COUNT(*) FILTER (WHERE da.note IS DISTINCT FROM 'roleplay' AND da.note IS DISTINCT FROM 'compliance')::int,
   COUNT(*) FILTER (WHERE da.note = 'roleplay')::int,
