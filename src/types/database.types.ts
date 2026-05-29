@@ -269,6 +269,42 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_presentation_materials: {
+        Row: {
+          id: string
+          workspace_id: string
+          title: string
+          url: string
+          whatsapp_template: string
+          sort_order: number
+          is_default: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          title: string
+          url: string
+          whatsapp_template: string
+          sort_order?: number
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          title?: string
+          url?: string
+          whatsapp_template?: string
+          sort_order?: number
+          is_default?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_custom_trainings: {
         Row: {
           id: string

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, TrendingUp, Search, X } from 'lucide-react'
+import { Plus, TrendingUp, Search, X, Presentation } from 'lucide-react'
+import Link from 'next/link'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, type CandidateFilter } from '@/hooks/useCandidates'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
@@ -92,13 +93,22 @@ export default function PipelinePage() {
             {t('pipelinePage.pipelineSubtitle')}
           </p>
         </div>
-        <button
-          onClick={() => setSheetOpen(true)}
-          className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
-        >
-          <Plus className="h-4 w-4" />
-          {t('pipeline.addCandidate')}
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Link
+            href="/pipeline/sunum-materyalleri"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:border-[#534AB7]/40 hover:text-[#534AB7]"
+          >
+            <Presentation className="h-4 w-4" />
+            {t('presentationMaterialsPage.title')}
+          </Link>
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
+          >
+            <Plus className="h-4 w-4" />
+            {t('pipeline.addCandidate')}
+          </button>
+        </div>
       </div>
 
       {/* Stat bar — clickable */}

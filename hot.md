@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-05-29 — Sunum Materyalleri (workspace bazlı WhatsApp)
+
+### Özellik
+- **`nmm_presentation_materials`** migration 028 — title, url, whatsapp_template, sort_order, is_default (max 5/workspace)
+- **Ayar sayfası:** `/pipeline/sunum-materyalleri` (Boru Hattı altında); Boru Hattı başlığında kısayol
+- **Aday detay:** materyal dropdown, mesaj önizlemesi, WhatsApp `{name}` `{url}` `{sender}` şablonu
+- **Fallback:** Süper Admin’de DB boşsa geçici Greenleaf; diğer kullanıcılar materyal ekleyene kadar uyarı
+
+**Deploy:** Supabase’de `028_presentation_materials.sql` uygula.
+
+---
+
 ## 2026-05-29 — Ekibim kapı, istatistik blur, YZ tablo düzeltmesi
 
 ### UX
