@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-29 — Popup UX + Council A/B/D
+
+### UX
+- Pano hesap popup: mobil kompakt, başlık HESAP BİLGİLERİNİZ, ÖNEMLİ kaldırıldı
+- Ekibim kapısı: `fixed` modal (kayma yok), sağ üst X, panel mount yok
+
+### Council A+B+D
+- A: `pickBilingual` + arama sayfası; B: `translateTextAction` kota; D: README + `docs/COUNCIL_STATUS.md`
+
+---
+
 ## 2026-05-29 — Pano hesap duyurusu + 14 gün tek deneme
 
 ### UX

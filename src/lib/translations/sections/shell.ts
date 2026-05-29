@@ -41,8 +41,7 @@ export const shellSection = {
       accountAlertTitle: 'Hesap durumu ile ilgili önemli duyuru!',
       accountAlertTap: 'Detayları gör',
       accountAlertClose: 'Kapat',
-      accountModalTitle: 'Hesap bilgileriniz',
-      accountModalSectionInfo: 'Hesap bilgileriniz',
+      accountModalTitle: 'HESAP BİLGİLERİNİZ',
       accountModalSectionPlan: 'Plan ve kullanım detayları',
       accountModalRegistered: 'Üyelik başlangıcı: {date}',
       accountModalFreeAccess:
@@ -97,8 +96,7 @@ export const shellSection = {
       accountAlertTitle: 'Important notice about your account!',
       accountAlertTap: 'View details',
       accountAlertClose: 'Close',
-      accountModalTitle: 'Your account information',
-      accountModalSectionInfo: 'Account information',
+      accountModalTitle: 'YOUR ACCOUNT INFORMATION',
       accountModalSectionPlan: 'Plan and usage details',
       accountModalRegistered: 'Membership started: {date}',
       accountModalFreeAccess:

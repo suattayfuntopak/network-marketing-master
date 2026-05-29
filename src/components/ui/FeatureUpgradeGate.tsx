@@ -1,12 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Lock } from 'lucide-react'
+import { Sparkles, ArrowRight, Lock, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 
 interface FeatureUpgradeGateProps {
-  /** e.g. team, compliance */
   feature: 'team'
   children: React.ReactNode
   locked: boolean
@@ -14,6 +14,7 @@ interface FeatureUpgradeGateProps {
 
 export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgradeGateProps) {
   const { t } = useTranslation()
+  const [dismissed, setDismissed] = useState(false)
 
   if (!locked) {
     return <>{children}</>
@@ -24,33 +25,64 @@ export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgrade
   const desc =
     feature === 'team' ? t('shellUi.teamGateDesc') : t('shellUi.featureGateDesc')
 
-  return (
-    <div className="relative min-h-[420px] rounded-2xl overflow-hidden">
-      <div
-        className="pointer-events-none select-none blur-[6px] opacity-40 saturate-50"
-        aria-hidden
-      >
-        {children}
+  if (dismissed) {
+    return (
+      <div className="mx-auto max-w-md rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 text-center shadow-sm">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
+          <Lock className="h-6 w-6" strokeWidth={1.75} />
+        </div>
+        <h2 className="text-base font-bold text-[var(--text-1)]">{title}</h2>
+        <p className="mt-2 text-xs leading-relaxed text-[var(--text-2)]">{desc}</p>
+        <Link
+          href="/odeme"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+        >
+          <Sparkles className="h-4 w-4" />
+          {t('shellUi.upgradeBannerCta')}
+          <ArrowRight className="h-4 w-4" />
+        </Link>
       </div>
+    )
+  }
+
+  return (
+    <>
+      {/* Placeholder — gerçek panel mount edilmez; layout kayması olmaz */}
+      <div
+        className="min-h-[200px] rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/40"
+        aria-hidden
+      />
 
       <div
-        className={`absolute inset-0 flex items-center justify-center p-4 bg-[var(--bg)]/55 backdrop-blur-[2px] ${Z.confirmBackdrop}`}
+        className={`fixed inset-0 flex items-center justify-center p-4 ${Z.confirmBackdrop} bg-black/50 backdrop-blur-sm`}
+        role="presentation"
+        onClick={() => setDismissed(true)}
       >
         <div
-          className={`w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-2xl text-center ${Z.confirm}`}
+          className={`relative w-full max-w-md rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-5 sm:p-6 shadow-2xl text-center ${Z.confirm}`}
           role="dialog"
           aria-labelledby="feature-gate-title"
+          onClick={e => e.stopPropagation()}
         >
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-500">
-            <Lock className="h-7 w-7" strokeWidth={1.75} />
+          <button
+            type="button"
+            onClick={() => setDismissed(true)}
+            className="absolute right-2.5 top-2.5 flex h-9 w-9 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] hover:bg-[var(--border)] hover:text-[var(--text-1)] transition"
+            aria-label={t('shellUi.accountAlertClose')}
+          >
+            <X className="h-4 w-4" strokeWidth={2.25} />
+          </button>
+
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-indigo-500">
+            <Lock className="h-6 w-6" strokeWidth={1.75} />
           </div>
-          <h2 id="feature-gate-title" className="text-lg font-bold text-[var(--text-1)]">
+          <h2 id="feature-gate-title" className="text-base sm:text-lg font-bold text-[var(--text-1)] pr-8">
             {title}
           </h2>
-          <p className="mt-2 text-sm leading-relaxed text-[var(--text-2)]">{desc}</p>
+          <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[var(--text-2)]">{desc}</p>
           <Link
             href="/odeme"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-3 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
+            className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
           >
             <Sparkles className="h-4 w-4" />
             {t('shellUi.upgradeBannerCta')}
@@ -58,6 +90,6 @@ export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgrade
           </Link>
         </div>
       </div>
-    </div>
+    </>
   )
 }

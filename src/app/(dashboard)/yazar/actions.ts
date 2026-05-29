@@ -250,9 +250,10 @@ export async function translateTextAction(text: string, targetLang: 'tr' | 'en')
 
   if (!text) return {}
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { error: 'Oturum gerekli.' }
+  const quota = await checkAIQuota('message', { lang: targetLang })
+  if (!quota.ok) {
+    return { error: quota.message }
+  }
 
   const systemPrompt = `Sen profesyonel bir çevirmensin. Görevin, verilen metni anlamını ve tonunu koruyarak ${
     targetLang === 'en' ? 'İngilizceye' : 'Türkçeye'

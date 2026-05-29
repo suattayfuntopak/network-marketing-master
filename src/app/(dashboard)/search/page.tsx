@@ -12,6 +12,7 @@ import { STAGE_LABEL, STAGE_COLOR } from '@/lib/domain/stages'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { ITIRAZLAR } from '../itirazlar/data/itirazlar'
+import { pickBilingual } from '@/lib/utils/pickLang'
 
 function SearchPageContent() {
   const { lang, t } = useTranslation()
@@ -65,9 +66,9 @@ function SearchPageContent() {
   const filteredObjections = query.trim()
     ? ITIRAZLAR.filter(i => {
         const term = query.toLowerCase()
-        const question = lang === 'en' ? i.soru.en : i.soru.tr
-        const answer = lang === 'en' ? i.cevap?.en ?? '' : i.cevap?.tr ?? ''
-        const category = lang === 'en' ? i.kategori.en : i.kategori.tr
+        const question = pickBilingual(i.soru, lang)
+        const answer = pickBilingual(i.cevap, lang)
+        const category = pickBilingual(i.kategori, lang)
         return (
           question.toLowerCase().includes(term) ||
           answer.toLowerCase().includes(term) ||
@@ -226,9 +227,9 @@ function SearchPageContent() {
             </h2>
             <div className="grid gap-2.5">
               {filteredObjections.map(objection => {
-                const question = lang === 'en' ? objection.soru.en : objection.soru.tr
-                const answer = lang === 'en' ? objection.cevap?.en ?? '' : objection.cevap?.tr ?? ''
-                const category = lang === 'en' ? objection.kategori.en : objection.kategori.tr
+                const question = pickBilingual(objection.soru, lang)
+                const answer = pickBilingual(objection.cevap, lang)
+                const category = pickBilingual(objection.kategori, lang)
                 return (
                   <Link
                     key={objection.id}

@@ -24,8 +24,8 @@ roleplays and compliance checks — all bilingual (Turkish / English).
   "Distribütör Doğru Başlangıç Rehberi"; AI team coach.
 - **İstatistikler / Platform Yönetim** — team performance, AI usage & limits, and the
   app-owner's platform admin desk (license management).
-- **AI quota & licenses** — `free` / `leader` / `pro` / `master`; per-license daily
-  limits via `getLimitsForLicense` (`src/lib/domain/aiUsage.ts`).
+- **AI quota & licenses** — `free` (14-day trial → Basic credits) / `leader` / `master` / `pro`;
+  daily limits via `getLimitsForLicense` (`src/lib/domain/aiUsage.ts`).
 
 ### Super admin = real user + app owner
 
@@ -83,3 +83,4 @@ supabase/migrations/ numbered SQL migrations (one number = one migration)
 - **i18n:** all user-visible copy via `useTranslation()` keys in `src/lib/translations`.
 - Full agent/contributor rules: [`AGENTS.md`](AGENTS.md) and [`CLAUDE.md`](CLAUDE.md).
 - Recent changes & deploy notes: [`hot.md`](hot.md).
+- Council triad backlog status: [`docs/COUNCIL_STATUS.md`](docs/COUNCIL_STATUS.md).
