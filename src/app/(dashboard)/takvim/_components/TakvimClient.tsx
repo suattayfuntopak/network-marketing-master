@@ -10,6 +10,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { formatCalendarMonth, weekdayShortLabels } from '@/lib/utils/calendarLocale'
 
 function followUpDate(c: NmmCandidate): Date | null {
   // Önce manuel atanmış tarihi kullan
@@ -34,14 +35,6 @@ function toKey(d: Date) {
   const day = String(d.getDate()).padStart(2, '0')
   return `${y}-${m}-${day}`
 }
-
-const MONTHS_TR = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran',
-                 'Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
-const MONTHS_EN = ['January','February','March','April','May','June',
-                 'July','August','September','October','November','December']
-const DAYS_TR   = ['Pzt','Sal','Çar','Per','Cum','Cmt','Paz']
-const DAYS_EN   = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
-
 
 export function TakvimClient() {
   const router = useRouter()
@@ -91,6 +84,8 @@ export function TakvimClient() {
   function prevMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() - 1, 1, 12, 0, 0)) }
   function nextMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() + 1, 1, 12, 0, 0)) }
 
+  const weekdayLabels = useMemo(() => weekdayShortLabels(lang), [lang])
+
   if (!mounted) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2">
@@ -109,7 +104,7 @@ export function TakvimClient() {
           <ChevronLeft className="h-4 w-4" />
         </button>
         <span className="text-sm font-bold text-[var(--text-1)]">
-          {(lang === 'en' ? MONTHS_EN : MONTHS_TR)[view.getMonth()]} {view.getFullYear()}
+          {formatCalendarMonth(view, lang)} {view.getFullYear()}
         </span>
         <button onClick={nextMonth} className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:text-[var(--text-1)]">
           <ChevronRight className="h-4 w-4" />
@@ -120,7 +115,7 @@ export function TakvimClient() {
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
         {/* Gün başlıkları */}
         <div className="mb-1 grid grid-cols-7">
-          {(lang === 'en' ? DAYS_EN : DAYS_TR).map(d => (
+          {weekdayLabels.map(d => (
             <div key={d} className="py-1 text-center text-[10px] font-semibold text-[var(--text-3)]">{d}</div>
           ))}
         </div>
@@ -262,7 +257,7 @@ export function TakvimClient() {
         return (
           <div className="mt-4 border-t border-[var(--border)] pt-4">
             <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-              {t('pagesUi.nextMonth')} ({(lang === 'en' ? MONTHS_EN : MONTHS_TR)[nmMonth]} {nmYear})
+              {t('pagesUi.nextMonth')} ({formatCalendarMonth(nextMonthDate, lang)} {nmYear})
             </p>
             <ul className="space-y-1.5">
               {nextMonthKeys.map(k => (

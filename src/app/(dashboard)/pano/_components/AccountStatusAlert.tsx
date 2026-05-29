@@ -66,7 +66,7 @@ export function AccountStatusAlert() {
           <div
             role="dialog"
             aria-labelledby="account-status-title"
-            className={`relative w-full max-w-[min(100%,22rem)] sm:max-w-md max-h-[min(88vh,520px)] overflow-y-auto rounded-2xl sm:rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl ${Z.confirm}`}
+            className={`relative flex w-full max-w-[min(100%,22rem)] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl sm:max-w-md sm:rounded-3xl max-h-[min(88vh,520px)] md:max-h-none ${Z.confirm}`}
             onClick={e => e.stopPropagation()}
           >
             <button
@@ -87,28 +87,44 @@ export function AccountStatusAlert() {
               </h2>
             </div>
 
-            <div className="space-y-4 px-4 py-3.5 sm:px-5 sm:py-4 text-xs sm:text-sm leading-relaxed text-[var(--text-2)]">
-              <ul className="space-y-1.5 list-disc pl-4">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3.5 text-xs leading-relaxed text-[var(--text-2)] sm:px-5 sm:py-4 sm:text-sm md:flex-none md:overflow-visible md:space-y-2 md:py-3">
+              <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
                 <li>{t('shellUi.accountModalRegistered', { date: registered })}</li>
-                <li>{t('shellUi.accountModalFreeAccess', { date: accessEnd })}</li>
+                <li className="md:hidden">
+                  {t('shellUi.accountModalFreeAccess', { date: accessEnd })}
+                </li>
+                <li className="hidden md:list-item">
+                  {t('shellUi.accountModalFreeAccessDesktop', { date: accessEnd })}
+                </li>
               </ul>
 
               <div>
-                <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-[var(--text-1)] mb-1.5">
+                <h3 className="text-[10px] sm:text-xs font-bold uppercase tracking-wide text-[var(--text-1)] mb-1.5 md:mb-1">
                   {t('shellUi.accountModalSectionPlan')}
                 </h3>
-                <ul className="space-y-1.5 list-disc pl-4">
-                  <li>{t('shellUi.accountModalTrialBullets')}</li>
-                  <li>{t('shellUi.accountModalTeamBullets')}</li>
+                <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
+                  <li className="md:hidden">{t('shellUi.accountModalTrialBullets')}</li>
+                  <li className="hidden md:list-item">
+                    {t('shellUi.accountModalTrialBulletsDesktop')}
+                  </li>
+                  <li className="md:hidden">{t('shellUi.accountModalTeamBullets')}</li>
+                  <li className="hidden md:list-item">
+                    {t('shellUi.accountModalTeamBulletsDesktop')}
+                  </li>
                 </ul>
               </div>
 
-              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)]">
-                {t('shellUi.accountModalFootnote', { date: accessEnd })}
+              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)] md:py-2 md:text-xs">
+                <span className="md:hidden">
+                  {t('shellUi.accountModalFootnote', { date: accessEnd })}
+                </span>
+                <span className="hidden md:inline">
+                  {t('shellUi.accountModalFootnoteDesktop', { date: accessEnd })}
+                </span>
               </p>
             </div>
 
-            <div className="flex flex-col-reverse sm:flex-row gap-2 border-t border-[var(--border)] px-4 py-3 sm:px-5 sm:py-4">
+            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:px-5 sm:py-3.5">
               <button
                 type="button"
                 onClick={() => setOpen(false)}

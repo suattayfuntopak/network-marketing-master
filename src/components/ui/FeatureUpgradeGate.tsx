@@ -25,9 +25,8 @@ export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgrade
   const desc =
     feature === 'team' ? t('shellUi.teamGateDesc') : t('shellUi.featureGateDesc')
 
-  if (dismissed) {
-    return (
-      <div className="mx-auto max-w-md rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 text-center shadow-sm">
+  const dismissedCard = (
+    <div className="w-full max-w-md rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 text-center shadow-sm">
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-500">
           <Lock className="h-6 w-6" strokeWidth={1.75} />
         </div>
@@ -41,7 +40,23 @@ export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgrade
           {t('shellUi.upgradeBannerCta')}
           <ArrowRight className="h-4 w-4" />
         </Link>
-      </div>
+    </div>
+  )
+
+  if (dismissed) {
+    return (
+      <>
+        <div
+          className="min-h-[200px] rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/40"
+          aria-hidden
+        />
+        <div
+          className={`fixed inset-0 flex items-center justify-center p-4 pointer-events-none ${Z.confirmBackdrop}`}
+          aria-hidden={false}
+        >
+          <div className="pointer-events-auto w-full max-w-md px-1">{dismissedCard}</div>
+        </div>
+      </>
     )
   }
 

@@ -43,3 +43,6 @@ next-env.d.ts
 # scratch directory for temporary developer scripts
 /scratch/
 
+# local-only docs (n8n JSON, secrets) — not pushed
+/docs/local/
+

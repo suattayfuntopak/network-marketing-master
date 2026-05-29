@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-05-29 — Popup masaüstü + Ekibim konum + e-posta rehberi
+
+### UX
+- **Hesap popup (md+):** Kısa metin varyantları; `max-h` kaldırıldı — butonlar kaydırmadan görünür; mobil metin aynı
+- **Ekibim kapısı:** X sonrası kart `fixed` viewport ortasında (modal ile aynı konum); mobil de ortalı
+
+### Council / dokümantasyon
+- Takvim: `calendarLocale` (Intl), `lang === 'en'` kaldırıldı
+- `docs/email-automation.md` — n8n / cron önerisi; `docs/local/` gitignore (n8n JSON yerel)
+- `COUNCIL_STATUS.md` güncellendi (F tamam, E kısmi, C Shopier bekliyor)
+
+---
+
 ## 2026-05-29 — Popup UX + Council A/B/D
 
 ### UX

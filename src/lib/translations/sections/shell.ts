@@ -52,6 +52,13 @@ export const shellSection = {
         'Ekibim sayfası ve yüksek limitler: Plus veya Pro planlarından birine geçiş yaptığınızda Ekibim sayfası erişiminiz aktif hale gelir. İhtiyacınıza göre daha yüksek yapay zeka mesaj limitleri için bu planları tercih edebilirsiniz.',
       accountModalFootnote:
         'Önemli not: 14 günlük deneme sürecinin sonunda bir abonelik başlatılmaması durumunda hesap kullanımına geçici olarak ara verilecektir. ({date})',
+      accountModalFreeAccessDesktop:
+        'Ücretsiz erişim (14 gün, Basic kredileri): {date} tarihine kadar.',
+      accountModalTrialBulletsDesktop:
+        'Denemede günlük 15 YZ Koçu, 10 Saha Provası, 2 Uyum Denetimi.',
+      accountModalTeamBulletsDesktop: 'Ekibim ve yüksek limitler: Plus veya Pro plan.',
+      accountModalFootnoteDesktop:
+        'Deneme bitiminde abonelik yoksa erişim duraklatılır ({date}).',
     },
   },
   en: {
@@ -107,6 +114,13 @@ export const shellSection = {
         'Team hub and higher limits: Upgrade to Plus or Pro to unlock the Team page and higher daily AI limits.',
       accountModalFootnote:
         'Important: If you do not start a subscription when your 14-day trial ends, account access will be paused until you choose a plan. ({date})',
+      accountModalFreeAccessDesktop:
+        'Free access (14-day trial, Basic credits): valid until {date}.',
+      accountModalTrialBulletsDesktop:
+        'During trial: 15 AI Coach, 10 roleplay, 2 compliance messages per day.',
+      accountModalTeamBulletsDesktop: 'Team hub and higher limits: Plus or Pro plan.',
+      accountModalFootnoteDesktop:
+        'Without a subscription after trial, access pauses ({date}).',
     },
   },
 } as const
