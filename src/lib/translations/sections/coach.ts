@@ -38,7 +38,7 @@ export const coachSection = {
       remainingCredits: 'Günlük simülasyon kullanımı: {used} / {limit}',
       selectScenarioTitle: 'Senaryo seç, prova başlasın!',
       introDesc: 'YZ aday veya yeni ortak rolüne girer; distribütörü zorlayan gerçekçi itirazlar sunar. Yazdığınız her yanıttan sonra net YZK notu ve puan kazanırsınız.',
-      dailyRoleplayQuota: 'Günlük simülasyon kullanımı: {used} / {limit}',
+      dailyRoleplayQuota: 'YZ Koçu kullanımı: {used} / {limit}',
       simulation: 'SİMÜLASYON',
 
       // YazarForm.tsx
@@ -112,7 +112,7 @@ export const coachSection = {
       remainingCredits: 'Daily roleplay usage: {used} / {limit}',
       selectScenarioTitle: 'Select Scenario, Start Rehearsing!',
       introDesc: 'The AI acts as a realistic prospect or team member. Type your replies, receive direct mentor scores, strengths, and leadership tips.',
-      dailyRoleplayQuota: 'Daily roleplay usage: {used} / {limit}',
+      dailyRoleplayQuota: 'AI Coach usage: {used} / {limit}',
       simulation: 'SIMULATION',
 
       // YazarForm.tsx
