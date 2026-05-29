@@ -75,8 +75,7 @@ export const pipelineSection = {
       limitReached: 'En fazla {max} materyal ekleyebilirsiniz.',
       manageLink: 'Materyalleri düzenle',
       selectMaterial: 'Gönderilecek materyal',
-      addFirst: 'Önce sunum materyali ekleyin',
-      addFirstHint: 'Boru Hattı → Sunum Materyalleri sayfasından link ve mesaj şablonunuzu tanımlayın.',
+      addFirst: 'Önce sunum materyali ekleyin!',
       previewLabel: 'Mesaj önizlemesi',
     },
     compliancePage: {
@@ -196,8 +195,7 @@ export const pipelineSection = {
       limitReached: 'You can add up to {max} materials.',
       manageLink: 'Manage materials',
       selectMaterial: 'Material to send',
-      addFirst: 'Add presentation materials first',
-      addFirstHint: 'Define your link and template under Pipeline → My Presentation Materials.',
+      addFirst: 'Add presentation materials first!',
       previewLabel: 'Message preview',
     },
     compliancePage: {

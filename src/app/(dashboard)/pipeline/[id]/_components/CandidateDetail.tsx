@@ -602,7 +602,6 @@ export function CandidateDetail({ candidateId }: Props) {
               ) : presentationMaterials.length === 0 ? (
                 <div className="mt-4 rounded-xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm leading-relaxed text-amber-900 dark:text-amber-200">
                   <p className="font-semibold">{t('presentationMaterialsPage.addFirst')}</p>
-                  <p className="mt-1 opacity-90">{t('presentationMaterialsPage.addFirstHint')}</p>
                 </div>
               ) : (
                 <>

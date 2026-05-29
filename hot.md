@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-30 — Sunum materyali boş uyarı metni kısaltıldı
+
+- Aday detay: yalnızca **"Önce sunum materyali ekleyin!"** (alt açıklama kaldırıldı)
+
+---
+
 ## 2026-05-30 — Lansman fiyat güncellemesi (Plus / Pro)
 
 - **Basic:** ₺499 (aynı)
