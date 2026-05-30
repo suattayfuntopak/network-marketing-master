@@ -32,16 +32,3 @@ export function keysForDaysAfter(anchorKey: string, count: number): string[] {
     return toCalendarKey(d)
   })
 }
-
-/** Pazartesi başlangıçlı haftanın 7 günü (seçili günün bulunduğu hafta). */
-export function weekKeysContaining(anchorKey: string): string[] {
-  const anchor = fromCalendarKey(anchorKey)
-  const mondayOffset = (anchor.getDay() + 6) % 7
-  const monday = new Date(anchor)
-  monday.setDate(anchor.getDate() - mondayOffset)
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(monday)
-    d.setDate(monday.getDate() + i)
-    return toCalendarKey(d)
-  })
-}

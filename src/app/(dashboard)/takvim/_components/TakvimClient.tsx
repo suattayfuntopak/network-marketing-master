@@ -27,7 +27,6 @@ import {
   toCalendarKey,
   fromCalendarKey,
   keysForDaysAfter,
-  weekKeysContaining,
 } from '@/lib/utils/calendarDates'
 import {
   bulkDeferOverdueFollowUpsAction,
@@ -35,7 +34,6 @@ import {
   deferFollowUpAction,
 } from '../actions'
 import { TakvimCandidateRow } from './TakvimCandidateRow'
-import { TakvimWeekStrip } from './TakvimWeekStrip'
 import { TakvimTeamCalendar } from './TakvimTeamCalendar'
 import { TakvimConfirmModal } from './TakvimConfirmModal'
 
@@ -85,8 +83,6 @@ export function TakvimClient() {
     () => nearestFollowUpKey(selected, byDate),
     [selected, byDate],
   )
-
-  const weekKeys = useMemo(() => weekKeysContaining(selected), [selected])
 
   const monthStats = useMemo(
     () => monthCalendarStats(view.getFullYear(), view.getMonth(), byDate, todayKey),
@@ -191,12 +187,6 @@ export function TakvimClient() {
     selectCalendarDate(todayKey)
   }
 
-  function shiftWeek(delta: number) {
-    const d = fromCalendarKey(selected)
-    d.setDate(d.getDate() + delta * 7)
-    selectCalendarDate(toCalendarKey(d))
-  }
-
   if (!mounted || !ws?.workspaceId) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2">
@@ -296,18 +286,6 @@ export function TakvimClient() {
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
-
-      <TakvimWeekStrip
-        weekKeys={weekKeys}
-        selected={selected}
-        todayKey={todayKey}
-        byDate={byDate}
-        lang={lang}
-        title={t('pagesUi.weekView')}
-        onSelect={selectCalendarDate}
-        onPrevWeek={() => shiftWeek(-1)}
-        onNextWeek={() => shiftWeek(1)}
-      />
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
         <div className="mb-1 grid grid-cols-7">

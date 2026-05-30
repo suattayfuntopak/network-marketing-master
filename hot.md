@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-30 — Takvim: hafta şeridi kaldırıldı
+
+- Aylık grid ile mükerrer olan "Hafta görünümü" (`TakvimWeekStrip`) kaldırıldı.
+
+---
+
 ## 2026-05-30 — Yetim workspace temizliği + owner başına tek workspace
 
 - **Sorun:** Geliştirme döneminde aynı `owner_id` ile 20 duplicate workspace (çoğu 0 aday); `ensureWorkspace` üyelik yokken yenilerini açıyordu.
