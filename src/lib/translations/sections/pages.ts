@@ -19,6 +19,11 @@ export const pagesSection = {
       prospectSingular: "aday",
       prospectPlural: "aday",
       nextMonth: "Önümüzdeki Ay",
+      backToToday: "Bugüne dön",
+      overdueFollowUps: "{count} gecikmiş takip",
+      viewTodayPriorities: "Bugün İlgilen →",
+      weekView: "Hafta görünümü",
+      nearestFollowUp: "En yakın takip: {date} ({count} aday)",
 
       // saha-provasi/page.tsx
       fieldRehearsalTitle: "Saha Provası",
@@ -74,6 +79,11 @@ export const pagesSection = {
       prospectSingular: "prospect",
       prospectPlural: "prospects",
       nextMonth: "Next Month",
+      backToToday: "Back to today",
+      overdueFollowUps: "{count} overdue follow-ups",
+      viewTodayPriorities: "Today's Priorities →",
+      weekView: "Week view",
+      nearestFollowUp: "Nearest follow-up: {date} ({count} prospects)",
 
       // saha-provasi/page.tsx
       fieldRehearsalTitle: "Field Rehearsal",

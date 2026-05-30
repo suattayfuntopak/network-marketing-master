@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-30 — Takvim modülü: 8 iyileştirme paketi
+
+1. **Terminal aşamalar** — Katıldı / İlgilenmedi / Kaybedildi / Pasif otomatik takvimden çıkarıldı (manuel `next_follow_up_at` hariç).
+2. **Bugüne dön** — Ay navigasyonunda kısayol.
+3. **Gecikmiş takip sayacı** — Üst banner; tıklanınca en eski gecikmiş güne gider, Bugün İlgilen linki.
+4. **Hafta görünümü** — Masaüstünde seçili haftanın 7 günlük şeridi (`md+`).
+5. **Hızlı erteleme** — Aday kartlarında +1 / +3 / +7 (seçili günden itibaren).
+6. **En yakın takip** — Boş günde dolu en yakın güne yönlendirme.
+7. **Intl tarih formatı** — `formatCalendarDayKey` / `formatCalendarDayShort` (TR/EN).
+8. **Performans** — `buildCalendarByDate` domain katmanı; terminal filtre tek geçişte.
+
+**Yeni dosyalar:** `calendarDates.ts`, `calendarFollowUp.ts`, `TakvimCandidateRow.tsx`, `TakvimWeekStrip.tsx`
+
+---
+
 ## 2026-05-30 — Takvim: "Seçili günden sonraki 7 gün" referans düzeltmesi
 
 - **Sorun:** "Önümüzdeki 7 gün" listesi `today` (bugün) üzerinden hesaplanıyordu; Haziran ayında 17'sine tıklanınca 5 Haziran gibi geçmiş tarihler görünüyordu.

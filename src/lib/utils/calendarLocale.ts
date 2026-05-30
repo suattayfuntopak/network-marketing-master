@@ -1,11 +1,30 @@
 /** Takvim başlıkları — Intl ile TR/EN; bileşende `lang === 'en'` gerekmez. */
 
+import { fromCalendarKey } from '@/lib/utils/calendarDates'
+
 function localeFor(lang: 'tr' | 'en') {
   return lang === 'en' ? 'en-GB' : 'tr-TR'
 }
 
 export function formatCalendarMonth(date: Date, lang: 'tr' | 'en') {
   return new Intl.DateTimeFormat(localeFor(lang), { month: 'long' }).format(date)
+}
+
+/** Tam tarih: 17 Haziran 2026 / 17 June 2026 */
+export function formatCalendarDayKey(key: string, lang: 'tr' | 'en') {
+  return new Intl.DateTimeFormat(localeFor(lang), {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(fromCalendarKey(key))
+}
+
+/** Kısa tarih: 17 Haz / 17 Jun */
+export function formatCalendarDayShort(key: string, lang: 'tr' | 'en') {
+  return new Intl.DateTimeFormat(localeFor(lang), {
+    day: 'numeric',
+    month: 'short',
+  }).format(fromCalendarKey(key))
 }
 
 /** Pazartesi başlangıçlı kısa gün adları (Pzt … Paz / Mon … Sun). */
