@@ -12,18 +12,18 @@ jobs:
     steps:
       - name: Trial lifecycle emails
         run: |
-          curl -fsS -X GET \
+          curl -fsS --max-redirs 0 -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/trial-emails"
 
       - name: Paid license renewal reminders
         run: |
-          curl -fsS -X GET \
+          curl -fsS --max-redirs 0 -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/license-reminder"
 
       - name: Daily calendar follow-up reminders
         run: |
-          curl -fsS -X GET \
+          curl -fsS --max-redirs 0 -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/calendar-reminder"

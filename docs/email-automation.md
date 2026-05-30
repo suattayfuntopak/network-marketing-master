@@ -96,3 +96,15 @@ GitHub → repo **Settings → Secrets → Actions**:
 - `NMM_APP_URL` — `https://nmm.suattayfuntopak.com`
 
 Kurulumdan sonra **Actions** sekmesinden workflow’u manuel çalıştırarak test edin. Ek ücret: GitHub public repo’da Actions kotası genelde yeterlidir.
+
+**Proxy:** `src/proxy.ts` içinde `/api/cron/` oturum kontrolünden muaf (route kendi `CRON_SECRET` doğrulamasını yapar). Yoksa istekler `/giris`’e 307 ile düşer ve e-posta gitmez.
+
+Doğrulama (yönlendirme takip edilmeden):
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" --max-redirs 0 \
+  -H "Authorization: Bearer CRON_SECRET" \
+  "https://nmm.suattayfuntopak.com/api/cron/trial-emails"
+```
+
+`200` beklenir; `307` = proxy whitelist eksik; `401` = secret uyuşmuyor.

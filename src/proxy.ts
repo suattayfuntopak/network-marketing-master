@@ -41,9 +41,11 @@ export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isShopierWebhook =
     pathname === '/api/payment/shopier' || pathname === '/api/payment/shopier/'
+  const isCronRoute = pathname.startsWith('/api/cron/')
   const isPublic =
     pathname === '/' ||
     isShopierWebhook ||
+    isCronRoute ||
     PUBLIC_PATHS.some(p => p !== '/api/payment/shopier' && pathname.startsWith(p))
 
   if (!user && !isPublic) {

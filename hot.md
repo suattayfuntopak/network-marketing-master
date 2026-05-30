@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-30 — Cron e-posta: proxy 307 engeli giderildi
+
+- **Sorun:** `/api/cron/*` oturum proxy’sine takılıyordu → 307 `/giris`; GitHub Actions yeşil görünüp mail gitmiyordu (curl redirect takibi).
+- **Düzeltme:** `proxy.ts` — `isCronRoute` whitelist; workflow curl’lere `--max-redirs 0`.
+- **Deploy sonrası:** Vercel redeploy → Actions manuel run veya `curl --max-redirs 0` ile **200** doğrula.
+
+---
+
 ## 2026-05-30 — Takvim sprint 2 (iCal hariç 7 öneri)
 
 1. **Mobil hafta şeridi** — Yatay kaydırma + hafta okları (`TakvimWeekStrip`).
