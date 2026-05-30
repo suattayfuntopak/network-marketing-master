@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { cronAuthError } from '@/lib/infra/cronAuth'
 import { fetchFreeTrialRecipients } from '@/lib/infra/cronTrialRecipients'
 import { sendTrialLifecycleEmail, type TrialEmailKind } from '@/lib/infra/trialEmails'
 
@@ -11,15 +12,10 @@ const JOBS: { kind: TrialEmailKind; offsetDays: number }[] = [
 ]
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = cronAuthError(request)
+  if (authError) return authError
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const supabase = createAdminClient()
 
   const results: { kind: TrialEmailKind; email: string; sent: boolean }[] = []
 

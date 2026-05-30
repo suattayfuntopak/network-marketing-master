@@ -1,17 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { cronAuthError } from '@/lib/infra/cronAuth'
 import { sendLicenseExpiryEmail } from '@/lib/infra/mail'
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = cronAuthError(request)
+  if (authError) return authError
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const supabase = createAdminClient()
 
   const now = new Date()
   const results: { email: string; days: number; sent: boolean }[] = []
@@ -46,6 +42,7 @@ export async function GET(request: NextRequest) {
           .maybeSingle()
 
         if (!member) continue
+        if (!ws.license_expires_at) continue
 
         const { data: authUser } = await supabase.auth.admin.getUserById(member.user_id)
         if (!authUser?.user?.email) continue

@@ -10,7 +10,7 @@ import {
   emailPlanBox,
 } from '@/lib/infra/emailTemplate'
 
-const resend = new Resend(process.env.RESEND_API_KEY || 're_test_key')
+const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
 export type TrialEmailKind = 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'

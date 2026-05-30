@@ -1,4 +1,4 @@
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { AdminClient } from '@/lib/supabase/admin'
 
 export interface TrialEmailRecipient {
   email: string
@@ -8,7 +8,7 @@ export interface TrialEmailRecipient {
 
 /** license_expires_at tam günü = bugün + offsetDays olan free workspace liderleri. */
 export async function fetchFreeTrialRecipients(
-  supabase: SupabaseClient,
+  supabase: AdminClient,
   offsetDays: number
 ): Promise<TrialEmailRecipient[]> {
   const target = new Date()

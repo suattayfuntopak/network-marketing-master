@@ -8,3 +8,6 @@ export function createAdminClient() {
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 }
+
+/** Service-role admin client tipi — typed Database şemasıyla. */
+export type AdminClient = ReturnType<typeof createAdminClient>

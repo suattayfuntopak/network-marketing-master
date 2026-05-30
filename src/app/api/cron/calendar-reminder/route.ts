@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { cronAuthError } from '@/lib/infra/cronAuth'
 import { buildCalendarByDate } from '@/lib/domain/calendarFollowUp'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate } from '@/types/database.types'
 
 export async function GET(request: NextRequest) {
-  const authHeader = request.headers.get('authorization')
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const authError = cronAuthError(request)
+  if (authError) return authError
 
   const supabase = createAdminClient()
   const todayKey = todayCalendarKey()
