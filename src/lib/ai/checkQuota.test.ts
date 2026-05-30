@@ -2,11 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 // Mock the Supabase server client and auth helper before importing the unit.
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }))
-vi.mock('@/lib/auth', () => ({ isSuperAdmin: vi.fn() }))
+vi.mock('@/lib/domain/auth', () => ({ isSuperAdmin: vi.fn() }))
 
 import { checkAIQuota } from './checkQuota'
 import { createClient } from '@/lib/supabase/server'
-import { isSuperAdmin } from '@/lib/auth'
+import { isSuperAdmin } from '@/lib/domain/auth'
 
 interface MockState {
   user: { id: string; email: string | null } | null

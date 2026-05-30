@@ -1,5 +1,5 @@
 import type { User } from '@supabase/supabase-js'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 
 /** Platform owner + real NMM user (dual role per CLAUDE.md §4). */
 export function isSuperAdmin(user: { email?: string | null } | null | undefined): boolean {

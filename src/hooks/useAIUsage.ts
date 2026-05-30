@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import { isSuperAdmin } from '@/lib/auth'
+import { isSuperAdmin } from '@/lib/domain/auth'
 
 export interface AIUsageData {
   roleplayUsed: number

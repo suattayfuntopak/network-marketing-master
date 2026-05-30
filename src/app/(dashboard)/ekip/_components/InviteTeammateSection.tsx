@@ -3,7 +3,7 @@
 import { UserPlus, Copy, Check } from 'lucide-react'
 import { SpoilerCode } from './SpoilerCode'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { REGISTER_URL } from '@/lib/constants'
+import { REGISTER_URL } from '@/lib/domain/constants'
 
 interface InviteTeammateSectionProps {
   inviteCode: string

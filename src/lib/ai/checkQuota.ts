@@ -4,7 +4,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getEffectiveLicenseType, getLimitsForLicense } from '@/lib/domain/aiUsage'
-import { isSuperAdmin } from '@/lib/auth'
+import { isSuperAdmin } from '@/lib/domain/auth'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'
 

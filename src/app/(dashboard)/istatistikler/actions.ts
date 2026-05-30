@@ -1,17 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
-import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
-
-function createAdminClient() {
-  return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 export interface IndependentAIUsageRow {
   userId: string

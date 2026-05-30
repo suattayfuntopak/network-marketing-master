@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { isSuperAdmin, resolveWorkspaceLicense } from '@/lib/auth'
+import { isSuperAdmin, resolveWorkspaceLicense } from '@/lib/domain/auth'
 import { getEffectiveLicenseType, isTrialPeriodActive } from '@/lib/domain/aiUsage'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 

@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { isSuperAdmin } from '@/lib/domain/auth'
 import { buildCalendarByDate, nextFollowUpKeyAfterCompletion, CALENDAR_TERMINAL_STAGES } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
@@ -201,8 +201,7 @@ export async function fetchTeamCalendarSummaryAction(
 ): Promise<TeamCalendarMemberSummary[]> {
   const { supabase, user, ws } = await assertWorkspaceOwner(workspaceId)
 
-  const isSuperAdmin = user.email === SUPER_ADMIN_EMAIL
-  if (ws.license_type !== 'pro' && !isSuperAdmin) {
+  if (ws.license_type !== 'pro' && !isSuperAdmin(user)) {
     return []
   }
 

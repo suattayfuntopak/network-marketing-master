@@ -1,19 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database.types'
-import { assertSuperAdmin } from '@/lib/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
-
-// Initialize Supabase Admin Client using Service Role Key to bypass RLS safely
-function createAdminClient() {
-  return createSupabaseClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
-}
 
 export interface PlatformWorkspaceItem {
   workspaceId: string

@@ -14,7 +14,9 @@ A–D, #6–7, E (i18n), F (perf), G (error/loading boundary), H (E2E), K-1..K-5
 | **A — Güvenlik** | Cron auth + secret hijyeni | K-1 (🔴), Y-1 | ✅ `cronAuthError` guard + Resend fallback sil + typed admin client (gizli null bug yakalandı) |
 | **B — Cron doğruluğu** | İdempotency + timezone + lisans | Y-2, Y-3, O-9 | ✅ `nmm_email_sent_log` (mig 036) + claim-before-send · İstanbul gün-başı · birleşik expiry · N+1→batch. **Deploy: migration 036.** |
 | **C — Veri bütünlüğü** | Race + yalancı UI | Y-4, Y-5, O-1, O-2, O-12 | ✅ taze-okuma race fix · yalancı e-posta UI silindi · bulkDefer terminal filtre + batch · parent_id ölü koşul kaldırıldı |
-| **D — i18n & yapı** | bimodal + flat lib + admin dedup | Y-7, O-3, O-4, O-6, O-8 | ⏳ |
+| **D — i18n & yapı** | bimodal + flat lib + admin dedup | Y-7, O-3, O-4, O-6, O-8 | ✅ flat lib→domain · admin client dedup · inline super-admin→isSuperAdmin · eslint exact allowlist · deleteWithUndo→t() |
+
+**Y-7 yeniden sınıflandırma (önemli):** "67 `lang === 'en'`" büyük ölçüde yanlış sayımdı. Çoğu meşru: `title_en:title_tr` (iki-dilli DB verisi — CLAUDE.md kalıbı) ve `'en-US':'tr-TR'` (locale argümanı). Gerçek hardcoded UI kopyası yalnızca `deleteWithUndo` (3 string → `common.*` anahtarları) + ölü `'Ayşe':'Ayşe'` ternary idi; ikisi de düzeltildi. Kalan kopya-vari ternary'ler `YazarForm`/`CandidateDetail` (god component) içinde → **Faz F**'te dekompozisyonla birlikte.
 | **E — `\|\|\|` göçü** | Okuma typed kolona, legacy sil | Y-6 | ⏳ (backfill doğrulaması) |
 | **F — God component & hijyen** | Bölme + lint + log + circular | Y-8, O-5, O-7, O-10, O-11 | ⏳ |
 | **G — Düşük öncelik** | Test, type, doc | L-1..L-4 | ⏳ |

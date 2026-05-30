@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
+import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 
 interface FormState {
   error?: string

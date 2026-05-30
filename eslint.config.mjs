@@ -20,17 +20,24 @@ const noSupabaseClientInTsx = {
   },
 };
 
-/** Phased migration — remove paths as each file moves to server actions. */
+/**
+ * Phased migration — exact file allowlist (NOT wildcards). Her dosya server
+ * action'a taşındıkça listeden silinir; yeni eklenen dosyalar bu istisnaya
+ * otomatik girmez, dolayısıyla borç ölçülebilir ve azalan kalır.
+ */
 const supabaseClientTsxLegacy = {
   files: [
-    "src/app/page.tsx",
-    "src/app/(auth)/**/*.tsx",
-    "src/app/(dashboard)/pipeline/**/*.tsx",
-    "src/app/(dashboard)/pano/**/*.tsx",
-    "src/app/(dashboard)/yazar/**/*.tsx",
+    "src/app/(auth)/giris/_components/LoginForm.tsx",
+    "src/app/(auth)/sifre-guncelle/_components/PasswordResetGate.tsx",
+    "src/app/(dashboard)/pano/_components/OnboardingModal.tsx",
+    "src/app/(dashboard)/pipeline/[id]/_components/CandidateDetail.tsx",
+    "src/app/(dashboard)/pipeline/_components/AddCandidateSheet.tsx",
+    "src/app/(dashboard)/pipeline/_components/EditCandidateSheet.tsx",
+    "src/app/(dashboard)/yazar/_components/YazarForm.tsx",
+    "src/app/_components/landing/LandingPage.tsx",
+    "src/components/ui/NotificationsModal.tsx",
     "src/components/ui/ProfileModal.tsx",
     "src/components/ui/SettingsModal.tsx",
-    "src/components/ui/NotificationsModal.tsx",
   ],
   rules: {
     "no-restricted-imports": "off",

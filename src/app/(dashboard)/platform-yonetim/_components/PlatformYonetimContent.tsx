@@ -23,7 +23,7 @@ import {
 } from '../actions'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { REGISTER_URL } from '@/lib/constants'
+import { REGISTER_URL } from '@/lib/domain/constants'
 
 const getAvatarColor = (name: string) => {
   const colors = [

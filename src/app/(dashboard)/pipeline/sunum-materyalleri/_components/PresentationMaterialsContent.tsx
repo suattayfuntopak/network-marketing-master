@@ -179,7 +179,7 @@ export function PresentationMaterialsContent() {
   }, [form.whatsappTemplate])
 
   const previewMessage = useMemo(() => {
-    const sampleName = lang === 'en' ? 'Ayşe' : 'Ayşe'
+    const sampleName = 'Ayşe'
     const sampleSender = ws?.fullName ?? (lang === 'en' ? 'Your name' : 'Adınız')
     const sampleUrl = form.url.trim() || 'https://ornek-sunum-linki.com'
     return form.whatsappTemplate

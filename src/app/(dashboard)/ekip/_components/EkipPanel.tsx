@@ -19,7 +19,7 @@ import {
 } from '../actions'
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { REGISTER_URL } from '@/lib/constants'
+import { REGISTER_URL } from '@/lib/domain/constants'
 import { fetchEkipMembers } from '@/lib/team/fetchEkipMembers'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
