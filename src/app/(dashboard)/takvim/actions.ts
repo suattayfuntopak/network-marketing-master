@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
-import { buildCalendarByDate, nextFollowUpKeyAfterCompletion } from '@/lib/domain/calendarFollowUp'
+import { buildCalendarByDate, nextFollowUpKeyAfterCompletion, CALENDAR_TERMINAL_STAGES } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
@@ -144,37 +144,39 @@ export async function bulkDeferOverdueFollowUpsAction(
   const { supabase, user } = await assertWorkspaceOwner(workspaceId)
   const targetIso = followUpToIsoFromKey(targetDateKey)
 
-  let updated = 0
-  for (const id of candidateIds) {
-    const { data: candidate } = await supabase
-      .from('nmm_candidates')
-      .select('id, next_follow_up_at')
-      .eq('id', id)
-      .eq('workspace_id', workspaceId)
-      .eq('owner_id', user.id)
-      .maybeSingle()
+  // Tek sorguyla doğrula (N+1 yerine batch). Terminal aşamadaki adaylar (katıldı,
+  // ilgilenmedi, kayboldu, pasif) toplu ertelemeye dahil edilmez.
+  const { data: candidates } = await supabase
+    .from('nmm_candidates')
+    .select('id, next_follow_up_at, stage')
+    .in('id', candidateIds)
+    .eq('workspace_id', workspaceId)
+    .eq('owner_id', user.id)
 
-    if (!candidate) continue
+  const eligible = (candidates ?? []).filter(
+    c => !CALENDAR_TERMINAL_STAGES.includes(c.stage),
+  )
+  if (!eligible.length) return { updated: 0 }
 
-    const { error: updateError } = await supabase
-      .from('nmm_candidates')
-      .update({ next_follow_up_at: targetIso })
-      .eq('id', id)
+  const eligibleIds = eligible.map(c => c.id)
+  const { error: updateError } = await supabase
+    .from('nmm_candidates')
+    .update({ next_follow_up_at: targetIso })
+    .in('id', eligibleIds)
 
-    if (updateError) continue
+  if (updateError) return { updated: 0 }
 
-    await logFollowUpChange(
-      supabase,
-      workspaceId,
-      user.id,
-      id,
-      candidate.next_follow_up_at,
-      targetIso,
-    )
-    updated++
-  }
+  // Audit log — tek toplu insert.
+  const logRows = eligible.map(c => ({
+    workspace_id: workspaceId,
+    user_id: user.id,
+    candidate_id: c.id,
+    action_type: 'note' as const,
+    note: `system_note:follow_up_change:${c.next_follow_up_at ?? 'none'}->${targetIso}`,
+  }))
+  await supabase.from('nmm_daily_actions').insert(logRows)
 
-  return { updated }
+  return { updated: eligible.length }
 }
 
 function monthPrefix(year: number, month: number): string {
@@ -204,10 +206,12 @@ export async function fetchTeamCalendarSummaryAction(
     return []
   }
 
+  // parent_id sponsorun user_id'sini saklar (migration 009). Mevcut kullanıcı lider
+  // olduğundan downline'lar parent_id = user.id ile bulunur.
   const { data: downlineWs } = await supabase
     .from('nmm_workspaces')
     .select('id, owner_id')
-    .or(`parent_id.eq.${workspaceId},parent_id.eq.${user.id}`)
+    .eq('parent_id', user.id)
 
   if (!downlineWs?.length) return []
 

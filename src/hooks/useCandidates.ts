@@ -93,10 +93,14 @@ export function useUpdateCandidate(workspaceId: string) {
     mutationFn: async ({ id, ...patch }: NmmCandidateUpdate & { id: string }) => {
       const supabase = createClient()
 
-      const cached = qc.getQueryData<NmmCandidate[]>(['candidates', workspaceId])
-      const currentCandidate =
-        cached?.find(c => c.id === id) ??
-        (await supabase.from('nmm_candidates').select('*').eq('id', id).single()).data
+      // Aktivite "öncesi" değerini stale cache'den DEĞİL, güncellemeden hemen önce
+      // DB'den taze oku. Aksi halde iki sekme aynı adayı güncellerken yanlış
+      // stage_change ("iletisim→davetli" yerine gerçek "sunum→davetli") loglanır.
+      const { data: currentCandidate } = await supabase
+        .from('nmm_candidates')
+        .select('*')
+        .eq('id', id)
+        .single()
 
       const { error } = await supabase
         .from('nmm_candidates')

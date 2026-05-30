@@ -13,7 +13,7 @@ A–D, #6–7, E (i18n), F (perf), G (error/loading boundary), H (E2E), K-1..K-5
 |---|---|---|---|
 | **A — Güvenlik** | Cron auth + secret hijyeni | K-1 (🔴), Y-1 | ✅ `cronAuthError` guard + Resend fallback sil + typed admin client (gizli null bug yakalandı) |
 | **B — Cron doğruluğu** | İdempotency + timezone + lisans | Y-2, Y-3, O-9 | ✅ `nmm_email_sent_log` (mig 036) + claim-before-send · İstanbul gün-başı · birleşik expiry · N+1→batch. **Deploy: migration 036.** |
-| **C — Veri bütünlüğü** | Race + yalancı UI | Y-4, Y-5, O-1, O-2, O-12 | ⏳ |
+| **C — Veri bütünlüğü** | Race + yalancı UI | Y-4, Y-5, O-1, O-2, O-12 | ✅ taze-okuma race fix · yalancı e-posta UI silindi · bulkDefer terminal filtre + batch · parent_id ölü koşul kaldırıldı |
 | **D — i18n & yapı** | bimodal + flat lib + admin dedup | Y-7, O-3, O-4, O-6, O-8 | ⏳ |
 | **E — `\|\|\|` göçü** | Okuma typed kolona, legacy sil | Y-6 | ⏳ (backfill doğrulaması) |
 | **F — God component & hijyen** | Bölme + lint + log + circular | Y-8, O-5, O-7, O-10, O-11 | ⏳ |

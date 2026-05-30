@@ -7,8 +7,6 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
-import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
-import { toast } from 'sonner'
 import { playNotificationSound } from './NotificationsModal'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 
@@ -60,7 +58,6 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
       // Trigger user alerts based on preferences
       const isSoundEnabled = localStorage.getItem('nmm_notif_sound') === 'true'
       const isPushEnabled = localStorage.getItem('nmm_notif_push') === 'true'
-      const isEmailEnabled = localStorage.getItem('nmm_notif_email') === 'true'
 
       if (isSoundEnabled) {
         playNotificationSound()
@@ -70,16 +67,6 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
         new Notification('Yeni Aday Eklendi!', {
           body: `${fullName.trim()} ekibinize yeni aday olarak başarıyla eklendi.`,
           icon: '/logo.png'
-        })
-      }
-
-      if (isEmailEnabled) {
-        toast.info(`📧 E-posta Gönderildi: Yeni Aday Eklendi`, {
-          description: `${fullName.trim()} aday detayları ${SUPER_ADMIN_EMAIL} adresine postalandı.`
-        })
-        console.log(`[EMAIL DISPATCH] Sent to ${SUPER_ADMIN_EMAIL}:`, {
-          subject: 'Yeni Aday Eklendi',
-          body: `Aday: ${fullName.trim()}\nNotlar: ${notes}`
         })
       }
 

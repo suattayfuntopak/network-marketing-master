@@ -61,12 +61,17 @@ async function fetchTeamMembersLegacy(workspaceId: string): Promise<TeamMember[]
   }
   members?.forEach(m => { uniqueMembersMap[m.user_id] = m })
 
-  // 3. Find all downline workspaces that have parent_id = leader's workspaceId
-  // Also support legacy where parent_id = leader's owner_id
-  const { data: downlineWs } = await supabase
-    .from('nmm_workspaces')
-    .select('id, owner_id')
-    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+  // 3. Downline workspace'leri bul: parent_id sponsorun user_id'sini saklar
+  // (migration 009). Lider kendi workspace'inin sahibi olduğundan ownWs.owner_id
+  // = liderin user_id'sidir.
+  const downlineWs = ownWs.owner_id
+    ? (
+        await supabase
+          .from('nmm_workspaces')
+          .select('id, owner_id')
+          .eq('parent_id', ownWs.owner_id)
+      ).data
+    : null
 
   const downlineWsIds = downlineWs?.map(w => w.id) ?? []
   const downlineOwnerIds = (downlineWs?.map(w => w.owner_id).filter(Boolean) ?? []) as string[]

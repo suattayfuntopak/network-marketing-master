@@ -12,11 +12,11 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate } from '@/types/database.types'
 import {
   buildCalendarByDate,
-  countOverdueFollowUps,
   earliestOverdueKey,
   getOverdueCandidates,
   monthCalendarStats,
   nearestFollowUpKey,
+  CALENDAR_TERMINAL_STAGES,
 } from '@/lib/domain/calendarFollowUp'
 import {
   formatCalendarMonth,
@@ -63,15 +63,17 @@ export function TakvimClient() {
 
   const byDate = useMemo(() => buildCalendarByDate(candidates), [candidates])
 
-  const overdueCount = useMemo(
-    () => countOverdueFollowUps(byDate, todayKey),
+  // Terminal aşamadaki adaylar (katıldı, pasif…) takvimde manuel tarihleriyle
+  // görünür ama toplu ertelemeye dahil edilmez — bu yüzden sayaç ve liste ondan arınık.
+  const overdueCandidates = useMemo(
+    () =>
+      getOverdueCandidates(byDate, todayKey).filter(
+        c => !CALENDAR_TERMINAL_STAGES.includes(c.stage),
+      ),
     [byDate, todayKey],
   )
 
-  const overdueCandidates = useMemo(
-    () => getOverdueCandidates(byDate, todayKey),
-    [byDate, todayKey],
-  )
+  const overdueCount = overdueCandidates.length
 
   const earliestOverdue = useMemo(
     () => earliestOverdueKey(byDate, todayKey),
