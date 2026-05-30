@@ -128,11 +128,11 @@ export function TakvimClient() {
     queryClient.invalidateQueries({ queryKey: ['takvim-team', ws?.workspaceId] })
   }, [queryClient, ws?.workspaceId])
 
-  const showPipelineToast = useCallback(() => {
+  const showPipelineToast = useCallback((candidateId: string) => {
     toast.success(t('pagesUi.followUpUpdated'), {
       action: {
         label: t('pagesUi.viewInPipeline'),
-        onClick: () => router.push('/pipeline'),
+        onClick: () => router.push(`/pipeline/${candidateId}`),
       },
     })
   }, [router, t])
@@ -140,9 +140,9 @@ export function TakvimClient() {
   const deferMutation = useMutation({
     mutationFn: ({ candidateId, days }: { candidateId: string; days: number }) =>
       deferFollowUpAction(ws!.workspaceId, candidateId, selected, days),
-    onSuccess: () => {
+    onSuccess: (_data, { candidateId }) => {
       invalidateCalendar()
-      showPipelineToast()
+      showPipelineToast(candidateId)
     },
     onError: (e: Error) => toast.error(e.message),
   })

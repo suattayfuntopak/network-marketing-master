@@ -100,7 +100,11 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   function clearFollowUp() {
     setQuickActionOpen(false)
-    update.mutate({ id: candidate.id, next_follow_up_at: null })
+    update.mutate({
+      id: candidate.id,
+      next_follow_up_at: null,
+      last_contact_at: new Date().toISOString(),
+    })
   }
 
   useEffect(() => {

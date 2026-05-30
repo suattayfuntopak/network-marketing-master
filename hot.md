@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-30 — Takvim: takip iptali kalıcı + boru hattı deep link
+
+- **Takibi İptal Et:** Yalnızca `next_follow_up_at = null` yeterli değildi; formülle hesaplanan tarih geri geliyordu. Artık `last_contact_at = now` + aktivite `follow_up_completed` — Supabase kalıcı.
+- **Boru Hattı'nda gör:** Erteleme toast'ı `/pipeline` yerine `/pipeline/{adayId}` açar.
+- **Dosyalar:** `takvim/actions.ts`, `TakvimClient.tsx`, `CandidateCard.tsx`; `docs/email-automation.md` (cron test rehberi); `landing.ts` (EN plan özellik metinleri).
+
+---
+
 ## 2026-05-30 — Takvim: toplu erteleme banner düzeltmesi
 
 - Gecikmiş takipler artık ekranda görünen aday listesi + **yarına** (bugün+1) taşınıyor; sunucu/tarayıcı tarih uyumsuzluğu ve “+1 gün hâlâ gecikmiş” sorunu giderildi.

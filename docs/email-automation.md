@@ -108,3 +108,65 @@ curl -s -o /dev/null -w "%{http_code}\n" --max-redirs 0 \
 ```
 
 `200` beklenir; `307` = proxy whitelist eksik; `401` = secret uyuşmuyor.
+
+## Cron test — `license_expires_at` rehberi
+
+Cron **bugün** (sunucu UTC günü) için eşleşen workspace’lere mail atar. `processed: 0` = o gün koşula uyan kimse yok (hata değil).
+
+### Deneme mailleri (`GET /api/cron/trial-emails`)
+
+Workspace şartları:
+
+- `license_type = 'free'`
+- Lider satırı `nmm_workspace_members` (role = `leader`)
+- Liderin `auth.users` kaydında geçerli e-posta
+
+| Mail | `license_expires_at` (cron çalıştığı gün = **D**) | Örnek (D = 30 Mayıs 2026) |
+|------|-----------------------------------------------------|---------------------------|
+| 3 gün kala | **D + 3 gün** (o gün içinde) | `2026-06-02T12:00:00+00:00` |
+| 1 gün kala | **D + 1 gün** | `2026-05-31T12:00:00+00:00` |
+| Deneme bitti | **D − 1 gün** (dün bitti) | `2026-05-29T12:00:00+00:00` |
+| 15 gün sonra | **D − 15 gün** | `2026-05-15T12:00:00+00:00` |
+
+Saat için `T12:00:00+00:00` (veya aynı UTC günü içinde herhangi bir an) yeterli.
+
+### Ücretli plan yenileme (`GET /api/cron/license-reminder`)
+
+- `license_type` ∈ `leader`, `master`, `pro`
+- Süresi dolmamış (`license_expires_at` > şimdi)
+
+| Mail | `license_expires_at` |
+|------|----------------------|
+| 7 gün kala | **D + 7 gün** |
+| 3 gün kala | **D + 3 gün** |
+| 1 gün kala | **D + 1 gün** |
+
+### Supabase’de hızlı test
+
+1. Test workspace’inizi seçin (`nmm_workspaces`).
+2. Yukarıdaki tabloya göre `license_expires_at` güncelleyin.
+3. Cron’u tetikleyin:
+
+```bash
+curl -s --max-redirs 0 \
+  -H "Authorization: Bearer CRON_SECRET" \
+  "https://nmm.suattayfuntopak.com/api/cron/trial-emails"
+```
+
+4. Yanıtta `"processed": 1` ve `"sent": true` bekleyin; **Resend dashboard**’da gönderimi doğrulayın.
+
+### Tam JSON yanıtı
+
+```bash
+curl -s --max-redirs 0 \
+  -H "Authorization: Bearer CRON_SECRET" \
+  "https://nmm.suattayfuntopak.com/api/cron/trial-emails" | python3 -m json.tool
+```
+
+`results` dizisinde `kind` (`trial_3d`, `trial_1d`, …) ve `sent` alanları görünür.
+
+### Notlar
+
+- Aynı günde birden fazla koşul sağlanırsa **birden fazla mail** gidebilir (her job ayrı döngü).
+- Testten sonra `license_expires_at`’i gerçek değere geri alın.
+- Hoş geldin maili cron değil; **yeni kayıt** anında gider (`sendWelcomeEmail`).

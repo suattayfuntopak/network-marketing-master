@@ -93,7 +93,7 @@ export async function clearFollowUpAction(
 
   const { data: candidate } = await supabase
     .from('nmm_candidates')
-    .select('next_follow_up_at')
+    .select('next_follow_up_at, last_contact_at')
     .eq('id', candidateId)
     .eq('workspace_id', workspaceId)
     .eq('owner_id', user.id)
@@ -101,9 +101,14 @@ export async function clearFollowUpAction(
 
   if (!candidate) throw new Error('Aday bulunamadı.')
 
+  const nowIso = new Date().toISOString()
+
   const { error } = await supabase
     .from('nmm_candidates')
-    .update({ next_follow_up_at: null })
+    .update({
+      next_follow_up_at: null,
+      last_contact_at: nowIso,
+    })
     .eq('id', candidateId)
 
   if (error) throw new Error(error.message)
@@ -116,6 +121,14 @@ export async function clearFollowUpAction(
     candidate.next_follow_up_at,
     null,
   )
+
+  await supabase.from('nmm_daily_actions').insert({
+    workspace_id: workspaceId,
+    user_id: user.id,
+    candidate_id: candidateId,
+    action_type: 'note',
+    note: 'system_note:follow_up_completed',
+  })
 }
 
 export async function bulkDeferOverdueFollowUpsAction(
