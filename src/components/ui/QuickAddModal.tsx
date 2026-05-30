@@ -7,7 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
-import { playNotificationSound } from './NotificationsModal'
+import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 
 interface QuickAddModalProps {

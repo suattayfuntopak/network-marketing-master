@@ -29,7 +29,7 @@ import {
   mergeCandidateContentUpdate,
 } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
-import { generateNotesSummary } from '../actions'
+import { generateNotesSummary, translateNoteAction } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
@@ -247,13 +247,8 @@ export function CandidateDetail({ candidateId }: Props) {
       if (!parsedN.isSystem && !parsedN.noteEn && parsedN.noteTr && !attemptedActionUpdates.current[n.id]) {
         attemptedActionUpdates.current[n.id] = true
 
-        fetch('/api/translate-note', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: parsedN.noteTr }),
-        })
-          .then(r => r.json())
-          .then(async ({ translated }: { translated: string }) => {
+        translateNoteAction(parsedN.noteTr)
+          .then(async (translated: string) => {
             if (translated) {
               const supabase = createClient()
               await supabase
@@ -325,13 +320,8 @@ export function CandidateDetail({ candidateId }: Props) {
     }
 
     setIsTranslating(true)
-    fetch('/api/translate-note', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: parsedLocal.noteTr }),
-    })
-      .then(r => r.json())
-      .then(({ translated }: { translated: string }) => {
+    translateNoteAction(parsedLocal.noteTr)
+      .then((translated: string) => {
         setTranslatedNote(translated)
         localStorage.setItem(cacheKey, translated)
         // Veritabanına kalıcı olarak kaydet
@@ -460,12 +450,7 @@ export function CandidateDetail({ candidateId }: Props) {
     setNewNote('') // Clear input immediately for optimal UX response
 
     try {
-      const res = await fetch('/api/translate-note', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: textToSave }),
-      })
-      const { translated } = await res.json()
+      const translated = await translateNoteAction(textToSave)
       addNoteMutation.mutate({
         candidateId,
         noteTr: textToSave,

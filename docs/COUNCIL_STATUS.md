@@ -18,7 +18,12 @@ A–D, #6–7, E (i18n), F (perf), G (error/loading boundary), H (E2E), K-1..K-5
 
 **Y-7 yeniden sınıflandırma (önemli):** "67 `lang === 'en'`" büyük ölçüde yanlış sayımdı. Çoğu meşru: `title_en:title_tr` (iki-dilli DB verisi — CLAUDE.md kalıbı) ve `'en-US':'tr-TR'` (locale argümanı). Gerçek hardcoded UI kopyası yalnızca `deleteWithUndo` (3 string → `common.*` anahtarları) + ölü `'Ayşe':'Ayşe'` ternary idi; ikisi de düzeltildi. Kalan kopya-vari ternary'ler `YazarForm`/`CandidateDetail` (god component) içinde → **Faz F**'te dekompozisyonla birlikte.
 | **E — `\|\|\|` göçü** | Okuma typed kolona, legacy sil | Y-6 | ✅ backfill doğrulandı (mig 023 içinde) · parseNote→2-segment · ölü formatNote silindi · fallback avatar/warmth kaldırıldı |
-| **F — God component & hijyen** | Bölme + lint + log + circular | Y-8, O-5, O-7, O-10, O-11 | ⏳ |
+| **F — God component & hijyen** | Bölme + lint + log + circular | Y-8, O-5, O-11 ✅ · O-7, O-10 ⏸️ | Y-8 circular dep kırıldı (notificationSound.ts) · O-5 translate-note→server action (API route silindi) · O-11 mail.ts success log temizlendi. **O-7/O-10 bilinçli ertelendi** (aşağıda). |
+
+**O-7 + O-10 — neden ertelendi (dürüst mühendislik kararı):** Bu ikisi tek-geçiş otomatik düzeltmeye uygun DEĞİL; aceleci değişiklik çalışan premium UX'i bozar.
+- **O-7 (god component):** `CandidateDetail` (1010) ve `IstatistiklerContent` (1000) satırlık dosyaların alt-bileşenlere bölünmesi çok-adımlı, app-doğrulaması (`/verify`) gerektiren bir refactor. EkipPanel örneği gibi tek tek, izleyerek yapılmalı.
+- **O-10 (lint 86 error):** Çoğu davranışsal: 32 `set-state-in-effect` (SSR hydration guard kalıbı — körlemesine değiştirmek hydration'ı bozar), 8 `exhaustive-deps` (yanlış bağımlılık sonsuz döngü yapabilir), **1 `rules-of-hooks` (koşullu `useCallback` — potansiyel gerçek bug, öncelikli ele alınmalı)**, 12 `img→next/image` (layout/optimizasyon riski), 31 `any`, 30 `unused-vars`. Her biri ayrı, doğrulanarak yapılmalı.
+- **Öneri:** O-7'yi bileşen-bileşen, O-10'u kural-kural ayrı oturumlarda `/verify` ile ilerletmek. rules-of-hooks bug'ı ilk sırada.
 | **G — Düşük öncelik** | Test, type, doc | L-1..L-4 | ⏳ |
 
 ### Önceki turdan devreden (1. tur)

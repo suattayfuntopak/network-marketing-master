@@ -50,14 +50,13 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
       ].join('')
 
   try {
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
       subject,
       html: buildPremiumEmail(content, lang),
     })
 
-    console.log('[Resend] Welcome email sent successfully:', data)
     return true
   } catch (err) {
     console.error('[Resend] Failed to send welcome email:', err)
@@ -130,14 +129,13 @@ export async function sendPaymentSuccessEmail(
       ].join('')
 
   try {
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
       subject,
       html: buildPremiumEmail(content, lang),
     })
 
-    console.log('[Resend] Payment success email sent:', data)
     return true
   } catch (err) {
     console.error('[Resend] Failed to send payment success email:', err)
@@ -199,13 +197,12 @@ export async function sendLicenseExpiryEmail(
       ].join('')
 
   try {
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
       subject,
       html: buildPremiumEmail(content, lang),
     })
-    console.log('[Resend] License expiry email sent:', data)
     return true
   } catch (err) {
     console.error('[Resend] Failed to send license expiry email:', err)
@@ -239,14 +236,13 @@ export async function sendAdminNewUserEmail(
   ].join('')
 
   try {
-    const data = await resend.emails.send({
+    await resend.emails.send({
       from: FROM_EMAIL,
       to: [adminEmail],
       subject,
       html: buildPremiumEmail(content, 'tr'),
     })
 
-    console.log('[Resend] Admin signup alert email sent successfully:', data)
     return true
   } catch (err) {
     console.error('[Resend] Failed to send admin signup alert email:', err)
