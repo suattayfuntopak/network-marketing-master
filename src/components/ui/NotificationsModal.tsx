@@ -9,6 +9,10 @@ import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import {
+  getNotificationPreferencesAction,
+  updateNotificationPreferencesAction,
+} from '@/app/(dashboard)/actions/notificationPreferences'
 import { createClient } from '@/lib/supabase/client'
 
 interface NotificationsModalProps {
@@ -181,27 +185,20 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     
     // Fetch authenticated user session to sync preferences persistently
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (user) {
         setUserEmail(user.email ?? '')
-        const prefs = user.user_metadata?.preferences
-        if (prefs) {
-          if (prefs.email !== undefined) {
-            setEmailAlerts(prefs.email)
-            localStorage.setItem('nmm_notif_email', String(prefs.email))
-          }
-          if (prefs.push !== undefined) {
-            setPushAlerts(prefs.push)
-            localStorage.setItem('nmm_notif_push', String(prefs.push))
-          }
-          if (prefs.sound !== undefined) {
-            setSoundAlerts(prefs.sound)
-            localStorage.setItem('nmm_notif_sound', String(prefs.sound))
-          }
-        } else {
-          // If no cloud metadata, load from localStorage with fallback to true
+        try {
+          const prefs = await getNotificationPreferencesAction()
+          setEmailAlerts(prefs.email)
+          setPushAlerts(prefs.push)
+          setSoundAlerts(prefs.sound)
+          localStorage.setItem('nmm_notif_email', String(prefs.email))
+          localStorage.setItem('nmm_notif_push', String(prefs.push))
+          localStorage.setItem('nmm_notif_sound', String(prefs.sound))
+        } catch {
           const emailPref = localStorage.getItem('nmm_notif_email')
-          const pushPref  = localStorage.getItem('nmm_notif_push')
+          const pushPref = localStorage.getItem('nmm_notif_push')
           const soundPref = localStorage.getItem('nmm_notif_sound')
           setEmailAlerts(emailPref !== 'false')
           setPushAlerts(pushPref !== 'false')
@@ -228,8 +225,6 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     let nextEmail = emailAlerts
     let nextPush = pushAlerts
     let nextSound = soundAlerts
-
-    const supabase = createClient()
 
     if (type === 'email')  { 
       setEmailAlerts(next);  
@@ -266,22 +261,17 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       }
     }
 
-    // Persist preferences in Supabase Auth user_metadata
-    try {
-      await supabase.auth.updateUser({
-        data: {
-          preferences: {
-            email: nextEmail,
-            push: nextPush,
-            sound: nextSound
-          }
-        }
-      })
-    } catch (err) {
-      console.error('[NotificationsModal] Failed to sync preferences to auth metadata:', err)
+    // Persist preferences in Supabase
+    const result = await updateNotificationPreferencesAction({
+      email: nextEmail,
+      push: nextPush,
+      sound: nextSound,
+    })
+    if (!result.ok) {
+      console.error('[NotificationsModal] Failed to sync preferences:', result.error)
     }
 
-    toast.success('Tercihleriniz güncellendi')
+    toast.success(t('common.notificationSuccess'))
   }
 
   function openNotification(n: any) {

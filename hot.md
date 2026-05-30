@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-05-30 — Takvim faslı KAPANDI (final 5 öneri)
+
+1. **Bugün İlgilen ↔ takvim** — `dailyPriorities.ts` / `buildDailyPriorities` takvim formülü (`isFollowUpDue`) ile tek kaynak.
+2. **Ekip bildirim deep link** — Migration `034`: sponsor pipeline’ında ekip üyesi kaydı; eşleşme yoksa `/ekip`.
+3. **`deferFollowUpAction`** — `followUpToIsoFromKey(toCalendarKey(...))` timezone tutarlılığı.
+4. **Bildirim tercihleri** — Migration `035`: `nmm_notification_preferences` tablosu + server actions.
+5. **Pro ekip takvimi** — Tek batch sorgu (`in workspace_id`), N+1 kaldırıldı.
+
+**Deploy:** Supabase `034_downline_notification_sponsor_pipeline.sql`, `035_notification_preferences.sql` (033 zaten uygulandıysa sırayla).
+
+---
+
 ## 2026-05-30 — Takvim sprint kapanış: 5 onaylı iyileştirme
 
 1. **Boru hattı Takip Zamanı** — `isFollowUpDue` / `calendarFollowUpDate` ile takvimle hizalı filtre ve rozetler.

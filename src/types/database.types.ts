@@ -251,6 +251,30 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_notification_preferences: {
+        Row: {
+          user_id: string
+          email_enabled: boolean
+          push_enabled: boolean
+          sound_enabled: boolean
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          email_enabled?: boolean
+          push_enabled?: boolean
+          sound_enabled?: boolean
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          email_enabled?: boolean
+          push_enabled?: boolean
+          sound_enabled?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_onboarding_progress: {
         Row: {
           id: string

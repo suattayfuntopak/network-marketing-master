@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
 import { buildCalendarByDate, nextFollowUpKeyAfterCompletion } from '@/lib/domain/calendarFollowUp'
-import { fromCalendarKey, followUpToIsoFromKey } from '@/lib/utils/calendarDates'
+import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
 export type TeamCalendarMemberSummary = {
@@ -65,8 +65,7 @@ export async function deferFollowUpAction(
 
   const base = fromCalendarKey(anchorDateKey)
   base.setDate(base.getDate() + addDays)
-  base.setHours(12, 0, 0, 0)
-  const iso = base.toISOString()
+  const iso = followUpToIsoFromKey(toCalendarKey(base))
 
   const { error } = await supabase
     .from('nmm_candidates')
@@ -223,18 +222,32 @@ export async function fetchTeamCalendarSummaryAction(
   members?.forEach(m => { nameByUser[m.user_id] = m.full_name ?? 'Ekip üyesi' })
 
   const prefix = monthPrefix(year, month)
+  const downlineWsIds = downlineWs.map(w => w.id)
+
+  const { data: allCandidates } = await supabase
+    .from('nmm_candidates')
+    .select('*')
+    .in('workspace_id', downlineWsIds)
+
+  const candidatesByOwner = new Map<string, NmmCandidate[]>()
+  for (const row of allCandidates ?? []) {
+    const c = row as NmmCandidate
+    if (!c.owner_id) continue
+    const list = candidatesByOwner.get(c.owner_id) ?? []
+    list.push(c)
+    candidatesByOwner.set(c.owner_id, list)
+  }
+
   const summaries: TeamCalendarMemberSummary[] = []
 
   for (const dl of downlineWs) {
     if (!dl.owner_id) continue
 
-    const { data: candidates } = await supabase
-      .from('nmm_candidates')
-      .select('*')
-      .eq('workspace_id', dl.id)
-      .eq('owner_id', dl.owner_id)
+    const memberCandidates = (candidatesByOwner.get(dl.owner_id) ?? []).filter(
+      c => c.workspace_id === dl.id,
+    )
 
-    const days = summarizeMemberMonth((candidates ?? []) as NmmCandidate[], prefix)
+    const days = summarizeMemberMonth(memberCandidates, prefix)
     if (!days.length) continue
 
     summaries.push({

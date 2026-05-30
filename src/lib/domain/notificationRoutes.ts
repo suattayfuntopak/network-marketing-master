@@ -12,7 +12,7 @@ export function notificationTargetHref(n: NotificationRouteInput): string {
   const routeByType: Record<NotificationType, string> = {
     user: '/ekip',
     calendar: '/takvim',
-    alert: '/odeme',
+    alert: '/ekip',
     bell: '/pano',
     info: '/pano',
   }
