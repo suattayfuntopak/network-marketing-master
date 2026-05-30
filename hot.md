@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-05-30 — Yetim workspace temizliği + owner başına tek workspace
+
+- **Sorun:** Geliştirme döneminde aynı `owner_id` ile 20 duplicate workspace (çoğu 0 aday); `ensureWorkspace` üyelik yokken yenilerini açıyordu.
+- **032 migration:** Boş yetimleri siler (Focus Team / üyelik / aday sayısı korunur); `owner_id` UNIQUE index.
+- **Kod:** `ensureWorkspaceAction` — mevcut sahip workspace varsa üyelik onarır, yeni INSERT yapmaz; unique çakışmada retry.
+
+**Deploy:** Supabase’de `032_orphan_workspaces_owner_unique.sql` uygula.
+
+---
+
 ## 2026-05-30 — Cron e-posta: proxy 307 engeli giderildi
 
 - **Sorun:** `/api/cron/*` oturum proxy’sine takılıyordu → 307 `/giris`; GitHub Actions yeşil görünüp mail gitmiyordu (curl redirect takibi).

@@ -75,9 +75,63 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Kullanıcı'
-  const inviteCode = generateInviteCode()
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
   const admin = isSuperAdmin(user)
+
+  // Üyelik satırı yok ama sahip olunan workspace var → yenisini açma, üyeliği onar
+  const { data: ownedWorkspace } = await supabase
+    .from('nmm_workspaces')
+    .select('id, invite_code, created_at, license_type, license_expires_at, parent_id')
+    .eq('owner_id', user.id)
+    .order('created_at', { ascending: true })
+    .limit(1)
+    .maybeSingle()
+
+  if (ownedWorkspace) {
+    const { error: memRepairError } = await supabase.from('nmm_workspace_members').upsert(
+      {
+        workspace_id: ownedWorkspace.id,
+        user_id: user.id,
+        role: 'leader',
+        full_name: fullName,
+        avatar_url: avatarUrl,
+      },
+      { onConflict: 'workspace_id,user_id' },
+    )
+
+    if (memRepairError) {
+      throw new Error(`Üyelik onarılamadı: ${memRepairError.message}`)
+    }
+
+    const license = resolveWorkspaceLicense(user, ownedWorkspace)
+    const effectiveLicenseType = getEffectiveLicenseType(
+      license.licenseType,
+      license.licenseExpiresAt,
+      ownedWorkspace.created_at,
+    )
+
+    return {
+      userId: user.id,
+      workspaceId: ownedWorkspace.id,
+      inviteCode: ownedWorkspace.invite_code ?? ownedWorkspace.id.slice(0, 8).toUpperCase(),
+      role: 'leader',
+      fullName,
+      avatarUrl,
+      licenseType: license.licenseType,
+      effectiveLicenseType,
+      licenseExpiresAt: license.licenseExpiresAt,
+      workspaceCreatedAt: ownedWorkspace.created_at ?? null,
+      isTrialActive: isTrialPeriodActive(
+        license.licenseType,
+        license.licenseExpiresAt,
+        ownedWorkspace.created_at,
+      ),
+      isSuperAdmin: admin,
+      hasUpline: !!ownedWorkspace.parent_id,
+    }
+  }
+
+  const inviteCode = generateInviteCode()
 
   const trialExpires = new Date()
   trialExpires.setDate(trialExpires.getDate() + 14)
@@ -91,10 +145,14 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
       license_type: 'free',
       license_expires_at: trialExpires.toISOString(),
     })
-    .select('id, invite_code, created_at, license_expires_at')
+    .select('id, invite_code, created_at, license_expires_at, parent_id')
     .single()
 
   if (wsError || !ws) {
+    // Yarış: başka istek aynı anda oluşturdu — unique owner_id
+    if (wsError?.code === '23505') {
+      return ensureWorkspaceAction()
+    }
     throw new Error(`Workspace oluşturulamadı: ${wsError?.message}`)
   }
 
@@ -117,7 +175,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const effectiveLicenseType = getEffectiveLicenseType(
     license.licenseType,
     license.licenseExpiresAt,
-    ws.created_at
+    ws.created_at,
   )
 
   return {
@@ -133,6 +191,6 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     workspaceCreatedAt: ws.created_at ?? null,
     isTrialActive: true,
     isSuperAdmin: admin,
-    hasUpline: false,
+    hasUpline: !!ws.parent_id,
   }
 }
