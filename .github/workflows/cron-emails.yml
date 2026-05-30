@@ -21,3 +21,9 @@ jobs:
           curl -fsS -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/license-reminder"
+
+      - name: Daily calendar follow-up reminders
+        run: |
+          curl -fsS -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.NMM_APP_URL }}/api/cron/calendar-reminder"

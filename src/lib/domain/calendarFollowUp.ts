@@ -63,6 +63,34 @@ export function earliestOverdueKey(
   return keys[0] ?? null
 }
 
+export function getOverdueCandidates(
+  byDate: Record<string, NmmCandidate[]>,
+  todayKey: string,
+): NmmCandidate[] {
+  const result: NmmCandidate[] = []
+  for (const [key, list] of Object.entries(byDate)) {
+    if (key < todayKey) result.push(...list)
+  }
+  return result
+}
+
+export function monthCalendarStats(
+  viewYear: number,
+  viewMonth: number,
+  byDate: Record<string, NmmCandidate[]>,
+  todayKey: string,
+): { total: number; overdue: number } {
+  const prefix = `${viewYear}-${String(viewMonth + 1).padStart(2, '0')}-`
+  let total = 0
+  let overdue = 0
+  for (const [key, list] of Object.entries(byDate)) {
+    if (!key.startsWith(prefix)) continue
+    total += list.length
+    if (key < todayKey) overdue += list.length
+  }
+  return { total, overdue }
+}
+
 /** Seçili günde takip yoksa: önce gelecek, yoksa geçmiş en yakın gün. */
 export function nearestFollowUpKey(
   selectedKey: string,

@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-05-30 — Takvim sprint 2 (iCal hariç 7 öneri)
+
+1. **Mobil hafta şeridi** — Yatay kaydırma + hafta okları (`TakvimWeekStrip`).
+2. **Erteleme toast** — Güncelleme sonrası “Boru Hattı'nda gör” aksiyonlu bildirim.
+3. **Toplu erteleme** — Gecikmiş banner: onaylı “Hepsini +1 gün ertele” (`bulkDeferOverdueFollowUpsAction`).
+4. **Sabah takvim bildirimi** — Cron `GET /api/cron/calendar-reminder` → `nmm_notifications` (type: calendar); GitHub Actions 09:00 TR.
+5. **Ekip Takvimi (Pro)** — Alt ekip liderlerinin aylık takip yoğunluğu, salt okunur.
+6. **Takip tamamlandı** — Karttan `next_follow_up_at` temizleme.
+7. **Ay özeti** — Başlık altında “Bu ay: X takip, Y gecikmiş”.
+
+**Dosyalar:** `takvim/actions.ts`, cron route, `TakvimTeamCalendar`, `TakvimConfirmModal`, workflow güncellemesi.
+
+---
+
 ## 2026-05-30 — Takvim modülü: 8 iyileştirme paketi
 
 1. **Terminal aşamalar** — Katıldı / İlgilenmedi / Kaybedildi / Pasif otomatik takvimden çıkarıldı (manuel `next_follow_up_at` hariç).

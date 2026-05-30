@@ -2,16 +2,20 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { ChevronLeft, ChevronRight, RotateCcw } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate } from '@/hooks/useCandidates'
-import type { NmmCandidate } from '@/types/database.types'
-import { useRouter } from 'next/navigation'
+import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
+import type { NmmCandidate } from '@/types/database.types'
 import {
   buildCalendarByDate,
   countOverdueFollowUps,
   earliestOverdueKey,
+  getOverdueCandidates,
+  monthCalendarStats,
   nearestFollowUpKey,
 } from '@/lib/domain/calendarFollowUp'
 import {
@@ -25,17 +29,25 @@ import {
   keysForDaysAfter,
   weekKeysContaining,
 } from '@/lib/utils/calendarDates'
+import {
+  bulkDeferOverdueFollowUpsAction,
+  clearFollowUpAction,
+  deferFollowUpAction,
+} from '../actions'
 import { TakvimCandidateRow } from './TakvimCandidateRow'
 import { TakvimWeekStrip } from './TakvimWeekStrip'
+import { TakvimTeamCalendar } from './TakvimTeamCalendar'
+import { TakvimConfirmModal } from './TakvimConfirmModal'
 
 export function TakvimClient() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const { candidates = [] } = useCandidates(ws?.workspaceId)
-  const update = useUpdateCandidate(ws?.workspaceId ?? '')
 
   const [mounted, setMounted] = useState(false)
+  const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
 
   const today = useMemo(() => {
     const d = new Date()
@@ -59,6 +71,11 @@ export function TakvimClient() {
     [byDate, todayKey],
   )
 
+  const overdueCandidates = useMemo(
+    () => getOverdueCandidates(byDate, todayKey),
+    [byDate, todayKey],
+  )
+
   const earliestOverdue = useMemo(
     () => earliestOverdueKey(byDate, todayKey),
     [byDate, todayKey],
@@ -71,13 +88,17 @@ export function TakvimClient() {
 
   const weekKeys = useMemo(() => weekKeysContaining(selected), [selected])
 
+  const monthStats = useMemo(
+    () => monthCalendarStats(view.getFullYear(), view.getMonth(), byDate, todayKey),
+    [view, byDate, todayKey],
+  )
+
   const { days, startPad } = useMemo(() => {
     const year = view.getFullYear()
     const month = view.getMonth()
     const firstDay = new Date(year, month, 1, 12, 0, 0)
-    const lastDay = new Date(year, month + 1, 0, 12, 0, 0)
     const pad = (firstDay.getDay() + 6) % 7
-    const total = lastDay.getDate()
+    const total = new Date(year, month + 1, 0).getDate()
     return { days: total, startPad: pad }
   }, [view])
 
@@ -104,6 +125,53 @@ export function TakvimClient() {
   const isViewingTodayMonth =
     view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth()
   const showBackToToday = selected !== todayKey || !isViewingTodayMonth
+  const showTeamCalendar = ws?.licenseType === 'pro' || ws?.isSuperAdmin
+
+  const invalidateCalendar = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['candidates', ws?.workspaceId] })
+    queryClient.invalidateQueries({ queryKey: ['takvim-team', ws?.workspaceId] })
+  }, [queryClient, ws?.workspaceId])
+
+  const showPipelineToast = useCallback(() => {
+    toast.success(t('pagesUi.followUpUpdated'), {
+      action: {
+        label: t('pagesUi.viewInPipeline'),
+        onClick: () => router.push('/pipeline'),
+      },
+    })
+  }, [router, t])
+
+  const deferMutation = useMutation({
+    mutationFn: ({ candidateId, days }: { candidateId: string; days: number }) =>
+      deferFollowUpAction(ws!.workspaceId, candidateId, selected, days),
+    onSuccess: () => {
+      invalidateCalendar()
+      showPipelineToast()
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
+  const clearMutation = useMutation({
+    mutationFn: (candidateId: string) => clearFollowUpAction(ws!.workspaceId, candidateId),
+    onSuccess: () => {
+      invalidateCalendar()
+      toast.success(t('pagesUi.followUpCompleted'))
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
+  const bulkDeferMutation = useMutation({
+    mutationFn: () => bulkDeferOverdueFollowUpsAction(ws!.workspaceId),
+    onSuccess: ({ updated }) => {
+      setBulkConfirmOpen(false)
+      invalidateCalendar()
+      toast.success(t('pagesUi.bulkDeferSuccess', { count: updated }))
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+
+  const isBusy =
+    deferMutation.isPending || clearMutation.isPending || bulkDeferMutation.isPending
 
   function prevMonth() {
     setView(v => new Date(v.getFullYear(), v.getMonth() - 1, 1, 12, 0, 0))
@@ -123,14 +191,13 @@ export function TakvimClient() {
     selectCalendarDate(todayKey)
   }
 
-  const deferFollowUp = useCallback((candidateId: string, days: number) => {
-    const base = fromCalendarKey(selected)
-    base.setDate(base.getDate() + days)
-    base.setHours(12, 0, 0, 0)
-    update.mutate({ id: candidateId, next_follow_up_at: base.toISOString() })
-  }, [selected, update])
+  function shiftWeek(delta: number) {
+    const d = fromCalendarKey(selected)
+    d.setDate(d.getDate() + delta * 7)
+    selectCalendarDate(toCalendarKey(d))
+  }
 
-  if (!mounted) {
+  if (!mounted || !ws?.workspaceId) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
@@ -144,9 +211,20 @@ export function TakvimClient() {
 
   return (
     <div className="space-y-5">
-      {/* Gecikmiş takip özeti */}
+      {bulkConfirmOpen && (
+        <TakvimConfirmModal
+          title={t('pagesUi.bulkDeferTitle')}
+          message={t('pagesUi.bulkDeferMessage', { count: overdueCandidates.length })}
+          confirmLabel={t('pagesUi.bulkDeferConfirm')}
+          cancelLabel={t('common.cancel')}
+          isLoading={bulkDeferMutation.isPending}
+          onConfirm={() => bulkDeferMutation.mutate()}
+          onCancel={() => setBulkConfirmOpen(false)}
+        />
+      )}
+
       {overdueCount > 0 && (
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0]/60 px-4 py-3">
+        <div className="flex flex-col gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0]/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={() => earliestOverdue && selectCalendarDate(earliestOverdue)}
@@ -157,16 +235,25 @@ export function TakvimClient() {
               {t('pagesUi.overdueFollowUps', { count: overdueCount })}
             </p>
           </button>
-          <Link
-            href="/bugun/ilgilen"
-            className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline"
-          >
-            {t('pagesUi.viewTodayPriorities')}
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setBulkConfirmOpen(true)}
+              disabled={isBusy}
+              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline disabled:opacity-50"
+            >
+              {t('pagesUi.bulkDeferOneDay')}
+            </button>
+            <Link
+              href="/bugun/ilgilen"
+              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline"
+            >
+              {t('pagesUi.viewTodayPriorities')}
+            </Link>
+          </div>
         </div>
       )}
 
-      {/* Ay navigasyonu */}
       <div className="flex items-center gap-2">
         <button
           type="button"
@@ -176,9 +263,19 @@ export function TakvimClient() {
           <ChevronLeft className="h-4 w-4" />
         </button>
 
-        <span className="min-w-0 flex-1 text-center text-sm font-bold text-[var(--text-1)]">
-          {formatCalendarMonth(view, lang)} {view.getFullYear()}
-        </span>
+        <div className="min-w-0 flex-1 text-center">
+          <span className="text-sm font-bold text-[var(--text-1)]">
+            {formatCalendarMonth(view, lang)} {view.getFullYear()}
+          </span>
+          {(monthStats.total > 0 || monthStats.overdue > 0) && (
+            <p className="mt-0.5 text-[11px] text-[var(--text-2)]">
+              {t('pagesUi.monthSummary', {
+                total: monthStats.total,
+                overdue: monthStats.overdue,
+              })}
+            </p>
+          )}
+        </div>
 
         {showBackToToday && (
           <button
@@ -200,7 +297,6 @@ export function TakvimClient() {
         </button>
       </div>
 
-      {/* Haftalık şerit — masaüstü */}
       <TakvimWeekStrip
         weekKeys={weekKeys}
         selected={selected}
@@ -209,9 +305,10 @@ export function TakvimClient() {
         lang={lang}
         title={t('pagesUi.weekView')}
         onSelect={selectCalendarDate}
+        onPrevWeek={() => shiftWeek(-1)}
+        onNextWeek={() => shiftWeek(1)}
       />
 
-      {/* Ay grid */}
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
         <div className="mb-1 grid grid-cols-7">
           {weekdayLabels.map(d => (
@@ -260,7 +357,6 @@ export function TakvimClient() {
         </div>
       </div>
 
-      {/* Seçilen güne ait adaylar */}
       <div>
         <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
           {selectedTitle} — {t('pagesUi.followUpList')}
@@ -306,18 +402,19 @@ export function TakvimClient() {
                 candidate={c}
                 lang={lang}
                 deferLabel={t('pipelinePage.rescheduleContact')}
+                completeLabel={t('pipelinePage.removeFollowUp')}
                 dayLabel={t('pipelinePage.day')}
                 daysLabel={t('pipelinePage.days')}
                 onOpen={() => router.push(`/pipeline/${c.id}`)}
-                onDefer={days => deferFollowUp(c.id, days)}
-                isDeferring={update.isPending}
+                onDefer={days => deferMutation.mutate({ candidateId: c.id, days })}
+                onComplete={() => clearMutation.mutate(c.id)}
+                isBusy={isBusy}
               />
             ))}
           </ul>
         )}
       </div>
 
-      {/* Seçili günden sonraki 7 gün */}
       {next7Keys.length > 0 && (
         <div>
           <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
@@ -342,7 +439,6 @@ export function TakvimClient() {
         </div>
       )}
 
-      {/* Görüntülenen ayın bir sonraki ayı */}
       {nextMonthKeys.length > 0 && (() => {
         const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1, 12, 0, 0)
         const nmYear = nextMonthDate.getFullYear()
@@ -370,6 +466,18 @@ export function TakvimClient() {
           </div>
         )
       })()}
+
+      {showTeamCalendar && (
+        <TakvimTeamCalendar
+          workspaceId={ws.workspaceId}
+          year={view.getFullYear()}
+          month={view.getMonth()}
+          lang={lang}
+          title={t('pagesUi.teamCalendarTitle')}
+          subtitle={t('pagesUi.teamCalendarSubtitle')}
+          emptyLabel={t('pagesUi.teamCalendarEmpty')}
+        />
+      )}
     </div>
   )
 }
