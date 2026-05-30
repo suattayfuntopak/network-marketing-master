@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-31 — Council Triad 2. Tur (analiz — kod değişmedi)
+
+**Üyeler:** Torvalds + Aristoteles + Ada. Tam rapor: [docs/council-triad-2026-05-31.md](docs/council-triad-2026-05-31.md).
+**Sonuç:** Geçen turun 5 kritiği ✅ kapanmış, regresyon yok. Yeni bulgu: son sprintteki **cron/e-posta/bildirim alt-sistemi en az sertleştirilmiş parça** — eski örüntüler (secret fallback, raw client, eksik idempotency) geri gelmiş.
+
+- 🔴 **K-1** — `CRON_SECRET` set/boş değilse `Bearer ` ile 3 cron endpoint herkese açık → tek satır guard (`!secret ||`).
+- 🟠 **Y-1** Resend `|| 're_test_key'` fallback + 2 cron raw client · **Y-2** trial/license cron idempotency yok → çift e-posta · **Y-3** calendar-reminder UTC↔İstanbul TZ asimetrisi + free/trial-ended lisans boşluğu · **Y-4** `useUpdateCandidate` read-before-write → hayalet aktivite (eski Y-6) · **Y-5** QuickAddModal yalancı "E-posta Gönderildi" UI + ölü kod · **Y-6** `|||` yarım göç (typed kolon ↔ legacy parse) · **Y-7** i18n `lang === 'en'` ×67 · **Y-8** useNotifications↔NotificationsModal circular.
+- 🟡 12 madde (O-1..O-12): bulkDefer terminal/N+1, lib flat ×3, admin client dedup, translate-note→action, inline super-admin, god component, lint 88 error, parent_id ölü koşul…
+- 🟢 4 madde (L-1..L-4): kota TZ, domain types, calendar test, doc.
+- **Faz planı A–G:** A=güvenlik (bugün), B=cron doğruluğu, C=veri bütünlüğü, D=i18n/yapı, E=`|||` göçü, F=god component, G=düşük.
+
+**Test:** 80/17 yeşil. **Lint:** 88 error / 54 warning (çoğu eski; takvim `set-state-in-effect`).
+
+---
+
 ## 2026-05-30 — Takvim faslı KAPANDI (final 5 öneri)
 
 1. **Bugün İlgilen ↔ takvim** — `dailyPriorities.ts` / `buildDailyPriorities` takvim formülü (`isFollowUpDue`) ile tek kaynak.
