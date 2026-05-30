@@ -14,6 +14,8 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/domain/stages'
+import { nextFollowUpKeyAfterCompletion } from '@/lib/domain/calendarFollowUp'
+import { followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
@@ -100,10 +102,12 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   function clearFollowUp() {
     setQuickActionOpen(false)
+    const todayKey = toCalendarKey(new Date())
+    const nextKey = nextFollowUpKeyAfterCompletion(todayKey, candidate.stage as CandidateStage)
     update.mutate({
       id: candidate.id,
-      next_follow_up_at: null,
       last_contact_at: new Date().toISOString(),
+      next_follow_up_at: nextKey ? followUpToIsoFromKey(nextKey) : null,
     })
   }
 

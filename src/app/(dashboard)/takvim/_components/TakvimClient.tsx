@@ -148,7 +148,8 @@ export function TakvimClient() {
   })
 
   const clearMutation = useMutation({
-    mutationFn: (candidateId: string) => clearFollowUpAction(ws!.workspaceId, candidateId),
+    mutationFn: (candidateId: string) =>
+      clearFollowUpAction(ws!.workspaceId, candidateId, selected),
     onSuccess: () => {
       invalidateCalendar()
       toast.success(t('pagesUi.followUpCompleted'))

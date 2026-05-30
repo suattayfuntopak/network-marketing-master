@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-30 — Takvim: Takibi İptal Et listeden düşürür (formül bug)
+
+- **Sorun:** İptal sonrası `last_contact_at = bugün` + `next = null` → formül yine aynı güne düşüyordu (ör. iletişim +3 = seçili gün); kişi listede kalıyordu.
+- **Düzeltme:** `nextFollowUpKeyAfterCompletion()` — tamamlanan gün + aşama günü → açık `next_follow_up_at`. Takvim seçili günü server'a iletilir; boru hattı kartı bugün referanslı.
+- **Dosyalar:** `calendarFollowUp.ts`, `takvim/actions.ts`, `TakvimClient.tsx`, `CandidateCard.tsx`.
+
+---
+
 ## 2026-05-30 — Takvim: takip iptali kalıcı + boru hattı deep link
 
 - **Takibi İptal Et:** Yalnızca `next_follow_up_at = null` yeterli değildi; formülle hesaplanan tarih geri geliyordu. Artık `last_contact_at = now` + aktivite `follow_up_completed` — Supabase kalıcı.

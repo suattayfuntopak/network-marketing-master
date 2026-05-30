@@ -2,9 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
-import { buildCalendarByDate } from '@/lib/domain/calendarFollowUp'
+import { buildCalendarByDate, nextFollowUpKeyAfterCompletion } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey } from '@/lib/utils/calendarDates'
-import type { NmmCandidate } from '@/types/database.types'
+import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
 export type TeamCalendarMemberSummary = {
   userId: string
@@ -88,12 +88,13 @@ export async function deferFollowUpAction(
 export async function clearFollowUpAction(
   workspaceId: string,
   candidateId: string,
+  completedOnDateKey: string,
 ): Promise<void> {
   const { supabase, user } = await assertWorkspaceOwner(workspaceId)
 
   const { data: candidate } = await supabase
     .from('nmm_candidates')
-    .select('next_follow_up_at, last_contact_at')
+    .select('next_follow_up_at, last_contact_at, stage')
     .eq('id', candidateId)
     .eq('workspace_id', workspaceId)
     .eq('owner_id', user.id)
@@ -102,11 +103,14 @@ export async function clearFollowUpAction(
   if (!candidate) throw new Error('Aday bulunamadı.')
 
   const nowIso = new Date().toISOString()
+  const stage = candidate.stage as CandidateStage
+  const nextKey = nextFollowUpKeyAfterCompletion(completedOnDateKey, stage)
+  const nextIso = nextKey ? followUpToIsoFromKey(nextKey) : null
 
   const { error } = await supabase
     .from('nmm_candidates')
     .update({
-      next_follow_up_at: null,
+      next_follow_up_at: nextIso,
       last_contact_at: nowIso,
     })
     .eq('id', candidateId)
@@ -119,7 +123,7 @@ export async function clearFollowUpAction(
     user.id,
     candidateId,
     candidate.next_follow_up_at,
-    null,
+    nextIso,
   )
 
   await supabase.from('nmm_daily_actions').insert({
