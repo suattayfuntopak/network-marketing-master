@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { cronAuthError } from '@/lib/infra/cronAuth'
+import { claimEmailSend } from '@/lib/infra/emailSentLog'
+import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { fetchFreeTrialRecipients } from '@/lib/infra/cronTrialRecipients'
 import { sendTrialLifecycleEmail, type TrialEmailKind } from '@/lib/infra/trialEmails'
 
@@ -16,13 +18,21 @@ export async function GET(request: NextRequest) {
   if (authError) return authError
 
   const supabase = createAdminClient()
+  const todayKey = todayCalendarKey()
 
-  const results: { kind: TrialEmailKind; email: string; sent: boolean }[] = []
+  const results: { kind: TrialEmailKind; email: string; sent: boolean; skipped?: boolean }[] = []
 
   for (const job of JOBS) {
     const recipients = await fetchFreeTrialRecipients(supabase, job.offsetDays)
 
     for (const r of recipients) {
+      // Idempotency: aynı gün aynı workspace+kind ikinci kez gönderilmez.
+      const fresh = await claimEmailSend(supabase, r.workspaceId, job.kind, todayKey)
+      if (!fresh) {
+        results.push({ kind: job.kind, email: r.email, sent: false, skipped: true })
+        continue
+      }
+
       const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, 'tr')
       results.push({ kind: job.kind, email: r.email, sent })
     }

@@ -37,3 +37,12 @@ export function keysForDaysAfter(anchorKey: string, count: number): string[] {
 export function followUpToIsoFromKey(key: string): string {
   return fromCalendarKey(key).toISOString()
 }
+
+/**
+ * Takvim anahtarının İstanbul gün başlangıcı (00:00 +03:00) ISO'su.
+ * Türkiye 2016'dan beri sabit UTC+3 (DST yok), bu yüzden offset sabittir.
+ * Cron idempotency penceresi için `todayCalendarKey()` ile aynı günü işaret eder.
+ */
+export function istanbulDayStartIso(key: string): string {
+  return new Date(`${key}T00:00:00+03:00`).toISOString()
+}

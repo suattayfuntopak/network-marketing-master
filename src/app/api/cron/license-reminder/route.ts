@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { cronAuthError } from '@/lib/infra/cronAuth'
+import { claimEmailSend } from '@/lib/infra/emailSentLog'
+import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { sendLicenseExpiryEmail } from '@/lib/infra/mail'
 
 export async function GET(request: NextRequest) {
@@ -8,9 +10,10 @@ export async function GET(request: NextRequest) {
   if (authError) return authError
 
   const supabase = createAdminClient()
+  const todayKey = todayCalendarKey()
 
   const now = new Date()
-  const results: { email: string; days: number; sent: boolean }[] = []
+  const results: { email: string; days: number; sent: boolean; skipped?: boolean }[] = []
 
   for (const daysRemaining of [7, 3, 1]) {
     const targetStart = new Date(now)
@@ -49,6 +52,13 @@ export async function GET(request: NextRequest) {
 
         const email = authUser.user.email
         const name = member.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak'
+
+        // Idempotency: aynı gün aynı workspace+gün-eşiği ikinci kez gönderilmez.
+        const fresh = await claimEmailSend(supabase, ws.id, `license_${daysRemaining}d`, todayKey)
+        if (!fresh) {
+          results.push({ email, days: daysRemaining, sent: false, skipped: true })
+          continue
+        }
 
         const sent = await sendLicenseExpiryEmail(
           email,

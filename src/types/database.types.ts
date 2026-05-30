@@ -275,6 +275,30 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_email_sent_log: {
+        Row: {
+          id: string
+          workspace_id: string
+          kind: string
+          sent_date: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          kind: string
+          sent_date: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          kind?: string
+          sent_date?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       nmm_onboarding_progress: {
         Row: {
           id: string
