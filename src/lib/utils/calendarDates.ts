@@ -32,3 +32,8 @@ export function keysForDaysAfter(anchorKey: string, count: number): string[] {
     return toCalendarKey(d)
   })
 }
+
+/** Takvim anahtarından DB'ye yazılacak ISO (yerel öğlen 12:00). */
+export function followUpToIsoFromKey(key: string): string {
+  return fromCalendarKey(key).toISOString()
+}

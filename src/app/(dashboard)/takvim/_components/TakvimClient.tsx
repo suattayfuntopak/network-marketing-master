@@ -157,11 +157,20 @@ export function TakvimClient() {
   })
 
   const bulkDeferMutation = useMutation({
-    mutationFn: () => bulkDeferOverdueFollowUpsAction(ws!.workspaceId),
+    mutationFn: () => {
+      const ids = overdueCandidates.map(c => c.id)
+      const targetDateKey = keysForDaysAfter(todayKey, 1)[0]
+      return bulkDeferOverdueFollowUpsAction(ws!.workspaceId, ids, targetDateKey)
+    },
     onSuccess: ({ updated }) => {
       setBulkConfirmOpen(false)
       invalidateCalendar()
+      if (updated === 0) {
+        toast.error(t('pagesUi.bulkDeferNone'))
+        return
+      }
       toast.success(t('pagesUi.bulkDeferSuccess', { count: updated }))
+      selectCalendarDate(keysForDaysAfter(todayKey, 1)[0])
     },
     onError: (e: Error) => toast.error(e.message),
   })
@@ -204,7 +213,10 @@ export function TakvimClient() {
       {bulkConfirmOpen && (
         <TakvimConfirmModal
           title={t('pagesUi.bulkDeferTitle')}
-          message={t('pagesUi.bulkDeferMessage', { count: overdueCandidates.length })}
+          message={t('pagesUi.bulkDeferMessage', {
+            count: overdueCandidates.length,
+            date: formatCalendarDayKey(keysForDaysAfter(todayKey, 1)[0], lang),
+          })}
           confirmLabel={t('pagesUi.bulkDeferConfirm')}
           cancelLabel={t('common.cancel')}
           isLoading={bulkDeferMutation.isPending}

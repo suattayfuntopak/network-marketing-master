@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-30 — Takvim: toplu erteleme banner düzeltmesi
+
+- Gecikmiş takipler artık ekranda görünen aday listesi + **yarına** (bugün+1) taşınıyor; sunucu/tarayıcı tarih uyumsuzluğu ve “+1 gün hâlâ gecikmiş” sorunu giderildi.
+
+---
+
 ## 2026-05-30 — Takvim: hafta şeridi kaldırıldı
 
 - Aylık grid ile mükerrer olan "Hafta görünümü" (`TakvimWeekStrip`) kaldırıldı.

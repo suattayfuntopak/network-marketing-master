@@ -2,12 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { SUPER_ADMIN_EMAIL } from '@/lib/constants'
-import {
-  buildCalendarByDate,
-  calendarFollowUpDate,
-  getOverdueCandidates,
-} from '@/lib/domain/calendarFollowUp'
-import { fromCalendarKey, todayCalendarKey, toCalendarKey } from '@/lib/utils/calendarDates'
+import { buildCalendarByDate } from '@/lib/domain/calendarFollowUp'
+import { fromCalendarKey, followUpToIsoFromKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate } from '@/types/database.types'
 
 export type TeamCalendarMemberSummary = {
@@ -124,35 +120,30 @@ export async function clearFollowUpAction(
 
 export async function bulkDeferOverdueFollowUpsAction(
   workspaceId: string,
+  candidateIds: string[],
+  targetDateKey: string,
 ): Promise<{ updated: number }> {
+  if (!candidateIds.length) return { updated: 0 }
+
   const { supabase, user } = await assertWorkspaceOwner(workspaceId)
-
-  const { data: candidates, error } = await supabase
-    .from('nmm_candidates')
-    .select('*')
-    .eq('workspace_id', workspaceId)
-    .eq('owner_id', user.id)
-
-  if (error) throw new Error(error.message)
-
-  const byDate = buildCalendarByDate((candidates ?? []) as NmmCandidate[])
-  const todayKey = todayCalendarKey()
-  const overdue = getOverdueCandidates(byDate, todayKey)
+  const targetIso = followUpToIsoFromKey(targetDateKey)
 
   let updated = 0
-  for (const c of overdue) {
-    const current = calendarFollowUpDate(c)
-    if (!current) continue
+  for (const id of candidateIds) {
+    const { data: candidate } = await supabase
+      .from('nmm_candidates')
+      .select('id, next_follow_up_at')
+      .eq('id', id)
+      .eq('workspace_id', workspaceId)
+      .eq('owner_id', user.id)
+      .maybeSingle()
 
-    const next = new Date(current)
-    next.setDate(next.getDate() + 1)
-    next.setHours(12, 0, 0, 0)
-    const iso = next.toISOString()
+    if (!candidate) continue
 
     const { error: updateError } = await supabase
       .from('nmm_candidates')
-      .update({ next_follow_up_at: iso })
-      .eq('id', c.id)
+      .update({ next_follow_up_at: targetIso })
+      .eq('id', id)
 
     if (updateError) continue
 
@@ -160,9 +151,9 @@ export async function bulkDeferOverdueFollowUpsAction(
       supabase,
       workspaceId,
       user.id,
-      c.id,
-      c.next_follow_up_at,
-      iso,
+      id,
+      candidate.next_follow_up_at,
+      targetIso,
     )
     updated++
   }
