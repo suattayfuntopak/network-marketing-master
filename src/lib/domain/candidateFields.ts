@@ -39,12 +39,14 @@ export function resolveCandidateFields(row: CandidateRow): ResolvedCandidateFiel
     }
   }
 
+  // Fallback yalnızca typed kolonların boş olduğu eski satırlar için. Migration 023
+  // sonrası `note` 2-segment (TR ||| EN); avatar/warmth bu satırlarda yok.
   const legacy = parseNote(row.note)
   return {
     noteTr: legacy.tr,
     noteEn: legacy.en,
-    avatarUrl: legacy.avatarUrl?.trim() || null,
-    warmth: legacy.warmth,
+    avatarUrl: null,
+    warmth: 'ilik',
   }
 }
 

@@ -1,40 +1,20 @@
 export interface ParsedNote {
   tr: string
   en: string
-  avatarUrl: string
-  warmth: 'sicak' | 'ilik' | 'soguk'
 }
 
+/**
+ * Legacy `note` kolonu artık yalnızca 2-segment çeviri (`TR ||| EN`) saklar.
+ * Migration 023 avatar/warmth'i typed kolonlara taşıdı ve `note`'u yeniden yazdı;
+ * bu fonksiyon yalnızca typed kolonların boş olduğu eski satırlar için fallback'tir.
+ */
 export function parseNote(rawNote: string | null): ParsedNote {
-  const result: ParsedNote = { tr: '', en: '', avatarUrl: '', warmth: 'ilik' }
-  if (!rawNote) return result
+  if (!rawNote) return { tr: '', en: '' }
   const parts = rawNote.split('|||')
-  result.tr = parts[0]?.trim() ?? ''
-  result.en = parts[1]?.trim() ?? ''
-  result.avatarUrl = parts[2]?.trim() ?? ''
-  
-  const w = parts[3]?.trim()
-  if (w === 'sicak' || w === 'ilik' || w === 'soguk') {
-    result.warmth = w
+  return {
+    tr: parts[0]?.trim() ?? '',
+    en: parts[1]?.trim() ?? '',
   }
-  return result
-}
-
-/** @deprecated Use `buildCandidateContentFields` — stores avatar/warmth in typed DB columns. */
-export function formatNote(tr: string, en?: string, avatarUrl?: string, warmth?: 'sicak' | 'ilik' | 'soguk'): string {
-  const parts = [
-    tr.trim(),
-    (en ?? '').trim(),
-    (avatarUrl ?? '').trim(),
-    (warmth ?? 'ilik').trim()
-  ]
-  
-  // Trim trailing empty parts to keep data footprint compact
-  while (parts.length > 0 && !parts[parts.length - 1]) {
-    parts.pop()
-  }
-  
-  return parts.join(' ||| ')
 }
 
 export interface ParsedSimpleNote {

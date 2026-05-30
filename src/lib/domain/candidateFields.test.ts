@@ -22,9 +22,11 @@ describe('resolveCandidateFields', () => {
     })
   })
 
-  it('falls back to legacy 4-segment note when typed columns are empty', () => {
+  it('falls back to legacy 2-segment note (TR ||| EN) when typed columns are empty', () => {
+    // Migration 023 sonrası `note` yalnızca 2-segment çeviri saklar; avatar/warmth
+    // typed kolonlarda. Boş typed kolonlu eski satırlarda avatar yok, warmth varsayılan.
     const row = {
-      note: 'TR metin ||| EN text ||| https://img/1.jpg ||| soguk',
+      note: 'TR metin ||| EN text',
       note_tr: null,
       note_en: null,
       avatar_url: null,
@@ -33,8 +35,8 @@ describe('resolveCandidateFields', () => {
     expect(resolveCandidateFields(row)).toEqual({
       noteTr: 'TR metin',
       noteEn: 'EN text',
-      avatarUrl: 'https://img/1.jpg',
-      warmth: 'soguk',
+      avatarUrl: null,
+      warmth: 'ilik',
     })
   })
 })

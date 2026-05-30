@@ -17,7 +17,7 @@ A–D, #6–7, E (i18n), F (perf), G (error/loading boundary), H (E2E), K-1..K-5
 | **D — i18n & yapı** | bimodal + flat lib + admin dedup | Y-7, O-3, O-4, O-6, O-8 | ✅ flat lib→domain · admin client dedup · inline super-admin→isSuperAdmin · eslint exact allowlist · deleteWithUndo→t() |
 
 **Y-7 yeniden sınıflandırma (önemli):** "67 `lang === 'en'`" büyük ölçüde yanlış sayımdı. Çoğu meşru: `title_en:title_tr` (iki-dilli DB verisi — CLAUDE.md kalıbı) ve `'en-US':'tr-TR'` (locale argümanı). Gerçek hardcoded UI kopyası yalnızca `deleteWithUndo` (3 string → `common.*` anahtarları) + ölü `'Ayşe':'Ayşe'` ternary idi; ikisi de düzeltildi. Kalan kopya-vari ternary'ler `YazarForm`/`CandidateDetail` (god component) içinde → **Faz F**'te dekompozisyonla birlikte.
-| **E — `\|\|\|` göçü** | Okuma typed kolona, legacy sil | Y-6 | ⏳ (backfill doğrulaması) |
+| **E — `\|\|\|` göçü** | Okuma typed kolona, legacy sil | Y-6 | ✅ backfill doğrulandı (mig 023 içinde) · parseNote→2-segment · ölü formatNote silindi · fallback avatar/warmth kaldırıldı |
 | **F — God component & hijyen** | Bölme + lint + log + circular | Y-8, O-5, O-7, O-10, O-11 | ⏳ |
 | **G — Düşük öncelik** | Test, type, doc | L-1..L-4 | ⏳ |
 
