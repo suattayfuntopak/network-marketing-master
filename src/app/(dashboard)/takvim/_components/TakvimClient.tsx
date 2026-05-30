@@ -36,6 +36,24 @@ function toKey(d: Date) {
   return `${y}-${m}-${day}`
 }
 
+function fromKey(key: string): Date {
+  const [y, m, day] = key.split('-').map(Number)
+  return new Date(y, m - 1, day, 12, 0, 0)
+}
+
+function formatKeyDisplay(key: string): string {
+  return key.split('-').reverse().join('.')
+}
+
+function keysForDaysAfter(anchorKey: string, count: number): string[] {
+  const anchor = fromKey(anchorKey)
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(anchor)
+    d.setDate(d.getDate() + i + 1)
+    return toKey(d)
+  })
+}
+
 export function TakvimClient() {
   const router = useRouter()
   const { lang, t } = useTranslation()
@@ -85,6 +103,29 @@ export function TakvimClient() {
   function nextMonth() { setView(v => new Date(v.getFullYear(), v.getMonth() + 1, 1, 12, 0, 0)) }
 
   const weekdayLabels = useMemo(() => weekdayShortLabels(lang), [lang])
+
+  const next7Keys = useMemo(() => {
+    return keysForDaysAfter(selected, 7).filter(k => byDate[k])
+  }, [selected, byDate])
+
+  const nextMonthKeys = useMemo(() => {
+    const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1, 12, 0, 0)
+    const nmYear = nextMonthDate.getFullYear()
+    const nmMonth = nextMonthDate.getMonth()
+    const daysInNm = new Date(nmYear, nmMonth + 1, 0).getDate()
+    const next7Set = new Set(keysForDaysAfter(selected, 7))
+
+    return Array.from({ length: daysInNm }, (_, i) => {
+      const d = new Date(nmYear, nmMonth, i + 1, 12, 0, 0)
+      return toKey(d)
+    }).filter(k => byDate[k] && !next7Set.has(k))
+  }, [view, selected, byDate])
+
+  function selectCalendarDate(key: string) {
+    const d = fromKey(key)
+    setView(new Date(d.getFullYear(), d.getMonth(), 1, 12, 0, 0))
+    setSelected(key)
+  }
 
   if (!mounted) {
     return (
@@ -163,7 +204,7 @@ export function TakvimClient() {
       {/* Seçilen güne ait adaylar */}
       <div>
         <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-          {selected === toKey(today) ? t('pagesUi.today') : selected.split('-').reverse().join('.')} — {t('pagesUi.followUpList')}
+          {selected === toKey(today) ? t('pagesUi.today') : formatKeyDisplay(selected)} — {t('pagesUi.followUpList')}
         </p>
 
         {selected < toKey(today) && selectedCandidates.length > 0 && (
@@ -212,48 +253,33 @@ export function TakvimClient() {
         )}
       </div>
 
-      {/* Yaklaşan takipler özeti */}
-      {(() => {
-        const next7 = Array.from({ length: 7 }, (_, i) => {
-          const d = new Date(today)
-          d.setDate(d.getDate() + i + 1)
-          return toKey(d)
-        }).filter(k => byDate[k])
-        if (!next7.length) return null
-        return (
-          <div>
-            <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
-              {t('pagesUi.next7Days')}
-            </p>
-            <ul className="space-y-1.5">
-              {next7.map(k => (
-                <button key={k} onClick={() => setSelected(k)}
-                  className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
-                  <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
-                  <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
-                    {byDate[k].length} {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
-                  </span>
-                </button>
-              ))}
-            </ul>
-          </div>
-        )
-      })()}
+      {/* Seçili günden sonraki 7 gün — takip özeti */}
+      {next7Keys.length > 0 && (
+        <div>
+          <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
+            {t('pagesUi.next7Days')}
+          </p>
+          <ul className="space-y-1.5">
+            {next7Keys.map(k => (
+              <button
+                key={k}
+                onClick={() => selectCalendarDate(k)}
+                className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]"
+              >
+                <span className="text-sm text-[var(--text-1)]">{formatKeyDisplay(k)}</span>
+                <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
+                  {byDate[k].length} {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
+                </span>
+              </button>
+            ))}
+          </ul>
+        </div>
+      )}
 
-      {/* Yaklaşan takipler özeti: Önümüzdeki Ay */}
-      {(() => {
+      {/* Görüntülenen ayın bir sonraki ayı — takip özeti */}
+      {nextMonthKeys.length > 0 && (() => {
         const nextMonthDate = new Date(view.getFullYear(), view.getMonth() + 1, 1, 12, 0, 0)
         const nmYear = nextMonthDate.getFullYear()
-        const nmMonth = nextMonthDate.getMonth()
-        const daysInNm = new Date(nmYear, nmMonth + 1, 0).getDate()
-        
-        const nextMonthKeys = Array.from({ length: daysInNm }, (_, i) => {
-          const d = new Date(nmYear, nmMonth, i + 1, 12, 0, 0)
-          return toKey(d)
-        }).filter(k => byDate[k])
-
-        if (!nextMonthKeys.length) return null
-
         return (
           <div className="mt-4 border-t border-[var(--border)] pt-4">
             <p className="mb-3 text-sm font-semibold text-[var(--text-1)]">
@@ -261,12 +287,12 @@ export function TakvimClient() {
             </p>
             <ul className="space-y-1.5">
               {nextMonthKeys.map(k => (
-                <button key={k} onClick={() => {
-                  setView(new Date(nmYear, nmMonth, 1))
-                  setSelected(k)
-                }}
-                  className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]">
-                  <span className="text-sm text-[var(--text-1)]">{k.split('-').reverse().join('.')}</span>
+                <button
+                  key={k}
+                  onClick={() => selectCalendarDate(k)}
+                  className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]"
+                >
+                  <span className="text-sm text-[var(--text-1)]">{formatKeyDisplay(k)}</span>
                   <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
                     {byDate[k].length} {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
                   </span>

@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-05-30 — Takvim: "Seçili günden sonraki 7 gün" referans düzeltmesi
+
+- **Sorun:** "Önümüzdeki 7 gün" listesi `today` (bugün) üzerinden hesaplanıyordu; Haziran ayında 17'sine tıklanınca 5 Haziran gibi geçmiş tarihler görünüyordu.
+- **Düzeltme:** Liste artık **seçili gün + 1 … +7** aralığından türetiliyor; tıklanınca ilgili aya geçiş (`selectCalendarDate`).
+- **Ek:** "Önümüzdeki Ay" listesinde seçili günün sonraki 7 günüyle çakışan tarihler elendi; başlık metni netleştirildi (TR/EN).
+
+**Dosyalar:** `TakvimClient.tsx`, `pages.ts` (i18n)
+
+---
+
 ## 2026-05-30 — Varsayılan WhatsApp sunum şablonu ([Firma İsmi])
 
 - `defaultWhatsappTemplate`: Merhaba {name}, + [Firma İsmi] metni (yeni materyal formu + süper admin fallback)
