@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { createPortal } from 'react-dom'
+import { useRouter } from 'next/navigation'
 import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserPlus, CalendarClock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
+import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { createClient } from '@/lib/supabase/client'
 
 interface NotificationsModalProps {
@@ -131,6 +133,7 @@ function formatTimeAgo(
 
 export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
   const { lang, t } = useTranslation()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [emailAlerts, setEmailAlerts]   = useState(true)
   const [pushAlerts, setPushAlerts]     = useState(true)
@@ -155,7 +158,9 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     time: formatTimeAgo(n.created_at, t),
     read: n.read,
     icon: n.type as 'bell' | 'alert' | 'info' | 'user' | 'calendar',
-    isDb: true
+    type: n.type,
+    candidate_id: n.candidate_id,
+    isDb: true,
   }))
 
   const notifications = [
@@ -468,18 +473,36 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
                 {selected.description}
               </p>
 
-              {/* Okundu rozeti */}
-              <div className="mt-4 flex items-center justify-between">
+              {/* Okundu rozeti + aksiyon */}
+              <div className="mt-4 flex items-center justify-between gap-3">
                 <span className="flex items-center gap-1.5 text-xs font-semibold text-[#0F6E56]">
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   Okundu olarak işaretlendi
                 </span>
-                <button
-                  onClick={() => setSelected(null)}
-                  className="rounded-xl bg-[#534AB7] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#453da0] active:scale-95"
-                >
-                  Kapat
-                </button>
+                <div className="flex items-center gap-2">
+                  {selected.candidate_id && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        router.push(notificationTargetHref({
+                          type: selected.type,
+                          candidate_id: selected.candidate_id,
+                        }))
+                        setSelected(null)
+                        onClose()
+                      }}
+                      className="rounded-xl border border-[#534AB7]/30 bg-[#EEEDFE] px-4 py-2 text-sm font-semibold text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white active:scale-95"
+                    >
+                      {t('pagesUi.viewInPipeline')}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setSelected(null)}
+                    className="rounded-xl bg-[#534AB7] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#453da0] active:scale-95"
+                  >
+                    Kapat
+                  </button>
+                </div>
               </div>
             </div>
           </div>

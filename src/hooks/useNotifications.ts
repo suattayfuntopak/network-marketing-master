@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/components/ui/NotificationsModal'
+import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useRouter } from 'next/navigation'
@@ -19,6 +20,7 @@ export interface NotificationItem {
   type: 'bell' | 'alert' | 'info' | 'user' | 'calendar'
   read: boolean
   created_at: string
+  candidate_id: string | null
 }
 
 async function fetchNotifications(): Promise<NotificationItem[]> {
@@ -86,23 +88,16 @@ export function useNotifications() {
             // 3. Show stunning interactive toast notification
             const title = lang === 'en' ? newNotif.title_en : newNotif.title_tr
             const description = lang === 'en' ? newNotif.description_en : newNotif.description_tr
-
-            // Route notifications to the screen most relevant to their type.
-            // Defaults to /pano (dashboard home) for unknown types.
-            const routeByType: Record<NotificationItem['type'], string> = {
-              user: '/ekip',
-              calendar: '/takvim',
-              alert: '/odeme',
-              bell: '/pano',
-              info: '/pano',
-            }
-            const targetHref = routeByType[newNotif.type] ?? '/pano'
+            const targetHref = notificationTargetHref(newNotif)
+            const actionLabel = newNotif.candidate_id
+              ? t('pagesUi.viewInPipeline')
+              : t('shellUi.view')
 
             toast(title, {
               description,
               duration: 6000,
               action: {
-                label: t('shellUi.view'),
+                label: actionLabel,
                 onClick: () => {
                   router.push(targetHref)
                 },
@@ -118,7 +113,7 @@ export function useNotifications() {
         supabase.removeChannel(channel)
       }
     }
-  }, [queryClient, supabase, lang, router])
+  }, [queryClient, supabase, lang, router, t])
 
   // Mutation: Mark all notifications as read
   const markAllReadMutation = useMutation({

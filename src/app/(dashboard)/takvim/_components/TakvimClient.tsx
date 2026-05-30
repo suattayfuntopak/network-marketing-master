@@ -27,6 +27,7 @@ import {
   toCalendarKey,
   fromCalendarKey,
   keysForDaysAfter,
+  todayCalendarKey,
 } from '@/lib/utils/calendarDates'
 import {
   bulkDeferOverdueFollowUpsAction,
@@ -47,16 +48,14 @@ export function TakvimClient() {
   const [mounted, setMounted] = useState(false)
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
 
-  const today = useMemo(() => {
-    const d = new Date()
-    d.setHours(12, 0, 0, 0)
-    return d
-  }, [])
+  const todayKey = useMemo(() => todayCalendarKey(), [])
+  const today = useMemo(() => fromCalendarKey(todayKey), [todayKey])
 
-  const todayKey = useMemo(() => toCalendarKey(today), [today])
-
-  const [view, setView] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1, 12, 0, 0))
-  const [selected, setSelected] = useState<string>(todayKey)
+  const [view, setView] = useState(() => {
+    const anchor = fromCalendarKey(todayCalendarKey())
+    return new Date(anchor.getFullYear(), anchor.getMonth(), 1, 12, 0, 0)
+  })
+  const [selected, setSelected] = useState(() => todayCalendarKey())
 
   useEffect(() => {
     setMounted(true)

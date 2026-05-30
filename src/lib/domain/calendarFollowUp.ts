@@ -42,6 +42,29 @@ export function nextFollowUpKeyAfterCompletion(
   return toCalendarKey(base)
 }
 
+export function calendarFollowUpKey(c: NmmCandidate): string | null {
+  const d = calendarFollowUpDate(c)
+  if (!d) return null
+  return toCalendarKey(d)
+}
+
+/** todayKey ile karşılaştır: gecikmiş / bugün / gelecek. */
+export function followUpDueStatus(
+  c: NmmCandidate,
+  todayKey: string,
+): 'past' | 'today' | 'future' | null {
+  const key = calendarFollowUpKey(c)
+  if (!key) return null
+  if (key < todayKey) return 'past'
+  if (key === todayKey) return 'today'
+  return 'future'
+}
+
+export function isFollowUpDue(c: NmmCandidate, todayKey: string): boolean {
+  const status = followUpDueStatus(c, todayKey)
+  return status === 'past' || status === 'today'
+}
+
 export function buildCalendarByDate(
   candidates: NmmCandidate[],
 ): Record<string, NmmCandidate[]> {

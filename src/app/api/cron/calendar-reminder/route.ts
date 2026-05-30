@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import {
-  buildCalendarByDate,
-} from '@/lib/domain/calendarFollowUp'
+import { buildCalendarByDate } from '@/lib/domain/calendarFollowUp'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate } from '@/types/database.types'
 
@@ -14,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient()
   const todayKey = todayCalendarKey()
-  const results: { userId: string; count: number; sent: boolean }[] = []
+  const results: { userId: string; candidateId: string; sent: boolean }[] = []
 
   const dayStart = new Date()
   dayStart.setHours(0, 0, 0, 0)
@@ -42,34 +40,41 @@ export async function GET(request: NextRequest) {
       .eq('owner_id', ws.owner_id)
 
     const byDate = buildCalendarByDate((candidates ?? []) as NmmCandidate[])
-    const todayCount = byDate[todayKey]?.length ?? 0
-    if (todayCount === 0) continue
+    const dueToday = byDate[todayKey] ?? []
+    if (dueToday.length === 0) continue
 
-    const { data: existing } = await supabase
-      .from('nmm_notifications')
-      .select('id')
-      .eq('user_id', ws.owner_id)
-      .eq('type', 'calendar')
-      .gte('created_at', dayStart.toISOString())
-      .limit(1)
+    for (const candidate of dueToday) {
+      const { data: existing } = await supabase
+        .from('nmm_notifications')
+        .select('id')
+        .eq('user_id', ws.owner_id)
+        .eq('type', 'calendar')
+        .eq('candidate_id', candidate.id)
+        .gte('created_at', dayStart.toISOString())
+        .limit(1)
 
-    if (existing?.length) {
-      results.push({ userId: ws.owner_id, count: todayCount, sent: false })
-      continue
-    }
+      if (existing?.length) {
+        results.push({ userId: ws.owner_id, candidateId: candidate.id, sent: false })
+        continue
+      }
 
-    const { error: insertError } = await supabase.from('nmm_notifications').insert({
-      user_id: ws.owner_id,
-      title_tr: 'Bugünkü takipleriniz 📅',
-      title_en: 'Today\'s follow-ups 📅',
-      description_tr: `Bugün ${todayCount} aday için planlı takip var. Takvimden kontrol edin.`,
-      description_en: `You have ${todayCount} scheduled follow-ups today. Check your calendar.`,
-      type: 'calendar',
-    })
+      const { error: insertError } = await supabase.from('nmm_notifications').insert({
+        user_id: ws.owner_id,
+        candidate_id: candidate.id,
+        title_tr: 'Takip zamanı geldi',
+        title_en: 'Follow-up Reminder',
+        description_tr: `${candidate.full_name} ile bugün yapmanız gereken sunum takibi var.`,
+        description_en: `You have a scheduled presentation follow-up with ${candidate.full_name} today.`,
+        type: 'calendar',
+      })
 
-    results.push({ userId: ws.owner_id, count: todayCount, sent: !insertError })
-    if (insertError) {
-      console.error(`[calendar-reminder] insert failed for ${ws.owner_id}:`, insertError)
+      results.push({ userId: ws.owner_id, candidateId: candidate.id, sent: !insertError })
+      if (insertError) {
+        console.error(
+          `[calendar-reminder] insert failed for ${ws.owner_id}/${candidate.id}:`,
+          insertError,
+        )
+      }
     }
   }
 

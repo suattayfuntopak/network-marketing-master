@@ -14,8 +14,8 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/domain/stages'
-import { nextFollowUpKeyAfterCompletion } from '@/lib/domain/calendarFollowUp'
-import { followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
+import { nextFollowUpKeyAfterCompletion, followUpDueStatus } from '@/lib/domain/calendarFollowUp'
+import { followUpToIsoFromKey, todayCalendarKey } from '@/lib/utils/calendarDates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
@@ -28,25 +28,6 @@ function daysSince(iso: string | null, t: (k: string, v?: Record<string, string 
   if (d === 0) return t('common.today')
   if (d === 1) return t('common.yesterday')
   return t('common.daysAgo', { days: d })
-}
-
-function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | null {
-  if (!iso) return null
-  const followDate = new Date(iso)
-  if (isNaN(followDate.getTime())) return null
-  
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
-  const followDateZero = new Date(followDate)
-  followDateZero.setHours(0, 0, 0, 0)
-  
-  if (followDateZero.getTime() < today.getTime()) {
-    return 'past'
-  } else if (followDateZero.getTime() === today.getTime()) {
-    return 'today'
-  }
-  return 'future'
 }
 
 interface CandidateCardProps {
@@ -102,7 +83,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   function clearFollowUp() {
     setQuickActionOpen(false)
-    const todayKey = toCalendarKey(new Date())
+    const todayKey = todayCalendarKey()
     const nextKey = nextFollowUpKeyAfterCompletion(todayKey, candidate.stage as CandidateStage)
     update.mutate({
       id: candidate.id,
@@ -345,7 +326,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               </button>
             )}
             {(() => {
-              const status = getFollowUpStatus(candidate.next_follow_up_at)
+              const status = followUpDueStatus(candidate, todayCalendarKey())
               if (status === 'past') {
                 return (
                   <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/20 px-2 py-0.5 text-[10px] font-semibold text-red-700 dark:text-red-300 border border-red-200/50 dark:border-red-900/30">

@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-05-30 — Takvim sprint kapanış: 5 onaylı iyileştirme
+
+1. **Boru hattı Takip Zamanı** — `isFollowUpDue` / `calendarFollowUpDate` ile takvimle hizalı filtre ve rozetler.
+2. **Toplu erteleme etiketi** — “Hepsini yarına ertele” (TR/EN).
+3. **`calendarFollowUp.test.ts`** — 8 unit test (formül, gecikmiş sayım, tamamlama sonrası tarih).
+4. **Bildirim deep link** — Migration `033`: `nmm_notifications.candidate_id`; cron kişi başı hatırlatma; toast/modal → `/pipeline/{id}`; ekip trigger güncellendi.
+5. **Saat dilimi** — Takvim UI `todayCalendarKey()` (Europe/Istanbul); boru hattı aynı kaynak.
+
+**Deploy:** Supabase’de `033_notifications_candidate_id.sql` uygula.
+
+---
+
 ## 2026-05-30 — Takvim: Takibi İptal Et listeden düşürür (formül bug)
 
 - **Sorun:** İptal sonrası `last_contact_at = bugün` + `next = null` → formül yine aynı güne düşüyordu (ör. iletişim +3 = seçili gün); kişi listede kalıyordu.

@@ -1,35 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Plus, TrendingUp, Search, X, Presentation } from 'lucide-react'
 import Link from 'next/link'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, type CandidateFilter } from '@/hooks/useCandidates'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
+import { isFollowUpDue } from '@/lib/domain/calendarFollowUp'
+import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { StageFilter } from './_components/StageFilter'
 import { CandidateCard } from './_components/CandidateCard'
 import { AddCandidateSheet } from './_components/AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { clsx } from 'clsx'
-
-function getFollowUpStatus(iso: string | null): 'past' | 'today' | 'future' | null {
-  if (!iso) return null
-  const followDate = new Date(iso)
-  if (isNaN(followDate.getTime())) return null
-  
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  
-  const followDateZero = new Date(followDate)
-  followDateZero.setHours(0, 0, 0, 0)
-  
-  if (followDateZero.getTime() < today.getTime()) {
-    return 'past'
-  } else if (followDateZero.getTime() === today.getTime()) {
-    return 'today'
-  }
-  return 'future'
-}
 
 export default function PipelinePage() {
   const { t } = useTranslation()
@@ -40,18 +23,14 @@ export default function PipelinePage() {
   const { data: ws, isLoading: wsLoading, error: wsError } = useWorkspace()
   const { candidates: all, isLoading, error } = useCandidates(ws?.workspaceId)
 
-  const followUpAlertCount = all.filter(c => {
-    const status = getFollowUpStatus(c.next_follow_up_at)
-    return status === 'past' || status === 'today'
-  }).length
+  const todayKey = useMemo(() => todayCalendarKey(), [])
+
+  const followUpAlertCount = all.filter(c => isFollowUpDue(c, todayKey)).length
 
   const filtered = filter === 'tumü'        ? all
     : filter === 'aktif'       ? all.filter(c => ACTIVE_STAGES.includes(c.stage))
     : filter === 'sicak'       ? all.filter(c => HOT_STAGES.includes(c.stage))
-    : filter === 'takip_zamani'? all.filter(c => {
-        const status = getFollowUpStatus(c.next_follow_up_at)
-        return status === 'past' || status === 'today'
-      })
+    : filter === 'takip_zamani'? all.filter(c => isFollowUpDue(c, todayKey))
     : filter === 'kaybolanlar' ? all.filter(c => c.stage === 'kayboldu')
     : all.filter(c => c.stage === filter)
 

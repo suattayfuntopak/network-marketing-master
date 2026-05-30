@@ -223,6 +223,7 @@ export interface Database {
           type: NotificationType
           read: boolean
           created_at: string
+          candidate_id: string | null
         }
         Insert: {
           id?: string
@@ -234,6 +235,7 @@ export interface Database {
           type?: NotificationType
           read?: boolean
           created_at?: string
+          candidate_id?: string | null
         }
         Update: {
           id?: string
@@ -245,6 +247,7 @@ export interface Database {
           type?: NotificationType
           read?: boolean
           created_at?: string
+          candidate_id?: string | null
         }
         Relationships: []
       }
