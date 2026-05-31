@@ -2,10 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, Trash2, X, Bot, History, PhoneCall, Check } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useDeleteActivity } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -26,10 +26,10 @@ import {
   daysSince,
   toInputDateTime,
   formatFollowUpDate,
-  renderActivityText,
 } from './candidateDetailUtils'
 import { CandidateProfileCard } from './CandidateProfileCard'
 import { LeaderNotesCard } from './LeaderNotesCard'
+import { ActivityLogCard } from './ActivityLogCard'
 import { PresentationMaterialsCard } from './PresentationMaterialsCard'
 
 
@@ -49,26 +49,10 @@ export function CandidateDetail({ candidateId }: Props) {
   const [translatedNote, setTranslatedNote] = useState<string | null>(null)
   const [isTranslating, setIsTranslating] = useState(false)
 
-  const [showAllActivity, setShowAllActivity] = useState(false)
-
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
-  const deleteActivityMutation = useDeleteActivity(ws?.workspaceId ?? '')
-  const { data: activityLog = [] } = useActivityHistory(candidateId)
-  
-  const [activityToDelete, setActivityToDelete] = useState<any | null>(null)
-
-  function handleActivityDeleteConfirmed() {
-    if (!activityToDelete) return
-    const id = activityToDelete.id
-    const typeLabel = t('pipelinePage.activityLog')
-    setActivityToDelete(null)
-    deleteWithUndo(typeLabel, () =>
-      deleteActivityMutation.mutate({ activityId: id, candidateId })
-    )
-  }
 
   const c = candidates.find(x => x.id === candidateId)
   const parsed = c
@@ -189,7 +173,6 @@ export function CandidateDetail({ candidateId }: Props) {
     : c.next_follow_up_at
       ? formatFollowUpDate(c.next_follow_up_at, lang)
       : suggestedFollowUp(c, lang)
-  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
 
   function changeStage(stage: CandidateStage) {
     setStageOpen(false)
@@ -301,53 +284,7 @@ export function CandidateDetail({ candidateId }: Props) {
             />
 
             {/* Aktivite Geçmişi */}
-            {activityLog.length > 0 && (
-              <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
-                <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
-                  <History className="h-3.5 w-3.5" />
-                  {t('pipeline.activityHistory')}
-                </p>
-                 <ul className="space-y-2">
-                  {(showAllActivity ? activityLog : activityLog.slice(0, 5)).map(a => (
-                    <li key={a.id} className="group flex items-start gap-2.5 text-sm py-0.5 animate-in fade-in duration-200">
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] mt-0.5">
-                        {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
-                        {a.action_type === 'whatsapp'     && <WhatsAppIcon className="h-3.5 w-3.5 text-[#25D366]" />}
-                        {a.action_type === 'ai_generate'   && <Bot className="h-3.5 w-3.5 text-[#534AB7]" />}
-                        {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
-                        {a.action_type === 'stage_change' && <ArrowRight className="h-3.5 w-3.5 text-[#854F0B]" />}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[13px] leading-relaxed text-[var(--text-2)] break-words">
-                          {renderActivityText(a, lang, t)}
-                        </p>
-                        <p className="text-[9px] text-[var(--text-3)] font-medium mt-0.5">
-                          {new Date(a.created_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setActivityToDelete(a)}
-                        className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex h-6 w-6 items-center justify-center rounded-lg hover:bg-red-50 text-red-500 hover:text-red-700 dark:hover:bg-red-950/20 active:scale-95 mt-1"
-                        title={t('pipelinePage.deleteActivity')}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-                {activityLog.length > 5 && (
-                  <button
-                    type="button"
-                    onClick={() => setShowAllActivity(!showAllActivity)}
-                    className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline pt-2 border-t border-[var(--border)] transition active:scale-95"
-                  >
-                    {showAllActivity
-                      ? t('pipelinePage.showLess')
-                      : t('pipelinePage.showAll')}
-                  </button>
-                )}
-              </div>
-            )}
+            <ActivityLogCard candidateId={candidateId} workspaceId={ws?.workspaceId ?? ''} />
 
             {/* Alt Yerleşim Grubu (Aşama, Takip ve Sil Butonları 3'lü Grid) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -459,14 +396,6 @@ export function CandidateDetail({ candidateId }: Props) {
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
           onCancel={handleConfirmCancel}
-        />
-      )}
-
-      {activityToDelete && (
-        <ConfirmDeleteModal
-          message={t('pipelinePage.confirmDeleteActivity')}
-          onConfirm={handleActivityDeleteConfirmed}
-          onCancel={() => setActivityToDelete(null)}
         />
       )}
 
