@@ -15,6 +15,7 @@ import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import type { CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
   resolveCandidateFields,
@@ -60,19 +61,7 @@ export function CandidateDetail({ candidateId }: Props) {
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
 
-  // Popup açıldığında arka plan kaymasını önleme (body scroll-lock)
-  useEffect(() => {
-    if (stageOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [stageOpen])
-
-
+  useBodyScrollLock(stageOpen || confirmOpen)
 
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {

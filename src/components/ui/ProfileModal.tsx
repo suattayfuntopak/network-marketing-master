@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 interface ProfileModalProps {
   onClose: () => void
@@ -31,6 +32,8 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+
+  useBodyScrollLock()
 
   useEffect(() => {
     setMounted(true)
@@ -192,7 +195,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   if (!mounted) return null
 
   return createPortal(
-    <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4`}>
+    <div className={`fixed inset-0 ${Z.sheet} flex items-center justify-center p-4 overscroll-contain`}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 

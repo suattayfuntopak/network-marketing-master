@@ -7,6 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getAccountLifecycle } from '@/lib/domain/accountLifecycle'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 function formatDateTime(date: Date, lang: 'tr' | 'en') {
   return date.toLocaleString(lang === 'en' ? 'en-GB' : 'tr-TR', {
@@ -22,6 +23,8 @@ export function AccountStatusAlert() {
   const { data: ws } = useWorkspace()
   const { t, lang } = useTranslation()
   const [open, setOpen] = useState(false)
+
+  useBodyScrollLock(open)
 
   const lifecycle = useMemo(() => {
     if (!ws || ws.isSuperAdmin || ws.licenseType !== 'free') return null

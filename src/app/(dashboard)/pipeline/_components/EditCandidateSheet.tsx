@@ -8,6 +8,7 @@ import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
 import { resolveCandidateFields, buildCandidateContentFields } from '@/lib/domain/candidateFields'
@@ -40,6 +41,8 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
 
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
+
+  useBodyScrollLock()
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

@@ -2,7 +2,7 @@
 
 import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy, Check } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
@@ -19,6 +19,7 @@ import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { toast } from 'sonner'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
 
@@ -89,18 +90,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
     })
   }
 
-  useEffect(() => {
-    if (stageOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
-  }, [stageOpen])
-
-
+  useBodyScrollLock(stageOpen || quickActionOpen || confirmOpen || !!activeMessage)
 
   const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
 

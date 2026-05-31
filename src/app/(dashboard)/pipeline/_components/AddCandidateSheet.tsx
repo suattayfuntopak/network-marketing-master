@@ -6,6 +6,7 @@ import { useAddCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PHONE_RE } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
@@ -32,6 +33,8 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
   const [draftName, setDraftName] = useState('')
 
   const add = useAddCandidate(workspaceId)
+
+  useBodyScrollLock()
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

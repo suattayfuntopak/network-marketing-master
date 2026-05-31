@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 interface SettingsModalProps {
   workspaceId: string
@@ -23,6 +24,8 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [workspaceName, setWorkspaceName] = useState('')
+
+  useBodyScrollLock()
 
   useEffect(() => {
     setMounted(true)

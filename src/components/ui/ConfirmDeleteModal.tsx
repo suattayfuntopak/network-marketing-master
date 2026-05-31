@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface ConfirmDeleteModalProps {
@@ -15,6 +16,9 @@ interface ConfirmDeleteModalProps {
 export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDeleteModalProps) {
   const { t } = useTranslation()
   const [mounted, setMounted] = useState(false)
+
+  useBodyScrollLock()
+
   // Escape tuşuyla kapat
   useEffect(() => {
     setMounted(true)

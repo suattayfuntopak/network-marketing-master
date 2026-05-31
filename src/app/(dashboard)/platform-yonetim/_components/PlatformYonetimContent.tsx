@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import {
@@ -107,6 +108,8 @@ export function PlatformYonetimContent() {
   const [editCategory, setEditCategory] = useState('')
 
   const [isModerating, startModerationTransition] = useTransition()
+
+  useBodyScrollLock(!!selectedWorkspace || !!selectedRequest || navConfirm !== null)
 
   useEffect(() => {
     if (!wsLoading && !isSuperAdmin) {

@@ -5,6 +5,7 @@ import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
@@ -33,6 +34,8 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
   const [newTags, setNewTags] = useState('')
 
   const [showSympathetic, setShowSympathetic] = useState(false)
+
+  useBodyScrollLock(open || showSympathetic)
 
   if (!open && !showSympathetic) return null
 

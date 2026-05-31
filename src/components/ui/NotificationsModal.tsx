@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserPlus, CalendarClock } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -107,6 +108,8 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
   const [userEmail, setUserEmail]       = useState('')
   const [localNotifs, setLocalNotifs]   = useState<any[]>([])
   const [selected, setSelected]         = useState<any | null>(null)
+
+  useBodyScrollLock()
 
   const {
     notifications: dbNotifications,

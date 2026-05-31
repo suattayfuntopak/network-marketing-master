@@ -6,6 +6,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import {
   formatTryPrice,
   getDisplayPrice,
@@ -30,6 +31,8 @@ export function OdemeClient() {
   const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
+
+  useBodyScrollLock(loading)
 
   const handlePayment = async (plan: 'leader' | 'master' | 'pro') => {
     setLoading(true)

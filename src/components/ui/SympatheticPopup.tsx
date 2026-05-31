@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { CheckCircle, Sparkles } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface SympatheticPopupProps {
@@ -21,6 +22,8 @@ export function SympatheticPopup({
 }: SympatheticPopupProps) {
   const { t, lang } = useTranslation()
   const [mounted, setMounted] = useState(false)
+
+  useBodyScrollLock(open)
 
   useEffect(() => {
     setMounted(true)

@@ -8,6 +8,7 @@ import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from './EkipPanel'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface Props {
@@ -19,6 +20,8 @@ interface Props {
 export function YZEkipKocuSheet({ member, daysInactive, onClose }: Props) {
   const { t } = useTranslation()
   const [state, action, isPending] = useActionState(generateDownlineCoachingMessage, {})
+
+  useBodyScrollLock()
 
   function handleCopy() {
     if (state.message) {

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { Sparkles, ArrowRight, Lock, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 interface FeatureUpgradeGateProps {
   feature: 'team'
@@ -19,6 +20,8 @@ export function FeatureUpgradeGate({ feature, children, locked }: FeatureUpgrade
   const { t } = useTranslation()
   const [dismissed, setDismissed] = useState(false)
   const [mounted, setMounted] = useState(false)
+
+  useBodyScrollLock(locked)
 
   useEffect(() => setMounted(true), [])
 

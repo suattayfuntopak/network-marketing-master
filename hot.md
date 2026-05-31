@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-31 — Popup açıkken arka plan scroll kilidi
+
+- **Sorun:** Modal/popup içinde kaydırırken imleç veya parmak dışarı taşınca flu arka plan sayfa kayıyordu (masaüstü + mobil).
+- **Çözüm:** Ref-counted `bodyScrollLock` (`position: fixed` + scroll pozisyonu geri yükleme); `useBodyScrollLock` hook; tüm overlay bileşenlerine uygulandı.
+- **Dosyalar:** `lib/ui/bodyScrollLock.ts`, `hooks/useBodyScrollLock.ts`, Profile/Settings/Confirm modalları, pipeline sheet’leri, pano/ödeme/platform overlay’leri, `CandidateCard` / `CandidateDetail`.
+
+---
+
 ## 2026-05-31 — Performans Faz 3: AI usage sunucu, keepPreviousData, dead code
 
 - **038 uygulandı** (kullanıcı tarafı).

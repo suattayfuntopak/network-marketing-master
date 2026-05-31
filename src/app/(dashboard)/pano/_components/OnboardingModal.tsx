@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 const STORAGE_KEY = 'nmm_onboarding_done'
 
@@ -23,6 +24,8 @@ export function OnboardingModal({ workspaceId, inviteCode }: Props) {
   const [joining, setJoining] = useState(false)
   const addCandidate = useAddCandidate(workspaceId)
   const qc = useQueryClient()
+
+  useBodyScrollLock(visible)
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !localStorage.getItem(STORAGE_KEY)) {

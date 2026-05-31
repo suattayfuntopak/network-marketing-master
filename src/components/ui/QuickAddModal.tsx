@@ -7,6 +7,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 
@@ -24,6 +25,8 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+
+  useBodyScrollLock()
 
   useEffect(() => {
     setMounted(true)

@@ -15,6 +15,7 @@ import { generateQuickMessageAction } from '../actions'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
@@ -39,6 +40,8 @@ export function IlgilenContent() {
     candidatePhone: string | null;
     message: string;
   } | null>(null)
+
+  useBodyScrollLock(!!activeMessage)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)

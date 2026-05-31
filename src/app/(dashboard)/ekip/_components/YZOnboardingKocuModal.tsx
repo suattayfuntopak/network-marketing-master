@@ -11,6 +11,7 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 const ONBOARDING_STEPS_TR: Record<string, string> = {
   'step_why': 'Başlangıç Görüşmesi & "Neden?" Belirleme',
@@ -51,6 +52,8 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
   const { data: usage, refetch: refetchUsage } = useAIUsage()
   const { data: modalWs } = useWorkspace()
   const { messageLimit } = getLimitsForLicense(modalWs?.licenseType)
+
+  useBodyScrollLock()
 
   useEffect(() => {
     let active = true

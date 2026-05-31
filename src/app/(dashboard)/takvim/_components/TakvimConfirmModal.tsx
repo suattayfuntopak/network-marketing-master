@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AlertTriangle } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
 type TakvimConfirmModalProps = {
   title: string
@@ -25,6 +26,8 @@ export function TakvimConfirmModal({
   isLoading,
 }: TakvimConfirmModalProps) {
   const [mounted, setMounted] = useState(false)
+
+  useBodyScrollLock()
 
   useEffect(() => {
     setMounted(true)
