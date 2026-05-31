@@ -96,7 +96,7 @@ export default function TermsPage() {
           title: '4. Acceptable Use Policy',
           text: 'When using our platform, you legally commit to the following standards of practice:',
           bullets: [
-            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with GDPR / KVKK and relevant telecommunication marketing consent laws,',
+            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with GDPR and relevant telecommunication marketing consent laws,',
             'Refraining from generating spam, abusive prospecting copy, or misleading network-marketing recruitment campaigns through our AI (Artificial Intelligence) models,',
             'Avoiding reverse-engineering, system scraping, automatic bots, or triggering server-overloading requests (DDoS attacks),',
             'Not using our compliance analysis tools to circumvent consumer protection guidelines or validate illegal pyramids.',

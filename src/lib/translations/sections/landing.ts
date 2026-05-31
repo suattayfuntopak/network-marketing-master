@@ -177,7 +177,7 @@ export const landingSection = {
       testimonialsSubtitle: '',
       footerRights: 'All rights reserved.',
       footerSignUp: 'Sign Up',
-      footerKvkk: 'Privacy & Personal Data (KVKK)',
+      footerKvkk: 'GDPR & Privacy Policy',
       footerTerms: 'Terms of Service',
       footerSecurity: 'Security Statement',
       footerContact: 'Contact Us',

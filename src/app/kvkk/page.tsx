@@ -62,14 +62,14 @@ export default function KVKKPage() {
       ],
     },
     en: {
-      title: 'Personal Data Protection (GDPR / KVKK) & Privacy Policy',
+      title: 'GDPR & Privacy Policy',
       subtitle: 'The safety and confidentiality of your personal data is our highest priority.',
       updateDate: 'Last Updated: May 31, 2026',
       sections: [
         {
           id: 'p1',
           title: '1. Data Controller',
-          text: 'In accordance with the Turkish Personal Data Protection Law No. 6698 (KVKK) and GDPR (General Data Protection Regulation) rules, Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
+          text: 'In accordance with the EU General Data Protection Regulation (GDPR), Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
         },
         {
           id: 'p2',
@@ -84,7 +84,7 @@ export default function KVKKPage() {
         {
           id: 'p3',
           title: '3. Legal Grounds & Purposes of Processing',
-          text: 'Your personal data is processed legally based on "Contractual Fulfillment" and "Legitimate Interests of the Data Controller" for the following objectives:',
+          text: 'Your personal data is processed under GDPR Article 6 on the legal bases of "Performance of a contract" and "Legitimate interests of the controller" for the following objectives:',
           bullets: [
             'Managing your authentication, workspace security, and session validation.',
             'Enabling candidate follow-up databases, kanban pipelines, and team sharing synchronization.',
@@ -136,7 +136,7 @@ export default function KVKKPage() {
           <div className="flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
             <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-              {lang === 'en' ? 'GDPR & KVKK COMPLIANT' : 'KVKK UYUMLU GÜVENLİ VERİ'}
+              {lang === 'en' ? 'GDPR COMPLIANT' : 'KVKK UYUMLU GÜVENLİ VERİ'}
             </span>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function KVKKPage() {
       <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <Shield className="h-3.5 w-3.5" />
-          <span>{lang === 'en' ? 'GDPR / KVKK' : 'KVKK'}</span>
+          <span>{lang === 'en' ? 'GDPR' : 'KVKK'}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}
