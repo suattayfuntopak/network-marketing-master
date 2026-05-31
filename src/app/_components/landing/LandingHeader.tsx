@@ -49,27 +49,30 @@ export function LandingHeader() {
             </button>
           )}
 
-          {/* TR Flag */}
-          <button
-            onClick={() => setLang('tr')}
-            title="Türkçe"
-            className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-slate-100 dark:hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
-              lang === 'tr' ? 'bg-slate-100 dark:bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
-            }`}
-          >
-            <TRFlag />
-          </button>
-
-          {/* US Flag */}
-          <button
-            onClick={() => setLang('en')}
-            title="English"
-            className={`flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-slate-100 dark:hover:bg-white/10 sm:h-9 sm:w-9 sm:rounded-xl ${
-              lang === 'en' ? 'bg-slate-100 dark:bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-50 hover:opacity-100'
-            }`}
-          >
-            <USFlag />
-          </button>
+          {/* Language Switch: active language's flag — clicking switches to other language */}
+          <div className="flex shrink-0 items-center justify-center">
+            {lang === 'tr' ? (
+              <button
+                type="button"
+                onClick={() => setLang('en')}
+                className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-lg sm:rounded-xl text-slate-400 dark:text-white/50 transition hover:bg-slate-100 dark:hover:bg-white/10"
+                title="Switch to English"
+                aria-label="Switch to English"
+              >
+                <TRFlag />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setLang('tr')}
+                className="flex h-7 w-7 sm:h-9 sm:w-9 items-center justify-center rounded-lg sm:rounded-xl text-slate-400 dark:text-white/50 transition hover:bg-slate-100 dark:hover:bg-white/10"
+                title="Türkçe'ye geç"
+                aria-label="Türkçe'ye geç"
+              >
+                <USFlag />
+              </button>
+            )}
+          </div>
 
           {/* Login — icon only on mobile, text on sm+ */}
           <Link

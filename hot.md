@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-05-31 (Akşam) — Premium Tasarım Cilası & Fiyatlandırma Kontrast Düzeltmeleri
+
+- **Dil Değiştirme Butonu:** Landing Page sağ üst köşesindeki dil butonu, pano (dashboard) içindekiyle uyumlu dinamik tekil butona dönüştürüldü. Türkçe aktifken Türk Bayrağı (`TRFlag`), İngilizce aktifken USA Bayrağı (`USFlag`) gösterilerek tek tıklamayla dil değişimi sağlandı.
+- **Fiyatlandırma Light Tema Kontrast İyileştirmesi:**
+  - `BİREYSEL ORTAK`, `TAKIM LİDERLERİ`, `EN ÇOK SATAN`, `BÜYÜK LİDERLER` ve `25% İndirim` etiketleri yüksek kontrastlı, uyumlu pastel HSL renk paletleriyle (`text-indigo-800 bg-indigo-100`, `text-amber-800 bg-amber-100` vb.) tamamen okunaklı hale getirildi.
+  - Tik işaretleri (`CheckCircle2`) daha canlı ve net tonlara (`text-indigo-600`, `text-amber-600`, `text-pink-600`) çekildi.
+  - Basic plandaki görünmeyen beyaz buton (`text-white`), light temada sınırları belirgin ve gölgeli şık bir gri buton olarak yeniden tasarlandı.
+- **Hero Üst Rozet Yeniliği:** En üstteki **"YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ"** yazısı bir punto büyütülerek (`text-sm sm:text-base`) light temada dikkat çekmesi için çift katmanlı sınır çizgisi (`border-2 border-indigo-500/30`), koyu lacivert ton (`text-indigo-950`) ve zarif bir gölge ile donatıldı.
+- **SSS Sınır Genişliği ve FAQ Kaldırma:** Sıkça Sorulan Sorular modülünün üstündeki gereksiz `"FAQ"` rozet ibaresi kaldırıldı. Modülün genişliği **"Tek Bir Platformdan Kusursuz Yönetim Merkezi"** ile tam uyum sağlayacak şekilde `max-w-7xl` genişliğine getirildi.
+- **Footer Sadeleştirme ve Copyright Ortalaması:**
+  - Sol taraftaki açıklama paragrafı tamamen kaldırıldı.
+  - Yeşil dalgalı "TÜM SERVİSLER AKTİF" (Systems Pulse) rozeti kaldırıldı.
+  - Sağ alttaki "SECURE PLATFORM" ibaresi kaldırıldı.
+  - Telif hakkı satırı (`© 2026 Network Marketing Master. Tüm hakları saklıdır.`) tüm ekran boyutlarında sayfanın en altında **tam ortalanmış** bir şekilde hizalandı.
+  - Sol taraftaki `Terminal` ikonu kaldırılıp yerine resmi yuvarlak logomuz (`/logo.png`) yerleştirildi.
+
+---
+
 ## 2026-05-31 — İçerik Moderasyon Otomasyonu + Yasal Sayfalar & Premium Landing Footer
 
 - **Özellik (İçerik/İtiraz Moderasyon Akışı):** "Vaktin Varsa" (Eğitim) ve "İtirazlara Cevaplar" sayfaları için draft-and-approval altyapısı tamamlandı.

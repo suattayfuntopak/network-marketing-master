@@ -1,14 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { ChevronDown, HelpCircle } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-
-interface FaqItem {
-  id: string
-  question: string
-  answer: string
-}
 
 export function LandingFaq() {
   const { lang } = useTranslation()
@@ -27,8 +21,8 @@ export function LandingFaq() {
       },
       {
         id: 'faq-2',
-        question: 'Belirli bir MLM şirketine bağlı mı?',
-        answer: 'Hayır. Network Marketing Master bağımsız bir yazılımdır. Hangi şirket veya ürün grubu ile çalışırsanız çalışın, aday takip huninizi, eğitimlerinizi ve YZ Saha Provası simülasyonlarınızı kendi işinize göre tamamen özelleştirebilirsiniz.',
+        question: 'Bu uygulama belirli bir Ağ Pazarlama/MLM şirketine bağlı mı?',
+        answer: 'Hayır. Network Marketing Master bağımsız bir yazılımdır. Hangi şirket veya ürün grubu ile çalışırsanız çalışın, aday takip huninizi, eğitimlerinizi ve diğer tüm hususları kendi işinize göre tamamen özelleştirebilirsiniz.',
       },
       {
         id: 'faq-3',
@@ -42,13 +36,13 @@ export function LandingFaq() {
       },
       {
         id: 'faq-5',
-        question: 'Sadece mesaj yazdıran bir yapay zeka aracı mı?',
-        answer: 'Çok daha fazlası! Mesaj Yazarı\'nın yanı sıra, interaktif YZ Saha Provası modülü sayesinde aday sıcaklığını ve itiraz türünü seçip yapay zeka ile canlı yazışarak kapanış provası yapabilir, YZ Koçu\'na dilediğiniz MLM stratejisi ve liderlik sorularını sorabilirsiniz.',
+        question: 'Bu uygulama sadece mesaj yazdıran bir yapay zeka aracı mı?',
+        answer: 'Elbette hayır, çok daha fazlası! Yapay Zeka (YZ) mesaj üreticisinin yanı sıra, interaktif YZ Saha Provası modülü sayesinde ilgili senaryoları seçip yapay zeka ile canlı yazışarak provalar yapabilir, YZ Koçu\'na dilediğiniz Ağ Pazarlama/MLM stratejileri ve liderlik sorularını sorabilirsiniz.',
       },
       {
         id: 'faq-6',
         question: 'Yapay zeka kullanımı nasıl ücretlendiriliyor?',
-        answer: 'Ekstra bir ücret ödemezsiniz. Seçtiğiniz üyelik planına (Basic, Plus, Pro) göre günlük YZ Mesaj Yazarı ve YZ Koçu kredileriniz her gün otomatik olarak yenilenir.',
+        answer: 'Ekstra bir ücret ödemezsiniz. Seçtiğiniz üyelik planına (Basic, Plus, Pro) göre günlük YZ Mesajı, YZ Koçu, Saha Provası ve Uyum Merkezi kredileriniz her gün otomatik olarak yenilenir.',
       },
       {
         id: 'faq-7',
@@ -58,7 +52,7 @@ export function LandingFaq() {
       {
         id: 'faq-8',
         question: 'Farklı modüller gerçekten birlikte çalışıyor mu?',
-        answer: 'Evet, tamamen entegre çalışır. Örneğin, boru hattına eklediğiniz bir adayın geçmişi ve son notları, YZ Mesaj Yazarı\'na otomatik bağlam sağlar. Böylece yapay zeka, adayın tüm geçmişini bilerek en uygun takip mesajını hazırlar.',
+        answer: 'Evet, tamamen entegre çalışır. Örneğin, boru hattına eklediğiniz bir adayın geçmişi ve son notları, YZ Mesaj üreticisine otomatik bağlam sağlar. Böylece yapay zeka, adayın tüm geçmişini bilerek en uygun takip mesajını hazırlar.',
       },
       {
         id: 'faq-9',
@@ -68,7 +62,7 @@ export function LandingFaq() {
       {
         id: 'faq-10',
         question: 'Ne kadar sürede sonuç görürüm?',
-        answer: 'Ekibinizde "Doğru Başlangıç Rehberi"ni kullanan üye oranını artırdığınız ilk haftadan itibaren sponsor eğitim zamanınızda gözle görülür bir tasarruf sağlar ve aday takip aksiyonlarında düzenli bir artış gözlemlersiniz.',
+        answer: 'İlk günden itibaren düzen ve hız kazanımı hissedebilirsiniz; ancak sonuçlar (takdir edersiniz ki) kişiden kişiye, liderden lidere değişir ve uygulamayı ne kadar doğru ve disiplinli kullandığınız sonuçları doğrudan etkiler. NMM bir sihirli değnek değil, işleri kolaylaştıran güçlü bir araçtır.',
       },
     ],
     en: [
@@ -79,8 +73,8 @@ export function LandingFaq() {
       },
       {
         id: 'faq-2',
-        question: 'Is it tied to a specific MLM company?',
-        answer: 'No. Network Marketing Master is an independent software. Regardless of the company or product line you represent, you can fully customize your prospect funnel, team training, and AI roleplay scenarios to fit your specific business.',
+        question: 'Is this application tied to a specific Network Marketing/MLM company?',
+        answer: 'No. Network Marketing Master is an independent software. Regardless of the company or product line you represent, you can fully customize your prospect funnel, team training, and all other aspects to fit your specific business.',
       },
       {
         id: 'faq-3',
@@ -94,13 +88,13 @@ export function LandingFaq() {
       },
       {
         id: 'faq-5',
-        question: 'Is it just an AI tool that writes messages?',
-        answer: 'Much more! In addition to the AI Copywriter, our interactive AI Rehearsal module lets you select prospect warmth and objection type to simulate live text roleplays, and you can consult the AI Coach for any MLM strategy or leadership advice.',
+        question: 'Is this application just an AI tool that writes messages?',
+        answer: 'Of course not, it is much more! In addition to the AI message generator, our interactive AI Rehearsal module lets you select scenarios and chat live with artificial intelligence to conduct roleplay trials, and you can consult the AI Coach for any Network Marketing/MLM strategy and leadership questions.',
       },
       {
         id: 'faq-6',
         question: 'How is AI usage charged?',
-        answer: 'There are no extra charges. Based on your selected subscription tier (Basic, Plus, Pro), your daily AI Copywriter and AI Coach credits are automatically renewed every day at midnight.',
+        answer: 'There are no extra charges. Based on your selected subscription tier (Basic, Plus, Pro), your daily AI Message, AI Coach, Rehearsal, and Compliance credits are automatically renewed every day at midnight.',
       },
       {
         id: 'faq-7',
@@ -110,7 +104,7 @@ export function LandingFaq() {
       {
         id: 'faq-8',
         question: 'Do different modules really work together?',
-        answer: 'Yes, they are fully integrated. For example, a prospect\'s pipeline history and notes automatically feed context directly into the AI Copywriter. This allows the AI to craft the perfect personalized follow-up message with full historical knowledge.',
+        answer: 'Yes, they are fully integrated. For example, a prospect\'s pipeline history and notes automatically feed context directly into the AI Message generator. This allows the AI to craft the perfect personalized follow-up message with full historical knowledge.',
       },
       {
         id: 'faq-9',
@@ -120,7 +114,7 @@ export function LandingFaq() {
       {
         id: 'faq-10',
         question: 'How soon will I see results?',
-        answer: 'From the very first week you deploy the "Quick Start Onboarding" checklists across your downline, you will observe significant savings in sponsor training hours and a steady increase in team prospecting activities.',
+        answer: 'You can feel order and speed gains from day one; however, results (as you will appreciate) vary from person to person, leader to leader, and how correctly and disciplined you use the application directly impacts the outcome. NMM is not a magic wand, but a powerful tool that makes tasks easier.',
       },
     ],
   }
@@ -128,12 +122,8 @@ export function LandingFaq() {
   const activeFaq = lang === 'en' ? faqData.en : faqData.tr
 
   return (
-    <section id="sss" className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
-      <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
-          <HelpCircle className="h-3.5 w-3.5" />
-          <span>FAQ</span>
-        </div>
+    <section id="sss" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12 animate-in fade-in duration-300">
+      <div className="text-center">
         <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
           {lang === 'en' ? 'Frequently Asked Questions' : 'Sıkça Sorulan Sorular'}
         </h2>

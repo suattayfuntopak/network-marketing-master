@@ -50,7 +50,7 @@ export function LandingPricing() {
               }`}
             >
               <span>{t('landingPage.pricingYearly')}</span>
-              <span className="text-[9px] bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-500/20 animate-pulse">
+              <span className="text-[9px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
                 {t('landingPage.pricingYearlyBadge')}
               </span>
             </button>
@@ -70,7 +70,7 @@ export function LandingPricing() {
         <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-indigo-800 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                 {t('landingPage.planBasicTag')}
               </span>
             </div>
@@ -95,7 +95,7 @@ export function LandingPricing() {
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
-                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                <span className="text-[10px] text-emerald-800 dark:text-emerald-400 font-extrabold bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
                   {t('landingPage.planBasicYearlyNote', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
@@ -104,23 +104,23 @@ export function LandingPricing() {
             {/* Bullet Features */}
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat1')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat3')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat4')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat5')}</span>
               </li>
             </ul>
@@ -129,7 +129,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className="block text-center rounded-xl border border-slate-200 dark:border-white/[0.08] hover:bg-slate-100 dark:hover:bg-white/[0.03] text-white py-3 text-xs font-bold transition cursor-pointer"
+              className="block text-center rounded-xl border border-slate-300 dark:border-white/[0.08] bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-700 dark:text-white py-3 text-xs font-bold shadow-sm transition cursor-pointer"
             >
               {t('landingPage.planBasicCta')}
             </Link>
@@ -139,14 +139,14 @@ export function LandingPricing() {
         {/* Plan B: Plus Plan */}
         <div className="rounded-3xl border border-[#534AB7]/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
           <div className="absolute right-6 top-6 animate-pulse">
-            <span className="text-[9px] font-black text-indigo-300 bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+            <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30">
               {t('landingPage.planPopularBadge')}
             </span>
           </div>
 
           <div className="space-y-6">
             <div>
-              <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                 {t('landingPage.planPlusTag')}
               </span>
               <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
@@ -168,7 +168,7 @@ export function LandingPricing() {
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
-                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
+                <span className="text-[10px] text-emerald-800 dark:text-emerald-400 font-extrabold bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit animate-pulse">
                   {t('landingPage.planPlusYearlyNote', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
@@ -177,31 +177,31 @@ export function LandingPricing() {
             {/* Bullet Features */}
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planPlusFeat1')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat3')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat4')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat5')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat6')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat7')}</span>
               </li>
             </ul>
@@ -220,14 +220,14 @@ export function LandingPricing() {
         {/* Plan C: Pro Plan */}
         <div className="rounded-3xl border border-pink-500/30 bg-pink-50 dark:bg-gradient-to-b dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
           <div className="absolute right-6 top-6 flex items-center gap-2">
-            <span className="text-[9px] font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
+            <span className="text-[9px] font-black text-pink-900 dark:text-pink-400 bg-pink-100 dark:bg-pink-500/20 border border-pink-200 dark:border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
               👑 {t('landingPage.planProBadge')}
             </span>
           </div>
 
           <div className="space-y-6">
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-pink-400 bg-pink-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
+              <span className="text-[10px] font-extrabold text-pink-800 dark:text-pink-400 bg-pink-100 dark:bg-pink-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                 {t('landingPage.planProTag')}
               </span>
               <h3 className="mt-4 text-xl font-extrabold text-slate-900 dark:text-white">
@@ -249,7 +249,7 @@ export function LandingPricing() {
                 </span>
               </div>
               {billingPeriod === 'yearly' && (
-                <span className="text-[10px] text-emerald-400 font-bold bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
+                <span className="text-[10px] text-emerald-800 dark:text-emerald-400 font-extrabold bg-emerald-100 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 px-2.5 py-0.5 rounded-lg mt-2 inline-block w-fit">
                   {t('landingPage.planProYearlyNote', { months: YEARLY_MONTHS_FREE })}
                 </span>
               )}
@@ -258,27 +258,27 @@ export function LandingPricing() {
             {/* Bullet Features */}
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planProFeat1')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
-                <span className="font-bold text-pink-300">{t('landingPage.planProFeat2')}</span>
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
+                <span className="font-bold text-pink-700 dark:text-pink-300">{t('landingPage.planProFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat3')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat4')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat5')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-400 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat6', { count: PRO_LIMITS.complianceLimit })}</span>
               </li>
             </ul>

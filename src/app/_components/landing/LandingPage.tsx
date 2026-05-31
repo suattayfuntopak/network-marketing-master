@@ -83,9 +83,9 @@ export function LandingPage() {
       <LandingHero />
       <LandingFeatures />
       <LandingRoiCalculator />
-      <LandingTestimonials />
       <LandingFaq />
       <LandingPricing />
+      <LandingTestimonials />
       <LandingFooter />
 
     </div>

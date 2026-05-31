@@ -20,27 +20,11 @@ export function LandingFooter() {
           {/* Brand and Description Column */}
           <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-tr from-[#534AB7] to-[#7B70F3] shadow-md shadow-[#534AB7]/20">
-                <Terminal className="h-4 w-4 text-white" />
+              <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
+                <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
               </div>
               <span className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent">
                 Network Marketing Master
-              </span>
-            </div>
-            <p className="text-xs text-slate-500 dark:text-zinc-400 font-medium leading-relaxed max-w-sm">
-              {isEn
-                ? 'Standardize candidate pipelines, simulate interactive AI roleplays, and track downline progress on autopilot with our next-generation MLM accelerator.'
-                : 'Yeni nesil YZ destekli MLM hızlandırıcıyla aday hunilerini standartlaştırın, interaktif saha provaları yapın ve ekibinizin gelişimini otomatik pilotta izleyin.'}
-            </p>
-            
-            {/* Status Pulse Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/[0.05] bg-white/60 dark:bg-white/[0.02] px-3.5 py-1.5 shadow-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-              </span>
-              <span className="text-[10px] font-extrabold tracking-wider text-slate-600 dark:text-zinc-400 uppercase">
-                {isEn ? 'All Systems Operational' : 'Tüm Servisler Aktif'}
               </span>
             </div>
           </div>
@@ -141,15 +125,10 @@ export function LandingFooter() {
         </div>
 
         {/* Bottom copyright segment */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-8 flex items-center justify-center text-center">
           <p className="text-[10px] sm:text-xs text-slate-500 dark:text-zinc-500 font-medium">
             &copy; {new Date().getFullYear()} Network Marketing Master. {t('landingPage.footerRights')}
           </p>
-          <div className="flex items-center gap-2">
-            <span className="text-[9px] font-bold text-slate-400 dark:text-zinc-600 uppercase tracking-widest">
-              SECURE PLATFORM
-            </span>
-          </div>
         </div>
 
       </div>
