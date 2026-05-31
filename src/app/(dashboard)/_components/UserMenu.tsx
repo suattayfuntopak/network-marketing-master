@@ -68,7 +68,10 @@ export function UserMenu() {
           {/* Kullanıcı bilgisi */}
           <div className="border-b border-[var(--border)] px-4 pb-3 pt-1">
             <p className="truncate text-sm font-semibold text-[var(--text-1)]">{ws?.fullName}</p>
-            <p className="text-xs capitalize text-[var(--text-3)]">
+            {ws?.email && (
+              <p className="truncate text-[10px] text-[var(--text-3)] font-medium mb-1">{ws.email}</p>
+            )}
+            <p className="text-xs capitalize text-[var(--text-3)] font-semibold">
               {ws?.role === 'leader'
                 ? t('shellUi.roleLeader')
                 : t('shellUi.roleMember')}

@@ -20,6 +20,7 @@ export interface WorkspaceContext {
   isSuperAdmin: boolean
   /** true when this user's workspace is linked to an upline sponsor */
   hasUpline: boolean
+  email?: string | null
 }
 
 export function useWorkspace() {

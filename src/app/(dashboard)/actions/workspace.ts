@@ -62,6 +62,7 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
     ),
     isSuperAdmin: admin,
     hasUpline: !!ws?.parent_id,
+    email: user.email,
   }
 }
 
@@ -128,6 +129,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
       ),
       isSuperAdmin: admin,
       hasUpline: !!ownedWorkspace.parent_id,
+      email: user.email,
     }
   }
 
@@ -192,5 +194,6 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     isTrialActive: true,
     isSuperAdmin: admin,
     hasUpline: !!ws.parent_id,
+    email: user.email,
   }
 }
