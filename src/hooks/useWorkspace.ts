@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { fetchWorkspaceAction, ensureWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
+import { queryKeys } from '@/lib/query/keys'
 
 export interface WorkspaceContext {
   userId: string
@@ -29,12 +30,12 @@ export function useWorkspace() {
   const initMutation = useMutation({
     mutationFn: ensureWorkspaceAction,
     onSuccess: (data) => {
-      queryClient.setQueryData(['workspace'], data)
+      queryClient.setQueryData(queryKeys.workspace(), data)
     },
   })
 
   const query = useQuery({
-    queryKey: ['workspace'],
+    queryKey: queryKeys.workspace(),
     queryFn: fetchWorkspaceAction,
     staleTime: 5 * 60 * 1000,
     retry: false,

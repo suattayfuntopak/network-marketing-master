@@ -18,7 +18,18 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
 
   const { data: membership, error: memSelectError } = await supabase
     .from('nmm_workspace_members')
-    .select('workspace_id, role, full_name')
+    .select(`
+      workspace_id,
+      role,
+      full_name,
+      nmm_workspaces (
+        invite_code,
+        license_type,
+        license_expires_at,
+        parent_id,
+        created_at
+      )
+    `)
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -31,11 +42,17 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
   const admin = isSuperAdmin(user)
 
-  const { data: ws } = await supabase
-    .from('nmm_workspaces')
-    .select('invite_code, license_type, license_expires_at, parent_id, created_at')
-    .eq('id', membership.workspace_id)
-    .single()
+  const ws = membership.nmm_workspaces as {
+    invite_code: string | null
+    license_type: string | null
+    license_expires_at: string | null
+    parent_id: string | null
+    created_at: string | null
+  } | null
+
+  if (!ws) {
+    throw new Error('Workspace bilgisi okunamadı.')
+  }
 
   const license = resolveWorkspaceLicense(user, ws)
   const effectiveLicenseType = getEffectiveLicenseType(
@@ -47,21 +64,21 @@ export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
   return {
     userId: user.id,
     workspaceId: membership.workspace_id,
-    inviteCode: ws?.invite_code ?? membership.workspace_id.slice(0, 8).toUpperCase(),
+    inviteCode: ws.invite_code ?? membership.workspace_id.slice(0, 8).toUpperCase(),
     role: membership.role,
     fullName: membership.full_name,
     avatarUrl,
     licenseType: license.licenseType,
     effectiveLicenseType,
     licenseExpiresAt: license.licenseExpiresAt,
-    workspaceCreatedAt: ws?.created_at ?? null,
+    workspaceCreatedAt: ws.created_at ?? null,
     isTrialActive: isTrialPeriodActive(
       license.licenseType,
       license.licenseExpiresAt,
-      ws?.created_at
+      ws.created_at
     ),
     isSuperAdmin: admin,
-    hasUpline: !!ws?.parent_id,
+    hasUpline: !!ws.parent_id,
     email: user.email,
   }
 }

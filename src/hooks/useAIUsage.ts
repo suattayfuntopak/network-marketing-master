@@ -69,6 +69,6 @@ export function useAIUsage() {
         isSuperAdmin: superAdmin,
       }
     },
-    refetchOnWindowFocus: true,
+    refetchOnWindowFocus: false,
   })
 }

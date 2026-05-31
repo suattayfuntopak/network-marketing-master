@@ -317,7 +317,7 @@ export function IstatistiklerContent() {
 
   const maxTrendCount = Math.max(...trendBars.map(b => b.count), 1)
 
-  if (wsLoading || cLoading || membersLoading) {
+  if (wsLoading || cLoading) {
     return (
       <div className="w-full space-y-4 px-4 pt-6">
         <div className="h-6 w-32 animate-pulse rounded bg-[var(--bg-subtle)]" />

@@ -6,6 +6,7 @@ import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/s
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useRouter } from 'next/navigation'
@@ -43,20 +44,23 @@ async function fetchNotifications(): Promise<NotificationItem[]> {
   return data ?? []
 }
 
-export function useNotifications() {
+export function useNotifications(options?: { enabled?: boolean }) {
   const queryClient = useQueryClient()
   const supabase = useMemo(() => createClient(), [])
   const { lang, t } = useTranslation()
   const router = useRouter()
+  const enabled = options?.enabled !== false
 
   const query = useQuery({
-    queryKey: ['notifications'],
+    queryKey: queryKeys.notifications(),
     queryFn: fetchNotifications,
-    staleTime: 30000, // 30 seconds
+    staleTime: 30000,
+    enabled,
   })
 
-  // Realtime subscriber for in-app written and audio alerts
+  // Realtime: yalnızca bildirim sorgusu aktifken abone ol
   useEffect(() => {
+    if (!enabled) return
     let channel: RealtimeChannel | null = null
 
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -77,7 +81,7 @@ export function useNotifications() {
             if (!newNotif) return
 
             // 1. Invalidate query to refresh UI lists and badge count instantly
-            queryClient.invalidateQueries({ queryKey: ['notifications'] })
+            queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
 
             // 2. Play beautiful synthesized notification chime
             const isSoundEnabled = localStorage.getItem('nmm_notif_sound') !== 'false'
@@ -113,7 +117,7 @@ export function useNotifications() {
         supabase.removeChannel(channel)
       }
     }
-  }, [queryClient, supabase, lang, router, t])
+  }, [queryClient, supabase, lang, router, t, enabled])
 
   // Mutation: Mark all notifications as read
   const markAllReadMutation = useMutation({
@@ -127,7 +131,7 @@ export function useNotifications() {
         .eq('user_id', user.id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
     },
   })
 
@@ -140,7 +144,7 @@ export function useNotifications() {
         .eq('id', id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
     },
   })
 
@@ -153,7 +157,7 @@ export function useNotifications() {
         .eq('id', id)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
     },
   })
 

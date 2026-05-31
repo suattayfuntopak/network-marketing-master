@@ -98,26 +98,6 @@ export function PanoContent() {
   const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
-  if (wsLoading) {
-    return (
-      <div className="w-full space-y-4">
-        <div className="h-4 w-24 animate-pulse rounded bg-[var(--bg-subtle)]" />
-        <div className="h-8 w-44 animate-pulse rounded bg-[var(--bg-subtle)]" />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="aspect-square animate-pulse rounded-[14px] bg-[var(--bg-subtle)]" />
-          ))}
-        </div>
-        <div className="grid grid-cols-3 gap-3 md:gap-4">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-          ))}
-        </div>
-        <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-      </div>
-    )
-  }
-
   const statsSkeleton = (
     <div className="grid grid-cols-3 gap-3 md:gap-4">
       {[1, 2, 3].map(i => (
@@ -140,7 +120,11 @@ export function PanoContent() {
 
       {/* Selamlama */}
       <header>
-        <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
+        {wsLoading ? (
+          <div className="h-8 w-56 animate-pulse rounded bg-[var(--bg-subtle)]" />
+        ) : (
+          <h1 className="text-2xl font-bold text-[var(--text-1)]">{greetingIcon} {greeting} {firstName} 👋🏻</h1>
+        )}
       </header>
 
       {/* ── 10 hızlı erişim karesi — mobil 2 sütun (5 satır), masaüstü 5 sütun (2 satır) ── */}

@@ -3,11 +3,13 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useEffect, useRef, useMemo } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ITEMS } from '@/lib/domain/navigation'
+import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
 
 interface BottomNavProps {
@@ -18,6 +20,7 @@ interface BottomNavProps {
 export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const pathname = usePathname()
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { t } = useTranslation()
   const activeRef = useRef<HTMLButtonElement | null>(null)
   const { data: ws } = useWorkspace()
@@ -29,11 +32,6 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   }, [isSuperAdmin])
 
   useEffect(() => {
-    items.forEach(({ href }) => router.prefetch(href))
-  }, [items, router])
-
-  // Automatically scroll & center active item horizontally
-  useEffect(() => {
     if (activeRef.current) {
       activeRef.current.scrollIntoView({
         behavior: 'smooth',
@@ -44,6 +42,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   }, [pathname])
 
   function navigate(targetHref: string) {
+    prefetchRouteData(queryClient, targetHref, ws?.workspaceId)
     const currentIdx = items.findIndex(({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)))
     const targetIdx = items.findIndex(({ href }) => href === targetHref)
     if (currentIdx !== -1 && targetIdx !== -1 && currentIdx !== targetIdx) {

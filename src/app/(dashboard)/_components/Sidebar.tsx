@@ -2,12 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { ChevronLeft, ChevronRight, Crown, Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ITEMS } from '@/lib/domain/navigation'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
 
 interface SidebarProps {
@@ -17,6 +19,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const pathname = usePathname()
+  const queryClient = useQueryClient()
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
@@ -50,6 +53,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               key={href}
               href={href}
               prefetch
+              onMouseEnter={() => prefetchRouteData(queryClient, href, ws?.workspaceId)}
+              onFocus={() => prefetchRouteData(queryClient, href, ws?.workspaceId)}
               title={collapsed ? label : undefined}
               className={clsx(
                 'flex items-center rounded-xl transition-colors',

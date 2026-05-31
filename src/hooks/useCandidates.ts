@@ -3,7 +3,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { getLang } from '@/lib/utils/getLang'
+import { queryKeys } from '@/lib/query/keys'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
@@ -13,28 +15,12 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
-async function fetchCandidates(workspaceId: string): Promise<NmmCandidate[]> {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Oturum bulunamadı.')
-
-  const { data, error } = await supabase
-    .from('nmm_candidates')
-    .select('*')
-    .eq('workspace_id', workspaceId)
-    .eq('owner_id', user.id)
-    .order('updated_at', { ascending: false })
-
-  if (error) throw new Error(error.message)
-  return data
-}
-
 export function useCandidates(workspaceId: string | undefined, filter: CandidateFilter = 'tumü') {
   const query = useQuery({
-    queryKey: ['candidates', workspaceId],
-    queryFn: () => fetchCandidates(workspaceId!),
+    queryKey: workspaceId ? queryKeys.candidates(workspaceId) : ['candidates', 'none'],
+    queryFn: () => fetchCandidatesAction(workspaceId!),
     enabled: !!workspaceId,
-    staleTime: 60_000,
+    staleTime: 2 * 60 * 1000,
   })
 
   const filtered = (query.data ?? []).filter(c => {

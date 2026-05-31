@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-05-31 — Dashboard performans: SSR prefetch + paralel veri
+
+- **Sorun:** Giriş/pano/istatistikler ve sayfalar arası gezinmede metrikler 3–5+ sn gecikmeli geliyordu; workspace→aday waterfall, istemci-only fetch, istatistiklerin ekip RPC’sini beklemesi.
+- **Çözüm:**
+  - Dashboard layout SSR: `HydrationBoundary` ile workspace + adaylar (+ super-admin platform sorguları) sunucuda prefetch.
+  - `fetchCandidatesAction` (server action); `useCandidates` istemci Supabase yerine sunucu.
+  - `fetchWorkspaceAction`: üyelik+workspace tek join sorgusu.
+  - İstatistikler: KPI/grafikler ekip verisini beklemez; ekip tablosu kendi skeleton’ında.
+  - Pano: hızlı erişim kareleri anında; selamlama/metrikler progressive.
+  - Bildirimler 400ms ertelendi; route `loading.tsx` kaldırıldı (cache varken tam sayfa flash yok).
+  - Sidebar/mobil nav hover’da aday prefetch; BottomNav duplicate route prefetch kaldırıldı.
+- **Dosyalar:** `layout.tsx`, `prefetchDashboard.ts`, `getQueryClient.ts`, `keys.ts`, `candidates.ts`, `workspace.ts`, `useCandidates.ts`, `IstatistiklerContent.tsx`, `PanoContent.tsx`, `Header.tsx`, `Sidebar.tsx`, `BottomNav.tsx`, `useNotifications.ts`, `useAIUsage.ts`.
+
+---
+
 ## 2026-05-31 — Tema düğmesi: aktif mod ikonu
 
 - **Sorun:** Tema toggle’da ikon bir sonraki modu gösteriyordu (dark’tayken güneş vb.).

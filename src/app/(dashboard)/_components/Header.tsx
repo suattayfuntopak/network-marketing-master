@@ -66,7 +66,15 @@ export function Header({ visible = true }: { visible?: boolean }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [quickAddOpen, setQuickAddOpen] = useState(false)
-  const { unreadCount: dbUnreadCount } = useNotifications()
+  const [notificationsReady, setNotificationsReady] = useState(false)
+
+  useEffect(() => {
+    if (!ws?.workspaceId) return
+    const id = window.setTimeout(() => setNotificationsReady(true), 400)
+    return () => window.clearTimeout(id)
+  }, [ws?.workspaceId])
+
+  const { unreadCount: dbUnreadCount } = useNotifications({ enabled: notificationsReady })
   const [localUnread, setLocalUnread] = useState(0)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
 
