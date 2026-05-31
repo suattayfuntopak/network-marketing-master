@@ -1,8 +1,15 @@
-# E-posta otomasyonu (NMM) — n8n önerisi
+# E-posta otomasyonu (NMM)
 
-NMU’daki n8n akışına benzer bir yapı **NMM’de henüz yok**. Uygulama içi bildirimler (`useNotifications`) var; **trial bitiş / hoş geldin e-postaları** için harici otomasyon önerilir.
+> **Durum: UYGULANDI** (Resend + cron route'lar + GitHub Actions tetikleyici).
+> Çalışan kurulum için doğrudan ["Repoda uygulandı"](#repoda-uygulandı-resend--cron) ve
+> ["Cron test"](#cron-test--license_expires_at-rehberi) bölümlerine bakın.
+> Aşağıdaki **n8n bölümü artık opsiyonel/geçmiş** — yeni kurulum gerektirmez, referans için tutuluyor.
 
-## Sade ve işlevsel model (önerilen)
+**İdempotency (migration 036):** `trial-emails` ve `license-reminder` cron'ları, aynı gün
+aynı workspace + e-posta türü için `nmm_email_sent_log`'a "claim-before-send" yazar; cron
+iki kez tetiklense bile çift e-posta gitmez. **Deploy:** `036_email_sent_log.sql` uygulanmalı.
+
+## (Opsiyonel/geçmiş) Sade ve işlevsel model — n8n
 
 | Tetikleyici | Sıklık | Aksiyon |
 |-------------|--------|---------|
@@ -167,6 +174,6 @@ curl -s --max-redirs 0 \
 
 ### Notlar
 
-- Aynı günde birden fazla koşul sağlanırsa **birden fazla mail** gidebilir (her job ayrı döngü).
+- Farklı **türler** (trial_3d, trial_1d…) aynı gün ayrı ayrı gidebilir (her job ayrı döngü). Ancak **aynı tür** aynı gün ikinci kez gitmez — `nmm_email_sent_log` idempotency guard'ı (migration 036) engeller.
 - Testten sonra `license_expires_at`’i gerçek değere geri alın.
 - Hoş geldin maili cron değil; **yeni kayıt** anında gider (`sendWelcomeEmail`).

@@ -24,7 +24,7 @@ A–D, #6–7, E (i18n), F (perf), G (error/loading boundary), H (E2E), K-1..K-5
 - **O-7 (god component):** `CandidateDetail` (1010) ve `IstatistiklerContent` (1000) satırlık dosyaların alt-bileşenlere bölünmesi çok-adımlı, app-doğrulaması (`/verify`) gerektiren bir refactor. EkipPanel örneği gibi tek tek, izleyerek yapılmalı.
 - **O-10 (lint 86 error):** Çoğu davranışsal: 32 `set-state-in-effect` (SSR hydration guard kalıbı — körlemesine değiştirmek hydration'ı bozar), 8 `exhaustive-deps` (yanlış bağımlılık sonsuz döngü yapabilir), **1 `rules-of-hooks` (koşullu `useCallback` — potansiyel gerçek bug, öncelikli ele alınmalı)**, 12 `img→next/image` (layout/optimizasyon riski), 31 `any`, 30 `unused-vars`. Her biri ayrı, doğrulanarak yapılmalı.
 - **Öneri:** O-7'yi bileşen-bileşen, O-10'u kural-kural ayrı oturumlarda `/verify` ile ilerletmek. rules-of-hooks bug'ı ilk sırada.
-| **G — Düşük öncelik** | Test, type, doc | L-1..L-4 | ⏳ |
+| **G — Düşük öncelik** | Test, type, doc | L-1..L-4 | ✅ L-1 kota UTC hizalama · L-3 calendarDates test (Faz B) · L-4 email-automation.md güncellendi · L-2 bilinçli "tip tüketim noktasında" kararı |
 
 ### Önceki turdan devreden (1. tur)
 | Paket | Not |

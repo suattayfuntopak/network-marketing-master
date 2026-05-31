@@ -28,8 +28,10 @@ export function useAIUsage() {
 
       const superAdmin = isSuperAdmin(user)
 
-      const today = new Date()
-      today.setHours(0, 0, 0, 0)
+      // Sunucu kota penceresi (checkQuota.ts) Vercel'de UTC gece yarısını kullanır.
+      // İstemci sayımının enforcement ile eşleşmesi için burada da UTC gece yarısı.
+      const now = new Date()
+      const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
 
       // Fetch today's AI generation actions
       const { data, error } = await supabase
