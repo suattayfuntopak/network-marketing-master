@@ -21,30 +21,38 @@ export function LandingPage() {
   useEffect(() => {
     const supabase = createClient()
 
+    // Şifre sıfırlama linki ana sayfaya düşerse hash/query korunarak yönlendir
+    const hash = window.location.hash
+    const search = window.location.search
+    if (
+      hash.includes('access_token') ||
+      hash.includes('type=recovery') ||
+      search.includes('code=') ||
+      search.includes('token_hash=') ||
+      search.includes('token=')
+    ) {
+      router.replace(`/sifre-guncelle${search}${hash}`)
+      return
+    }
+
     // 1. Initial active session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       const onLandingPreview = window.location.pathname.startsWith('/acilis')
-      const hasHash = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')
-      if (session && !onLandingPreview && !hasHash) {
+      if (session && !onLandingPreview) {
         router.push('/pano')
       } else {
-        if (!hasHash) {
-          setCheckingSession(false)
-        }
+        setCheckingSession(false)
       }
     })
 
     // 2. Auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        router.push('/sifre-guncelle')
+        router.replace('/sifre-guncelle')
         return
       }
       if (session && !window.location.pathname.startsWith('/acilis')) {
-        const hasHash = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')
-        if (!hasHash) {
-          router.push('/pano')
-        }
+        router.push('/pano')
       } else {
         setCheckingSession(false)
       }

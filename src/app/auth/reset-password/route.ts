@@ -1,18 +1,19 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-// Eski proje email şablonları bu path'e yönlendiriyor.
-// code veya token varsa /auth/callback'e, yoksa /sifre-sifirla'ya at.
+/** Eski e-posta şablonları ve Supabase verify sonrası query param'ları buraya düşebilir. */
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url)
-  const code = searchParams.get('code')
-  const token = searchParams.get('token')
 
-  if (code) {
-    return NextResponse.redirect(`${origin}/auth/callback?code=${code}&next=/sifre-guncelle`)
+  const next = '/sifre-guncelle'
+  const passthrough = new URLSearchParams()
+  for (const key of ['code', 'token_hash', 'token', 'type', 'error_description']) {
+    const val = searchParams.get(key)
+    if (val) passthrough.set(key, val)
   }
 
-  if (token) {
-    return NextResponse.redirect(`${origin}/auth/callback?token=${token}&next=/sifre-guncelle`)
+  if (passthrough.has('code') || passthrough.has('token_hash') || passthrough.has('token')) {
+    passthrough.set('next', next)
+    return NextResponse.redirect(`${origin}/auth/callback?${passthrough.toString()}`)
   }
 
   return NextResponse.redirect(`${origin}/sifre-sifirla`)

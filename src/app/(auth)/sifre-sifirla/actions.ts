@@ -19,7 +19,7 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
   const host = headersList.get('host') ?? ''
   const protocol = host.includes('localhost') ? 'http' : 'https'
   const origin = headersList.get('origin') || `${protocol}://${host}`
-  const redirectTo = `${origin}/sifre-guncelle`
+  const redirectTo = `${origin}/auth/callback?next=/sifre-guncelle`
 
   const admin = createAdminClient()
   const { data, error: linkError } = await admin.auth.admin.generateLink({

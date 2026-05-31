@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-31 — Şifre sıfırlama akışı düzeltildi (kırmızı hata + pano'ya kaçış)
+
+- **Sorun:** E-posta linki oturumu kuruyordu ama `/sifre-guncelle` 5 sn'de hata veriyor; kullanıcı pano'ya düşüyordu, şifre değişmiyordu.
+- **Düzeltme:** Link `auth/callback` üzerinden sunucuda oturum kuruyor; `token_hash`/`code`/hash desteği; LandingPage recovery yönlendirmesi.
+- **Supabase:** Redirect URLs'e `https://nmm.suattayfuntopak.com/auth/callback` eklenmeli.
+
+---
+
 ## 2026-05-31 — E-posta markası: NMM logosu
 
 - Şifre sıfırlama + tüm Resend mailleri: `logo.png` üst başlık; Supabase mor N şablonu bypass (`generateLink` + Resend).

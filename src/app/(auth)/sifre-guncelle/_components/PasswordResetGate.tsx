@@ -1,51 +1,102 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Status = 'loading' | 'ready' | 'error'
+
+/** E-posta linkindeki token/code/hash → sunucu callback veya setSession. */
+function buildCallbackUrl(params: URLSearchParams): string | null {
+  const code = params.get('code')
+  if (code) {
+    return `/auth/callback?code=${encodeURIComponent(code)}&next=/sifre-guncelle`
+  }
+
+  const tokenHash = params.get('token_hash') ?? params.get('token')
+  const type = params.get('type')
+  if (tokenHash && type) {
+    return `/auth/callback?token_hash=${encodeURIComponent(tokenHash)}&type=${encodeURIComponent(type)}&next=/sifre-guncelle`
+  }
+
+  return null
+}
 
 export function PasswordResetGate() {
   const [status, setStatus] = useState<Status>('loading')
   const [password, setPassword] = useState('')
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState('')
-  const router = useRouter()
 
   useEffect(() => {
     const supabase = createClient()
+    let cancelled = false
 
-    // PKCE flow: ?code= query param varsa client-side exchange yap
-    const code = new URLSearchParams(window.location.search).get('code')
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        if (error) setStatus('error')
-        else setStatus('ready')
+    async function init() {
+      const query = new URLSearchParams(window.location.search)
+      const callbackFromQuery = buildCallbackUrl(query)
+      if (callbackFromQuery) {
+        window.location.replace(callbackFromQuery)
+        return
+      }
+
+      const hashRaw = window.location.hash.startsWith('#')
+        ? window.location.hash.slice(1)
+        : window.location.hash
+      if (hashRaw) {
+        const hashParams = new URLSearchParams(hashRaw)
+        const accessToken = hashParams.get('access_token')
+        const refreshToken = hashParams.get('refresh_token')
+
+        if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+          window.history.replaceState(null, '', '/sifre-guncelle')
+          if (!cancelled) setStatus(error ? 'error' : 'ready')
+          return
+        }
+
+        const callbackFromHash = buildCallbackUrl(hashParams)
+        if (callbackFromHash) {
+          window.location.replace(callbackFromHash)
+          return
+        }
+      }
+
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        if (!cancelled) setStatus('ready')
+        return
+      }
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, nextSession) => {
+        if (
+          nextSession &&
+          (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || event === 'INITIAL_SESSION')
+        ) {
+          if (!cancelled) setStatus('ready')
+        }
       })
-      return
+
+      const timer = window.setTimeout(() => {
+        if (!cancelled) setStatus(s => (s === 'loading' ? 'error' : s))
+      }, 12_000)
+
+      return () => {
+        subscription.unsubscribe()
+        window.clearTimeout(timer)
+      }
     }
 
-    // Implicit flow: hash fragment'taki PASSWORD_RECOVERY event'ini dinle
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === 'PASSWORD_RECOVERY' && session) setStatus('ready')
-        if (event === 'SIGNED_IN' && session) setStatus('ready')
-      }
-    )
-
-    // /auth/callback üzerinden session zaten kurulmuşsa
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setStatus('ready')
+    let cleanup: (() => void) | void
+    init().then(c => {
+      cleanup = c
     })
 
-    const timer = setTimeout(() => {
-      setStatus(s => s === 'loading' ? 'error' : s)
-    }, 5000)
-
     return () => {
-      subscription.unsubscribe()
-      clearTimeout(timer)
+      cancelled = true
+      cleanup?.()
     }
   }, [])
 
@@ -60,17 +111,18 @@ export function PasswordResetGate() {
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password })
     if (error) {
-      setFormError('Şifre güncellenemedi. Yeni sıfırlama isteği gönder.')
+      setFormError('Şifre güncellenemedi. Yeni sıfırlama bağlantısı iste.')
       setSaving(false)
       return
     }
-    router.push('/pano')
+    window.location.assign('/pano')
   }
 
   if (status === 'loading') {
     return (
-      <div className="flex justify-center py-4">
+      <div className="flex flex-col items-center gap-3 py-6">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+        <p className="text-xs text-gray-500">Bağlantı doğrulanıyor…</p>
       </div>
     )
   }
@@ -79,7 +131,7 @@ export function PasswordResetGate() {
     return (
       <div className="space-y-4">
         <p className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-          Bağlantı süresi dolmuş veya geçersiz. Yeni sıfırlama isteği gönder.
+          Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı iste.
         </p>
         <a
           href="/sifre-sifirla"
@@ -111,9 +163,7 @@ export function PasswordResetGate() {
       </div>
 
       {formError && (
-        <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">
-          {formError}
-        </p>
+        <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">{formError}</p>
       )}
 
       <button
