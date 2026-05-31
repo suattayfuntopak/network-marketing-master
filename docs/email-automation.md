@@ -188,8 +188,8 @@ curl -s --max-redirs 0 \
 
 Bu, HTML şablonundan **bağımsızdır**. Gmail gönderen adresinin ilk harfini veya Gravatar/BIMI görselini gösterir.
 
-1. **Resend gönderen adı:** Vercel `RESEND_FROM_EMAIL` = `Network Marketing Master <noreply@nmm.suattayfuntopak.com>` (veya doğrulanmış domain adresiniz). "Network Marketing Ultimate" gibi eski isimler N harfi üretir.
-2. **Gravatar (önerilen):** [gravatar.com](https://gravatar.com) — gönderen e-posta adresiyle kayıt olun, `public/logo.png` ile aynı görseli yükleyin. Gmail bir süre sonra avatarı önbelleğe alır.
+1. **Resend gönderen adı:** Vercel `RESEND_FROM_EMAIL` = `Network Marketing Master <info@suattayfuntopak.com>`. "Network Marketing Ultimate" gibi eski isimler N harfi üretir.
+2. **Gravatar (önerilen):** [gravatar.com](https://gravatar.com) — **aynı gönderen adresi** (`info@suattayfuntopak.com`) ile kayıt olun, `public/logo.png` ile aynı görseli yükleyin. Gmail bir süre sonra avatarı önbelleğe alır.
 3. **BIMI (ileri seviye):** Marka logosu + DMARC için kurumsal kurulum; zorunlu değil.
 
 Supabase Dashboard → Authentication → Email Templates yalnızca Resend yedek yolu (`RESEND_API_KEY` yoksa) devreye girer; production'da Resend açıkken bu şablonlar kullanılmaz.

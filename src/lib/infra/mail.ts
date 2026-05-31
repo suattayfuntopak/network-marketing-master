@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import {
   NMM_APP_URL,
+  NMM_REPLY_TO,
   buildPremiumEmail,
   emailCta,
   emailHeading,
@@ -53,6 +54,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })
@@ -132,6 +134,7 @@ export async function sendPaymentSuccessEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })
@@ -200,6 +203,7 @@ export async function sendLicenseExpiryEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })
@@ -239,6 +243,7 @@ export async function sendAdminNewUserEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [adminEmail],
+      replyTo: newUserEmail,
       subject,
       html: buildPremiumEmail(content, 'tr'),
     })
@@ -347,7 +352,7 @@ export async function sendModerationApprovedEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [userEmail],
-      replyTo: 'info@suattayfuntopak.com',
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })
@@ -422,7 +427,7 @@ export async function sendModerationRejectedEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [userEmail],
-      replyTo: 'info@suattayfuntopak.com',
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })
@@ -476,6 +481,7 @@ export async function sendPasswordResetEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to: [email],
+      replyTo: NMM_REPLY_TO,
       subject,
       html: buildPremiumEmail(content, lang),
     })

@@ -2,6 +2,8 @@
 
 export const NMM_APP_URL = 'https://nmm.suattayfuntopak.com'
 export const NMM_LOGO_URL = `${NMM_APP_URL}/logo.png`
+/** Yanıtların gideceği destek adresi (Reply-To). */
+export const NMM_REPLY_TO = 'info@suattayfuntopak.com'
 
 /** E-posta üstü — yuvarlak NMM logosu (Gmail/Outlook uyumlu mutlak URL). */
 export function emailLogoHeader(): string {

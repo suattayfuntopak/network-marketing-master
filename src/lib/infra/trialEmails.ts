@@ -1,6 +1,7 @@
 import { Resend } from 'resend'
 import {
   NMM_APP_URL,
+  NMM_REPLY_TO,
   buildPremiumEmail,
   emailBulletList,
   emailCta,
@@ -172,7 +173,7 @@ export async function sendTrialLifecycleEmail(
   const { subject, html } = contentFor(kind, name, lang)
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: [email], subject, html })
+    await resend.emails.send({ from: FROM_EMAIL, to: [email], replyTo: NMM_REPLY_TO, subject, html })
     return true
   } catch (err) {
     console.error('[Resend] trial email failed:', kind, err)
