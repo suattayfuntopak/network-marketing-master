@@ -1,6 +1,12 @@
 # Hot Log
 
-## 2026-05-31 — PDPL / KVKK / GDPR terminolojisi + yasal sayfa araç çubuğu
+## 2026-05-31 — Platform Yönetim: Onay Masası en alta
+
+- **Platform Yönetim paneli:** "İçerik ve İtiraz Talepleri Onay Masası" modülü workspace tablosunun altına taşındı.
+- **Dosya:** `PlatformYonetimContent.tsx`.
+
+---
+
 
 - **Terminoloji:** TR → KVKK, Genel Veri Koruma Yönetmeliği (GDPR); EN → PDPL (Personal Data Protection Law), GDPR (EU regulation). Footer EN: `PDPL & Privacy Policy`.
 - **Yasal sayfalar (`/kvkk`, `/kullanim-kosullari`, `/guvenlik`):** Sağ üstte tema düğmesi + bayrak (TR'de 🇹🇷, EN'de 🇺🇸); içerikler PDPL/KVKK ayrımına göre güncellendi.
