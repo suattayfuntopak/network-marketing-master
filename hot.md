@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-31 — Takvim: Takibi İptal Et +3 gün döngüsü kesildi
+
+- **Sorun:** İptal sonrası tamamlanan gün + aşama günü (14 Haz → 17 Haz) yeniden planlıyordu.
+- **Düzeltme:** `FOLLOW_UP_CALENDAR_SUPPRESSED_ISO` — iptal = takvimden tamamen çıkar; +1/+3/+7 veya manuel tarih ile tekrar planlanır.
+- **Deploy sonrası:** Eski DB kayıtları (17 Haz) için bir kez daha “Takibi İptal Et” gerekebilir.
+
+---
+
 ## 2026-05-31 — Council Triad 2. Tur (analiz — kod değişmedi)
 
 **Üyeler:** Torvalds + Aristoteles + Ada. Tam rapor: [docs/council-triad-2026-05-31.md](docs/council-triad-2026-05-31.md).
