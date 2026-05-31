@@ -8,14 +8,6 @@
 
 ---
 
-
-- **Footer:** TR `KVKK ve Gizlilik Politikası`; EN `GDPR & Privacy Policy` (KVKK karışımı kaldırıldı).
-- **`/kvkk`:** İngilizce içerik yalnızca GDPR; rozet ve başlıklarda `GDPR / KVKK` birleşik ifadeler temizlendi.
-- **Kullanım Koşulları:** EN maddede `GDPR / KVKK` → `GDPR`.
-- **Dosyalar:** `landing.ts`, `kvkk/page.tsx`, `kullanim-kosullari/page.tsx`.
-
----
-
 ## 2026-05-31 — Şifre sıfırlama akışı düzeltildi (kırmızı hata + pano'ya kaçış)
 
 - **Sorun:** E-posta linki oturumu kuruyordu ama `/sifre-guncelle` 5 sn'de hata veriyor; kullanıcı pano'ya düşüyordu, şifre değişmiyordu.
