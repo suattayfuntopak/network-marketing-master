@@ -35,7 +35,12 @@ export function ItirazlarContent() {
   useEffect(() => {
     let cancelled = false
     loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', ws?.workspaceId ?? null)
-      .then(items => { if (!cancelled) setCustomItirazlar(items as unknown as CustomItiraz[]) })
+      .then(items => {
+        if (!cancelled) {
+          const approved = items.filter(it => (it as any).isApproved)
+          setCustomItirazlar(approved as unknown as CustomItiraz[])
+        }
+      })
       .catch(() => {})
     return () => { cancelled = true }
   }, [ws?.workspaceId])

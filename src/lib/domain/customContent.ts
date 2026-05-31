@@ -40,11 +40,15 @@ export async function loadCustomContent(
 
   const { data: rows } = await supabase
     .from(table)
-    .select('item_key, data, created_at')
-    .eq('user_id', user.id)
+    .select('item_key, data, created_at, is_approved, user_id')
+    .or(`is_approved.eq.true,user_id.eq.${user.id}`)
     .order('created_at', { ascending: false })
 
-  const dbItems = (rows ?? []).map(r => r.data as CustomItem)
+  const dbItems = (rows ?? []).map(r => ({
+    ...(r.data as CustomItem),
+    isApproved: (r as any).is_approved,
+    userId: (r as any).user_id,
+  }))
   const dbKeys = new Set((rows ?? []).map(r => String(r.item_key)))
 
   // One-time migration of localStorage-only items.
@@ -57,6 +61,7 @@ export async function loadCustomContent(
         workspace_id: workspaceId,
         item_key: String(it.id),
         data: it as unknown as Json,
+        is_approved: true, // Migrated ones are immediately approved for the owner
       }))
     )
   }
@@ -64,7 +69,13 @@ export async function loadCustomContent(
     try { localStorage.removeItem(localKey) } catch { /* ignore */ }
   }
 
-  return [...toMigrate, ...dbItems]
+  const migratedItems = toMigrate.map(it => ({
+    ...it,
+    isApproved: true,
+    userId: user.id,
+  }))
+
+  return [...migratedItems, ...dbItems]
 }
 
 export async function addCustomContent(

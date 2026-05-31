@@ -249,3 +249,111 @@ export async function sendAdminNewUserEmail(
     return false
   }
 }
+
+/**
+ * Sends a notification email to the Super Admin about a new user-submitted training/objection request.
+ */
+export async function sendModerationAlertEmail(
+  userEmail: string,
+  userName: string,
+  contentType: 'training' | 'objection',
+  contentTitle: string
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendModerationAlertEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const typeLabel = contentType === 'training' ? 'İçerik (Vaktin Varsa)' : 'İtirazlara Cevap'
+  const subject = `Yeni Moderasyon Talebi: ${contentTitle}`
+  const content = [
+    emailHeading('Yeni İçerik/İtiraz Ekleme Talebi'),
+    emailParagraph(`Platformdaki bir kullanıcı yeni bir ${emailHighlight(typeLabel)} ekleme talebinde bulundu.`),
+    emailPlanBox([
+      `<strong>Gönderen:</strong> ${userName} (${userEmail})`,
+      `<strong>Başlık:</strong> ${contentTitle}`,
+      `<strong>Tür:</strong> ${typeLabel}`,
+      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+    ]),
+    emailParagraph('Talebi incelemek, düzenlemek veya onaylamak için Platform Yönetimi paneline gidebilirsiniz.'),
+    emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Moderasyon Panelini Aç'),
+  ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ['info@suattayfuntopak.com'],
+      replyTo: userEmail,
+      subject,
+      html: buildPremiumEmail(content, 'tr'),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send moderation alert email:', err)
+    return false
+  }
+}
+
+/**
+ * Sends an email notification to the submitter when their training/objection is approved by the admin.
+ */
+export async function sendModerationApprovedEmail(
+  userEmail: string,
+  userName: string,
+  contentType: 'training' | 'objection',
+  contentTitle: string,
+  itemKey: string,
+  lang: 'tr' | 'en' = 'tr'
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendModerationApprovedEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const typeLabel = contentType === 'training'
+    ? (lang === 'en' ? 'Training content' : 'İçerik')
+    : (lang === 'en' ? 'Objection handler' : 'İtiraz')
+
+  const subject = lang === 'en'
+    ? `Approved! Your content addition is live 🚀`
+    : `Tebrikler! İçerik ekleme talebiniz onaylandı 🚀`
+
+  const targetPath = contentType === 'training' ? 'egitim' : 'itirazlar'
+  const directLink = `${NMM_APP_URL}/${targetPath}?id=${itemKey}`
+
+  const content = lang === 'en'
+    ? [
+        emailHeading('Content approved!'),
+        emailParagraph(`Dear ${userName},`),
+        emailParagraph(
+          `Your request to add the ${emailHighlight(typeLabel)} has been approved and is now live for you and the entire NMM family.`
+        ),
+        emailParagraph(`Approved Title: <strong>${contentTitle}</strong>`),
+        emailParagraph('Thank you very much for your interest and contribution to our application.'),
+        emailCta(directLink, 'View Live Content'),
+      ].join('')
+    : [
+        emailHeading('İçerik talebiniz onaylandı!'),
+        emailParagraph(`Sayın ${userName},`),
+        emailParagraph(
+          `İçerik/İtiraz ekleme talebiniz onaylanmıştır ve aşağıdaki bağlantıdan siz ve tüm NMM ailesinin kullanımına açılmıştır.`
+        ),
+        emailParagraph(`Onaylanan Başlık: <strong>${contentTitle}</strong>`),
+        emailParagraph('Uygulamamıza göstermiş olduğunuz ilgi ve katkıdan dolayı çok teşekkür ederiz.'),
+        emailCta(directLink, 'İçeriği Görüntüle'),
+      ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [userEmail],
+      replyTo: 'info@suattayfuntopak.com',
+      subject,
+      html: buildPremiumEmail(content, lang),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send moderation approved email:', err)
+    return false
+  }
+}

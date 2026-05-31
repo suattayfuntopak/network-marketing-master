@@ -1,10 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { X } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { useAIUsage } from '@/hooks/useAIUsage'
+import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
+import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { CustomItiraz } from '../types'
 
 type Props = {
@@ -15,6 +19,10 @@ type Props = {
 
 export function AddObjectionModal({ open, onClose, onAdd }: Props) {
   const { t } = useTranslation()
+  const { data: ws } = useWorkspace()
+  const { data: aiUsage } = useAIUsage()
+  const [isPending, startTransition] = useTransition()
+
   const [newSoru, setNewSoru] = useState('')
   const [newKategori, setNewKategori] = useState('Genel')
   const [newKisaCevap, setNewKisaCevap] = useState('')
@@ -24,7 +32,9 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
   const [newEmoji, setNewEmoji] = useState('🛡️')
   const [newTags, setNewTags] = useState('')
 
-  if (!open) return null
+  const [showSympathetic, setShowSympathetic] = useState(false)
+
+  if (!open && !showSympathetic) return null
 
   function resetForm() {
     setNewSoru('')
@@ -40,8 +50,9 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
     e.preventDefault()
     if (!newSoru.trim()) return
 
+    const itemKey = Date.now()
     const newObj: CustomItiraz = {
-      id: Date.now(),
+      id: itemKey,
       kategori: { tr: newKategori, en: newKategori },
       soru: { tr: newSoru, en: newSoru },
       emoji: newEmoji || '🛡️',
@@ -52,155 +63,189 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
       tags: newTags.split(',').map(tag => tag.trim()).filter(Boolean),
     }
 
-    onAdd(newObj)
-    resetForm()
-    onClose()
-    toast.success(t('objectionsPage.objectionAdded'))
+    startTransition(async () => {
+      try {
+        const res = await submitModeratedRequestAction(
+          'objection',
+          ws?.workspaceId ?? null,
+          String(itemKey),
+          newObj as unknown as Record<string, any>
+        )
+
+        resetForm()
+
+        if (res.isApproved) {
+          onAdd(newObj)
+          toast.success(t('objectionsPage.objectionAdded'))
+          onClose()
+        } else {
+          // Regular user submitted successfully, closed and show sympathetic modal
+          onClose()
+          setShowSympathetic(true)
+        }
+      } catch (err: any) {
+        toast.error(err.message || 'Hata oluştu.')
+      }
+    })
   }
 
   return (
-    <div className={`fixed inset-0 ${Z.fullscreen} flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200`}>
-      <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
-        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-          <div>
-            <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
-            <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
-              Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
-            </p>
+    <>
+      {open && (
+        <div className={`fixed inset-0 ${Z.fullscreen} flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-md overflow-y-auto animate-in fade-in duration-200`}>
+          <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
+              <div>
+                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
+                <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
+                  Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex items-center gap-1 text-[11px] md:text-xs font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
+              >
+                <X className="h-4 w-4" />
+                <span>Formu Kapat</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
+                  <input
+                    type="text"
+                    required
+                    value={newSoru}
+                    onChange={e => setNewSoru(e.target.value)}
+                    placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                  <select
+                    value={newKategori}
+                    onChange={e => setNewKategori(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  >
+                    <option value="Para & Kazanç">Para & Kazanç</option>
+                    <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
+                    <option value="Güven & Şüphe">Güven & Şüphe</option>
+                    <option value="Yetenek & Kimlik">Yetenek & Kimlik</option>
+                    <option value="Aile & Çevre">Aile & Çevre</option>
+                    <option value="Ürün & Sistem">Ürün & Sistem</option>
+                    <option value="Genel">Genel</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
+                <textarea
+                  rows={3}
+                  value={newKisaCevap}
+                  onChange={e => setNewKisaCevap(e.target.value)}
+                  placeholder="Kısa ve hızlı saha cevabı..."
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
+                <textarea
+                  rows={4}
+                  value={newDetayliCevap}
+                  onChange={e => setNewDetayliCevap(e.target.value)}
+                  placeholder="Detaylı cevap metni..."
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
+                  <textarea
+                    rows={3}
+                    value={newYaklasim}
+                    onChange={e => setNewYaklasim(e.target.value)}
+                    placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
+                  <textarea
+                    rows={3}
+                    value={newOrnekDiyalog}
+                    onChange={e => setNewOrnekDiyalog(e.target.value)}
+                    placeholder="Kısa örnek konuşma..."
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                  <select
+                    value={newEmoji}
+                    onChange={e => setNewEmoji(e.target.value)}
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  >
+                    <option value="🛡️">🛡️ Kalkan</option>
+                    <option value="⚖️">⚖️ Terazi</option>
+                    <option value="💰">💰 Para Torbası</option>
+                    <option value="⏳">⏳ Kum Saati</option>
+                    <option value="🤝">🤝 El Sıkışma</option>
+                    <option value="🗣️">🗣️ Konuşma</option>
+                    <option value="🚪">🚪 Kapı</option>
+                    <option value="🕌">🕌 Cami</option>
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                  <input
+                    type="text"
+                    value={newTags}
+                    onChange={e => setNewTags(e.target.value)}
+                    placeholder="örn. güven, fiyat, zamanlama"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isPending}
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                >
+                  {isPending ? (
+                    <>
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      <span>İncelemeye Gönderiliyor...</span>
+                    </>
+                  ) : (
+                    <span>+ Ekle</span>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="flex items-center gap-1 text-[11px] md:text-xs font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
-          >
-            <X className="h-4 w-4" />
-            <span>Formu Kapat</span>
-          </button>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
-              <input
-                type="text"
-                required
-                value={newSoru}
-                onChange={e => setNewSoru(e.target.value)}
-                placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
-              <select
-                value={newKategori}
-                onChange={e => setNewKategori(e.target.value)}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
-              >
-                <option value="Para & Kazanç">Para & Kazanç</option>
-                <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
-                <option value="Güven & Şüphe">Güven & Şüphe</option>
-                <option value="Yetenek & Kimlik">Yetenek & Kimlik</option>
-                <option value="Aile & Çevre">Aile & Çevre</option>
-                <option value="Ürün & Sistem">Ürün & Sistem</option>
-                <option value="Genel">Genel</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
-            <textarea
-              rows={3}
-              value={newKisaCevap}
-              onChange={e => setNewKisaCevap(e.target.value)}
-              placeholder="Kısa ve hızlı saha cevabı..."
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
-            <textarea
-              rows={4}
-              value={newDetayliCevap}
-              onChange={e => setNewDetayliCevap(e.target.value)}
-              placeholder="Detaylı cevap metni..."
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
-              <textarea
-                rows={3}
-                value={newYaklasim}
-                onChange={e => setNewYaklasim(e.target.value)}
-                placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
-              <textarea
-                rows={3}
-                value={newOrnekDiyalog}
-                onChange={e => setNewOrnekDiyalog(e.target.value)}
-                placeholder="Kısa örnek konuşma..."
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
-              <select
-                value={newEmoji}
-                onChange={e => setNewEmoji(e.target.value)}
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
-              >
-                <option value="🛡️">🛡️ Kalkan</option>
-                <option value="⚖️">⚖️ Terazi</option>
-                <option value="💰">💰 Para Torbası</option>
-                <option value="⏳">⏳ Kum Saati</option>
-                <option value="🤝">🤝 El Sıkışma</option>
-                <option value="🗣️">🗣️ Konuşma</option>
-                <option value="🚪">🚪 Kapı</option>
-                <option value="🕌">🕌 Cami</option>
-              </select>
-            </div>
-            <div className="space-y-1">
-              <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
-              <input
-                type="text"
-                value={newTags}
-                onChange={e => setNewTags(e.target.value)}
-                placeholder="örn. güven, fiyat, zamanlama"
-                className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold transition active:scale-95 cursor-pointer"
-            >
-              İptal
-            </button>
-            <button
-              type="submit"
-              className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
-            >
-              + Ekle
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      )}
+      <SympatheticPopup open={showSympathetic} onClose={() => setShowSympathetic(false)} />
+    </>
   )
 }

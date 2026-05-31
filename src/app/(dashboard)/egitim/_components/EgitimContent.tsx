@@ -38,7 +38,12 @@ export function EgitimContent() {
   useEffect(() => {
     let cancelled = false
     loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', ws?.workspaceId ?? null)
-      .then(items => { if (!cancelled) setCustomTrainings(items as unknown as TrainingTopic[]) })
+      .then(items => {
+        if (!cancelled) {
+          const approved = items.filter(it => (it as any).isApproved)
+          setCustomTrainings(approved as unknown as TrainingTopic[])
+        }
+      })
       .catch(() => {})
     return () => { cancelled = true }
   }, [ws?.workspaceId])

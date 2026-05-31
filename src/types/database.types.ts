@@ -364,6 +364,9 @@ export interface Database {
           item_key: string
           data: Json
           created_at: string
+          is_approved: boolean
+          user_email: string | null
+          user_name: string | null
         }
         Insert: {
           id?: string
@@ -372,6 +375,9 @@ export interface Database {
           item_key: string
           data: Json
           created_at?: string
+          is_approved?: boolean
+          user_email?: string | null
+          user_name?: string | null
         }
         Update: {
           id?: string
@@ -380,6 +386,9 @@ export interface Database {
           item_key?: string
           data?: Json
           created_at?: string
+          is_approved?: boolean
+          user_email?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }
@@ -391,6 +400,9 @@ export interface Database {
           item_key: string
           data: Json
           created_at: string
+          is_approved: boolean
+          user_email: string | null
+          user_name: string | null
         }
         Insert: {
           id?: string
@@ -399,6 +411,9 @@ export interface Database {
           item_key: string
           data: Json
           created_at?: string
+          is_approved?: boolean
+          user_email?: string | null
+          user_name?: string | null
         }
         Update: {
           id?: string
@@ -407,6 +422,9 @@ export interface Database {
           item_key?: string
           data?: Json
           created_at?: string
+          is_approved?: boolean
+          user_email?: string | null
+          user_name?: string | null
         }
         Relationships: []
       }

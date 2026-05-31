@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-05-31 — İçerik Moderasyon Otomasyonu + Yasal Sayfalar & Premium Landing Footer
+
+- **Özellik (İçerik/İtiraz Moderasyon Akışı):** "Vaktin Varsa" (Eğitim) ve "İtirazlara Cevaplar" sayfaları için draft-and-approval altyapısı tamamlandı.
+- **Süper Admin Auto-Bypass:** `suattayfuntopak@gmail.com` tarafından eklenen tüm içerik ve itirazlar anında `is_approved = true` olarak kaydedilir. Onay/inceleme gerektirmez, sınırsız ekleme hakkı vardır ve sympathetic popup/moderasyon adımları bu kullanıcı için tamamen bypass edilir.
+- **Normal Kullanıcı Akışı:** Diğer distribütörlerin eklediği içerikler `is_approved = false` olarak taslak kaydedilir. Form kapandığında platform-portal tabanlı interaktif `SympatheticPopup` gösterilir. Aynı anda `info@suattayfuntopak.com` / `suattayfuntopak@gmail.com` adresine Resend API aracılığıyla gerçek zamanlı e-posta alarmı gönderilir.
+- **Admin Onay Masası:** Platform Yönetim panelinde ("PlatformYonetimContent.tsx") bekleyen tüm istekleri düzenleme, kaydetme ve onaylama/reddetme paneli açıldı.
+- **Onay E-postası & Derin Link (Deep Link):** Onaylandığında, içerik sahibine Resend üzerinden `${NMM_APP_URL}/egitim?id=${item_key}` veya `/itirazlar?id=${item_key}` parametreli e-posta gider. Bu link tıklandığında sayfa pürüzsüz kaydırma ile ilgili karta odaklanır ve chevron detayını otomatik açar.
+- **Yasal & Gizlilik Sayfaları:** Premium glassmorphism ve orbs tasarımıyla KVKK (`/kvkk`), Kullanım Koşulları (`/kullanim-kosullari`) ve Bilgi Güvenliği Bildirgesi (`/guvenlik`) sayfaları dynamic sidebar index yapısı ve tam TR/EN lokalizasyonuyla oluşturuldu.
+- **Premium Landing Footer:** Sade 2 linkli footer yerine; marka logosu, pulsing "Tüm Servisler Aktif" / "All Systems Operational" yeşil rozeti, 4 yasal/ürün/hesap/iletişim kolonu ve i18n dil desteğiyle premium görünümlü bir footer entegre edildi.
+- **Derleme:** `npm run build` hatasız tamamlandı, TypeScript/Turbopack statik sayfaları başarıyla üretti.
+
+---
+
 ## 2026-05-31 — Build fix: CALENDAR_TERMINAL_STAGES import
 
 - Vercel TS hatası (`takvim/actions.ts:149`) — eksik import eklendi; `npm run build` yeşil.

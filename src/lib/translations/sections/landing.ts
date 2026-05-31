@@ -85,6 +85,10 @@ export const landingSection = {
       testimonialsSubtitle: 'Sponsorların aday listelerini ve doğru başlangıç adımlarını nasıl otomatikleştirdiğini görün.',
       footerRights: 'Tüm hakları saklıdır.',
       footerSignUp: 'Kayıt Ol',
+      footerKvkk: 'KVKK ve Gizlilik Politikası',
+      footerTerms: 'Kullanım Koşulları',
+      footerSecurity: 'Güvenlik Bildirgesi',
+      footerContact: 'İletişim',
     },
   },
   en: {
@@ -173,6 +177,10 @@ export const landingSection = {
       testimonialsSubtitle: 'See how top sponsors automated candidate lists and onboarding.',
       footerRights: 'All rights reserved.',
       footerSignUp: 'Sign Up',
+      footerKvkk: 'Privacy & Personal Data (KVKK)',
+      footerTerms: 'Terms of Service',
+      footerSecurity: 'Security Statement',
+      footerContact: 'Contact Us',
     },
   },
 } as const
