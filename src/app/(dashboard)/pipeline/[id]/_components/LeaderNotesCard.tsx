@@ -4,17 +4,15 @@ import { useState, useMemo, useEffect, useRef } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { StickyNote, ChevronUp, ChevronDown, Bot, Check } from 'lucide-react'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useCandidateNotes, useAddCandidateNote } from '@/hooks/useCandidates'
 import {
   resolveDailyActionNote,
-  mergeDailyActionNoteUpdate,
   displayDailyActionNote,
   parseBilingualText,
   isLeaderUserNote,
 } from '@/lib/domain/dailyActionNote'
-import { generateNotesSummary, translateNoteAction } from '../actions'
+import { generateNotesSummary, translateNoteAction, persistLeaderNoteTranslationAction } from '../actions'
 
 interface Props {
   candidateId: string
@@ -69,12 +67,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
         translateNoteAction(parsedN.noteTr)
           .then(async (translated: string) => {
             if (translated) {
-              const supabase = createClient()
-              await supabase
-                .from('nmm_daily_actions')
-                .update(mergeDailyActionNoteUpdate(n, { noteEn: translated }))
-                .eq('id', n.id)
-
+              await persistLeaderNoteTranslationAction(n.id, translated)
               queryClient.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
               queryClient.invalidateQueries({ queryKey: ['activity', candidateId] })
             }

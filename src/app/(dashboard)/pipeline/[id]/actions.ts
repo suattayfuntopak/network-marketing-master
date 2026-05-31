@@ -3,6 +3,7 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -212,5 +213,31 @@ export async function translateNoteAction(text: string): Promise<string> {
   } catch {
     return text
   }
+}
+
+/**
+ * Lider notunun otomatik EN çevirisini kalıcı saklar — istemci tarafı doğrudan DB
+ * yazımı yerine (AGENTS: mutasyonlar server action ile). Oturum zorunlu; RLS owner
+ * kontrolü uygular. Davranış eskiyle aynı: mevcut not alanları + noteEn birleştirilir.
+ */
+export async function persistLeaderNoteTranslationAction(
+  actionId: string,
+  noteEn: string,
+): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const { data: action } = await supabase
+    .from('nmm_daily_actions')
+    .select('*')
+    .eq('id', actionId)
+    .single()
+  if (!action) return
+
+  await supabase
+    .from('nmm_daily_actions')
+    .update(mergeDailyActionNoteUpdate(action, { noteEn }))
+    .eq('id', actionId)
 }
 
