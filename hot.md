@@ -2,6 +2,7 @@
 
 ## 2026-05-31 (Akşam) — Premium Tasarım Cilası & Fiyatlandırma Kontrast Düzeltmeleri
 
+- **Şifre Sıfırlama Yönlendirme Hatası Giderildi (Bugfix):** Supabase'den gelen şifre sıfırlama e-posta linkine tıklandığında oluşan yarış durumu (race condition) engellendi. Giriş sayfasında URL'deki hash fragment (`access_token` veya `type=recovery`) algılandığında sistemin kullanıcıyı anında `/pano`'ya fırlatması durdurularak, doğrudan ve güvenli bir şekilde `/sifre-guncelle` sayfasına yönlendirilmesi sağlandı. Kullanıcının şifresini değiştirebilmesi garanti altına alındı.
 - **Yasal & Uyumluluk Sayfaları Sadeleştirmesi:** KVKK (`/kvkk`), Kullanım Koşulları (`/kullanim-kosullari`) ve Bilgi Güvenliği Bildirgesi (`/guvenlik`) sayfalarındaki sol yan menü sekmeleri tamamen kaldırıldı. Sayfalar, okuma konforunu en üst düzeye çıkarmak için `max-w-3xl` sınırlarında **tek sütun ortalanmış modern bir doküman düzenine** kavuşturuldu.
 - **Hero Üst Rozet Ölçeklendirmesi:** En üstteki "YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ" rozeti, görsel oranları kusursuzlaştırmak adına bir punto küçültülerek `text-xs sm:text-sm` ve `px-4.5 py-2` ölçülerine getirildi.
 - **Dil Değiştirme Butonu:** Landing Page sağ üst köşesindeki dil butonu, pano (dashboard) içindekiyle uyumlu dinamik tekil butona dönüştürüldü. Türkçe aktifken Türk Bayrağı (`TRFlag`), İngilizce aktifken USA Bayrağı (`USFlag`) gösterilerek tek tıklamayla dil değişimi sağlandı.

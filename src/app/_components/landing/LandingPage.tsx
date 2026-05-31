@@ -24,11 +24,10 @@ export function LandingPage() {
     // 1. Initial active session check
     supabase.auth.getSession().then(({ data: { session } }) => {
       const onLandingPreview = window.location.pathname.startsWith('/acilis')
-      if (session && !onLandingPreview) {
+      const hasHash = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')
+      if (session && !onLandingPreview && !hasHash) {
         router.push('/pano')
       } else {
-        // Look for recovery or tokens in hash
-        const hasHash = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')
         if (!hasHash) {
           setCheckingSession(false)
         }
@@ -42,7 +41,10 @@ export function LandingPage() {
         return
       }
       if (session && !window.location.pathname.startsWith('/acilis')) {
-        router.push('/pano')
+        const hasHash = window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery')
+        if (!hasHash) {
+          router.push('/pano')
+        }
       } else {
         setCheckingSession(false)
       }
