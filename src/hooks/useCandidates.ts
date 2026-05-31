@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { fetchCandidatesAction, fetchCandidateDetailAction } from '@/app/(dashboard)/actions/candidates'
@@ -26,6 +26,7 @@ export function useCandidates(workspaceId: string | undefined, filter: Candidate
     queryFn: () => fetchCandidatesAction(workspaceId!),
     enabled: !!workspaceId,
     staleTime: 2 * 60 * 1000,
+    placeholderData: keepPreviousData,
   })
 
   const filtered = (query.data ?? []).filter(c => {
@@ -53,6 +54,7 @@ export function useCandidateDetail(workspaceId: string | undefined, candidateId:
     queryFn: () => fetchCandidateDetailAction(workspaceId!, candidateId),
     enabled: !!workspaceId && !!candidateId,
     staleTime: 60_000,
+    placeholderData: keepPreviousData,
     initialData: () => {
       if (!workspaceId) return undefined
       const list = queryClient.getQueryData<NmmCandidate[]>(queryKeys.candidates(workspaceId))

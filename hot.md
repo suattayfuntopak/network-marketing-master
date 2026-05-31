@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-05-31 — Performans Faz 3: AI usage sunucu, keepPreviousData, dead code
+
+- **038 uygulandı** (kullanıcı tarafı).
+- **YZ kotası:** `fetchAIUsageAction` server action; `useAIUsage` istemci Supabase kaldırıldı; SSR prefetch'e eklendi.
+- **Gezinme UX:** `keepPreviousData` — aday listesi, ekip bundle, AI usage refetch/invalidate sırasında önceki veri görünür kalır.
+- **Temizlik:** Kullanılmayan `fetchEkipMembers.ts` wrapper silindi.
+- **Dosyalar:** `actions/aiUsage.ts`, `useAIUsage.ts`, `useCandidates.ts`, `useTeamMembers.ts`, `prefetchDashboard.ts`, `invalidateTeamAndAI.ts`.
+
+---
+
 ## 2026-05-31 — Performans Faz 2: ekip bundle, aday select, lazy admin, index
 
 - **Ekip RPC sunucuya:** `fetchTeamBundle` + `fetchTeamBundleAction`; `useTeamMembers` / `useEkipPanelRows` tek `['team', workspaceId]` cache; SSR prefetch.

@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { queryKeys } from '@/lib/query/keys'
 
@@ -32,6 +32,7 @@ function teamQueryOptions(workspaceId: string | undefined) {
     queryFn: () => fetchTeamBundleAction(workspaceId!),
     enabled: !!workspaceId,
     staleTime: TEAM_STALE,
+    placeholderData: keepPreviousData,
   } as const
 }
 

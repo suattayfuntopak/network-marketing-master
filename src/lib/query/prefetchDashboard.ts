@@ -1,5 +1,6 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
+import { fetchAIUsageAction } from '@/app/(dashboard)/actions/aiUsage'
 import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
@@ -33,6 +34,11 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
       queryKey: queryKeys.team(ws.workspaceId),
       queryFn: () => fetchTeamBundleAction(ws.workspaceId),
       staleTime: TEAM_STALE,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.dailyAiUsage(),
+      queryFn: fetchAIUsageAction,
+      staleTime: 60_000,
     }),
   ]
 
