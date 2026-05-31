@@ -99,8 +99,8 @@ export default function KVKKPage() {
         },
         {
           id: 'p5',
-          title: '5. Your Rights as a Data Subject',
-          text: 'You have full rights regarding your personal data to;',
+          title: '5. Your Rights under GDPR',
+          text: 'Under GDPR, you may contact us to exercise the following rights regarding your personal data:',
           bullets: [
             'Request details on whether your data is processed and demand copies,',
             'Learn the scope of data processing and verify appropriate usage,',
