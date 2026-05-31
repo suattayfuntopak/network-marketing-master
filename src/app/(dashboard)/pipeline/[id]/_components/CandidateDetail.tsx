@@ -383,6 +383,9 @@ export function CandidateDetail({ candidateId }: Props) {
     window.open(`sms:${candidatePhoneClean}?body=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
   }, [candidatePhoneClean, activeMaterial, getPresentationMessage, t])
 
+  // Tüm hook'lar erken return'lerden ÖNCE çağrılmalı (rules-of-hooks).
+  const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
+
   if (wsLoading || cLoading) {
     return (
       <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
@@ -435,8 +438,6 @@ export function CandidateDetail({ candidateId }: Props) {
   function handleDelete() {
     setConfirmOpen(true)
   }
-
-  const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
 
   function handleDeleteConfirmed() {
     setConfirmOpen(false)
