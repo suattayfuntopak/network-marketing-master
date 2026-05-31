@@ -1,6 +1,12 @@
 # Hot Log
 
-## 2026-05-31 — Platform Yönetim: Onay Masası en alta
+## 2026-05-31 — Platform Yönetim hızlandırma + stayfuntopak temizlik SQL
+
+- **Performans:** Paralel admin sorguları, TanStack Query cache, `useWorkspace` ile super-admin gate, progressive skeleton UI (tam sayfa spinner kaldırıldı).
+- **Temizlik:** `supabase/scripts/cleanup_stayfuntopak_duplicate_user.sql` — yanlış `stayfuntopak@gmail.com` hesabı + kırıntılar (Preview → Cleanup → Verify).
+
+---
+
 
 - **Platform Yönetim paneli:** "İçerik ve İtiraz Talepleri Onay Masası" modülü workspace tablosunun altına taşındı.
 - **Dosya:** `PlatformYonetimContent.tsx`.

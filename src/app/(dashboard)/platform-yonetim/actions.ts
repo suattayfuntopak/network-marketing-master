@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
+import type { User } from '@supabase/supabase-js'
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
@@ -26,6 +27,23 @@ export interface PlatformWorkspaceItem {
   ownerPhone: string | null
 }
 
+async function listAllAuthUsers(admin: ReturnType<typeof createAdminClient>): Promise<User[]> {
+  const users: User[] = []
+  let page = 1
+  const perPage = 200
+
+  while (true) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage })
+    if (error) throw error
+    const batch = data.users ?? []
+    users.push(...batch)
+    if (batch.length < perPage) break
+    page += 1
+  }
+
+  return users
+}
+
 /**
  * Fetches all registered workspaces, users, candidate counts and sponsorship links.
  * Restricted strictly to the Super Admin suattayfuntopak@gmail.com.
@@ -38,30 +56,35 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
 
   const admin = createAdminClient()
 
-  // 1. Fetch all users from Supabase Auth
-  const { data: { users = [] }, error: usersError } = await admin.auth.admin.listUsers()
-  if (usersError) {
-    console.error('[getPlatformWorkspacesAction] listUsers error:', usersError)
-    throw new Error('Kullanıcı listesi çekilemedi.')
-  }
+  const [
+    users,
+    workspacesResult,
+    countRpcResult,
+    adminCandidatesResult,
+  ] = await Promise.all([
+    listAllAuthUsers(admin),
+    admin
+      .from('nmm_workspaces')
+      .select('id, name, owner_id, parent_id, license_type, license_expires_at, created_at')
+      .order('created_at', { ascending: true }),
+    admin.rpc('nmm_count_candidates_per_workspace'),
+    admin
+      .from('nmm_candidates')
+      .select('id, owner_id, full_name, phone')
+      .eq('owner_id', user.id),
+  ])
 
-  // Map users by ID for O(1) lookup
-  const userMap = new Map<string, typeof users[0]>()
-  users.forEach(u => userMap.set(u.id, u))
-
-  // 2. Fetch all workspaces (oldest first → primary workspace per user kept after dedup)
-  const { data: workspaces, error: wsError } = await admin
-    .from('nmm_workspaces')
-    .select('*')
-    .order('created_at', { ascending: true })
-
+  const { data: workspaces, error: wsError } = workspacesResult
   if (wsError || !workspaces) {
     console.error('[getPlatformWorkspacesAction] workspaces error:', wsError)
     throw new Error('Çalışma alanları çekilemedi.')
   }
 
+  const userMap = new Map<string, User>()
+  users.forEach(u => userMap.set(u.id, u))
+
   const candidateCountMap = new Map<string, number>()
-  const { data: countJson, error: countRpcError } = await admin.rpc('nmm_count_candidates_per_workspace')
+  const { data: countJson, error: countRpcError } = countRpcResult
   if (!countRpcError && countJson && typeof countJson === 'object') {
     Object.entries(countJson as Record<string, number>).forEach(([wsId, cnt]) => {
       candidateCountMap.set(wsId, cnt)
@@ -77,7 +100,6 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     }
   }
 
-  // 4. Count downlines per workspace (parent_id is a workspace UUID)
   const parentCountMap = new Map<string, number>()
   workspaces.forEach(w => {
     if (w.parent_id) {
@@ -85,7 +107,6 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     }
   })
 
-  // Build workspace lookup by ID for sponsor resolution
   const workspaceById = new Map<string, typeof workspaces[0]>()
   workspaces.forEach(w => workspaceById.set(w.id, w))
 
@@ -106,10 +127,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     })
   }
 
-  const { data: adminCandidates } = await admin
-    .from('nmm_candidates')
-    .select('id, owner_id, full_name, phone')
-    .eq('owner_id', user.id)
+  const { data: adminCandidates } = adminCandidatesResult
 
   const phoneByCandidateId = new Map<string, string>()
   adminCandidates?.forEach(c => {

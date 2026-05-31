@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatformAdmin'
 import {
   Crown, Users, ShieldCheck, Search,
   Mail, Sparkles, UserPlus, BookOpen, MessageSquare,
@@ -15,20 +16,19 @@ import { Z } from '@/lib/ui/zIndex'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import {
-  getPlatformWorkspacesAction,
   adminExtendLicenseAction,
   addIndependentAsCandidateAction,
   deleteUserAction,
   type PlatformWorkspaceItem
 } from '../actions'
 import {
-  getPendingRequestsAction,
   approveRequestAction,
   rejectRequestAction,
   type ModerationRequestItem
 } from '@/app/(dashboard)/actions/moderation'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
 
 const getAvatarColor = (name: string) => {
@@ -51,13 +51,29 @@ const getAvatarColor = (name: string) => {
 export function PlatformYonetimContent() {
   const { t } = useTranslation()
   const router = useRouter()
-  const { data: usage, isLoading: usageLoading } = useAIUsage()
-  
-  const { data: wsData } = useWorkspace()
-  const inviteCode = wsData?.inviteCode ?? ''
+  const queryClient = useQueryClient()
 
-  const [workspaces, setWorkspaces] = useState<PlatformWorkspaceItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: wsData, isLoading: wsLoading } = useWorkspace()
+  const inviteCode = wsData?.inviteCode ?? ''
+  const isSuperAdmin = wsData?.isSuperAdmin ?? false
+
+  const {
+    data: workspaces = [],
+    isLoading: workspacesLoading,
+    isError: workspacesError,
+    error: workspacesQueryError,
+  } = usePlatformWorkspaces(isSuperAdmin)
+
+  const {
+    data: pendingRequests = [],
+    isLoading: moderationLoading,
+  } = usePlatformModeration(isSuperAdmin)
+
+  const refreshPlatform = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['platform-workspaces'] })
+    queryClient.invalidateQueries({ queryKey: ['platform-moderation'] })
+  }, [queryClient])
+
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedWorkspace, setSelectedWorkspace] = useState<PlatformWorkspaceItem | null>(null)
 
@@ -76,7 +92,6 @@ export function PlatformYonetimContent() {
   const [navConfirm, setNavConfirm] = useState<'payment' | 'landing' | null>(null)
 
   // Moderation state
-  const [pendingRequests, setPendingRequests] = useState<ModerationRequestItem[]>([])
   const [selectedRequest, setSelectedRequest] = useState<ModerationRequestItem | null>(null)
   
   // Fields for editing submissions
@@ -93,37 +108,18 @@ export function PlatformYonetimContent() {
 
   const [isModerating, startModerationTransition] = useTransition()
 
-  const isSuperAdmin = usage?.isSuperAdmin ?? false
-
   useEffect(() => {
-    // If loading finishes and user is not super admin, bounce them out!
-    if (!usageLoading && !isSuperAdmin) {
+    if (!wsLoading && !isSuperAdmin) {
       router.push('/pano')
       toast.error(t('platformPage.unauthorizedAccess'))
     }
-  }, [isSuperAdmin, usageLoading, router, t])
-
-  const loadData = useCallback(async () => {
-    try {
-      setLoading(true)
-      const data = await getPlatformWorkspacesAction()
-      setWorkspaces(data)
-
-      const requests = await getPendingRequestsAction()
-      setPendingRequests(requests)
-    } catch (err: any) {
-      console.error(err)
-      toast.error(err.message || 'Veriler yüklenirken bir hata oluştu.')
-    } finally {
-      setLoading(false)
-    }
-  }, [])
+  }, [isSuperAdmin, wsLoading, router, t])
 
   useEffect(() => {
-    if (isSuperAdmin) {
-      loadData()
+    if (workspacesError) {
+      toast.error(workspacesQueryError instanceof Error ? workspacesQueryError.message : 'Veriler yüklenirken bir hata oluştu.')
     }
-  }, [isSuperAdmin, loadData])
+  }, [workspacesError, workspacesQueryError])
 
   function handleOpenReview(req: ModerationRequestItem) {
     setSelectedRequest(req)
@@ -185,7 +181,7 @@ export function PlatformYonetimContent() {
         if (res.success) {
           toast.success('İçerik başarıyla onaylandı ve yayına alındı!')
           setSelectedRequest(null)
-          loadData()
+          refreshPlatform()
         }
       } catch (err: any) {
         toast.error(err.message || 'Onaylama başarısız oldu.')
@@ -201,7 +197,7 @@ export function PlatformYonetimContent() {
         const res = await approveRequestAction(req.id, req.contentType, req.data)
         if (res.success) {
           toast.success('İçerik hızlıca onaylandı!')
-          loadData()
+          refreshPlatform()
         }
       } catch (err: any) {
         toast.error(err.message || 'Onaylama başarısız oldu.')
@@ -221,7 +217,7 @@ export function PlatformYonetimContent() {
         const res = await rejectRequestAction(req.id, req.contentType, reason)
         if (res.success) {
           toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
-          loadData()
+          refreshPlatform()
           setSelectedRequest(null) // Close the review/edit modal
         }
       } catch (err: any) {
@@ -245,7 +241,7 @@ export function PlatformYonetimContent() {
         if (res.success) {
           toast.success(t('platformPage.licenseUpdated'))
           setSelectedWorkspace(null)
-          loadData() // Reload table
+          refreshPlatform() // Reload table
         }
       } catch (err: any) {
         console.error(err)
@@ -323,7 +319,7 @@ export function PlatformYonetimContent() {
     try {
       await deleteUserAction(ownerId, email)
       toast.success(t('platformPage.userDeleted'))
-      loadData()
+      refreshPlatform()
     } catch (err: any) {
       toast.error(err.message || t('platformPage.deleteFailed'))
     } finally {
@@ -340,14 +336,19 @@ export function PlatformYonetimContent() {
   const totalCandidatesCount = workspaces.reduce((acc, w) => acc + w.candidateCount, 0)
   const independentMembers = workspaces.filter(w => w.isIndependent)
 
-  if (usageLoading || loading) {
+  if (wsLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--bg)] text-[var(--text-1)]">
-        <Loader2 className="h-10 w-10 animate-spin text-[#534AB7]" />
-        <p className="mt-3 text-sm text-[var(--text-2)] font-semibold animate-pulse">
-          {t('platformPage.loadingGrid')}
-        </p>
-      </div>
+      <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+        <div className="w-full space-y-6">
+          <Skeleton className="h-16 w-full max-w-md rounded-2xl" />
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="h-24 rounded-2xl" />
+            ))}
+          </div>
+          <Skeleton className="h-96 w-full rounded-2xl" />
+        </div>
+      </main>
     )
   }
 
@@ -563,7 +564,15 @@ export function PlatformYonetimContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
-                {filtered.length === 0 ? (
+                {workspacesLoading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <tr key={i}>
+                      <td colSpan={9} className="p-3">
+                        <Skeleton className="h-10 w-full rounded-lg" />
+                      </td>
+                    </tr>
+                  ))
+                ) : filtered.length === 0 ? (
                   <tr>
                     <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-3)] italic">
                       {t('platformPage.noLeadersFound')}
@@ -762,7 +771,13 @@ export function PlatformYonetimContent() {
             </span>
           </div>
 
-          {pendingRequests.length === 0 ? (
+          {moderationLoading ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-44 rounded-2xl" />
+              ))}
+            </div>
+          ) : pendingRequests.length === 0 ? (
             <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-8 text-center text-xs text-[var(--text-3)] italic">
               Bekleyen herhangi bir onay talebi bulunmamaktadır. 🎉 Ekip üyeleri içerik ekledikçe burada listelenecektir.
             </div>

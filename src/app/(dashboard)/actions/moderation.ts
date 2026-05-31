@@ -84,20 +84,23 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
 
   const admin = createAdminClient()
 
-  const { data: trainings, error: tErr } = await admin
-    .from('nmm_custom_trainings')
-    .select('*')
-    .eq('is_approved', false)
-    .order('created_at', { ascending: false })
+  const [trainingsResult, objectionsResult] = await Promise.all([
+    admin
+      .from('nmm_custom_trainings')
+      .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
+      .eq('is_approved', false)
+      .order('created_at', { ascending: false }),
+    admin
+      .from('nmm_custom_objections')
+      .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
+      .eq('is_approved', false)
+      .order('created_at', { ascending: false }),
+  ])
 
+  const { data: trainings, error: tErr } = trainingsResult
   if (tErr) console.error('[getPendingRequestsAction] trainings fetch error:', tErr)
 
-  const { data: objections, error: oErr } = await admin
-    .from('nmm_custom_objections')
-    .select('*')
-    .eq('is_approved', false)
-    .order('created_at', { ascending: false })
-
+  const { data: objections, error: oErr } = objectionsResult
   if (oErr) console.error('[getPendingRequestsAction] objections fetch error:', oErr)
 
   const list: ModerationRequestItem[] = []
