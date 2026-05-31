@@ -59,13 +59,14 @@ export async function proxy(request: NextRequest) {
   }
 
   const isPasswordReset = pathname.startsWith('/sifre-guncelle')
+  const isAuthSystem = pathname.startsWith('/auth')
   const isLandingLegal =
     pathname === '/acilis' ||
     pathname === '/kvkk' ||
     pathname === '/kullanim-kosullari' ||
     pathname === '/guvenlik'
 
-  if (user && isPublic && !isPasswordReset && !isLandingLegal) {
+  if (user && isPublic && !isPasswordReset && !isAuthSystem && !isLandingLegal) {
     const url = request.nextUrl.clone()
     url.pathname = '/pano'
     return NextResponse.redirect(url)
