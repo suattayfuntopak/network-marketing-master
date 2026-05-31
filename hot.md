@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-31 — Aktivite geçmişi: follow_up_cleared yerelleştirmesi
+
+- **Sorun:** Takvimden takip kapatıldığında (`system_note:follow_up_cleared:*`) aktivite geçmişinde ham sistem anahtarı “Lider notu eklendi” olarak görünüyordu.
+- **Düzeltme:** `renderActivityText` içinde `follow_up_cleared` ve bilinmeyen `system_note:*` kayıtları için TR/EN çeviri; YazarForm aktivite özeti uyumu.
+- **Dosyalar:** `candidateDetailUtils.ts`, `pipeline.ts`, `YazarForm.tsx`, `LeaderNotesCard.tsx` (ayrı bileşen), `CandidateDetail.tsx`.
+
+---
+
 ## 2026-05-31 — Platform Yönetim hızlandırma + stayfuntopak temizlik SQL
 
 - **Performans:** Paralel admin sorguları, TanStack Query cache, `useWorkspace` ile super-admin gate, progressive skeleton UI (tam sayfa spinner kaldırıldı).

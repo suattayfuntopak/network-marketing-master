@@ -255,6 +255,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             : a.note?.startsWith('system_note:profile_update') ? (lang === 'en' ? 'Profile updated' : 'Profil güncellendi')
             : a.note?.startsWith('system_note:warmth_change:') ? (lang === 'en' ? 'Relationship level updated' : 'Sıcaklık derecesi güncellendi')
             : a.note?.startsWith('system_note:follow_up_change:') ? (lang === 'en' ? 'Follow-up date updated' : 'Takip tarihi güncellendi')
+            : a.note?.startsWith('system_note:follow_up_cleared:') ? (lang === 'en' ? 'Follow-up reminder cleared' : 'Takip hatırlatması kapatıldı')
+            : a.note?.startsWith('system_note:') ? (lang === 'en' ? 'System activity recorded' : 'Sistem aktivitesi kaydedildi')
             : a.note || (lang === 'en' ? 'Note Added' : 'Not Eklendi')
           return `- ${dateStr}: ${actionText}`
         }).join('\n')

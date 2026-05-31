@@ -30,7 +30,7 @@ const supabaseClientTsxLegacy = {
     "src/app/(auth)/giris/_components/LoginForm.tsx",
     "src/app/(auth)/sifre-guncelle/_components/PasswordResetGate.tsx",
     "src/app/(dashboard)/pano/_components/OnboardingModal.tsx",
-    "src/app/(dashboard)/pipeline/[id]/_components/CandidateDetail.tsx",
+    "src/app/(dashboard)/pipeline/[id]/_components/LeaderNotesCard.tsx",
     "src/app/(dashboard)/pipeline/_components/AddCandidateSheet.tsx",
     "src/app/(dashboard)/pipeline/_components/EditCandidateSheet.tsx",
     "src/app/(dashboard)/yazar/_components/YazarForm.tsx",

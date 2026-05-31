@@ -2,7 +2,9 @@ import { FOLLOW_DAYS } from '@/lib/domain/stages'
 import {
   displayDailyActionNote,
   getWhatsAppActivityDisplay,
+  isSystemActionNote,
 } from '@/lib/domain/dailyActionNote'
+import { fromCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate } from '@/types/database.types'
 
 type TFunc = (k: string, v?: Record<string, string | number>) => string
@@ -117,6 +119,20 @@ export function renderActivityText(a: any, lang: string, t: TFunc): string {
         } catch { return val }
       }
       return t('pipelinePage.followUpDateChanged', { old: formatD(parts[0]), new: formatD(parts[1]) })
+    }
+    if (a.note?.startsWith('system_note:follow_up_cleared:')) {
+      const dateKey = a.note.replace('system_note:follow_up_cleared:', '')
+      let formatted = dateKey
+      try {
+        formatted = fromCalendarKey(dateKey).toLocaleDateString(
+          lang === 'en' ? 'en-US' : 'tr-TR',
+          { day: 'numeric', month: 'long', year: 'numeric' },
+        )
+      } catch { /* keep raw key */ }
+      return t('pipelinePage.followUpCleared', { date: formatted })
+    }
+    if (isSystemActionNote(a.note)) {
+      return t('pipelinePage.systemActivityRecorded')
     }
 
     const displayNote = displayDailyActionNote(a, lang === 'en' ? 'en' : 'tr')
