@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-05-31 — E-posta markası: NMM logosu
+
+- Şifre sıfırlama + tüm Resend mailleri: `logo.png` üst başlık; Supabase mor N şablonu bypass (`generateLink` + Resend).
+- Gmail avatar: `RESEND_FROM_EMAIL` + Gravatar rehberi → `docs/email-automation.md`.
+
+---
+
 ## 2026-05-31 (Akşam) — Premium Tasarım Cilası & Fiyatlandırma Kontrast Düzeltmeleri
 
 - **Şifre Sıfırlama Yönlendirme Hatası Giderildi (Bugfix):** Supabase'den gelen şifre sıfırlama e-posta linkine tıklandığında oluşan yarış durumu (race condition) engellendi. Giriş sayfasında URL'deki hash fragment (`access_token` veya `type=recovery`) algılandığında sistemin kullanıcıyı anında `/pano`'ya fırlatması durdurularak, doğrudan ve güvenli bir şekilde `/sifre-guncelle` sayfasına yönlendirilmesi sağlandı. Kullanıcının şifresini değiştirebilmesi garanti altına alındı.
