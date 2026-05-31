@@ -106,14 +106,14 @@ export default function SecurityPage() {
           title: '4. Financial Transaction Security (PCI-DSS)',
           text: 'Subscription payments are processed in compliance with the highest payment industry rules. NMM does not store or process card numbers on our hardware:',
           bullets: [
-            'All payment cycles are managed by PCI-DSS Level 1 certified gateways under central banking licenses.',
+            'All payment cycles are managed by PCI-DSS Level 1 certified gateways under secure BDDK (Banking Regulation and Supervision Agency) central banking licenses.',
             'Payment forms load via isolated secure frames (iframes), routing credit card payloads directly to financial institutions.',
           ],
         },
         {
           id: 's5',
           title: '5. Artificial Intelligence Security',
-          text: 'When utilizing the AI Coach, roleplay simulations, or compliance checkers, your prompts are securely isolated:',
+          text: 'When utilizing the AI (Artificial Intelligence) Coach, roleplay simulations, or compliance checkers, your prompts are securely isolated:',
           bullets: [
             'Prompt data sent to AI model endpoints (Gemini, OpenAI) travels exclusively over SSL-secured corporate API keys.',
             'Under zero circumstances are your specific team strategies, candidate details, or inputs utilized to train public LLM models.',
@@ -135,7 +135,7 @@ export default function SecurityPage() {
 
       {/* Header Back Bar */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
-        <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
@@ -153,7 +153,7 @@ export default function SecurityPage() {
       </nav>
 
       {/* Title Hero */}
-      <header className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center space-y-3">
+      <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <ShieldCheck className="h-3.5 w-3.5" />
           <span>{lang === 'en' ? 'Security' : 'Güvenlik'}</span>
@@ -161,7 +161,7 @@ export default function SecurityPage() {
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}
         </h1>
-        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-3xl mx-auto">
+        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-5xl mx-auto">
           {activeContent.subtitle}
         </p>
         <p className="text-xs font-bold text-indigo-500/80 dark:text-indigo-400/80 tracking-wider">
@@ -170,7 +170,7 @@ export default function SecurityPage() {
       </header>
 
       {/* Document Centered Layout */}
-      <main className="mx-auto max-w-3xl px-4 pb-24 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 space-y-6">
         
         {/* Main Document Body */}
         <article className="space-y-6">

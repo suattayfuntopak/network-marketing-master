@@ -62,14 +62,14 @@ export default function KVKKPage() {
       ],
     },
     en: {
-      title: 'Personal Data Protection (KVKK) & Privacy Policy',
+      title: 'Personal Data Protection (GDPR / KVKK) & Privacy Policy',
       subtitle: 'The safety and confidentiality of your personal data is our highest priority.',
       updateDate: 'Last Updated: May 31, 2026',
       sections: [
         {
           id: 'p1',
           title: '1. Data Controller',
-          text: 'In accordance with the Personal Data Protection Law No. 6698 (KVKK) and GDPR regulations, Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
+          text: 'In accordance with the Turkish Personal Data Protection Law No. 6698 (KVKK) and GDPR (General Data Protection Regulation) rules, Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
         },
         {
           id: 'p2',
@@ -95,7 +95,7 @@ export default function KVKKPage() {
         {
           id: 'p4',
           title: '4. Third-Party Sharing & Safe Storage',
-          text: 'Under no circumstances do we sell, trade, or share your data with external advertisers or third parties. All platform data is end-to-end encrypted and hosted on European servers using the world-class Supabase database cloud provider, which strictly adheres to SOC2 and ISO 27001 security standards. All payment processes are carried out directly via encrypted SSL pathways by licensed payment processors; no credit card details are ever stored on our servers.',
+          text: 'Under no circumstances do we sell, trade, or share your data with external advertisers or third parties. All platform data is end-to-end encrypted and hosted on European servers using the world-class Supabase database cloud provider, which strictly adheres to SOC2 and ISO 27001 security standards. All payment processes are carried out directly via encrypted SSL pathways by secure BDDK-licensed (Banking Regulation and Supervision Agency) payment processors; no credit card details are ever stored on our servers.',
         },
         {
           id: 'p5',
@@ -125,7 +125,7 @@ export default function KVKKPage() {
 
       {/* Header Back Bar */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
-        <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
@@ -143,15 +143,15 @@ export default function KVKKPage() {
       </nav>
 
       {/* Title Hero */}
-      <header className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center space-y-3">
+      <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <Shield className="h-3.5 w-3.5" />
-          <span>KVKK</span>
+          <span>{lang === 'en' ? 'GDPR / KVKK' : 'KVKK'}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}
         </h1>
-        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-3xl mx-auto">
+        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-5xl mx-auto">
           {activeContent.subtitle}
         </p>
         <p className="text-xs font-bold text-indigo-500/80 dark:text-indigo-400/80 tracking-wider">
@@ -160,7 +160,7 @@ export default function KVKKPage() {
       </header>
 
       {/* Document Centered Layout */}
-      <main className="mx-auto max-w-3xl px-4 pb-24 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 space-y-6">
         
         {/* Main Document Body */}
         <article className="space-y-6">

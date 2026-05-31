@@ -2609,3 +2609,18 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 ### fix: resetPasswordAction Dinamik Origin Fallback Mekanizması (`src/app/(auth)/sifre-sifirla/actions.ts`)
 - Bazı tarayıcı veya proxy konfigürasyonlarında sunucu eylemlerine (Server Actions) `origin` header bilgisi ulaşmadığı durumlar için `host` header'ına dayalı dinamik bir fallback protokolü kuruldu. Origin boş olsa dahi `redirectTo` parametresi her zaman tam yetkili, geçerli bir URL olarak Supabase'e iletilmektedir.
 
+
+## 2026-05-31 — Yasal Sayfaların Tasarımsal Genişletilmesi ve Çift Dil İyileştirmeleri
+
+### feat: Yasal Sayfaların Genişliği `max-w-7xl` Seviyesine Yükseltildi
+- Landing page üzerindeki yasal sayfaların (KVKK, Kullanım Koşulları, Bilgi Güvenliği) arayüz yerleşimi, kullanıcının talebi doğrultusunda **"Tek Bir Platformdan Kusursuz Yönetim Merkezi"** modülü genişliğine getirildi.
+- Sayfalardaki dar ve okunması zor `max-w-3xl` (768px) konteyner yapısı, tam genişlikte ultra premium bir görünüm sunan `max-w-7xl` (1280px) standardı ile değiştirildi.
+- Ekran genişledikçe sayfa kenarlarında şık boşluklar bırakan `px-4 sm:px-6 lg:px-8` yapısı entegre edilerek tüm yasal belgelerin okunabilirliği ve bütünsel estetiği artırıldı.
+
+### feat: Yasal Kısaltmaların ve Terimlerin İngilizce Karşılıkları Eklendi
+- İngilizce dil seçeneği aktif edildiğinde yasal sayfalardaki Türkçe kısaltmaların ve finansal/yasal kurumsal terimlerin uluslararası karşılıkları yerleştirildi:
+  - **KVKK** ifadesinin yanına ve rozet alanlarına küresel standart olan **GDPR / KVKK** karşılığı eklendi.
+  - **BDDK** (Bankacılık Düzenleme ve Denetleme Kurumu) ifadesi İngilizce şablonlarda **BDDK (Banking Regulation and Supervision Agency)** şeklinde detaylandırılarak açıklandı.
+  - Türkçe içeriklerde yer alan **YZ** (Yapay Zeka) kısaltmaları, İngilizce sürümde **AI (Artificial Intelligence)** olarak revize edilip zenginleştirildi.
+
+

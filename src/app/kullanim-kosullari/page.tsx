@@ -96,8 +96,8 @@ export default function TermsPage() {
           title: '4. Acceptable Use Policy',
           text: 'When using our platform, you legally commit to the following standards of practice:',
           bullets: [
-            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with GDPR, KVKK, and relevant telecommunication marketing consent laws,',
-            'Refraining from generating spam, abusive prospecting copy, or misleading network-marketing recruitment campaigns through our AI models,',
+            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with GDPR / KVKK and relevant telecommunication marketing consent laws,',
+            'Refraining from generating spam, abusive prospecting copy, or misleading network-marketing recruitment campaigns through our AI (Artificial Intelligence) models,',
             'Avoiding reverse-engineering, system scraping, automatic bots, or triggering server-overloading requests (DDoS attacks),',
             'Not using our compliance analysis tools to circumvent consumer protection guidelines or validate illegal pyramids.',
           ],
@@ -110,7 +110,7 @@ export default function TermsPage() {
             'All billing cycles are paid in advance and are non-refundable unless legally mandated otherwise.',
             'If a 14-day free trial is not cancelled prior to expiration, your payment method will be automatically charged for the recurring subscription.',
             'You can cancel your subscription at any time within your Workspace billing panel. Cancellation stops future renewals while keeping active access until the cycle ends.',
-            'Payment transactions are safely handled by fully compliant, secure payment gateways using end-to-end SSL keys.',
+            'Payment transactions are safely handled by secure, BDDK-licensed (Banking Regulation and Supervision Agency) payment gateways using end-to-end SSL keys.',
           ],
         },
         {
@@ -133,7 +133,7 @@ export default function TermsPage() {
 
       {/* Header Back Bar */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
-        <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
@@ -151,7 +151,7 @@ export default function TermsPage() {
       </nav>
 
       {/* Title Hero */}
-      <header className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center space-y-3">
+      <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <FileText className="h-3.5 w-3.5" />
           <span>{lang === 'en' ? 'Terms' : 'Koşullar'}</span>
@@ -159,7 +159,7 @@ export default function TermsPage() {
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}
         </h1>
-        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-3xl mx-auto">
+        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-5xl mx-auto">
           {activeContent.subtitle}
         </p>
         <p className="text-xs font-bold text-indigo-500/80 dark:text-indigo-400/80 tracking-wider">
@@ -168,7 +168,7 @@ export default function TermsPage() {
       </header>
 
       {/* Document Centered Layout */}
-      <main className="mx-auto max-w-3xl px-4 pb-24 space-y-6">
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 space-y-6">
         
         {/* Main Document Body */}
         <article className="space-y-6">
