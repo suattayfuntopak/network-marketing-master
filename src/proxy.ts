@@ -17,6 +17,27 @@ const PUBLIC_PATHS = [
 ]
 
 export async function proxy(request: NextRequest) {
+  const hostname = request.headers.get('host') || ''
+  const pathname = request.nextUrl.pathname
+
+  // 1. If on the old vercel domain, redirect to the official domain, mapping wildcards to /sifre-guncelle
+  if (hostname === 'network-marketing-master.vercel.app') {
+    const url = request.nextUrl.clone()
+    url.host = 'nmm.suattayfuntopak.com'
+    url.protocol = 'https:'
+    if (url.pathname === '/**' || url.pathname === '/**/' || url.pathname.includes('%2A%2A') || url.pathname.includes('**')) {
+      url.pathname = '/sifre-guncelle'
+    }
+    return NextResponse.redirect(url)
+  }
+
+  // 2. Wildcard path check on official domain (fallback from Supabase)
+  if (pathname === '/**' || pathname === '/**/' || pathname.includes('%2A%2A') || pathname.includes('**')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/sifre-guncelle'
+    return NextResponse.redirect(url)
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient<Database>(
@@ -42,7 +63,6 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const pathname = request.nextUrl.pathname
   const isShopierWebhook =
     pathname === '/api/payment/shopier' || pathname === '/api/payment/shopier/'
   const isCronRoute = pathname.startsWith('/api/cron/')

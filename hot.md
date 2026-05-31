@@ -2592,3 +2592,19 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Kök neden (avatar):** Downline üyeler sponsor workspace'inde `avatar_url = null` satırla listeleniyor; fotoğraf çoğunlukla kendi workspace satırında veya `auth.users` metadata'sında. Platform Yönetimi metadata'dan okuduğu için orada görünüyordu, Ekibim ise yalnızca sponsor satırına bakıyordu.
 - **Çözüm (avatar):** Tüm `nmm_workspace_members` satırlarından avatar birleştirme, downline merge'de null üzerine yazma, aday notundan `parseNote` avatarı, ve `resolveTeamAvatarsAction` (service role ile yetkili downline'lar için auth metadata) eklendi.
 - `useTeamMembers.ts` içinde aynı çoklu-kaynak avatar birleştirmesi istatistikler tablosuyla tutarlılık için güncellendi.
+
+
+## 2026-05-31 — Şifre Sıfırlama Yönlendirme ve Domain Senkronizasyonu Çözümü
+
+### fix: Supabase Email Yönlendirme ve Giriş Sayfasına Atma Hatası Giderildi
+- **Sorunun Tespiti:**
+  - Süper admin/kullanıcı e-posta sıfırlama linkine tıkladığında, `nmm.suattayfuntopak.com` alan adı Supabase Dashboard üzerindeki onaylı yönlendirme listesinde (Allowed Redirect URLs) bulunmadığı için Supabase isteği reddedip varsayılan Vercel wildcard URL'ine (`https://network-marketing-master.vercel.app/**`) yönlendiriyordu.
+  - Tarayıcı `https://network-marketing-master.vercel.app/**` (ve hash fragment) adresine gittiğinde, Next.js proxy middleware'i (`proxy.ts`) bu `/**` dizin yolunu halka açık yollar listesinde (PUBLIC_PATHS) bulamadığı için isteği yetkisiz algılayıp anında `/giris` sayfasına yönlendiriyordu.
+- **Çözüm Entegrasyonu (`src/proxy.ts`):**
+  - Proxy middleware'in başına eski Vercel alan adından (`network-marketing-master.vercel.app`) gelen tüm istekleri resmi üretim alan adına (`nmm.suattayfuntopak.com`) yönlendiren otomatik kural eklendi.
+  - Supabase'in wildcard yönlendirmesi sonucu oluşan `/**` veya URL kodlu `%2A%2A` şeklindeki geçersiz dizin yolları algılandığında, tarayıcının hash fragment'ını (kullanıcı oturum token'ını) kaybetmeden doğrudan şifre belirleme sayfasına (`/sifre-guncelle`) yönlendirilmesi sağlandı.
+  - Böylece Supabase tarafında herhangi bir panel ayarı değişimi gerekmeden, e-postadaki sıfırlama linki tıklandığı an kullanıcı pürüzsüzce `nmm.suattayfuntopak.com/sifre-guncelle` adresine ulaştırılmakta ve yeni şifresini güvenle belirleyebilmektedir.
+
+### fix: resetPasswordAction Dinamik Origin Fallback Mekanizması (`src/app/(auth)/sifre-sifirla/actions.ts`)
+- Bazı tarayıcı veya proxy konfigürasyonlarında sunucu eylemlerine (Server Actions) `origin` header bilgisi ulaşmadığı durumlar için `host` header'ına dayalı dinamik bir fallback protokolü kuruldu. Origin boş olsa dahi `redirectTo` parametresi her zaman tam yetkili, geçerli bir URL olarak Supabase'e iletilmektedir.
+
