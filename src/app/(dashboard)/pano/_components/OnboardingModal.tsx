@@ -61,7 +61,7 @@ export function OnboardingModal({ workspaceId, inviteCode }: Props) {
 
       toast.success('Başarıyla ekibe katıldınız!')
       qc.invalidateQueries({ queryKey: ['workspace'] })
-      qc.invalidateQueries({ queryKey: ['members'] })
+      qc.invalidateQueries({ queryKey: ['team'] })
       qc.invalidateQueries({ queryKey: ['candidates'] })
     } catch {
       toast.error('Katılım başarısız oldu.')

@@ -7,10 +7,8 @@ export function invalidateTeamAndAIUsage(
 ) {
   qc.invalidateQueries({ queryKey: ['daily-ai-usage'] })
   if (workspaceId) {
-    qc.invalidateQueries({ queryKey: ['members', workspaceId] })
-    qc.invalidateQueries({ queryKey: ['ekip-panel', workspaceId] })
+    qc.invalidateQueries({ queryKey: ['team', workspaceId] })
   } else {
-    qc.invalidateQueries({ queryKey: ['members'] })
-    qc.invalidateQueries({ queryKey: ['ekip-panel'] })
+    qc.invalidateQueries({ queryKey: ['team'] })
   }
 }

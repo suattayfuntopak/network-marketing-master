@@ -125,7 +125,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       setAvatarUrl(publicUrl)
       setAvatarPreview(publicUrl)
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
-      queryClient.invalidateQueries({ queryKey: ['members'] })
+      queryClient.invalidateQueries({ queryKey: ['team'] })
       toast.success('Profil fotoğrafı güncellendi!')
     } catch (err: any) {
       console.error(err)

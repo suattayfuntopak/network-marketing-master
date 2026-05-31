@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useCandidates, useCandidateDetail, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -50,11 +50,10 @@ export function CandidateDetail({ candidateId }: Props) {
   const [isTranslating, setIsTranslating] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
-  const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
+  const { data: c, isLoading: cLoading } = useCandidateDetail(ws?.workspaceId, candidateId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
 
-  const c = candidates.find(x => x.id === candidateId)
   const parsed = c
     ? resolveCandidateFields(c)
     : { noteTr: '', noteEn: '', avatarUrl: null as string | null, warmth: 'ilik' as const }

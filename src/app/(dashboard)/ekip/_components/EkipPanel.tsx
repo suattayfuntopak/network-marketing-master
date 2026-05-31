@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -20,7 +20,8 @@ import {
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
-import { fetchEkipMembers } from '@/lib/team/fetchEkipMembers'
+import { useTeamMembers, useEkipPanelRows } from '@/hooks/useTeamMembers'
+import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 
@@ -76,8 +77,7 @@ export function EkipPanel() {
     try {
       await toggleOnboardingStepAction(userId, stepId, !isStepDone)
       toast.success(isStepDone ? t('team.stepIncomplete') : t('team.stepComplete'))
-      queryClient.invalidateQueries({ queryKey: ['ekip-panel', ws?.workspaceId] })
-      queryClient.invalidateQueries({ queryKey: ['members', ws?.workspaceId] })
+      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws!.workspaceId) })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error('[toggleOnboardingStep] error:', err)
@@ -85,12 +85,7 @@ export function EkipPanel() {
     }
   }, [queryClient, ws?.workspaceId, t])
 
-  const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useQuery({
-    queryKey: ['ekip-panel', ws?.workspaceId],
-    queryFn: () => fetchEkipMembers(ws!.workspaceId),
-    enabled: !!ws?.workspaceId,
-    staleTime: 2 * 60 * 1000,
-  })
+  const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useEkipPanelRows(ws?.workspaceId)
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
@@ -144,8 +139,7 @@ export function EkipPanel() {
       toast.success(t('team.joinSuccess', { name: result.workspace_name ?? '' }))
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
-      queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
-      queryClient.invalidateQueries({ queryKey: ['members'] })
+      queryClient.invalidateQueries({ queryKey: ['team'] })
       queryClient.invalidateQueries({ queryKey: ['candidates'] })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
@@ -165,8 +159,7 @@ export function EkipPanel() {
     try {
       await removeTeamMemberAction(memberId, memberName)
       toast.success(t('team.removeSuccess', { name: memberName }))
-      queryClient.invalidateQueries({ queryKey: ['ekip-panel'] })
-      queryClient.invalidateQueries({ queryKey: ['members'] })
+      queryClient.invalidateQueries({ queryKey: ['team'] })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error(err)

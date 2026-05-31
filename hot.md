@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-05-31 — Performans Faz 2: ekip bundle, aday select, lazy admin, index
+
+- **Ekip RPC sunucuya:** `fetchTeamBundle` + `fetchTeamBundleAction`; `useTeamMembers` / `useEkipPanelRows` tek `['team', workspaceId]` cache; SSR prefetch.
+- **Aday select:** `CANDIDATE_LIST_SELECT` (liste); `fetchCandidateDetailAction` + `useCandidateDetail` (pipeline detay).
+- **Super-admin istatistik:** `StatsSuperAdminSections` dynamic import; ağır admin sorguları ana bundle dışında lazy.
+- **Giriş:** `router.refresh()` + `router.replace('/pano')` (tam sayfa reload kaldırıldı).
+- **DB:** `038_candidates_ws_owner_updated_idx.sql` composite index.
+- **Dosyalar:** `fetchTeamBundle.ts`, `actions/team.ts`, `useTeamMembers.ts`, `fetchEkipMembers.ts`, `candidateSelect.ts`, `StatsSuperAdminSections.tsx`, `IstatistiklerContent.tsx`, `EkipPanel.tsx`, `CandidateDetail.tsx`, `LoginForm.tsx`, `prefetchDashboard.ts`, `keys.ts`, `038_*.sql`.
+
+---
+
 ## 2026-05-31 — Dashboard performans: SSR prefetch + paralel veri
 
 - **Sorun:** Giriş/pano/istatistikler ve sayfalar arası gezinmede metrikler 3–5+ sn gecikmeli geliyordu; workspace→aday waterfall, istemci-only fetch, istatistiklerin ekip RPC’sini beklemesi.

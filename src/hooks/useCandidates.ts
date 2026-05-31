@@ -3,7 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
-import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
+import { fetchCandidatesAction, fetchCandidateDetailAction } from '@/app/(dashboard)/actions/candidates'
 import { getLang } from '@/lib/utils/getLang'
 import { queryKeys } from '@/lib/query/keys'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
@@ -12,6 +12,11 @@ import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyActi
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildDailyActionNoteFields, buildPresentationWhatsAppActivityFields } from '@/lib/domain/dailyActionNote'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
+
+function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string) {
+  qc.invalidateQueries({ queryKey: queryKeys.candidates(workspaceId) })
+  qc.invalidateQueries({ queryKey: ['candidate', workspaceId] })
+}
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
 
@@ -34,6 +39,26 @@ export function useCandidates(workspaceId: string | undefined, filter: Candidate
   })
 
   return { ...query, candidates: filtered }
+}
+
+/** Pipeline detay — liste cache'inden bağımsız tek aday fetch. */
+export function useCandidateDetail(workspaceId: string | undefined, candidateId: string) {
+  const queryClient = useQueryClient()
+
+  return useQuery({
+    queryKey:
+      workspaceId && candidateId
+        ? queryKeys.candidateDetail(workspaceId, candidateId)
+        : ['candidate', 'none'],
+    queryFn: () => fetchCandidateDetailAction(workspaceId!, candidateId),
+    enabled: !!workspaceId && !!candidateId,
+    staleTime: 60_000,
+    initialData: () => {
+      if (!workspaceId) return undefined
+      const list = queryClient.getQueryData<NmmCandidate[]>(queryKeys.candidates(workspaceId))
+      return list?.find(c => c.id === candidateId)
+    },
+  })
 }
 
 export function useAddCandidate(workspaceId: string) {
@@ -66,7 +91,7 @@ export function useAddCandidate(workspaceId: string) {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      invalidateCandidateQueries(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Candidate added' : 'Aday eklendi')
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to add: ${e.message}` : `Eklenemedi: ${e.message}`),
@@ -159,7 +184,7 @@ export function useUpdateCandidate(workspaceId: string) {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      invalidateCandidateQueries(qc, workspaceId)
       qc.invalidateQueries({ queryKey: ['activity'] })
       invalidateTeamAndAIUsage(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
@@ -177,7 +202,7 @@ export function useDeleteCandidate(workspaceId: string) {
       if (error) throw new Error(error.message)
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      invalidateCandidateQueries(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Candidate deleted' : 'Aday silindi')
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete: ${e.message}` : `Silinemedi: ${e.message}`),
@@ -205,7 +230,7 @@ export function useMarkContacted(workspaceId: string) {
       ])
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      invalidateCandidateQueries(qc, workspaceId)
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
   })
@@ -244,7 +269,7 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
       ])
     },
     onSuccess: (_data, vars) => {
-      qc.invalidateQueries({ queryKey: ['candidates', workspaceId] })
+      invalidateCandidateQueries(qc, workspaceId)
       qc.invalidateQueries({ queryKey: ['activity', vars.candidateId] })
       invalidateTeamAndAIUsage(qc, workspaceId)
     },

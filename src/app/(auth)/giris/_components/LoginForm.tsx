@@ -21,10 +21,10 @@ export function LoginForm() {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        window.location.replace('/pano')
+        router.replace('/pano')
       }
     })
-  }, [])
+  }, [router])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -46,8 +46,9 @@ export function LoginForm() {
       return
     }
 
-    // Tam sayfa yüklemesi: SSR proxy oturum çerezlerini okuyabilsin (router.push yeterli değil)
-    window.location.assign('/pano')
+    await supabase.auth.getSession()
+    router.refresh()
+    router.replace('/pano')
   }
 
   return (
