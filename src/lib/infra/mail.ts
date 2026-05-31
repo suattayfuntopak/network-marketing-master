@@ -357,3 +357,79 @@ export async function sendModerationApprovedEmail(
     return false
   }
 }
+
+/**
+ * Sends a polite, professional notification email to the submitter when their training/objection is rejected by the admin.
+ */
+export async function sendModerationRejectedEmail(
+  userEmail: string,
+  userName: string,
+  contentType: 'training' | 'objection',
+  contentTitle: string,
+  reason: string,
+  lang: 'tr' | 'en' = 'tr'
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendModerationRejectedEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const typeLabel = contentType === 'training'
+    ? (lang === 'en' ? 'Training content' : 'İçerik')
+    : (lang === 'en' ? 'Objection handler' : 'İtiraz')
+
+  const subject = lang === 'en'
+    ? `Update regarding your content addition request`
+    : `İçerik ekleme talebiniz hakkında bilgilendirme`
+
+  const reasonContent = reason.trim() 
+    ? (lang === 'en' 
+        ? `<p><strong>Feedback from Admin:</strong></p><blockquote style="border-left: 4px solid #ef4444; padding-left: 14px; margin: 16px 0; color: #4b5563; font-style: italic; font-size: 13px; line-height: 1.6;">"${reason}"</blockquote>`
+        : `<p><strong>Yönetici Geri Bildirimi:</strong></p><blockquote style="border-left: 4px solid #ef4444; padding-left: 14px; margin: 16px 0; color: #4b5563; font-style: italic; font-size: 13px; line-height: 1.6;">"${reason}"</blockquote>`)
+    : ''
+
+  const content = lang === 'en'
+    ? [
+        emailHeading('Content request update'),
+        emailParagraph(`Dear ${userName},`),
+        emailParagraph(
+          `Thank you for your submission to add "${contentTitle}" to Network Marketing Master.`
+        ),
+        emailParagraph(
+          `Our administration team has reviewed your request. Unfortunately, we cannot add this specific ${typeLabel} to the general database at this time.`
+        ),
+        reasonContent,
+        emailParagraph(
+          `If you have any questions or want to make adjustments, you can contact us at info@suattayfuntopak.com.`
+        ),
+      ].join('')
+    : [
+        emailHeading('İçerik talebi hakkında'),
+        emailParagraph(`Sayın ${userName},`),
+        emailParagraph(
+          `Network Marketing Master platformuna "${contentTitle}" başlığıyla yapmış olduğunuz ekleme talebi için teşekkür ederiz.`
+        ),
+        emailParagraph(
+          `Yönetici ekibimiz ilgili talebinizi incelemiştir. Yapılan değerlendirme sonucunda, bu ${typeLabel} talebini mevcut haliyle genel veri tabanına ekleyemeyeceğimizi bildirmek isteriz.`
+        ),
+        reasonContent,
+        emailParagraph(
+          `Herhangi bir sorunuz varsa veya düzenleme yaparak tekrar iletmek isterseniz info@suattayfuntopak.com adresi üzerinden bizimle iletişime geçebilirsiniz.`
+        ),
+      ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [userEmail],
+      replyTo: 'info@suattayfuntopak.com',
+      subject,
+      html: buildPremiumEmail(content, lang),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send moderation rejected email:', err)
+    return false
+  }
+}
+

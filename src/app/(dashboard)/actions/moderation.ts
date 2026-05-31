@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
-import { sendModerationAlertEmail, sendModerationApprovedEmail } from '@/lib/infra/mail'
+import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
 
 interface ContentSubmissionResult {
   success: boolean
@@ -201,10 +201,12 @@ export async function approveRequestAction(
 
 /**
  * Rejects (deletes) a custom content submission.
+ * Sends a polite notification email to the submitter detailing the rejection reason.
  */
 export async function rejectRequestAction(
   id: string,
-  contentType: 'training' | 'objection'
+  contentType: 'training' | 'objection',
+  reason?: string
 ): Promise<{ success: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -213,9 +215,38 @@ export async function rejectRequestAction(
   const admin = createAdminClient()
   const table = contentType === 'training' ? 'nmm_custom_trainings' : 'nmm_custom_objections'
 
+  // Fetch the submission row first to retrieve user contact details and the title before deletion
+  const { data: row } = await admin
+    .from(table)
+    .select('user_email, user_name, data')
+    .eq('id', id)
+    .single()
+
   const { error } = await admin.from(table).delete().eq('id', id)
   if (error) {
     throw new Error('İçerik reddedilirken silinemedi: ' + error.message)
+  }
+
+  // Trigger rejection notification asynchronously
+  if (row && row.user_email) {
+    const rowData = row.data as any
+    const title = contentType === 'training'
+      ? (rowData?.baslik ?? 'İsimsiz İçerik')
+      : (rowData?.soru?.tr ?? rowData?.soru?.en ?? rowData?.soru ?? 'İsimsiz İtiraz')
+
+    // Find lang or default to 'tr'
+    let userLang: 'tr' | 'en' = 'tr'
+
+    sendModerationRejectedEmail(
+      row.user_email,
+      row.user_name ?? 'NMM Üyesi',
+      contentType,
+      title,
+      reason ?? '',
+      userLang
+    ).catch(err => {
+      console.error('[Resend Rejection Email Error]', err)
+    })
   }
 
   return { success: true }

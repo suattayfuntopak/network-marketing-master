@@ -210,14 +210,19 @@ export function PlatformYonetimContent() {
   }
 
   async function handleRejectRequest(req: ModerationRequestItem) {
-    if (!confirm('Bu talebi reddetmek ve silmek istediğinize emin misiniz? (Bu işlem geri alınamaz)')) return
+    const reason = prompt(
+      'Bu talebi reddetmek istediğinize emin misiniz? (Bu işlem geri alınamaz)\n\nKullanıcıya nazikçe iletilecek Red gerekçesini buraya yazabilirsiniz (İsteğe bağlı):',
+      'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'
+    )
+    if (reason === null) return // Admin cancelled the prompt
 
     startModerationTransition(async () => {
       try {
-        const res = await rejectRequestAction(req.id, req.contentType)
+        const res = await rejectRequestAction(req.id, req.contentType, reason)
         if (res.success) {
-          toast.success('Talep reddedildi ve silindi.')
+          toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
           loadData()
+          setSelectedRequest(null) // Close the review/edit modal
         }
       } catch (err: any) {
         toast.error(err.message || 'Reddetme işlemi başarısız oldu.')
