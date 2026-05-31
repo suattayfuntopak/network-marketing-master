@@ -2,9 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
-import { buildCalendarByDate, nextFollowUpKeyAfterCompletion, CALENDAR_TERMINAL_STAGES } from '@/lib/domain/calendarFollowUp'
+import { buildCalendarByDate, FOLLOW_UP_CALENDAR_SUPPRESSED_ISO } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
-import type { NmmCandidate, CandidateStage } from '@/types/database.types'
+import type { NmmCandidate } from '@/types/database.types'
 
 export type TeamCalendarMemberSummary = {
   userId: string
@@ -93,7 +93,7 @@ export async function clearFollowUpAction(
 
   const { data: candidate } = await supabase
     .from('nmm_candidates')
-    .select('next_follow_up_at, last_contact_at, stage')
+    .select('next_follow_up_at')
     .eq('id', candidateId)
     .eq('workspace_id', workspaceId)
     .eq('owner_id', user.id)
@@ -101,17 +101,9 @@ export async function clearFollowUpAction(
 
   if (!candidate) throw new Error('Aday bulunamadı.')
 
-  const nowIso = new Date().toISOString()
-  const stage = candidate.stage as CandidateStage
-  const nextKey = nextFollowUpKeyAfterCompletion(completedOnDateKey, stage)
-  const nextIso = nextKey ? followUpToIsoFromKey(nextKey) : null
-
   const { error } = await supabase
     .from('nmm_candidates')
-    .update({
-      next_follow_up_at: nextIso,
-      last_contact_at: nowIso,
-    })
+    .update({ next_follow_up_at: FOLLOW_UP_CALENDAR_SUPPRESSED_ISO })
     .eq('id', candidateId)
 
   if (error) throw new Error(error.message)
@@ -122,7 +114,7 @@ export async function clearFollowUpAction(
     user.id,
     candidateId,
     candidate.next_follow_up_at,
-    nextIso,
+    FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
   )
 
   await supabase.from('nmm_daily_actions').insert({
@@ -130,7 +122,7 @@ export async function clearFollowUpAction(
     user_id: user.id,
     candidate_id: candidateId,
     action_type: 'note',
-    note: 'system_note:follow_up_completed',
+    note: `system_note:follow_up_cleared:${completedOnDateKey}`,
   })
 }
 

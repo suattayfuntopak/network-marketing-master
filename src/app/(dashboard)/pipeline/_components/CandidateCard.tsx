@@ -14,8 +14,8 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { EditCandidateSheet } from './EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, STAGE_CARD_BG } from '@/lib/domain/stages'
-import { nextFollowUpKeyAfterCompletion, followUpDueStatus } from '@/lib/domain/calendarFollowUp'
-import { followUpToIsoFromKey, todayCalendarKey } from '@/lib/utils/calendarDates'
+import { FOLLOW_UP_CALENDAR_SUPPRESSED_ISO, followUpDueStatus, isFollowUpCalendarSuppressed } from '@/lib/domain/calendarFollowUp'
+import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
@@ -83,12 +83,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   function clearFollowUp() {
     setQuickActionOpen(false)
-    const todayKey = todayCalendarKey()
-    const nextKey = nextFollowUpKeyAfterCompletion(todayKey, candidate.stage as CandidateStage)
     update.mutate({
       id: candidate.id,
-      last_contact_at: new Date().toISOString(),
-      next_follow_up_at: nextKey ? followUpToIsoFromKey(nextKey) : null,
+      next_follow_up_at: FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
     })
   }
 
@@ -269,7 +266,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                       </div>
 
                       {/* Takibi Kapat */}
-                      {candidate.next_follow_up_at && (
+                      {candidate.next_follow_up_at && !isFollowUpCalendarSuppressed(candidate) && (
                         <div className="pt-2.5 border-t border-[var(--border)] mt-2">
                           <button
                             onClick={clearFollowUp}

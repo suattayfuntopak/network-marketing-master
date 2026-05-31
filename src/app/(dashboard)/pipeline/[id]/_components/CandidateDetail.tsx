@@ -11,6 +11,7 @@ import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { STAGE_LABEL, STAGE_COLOR, STAGE_ORDER, FOLLOW_DAYS } from '@/lib/domain/stages'
+import { isFollowUpCalendarSuppressed } from '@/lib/domain/calendarFollowUp'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { waHref } from '@/lib/utils/waLink'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
@@ -416,9 +417,11 @@ export function CandidateDetail({ candidateId }: Props) {
   }
 
   const waLink = waHref(c.phone)
-  const nextFollow = c.next_follow_up_at
-    ? formatFollowUpDate(c.next_follow_up_at, lang)
-    : suggestedFollowUp(c, lang)
+  const nextFollow = isFollowUpCalendarSuppressed(c)
+    ? null
+    : c.next_follow_up_at
+      ? formatFollowUpDate(c.next_follow_up_at, lang)
+      : suggestedFollowUp(c, lang)
   const locale = lang === 'en' ? 'en-US' : 'tr-TR'
 
   function changeStage(stage: CandidateStage) {

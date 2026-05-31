@@ -4,8 +4,9 @@ import {
   calendarFollowUpKey,
   countOverdueFollowUps,
   followUpDueStatus,
+  FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
   isFollowUpDue,
-  nextFollowUpKeyAfterCompletion,
+  isFollowUpCalendarSuppressed,
 } from './calendarFollowUp'
 import type { NmmCandidate } from '@/types/database.types'
 
@@ -64,13 +65,22 @@ describe('followUpDueStatus', () => {
   })
 })
 
-describe('nextFollowUpKeyAfterCompletion', () => {
-  it('schedules from completed day + stage interval', () => {
-    expect(nextFollowUpKeyAfterCompletion('2026-06-02', 'iletisim')).toBe('2026-06-05')
+describe('followUpCalendarSuppressed', () => {
+  it('excludes suppressed candidates from calendar', () => {
+    const c = mockCandidate({ next_follow_up_at: FOLLOW_UP_CALENDAR_SUPPRESSED_ISO })
+    expect(isFollowUpCalendarSuppressed(c)).toBe(true)
+    expect(calendarFollowUpKey(c)).toBeNull()
+    expect(buildCalendarByDate([c])).toEqual({})
   })
 
-  it('returns null for terminal stages', () => {
-    expect(nextFollowUpKeyAfterCompletion('2026-06-02', 'katildi')).toBeNull()
+  it('does not reschedule after cancel (14 Jun iletisim stays off calendar)', () => {
+    const c = mockCandidate({
+      stage: 'iletisim',
+      next_follow_up_at: FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
+      last_contact_at: '2026-06-14T10:00:00.000Z',
+    })
+    expect(calendarFollowUpKey(c)).toBeNull()
+    expect(isFollowUpDue(c, '2026-06-17')).toBe(false)
   })
 })
 

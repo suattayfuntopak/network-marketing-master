@@ -1,5 +1,5 @@
 import { FOLLOW_DAYS } from '@/lib/domain/stages'
-import { toCalendarKey, fromCalendarKey } from '@/lib/utils/calendarDates'
+import { toCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 
 /** Takvimde otomatik takip hesaplanmayan terminal aşamalar. Manuel tarih varsa gösterilir. */
@@ -10,7 +10,16 @@ export const CALENDAR_TERMINAL_STAGES: CandidateStage[] = [
   'pasif',
 ]
 
+/** Kullanıcı takvimde "Takibi İptal Et" dediğinde — formül yeniden hesaplamaz. */
+export const FOLLOW_UP_CALENDAR_SUPPRESSED_ISO = '9999-12-31T09:00:00.000Z'
+
+export function isFollowUpCalendarSuppressed(c: NmmCandidate): boolean {
+  return c.next_follow_up_at === FOLLOW_UP_CALENDAR_SUPPRESSED_ISO
+}
+
 export function calendarFollowUpDate(c: NmmCandidate): Date | null {
+  if (isFollowUpCalendarSuppressed(c)) return null
+
   if (c.next_follow_up_at) {
     const d = new Date(c.next_follow_up_at)
     d.setHours(12, 0, 0, 0)
@@ -27,19 +36,6 @@ export function calendarFollowUpDate(c: NmmCandidate): Date | null {
   d.setDate(d.getDate() + days)
   d.setHours(12, 0, 0, 0)
   return d
-}
-
-/** Takvimde tamamlanan günün ardından bir sonraki planlı takip anahtarı. */
-export function nextFollowUpKeyAfterCompletion(
-  completedOnDateKey: string,
-  stage: CandidateStage,
-): string | null {
-  if (CALENDAR_TERMINAL_STAGES.includes(stage)) return null
-  const days = FOLLOW_DAYS[stage]
-  if (!days) return null
-  const base = fromCalendarKey(completedOnDateKey)
-  base.setDate(base.getDate() + days)
-  return toCalendarKey(base)
 }
 
 export function calendarFollowUpKey(c: NmmCandidate): string | null {
