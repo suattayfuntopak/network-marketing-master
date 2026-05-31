@@ -2,10 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Presentation, Check, StickyNote } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Phone, Pencil, ChevronDown, ChevronUp, Trash2, X, Bot, History, PhoneCall, MessageSquare, Check, StickyNote } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity, useLogPresentationWhatsApp } from '@/hooks/useCandidates'
+import { useCandidates, useUpdateCandidate, useDeleteCandidate, useActivityHistory, useCandidateNotes, useAddCandidateNote, useDeleteActivity } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { toast } from 'sonner'
@@ -31,9 +31,6 @@ import {
 import { generateNotesSummary, translateNoteAction } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
-import Link from 'next/link'
-import { usePresentationMaterials, pickDefaultMaterial } from '@/hooks/usePresentationMaterials'
-import { renderPresentationMessage } from '@/lib/domain/presentationMaterials'
 import {
   suggestedFollowUp,
   daysSince,
@@ -42,6 +39,7 @@ import {
   renderActivityText,
 } from './candidateDetailUtils'
 import { CandidateProfileCard } from './CandidateProfileCard'
+import { PresentationMaterialsCard } from './PresentationMaterialsCard'
 
 
 
@@ -72,16 +70,10 @@ export function CandidateDetail({ candidateId }: Props) {
 
   const queryClient = useQueryClient()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
-  const { data: presentationMaterials = [], isLoading: materialsLoading } = usePresentationMaterials(
-    ws?.workspaceId,
-    { isSuperAdmin: ws?.isSuperAdmin, lang, includeFallback: true }
-  )
-  const [selectedMaterialId, setSelectedMaterialId] = useState<string | null>(null)
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
   const deleteActivityMutation = useDeleteActivity(ws?.workspaceId ?? '')
-  const logPresentationWhatsApp = useLogPresentationWhatsApp(ws?.workspaceId ?? '')
   const { data: activityLog = [] } = useActivityHistory(candidateId)
   
   const [activityToDelete, setActivityToDelete] = useState<any | null>(null)
@@ -228,50 +220,6 @@ export function CandidateDetail({ candidateId }: Props) {
   }, [lang, c, candidateId, update, isTranslating])
 
   const senderName = ws?.fullName || t('pipelinePage.yourAdvisor')
-  const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
-
-  const activeMaterial = useMemo(() => {
-    if (presentationMaterials.length === 0) return null
-    if (selectedMaterialId) {
-      return presentationMaterials.find(m => m.id === selectedMaterialId) ?? pickDefaultMaterial(presentationMaterials)
-    }
-    return pickDefaultMaterial(presentationMaterials)
-  }, [presentationMaterials, selectedMaterialId])
-
-  useEffect(() => {
-    const defaultMaterial = pickDefaultMaterial(presentationMaterials)
-    if (defaultMaterial && !selectedMaterialId) {
-      setSelectedMaterialId(defaultMaterial.id)
-    }
-  }, [presentationMaterials, selectedMaterialId])
-
-  const getPresentationMessage = useCallback(() => {
-    const name = c?.full_name?.trim() || t('pipelinePage.customer')
-    if (!activeMaterial) return ''
-    return renderPresentationMessage(activeMaterial.whatsapp_template, {
-      name,
-      url: activeMaterial.url,
-      sender: senderName,
-    })
-  }, [c, activeMaterial, senderName, t])
-
-  const handleSendWhatsApp = useCallback(() => {
-    if (!candidatePhoneClean || !activeMaterial || !c) return
-    const msg = getPresentationMessage()
-    navigator.clipboard.writeText(msg).then(() => toast.success(t('pipeline.presentationCopied'))).catch(() => {})
-    window.open(`https://wa.me/${candidatePhoneClean}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
-    logPresentationWhatsApp.mutate({
-      candidateId: c.id,
-      materialTitle: activeMaterial.title,
-    })
-  }, [candidatePhoneClean, activeMaterial, c, getPresentationMessage, t, logPresentationWhatsApp])
-
-  const handleSendSms = useCallback(() => {
-    if (!candidatePhoneClean || !activeMaterial) return
-    const msg = getPresentationMessage()
-    navigator.clipboard.writeText(msg).then(() => toast.success(t('pipeline.presentationCopied'))).catch(() => {})
-    window.open(`sms:${candidatePhoneClean}?body=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer')
-  }, [candidatePhoneClean, activeMaterial, getPresentationMessage, t])
 
   // Tüm hook'lar erken return'lerden ÖNCE çağrılmalı (rules-of-hooks).
   const handleConfirmCancel = useCallback(() => setConfirmOpen(false), [])
@@ -425,80 +373,12 @@ export function CandidateDetail({ candidateId }: Props) {
             </div>
 
             {/* Sunum Materyalleri */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 text-sm">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
-                    <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
-                    {t('pipeline.presentationMaterials')}
-                  </p>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-3)]">
-                    {t('pipeline.presentationMaterialsDesc')}
-                  </p>
-                </div>
-                <Link
-                  href="/pipeline/sunum-materyalleri"
-                  className="shrink-0 text-xs font-semibold text-[#534AB7] hover:underline whitespace-nowrap dark:text-[#F5F0E8] dark:hover:text-[#FFF8DC]"
-                >
-                  {t('presentationMaterialsPage.manageLink')}
-                </Link>
-              </div>
-
-              {materialsLoading ? (
-                <div className="mt-4 h-10 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-              ) : presentationMaterials.length === 0 ? (
-                <div className="mt-4 rounded-xl border border-amber-200 dark:border-amber-900/40 bg-amber-50 dark:bg-amber-950/20 p-3 text-sm leading-relaxed text-amber-900 dark:text-amber-200">
-                  <p className="font-semibold">{t('presentationMaterialsPage.addFirst')}</p>
-                </div>
-              ) : (
-                <>
-                  <label className="mt-4 block space-y-1.5">
-                    <span className="text-xs font-semibold text-[var(--text-2)]">
-                      {t('presentationMaterialsPage.selectMaterial')}
-                    </span>
-                    <select
-                      value={activeMaterial?.id ?? ''}
-                      onChange={e => setSelectedMaterialId(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
-                    >
-                      {presentationMaterials.map(material => (
-                        <option key={material.id} value={material.id}>
-                          {material.title}
-                          {material.is_default ? ` ★` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  {activeMaterial && (
-                    <p className="mt-3 rounded-xl bg-[var(--bg-subtle)] px-3 py-2.5 text-xs leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">
-                      <span className="font-semibold text-[var(--text-1)]">
-                        {t('presentationMaterialsPage.previewLabel')}:
-                      </span>{' '}
-                      {getPresentationMessage()}
-                    </p>
-                  )}
-                </>
-              )}
-
-              {!candidatePhoneClean && (
-                <p className="mt-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/30 p-3 text-xs leading-relaxed text-amber-800 dark:text-amber-300">
-                  {t('pipeline.presentationWarning')}
-                </p>
-              )}
-
-              <div className="mt-4 flex justify-center">
-                <button
-                  type="button"
-                  disabled={!candidatePhoneClean || !activeMaterial}
-                  onClick={handleSendWhatsApp}
-                  className="flex w-1/3 items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center disabled:pointer-events-none disabled:opacity-40 cursor-pointer shadow-md hover:shadow-green-500/20"
-                >
-                  <WhatsAppIcon className="h-4 w-4 shrink-0" />
-                  WhatsApp
-                </button>
-              </div>
-            </div>
+            <PresentationMaterialsCard
+              c={c}
+              workspaceId={ws?.workspaceId}
+              isSuperAdmin={ws?.isSuperAdmin}
+              senderName={senderName}
+            />
 
             {/* Lider Notu */}
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300">
