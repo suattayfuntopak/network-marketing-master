@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-05-31 — Build fix: CALENDAR_TERMINAL_STAGES import
+
+- Vercel TS hatası (`takvim/actions.ts:149`) — eksik import eklendi; `npm run build` yeşil.
+
+---
+
 ## 2026-05-31 — Takvim: Takibi İptal Et +3 gün döngüsü kesildi
 
 - **Sorun:** İptal sonrası tamamlanan gün + aşama günü (14 Haz → 17 Haz) yeniden planlıyordu.

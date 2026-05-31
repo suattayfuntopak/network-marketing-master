@@ -2,7 +2,11 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
-import { buildCalendarByDate, FOLLOW_UP_CALENDAR_SUPPRESSED_ISO } from '@/lib/domain/calendarFollowUp'
+import {
+  buildCalendarByDate,
+  CALENDAR_TERMINAL_STAGES,
+  FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
+} from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import type { NmmCandidate } from '@/types/database.types'
 
