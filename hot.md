@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-05-31 — Tema düğmesi: aktif mod ikonu
+
+- **Sorun:** Tema toggle’da ikon bir sonraki modu gösteriyordu (dark’tayken güneş vb.).
+- **Düzeltme:** Aktif mod ikonu: light → güneş, dark → ay, system → monitör. Ortak `ThemeIcon` (`lib/ui/themeToggle.tsx`); landing, yasal sayfalar, auth, pano header (`ThemeToggle`).
+- **Dosyalar:** `themeToggle.tsx`, `ThemeToggle.tsx`, `LandingHeader.tsx`, `LegalPageToolbar.tsx`, `(auth)/layout.tsx`, `landing/constants.ts`.
+
+---
+
 ## 2026-05-31 — Aktivite geçmişi: follow_up_cleared yerelleştirmesi
 
 - **Sorun:** Takvimden takip kapatıldığında (`system_note:follow_up_cleared:*`) aktivite geçmişinde ham sistem anahtarı “Lider notu eklendi” olarak görünüyordu.

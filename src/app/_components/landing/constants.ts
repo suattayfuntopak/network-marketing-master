@@ -2,7 +2,8 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 export const PRO_LIMITS = getLimitsForLicense('pro')
 
-export const NEXT_THEME: Record<string, string> = { dark: 'light', light: 'system', system: 'dark' }
+export { NEXT_THEME } from '@/lib/ui/themeToggle'
+
 export const NEXT_THEME_LABEL: Record<string, string> = {
   dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',
 }

@@ -1,17 +1,11 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { NEXT_THEME, NEXT_THEME_LABEL } from '@/app/_components/landing/constants'
-
-const THEME_ICON: Record<string, ReactNode> = {
-  dark: <Sun className="h-3.5 w-3.5" strokeWidth={1.75} />,
-  light: <Monitor className="h-3.5 w-3.5" strokeWidth={1.75} />,
-  system: <Moon className="h-3.5 w-3.5" strokeWidth={1.75} />,
-}
+import { resolveThemeMode, ThemeIcon } from '@/lib/ui/themeToggle'
 
 export function LegalPageToolbar() {
   const { lang, setLang } = useTranslation()
@@ -20,7 +14,7 @@ export function LegalPageToolbar() {
 
   useEffect(() => setThemeMounted(true), [])
 
-  const currentTheme = themeMounted && theme && theme in NEXT_THEME ? theme : 'system'
+  const currentTheme = themeMounted ? resolveThemeMode(theme) : 'system'
 
   return (
     <div className="flex shrink-0 items-center gap-1">
@@ -32,7 +26,7 @@ export function LegalPageToolbar() {
           aria-label={NEXT_THEME_LABEL[currentTheme]}
           className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
         >
-          {THEME_ICON[currentTheme]}
+          <ThemeIcon mode={currentTheme} className="h-3.5 w-3.5" />
         </button>
       )}
 

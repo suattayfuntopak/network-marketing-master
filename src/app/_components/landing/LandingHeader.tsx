@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { ArrowRight, LogIn, Monitor, Moon, Sun, UserPlus } from 'lucide-react'
+import { ArrowRight, LogIn, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { Z } from '@/lib/ui/zIndex'
+import { resolveThemeMode, ThemeIcon } from '@/lib/ui/themeToggle'
 import { NEXT_THEME, NEXT_THEME_LABEL } from './constants'
 
 export function LandingHeader() {
@@ -16,12 +17,7 @@ export function LandingHeader() {
 
   useEffect(() => setThemeMounted(true), [])
 
-  const currentTheme = themeMounted && theme && theme in NEXT_THEME ? theme : 'system'
-  const THEME_ICON: Record<string, ReactNode> = {
-    dark:   <Sun     className="h-3.5 w-3.5" strokeWidth={1.75} />,
-    light:  <Monitor className="h-3.5 w-3.5" strokeWidth={1.75} />,
-    system: <Moon    className="h-3.5 w-3.5" strokeWidth={1.75} />,
-  }
+  const currentTheme = themeMounted ? resolveThemeMode(theme) : 'system'
 
   return (
     <header className={`sticky top-0 ${Z.header} w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]`}>
@@ -45,7 +41,7 @@ export function LandingHeader() {
               title={NEXT_THEME_LABEL[currentTheme]}
               className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-white/50 transition hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
             >
-              {THEME_ICON[currentTheme]}
+              <ThemeIcon mode={currentTheme} className="h-3.5 w-3.5" />
             </button>
           )}
 

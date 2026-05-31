@@ -3,17 +3,10 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { Sun, Moon, Monitor } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { Z } from '@/lib/ui/zIndex'
-
-const NEXT_THEME: Record<string, string> = { dark: 'light', light: 'system', system: 'dark' }
-const THEME_ICON: Record<string, React.ReactNode> = {
-  dark:   <Sun     className="h-4 w-4" strokeWidth={1.75} />,
-  light:  <Monitor className="h-4 w-4" strokeWidth={1.75} />,
-  system: <Moon    className="h-4 w-4" strokeWidth={1.75} />,
-}
+import { NEXT_THEME, resolveThemeMode, ThemeIcon } from '@/lib/ui/themeToggle'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const { lang, setLang } = useTranslation()
@@ -21,7 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
-  const currentTheme = mounted && theme && theme in NEXT_THEME ? theme : 'system'
+  const currentTheme = mounted ? resolveThemeMode(theme) : 'system'
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#0a0b10] bg-radial-[circle_at_top,_var(--tw-gradient-stops)] from-[#1a1c2e] via-[#0a0b10] to-[#050508] px-4 text-white">
@@ -34,7 +27,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
             title="Change theme"
             className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition hover:bg-white/10 hover:text-white"
           >
-            {THEME_ICON[currentTheme]}
+            <ThemeIcon mode={currentTheme} />
           </button>
         )}
         <button
