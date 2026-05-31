@@ -10,7 +10,7 @@ export function LandingHero() {
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:px-8 text-center space-y-8">
       {/* Glow badge */}
-      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-indigo-500/30 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/5 px-5 py-2.5 text-sm sm:text-base font-extrabold text-indigo-950 dark:text-indigo-300 animate-pulse shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/5">
+      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-indigo-500/30 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/5 px-4.5 py-2 text-xs sm:text-sm font-extrabold text-indigo-950 dark:text-indigo-300 animate-pulse shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/5">
         <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
         <span>{t('landingPage.heroBadge')}</span>
       </div>

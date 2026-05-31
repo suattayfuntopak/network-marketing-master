@@ -28,7 +28,6 @@ import {
   resolveCandidateFields,
   mergeCandidateContentUpdate,
 } from '@/lib/domain/candidateFields'
-import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { generateNotesSummary, translateNoteAction } from '../actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { createClient } from '@/lib/supabase/client'
@@ -42,6 +41,7 @@ import {
   formatFollowUpDate,
   renderActivityText,
 } from './candidateDetailUtils'
+import { CandidateProfileCard } from './CandidateProfileCard'
 
 
 
@@ -378,43 +378,12 @@ export function CandidateDetail({ candidateId }: Props) {
         <div className="space-y-4">
 
           {/* Profil kartı */}
-            <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
-              <div className="flex items-center gap-4">
-                <PersonAvatar
-                  name={c.full_name}
-                  imageUrl={parsed.avatarUrl}
-                  size="xl"
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
-                    {parsed.warmth === 'sicak' && (
-                      <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/30 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
-                    )}
-                    {parsed.warmth === 'ilik' && (
-                      <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {t('pipelinePage.warmthWarm')}</span>
-                    )}
-                    {parsed.warmth === 'soguk' && (
-                      <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
-                    )}
-                  </div>
-                  {c.phone && (
-                    <p className="text-sm text-[var(--text-2)]">{c.phone}</p>
-                  )}
-                </div>
-              </div>
-
-              {c.note && (
-                <p className={`mt-4 rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-2)] leading-relaxed transition-opacity ${isTranslating ? 'opacity-50' : 'opacity-100'}`}>
-                  {lang === 'en' ? (translatedNote || parsed.noteEn || parsed.noteTr) : parsed.noteTr}
-                  {isTranslating && (
-                    <span className="ml-2 text-[10px] text-[var(--text-3)] animate-pulse">
-                      {t('pipeline.noteTranslating')}
-                    </span>
-                  )}
-                </p>
-              )}
-            </div>
+            <CandidateProfileCard
+              c={c}
+              parsed={parsed}
+              translatedNote={translatedNote}
+              isTranslating={isTranslating}
+            />
 
             {/* Aksiyon butonları */}
             <div className="grid grid-cols-3 gap-3">

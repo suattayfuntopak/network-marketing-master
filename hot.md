@@ -2,12 +2,13 @@
 
 ## 2026-05-31 (Akşam) — Premium Tasarım Cilası & Fiyatlandırma Kontrast Düzeltmeleri
 
+- **Yasal & Uyumluluk Sayfaları Sadeleştirmesi:** KVKK (`/kvkk`), Kullanım Koşulları (`/kullanim-kosullari`) ve Bilgi Güvenliği Bildirgesi (`/guvenlik`) sayfalarındaki sol yan menü sekmeleri tamamen kaldırıldı. Sayfalar, okuma konforunu en üst düzeye çıkarmak için `max-w-3xl` sınırlarında **tek sütun ortalanmış modern bir doküman düzenine** kavuşturuldu.
+- **Hero Üst Rozet Ölçeklendirmesi:** En üstteki "YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ" rozeti, görsel oranları kusursuzlaştırmak adına bir punto küçültülerek `text-xs sm:text-sm` ve `px-4.5 py-2` ölçülerine getirildi.
 - **Dil Değiştirme Butonu:** Landing Page sağ üst köşesindeki dil butonu, pano (dashboard) içindekiyle uyumlu dinamik tekil butona dönüştürüldü. Türkçe aktifken Türk Bayrağı (`TRFlag`), İngilizce aktifken USA Bayrağı (`USFlag`) gösterilerek tek tıklamayla dil değişimi sağlandı.
 - **Fiyatlandırma Light Tema Kontrast İyileştirmesi:**
   - `BİREYSEL ORTAK`, `TAKIM LİDERLERİ`, `EN ÇOK SATAN`, `BÜYÜK LİDERLER` ve `25% İndirim` etiketleri yüksek kontrastlı, uyumlu pastel HSL renk paletleriyle (`text-indigo-800 bg-indigo-100`, `text-amber-800 bg-amber-100` vb.) tamamen okunaklı hale getirildi.
   - Tik işaretleri (`CheckCircle2`) daha canlı ve net tonlara (`text-indigo-600`, `text-amber-600`, `text-pink-600`) çekildi.
   - Basic plandaki görünmeyen beyaz buton (`text-white`), light temada sınırları belirgin ve gölgeli şık bir gri buton olarak yeniden tasarlandı.
-- **Hero Üst Rozet Yeniliği:** En üstteki **"YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ"** yazısı bir punto büyütülerek (`text-sm sm:text-base`) light temada dikkat çekmesi için çift katmanlı sınır çizgisi (`border-2 border-indigo-500/30`), koyu lacivert ton (`text-indigo-950`) ve zarif bir gölge ile donatıldı.
 - **SSS Sınır Genişliği ve FAQ Kaldırma:** Sıkça Sorulan Sorular modülünün üstündeki gereksiz `"FAQ"` rozet ibaresi kaldırıldı. Modülün genişliği **"Tek Bir Platformdan Kusursuz Yönetim Merkezi"** ile tam uyum sağlayacak şekilde `max-w-7xl` genişliğine getirildi.
 - **Footer Sadeleştirme ve Copyright Ortalaması:**
   - Sol taraftaki açıklama paragrafı tamamen kaldırıldı.

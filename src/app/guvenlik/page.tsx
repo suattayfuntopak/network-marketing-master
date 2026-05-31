@@ -135,7 +135,7 @@ export default function SecurityPage() {
 
       {/* Header Back Bar */}
       <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+        <div className="mx-auto max-w-3xl px-4 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
@@ -153,7 +153,7 @@ export default function SecurityPage() {
       </nav>
 
       {/* Title Hero */}
-      <header className="mx-auto max-w-6xl px-4 pt-10 pb-6 text-center md:text-left space-y-3">
+      <header className="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <ShieldCheck className="h-3.5 w-3.5" />
           <span>{lang === 'en' ? 'Security' : 'Güvenlik'}</span>
@@ -161,7 +161,7 @@ export default function SecurityPage() {
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}
         </h1>
-        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-3xl">
+        <p className="text-sm md:text-base text-slate-500 dark:text-zinc-400 font-medium max-w-3xl mx-auto">
           {activeContent.subtitle}
         </p>
         <p className="text-xs font-bold text-indigo-500/80 dark:text-indigo-400/80 tracking-wider">
@@ -169,40 +169,11 @@ export default function SecurityPage() {
         </p>
       </header>
 
-      {/* Document split Layout */}
-      <main className="mx-auto max-w-6xl px-4 pb-24 grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+      {/* Document Centered Layout */}
+      <main className="mx-auto max-w-3xl px-4 pb-24 space-y-6">
         
-        {/* Sidebar Index */}
-        <aside className="md:col-span-4 sticky top-20 hidden md:block space-y-2.5">
-          <div className="rounded-3xl border border-slate-200/80 dark:border-white/[0.04] bg-white/50 dark:bg-white/[0.02] backdrop-blur-xl p-5 shadow-sm space-y-4">
-            <h3 className="text-xs font-extrabold tracking-widest text-slate-400 dark:text-zinc-500 uppercase">
-              {lang === 'en' ? 'SECURITY SECTIONS' : 'BİLDİRGE BÖLÜMLERİ'}
-            </h3>
-            <ul className="space-y-1.5 font-medium">
-              {activeContent.sections.map(section => (
-                <li key={section.id}>
-                  <button
-                    onClick={() => {
-                      setActiveSection(section.id)
-                      document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-                    }}
-                    className={`w-full text-left rounded-xl px-3.5 py-2 text-xs font-semibold transition-all duration-200 flex items-center gap-2 ${
-                      activeSection === section.id
-                        ? 'bg-[#534AB7] text-white shadow-md shadow-[#534AB7]/15 translate-x-1'
-                        : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-200/50 dark:hover:bg-white/5'
-                    }`}
-                  >
-                    <FileText className="h-3.5 w-3.5 shrink-0" />
-                    <span className="truncate">{section.title}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
-
         {/* Main Document Body */}
-        <article className="md:col-span-8 space-y-6">
+        <article className="space-y-6">
           <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-white dark:bg-white/[0.01] backdrop-blur-xl p-6 md:p-9 shadow-xl space-y-8 animate-in fade-in duration-300">
             {activeContent.sections.map(section => (
               <section
