@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Shield, Lock, FileText, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function KVKKPage() {
   const { lang, t } = useTranslation()
@@ -44,7 +45,7 @@ export default function KVKKPage() {
         {
           id: 'p4',
           title: '4. Verilerin Aktarılması ve Saklanması',
-          text: 'Toplanan kişisel verileriniz kesinlikle üçüncü şahıslara veya reklam ağlarına satılmaz ya da paylaşılmaz. Verileriniz, dünya standartlarında güvenlik önlemlerine (ISO 27001, SOC2) sahip olan ve tüm dünyada kabul gören Supabase bulut veri tabanı altyapısında, Avrupa sunucularında uçtan uca şifrelenmiş olarak saklanır. Ödeme bilgileri ise BDDK lisanslı güvenli ödeme geçidi aracılığıyla doğrudan işlenir ve sunucularımızda kart bilgisi tutulmaz.',
+          text: 'Toplanan kişisel verileriniz kesinlikle üçüncü şahıslara veya reklam ağlarına satılmaz ya da paylaşılmaz. Verileriniz, dünya standartlarında güvenlik önlemlerine (ISO 27001, SOC2) sahip olan Supabase bulut veri tabanı altyapısında, Avrupa sunucularında KVKK ve Genel Veri Koruma Yönetmeliği (GDPR) uyum standartlarına uygun olarak uçtan uca şifrelenmiş biçimde saklanır. Ödeme bilgileri ise BDDK lisanslı güvenli ödeme geçidi aracılığıyla doğrudan işlenir ve sunucularımızda kart bilgisi tutulmaz.',
         },
         {
           id: 'p5',
@@ -62,14 +63,14 @@ export default function KVKKPage() {
       ],
     },
     en: {
-      title: 'GDPR & Privacy Policy',
+      title: 'PDPL & Privacy Policy',
       subtitle: 'The safety and confidentiality of your personal data is our highest priority.',
       updateDate: 'Last Updated: May 31, 2026',
       sections: [
         {
           id: 'p1',
           title: '1. Data Controller',
-          text: 'In accordance with the EU General Data Protection Regulation (GDPR), Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
+          text: 'In accordance with the Personal Data Protection Law No. 6698 (PDPL), Network Marketing Master ("Platform") processes your personal data legally within the scope defined below. Protecting your personal data with state-of-the-art security measures is our core commitment.',
         },
         {
           id: 'p2',
@@ -84,7 +85,7 @@ export default function KVKKPage() {
         {
           id: 'p3',
           title: '3. Legal Grounds & Purposes of Processing',
-          text: 'Your personal data is processed under GDPR Article 6 on the legal bases of "Performance of a contract" and "Legitimate interests of the controller" for the following objectives:',
+          text: 'Your personal data is processed under PDPL Article 5 on the legal bases of "Performance of a contract" and "Legitimate interests of the controller" for the following objectives:',
           bullets: [
             'Managing your authentication, workspace security, and session validation.',
             'Enabling candidate follow-up databases, kanban pipelines, and team sharing synchronization.',
@@ -95,12 +96,12 @@ export default function KVKKPage() {
         {
           id: 'p4',
           title: '4. Third-Party Sharing & Safe Storage',
-          text: 'Under no circumstances do we sell, trade, or share your data with external advertisers or third parties. All platform data is end-to-end encrypted and hosted on European servers using the world-class Supabase database cloud provider, which strictly adheres to SOC2 and ISO 27001 security standards. All payment processes are carried out directly via encrypted SSL pathways by secure BDDK-licensed (Banking Regulation and Supervision Agency) payment processors; no credit card details are ever stored on our servers.',
+          text: 'Under no circumstances do we sell, trade, or share your data with external advertisers or third parties. All platform data is end-to-end encrypted and hosted on European servers using the world-class Supabase database cloud provider, which adheres to PDPL and General Data Protection Regulation (GDPR) security standards including SOC2 and ISO 27001. All payment processes are carried out directly via encrypted SSL pathways by secure BDDK-licensed (Banking Regulation and Supervision Agency) payment processors; no credit card details are ever stored on our servers.',
         },
         {
           id: 'p5',
-          title: '5. Your Rights under GDPR',
-          text: 'Under GDPR, you may contact us to exercise the following rights regarding your personal data:',
+          title: '5. Your Rights under PDPL (Article 11)',
+          text: 'Under the PDPL, you may contact us to exercise the following rights regarding your personal data:',
           bullets: [
             'Request details on whether your data is processed and demand copies,',
             'Learn the scope of data processing and verify appropriate usage,',
@@ -133,11 +134,14 @@ export default function KVKKPage() {
             <ArrowLeft className="h-4 w-4" />
             <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-              {lang === 'en' ? 'GDPR COMPLIANT' : 'KVKK UYUMLU GÜVENLİ VERİ'}
-            </span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
+                {lang === 'en' ? 'PDPL COMPLIANT' : 'KVKK UYUMLU GÜVENLİ VERİ'}
+              </span>
+            </div>
+            <LegalPageToolbar />
           </div>
         </div>
       </nav>
@@ -146,7 +150,7 @@ export default function KVKKPage() {
       <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <Shield className="h-3.5 w-3.5" />
-          <span>{lang === 'en' ? 'GDPR' : 'KVKK'}</span>
+          <span>{lang === 'en' ? 'PDPL' : 'KVKK'}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}

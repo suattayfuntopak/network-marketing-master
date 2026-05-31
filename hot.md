@@ -1,6 +1,13 @@
 # Hot Log
 
-## 2026-05-31 — KVKK / GDPR i18n (footer + yasal sayfalar)
+## 2026-05-31 — PDPL / KVKK / GDPR terminolojisi + yasal sayfa araç çubuğu
+
+- **Terminoloji:** TR → KVKK, Genel Veri Koruma Yönetmeliği (GDPR); EN → PDPL (Personal Data Protection Law), GDPR (EU regulation). Footer EN: `PDPL & Privacy Policy`.
+- **Yasal sayfalar (`/kvkk`, `/kullanim-kosullari`, `/guvenlik`):** Sağ üstte tema düğmesi + bayrak (TR'de 🇹🇷, EN'de 🇺🇸); içerikler PDPL/KVKK ayrımına göre güncellendi.
+- **Dosyalar:** `LegalPageToolbar.tsx`, `kvkk/page.tsx`, `kullanim-kosullari/page.tsx`, `guvenlik/page.tsx`, `landing.ts`, `trainingData.ts`.
+
+---
+
 
 - **Footer:** TR `KVKK ve Gizlilik Politikası`; EN `GDPR & Privacy Policy` (KVKK karışımı kaldırıldı).
 - **`/kvkk`:** İngilizce içerik yalnızca GDPR; rozet ve başlıklarda `GDPR / KVKK` birleşik ifadeler temizlendi.

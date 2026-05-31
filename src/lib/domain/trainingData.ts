@@ -1003,7 +1003,7 @@ const EN_KATEGORILER: Kategori[] = [
         maddeler: [
           'Income: "X earnings in Y time" carries both trust and compliance risk—use measured language.',
           'Health: start with "My own experience was..."; avoid medical claims and guarantees.',
-          'Data privacy: don\'t share personal data without permission; no unnecessary list transfers.',
+          'PDPL: Do not share personal data without permission; no unnecessary list transfers.',
           'Distance selling: accurately explain your company\'s order and withdrawal processes.',
           'Transparent, measured, compliance-aligned language → long-term trust.',
         ],

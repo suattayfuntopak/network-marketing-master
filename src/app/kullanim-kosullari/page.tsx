@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, FileText, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function TermsPage() {
   const { lang } = useTranslation()
@@ -96,7 +97,7 @@ export default function TermsPage() {
           title: '4. Acceptable Use Policy',
           text: 'When using our platform, you legally commit to the following standards of practice:',
           bullets: [
-            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with GDPR and relevant telecommunication marketing consent laws,',
+            'Warranting that all prospective lead lists uploaded have been gathered in strict compliance with the Personal Data Protection Law (PDPL) and relevant telecommunication marketing consent laws,',
             'Refraining from generating spam, abusive prospecting copy, or misleading network-marketing recruitment campaigns through our AI (Artificial Intelligence) models,',
             'Avoiding reverse-engineering, system scraping, automatic bots, or triggering server-overloading requests (DDoS attacks),',
             'Not using our compliance analysis tools to circumvent consumer protection guidelines or validate illegal pyramids.',
@@ -141,11 +142,14 @@ export default function TermsPage() {
             <ArrowLeft className="h-4 w-4" />
             <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
-            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-              {lang === 'en' ? 'LEGAL USER TERMS' : 'YASAL KULLANICI SÖZLEŞMESİ'}
-            </span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              <AlertCircle className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
+                {lang === 'en' ? 'LEGAL USER TERMS' : 'YASAL KULLANICI SÖZLEŞMESİ'}
+              </span>
+            </div>
+            <LegalPageToolbar />
           </div>
         </div>
       </nav>

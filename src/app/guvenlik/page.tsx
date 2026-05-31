@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, ShieldCheck, Lock, FileText, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function SecurityPage() {
   const { lang } = useTranslation()
@@ -31,7 +32,7 @@ export default function SecurityPage() {
           text: 'Tüm verileriniz hem iletim sırasında hem de saklanırken endüstri standardı güçlü şifreleme protokolleri ile korunur:',
           bullets: [
             'Veri İletim Güvenliği: Tarayıcınız ile platform sunucuları arasındaki tüm iletişim 256-bit TLS/SSL şifreleme tünelleri üzerinden gerçekleştirilir.',
-            'Durağan Veri Güvenliği: Veri tabanımızda saklanan tüm müşteri bilgileri, AWS / Supabase altyapısında AES-256 standardında uçtan uca şifrelenmiş (encryption at rest) olarak barındırılır.',
+            'Durağan Veri Güvenliği: Veri tabanımızda saklanan tüm müşteri bilgileri, Avrupa sunucularındaki AWS / Supabase altyapısında KVKK ve Genel Veri Koruma Yönetmeliği (GDPR) uyum standartlarına uygun olarak AES-256 standardında uçtan uca şifrelenmiş (encryption at rest) biçimde barındırılır.',
             'Yedekleme Güvenliği: Günlük olarak alınan sistem yedekleri, aynı yüksek şifreleme katmanı ile izole edilmiş depolama alanlarında saklanır.',
           ],
         },
@@ -87,7 +88,7 @@ export default function SecurityPage() {
           text: 'Your sensitive business information is fully shielded both in transit and at rest using modern military-grade cryptography:',
           bullets: [
             'Data in Transit: All interactions between your browser/app and our servers are encrypted using 256-bit TLS/SSL secure tunnels.',
-            'Data at Rest: Your workspace database is encrypted using industry-standard AES-256 algorithms on European servers operated by Supabase.',
+            'Data at Rest: Your workspace database is encrypted using AES-256 on European Supabase servers, in compliance with PDPL and General Data Protection Regulation (GDPR) standards.',
             'Backup Security: System backups are automatically processed daily and stored in isolated storage layers with equivalent AES-256 coverage.',
           ],
         },
@@ -143,11 +144,14 @@ export default function SecurityPage() {
             <ArrowLeft className="h-4 w-4" />
             <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <Lock className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
-            <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-              {lang === 'en' ? 'HIGH INFRASTRUCTURE SECURITY' : 'YÜKSEK ALTYAPI GÜVENLİĞİ'}
-            </span>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex items-center gap-2">
+              <Lock className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
+              <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
+                {lang === 'en' ? 'HIGH INFRASTRUCTURE SECURITY' : 'YÜKSEK ALTYAPI GÜVENLİĞİ'}
+              </span>
+            </div>
+            <LegalPageToolbar />
           </div>
         </div>
       </nav>
