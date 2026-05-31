@@ -433,3 +433,56 @@ export async function sendModerationRejectedEmail(
   }
 }
 
+/** Şifre sıfırlama — NMM logo + premium şablon (Supabase varsayılan N harfi yerine). */
+export async function sendPasswordResetEmail(
+  email: string,
+  resetLink: string,
+  lang: 'tr' | 'en' = 'tr',
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendPasswordResetEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const subject =
+    lang === 'en'
+      ? 'Reset your password — Network Marketing Master'
+      : 'Şifreni Sıfırla — Network Marketing Master'
+
+  const content =
+    lang === 'en'
+      ? [
+          emailHeading('Reset your password'),
+          emailParagraph(
+            'We received a password reset request. Click the button below to set a new password.',
+          ),
+          emailCta(resetLink, 'Reset my password'),
+          emailParagraph(
+            'This link is valid for 1 hour. If you did not request this, you can ignore this email.',
+          ),
+        ].join('')
+      : [
+          emailHeading('Şifreni sıfırla'),
+          emailParagraph(
+            'Bir şifre sıfırlama talebi aldık. Aşağıdaki butona tıklayarak yeni şifreni belirleyebilirsin.',
+          ),
+          emailCta(resetLink, 'Şifremi Sıfırla'),
+          emailParagraph(
+            'Bu bağlantı 1 saat geçerlidir. Talebi sen yapmadıysan bu e-postayı yok say.',
+          ),
+        ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      subject,
+      html: buildPremiumEmail(content, lang),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send password reset email:', err)
+    return false
+  }
+}
+

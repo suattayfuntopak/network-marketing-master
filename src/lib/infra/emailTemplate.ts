@@ -1,6 +1,23 @@
-/** Premium transactional email — açık tema, görsel yok (spam dostu). */
+/** Premium transactional email — açık tema, NMM logosu (public/logo.png). */
 
 export const NMM_APP_URL = 'https://nmm.suattayfuntopak.com'
+export const NMM_LOGO_URL = `${NMM_APP_URL}/logo.png`
+
+/** E-posta üstü — yuvarlak NMM logosu (Gmail/Outlook uyumlu mutlak URL). */
+export function emailLogoHeader(): string {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
+  <tr>
+    <td align="center" style="padding:0 0 4px;">
+      <img src="${NMM_LOGO_URL}" alt="Network Marketing Master" width="72" height="72" style="display:block;width:72px;height:72px;border-radius:50%;border:2px solid #EEEDFE;object-fit:cover;" />
+    </td>
+  </tr>
+  <tr>
+    <td align="center" style="padding:0;">
+      <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#534AB7;">Network Marketing Master</p>
+    </td>
+  </tr>
+</table>`
+}
 
 export function buildPremiumEmail(contentHtml: string, lang: 'tr' | 'en'): string {
   const footer =
@@ -27,7 +44,7 @@ export function buildPremiumEmail(contentHtml: string, lang: 'tr' | 'en'): strin
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #e8eaef;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(15,23,42,0.06);">
           <tr>
             <td style="padding:28px 32px 8px;text-align:center;border-bottom:1px solid #f0f1f4;">
-              <p style="margin:0;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#534AB7;">Network Marketing Master</p>
+              ${emailLogoHeader()}
             </td>
           </tr>
           <tr>
