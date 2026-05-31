@@ -20,22 +20,62 @@ export async function proxy(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   const pathname = request.nextUrl.pathname
 
-  // 1. If on the old vercel domain, redirect to the official domain, mapping wildcards to /sifre-guncelle
+  // 1. If on the old vercel domain, client-side redirect to the official domain, mapping wildcards to /sifre-guncelle
   if (hostname === 'network-marketing-master.vercel.app') {
-    const url = request.nextUrl.clone()
-    url.host = 'nmm.suattayfuntopak.com'
-    url.protocol = 'https:'
-    if (url.pathname === '/**' || url.pathname === '/**/' || url.pathname.includes('%2A%2A') || url.pathname.includes('**')) {
-      url.pathname = '/sifre-guncelle'
+    let targetPath = pathname
+    if (pathname === '/**' || pathname === '/**/' || pathname.includes('%2A%2A') || pathname.includes('**')) {
+      targetPath = '/sifre-guncelle'
     }
-    return NextResponse.redirect(url)
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Yönlendiriliyorsunuz...</title>
+          <script>
+            var hash = window.location.hash || '';
+            var search = window.location.search || '';
+            window.location.href = 'https://nmm.suattayfuntopak.com' + '${targetPath}' + search + hash;
+          </script>
+        </head>
+        <body style="background:#0a0b10;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="text-align:center;">
+            <div style="border:3px solid #534AB7;border-top-color:transparent;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+            <p style="font-size:14px;opacity:0.8;">Yönlendiriliyorsunuz...</p>
+          </div>
+          <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+        </body>
+      </html>
+    `
+    return new NextResponse(html, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    })
   }
 
-  // 2. Wildcard path check on official domain (fallback from Supabase)
+  // 2. Client-side redirect for wildcard path on official domain too
   if (pathname === '/**' || pathname === '/**/' || pathname.includes('%2A%2A') || pathname.includes('**')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/sifre-guncelle'
-    return NextResponse.redirect(url)
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Yönlendiriliyorsunuz...</title>
+          <script>
+            var hash = window.location.hash || '';
+            var search = window.location.search || '';
+            window.location.href = 'https://nmm.suattayfuntopak.com/sifre-guncelle' + search + hash;
+          </script>
+        </head>
+        <body style="background:#0a0b10;color:#fff;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="text-align:center;">
+            <div style="border:3px solid #534AB7;border-top-color:transparent;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite;margin:0 auto 16px;"></div>
+            <p style="font-size:14px;opacity:0.8;">Yönlendiriliyorsunuz...</p>
+          </div>
+          <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+        </body>
+      </html>
+    `
+    return new NextResponse(html, {
+      headers: { 'Content-Type': 'text/html; charset=utf-8' }
+    })
   }
 
   let supabaseResponse = NextResponse.next({ request })
