@@ -5,7 +5,7 @@ import { CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function LandingRoiCalculator() {
-  const { t } = useTranslation()
+  const { lang, t } = useTranslation()
   const [teamSize, setTeamSize] = useState(25)
 
   const calculatedCandidatesNMM = teamSize * 15
@@ -14,14 +14,21 @@ export function LandingRoiCalculator() {
   const calculatedActiveRate = "88%"
 
   return (
-    <section id="roi-calculator" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
+    <section id="nasil-calisir" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
       <div className="text-center space-y-3">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
           {t('landingPage.roiTitle')}
         </h2>
-        <p className="mx-auto max-w-xl text-xs sm:text-sm text-slate-500 dark:text-zinc-400 font-medium">
-          {t('landingPage.roiSubtitle')}
-        </p>
+        <div className="mx-auto max-w-2xl space-y-2">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-[#94A3B8] font-medium leading-relaxed">
+            {t('landingPage.roiSubtitle')}
+          </p>
+          <p className="text-[10px] sm:text-xs text-slate-400 dark:text-[#64748B] italic font-semibold leading-relaxed max-w-xl mx-auto">
+            {lang === 'en'
+              ? '*(These settings never reflect a real situation or compensation plan, they are fully simulated to illustrate the application effect.)'
+              : '*(Bu ayarlar asla gerçek bir durumu ya da kazanç planını yansıtmaz, tamamen uygulama etkisinin anlaşılabilmesi için simüle edilmiştir)'}
+          </p>
+        </div>
       </div>
 
       {/* Calculator layout */}

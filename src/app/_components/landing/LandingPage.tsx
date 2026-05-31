@@ -10,6 +10,7 @@ import { LandingFeatures } from './LandingFeatures'
 import { LandingRoiCalculator } from './LandingRoiCalculator'
 import { LandingPricing } from './LandingPricing'
 import { LandingTestimonials } from './LandingTestimonials'
+import { LandingFaq } from './LandingFaq'
 import { LandingFooter } from './LandingFooter'
 
 export function LandingPage() {
@@ -82,8 +83,9 @@ export function LandingPage() {
       <LandingHero />
       <LandingFeatures />
       <LandingRoiCalculator />
-      <LandingPricing />
       <LandingTestimonials />
+      <LandingFaq />
+      <LandingPricing />
       <LandingFooter />
 
     </div>

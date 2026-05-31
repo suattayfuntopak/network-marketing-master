@@ -17,7 +17,7 @@ export function LandingPricing() {
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
+    <section id="ucretlendirme" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
       <div className="text-center space-y-4">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
           {t('landingPage.pricingTitle')}

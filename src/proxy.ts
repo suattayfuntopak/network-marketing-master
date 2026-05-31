@@ -9,7 +9,11 @@ const PUBLIC_PATHS = [
   '/sifre-guncelle', 
   '/auth/callback', 
   '/auth/reset-password',
-  '/api/payment/shopier' // Shopier webhook is whitelisted so it is fully public
+  '/api/payment/shopier', // Shopier webhook is whitelisted so it is fully public
+  '/acilis',
+  '/kvkk',
+  '/kullanim-kosullari',
+  '/guvenlik'
 ]
 
 export async function proxy(request: NextRequest) {
@@ -55,8 +59,13 @@ export async function proxy(request: NextRequest) {
   }
 
   const isPasswordReset = pathname.startsWith('/sifre-guncelle')
+  const isLandingLegal =
+    pathname === '/acilis' ||
+    pathname === '/kvkk' ||
+    pathname === '/kullanim-kosullari' ||
+    pathname === '/guvenlik'
 
-  if (user && isPublic && !isPasswordReset) {
+  if (user && isPublic && !isPasswordReset && !isLandingLegal) {
     const url = request.nextUrl.clone()
     url.pathname = '/pano'
     return NextResponse.redirect(url)

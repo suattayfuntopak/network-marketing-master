@@ -79,9 +79,8 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/kvkk" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5">
-                    <ShieldCheck className="h-3.5 w-3.5 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
-                    <span>{t('landingPage.footerKvkk')}</span>
+                  <Link href="/kvkk" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                    {t('landingPage.footerKvkk')}
                   </Link>
                 </li>
                 <li>
@@ -128,7 +127,7 @@ export function LandingFooter() {
                     className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5 group"
                   >
                     <Mail className="h-3.5 w-3.5 text-[#534AB7] dark:text-[#a09be8] group-hover:scale-110 transition-transform duration-200 shrink-0" />
-                    <span className="truncate">info@suattayfuntopak.com</span>
+                    <span className="break-all md:break-normal text-[11px] sm:text-xs">info@suattayfuntopak.com</span>
                   </a>
                 </li>
                 <li className="text-[10px] text-slate-500 dark:text-zinc-500 italic">

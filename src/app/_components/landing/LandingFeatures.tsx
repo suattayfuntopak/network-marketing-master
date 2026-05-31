@@ -9,7 +9,7 @@ export function LandingFeatures() {
   const { t } = useTranslation()
 
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
+    <section id="ozellikler" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">
       <div className="text-center space-y-3">
         <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
           {t('landingPage.featuresTitle')}
