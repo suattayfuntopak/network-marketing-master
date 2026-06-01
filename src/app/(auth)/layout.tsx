@@ -6,48 +6,59 @@ import { useTheme } from 'next-themes'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { Z } from '@/lib/ui/zIndex'
-import { NEXT_THEME, resolveThemeMode, ThemeIcon } from '@/lib/ui/themeToggle'
+import { NEXT_THEME, resolveThemeMode, ThemeIcon, type ThemeMode } from '@/lib/ui/themeToggle'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { lang, setLang } = useTranslation()
+  const { lang, setLang, t } = useTranslation()
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
   const currentTheme = mounted ? resolveThemeMode(theme) : 'system'
 
+  const nextThemeLabel: Record<ThemeMode, string> = {
+    dark: t('common.themeLight'),
+    light: t('common.themeSystem'),
+    system: t('common.themeDark'),
+  }
+
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-[#0a0b10] bg-radial-[circle_at_top,_var(--tw-gradient-stops)] from-[#1a1c2e] via-[#0a0b10] to-[#050508] px-4 text-white">
 
-      {/* Top-right controls: theme + language flags */}
+      {/* Top-right: theme (current icon) + single language flag (active locale) */}
       <div className={`fixed top-3 right-3 ${Z.bottomNav} flex items-center gap-1`}>
         {mounted && (
           <button
+            type="button"
             onClick={() => setTheme(NEXT_THEME[currentTheme])}
-            title="Change theme"
+            title={nextThemeLabel[currentTheme]}
+            aria-label={nextThemeLabel[currentTheme]}
             className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition hover:bg-white/10 hover:text-white"
           >
             <ThemeIcon mode={currentTheme} />
           </button>
         )}
-        <button
-          onClick={() => setLang('tr')}
-          title="Türkçe"
-          className={`flex h-8 w-8 items-center justify-center rounded-xl transition hover:bg-white/10 ${
-            lang === 'tr' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-40 hover:opacity-100'
-          }`}
-        >
-          <TRFlag />
-        </button>
-        <button
-          onClick={() => setLang('en')}
-          title="English"
-          className={`flex h-8 w-8 items-center justify-center rounded-xl transition hover:bg-white/10 ${
-            lang === 'en' ? 'bg-white/10 ring-1 ring-indigo-500/40' : 'opacity-40 hover:opacity-100'
-          }`}
-        >
-          <USFlag />
-        </button>
+        {lang === 'tr' ? (
+          <button
+            type="button"
+            onClick={() => setLang('en')}
+            title="Switch to English"
+            aria-label="Switch to English"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition hover:bg-white/10 hover:text-white"
+          >
+            <TRFlag />
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setLang('tr')}
+            title="Türkçe'ye geç"
+            aria-label="Türkçe'ye geç"
+            className="flex h-8 w-8 items-center justify-center rounded-xl text-white/50 transition hover:bg-white/10 hover:text-white"
+          >
+            <USFlag />
+          </button>
+        )}
       </div>
 
       <div className="w-full max-w-sm">

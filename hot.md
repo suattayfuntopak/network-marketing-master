@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-01 — Auth sayfaları: tek dil bayrağı + tema ikonları
+
+- **Kapsam:** `(auth)/layout.tsx` — giriş, kayıt, şifre sıfırlama/güncelleme ortak layout.
+- **Dil:** İki ayrı TR/EN butonu kaldırıldı; dashboard/landing ile aynı mantık — seçili dilin bayrağı görünür, tıklanınca diğer dile geçilir.
+- **Tema:** `ThemeIcon` zaten system → monitör, dark → ay, light → güneş; tooltip/aria `common.theme*` çevirileriyle hizalandı.
+
 ## 2026-06-01 — Havale/EFT alternatif ödeme (Shopier yanında)
 
 Shopier onayı beklenirken (lansman öncesi, düşük hacim) ikinci ödeme kanalı: ödeme
