@@ -7,3 +7,12 @@ export function hasTeamPageAccess(
   const type = licenseType ?? 'free'
   return type === 'master' || type === 'pro'
 }
+
+/** Ekip Nabzı tablosu (öğrenme + nabız rozetleri) — yalnızca Pro; Plus kendi nabzını görür. */
+export function hasTeamPulseAccess(
+  licenseType: string | null | undefined,
+  isSuperAdmin?: boolean
+): boolean {
+  if (isSuperAdmin) return true
+  return (licenseType ?? 'free') === 'pro'
+}

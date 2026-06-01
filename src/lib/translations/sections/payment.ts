@@ -56,6 +56,8 @@ export const paymentSection = {
       proYearlyEquivalent: '{months} ay bedava!',
       proFeature1: 'Plus Planındaki TÜM Özellikler',
       proFeature2: 'Sınırsız Alt Ekip Takibi',
+      proFeature7:
+        'Ekip Nabzı: Ekibinizin eğitim ve itiraz tamamlama özetini koçluk sinyalleriyle görün',
       proFeature3: 'Yapay Zeka Alt Ekip Koçu',
       proFeature4: 'Günlük 100 YZ Mesajı',
       proFeature5: 'Günlük 60 YZ Koçu',
@@ -143,6 +145,8 @@ export const paymentSection = {
       proYearlyEquivalent: '{months} months free!',
       proFeature1: 'All Plus Plan Features',
       proFeature2: 'Sınırsız Alt Ekip Takibi',
+      proFeature7:
+        'Team Pulse: View your team\'s training and objection completion summaries with coaching signals',
       proFeature3: 'AI Sub-Team Coach',
       proFeature4: 'Daily 100 AI Messages',
       proFeature5: 'Daily 60 AI Coach sessions',

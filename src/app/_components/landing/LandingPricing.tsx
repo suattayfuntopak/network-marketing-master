@@ -269,6 +269,10 @@ export function LandingPricing() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
+                <span className="font-bold text-pink-700 dark:text-pink-300">{t('landingPage.planProFeat7')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat3')}</span>
               </li>
               <li className="flex items-center gap-2">

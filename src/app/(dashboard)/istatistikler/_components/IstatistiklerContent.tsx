@@ -19,6 +19,7 @@ import { StatsKpiCards } from './StatsKpiCards'
 import { StatsCharts } from './StatsCharts'
 import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
+import { PulseMySection } from '@/app/(dashboard)/_components/pulse/PulseMySection'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -364,6 +365,8 @@ export function IstatistiklerContent() {
               workspaceCreatedAt={ws?.workspaceCreatedAt}
             />
           )}
+
+          <PulseMySection />
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <MyAIUsageQuotaCard

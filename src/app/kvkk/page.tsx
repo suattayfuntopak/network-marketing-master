@@ -58,6 +58,15 @@ export default function KVKKPage() {
           ],
           footer: 'Tüm bu haklarınız kapsamındaki taleplerinizi info@suattayfuntopak.com adresine yazılı olarak iletebilirsiniz.',
         },
+        {
+          id: 'p6',
+          title: '6. Ekip Nabzı ve Sponsor Görünürlüğü',
+          text: 'Pro plan kapsamında doğrudan sponsorunuz, Platform üzerindeki eğitim ve itiraz içeriklerine ilişkin ilerleme özetinizi (okunan içerik oranı, favori sayısı gibi toplu metrikler) ve seçtiğiniz döneme ait genel saha aktivite istatistiklerinizi görüntüleyebilir. Bu veriler bireysel koçluk ve ekip gelişimi amacıyla işlenir; saniye bazlı ekran kaydı veya aday notu metinleri sponsor ile paylaşılmaz.',
+          bullets: [
+            'İlerleme verileri yalnızca özet düzeyinde (yüzde ve sayaç) sponsorunuza sunulur.',
+            'İstediğiniz zaman hesap ayarlarınızdan veya destek kanalından bilgi talep edebilirsiniz.',
+          ],
+        },
       ],
     },
     en: {
@@ -108,6 +117,15 @@ export default function KVKKPage() {
             'Request permanent deletion or erasure of your account details at any time.',
           ],
           footer: 'To exercise any of these rights, please write to us at info@suattayfuntopak.com.',
+        },
+        {
+          id: 'p6',
+          title: '6. Team Pulse and Sponsor Visibility',
+          text: 'On the Pro plan, your direct sponsor may view summary progress for training and objection content (e.g. completion rates, favorite counts) and general field activity metrics for the period you select. Data is used for coaching and team development; per-second tracking and candidate note text are not shared with sponsors.',
+          bullets: [
+            'Progress is shown to your sponsor only as aggregated percentages and counts.',
+            'You may contact support at any time to exercise your data protection rights.',
+          ],
         },
       ],
     },

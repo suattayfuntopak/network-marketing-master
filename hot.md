@@ -1,5 +1,9 @@
 # Hot Log
 
+## 2026-06-01 — Ekip Nabzı Faz 1 (tamamlandı)
+
+Hibrit yerleşim: **Gelişim Nabzım** → İstatistikler; **Ekip Nabzı** → Ekibim. Pro: ekip tablosu; Plus: kendi nabız + Pro upsell. Migration `039`, RLS, i18n, KVKK/koşullar, landing/ödeme Pro maddesi, `videoTraining.ts` (F3 hazırlık). **Deploy:** `039` uygula.
+
 ## 2026-06-01 — Havale/EFT: alt başlık + IBAN tek satır + QR + tek bileşen + "Ödedim" bildirimi
 
 Birden çok iyileştirme:

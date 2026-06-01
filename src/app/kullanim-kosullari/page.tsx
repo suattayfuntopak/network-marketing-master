@@ -59,7 +59,16 @@ export default function TermsPage() {
         },
         {
           id: 't6',
-          title: '6. Sorumlulukların Sınırlandırılması',
+          title: '6. Ekip Nabzı ve Sponsor Görünürlüğü',
+          text: 'Pro plan kapsamında, doğrudan sponsorunuz eğitim ve itiraz modüllerindeki ilerleme özetinizi (tamamlama yüzdesi, favori sayısı) ve seçilen döneme ait genel saha aktivite metriklerinizi koçluk amacıyla görüntüleyebilir. Aday notları ve mesaj içerikleri paylaşılmaz. Kullanıcı, bu görünürlüğün Platform arayüzünde açıklandığını kabul eder.',
+          bullets: [
+            'Özet metrikler koçluk ve ekip gelişimi amacıyla işlenir; gözetim amaçlı saniye bazlı izleme yapılmaz.',
+            'Plus ve alt planlarda yalnızca kullanıcının kendi gelişim özeti görüntülenir; ekip nabzı tablosu Pro plana özeldir.',
+          ],
+        },
+        {
+          id: 't7',
+          title: '7. Sorumlulukların Sınırlandırılması',
           text: 'Network Marketing Master, yazılımı "olduğu gibi" (as-is) sunmaktadır. Platform, kesintisiz çalışma veya sıfır veri kaybı garantisi vermez. Mücbir sebepler, altyapı sağlayıcılarında (Supabase, OpenAI vb.) meydana gelebilecek kesintiler nedeniyle oluşabilecek geçici erişim sorunlarından Platform sorumlu tutulamaz. Aday listelerinizin ve kritik çalışma alanı verilerinizin düzenli yedeklerini (Excel dışa aktarma yoluyla) almak kullanıcının sorumluluğundadır.',
         },
       ],
@@ -114,7 +123,16 @@ export default function TermsPage() {
         },
         {
           id: 't6',
-          title: '6. Limitation of Liability & Disclaimers',
+          title: '6. Team Pulse and Sponsor Visibility',
+          text: 'On the Pro plan, your direct sponsor may view summary progress for training and objection modules (completion %, favorite counts) and general field activity metrics for the selected period, for coaching purposes. Candidate notes and message content are not shared. You acknowledge this visibility is disclosed in the Platform UI.',
+          bullets: [
+            'Metrics are aggregated for coaching; there is no per-second surveillance.',
+            'The team pulse table is Pro-only; Plus and lower tiers retain their own progress summary only.',
+          ],
+        },
+        {
+          id: 't7',
+          title: '7. Limitation of Liability & Disclaimers',
           text: 'Network Marketing Master is provided on an "as-is" and "as-available" basis. We make no warranty that the SaaS will run error-free, uninterrupted, or without temporary cloud outages. Under no circumstances shall NMM be held liable for commercial performance, data loss, or server downtime caused by underlying infrastructure providers (e.g., Supabase, OpenAI, Resend). We highly recommend regularly exporting your pipeline data via our spreadsheet exports.',
         },
       ],

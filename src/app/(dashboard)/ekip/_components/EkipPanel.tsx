@@ -21,6 +21,9 @@ import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
+import { useCandidates } from '@/hooks/useCandidates'
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
+import { PulseTeamSection } from '@/app/(dashboard)/_components/pulse/PulseTeamSection'
 import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
@@ -86,6 +89,19 @@ export function EkipPanel() {
   }, [queryClient, ws?.workspaceId, t])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useEkipPanelRows(ws?.workspaceId)
+  const { candidates = [] } = useCandidates(ws?.workspaceId)
+
+  const leaderOwnerId = members.find(m => m.role === 'leader')?.user_id ?? null
+  const getMemberHref = useCallback(
+    (row: { user_id: string; full_name: string | null; isAppUser?: boolean }) => {
+      if (row.isAppUser === false) return `/pipeline/${row.user_id}`
+      const matchedId = leaderOwnerId
+        ? findLeaderCandidateForMember(candidates, leaderOwnerId, row.full_name)
+        : null
+      return matchedId ? `/pipeline/${matchedId}` : null
+    },
+    [candidates, leaderOwnerId]
+  )
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
@@ -196,6 +212,8 @@ export function EkipPanel() {
         toggleOnboardingStep={toggleOnboardingStep}
         handleInviteMember={handleInviteMember}
       />
+
+      <PulseTeamSection members={members} getMemberHref={getMemberHref} />
 
       {isLeader && (
         <InviteTeammateSection

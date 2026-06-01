@@ -75,6 +75,8 @@ export const landingSection = {
       planProYearlyNote: '{months} ay bedava!',
       planProFeat1: 'Plus Planındaki TÜM Özellikler',
       planProFeat2: 'Sınırsız Alt Ekip Takibi',
+      planProFeat7:
+        'Ekip Nabzı modülü: Ekibinizin eğitim ve itiraz ilerlemesini özet yüzdeler ve koçluk sinyalleriyle takip edin.',
       planProFeat3:
         'Yapay Zeka Alt Ekip Koçu: Ekibinizdeki ortakların YZ kullanımı ve onboarding takibi (Ekibim).',
       planProFeat4: 'Günlük 100 YZ Mesajı',
@@ -167,6 +169,8 @@ export const landingSection = {
       planProYearlyNote: '{months} months free!',
       planProFeat1: 'All Plus Plan Features',
       planProFeat2: 'Unlimited Downline Tracking',
+      planProFeat7:
+        'Team Pulse: Track your team\'s training and objection progress with summary percentages and coaching signals.',
       planProFeat3:
         'AI downline coaching: team AI usage and onboarding tracking (Team hub).',
       planProFeat4: 'Daily 100 AI Messages',
