@@ -22,15 +22,16 @@ export function AIUsageArchiveSection() {
   const { t } = useTranslation()
   const [period, setPeriod] = useState<AIUsageArchivePeriod>('30d')
 
-  const { data, isLoading, isError } = useQuery({
+  const { data: result, isLoading } = useQuery({
     queryKey: ['ai-usage-archive', period],
     queryFn: () => getAIUsageArchiveAction(period),
     staleTime: 120_000,
-    retry: 1,
+    throwOnError: false,
   })
 
+  const data = result?.data
   const totals = data?.totals ?? ZERO_TOTALS
-  const showUnavailable = isError
+  const showWarning = result?.warning === 'load_failed'
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
@@ -62,9 +63,9 @@ export function AIUsageArchiveSection() {
         </div>
       </div>
 
-      {showUnavailable && (
+      {showWarning && (
         <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
-          {t('statsPage.archiveUnavailable')}
+          {t('statsPage.dataPartialWarning')}
         </p>
       )}
 

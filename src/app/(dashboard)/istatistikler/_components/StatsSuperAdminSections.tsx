@@ -9,6 +9,7 @@ import type { TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { getIndependentSignupAIUsageAction, getMemberLicenseProfilesAction } from '../actions'
 import { AIUsageArchiveSection } from './AIUsageArchiveSection'
+import { PulseIndependentOwnersSection } from '@/app/(dashboard)/_components/pulse/PulseIndependentOwnersSection'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
@@ -36,13 +37,14 @@ export function StatsSuperAdminSections({
 
   const memberUserIds = useMemo(() => sortedMembers.map(m => m.user_id), [sortedMembers])
 
-  const { data: independentUsage = [], isLoading: independentLoading, isError: independentError } =
-    useQuery({
-      queryKey: ['independent-ai-usage'],
-      queryFn: getIndependentSignupAIUsageAction,
-      staleTime: 60_000,
-      retry: 1,
-    })
+  const { data: independentResult, isLoading: independentLoading } = useQuery({
+    queryKey: ['independent-ai-usage'],
+    queryFn: getIndependentSignupAIUsageAction,
+    staleTime: 60_000,
+    throwOnError: false,
+  })
+  const independentUsage = independentResult?.data ?? []
+  const independentWarning = independentResult?.warning === 'load_failed'
 
   const { data: memberLicenses = {} } = useQuery({
     queryKey: ['member-license-profiles', memberUserIds],
@@ -174,9 +176,9 @@ export function StatsSuperAdminSections({
           </p>
         </div>
 
-        {independentError && (
+        {independentWarning && (
           <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
-            {t('statsPage.pulseLoadFallback')}
+            {t('statsPage.dataPartialWarning')}
           </p>
         )}
 
@@ -242,6 +244,8 @@ export function StatsSuperAdminSections({
           </div>
         )}
       </section>
+
+      <PulseIndependentOwnersSection />
 
       <AIUsageArchiveSection />
     </>

@@ -8,6 +8,7 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
 export interface IndependentAIUsageRow {
   userId: string
+  workspaceId: string
   fullName: string | null
   email: string
   avatarUrl: string | null
@@ -22,6 +23,8 @@ export interface IndependentAIUsageRow {
   complianceLimit: number
 }
 
+export type ActionWithWarning<T> = { data: T; warning: string | null }
+
 export type MemberLicenseProfile = {
   licenseType: string
   licenseExpiresAt: string | null
@@ -33,12 +36,15 @@ export type MemberLicenseProfile = {
  * Super-admin only: bağımsız dış kayıt — Platform Masası ile aynı kriter: free lisans, parent_id boş.
  * (Ekibe üye olarak eklenmiş olsa bile kendi workspace'inde sponsor yoksa listelenir.)
  */
-export async function getIndependentSignupAIUsageAction(): Promise<IndependentAIUsageRow[]> {
+export async function getIndependentSignupAIUsageAction(): Promise<
+  ActionWithWarning<IndependentAIUsageRow[]>
+> {
   try {
-    return await buildIndependentSignupAIUsage()
+    const data = await buildIndependentSignupAIUsage()
+    return { data, warning: null }
   } catch (err) {
     console.error('[getIndependentSignupAIUsage]', err)
-    return []
+    return { data: [], warning: 'load_failed' }
   }
 }
 
@@ -63,7 +69,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
     .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
-    .eq('license_type', 'free')
+    .or('license_type.eq.free,license_type.is.null')
     .order('created_at', { ascending: false })
 
   if (wsError || !workspaces) {
@@ -74,6 +80,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
   const seenOwners = new Set<string>()
   const independentOwners: {
     userId: string
+    workspaceId: string
     licenseType: string
     licenseExpiresAt: string | null
     registeredAt: string
@@ -86,6 +93,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
     seenOwners.add(ws.owner_id)
     independentOwners.push({
       userId: ws.owner_id,
+      workspaceId: ws.id,
       licenseType: ws.license_type ?? 'free',
       licenseExpiresAt: ws.license_expires_at ?? null,
       registeredAt: ws.created_at,
@@ -153,6 +161,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
       return {
         userId: owner.userId,
+        workspaceId: owner.workspaceId,
         fullName,
         email,
         avatarUrl,
@@ -296,12 +305,13 @@ function emptyArchiveSummary(
 /** Super-admin: günlük roll-up tablosundan dönem bazlı YZ kullanım arşivi. */
 export async function getAIUsageArchiveAction(
   period: AIUsageArchivePeriod = '30d'
-): Promise<AIUsageArchiveSummary> {
+): Promise<ActionWithWarning<AIUsageArchiveSummary>> {
   try {
-    return await buildAIUsageArchive(period)
+    const data = await buildAIUsageArchive(period)
+    return { data, warning: null }
   } catch (err) {
     console.error('[getAIUsageArchive]', err)
-    return emptyArchiveSummary(period, true)
+    return { data: emptyArchiveSummary(period), warning: 'load_failed' }
   }
 }
 

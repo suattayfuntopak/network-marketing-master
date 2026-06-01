@@ -1,7 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { isSuperAdmin } from '@/lib/domain/auth'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
+import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import {
   ONBOARDING_STEP_COUNT,
   emptyMyPulseSummary,
@@ -70,15 +72,173 @@ function countEngagement(
   }
 }
 
+export type PulseSummaryResult = {
+  data: MyPulseSummary
+  warning: string | null
+}
+
 export async function getMyPulseSummaryAction(
   workspaceId: string,
   period: PulsePeriod
-): Promise<MyPulseSummary> {
+): Promise<PulseSummaryResult> {
   try {
-    return await buildMyPulseSummary(workspaceId, period)
+    const data = await buildMyPulseSummary(workspaceId, period)
+    return { data, warning: null }
   } catch (err) {
     console.error('[getMyPulseSummary]', err)
-    return emptyMyPulseSummary(period)
+    return { data: emptyMyPulseSummary(period), warning: 'load_failed' }
+  }
+}
+
+export type IndependentOwnerPulseRow = {
+  userId: string
+  workspaceId: string
+  fullName: string | null
+  email: string
+  trainingPct: number
+  objectionPct: number
+  onboardingDone: number
+  videoPct: number
+  newCandidates: number
+  calls: number
+}
+
+/** Super-admin: bağımsız dış kayıtların kişi bazlı nabız özeti (admin okuma). */
+export async function getIndependentOwnersPulseAction(): Promise<{
+  rows: IndependentOwnerPulseRow[]
+  warning: string | null
+}> {
+  try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    assertSuperAdmin(user)
+    const admin = createAdminClient()
+
+    const { data: myMembership } = await supabase
+      .from('nmm_workspace_members')
+      .select('workspace_id')
+      .eq('user_id', user!.id)
+      .eq('role', 'leader')
+      .maybeSingle()
+
+    const excludeWorkspaceId = myMembership?.workspace_id ?? null
+
+    const { data: workspaces, error: wsError } = await admin
+      .from('nmm_workspaces')
+      .select('id, owner_id, license_type, parent_id')
+      .or('license_type.eq.free,license_type.is.null')
+      .order('created_at', { ascending: false })
+
+    if (wsError || !workspaces) {
+      return { rows: [], warning: 'load_failed' }
+    }
+
+    const seen = new Set<string>()
+    const targets: { userId: string; workspaceId: string }[] = []
+    for (const ws of workspaces) {
+      if (ws.id === excludeWorkspaceId || !ws.owner_id || ws.owner_id === user!.id) continue
+      if (ws.parent_id) continue
+      if (seen.has(ws.owner_id)) continue
+      seen.add(ws.owner_id)
+      targets.push({ userId: ws.owner_id, workspaceId: ws.id })
+    }
+
+    if (targets.length === 0) return { rows: [], warning: null }
+
+    const users = await listAllAuthUsers(admin)
+    const userMap = new Map(users.map(u => [u.id, u]))
+    const ownerIds = targets.map(t => t.userId)
+
+    const { data: progressRows } = await admin
+      .from('nmm_user_progress')
+      .select('user_id, read_trainings, read_objections, fav_trainings, fav_objections')
+      .in('user_id', ownerIds)
+
+    const progressByUser = new Map((progressRows ?? []).map(r => [r.user_id, r]))
+
+    const { data: onboardingRows } = await admin
+      .from('nmm_onboarding_progress')
+      .select('user_id')
+      .in('user_id', ownerIds)
+
+    const onboardingCount = new Map<string, number>()
+    onboardingRows?.forEach(r => {
+      onboardingCount.set(r.user_id, (onboardingCount.get(r.user_id) ?? 0) + 1)
+    })
+
+    const since = periodStartIso('30d')
+    let actionsQuery = admin
+      .from('nmm_daily_actions')
+      .select('user_id, action_type')
+      .in('user_id', ownerIds)
+    if (since) actionsQuery = actionsQuery.gte('created_at', since)
+
+    const { data: actions } = await actionsQuery
+    const callsByUser = new Map<string, number>()
+    actions?.forEach(a => {
+      if (a.action_type === 'call') {
+        callsByUser.set(a.user_id, (callsByUser.get(a.user_id) ?? 0) + 1)
+      }
+    })
+
+    let candQuery = admin
+      .from('nmm_candidates')
+      .select('owner_id')
+      .in('owner_id', ownerIds)
+    if (since) candQuery = candQuery.gte('created_at', since)
+    const { data: cands } = await candQuery
+    const candByOwner = new Map<string, number>()
+    cands?.forEach(c => {
+      if (c.owner_id) candByOwner.set(c.owner_id, (candByOwner.get(c.owner_id) ?? 0) + 1)
+    })
+
+    const { data: videoRows } = await admin
+      .from('nmm_video_progress')
+      .select('user_id, video_key, status, watch_percent')
+      .in('user_id', ownerIds)
+
+    const videoByUser = new Map<string, Record<string, { status: 'started' | 'completed'; watch_percent: number }>>()
+    for (const row of videoRows ?? []) {
+      const map = videoByUser.get(row.user_id) ?? {}
+      map[row.video_key] = {
+        status: row.status as 'started' | 'completed',
+        watch_percent: row.watch_percent ?? 0,
+      }
+      videoByUser.set(row.user_id, map)
+    }
+
+    const rows: IndependentOwnerPulseRow[] = targets.map(t => {
+      const authUser = userMap.get(t.userId)
+      const email = authUser?.email ?? '—'
+      const fullName =
+        (authUser?.user_metadata?.full_name as string | undefined) ??
+        email.split('@')[0] ??
+        null
+      const learning = parseLearningProgress(progressByUser.get(t.userId) ?? null)
+      const video = summarizeVideoProgress(
+        TRAINING_VIDEOS.map(v => v.key),
+        videoByUser.get(t.userId) ?? {}
+      )
+      return {
+        userId: t.userId,
+        workspaceId: t.workspaceId,
+        fullName,
+        email,
+        trainingPct: learning.trainingPct,
+        objectionPct: learning.objectionPct,
+        onboardingDone: onboardingCount.get(t.userId) ?? 0,
+        videoPct: video.pct,
+        newCandidates: candByOwner.get(t.userId) ?? 0,
+        calls: callsByUser.get(t.userId) ?? 0,
+      }
+    })
+
+    return { rows, warning: null }
+  } catch (err) {
+    console.error('[getIndependentOwnersPulse]', err)
+    return { rows: [], warning: 'load_failed' }
   }
 }
 

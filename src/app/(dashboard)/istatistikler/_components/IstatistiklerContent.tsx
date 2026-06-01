@@ -20,6 +20,9 @@ import { StatsCharts } from './StatsCharts'
 import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { PulseMySection } from '@/app/(dashboard)/_components/pulse/PulseMySection'
+import { PulseTeamSection } from '@/app/(dashboard)/_components/pulse/PulseTeamSection'
+import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import type { MemberRow } from '@/lib/team/types'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -51,6 +54,7 @@ export function IstatistiklerContent() {
   )
   const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
+  const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
@@ -81,6 +85,23 @@ export function IstatistiklerContent() {
     const downlines = members.filter(m => m.role === 'member')
     return leader ? [leader, ...downlines] : members
   }, [members])
+
+  const pulseMemberRows = useMemo((): MemberRow[] => {
+    return sortedMembers.map(m => ({
+      user_id: m.user_id,
+      full_name: m.full_name,
+      role: m.role,
+      joined_at: m.joined_at,
+      candidate_count: m.candidate_count,
+      yeni_count: m.yeni_count,
+      sunum_count: m.sunum_count,
+      takip_count: m.takip_count,
+      katildi_count: m.katildi_count,
+      last_activity_at: m.last_activity_at,
+      onboarding_steps: m.onboarding_steps,
+      avatar_url: m.avatar_url ?? null,
+    }))
+  }, [sortedMembers])
 
   // Turkish-aware name normalizer — must match EkipPanel's cleanStr
   const cleanStr = (s: string | null | undefined) => (s ?? '')
@@ -353,6 +374,12 @@ export function IstatistiklerContent() {
             teamStatsLocked={teamStatsLocked}
             loading={membersLoading || cLoading}
           />
+
+          <PulseTeamSection members={pulseMemberRows} getMemberHref={getMemberHref} />
+
+          {teamPulseUnlocked && (
+            <p className="text-xs text-[var(--text-3)] px-1">{t('statsPage.realtimePulseNote')}</p>
+          )}
 
           {usage?.isSuperAdmin && (
             <StatsSuperAdminSections

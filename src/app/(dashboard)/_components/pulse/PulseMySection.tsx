@@ -36,18 +36,18 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
   const { data: ws } = useWorkspace()
   const [period, setPeriod] = useState<PulsePeriod>('30d')
 
-  const { data, isLoading, isError, isFetching } = useQuery({
+  const { data: result, isLoading, isFetching } = useQuery({
     queryKey: ['pulse-my', ws?.workspaceId, period],
     queryFn: () => getMyPulseSummaryAction(ws!.workspaceId, period),
     enabled: !!ws?.workspaceId,
     staleTime: 30_000,
-    retry: 1,
+    throwOnError: false,
   })
 
   if (!ws?.workspaceId) return null
 
-  const display = data ?? emptyMyPulseSummary(period)
-  const showFallbackNote = isError
+  const display = result?.data ?? emptyMyPulseSummary(period)
+  const showFallbackNote = result?.warning === 'load_failed'
 
   const titleCls = comfortableTypography
     ? 'text-base font-bold text-[var(--text-1)] flex items-center gap-2'
@@ -110,7 +110,7 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
       <p className={`${noteCls} text-[var(--text-3)]`}>{t('pulse.allTimeNote')}</p>
       <p className={`${noteCls} text-[var(--text-3)] -mt-2`}>{t('pulse.periodFieldNote')}</p>
 
-      {isLoading || (isFetching && !data) ? (
+      {isLoading || (isFetching && !result) ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[1, 2, 3, 4].map(i => (
             <Skeleton key={i} className="h-24 rounded-2xl" />

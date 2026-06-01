@@ -1,8 +1,9 @@
 export const pulseSection = {
   tr: {
     pulse: {
-      myTitle: 'Ekip Nabzı',
-      mySubtitle: 'Eğitim, itirazlar ve saha aktiviten — özet görünüm',
+      myTitle: 'Benim Nabzım',
+      mySubtitle:
+        'Yalnızca sizin hesabınız: eğitim, itiraz ve saha aktivitesi. Ekip üyeleri için aşağıdaki tabloya bakın.',
       teamTitle: 'Ekip Nabzı',
       teamSubtitle: 'Ekibinizin öğrenme ilerlemesi ve koçluk sinyalleri',
       allTimeNote: 'Üst satırdaki eğitim/itiraz yüzdeleri tüm zamanlar içindir.',
@@ -70,8 +71,9 @@ export const pulseSection = {
   },
   en: {
     pulse: {
-      myTitle: 'Team Pulse',
-      mySubtitle: 'Training, objections and field activity at a glance',
+      myTitle: 'My Pulse',
+      mySubtitle:
+        'Your account only: training, objections and field activity. See the team table below for members.',
       teamTitle: 'Team Pulse',
       teamSubtitle: 'Your team\'s learning progress and coaching signals',
       allTimeNote: 'Training and objection percentages above are all-time.',

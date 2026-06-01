@@ -115,6 +115,13 @@ export const statsSection = {
         'Arşiv verisi şu an yüklenemedi. Migration 029–030 uygulandıysa bir süre sonra yenileyin.',
       pulseLoadFallback:
         'Nabız verisi tam yüklenemedi; kutularda sıfır gösteriliyor. Sayfayı yenileyin veya birkaç dakika sonra tekrar deneyin.',
+      dataPartialWarning:
+        'Bazı kayıtlar yüklenemedi; tabloda eldeki veriler gösteriliyor.',
+      independentPulseTitle: 'Bağımsız Kayıt Nabzı (kişi bazlı)',
+      independentPulseSubtitle:
+        'Platforma kendi başına kayıolan liderlerin öğrenme ve saha özeti — örn. Yusuf Emre. Canlı güncelleme ~30 sn.',
+      realtimePulseNote:
+        'Ekip nabzı verileri canlı yayın ile güncellenir (yaklaşık 30 sn gecikme).',
       archiveRange: '{from} — {to} arası',
       archiveRangeAll: 'Tüm kayıtlar ({to} tarihine kadar)',
     },
@@ -235,6 +242,11 @@ export const statsSection = {
         'Archive data could not be loaded. If migrations 029–030 are applied, try again shortly.',
       pulseLoadFallback:
         'Pulse data could not load fully; showing zeros. Refresh or try again in a few minutes.',
+      dataPartialWarning: 'Some records could not load; showing available data.',
+      independentPulseTitle: 'Independent signup pulse (per person)',
+      independentPulseSubtitle:
+        'Per-person learning and field summary for leaders who joined without a sponsor — e.g. external signups.',
+      realtimePulseNote: 'Team pulse updates via live sync (~30s delay).',
       archiveRange: '{from} — {to}',
       archiveRangeAll: 'All records (through {to})',
     },
