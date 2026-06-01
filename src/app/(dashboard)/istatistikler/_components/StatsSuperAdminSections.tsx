@@ -79,11 +79,11 @@ export function StatsSuperAdminSections({
     <>
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
         <div>
-          <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
             <Sparkles className="h-4 w-4 text-brand animate-pulse" />
             {t('statsPage.aiAdminTitle')}
           </h2>
-          <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
             {t('statsPage.aiAdminSubtitle')}
           </p>
         </div>
@@ -92,7 +92,7 @@ export function StatsSuperAdminSections({
           className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
           onTouchStart={e => e.stopPropagation()}
         >
-          <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+          <table className="w-full text-left border-collapse text-sm min-w-[800px]">
             <thead>
               <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                 <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
@@ -135,7 +135,7 @@ export function StatsSuperAdminSections({
                       )}
                       <span>{m.full_name ?? t('statsPage.unnamedMember')}</span>
                     </td>
-                    <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                    <td className="p-3 text-sm text-[var(--text-2)] font-semibold uppercase">
                       {isLeader ? t('statsPage.roleLeader') : t('statsPage.rolePartner')}
                     </td>
                     <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
@@ -163,25 +163,25 @@ export function StatsSuperAdminSections({
 
       <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
         <div>
-          <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
             <Sparkles className="h-4 w-4 text-brand animate-pulse" />
             {t('statsPage.aiIndependentTitle')}
           </h2>
-          <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
             {t('statsPage.aiIndependentSubtitle')}
           </p>
         </div>
 
         {independentLoading ? (
-          <p className="text-xs text-[var(--text-3)] py-4 text-center">…</p>
+          <p className="text-sm text-[var(--text-3)] py-4 text-center">…</p>
         ) : independentUsage.length === 0 ? (
-          <p className="text-xs text-[var(--text-3)] py-4 text-center">{t('statsPage.aiIndependentEmpty')}</p>
+          <p className="text-sm text-[var(--text-3)] py-4 text-center">{t('statsPage.aiIndependentEmpty')}</p>
         ) : (
           <div
             className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
             onTouchStart={e => e.stopPropagation()}
           >
-            <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+            <table className="w-full text-left border-collapse text-sm min-w-[800px]">
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                   <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
@@ -211,11 +211,11 @@ export function StatsSuperAdminSections({
                         )}
                         <div className="min-w-0">
                           <div className="font-semibold truncate">{row.fullName ?? t('statsPage.unnamedMember')}</div>
-                          <div className="text-[10px] text-[var(--text-3)] truncate">{row.email}</div>
+                          <div className="text-sm text-[var(--text-3)] truncate">{row.email}</div>
                         </div>
                       </div>
                     </td>
-                    <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                    <td className="p-3 text-sm text-[var(--text-2)] font-semibold uppercase">
                       {licenseLabel(row.licenseType)}
                     </td>
                     <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">

@@ -304,10 +304,10 @@ export function IstatistiklerContent() {
               <TrendingUp className="h-5 w-5 text-[#1A56DB]" strokeWidth={1.75} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-1)]">
+              <h1 className="text-2xl font-bold text-[var(--text-1)]">
                 {t('statsPage.title')}
               </h1>
-              <p className="text-sm text-[var(--text-3)]">
+              <p className="text-base text-[var(--text-3)]">
                 {t('statsPage.subtitle')}
               </p>
             </div>
@@ -319,7 +319,7 @@ export function IstatistiklerContent() {
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition-all cursor-pointer ${
+                className={`rounded-lg px-3 py-1.5 text-sm font-bold transition-all cursor-pointer ${
                   period === p
                     ? 'bg-[var(--bg-card)] text-[#1A56DB] shadow-sm border border-[var(--border)]'
                     : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
@@ -366,7 +366,7 @@ export function IstatistiklerContent() {
             />
           )}
 
-          <PulseMySection />
+          <PulseMySection comfortableTypography />
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <MyAIUsageQuotaCard
@@ -379,7 +379,7 @@ export function IstatistiklerContent() {
           {/* Bilgi Notu */}
           <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">
             <Clock className="h-4 w-4 shrink-0 text-[var(--text-3)] mt-0.5" />
-            <p className="text-[11px] leading-relaxed text-[var(--text-3)] font-semibold">
+            <p className="text-sm leading-relaxed text-[var(--text-3)] font-semibold">
               {t('statsPage.infoNote')}
             </p>
           </section>

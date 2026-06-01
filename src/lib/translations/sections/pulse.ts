@@ -1,7 +1,7 @@
 export const pulseSection = {
   tr: {
     pulse: {
-      myTitle: 'Gelişim Nabzım',
+      myTitle: 'Bireysel Gelişim Takip Tablosu',
       mySubtitle: 'Eğitim, itirazlar ve saha aktiviten — özet görünüm',
       teamTitle: 'Ekip Nabzı',
       teamSubtitle: 'Ekibinizin öğrenme ilerlemesi ve koçluk sinyalleri',
@@ -70,7 +70,7 @@ export const pulseSection = {
   },
   en: {
     pulse: {
-      myTitle: 'My Progress Pulse',
+      myTitle: 'Personal Development Tracker',
       mySubtitle: 'Training, objections and field activity at a glance',
       teamTitle: 'Team Pulse',
       teamSubtitle: 'Your team\'s learning progress and coaching signals',

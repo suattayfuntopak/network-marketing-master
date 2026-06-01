@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-01 — İstatistikler tipografi + çıkış düzeltmesi
+
+- **İstatistikler** (`istatistikler/_components/*`, `PulseMySection` + `comfortableTypography`): tüm metinler ~1 punto büyütüldü; diğer sayfalar etkilenmedi.
+- Başlık: **Bireysel Gelişim Takip Tablosu** (`pulse.myTitle` TR/EN).
+- **Çıkış yap:** önce `logoutAction` (sunucu cookie), sonra client `signOut({ scope: 'global' })`, ardından `window.location.assign('/giris')` — SPA `router.push` oturum cookie’si kalınca proxy’nin tekrar `/pano`’ya atması engellendi.
+
 ## 2026-06-01 — Nabız cron → GitHub Actions (Hobby Vercel)
 
 SQL 040–043 tamam. **Yeni secret yok** — mevcut `CRON_SECRET` + `NMM_APP_URL` (e-posta cron ile aynı).

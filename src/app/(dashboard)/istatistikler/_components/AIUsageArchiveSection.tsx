@@ -30,11 +30,11 @@ export function AIUsageArchiveSection() {
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
             <BarChart3 className="h-4 w-4 text-brand" />
             {t('statsPage.archiveTitle')}
           </h2>
-          <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed max-w-2xl">
+          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed max-w-2xl">
             {t('statsPage.archiveSubtitle')}
           </p>
         </div>
@@ -44,7 +44,7 @@ export function AIUsageArchiveSection() {
               key={p.id}
               type="button"
               onClick={() => setPeriod(p.id)}
-              className={`rounded-full px-3 py-1.5 text-[11px] font-bold transition ${
+              className={`rounded-full px-3 py-1.5 text-sm font-bold transition ${
                 period === p.id
                   ? 'bg-[#534AB7] text-white shadow-md'
                   : 'border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:border-[#534AB7]/40'
@@ -69,14 +69,14 @@ export function AIUsageArchiveSection() {
               className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/60 px-3 py-2.5 text-center"
             >
               <p className="text-lg font-black tabular-nums text-[var(--text-1)]">{stat.value}</p>
-              <p className="text-[10px] font-semibold text-[var(--text-3)]">{stat.label}</p>
+              <p className="text-sm font-semibold text-[var(--text-3)]">{stat.label}</p>
             </div>
           ))}
         </div>
       )}
 
       {error && (
-        <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs text-red-700 dark:text-red-300">
+        <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-700 dark:text-red-300">
           {(error as Error).message}
         </p>
       )}
@@ -84,12 +84,12 @@ export function AIUsageArchiveSection() {
       {isLoading ? (
         <div className="h-40 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
       ) : !data || data.rows.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[var(--border)] py-10 text-center text-xs text-[var(--text-3)]">
+        <div className="rounded-xl border border-dashed border-[var(--border)] py-10 text-center text-sm text-[var(--text-3)]">
           {t('statsPage.archiveEmpty')}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
-          <table className="w-full text-left border-collapse text-xs min-w-[880px]">
+          <table className="w-full text-left border-collapse text-sm min-w-[880px]">
             <thead>
               <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold">
                 <th className="p-3">{t('statsPage.colPartnerName')}</th>
@@ -108,14 +108,14 @@ export function AIUsageArchiveSection() {
                   <tr key={row.userId} className="hover:bg-[var(--bg-subtle)]/60">
                     <td className="p-3">
                       <div className="font-semibold">{row.fullName ?? t('statsPage.unnamedMember')}</div>
-                      <div className="text-[10px] text-[var(--text-3)] truncate max-w-[200px]">{row.email}</div>
+                      <div className="text-sm text-[var(--text-3)] truncate max-w-[200px]">{row.email}</div>
                       {row.isInvitedDownline && (
-                        <span className="mt-1 inline-block rounded-full bg-purple-500/10 px-2 py-0.5 text-[9px] font-bold text-purple-600 dark:text-purple-400">
+                        <span className="mt-1 inline-block rounded-full bg-purple-500/10 px-2 py-0.5 text-sm font-bold text-purple-600 dark:text-purple-400">
                           {t('statsPage.archiveTagInvited')}
                         </span>
                       )}
                     </td>
-                    <td className="p-3 text-[10px] font-bold uppercase text-[var(--text-2)]">
+                    <td className="p-3 text-sm font-bold uppercase text-[var(--text-2)]">
                       {row.isSuperAdmin
                         ? t('statsPage.licensePlanSuperAdmin')
                         : row.licenseType === 'free'
@@ -140,7 +140,7 @@ export function AIUsageArchiveSection() {
       )}
 
       {data && (
-        <p className="flex items-center gap-1.5 text-[10px] text-[var(--text-3)]">
+        <p className="flex items-center gap-1.5 text-sm text-[var(--text-3)]">
           <CalendarRange className="h-3.5 w-3.5" />
           {data.fromDate
             ? t('statsPage.archiveRange', { from: data.fromDate, to: data.toDate })

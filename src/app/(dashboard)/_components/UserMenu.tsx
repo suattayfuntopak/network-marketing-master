@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { LogOut, User, Settings, Bell, ChevronDown, Sparkles } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { logoutAction } from '../_shared-actions'
@@ -15,6 +16,7 @@ import { Z } from '@/lib/ui/zIndex'
 export function UserMenu() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const [loggingOut, setLoggingOut] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -36,6 +38,22 @@ export function UserMenu() {
     : '?'
   const avatarUrl = ws?.avatarUrl ?? null
   const showUpgrade = ws && !ws.isSuperAdmin && ws.licenseType === 'free'
+
+  async function handleLogoutConfirm() {
+    if (loggingOut) return
+    setLoggingOut(true)
+    setLogoutConfirmOpen(false)
+    setOpen(false)
+    try {
+      await logoutAction()
+      const supabase = createClient()
+      await supabase.auth.signOut({ scope: 'global' })
+    } catch (err) {
+      console.error('[logout]', err)
+    }
+    // Tam sayfa yüklemesi: cookie temizlendikten sonra proxy /giris'te kalır (SPA push bazen /pano'ya geri döner)
+    window.location.assign('/giris')
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -160,8 +178,7 @@ export function UserMenu() {
         <ConfirmDialog
           message={t('shellUi.confirmLogout')}
           onConfirm={() => {
-            setLogoutConfirmOpen(false)
-            void logoutAction()
+            void handleLogoutConfirm()
           }}
           onCancel={() => setLogoutConfirmOpen(false)}
         />

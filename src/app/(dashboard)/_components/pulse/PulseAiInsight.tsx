@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 type Props = {
   scope: 'personal' | 'team'
+  comfortableTypography?: boolean
 }
 
 const RISK_KEYS: Record<string, string> = {
@@ -25,7 +26,7 @@ function riskFlagLabel(t: (key: string) => string, flag: string): string {
   return key ? t(key) : flag
 }
 
-export function PulseAiInsight({ scope }: Props) {
+export function PulseAiInsight({ scope, comfortableTypography = false }: Props) {
   const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
 
@@ -43,13 +44,21 @@ export function PulseAiInsight({ scope }: Props) {
 
   return (
     <div className="rounded-xl border border-brand/20 bg-gradient-to-br from-brand/5 to-transparent p-4 space-y-2">
-      <div className="flex items-center gap-2 text-xs font-bold text-brand">
+      <div
+        className={`flex items-center gap-2 font-bold text-brand ${comfortableTypography ? 'text-sm' : 'text-xs'}`}
+      >
         <Sparkles className="h-4 w-4" />
         {scope === 'team' ? t('pulse.aiTeamTitle') : t('pulse.aiPersonalTitle')}
       </div>
-      <p className="text-xs leading-relaxed text-[var(--text-2)]">{data.summary}</p>
+      <p
+        className={`leading-relaxed text-[var(--text-2)] ${comfortableTypography ? 'text-sm' : 'text-xs'}`}
+      >
+        {data.summary}
+      </p>
       {data.bullets.length > 0 && (
-        <ul className="list-disc pl-4 space-y-1 text-[11px] text-[var(--text-2)]">
+        <ul
+          className={`list-disc pl-4 space-y-1 text-[var(--text-2)] ${comfortableTypography ? 'text-sm' : 'text-[11px]'}`}
+        >
           {data.bullets.map((b, i) => (
             <li key={i}>{b}</li>
           ))}
@@ -60,14 +69,14 @@ export function PulseAiInsight({ scope }: Props) {
           {data.riskFlags.map(flag => (
             <span
               key={flag}
-              className="rounded-md bg-rose-500/10 px-1.5 py-0.5 text-[9px] font-bold text-rose-700 dark:text-rose-300"
+              className={`rounded-md bg-rose-500/10 px-1.5 py-0.5 font-bold text-rose-700 dark:text-rose-300 ${comfortableTypography ? 'text-[11px]' : 'text-[9px]'}`}
             >
               {riskFlagLabel(t, flag)}
             </span>
           ))}
         </div>
       )}
-      <p className="text-[9px] text-[var(--text-3)]">
+      <p className={`text-[var(--text-3)] ${comfortableTypography ? 'text-[11px]' : 'text-[9px]'}`}>
         {t('pulse.aiWeekNote', { week: data.weekStart })}
       </p>
     </div>

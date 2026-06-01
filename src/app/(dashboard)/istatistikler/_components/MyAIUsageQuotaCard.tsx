@@ -28,10 +28,10 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
           <Sparkles className="h-4 w-4 text-[#D97706]" strokeWidth={2} />
         </div>
         <div>
-          <h2 className="text-sm font-bold text-[var(--text-1)]">
+          <h2 className="text-base font-bold text-[var(--text-1)]">
             {t('statsPage.quotaTitle')}
           </h2>
-          <p className="text-[11px] text-[var(--text-3)]">
+          <p className="text-sm text-[var(--text-3)]">
             {t('statsPage.quotaSubtitle')}
           </p>
         </div>
@@ -43,10 +43,10 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
           <div className="flex items-start gap-3">
             <div className="text-2xl mt-0.5 animate-bounce">👑</div>
             <div className="space-y-1">
-              <h3 className="text-xs font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+              <h3 className="text-base font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
                 {t('statsPage.quotaSuperTitle')}
               </h3>
-              <p className="text-xs leading-relaxed text-[var(--text-2)] font-semibold">
+              <p className="text-sm leading-relaxed text-[var(--text-2)] font-semibold">
                 {t('statsPage.quotaSuperDesc')}
               </p>
             </div>
@@ -57,7 +57,7 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-1">
           {/* 1. YZ Mesajı */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+            <div className="flex items-center justify-between text-sm font-bold text-[var(--text-1)]">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-[#0F6E56]" />
                 {t('statsPage.quotaWriter')}
@@ -76,7 +76,7 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
 
           {/* 2. YZ Koçu (Saha Provası) */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+            <div className="flex items-center justify-between text-sm font-bold text-[var(--text-1)]">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-[#534AB7]" />
                 {t('statsPage.quotaCoach')}
@@ -95,7 +95,7 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
 
           {/* 3. Uyum Denetimi */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-xs font-bold text-[var(--text-1)]">
+            <div className="flex items-center justify-between text-sm font-bold text-[var(--text-1)]">
               <span className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-[#C03E1F]" />
                 {t('statsPage.quotaCompliance')}

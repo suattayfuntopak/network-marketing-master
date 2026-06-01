@@ -5,16 +5,31 @@ type Props = {
   primary: string
   secondary?: string
   pct?: number
+  comfortableTypography?: boolean
 }
 
-export function PulseKpiCard({ label, primary, secondary, pct }: Props) {
+export function PulseKpiCard({
+  label,
+  primary,
+  secondary,
+  pct,
+  comfortableTypography = false,
+}: Props) {
+  const labelCls = comfortableTypography
+    ? 'text-sm font-bold uppercase tracking-wider text-[var(--text-3)]'
+    : 'text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]'
+  const secondaryCls = comfortableTypography
+    ? 'mt-0.5 text-base text-[var(--text-2)]'
+    : 'mt-0.5 text-xs text-[var(--text-2)]'
+  const primaryCls = comfortableTypography
+    ? 'mt-1 text-3xl font-black text-[var(--text-1)]'
+    : 'mt-1 text-2xl font-black text-[var(--text-1)]'
+
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">{label}</p>
-      <p className="mt-1 text-2xl font-black text-[var(--text-1)]">{primary}</p>
-      {secondary && (
-        <p className="mt-0.5 text-xs text-[var(--text-2)]">{secondary}</p>
-      )}
+      <p className={labelCls}>{label}</p>
+      <p className={primaryCls}>{primary}</p>
+      {secondary && <p className={secondaryCls}>{secondary}</p>}
       {pct !== undefined && (
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
           <div

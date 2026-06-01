@@ -22,11 +22,11 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
   return (
     <section className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200 overflow-hidden">
       <div>
-        <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+        <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
           <Users className="h-4 w-4 text-brand" />
           {t('statsPage.teamTitle')}
         </h2>
-        <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+        <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
           {t('statsPage.teamSubtitle')}
         </p>
       </div>
@@ -34,12 +34,12 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
       {loading ? (
         <div className="h-32 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
       ) : performanceRows.length === 0 ? (
-        <div className="py-10 text-center text-xs text-[var(--text-3)] italic">
+        <div className="py-10 text-center text-sm text-[var(--text-3)] italic">
           {t('statsPage.teamEmpty')}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true" onTouchStart={(e) => e.stopPropagation()}>
-          <table className="w-full text-left border-collapse text-xs min-w-[800px]">
+          <table className="w-full text-left border-collapse text-sm min-w-[800px]">
             <thead>
               <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                 <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
@@ -86,16 +86,16 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
                       )}
                       <span>{m.full_name ?? t('statsPage.unnamedMember')}</span>
                     </td>
-                    <td className="p-3 text-[10px] text-[var(--text-2)] font-semibold uppercase">
+                    <td className="p-3 text-sm text-[var(--text-2)] font-semibold uppercase">
                       {isLeader ? t('statsPage.roleLeader') : t('statsPage.rolePartner')}
                     </td>
                     <td className="p-3 text-center">
                       {isLeader ? null : isAppUser ? (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-[9px] font-black text-purple-700 dark:text-purple-400 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-sm font-black text-purple-700 dark:text-purple-400 whitespace-nowrap">
                           💎 {t('statsPage.typeNmm')}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800/60 px-2 py-0.5 text-[9px] font-black text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800/60 px-2 py-0.5 text-sm font-black text-zinc-600 dark:text-zinc-400 whitespace-nowrap">
                           🤝 {t('statsPage.typeField')}
                         </span>
                       )}
@@ -108,7 +108,7 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
                     <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{isAppUser ? m.takip_count : '—'}</td>
                     <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{isAppUser ? m.katildi_count : '—'}</td>
                     <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-black">{isAppUser ? `%${onboardingPct}` : '—'}</td>
-                    <td className="p-3 text-right text-[11px] text-[var(--text-2)] font-medium truncate">
+                    <td className="p-3 text-right text-sm text-[var(--text-2)] font-medium truncate">
                       {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—'}
                     </td>
                   </tr>
@@ -118,7 +118,7 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
           </table>
         </div>
       )}
-      <div className="text-[10px] font-bold text-[var(--text-3)] select-none pl-1 mt-1">
+      <div className="text-sm font-bold text-[var(--text-3)] select-none pl-1 mt-1">
         * {t('statsPage.dqsgFootnote')}
       </div>
 
@@ -132,7 +132,7 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
           </div>
           <div className="max-w-sm space-y-1">
             <p className="text-sm font-bold text-[var(--text-1)]">{t('statsPage.teamLockedTitle')}</p>
-            <p className="text-xs leading-relaxed text-[var(--text-2)]">{t('statsPage.teamLockedDesc')}</p>
+            <p className="text-sm leading-relaxed text-[var(--text-2)]">{t('statsPage.teamLockedDesc')}</p>
           </div>
           <Link
             href="/odeme"
