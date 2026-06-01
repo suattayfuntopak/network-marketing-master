@@ -1,19 +1,13 @@
 # Hot Log
 
-## 2026-06-01 — Nabız cron kurulum (senin yapman gerekenler)
+## 2026-06-01 — Nabız cron → GitHub Actions (Hobby Vercel)
 
-1. **Supabase:** `040` → `041` → `042` → `043` migration’ları sırayla uygula (039 sonrası).
-2. **Ortam değişkeni:** Production’da (Vercel vb.) `CRON_SECRET` tanımlı olsun (güçlü rastgele string).
-3. **Zamanlayıcı (birini seç):**
-   - **Vercel Cron** veya **GitHub Actions** ile günlük `pulse-rollup`, haftalık `pulse-weekly` çağrısı; veya
-   - İlk kurulumda **bir kez manuel** `curl` (aşağı), sonra zamanlayıcıyı ekle.
-4. **Manuel test (isteğe bağlı):** `<domain>` = canlı site (ör. `https://networkmarketingmaster.com`), terminalde `CRON_SECRET` export et:
-   ```bash
-   curl -sS -H "Authorization: Bearer $CRON_SECRET" "https://<domain>/api/cron/pulse-rollup"
-   curl -sS -H "Authorization: Bearer $CRON_SECRET" "https://<domain>/api/cron/pulse-weekly"
-   ```
-   `{"ok":true,...}` dönmeli. YZ özet kartı için önce rollup birkaç gün biriksin veya weekly’yi bir kez tetikle.
-5. **Realtime (F5):** Ek curl gerekmez; `043` migration sonrası nabız sayfaları otomatik yenilenir.
+SQL 040–043 tamam. **Yeni secret yok** — mevcut `CRON_SECRET` + `NMM_APP_URL` (e-posta cron ile aynı).
+
+- `.github/workflows/cron-emails.yml` → günlük `pulse-rollup` eklendi.
+- `.github/workflows/cron-pulse-weekly.yml` → Pazartesi `pulse-weekly` (YZ özet).
+- Senin adımın: push sonrası GitHub Actions’tan **Run workflow** ile bir kez test (aşağıdaki rehber).
+- Vercel’de `GEMINI_API_KEY` olmalı (haftalık AI için).
 
 ## 2026-06-01 — Ekip Nabzı Faz 5 (tamamlandı)
 

@@ -104,6 +104,17 @@ GitHub → repo **Settings → Secrets → Actions**:
 
 Kurulumdan sonra **Actions** sekmesinden workflow’u manuel çalıştırarak test edin. Ek ücret: GitHub public repo’da Actions kotası genelde yeterlidir.
 
+### Ekip Nabzı cron (F4 — aynı secret’lar)
+
+| Workflow | Dosya | Ne zaman | Endpoint |
+|----------|--------|----------|----------|
+| Günlük rollup | `cron-emails.yml` (ek adım) | Her gün ~09:00 TR | `GET /api/cron/pulse-rollup` |
+| Haftalık AI özet | `cron-pulse-weekly.yml` | Pazartesi ~10:00 TR | `GET /api/cron/pulse-weekly` |
+
+Yeni GitHub secret gerekmez (`CRON_SECRET` + `NMM_APP_URL` yeterli). **Vercel’de** `GEMINI_API_KEY` tanımlı olmalı (haftalık özet için). SQL: `040`–`043` uygulanmış olmalı.
+
+Manuel test: Actions → **NMM pulse weekly AI** → **Run workflow**. İstatistikler / Ekibim’de “YZ haftalık nabız özeti” kartı görünür (ilk çalıştırmadan sonra).
+
 **Proxy:** `src/proxy.ts` içinde `/api/cron/` oturum kontrolünden muaf (route kendi `CRON_SECRET` doğrulamasını yapar). Yoksa istekler `/giris`’e 307 ile düşer ve e-posta gitmez.
 
 Doğrulama (yönlendirme takip edilmeden):
