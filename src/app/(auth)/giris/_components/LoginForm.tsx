@@ -5,6 +5,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { createClient } from '@/lib/supabase/client'
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authLinkAccentClass,
+  authLinkSecondaryClass,
+  authMutedClass,
+  authPrimaryBtnClass,
+} from '@/app/(auth)/_components/authUi'
 
 export function LoginForm() {
   const { t } = useTranslation()
@@ -54,7 +63,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-300" htmlFor="email">
+        <label className={authLabelClass} htmlFor="email">
           {t('auth.emailLabel')}
         </label>
         <input
@@ -64,12 +73,12 @@ export function LoginForm() {
           required
           autoComplete="email"
           placeholder="email@example.com"
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          className={authInputClass}
         />
       </div>
 
       <div>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-gray-300" htmlFor="password">
+        <label className={authLabelClass} htmlFor="password">
           {t('auth.passwordLabel')}
         </label>
         <input
@@ -79,12 +88,12 @@ export function LoginForm() {
           required
           autoComplete="current-password"
           placeholder="••••••••"
-          className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none transition focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20"
+          className={authInputClass}
         />
       </div>
 
       {error && (
-        <p className="rounded-xl bg-[#FBEAF0]/10 border border-[#72243E]/20 px-4 py-2.5 text-sm text-rose-300">
+        <p className={authErrorClass}>
           {error}
         </p>
       )}
@@ -92,21 +101,21 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 py-3 text-sm font-semibold text-white transition hover:opacity-90 active:scale-[0.98] disabled:opacity-60 shadow-[0_4px_20px_rgba(6,182,212,0.25)]"
+        className={authPrimaryBtnClass}
       >
         {pending ? t('common.loading') : t('auth.loginBtn')}
       </button>
 
       <div className="space-y-2.5 pt-2 text-center text-xs">
         <p>
-          <Link href="/sifre-sifirla" className="font-semibold text-cyan-400 hover:text-cyan-300 hover:underline">
+          <Link href="/sifre-sifirla" className={authLinkAccentClass}>
             {t('auth.resetPassword')}
           </Link>
         </p>
 
-        <p className="text-gray-400">
+        <p className={authMutedClass}>
           {t('auth.noAccount')}{' '}
-          <Link href="/kayit" className="font-semibold text-indigo-400 hover:text-indigo-300 hover:underline ml-1">
+          <Link href="/kayit" className={`${authLinkSecondaryClass} ml-1`}>
             {t('auth.registerTitle')}
           </Link>
         </p>

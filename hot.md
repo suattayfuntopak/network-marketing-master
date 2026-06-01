@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-01 — Auth tema: light/system gerçekten uygulanıyor
+
+- **Sorun:** Tema ikonu döngüsü çalışıyordu ama arka plan/formlar sabit koyu (`#0a0b10`, `text-white`) — üç modda da dark görünüyordu.
+- **Çözüm:** `authUi.ts` — `--bg`, `--text-*`, `dark:` ile shell, input, link sınıfları; layout + giriş/kayıt/şifre formları güncellendi.
+- Light: açık gradient + kart input; Dark: önceki radial koyu görünüm korundu.
+
 ## 2026-06-01 — Auth sayfaları: tek dil bayrağı + tema ikonları
 
 - **Kapsam:** `(auth)/layout.tsx` — giriş, kayıt, şifre sıfırlama/güncelleme ortak layout.

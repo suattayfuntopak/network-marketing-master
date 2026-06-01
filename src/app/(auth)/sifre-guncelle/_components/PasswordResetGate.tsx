@@ -2,6 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import {
+  authErrorClass,
+  authInputClass,
+  authLabelClass,
+  authLinkSecondaryClass,
+  authMutedClass,
+  authPrimaryBtnClass,
+} from '@/app/(auth)/_components/authUi'
 
 type Status = 'loading' | 'ready' | 'error'
 
@@ -122,7 +130,7 @@ export function PasswordResetGate() {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
-        <p className="text-xs text-gray-500">Bağlantı doğrulanıyor…</p>
+        <p className={`text-xs ${authMutedClass}`}>Bağlantı doğrulanıyor…</p>
       </div>
     )
   }
@@ -130,12 +138,12 @@ export function PasswordResetGate() {
   if (status === 'error') {
     return (
       <div className="space-y-4">
-        <p className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
+        <p className={authErrorClass}>
           Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı iste.
         </p>
         <a
           href="/sifre-sifirla"
-          className="block text-center text-sm font-semibold text-[#534AB7] hover:underline"
+          className={`block text-center text-sm ${authLinkSecondaryClass}`}
         >
           Yeni bağlantı iste
         </a>
@@ -146,7 +154,7 @@ export function PasswordResetGate() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1.5 block text-sm font-medium text-gray-900" htmlFor="password">
+        <label className={authLabelClass} htmlFor="password">
           Yeni Şifre
         </label>
         <input
@@ -158,18 +166,18 @@ export function PasswordResetGate() {
           placeholder="En az 6 karakter"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
+          className={authInputClass}
         />
       </div>
 
       {formError && (
-        <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">{formError}</p>
+        <p className={authErrorClass}>{formError}</p>
       )}
 
       <button
         type="submit"
         disabled={saving}
-        className="w-full rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60"
+        className={authPrimaryBtnClass}
       >
         {saving ? 'Kaydediliyor...' : 'Şifremi Güncelle'}
       </button>
