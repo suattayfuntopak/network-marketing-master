@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-01 — Kilit metni + Aday Kazanım İvmesi akışkanlık + İçerik %
+
+- **Kilit overlay** (Plus/Pro gate) metni yeni tabloya göre güncellendi: "Ekip Performans İzleme
+  Tablosu" + ne içerdiği (aday hunisi, içerik, video, DQSG). TR+EN, `stats.ts`.
+- **Aday Kazanım İvmesi zıplaması düzeltildi:** trendBars dönemle bucket sayısı değiştiriyordu
+  (7d→7, 30d→6, diğer→8 = reflow). Artık **sabit 7 bucket** (5 dönemi de — today/7d/30d/ytd/all —
+  doğru aralık+etiketle ele alır) + çubuklara `duration-700 ease-out` → diğer grafikler gibi akışkan.
+- **"Eğitim %" → "İçerik %"** (perf tablosu sütunu; pulse.colTraining TR+EN).
+- tsc temiz, 86 test, lint 0 hata.
+
+İnceleme (rapora): İçerik% = işaretlenen okumalar/30 (manuel ✓ butonu, tıkla-aç değil). Video% =
+tamamlanan/7 (placeholder YouTube kataloğu, manuel "Tamamladım"). Tüm sütunlar GERÇEK veri çeker;
+sadece 7 video içeriği placeholder (NMM kendi videolarıyla değiştirebilir).
+
 ## 2026-06-01 — KVKK §6 + Yusuf dış kayıt fix + SUPER ADMIN ∞ + perf dönem kaldır
 
 - **KVKK §6** "Ekip Nabzı" → **"Ekip Performans İzleme ve Sponsor Görünürlüğü"**; içerik yeni

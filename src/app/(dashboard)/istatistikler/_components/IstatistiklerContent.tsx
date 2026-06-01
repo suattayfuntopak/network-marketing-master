@@ -280,37 +280,50 @@ export function IstatistiklerContent() {
 
   // 5. Kayıt Trendi Barları (MiniTrend benzeri)
   const trendBars = useMemo(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    const length = period === '7d' ? 7 : period === '30d' ? 6 : 8
-    const intervalDays = period === '7d' ? 1 : period === '30d' ? 5 : 30
+    // Sabit bucket sayısı → dönem değişince çubuk sayısı sabit kalır (reflow/zıplama yok).
+    const BUCKETS = 7
+    const now = new Date().getTime()
+    const dayMs = 86_400_000
 
-    return Array.from({ length }, (_, idx) => {
-      const endOffset = (length - 1 - idx) * intervalDays
-      const startOffset = endOffset + intervalDays
-      
-      const dStart = new Date(today)
-      dStart.setDate(dStart.getDate() - startOffset)
-      const dEnd = new Date(today)
-      dEnd.setDate(dEnd.getDate() - endOffset)
-      
+    let start: number
+    if (period === 'today') {
+      const d = new Date(); d.setHours(0, 0, 0, 0); start = d.getTime()
+    } else if (period === '7d') {
+      start = now - 7 * dayMs
+    } else if (period === '30d') {
+      start = now - 30 * dayMs
+    } else if (period === 'ytd') {
+      start = new Date(new Date().getFullYear(), 0, 1).getTime()
+    } else {
+      // all: en eski adaydan bugüne (aday yoksa son ~7 gün)
+      start = candidates.length
+        ? candidates.reduce((m, c) => Math.min(m, new Date(c.created_at).getTime()), now)
+        : now - 6 * dayMs
+    }
+
+    const span = Math.max(now - start, 3_600_000) // en az 1 saat
+    const step = span / BUCKETS
+
+    return Array.from({ length: BUCKETS }, (_, idx) => {
+      const bStart = start + idx * step
+      const bEnd = idx === BUCKETS - 1 ? now + 1 : start + (idx + 1) * step
       const count = candidates.filter(c => {
-        const t = new Date(c.created_at)
-        return t >= dStart && t < dEnd
+        const t = new Date(c.created_at).getTime()
+        return t >= bStart && t < bEnd
       }).length
 
-      let label = ''
-      if (period === '7d') {
+      const dRef = new Date(bStart)
+      let label: string
+      if (period === 'today') {
+        label = dRef.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+      } else if (period === '7d') {
         const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
-        const dayIdx = (dEnd.getDay() + 6) % 7
-        label = days[dayIdx]
+        label = days[(dRef.getDay() + 6) % 7]
       } else if (period === '30d') {
-        label = `${dEnd.getDate()} ${dEnd.toLocaleDateString(undefined, { month: 'short' })}`
+        label = `${dRef.getDate()} ${dRef.toLocaleDateString(undefined, { month: 'short' })}`
       } else {
-        label = dEnd.toLocaleDateString(undefined, { month: 'short', year: '2-digit' })
+        label = dRef.toLocaleDateString(undefined, { month: 'short', year: '2-digit' })
       }
-
       return { label, count }
     })
   }, [candidates, period])

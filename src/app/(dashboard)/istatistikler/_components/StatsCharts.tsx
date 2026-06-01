@@ -193,7 +193,7 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
                 <div key={i} className="flex flex-1 flex-col items-center gap-1">
                   <span className="text-sm font-bold text-[var(--text-1)]">{bar.count > 0 ? bar.count : ''}</span>
                   <div
-                    className={`w-full rounded-t-md transition-all ${bar.count > 0 ? 'bg-[#4169E1]' : 'bg-[#EEF2FF] dark:bg-[#4169E1]/20'}`}
+                    className={`w-full rounded-t-md transition-all duration-700 ease-out ${bar.count > 0 ? 'bg-[#4169E1]' : 'bg-[#EEF2FF] dark:bg-[#4169E1]/20'}`}
                     style={{ height: `${Math.max((bar.count / maxTrendCount) * 105, bar.count > 0 ? 10 : 2)}px` }}
                   />
                   <span className="text-sm font-semibold text-[var(--text-3)] truncate w-full text-center">{bar.label}</span>
