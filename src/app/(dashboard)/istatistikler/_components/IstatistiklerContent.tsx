@@ -101,7 +101,6 @@ export function IstatistiklerContent() {
         const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
         return mWords.some((w: string) => cf.includes(w))
       }))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [candidates, sortedMembers])
 
   // Combined performance table rows: NMM members + Saha Ortakları

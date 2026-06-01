@@ -180,7 +180,7 @@ export async function approveRequestAction(
   }
 
   // Fetch user language settings or default to 'tr'
-  let userLang: 'tr' | 'en' = 'tr'
+  const userLang: 'tr' | 'en' = 'tr'
   try {
     const { data: profile } = await admin
       .from('nmm_workspace_members')
@@ -238,7 +238,7 @@ export async function rejectRequestAction(
       : (rowData?.soru?.tr ?? rowData?.soru?.en ?? rowData?.soru ?? 'İsimsiz İtiraz')
 
     // Find lang or default to 'tr'
-    let userLang: 'tr' | 'en' = 'tr'
+    const userLang: 'tr' | 'en' = 'tr'
 
     sendModerationRejectedEmail(
       row.user_email,
