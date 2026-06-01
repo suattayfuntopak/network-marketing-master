@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-01 — Ekip Nabzı Faz 3 (tamamlandı)
+
+Video eğitim modülü + nabız entegrasyonu. **Deploy:** `041_video_progress.sql` (040 sonrası).
+
+- `/egitim/videolar` — 6 kürasyonlu YouTube embed (nocookie), başla/tamamla, manuel % kaydırıcı.
+- `nmm_video_progress` + sponsor SELECT (039 ile aynı downline modeli).
+- Gelişim Nabzım: video tamamlama + drop-off (yarım video).
+- Ekip Nabzı: Video % sütunu; tüm videolar bitince lidere bildirim.
+- `trainingVideos.ts` — `youtubeId` değerlerini kendi kanalınızla değiştirebilirsiniz.
+
+## 2026-06-01 — Ekip Nabzı Faz 2 (tamamlandı)
+
+Olay logu + dönem metrikleri + streak + sponsor bildirimi. **Deploy:** `040_learning_events.sql` uygula (039 sonrası).
+
+- Migration `040`: `nmm_learning_events` (RLS: kendi yaz/oku + sponsor SELECT downline).
+- `recordProgressChangeAction` — ilerleme upsert + okuma/favori olayları; kütüphane tamamlanınca lidere bildirim.
+- Engagement: `presentation_sent`, `appointment_set`, `appointment_done` (takvim, aday güncelleme, sunum WhatsApp).
+- Gelişim Nabzım: dönem Bugün/7g/30g/Yıl/Tümü, dönemde okunan, streak, sunum/randevu KPI.
+- Ekip Nabzı: son 30g sunum + randevu sütunları; rozet metni netleştirildi (`objections_gap` = koçluk sinyali, eksik özellik değil).
+
 ## 2026-06-01 — Ekip Nabzı Faz 1 (tamamlandı)
 
 Hibrit yerleşim: **Gelişim Nabzım** → İstatistikler; **Ekip Nabzı** → Ekibim. Pro: ekip tablosu; Plus: kendi nabız + Pro upsell. Migration `039`, RLS, i18n, KVKK/koşullar, landing/ödeme Pro maddesi, `videoTraining.ts` (F3 hazırlık). **Deploy:** `039` uygula.

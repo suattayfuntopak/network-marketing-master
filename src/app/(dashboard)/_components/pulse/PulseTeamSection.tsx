@@ -43,9 +43,11 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
     [downlineMembers]
   )
 
+  const teamPeriod = '30d' as const
+
   const { data: progressData, isLoading } = useQuery({
-    queryKey: ['pulse-team', ws?.workspaceId, memberIds.join(',')],
-    queryFn: () => getTeamProgressMapAction(ws!.workspaceId, memberIds),
+    queryKey: ['pulse-team', ws?.workspaceId, memberIds.join(','), teamPeriod],
+    queryFn: () => getTeamProgressMapAction(ws!.workspaceId, memberIds, teamPeriod),
     enabled: !!ws?.workspaceId && memberIds.length > 0 && pulseUnlocked,
     staleTime: 30_000,
   })
@@ -92,14 +94,19 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
       ) : isLoading ? (
         <Skeleton className="h-40 rounded-xl" />
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
-          <table className="w-full min-w-[640px] text-left text-xs">
+        <>
+          <p className="text-[10px] text-[var(--text-3)]">{t('pulse.teamPeriodNote')}</p>
+          <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
+          <table className="w-full min-w-[820px] text-left text-xs">
             <thead>
               <tr className="border-b border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]">
                 <th className="p-3 font-semibold">{t('pulse.colPartner')}</th>
                 <th className="p-3 font-semibold text-center">{t('pulse.colTraining')}</th>
                 <th className="p-3 font-semibold text-center">{t('pulse.colObjections')}</th>
                 <th className="p-3 font-semibold text-center">{t('pulse.colDqsg')}</th>
+                <th className="p-3 font-semibold text-center">{t('pulse.colVideos')}</th>
+                <th className="p-3 font-semibold text-center">{t('pulse.colPresentations')}</th>
+                <th className="p-3 font-semibold text-center">{t('pulse.colAppointments')}</th>
                 <th className="p-3 font-semibold text-right">{t('pulse.colLastActive')}</th>
               </tr>
             </thead>
@@ -120,6 +127,11 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
                   lastActivityAt: m.last_activity_at,
                   joinedAt: m.joined_at,
                 })
+                const videoSummary = progressData?.videoByUserId[m.user_id]
+                const videoPct = videoSummary?.pct ?? 0
+                const engagement = progressData?.engagementByUserId[m.user_id]
+                const apptTotal =
+                  (engagement?.appointmentsSet ?? 0) + (engagement?.appointmentsDone ?? 0)
                 const lastActive = m.last_activity_at
                   ? new Date(m.last_activity_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR')
                   : '—'
@@ -145,7 +157,10 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
                           </span>
                         )}
                         {flags.includes('objections_gap') && (
-                          <span className="rounded-md bg-indigo-500/10 px-1.5 py-0.5 text-[9px] font-bold text-indigo-700 dark:text-indigo-300">
+                          <span
+                            title={t('pulse.flagObjectionsGapHint')}
+                            className="rounded-md bg-indigo-500/10 px-1.5 py-0.5 text-[9px] font-bold text-indigo-700 dark:text-indigo-300"
+                          >
                             {t('pulse.flagObjectionsGap')}
                           </span>
                         )}
@@ -154,6 +169,13 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
                     <td className="p-3 text-center font-bold">{trainingPct}%</td>
                     <td className="p-3 text-center font-bold">{objectionPct}%</td>
                     <td className="p-3 text-center font-bold">{dqsgPct}%</td>
+                    <td className="p-3 text-center font-bold">{videoPct}%</td>
+                    <td className="p-3 text-center font-bold text-[var(--text-2)]">
+                      {engagement?.presentationsSent ?? 0}
+                    </td>
+                    <td className="p-3 text-center font-bold text-[var(--text-2)]">
+                      {apptTotal > 0 ? apptTotal : '—'}
+                    </td>
                     <td className="p-3 text-right text-[var(--text-2)]">{lastActive}</td>
                   </tr>
                 )
@@ -161,6 +183,7 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       <PulseDisclaimer />

@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { BookOpen, Search, X, Plus, Star, CheckCircle2 } from 'lucide-react'
+import Link from 'next/link'
+import { BookOpen, Search, X, Plus, Star, CheckCircle2, Film } from 'lucide-react'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
@@ -163,7 +164,7 @@ export function EgitimContent() {
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <header className="mb-6">
         <div className="flex items-center justify-between gap-3 mb-1">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
               <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
             </div>
@@ -172,13 +173,22 @@ export function EgitimContent() {
               <p className="text-sm text-[var(--text-3)]">{t('training.subtitle')}</p>
             </div>
           </div>
-          <button
-            onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            <span>{t('trainingPage.addContent')}</span>
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link
+              href="/egitim/videolar"
+              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-bold text-brand hover:border-brand/40 transition"
+            >
+              <Film className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
+            </Link>
+            <button
+              onClick={() => setFormOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>{t('trainingPage.addContent')}</span>
+            </button>
+          </div>
         </div>
 
         <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">

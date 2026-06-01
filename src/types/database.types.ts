@@ -496,6 +496,75 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_learning_events: {
+        Row: {
+          id: string
+          workspace_id: string
+          user_id: string
+          event_type: string
+          item_key: string | null
+          payload: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          user_id: string
+          event_type: string
+          item_key?: string | null
+          payload?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          user_id?: string
+          event_type?: string
+          item_key?: string | null
+          payload?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
+      nmm_video_progress: {
+        Row: {
+          user_id: string
+          video_key: string
+          workspace_id: string | null
+          status: string
+          position_sec: number
+          duration_sec: number | null
+          watch_percent: number
+          started_at: string
+          completed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          video_key: string
+          workspace_id?: string | null
+          status?: string
+          position_sec?: number
+          duration_sec?: number | null
+          watch_percent?: number
+          started_at?: string
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          video_key?: string
+          workspace_id?: string | null
+          status?: string
+          position_sec?: number
+          duration_sec?: number | null
+          watch_percent?: number
+          started_at?: string
+          completed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: { [_ in never]: never }
     Functions: {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Activity } from 'lucide-react'
+import { Activity, Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { ONBOARDING_STEP_COUNT, type PulsePeriod } from '@/lib/domain/pulse'
@@ -10,6 +10,16 @@ import { getMyPulseSummaryAction } from '@/app/(dashboard)/pulse/actions'
 import { PulseKpiCard } from './PulseKpiCard'
 import { PulseDisclaimer } from './PulseDisclaimer'
 import { Skeleton } from '@/components/ui/Skeleton'
+
+const PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
+
+function periodLabel(t: (key: string) => string, p: PulsePeriod): string {
+  if (p === 'today') return t('pulse.periodToday')
+  if (p === '7d') return t('statsPage.period7d')
+  if (p === '30d') return t('statsPage.period30d')
+  if (p === 'ytd') return t('pulse.periodYtd')
+  return t('statsPage.periodAll')
+}
 
 export function PulseMySection() {
   const { t } = useTranslation()
@@ -35,25 +45,31 @@ export function PulseMySection() {
           </h2>
           <p className="mt-1 text-xs text-[var(--text-3)]">{t('pulse.mySubtitle')}</p>
         </div>
-        <div className="flex rounded-xl bg-[var(--bg-subtle)] p-0.5 border border-[var(--border)] self-start">
-          {(['7d', '30d', 'all'] as const).map(p => (
+        <div className="flex flex-wrap rounded-xl bg-[var(--bg-subtle)] p-0.5 border border-[var(--border)] self-start gap-0.5">
+          {PERIOD_OPTIONS.map(p => (
             <button
               key={p}
               type="button"
               onClick={() => setPeriod(p)}
-              className={`rounded-lg px-2.5 py-1 text-[10px] font-bold transition-all ${
+              className={`rounded-lg px-2 py-1 text-[10px] font-bold transition-all ${
                 period === p
                   ? 'bg-[var(--bg-card)] text-brand shadow-sm border border-[var(--border)]'
                   : 'text-[var(--text-2)]'
               }`}
             >
-              {p === '7d' && t('statsPage.period7d')}
-              {p === '30d' && t('statsPage.period30d')}
-              {p === 'all' && t('statsPage.periodAll')}
+              {periodLabel(t, p)}
             </button>
           ))}
         </div>
       </header>
+
+      {data && data.streakDays > 0 && (
+        <div className="flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-xs text-amber-800 dark:text-amber-200">
+          <Flame className="h-4 w-4 shrink-0 text-amber-600" />
+          <span className="font-semibold">{t('pulse.streak')}</span>
+          <span>{t('pulse.streakDays', { count: data.streakDays })}</span>
+        </div>
+      )}
 
       <p className="text-[10px] text-[var(--text-3)]">{t('pulse.allTimeNote')}</p>
       <p className="text-[10px] text-[var(--text-3)] -mt-2">{t('pulse.periodFieldNote')}</p>
@@ -89,7 +105,20 @@ export function PulseMySection() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {data.periodLearning && (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
+              <PulseKpiCard
+                label={`${t('pulse.periodReads')} · ${t('pulse.training')}`}
+                primary={String(data.periodLearning.trainingReads)}
+              />
+              <PulseKpiCard
+                label={`${t('pulse.periodReads')} · ${t('pulse.objections')}`}
+                primary={String(data.periodLearning.objectionReads)}
+              />
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
             <PulseKpiCard
               label={t('pulse.onboarding')}
               primary={t('pulse.onboardingSteps', {
@@ -98,13 +127,25 @@ export function PulseMySection() {
               })}
               pct={Math.round((data.onboardingDone / ONBOARDING_STEP_COUNT) * 100)}
             />
+            <PulseKpiCard
+              label={t('pulse.videos')}
+              primary={`${data.video.completed} / ${data.video.total}`}
+              secondary={`${data.video.pct}%`}
+              pct={data.video.pct}
+            />
+            {data.videoDropoff > 0 && (
+              <PulseKpiCard
+                label={t('pulse.videoDropoff')}
+                primary={String(data.videoDropoff)}
+              />
+            )}
           </div>
 
           <div>
             <p className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
               {t('pulse.fieldActivity')}
             </p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               <PulseKpiCard
                 label={t('pulse.newCandidates')}
                 primary={String(data.field.newCandidates)}
@@ -113,6 +154,18 @@ export function PulseMySection() {
               <PulseKpiCard
                 label={t('pulse.whatsapps')}
                 primary={String(data.field.whatsapps)}
+              />
+              <PulseKpiCard
+                label={t('pulse.presentationsSent')}
+                primary={String(data.field.presentationsSent)}
+              />
+              <PulseKpiCard
+                label={t('pulse.appointmentsSet')}
+                primary={String(data.field.appointmentsSet)}
+              />
+              <PulseKpiCard
+                label={t('pulse.appointmentsDone')}
+                primary={String(data.field.appointmentsDone)}
               />
             </div>
           </div>

@@ -10,7 +10,12 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
 
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { buildDailyActionNoteFields, buildPresentationWhatsAppActivityFields } from '@/lib/domain/dailyActionNote'
+import { FOLLOW_UP_CALENDAR_SUPPRESSED_ISO, isFollowUpCalendarSuppressed } from '@/lib/domain/calendarFollowUp'
+import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
+import {
+  logEngagementEventAction,
+  logPresentationWhatsAppAction,
+} from '@/app/(dashboard)/pulse/learningEvents'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string) {
@@ -182,6 +187,31 @@ export function useUpdateCandidate(workspaceId: string) {
           if (inserts.length > 0) {
             await supabase.from('nmm_daily_actions').insert(inserts)
           }
+
+          if (patch.next_follow_up_at !== undefined) {
+            const hadScheduled =
+              currentCandidate.next_follow_up_at &&
+              !isFollowUpCalendarSuppressed(currentCandidate)
+            const nextVal = patch.next_follow_up_at
+            if (
+              nextVal === FOLLOW_UP_CALENDAR_SUPPRESSED_ISO &&
+              hadScheduled
+            ) {
+              await logEngagementEventAction(workspaceId, 'appointment_done', {
+                candidate_id: id,
+                source: 'candidate_update',
+              })
+            } else if (
+              nextVal &&
+              nextVal !== FOLLOW_UP_CALENDAR_SUPPRESSED_ISO &&
+              nextVal !== currentCandidate.next_follow_up_at
+            ) {
+              await logEngagementEventAction(workspaceId, 'appointment_set', {
+                candidate_id: id,
+                scheduled_at: nextVal,
+              })
+            }
+          }
         }
       }
     },
@@ -248,27 +278,7 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
       candidateId: string
       materialTitle: string
     }) => {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
-
-      const noteFields = buildPresentationWhatsAppActivityFields(materialTitle)
-
-      await Promise.all([
-        supabase
-          .from('nmm_candidates')
-          .update({ last_contact_at: new Date().toISOString() })
-          .eq('id', candidateId),
-        supabase.from('nmm_daily_actions').insert({
-          workspace_id: workspaceId,
-          user_id: user.id,
-          candidate_id: candidateId,
-          action_type: 'whatsapp',
-          ...noteFields,
-        }),
-      ])
+      await logPresentationWhatsAppAction(workspaceId, candidateId, materialTitle)
     },
     onSuccess: (_data, vars) => {
       invalidateCandidateQueries(qc, workspaceId)

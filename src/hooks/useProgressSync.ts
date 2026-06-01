@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { recordProgressChangeAction } from '@/app/(dashboard)/pulse/learningEvents'
 import { useWorkspace } from './useWorkspace'
 
 export interface ProgressData {
@@ -186,8 +187,6 @@ export function useProgressSync() {
     id: any,
     add: boolean
   ) => {
-    const supabase = createClient()
-    
     // Optimistic UI update
     let nextRT = readTrainings
     let nextFT = favTrainings
@@ -216,12 +215,9 @@ export function useProgressSync() {
       saveLocalSet(FAV_OBJECTION_KEY, nextFO)
     }
 
-    // Trigger async remote save
     if (ws?.workspaceId) {
-      supabase.auth.getUser().then(({ data: { user } }) => {
-        if (user) {
-          saveToSupabase(ws.workspaceId, user.id, nextRT, nextFT, nextRO, nextFO)
-        }
+      recordProgressChangeAction(ws.workspaceId, type, id, add).catch(err => {
+        console.error('Progress sync failed:', err)
       })
     }
   }
