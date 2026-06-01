@@ -3,6 +3,13 @@
 export const authShellClass =
   'relative flex min-h-screen flex-col items-center justify-center px-4 text-[var(--text-1)] bg-gradient-to-b from-slate-50 via-[var(--bg)] to-slate-100 dark:bg-[#0a0b10] dark:bg-radial-[circle_at_top,_var(--tw-gradient-stops)] dark:from-[#1a1c2e] dark:via-[#0a0b10] dark:to-[#050508]'
 
+export const authCardClass =
+  'rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-8 shadow-xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300 dark:border-white/10 dark:bg-[#161824]/60 dark:shadow-2xl'
+
+export const authCardTitleClass = 'mb-1 text-xl font-bold text-[var(--text-1)]'
+
+export const authCardSubtitleClass = 'mb-6 text-sm text-[var(--text-3)]'
+
 export const authToolbarBtnClass =
   'flex h-8 w-8 items-center justify-center rounded-xl text-[var(--text-3)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]'
 
