@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-01 — Bildirim tercihleri toggle stabilitesi
+
+- **Sorun:** Sesli uyarı kapatılınca toggle «dans ediyordu» — `useEffect` her Header render’ında `onClose` referansıyla tercihleri DB’den yeniden yüklüyordu; sunucuda satır yokken `DEFAULTS` localStorage’ı eziyordu.
+- **Çözüm:** `useNotificationPreferences` (TanStack optimistic update + localStorage); `PreferenceToggle` 300ms ease; `getNotificationPreferencesAction` satır yoksa `null`; `notificationPrefsStorage` ortak okuma; QuickAddModal ses/push tutarlılığı.
+- **Dosyalar:** `NotificationsModal.tsx`, `useNotificationPreferences.ts`, `notificationPrefsStorage.ts`, `notificationPreferences.ts`, `useNotifications.ts`, `QuickAddModal.tsx`, `keys.ts`
+
+---
+
 ## 2026-06-01 — Bildirim detay: footer genişliği
 
 - **Sorun:** «Okundu olarak işaretlendi» footer’da `truncate` ile kesiliyordu (`max-w-sm` + sıkışık satır).

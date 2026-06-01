@@ -9,6 +9,10 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
+import {
+  isNotificationPushEnabled,
+  isNotificationSoundEnabled,
+} from '@/lib/ui/notificationPrefsStorage'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 
 interface QuickAddModalProps {
@@ -59,14 +63,11 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
       })
 
       // Trigger user alerts based on preferences
-      const isSoundEnabled = localStorage.getItem('nmm_notif_sound') === 'true'
-      const isPushEnabled = localStorage.getItem('nmm_notif_push') === 'true'
-
-      if (isSoundEnabled) {
+      if (isNotificationSoundEnabled()) {
         playNotificationSound()
       }
 
-      if (isPushEnabled && 'Notification' in window && Notification.permission === 'granted') {
+      if (isNotificationPushEnabled() && 'Notification' in window && Notification.permission === 'granted') {
         new Notification('Yeni Aday Eklendi!', {
           body: `${fullName.trim()} ekibinize yeni aday olarak başarıyla eklendi.`,
           icon: '/logo.png'

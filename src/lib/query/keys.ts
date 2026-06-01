@@ -9,6 +9,7 @@ export const queryKeys = {
   members: (workspaceId: string) => ['team', workspaceId] as const,
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   notifications: () => ['notifications'] as const,
+  notificationPreferences: () => ['notification-preferences'] as const,
   platformWorkspaces: () => ['platform-workspaces'] as const,
   platformModeration: () => ['platform-moderation'] as const,
 }

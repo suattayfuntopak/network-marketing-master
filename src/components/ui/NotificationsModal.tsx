@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserPlus, CalendarClock } from 'lucide-react'
@@ -11,10 +11,7 @@ import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
-import {
-  getNotificationPreferencesAction,
-  updateNotificationPreferencesAction,
-} from '@/app/(dashboard)/actions/notificationPreferences'
+import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 import { createClient } from '@/lib/supabase/client'
 
 interface NotificationsModalProps {
@@ -76,6 +73,38 @@ function NotifIconBg({ type }: { type: NotificationItem['icon'] }) {
   return 'bg-[#EEEDFE]'
 }
 
+function PreferenceToggle({
+  checked,
+  disabled,
+  onToggle,
+  label,
+}: {
+  checked: boolean
+  disabled?: boolean
+  onToggle: () => void
+  label: string
+}) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      onClick={onToggle}
+      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 ${
+        checked ? 'bg-[#534AB7]' : 'bg-[var(--border)]'
+      }`}
+    >
+      <span
+        className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform duration-300 ease-in-out will-change-transform ${
+          checked ? 'translate-x-5' : 'translate-x-0'
+        }`}
+      />
+    </button>
+  )
+}
+
 function formatTimeAgo(
   dateString: string,
   t: (keyPath: string, variables?: Record<string, string | number>) => string,
@@ -102,14 +131,14 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
   const { lang, t } = useTranslation()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
-  const [emailAlerts, setEmailAlerts]   = useState(true)
-  const [pushAlerts, setPushAlerts]     = useState(true)
-  const [soundAlerts, setSoundAlerts]   = useState(true)
   const [userEmail, setUserEmail]       = useState('')
   const [localNotifs, setLocalNotifs]   = useState<any[]>([])
   const [selected, setSelected]         = useState<any | null>(null)
 
   useBodyScrollLock()
+
+  const { prefs, isLoading: prefsLoading, isSaving: prefsSaving, savePrefs } =
+    useNotificationPreferences()
 
   const {
     notifications: dbNotifications,
@@ -147,96 +176,58 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   useEffect(() => {
     setMounted(true)
-    
-    // Fetch authenticated user session to sync preferences persistently
-    const supabase = createClient()
-    supabase.auth.getUser().then(async ({ data: { user } }) => {
-      if (user) {
-        setUserEmail(user.email ?? '')
-        try {
-          const prefs = await getNotificationPreferencesAction()
-          setEmailAlerts(prefs.email)
-          setPushAlerts(prefs.push)
-          setSoundAlerts(prefs.sound)
-          localStorage.setItem('nmm_notif_email', String(prefs.email))
-          localStorage.setItem('nmm_notif_push', String(prefs.push))
-          localStorage.setItem('nmm_notif_sound', String(prefs.sound))
-        } catch {
-          const emailPref = localStorage.getItem('nmm_notif_email')
-          const pushPref = localStorage.getItem('nmm_notif_push')
-          const soundPref = localStorage.getItem('nmm_notif_sound')
-          setEmailAlerts(emailPref !== 'false')
-          setPushAlerts(pushPref !== 'false')
-          setSoundAlerts(soundPref !== 'false')
-        }
-      }
-    })
-
-    // Restore persisted read/dismissed state
     setLocalNotifs(loadNotifications())
 
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) setUserEmail(user.email ?? '')
+    })
+  }, [])
+
+  useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        if (selected) setSelected(null)
-        else onClose()
-      }
+      if (e.key !== 'Escape') return
+      if (selected) setSelected(null)
+      else onClose()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose, selected])
 
-  async function handleToggle(type: 'email' | 'push' | 'sound', current: boolean) {
-    const next = !current
-    let nextEmail = emailAlerts
-    let nextPush = pushAlerts
-    let nextSound = soundAlerts
+  async function handleToggle(type: 'email' | 'push' | 'sound') {
+    if (prefsSaving || prefsLoading) return
 
-    if (type === 'email')  { 
-      setEmailAlerts(next);  
-      nextEmail = next;
-      localStorage.setItem('nmm_notif_email', String(next));
-      if (next) {
+    const key = type === 'email' ? 'email' : type === 'push' ? 'push' : 'sound'
+    const next = !prefs[key]
+    const nextPrefs = { ...prefs, [key]: next }
+
+    try {
+      await savePrefs(nextPrefs)
+
+      if (type === 'email' && next) {
         toast.info(t('shellUi.emailAlertsEnabled', { email: userEmail }))
       }
-    }
-    if (type === 'push')   { 
-      setPushAlerts(next);   
-      nextPush = next;
-      localStorage.setItem('nmm_notif_push',  String(next));
-      if (next && 'Notification' in window) {
-        Notification.requestPermission().then(perm => {
-          if (perm === 'granted') {
-            toast.success(t('shellUi.browserNotifEnabled'))
-            new Notification('Network Marketing Master', {
-              body: t('shellUi.systemNotifEnabled'),
-              icon: '/logo.png'
-            })
-          } else {
-            toast.warning(t('shellUi.permissionDenied'))
-          }
-        })
+      if (type === 'push' && next && 'Notification' in window) {
+        const perm = await Notification.requestPermission()
+        if (perm === 'granted') {
+          toast.success(t('shellUi.browserNotifEnabled'))
+          new Notification('Network Marketing Master', {
+            body: t('shellUi.systemNotifEnabled'),
+            icon: '/logo.png',
+          })
+        } else {
+          toast.warning(t('shellUi.permissionDenied'))
+        }
       }
-    }
-    if (type === 'sound')  { 
-      setSoundAlerts(next);  
-      nextSound = next;
-      localStorage.setItem('nmm_notif_sound', String(next));
-      if (next) {
+      if (type === 'sound' && next) {
         playNotificationSound()
       }
-    }
 
-    // Persist preferences in Supabase
-    const result = await updateNotificationPreferencesAction({
-      email: nextEmail,
-      push: nextPush,
-      sound: nextSound,
-    })
-    if (!result.ok) {
-      console.error('[NotificationsModal] Failed to sync preferences:', result.error)
+      toast.success(t('common.notificationSuccess'))
+    } catch (err) {
+      console.error('[NotificationsModal] preference save failed:', err)
+      toast.error(t('common.error'))
     }
-
-    toast.success(t('common.notificationSuccess'))
   }
 
   function openNotification(n: any) {
@@ -251,8 +242,7 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
       })
     }
 
-    // Play chime sound directly matching React state soundAlerts
-    if (soundAlerts) {
+    if (prefs.sound) {
       playNotificationSound()
     }
   }
@@ -375,21 +365,21 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
           <div className="space-y-3 rounded-2xl bg-[var(--bg-subtle)] p-4 border border-[var(--border)]">
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-2)]">Tercihler</p>
             {[
-              { type: 'email' as const, icon: Mail,    label: 'E-posta Bildirimleri',  val: emailAlerts },
-              { type: 'push'  as const, icon: Monitor, label: 'Tarayıcı Bildirimleri', val: pushAlerts  },
-              { type: 'sound' as const, icon: Volume2, label: 'Sesli Uyarılar',        val: soundAlerts },
+              { type: 'email' as const, icon: Mail,    label: 'E-posta Bildirimleri',  val: prefs.email },
+              { type: 'push'  as const, icon: Monitor, label: 'Tarayıcı Bildirimleri', val: prefs.push  },
+              { type: 'sound' as const, icon: Volume2, label: 'Sesli Uyarılar',        val: prefs.sound },
             ].map(({ type, icon: Icon, label, val }) => (
               <div key={type} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Icon className="h-4 w-4 text-[#534AB7]" />
                   <span className="text-sm font-medium text-[var(--text-1)]">{label}</span>
                 </div>
-                <button
-                  onClick={() => handleToggle(type, val)}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ${val ? 'bg-[#534AB7]' : 'bg-[var(--border)]'}`}
-                >
-                  <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${val ? 'translate-x-5' : 'translate-x-0'}`} />
-                </button>
+                <PreferenceToggle
+                  label={label}
+                  checked={val}
+                  disabled={prefsLoading || prefsSaving}
+                  onToggle={() => void handleToggle(type)}
+                />
               </div>
             ))}
           </div>

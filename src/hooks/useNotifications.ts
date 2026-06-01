@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
+import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
 import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
@@ -84,8 +85,7 @@ export function useNotifications(options?: { enabled?: boolean }) {
             queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
 
             // 2. Play beautiful synthesized notification chime
-            const isSoundEnabled = localStorage.getItem('nmm_notif_sound') !== 'false'
-            if (isSoundEnabled) {
+            if (isNotificationSoundEnabled()) {
               playNotificationSound()
             }
 
