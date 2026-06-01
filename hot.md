@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-01 — Ekip Nabzı Faz 4 (tamamlandı)
+
+Günlük rollup + haftalık YZ nabız özeti. **Deploy:** `042_pulse_rollup_weekly.sql` (041 sonrası).
+
+- `nmm_team_pulse_daily` — cron günlük metrik rollup.
+- `nmm_pulse_weekly_summaries` — kişisel + ekip (Pro) haftalık AI özet (TR/EN).
+- Cron: `GET /api/cron/pulse-rollup` (dün, `?day=YYYY-MM-DD`), `GET /api/cron/pulse-weekly` (`?week_start=`).
+- UI: Gelişim Nabzım + Ekip Nabzı üstünde `PulseAiInsight` kartı (özet yoksa gizli).
+- **Cron kurulum:** Vercel/hosting’de `CRON_SECRET` ile Bearer; rollup günlük ~03:00, weekly Pazartesi önerilir.
+
 ## 2026-06-01 — Havale/EFT geçici kapalı
 
 `BANK_TRANSFER_ENABLED = false` — landing (`LandingPricing`) ve `/odeme` havale kartı gizlenir; Shopier kartlı ödeme aynen çalışır. Tekrar açmak: `src/lib/domain/bankTransfer.ts` içinde `true` yap.

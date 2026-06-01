@@ -565,6 +565,72 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_team_pulse_daily: {
+        Row: {
+          user_id: string
+          workspace_id: string
+          day: string
+          metrics: Json
+        }
+        Insert: {
+          user_id: string
+          workspace_id: string
+          day: string
+          metrics?: Json
+        }
+        Update: {
+          user_id?: string
+          workspace_id?: string
+          day?: string
+          metrics?: Json
+        }
+        Relationships: []
+      }
+      nmm_pulse_weekly_summaries: {
+        Row: {
+          id: string
+          user_id: string
+          workspace_id: string
+          scope: string
+          week_start: string
+          summary_tr: string
+          summary_en: string
+          bullets_tr: Json
+          bullets_en: Json
+          risk_flags: Json
+          model: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          workspace_id: string
+          scope: string
+          week_start: string
+          summary_tr: string
+          summary_en: string
+          bullets_tr?: Json
+          bullets_en?: Json
+          risk_flags?: Json
+          model?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          workspace_id?: string
+          scope?: string
+          week_start?: string
+          summary_tr?: string
+          summary_en?: string
+          bullets_tr?: Json
+          bullets_en?: Json
+          risk_flags?: Json
+          model?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: { [_ in never]: never }
     Functions: {

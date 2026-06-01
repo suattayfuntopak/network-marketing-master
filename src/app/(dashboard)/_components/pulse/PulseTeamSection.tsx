@@ -15,6 +15,7 @@ import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import type { MemberRow } from '@/lib/team/types'
 import { PulseDisclaimer } from './PulseDisclaimer'
+import { PulseAiInsight } from './PulseAiInsight'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 type Props = {
@@ -95,6 +96,7 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
         <Skeleton className="h-40 rounded-xl" />
       ) : (
         <>
+          <PulseAiInsight scope="team" />
           <p className="text-[10px] text-[var(--text-3)]">{t('pulse.teamPeriodNote')}</p>
           <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
           <table className="w-full min-w-[820px] text-left text-xs">

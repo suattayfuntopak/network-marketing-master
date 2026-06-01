@@ -19,6 +19,13 @@ export function todayCalendarKey(timeZone = DEFAULT_TZ): string {
   }).format(new Date())
 }
 
+export function yesterdayCalendarKey(timeZone = DEFAULT_TZ): string {
+  const today = todayCalendarKey(timeZone)
+  const d = fromCalendarKey(today)
+  d.setDate(d.getDate() - 1)
+  return toCalendarKey(d)
+}
+
 export function fromCalendarKey(key: string): Date {
   const [y, m, day] = key.split('-').map(Number)
   return new Date(y, m - 1, day, 12, 0, 0)

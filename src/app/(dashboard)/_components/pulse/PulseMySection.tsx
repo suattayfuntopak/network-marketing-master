@@ -9,6 +9,7 @@ import { ONBOARDING_STEP_COUNT, type PulsePeriod } from '@/lib/domain/pulse'
 import { getMyPulseSummaryAction } from '@/app/(dashboard)/pulse/actions'
 import { PulseKpiCard } from './PulseKpiCard'
 import { PulseDisclaimer } from './PulseDisclaimer'
+import { PulseAiInsight } from './PulseAiInsight'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 const PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
@@ -70,6 +71,8 @@ export function PulseMySection() {
           <span>{t('pulse.streakDays', { count: data.streakDays })}</span>
         </div>
       )}
+
+      <PulseAiInsight scope="personal" />
 
       <p className="text-[10px] text-[var(--text-3)]">{t('pulse.allTimeNote')}</p>
       <p className="text-[10px] text-[var(--text-3)] -mt-2">{t('pulse.periodFieldNote')}</p>
