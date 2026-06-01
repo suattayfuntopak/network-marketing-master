@@ -10,7 +10,9 @@ import {
   YEARLY_MONTHS_FREE,
   type BillingPeriod,
 } from '@/lib/domain/pricing'
+import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
 import { PRO_LIMITS } from './constants'
+import { LandingBankTransfer } from './LandingBankTransfer'
 
 export function LandingPricing() {
   const { t } = useTranslation()
@@ -295,6 +297,8 @@ export function LandingPricing() {
         </div>
 
       </div>
+
+      {BANK_TRANSFER_ENABLED && <LandingBankTransfer />}
     </section>
   )
 }

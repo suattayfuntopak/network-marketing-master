@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-01 — Havale/EFT: landing'e taşındı + tam genişlik tasarım
+
+Havale/EFT kartı artık **landing page'de de** (ödeme sayfasıyla aynı yerde, üç plan
+kutusunun hemen altında). Gerekçe: ziyaretçi ödeme yöntemini **kayıt olmadan** görebilmeli;
+karta güvenmeyen kitle kapıda kaybedilmesin. Ayrıca her iki sayfada da kart `max-w-2xl`'den
+**`max-w-6xl`'e** genişletildi (üç kutuyla aynı hiza) ve içerik iki sütunlu yatay düzene
+geçti: **sol** IBAN + kopyala + hesap/banka, **sağ** 3 adımlık yönerge + WhatsApp/e-posta
+butonları. Öksüz/dar görünüm giderildi.
+
+- **Yeni:** `_components/landing/LandingBankTransfer.tsx` — landing estetiği (slate/zinc +
+  dark variant, rounded-3xl). i18n `paymentPage.bank*` anahtarları yeniden kullanıldı (DRY).
+- **Landing:** `LandingPricing.tsx` — grid altına `{BANK_TRANSFER_ENABLED && <LandingBankTransfer />}`.
+- **Dashboard:** `odeme/_components/BankTransferCard.tsx` — iki sütunlu, tam genişlik yeniden tasarım.
+- **Tek dokunuşla kaldırma:** `BANK_TRANSFER_ENABLED = false` → her iki sayfadan da kalkar.
+- tsc temiz, lint temiz.
+
 ## 2026-06-01 — Auth tema: light/system gerçekten uygulanıyor
 
 - **Sorun:** Tema ikonu döngüsü çalışıyordu ama arka plan/formlar sabit koyu (`#0a0b10`, `text-white`) — üç modda da dark görünüyordu.
