@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-01 — Lisans modal: plan adları + Süresiz toggle düzeltme
+
+- **Lisans Paketi Seviyesi dropdown** plan adlarıyla hizalandı (landing/ödeme ile birebir):
+  `Leader→Basic Plan`, `Master→Plus Plan`, `Pro (Süper Lider)→Pro Plan`. Free seçeneği TR
+  `Ücretsiz — Lisansını İptal Et` (EN `Free — Revoke License`).
+- **Süresiz Erişim toggle** kırık görünümü düzeltildi: knob track'ten taşıyordu (`h-4 w-8` track +
+  `h-3 w-3` absolute knob). NotificationsModal switch desenine geçildi: `h-6 w-11 border-2
+  border-transparent` track + `h-5 w-5 translate-x-5/0` knob. Renk emerald korundu (yeşil).
+- tsc temiz.
+
 ## 2026-06-01 — Punto +1 (5 sayfa) + perf Tür 👑 + AI lisans PRO-SINIRSIZ
 
 - **Yazı puntosu bir birim büyütüldü** (her `text-*` utility bir kademe yukarı; cascade'siz tek

@@ -905,9 +905,9 @@ export function PlatformYonetimContent() {
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   >
                     <option value="free">{t('platformPage.freeRevoke')}</option>
-                    <option value="leader">Leader</option>
-                    <option value="master">Master</option>
-                    <option value="pro">Pro (Süper Lider)</option>
+                    <option value="leader">Basic Plan</option>
+                    <option value="master">Plus Plan</option>
+                    <option value="pro">Pro Plan</option>
                   </select>
                 </div>
 
@@ -925,8 +925,8 @@ export function PlatformYonetimContent() {
                       }`}
                     >
                       <span>{t('platformPage.unlimitedAccess')}</span>
-                      <span className={`h-4 w-8 rounded-full transition-colors duration-300 ease-out ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'} relative`}>
-                        <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform duration-300 ease-out ${isUnlimited ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      <span className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'}`}>
+                        <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform duration-300 ease-in-out will-change-transform ${isUnlimited ? 'translate-x-5' : 'translate-x-0'}`} />
                       </span>
                     </button>
 
