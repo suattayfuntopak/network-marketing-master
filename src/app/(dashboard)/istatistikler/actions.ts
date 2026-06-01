@@ -66,11 +66,12 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const excludeWorkspaceId = myMembership?.workspace_id ?? null
 
+  // Platform Masası ile aynı kriter: parent_id boş (lisans tipine bakılmaz)
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
     .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
-    .or('license_type.eq.free,license_type.is.null')
-    .order('created_at', { ascending: false })
+    .is('parent_id', null)
+    .order('created_at', { ascending: true })
 
   if (wsError || !workspaces) {
     console.error('[getIndependentSignupAIUsage]', wsError)
@@ -104,7 +105,12 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const filteredOwnerIds = independentOwners.map(o => o.userId)
 
-  const users = await listAllAuthUsers(admin)
+  let users: Awaited<ReturnType<typeof listAllAuthUsers>> = []
+  try {
+    users = await listAllAuthUsers(admin)
+  } catch (listErr) {
+    console.error('[getIndependentSignupAIUsage] listUsers', listErr)
+  }
   const userMap = new Map(users.map(u => [u.id, u]))
 
   const { data: memberRows } = await admin

@@ -1,5 +1,10 @@
 # Hot Log
 
+## 2026-06-01 — Dış kayıt masası: alt başlık kaldır + Yusuf listesi
+
+- **UI:** Dış Kayıt YZ masasında yalnızca başlık; açıklama paragrafı kaldırıldı.
+- **Veri:** Bağımsız kayıt filtresi Platform Masası ile aynı — `parent_id` boş, lisans tipi filtrelenmez (Yusuf Emre vb. free dışı trial lisanslarda da görünür).
+
 ## 2026-06-01 — Havale kartı: kopya ikonu sade + plan seçici + QR regen notu
 
 Havale/EFT kartında (paylaşılan `src/components/payment/BankTransferCard.tsx`):

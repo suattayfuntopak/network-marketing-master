@@ -171,9 +171,6 @@ export function StatsSuperAdminSections({
             <Sparkles className="h-4 w-4 text-brand animate-pulse" />
             {t('statsPage.aiIndependentTitle')}
           </h2>
-          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-            {t('statsPage.aiIndependentSubtitle')}
-          </p>
         </div>
 
         {independentWarning && (

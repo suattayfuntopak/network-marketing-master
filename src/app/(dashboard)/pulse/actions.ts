@@ -128,8 +128,8 @@ export async function getIndependentOwnersPulseAction(): Promise<{
     const { data: workspaces, error: wsError } = await admin
       .from('nmm_workspaces')
       .select('id, owner_id, license_type, parent_id')
-      .or('license_type.eq.free,license_type.is.null')
-      .order('created_at', { ascending: false })
+      .is('parent_id', null)
+      .order('created_at', { ascending: true })
 
     if (wsError || !workspaces) {
       return { rows: [], warning: 'load_failed' }
