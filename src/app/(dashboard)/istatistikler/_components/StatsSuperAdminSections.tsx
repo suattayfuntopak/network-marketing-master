@@ -14,6 +14,7 @@ import {
   type AIUsageArchivePeriod,
 } from '../actions'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
+import { Skeleton } from '@/components/ui/Skeleton'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
@@ -44,6 +45,8 @@ type AiRow = {
   unlimited: boolean
   /** Plan limitleri; saha (uygulama dışı) için null. */
   limits: Triple | null
+  /** Lisans profili henüz yüklenmedi → free fallback yerine iskelet göster. */
+  loading?: boolean
 }
 
 /** "kullanım / limit" — süper admin ∞, saha —. */
@@ -113,14 +116,16 @@ export function StatsSuperAdminSections({
 
     const memberRow = (m: TeamMember, type: AiRowType): AiRow => {
       const profile = memberLicenses[m.user_id]
+      // Profil henüz yüklenmedi → free fallback gösterme (ÜCRETSİZ yanıp sönmesi).
+      const loading = !profile
       const isAdmin = !!profile?.isSuperAdmin
-      const lim = isAdmin
+      const lim = isAdmin || !profile
         ? null
         : getLimitsForLicense(
-            profile?.licenseType ?? 'free',
+            profile.licenseType,
             false,
-            profile?.licenseExpiresAt,
-            profile?.workspaceCreatedAt
+            profile.licenseExpiresAt,
+            profile.workspaceCreatedAt
           )
       return {
         key: `m_${m.user_id}`,
@@ -128,15 +133,18 @@ export function StatsSuperAdminSections({
         email: null,
         avatarUrl: m.avatar_url ?? null,
         type,
-        license: isAdmin
-          ? t('statsPage.licensePlanSuperAdmin')
-          : licenseLabel(profile?.licenseType ?? 'free'),
+        license: loading
+          ? null
+          : isAdmin
+            ? t('statsPage.licensePlanSuperAdmin')
+            : licenseLabel(profile.licenseType),
         href: getMemberHref({ ...m, isAppUser: true }),
         usage: periodUsage[m.user_id] ?? { message: 0, roleplay: 0, compliance: 0 },
         unlimited: isAdmin,
         limits: lim
           ? { message: lim.messageLimit, roleplay: lim.roleplayLimit, compliance: lim.complianceLimit }
           : null,
+        loading,
       }
     }
 
@@ -253,16 +261,16 @@ export function StatsSuperAdminSections({
                     </span>
                   </td>
                   <td className="p-3 text-sm text-[var(--text-2)] font-semibold uppercase">
-                    {row.license ?? '—'}
+                    {row.loading ? <Skeleton className="h-3.5 w-14 rounded" /> : (row.license ?? '—')}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                    {usageCell(row.usage, 'message', row.unlimited, row.limits)}
+                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'message', row.unlimited, row.limits)}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                    {usageCell(row.usage, 'roleplay', row.unlimited, row.limits)}
+                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'roleplay', row.unlimited, row.limits)}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                    {usageCell(row.usage, 'compliance', row.unlimited, row.limits)}
+                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'compliance', row.unlimited, row.limits)}
                   </td>
                 </tr>
               )

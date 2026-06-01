@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-01 — AI tablosu lisans "ÜCRETSİZ" flash düzeltme
+
+- İstatistikler açılış/yenilemede AI Kullanım tablosunda Suat & Elif birkaç saniye **ÜCRETSİZ**
+  (+ free limitleri) gösteriyordu: `memberLicenses` query çözülmeden `licenseType ?? 'free'`
+  fallback'i devreye giriyordu. Artık profil yüklenene dek (`!profile` → `loading`) free fallback
+  yerine **Skeleton** gösteriliyor (lisans + 3 kullanım hücresi). Yüklenince gerçek değer (PRO -
+  SINIRSIZ / PLUS) oturur, yanıp sönme yok.
+- tsc temiz.
+
 ## 2026-06-01 — Yönetim tablosu lisans rozeti yerelleştirildi
 
 - Yönetim paneli leader tablosundaki **Lisans Paketi** rozeti ham `licenseType` (FREE/MASTER)
