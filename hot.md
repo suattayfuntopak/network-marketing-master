@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-01 — İstatistik cilası: dipnot/KVKK, üst dönem işlevsel, süper admin ∞, i18n süpürme
+
+- **Perf tablosu dipnotu:** Başlığa `*`, DQSG sütununa `**`. Altta küçük italik: `*` → sponsor
+  görünürlük/KVKK metni + **KVKK ve Gizlilik Politikası** gömülü linki (/kvkk); `**` → DDBR açıklaması.
+- **İstatistikler alt bilgi notu** (cihazda hesaplanır…) kaldırıldı (+ `infoNote` i18n silindi).
+- **Üst dönem sekmesi** artık 5'li (Bugün/Son 7 Gün/Son 30 Gün/Bu Yıl/Tüm Zamanlar) ve **işlevsel** —
+  `filteredCandidates` today/ytd dahil tüm dönemleri filtreliyor; ortak `PulsePeriodTabs` kullanıldı.
+- **Ekip & Dış Kaynak YZ tablosu:** "kullanım / limit" formatı geri geldi; **süper admin (Suat) → ∞**,
+  diğerleri kendi plan limitleri; saha → —.
+- **i18n süpürme:** ölü anahtarlar silindi (archive*, aiIndependent*, independentPulse*, realtimePulseNote,
+  dataPartialWarning, pulseLoadFallback, infoNote). `getIndependentSignupAIUsageAction` gereksiz today*
+  hesaplaması kaldırıldı (limitler korundu).
+- tsc temiz, 86 test.
+
 ## 2026-06-01 — YZ kullanım: tek tablo + lisans modal toggle animasyonu
 
 **Tek tablo (Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol Tablosu):**

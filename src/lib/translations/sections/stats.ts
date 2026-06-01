@@ -73,10 +73,6 @@ export const statsSection = {
       unlimited: 'Sınırsız',
       licensePlanSuperAdmin: 'Pro · Sınırsız',
 
-      aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
-      aiIndependentSubtitle:
-        'Platform Masasındaki bağımsız kayıtlar: ücretsiz lisans ve sponsor bağlantısı yok (parent_id boş) — örn. Yusuf Emre.',
-      aiIndependentEmpty: 'Henüz bağımsız dış kayıt bulunmuyor.',
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',
       licensePlanLeader: 'Basic',
@@ -92,41 +88,6 @@ export const statsSection = {
       quotaWriter: 'YZ Mesajı',
       quotaCompliance: 'Uyum Denetimi',
       quotaUpgrade: 'Plan gerekli',
-
-      infoNote: 'İstatistikler, Boru Hattınızdaki adayların güncel durumuna göre anlık olarak cihazınızda hesaplanır. Verilerinizin doğru olması için Aday Detaylarındaki aşama güncellemelerini aksatmayın.',
-
-      archiveTitle: 'YZ Kullanım Arşivi',
-      archiveSubtitle: 'Tüm kullanıcıların günlük, aylık ve yıllık yapay zeka tüketimini gösterir.',
-      archivePeriodToday: 'Bugün',
-      archivePeriod7d: 'Son 7 Gün',
-      archivePeriod30d: 'Son 30 Gün',
-      archivePeriod365d: '12 Ay',
-      archivePeriodYtd: 'Bu Yıl',
-      archivePeriodAll: 'Tüm Zamanlar',
-      archiveStatUsers: 'Aktif kullanıcı',
-      archiveStatMessages: 'YZ Mesajı',
-      archiveStatCoach: 'YZ Koçu',
-      archiveStatCompliance: 'Uyum Denetimi',
-      archiveColDays: 'Aktif gün',
-      archiveColMessage: 'YZ Mesajı',
-      archiveColCoach: 'YZ Koçu',
-      archiveColCompliance: 'Uyum Denetimi',
-      archiveColTotal: 'Toplam',
-      archiveTagInvited: 'Davetli alt ekip',
-      archiveEmpty: 'Seçilen dönemde kayıtlı YZ kullanımı yok.',
-      archiveUnavailable:
-        'Arşiv verisi şu an yüklenemedi. Migration 029–030 uygulandıysa bir süre sonra yenileyin.',
-      pulseLoadFallback:
-        'Nabız verisi tam yüklenemedi; kutularda sıfır gösteriliyor. Sayfayı yenileyin veya birkaç dakika sonra tekrar deneyin.',
-      dataPartialWarning:
-        'Bazı kayıtlar yüklenemedi; tabloda eldeki veriler gösteriliyor.',
-      independentPulseTitle: 'Bağımsız Kayıt Nabzı (kişi bazlı)',
-      independentPulseSubtitle:
-        'Platforma kendi başına kayıolan liderlerin öğrenme ve saha özeti — örn. Yusuf Emre. Canlı güncelleme ~30 sn.',
-      realtimePulseNote:
-        'Ekip nabzı verileri canlı yayın ile güncellenir (yaklaşık 30 sn gecikme).',
-      archiveRange: '{from} — {to} arası',
-      archiveRangeAll: 'Tüm kayıtlar ({to} tarihine kadar)',
     },
   },
   en: {
@@ -203,10 +164,6 @@ export const statsSection = {
       unlimited: 'Unlimited',
       licensePlanSuperAdmin: 'Pro · Unlimited',
 
-      aiIndependentTitle: 'Independent Signup AI Usage & Quotas Control Spread',
-      aiIndependentSubtitle:
-        'Same as Platform Desk independent signups: free license, no sponsor link (parent_id empty).',
-      aiIndependentEmpty: 'No independent signups yet.',
       colLicense: 'License',
       licensePlanFree: 'Free',
       licensePlanLeader: 'Basic',
@@ -222,39 +179,6 @@ export const statsSection = {
       quotaWriter: 'AI Message',
       quotaCompliance: 'Compliance',
       quotaUpgrade: 'Upgrade required',
-
-      infoNote: 'Calculations are processed client-side based on your active candidates pipeline database. Keep candidate stages updated in Pipeline to ensure precise data.',
-
-      archiveTitle: 'AI Usage Archive',
-      archiveSubtitle: 'Shows daily, monthly and yearly AI consumption for all users.',
-      archivePeriodToday: 'Today',
-      archivePeriod7d: 'Last 7 Days',
-      archivePeriod30d: 'Last 30 Days',
-      archivePeriod365d: '12 Months',
-      archivePeriodYtd: 'This Year',
-      archivePeriodAll: 'All Time',
-      archiveStatUsers: 'Active users',
-      archiveStatMessages: 'AI messages',
-      archiveStatCoach: 'AI coach',
-      archiveStatCompliance: 'Compliance',
-      archiveColDays: 'Active days',
-      archiveColMessage: 'AI Messages',
-      archiveColCoach: 'AI Coach',
-      archiveColCompliance: 'Compliance',
-      archiveColTotal: 'Total',
-      archiveTagInvited: 'Invited downline',
-      archiveEmpty: 'No AI usage recorded for this period.',
-      archiveUnavailable:
-        'Archive data could not be loaded. If migrations 029–030 are applied, try again shortly.',
-      pulseLoadFallback:
-        'Pulse data could not load fully; showing zeros. Refresh or try again in a few minutes.',
-      dataPartialWarning: 'Some records could not load; showing available data.',
-      independentPulseTitle: 'Independent signup pulse (per person)',
-      independentPulseSubtitle:
-        'Per-person learning and field summary for leaders who joined without a sponsor — e.g. external signups.',
-      realtimePulseNote: 'Team pulse updates via live sync (~30s delay).',
-      archiveRange: '{from} — {to}',
-      archiveRangeAll: 'All records (through {to})',
     },
   },
 } as const

@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Crown, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { TeamMember } from '@/hooks/useTeamMembers'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import {
   getIndependentSignupAIUsageAction,
   getMemberLicenseProfilesAction,
@@ -28,6 +29,8 @@ type StatsSuperAdminSectionsProps = {
 
 type AiRowType = 'leader' | 'nmm' | 'saha' | 'external'
 
+type Triple = { message: number; roleplay: number; compliance: number }
+
 type AiRow = {
   key: string
   name: string
@@ -36,7 +39,19 @@ type AiRow = {
   type: AiRowType
   license: string | null
   href: string | null
-  usage: { message: number; roleplay: number; compliance: number } | null
+  usage: Triple | null
+  /** Süper admin için true → limit ∞ gösterilir. */
+  unlimited: boolean
+  /** Plan limitleri; saha (uygulama dışı) için null. */
+  limits: Triple | null
+}
+
+/** "kullanım / limit" — süper admin ∞, saha —. */
+function usageCell(usage: Triple | null, key: keyof Triple, unlimited: boolean, limits: Triple | null): string {
+  if (!usage) return '—'
+  if (unlimited) return `${usage[key]} / ∞`
+  if (limits) return `${usage[key]} / ${limits[key]}`
+  return String(usage[key])
 }
 
 const TYPE_BADGE: Record<AiRowType, { icon: string; labelKey: string }> = {
@@ -99,6 +114,14 @@ export function StatsSuperAdminSections({
     const memberRow = (m: TeamMember, type: AiRowType): AiRow => {
       const profile = memberLicenses[m.user_id]
       const isAdmin = !!profile?.isSuperAdmin
+      const lim = isAdmin
+        ? null
+        : getLimitsForLicense(
+            profile?.licenseType ?? 'free',
+            false,
+            profile?.licenseExpiresAt,
+            profile?.workspaceCreatedAt
+          )
       return {
         key: `m_${m.user_id}`,
         name: m.full_name ?? t('statsPage.unnamedMember'),
@@ -110,6 +133,10 @@ export function StatsSuperAdminSections({
           : licenseLabel(profile?.licenseType ?? 'free'),
         href: getMemberHref({ ...m, isAppUser: true }),
         usage: periodUsage[m.user_id] ?? { message: 0, roleplay: 0, compliance: 0 },
+        unlimited: isAdmin,
+        limits: lim
+          ? { message: lim.messageLimit, roleplay: lim.roleplayLimit, compliance: lim.complianceLimit }
+          : null,
       }
     }
 
@@ -125,6 +152,8 @@ export function StatsSuperAdminSections({
         license: null,
         href: `/pipeline/${s.id}`,
         usage: null,
+        unlimited: false,
+        limits: null,
       })
     }
     for (const r of independentUsage) {
@@ -137,6 +166,8 @@ export function StatsSuperAdminSections({
         license: licenseLabel(r.licenseType),
         href: null,
         usage: periodUsage[r.userId] ?? { message: 0, roleplay: 0, compliance: 0 },
+        unlimited: false,
+        limits: { message: r.messageLimit, roleplay: r.roleplayLimit, compliance: r.complianceLimit },
       })
     }
     return out
@@ -226,13 +257,13 @@ export function StatsSuperAdminSections({
                     {row.license ?? '—'}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                    {row.usage ? row.usage.message : '—'}
+                    {usageCell(row.usage, 'message', row.unlimited, row.limits)}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                    {row.usage ? row.usage.roleplay : '—'}
+                    {usageCell(row.usage, 'roleplay', row.unlimited, row.limits)}
                   </td>
                   <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                    {row.usage ? row.usage.compliance : '—'}
+                    {usageCell(row.usage, 'compliance', row.unlimited, row.limits)}
                   </td>
                 </tr>
               )

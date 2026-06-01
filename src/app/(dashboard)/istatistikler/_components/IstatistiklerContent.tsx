@@ -4,9 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
-import {
-  TrendingUp, Clock
-} from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -23,6 +21,7 @@ import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import type { PulsePeriod } from '@/lib/domain/pulse'
+import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import type { MemberRow } from '@/lib/team/types'
 
 const StatsSuperAdminSections = dynamic(
@@ -37,7 +36,6 @@ const StatsSuperAdminSections = dynamic(
   }
 )
 
-type PeriodOption = '7d' | '30d' | 'all'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
@@ -58,7 +56,7 @@ export function IstatistiklerContent() {
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
   const [perfPeriod, setPerfPeriod] = useState<PulsePeriod>('30d')
 
-  const [period, setPeriod] = useState<PeriodOption>('30d')
+  const [period, setPeriod] = useState<PulsePeriod>('30d')
 
 
   const licenseLabel = useCallback(
@@ -183,23 +181,23 @@ export function IstatistiklerContent() {
     return matchedId ? `/pipeline/${matchedId}` : null
   }
 
-  // 1. Adayları seçilen periyoda göre filtrele
+  // 1. Adayları seçilen periyoda göre filtrele (Bugün / 7g / 30g / Bu yıl / Tüm)
   const filteredCandidates = useMemo(() => {
     if (period === 'all') return candidates
 
     const now = new Date()
-    const cutoff = new Date()
-    if (period === '7d') {
-      cutoff.setDate(now.getDate() - 7)
+    let cutoff: Date
+    if (period === 'ytd') {
+      cutoff = new Date(now.getFullYear(), 0, 1)
     } else {
-      cutoff.setDate(now.getDate() - 30)
+      cutoff = new Date()
+      if (period === '7d') cutoff.setDate(now.getDate() - 7)
+      else if (period === '30d') cutoff.setDate(now.getDate() - 30)
+      // 'today' → bugünün başlangıcı
+      cutoff.setHours(0, 0, 0, 0)
     }
-    cutoff.setHours(0, 0, 0, 0)
 
-    return candidates.filter(c => {
-      const createdAt = new Date(c.created_at)
-      return createdAt >= cutoff
-    })
+    return candidates.filter(c => new Date(c.created_at) >= cutoff)
   }, [candidates, period])
 
   // 2. Özet Metrikleri Hesaplama
@@ -355,24 +353,8 @@ export function IstatistiklerContent() {
             </div>
           </div>
 
-          {/* Period Filter */}
-          <div className="flex rounded-xl bg-[var(--bg-subtle)] p-0.5 border border-[var(--border)] self-start sm:self-auto">
-            {(['7d', '30d', 'all'] as const).map(p => (
-              <button
-                key={p}
-                onClick={() => setPeriod(p)}
-                className={`rounded-lg px-3 py-1.5 text-sm font-bold transition-all cursor-pointer ${
-                  period === p
-                    ? 'bg-[var(--bg-card)] text-[#1A56DB] shadow-sm border border-[var(--border)]'
-                    : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
-                }`}
-              >
-                {p === '7d' && t('statsPage.period7d')}
-                {p === '30d' && t('statsPage.period30d')}
-                {p === 'all' && t('statsPage.periodAll')}
-              </button>
-            ))}
-          </div>
+          {/* Period Filter — Bugün / Son 7 Gün / Son 30 Gün / Bu Yıl / Tüm Zamanlar */}
+          <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
         </header>
 
         <div className="space-y-6">
@@ -416,14 +398,6 @@ export function IstatistiklerContent() {
             roleplayLimit={roleplayLimit}
             complianceLimit={complianceLimit}
           />
-
-          {/* Bilgi Notu */}
-          <section className="flex gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-4">
-            <Clock className="h-4 w-4 shrink-0 text-[var(--text-3)] mt-0.5" />
-            <p className="text-sm leading-relaxed text-[var(--text-3)] font-semibold">
-              {t('statsPage.infoNote')}
-            </p>
-          </section>
 
         </div>
       </div>

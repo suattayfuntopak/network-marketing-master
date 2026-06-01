@@ -75,7 +75,7 @@ export function TeamPerformanceTable({
         <div>
           <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
             <Users className="h-4 w-4 text-brand" />
-            {t('statsPage.teamTitle')}
+            <span>{t('statsPage.teamTitle')}<sup>*</sup></span>
           </h2>
           <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
             {t('statsPage.teamSubtitle')}
@@ -106,7 +106,7 @@ export function TeamPerformanceTable({
                 <th className="p-3 font-semibold text-center bg-amber-50/20 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400">{t('statsPage.colFollowUp')}</th>
                 <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">{t('statsPage.colJoined')}</th>
                 <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
-                  {t('statsPage.colDqsg')}<sup>*</sup>
+                  {t('statsPage.colDqsg')}<sup>**</sup>
                 </th>
                 <th className="p-3 font-semibold text-center bg-teal-50/20 dark:bg-teal-950/5 text-teal-700 dark:text-teal-400 whitespace-nowrap">{t('pulse.colTraining')}</th>
                 <th className="p-3 font-semibold text-center bg-teal-50/20 dark:bg-teal-950/5 text-teal-700 dark:text-teal-400 whitespace-nowrap">{t('pulse.colObjections')}</th>
@@ -196,8 +196,14 @@ export function TeamPerformanceTable({
           </table>
         </div>
       )}
-      <div className="text-sm font-bold text-[var(--text-3)] select-none pl-1 mt-1">
-        * {t('statsPage.dqsgFootnote')}
+      <div className="space-y-1 pl-1 mt-1 text-xs italic leading-relaxed text-[var(--text-3)] select-none">
+        <p>
+          * {t('pulse.disclaimer')}{' '}
+          <Link href="/kvkk" className="not-italic font-semibold text-brand hover:underline">
+            {t('pulse.disclaimerLink')}
+          </Link>
+        </p>
+        <p>** {t('statsPage.dqsgFootnote')}</p>
       </div>
 
       {teamStatsLocked && performanceRows.length > 0 && (

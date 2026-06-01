@@ -15,9 +15,6 @@ export interface IndependentAIUsageRow {
   licenseType: string
   licenseExpiresAt: string | null
   registeredAt: string
-  todayMessage: number
-  todayRoleplay: number
-  todayCompliance: number
   messageLimit: number
   roleplayLimit: number
   complianceLimit: number
@@ -123,33 +120,10 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const memberByUser = new Map((memberRows ?? []).map(m => [m.user_id, m]))
 
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
-
-  const { data: todayActions } = await admin
-    .from('nmm_daily_actions')
-    .select('user_id, note')
-    .in('user_id', filteredOwnerIds)
-    .eq('action_type', 'ai_generate')
-    .gte('created_at', todayStart.toISOString())
-
-  const usageByUser = new Map<string, { message: number; roleplay: number; compliance: number }>()
-  for (const id of filteredOwnerIds) {
-    usageByUser.set(id, { message: 0, roleplay: 0, compliance: 0 })
-  }
-  todayActions?.forEach(act => {
-    const bucket = usageByUser.get(act.user_id)
-    if (!bucket) return
-    if (act.note === 'roleplay') bucket.roleplay++
-    else if (act.note === 'compliance') bucket.compliance++
-    else bucket.message++
-  })
-
   return independentOwners
     .map(owner => {
       const authUser = userMap.get(owner.userId)
       const member = memberByUser.get(owner.userId)
-      const usage = usageByUser.get(owner.userId) ?? { message: 0, roleplay: 0, compliance: 0 }
       const limits = getLimitsForLicense(
         owner.licenseType,
         false,
@@ -177,20 +151,12 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
         licenseType: owner.licenseType,
         licenseExpiresAt: owner.licenseExpiresAt,
         registeredAt: owner.registeredAt,
-        todayMessage: usage.message,
-        todayRoleplay: usage.roleplay,
-        todayCompliance: usage.compliance,
         messageLimit: limits.messageLimit,
         roleplayLimit: limits.roleplayLimit,
         complianceLimit: limits.complianceLimit,
       }
     })
-    .sort((a, b) => {
-      const totalA = a.todayMessage + a.todayRoleplay + a.todayCompliance
-      const totalB = b.todayMessage + b.todayRoleplay + b.todayCompliance
-      if (totalB !== totalA) return totalB - totalA
-      return new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime()
-    })
+    .sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime())
 }
 
 /** Super-admin only: ekip tablosundaki her üyenin kendi workspace lisans profili. */
