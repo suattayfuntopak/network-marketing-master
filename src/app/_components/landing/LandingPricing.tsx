@@ -11,8 +11,8 @@ import {
   type BillingPeriod,
 } from '@/lib/domain/pricing'
 import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
+import { BankTransferCard } from '@/components/payment/BankTransferCard'
 import { PRO_LIMITS } from './constants'
-import { LandingBankTransfer } from './LandingBankTransfer'
 
 export function LandingPricing() {
   const { t } = useTranslation()
@@ -298,7 +298,7 @@ export function LandingPricing() {
 
       </div>
 
-      {BANK_TRANSFER_ENABLED && <LandingBankTransfer />}
+      {BANK_TRANSFER_ENABLED && <BankTransferCard variant="landing" />}
     </section>
   )
 }

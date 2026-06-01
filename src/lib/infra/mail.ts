@@ -438,6 +438,55 @@ export async function sendModerationRejectedEmail(
   }
 }
 
+/**
+ * Havale/EFT ile ödeyen kullanıcı "ödedim" dediğinde super admin'e bildirim gönderir.
+ * Müşterinin kayıtlı e-postasını otomatik içerir (kullanıcı açıklamaya yazmayı unutsa bile),
+ * admin'i doğrudan Platform Yönetimi'ne yönlendirir. Migration gerektirmez (Resend).
+ */
+export async function sendBankTransferNotifyEmail(
+  userEmail: string,
+  userName: string,
+  workspaceName: string | null,
+  currentPlan: string,
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendBankTransferNotifyEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const subject = `Havale/EFT Ödeme Bildirimi: ${userName}`
+  const content = [
+    emailHeading('Havale/EFT ödeme bildirimi'),
+    emailParagraph(
+      `Bir kullanıcı ${emailHighlight('havale/EFT ile ödeme yaptığını')} bildirdi. Lütfen banka hesabınızı kontrol edip lisansı aktive edin.`,
+    ),
+    emailPlanBox(
+      [
+        `<strong>İsim:</strong> ${userName}`,
+        `<strong>Kayıtlı e-posta:</strong> ${userEmail}`,
+        workspaceName ? `<strong>Çalışma alanı:</strong> ${workspaceName}` : '',
+        `<strong>Mevcut plan:</strong> ${currentPlan}`,
+        `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      ].filter(Boolean),
+    ),
+    emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Lisansı Aktive Et'),
+  ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ['info@suattayfuntopak.com'],
+      replyTo: userEmail,
+      subject,
+      html: buildPremiumEmail(content, 'tr'),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send bank transfer notify email:', err)
+    return false
+  }
+}
+
 /** Şifre sıfırlama — NMM logo + premium şablon (Supabase varsayılan N harfi yerine). */
 export async function sendPasswordResetEmail(
   email: string,

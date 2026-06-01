@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-01 — Havale/EFT: alt başlık + IBAN tek satır + QR + tek bileşen + "Ödedim" bildirimi
+
+Birden çok iyileştirme:
+
+1. **Fiyatlandırma alt başlığı (landing):** "kredi kartı veya havale/eft ile ödemenizi
+   kolayca ve güvenle..." vurgusu eklendi (TR+EN, `landingPage.pricingSubtitle`).
+2. **IBAN tek satıra sığıyor:** Punto `text-[13px] sm:text-base`'e çekildi, kendi tam
+   genişlik satırına alındı, `whitespace-nowrap` + `overflow-x-auto` ile alta kayma giderildi
+   (hem landing hem ödeme, mobil dahil).
+3. **QR kod (öneri #2):** IBAN'ın statik QR'ı `public/iban-qr.svg` (npx ile üretildi, runtime
+   bağımlılığı yok). **Yalnızca masaüstünde** gösteriliyor — kullanıcı telefon bankacılığıyla
+   ekranı tarar; mobilde aynı cihazda tarama anlamsız + tek-satır IBAN için yer açar.
+4. **Tek bileşen (öneri #4, DRY):** İki ayrı kart (`odeme/_components/BankTransferCard` +
+   `landing/LandingBankTransfer`) silindi → tek `src/components/payment/BankTransferCard.tsx`
+   (`variant: 'dashboard' | 'landing'`). Kopyalama/QR/adım/bildirim mantığı tek yerde.
+5. **"Ödedim, Bildir" (öneri #3, migration'sız):** Ödeme sayfasında giriş yapmış kullanıcı
+   tek tıkla super admin'e yapılandırılmış e-posta gönderir (kayıtlı e-posta otomatik eklenir
+   — "açıklamaya e-posta yaz" adımını unutma sorununu çözer). `notifyBankTransferAction`
+   (server action) + `sendBankTransferNotifyEmail` (mevcut Resend altyapısı, `info@`'a, CTA →
+   Platform Yönetimi). Landing'de (anonim) e-posta butonu klasik `mailto:` kalır.
+
+- tsc temiz, lint temiz (sadece önceden var olan `selectedPlan` uyarısı), 86 test geçti.
+- Kaldırma: `BANK_TRANSFER_ENABLED = false` her iki sayfadan da kaldırır.
+
 ## 2026-06-01 — Tema toggle anında tepki (landing + auth)
 
 - Gecikme: `body` 0.2s transition + `disableTransitionOnChange={false}` + React/next-themes sırası.
