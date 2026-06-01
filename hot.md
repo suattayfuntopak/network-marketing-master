@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-01 — Tema toggle anında tepki (landing + auth)
+
+- Gecikme: `body` 0.2s transition + `disableTransitionOnChange={false}` + React/next-themes sırası.
+- `applyThemeToDocument` + `useThemeCycle` (optimistic ikon); `ThemeCycleButton` — landing, auth, dashboard.
+- `ThemeProvider`: `disableTransitionOnChange`; `globals.css` body transition kaldırıldı.
+
 ## 2026-06-01 — Auth giriş/kayıt kartı light modda açık
 
 - `giris/page.tsx` ve `kayit/page.tsx` orta kartı sabit `#161824` kullanıyordu; light arka planda koyu kutu kalıyordu.

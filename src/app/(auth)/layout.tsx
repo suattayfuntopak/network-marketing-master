@@ -1,44 +1,21 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
+import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { Z } from '@/lib/ui/zIndex'
-import { NEXT_THEME, resolveThemeMode, ThemeIcon, type ThemeMode } from '@/lib/ui/themeToggle'
 import { authLogoRingClass, authShellClass, authTitleClass, authToolbarBtnClass } from './_components/authUi'
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const { lang, setLang, t } = useTranslation()
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
-
-  const currentTheme = mounted ? resolveThemeMode(theme) : 'system'
-
-  const nextThemeLabel: Record<ThemeMode, string> = {
-    dark: t('common.themeLight'),
-    light: t('common.themeSystem'),
-    system: t('common.themeDark'),
-  }
+  const { lang, setLang } = useTranslation()
 
   return (
     <div className={authShellClass}>
 
       {/* Top-right: theme (current icon) + single language flag (active locale) */}
       <div className={`fixed top-3 right-3 ${Z.bottomNav} flex items-center gap-1`}>
-        {mounted && (
-          <button
-            type="button"
-            onClick={() => setTheme(NEXT_THEME[currentTheme])}
-            title={nextThemeLabel[currentTheme]}
-            aria-label={nextThemeLabel[currentTheme]}
-            className={authToolbarBtnClass}
-          >
-            <ThemeIcon mode={currentTheme} />
-          </button>
-        )}
+        <ThemeCycleButton buttonClassName={authToolbarBtnClass} />
         {lang === 'tr' ? (
           <button
             type="button"

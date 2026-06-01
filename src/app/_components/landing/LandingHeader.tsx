@@ -1,23 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { ArrowRight, LogIn, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
+import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { Z } from '@/lib/ui/zIndex'
-import { resolveThemeMode, ThemeIcon } from '@/lib/ui/themeToggle'
-import { NEXT_THEME, NEXT_THEME_LABEL } from './constants'
+import { NEXT_THEME_LABEL } from './constants'
+import type { ThemeMode } from '@/lib/ui/themeToggle'
 
 export function LandingHeader() {
   const { t, lang, setLang } = useTranslation()
-  const { theme, setTheme } = useTheme()
-  const [themeMounted, setThemeMounted] = useState(false)
-
-  useEffect(() => setThemeMounted(true), [])
-
-  const currentTheme = themeMounted ? resolveThemeMode(theme) : 'system'
 
   return (
     <header className={`sticky top-0 ${Z.header} w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]`}>
@@ -34,16 +27,11 @@ export function LandingHeader() {
 
         {/* Navigation & Auth */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">
-          {/* Theme Toggle */}
-          {themeMounted && (
-            <button
-              onClick={() => setTheme(NEXT_THEME[currentTheme])}
-              title={NEXT_THEME_LABEL[currentTheme]}
-              className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 dark:text-white/50 transition hover:bg-slate-100 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
-            >
-              <ThemeIcon mode={currentTheme} className="h-3.5 w-3.5" />
-            </button>
-          )}
+          <ThemeCycleButton
+            buttonClassName="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition hover:bg-slate-100 hover:text-slate-900 dark:text-white/50 dark:hover:bg-white/10 dark:hover:text-white sm:h-9 sm:w-9 sm:rounded-xl"
+            iconClassName="h-3.5 w-3.5"
+            titleForMode={(mode: ThemeMode) => NEXT_THEME_LABEL[mode]}
+          />
 
           {/* Language Switch: active language's flag — clicking switches to other language */}
           <div className="flex shrink-0 items-center justify-center">
