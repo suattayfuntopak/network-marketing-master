@@ -152,7 +152,7 @@ export function PlatformYonetimContent() {
 
     startModerationTransition(async () => {
       try {
-        let edited: Record<string, any> = {}
+        let edited: Record<string, unknown> = {}
         const d = selectedRequest.data
 
         if (selectedRequest.contentType === 'training') {
@@ -186,8 +186,8 @@ export function PlatformYonetimContent() {
           setSelectedRequest(null)
           refreshPlatform()
         }
-      } catch (err: any) {
-        toast.error(err.message || 'Onaylama başarısız oldu.')
+      } catch (err: unknown) {
+        toast.error((err instanceof Error ? err.message : '') || 'Onaylama başarısız oldu.')
       }
     })
   }
@@ -202,8 +202,8 @@ export function PlatformYonetimContent() {
           toast.success('İçerik hızlıca onaylandı!')
           refreshPlatform()
         }
-      } catch (err: any) {
-        toast.error(err.message || 'Onaylama başarısız oldu.')
+      } catch (err: unknown) {
+        toast.error((err instanceof Error ? err.message : '') || 'Onaylama başarısız oldu.')
       }
     })
   }
@@ -223,8 +223,8 @@ export function PlatformYonetimContent() {
           refreshPlatform()
           setSelectedRequest(null) // Close the review/edit modal
         }
-      } catch (err: any) {
-        toast.error(err.message || 'Reddetme işlemi başarısız oldu.')
+      } catch (err: unknown) {
+        toast.error((err instanceof Error ? err.message : '') || 'Reddetme işlemi başarısız oldu.')
       }
     })
   }
@@ -246,9 +246,9 @@ export function PlatformYonetimContent() {
           setSelectedWorkspace(null)
           refreshPlatform() // Reload table
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err)
-        toast.error(err.message || 'İşlem başarısız.')
+        toast.error((err instanceof Error ? err.message : '') || 'İşlem başarısız.')
       }
     })
   }
@@ -283,8 +283,8 @@ export function PlatformYonetimContent() {
       await addIndependentAsCandidateAction(email, name)
       setAddedIds(prev => new Set(prev).add(workspaceId))
       toast.success(t('platformPage.addedToPipeline', { name }))
-    } catch (err: any) {
-      toast.error(err.message || t('platformPage.operationFailed'))
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : '') || t('platformPage.operationFailed'))
     } finally {
       setAddingId(null)
     }
@@ -323,8 +323,8 @@ export function PlatformYonetimContent() {
       await deleteUserAction(ownerId, email)
       toast.success(t('platformPage.userDeleted'))
       refreshPlatform()
-    } catch (err: any) {
-      toast.error(err.message || t('platformPage.deleteFailed'))
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : '') || t('platformPage.deleteFailed'))
     } finally {
       setDeletingUserId(null)
       setDeleteCountdown(0)
