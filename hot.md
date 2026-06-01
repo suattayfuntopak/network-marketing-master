@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-01 — KVKK §6 + Yusuf dış kayıt fix + SUPER ADMIN ∞ + perf dönem kaldır
+
+- **KVKK §6** "Ekip Nabzı" → **"Ekip Performans İzleme ve Sponsor Görünürlüğü"**; içerik yeni
+  tabloya göre yeniden yazıldı (eğitim/itiraz/video %, DQSG, huni dağılımı; ham içerik/notlar
+  paylaşılmaz). TR+EN, `kvkk/page.tsx`.
+- **Yusuf dış kayıt fix:** `getIndependentSignupAIUsageAction` artık Platform Yönetim gibi **TÜM**
+  workspace'leri çekiyor; sadece süper admin'in kendi workspace'i + doğrudan ekibi (iki parent_id
+  formatı) eleniyor. Böylece parent_id dolu / free olmayan dış kayıtlar (Yusuf) da listede.
+- **SUPER ADMIN:** AI tablosunda süper admin lisansı **"SUPER ADMIN"**; kullanım/limit üçü de
+  **0/∞** (memberRow.unlimited → `usage / ∞`). i18n `licensePlanSuperAdmin`.
+- **AI tablosunda e-posta kaldırıldı** (dış kayıt satırlarındaki e-posta gösterimi).
+- **Perf tablosu dönem sekmesi kaldırıldı:** veriler kümülatif (genel %) + anlık huni durumu;
+  learning_events de gittiği için döneme bağlanamaz → işlevsiz sekme kaldırıldı. Dönem mantıklı
+  olan tek yer YZ kullanım tablosu (orada çalışıyor).
+- **Pre-existing lint:** kvkk `z-40`→`Z.header`, perf kilit overlay `z-20`→`Z.cardOverlay`.
+- tsc temiz, 86 test, lint 0 hata.
+
 ## 2026-06-01 — nmm_learning_events tamamen kaldırıldı (tüm zincir + 045)
 
 Yazılıp hiçbir yerde gösterilmeyen olay-logu tablosu tüm zinciriyle söküldü:

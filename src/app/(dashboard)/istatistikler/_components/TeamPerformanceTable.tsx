@@ -4,9 +4,8 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Users, Crown, Lock, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { Z } from '@/lib/ui/zIndex'
 import type { TeamMember } from '@/hooks/useTeamMembers'
-import type { PulsePeriod } from '@/lib/domain/pulse'
-import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
@@ -21,8 +20,6 @@ interface Props {
   /** Kişi-bazlı eğitim/itiraz ilerlemesi (genel) — yalnız uygulama kullananlar için. */
   progressByUserId?: PerfLearningMap
   videoByUserId?: PerfVideoMap
-  period: PulsePeriod
-  onPeriodChange: (p: PulsePeriod) => void
 }
 
 /** Rakam altında ince ilerleme çubuğu. */
@@ -45,8 +42,6 @@ export function TeamPerformanceTable({
   loading,
   progressByUserId = {},
   videoByUserId = {},
-  period,
-  onPeriodChange,
 }: Props) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -71,17 +66,14 @@ export function TeamPerformanceTable({
 
   return (
     <section className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200 overflow-hidden">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-            <Users className="h-4 w-4 text-brand" />
-            <span>{t('statsPage.teamTitle')}<sup>*</sup></span>
-          </h2>
-          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-            {t('statsPage.teamSubtitle')}
-          </p>
-        </div>
-        <PulsePeriodTabs period={period} onChange={onPeriodChange} comfortableTypography />
+      <div>
+        <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
+          <Users className="h-4 w-4 text-brand" />
+          <span>{t('statsPage.teamTitle')}<sup>*</sup></span>
+        </h2>
+        <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
+          {t('statsPage.teamSubtitle')}
+        </p>
       </div>
 
       {loading ? (
@@ -208,7 +200,7 @@ export function TeamPerformanceTable({
 
       {teamStatsLocked && performanceRows.length > 0 && (
         <div
-          className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-[#534AB7]/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]"
+          className={`absolute inset-0 ${Z.cardOverlay} flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-[#534AB7]/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
           aria-hidden={false}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-indigo-200 shadow-lg">

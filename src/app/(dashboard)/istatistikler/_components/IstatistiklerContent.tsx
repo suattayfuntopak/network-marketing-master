@@ -54,7 +54,6 @@ export function IstatistiklerContent() {
   const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
-  const [perfPeriod, setPerfPeriod] = useState<PulsePeriod>('30d')
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')
 
@@ -105,7 +104,7 @@ export function IstatistiklerContent() {
     [pulseMemberRows]
   )
   const { data: perfProgress } = useQuery({
-    queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(','), perfPeriod],
+    queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(',')],
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
     enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
     staleTime: 30_000,
@@ -378,8 +377,6 @@ export function IstatistiklerContent() {
             loading={membersLoading || cLoading}
             progressByUserId={perfProgress?.progressByUserId}
             videoByUserId={perfProgress?.videoByUserId}
-            period={perfPeriod}
-            onPeriodChange={setPerfPeriod}
           />
 
           {usage?.isSuperAdmin && (

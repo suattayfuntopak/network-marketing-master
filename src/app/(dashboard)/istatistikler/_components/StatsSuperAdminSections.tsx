@@ -244,7 +244,6 @@ export function StatsSuperAdminSections({
                       )}
                       <div className="min-w-0">
                         <div className="font-semibold truncate">{row.name}</div>
-                        {row.email && <div className="text-sm text-[var(--text-3)] truncate">{row.email}</div>}
                       </div>
                     </div>
                   </td>

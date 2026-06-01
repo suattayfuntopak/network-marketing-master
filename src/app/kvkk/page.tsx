@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, Shield, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
+import { Z } from '@/lib/ui/zIndex'
 
 export default function KVKKPage() {
   const { lang } = useTranslation()
@@ -60,11 +61,11 @@ export default function KVKKPage() {
         },
         {
           id: 'p6',
-          title: '6. Ekip Nabzı ve Sponsor Görünürlüğü',
-          text: 'Pro plan kapsamında doğrudan sponsorunuz, Platform üzerindeki eğitim ve itiraz içeriklerine ilişkin ilerleme özetinizi (okunan içerik oranı, favori sayısı gibi toplu metrikler) ve seçtiğiniz döneme ait genel saha aktivite istatistiklerinizi görüntüleyebilir. Bu veriler bireysel koçluk ve ekip gelişimi amacıyla işlenir; saniye bazlı ekran kaydı veya aday notu metinleri sponsor ile paylaşılmaz.',
+          title: '6. Ekip Performans İzleme ve Sponsor Görünürlüğü',
+          text: 'Pro plan kapsamında doğrudan sponsorunuz (lideriniz), "Ekip Performans İzleme Tablosu" üzerinde ekip gelişiminizi yalnızca özet düzeyde görüntüleyebilir: eğitim, itiraz ve video içeriklerindeki tamamlama yüzdeleriniz, Doğru Başlangıç (DQSG) ilerlemeniz ve aday boru hattınızdaki aşama dağılımınız. Bu veriler yalnızca bireysel koçluk ve ekip gelişimi amacıyla işlenir; aday notlarınız veya mesaj içerikleriniz sponsorunuzla paylaşılmaz.',
           bullets: [
-            'İlerleme verileri yalnızca özet düzeyinde (yüzde ve sayaç) sponsorunuza sunulur.',
-            'İstediğiniz zaman hesap ayarlarınızdan veya destek kanalından bilgi talep edebilirsiniz.',
+            'İlerleme verileri sponsorunuza yalnızca özet düzeyde (yüzde ve sayaç) sunulur; ham içerik paylaşılmaz.',
+            'İstediğiniz zaman hesap ayarlarınızdan veya destek kanalından verilerinize ilişkin bilgi talep edebilirsiniz.',
           ],
         },
       ],
@@ -120,11 +121,11 @@ export default function KVKKPage() {
         },
         {
           id: 'p6',
-          title: '6. Team Pulse and Sponsor Visibility',
-          text: 'On the Pro plan, your direct sponsor may view summary progress for training and objection content (e.g. completion rates, favorite counts) and general field activity metrics for the period you select. Data is used for coaching and team development; per-second tracking and candidate note text are not shared with sponsors.',
+          title: '6. Team Performance Tracking and Sponsor Visibility',
+          text: 'On the Pro plan, your direct sponsor (your leader) may view your team development only at a summary level in the "Team Performance Tracking Table": your completion percentages for training, objection and video content, your Onboarding (DQSG) progress, and the stage distribution of your candidate pipeline. This data is used solely for individual coaching and team development; your candidate notes or message content are not shared with your sponsor.',
           bullets: [
-            'Progress is shown to your sponsor only as aggregated percentages and counts.',
-            'You may contact support at any time to exercise your data protection rights.',
+            'Progress is shown to your sponsor only at a summary level (percentages and counters); raw content is not shared.',
+            'You may request information about your data from your account settings or support channel at any time.',
           ],
         },
       ],
@@ -141,7 +142,7 @@ export default function KVKKPage() {
       <div className="absolute bottom-[10%] right-[-10%] h-[400px] w-[400px] rounded-full bg-pink-600/5 blur-[140px] pointer-events-none" />
 
       {/* Header Back Bar */}
-      <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
+      <nav className={`sticky top-0 ${Z.header} backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
