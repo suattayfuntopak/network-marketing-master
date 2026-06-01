@@ -55,12 +55,12 @@ export function ItirazCard({
           onClick={onToggle}
           className="flex w-full items-center gap-3 p-4 text-left"
         >
-          <span className={`shrink-0 text-xl leading-none transition-opacity ${isRead ? 'opacity-40' : ''}`}>{itiraz.emoji}</span>
+          <span className={`shrink-0 text-2xl leading-none transition-opacity ${isRead ? 'opacity-40' : ''}`}>{itiraz.emoji}</span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold uppercase tracking-wider text-[#9B1D47] dark:text-[#fda4af] mb-0.5">
               {kategori}
             </p>
-            <p className={`text-sm font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
+            <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
               &quot;{soru}&quot;
             </p>
           </div>
@@ -113,7 +113,7 @@ export function ItirazCard({
               <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#FFF1F3] dark:bg-[#3d0a1a]">
                 <span className="text-[10px]">💡</span>
               </div>
-              <div className="flex-1 text-sm leading-relaxed text-[var(--text-2)] space-y-3">
+              <div className="flex-1 text-base leading-relaxed text-[var(--text-2)] space-y-3">
                 {itiraz.cevap ? (
                   <p>{cevap}</p>
                 ) : (
@@ -133,13 +133,13 @@ export function ItirazCard({
                     {itiraz.yaklasim && (
                       <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
                         <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ Yaklaşım</h5>
-                        <p className="text-xs text-[var(--text-3)] leading-relaxed">{itiraz.yaklasim}</p>
+                        <p className="text-sm text-[var(--text-3)] leading-relaxed">{itiraz.yaklasim}</p>
                       </div>
                     )}
                     {itiraz.ornekDiyalog && (
                       <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
                         <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 Örnek Diyalog</h5>
-                        <p className="text-xs italic leading-relaxed whitespace-pre-wrap">&quot;{itiraz.ornekDiyalog}&quot;</p>
+                        <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{itiraz.ornekDiyalog}&quot;</p>
                       </div>
                     )}
                   </>
@@ -149,7 +149,7 @@ export function ItirazCard({
             <div className="mt-3 ml-7 flex flex-wrap items-center gap-2">
               <button
                 onClick={e => onCopy(copyValue, e)}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all ${
                   copied
                     ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
                     : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#FFF1F3] hover:text-[#9B1D47] dark:hover:bg-[#3d0a1a] dark:hover:text-[#fda4af]'
@@ -166,7 +166,7 @@ export function ItirazCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-xs font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
+                className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-sm font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
               >
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>

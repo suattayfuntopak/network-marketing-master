@@ -44,7 +44,7 @@ export function TrainingCard({
         }`}
       >
         <button onClick={onToggle} className="flex w-full items-center gap-3 p-4 text-left">
-          <span className={`shrink-0 text-xl leading-none transition-opacity ${isRead ? 'opacity-40' : ''}`}>
+          <span className={`shrink-0 text-2xl leading-none transition-opacity ${isRead ? 'opacity-40' : ''}`}>
             {konu.emoji}
           </span>
           <div className="min-w-0 flex-1">
@@ -56,7 +56,7 @@ export function TrainingCard({
                 {konu.seviye}
               </span>
             </div>
-            <p className={`text-sm font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
+            <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
               {konu.baslik}
             </p>
             <div className="mt-1 flex items-center gap-2">
@@ -64,7 +64,7 @@ export function TrainingCard({
                 <Clock className="h-3 w-3 shrink-0" />
                 <span>{konu.sure}</span>
               </div>
-              <span className="text-[var(--text-3)] text-xs">·</span>
+              <span className="text-[var(--text-3)] text-sm">·</span>
               <span className="text-[11px] text-[var(--text-3)] truncate block max-w-[200px] sm:max-w-none">{konu.ozet}</span>
             </div>
           </div>
@@ -120,7 +120,7 @@ export function TrainingCard({
                   <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${bulletStyle}`}>
                     {idx + 1}
                   </span>
-                  <p className="text-sm leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{madde}</p>
+                  <p className="text-base leading-relaxed text-[var(--text-2)] whitespace-pre-wrap">{madde}</p>
                 </li>
               ))}
             </ul>
@@ -128,7 +128,7 @@ export function TrainingCard({
             <div className="mt-4 ml-7 flex flex-wrap items-center gap-2">
               <button
                 onClick={onCopy}
-                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all ${
                   copied
                     ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
                     : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3]'
@@ -145,7 +145,7 @@ export function TrainingCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-xs font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
+                className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-sm font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
               >
                 <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>

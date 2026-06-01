@@ -138,7 +138,11 @@ export function TeamPerformanceTable({
                       {isLeader ? t('statsPage.roleLeader') : t('statsPage.rolePartner')}
                     </td>
                     <td className="p-3 text-center">
-                      {isLeader ? null : isAppUser ? (
+                      {isLeader ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2 py-0.5 text-sm font-black text-amber-700 dark:text-amber-400 whitespace-nowrap">
+                          👑 {t('statsPage.roleLeader')}
+                        </span>
+                      ) : isAppUser ? (
                         <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 px-2 py-0.5 text-sm font-black text-purple-700 dark:text-purple-400 whitespace-nowrap">
                           💎 {t('statsPage.typeNmm')}
                         </span>

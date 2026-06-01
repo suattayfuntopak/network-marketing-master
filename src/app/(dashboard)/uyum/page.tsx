@@ -223,10 +223,10 @@ export default function CompliancePage() {
             <Shield className="h-5 w-5 text-[#C03E1F]" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">
+            <h1 className="text-2xl font-bold text-[var(--text-1)]">
               {t('compliancePage.complianceCenter')}
             </h1>
-            <p className="text-sm text-[var(--text-3)]">
+            <p className="text-base text-[var(--text-3)]">
               {t('compliancePage.complianceSubtitle')}
             </p>
           </div>
@@ -236,7 +236,7 @@ export default function CompliancePage() {
         <div className="flex rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)] max-w-md mx-auto">
           <button
             onClick={() => setActiveTab('auditor')}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'auditor'
                 ? 'bg-[var(--bg-card)] text-[#C03E1F] shadow-sm border border-[var(--border)]'
                 : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
@@ -247,7 +247,7 @@ export default function CompliancePage() {
           </button>
           <button
             onClick={() => setActiveTab('library')}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-bold transition-all cursor-pointer ${
+            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-all cursor-pointer ${
               activeTab === 'library'
                 ? 'bg-[var(--bg-card)] text-[#C03E1F] shadow-sm border border-[var(--border)]'
                 : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
@@ -265,11 +265,11 @@ export default function CompliancePage() {
               {/* YZ Uyum Denetleyicisi Formu */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
                 <div>
-                  <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                  <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <Sparkles className="h-4 w-4 text-[#C03E1F]" />
                     {t('compliancePage.auditYourMessage')}
                   </h2>
-                  <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                  <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
                     {t('compliancePage.auditYourMessageDesc')}
                   </p>
                 </div>
@@ -280,7 +280,7 @@ export default function CompliancePage() {
                     onChange={e => setInputText(e.target.value)}
                     required
                     placeholder={t('compliancePage.auditPlaceholder')}
-                    className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
+                    className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
                   />
                   <div className="flex justify-end">
                     <button
@@ -291,7 +291,7 @@ export default function CompliancePage() {
                         (!limitsSuperAdmin && complianceLimit === 0) ||
                         (!limitsSuperAdmin && complianceRemaining <= 0)
                       }
-                      className="flex max-w-full items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-4 py-2.5 text-xs sm:text-sm font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer whitespace-nowrap"
+                      className="flex max-w-full items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-4 py-2.5 text-sm sm:text-base font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer whitespace-nowrap"
                     >
                       {isAuditing ? (
                         <>
@@ -321,7 +321,7 @@ export default function CompliancePage() {
                   <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-4">
                     {/* Gauge / Score Card */}
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 flex flex-col items-center justify-center text-center space-y-3">
-                      <span className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
+                      <span className="text-sm font-bold text-[var(--text-3)] uppercase tracking-wider">
                         {t('compliancePage.complianceScore')}
                       </span>
                       
@@ -356,12 +356,12 @@ export default function CompliancePage() {
                           />
                         </svg>
                         <div className="text-center">
-                          <span className="text-3xl font-black text-[var(--text-1)]">{auditResult.score}</span>
-                          <span className="text-xs text-[var(--text-3)] font-bold block">/100</span>
+                          <span className="text-4xl font-black text-[var(--text-1)]">{auditResult.score}</span>
+                          <span className="text-sm text-[var(--text-3)] font-bold block">/100</span>
                         </div>
                       </div>
 
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider ${
+                      <span className={`rounded-full px-3 py-1 text-sm font-bold uppercase tracking-wider ${
                         auditResult.safety_level === 'safe'
                           ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400'
                           : auditResult.safety_level === 'warning'
@@ -376,13 +376,13 @@ export default function CompliancePage() {
 
                     {/* Violations List */}
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-3 justify-center flex flex-col">
-                      <h3 className="text-xs font-bold text-[var(--text-3)] uppercase tracking-wider">
+                      <h3 className="text-sm font-bold text-[var(--text-3)] uppercase tracking-wider">
                         {t('compliancePage.detectedRisks')}
                       </h3>
                       {(!auditResult.violations || auditResult.violations.length === 0) ? (
                         <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 py-3">
                           <CheckCircle2 className="h-5 w-5 shrink-0" />
-                          <span className="text-sm font-semibold">
+                          <span className="text-base font-semibold">
                             {t('compliancePage.noRisksDetected')}
                           </span>
                         </div>
@@ -391,7 +391,7 @@ export default function CompliancePage() {
                           {auditResult.violations.map((v, i) => (
                             <div key={i} className="rounded-xl border border-red-100 dark:border-red-950/20 bg-red-50/20 dark:bg-red-950/5 p-3 flex gap-2.5 items-start">
                               <AlertTriangle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
-                              <div className="text-xs space-y-0.5">
+                              <div className="text-sm space-y-0.5">
                                 <p className="font-bold text-[var(--text-1)]">
                                   "{v.phrase}" <span className="text-[10px] bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 font-bold px-1.5 py-0.5 rounded-full uppercase ml-1.5">{v.category}</span>
                                 </p>
@@ -426,11 +426,11 @@ export default function CompliancePage() {
                         </a>
                       </div>
                       <div className="pr-20">
-                        <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
+                        <h4 className="text-sm font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5 mb-2">
                           <CheckCircle2 className="h-4 w-4" />
                           {t('compliancePage.recommendedVersion')}
                         </h4>
-                        <p className="text-sm leading-relaxed text-[var(--text-1)] italic whitespace-pre-wrap font-medium">
+                        <p className="text-base leading-relaxed text-[var(--text-1)] italic whitespace-pre-wrap font-medium">
                           {auditResult.improved_text}
                         </p>
                       </div>
@@ -443,15 +443,15 @@ export default function CompliancePage() {
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                    <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
                       <Shield className="h-4 w-4 text-[#C03E1F]" />
                       {t('compliancePage.preShareChecklist')}
                     </h2>
-                    <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                    <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
                       {t('compliancePage.preShareChecklistDesc')}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2.5 text-xs text-[var(--text-3)] shrink-0">
+                  <div className="flex items-center gap-2.5 text-sm text-[var(--text-3)] shrink-0">
                     <span>{checkedCount}/{checklist.length}</span>
                     {checkedCount > 0 && (
                       <button
@@ -480,14 +480,14 @@ export default function CompliancePage() {
                       }`}>
                         {checkedItems[ci.id] && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
                       </span>
-                      <span className="text-xs sm:text-sm leading-tight">{ci.label}</span>
+                      <span className="text-sm sm:text-base leading-tight">{ci.label}</span>
                     </button>
                   ))}
 
                   {isAllChecked && (
                     <div className="flex items-center gap-2 rounded-xl bg-emerald-500 text-white px-4 py-3 shadow-md mt-3 animate-in fade-in zoom-in-95 duration-200">
                       <CheckCircle2 className="h-5 w-5 shrink-0" />
-                      <span className="text-xs sm:text-sm font-bold">
+                      <span className="text-sm sm:text-base font-bold">
                         {t('compliancePage.allChecksPassed')}
                       </span>
                     </div>
@@ -502,11 +502,11 @@ export default function CompliancePage() {
               {/* Onaylı İfadeler Paneli */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
                 <div>
-                  <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                  <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                     {t('compliancePage.approvedTemplates')}
                   </h2>
-                  <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                  <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
                     {t('compliancePage.approvedTemplatesDesc')}
                   </p>
                 </div>
@@ -514,7 +514,7 @@ export default function CompliancePage() {
                 <div className="space-y-2">
                   {APPROVED_CLAIMS[currentLang].map(claim => (
                     <div key={claim.id} className="flex items-start justify-between gap-4 rounded-xl border border-emerald-100/30 bg-emerald-50/5 dark:bg-emerald-950/5 px-4 py-3">
-                      <div className="text-xs sm:text-sm leading-relaxed text-[var(--text-1)]">
+                      <div className="text-sm sm:text-base leading-relaxed text-[var(--text-1)]">
                         {claim.text}
                       </div>
                       <button
@@ -532,11 +532,11 @@ export default function CompliancePage() {
               {/* Kaçınılacak İfadeler Örnekleri */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
                 <div>
-                  <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-1.5">
+                  <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
                     <XCircle className="h-4 w-4 text-red-500" />
                     {t('compliancePage.prohibitedClaims')}
                   </h2>
-                  <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed">
+                  <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
                     {t('compliancePage.prohibitedClaimsDesc')}
                   </p>
                 </div>
@@ -544,7 +544,7 @@ export default function CompliancePage() {
                 <div className="space-y-4">
                   {AVOID_CLAIMS[currentLang].map(category => (
                     <div key={category.id} className="space-y-2">
-                      <h3 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-widest flex items-center gap-1">
+                      <h3 className="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-widest flex items-center gap-1">
                         <AlertTriangle className="h-3.5 w-3.5" />
                         {category.category}
                       </h3>
@@ -552,7 +552,7 @@ export default function CompliancePage() {
                         {category.items.map((item, idx) => (
                           <div key={idx} className="rounded-xl border border-red-100/20 bg-red-50/5 dark:bg-red-950/5 p-3 flex items-start gap-2.5">
                             <XCircle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
-                            <p className="text-xs sm:text-sm text-[var(--text-2)] leading-relaxed">{item}</p>
+                            <p className="text-sm sm:text-base text-[var(--text-2)] leading-relaxed">{item}</p>
                           </div>
                         ))}
                       </div>
@@ -578,7 +578,7 @@ export default function CompliancePage() {
                   </div>
                   <div>
                     <p className={clsx(
-                      'text-xs font-bold',
+                      'text-sm font-bold',
                       complianceLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
                     )}>
                       {complianceLimit === 0

@@ -134,22 +134,22 @@ export function ItirazlarContent() {
               <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
-              <p className="text-sm text-[var(--text-3)]">{t('objectionsPage.subtitle')}</p>
+              <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
+              <p className="text-base text-[var(--text-3)]">{t('objectionsPage.subtitle')}</p>
             </div>
           </div>
           <button
             onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{t('objectionsPage.addObjection')}</span>
           </button>
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
-          <span className="text-2xl">🛡️</span>
+          <span className="text-3xl">🛡️</span>
           <div className="flex-1">
-            <p className="text-xs font-semibold text-[#9B1D47] dark:text-[#fda4af]">
+            <p className="text-sm font-semibold text-[#9B1D47] dark:text-[#fda4af]">
               {tumItirazlar.length} {t('objectionsPage.objections')} · {KATEGORILER.length - 2} {t('objectionsPage.categories')}
             </p>
             <p className="text-[11px] text-[#9B1D47]/70 dark:text-[#fda4af]/70">{t('objectionsPage.heroHint')}</p>
@@ -177,7 +177,7 @@ export function ItirazlarContent() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t('objectionsPage.searchPlaceholder')}
-          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition-all"
+          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition-all"
         />
         {search && (
           <button
@@ -194,7 +194,7 @@ export function ItirazlarContent() {
           <button
             key={k}
             onClick={() => setAktifKategori(idx)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
               aktifKategori === idx
                 ? 'bg-[#9B1D47] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
                 : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#9B1D47] dark:hover:border-[#fda4af]'
@@ -212,24 +212,24 @@ export function ItirazlarContent() {
       </div>
 
       {search && (
-        <p className="mb-3 text-xs text-[var(--text-3)]">
+        <p className="mb-3 text-sm text-[var(--text-3)]">
           {filtrelenmis.length} {t('objectionsPage.resultsFound')}
         </p>
       )}
 
       {isFavoritesEmpty && (
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
-          <p className="mb-2 text-3xl">⭐</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">{t('objectionsPage.noFavorites')}</p>
-          <p className="mt-1 text-xs text-[var(--text-2)]">{t('objectionsPage.noFavoritesDesc')}</p>
+          <p className="mb-2 text-4xl">⭐</p>
+          <p className="text-base font-semibold text-[var(--text-1)]">{t('objectionsPage.noFavorites')}</p>
+          <p className="mt-1 text-sm text-[var(--text-2)]">{t('objectionsPage.noFavoritesDesc')}</p>
         </div>
       )}
 
       {!isFavoritesEmpty && filtrelenmis.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
-          <p className="mb-2 text-3xl">🔍</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">{t('objectionsPage.noMatchingObjections')}</p>
-          <p className="mt-1 text-xs text-[var(--text-2)]">{t('objectionsPage.tryDifferentKeywords')}</p>
+          <p className="mb-2 text-4xl">🔍</p>
+          <p className="text-base font-semibold text-[var(--text-1)]">{t('objectionsPage.noMatchingObjections')}</p>
+          <p className="mt-1 text-sm text-[var(--text-2)]">{t('objectionsPage.tryDifferentKeywords')}</p>
         </div>
       ) : !isFavoritesEmpty && (
         <>
@@ -273,7 +273,7 @@ export function ItirazlarContent() {
                     setAcikId(null)
                     window.scrollTo({ top: 0, behavior: 'smooth' })
                   }}
-                  className={`h-9 w-9 rounded-xl text-sm font-semibold transition-all ${
+                  className={`h-9 w-9 rounded-xl text-base font-semibold transition-all ${
                     page === p
                       ? 'bg-[#9B1D47] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
                       : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#9B1D47] dark:hover:border-[#fda4af]'

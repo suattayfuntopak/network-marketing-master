@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-01 — Punto +1 (5 sayfa) + perf Tür 👑 + AI lisans PRO-SINIRSIZ
+
+- **Yazı puntosu bir birim büyütüldü** (her `text-*` utility bir kademe yukarı; cascade'siz tek
+  geçişli transform): Platform Yönetim Masası (`PlatformYonetimContent`), Uyum Merkezi (`uyum/page`),
+  Saha Provası (`ProvaForm` — yalnız saha-provasi kullanıyor), Vaktin Varsa (`EgitimContent` +
+  `TrainingCard` + `AddTrainingModal`), İtirazlara Cevaplar (`ItirazlarContent` + `ItirazCard` +
+  `AddObjectionModal`). xs→sm, sm→base … 3xl→4xl.
+- **Ekip Performans İzleme Tablosu** — lider (Suat) **Tür** sütununa 👑 Lider rozeti geri kondu
+  (amber badge; eskiden boştu).
+- **Ekip & Dış Kaynak AI tablosu** — süper admin **Lisans** = **"PRO - SINIRSIZ"** (EN: PRO -
+  UNLIMITED); önceki "SUPER ADMIN" etiketi değişti.
+- tsc temiz, 86 test, diff yalnız className + 2 i18n + rozet JSX (mevcut lint hataları konu dışı).
+
 ## 2026-06-01 — Kilit metni + Aday Kazanım İvmesi akışkanlık + İçerik %
 
 - **Kilit overlay** (Plus/Pro gate) metni yeni tabloya göre güncellendi: "Ekip Performans İzleme

@@ -15,10 +15,10 @@ export default function SahaProvasiPage() {
             <Target className="h-5 w-5 text-amber-600" strokeWidth={1.75} />
           </div>
           <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">
+            <h1 className="text-2xl font-bold text-[var(--text-1)]">
               {t('pagesUi.fieldRehearsalTitle')}
             </h1>
-            <p className="text-sm text-[var(--text-2)]">
+            <p className="text-base text-[var(--text-2)]">
               {t('pagesUi.fieldRehearsalSubtitle')}
             </p>
           </div>

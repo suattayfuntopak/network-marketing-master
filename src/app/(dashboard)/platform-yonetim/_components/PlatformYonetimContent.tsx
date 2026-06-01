@@ -368,13 +368,13 @@ export function PlatformYonetimContent() {
               <Crown className="h-5 w-5 text-white" strokeWidth={2.25} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-1)] flex items-center gap-2">
+              <h1 className="text-2xl font-bold text-[var(--text-1)] flex items-center gap-2">
                 {t('platformPage.consoleTitle')}
                 <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400">
                   {t('platformPage.superAdmin')}
                 </span>
               </h1>
-              <p className="text-sm text-[var(--text-3)] font-medium">
+              <p className="text-base text-[var(--text-3)] font-medium">
                 {t('platformPage.consoleSubtitle')}
               </p>
             </div>
@@ -405,7 +405,7 @@ export function PlatformYonetimContent() {
               {t('platformPage.kpiTotalLeaders')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-[var(--text-1)]">{totalUsersCount}</span>
+              <span className="text-3xl font-black text-[var(--text-1)]">{totalUsersCount}</span>
               <Users className="h-4.5 w-4.5 text-[var(--text-3)] ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
@@ -419,7 +419,7 @@ export function PlatformYonetimContent() {
               {t('platformPage.kpiIndependent')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-purple-600 dark:text-purple-400">{independentCount}</span>
+              <span className="text-3xl font-black text-purple-600 dark:text-purple-400">{independentCount}</span>
               <Sparkles className="h-4.5 w-4.5 text-purple-600 dark:text-purple-400 ml-auto animate-pulse" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
@@ -433,7 +433,7 @@ export function PlatformYonetimContent() {
               {t('platformPage.kpiPaid')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400">{totalPaidCount}</span>
+              <span className="text-3xl font-black text-emerald-700 dark:text-emerald-400">{totalPaidCount}</span>
               <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-400 ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
@@ -447,7 +447,7 @@ export function PlatformYonetimContent() {
               {t('platformPage.kpiProspects')}
             </span>
             <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-2xl font-black text-blue-600 dark:text-blue-400">{totalCandidatesCount}</span>
+              <span className="text-3xl font-black text-blue-600 dark:text-blue-400">{totalCandidatesCount}</span>
               <ArrowUpRight className="h-4.5 w-4.5 text-blue-600 dark:text-blue-400 ml-auto" />
             </div>
             <p className="text-[10px] text-[var(--text-3)] mt-1 font-semibold">
@@ -461,7 +461,7 @@ export function PlatformYonetimContent() {
           <section className="rounded-2xl border border-purple-500/30 bg-purple-500/5 p-5 space-y-3">
             <div className="flex flex-wrap items-center gap-2">
               <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
-              <h2 className="text-sm font-bold text-[var(--text-1)]">
+              <h2 className="text-base font-bold text-[var(--text-1)]">
                 {t('platformPage.independentSignupsTitle')}
                 <span className="ml-2 text-purple-600 dark:text-purple-400">({independentMembers.length})</span>
               </h2>
@@ -487,12 +487,12 @@ export function PlatformYonetimContent() {
                         <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
                       </div>
                     ) : (
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-sm font-black text-white shadow`}>
+                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-base font-black text-white shadow`}>
                         {w.ownerName.charAt(0).toUpperCase()}
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="font-bold text-xs text-[var(--text-1)] truncate">{w.ownerName}</div>
+                      <div className="font-bold text-sm text-[var(--text-1)] truncate">{w.ownerName}</div>
                       <div className="text-[10px] text-[var(--text-3)] truncate">{w.ownerEmail}</div>
                     </div>
                     <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -545,14 +545,14 @@ export function PlatformYonetimContent() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder={t('platformPage.searchPlaceholder')}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
           />
         </div>
 
         {/* Workspaces Spreadsheet Grid */}
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
           <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true">
-            <table className="w-full text-left border-collapse text-sm min-w-[1000px]">
+            <table className="w-full text-left border-collapse text-base min-w-[1000px]">
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
                   <th className="p-3 font-semibold">{t('platformPage.thLeaderName')}</th>
@@ -577,7 +577,7 @@ export function PlatformYonetimContent() {
                   ))
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={9} className="p-8 text-center text-sm text-[var(--text-3)] italic">
+                    <td colSpan={9} className="p-8 text-center text-base text-[var(--text-3)] italic">
                       {t('platformPage.noLeadersFound')}
                     </td>
                   </tr>
@@ -618,7 +618,7 @@ export function PlatformYonetimContent() {
                             )}
                             <div>
                               <div className="font-bold text-[var(--text-1)]">{w.ownerName}</div>
-                              <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1">
+                              <div className="text-sm text-[var(--text-3)] font-semibold flex items-center gap-1">
                                 <Mail className="h-3 w-3 shrink-0" />
                                 {w.ownerEmail}
                               </div>
@@ -631,7 +631,7 @@ export function PlatformYonetimContent() {
 
                         {/* 3. License type */}
                         <td className="p-3 whitespace-nowrap font-bold">
-                          <span className={`rounded-full px-2.5 py-0.5 text-xs font-black uppercase tracking-wider ${
+                          <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
                               : w.licenseType === 'master'
@@ -680,7 +680,7 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 8. Registration Date */}
-                        <td className="p-3 text-center text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
+                        <td className="p-3 text-center text-sm text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
 
                         {/* 9. Actions */}
                         <td className="p-3 whitespace-nowrap text-right">
@@ -730,7 +730,7 @@ export function PlatformYonetimContent() {
                               <button
                                 onClick={handleCancelDeleteUser}
                                 title={t('platformPage.cancelDeletion')}
-                                className="flex h-7 px-2 items-center justify-center rounded-lg bg-red-500 text-white font-bold text-xs hover:bg-red-600 transition min-w-[4rem]"
+                                className="flex h-7 px-2 items-center justify-center rounded-lg bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition min-w-[4rem]"
                               >
                                 {t('platformPage.undoLabel')} ({deleteCountdown})
                               </button>
@@ -761,7 +761,7 @@ export function PlatformYonetimContent() {
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
               <ShieldCheck className="h-4 w-4" />
             </div>
-            <h2 className="text-sm font-bold text-[var(--text-1)]">
+            <h2 className="text-base font-bold text-[var(--text-1)]">
               İçerik ve İtiraz Talepleri Onay Masası
               {pendingRequests.length > 0 && (
                 <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-black text-white">
@@ -781,7 +781,7 @@ export function PlatformYonetimContent() {
               ))}
             </div>
           ) : pendingRequests.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-8 text-center text-xs text-[var(--text-3)] italic">
+            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-8 text-center text-sm text-[var(--text-3)] italic">
               Bekleyen herhangi bir onay talebi bulunmamaktadır. 🎉 Ekip üyeleri içerik ekledikçe burada listelenecektir.
             </div>
           ) : (
@@ -808,8 +808,8 @@ export function PlatformYonetimContent() {
                       </div>
 
                       <div>
-                        <h3 className="text-xs font-bold text-[var(--text-1)] line-clamp-1 flex items-center gap-1">
-                          <span className="text-sm shrink-0">{req.data.emoji}</span>
+                        <h3 className="text-sm font-bold text-[var(--text-1)] line-clamp-1 flex items-center gap-1">
+                          <span className="text-base shrink-0">{req.data.emoji}</span>
                           {title}
                         </h3>
                         <p className="text-[10px] text-[var(--text-3)] font-semibold mt-0.5 truncate">Kategori: {category}</p>
@@ -866,7 +866,7 @@ export function PlatformYonetimContent() {
               
               <form onSubmit={handleSaveLicense} className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-[var(--text-1)]">
+                  <h3 className="text-lg font-bold text-[var(--text-1)]">
                     {t('platformPage.manageWorkspaceLicense')}
                   </h3>
                   <button 
@@ -878,7 +878,7 @@ export function PlatformYonetimContent() {
                   </button>
                 </div>
 
-                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)]">
+                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)]">
                   <div><strong>{t('platformPage.userLabel')}</strong> {selectedWorkspace.ownerName}</div>
                   <div className="mt-1"><strong>{t('platformPage.emailLabel')}</strong> {selectedWorkspace.ownerEmail}</div>
                   <div className="mt-1"><strong>{t('platformPage.currentExpiryLabel')}</strong> {
@@ -892,7 +892,7 @@ export function PlatformYonetimContent() {
 
                 {/* Plan select */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[var(--text-1)]">
+                  <label className="text-sm font-bold text-[var(--text-1)]">
                     {t('platformPage.licenseLevel')}
                   </label>
                   <select
@@ -902,7 +902,7 @@ export function PlatformYonetimContent() {
                       setLicenseType(v)
                       if (v === 'free') setIsUnlimited(false)
                     }}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   >
                     <option value="free">{t('platformPage.freeRevoke')}</option>
                     <option value="leader">Leader</option>
@@ -918,7 +918,7 @@ export function PlatformYonetimContent() {
                     <button
                       type="button"
                       onClick={() => setIsUnlimited(v => !v)}
-                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors duration-300 ease-out ${
+                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm font-bold transition-colors duration-300 ease-out ${
                         isUnlimited
                           ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                           : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]'
@@ -939,7 +939,7 @@ export function PlatformYonetimContent() {
                     >
                       <div className="overflow-hidden">
                         <div className="space-y-1.5 pt-2">
-                          <label className="text-xs font-bold text-[var(--text-1)]">
+                          <label className="text-sm font-bold text-[var(--text-1)]">
                             {t('platformPage.extendAccessDays')}
                             <span className="ml-1 font-normal text-[var(--text-3)]">
                               {t('platformPage.extendAccessHint')}
@@ -952,7 +952,7 @@ export function PlatformYonetimContent() {
                             min={1}
                             value={extensionDays}
                             onChange={e => setExtensionDays(Number(e.target.value))}
-                            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                           />
                         </div>
                       </div>
@@ -964,7 +964,7 @@ export function PlatformYonetimContent() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-base font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
                 >
                   {isUpdating ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> {t('platformPage.saving')}</>
@@ -989,7 +989,7 @@ export function PlatformYonetimContent() {
               
               <form onSubmit={handleApproveSubmit} className="p-6 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-base font-bold text-[var(--text-1)]">
+                  <h3 className="text-lg font-bold text-[var(--text-1)]">
                     Talebi İncele & Onayla
                   </h3>
                   <button 
@@ -1001,14 +1001,14 @@ export function PlatformYonetimContent() {
                   </button>
                 </div>
 
-                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-xs leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
+                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
                   <div><strong>Gönderen:</strong> {selectedRequest.userName} ({selectedRequest.userEmail})</div>
                   <div><strong>Tür:</strong> {selectedRequest.contentType === 'training' ? 'Vaktin Varsa (Eğitim)' : 'İtirazlara Cevap'}</div>
                 </div>
 
                 {/* Edit Title/Soru */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[var(--text-1)]">
+                  <label className="text-sm font-bold text-[var(--text-1)]">
                     {selectedRequest.contentType === 'training' ? 'Eğitim Başlığı' : 'İtiraz Sorusu'}
                   </label>
                   <input
@@ -1016,19 +1016,19 @@ export function PlatformYonetimContent() {
                     required
                     value={editTitle}
                     onChange={e => setEditTitle(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   />
                 </div>
 
                 {/* Edit Category */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[var(--text-1)]">Kategori</label>
+                  <label className="text-sm font-bold text-[var(--text-1)]">Kategori</label>
                   <input
                     type="text"
                     required
                     value={editCategory}
                     onChange={e => setEditCategory(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   />
                 </div>
 
@@ -1036,25 +1036,25 @@ export function PlatformYonetimContent() {
                   <>
                     {/* Training Ozet */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">Özet</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">Özet</label>
                       <input
                         type="text"
                         required
                         value={editOzet}
                         onChange={e => setEditOzet(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                       />
                     </div>
 
                     {/* Training Icerik (Maddeler) */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">İçerik Maddeleri (Her satır yeni madde)</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">İçerik Maddeleri (Her satır yeni madde)</label>
                       <textarea
                         rows={4}
                         required
                         value={editIcerik}
                         onChange={e => setEditIcerik(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition resize-none"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition resize-none"
                       />
                     </div>
                   </>
@@ -1062,45 +1062,45 @@ export function PlatformYonetimContent() {
                   <>
                     {/* Objection Kisa Cevap */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">Kısa Cevap</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">Kısa Cevap</label>
                       <textarea
                         rows={2}
                         value={editKisaCevap}
                         onChange={e => setEditKisaCevap(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
                       />
                     </div>
 
                     {/* Objection Detayli Cevap */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">Detaylı Cevap</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">Detaylı Cevap</label>
                       <textarea
                         rows={3}
                         value={editDetayliCevap}
                         onChange={e => setEditDetayliCevap(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
                       />
                     </div>
 
                     {/* Objection Yaklasim */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">Yaklaşım</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">Yaklaşım</label>
                       <textarea
                         rows={2}
                         value={editYaklasim}
                         onChange={e => setEditYaklasim(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
                       />
                     </div>
 
                     {/* Objection Ornek Diyalog */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-[var(--text-1)]">Örnek Diyalog</label>
+                      <label className="text-sm font-bold text-[var(--text-1)]">Örnek Diyalog</label>
                       <textarea
                         rows={2}
                         value={editOrnekDiyalog}
                         onChange={e => setEditOrnekDiyalog(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-xs text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
+                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
                       />
                     </div>
                   </>
@@ -1109,22 +1109,22 @@ export function PlatformYonetimContent() {
                 {/* Common Fields: Emoji & Tags */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[var(--text-1)]">Emoji</label>
+                    <label className="text-sm font-bold text-[var(--text-1)]">Emoji</label>
                     <input
                       type="text"
                       required
                       value={editEmoji}
                       onChange={e => setEditEmoji(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-[var(--text-1)]">Etiketler (Virgülle Ayır)</label>
+                    <label className="text-sm font-bold text-[var(--text-1)]">Etiketler (Virgülle Ayır)</label>
                     <input
                       type="text"
                       value={editTags}
                       onChange={e => setEditTags(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                     />
                   </div>
                 </div>
@@ -1134,14 +1134,14 @@ export function PlatformYonetimContent() {
                   <button
                     type="button"
                     onClick={() => handleRejectRequest(selectedRequest)}
-                    className="flex-1 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 py-3 text-xs font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
+                    className="flex-1 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 py-3 text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
                     disabled={isModerating}
                   >
                     Reddet / Sil
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-xs font-bold transition active:scale-95 cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5"
+                    className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-sm font-bold transition active:scale-95 cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5"
                     disabled={isModerating}
                   >
                     {isModerating ? (

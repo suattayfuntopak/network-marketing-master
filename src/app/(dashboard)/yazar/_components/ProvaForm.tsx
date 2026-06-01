@@ -380,7 +380,7 @@ export function ProvaForm() {
               setActiveScenario(null)
               setMessages([])
             }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-[var(--text-3)] hover:text-[#D97706] transition"
+            className="flex items-center gap-1.5 text-sm font-semibold text-[var(--text-3)] hover:text-[#D97706] transition"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{t('coachUi.changeScenario')}</span>
@@ -407,10 +407,10 @@ export function ProvaForm() {
             if (m.role === 'candidate') {
               return (
                 <div key={idx} className="flex gap-2.5 items-start animate-in slide-in-from-left duration-200">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-xs font-black shadow-sm text-slate-700 dark:text-slate-300">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-200 dark:bg-slate-800 text-sm font-black shadow-sm text-slate-700 dark:text-slate-300">
                     👤
                   </div>
-                  <div className="rounded-2xl rounded-tl-none bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 px-4 py-3 text-sm text-[var(--text-1)] max-w-[85%] shadow-sm leading-relaxed">
+                  <div className="rounded-2xl rounded-tl-none bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50 px-4 py-3 text-base text-[var(--text-1)] max-w-[85%] shadow-sm leading-relaxed">
                     {m.text}
                   </div>
                 </div>
@@ -418,10 +418,10 @@ export function ProvaForm() {
             } else if (m.role === 'user') {
               return (
                 <div key={idx} className="flex gap-2.5 items-start justify-end animate-in slide-in-from-right duration-200">
-                  <div className="rounded-2xl rounded-tr-none bg-[#D97706] text-white px-4 py-3 text-sm max-w-[85%] shadow-md leading-relaxed">
+                  <div className="rounded-2xl rounded-tr-none bg-[#D97706] text-white px-4 py-3 text-base max-w-[85%] shadow-md leading-relaxed">
                     {m.text}
                   </div>
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-100 text-xs font-black shadow-sm text-amber-800">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-black shadow-sm text-amber-800">
                     🙋‍♂️
                   </div>
                 </div>
@@ -429,7 +429,7 @@ export function ProvaForm() {
             } else if (m.role === 'yzk') {
               return (
                 <div key={idx} className="flex gap-2.5 items-start animate-in zoom-in duration-300">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-black shadow-md">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-sm font-black shadow-md">
                     🤖
                   </div>
                   {/* Gold/Amber Framed Premium YZK Feedback Card */}
@@ -438,12 +438,12 @@ export function ProvaForm() {
                       <p className="text-[10px] font-black uppercase tracking-wider text-amber-700 dark:text-amber-400">
                         {t('coachUi.mentorNote')}
                       </p>
-                      <span className="rounded-full bg-[#D97706] text-white px-2 py-0.5 text-xs font-black shadow-md animate-pulse">
+                      <span className="rounded-full bg-[#D97706] text-white px-2 py-0.5 text-sm font-black shadow-md animate-pulse">
                         {m.score}/100
                       </span>
                     </div>
 
-                    <div className="space-y-2 text-xs leading-relaxed text-[var(--text-1)]">
+                    <div className="space-y-2 text-sm leading-relaxed text-[var(--text-1)]">
                       {m.strengths && m.strengths.length > 0 && (
                         <div>
                           <p className="font-bold text-emerald-700 dark:text-emerald-400 mb-0.5">
@@ -475,10 +475,10 @@ export function ProvaForm() {
 
           {isPending && (
             <div className="flex gap-2.5 items-start animate-in fade-in duration-200">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-xs font-black shadow-md">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white text-sm font-black shadow-md">
                 🤖
               </div>
-              <div className="flex items-center gap-2 rounded-2xl bg-amber-500/5 border border-amber-200/50 dark:border-amber-900/20 px-4 py-3 text-xs font-semibold text-amber-700 dark:text-amber-400 shadow-sm animate-pulse">
+              <div className="flex items-center gap-2 rounded-2xl bg-amber-500/5 border border-amber-200/50 dark:border-amber-900/20 px-4 py-3 text-sm font-semibold text-amber-700 dark:text-amber-400 shadow-sm animate-pulse">
                 <Loader2 className="h-4.5 w-4.5 animate-spin" />
                 <span>{t('coachUi.analyzingMessage')}</span>
               </div>
@@ -496,7 +496,7 @@ export function ProvaForm() {
             onChange={e => setInputValue(e.target.value)}
             disabled={isPending}
             placeholder={t('coachUi.practiceInputPlaceholder')}
-            className="flex-1 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#D97706] focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-950/20 disabled:opacity-60"
+            className="flex-1 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-base text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#D97706] focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-950/20 disabled:opacity-60"
           />
           <button
             type="submit"
@@ -517,15 +517,15 @@ export function ProvaForm() {
       
       {/* Intro info box */}
       <div className="rounded-2xl border border-dashed border-[var(--border)] p-5 text-center bg-[var(--bg-card)] w-full shadow-sm animate-in fade-in duration-300">
-        <span className="text-3xl leading-none block mb-2">🎭</span>
-        <h2 className="text-sm font-bold text-[var(--text-1)]">
+        <span className="text-4xl leading-none block mb-2">🎭</span>
+        <h2 className="text-base font-bold text-[var(--text-1)]">
           {t('coachUi.selectScenarioTitle')}
         </h2>
-        <p className="mt-1 text-xs text-[var(--text-3)] leading-relaxed max-w-md mx-auto">
+        <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed max-w-md mx-auto">
           {t('coachUi.introDesc')}
         </p>
         {!isSuperAdmin && (
-          <p className="mt-2.5 text-xs font-bold text-[var(--text-3)]">
+          <p className="mt-2.5 text-sm font-bold text-[var(--text-3)]">
             {t('coachUi.dailyRoleplayQuota', { used: roleplayUsed, limit: roleplayLimit })}
           </p>
         )}
@@ -550,10 +550,10 @@ export function ProvaForm() {
                 <p className="text-[10px] font-black tracking-widest text-[#D97706] uppercase mb-0.5">
                   {s.emoji} {t('coachUi.simulation')}
                 </p>
-                <h3 className="text-sm font-bold text-[var(--text-1)] group-hover:text-[#D97706] transition-colors truncate">
+                <h3 className="text-base font-bold text-[var(--text-1)] group-hover:text-[#D97706] transition-colors truncate">
                   {title}
                 </h3>
-                <p className="mt-1.5 text-xs text-[var(--text-2)] leading-relaxed line-clamp-2">
+                <p className="mt-1.5 text-sm text-[var(--text-2)] leading-relaxed line-clamp-2">
                   {desc}
                 </p>
               </div>

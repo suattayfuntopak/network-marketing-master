@@ -169,21 +169,21 @@ export function EgitimContent() {
               <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
-              <p className="text-sm text-[var(--text-3)]">{t('training.subtitle')}</p>
+              <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
+              <p className="text-base text-[var(--text-3)]">{t('training.subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/egitim/videolar"
-              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-bold text-brand hover:border-brand/40 transition"
+              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand hover:border-brand/40 transition"
             >
               <Film className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
             </Link>
             <button
               onClick={() => setFormOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-xs font-bold shadow-sm transition active:scale-95 cursor-pointer"
+              className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{t('trainingPage.addContent')}</span>
@@ -192,9 +192,9 @@ export function EgitimContent() {
         </div>
 
         <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
-          <span className="text-2xl">📖</span>
+          <span className="text-3xl">📖</span>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#3730A3] dark:text-[#a5b4fc]">
+            <p className="text-sm font-semibold text-[#3730A3] dark:text-[#a5b4fc]">
               {t('training.heroTitle')}
             </p>
             <p className="text-[11px] text-[#3730A3]/70 dark:text-[#a5b4fc]/70 leading-relaxed truncate">
@@ -224,7 +224,7 @@ export function EgitimContent() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t('trainingPage.searchPlaceholder')}
-          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition-all"
+          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition-all"
         />
         {search && (
           <button
@@ -241,7 +241,7 @@ export function EgitimContent() {
           <button
             key={k}
             onClick={() => setAktifKategori(idx)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all flex items-center gap-1.5 ${
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
               aktifKategori === idx
                 ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
                 : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#a5b4fc]'
@@ -259,18 +259,18 @@ export function EgitimContent() {
       </div>
 
       {search && (
-        <p className="mb-3 text-xs text-[var(--text-3)]">
+        <p className="mb-3 text-sm text-[var(--text-3)]">
           {filtrelenmis.length} {t('trainingPage.topicsFound')}
         </p>
       )}
 
       {isFavoritesEmpty && (
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
-          <p className="mb-2 text-3xl">⭐</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">
+          <p className="mb-2 text-4xl">⭐</p>
+          <p className="text-base font-semibold text-[var(--text-1)]">
             {t('trainingPage.noFavorites')}
           </p>
-          <p className="mt-1 text-xs text-[var(--text-2)]">
+          <p className="mt-1 text-sm text-[var(--text-2)]">
             {t('trainingPage.noFavoritesDesc')}
           </p>
         </div>
@@ -278,11 +278,11 @@ export function EgitimContent() {
 
       {!isFavoritesEmpty && filtrelenmis.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
-          <p className="mb-2 text-3xl">🔍</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">
+          <p className="mb-2 text-4xl">🔍</p>
+          <p className="text-base font-semibold text-[var(--text-1)]">
             {t('trainingPage.noMatchingTopics')}
           </p>
-          <p className="mt-1 text-xs text-[var(--text-2)]">
+          <p className="mt-1 text-sm text-[var(--text-2)]">
             {t('trainingPage.tryDifferentKeywords')}
           </p>
         </div>
@@ -323,7 +323,7 @@ export function EgitimContent() {
                 <button
                   key={p}
                   onClick={() => { setPage(p); setAcikId(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-                  className={`h-9 w-9 rounded-xl text-sm font-semibold transition-all ${
+                  className={`h-9 w-9 rounded-xl text-base font-semibold transition-all ${
                     page === p
                       ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
                       : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#a5b4fc]'

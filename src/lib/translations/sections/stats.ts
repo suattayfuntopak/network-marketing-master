@@ -71,7 +71,7 @@ export const statsSection = {
       aiColCoach: 'YZ Koçu (Kullanılan / Limit)',
       aiColCompliance: 'Uyum Denetimi (Kullanılan / Limit)',
       unlimited: 'Sınırsız',
-      licensePlanSuperAdmin: 'SUPER ADMIN',
+      licensePlanSuperAdmin: 'PRO - SINIRSIZ',
 
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',
@@ -162,7 +162,7 @@ export const statsSection = {
       aiColCoach: 'AI Coach (Used / Limit)',
       aiColCompliance: 'Compliance (Used / Limit)',
       unlimited: 'Unlimited',
-      licensePlanSuperAdmin: 'SUPER ADMIN',
+      licensePlanSuperAdmin: 'PRO - UNLIMITED',
 
       colLicense: 'License',
       licensePlanFree: 'Free',

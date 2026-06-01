@@ -99,15 +99,15 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h2 className="text-base md:text-lg font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
-                <p className="text-[11px] md:text-xs text-[var(--text-3)] font-medium mt-0.5">
+                <h2 className="text-lg md:text-xl font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
+                <p className="text-[11px] md:text-sm text-[var(--text-3)] font-medium mt-0.5">
                   Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex items-center gap-1 text-[11px] md:text-xs font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
+                className="flex items-center gap-1 text-[11px] md:text-sm font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
               >
                 <X className="h-4 w-4" />
                 <span>Formu Kapat</span>
@@ -117,22 +117,22 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">İtiraz (Soru)</label>
                   <input
                     type="text"
                     required
                     value={newSoru}
                     onChange={e => setNewSoru(e.target.value)}
                     placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Kategori</label>
                   <select
                     value={newKategori}
                     onChange={e => setNewKategori(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="Para & Kazanç">Para & Kazanç</option>
                     <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
@@ -146,57 +146,57 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
+                <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Kısa Cevap</label>
                 <textarea
                   rows={3}
                   value={newKisaCevap}
                   onChange={e => setNewKisaCevap(e.target.value)}
                   placeholder="Kısa ve hızlı saha cevabı..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
+                <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Detaylı Cevap</label>
                 <textarea
                   rows={4}
                   value={newDetayliCevap}
                   onChange={e => setNewDetayliCevap(e.target.value)}
                   placeholder="Detaylı cevap metni..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Yaklaşım</label>
                   <textarea
                     rows={3}
                     value={newYaklasim}
                     onChange={e => setNewYaklasim(e.target.value)}
                     placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Örnek Diyalog</label>
                   <textarea
                     rows={3}
                     value={newOrnekDiyalog}
                     onChange={e => setNewOrnekDiyalog(e.target.value)}
                     placeholder="Kısa örnek konuşma..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Emoji</label>
                   <select
                     value={newEmoji}
                     onChange={e => setNewEmoji(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="🛡️">🛡️ Kalkan</option>
                     <option value="⚖️">⚖️ Terazi</option>
@@ -209,13 +209,13 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
                   </select>
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] md:text-xs font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
+                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">Etiketler (Virgülle Ayır)</label>
                   <input
                     type="text"
                     value={newTags}
                     onChange={e => setNewTags(e.target.value)}
                     placeholder="örn. güven, fiyat, zamanlama"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-xs md:text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
               </div>
@@ -225,14 +225,14 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
                   type="button"
                   onClick={onClose}
                   disabled={isPending}
-                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-xs md:text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
+                  className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] hover:bg-[var(--bg-subtle)] text-[var(--text-2)] px-4 py-2 md:py-2.5 text-sm md:text-base font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   İptal
                 </button>
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 md:py-2.5 text-xs md:text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 md:py-2.5 text-sm md:text-base font-bold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isPending ? (
                     <>
