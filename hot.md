@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-01 — YZ kullanım: tek tablo + lisans modal toggle animasyonu
+
+**Tek tablo (Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol Tablosu):**
+- 3 ayrı YZ tablosu (Ekip AI + Dış Kayıt AI + YZ Kullanım Arşivi) → **tek tabloda** birleştirildi.
+- Sağ üstte **dönem sekmesi** (Bugün/Hafta/Ay/Yıl/Tüm), altta **TOPLAM** satırı.
+- Sıralama: **Lider 👑 → NMM 💎 → Saha 🤝 → Dış Kayıt 🌐** (her grup kendi içinde büyür).
+- Alt başlık: "NMM ortakları (💎) & katıldı saha distribütörleri (🤝) ve dış kayıtları (🌐)…".
+- Yeni `getAiUsageByPeriodAction` (dönem-bazlı kullanım, `nmm_daily_actions`). `AIUsageArchiveSection`
+  + ölü arşiv action'ları (getAIUsageArchive/build/assemble/emptyArchiveSummary + tipler) **tamamen silindi**.
+
+**Lisans modal toggle animasyonu (platform-yönetim):**
+- "Süresiz Erişim" toggle'ına basınca popup **zıplıyordu** (gün input'u anında unmount).
+- Gün bölümü artık hep render edilip `grid-rows-[1fr]→[0fr]` + opacity ile **yumuşakça kapanıyor**;
+  toggle slider'a net `duration-300 ease-out`. Üçü (yeşil geçiş + gün kaybolma + popup küçülme) senkron.
+- Tüm lisans seviyeleri (leader/master/pro) aynı bölümü kullanıyor — hepsi düzeldi. `disabled={isUnlimited}`
+  ile süresizde input form'a karışmıyor.
+
+- tsc temiz, 86 test, lint 0 hata. Kalan zararsız kırıntılar: birkaç ölü i18n anahtarı (archive*).
+
 ## 2026-06-01 — Nabız sadeleştirme: tek tablo + YZ kullanım bug'ları onarıldı
 
 Kullanıcı isteğiyle dağınık nabız bölümleri **tek tabloda toplandı** ve YZ kullanım tabloları onarıldı.

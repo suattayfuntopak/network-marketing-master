@@ -270,88 +270,6 @@ function archiveDateRange(period: AIUsageArchivePeriod): {
   return { fromDate, toDate }
 }
 
-export interface AIUsageArchiveRow {
-  userId: string
-  fullName: string | null
-  email: string
-  licenseType: string
-  isSuperAdmin: boolean
-  isInvitedDownline: boolean
-  messageTotal: number
-  roleplayTotal: number
-  complianceTotal: number
-  activeDays: number
-}
-
-export interface AIUsageArchiveSummary {
-  period: AIUsageArchivePeriod
-  fromDate: string | null
-  toDate: string
-  rows: AIUsageArchiveRow[]
-  totals: {
-    message: number
-    roleplay: number
-    compliance: number
-    users: number
-  }
-  unavailable?: boolean
-}
-
-const EMPTY_ARCHIVE_TOTALS = {
-  message: 0,
-  roleplay: 0,
-  compliance: 0,
-  users: 0,
-} as const
-
-function emptyArchiveSummary(
-  period: AIUsageArchivePeriod,
-  unavailable = false
-): AIUsageArchiveSummary {
-  const { fromDate, toDate } = archiveDateRange(period)
-  return {
-    period,
-    fromDate,
-    toDate,
-    rows: [],
-    totals: { ...EMPTY_ARCHIVE_TOTALS },
-    unavailable,
-  }
-}
-
-/** Super-admin: günlük roll-up tablosundan dönem bazlı YZ kullanım arşivi. */
-export async function getAIUsageArchiveAction(
-  period: AIUsageArchivePeriod = '30d'
-): Promise<ActionWithWarning<AIUsageArchiveSummary>> {
-  try {
-    const data = await buildAIUsageArchive(period)
-    return { data, warning: null }
-  } catch (err) {
-    console.error('[getAIUsageArchive]', err)
-    return { data: emptyArchiveSummary(period), warning: 'load_failed' }
-  }
-}
-
-async function buildAIUsageArchive(
-  period: AIUsageArchivePeriod
-): Promise<AIUsageArchiveSummary> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  assertSuperAdmin(user)
-
-  const admin = createAdminClient()
-  const { fromDate, toDate } = archiveDateRange(period)
-
-  // Doğrudan ham olay kaynağından (nmm_daily_actions) hesapla — her ai_generate burada;
-  // rollup tablosu boş/eksik olsa bile doğru sonuç verir.
-  const byUser = new Map<string, UsageAgg>()
-  await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
-
-  return assembleArchiveSummary(admin, period, fromDate, toDate, byUser)
-}
-
 type UsageAgg = {
   message: number
   roleplay: number
@@ -401,85 +319,37 @@ async function aggregateAiUsageFromDailyActions(
   })
 }
 
-async function assembleArchiveSummary(
-  admin: AdminClient,
-  period: AIUsageArchivePeriod,
-  fromDate: string | null,
-  toDate: string,
-  byUser: Map<string, UsageAgg>
-): Promise<AIUsageArchiveSummary> {
-  const userIds = [...byUser.keys()]
-  if (userIds.length === 0) {
-    return emptyArchiveSummary(period)
+export type AiUsageByPeriod = Record<
+  string,
+  { message: number; roleplay: number; compliance: number }
+>
+
+/**
+ * Süper admin: verilen kullanıcıların seçili dönemdeki YZ kullanım sayıları
+ * (mesaj/koç/uyum) — ham `nmm_daily_actions`'tan, UTC-tutarlı bugünü kapsayan aralık.
+ * "Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol Tablosu" için tek kaynak.
+ */
+export async function getAiUsageByPeriodAction(
+  userIds: string[],
+  period: AIUsageArchivePeriod
+): Promise<AiUsageByPeriod> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  assertSuperAdmin(user)
+  if (userIds.length === 0) return {}
+
+  const admin = createAdminClient()
+  const { fromDate, toDate } = archiveDateRange(period)
+  const byUser = new Map<string, UsageAgg>()
+  await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
+
+  const idSet = new Set(userIds)
+  const result: AiUsageByPeriod = {}
+  for (const [uid, agg] of byUser) {
+    if (!idSet.has(uid)) continue
+    result[uid] = { message: agg.message, roleplay: agg.roleplay, compliance: agg.compliance }
   }
-
-  const users = await listAllAuthUsers(admin)
-  const emailById = new Map(users.map(u => [u.id, u.email ?? '']))
-  const nameById = new Map(
-    users.map(u => [
-      u.id,
-      (u.user_metadata?.full_name as string | undefined) ?? u.email?.split('@')[0] ?? null,
-    ])
-  )
-
-  const { data: memberRows } = await admin
-    .from('nmm_workspace_members')
-    .select('user_id, full_name')
-    .in('user_id', userIds)
-
-  memberRows?.forEach(m => {
-    if (m.full_name) nameById.set(m.user_id, m.full_name)
-  })
-
-  const { data: workspaces } = await admin
-    .from('nmm_workspaces')
-    .select('owner_id, license_type, parent_id')
-    .in('owner_id', userIds)
-
-  const licenseByOwner = new Map(
-    (workspaces ?? []).map(w => [w.owner_id!, w.license_type ?? 'free'])
-  )
-  const invitedOwners = new Set(
-    (workspaces ?? []).filter(w => w.parent_id).map(w => w.owner_id!)
-  )
-
-  const rows: AIUsageArchiveRow[] = userIds
-    .map(userId => {
-      const agg = byUser.get(userId)!
-      const email = emailById.get(userId) ?? '—'
-      const superAdmin = isSuperAdmin({ email })
-      return {
-        userId,
-        fullName: nameById.get(userId) ?? null,
-        email,
-        licenseType: superAdmin
-          ? superAdminLicenseOverride().licenseType
-          : (licenseByOwner.get(userId) ?? 'free'),
-        isSuperAdmin: superAdmin,
-        isInvitedDownline: invitedOwners.has(userId),
-        messageTotal: agg.message,
-        roleplayTotal: agg.roleplay,
-        complianceTotal: agg.compliance,
-        activeDays: agg.days.size,
-      }
-    })
-    .sort((a, b) => {
-      if (a.isSuperAdmin && !b.isSuperAdmin) return -1
-      if (!a.isSuperAdmin && b.isSuperAdmin) return 1
-      const totalA = a.messageTotal + a.roleplayTotal + a.complianceTotal
-      const totalB = b.messageTotal + b.roleplayTotal + b.complianceTotal
-      return totalB - totalA
-    })
-
-  const totals = rows.reduce(
-    (acc, r) => ({
-      message: acc.message + r.messageTotal,
-      roleplay: acc.roleplay + r.roleplayTotal,
-      compliance: acc.compliance + r.complianceTotal,
-      users: acc.users + 1,
-    }),
-    { message: 0, roleplay: 0, compliance: 0, users: 0 }
-  )
-
-  return { period, fromDate, toDate, rows, totals }
+  return result
 }

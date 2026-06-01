@@ -13,7 +13,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
-import { formatAIUsageDisplay, getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { StatsKpiCards } from './StatsKpiCards'
@@ -60,10 +60,6 @@ export function IstatistiklerContent() {
 
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
-  const formatUsageLimit = useCallback(
-    (used: number, limit: number) => formatAIUsageDisplay(used, limit, lang),
-    [lang]
-  )
 
   const licenseLabel = useCallback(
     (licenseType: string) => {
@@ -161,6 +157,17 @@ export function IstatistiklerContent() {
     }))
     return [...nmmRows, ...sahaRows]
   }, [sortedMembers, sahaOrtaklari])
+
+  // Saha satırları — Ekip & Dış Kaynak YZ tablosu için (kişi bazlı, YZ kullanımı yok).
+  const sahaRows = useMemo(
+    () =>
+      sahaOrtaklari.map(c => ({
+        id: c.id,
+        full_name: c.full_name,
+        avatar_url: resolveCandidateFields(c).avatarUrl,
+      })),
+    [sahaOrtaklari]
+  )
 
   // Person detail page = candidate detail (/pipeline/[id]). Saha rows ARE candidates;
   // NMM members are matched to the leader's own candidate by name.
@@ -396,12 +403,9 @@ export function IstatistiklerContent() {
           {usage?.isSuperAdmin && (
             <StatsSuperAdminSections
               sortedMembers={sortedMembers}
+              sahaRows={sahaRows}
               getMemberHref={getMemberHref}
-              formatUsageLimit={formatUsageLimit}
               licenseLabel={licenseLabel}
-              workspaceLicenseType={ws?.licenseType}
-              workspaceExpiresAt={ws?.licenseExpiresAt}
-              workspaceCreatedAt={ws?.workspaceCreatedAt}
             />
           )}
 

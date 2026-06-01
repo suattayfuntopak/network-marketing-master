@@ -918,37 +918,45 @@ export function PlatformYonetimContent() {
                     <button
                       type="button"
                       onClick={() => setIsUnlimited(v => !v)}
-                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition ${
+                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-xs font-bold transition-colors duration-300 ease-out ${
                         isUnlimited
                           ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                           : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]'
                       }`}
                     >
                       <span>{t('platformPage.unlimitedAccess')}</span>
-                      <span className={`h-4 w-8 rounded-full transition-colors ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'} relative`}>
-                        <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform ${isUnlimited ? 'translate-x-4' : 'translate-x-0.5'}`} />
+                      <span className={`h-4 w-8 rounded-full transition-colors duration-300 ease-out ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'} relative`}>
+                        <span className={`absolute top-0.5 h-3 w-3 rounded-full bg-white shadow transition-transform duration-300 ease-out ${isUnlimited ? 'translate-x-4' : 'translate-x-0.5'}`} />
                       </span>
                     </button>
 
-                    {/* Gün girişi — sadece süreli seçiliyse */}
-                    {!isUnlimited && (
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-[var(--text-1)]">
-                          {t('platformPage.extendAccessDays')}
-                          <span className="ml-1 font-normal text-[var(--text-3)]">
-                            {t('platformPage.extendAccessHint')}
-                          </span>
-                        </label>
-                        <input
-                          type="number"
-                          required
-                          min={1}
-                          value={extensionDays}
-                          onChange={e => setExtensionDays(Number(e.target.value))}
-                          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                        />
+                    {/* Gün girişi — süreli seçiliyse; süresizde zıplamadan yumuşakça kapanır */}
+                    <div
+                      className={`grid transition-all duration-300 ease-out ${
+                        isUnlimited ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'
+                      }`}
+                      aria-hidden={isUnlimited}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="space-y-1.5 pt-2">
+                          <label className="text-xs font-bold text-[var(--text-1)]">
+                            {t('platformPage.extendAccessDays')}
+                            <span className="ml-1 font-normal text-[var(--text-3)]">
+                              {t('platformPage.extendAccessHint')}
+                            </span>
+                          </label>
+                          <input
+                            type="number"
+                            required={!isUnlimited}
+                            disabled={isUnlimited}
+                            min={1}
+                            value={extensionDays}
+                            onChange={e => setExtensionDays(Number(e.target.value))}
+                            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                          />
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </>
                 )}
 
