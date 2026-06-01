@@ -13,6 +13,8 @@ import {
   YEARLY_MONTHS_FREE,
   type BillingPeriod,
 } from '@/lib/domain/pricing'
+import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
+import { BankTransferCard } from './BankTransferCard'
 
 const ACTIVE_PLAN_BTN =
   'opacity-100 cursor-not-allowed !bg-neutral-100 dark:!bg-neutral-900 !text-black dark:!text-white hover:shadow-none border border-[var(--border)]'
@@ -487,6 +489,8 @@ export function OdemeClient() {
         </div>
 
       </div>
+
+      {BANK_TRANSFER_ENABLED && <BankTransferCard />}
 
       <div className="max-w-2xl mx-auto text-center rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 space-y-2 shadow-sm">
         <h4 className="text-xs font-bold text-[var(--text-1)]">

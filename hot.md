@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-01 — Havale/EFT alternatif ödeme (Shopier yanında)
+
+Shopier onayı beklenirken (lansman öncesi, düşük hacim) ikinci ödeme kanalı: ödeme
+sayfasına **"Havale / EFT ile Öde"** kartı eklendi. Premium/sade tasarım: IBAN + kopyala
+butonu, hesap sahibi/banka, 3 adımlık yönerge, WhatsApp + e-posta "bilgi ver" butonları.
+Müşteri öder → super admin **Platform Yönetimi panelinden** lisansı manuel aktive eder
+(mevcut `adminExtendLicenseAction`). Shopier kartlı ödeme aynen yerinde.
+
+- **Config:** `src/lib/domain/bankTransfer.ts` — `BANK_TRANSFER_ENABLED` + IBAN/hesap/iletişim.
+- **Tek dokunuşla kaldırma:** `BANK_TRANSFER_ENABLED = false` → kart tamamen kaybolur.
+- **Bileşen:** `odeme/_components/BankTransferCard.tsx`; OdemeClient'a flag arkasında eklendi.
+- i18n TR+EN (`paymentPage.bank*`). tsc temiz, 86 test, yerelde gözle doğrulandı.
+
 ## 2026-06-01 — Bildirim tercihleri toggle stabilitesi
 
 - **Sorun:** Sesli uyarı kapatılınca toggle «dans ediyordu» — `useEffect` her Header render’ında `onClose` referansıyla tercihleri DB’den yeniden yüklüyordu; sunucuda satır yokken `DEFAULTS` localStorage’ı eziyordu.
