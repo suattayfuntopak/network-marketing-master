@@ -106,7 +106,7 @@ export function IstatistiklerContent() {
   )
   const { data: perfProgress } = useQuery({
     queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(','), perfPeriod],
-    queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds, perfPeriod),
+    queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
     enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
     staleTime: 30_000,
   })

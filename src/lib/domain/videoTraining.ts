@@ -17,7 +17,7 @@ export function extractYouTubeVideoId(urlOrId: string): string | null {
 }
 
 /**
- * F3 tracking without creator API:
- * 1) User taps "İzlemeye başladım" / "Tamamladım" → nmm_learning_events
- * 2) Optional: Google IFrame Player API (app-owned key) for approximate %
+ * Video izleme takibi (creator API'siz):
+ * 1) Kullanıcı "İzlemeye başladım" / "Tamamladım" → nmm_video_progress
+ * 2) Opsiyonel: Google IFrame Player API (uygulama anahtarı) ile yaklaşık %
  */

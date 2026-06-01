@@ -7,15 +7,11 @@ import { fetchCandidatesAction, fetchCandidateDetailAction } from '@/app/(dashbo
 import { getLang } from '@/lib/utils/getLang'
 import { queryKeys } from '@/lib/query/keys'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
-import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, CandidateStage, ActionType } from '@/types/database.types'
+import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, NmmDailyActionInsert, ActionType } from '@/types/database.types'
 
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { FOLLOW_UP_CALENDAR_SUPPRESSED_ISO, isFollowUpCalendarSuppressed } from '@/lib/domain/calendarFollowUp'
 import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
-import {
-  logEngagementEventAction,
-  logPresentationWhatsAppAction,
-} from '@/app/(dashboard)/pulse/learningEvents'
+import { logPresentationWhatsAppAction } from '@/app/(dashboard)/pulse/learningEvents'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 
 function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string) {
@@ -131,7 +127,7 @@ export function useUpdateCandidate(workspaceId: string) {
       if (currentCandidate) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
-          const inserts: any[] = []
+          const inserts: NmmDailyActionInsert[] = []
 
           // Stage change
           if (patch.stage && patch.stage !== currentCandidate.stage) {
@@ -186,31 +182,6 @@ export function useUpdateCandidate(workspaceId: string) {
 
           if (inserts.length > 0) {
             await supabase.from('nmm_daily_actions').insert(inserts)
-          }
-
-          if (patch.next_follow_up_at !== undefined) {
-            const hadScheduled =
-              currentCandidate.next_follow_up_at &&
-              !isFollowUpCalendarSuppressed(currentCandidate)
-            const nextVal = patch.next_follow_up_at
-            if (
-              nextVal === FOLLOW_UP_CALENDAR_SUPPRESSED_ISO &&
-              hadScheduled
-            ) {
-              await logEngagementEventAction(workspaceId, 'appointment_done', {
-                candidate_id: id,
-                source: 'candidate_update',
-              })
-            } else if (
-              nextVal &&
-              nextVal !== FOLLOW_UP_CALENDAR_SUPPRESSED_ISO &&
-              nextVal !== currentCandidate.next_follow_up_at
-            ) {
-              await logEngagementEventAction(workspaceId, 'appointment_set', {
-                candidate_id: id,
-                scheduled_at: nextVal,
-              })
-            }
           }
         }
       }

@@ -496,36 +496,6 @@ export interface Database {
         }
         Relationships: []
       }
-      nmm_learning_events: {
-        Row: {
-          id: string
-          workspace_id: string
-          user_id: string
-          event_type: string
-          item_key: string | null
-          payload: Json
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          workspace_id: string
-          user_id: string
-          event_type: string
-          item_key?: string | null
-          payload?: Json
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          workspace_id?: string
-          user_id?: string
-          event_type?: string
-          item_key?: string | null
-          payload?: Json
-          created_at?: string
-        }
-        Relationships: []
-      }
       nmm_video_progress: {
         Row: {
           user_id: string

@@ -8,7 +8,6 @@ import {
   FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
 } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
-import { logEngagementEventAction } from '@/app/(dashboard)/pulse/learningEvents'
 import type { NmmCandidate } from '@/types/database.types'
 
 export type TeamCalendarMemberSummary = {
@@ -87,12 +86,6 @@ export async function deferFollowUpAction(
     candidate.next_follow_up_at,
     iso,
   )
-
-  await logEngagementEventAction(workspaceId, 'appointment_set', {
-    candidate_id: candidateId,
-    scheduled_at: iso,
-    source: 'takvim_defer',
-  })
 }
 
 export async function clearFollowUpAction(
@@ -134,12 +127,6 @@ export async function clearFollowUpAction(
     candidate_id: candidateId,
     action_type: 'note',
     note: `system_note:follow_up_cleared:${completedOnDateKey}`,
-  })
-
-  await logEngagementEventAction(workspaceId, 'appointment_done', {
-    candidate_id: candidateId,
-    completed_on: completedOnDateKey,
-    source: 'takvim_complete',
   })
 }
 

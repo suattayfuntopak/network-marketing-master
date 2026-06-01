@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-01 — nmm_learning_events tamamen kaldırıldı (tüm zincir + 045)
+
+Yazılıp hiçbir yerde gösterilmeyen olay-logu tablosu tüm zinciriyle söküldü:
+- **Yazımlar:** `recordProgressChangeAction` (learning_events insert + milestone/notify),
+  `logEngagementEventAction` (silindi), `logPresentationWhatsAppAction` engagement çağrısı,
+  takvim randevu logları, useCandidates randevu logları — hepsi kaldırıldı.
+  **Korundu:** user_progress upsert, daily_actions yazımı, candidate güncellemesi.
+- **Okumalar:** `pulse/actions.ts` baştan yazıldı → sadece `getTeamProgressMapAction`
+  (progress+video, engagement'sız) kaldı; 3 ölü fonksiyon (getMyPulse/getTeamPulseTotals/
+  getIndependentOwnersPulse) silindi.
+- **Domain:** `lib/domain/learningEvents.ts` → sadece `ProgressChangeType`; videoTraining yorumu düzeltildi.
+- **DB:** `045_drop_learning_events.sql` (DROP TABLE CASCADE → RLS/index'ler gider).
+  `database.types.ts`'ten tip kaldırıldı.
+- src'de **sıfır** `nmm_learning_events`/`logEngagementEventAction` referansı. tsc temiz, 86 test.
+- ⚠️ **045 migration'ı Supabase'de uygula.**
+
 ## 2026-06-01 — İstatistik cilası: dipnot/KVKK, üst dönem işlevsel, süper admin ∞, i18n süpürme
 
 - **Perf tablosu dipnotu:** Başlığa `*`, DQSG sütununa `**`. Altta küçük italik: `*` → sponsor
