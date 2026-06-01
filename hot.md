@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-01 — Bildirim detay: Boru Hattı butonu
+
+- **Sorun:** Bildirim detay popup’ında «Boru Hattı'nda gör» butonu dar alanda 3 satıra kırılıyor, `text-sm` ile footer’daki metinlerden büyük görünüyordu.
+- **Çözüm:** `text-xs`, kompakt padding, `whitespace-nowrap`; footer’da sol metin `truncate`, buton grubu `shrink-0`; Kapat ile aynı satır yüksekliği.
+- **Dosya:** `NotificationsModal.tsx`
+
+---
+
 ## 2026-06-01 — İstatistikler kilit ikonu (light mode)
 
 - **Sorun:** Dış kayıt / Basic kullanıcıda Ekip Performans buzlu cam overlay’inde kilit ikonu light mode’da neredeyse görünmüyordu (`text-indigo-200`).

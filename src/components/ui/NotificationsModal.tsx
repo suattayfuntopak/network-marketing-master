@@ -429,12 +429,12 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
               </p>
 
               {/* Okundu rozeti + aksiyon */}
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-[#0F6E56]">
-                  <CheckCircle2 className="h-3.5 w-3.5" />
-                  Okundu olarak işaretlendi
+              <div className="mt-4 flex items-center justify-between gap-2">
+                <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate pr-2 text-xs font-semibold text-[#0F6E56]">
+                  <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">Okundu olarak işaretlendi</span>
                 </span>
-                <div className="flex items-center gap-2">
+                <div className="flex shrink-0 items-center gap-1.5">
                   {selected.candidate_id && (
                     <button
                       type="button"
@@ -446,14 +446,14 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
                         setSelected(null)
                         onClose()
                       }}
-                      className="rounded-xl border border-[#534AB7]/30 bg-[#EEEDFE] px-4 py-2 text-sm font-semibold text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white active:scale-95"
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-[#534AB7]/25 bg-[#534AB7]/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-[#534AB7] transition-colors hover:border-[#534AB7]/40 hover:bg-[#534AB7]/12 active:scale-[0.98] dark:border-[#534AB7]/35 dark:bg-[#534AB7]/15 dark:hover:bg-[#534AB7]/22"
                     >
                       {t('pagesUi.viewInPipeline')}
                     </button>
                   )}
                   <button
                     onClick={() => setSelected(null)}
-                    className="rounded-xl bg-[#534AB7] px-5 py-2 text-sm font-semibold text-white transition hover:bg-[#453da0] active:scale-95"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-[#534AB7] px-3.5 py-1.5 text-xs font-semibold leading-tight text-white transition-colors hover:bg-[#453da0] active:scale-[0.98]"
                   >
                     Kapat
                   </button>
