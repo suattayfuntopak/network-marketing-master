@@ -1,5 +1,10 @@
 # Hot Log
 
+## 2026-06-01 — Auth giriş/kayıt kartı light modda açık
+
+- `giris/page.tsx` ve `kayit/page.tsx` orta kartı sabit `#161824` kullanıyordu; light arka planda koyu kutu kalıyordu.
+- `authCardClass`, `authCardTitleClass`, `authCardSubtitleClass` — light’ta `--bg-card`, dark’ta önceki cam efekt.
+
 ## 2026-06-01 — Havale/EFT: landing'e taşındı + tam genişlik tasarım
 
 Havale/EFT kartı artık **landing page'de de** (ödeme sayfasıyla aynı yerde, üç plan
