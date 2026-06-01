@@ -66,11 +66,13 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const excludeWorkspaceId = myMembership?.workspace_id ?? null
 
-  // Platform Masası ile aynı kriter: parent_id boş (lisans tipine bakılmaz)
+  // Dış kayıt = bağımsız (parent_id boş) VEYA ücretsiz/deneme kullanıcılar (lisans yönetimi için).
+  // Süper admin'in kendi ekibi aşağıda ayrıca eleniyor; böylece free trial dış kayıtlar (Yusuf gibi)
+  // parent_id dolu olsa bile listede kalır.
   const { data: workspaces, error: wsError } = await admin
     .from('nmm_workspaces')
     .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
-    .is('parent_id', null)
+    .or('parent_id.is.null,license_type.eq.free,license_type.is.null')
     .order('created_at', { ascending: true })
 
   if (wsError || !workspaces) {
@@ -89,7 +91,8 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   for (const ws of workspaces) {
     if (ws.id === excludeWorkspaceId || !ws.owner_id || ws.owner_id === user!.id) continue
-    if (ws.parent_id) continue
+    // Yalnızca süper admin'in KENDİ doğrudan alt ekibini ele (onlar üstteki ekip tablosunda).
+    if (ws.parent_id === user!.id) continue
     if (seenOwners.has(ws.owner_id)) continue
     seenOwners.add(ws.owner_id)
     independentOwners.push({
