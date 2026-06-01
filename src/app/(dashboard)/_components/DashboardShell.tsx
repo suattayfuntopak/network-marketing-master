@@ -8,7 +8,6 @@ import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
 import { AccountAccessGuard } from './AccountAccessGuard'
-import { PulseRealtimeSync } from './pulse/PulseRealtimeSync'
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
   setTimeout(() => { delete document.documentElement.dataset.navDir }, 500)
@@ -133,7 +132,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
-      <PulseRealtimeSync />
       <Header visible={visible} />
       <Sidebar
         collapsed={collapsed}

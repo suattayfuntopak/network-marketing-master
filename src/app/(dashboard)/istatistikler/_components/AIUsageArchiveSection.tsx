@@ -10,9 +10,10 @@ import {
 } from '../actions'
 
 const PERIODS: { id: AIUsageArchivePeriod; labelKey: string }[] = [
+  { id: 'today', labelKey: 'statsPage.archivePeriodToday' },
   { id: '7d', labelKey: 'statsPage.archivePeriod7d' },
   { id: '30d', labelKey: 'statsPage.archivePeriod30d' },
-  { id: '365d', labelKey: 'statsPage.archivePeriod365d' },
+  { id: 'ytd', labelKey: 'statsPage.archivePeriodYtd' },
   { id: 'all', labelKey: 'statsPage.archivePeriodAll' },
 ]
 
@@ -97,11 +98,7 @@ export function AIUsageArchiveSection() {
             ))}
           </div>
 
-          {!data || data.rows.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] py-10 text-center text-sm text-[var(--text-3)]">
-              {t('statsPage.archiveEmpty')}
-            </div>
-          ) : (
+          {!data || data.rows.length === 0 ? null : (
             <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
               <table className="w-full text-left border-collapse text-sm min-w-[880px]">
                 <thead>

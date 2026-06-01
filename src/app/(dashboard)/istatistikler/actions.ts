@@ -241,7 +241,31 @@ export async function getMemberLicenseProfilesAction(
   return result
 }
 
-export type AIUsageArchivePeriod = '7d' | '30d' | '365d' | 'all'
+export type AIUsageArchivePeriod = 'today' | '7d' | '30d' | 'ytd' | 'all'
+
+/**
+ * Dönem tarih aralığı — UTC tutarlı, BUGÜNÜ KAPSAR.
+ * (Eski hata: yerel gece yarısı toISOString ile UTC+3'te düne kayıyor, bugünkü kullanım düşüyordu.)
+ */
+function archiveDateRange(period: AIUsageArchivePeriod): {
+  fromDate: string | null
+  toDate: string
+} {
+  const now = new Date()
+  const toDate = now.toISOString().slice(0, 10)
+  const dayMs = 24 * 60 * 60 * 1000
+  let fromDate: string | null = null
+  if (period === 'today') {
+    fromDate = toDate
+  } else if (period === '7d') {
+    fromDate = new Date(now.getTime() - 6 * dayMs).toISOString().slice(0, 10)
+  } else if (period === '30d') {
+    fromDate = new Date(now.getTime() - 29 * dayMs).toISOString().slice(0, 10)
+  } else if (period === 'ytd') {
+    fromDate = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)).toISOString().slice(0, 10)
+  }
+  return { fromDate, toDate }
+}
 
 export interface AIUsageArchiveRow {
   userId: string
@@ -281,23 +305,7 @@ function emptyArchiveSummary(
   period: AIUsageArchivePeriod,
   unavailable = false
 ): AIUsageArchiveSummary {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const toDate = today.toISOString().slice(0, 10)
-  let fromDate: string | null = null
-  if (period === '7d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 6)
-    fromDate = d.toISOString().slice(0, 10)
-  } else if (period === '30d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 29)
-    fromDate = d.toISOString().slice(0, 10)
-  } else if (period === '365d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 364)
-    fromDate = d.toISOString().slice(0, 10)
-  }
+  const { fromDate, toDate } = archiveDateRange(period)
   return {
     period,
     fromDate,
@@ -331,57 +339,12 @@ async function buildAIUsageArchive(
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const toDate = today.toISOString().slice(0, 10)
+  const { fromDate, toDate } = archiveDateRange(period)
 
-  let fromDate: string | null = null
-  if (period === '7d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 6)
-    fromDate = d.toISOString().slice(0, 10)
-  } else if (period === '30d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 29)
-    fromDate = d.toISOString().slice(0, 10)
-  } else if (period === '365d') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 364)
-    fromDate = d.toISOString().slice(0, 10)
-  }
-
-  let query = admin.from('nmm_ai_usage_daily').select('*')
-  if (fromDate) {
-    query = query.gte('usage_date', fromDate).lte('usage_date', toDate)
-  }
-
-  const { data: dailyRows, error: dailyError } = await query
-
-  const byUser = new Map<
-    string,
-    { message: number; roleplay: number; compliance: number; days: Set<string>; workspaceId: string | null }
-  >()
-
-  if (dailyError) {
-    console.error('[getAIUsageArchive] daily rollup', dailyError)
-    await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
-  } else {
-    dailyRows?.forEach(row => {
-      const bucket = byUser.get(row.user_id) ?? {
-        message: 0,
-        roleplay: 0,
-        compliance: 0,
-        days: new Set<string>(),
-        workspaceId: row.workspace_id,
-      }
-      bucket.message += row.message_count ?? 0
-      bucket.roleplay += row.roleplay_count ?? 0
-      bucket.compliance += row.compliance_count ?? 0
-      bucket.days.add(row.usage_date)
-      if (!bucket.workspaceId && row.workspace_id) bucket.workspaceId = row.workspace_id
-      byUser.set(row.user_id, bucket)
-    })
-  }
+  // Doğrudan ham olay kaynağından (nmm_daily_actions) hesapla — her ai_generate burada;
+  // rollup tablosu boş/eksik olsa bile doğru sonuç verir.
+  const byUser = new Map<string, UsageAgg>()
+  await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
 
   return assembleArchiveSummary(admin, period, fromDate, toDate, byUser)
 }

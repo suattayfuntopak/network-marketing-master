@@ -9,7 +9,6 @@ import type { TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { getIndependentSignupAIUsageAction, getMemberLicenseProfilesAction } from '../actions'
 import { AIUsageArchiveSection } from './AIUsageArchiveSection'
-import { PulseIndependentOwnersSection } from '@/app/(dashboard)/_components/pulse/PulseIndependentOwnersSection'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
@@ -241,8 +240,6 @@ export function StatsSuperAdminSections({
           </div>
         )}
       </section>
-
-      <PulseIndependentOwnersSection />
 
       <AIUsageArchiveSection />
     </>

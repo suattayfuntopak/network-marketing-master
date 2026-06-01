@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
+import { useQuery } from '@tanstack/react-query'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import {
   TrendingUp, Clock
@@ -19,10 +20,9 @@ import { StatsKpiCards } from './StatsKpiCards'
 import { StatsCharts } from './StatsCharts'
 import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
-import { PulseMySection } from '@/app/(dashboard)/_components/pulse/PulseMySection'
-import { PulseTeamSection } from '@/app/(dashboard)/_components/pulse/PulseTeamSection'
-import { PulseTeamTotalsSection } from '@/app/(dashboard)/_components/pulse/PulseTeamTotalsSection'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
+import type { PulsePeriod } from '@/lib/domain/pulse'
 import type { MemberRow } from '@/lib/team/types'
 
 const StatsSuperAdminSections = dynamic(
@@ -56,6 +56,7 @@ export function IstatistiklerContent() {
   const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
+  const [perfPeriod, setPerfPeriod] = useState<PulsePeriod>('30d')
 
   const [period, setPeriod] = useState<PeriodOption>('30d')
 
@@ -103,6 +104,18 @@ export function IstatistiklerContent() {
       avatar_url: m.avatar_url ?? null,
     }))
   }, [sortedMembers])
+
+  // Eğitim/İtiraz/Video ilerlemesi — perf tablosunun 3 yeni sütunu için (kişi bazlı).
+  const perfMemberIds = useMemo(
+    () => pulseMemberRows.filter(m => m.role !== 'leader').map(m => m.user_id),
+    [pulseMemberRows]
+  )
+  const { data: perfProgress } = useQuery({
+    queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(','), perfPeriod],
+    queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds, perfPeriod),
+    enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
+    staleTime: 30_000,
+  })
 
   // Turkish-aware name normalizer — must match EkipPanel's cleanStr
   const cleanStr = (s: string | null | undefined) => (s ?? '')
@@ -368,21 +381,17 @@ export function IstatistiklerContent() {
             maxTrendCount={maxTrendCount}
           />
 
-          {/* Ekip Performans Tablosu (Excel tarzı) */}
+          {/* Ekip Performans İzleme Tablosu — kişi bazlı + dönem + Eğitim/İtiraz/Video % + TOPLAM */}
           <TeamPerformanceTable
             performanceRows={performanceRows}
             getMemberHref={getMemberHref}
             teamStatsLocked={teamStatsLocked}
             loading={membersLoading || cLoading}
+            progressByUserId={perfProgress?.progressByUserId}
+            videoByUserId={perfProgress?.videoByUserId}
+            period={perfPeriod}
+            onPeriodChange={setPerfPeriod}
           />
-
-          <PulseTeamSection members={pulseMemberRows} getMemberHref={getMemberHref} />
-
-          <PulseTeamTotalsSection members={pulseMemberRows} />
-
-          {teamPulseUnlocked && (
-            <p className="text-xs text-[var(--text-3)] px-1">{t('statsPage.realtimePulseNote')}</p>
-          )}
 
           {usage?.isSuperAdmin && (
             <StatsSuperAdminSections
@@ -395,8 +404,6 @@ export function IstatistiklerContent() {
               workspaceCreatedAt={ws?.workspaceCreatedAt}
             />
           )}
-
-          <PulseMySection comfortableTypography />
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <MyAIUsageQuotaCard

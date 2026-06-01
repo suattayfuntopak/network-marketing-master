@@ -1,5 +1,34 @@
 # Hot Log
 
+## 2026-06-01 — Nabız sadeleştirme: tek tablo + YZ kullanım bug'ları onarıldı
+
+Kullanıcı isteğiyle dağınık nabız bölümleri **tek tabloda toplandı** ve YZ kullanım tabloları onarıldı.
+
+**Birleştirme (tek tablo):**
+- "Ekip Performans Dağılım Tablosu" → **"Ekip Performans İzleme Tablosu"**. Sağ üstte dönem sekmesi
+  (Bugün/Hafta/Ay/Yıl/Tüm). DDBR/DQSG ile Son Aktiflik arasına **Eğitim % · İtiraz % · Video %**
+  (ilerleme çubuklu) eklendi. En alta **TOPLAM** satırı (sayısal toplamlar + % ortalamaları).
+- **Silinen pulse bölümleri:** istatistiklerde "Ekip Gelişimi Takip Tablosu (Bireysel/Toplam)" +
+  "Bireysel Gelişim Takip Tablosu"; ekip sayfasındaki tablo; süper-admin "Bağımsız Kayıt Nabzı".
+- **Silinen dosyalar (8 bileşen + hook + 2 cron + 3 cron-helper):** PulseTeamSection/TotalsSection/
+  MySection/IndependentOwners/RealtimeSync/AiInsight/Disclaimer/KpiCard, usePulseRealtime,
+  insightActions, pulseRollup, pulse-rollup & pulse-weekly route + workflow, pulseCronHelpers,
+  pulseWeeklyAi. **Korundu:** PulsePeriodTabs (perf tablosu kullanıyor), getTeamProgressMapAction.
+
+**YZ Kullanım Arşivi bug'ı (asıl şikâyet — "7 gün boş"):**
+- **Zaman dilimi:** `setHours(0,0,0,0)` UTC+3'te `toDate`'i düne kaydırıyor, bugünkü kullanım düşüyordu →
+  UTC-tutarlı, **bugünü kapsayan** `archiveDateRange` yardımcısı.
+- **Kaynak:** rollup tablosu boşsa fallback tetiklenmiyordu → arşiv artık doğrudan `nmm_daily_actions`'tan
+  (her ai_generate orada) hesaplıyor.
+- **Sekmeler:** "7/30/12Ay/Tümü" → **Bugün/Son 7 Gün/Son 30 Gün/Bu Yıl/Tüm Zamanlar** (hepsi çalışır).
+- Boş durumdaki çizgili dikdörtgen kaldırıldı.
+
+**Supabase temizliği:** `044_pulse_cleanup.sql` — kullanılmayan `nmm_team_pulse_daily` +
+`nmm_pulse_weekly_summaries` DROP, realtime publication abonelikleri kaldırıldı. **Korunan tablolar:**
+`nmm_user_progress`, `nmm_video_progress`, `nmm_learning_events` (% sütunları + sponsor görünürlüğü).
+
+- tsc temiz, 86 test geçti. ⚠️ 044 migration'ı Supabase'de uygulanmalı.
+
 ## 2026-06-01 — Ekip Gelişimi: 3 tablo (isimlendirme + dönem + ilerleme çubukları + Toplam)
 
 Kullanıcı isteğiyle nabız tabloları yeniden adlandırıldı ve genişletildi:

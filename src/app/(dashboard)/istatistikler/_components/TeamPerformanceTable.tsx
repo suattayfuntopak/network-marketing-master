@@ -5,30 +5,83 @@ import Link from 'next/link'
 import { Users, Crown, Lock, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { TeamMember } from '@/hooks/useTeamMembers'
+import type { PulsePeriod } from '@/lib/domain/pulse'
+import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
+
+export type PerfLearningMap = Record<string, { trainingPct: number; objectionPct: number }>
+export type PerfVideoMap = Record<string, { pct: number }>
 
 interface Props {
   performanceRows: PerformanceRow[]
   getMemberHref: (row: { user_id: string; full_name: string | null; isAppUser?: boolean }) => string | null
   teamStatsLocked: boolean
   loading: boolean
+  /** Kişi-bazlı eğitim/itiraz ilerlemesi (genel) — yalnız uygulama kullananlar için. */
+  progressByUserId?: PerfLearningMap
+  videoByUserId?: PerfVideoMap
+  period: PulsePeriod
+  onPeriodChange: (p: PulsePeriod) => void
 }
 
-export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStatsLocked, loading }: Props) {
+/** Rakam altında ince ilerleme çubuğu. */
+function PctCell({ value, show }: { value: number; show: boolean }) {
+  if (!show) return <span className="text-[var(--text-3)]">—</span>
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-bold tabular-nums">%{value}</span>
+      <div className="h-1 w-12 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
+        <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, value)}%` }} />
+      </div>
+    </div>
+  )
+}
+
+export function TeamPerformanceTable({
+  performanceRows,
+  getMemberHref,
+  teamStatsLocked,
+  loading,
+  progressByUserId = {},
+  videoByUserId = {},
+  period,
+  onPeriodChange,
+}: Props) {
   const { t } = useTranslation()
   const router = useRouter()
 
+  // TOPLAM satırı — uygulama kullananların sayısal sütun toplamları + % ortalamaları.
+  const appRows = performanceRows.filter(r => r.isAppUser !== false)
+  const sum = (sel: (r: PerformanceRow) => number) => appRows.reduce((a, r) => a + (sel(r) || 0), 0)
+  const avg = (sel: (r: PerformanceRow) => number) =>
+    appRows.length ? Math.round(sum(sel) / appRows.length) : 0
+  const totals = {
+    candidate: sum(r => r.candidate_count ?? 0),
+    yeni: sum(r => r.yeni_count ?? 0),
+    iletisim: sum(r => r.iletisim_count ?? 0),
+    davetli: sum(r => r.davetli_count ?? 0),
+    sunum: sum(r => r.sunum_count ?? 0),
+    takip: sum(r => r.takip_count ?? 0),
+    katildi: sum(r => r.katildi_count ?? 0),
+    trainingAvg: avg(r => progressByUserId[r.user_id]?.trainingPct ?? 0),
+    objectionAvg: avg(r => progressByUserId[r.user_id]?.objectionPct ?? 0),
+    videoAvg: avg(r => videoByUserId[r.user_id]?.pct ?? 0),
+  }
+
   return (
     <section className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200 overflow-hidden">
-      <div>
-        <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-          <Users className="h-4 w-4 text-brand" />
-          {t('statsPage.teamTitle')}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-          {t('statsPage.teamSubtitle')}
-        </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
+            <Users className="h-4 w-4 text-brand" />
+            {t('statsPage.teamTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
+            {t('statsPage.teamSubtitle')}
+          </p>
+        </div>
+        <PulsePeriodTabs period={period} onChange={onPeriodChange} comfortableTypography />
       </div>
 
       {loading ? (
@@ -55,6 +108,9 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
                 <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 whitespace-nowrap">
                   {t('statsPage.colDqsg')}<sup>*</sup>
                 </th>
+                <th className="p-3 font-semibold text-center bg-teal-50/20 dark:bg-teal-950/5 text-teal-700 dark:text-teal-400 whitespace-nowrap">{t('pulse.colTraining')}</th>
+                <th className="p-3 font-semibold text-center bg-teal-50/20 dark:bg-teal-950/5 text-teal-700 dark:text-teal-400 whitespace-nowrap">{t('pulse.colObjections')}</th>
+                <th className="p-3 font-semibold text-center bg-teal-50/20 dark:bg-teal-950/5 text-teal-700 dark:text-teal-400 whitespace-nowrap">{t('pulse.colVideos')}</th>
                 <th className="p-3 font-semibold text-right">{t('statsPage.colLastActive')}</th>
               </tr>
             </thead>
@@ -108,12 +164,34 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
                     <td className="p-3 text-center tabular-nums bg-amber-50/10 dark:bg-amber-950/5 text-amber-600 dark:text-amber-400 font-semibold">{isAppUser ? m.takip_count : '—'}</td>
                     <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">{isAppUser ? m.katildi_count : '—'}</td>
                     <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-black">{isAppUser ? `%${onboardingPct}` : '—'}</td>
+                    <td className="p-3 text-center bg-teal-50/10 dark:bg-teal-950/5"><PctCell value={progressByUserId[m.user_id]?.trainingPct ?? 0} show={isAppUser} /></td>
+                    <td className="p-3 text-center bg-teal-50/10 dark:bg-teal-950/5"><PctCell value={progressByUserId[m.user_id]?.objectionPct ?? 0} show={isAppUser} /></td>
+                    <td className="p-3 text-center bg-teal-50/10 dark:bg-teal-950/5"><PctCell value={videoByUserId[m.user_id]?.pct ?? 0} show={isAppUser} /></td>
                     <td className="p-3 text-right text-sm text-[var(--text-2)] font-medium truncate">
                       {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—'}
                     </td>
                   </tr>
                 )
               })}
+              {appRows.length > 0 && (
+                <tr className="border-t-2 border-[var(--border)] bg-[var(--bg-subtle)]/60 font-black text-[var(--text-1)]">
+                  <td className="p-3 uppercase tracking-wide">{t('statsPage.colTotal')}</td>
+                  <td className="p-3" />
+                  <td className="p-3" />
+                  <td className="p-3 text-center tabular-nums text-blue-600 dark:text-blue-400">{totals.candidate}</td>
+                  <td className="p-3 text-center tabular-nums text-indigo-600 dark:text-indigo-400">{totals.yeni}</td>
+                  <td className="p-3 text-center tabular-nums text-sky-600 dark:text-sky-400">{totals.iletisim}</td>
+                  <td className="p-3 text-center tabular-nums text-red-600 dark:text-red-400">{totals.davetli}</td>
+                  <td className="p-3 text-center tabular-nums text-cyan-600 dark:text-cyan-400">{totals.sunum}</td>
+                  <td className="p-3 text-center tabular-nums text-amber-600 dark:text-amber-400">{totals.takip}</td>
+                  <td className="p-3 text-center tabular-nums text-emerald-700 dark:text-emerald-400">{totals.katildi}</td>
+                  <td className="p-3 text-center text-[var(--text-3)]">—</td>
+                  <td className="p-3 text-center tabular-nums text-teal-700 dark:text-teal-400">%{totals.trainingAvg}</td>
+                  <td className="p-3 text-center tabular-nums text-teal-700 dark:text-teal-400">%{totals.objectionAvg}</td>
+                  <td className="p-3 text-center tabular-nums text-teal-700 dark:text-teal-400">%{totals.videoAvg}</td>
+                  <td className="p-3 text-right text-[var(--text-3)]">—</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
