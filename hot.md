@@ -1,5 +1,9 @@
 # Hot Log
 
+## 2026-06-01 — Havale/EFT geçici kapalı
+
+`BANK_TRANSFER_ENABLED = false` — landing (`LandingPricing`) ve `/odeme` havale kartı gizlenir; Shopier kartlı ödeme aynen çalışır. Tekrar açmak: `src/lib/domain/bankTransfer.ts` içinde `true` yap.
+
 ## 2026-06-01 — Ekip Nabzı Faz 3 (tamamlandı)
 
 Video eğitim modülü + nabız entegrasyonu. **Deploy:** `041_video_progress.sql` (040 sonrası).

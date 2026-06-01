@@ -5,7 +5,7 @@
  * havale kartı tamamen kaybolur, başka hiçbir yere dokunmaya gerek yok. Shopier
  * kartlı ödeme bundan bağımsız çalışmaya devam eder.
  */
-export const BANK_TRANSFER_ENABLED = true
+export const BANK_TRANSFER_ENABLED = false
 
 export const BANK_TRANSFER_INFO = {
   /** Görüntülenecek IBAN (boşluklu). Kopyalarken boşluklar otomatik temizlenir. */
