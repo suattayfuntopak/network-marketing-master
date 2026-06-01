@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-01 — Bildirim detay: footer genişliği
+
+- **Sorun:** «Okundu olarak işaretlendi» footer’da `truncate` ile kesiliyordu (`max-w-sm` + sıkışık satır).
+- **Çözüm:** Detay popup `max-w-[27rem]` (+48px); sol metinden `truncate` kaldırıldı.
+- **Dosya:** `NotificationsModal.tsx`
+
+---
+
 ## 2026-06-01 — Bildirim detay: Boru Hattı butonu
 
 - **Sorun:** Bildirim detay popup’ında «Boru Hattı'nda gör» butonu dar alanda 3 satıra kırılıyor, `text-sm` ile footer’daki metinlerden büyük görünüyordu.
