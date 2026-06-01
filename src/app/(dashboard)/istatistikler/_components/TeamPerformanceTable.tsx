@@ -128,7 +128,7 @@ export function TeamPerformanceTable({ performanceRows, getMemberHref, teamStats
           aria-hidden={false}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-indigo-200 shadow-lg">
-            <Lock className="h-6 w-6" strokeWidth={1.75} />
+            <Lock className="h-6 w-6 text-[#534AB7] dark:text-indigo-200" strokeWidth={1.75} />
           </div>
           <div className="max-w-sm space-y-1">
             <p className="text-sm font-bold text-[var(--text-1)]">{t('statsPage.teamLockedTitle')}</p>

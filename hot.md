@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-01 — İstatistikler kilit ikonu (light mode)
+
+- **Sorun:** Dış kayıt / Basic kullanıcıda Ekip Performans buzlu cam overlay’inde kilit ikonu light mode’da neredeyse görünmüyordu (`text-indigo-200`).
+- **Çözüm:** Yalnızca `Lock` ikonuna light mode’da marka moru (`#534AB7`); dark mode aynı (`dark:text-indigo-200`).
+- **Dosya:** `TeamPerformanceTable.tsx`
+
+---
+
 ## 2026-05-31 — Popup açıkken arka plan scroll kilidi
 
 - **Sorun:** Modal/popup içinde kaydırırken imleç veya parmak dışarı taşınca flu arka plan sayfa kayıyordu (masaüstü + mobil).
