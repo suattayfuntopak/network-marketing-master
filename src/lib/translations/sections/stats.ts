@@ -74,7 +74,7 @@ export const statsSection = {
 
       aiIndependentTitle: 'Dış Kayıt Yapay Zeka Kullanım & Limit Kontrol Masası',
       aiIndependentSubtitle:
-        'Platformu kendi başına keşfeden, davet kodu kullanmamış (parent_id boş) ve hâlâ ücretsiz denemede olan liderler — örn. Yusuf gibi dış test kullanıcıları. Davetle ekibe katılanlar yalnızca Ekip YZ tablosunda görünür.',
+        'Platform Masasındaki bağımsız kayıtlar: ücretsiz lisans ve sponsor bağlantısı yok (parent_id boş) — örn. Yusuf Emre.',
       aiIndependentEmpty: 'Henüz bağımsız dış kayıt bulunmuyor.',
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',
@@ -194,7 +194,7 @@ export const statsSection = {
 
       aiIndependentTitle: 'Independent Signup AI Usage & Quotas Control Spread',
       aiIndependentSubtitle:
-        'Leaders still on free trial who discovered NMM on their own (no invite code, parent_id empty) — e.g. external test users. Invite-based downlines appear only in the Team AI table.',
+        'Same as Platform Desk independent signups: free license, no sponsor link (parent_id empty).',
       aiIndependentEmpty: 'No independent signups yet.',
       colLicense: 'License',
       licensePlanFree: 'Free',

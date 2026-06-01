@@ -47,16 +47,16 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
   if (!ws?.workspaceId) return null
 
   const display = data ?? emptyMyPulseSummary(period)
-  const showFallbackNote = isError || (!isLoading && !data)
+  const showFallbackNote = isError
 
   const titleCls = comfortableTypography
-    ? 'text-lg font-bold text-[var(--text-1)] flex items-center gap-2'
+    ? 'text-base font-bold text-[var(--text-1)] flex items-center gap-2'
     : 'text-sm font-bold text-[var(--text-1)] flex items-center gap-2'
   const subtitleCls = comfortableTypography
-    ? 'mt-1 text-base text-[var(--text-3)]'
+    ? 'mt-1 text-sm text-[var(--text-3)] leading-relaxed'
     : 'mt-1 text-xs text-[var(--text-3)]'
   const periodBtnCls = comfortableTypography ? 'text-sm' : 'text-[10px]'
-  const noteCls = comfortableTypography ? 'text-sm' : 'text-[10px]'
+  const noteCls = comfortableTypography ? 'text-xs' : 'text-[10px]'
   const fieldHdrCls = comfortableTypography
     ? 'mb-2 text-sm font-bold uppercase tracking-wider text-[var(--text-3)]'
     : 'mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]'

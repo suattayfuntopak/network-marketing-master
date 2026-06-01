@@ -30,7 +30,7 @@ export function AIUsageArchiveSection() {
   })
 
   const totals = data?.totals ?? ZERO_TOTALS
-  const showUnavailable = isError || data?.unavailable
+  const showUnavailable = isError
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">

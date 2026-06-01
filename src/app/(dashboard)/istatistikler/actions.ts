@@ -1,7 +1,8 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createAdminClient, type AdminClient } from '@/lib/supabase/admin'
+import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
 import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 
@@ -28,21 +29,20 @@ export type MemberLicenseProfile = {
   isSuperAdmin: boolean
 }
 
-/** Başka bir ekibe davet kodu ile katılmış mı? (kendi workspace'ine ek olarak) */
-function isInvitedTeamMember(
-  userId: string,
-  ownedWorkspaceIds: Set<string>,
-  membershipsByUser: Map<string, string[]>
-): boolean {
-  const memberships = membershipsByUser.get(userId) ?? []
-  return memberships.some(wsId => !ownedWorkspaceIds.has(wsId))
-}
-
 /**
- * Super-admin only: bağımsız dış kayıt — free lisans, sponsor bağlantısı yok (parent_id null).
- * Davet kodu ile katılan downline'lar kendi workspace'lerinde kalır; Ekip YZ tablosunda listelenir.
+ * Super-admin only: bağımsız dış kayıt — Platform Masası ile aynı kriter: free lisans, parent_id boş.
+ * (Ekibe üye olarak eklenmiş olsa bile kendi workspace'inde sponsor yoksa listelenir.)
  */
 export async function getIndependentSignupAIUsageAction(): Promise<IndependentAIUsageRow[]> {
+  try {
+    return await buildIndependentSignupAIUsage()
+  } catch (err) {
+    console.error('[getIndependentSignupAIUsage]', err)
+    return []
+  }
+}
+
+async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -71,53 +71,32 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
     return []
   }
 
-  const ownerIds = workspaces
-    .filter(ws => ws.id !== excludeWorkspaceId && ws.owner_id && ws.owner_id !== user!.id)
-    .map(ws => ws.owner_id!)
+  const seenOwners = new Set<string>()
+  const independentOwners: {
+    userId: string
+    licenseType: string
+    licenseExpiresAt: string | null
+    registeredAt: string
+  }[] = []
 
-  if (ownerIds.length === 0) return []
-
-  const ownedByUser = new Map<string, Set<string>>()
   for (const ws of workspaces) {
-    if (!ws.owner_id) continue
-    const set = ownedByUser.get(ws.owner_id) ?? new Set<string>()
-    set.add(ws.id)
-    ownedByUser.set(ws.owner_id, set)
-  }
-
-  const { data: allMemberships } = await admin
-    .from('nmm_workspace_members')
-    .select('user_id, workspace_id')
-    .in('user_id', ownerIds)
-
-  const membershipsByUser = new Map<string, string[]>()
-  allMemberships?.forEach(row => {
-    const list = membershipsByUser.get(row.user_id) ?? []
-    list.push(row.workspace_id)
-    membershipsByUser.set(row.user_id, list)
-  })
-
-  const independentOwners = workspaces
-    .filter(ws => ws.id !== excludeWorkspaceId && ws.owner_id && ws.owner_id !== user!.id)
-    // Davet kodu ile katılanlar: kendi workspace'inde parent_id = sponsor workspace id
-    .filter(ws => !ws.parent_id)
-    .filter(ws => {
-      const owned = ownedByUser.get(ws.owner_id!) ?? new Set<string>()
-      return !isInvitedTeamMember(ws.owner_id!, owned, membershipsByUser)
-    })
-    .map(ws => ({
-      userId: ws.owner_id!,
+    if (ws.id === excludeWorkspaceId || !ws.owner_id || ws.owner_id === user!.id) continue
+    if (ws.parent_id) continue
+    if (seenOwners.has(ws.owner_id)) continue
+    seenOwners.add(ws.owner_id)
+    independentOwners.push({
+      userId: ws.owner_id,
       licenseType: ws.license_type ?? 'free',
       licenseExpiresAt: ws.license_expires_at ?? null,
       registeredAt: ws.created_at,
-    }))
+    })
+  }
 
   if (independentOwners.length === 0) return []
 
   const filteredOwnerIds = independentOwners.map(o => o.userId)
 
-  const { data: listData } = await admin.auth.admin.listUsers({ perPage: 200 })
-  const users = listData?.users ?? []
+  const users = await listAllAuthUsers(admin)
   const userMap = new Map(users.map(u => [u.id, u]))
 
   const { data: memberRows } = await admin
@@ -360,43 +339,102 @@ async function buildAIUsageArchive(
     query = query.gte('usage_date', fromDate).lte('usage_date', toDate)
   }
 
-  const { data: dailyRows, error } = await query
-  if (error) {
-    throw new Error(error.message.includes('nmm_ai_usage_daily')
-      ? 'YZ arşiv tablosu kurulmadı. Migration 029 uygulayın.'
-      : error.message)
-  }
+  const { data: dailyRows, error: dailyError } = await query
 
   const byUser = new Map<
     string,
     { message: number; roleplay: number; compliance: number; days: Set<string>; workspaceId: string | null }
   >()
 
-  dailyRows?.forEach(row => {
-    const bucket = byUser.get(row.user_id) ?? {
+  if (dailyError) {
+    console.error('[getAIUsageArchive] daily rollup', dailyError)
+    await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
+  } else {
+    dailyRows?.forEach(row => {
+      const bucket = byUser.get(row.user_id) ?? {
+        message: 0,
+        roleplay: 0,
+        compliance: 0,
+        days: new Set<string>(),
+        workspaceId: row.workspace_id,
+      }
+      bucket.message += row.message_count ?? 0
+      bucket.roleplay += row.roleplay_count ?? 0
+      bucket.compliance += row.compliance_count ?? 0
+      bucket.days.add(row.usage_date)
+      if (!bucket.workspaceId && row.workspace_id) bucket.workspaceId = row.workspace_id
+      byUser.set(row.user_id, bucket)
+    })
+  }
+
+  return assembleArchiveSummary(admin, period, fromDate, toDate, byUser)
+}
+
+type UsageAgg = {
+  message: number
+  roleplay: number
+  compliance: number
+  days: Set<string>
+  workspaceId: string | null
+}
+
+async function aggregateAiUsageFromDailyActions(
+  admin: AdminClient,
+  byUser: Map<string, UsageAgg>,
+  fromDate: string | null,
+  toDate: string
+): Promise<void> {
+  let q = admin
+    .from('nmm_daily_actions')
+    .select('user_id, workspace_id, note, created_at')
+    .eq('action_type', 'ai_generate')
+
+  if (fromDate) {
+    q = q
+      .gte('created_at', `${fromDate}T00:00:00.000Z`)
+      .lte('created_at', `${toDate}T23:59:59.999Z`)
+  }
+
+  const { data: actions, error } = await q
+  if (error) {
+    console.error('[aggregateAiUsageFromDailyActions]', error)
+    return
+  }
+
+  actions?.forEach(act => {
+    const day = act.created_at.slice(0, 10)
+    const bucket = byUser.get(act.user_id) ?? {
       message: 0,
       roleplay: 0,
       compliance: 0,
       days: new Set<string>(),
-      workspaceId: row.workspace_id,
+      workspaceId: act.workspace_id,
     }
-    bucket.message += row.message_count ?? 0
-    bucket.roleplay += row.roleplay_count ?? 0
-    bucket.compliance += row.compliance_count ?? 0
-    bucket.days.add(row.usage_date)
-    if (!bucket.workspaceId && row.workspace_id) bucket.workspaceId = row.workspace_id
-    byUser.set(row.user_id, bucket)
+    if (act.note === 'roleplay') bucket.roleplay++
+    else if (act.note === 'compliance') bucket.compliance++
+    else bucket.message++
+    bucket.days.add(day)
+    if (!bucket.workspaceId && act.workspace_id) bucket.workspaceId = act.workspace_id
+    byUser.set(act.user_id, bucket)
   })
+}
 
+async function assembleArchiveSummary(
+  admin: AdminClient,
+  period: AIUsageArchivePeriod,
+  fromDate: string | null,
+  toDate: string,
+  byUser: Map<string, UsageAgg>
+): Promise<AIUsageArchiveSummary> {
   const userIds = [...byUser.keys()]
   if (userIds.length === 0) {
     return emptyArchiveSummary(period)
   }
 
-  const { data: listData } = await admin.auth.admin.listUsers({ perPage: 200 })
-  const emailById = new Map((listData?.users ?? []).map(u => [u.id, u.email ?? '']))
+  const users = await listAllAuthUsers(admin)
+  const emailById = new Map(users.map(u => [u.id, u.email ?? '']))
   const nameById = new Map(
-    (listData?.users ?? []).map(u => [
+    users.map(u => [
       u.id,
       (u.user_metadata?.full_name as string | undefined) ?? u.email?.split('@')[0] ?? null,
     ])
@@ -423,29 +461,33 @@ async function buildAIUsageArchive(
     (workspaces ?? []).filter(w => w.parent_id).map(w => w.owner_id!)
   )
 
-  const rows: AIUsageArchiveRow[] = userIds.map(userId => {
-    const agg = byUser.get(userId)!
-    const email = emailById.get(userId) ?? '—'
-    const superAdmin = isSuperAdmin({ email })
-    return {
-      userId,
-      fullName: nameById.get(userId) ?? null,
-      email,
-      licenseType: superAdmin ? superAdminLicenseOverride().licenseType : (licenseByOwner.get(userId) ?? 'free'),
-      isSuperAdmin: superAdmin,
-      isInvitedDownline: invitedOwners.has(userId),
-      messageTotal: agg.message,
-      roleplayTotal: agg.roleplay,
-      complianceTotal: agg.compliance,
-      activeDays: agg.days.size,
-    }
-  }).sort((a, b) => {
-    if (a.isSuperAdmin && !b.isSuperAdmin) return -1
-    if (!a.isSuperAdmin && b.isSuperAdmin) return 1
-    const totalA = a.messageTotal + a.roleplayTotal + a.complianceTotal
-    const totalB = b.messageTotal + b.roleplayTotal + b.complianceTotal
-    return totalB - totalA
-  })
+  const rows: AIUsageArchiveRow[] = userIds
+    .map(userId => {
+      const agg = byUser.get(userId)!
+      const email = emailById.get(userId) ?? '—'
+      const superAdmin = isSuperAdmin({ email })
+      return {
+        userId,
+        fullName: nameById.get(userId) ?? null,
+        email,
+        licenseType: superAdmin
+          ? superAdminLicenseOverride().licenseType
+          : (licenseByOwner.get(userId) ?? 'free'),
+        isSuperAdmin: superAdmin,
+        isInvitedDownline: invitedOwners.has(userId),
+        messageTotal: agg.message,
+        roleplayTotal: agg.roleplay,
+        complianceTotal: agg.compliance,
+        activeDays: agg.days.size,
+      }
+    })
+    .sort((a, b) => {
+      if (a.isSuperAdmin && !b.isSuperAdmin) return -1
+      if (!a.isSuperAdmin && b.isSuperAdmin) return 1
+      const totalA = a.messageTotal + a.roleplayTotal + a.complianceTotal
+      const totalB = b.messageTotal + b.roleplayTotal + b.complianceTotal
+      return totalB - totalA
+    })
 
   const totals = rows.reduce(
     (acc, r) => ({

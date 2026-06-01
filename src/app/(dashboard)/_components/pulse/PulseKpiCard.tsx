@@ -15,14 +15,15 @@ export function PulseKpiCard({
   pct,
   comfortableTypography = false,
 }: Props) {
+  // comfortableTypography = İstatistikler sayfası → StatsKpiCards ile aynı ölçek
   const labelCls = comfortableTypography
     ? 'text-sm font-bold uppercase tracking-wider text-[var(--text-3)]'
     : 'text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]'
   const secondaryCls = comfortableTypography
-    ? 'mt-0.5 text-base text-[var(--text-2)]'
+    ? 'mt-1 text-sm text-[var(--text-3)] font-semibold'
     : 'mt-0.5 text-xs text-[var(--text-2)]'
   const primaryCls = comfortableTypography
-    ? 'mt-1 text-3xl font-black text-[var(--text-1)]'
+    ? 'mt-1 text-2xl font-black text-[var(--text-1)]'
     : 'mt-1 text-2xl font-black text-[var(--text-1)]'
 
   return (

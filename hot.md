@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-01 — Yusuf dış kayıt + nabız font + arşiv fallback
+
+- **Dış kayıt masası:** Platform Masası ile aynı filtre (`parent_id` boş); ekibe üye olsa bile Yusuf Emre listelenir.
+- **YZ arşivi:** `nmm_ai_usage_daily` yoksa `nmm_daily_actions` üzerinden fallback; gereksiz sarı uyarı kalkar.
+- **Ekip Nabzı KPI:** kart başlık/değer fontu `StatsKpiCards` ile eşitlendi (`text-sm` / `text-2xl`).
+
 ## 2026-06-01 — İstatistikler nabız/arşiv boş & hata durumu
 
 - **Ekip Nabzı** (`pulse.myTitle`): istatistiklerdeki nabız bölümü başlığı güncellendi.
