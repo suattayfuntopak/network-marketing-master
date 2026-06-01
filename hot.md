@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-01 — Ekip Gelişimi: 3 tablo (isimlendirme + dönem + ilerleme çubukları + Toplam)
+
+Kullanıcı isteğiyle nabız tabloları yeniden adlandırıldı ve genişletildi:
+
+1. **③ "Benim Nabzım" → "Bireysel Gelişim Takip Tablosu"** — herkesin kendi istatistik
+   sayfasında, kendi ilerlemesi (zaten ilerleme çubuklu kartlar var). Sadece i18n adı.
+2. **① "Ekip Nabzı" → "Ekip Gelişimi Takip Tablosu (Bireysel)"** — kişi-bazlı tablo.
+   Eklenenler: **dönem seçici** (Bugün/Hafta/Ay/Yıl/Tüm — sabit 30g kaldırıldı) +
+   **% sütunlarının altında ilerleme çubukları** (Eğitim/İtiraz/DQSG/Video).
+3. **② YENİ "Ekip Gelişimi Takip Tablosu (Toplam)"** — seçili dönemde ekibin birleşik
+   rakamları (okunan eğitim/itiraz, tamamlanan video, sunum, randevu, aktif üye).
+   `getTeamPulseTotalsAction` (RLS-güvenli: yalnız sponsor-read olan olay-logu + video).
+
+- **Kapsam kararı:** Geliştirme tabloları uygulama kullananları gösterir (NMM ekip + dış
+  kayıtlar); saha/boru hattı zaten ayrı performans tablosunda. Gating: Pro + süper admin.
+- **Yeni:** `PulsePeriodTabs.tsx` (ortak dönem seçici), `PulseTeamTotalsSection.tsx`.
+- tsc temiz, 86 test, lint temiz (yalnız önceden var olan exhaustive-deps uyarısı).
+- Not: Cursor ajanı bu modülde aktifti; çakışmamak için stash ile duraklayıp temiz devam edildi.
+
 ## 2026-06-01 — Dış kayıt masası: alt başlık kaldır + Yusuf listesi
 
 - **UI:** Dış Kayıt YZ masasında yalnızca başlık; açıklama paragrafı kaldırıldı.

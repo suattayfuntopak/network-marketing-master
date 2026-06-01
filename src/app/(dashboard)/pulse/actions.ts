@@ -426,4 +426,91 @@ export async function getTeamProgressMapAction(
   return { locked: false, progressByUserId, engagementByUserId, videoByUserId }
 }
 
+export type TeamPulseTotals = {
+  trainingReads: number
+  objectionReads: number
+  videosCompleted: number
+  presentationsSent: number
+  appointmentsSet: number
+  appointmentsDone: number
+  activeMembers: number
+}
+
+const EMPTY_TEAM_TOTALS: TeamPulseTotals = {
+  trainingReads: 0,
+  objectionReads: 0,
+  videosCompleted: 0,
+  presentationsSent: 0,
+  appointmentsSet: 0,
+  appointmentsDone: 0,
+  activeMembers: 0,
+}
+
+/**
+ * ② Ekip Gelişimi Takip Tablosu (Toplam) — seçili dönemde tüm ekibin birleşik aktivitesi.
+ * Yalnızca sponsor-read RLS'i olan olay-logu + video tablolarından hesaplanır (güvenli).
+ */
+export async function getTeamPulseTotalsAction(
+  workspaceId: string,
+  memberUserIds: string[],
+  period: PulsePeriod = '30d'
+): Promise<{ locked: boolean; totals: TeamPulseTotals }> {
+  const { supabase, user } = await assertWorkspaceMember(workspaceId)
+
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('license_type')
+    .eq('id', workspaceId)
+    .single()
+
+  const locked = !hasTeamPulseAccess(ws?.license_type, isSuperAdmin(user))
+  if (locked || memberUserIds.length === 0) {
+    return { locked, totals: { ...EMPTY_TEAM_TOTALS } }
+  }
+
+  const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
+  const since = periodStartIso(period)
+  const totals: TeamPulseTotals = { ...EMPTY_TEAM_TOTALS }
+  const active = new Set<string>()
+
+  let eventsQuery = supabase
+    .from('nmm_learning_events')
+    .select('user_id, event_type')
+    .in('user_id', uniqueIds)
+    .in('event_type', [
+      'training_read',
+      'objection_read',
+      'presentation_sent',
+      'appointment_set',
+      'appointment_done',
+    ])
+  if (since) eventsQuery = eventsQuery.gte('created_at', since)
+
+  const { data: events } = await eventsQuery
+  for (const e of events ?? []) {
+    active.add(e.user_id)
+    if (e.event_type === 'training_read') totals.trainingReads++
+    else if (e.event_type === 'objection_read') totals.objectionReads++
+    else if (e.event_type === 'presentation_sent') totals.presentationsSent++
+    else if (e.event_type === 'appointment_set') totals.appointmentsSet++
+    else if (e.event_type === 'appointment_done') totals.appointmentsDone++
+  }
+
+  let videoQuery = supabase
+    .from('nmm_video_progress')
+    .select('user_id, completed_at')
+    .in('user_id', uniqueIds)
+    .eq('status', 'completed')
+  if (since) videoQuery = videoQuery.gte('completed_at', since)
+
+  const { data: videos } = await videoQuery
+  for (const v of videos ?? []) {
+    totals.videosCompleted++
+    active.add(v.user_id)
+  }
+
+  totals.activeMembers = active.size
+  return { locked: false, totals }
+}
+
 export { ONBOARDING_STEP_COUNT }

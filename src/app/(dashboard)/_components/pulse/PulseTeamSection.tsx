@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
@@ -10,13 +10,30 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import {
   computeAttentionFlags,
   ONBOARDING_STEP_COUNT,
+  type PulsePeriod,
 } from '@/lib/domain/pulse'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import type { MemberRow } from '@/lib/team/types'
 import { PulseDisclaimer } from './PulseDisclaimer'
 import { PulseAiInsight } from './PulseAiInsight'
+import { PulsePeriodTabs } from './PulsePeriodTabs'
 import { Skeleton } from '@/components/ui/Skeleton'
+
+/** Rakamın altında ince ilerleme çubuğu (tablo hücresi). */
+function CellPct({ pct }: { pct: number }) {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-bold tabular-nums">{pct}%</span>
+      <div className="h-1 w-12 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
+        <div
+          className="h-full rounded-full bg-brand transition-[width] duration-300"
+          style={{ width: `${Math.min(100, pct)}%` }}
+        />
+      </div>
+    </div>
+  )
+}
 
 type Props = {
   members: MemberRow[]
@@ -44,7 +61,7 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
     [downlineMembers]
   )
 
-  const teamPeriod = '30d' as const
+  const [teamPeriod, setTeamPeriod] = useState<PulsePeriod>('30d')
 
   const { data: progressData, isLoading } = useQuery({
     queryKey: ['pulse-team', ws?.workspaceId, memberIds.join(','), teamPeriod],
@@ -59,12 +76,17 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
 
   return (
     <section className="relative space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 overflow-hidden">
-      <header>
-        <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-2">
-          <Activity className="h-4 w-4 text-brand" />
-          {t('pulse.teamTitle')}
-        </h2>
-        <p className="mt-1 text-xs text-[var(--text-3)]">{t('pulse.teamSubtitle')}</p>
+      <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-sm font-bold text-[var(--text-1)] flex items-center gap-2">
+            <Activity className="h-4 w-4 text-brand" />
+            {t('pulse.teamTitle')}
+          </h2>
+          <p className="mt-1 text-xs text-[var(--text-3)]">{t('pulse.teamSubtitle')}</p>
+        </div>
+        {!showGate && downlineMembers.length > 0 && (
+          <PulsePeriodTabs period={teamPeriod} onChange={setTeamPeriod} />
+        )}
       </header>
 
       {showGate ? (
@@ -168,10 +190,10 @@ export function PulseTeamSection({ members, getMemberHref }: Props) {
                         )}
                       </div>
                     </td>
-                    <td className="p-3 text-center font-bold">{trainingPct}%</td>
-                    <td className="p-3 text-center font-bold">{objectionPct}%</td>
-                    <td className="p-3 text-center font-bold">{dqsgPct}%</td>
-                    <td className="p-3 text-center font-bold">{videoPct}%</td>
+                    <td className="p-3 text-center"><CellPct pct={trainingPct} /></td>
+                    <td className="p-3 text-center"><CellPct pct={objectionPct} /></td>
+                    <td className="p-3 text-center"><CellPct pct={dqsgPct} /></td>
+                    <td className="p-3 text-center"><CellPct pct={videoPct} /></td>
                     <td className="p-3 text-center font-bold text-[var(--text-2)]">
                       {engagement?.presentationsSent ?? 0}
                     </td>

@@ -21,6 +21,7 @@ import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { PulseMySection } from '@/app/(dashboard)/_components/pulse/PulseMySection'
 import { PulseTeamSection } from '@/app/(dashboard)/_components/pulse/PulseTeamSection'
+import { PulseTeamTotalsSection } from '@/app/(dashboard)/_components/pulse/PulseTeamTotalsSection'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { MemberRow } from '@/lib/team/types'
 
@@ -376,6 +377,8 @@ export function IstatistiklerContent() {
           />
 
           <PulseTeamSection members={pulseMemberRows} getMemberHref={getMemberHref} />
+
+          <PulseTeamTotalsSection members={pulseMemberRows} />
 
           {teamPulseUnlocked && (
             <p className="text-xs text-[var(--text-3)] px-1">{t('statsPage.realtimePulseNote')}</p>
