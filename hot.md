@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-01 — Nabız cron kurulum (senin yapman gerekenler)
+
+1. **Supabase:** `040` → `041` → `042` → `043` migration’ları sırayla uygula (039 sonrası).
+2. **Ortam değişkeni:** Production’da (Vercel vb.) `CRON_SECRET` tanımlı olsun (güçlü rastgele string).
+3. **Zamanlayıcı (birini seç):**
+   - **Vercel Cron** veya **GitHub Actions** ile günlük `pulse-rollup`, haftalık `pulse-weekly` çağrısı; veya
+   - İlk kurulumda **bir kez manuel** `curl` (aşağı), sonra zamanlayıcıyı ekle.
+4. **Manuel test (isteğe bağlı):** `<domain>` = canlı site (ör. `https://networkmarketingmaster.com`), terminalde `CRON_SECRET` export et:
+   ```bash
+   curl -sS -H "Authorization: Bearer $CRON_SECRET" "https://<domain>/api/cron/pulse-rollup"
+   curl -sS -H "Authorization: Bearer $CRON_SECRET" "https://<domain>/api/cron/pulse-weekly"
+   ```
+   `{"ok":true,...}` dönmeli. YZ özet kartı için önce rollup birkaç gün biriksin veya weekly’yi bir kez tetikle.
+5. **Realtime (F5):** Ek curl gerekmez; `043` migration sonrası nabız sayfaları otomatik yenilenir.
+
+## 2026-06-01 — Ekip Nabzı Faz 5 (tamamlandı)
+
+Supabase Realtime ile nabız verisi anında yenilenir (F1–F4’te ~30sn polling yedek olarak kalır). **Deploy:** `043_pulse_realtime.sql`.
+
+- Publication: `nmm_user_progress`, `nmm_learning_events`, `nmm_video_progress`, `nmm_pulse_weekly_summaries`.
+- `PulseRealtimeSync` → tüm dashboard; sponsor RLS ile downline değişikliklerini de alır.
+
 ## 2026-06-01 — Ekip Nabzı Faz 4 (tamamlandı)
 
 Günlük rollup + haftalık YZ nabız özeti. **Deploy:** `042_pulse_rollup_weekly.sql` (041 sonrası).
