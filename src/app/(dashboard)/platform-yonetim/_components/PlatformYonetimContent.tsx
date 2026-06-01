@@ -640,7 +640,13 @@ export function PlatformYonetimContent() {
                                   ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                                   : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400'
                           }`}>
-                            {w.licenseType}
+                            {w.licenseType === 'pro'
+                              ? t('platformPage.planPro')
+                              : w.licenseType === 'master'
+                                ? t('platformPage.planMaster')
+                                : w.licenseType === 'leader'
+                                  ? t('platformPage.planLeader')
+                                  : t('platformPage.planFree')}
                           </span>
                         </td>
 

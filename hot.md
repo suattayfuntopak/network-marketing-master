@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-01 — Yönetim tablosu lisans rozeti yerelleştirildi
+
+- Yönetim paneli leader tablosundaki **Lisans Paketi** rozeti ham `licenseType` (FREE/MASTER)
+  yerine yerel ada çevrildi → istatistiklerle parite: `free→Ücretsiz`, `leader→Basic`,
+  `master→Plus`, `pro→Pro` (EN: Free/Basic/Plus/Pro). Yeni `platformPage.plan*` anahtarları.
+- tsc temiz.
+
 ## 2026-06-01 — Lisans modal: plan adları + Süresiz toggle düzeltme
 
 - **Lisans Paketi Seviyesi dropdown** plan adlarıyla hizalandı (landing/ödeme ile birebir):
