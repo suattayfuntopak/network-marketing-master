@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, FileText, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -8,7 +7,6 @@ import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function TermsPage() {
   const { lang } = useTranslation()
-  const [activeSection, setActiveSection] = useState('t1')
 
   const content = {
     tr: {

@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, ShieldCheck, Lock, FileText, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, ShieldCheck, Lock, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function SecurityPage() {
   const { lang } = useTranslation()
-  const [activeSection, setActiveSection] = useState('s1')
 
   const content = {
     tr: {

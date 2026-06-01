@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageSquare, Target, HelpCircle } from 'lucide-react'
+import { MessageSquare, HelpCircle } from 'lucide-react'
 import { YazarForm } from './YazarForm'
-import { ProvaForm } from './ProvaForm'
 import { KoclukForm } from './KoclukForm'
 import { useTranslation } from '@/providers/LanguageProvider'
 

@@ -20,7 +20,7 @@ import {
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
-import { useTeamMembers, useEkipPanelRows } from '@/hooks/useTeamMembers'
+import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'

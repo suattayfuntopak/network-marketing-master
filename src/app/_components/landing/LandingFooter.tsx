@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { Mail, ShieldCheck, Activity, Terminal } from 'lucide-react'
+import { Mail } from 'lucide-react'
 
 export function LandingFooter() {
   const { lang, t } = useTranslation()

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { clsx } from 'clsx'
 import {
   Shield, CheckCircle2, AlertTriangle, XCircle, Copy, Info,
-  Sparkles, Check, RefreshCw, ChevronRight, HelpCircle, ArrowRight
+  Sparkles, Check, RefreshCw, HelpCircle, ArrowRight
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { auditComplianceMessageAction, type ComplianceAuditState } from './actions'

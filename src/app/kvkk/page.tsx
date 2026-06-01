@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Shield, Lock, FileText, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Shield, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function KVKKPage() {
-  const { lang, t } = useTranslation()
-  const [activeSection, setActiveSection] = useState('p1')
+  const { lang } = useTranslation()
 
   const content = {
     tr: {

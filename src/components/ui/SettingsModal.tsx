@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Settings, Layout, Sun, Moon, Monitor, Loader2, Save } from 'lucide-react'
+import { X, Layout, Sun, Moon, Monitor, Loader2, Save } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'

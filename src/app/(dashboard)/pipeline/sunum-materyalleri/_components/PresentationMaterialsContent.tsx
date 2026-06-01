@@ -9,7 +9,6 @@ import {
   Link2,
   Plus,
   Presentation,
-  Sparkles,
   Trash2,
   Pencil,
   Check,

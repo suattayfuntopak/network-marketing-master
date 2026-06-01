@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { 
-  Zap, Phone, Shield, BarChart3, Target, Clock, Users, RefreshCw,
-  MessageSquare, UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, X, Loader2,
+import {
+  Phone, Shield, BarChart3, Target, Clock, Users, RefreshCw,
+  UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, Loader2,
   Compass
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'

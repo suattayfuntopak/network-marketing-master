@@ -1,4 +1,4 @@
-import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate } from '@/types/database.types'
+import type { NmmCandidateInsert, NmmCandidateUpdate } from '@/types/database.types'
 import { parseNote, formatSimpleNote } from '@/lib/utils/noteParser'
 
 export type CandidateWarmth = 'sicak' | 'ilik' | 'soguk'

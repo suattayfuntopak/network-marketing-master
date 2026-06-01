@@ -1,7 +1,6 @@
 'use server'
 
 import { generateMessage } from '@/lib/ai/generateMessage'
-import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
 
