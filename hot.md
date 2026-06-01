@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-01 — Havale kartı: kopya ikonu sade + plan seçici + QR regen notu
+
+Havale/EFT kartında (paylaşılan `src/components/payment/BankTransferCard.tsx`):
+
+1. **Kopya butonu sadeleşti:** "IBAN'ı Kopyala" yazısı kaldırıldı → sadece kopya ikonu,
+   IBAN satırı hizasında, IBAN numarası ile (masaüstü) QR'ın sol duvarı arasına ortalandı
+   (`flex-1 justify-center`). Hem landing hem /odeme (tek bileşen).
+2. **Plan seçici (öneri #2):** "Ödedim, Bildir" üstünde opsiyonel Basic/Plus/Pro pill'leri;
+   seçilirse bildirim e-postasına **"Talep edilen plan"** eklenir → admin tahmin etmez.
+   `notifyBankTransferAction(plan?)` + `sendBankTransferNotifyEmail(..., intendedPlan?)`.
+   Sadece dashboard variant'ta (anonim landing'de yok). Migration yok.
+3. **QR regen notu (öneri #3):** `bankTransfer.ts` — IBAN değişirse QR'ı yeniden üretme
+   komutu yorum olarak eklendi.
+4. **Öneri #1 (tam onay kuyruğu) ERTELENDİ:** Mevcut e-posta bildirimi + Platform Yönetimi
+   lisans paneli döngüyü zaten kapatıyor; geçici (şimdilik `BANK_TRANSFER_ENABLED=false`,
+   Shopier bekleniyor) bir kanal için migration+storage+kuyruk gereksiz tekrar olurdu.
+
+- Flag hâlâ `false` (Shopier başvurusu) — kod hazır, `true` yapınca görünür.
+- tsc temiz, lint temiz, 86 test geçti.
+
 ## 2026-06-01 — Yusuf dış kayıt + nabız font + arşiv fallback
 
 - **Dış kayıt masası:** Platform Masası ile aynı filtre (`parent_id` boş); ekibe üye olsa bile Yusuf Emre listelenir.

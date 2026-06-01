@@ -14,10 +14,13 @@ interface BankTransferCardProps {
   variant?: Variant
   /**
    * Verilirse "Ödedim, Bildir" butonu bunu çağırır (giriş yapmış kullanıcı → super admin'e
-   * otomatik e-posta). Verilmezse e-posta butonu klasik `mailto:` olur (anonim ziyaretçi).
+   * otomatik e-posta). Opsiyonel olarak seçilen plan iletilir. Verilmezse e-posta butonu
+   * klasik `mailto:` olur (anonim ziyaretçi).
    */
-  onNotify?: () => Promise<boolean>
+  onNotify?: (plan?: 'leader' | 'master' | 'pro') => Promise<boolean>
 }
+
+type PlanCode = 'leader' | 'master' | 'pro'
 
 /** Variant'a göre nötr palet; vurgu (emerald + WhatsApp yeşili) her ikisinde ortak. */
 function tokens(variant: Variant) {
@@ -50,6 +53,7 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
   const [copied, setCopied] = useState(false)
   const [notifying, setNotifying] = useState(false)
   const [notified, setNotified] = useState(false)
+  const [plan, setPlan] = useState<PlanCode | null>(null)
   const tk = tokens(variant)
 
   const copyIban = () => {
@@ -67,7 +71,7 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
     if (!onNotify || notifying || notified) return
     setNotifying(true)
     try {
-      const ok = await onNotify()
+      const ok = await onNotify(plan ?? undefined)
       if (ok) {
         setNotified(true)
         toast.success(t('paymentPage.bankNotifiedToast'))
@@ -117,30 +121,34 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
       <div className="mt-6 grid gap-5 lg:grid-cols-2 items-stretch">
         {/* Sol: IBAN + (masaüstü) QR */}
         <div className={`flex flex-col rounded-2xl border p-5 ${tk.innerBorder} ${tk.innerBg}`}>
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
             <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className={`text-[10px] font-bold uppercase tracking-wider ${tk.muted}`}>
-                  IBAN
-                </span>
-                <button
-                  type="button"
-                  onClick={copyIban}
-                  className={`shrink-0 inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition active:scale-95 cursor-pointer ${tk.btn}`}
+              <span className={`block text-[10px] font-bold uppercase tracking-wider ${tk.muted}`}>
+                IBAN
+              </span>
+              {/* IBAN satırı: numara — (ortada) kopya ikonu — QR sol duvarı */}
+              <div className="mt-2 flex items-center gap-3">
+                <p
+                  className={`min-w-0 font-mono text-[13px] sm:text-base font-bold tracking-tight whitespace-nowrap overflow-x-auto scrollbar-none select-all ${tk.text1}`}
                 >
-                  {copied ? (
-                    <Check className="h-3.5 w-3.5 text-emerald-500" />
-                  ) : (
-                    <Copy className={`h-3.5 w-3.5 ${tk.muted}`} />
-                  )}
-                  <span className="hidden sm:inline">{t('paymentPage.bankIbanCopy')}</span>
-                </button>
+                  {BANK_TRANSFER_INFO.iban}
+                </p>
+                <div className="flex flex-1 justify-center">
+                  <button
+                    type="button"
+                    onClick={copyIban}
+                    aria-label={t('paymentPage.bankIbanCopy')}
+                    title={t('paymentPage.bankIbanCopy')}
+                    className={`shrink-0 inline-flex items-center justify-center rounded-lg border p-2 transition active:scale-95 cursor-pointer ${tk.btn}`}
+                  >
+                    {copied ? (
+                      <Check className="h-4 w-4 text-emerald-500" />
+                    ) : (
+                      <Copy className={`h-4 w-4 ${tk.muted}`} />
+                    )}
+                  </button>
+                </div>
               </div>
-              <p
-                className={`mt-2 font-mono text-[13px] sm:text-base font-bold tracking-tight whitespace-nowrap overflow-x-auto scrollbar-none select-all ${tk.text1}`}
-              >
-                {BANK_TRANSFER_INFO.iban}
-              </p>
             </div>
 
             {/* QR — yalnızca masaüstü: telefon bankacılığıyla ekranı taramak için */}
@@ -183,18 +191,53 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
             ))}
           </ol>
 
-          <div className="mt-auto pt-5 flex flex-col sm:flex-row gap-2.5">
-            <a
-              href={waHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white transition hover:opacity-90 active:scale-95"
-            >
-              <WhatsAppIcon className="h-4 w-4" />
-              {t('paymentPage.bankNotifyWhatsapp')}
-            </a>
+          <div className="mt-auto pt-5 space-y-3">
+            {/* Opsiyonel plan seçimi — bildirim e-postasına "talep edilen plan" eklenir */}
+            {onNotify && (
+              <div>
+                <p className={`text-[11px] font-semibold ${tk.text3}`}>
+                  {t('paymentPage.bankPlanQuestion')}
+                </p>
+                <div className="mt-1.5 grid grid-cols-3 gap-1.5">
+                  {(['leader', 'master', 'pro'] as const).map((p) => {
+                    const label =
+                      p === 'leader'
+                        ? t('paymentPage.bankPlanBasic')
+                        : p === 'master'
+                          ? t('paymentPage.bankPlanPlus')
+                          : t('paymentPage.bankPlanPro')
+                    const active = plan === p
+                    return (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setPlan(active ? null : p)}
+                        className={`rounded-lg border px-2 py-1.5 text-[11px] font-bold transition active:scale-95 cursor-pointer ${
+                          active
+                            ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                            : tk.btn
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
-            {onNotify ? (
+            <div className="flex flex-col sm:flex-row gap-2.5">
+              <a
+                href={waHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white transition hover:opacity-90 active:scale-95"
+              >
+                <WhatsAppIcon className="h-4 w-4" />
+                {t('paymentPage.bankNotifyWhatsapp')}
+              </a>
+
+              {onNotify ? (
               <button
                 type="button"
                 onClick={handleNotify}
@@ -218,7 +261,8 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
                 <Mail className={`h-4 w-4 ${tk.muted}`} />
                 {t('paymentPage.bankNotifyEmail')}
               </a>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -19,7 +19,15 @@ export async function initiateShopierPayment(
  * yapılandırılmış e-posta bildirimi gönderir. Kullanıcının kayıtlı e-postası otomatik
  * eklenir. Migration yok — mevcut Resend altyapısını kullanır.
  */
-export async function notifyBankTransferAction(): Promise<boolean> {
+const INTENDED_PLAN_LABEL: Record<'leader' | 'master' | 'pro', string> = {
+  leader: 'Basic Partner',
+  master: 'Plus Lider',
+  pro: 'Pro Lider',
+}
+
+export async function notifyBankTransferAction(
+  intendedPlan?: 'leader' | 'master' | 'pro',
+): Promise<boolean> {
   const supabase = await createClient()
   const {
     data: { user },
@@ -37,5 +45,11 @@ export async function notifyBankTransferAction(): Promise<boolean> {
     .eq('owner_id', user.id)
     .maybeSingle()
 
-  return sendBankTransferNotifyEmail(user.email, name, ws?.name ?? null, ws?.license_type ?? 'free')
+  return sendBankTransferNotifyEmail(
+    user.email,
+    name,
+    ws?.name ?? null,
+    ws?.license_type ?? 'free',
+    intendedPlan ? INTENDED_PLAN_LABEL[intendedPlan] : null,
+  )
 }

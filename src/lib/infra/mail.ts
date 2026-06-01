@@ -448,6 +448,7 @@ export async function sendBankTransferNotifyEmail(
   userName: string,
   workspaceName: string | null,
   currentPlan: string,
+  intendedPlan?: string | null,
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn('[Resend] Skipping sendBankTransferNotifyEmail: RESEND_API_KEY is not defined.')
@@ -466,6 +467,7 @@ export async function sendBankTransferNotifyEmail(
         `<strong>Kayıtlı e-posta:</strong> ${userEmail}`,
         workspaceName ? `<strong>Çalışma alanı:</strong> ${workspaceName}` : '',
         `<strong>Mevcut plan:</strong> ${currentPlan}`,
+        intendedPlan ? `<strong>Talep edilen plan:</strong> ${intendedPlan}` : '',
         `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
       ].filter(Boolean),
     ),
