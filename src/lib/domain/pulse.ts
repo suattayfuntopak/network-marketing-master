@@ -1,3 +1,10 @@
+import { TRAINING_VIDEOS } from '@/lib/domain/trainingVideos'
+import {
+  summarizeVideoProgress,
+  videoDropoffCount,
+  type VideoProgressSummary,
+} from '@/lib/domain/videoProgress'
+
 /** Canonical content counts (F1 — static library sizes). */
 export const CANONICAL_TRAINING_COUNT = 30
 export const CANONICAL_OBJECTION_COUNT = 34
@@ -139,6 +146,38 @@ export type PulseAttentionFlag =
   | 'inactive'
   | 'low_training'
   | 'objections_gap'
+
+/** Nabız verisi yok veya sorgu hata verdiğinde UI sıfır gösterir. */
+export function emptyMyPulseSummary(period: PulsePeriod): {
+  learning: LearningProgressSummary
+  periodLearning: PeriodLearningSummary | null
+  onboardingDone: number
+  field: FieldEngagementSummary
+  streakDays: number
+  video: VideoProgressSummary
+  videoDropoff: number
+} {
+  const video = summarizeVideoProgress(
+    TRAINING_VIDEOS.map(v => v.key),
+    {}
+  )
+  return {
+    learning: parseLearningProgress(null),
+    periodLearning: period === 'all' ? null : { trainingReads: 0, objectionReads: 0 },
+    onboardingDone: 0,
+    field: {
+      newCandidates: 0,
+      calls: 0,
+      whatsapps: 0,
+      presentationsSent: 0,
+      appointmentsSet: 0,
+      appointmentsDone: 0,
+    },
+    streakDays: 0,
+    video,
+    videoDropoff: videoDropoffCount(video),
+  }
+}
 
 export function computeAttentionFlags(input: {
   trainingPct: number

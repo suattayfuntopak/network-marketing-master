@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import {
   ONBOARDING_STEP_COUNT,
+  emptyMyPulseSummary,
   parseLearningProgress,
   periodStartIso,
   computeLearningStreak,
@@ -70,6 +71,18 @@ function countEngagement(
 }
 
 export async function getMyPulseSummaryAction(
+  workspaceId: string,
+  period: PulsePeriod
+): Promise<MyPulseSummary> {
+  try {
+    return await buildMyPulseSummary(workspaceId, period)
+  } catch (err) {
+    console.error('[getMyPulseSummary]', err)
+    return emptyMyPulseSummary(period)
+  }
+}
+
+async function buildMyPulseSummary(
   workspaceId: string,
   period: PulsePeriod
 ): Promise<MyPulseSummary> {

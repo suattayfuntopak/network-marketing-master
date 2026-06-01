@@ -5,7 +5,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Activity, Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { ONBOARDING_STEP_COUNT, type PulsePeriod } from '@/lib/domain/pulse'
+import {
+  ONBOARDING_STEP_COUNT,
+  emptyMyPulseSummary,
+  type PulsePeriod,
+} from '@/lib/domain/pulse'
 import { getMyPulseSummaryAction } from '@/app/(dashboard)/pulse/actions'
 import { PulseKpiCard } from './PulseKpiCard'
 import { PulseDisclaimer } from './PulseDisclaimer'
@@ -32,14 +36,18 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
   const { data: ws } = useWorkspace()
   const [period, setPeriod] = useState<PulsePeriod>('30d')
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['pulse-my', ws?.workspaceId, period],
     queryFn: () => getMyPulseSummaryAction(ws!.workspaceId, period),
     enabled: !!ws?.workspaceId,
     staleTime: 30_000,
+    retry: 1,
   })
 
   if (!ws?.workspaceId) return null
+
+  const display = data ?? emptyMyPulseSummary(period)
+  const showFallbackNote = isError || (!isLoading && !data)
 
   const titleCls = comfortableTypography
     ? 'text-lg font-bold text-[var(--text-1)] flex items-center gap-2'
@@ -81,13 +89,19 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
         </div>
       </header>
 
-      {data && data.streakDays > 0 && (
+      {showFallbackNote && (
+        <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
+          {t('statsPage.pulseLoadFallback')}
+        </p>
+      )}
+
+      {display.streakDays > 0 && (
         <div
           className={`flex items-center gap-2 rounded-xl border border-amber-500/20 bg-amber-500/5 px-3 py-2 text-amber-800 dark:text-amber-200 ${comfortableTypography ? 'text-sm' : 'text-xs'}`}
         >
           <Flame className="h-4 w-4 shrink-0 text-amber-600" />
           <span className="font-semibold">{t('pulse.streak')}</span>
-          <span>{t('pulse.streakDays', { count: data.streakDays })}</span>
+          <span>{t('pulse.streakDays', { count: display.streakDays })}</span>
         </div>
       )}
 
@@ -96,52 +110,52 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
       <p className={`${noteCls} text-[var(--text-3)]`}>{t('pulse.allTimeNote')}</p>
       <p className={`${noteCls} text-[var(--text-3)] -mt-2`}>{t('pulse.periodFieldNote')}</p>
 
-      {isLoading ? (
+      {isLoading || (isFetching && !data) ? (
         <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           {[1, 2, 3, 4].map(i => (
             <Skeleton key={i} className="h-24 rounded-2xl" />
           ))}
         </div>
-      ) : data ? (
+      ) : (
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <PulseKpiCard
               comfortableTypography={comfortableTypography}
               label={t('pulse.training')}
-              primary={`${data.learning.trainingRead} / 30`}
-              secondary={`${data.learning.trainingPct}%`}
-              pct={data.learning.trainingPct}
+              primary={`${display.learning.trainingRead} / 30`}
+              secondary={`${display.learning.trainingPct}%`}
+              pct={display.learning.trainingPct}
             />
             <PulseKpiCard
               comfortableTypography={comfortableTypography}
               label={t('pulse.objections')}
-              primary={`${data.learning.objectionRead} / 34`}
-              secondary={`${data.learning.objectionPct}%`}
-              pct={data.learning.objectionPct}
+              primary={`${display.learning.objectionRead} / 34`}
+              secondary={`${display.learning.objectionPct}%`}
+              pct={display.learning.objectionPct}
             />
             <PulseKpiCard
               comfortableTypography={comfortableTypography}
               label={t('pulse.trainingFav')}
-              primary={String(data.learning.trainingFav)}
+              primary={String(display.learning.trainingFav)}
             />
             <PulseKpiCard
               comfortableTypography={comfortableTypography}
               label={t('pulse.objectionFav')}
-              primary={String(data.learning.objectionFav)}
+              primary={String(display.learning.objectionFav)}
             />
           </div>
 
-          {data.periodLearning && (
+          {display.periodLearning && (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={`${t('pulse.periodReads')} · ${t('pulse.training')}`}
-                primary={String(data.periodLearning.trainingReads)}
+                primary={String(display.periodLearning.trainingReads)}
               />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={`${t('pulse.periodReads')} · ${t('pulse.objections')}`}
-                primary={String(data.periodLearning.objectionReads)}
+                primary={String(display.periodLearning.objectionReads)}
               />
             </div>
           )}
@@ -151,23 +165,23 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
               comfortableTypography={comfortableTypography}
               label={t('pulse.onboarding')}
               primary={t('pulse.onboardingSteps', {
-                done: data.onboardingDone,
+                done: display.onboardingDone,
                 total: ONBOARDING_STEP_COUNT,
               })}
-              pct={Math.round((data.onboardingDone / ONBOARDING_STEP_COUNT) * 100)}
+              pct={Math.round((display.onboardingDone / ONBOARDING_STEP_COUNT) * 100)}
             />
             <PulseKpiCard
               comfortableTypography={comfortableTypography}
               label={t('pulse.videos')}
-              primary={`${data.video.completed} / ${data.video.total}`}
-              secondary={`${data.video.pct}%`}
-              pct={data.video.pct}
+              primary={`${display.video.completed} / ${display.video.total}`}
+              secondary={`${display.video.pct}%`}
+              pct={display.video.pct}
             />
-            {data.videoDropoff > 0 && (
+            {display.videoDropoff > 0 && (
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.videoDropoff')}
-                primary={String(data.videoDropoff)}
+                primary={String(display.videoDropoff)}
               />
             )}
           </div>
@@ -178,35 +192,37 @@ export function PulseMySection({ comfortableTypography = false }: Props) {
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.newCandidates')}
-                primary={String(data.field.newCandidates)}
+                primary={String(display.field.newCandidates)}
               />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
-                label={t('pulse.calls')} primary={String(data.field.calls)} />
+                label={t('pulse.calls')}
+                primary={String(display.field.calls)}
+              />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.whatsapps')}
-                primary={String(data.field.whatsapps)}
+                primary={String(display.field.whatsapps)}
               />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.presentationsSent')}
-                primary={String(data.field.presentationsSent)}
+                primary={String(display.field.presentationsSent)}
               />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.appointmentsSet')}
-                primary={String(data.field.appointmentsSet)}
+                primary={String(display.field.appointmentsSet)}
               />
               <PulseKpiCard
                 comfortableTypography={comfortableTypography}
                 label={t('pulse.appointmentsDone')}
-                primary={String(data.field.appointmentsDone)}
+                primary={String(display.field.appointmentsDone)}
               />
             </div>
           </div>
         </>
-      ) : null}
+      )}
 
       <PulseDisclaimer comfortableTypography={comfortableTypography} />
     </section>

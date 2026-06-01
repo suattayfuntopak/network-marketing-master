@@ -111,6 +111,10 @@ export const statsSection = {
       archiveColTotal: 'Toplam',
       archiveTagInvited: 'Davetli alt ekip',
       archiveEmpty: 'Seçilen dönemde kayıtlı YZ kullanımı yok.',
+      archiveUnavailable:
+        'Arşiv verisi şu an yüklenemedi. Migration 029–030 uygulandıysa bir süre sonra yenileyin.',
+      pulseLoadFallback:
+        'Nabız verisi tam yüklenemedi; kutularda sıfır gösteriliyor. Sayfayı yenileyin veya birkaç dakika sonra tekrar deneyin.',
       archiveRange: '{from} — {to} arası',
       archiveRangeAll: 'Tüm kayıtlar ({to} tarihine kadar)',
     },
@@ -227,6 +231,10 @@ export const statsSection = {
       archiveColTotal: 'Total',
       archiveTagInvited: 'Invited downline',
       archiveEmpty: 'No AI usage recorded for this period.',
+      archiveUnavailable:
+        'Archive data could not be loaded. If migrations 029–030 are applied, try again shortly.',
+      pulseLoadFallback:
+        'Pulse data could not load fully; showing zeros. Refresh or try again in a few minutes.',
       archiveRange: '{from} — {to}',
       archiveRangeAll: 'All records (through {to})',
     },

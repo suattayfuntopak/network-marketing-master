@@ -36,11 +36,13 @@ export function StatsSuperAdminSections({
 
   const memberUserIds = useMemo(() => sortedMembers.map(m => m.user_id), [sortedMembers])
 
-  const { data: independentUsage = [], isLoading: independentLoading } = useQuery({
-    queryKey: ['independent-ai-usage'],
-    queryFn: getIndependentSignupAIUsageAction,
-    staleTime: 60_000,
-  })
+  const { data: independentUsage = [], isLoading: independentLoading, isError: independentError } =
+    useQuery({
+      queryKey: ['independent-ai-usage'],
+      queryFn: getIndependentSignupAIUsageAction,
+      staleTime: 60_000,
+      retry: 1,
+    })
 
   const { data: memberLicenses = {} } = useQuery({
     queryKey: ['member-license-profiles', memberUserIds],
@@ -171,6 +173,12 @@ export function StatsSuperAdminSections({
             {t('statsPage.aiIndependentSubtitle')}
           </p>
         </div>
+
+        {independentError && (
+          <p className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-3 py-2 text-sm text-amber-900 dark:text-amber-100">
+            {t('statsPage.pulseLoadFallback')}
+          </p>
+        )}
 
         {independentLoading ? (
           <p className="text-sm text-[var(--text-3)] py-4 text-center">…</p>

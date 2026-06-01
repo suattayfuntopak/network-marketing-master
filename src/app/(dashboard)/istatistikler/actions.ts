@@ -67,7 +67,8 @@ export async function getIndependentSignupAIUsageAction(): Promise<IndependentAI
     .order('created_at', { ascending: false })
 
   if (wsError || !workspaces) {
-    throw new Error('Dış kayıt listesi okunamadı.')
+    console.error('[getIndependentSignupAIUsage]', wsError)
+    return []
   }
 
   const ownerIds = workspaces
@@ -272,11 +273,61 @@ export interface AIUsageArchiveSummary {
     compliance: number
     users: number
   }
+  unavailable?: boolean
+}
+
+const EMPTY_ARCHIVE_TOTALS = {
+  message: 0,
+  roleplay: 0,
+  compliance: 0,
+  users: 0,
+} as const
+
+function emptyArchiveSummary(
+  period: AIUsageArchivePeriod,
+  unavailable = false
+): AIUsageArchiveSummary {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const toDate = today.toISOString().slice(0, 10)
+  let fromDate: string | null = null
+  if (period === '7d') {
+    const d = new Date(today)
+    d.setDate(d.getDate() - 6)
+    fromDate = d.toISOString().slice(0, 10)
+  } else if (period === '30d') {
+    const d = new Date(today)
+    d.setDate(d.getDate() - 29)
+    fromDate = d.toISOString().slice(0, 10)
+  } else if (period === '365d') {
+    const d = new Date(today)
+    d.setDate(d.getDate() - 364)
+    fromDate = d.toISOString().slice(0, 10)
+  }
+  return {
+    period,
+    fromDate,
+    toDate,
+    rows: [],
+    totals: { ...EMPTY_ARCHIVE_TOTALS },
+    unavailable,
+  }
 }
 
 /** Super-admin: günlük roll-up tablosundan dönem bazlı YZ kullanım arşivi. */
 export async function getAIUsageArchiveAction(
   period: AIUsageArchivePeriod = '30d'
+): Promise<AIUsageArchiveSummary> {
+  try {
+    return await buildAIUsageArchive(period)
+  } catch (err) {
+    console.error('[getAIUsageArchive]', err)
+    return emptyArchiveSummary(period, true)
+  }
+}
+
+async function buildAIUsageArchive(
+  period: AIUsageArchivePeriod
 ): Promise<AIUsageArchiveSummary> {
   const supabase = await createClient()
   const {
@@ -339,13 +390,7 @@ export async function getAIUsageArchiveAction(
 
   const userIds = [...byUser.keys()]
   if (userIds.length === 0) {
-    return {
-      period,
-      fromDate,
-      toDate,
-      rows: [],
-      totals: { message: 0, roleplay: 0, compliance: 0, users: 0 },
-    }
+    return emptyArchiveSummary(period)
   }
 
   const { data: listData } = await admin.auth.admin.listUsers({ perPage: 200 })

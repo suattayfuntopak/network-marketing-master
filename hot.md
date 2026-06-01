@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-01 — İstatistikler nabız/arşiv boş & hata durumu
+
+- **Ekip Nabzı** (`pulse.myTitle`): istatistiklerdeki nabız bölümü başlığı güncellendi.
+- **4 KPI kutusu** veri/hata yokken de görünür (`emptyMyPulseSummary` + `PulseMySection` fallback).
+- **YZ Kullanım Arşivi:** sunucu hatası yerine 0 özet + uyarı; kırmızı Server Components kutusu kalkar.
+- `getMyPulseSummaryAction` / `getAIUsageArchiveAction` try-catch ile güvenli dönüş.
+
 ## 2026-06-01 — İstatistikler tipografi + çıkış düzeltmesi
 
 - **İstatistikler** (`istatistikler/_components/*`, `PulseMySection` + `comfortableTypography`): tüm metinler ~1 punto büyütüldü; diğer sayfalar etkilenmedi.
