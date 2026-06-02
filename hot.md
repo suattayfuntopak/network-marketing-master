@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-02 — Video kataloğu Supabase'e taşındı + super-admin CRUD
+
+- **Migration 047** `nmm_training_videos` (key/youtube_id/title_tr-en/desc/duration/category/sort_order)
+  + RLS (okuma: authenticated, yazma: super admin e-posta) + 6 placeholder video seed. MANUEL uygulanacak.
+- **videoActions.ts** DB-tabanlı: getTrainingVideosAction, getVideoCatalogAction artık DB'den okur;
+  mark*/team summary DB anahtarlarıyla; tamamlanma sayısı dinamik. Super-admin CRUD:
+  createTrainingVideoAction/updateTrainingVideoAction/deleteTrainingVideoAction (assertSuperAdmin +
+  admin client). YouTube URL→ID çıkarıcı.
+- **UI:** VideolarContent'e super-admin-only ➕ ekle butonu (başlıkta) + her kartta yazısız ✏️/🗑️
+  (TrainingVideoCard isAdmin/onEdit/onDelete). Yeni **VideoEditModal** (TR/EN başlık+açıklama,
+  süre, kategori, sıra, ilgili konu). database.types.ts'e tablo eklendi.
+- tsc temiz, 107 test, lint temiz. (pulse.ts boş-durum statik fallback'i korundu.)
+
 ## 2026-06-02 — Sticky header GERÇEK fix + video sayfa metin/genişlik + landing pro kart
 
 - **Sticky header asıl sebep:** `globals.css` `html, body { overflow-x: hidden }` →

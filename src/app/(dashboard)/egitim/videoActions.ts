@@ -1,12 +1,9 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import {
-  CANONICAL_VIDEO_COUNT,
-  TRAINING_VIDEOS,
-  getTrainingVideoByKey,
-  type TrainingVideoDef,
-} from '@/lib/domain/trainingVideos'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { assertSuperAdmin } from '@/lib/domain/auth'
+import { type TrainingVideoDef } from '@/lib/domain/trainingVideos'
 import {
   summarizeVideoProgress,
   type VideoProgressRow,
@@ -15,10 +12,64 @@ import {
 
 export type VideoProgressMap = Record<string, VideoProgressRow>
 
+/** DB satırı + id/sortOrder ile zenginleştirilmiş video tanımı (admin düzenleme için). */
+export type TrainingVideoAdmin = TrainingVideoDef & { id: string; sortOrder: number }
+
 export type VideoCatalogPayload = {
-  videos: TrainingVideoDef[]
+  videos: TrainingVideoAdmin[]
   progressByKey: VideoProgressMap
   summary: VideoProgressSummary
+}
+
+type VideoRow = {
+  id: string
+  key: string
+  youtube_id: string
+  title_tr: string
+  title_en: string
+  description_tr: string
+  description_en: string
+  duration_min: number
+  category_tr: string
+  category_en: string
+  related_training_id: string | null
+  sort_order: number
+}
+
+const VIDEO_COLS =
+  'id, key, youtube_id, title_tr, title_en, description_tr, description_en, duration_min, category_tr, category_en, related_training_id, sort_order'
+
+function rowToDef(r: VideoRow): TrainingVideoAdmin {
+  return {
+    id: r.id,
+    key: r.key,
+    youtubeId: r.youtube_id,
+    titleTr: r.title_tr,
+    titleEn: r.title_en,
+    descriptionTr: r.description_tr,
+    descriptionEn: r.description_en,
+    durationMin: r.duration_min,
+    categoryTr: r.category_tr,
+    categoryEn: r.category_en,
+    relatedTrainingId: r.related_training_id ?? undefined,
+    sortOrder: r.sort_order,
+  }
+}
+
+/** YouTube URL'sinden (veya ham id'den) 11 karakterlik video id'sini çıkarır. */
+function extractYoutubeId(input: string): string {
+  const raw = input.trim()
+  const patterns = [
+    /youtu\.be\/([A-Za-z0-9_-]{11})/,
+    /[?&]v=([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/embed\/([A-Za-z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([A-Za-z0-9_-]{11})/,
+  ]
+  for (const p of patterns) {
+    const m = raw.match(p)
+    if (m) return m[1]
+  }
+  return raw.replace(/[^A-Za-z0-9_-]/g, '').slice(0, 11)
 }
 
 async function assertMember(workspaceId: string) {
@@ -54,30 +105,69 @@ function rowsToMap(rows: VideoProgressRow[]): VideoProgressMap {
   return map
 }
 
+/** Public video kataloğu (sort_order'a göre) — sayfa + admin için. */
+export async function getTrainingVideosAction(): Promise<TrainingVideoAdmin[]> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_training_videos')
+    .select(VIDEO_COLS)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+  return ((data ?? []) as VideoRow[]).map(rowToDef)
+}
+
+async function fetchVideoByKey(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  key: string
+): Promise<VideoRow | null> {
+  const { data } = await supabase
+    .from('nmm_training_videos')
+    .select(VIDEO_COLS)
+    .eq('key', key)
+    .maybeSingle()
+  return (data as VideoRow | null) ?? null
+}
+
+async function countVideos(
+  supabase: Awaited<ReturnType<typeof createClient>>
+): Promise<number> {
+  const { count } = await supabase
+    .from('nmm_training_videos')
+    .select('id', { count: 'exact', head: true })
+  return count ?? 0
+}
+
 export async function getVideoCatalogAction(workspaceId: string): Promise<VideoCatalogPayload> {
   const { supabase, user } = await assertMember(workspaceId)
 
-  const { data: rows } = await supabase
-    .from('nmm_video_progress')
-    .select('video_key, status, watch_percent, position_sec, duration_sec, started_at, completed_at')
-    .eq('user_id', user.id)
+  const [{ data: videoRows }, { data: rows }] = await Promise.all([
+    supabase
+      .from('nmm_training_videos')
+      .select(VIDEO_COLS)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('nmm_video_progress')
+      .select('video_key, status, watch_percent, position_sec, duration_sec, started_at, completed_at')
+      .eq('user_id', user.id),
+  ])
 
+  const videos = ((videoRows ?? []) as VideoRow[]).map(rowToDef)
   const progressByKey = rowsToMap((rows ?? []) as VideoProgressRow[])
-  const keys = TRAINING_VIDEOS.map(v => v.key)
+  const keys = videos.map(v => v.key)
   const summary = summarizeVideoProgress(keys, progressByKey)
 
-  return { videos: TRAINING_VIDEOS, progressByKey, summary }
+  return { videos, progressByKey, summary }
 }
 
 export async function markVideoStartedAction(
   workspaceId: string,
   videoKey: string
 ): Promise<void> {
-  if (!getTrainingVideoByKey(videoKey)) throw new Error('Geçersiz video.')
-
   const { supabase, user } = await assertMember(workspaceId)
-  const video = getTrainingVideoByKey(videoKey)!
-  const durationSec = video.durationMin * 60
+  const video = await fetchVideoByKey(supabase, videoKey)
+  if (!video) throw new Error('Geçersiz video.')
+  const durationSec = video.duration_min * 60
 
   const { data: existing } = await supabase
     .from('nmm_video_progress')
@@ -106,11 +196,10 @@ export async function markVideoCompletedAction(
   workspaceId: string,
   videoKey: string
 ): Promise<void> {
-  if (!getTrainingVideoByKey(videoKey)) throw new Error('Geçersiz video.')
-
   const { supabase, user } = await assertMember(workspaceId)
-  const video = getTrainingVideoByKey(videoKey)!
-  const durationSec = video.durationMin * 60
+  const video = await fetchVideoByKey(supabase, videoKey)
+  if (!video) throw new Error('Geçersiz video.')
+  const durationSec = video.duration_min * 60
   const now = new Date().toISOString()
 
   const { data: priorRows } = await supabase
@@ -138,8 +227,9 @@ export async function markVideoCompletedAction(
     { onConflict: 'user_id,video_key' }
   )
 
-  if (completedBefore === CANONICAL_VIDEO_COUNT - 1) {
-    await maybeNotifyAllVideosComplete(supabase, user.id)
+  const total = await countVideos(supabase)
+  if (total > 0 && completedBefore === total - 1) {
+    await maybeNotifyAllVideosComplete(supabase, user.id, total)
   }
 }
 
@@ -148,12 +238,12 @@ export async function updateVideoWatchPercentAction(
   videoKey: string,
   watchPercent: number
 ): Promise<void> {
-  if (!getTrainingVideoByKey(videoKey)) throw new Error('Geçersiz video.')
   const pct = Math.max(0, Math.min(100, Math.round(watchPercent)))
 
   const { supabase, user } = await assertMember(workspaceId)
-  const video = getTrainingVideoByKey(videoKey)!
-  const durationSec = video.durationMin * 60
+  const video = await fetchVideoByKey(supabase, videoKey)
+  if (!video) throw new Error('Geçersiz video.')
+  const durationSec = video.duration_min * 60
   const positionSec = Math.round((durationSec * pct) / 100)
   const now = new Date().toISOString()
   const completed = pct >= 90
@@ -176,7 +266,8 @@ export async function updateVideoWatchPercentAction(
 
 async function maybeNotifyAllVideosComplete(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  memberUserId: string
+  memberUserId: string,
+  totalVideos: number
 ) {
   const { count } = await supabase
     .from('nmm_video_progress')
@@ -184,7 +275,7 @@ async function maybeNotifyAllVideosComplete(
     .eq('user_id', memberUserId)
     .eq('status', 'completed')
 
-  if ((count ?? 0) < CANONICAL_VIDEO_COUNT) return
+  if ((count ?? 0) < totalVideos) return
 
   const { data: member } = await supabase
     .from('nmm_workspace_members')
@@ -220,7 +311,8 @@ export async function getTeamVideoSummaryMapAction(
   if (memberUserIds.length === 0) return {}
 
   const supabase = await createClient()
-  const keys = TRAINING_VIDEOS.map(v => v.key)
+  const { data: vids } = await supabase.from('nmm_training_videos').select('key')
+  const keys = ((vids ?? []) as { key: string }[]).map(v => v.key)
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
 
   const { data: rows } = await supabase
@@ -241,4 +333,83 @@ export async function getTeamVideoSummaryMapAction(
     result[uid] = summarizeVideoProgress(keys, byUser[uid] ?? {})
   }
   return result
+}
+
+// ───────────────────────── Super Admin CRUD ─────────────────────────
+
+export type VideoInput = {
+  youtubeUrlOrId: string
+  titleTr: string
+  titleEn: string
+  descriptionTr: string
+  descriptionEn: string
+  durationMin: number
+  categoryTr: string
+  categoryEn: string
+  relatedTrainingId?: string | null
+  sortOrder?: number
+}
+
+async function assertAdmin() {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  assertSuperAdmin(user)
+  return createAdminClient()
+}
+
+export async function createTrainingVideoAction(input: VideoInput): Promise<void> {
+  const admin = await assertAdmin()
+  const youtubeId = extractYoutubeId(input.youtubeUrlOrId)
+  if (!youtubeId) throw new Error('Geçerli bir YouTube video bağlantısı/ID girin.')
+  if (!input.titleTr.trim()) throw new Error('Başlık (TR) gerekli.')
+
+  const key = `vid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
+
+  const { error } = await admin.from('nmm_training_videos').insert({
+    key,
+    youtube_id: youtubeId,
+    title_tr: input.titleTr.trim(),
+    title_en: (input.titleEn || input.titleTr).trim(),
+    description_tr: input.descriptionTr.trim(),
+    description_en: input.descriptionEn.trim(),
+    duration_min: Math.max(1, Math.round(input.durationMin || 10)),
+    category_tr: input.categoryTr.trim(),
+    category_en: input.categoryEn.trim(),
+    related_training_id: input.relatedTrainingId || null,
+    sort_order: input.sortOrder ?? 999,
+  })
+  if (error) throw new Error('Video eklenemedi: ' + error.message)
+}
+
+export async function updateTrainingVideoAction(id: string, input: VideoInput): Promise<void> {
+  const admin = await assertAdmin()
+  const youtubeId = extractYoutubeId(input.youtubeUrlOrId)
+  if (!youtubeId) throw new Error('Geçerli bir YouTube video bağlantısı/ID girin.')
+  if (!input.titleTr.trim()) throw new Error('Başlık (TR) gerekli.')
+
+  const { error } = await admin
+    .from('nmm_training_videos')
+    .update({
+      youtube_id: youtubeId,
+      title_tr: input.titleTr.trim(),
+      title_en: (input.titleEn || input.titleTr).trim(),
+      description_tr: input.descriptionTr.trim(),
+      description_en: input.descriptionEn.trim(),
+      duration_min: Math.max(1, Math.round(input.durationMin || 10)),
+      category_tr: input.categoryTr.trim(),
+      category_en: input.categoryEn.trim(),
+      related_training_id: input.relatedTrainingId || null,
+      sort_order: input.sortOrder ?? 999,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+  if (error) throw new Error('Video güncellenemedi: ' + error.message)
+}
+
+export async function deleteTrainingVideoAction(id: string): Promise<void> {
+  const admin = await assertAdmin()
+  const { error } = await admin.from('nmm_training_videos').delete().eq('id', id)
+  if (error) throw new Error('Video silinemedi: ' + error.message)
 }

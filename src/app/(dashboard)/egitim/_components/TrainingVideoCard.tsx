@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, Play } from 'lucide-react'
+import { CheckCircle2, Circle, Play, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { youtubeEmbedUrl } from '@/lib/domain/videoTraining'
@@ -22,9 +22,13 @@ type Props = {
   workspaceId: string
   progress?: VideoProgressRow
   onProgressChange: () => void
+  /** Super admin: yazısız düzenle/sil ikon butonları gösterilir. */
+  isAdmin?: boolean
+  onEdit?: () => void
+  onDelete?: () => void
 }
 
-export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange }: Props) {
+export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, onEdit, onDelete }: Props) {
   const { lang, t } = useTranslation()
   const [busy, setBusy] = useState(false)
   const [showEmbed, setShowEmbed] = useState(false)
@@ -60,6 +64,28 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             </p>
           </div>
           <div className="flex items-center gap-1.5">
+            {isAdmin && (
+              <>
+                <button
+                  type="button"
+                  onClick={onEdit}
+                  title="Düzenle"
+                  aria-label="Videoyu düzenle"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-3)] hover:bg-[var(--bg-subtle)] hover:text-brand transition"
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={onDelete}
+                  title="Sil"
+                  aria-label="Videoyu sil"
+                  className="flex h-7 w-7 items-center justify-center rounded-lg text-[var(--text-3)] hover:bg-red-500/10 hover:text-red-500 transition"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </>
+            )}
             {isCompleted ? (
               <CheckCircle2 className="h-5 w-5 text-emerald-500" />
             ) : isStarted ? (

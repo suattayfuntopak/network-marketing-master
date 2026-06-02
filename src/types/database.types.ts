@@ -392,6 +392,57 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_training_videos: {
+        Row: {
+          id: string
+          key: string
+          youtube_id: string
+          title_tr: string
+          title_en: string
+          description_tr: string
+          description_en: string
+          duration_min: number
+          category_tr: string
+          category_en: string
+          related_training_id: string | null
+          sort_order: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          youtube_id: string
+          title_tr: string
+          title_en?: string
+          description_tr?: string
+          description_en?: string
+          duration_min?: number
+          category_tr?: string
+          category_en?: string
+          related_training_id?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          youtube_id?: string
+          title_tr?: string
+          title_en?: string
+          description_tr?: string
+          description_en?: string
+          duration_min?: number
+          category_tr?: string
+          category_en?: string
+          related_training_id?: string | null
+          sort_order?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_custom_objections: {
         Row: {
           id: string
