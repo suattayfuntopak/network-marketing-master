@@ -29,21 +29,13 @@ export async function getMyPanoInsightsAction(workspaceId: string): Promise<MyPa
   if (!user) return { fieldWeek: emptyField, fieldStreak: 0 }
 
   const weekStart = periodStartIso('7d')!
-  const streakStart = new Date()
-  streakStart.setDate(streakStart.getDate() - 90)
-  streakStart.setHours(0, 0, 0, 0)
 
-  const [{ data: weekActions }, { data: streakActions }, { data: newCandidates }] = await Promise.all([
+  const [{ data: weekActions }, { data: newCandidates }] = await Promise.all([
     supabase
       .from('nmm_daily_actions')
       .select('action_type, created_at')
       .eq('user_id', user.id)
       .gte('created_at', weekStart),
-    supabase
-      .from('nmm_daily_actions')
-      .select('action_type, created_at')
-      .eq('user_id', user.id)
-      .gte('created_at', streakStart.toISOString()),
     supabase
       .from('nmm_candidates')
       .select('id')
@@ -61,7 +53,7 @@ export async function getMyPanoInsightsAction(workspaceId: string): Promise<MyPa
     else if (act.action_type === 'stage_change') fieldWeek.presentationsSent++
   }
 
-  const fieldStreak = computeFieldStreak(streakActions ?? [])
+  const fieldStreak = computeFieldStreak(weekActions ?? [])
 
   return { fieldWeek, fieldStreak }
 }

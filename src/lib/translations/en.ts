@@ -146,6 +146,9 @@ export const en = {
     coachingReasonInactive: "{count} inactive for 7+ days",
     coachingReasonOnboarding: "{count} just started onboarding",
     coachingDetail: "Details",
+    coachingSeeAll: "View full team",
+    coachingFlagInactive: "Inactive · {days} days",
+    coachingFlagOnboarding: "New to onboarding",
   },
   pipeline: {
     addCandidate: "Add Candidate",

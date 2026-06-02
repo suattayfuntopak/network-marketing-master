@@ -1,7 +1,8 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -33,6 +34,8 @@ export type { MemberRow, OnboardingStep }
 
 export function EkipPanel() {
   const queryClient = useQueryClient()
+  const router = useRouter()
+  const searchParams = useSearchParams()
   const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
 
@@ -60,6 +63,7 @@ export function EkipPanel() {
   } | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
   const [activityMember, setActivityMember] = useState<MemberRow | null>(null)
+  const openedActivityFromUrl = useRef(false)
 
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
@@ -126,6 +130,16 @@ export function EkipPanel() {
   })
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
+
+  useEffect(() => {
+    const activityUserId = searchParams.get('activity')
+    if (!activityUserId || members.length === 0 || openedActivityFromUrl.current) return
+    const member = members.find(m => m.user_id === activityUserId)
+    if (!member || member.role === 'leader') return
+    openedActivityFromUrl.current = true
+    setActivityMember(member)
+    router.replace('/ekip', { scroll: false })
+  }, [searchParams, members, router])
 
   if (wsLoading || mLoading) {
     return (

@@ -1,13 +1,13 @@
 'use client'
 
-import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { Flame, ChevronRight } from 'lucide-react'
+import { Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
+import { Skeleton } from '@/components/ui/Skeleton'
 
-export function PanoFieldSummary() {
+export function FieldWeekSummary() {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
 
@@ -23,14 +23,15 @@ export function PanoFieldSummary() {
   if (isLoading) {
     return (
       <div className="space-y-3">
-        <div className="h-14 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-        <div className="h-28 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+        <Skeleton className="h-14 rounded-2xl" />
+        <Skeleton className="h-28 rounded-2xl" />
       </div>
     )
   }
 
-  const streak = data?.fieldStreak ?? 0
+  const activeDays = data?.fieldStreak ?? 0
   const field = data?.fieldWeek
+  const fullWeek = activeDays >= 7
 
   const kpis = [
     { label: t('pulse.newCandidates'), value: field?.newCandidates ?? 0 },
@@ -43,41 +44,37 @@ export function PanoFieldSummary() {
     <div className="space-y-3">
       <div
         className={`rounded-2xl border px-4 py-3 flex items-center justify-between gap-3 ${
-          streak > 0
+          activeDays > 0
             ? 'border-orange-400/35 bg-gradient-to-r from-orange-50/90 to-amber-50/60 dark:from-orange-950/25 dark:to-amber-950/15'
             : 'border-[var(--border)] bg-[var(--bg-subtle)]/60'
         }`}
       >
         <div className="flex items-center gap-2.5 min-w-0">
           <Flame
-            className={`h-5 w-5 shrink-0 ${streak > 0 ? 'text-orange-500' : 'text-[var(--text-3)]'}`}
+            className={`h-5 w-5 shrink-0 ${activeDays > 0 ? 'text-orange-500' : 'text-[var(--text-3)]'}`}
           />
           <div className="min-w-0">
             <p className="text-sm font-bold text-[var(--text-1)]">
-              {streak > 0
-                ? t('pulse.fieldStreakDays', { count: streak })
-                : t('pulse.fieldStreakEmpty')}
+              {fullWeek
+                ? t('pulse.fieldStreakFullWeek')
+                : activeDays > 0
+                  ? t('pulse.fieldStreakDays', { count: activeDays })
+                  : t('pulse.fieldStreakEmpty')}
             </p>
             <p className="text-xs text-[var(--text-3)] truncate">{t('pulse.fieldStreakHint')}</p>
           </div>
         </div>
-        {streak > 0 && (
+        {activeDays > 0 && (
           <span className="text-2xl font-black tabular-nums text-orange-600 dark:text-orange-400 shrink-0">
-            {streak}
+            {activeDays}/7
           </span>
         )}
       </div>
 
-      <Link
-        href="/bugun/ilgilen"
-        className="block rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition hover:border-brand/30 active:scale-[0.99]"
-      >
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <div>
-            <p className="text-sm font-bold text-[var(--text-1)]">{t('pulse.panoFieldWeekTitle')}</p>
-            <p className="text-xs text-[var(--text-3)] mt-0.5">{t('pulse.panoFieldWeekSubtitle')}</p>
-          </div>
-          <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-3)]" />
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
+        <div className="mb-3">
+          <p className="text-sm font-bold text-[var(--text-1)]">{t('pulse.bugunFieldWeekTitle')}</p>
+          <p className="text-xs text-[var(--text-3)] mt-0.5">{t('pulse.bugunFieldWeekSubtitle')}</p>
         </div>
         <div className="grid grid-cols-4 gap-2">
           {kpis.map(({ label, value }) => (
@@ -89,7 +86,7 @@ export function PanoFieldSummary() {
             </div>
           ))}
         </div>
-      </Link>
+      </div>
     </div>
   )
 }

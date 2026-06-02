@@ -146,6 +146,9 @@ export const tr = {
     coachingReasonInactive: "{count} kişi 7+ gündür inaktif",
     coachingReasonOnboarding: "{count} kişi Doğru Başlangıç’a yeni başladı",
     coachingDetail: "Detay",
+    coachingSeeAll: "Tüm ekibi gör",
+    coachingFlagInactive: "İnaktif · {days} gün",
+    coachingFlagOnboarding: "Doğru Başlangıç’a yeni",
   },
   pipeline: {
     addCandidate: "Aday Ekle",

@@ -91,7 +91,8 @@ export function computeConsecutiveDayStreak(dayKeys: Iterable<string>): number {
 }
 
 export function computeFieldStreak(
-  actions: { action_type: string; created_at: string }[]
+  actions: { action_type: string; created_at: string }[],
+  windowDays = 7
 ): number {
   const fieldTypes = new Set(['call', 'whatsapp', 'stage_change', 'note', 'ai_generate'])
   const dayKeys = new Set<string>()
@@ -100,7 +101,23 @@ export function computeFieldStreak(
       dayKeys.add(a.created_at.slice(0, 10))
     }
   }
-  return computeConsecutiveDayStreak(dayKeys)
+
+  const toKey = (date: Date) => {
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${y}-${m}-${day}`
+  }
+
+  const cursor = new Date()
+  cursor.setHours(0, 0, 0, 0)
+  let activeDays = 0
+  for (let i = 0; i < windowDays; i++) {
+    const d = new Date(cursor)
+    d.setDate(d.getDate() - i)
+    if (dayKeys.has(toKey(d))) activeDays++
+  }
+  return activeDays
 }
 
 export function computeLearningStreak(

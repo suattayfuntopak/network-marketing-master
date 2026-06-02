@@ -16,7 +16,6 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { AccountStatusAlert } from './AccountStatusAlert'
 import { PanoVideoStrip } from './PanoVideoStrip'
-import { PanoFieldSummary } from './PanoFieldSummary'
 import { PanoTeamCoachingAlert } from './PanoTeamCoachingAlert'
 
 
@@ -152,11 +151,6 @@ export function PanoContent() {
         <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   desktopColor="teal"   href="/istatistikler" />
       </div>
 
-      <PanoVideoStrip />
-      <PanoFieldSummary />
-      <PanoTeamCoachingAlert />
-
-      {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
       {cLoading ? statsSkeleton : (
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
@@ -173,6 +167,9 @@ export function PanoContent() {
         </div>
       </div>
       )}
+
+      <PanoVideoStrip />
+      <PanoTeamCoachingAlert />
 
       {/* ── Bugün Öncelikliler — karelerle aynı genişlik ── */}
       {cLoading ? prioritiesSkeleton : (

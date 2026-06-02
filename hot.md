@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-02 — Crown+ UX: saha özeti yalnız Bugün, pano düzeni, koçluk listesi, 7/7 seri
+
+- **Saha serisi + haftalık KPI** panodan kaldırıldı → yalnız **`/bugun/ilgilen`** (`FieldWeekSummary`).
+- **Seri mantığı:** ardışık gün değil → **son 7 günde kaç gün saha kaydı** (0–7); tam hafta = **7/7**.
+- **Pano:** Toplam/Aktif/Katıldı KPI’ları video şeridinin üstüne taşındı.
+- **Koçluk uyarısı:** isim listesi (max 3) + **Tüm ekibi gör** → `/ekip`; kişi → `/ekip?activity=` → Aktivite sheet.
+- `teamCoaching.ts`, `PanoFieldSummary` silindi (ortak `FieldWeekSummary`).
+
 ## 2026-06-02 — User settings (049): onboarding + uyum checklist Supabase
 
 - Migration **`049_user_settings.sql`** — `nmm_user_settings` (jsonb: onboardingDone, complianceChecklist).
