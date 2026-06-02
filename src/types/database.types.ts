@@ -610,6 +610,24 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_user_settings: {
+        Row: {
+          user_id: string
+          settings: Json
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          settings?: Json
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          settings?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_video_progress: {
         Row: {
           user_id: string

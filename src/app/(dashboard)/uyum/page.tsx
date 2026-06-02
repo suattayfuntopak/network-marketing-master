@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { clsx } from 'clsx'
 import {
@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { useUserSettings } from '@/hooks/useUserSettings'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useAILimits } from '@/hooks/useAILimits'
 import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
@@ -119,8 +120,6 @@ const SHARE_CHECKLIST = {
   ],
 }
 
-const CHECKLIST_KEY = 'nmm_compliance_checklist_v1'
-
 export default function CompliancePage() {
   const { lang, t } = useTranslation()
   const currentLang = lang === 'en' ? 'en' : 'tr'
@@ -133,33 +132,27 @@ export default function CompliancePage() {
 
   const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
+  const { settings, patchSettings } = useUserSettings(ws?.userId)
   const qc = useQueryClient()
 
   const [auditResult, setAuditResult] = useState<ComplianceAuditState | null>(null)
-  const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({})
+  const checkedItems = settings.complianceChecklist
 
-  useEffect(() => {
+  async function toggleCheck(id: string) {
+    const next = { ...checkedItems, [id]: !checkedItems[id] }
     try {
-      const stored = localStorage.getItem(CHECKLIST_KEY)
-      if (stored) setCheckedItems(JSON.parse(stored))
-    } catch {}
-  }, [])
-
-  function toggleCheck(id: string) {
-    setCheckedItems(prev => {
-      const next = { ...prev, [id]: !prev[id] }
-      try {
-        localStorage.setItem(CHECKLIST_KEY, JSON.stringify(next))
-      } catch {}
-      return next
-    })
+      await patchSettings({ complianceChecklist: next })
+    } catch {
+      toast.error(t('compliancePage.checklistSaveError'))
+    }
   }
 
-  function resetChecklist() {
-    setCheckedItems({})
+  async function resetChecklist() {
     try {
-      localStorage.removeItem(CHECKLIST_KEY)
-    } catch {}
+      await patchSettings({ complianceChecklist: {} })
+    } catch {
+      toast.error(t('compliancePage.checklistSaveError'))
+    }
   }
 
   async function handleCopyText(id: string, text: string) {

@@ -8,8 +8,9 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
-
-const STORAGE_KEY = 'nmm_onboarding_done'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { useUserSettings } from '@/hooks/useUserSettings'
+import { writeUserSettingsCache } from '@/lib/ui/userSettingsStorage'
 
 interface Props {
   workspaceId: string
@@ -19,6 +20,10 @@ interface Props {
 }
 
 export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitially = false }: Props) {
+  const { data: ws } = useWorkspace()
+  const userId = ws?.userId
+  const { settings, isLoading: settingsLoading, patchSettings } = useUserSettings(userId)
+
   const [step, setStep] = useState(1)
   const [visible, setVisible] = useState(false)
   const [candidateName, setCandidateName] = useState('')
@@ -26,24 +31,28 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
   const [joining, setJoining] = useState(false)
   const addCandidate = useAddCandidate(workspaceId)
   const qc = useQueryClient()
-  // Mount anındaki değeri sabitle: adım 2'de aday eklenince akış kapanmasın.
   const hadCandidatesAtMount = useRef(hasCandidatesInitially)
+  const dismissedRef = useRef(false)
 
   useBodyScrollLock(visible)
 
   useEffect(() => {
-    if (
-      typeof window !== 'undefined' &&
-      !localStorage.getItem(STORAGE_KEY) &&
-      !hadCandidatesAtMount.current
-    ) {
+    if (!userId || settingsLoading || dismissedRef.current) return
+    if (!settings.onboardingDone && !hadCandidatesAtMount.current) {
       setVisible(true)
     }
-  }, [])
+  }, [userId, settingsLoading, settings.onboardingDone])
 
-  function dismiss() {
-    localStorage.setItem(STORAGE_KEY, '1')
+  async function dismiss() {
+    dismissedRef.current = true
     setVisible(false)
+    if (!userId) return
+    writeUserSettingsCache(userId, { ...settings, onboardingDone: true })
+    try {
+      await patchSettings({ onboardingDone: true })
+    } catch {
+      /* Modal kapalı; bir sonraki yüklemede sunucu senkron olur */
+    }
   }
 
   async function handleAddCandidate() {

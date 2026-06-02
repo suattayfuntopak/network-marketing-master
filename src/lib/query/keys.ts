@@ -10,6 +10,7 @@ export const queryKeys = {
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
+  userSettings: (userId: string) => ['user-settings', userId] as const,
   platformWorkspaces: () => ['platform-workspaces'] as const,
   platformModeration: () => ['platform-moderation'] as const,
 }

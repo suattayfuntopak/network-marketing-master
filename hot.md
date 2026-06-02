@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-02 — User settings (049): onboarding + uyum checklist Supabase
+
+- Migration **`049_user_settings.sql`** — `nmm_user_settings` (jsonb: onboardingDone, complianceChecklist).
+- **`useUserSettings`** + per-user localStorage flash cache; eski global anahtarlardan tek seferlik migrasyon.
+- **OnboardingModal** ve **/uyum** checklist artık `patchUserSettingsAction` kullanıyor.
+- **Deploy:** Supabase SQL Editor → **049**, sonra **050** (member goals). Sıra: 049 → 050.
+
 ## 2026-06-02 — Crown Faz C: pano saha özeti, seri, üye hedefleri
 
 - **Pano (C1):** `PanoFieldSummary` — saha serisi (`computeFieldStreak` / `nmm_daily_actions`) +

@@ -115,8 +115,8 @@ export function PanoContent() {
 
   return (
     <div className="w-full space-y-5">
-      {/* Onboarding — modal kendini localStorage + mount-anı aday durumuyla yönetir.
-          candidates.length'e bağlamıyoruz; yoksa adım 2'de aday eklenince akış kapanırdı. */}
+      {/* Onboarding — Supabase user settings + mount-anı aday durumu; adım 2'de aday
+          eklenince akış kapanmaz. */}
       {!cLoading && ws && (
         <OnboardingModal
           workspaceId={ws.workspaceId}
