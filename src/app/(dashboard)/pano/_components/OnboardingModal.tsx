@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { X, ChevronRight, Users, UserPlus, Rocket } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { createClient } from '@/lib/supabase/client'
@@ -14,9 +14,11 @@ const STORAGE_KEY = 'nmm_onboarding_done'
 interface Props {
   workspaceId: string
   inviteCode: string
+  /** İlk açılışta kullanıcının zaten adayı var mıydı — yeni kullanıcı tespiti (mount'ta sabitlenir). */
+  hasCandidatesInitially?: boolean
 }
 
-export function OnboardingModal({ workspaceId, inviteCode }: Props) {
+export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitially = false }: Props) {
   const [step, setStep] = useState(1)
   const [visible, setVisible] = useState(false)
   const [candidateName, setCandidateName] = useState('')
@@ -24,11 +26,17 @@ export function OnboardingModal({ workspaceId, inviteCode }: Props) {
   const [joining, setJoining] = useState(false)
   const addCandidate = useAddCandidate(workspaceId)
   const qc = useQueryClient()
+  // Mount anındaki değeri sabitle: adım 2'de aday eklenince akış kapanmasın.
+  const hadCandidatesAtMount = useRef(hasCandidatesInitially)
 
   useBodyScrollLock(visible)
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem(STORAGE_KEY)) {
+    if (
+      typeof window !== 'undefined' &&
+      !localStorage.getItem(STORAGE_KEY) &&
+      !hadCandidatesAtMount.current
+    ) {
       setVisible(true)
     }
   }, [])

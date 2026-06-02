@@ -112,9 +112,14 @@ export function PanoContent() {
 
   return (
     <div className="w-full space-y-5">
-      {/* Onboarding — sadece hiç aday yoksa göster */}
-      {!cLoading && candidates.length === 0 && ws && (
-        <OnboardingModal workspaceId={ws.workspaceId} inviteCode={ws.inviteCode} />
+      {/* Onboarding — modal kendini localStorage + mount-anı aday durumuyla yönetir.
+          candidates.length'e bağlamıyoruz; yoksa adım 2'de aday eklenince akış kapanırdı. */}
+      {!cLoading && ws && (
+        <OnboardingModal
+          workspaceId={ws.workspaceId}
+          inviteCode={ws.inviteCode}
+          hasCandidatesInitially={candidates.length > 0}
+        />
       )}
       <AccountStatusAlert />
 
