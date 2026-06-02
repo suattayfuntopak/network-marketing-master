@@ -12,10 +12,22 @@ export interface ProgressData {
   favObjections: number[]
 }
 
-const READ_TRAINING_KEY = 'nmm_egitim_read'
-const FAV_TRAINING_KEY = 'nmm_egitim_favori'
-const READ_OBJECTION_KEY = 'nmm_itiraz_read'
-const FAV_OBJECTION_KEY = 'nmm_itiraz_favori'
+// localStorage anahtar tabanları. DİKKAT: gerçek anahtar her zaman userId ile
+// izole edilir (`<base>_<userId>`) — aksi halde aynı tarayıcıda kullanıcı değişince
+// önceki kullanıcının favori/okumaları sızar ve yanlış kişiye yazılır.
+const BASE = {
+  readTraining: 'nmm_egitim_read',
+  favTraining: 'nmm_egitim_favori',
+  readObjection: 'nmm_itiraz_read',
+  favObjection: 'nmm_itiraz_favori',
+} as const
+
+/** Eski (userId'siz) global anahtarlar — kullanıcılar arası sızıntı kaynağıydı, temizlenir. */
+const LEGACY_KEYS = Object.values(BASE)
+
+function scopedKey(base: string, userId: string): string {
+  return `${base}_${userId}`
+}
 
 function loadLocalSet<T>(key: string): Set<T> {
   if (typeof window === 'undefined') return new Set()
@@ -34,36 +46,46 @@ function saveLocalSet<T>(key: string, set: Set<T>) {
 
 export function useProgressSync() {
   const { data: ws } = useWorkspace()
+  const userId = ws?.userId
   const [readTrainings, setReadTrainings] = useState<Set<string>>(new Set())
   const [favTrainings, setFavTrainings] = useState<Set<string>>(new Set())
   const [readObjections, setReadObjections] = useState<Set<number>>(new Set())
   const [favObjections, setFavObjections] = useState<Set<number>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
-  const isLoadedRef = useRef(false)
+  const loadedForRef = useRef<string | null>(null)
 
-  // Load from local storage immediately for fast UI
+  // Kullanıcı (userId) belli olunca: önce userId-izole local cache, sonra Supabase.
   useEffect(() => {
-    setReadTrainings(loadLocalSet<string>(READ_TRAINING_KEY))
-    setFavTrainings(loadLocalSet<string>(FAV_TRAINING_KEY))
-    setReadObjections(loadLocalSet<number>(READ_OBJECTION_KEY))
-    setFavObjections(loadLocalSet<number>(FAV_OBJECTION_KEY))
-  }, [])
+    if (!userId || !ws?.workspaceId) return
+    if (loadedForRef.current === userId) return
+    loadedForRef.current = userId
 
-  // Sync with Supabase once workspace is ready
-  useEffect(() => {
-    if (!ws?.workspaceId || isLoadedRef.current) return
-    isLoadedRef.current = true
+    // Eski global anahtarları bir defa temizle (sızıntı kaynağıydı).
+    if (typeof window !== 'undefined') {
+      for (const lk of LEGACY_KEYS) localStorage.removeItem(lk)
+    }
+
+    // Hızlı UI için kullanıcıya özel local cache.
+    const localRT = loadLocalSet<string>(scopedKey(BASE.readTraining, userId))
+    const localFT = loadLocalSet<string>(scopedKey(BASE.favTraining, userId))
+    const localRO = loadLocalSet<number>(scopedKey(BASE.readObjection, userId))
+    const localFO = loadLocalSet<number>(scopedKey(BASE.favObjection, userId))
+    setReadTrainings(localRT)
+    setFavTrainings(localFT)
+    setReadObjections(localRO)
+    setFavObjections(localFO)
 
     const syncFromSupabase = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (!user) {
         setIsLoading(false)
         return
       }
 
       try {
-        // Fetch the dedicated progress row (O-4: no longer abuses nmm_daily_actions)
         const { data } = await supabase
           .from('nmm_user_progress')
           .select('read_trainings, fav_trainings, read_objections, fav_objections')
@@ -85,7 +107,7 @@ export function useProgressSync() {
             favObjections: (data.fav_objections as number[]) ?? [],
           }
         } else {
-          // One-time migration from the legacy nmm_daily_actions progress row.
+          // Tek seferlik legacy göç (nmm_daily_actions) — yine user.id'ye özel.
           const { data: legacy } = await supabase
             .from('nmm_daily_actions')
             .select('note')
@@ -105,47 +127,31 @@ export function useProgressSync() {
           }
         }
 
-        // Merge local and remote
-        const localReadTrainings = loadLocalSet<string>(READ_TRAINING_KEY)
-        const localFavTrainings = loadLocalSet<string>(FAV_TRAINING_KEY)
-        const localReadObjections = loadLocalSet<number>(READ_OBJECTION_KEY)
-        const localFavObjections = loadLocalSet<number>(FAV_OBJECTION_KEY)
+        // Merge — local + remote AYNI kullanıcıya ait olduğu için güvenli (offline düzenlemeler korunur).
+        const mergedRT = new Set([...localRT, ...(remoteProgress.readTrainings || [])])
+        const mergedFT = new Set([...localFT, ...(remoteProgress.favTrainings || [])])
+        const mergedRO = new Set([...localRO, ...(remoteProgress.readObjections || [])])
+        const mergedFO = new Set([...localFO, ...(remoteProgress.favObjections || [])])
 
-        // Union sets
-        const mergedReadTrainings = new Set([...localReadTrainings, ...(remoteProgress.readTrainings || [])])
-        const mergedFavTrainings = new Set([...localFavTrainings, ...(remoteProgress.favTrainings || [])])
-        const mergedReadObjections = new Set([...localReadObjections, ...(remoteProgress.readObjections || [])])
-        const mergedFavObjections = new Set([...localFavObjections, ...(remoteProgress.favObjections || [])])
+        setReadTrainings(mergedRT)
+        setFavTrainings(mergedFT)
+        setReadObjections(mergedRO)
+        setFavObjections(mergedFO)
 
-        // Update states
-        setReadTrainings(mergedReadTrainings)
-        setFavTrainings(mergedFavTrainings)
-        setReadObjections(mergedReadObjections)
-        setFavObjections(mergedFavObjections)
+        saveLocalSet(scopedKey(BASE.readTraining, user.id), mergedRT)
+        saveLocalSet(scopedKey(BASE.favTraining, user.id), mergedFT)
+        saveLocalSet(scopedKey(BASE.readObjection, user.id), mergedRO)
+        saveLocalSet(scopedKey(BASE.favObjection, user.id), mergedFO)
 
-        // Save merged sets locally
-        saveLocalSet(READ_TRAINING_KEY, mergedReadTrainings)
-        saveLocalSet(FAV_TRAINING_KEY, mergedFavTrainings)
-        saveLocalSet(READ_OBJECTION_KEY, mergedReadObjections)
-        saveLocalSet(FAV_OBJECTION_KEY, mergedFavObjections)
-
-        // If local sets were different or there was no remote row, save back to remote
         const hasDifferences =
-          localReadTrainings.size !== mergedReadTrainings.size ||
-          localFavTrainings.size !== mergedFavTrainings.size ||
-          localReadObjections.size !== mergedReadObjections.size ||
-          localFavObjections.size !== mergedFavObjections.size ||
+          localRT.size !== mergedRT.size ||
+          localFT.size !== mergedFT.size ||
+          localRO.size !== mergedRO.size ||
+          localFO.size !== mergedFO.size ||
           !data
 
         if (hasDifferences) {
-          await saveToSupabase(
-            ws.workspaceId,
-            user.id,
-            mergedReadTrainings,
-            mergedFavTrainings,
-            mergedReadObjections,
-            mergedFavObjections
-          )
+          await saveToSupabase(ws.workspaceId, user.id, mergedRT, mergedFT, mergedRO, mergedFO)
         }
       } catch (err) {
         console.error('Error syncing progress with Supabase:', err)
@@ -155,64 +161,52 @@ export function useProgressSync() {
     }
 
     syncFromSupabase()
-  }, [ws?.workspaceId])
+  }, [userId, ws?.workspaceId])
 
   const saveToSupabase = async (
     workspaceId: string,
-    userId: string,
+    uid: string,
     rt: Set<string>,
     ft: Set<string>,
     ro: Set<number>,
     fo: Set<number>
   ) => {
     const supabase = createClient()
-    await supabase
-      .from('nmm_user_progress')
-      .upsert(
-        {
-          user_id: userId,
-          workspace_id: workspaceId,
-          read_trainings: Array.from(rt),
-          fav_trainings: Array.from(ft),
-          read_objections: Array.from(ro),
-          fav_objections: Array.from(fo),
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' }
-      )
+    await supabase.from('nmm_user_progress').upsert(
+      {
+        user_id: uid,
+        workspace_id: workspaceId,
+        read_trainings: Array.from(rt),
+        fav_trainings: Array.from(ft),
+        read_objections: Array.from(ro),
+        fav_objections: Array.from(fo),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    )
   }
 
   const handleUpdate = (
     type: 'readTraining' | 'favTraining' | 'readObjection' | 'favObjection',
-    id: any,
+    id: string | number,
     add: boolean
   ) => {
-    // Optimistic UI update
-    let nextRT = readTrainings
-    let nextFT = favTrainings
-    let nextRO = readObjections
-    let nextFO = favObjections
-
-    if (type === 'readTraining') {
-      nextRT = new Set(readTrainings)
-      add ? nextRT.add(id) : nextRT.delete(id)
-      setReadTrainings(nextRT)
-      saveLocalSet(READ_TRAINING_KEY, nextRT)
-    } else if (type === 'favTraining') {
-      nextFT = new Set(favTrainings)
-      add ? nextFT.add(id) : nextFT.delete(id)
-      setFavTrainings(nextFT)
-      saveLocalSet(FAV_TRAINING_KEY, nextFT)
-    } else if (type === 'readObjection') {
-      nextRO = new Set(readObjections)
-      add ? nextRO.add(id) : nextRO.delete(id)
-      setReadObjections(nextRO)
-      saveLocalSet(READ_OBJECTION_KEY, nextRO)
-    } else if (type === 'favObjection') {
-      nextFO = new Set(favObjections)
-      add ? nextFO.add(id) : nextFO.delete(id)
-      setFavObjections(nextFO)
-      saveLocalSet(FAV_OBJECTION_KEY, nextFO)
+    if (type === 'readTraining' || type === 'favTraining') {
+      const cur = type === 'readTraining' ? readTrainings : favTrainings
+      const next = new Set(cur)
+      if (add) next.add(id as string)
+      else next.delete(id as string)
+      if (type === 'readTraining') setReadTrainings(next)
+      else setFavTrainings(next)
+      if (userId) saveLocalSet(scopedKey(BASE[type], userId), next)
+    } else {
+      const cur = type === 'readObjection' ? readObjections : favObjections
+      const next = new Set(cur)
+      if (add) next.add(id as number)
+      else next.delete(id as number)
+      if (type === 'readObjection') setReadObjections(next)
+      else setFavObjections(next)
+      if (userId) saveLocalSet(scopedKey(BASE[type], userId), next)
     }
 
     if (ws?.workspaceId) {
