@@ -10,6 +10,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { getStageLabel } from '@/lib/domain/stages'
 
 import { waHref } from '@/lib/utils/waLink'
+import { readUserScopedJSON, writeUserScopedJSON } from '@/lib/ui/userScopedStorage'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
@@ -53,10 +54,9 @@ const TONES = [
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
 
-// DİKKAT: anahtar her zaman userId ile izole edilir — aksi halde aynı tarayıcıda
-// kullanıcı değişince önceki kişinin ürettiği mesajlar yeni kişiye sızar.
-const HISTORY_KEY_BASE = 'nmm_message_history'
-const LEGACY_HISTORY_KEY = 'nmm_message_history' // userId'siz eski global anahtar
+// Mesaj geçmişi cihaz-yerel scratchpad'tir; userId ile izole edilir (genel
+// userScopedStorage helper'ı) → aynı tarayıcıda kullanıcı değişince sızmaz.
+const HISTORY_BASE = 'nmm_message_history'
 const MAX_HISTORY = 5
 
 interface HistoryEntry {
@@ -66,24 +66,14 @@ interface HistoryEntry {
   timestamp: number
 }
 
-function historyKey(userId: string): string {
-  return `${HISTORY_KEY_BASE}_${userId}`
-}
-
 function loadHistory(userId: string | undefined | null): HistoryEntry[] {
-  if (typeof window === 'undefined' || !userId) return []
-  // Eski global anahtarı bir defa temizle (sızıntı kaynağıydı).
-  try { localStorage.removeItem(LEGACY_HISTORY_KEY) } catch { /* ignore */ }
-  try {
-    return JSON.parse(localStorage.getItem(historyKey(userId)) ?? '[]')
-  } catch { return [] }
+  return readUserScopedJSON<HistoryEntry[]>(HISTORY_BASE, userId, [])
 }
 
 function saveToHistory(userId: string | undefined | null, entry: HistoryEntry) {
-  if (typeof window === 'undefined' || !userId) return
-  const history = loadHistory(userId)
-  const updated = [entry, ...history].slice(0, MAX_HISTORY)
-  localStorage.setItem(historyKey(userId), JSON.stringify(updated))
+  if (!userId) return
+  const updated = [entry, ...loadHistory(userId)].slice(0, MAX_HISTORY)
+  writeUserScopedJSON(HISTORY_BASE, userId, updated)
 }
 
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {

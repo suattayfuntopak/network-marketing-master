@@ -10,6 +10,7 @@ import { ProfileModal } from '@/components/ui/ProfileModal'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { clearNmmLocalStorage } from '@/lib/ui/userScopedStorage'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -48,6 +49,9 @@ export function UserMenu() {
       await logoutAction()
       const supabase = createClient()
       await supabase.auth.signOut({ scope: 'global' })
+      // Paylaşılan tarayıcı hijyeni: önceki kullanıcının cihaz-yerel izini sil
+      // (tümü Supabase'de kalıcı; sonraki girişte yeniden yüklenir).
+      clearNmmLocalStorage()
     } catch (err) {
       console.error('[logout]', err)
     }
