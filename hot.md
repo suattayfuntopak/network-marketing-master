@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-06-03 — Perf (getUser cache) + onboarding UX + kalıcılık + ödeme uyarısı
+
+- **Perf (giriş→pano):** `src/lib/supabase/authUser.ts` → React `cache()`'li `getAuthUser()`.
+  Prefetch'teki workspace/candidates/aiUsage/platform/moderation aksiyonları artık TEK
+  `getUser()` round-trip paylaşır (önceden navigasyon başına 4-5). **KİLİTLİ:** hot-path
+  aksiyonlar ham `supabase.auth.getUser()` yerine `getAuthUser()` kullanmalı.
+- **Onboarding UX:** kişiselleştirme ("Hoş geldin, {ad}!"), adım-2 kutlama toast'u, **adım 4**
+  (Hazırsın 🚀), dengeli step-3 ikincil buton, **Ayarlar → Turu Tekrar Başlat** (tek seferlik
+  `sessionStorage` işareti, kalıcı flag'e dokunmaz).
+- **Kalıcılık / cross-user leak:** Yazar mesaj geçmişi `<key>_<userId>` ile izole; eski global
+  anahtar temizlenir. Bildirim oku/sil zaten Supabase'de (`nmm_notifications.read`) → ölü global
+  localStorage anahtarları (`nmm_notif_read_ids`/`dismissed_ids`) ve yerel-bildirim yolu kaldırıldı.
+- **Ödeme (kritik):** `order.created` unresolved (note→workspace ya da productId→plan eşleşmezse)
+  artık `sendUnresolvedOrderAlertEmail` ile süper admin'e uyarı → müşteri ödeyip lisans alamazsa
+  sessiz kalmaz.
+- **Süper admin lisans:** zaten `superAdminLicenseOverride()` ile pro/süresiz (DB cosmetic).
+  `is_owner` yerine bu override korunuyor — şema değişikliği yok, tek kaynak.
+
 ## 2026-06-02 — Crown+ UX: saha özeti yalnız Bugün, pano düzeni, koçluk listesi, 7/7 seri
 
 - **Saha serisi + haftalık KPI** panodan kaldırıldı → yalnız **`/bugun/ilgilen`** (`FieldWeekSummary`).
