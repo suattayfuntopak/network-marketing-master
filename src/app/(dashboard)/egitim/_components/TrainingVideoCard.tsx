@@ -91,7 +91,11 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
 
         {video.relatedTrainingId && (
           <Link
-            href={`/egitim?id=${video.relatedTrainingId}`}
+            href={
+              /^\d+$/.test(video.relatedTrainingId)
+                ? `/itirazlar?id=${video.relatedTrainingId}` // sayısal id → itiraz
+                : `/egitim?id=${video.relatedTrainingId}` // harf önekli → içerik
+            }
             className="text-[11px] font-semibold text-brand hover:underline"
           >
             {t('videoTraining.relatedTopic')} →

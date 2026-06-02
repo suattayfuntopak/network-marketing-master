@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { X, Loader2, Film } from 'lucide-react'
+import { X, Loader2, Film, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { RelatedTopicPicker, resolveTopicLabel } from './RelatedTopicPicker'
 import {
   createTrainingVideoAction,
   updateTrainingVideoAction,
@@ -37,6 +39,8 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
     sortOrder: editing?.sortOrder ?? 999,
   })
   const [saving, setSaving] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const { lang } = useTranslation()
   useBodyScrollLock(true)
 
   const set = <K extends keyof VideoInput>(k: K, v: VideoInput[K]) =>
@@ -132,8 +136,29 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
               <input type="number" className={inputCls} value={form.sortOrder} onChange={e => set('sortOrder', Number(e.target.value))} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>İlgili konu ID</label>
-              <input className={inputCls} value={form.relatedTrainingId ?? ''} onChange={e => set('relatedTrainingId', e.target.value)} placeholder="z1, i1…" />
+              <label className={labelCls}>İlgili konu</label>
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  className={`${inputCls} flex flex-1 items-center justify-between gap-1 text-left`}
+                >
+                  <span className={`line-clamp-1 ${form.relatedTrainingId ? 'text-[var(--text-1)]' : 'text-[var(--text-3)]'}`}>
+                    {resolveTopicLabel(form.relatedTrainingId ?? null, lang) ?? 'Seç…'}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--text-3)]" />
+                </button>
+                {form.relatedTrainingId && (
+                  <button
+                    type="button"
+                    onClick={() => set('relatedTrainingId', '')}
+                    title="Temizle"
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)] transition hover:bg-red-500/10 hover:text-red-500"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -157,6 +182,14 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
           </button>
         </div>
       </div>
+
+      {pickerOpen && (
+        <RelatedTopicPicker
+          current={form.relatedTrainingId ?? null}
+          onSelect={v => set('relatedTrainingId', v)}
+          onClose={() => setPickerOpen(false)}
+        />
+      )}
     </div>
   )
 }

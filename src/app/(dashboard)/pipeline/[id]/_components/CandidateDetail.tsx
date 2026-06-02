@@ -61,7 +61,7 @@ export function CandidateDetail({ candidateId }: Props) {
 
   const attemptedUpdates = useRef<Record<string, boolean>>({})
 
-  useBodyScrollLock(stageOpen || confirmOpen)
+  useBodyScrollLock(stageOpen || confirmOpen || editingFollowUp)
 
   // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
   useEffect(() => {
@@ -301,54 +301,26 @@ export function CandidateDetail({ candidateId }: Props) {
                   <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
                     {t('pipeline.nextContact')}
                   </p>
-                  {!editingFollowUp && (
-                    <button
-                      onClick={() => {
-                        setEditingFollowUp(true)
-                        setTempFollowUp(toInputDateTime(c.next_follow_up_at))
-                      }}
-                      className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
-                      title={t('common.edit')}
-                    >
-                      <Pencil className="h-3.5 w-3.5" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => {
+                      setTempFollowUp(toInputDateTime(c.next_follow_up_at))
+                      setEditingFollowUp(true)
+                    }}
+                    className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
+                    title={t('common.edit')}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                  </button>
                 </div>
                 <div className="mt-2 flex-1 flex flex-col justify-end">
-                  {editingFollowUp ? (
-                    <div className="flex items-center gap-1.5 w-full">
-                      <input
-                        type="datetime-local"
-                        value={tempFollowUp}
-                        onChange={e => setTempFollowUp(e.target.value)}
-                        className="w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-2 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-[#534AB7]"
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => saveFollowUpDate(tempFollowUp)}
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-green-500 text-white hover:bg-green-600 transition shadow-sm"
-                        title={t('common.save')}
-                      >
-                        <Check className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => setEditingFollowUp(false)}
-                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
-                        title={t('common.cancel')}
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-baseline justify-between w-full">
-                      <p className="text-sm font-semibold text-[#534AB7] truncate">
-                        {nextFollow ?? '—'}
-                      </p>
-                      <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
-                        ({daysSince(c.last_contact_at, t)})
-                      </span>
-                    </div>
-                  )}
+                  <div className="flex items-baseline justify-between w-full">
+                    <p className="text-sm font-semibold text-[#534AB7] truncate">
+                      {nextFollow ?? '—'}
+                    </p>
+                    <span className="text-[10px] text-[var(--text-3)] shrink-0 ml-1">
+                      ({daysSince(c.last_contact_at, t)})
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -385,6 +357,52 @@ export function CandidateDetail({ candidateId }: Props) {
           onConfirm={handleDeleteConfirmed}
           onCancel={handleConfirmCancel}
         />
+      )}
+
+      {/* Gelecek Temas — ortalı popup (native takvim sayfa altında kesilmesin) */}
+      {editingFollowUp && (
+        <div
+          className={`fixed inset-0 ${Z.confirm} flex items-center justify-center bg-black/50 backdrop-blur-sm p-4`}
+          onClick={() => setEditingFollowUp(false)}
+        >
+          <div
+            className="w-full max-w-xs space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="text-sm font-bold text-[var(--text-1)]">{t('pipeline.nextContact')}</h3>
+            <input
+              type="datetime-local"
+              value={tempFollowUp}
+              onChange={e => setTempFollowUp(e.target.value)}
+              autoFocus
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7]"
+            />
+            <div className="flex items-center justify-between gap-2">
+              <button
+                onClick={() => saveFollowUpDate('')}
+                className="text-xs font-semibold text-[var(--text-3)] transition hover:text-red-500"
+              >
+                {lang === 'en' ? 'Clear' : 'Temizle'}
+              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setEditingFollowUp(false)}
+                  className="flex h-9 items-center justify-center rounded-xl border border-[var(--border)] px-3 text-sm font-bold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)]"
+                  title={t('common.cancel')}
+                >
+                  <X className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => saveFollowUpDate(tempFollowUp)}
+                  className="flex h-9 items-center gap-1.5 rounded-xl bg-green-500 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-green-600"
+                >
+                  <Check className="h-4 w-4" />
+                  {t('common.save')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {stageOpen && (

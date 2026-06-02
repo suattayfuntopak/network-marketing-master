@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-02 — Gelecek Temas popup + optimistic + video "İlgili konu" seçici
+
+- **Gelecek Temas tarih editörü:** inline native datetime-local takvimi sayfa altında kesiliyordu →
+  ortalı **popup** (Z.confirm, scroll-lock); Tamam/Vazgeç/Temizle. Kart hep tarihi gösterir, kalem
+  popup'ı açar.
+- **Optimistic update:** `useUpdateCandidate`'e `onMutate` eklendi (detail + list cache anında
+  yamalanır) → yeni tarih "tak diye" gelir, refetch beklenmez; hata olursa geri alınır.
+- **Video "İlgili konu" seçici:** z1/i1 kodu elle yazmak yerine **RelatedTopicPicker** popup'ı
+  (içerik + itiraz başlıkları, arama, radyo seç). Seçince id alana yazılır. Kart linki route-aware:
+  sayısal id→/itirazlar, harfli→/egitim. (getTrainingData + ITIRAZLAR, bilingual.)
+- tsc temiz, 107 test. (CandidateDetail'de setTranslatedNote set-state-in-effect ÖNCEDEN var, ayrı iş.)
+
 ## 2026-06-02 — Cron fix + video kartı + sunum kartı taşı/aç-kapa + hızlı geçişler
 
 - **Cron workflow FIX:** `cron-emails.yml` silinmiş `/api/cron/pulse-rollup` endpoint'ini çağırıyordu

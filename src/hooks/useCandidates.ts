@@ -186,13 +186,35 @@ export function useUpdateCandidate(workspaceId: string) {
         }
       }
     },
+    // Optimistic: yeni değer (ör. takip tarihi) anında görünsün, refetch'i bekleme.
+    onMutate: async ({ id, ...patch }) => {
+      const detailKey = queryKeys.candidateDetail(workspaceId, id)
+      const listKey = queryKeys.candidates(workspaceId)
+      await Promise.all([
+        qc.cancelQueries({ queryKey: detailKey }),
+        qc.cancelQueries({ queryKey: listKey }),
+      ])
+      const prevDetail = qc.getQueryData<NmmCandidate>(detailKey)
+      const prevList = qc.getQueryData<NmmCandidate[]>(listKey)
+      qc.setQueryData<NmmCandidate | undefined>(detailKey, old =>
+        old ? ({ ...old, ...patch } as NmmCandidate) : old
+      )
+      qc.setQueryData<NmmCandidate[] | undefined>(listKey, old =>
+        old?.map(c => (c.id === id ? ({ ...c, ...patch } as NmmCandidate) : c))
+      )
+      return { prevDetail, prevList, detailKey, listKey }
+    },
     onSuccess: () => {
       invalidateCandidateQueries(qc, workspaceId)
       qc.invalidateQueries({ queryKey: ['activity'] })
       invalidateTeamAndAIUsage(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to update: ${e.message}` : `Güncellenemedi: ${e.message}`),
+    onError: (e: Error, _vars, ctx) => {
+      if (ctx?.prevDetail !== undefined) qc.setQueryData(ctx.detailKey, ctx.prevDetail)
+      if (ctx?.prevList !== undefined) qc.setQueryData(ctx.listKey, ctx.prevList)
+      toast.error(getLang() === 'en' ? `Failed to update: ${e.message}` : `Güncellenemedi: ${e.message}`)
+    },
   })
 }
 
