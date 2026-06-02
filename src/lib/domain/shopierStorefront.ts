@@ -14,15 +14,26 @@ import type { BillingPeriod, PlanId } from '@/lib/domain/pricing'
  * ({@link resolvePlanFromProductId}). Böylece kullanıcı note'u kurcalayıp
  * ucuz plana ödeyip pahalı plan kapamaz.
  *
+ * İSİMLENDİRME: env'de görünür isimler **Basic/Plus/Pro** (planların görünen adı);
+ * içeride DB `license_type` değerleri **leader/master/pro** (PlanId). Eşleme:
+ * basic↔leader, plus↔master, pro↔pro. Env friendly, iç kimlik bozulmaz.
+ *
  * AÇMAK İÇİN (cutover):
  *   SHOPIER_STOREFRONT_ENABLED=true
- *   SHOPIER_PRODUCTS={"leader_monthly":{"url":"https://www.shopier.com/...","productId":"123"}, ...}
+ *   SHOPIER_PRODUCTS={"basic_monthly":{"url":"https://www.shopier.com/...","productId":"123"}, ...}
  */
 
-export type ProductKey = `${PlanId}_${BillingPeriod}`
+/** Env/görünür plan adı (Basic/Plus/Pro). */
+export type PlanAlias = 'basic' | 'plus' | 'pro'
+export type ProductKey = `${PlanAlias}_${BillingPeriod}`
+
+/** Görünür ad → DB license_type (PlanId). */
+const ALIAS_TO_PLAN: Record<PlanAlias, PlanId> = { basic: 'leader', plus: 'master', pro: 'pro' }
+/** DB license_type (PlanId) → görünür ad. */
+const PLAN_TO_ALIAS: Record<PlanId, PlanAlias> = { leader: 'basic', master: 'plus', pro: 'pro' }
 
 export interface ShopierStorefrontProduct {
-  /** Dükkandaki tam ürün linki (ör. https://www.shopier.com/NetworkMarketingMaster/123456). */
+  /** Dükkandaki tam ürün linki (ör. https://www.shopier.com/networkmarketingmaster/47695583). */
   url: string
   /** Shopier ürün id'si — order.created webhook'unda plan eşlemesi için. */
   productId: string
@@ -34,13 +45,25 @@ export function isShopierStorefrontEnabled(): boolean {
 }
 
 export function productKey(plan: PlanId, period: BillingPeriod): ProductKey {
-  return `${plan}_${period}`
+  return `${PLAN_TO_ALIAS[plan]}_${period}`
+}
+
+/**
+ * Env anahtarını normalize eder: `basic_monthly` / `plus_yearly` … döner.
+ * Geriye dönük uyumluluk için eski `leader_*`/`master_*` de kabul edilir.
+ */
+function normalizeProductKey(key: string): ProductKey | null {
+  const m = key.trim().toLowerCase().match(/^(basic|plus|pro|leader|master)_(monthly|yearly)$/)
+  if (!m) return null
+  const planPart =
+    m[1] === 'leader' ? 'basic' : m[1] === 'master' ? 'plus' : (m[1] as PlanAlias)
+  return `${planPart}_${m[2] as BillingPeriod}`
 }
 
 /**
  * Ürün haritasını env JSON'undan okur:
- *   SHOPIER_PRODUCTS={"leader_monthly":{"url":"...","productId":"123"},"pro_yearly":{...}}
- * Geçersiz/eksik kayıtlar sessizce atlanır.
+ *   SHOPIER_PRODUCTS={"basic_monthly":{"url":"...","productId":"123"},"pro_yearly":{...}}
+ * Geçersiz/eksik kayıtlar sessizce atlanır; anahtarlar normalize edilir.
  */
 export function loadShopierProductMap(
   raw: string | undefined = process.env.SHOPIER_PRODUCTS
@@ -55,11 +78,12 @@ export function loadShopierProductMap(
   if (!parsed || typeof parsed !== 'object') return {}
 
   const out: Partial<Record<ProductKey, ShopierStorefrontProduct>> = {}
-  for (const [key, value] of Object.entries(parsed as Record<string, unknown>)) {
-    if (!value || typeof value !== 'object') continue
+  for (const [rawKey, value] of Object.entries(parsed as Record<string, unknown>)) {
+    const key = normalizeProductKey(rawKey)
+    if (!key || !value || typeof value !== 'object') continue
     const { url, productId } = value as Record<string, unknown>
     if (typeof url === 'string' && url.trim() && (typeof productId === 'string' || typeof productId === 'number')) {
-      out[key as ProductKey] = { url: url.trim(), productId: String(productId).trim() }
+      out[key] = { url: url.trim(), productId: String(productId).trim() }
     }
   }
   return out
@@ -82,6 +106,7 @@ export function buildStorefrontRedirectUrl(productUrl: string, note: string): st
 }
 
 export interface ResolvedStorefrontPlan {
+  /** DB license_type (leader/master/pro) — applyLicenseUpgrade buna yazar. */
   plan: PlanId
   period: BillingPeriod
   daysToAdd: number
@@ -99,8 +124,8 @@ export function resolvePlanFromProductId(
   if (!target) return null
   for (const [key, product] of Object.entries(map)) {
     if (product && product.productId === target) {
-      const [plan, period] = key.split('_') as [PlanId, BillingPeriod]
-      return { plan, period, daysToAdd: period === 'yearly' ? 365 : 30 }
+      const [alias, period] = key.split('_') as [PlanAlias, BillingPeriod]
+      return { plan: ALIAS_TO_PLAN[alias], period, daysToAdd: period === 'yearly' ? 365 : 30 }
     }
   }
   return null

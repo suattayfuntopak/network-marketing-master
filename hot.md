@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-06-02 — Shopier Faz 3: ürünler + PAT + webhook kaydı + secret
+
+- **Naming düzeltildi:** env ürün anahtarları artık **basic/plus/pro** (görünür ad); içeride
+  otomatik **leader/master/pro** (DB license_type) → `ALIAS_TO_PLAN`. leader/master/pro DB kimliği
+  KORUNUR (kalıntı bug değildi; eski fix display-only idi). Eski leader_* anahtarları da normalize
+  edilir (geri uyum). +1 test (107 toplam).
+- **6 ürün** dükkanda hazır → `SHOPIER_PRODUCTS` env (.env.local, gitignored). productId = URL
+  numarası (test webhook log'undan kesinleşecek).
+- **PAT** kopya-yapıştırda kuyruğu 1 kez tekrarlanmıştı (4 dot-parça); temizlendi (header.payload.
+  son-imza). Doğrulandı: `GET /v1/webhooks`, `/v1/orders` → HTTP 200. (products → 403, sorun değil.)
+- **order.created webhook KAYDEDİLDİ** (Shopier API): id `8ad852392293a891` →
+  `https://nmm.suattayfuntopak.com/api/payment/shopier`. Kayıt cevabındaki **`token` = HS256 imza
+  secret'ı** → `SHOPIER_WEBHOOK_SECRET` (.env.local).
+
+KALAN (cutover): **Prod env'e** (Vercel/host) SHOPIER_PRODUCTS + SHOPIER_WEBHOOK_SECRET +
+SHOPIER_STOREFRONT_ENABLED=true gir → 1 test siparişi → log'dan payload alanları + imza şemasını
+teyit et (handler ham payload'ı verify ÖNCESİ loglar) → gerekirse extractOrderFields/imza rötuşu.
+
 ## 2026-06-02 — Shopier dükkan-yönlendirme iskeleti (Faz 2, flag KAPALI)
 
 Shopier api_pay4 (uygulama/API checkout) reddedildi → "dükkan-yönlendirme + order.created
