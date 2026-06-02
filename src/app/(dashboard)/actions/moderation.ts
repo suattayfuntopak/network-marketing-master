@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
@@ -78,8 +79,7 @@ export interface ModerationRequestItem {
  * Fetches all pending unapproved requests (restricted to Super Admin).
  */
 export async function getPendingRequestsAction(): Promise<ModerationRequestItem[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()

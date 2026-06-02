@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
 export interface AIUsageData {
@@ -13,10 +14,7 @@ export interface AIUsageData {
 /** Günlük YZ kullanım sayımı — sunucu UTC gece yarısı penceresi (checkQuota ile uyumlu). */
 export async function fetchAIUsageAction(): Promise<AIUsageData> {
   const supabase = await createClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
 
   if (userError || !user) {
     return {

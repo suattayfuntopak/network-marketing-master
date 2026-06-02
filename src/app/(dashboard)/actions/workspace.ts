@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin, resolveWorkspaceLicense } from '@/lib/domain/auth'
 import { getEffectiveLicenseType, isTrialPeriodActive } from '@/lib/domain/aiUsage'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
@@ -13,7 +14,7 @@ function generateInviteCode(): string {
 /** Read-only: returns null when the user has no workspace membership yet. */
 export async function fetchWorkspaceAction(): Promise<WorkspaceContext | null> {
   const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   const { data: membership, error: memSelectError } = await supabase

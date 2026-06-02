@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
@@ -50,9 +51,8 @@ async function listAllAuthUsers(admin: ReturnType<typeof createAdminClient>): Pr
  * Restricted strictly to the Super Admin suattayfuntopak@gmail.com.
  */
 export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceItem[]> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  
+  const { user } = await getAuthUser()
+
   assertSuperAdmin(user)
 
   const admin = createAdminClient()

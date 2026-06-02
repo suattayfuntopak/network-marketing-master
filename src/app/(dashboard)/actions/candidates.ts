@@ -1,16 +1,14 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { CANDIDATE_DETAIL_SELECT, CANDIDATE_LIST_SELECT } from '@/lib/domain/candidateSelect'
 import type { NmmCandidate } from '@/types/database.types'
 
 /** Workspace aday listesi — dashboard SSR prefetch ve useCandidates ile paylaşılır. */
 export async function fetchCandidatesAction(workspaceId: string): Promise<NmmCandidate[]> {
   const supabase = await createClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   const { data, error } = await supabase
@@ -30,10 +28,7 @@ export async function fetchCandidateDetailAction(
   candidateId: string
 ): Promise<NmmCandidate | null> {
   const supabase = await createClient()
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   const { data, error } = await supabase
