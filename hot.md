@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-02 — Shopier sağlamlaştırma + favori izolasyon + onboarding fix + lint
+
+- **Shopier idempotency:** `048_shopier_processed_orders` (order_id PK). order.created'da dedupe
+  (aynı sipariş 2. kez lisans uzatmaz; tablo hatası non-fatal). **MANUEL migration gerek.**
+- **Shopier refund:** `refund.updated` webhook kaydedildi (id `44da13ea49215e7a`). İade gelince
+  sipariş→workspace eşleşip lisans 'free'e düşürülür. **DİKKAT: her webhook'un AYRI secret'ı var**
+  → `SHOPIER_REFUND_WEBHOOK_SECRET=463186f2…` Vercel'e EKLENMELİ (yoksa iade işlenmez, güvenli taraf).
+  refund.requested sadece loglanır (erken düşürme yok).
+- **Favori izolasyon bug FIX:** useProgressSync global localStorage anahtarları (nmm_egitim_favori…)
+  kullanıcılar arası sızıyordu → `<base>_<userId>` ile izole edildi, eski global anahtarlar temizlenir.
+  Elif'in DB satırı kontrol edildi (boştu, kirlenmemiş). DB/RLS zaten per-user'dı.
+- **Onboarding fix:** PanoContent modal'ı `candidates.length===0` iken render ediyordu → adım 2'de
+  aday eklenince unmount → adım 3 görünmüyordu. Artık ws varken mount, yeni-kullanıcı tespiti mount-anı
+  (useRef) ile sabit.
+- **Lint:** CandidateDetail not-çevirisi set-state-in-effect temizlendi (render'da türetme + async fn).
+- **Test temizliği (önceki):** Suat workspace pro/süresiz geri alındı; ödeme maili süper admin'e gitmez.
+- tsc temiz, **111 test**.
+
+KALAN (Suat manuel): 048 migration uygula · SHOPIER_REFUND_WEBHOOK_SECRET'ı Vercel'e ekle.
+
 ## 2026-06-02 — 🎉 SHOPIER CANLI (storefront-redirect + order.created webhook)
 
 Cutover tamamlandı, uçtan uca test geçti (1 TL gerçek /odeme alışverişi):
