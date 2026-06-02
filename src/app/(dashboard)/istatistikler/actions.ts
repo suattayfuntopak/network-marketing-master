@@ -5,6 +5,7 @@ import { createAdminClient, type AdminClient } from '@/lib/supabase/admin'
 import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
 import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 
 export interface IndependentAIUsageRow {
   userId: string
@@ -95,7 +96,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
     independentOwners.push({
       userId: ws.owner_id,
       workspaceId: ws.id,
-      licenseType: ws.license_type ?? 'free',
+      licenseType: normalizeLicenseType(ws.license_type),
       licenseExpiresAt: ws.license_expires_at ?? null,
       registeredAt: ws.created_at,
     })
@@ -190,7 +191,7 @@ export async function getMemberLicenseProfilesAction(
     const email = emailById.get(ws.owner_id) ?? ''
     const adminUser = isSuperAdmin({ email })
     profileByOwner.set(ws.owner_id, {
-      licenseType: adminUser ? superAdminLicenseOverride().licenseType : (ws.license_type ?? 'free'),
+      licenseType: adminUser ? superAdminLicenseOverride().licenseType : normalizeLicenseType(ws.license_type),
       licenseExpiresAt: adminUser ? null : (ws.license_expires_at ?? null),
       workspaceCreatedAt: ws.created_at,
       isSuperAdmin: adminUser,

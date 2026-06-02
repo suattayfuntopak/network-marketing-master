@@ -75,8 +75,8 @@ export const statsSection = {
 
       colLicense: 'Lisans',
       licensePlanFree: 'Ücretsiz',
-      licensePlanLeader: 'Basic',
-      licensePlanMaster: 'Plus',
+      licensePlanBasic: 'Basic',
+      licensePlanPlus: 'Plus',
       licensePlanPro: 'Pro',
 
       quotaTitle: 'Yapay Zeka Günlük Kullanım Kotası',
@@ -166,8 +166,8 @@ export const statsSection = {
 
       colLicense: 'License',
       licensePlanFree: 'Free',
-      licensePlanLeader: 'Basic',
-      licensePlanMaster: 'Plus',
+      licensePlanBasic: 'Basic',
+      licensePlanPlus: 'Plus',
       licensePlanPro: 'Pro',
 
       quotaTitle: 'AI Daily Usage Quotas',

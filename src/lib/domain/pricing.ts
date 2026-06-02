@@ -1,6 +1,6 @@
 import { formatShopierOrderValue } from '@/lib/domain/shopierCheckout'
 
-export type PlanId = 'leader' | 'master' | 'pro'
+export type PlanId = 'basic' | 'plus' | 'pro'
 export type BillingPeriod = 'monthly' | 'yearly'
 
 /** 25% annual discount — equivalent to 3 months free on a 12-month plan. */
@@ -8,8 +8,8 @@ export const YEARLY_DISCOUNT_RATE = 0.25
 export const YEARLY_MONTHS_FREE = 3
 
 const MONTHLY_PRICES: Record<PlanId, number> = {
-  leader: 499,
-  master: 1099,
+  basic: 499,
+  plus: 1099,
   pro: 1999,
 }
 

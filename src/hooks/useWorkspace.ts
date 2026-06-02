@@ -12,9 +12,9 @@ export interface WorkspaceContext {
   role: 'leader' | 'member'
   fullName: string | null
   avatarUrl: string | null
-  licenseType: 'free' | 'leader' | 'master' | 'pro'
+  licenseType: 'free' | 'basic' | 'plus' | 'pro'
   /** Basic trial credits while license_type is free and trial window active */
-  effectiveLicenseType: 'free' | 'leader' | 'master' | 'pro'
+  effectiveLicenseType: 'free' | 'basic' | 'plus' | 'pro'
   licenseExpiresAt: string | null
   workspaceCreatedAt: string | null
   isTrialActive: boolean

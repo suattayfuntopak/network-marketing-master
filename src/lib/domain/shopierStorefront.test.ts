@@ -8,7 +8,7 @@ import {
   productKey,
 } from './shopierStorefront'
 
-// Env'de görünür isimler basic/plus/pro; içeride leader/master/pro'ya çevrilir.
+// Env anahtarları basic/plus/pro (= PlanId; DB license_type ile birebir).
 const MAP_JSON = JSON.stringify({
   basic_monthly: { url: 'https://www.shopier.com/networkmarketingmaster/47695583', productId: '47695583' },
   plus_yearly: { url: 'https://www.shopier.com/networkmarketingmaster/47695729', productId: 47695729 },
@@ -25,12 +25,11 @@ describe('loadShopierProductMap', () => {
     expect(map.plus_yearly?.productId).toBe('47695729')
   })
 
-  it('normalizes legacy leader/master keys to basic/plus', () => {
+  it('ignores legacy leader/master keys (only basic/plus/pro accepted)', () => {
     const map = loadShopierProductMap(
       JSON.stringify({ leader_monthly: { url: 'x', productId: '1' }, master_yearly: { url: 'y', productId: '2' } })
     )
-    expect(map.basic_monthly?.productId).toBe('1')
-    expect(map.plus_yearly?.productId).toBe('2')
+    expect(map).toEqual({})
   })
 
   it('returns empty object for missing or invalid JSON', () => {
@@ -48,10 +47,9 @@ describe('loadShopierProductMap', () => {
 })
 
 describe('getStorefrontProduct', () => {
-  it('looks up by plan (license_type) + period via alias', () => {
+  it('looks up by plan (license_type) + period', () => {
     const map = loadShopierProductMap(MAP_JSON)
-    // master == Plus
-    expect(getStorefrontProduct('master', 'yearly', map)?.productId).toBe('47695729')
+    expect(getStorefrontProduct('plus', 'yearly', map)?.productId).toBe('47695729')
     expect(getStorefrontProduct('pro', 'yearly', map)).toBeNull()
   })
 })
@@ -77,8 +75,8 @@ describe('resolvePlanFromProductId', () => {
   const map = loadShopierProductMap(MAP_JSON)
 
   it('reverse-maps productId to DB license_type/period/days', () => {
-    expect(resolvePlanFromProductId('47695583', map)).toEqual({ plan: 'leader', period: 'monthly', daysToAdd: 30 })
-    expect(resolvePlanFromProductId('47695729', map)).toEqual({ plan: 'master', period: 'yearly', daysToAdd: 365 })
+    expect(resolvePlanFromProductId('47695583', map)).toEqual({ plan: 'basic', period: 'monthly', daysToAdd: 30 })
+    expect(resolvePlanFromProductId('47695729', map)).toEqual({ plan: 'plus', period: 'yearly', daysToAdd: 365 })
   })
 
   it('returns null for unknown productId (no upgrade)', () => {
@@ -104,9 +102,9 @@ describe('extractWorkspaceIdFromNote', () => {
 })
 
 describe('productKey', () => {
-  it('maps license_type to the alias key', () => {
-    expect(productKey('master', 'monthly')).toBe('plus_monthly')
-    expect(productKey('leader', 'yearly')).toBe('basic_yearly')
+  it('builds the composite key from license_type + period', () => {
+    expect(productKey('plus', 'monthly')).toBe('plus_monthly')
+    expect(productKey('basic', 'yearly')).toBe('basic_yearly')
     expect(productKey('pro', 'monthly')).toBe('pro_monthly')
   })
 })

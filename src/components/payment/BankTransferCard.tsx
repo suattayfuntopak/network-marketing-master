@@ -17,10 +17,10 @@ interface BankTransferCardProps {
    * otomatik e-posta). Opsiyonel olarak seçilen plan iletilir. Verilmezse e-posta butonu
    * klasik `mailto:` olur (anonim ziyaretçi).
    */
-  onNotify?: (plan?: 'leader' | 'master' | 'pro') => Promise<boolean>
+  onNotify?: (plan?: 'basic' | 'plus' | 'pro') => Promise<boolean>
 }
 
-type PlanCode = 'leader' | 'master' | 'pro'
+type PlanCode = 'basic' | 'plus' | 'pro'
 
 /** Variant'a göre nötr palet; vurgu (emerald + WhatsApp yeşili) her ikisinde ortak. */
 function tokens(variant: Variant) {
@@ -199,11 +199,11 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
                   {t('paymentPage.bankPlanQuestion')}
                 </p>
                 <div className="mt-1.5 grid grid-cols-3 gap-1.5">
-                  {(['leader', 'master', 'pro'] as const).map((p) => {
+                  {(['basic', 'plus', 'pro'] as const).map((p) => {
                     const label =
-                      p === 'leader'
+                      p === 'basic'
                         ? t('paymentPage.bankPlanBasic')
-                        : p === 'master'
+                        : p === 'plus'
                           ? t('paymentPage.bankPlanPlus')
                           : t('paymentPage.bankPlanPro')
                     const active = plan === p

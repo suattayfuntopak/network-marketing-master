@@ -7,7 +7,7 @@ import {
 import { isShopierStorefrontEnabled } from '@/lib/domain/shopierStorefront'
 import type { BillingPeriod, PlanId } from '@/lib/domain/pricing'
 
-const VALID_PLANS: PlanId[] = ['leader', 'master', 'pro']
+const VALID_PLANS: PlanId[] = ['basic', 'plus', 'pro']
 const VALID_PERIODS: BillingPeriod[] = ['monthly', 'yearly']
 
 function parsePlan(value: FormDataEntryValue | null): PlanId | null {

@@ -72,7 +72,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
 export async function sendPaymentSuccessEmail(
   email: string,
   name: string,
-  plan: 'leader' | 'master' | 'pro',
+  plan: 'basic' | 'plus' | 'pro',
   amount: string,
   expiresAt: string,
   lang: 'tr' | 'en' = 'tr'
@@ -84,7 +84,7 @@ export async function sendPaymentSuccessEmail(
 
   const planLabel = plan === 'pro'
     ? (lang === 'en' ? 'Diamond Pro Lider Planı' : 'Diamond Pro Lider Planı')
-    : plan === 'master'
+    : plan === 'plus'
       ? (lang === 'en' ? 'Plus Lider Planı' : 'Plus Lider Planı')
       : (lang === 'en' ? 'Basic Partner Planı' : 'Basic Partner Planı')
 
@@ -152,7 +152,7 @@ export async function sendPaymentSuccessEmail(
 export async function sendLicenseExpiryEmail(
   email: string,
   name: string,
-  plan: 'leader' | 'master' | 'pro',
+  plan: 'basic' | 'plus' | 'pro',
   expiresAt: string,
   daysRemaining: number,
   lang: 'tr' | 'en' = 'tr'
@@ -164,7 +164,7 @@ export async function sendLicenseExpiryEmail(
 
   const planLabel = plan === 'pro'
     ? 'Diamond Pro Lider'
-    : plan === 'master'
+    : plan === 'plus'
       ? 'Plus Lider'
       : 'Basic Partner'
 

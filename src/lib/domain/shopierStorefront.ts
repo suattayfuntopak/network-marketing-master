@@ -14,23 +14,12 @@ import type { BillingPeriod, PlanId } from '@/lib/domain/pricing'
  * ({@link resolvePlanFromProductId}). Böylece kullanıcı note'u kurcalayıp
  * ucuz plana ödeyip pahalı plan kapamaz.
  *
- * İSİMLENDİRME: env'de görünür isimler **Basic/Plus/Pro** (planların görünen adı);
- * içeride DB `license_type` değerleri **leader/master/pro** (PlanId). Eşleme:
- * basic↔leader, plus↔master, pro↔pro. Env friendly, iç kimlik bozulmaz.
- *
  * AÇMAK İÇİN (cutover):
  *   SHOPIER_STOREFRONT_ENABLED=true
  *   SHOPIER_PRODUCTS={"basic_monthly":{"url":"https://www.shopier.com/...","productId":"123"}, ...}
  */
 
-/** Env/görünür plan adı (Basic/Plus/Pro). */
-export type PlanAlias = 'basic' | 'plus' | 'pro'
-export type ProductKey = `${PlanAlias}_${BillingPeriod}`
-
-/** Görünür ad → DB license_type (PlanId). */
-const ALIAS_TO_PLAN: Record<PlanAlias, PlanId> = { basic: 'leader', plus: 'master', pro: 'pro' }
-/** DB license_type (PlanId) → görünür ad. */
-const PLAN_TO_ALIAS: Record<PlanId, PlanAlias> = { leader: 'basic', master: 'plus', pro: 'pro' }
+export type ProductKey = `${PlanId}_${BillingPeriod}`
 
 export interface ShopierStorefrontProduct {
   /** Dükkandaki tam ürün linki (ör. https://www.shopier.com/networkmarketingmaster/47695583). */
@@ -45,25 +34,20 @@ export function isShopierStorefrontEnabled(): boolean {
 }
 
 export function productKey(plan: PlanId, period: BillingPeriod): ProductKey {
-  return `${PLAN_TO_ALIAS[plan]}_${period}`
+  return `${plan}_${period}`
 }
 
-/**
- * Env anahtarını normalize eder: `basic_monthly` / `plus_yearly` … döner.
- * Geriye dönük uyumluluk için eski `leader_*`/`master_*` de kabul edilir.
- */
-function normalizeProductKey(key: string): ProductKey | null {
-  const m = key.trim().toLowerCase().match(/^(basic|plus|pro|leader|master)_(monthly|yearly)$/)
+/** `basic_monthly` / `plus_yearly` … geçerli anahtar mı? Değilse null. */
+function parseProductKey(key: string): ProductKey | null {
+  const m = key.trim().toLowerCase().match(/^(basic|plus|pro)_(monthly|yearly)$/)
   if (!m) return null
-  const planPart =
-    m[1] === 'leader' ? 'basic' : m[1] === 'master' ? 'plus' : (m[1] as PlanAlias)
-  return `${planPart}_${m[2] as BillingPeriod}`
+  return `${m[1] as PlanId}_${m[2] as BillingPeriod}`
 }
 
 /**
  * Ürün haritasını env JSON'undan okur:
  *   SHOPIER_PRODUCTS={"basic_monthly":{"url":"...","productId":"123"},"pro_yearly":{...}}
- * Geçersiz/eksik kayıtlar sessizce atlanır; anahtarlar normalize edilir.
+ * Geçersiz/eksik kayıtlar sessizce atlanır.
  */
 export function loadShopierProductMap(
   raw: string | undefined = process.env.SHOPIER_PRODUCTS
@@ -79,7 +63,7 @@ export function loadShopierProductMap(
 
   const out: Partial<Record<ProductKey, ShopierStorefrontProduct>> = {}
   for (const [rawKey, value] of Object.entries(parsed as Record<string, unknown>)) {
-    const key = normalizeProductKey(rawKey)
+    const key = parseProductKey(rawKey)
     if (!key || !value || typeof value !== 'object') continue
     const { url, productId } = value as Record<string, unknown>
     if (typeof url === 'string' && url.trim() && (typeof productId === 'string' || typeof productId === 'number')) {
@@ -106,7 +90,7 @@ export function buildStorefrontRedirectUrl(productUrl: string, note: string): st
 }
 
 export interface ResolvedStorefrontPlan {
-  /** DB license_type (leader/master/pro) — applyLicenseUpgrade buna yazar. */
+  /** DB license_type (basic/plus/pro) — applyLicenseUpgrade buna yazar. */
   plan: PlanId
   period: BillingPeriod
   daysToAdd: number
@@ -124,8 +108,8 @@ export function resolvePlanFromProductId(
   if (!target) return null
   for (const [key, product] of Object.entries(map)) {
     if (product && product.productId === target) {
-      const [alias, period] = key.split('_') as [PlanAlias, BillingPeriod]
-      return { plan: ALIAS_TO_PLAN[alias], period, daysToAdd: period === 'yearly' ? 365 : 30 }
+      const [plan, period] = key.split('_') as [PlanId, BillingPeriod]
+      return { plan, period, daysToAdd: period === 'yearly' ? 365 : 30 }
     }
   }
   return null

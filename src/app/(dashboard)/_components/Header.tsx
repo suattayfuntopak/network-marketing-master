@@ -97,7 +97,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
   const getPlanLabel = (type: string) => {
     if (type === 'pro') return t('header.planPro')
-    if (type === 'master') return t('header.planPlus')
+    if (type === 'plus') return t('header.planPlus')
     return t('header.planBasic')
   }
 

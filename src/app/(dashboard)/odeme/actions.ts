@@ -8,7 +8,7 @@ export type ShopierFormData = Record<string, string>
 
 /** @deprecated Prefer POST /odeme/launch server HTML redirect. Kept for diagnostics. */
 export async function initiateShopierPayment(
-  plan: 'leader' | 'master' | 'pro',
+  plan: 'basic' | 'plus' | 'pro',
   period: 'monthly' | 'yearly' = 'monthly'
 ): Promise<ShopierFormData> {
   return createShopierPaymentSession(plan, period)
@@ -19,14 +19,14 @@ export async function initiateShopierPayment(
  * yapılandırılmış e-posta bildirimi gönderir. Kullanıcının kayıtlı e-postası otomatik
  * eklenir. Migration yok — mevcut Resend altyapısını kullanır.
  */
-const INTENDED_PLAN_LABEL: Record<'leader' | 'master' | 'pro', string> = {
-  leader: 'Basic Partner',
-  master: 'Plus Lider',
+const INTENDED_PLAN_LABEL: Record<'basic' | 'plus' | 'pro', string> = {
+  basic: 'Basic Partner',
+  plus: 'Plus Lider',
   pro: 'Pro Lider',
 }
 
 export async function notifyBankTransferAction(
-  intendedPlan?: 'leader' | 'master' | 'pro',
+  intendedPlan?: 'basic' | 'plus' | 'pro',
 ): Promise<boolean> {
   const supabase = await createClient()
   const {

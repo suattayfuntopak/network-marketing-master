@@ -1,5 +1,6 @@
 import type { User } from '@supabase/supabase-js'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
+import { normalizeLicenseType, type LicenseTier } from '@/lib/domain/aiUsage'
 
 /** Platform owner + real NMM user (dual role per CLAUDE.md §4). */
 export function isSuperAdmin(user: { email?: string | null } | null | undefined): boolean {
@@ -30,7 +31,7 @@ export function resolveWorkspaceLicense(
   user: User | null | undefined,
   ws: { license_type?: string | null; license_expires_at?: string | null } | null
 ): {
-  licenseType: 'free' | 'leader' | 'master' | 'pro'
+  licenseType: LicenseTier
   licenseExpiresAt: string | null
   isSuperAdmin: boolean
 } {
@@ -39,7 +40,8 @@ export function resolveWorkspaceLicense(
     return { ...superAdminLicenseOverride(), isSuperAdmin: true }
   }
   return {
-    licenseType: (ws?.license_type ?? 'free') as 'free' | 'leader' | 'master' | 'pro',
+    // normalizeLicenseType: legacy leader/master DB değerlerini basic/plus'a indirger.
+    licenseType: normalizeLicenseType(ws?.license_type),
     licenseExpiresAt: ws?.license_expires_at ?? null,
     isSuperAdmin: false,
   }

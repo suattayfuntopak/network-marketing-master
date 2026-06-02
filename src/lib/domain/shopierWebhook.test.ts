@@ -58,9 +58,9 @@ describe('parseShopierOrderId', () => {
   })
 
   it('parses a valid monthly order into 30 days', () => {
-    const parsed = parseShopierOrderId('ws-1234567890_leader_monthly_1700000000')
+    const parsed = parseShopierOrderId('ws-1234567890_basic_monthly_1700000000')
     expect(parsed?.daysToAdd).toBe(30)
-    expect(parsed?.plan).toBe('leader')
+    expect(parsed?.plan).toBe('basic')
   })
 
   it('rejects too-few segments', () => {

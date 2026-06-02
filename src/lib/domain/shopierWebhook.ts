@@ -3,7 +3,7 @@
 
 import crypto from 'crypto'
 
-export const VALID_PLANS = ['leader', 'master', 'pro'] as const
+export const VALID_PLANS = ['basic', 'plus', 'pro'] as const
 export const VALID_PERIODS = ['monthly', 'yearly'] as const
 export type Plan = (typeof VALID_PLANS)[number]
 export type Period = (typeof VALID_PERIODS)[number]

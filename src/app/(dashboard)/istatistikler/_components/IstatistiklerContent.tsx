@@ -63,10 +63,10 @@ export function IstatistiklerContent() {
       switch (licenseType) {
         case 'pro':
           return t('statsPage.licensePlanPro')
-        case 'master':
-          return t('statsPage.licensePlanMaster')
-        case 'leader':
-          return t('statsPage.licensePlanLeader')
+        case 'plus':
+          return t('statsPage.licensePlanPlus')
+        case 'basic':
+          return t('statsPage.licensePlanBasic')
         default:
           return t('statsPage.licensePlanFree')
       }

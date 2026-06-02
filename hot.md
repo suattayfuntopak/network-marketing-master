@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-02 — KÖKTEN: license_type leader/master → basic/plus (her yerde)
+
+İç kimlikler artık **basic/plus/pro** (free dahil). leader/master uygulamadan kalktı.
+**ROL `'leader'` (takım lideri) AYRI — dokunulmadı.** Migration MANUEL uygulanacak.
+
+- **Çekirdek:** `PlanId`, `LicenseTier`, `VALID_PLANS`, fiyat haritaları, `database.types.ts`
+  union'ları → basic/plus/pro. Yeni `normalizeLicenseType()` (aiUsage): legacy leader/master DB
+  değerlerini basic/plus okur → deploy↔migration sırası önemsiz, kimse boşta kalmaz.
+- **Boundary normalize:** auth.resolveWorkspaceLicense, getEffectiveLicenseType,
+  istatistikler/platform actions license_type okumaları, teamAccess.
+- **UI/actions:** odeme (OdemeClient isBasic/isPlusActive), platform modal+badge+option value,
+  ekip, header, mail, bank, cron filter, shopier route cast. Trial artık 'basic' kredisi.
+- **shopierStorefront sadeleşti:** alias katmanı (leader↔basic) silindi; ProductKey = PlanId.
+  SHOPIER_PRODUCTS env zaten basic/plus/pro — değişiklik gerekmez.
+- **i18n:** licensePlanLeader→Basic, licensePlanMaster→Plus, planLeader/Master→Basic/Plus,
+  masterRequired→plusRequired (metin "Ekip Master"→"Ekip Plus"). Kalan kopya Leader/Master→Basic/Plus.
+- **DB:** düz text kolon, enum/RLS/function bağımlılığı YOK. Canlı: 1 satır etkilenir (master→plus).
+- tsc temiz, **107 test geçti**, çekirdek dosyalar lint temiz.
+
+⚠️ **CUTOVER:** Supabase'de `046_license_type_rename.sql` uygulanmalı (leader→basic, master→plus).
+normalizeLicenseType sayesinde deploy önce/sonra fark etmez; ama kalıcı temizlik için migration şart.
+
 ## 2026-06-02 — Landing sticky header + pro kart "Ekip Performans İzleme Tablosu" metni
 
 - **Landing header sticky bug:** Header zaten `sticky top-0` idi ama LandingPage kök sarmalayıcıda

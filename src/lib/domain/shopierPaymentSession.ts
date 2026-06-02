@@ -16,11 +16,11 @@ import {
 function productNameForPlan(plan: PlanId, period: BillingPeriod): string {
   if (period === 'yearly') {
     if (plan === 'pro') return 'Network Marketing Master - Annual Pro Leader Plan'
-    if (plan === 'master') return 'Network Marketing Master - Annual Plus Leader Plan'
+    if (plan === 'plus') return 'Network Marketing Master - Annual Plus Leader Plan'
     return 'Network Marketing Master - Annual Basic Plan'
   }
   if (plan === 'pro') return 'Network Marketing Master - Pro Leader Plan'
-  if (plan === 'master') return 'Network Marketing Master - Plus Leader Plan'
+  if (plan === 'plus') return 'Network Marketing Master - Plus Leader Plan'
   return 'Network Marketing Master - Basic Plan'
 }
 

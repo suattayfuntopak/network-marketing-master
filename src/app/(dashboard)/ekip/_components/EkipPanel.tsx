@@ -38,7 +38,7 @@ export function EkipPanel() {
   const isLicenseExpired = licenseExpiresAt
     ? new Date(licenseExpiresAt) < new Date()
     : false
-  const hasMasterAccess = (licenseType === 'master' || licenseType === 'pro') && !isLicenseExpired
+  const hasMasterAccess = (licenseType === 'plus' || licenseType === 'pro') && !isLicenseExpired
 
   const [copied, setCopied] = useState(false)
   const [inviteCodeInput, setInviteCodeInput] = useState('')
@@ -89,9 +89,9 @@ export function EkipPanel() {
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
-  const isPlusCapReached = licenseType === 'master' && totalDownlineCount > 50
+  const isPlusCapReached = licenseType === 'plus' && totalDownlineCount > 50
 
-  const visibleMembers = licenseType === 'master'
+  const visibleMembers = licenseType === 'plus'
     ? [members[0], ...downlineMembers.slice(0, 50)].filter(Boolean)
     : members
 

@@ -86,7 +86,7 @@ export function PlatformYonetimContent() {
   const [deleteCountdown, setDeleteCountdown] = useState<number>(0)
 
   // Extension Modal states
-  const [licenseType, setLicenseType] = useState<'free' | 'leader' | 'master' | 'pro'>('master')
+  const [licenseType, setLicenseType] = useState<'free' | 'basic' | 'plus' | 'pro'>('plus')
   const [extensionDays, setExtensionDays] = useState(30)
   const [isUnlimited, setIsUnlimited] = useState(false)
   const [isUpdating, startUpdateTransition] = useTransition()
@@ -634,18 +634,18 @@ export function PlatformYonetimContent() {
                           <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                              : w.licenseType === 'master'
+                              : w.licenseType === 'plus'
                                 ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                                : w.licenseType === 'leader'
+                                : w.licenseType === 'basic'
                                   ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
                                   : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400'
                           }`}>
                             {w.licenseType === 'pro'
                               ? t('platformPage.planPro')
-                              : w.licenseType === 'master'
-                                ? t('platformPage.planMaster')
-                                : w.licenseType === 'leader'
-                                  ? t('platformPage.planLeader')
+                              : w.licenseType === 'plus'
+                                ? t('platformPage.planPlus')
+                                : w.licenseType === 'basic'
+                                  ? t('platformPage.planBasic')
                                   : t('platformPage.planFree')}
                           </span>
                         </td>
@@ -717,8 +717,8 @@ export function PlatformYonetimContent() {
                                 setSelectedWorkspace(w)
                                 setLicenseType(
                                   w.licenseType === 'free' ||
-                                    w.licenseType === 'leader' ||
-                                    w.licenseType === 'master' ||
+                                    w.licenseType === 'basic' ||
+                                    w.licenseType === 'plus' ||
                                     w.licenseType === 'pro'
                                     ? w.licenseType
                                     : 'free'
@@ -911,8 +911,8 @@ export function PlatformYonetimContent() {
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
                   >
                     <option value="free">{t('platformPage.freeRevoke')}</option>
-                    <option value="leader">Basic Plan</option>
-                    <option value="master">Plus Plan</option>
+                    <option value="basic">Basic Plan</option>
+                    <option value="plus">Plus Plan</option>
                     <option value="pro">Pro Plan</option>
                   </select>
                 </div>

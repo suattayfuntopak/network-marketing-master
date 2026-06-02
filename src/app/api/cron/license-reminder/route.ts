@@ -4,6 +4,7 @@ import { cronAuthError } from '@/lib/infra/cronAuth'
 import { claimEmailSend } from '@/lib/infra/emailSentLog'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { sendLicenseExpiryEmail } from '@/lib/infra/mail'
+import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 
 export async function GET(request: NextRequest) {
   const authError = cronAuthError(request)
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
       .select('id, license_type, license_expires_at')
       .gte('license_expires_at', targetStart.toISOString())
       .lte('license_expires_at', targetEnd.toISOString())
-      .in('license_type', ['leader', 'master', 'pro'])
+      .in('license_type', ['basic', 'plus', 'pro'])
 
     if (error) {
       console.error(`[license-reminder] Error querying workspaces for ${daysRemaining}d:`, error)
@@ -63,7 +64,7 @@ export async function GET(request: NextRequest) {
         const sent = await sendLicenseExpiryEmail(
           email,
           name,
-          ws.license_type as 'leader' | 'master' | 'pro',
+          normalizeLicenseType(ws.license_type) as 'basic' | 'plus' | 'pro',
           ws.license_expires_at,
           daysRemaining,
           'tr'

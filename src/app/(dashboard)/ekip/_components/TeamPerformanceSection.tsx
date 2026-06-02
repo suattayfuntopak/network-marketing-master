@@ -327,10 +327,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                         </div>
                         <div>
                           <h4 className="text-sm font-extrabold text-white">
-                            {t('team.masterRequired')}
+                            {t('team.plusRequired')}
                           </h4>
                           <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                            {t('team.masterRequiredDesc')}
+                            {t('team.plusRequiredDesc')}
                           </p>
                         </div>
                         <div>

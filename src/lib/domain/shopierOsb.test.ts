@@ -9,7 +9,7 @@ describe('shopierOsb', () => {
   it('parses base64 order payload', () => {
     const payload = {
       email: 'test@example.com',
-      orderid: '999311ea-4e69-4b84-97b5-a1468ffd083e_master_monthly_123',
+      orderid: '999311ea-4e69-4b84-97b5-a1468ffd083e_plus_monthly_123',
       price: 399,
     }
     const res = Buffer.from(JSON.stringify(payload)).toString('base64')

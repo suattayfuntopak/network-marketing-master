@@ -6,6 +6,7 @@ import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import type { User } from '@supabase/supabase-js'
+import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
@@ -186,7 +187,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       ownerName,
       avatarUrl,
       createdAt: w.created_at,
-      licenseType: w.license_type ?? 'free',
+      licenseType: normalizeLicenseType(w.license_type),
       licenseExpiresAt: w.license_expires_at ?? null,
       candidateCount,
       downlineCount,
@@ -207,7 +208,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
  */
 export async function adminExtendLicenseAction(
   workspaceId: string,
-  licenseType: 'free' | 'leader' | 'master' | 'pro',
+  licenseType: 'free' | 'basic' | 'plus' | 'pro',
   days: number,
   unlimited: boolean = false
 ): Promise<{ success: boolean; expiresAt: string | null }> {

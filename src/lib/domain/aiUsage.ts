@@ -1,6 +1,6 @@
 // Günlük AI mesaj limitleri — tek kaynak, tüm server action'lar ve UI bu fonksiyonu kullanır.
 
-export type LicenseTier = 'free' | 'leader' | 'master' | 'pro'
+export type LicenseTier = 'free' | 'basic' | 'plus' | 'pro'
 
 export interface AILimits {
   messageLimit: number
@@ -12,8 +12,28 @@ export const TRIAL_DAYS = 14
 
 const PAID_LIMITS: Record<Exclude<LicenseTier, 'free'>, AILimits> = {
   pro: { messageLimit: 100, roleplayLimit: 60, complianceLimit: 15 },
-  master: { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 },
-  leader: { messageLimit: 15, roleplayLimit: 10, complianceLimit: 2 },
+  plus: { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 },
+  basic: { messageLimit: 15, roleplayLimit: 10, complianceLimit: 2 },
+}
+
+/**
+ * DB'deki license_type değerini kanonik forma indirger. Eski (legacy) değerler
+ * leader→basic, master→plus ile eşlenir; basic/plus/pro/free aynen geçer. Bu,
+ * 028 migration'ı ile deploy'un sırasını önemsizleştirir (kimse boşta kalmaz).
+ */
+export function normalizeLicenseType(raw: string | null | undefined): LicenseTier {
+  switch (raw) {
+    case 'basic':
+    case 'leader':
+      return 'basic'
+    case 'plus':
+    case 'master':
+      return 'plus'
+    case 'pro':
+      return 'pro'
+    default:
+      return 'free'
+  }
 }
 
 const POST_TRIAL_FREE_LIMITS: AILimits = {
@@ -22,7 +42,7 @@ const POST_TRIAL_FREE_LIMITS: AILimits = {
   complianceLimit: 0,
 }
 
-/** 14-day signup trial uses Basic (leader) daily credits while license_type stays `free`. */
+/** 14-day signup trial uses Basic daily credits while license_type stays `free`. */
 export function isTrialPeriodActive(
   licenseType: string | null | undefined,
   licenseExpiresAt: string | null | undefined,
@@ -46,9 +66,9 @@ export function getEffectiveLicenseType(
   licenseExpiresAt?: string | null,
   workspaceCreatedAt?: string | null
 ): LicenseTier {
-  const type = (licenseType ?? 'free') as LicenseTier
+  const type = normalizeLicenseType(licenseType)
   if (type !== 'free') return type
-  return isTrialPeriodActive(type, licenseExpiresAt, workspaceCreatedAt) ? 'leader' : 'free'
+  return isTrialPeriodActive(type, licenseExpiresAt, workspaceCreatedAt) ? 'basic' : 'free'
 }
 
 export function getLimitsForLicense(

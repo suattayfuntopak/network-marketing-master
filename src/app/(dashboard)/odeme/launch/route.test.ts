@@ -16,12 +16,12 @@ describe('POST /odeme/launch', () => {
     ;(createShopierPaymentSession as ReturnType<typeof vi.fn>).mockResolvedValue({
       API_key: 'test-key',
       signature: 'sig+test=',
-      platform_order_id: 'ws_leader_monthly_1',
+      platform_order_id: 'ws_basic_monthly_1',
       total_order_value: '499',
     })
 
     const formData = new FormData()
-    formData.set('plan', 'leader')
+    formData.set('plan', 'basic')
     formData.set('period', 'monthly')
 
     const req = new Request('http://localhost/odeme/launch', { method: 'POST', body: formData })
@@ -32,7 +32,7 @@ describe('POST /odeme/launch', () => {
     expect(html).toContain('api_pay4.php')
     expect(html).toContain('multipart/form-data')
     expect(html).toContain('value="499"')
-    expect(createShopierPaymentSession).toHaveBeenCalledWith('leader', 'monthly')
+    expect(createShopierPaymentSession).toHaveBeenCalledWith('basic', 'monthly')
   })
 
   it('returns 400 when plan is invalid', async () => {

@@ -97,7 +97,7 @@ async function applyLicenseUpgrade(params: {
         sendPaymentSuccessEmail(
           authUser.user.email,
           leaderMember.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak',
-          params.newLicenseType as 'leader' | 'master' | 'pro',
+          params.newLicenseType as 'basic' | 'plus' | 'pro',
           params.totalAmount,
           newExpiry.toISOString(),
           'tr'

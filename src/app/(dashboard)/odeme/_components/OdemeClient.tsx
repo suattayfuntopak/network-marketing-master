@@ -31,13 +31,13 @@ export function OdemeClient() {
   const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   
-  const [selectedPlan, setSelectedPlan] = useState<'leader' | 'master' | 'pro' | null>(null)
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'plus' | 'pro' | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
 
   useBodyScrollLock(loading)
 
-  const handlePayment = async (plan: 'leader' | 'master' | 'pro') => {
+  const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)
     setSelectedPlan(plan)
     toast.info(t('paymentPage.preparingCheckout'))
@@ -121,8 +121,8 @@ export function OdemeClient() {
   }
 
   const isProActive = workspace?.licenseType === 'pro'
-  const isMasterActive = workspace?.licenseType === 'master'
-  const isLeaderActive = workspace?.licenseType === 'leader'
+  const isPlusActive = workspace?.licenseType === 'plus'
+  const isBasicActive = workspace?.licenseType === 'basic'
 
   return (
     <div className="mx-auto max-w-7xl space-y-12 py-4">
@@ -145,7 +145,7 @@ export function OdemeClient() {
         </div>
       )}
 
-      {workspace && (isProActive || isMasterActive || isLeaderActive) && (
+      {workspace && (isProActive || isPlusActive || isBasicActive) && (
         <div className="rounded-2xl border border-indigo-500/25 bg-indigo-500/5 p-6 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="flex items-center gap-4 text-center md:text-left">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
@@ -160,7 +160,7 @@ export function OdemeClient() {
                 <span className="font-extrabold text-indigo-600 dark:text-indigo-300">
                   {workspace.licenseType === 'pro'
                     ? t('paymentPage.planPro')
-                    : workspace.licenseType === 'master'
+                    : workspace.licenseType === 'plus'
                       ? t('paymentPage.planPlus')
                       : t('paymentPage.planBasic')}
                 </span>
@@ -232,7 +232,7 @@ export function OdemeClient() {
               <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                 {t('paymentPage.soloBuilderTag')}
               </span>
-              {isLeaderActive && (
+              {isBasicActive && (
                 <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                   {t('paymentPage.active')}
                 </span>
@@ -251,7 +251,7 @@ export function OdemeClient() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-[var(--text-1)]">
-                  {formatTryPrice(getDisplayPrice('leader', billingPeriod))}
+                  {formatTryPrice(getDisplayPrice('basic', billingPeriod))}
                 </span>
                 <span className="text-xs text-[var(--text-3)]">
                   / {t('paymentPage.monthUnit')}
@@ -290,13 +290,13 @@ export function OdemeClient() {
 
           <div className="pt-8">
             <button
-              onClick={() => handlePayment('leader')}
-              disabled={loading || (billingPeriod === 'monthly' ? isLeaderActive : false)}
+              onClick={() => handlePayment('basic')}
+              disabled={loading || (billingPeriod === 'monthly' ? isBasicActive : false)}
               className={`w-full text-center rounded-xl border border-[var(--border)] hover:bg-[var(--bg-subtle)] text-[var(--text-1)] py-3 text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 ${
-                isLeaderActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
+                isBasicActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
-              {isLeaderActive && billingPeriod === 'monthly' ? (
+              {isBasicActive && billingPeriod === 'monthly' ? (
                 t('paymentPage.currentActivePlan')
               ) : (
                 <>
@@ -315,7 +315,7 @@ export function OdemeClient() {
         {/* Plus Plan */}
         <div className="rounded-3xl border border-[#534AB7]/35 bg-[var(--bg-card)] dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/20 dark:ring-[#534AB7]/30 shadow-lg shadow-indigo-500/5 dark:shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/50 transition duration-300">
           <div className="absolute right-6 top-6 flex items-center gap-2">
-            {isMasterActive && (
+            {isPlusActive && (
               <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {t('paymentPage.active')}
               </span>
@@ -341,7 +341,7 @@ export function OdemeClient() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-[var(--text-1)]">
-                  {formatTryPrice(getDisplayPrice('master', billingPeriod))}
+                  {formatTryPrice(getDisplayPrice('plus', billingPeriod))}
                 </span>
                 <span className="text-xs text-[var(--text-3)]">
                   / {t('paymentPage.monthUnit')}
@@ -388,13 +388,13 @@ export function OdemeClient() {
 
           <div className="pt-8">
             <button
-              onClick={() => handlePayment('master')}
-              disabled={loading || (billingPeriod === 'monthly' ? isMasterActive : false)}
+              onClick={() => handlePayment('plus')}
+              disabled={loading || (billingPeriod === 'monthly' ? isPlusActive : false)}
               className={`w-full text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
-                isMasterActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
+                isPlusActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
-              {isMasterActive && billingPeriod === 'monthly' ? (
+              {isPlusActive && billingPeriod === 'monthly' ? (
                 t('paymentPage.currentActivePlan')
               ) : (
                 <>

@@ -90,7 +90,7 @@ export function LandingPricing() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-slate-900 dark:text-white">
-                  {formatTryPrice(getDisplayPrice('leader', billingPeriod))}
+                  {formatTryPrice(getDisplayPrice('basic', billingPeriod))}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-zinc-500">
                   / {t('landingPage.priceMonth')}
@@ -163,7 +163,7 @@ export function LandingPricing() {
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
                 <span className="text-4xl font-black text-slate-900 dark:text-white">
-                  {formatTryPrice(getDisplayPrice('master', billingPeriod))}
+                  {formatTryPrice(getDisplayPrice('plus', billingPeriod))}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-zinc-500">
                   / {t('landingPage.priceMonth')}

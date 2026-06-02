@@ -85,7 +85,7 @@ describe('checkAIQuota', () => {
     const res = await checkAIQuota('compliance')
     expect(res.ok).toBe(true)
     if (res.ok) {
-      expect(res.licenseType).toBe('leader')
+      expect(res.licenseType).toBe('basic')
       expect(res.limit).toBe(2)
     }
   })

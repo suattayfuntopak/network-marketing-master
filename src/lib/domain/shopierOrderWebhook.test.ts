@@ -52,9 +52,9 @@ describe('extractOrderFields', () => {
   })
 
   it('supports snake_case and direct productId keys', () => {
-    const payload = { customer_note: 'ws0123456789_master_monthly_1', product_id: 222 }
+    const payload = { customer_note: 'ws0123456789_plus_monthly_1', product_id: 222 }
     expect(extractOrderFields(payload)).toEqual({
-      note: 'ws0123456789_master_monthly_1',
+      note: 'ws0123456789_plus_monthly_1',
       productId: '222',
     })
   })

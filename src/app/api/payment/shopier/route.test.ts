@@ -33,13 +33,13 @@ vi.mock('@/lib/domain/shopierOsb', async (importOriginal) => {
     }),
     verifyShopierOsbHash: vi.fn(() => true),
     parseShopierOsbPayload: vi.fn(() => ({
-      orderid: '999311ea-4e69-4b84-97b5-a1468ffd083e_leader_monthly_1700000000',
+      orderid: '999311ea-4e69-4b84-97b5-a1468ffd083e_basic_monthly_1700000000',
       price: 399,
       email: 'buyer@example.com',
     })),
     resolveOrderFromOsb: vi.fn(() => ({
       workspaceId: '999311ea-4e69-4b84-97b5-a1468ffd083e',
-      plan: 'leader',
+      plan: 'basic',
       period: 'monthly',
       daysToAdd: 30,
     })),

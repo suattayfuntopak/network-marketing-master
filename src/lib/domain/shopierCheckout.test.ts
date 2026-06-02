@@ -86,11 +86,11 @@ describe('shopierCheckout', () => {
   it('builds parseable platform order ids for webhooks', () => {
     const orderId = buildShopierPlatformOrderId(
       '999311ea-4e69-4b84-97b5-a1468ffd083e',
-      'leader',
+      'basic',
       'monthly'
     )
-    expect(orderId).toMatch(/^999311ea-4e69-4b84-97b5-a1468ffd083e_leader_monthly_\d+$/)
-    expect(parseShopierOrderId(orderId)?.plan).toBe('leader')
+    expect(orderId).toMatch(/^999311ea-4e69-4b84-97b5-a1468ffd083e_basic_monthly_\d+$/)
+    expect(parseShopierOrderId(orderId)?.plan).toBe('basic')
   })
 
   it('builds multipart auto-submit launch html', () => {

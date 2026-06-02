@@ -62,7 +62,7 @@ describe('getLimitsForLicense', () => {
     expect(
       isTrialPeriodActive('free', null, createdRecently)
     ).toBe(true)
-    expect(getEffectiveLicenseType('free', null, createdRecently)).toBe('leader')
+    expect(getEffectiveLicenseType('free', null, createdRecently)).toBe('basic')
     expect(getLimitsForLicense('free', false, null, createdRecently)).toEqual({
       messageLimit: 15,
       roleplayLimit: 10,
