@@ -16,6 +16,7 @@ import {
   extractWorkspaceIdFromNote,
   resolvePlanFromProductId,
 } from '@/lib/domain/shopierStorefront'
+import { isSuperAdmin } from '@/lib/domain/auth'
 
 async function applyLicenseUpgrade(params: {
   workspaceId: string
@@ -93,7 +94,8 @@ async function applyLicenseUpgrade(params: {
 
     if (leaderMember) {
       const { data: authUser } = await supabase.auth.admin.getUserById(leaderMember.user_id)
-      if (authUser?.user?.email) {
+      // Süper admin'e (uygulama sahibi, test/override) ödeme maili gönderme; gerçek müşterilere gider.
+      if (authUser?.user?.email && !isSuperAdmin({ email: authUser.user.email })) {
         sendPaymentSuccessEmail(
           authUser.user.email,
           leaderMember.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak',
