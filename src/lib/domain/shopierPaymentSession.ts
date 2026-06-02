@@ -8,6 +8,10 @@ import {
   normalizeShopierPhone,
   toShopierBuyerId,
 } from '@/lib/domain/shopierCheckout'
+import {
+  buildStorefrontRedirectUrl,
+  getStorefrontProduct,
+} from '@/lib/domain/shopierStorefront'
 
 function productNameForPlan(plan: PlanId, period: BillingPeriod): string {
   if (period === 'yearly') {
@@ -84,4 +88,43 @@ export async function createShopierPaymentSession(
       randomNr,
     },
   })
+}
+
+/**
+ * Shopier "dükkan yönlendirme" (storefront-redirect) modeli için ürün linkini üretir.
+ * Ödemeyi biz başlatmayız; kullanıcıyı dükkandaki ürüne yönlendiririz; `note` ile
+ * workspace'i işaretleriz ve order.created webhook'unda eşleriz (bkz. shopierStorefront.ts).
+ */
+export async function createShopierStorefrontRedirect(
+  plan: PlanId,
+  period: BillingPeriod = 'monthly'
+): Promise<string> {
+  if (process.env.PAYMENT_MAINTENANCE === 'true') {
+    throw new Error('Ödeme sistemi şu anda bakımda, lütfen birkaç dakika sonra tekrar deneyin.')
+  }
+
+  const supabase = await createClient()
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) {
+    throw new Error('Oturum bulunamadı. Lütfen tekrar giriş yapın.')
+  }
+
+  const { data: membership, error: memError } = await supabase
+    .from('nmm_workspace_members')
+    .select('workspace_id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (memError || !membership) {
+    throw new Error('Çalışma alanı (Workspace) bulunamadı. Lütfen bir ekibe katılın veya yeni bir tane oluşturun.')
+  }
+
+  const product = getStorefrontProduct(plan, period)
+  if (!product) {
+    throw new Error('Ödeme ürünü henüz yapılandırılmamış. Lütfen kısa süre sonra tekrar deneyin.')
+  }
+
+  // note = mevcut sipariş formatı; webhook tarafında parse edilir (workspaceId alınır).
+  const note = buildShopierPlatformOrderId(membership.workspace_id, plan, period)
+  return buildStorefrontRedirectUrl(product.url, note)
 }

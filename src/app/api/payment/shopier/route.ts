@@ -8,6 +8,14 @@ import {
   resolveOrderFromOsb,
   verifyShopierOsbHash,
 } from '@/lib/domain/shopierOsb'
+import {
+  extractOrderFields,
+  verifyShopierWebhookSignature,
+} from '@/lib/domain/shopierOrderWebhook'
+import {
+  extractWorkspaceIdFromNote,
+  resolvePlanFromProductId,
+} from '@/lib/domain/shopierStorefront'
 
 async function applyLicenseUpgrade(params: {
   workspaceId: string
@@ -140,8 +148,85 @@ async function handleOsbNotification(res: string, hash: string) {
   })
 }
 
+/**
+ * Shopier `order.created` REST webhook'u (dükkan-yönlendirme modeli).
+ * note → workspaceId ("kime"); productId → plan/süre (güvenli tier kaynağı).
+ *
+ * KEŞİF FAZI: payload alan adları kesinleşene dek ham gövde + header'lar loglanır.
+ * SHOPIER_WEBHOOK_SECRET set ise HS256 imza doğrulanır (SHOPIER_WEBHOOK_VERIFY=false
+ * ile geçici bypass — sadece ilk test webhook'larını görmek için).
+ */
+async function handleOrderCreatedWebhook(request: NextRequest) {
+  const raw = await request.text()
+  const signature = request.headers.get('shopier-signature')
+  const event = request.headers.get('shopier-event')
+  const timestamp = request.headers.get('shopier-timestamp')
+
+  // Keşif: gerçek payload + header'ları gör (alan adlarını buradan kilitleyeceğiz).
+  console.info('[Shopier order.created] received', {
+    event,
+    timestamp,
+    webhookId: request.headers.get('shopier-webhook-id'),
+    bodyPreview: raw.slice(0, 4000),
+  })
+
+  const secret = process.env.SHOPIER_WEBHOOK_SECRET
+  if (secret && process.env.SHOPIER_WEBHOOK_VERIFY !== 'false') {
+    if (!verifyShopierWebhookSignature(raw, signature, secret, timestamp)) {
+      console.warn('[Shopier order.created] signature mismatch')
+      return new NextResponse('invalid signature', { status: 401 })
+    }
+  }
+
+  let payload: unknown
+  try {
+    payload = JSON.parse(raw)
+  } catch {
+    return new NextResponse('invalid json', { status: 400 })
+  }
+
+  // Yalnız order.created işlenir (başka event header'ı gelirse yok say).
+  if (event && event !== 'order.created') {
+    return NextResponse.json({ received: true, ignored: event })
+  }
+
+  const { note, productId } = extractOrderFields(payload)
+  const workspaceId = extractWorkspaceIdFromNote(note)
+  const resolved = productId ? resolvePlanFromProductId(productId) : null
+
+  if (!workspaceId || !resolved) {
+    // 200 dön ki Shopier sürekli retry etmesin; eksikleri log'dan tamamlayacağız.
+    console.warn('[Shopier order.created] unresolved', {
+      note,
+      productId,
+      hasWorkspace: !!workspaceId,
+      hasPlan: !!resolved,
+    })
+    return NextResponse.json({ received: true, applied: false })
+  }
+
+  const newExpiry = await applyLicenseUpgrade({
+    workspaceId,
+    newLicenseType: resolved.plan,
+    daysToAdd: resolved.daysToAdd,
+    totalAmount: '',
+    parentId: null,
+  })
+
+  console.log(
+    `[Shopier order.created] License updated for workspace ${workspaceId} (${resolved.plan}) until ${newExpiry.toISOString()}`
+  )
+  return NextResponse.json({ received: true, applied: true })
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // order.created REST webhook'u JSON gönderir; OSB/api_pay4 ise form-encoded.
+    const contentType = request.headers.get('content-type') ?? ''
+    if (contentType.includes('application/json')) {
+      return await handleOrderCreatedWebhook(request)
+    }
+
     const formData = await request.formData()
 
     const osbRes = formData.get('res')?.toString()

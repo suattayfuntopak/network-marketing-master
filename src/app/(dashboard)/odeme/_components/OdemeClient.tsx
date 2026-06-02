@@ -57,7 +57,7 @@ export function OdemeClient() {
 
       const bodyText = await res.text()
 
-      if (!res.ok || !contentType.includes('text/html')) {
+      if (!res.ok) {
         let message = t('paymentPage.unknownError')
         try {
           const data = JSON.parse(bodyText) as { error?: string }
@@ -68,10 +68,25 @@ export function OdemeClient() {
         throw new Error(message)
       }
 
-      const html = bodyText
-      document.open()
-      document.write(html)
-      document.close()
+      // Yeni Shopier akışı (dükkan yönlendirme): JSON { redirectUrl } → tarayıcıyı yönlendir.
+      if (contentType.includes('application/json')) {
+        const data = JSON.parse(bodyText) as { redirectUrl?: string; error?: string }
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl
+          return
+        }
+        throw new Error(data.error || t('paymentPage.unknownError'))
+      }
+
+      // Eski api_pay4 akışı: otomatik gönderilen HTML formu.
+      if (contentType.includes('text/html')) {
+        document.open()
+        document.write(bodyText)
+        document.close()
+        return
+      }
+
+      throw new Error(t('paymentPage.unknownError'))
     } catch (err: unknown) {
       console.error('[OdemeClient] checkout launch failed:', err)
       toast.error(

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { buildShopierLaunchHtml } from '@/lib/domain/shopierCheckout'
-import { createShopierPaymentSession } from '@/lib/domain/shopierPaymentSession'
+import {
+  createShopierPaymentSession,
+  createShopierStorefrontRedirect,
+} from '@/lib/domain/shopierPaymentSession'
+import { isShopierStorefrontEnabled } from '@/lib/domain/shopierStorefront'
 import type { BillingPeriod, PlanId } from '@/lib/domain/pricing'
 
 const VALID_PLANS: PlanId[] = ['leader', 'master', 'pro']
@@ -26,6 +30,17 @@ export async function POST(request: NextRequest) {
 
     if (!plan) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    }
+
+    // Yeni Shopier modeli: dükkan ürün linkine yönlendirme (api_pay4 reddedildi).
+    // Flag açıkken JSON { redirectUrl } döner; client window.location ile gider.
+    if (isShopierStorefrontEnabled()) {
+      const redirectUrl = await createShopierStorefrontRedirect(plan, period)
+      console.info('[Shopier Launch] storefront redirect', { plan, period })
+      return NextResponse.json(
+        { redirectUrl },
+        { headers: { 'Cache-Control': 'no-store' } }
+      )
     }
 
     const checkoutForm = await createShopierPaymentSession(plan, period)

@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-02 — Shopier dükkan-yönlendirme iskeleti (Faz 2, flag KAPALI)
+
+Shopier api_pay4 (uygulama/API checkout) reddedildi → "dükkan-yönlendirme + order.created
+webhook" modeline geçiş. Env-flag arkasında kuruldu; `SHOPIER_STOREFRONT_ENABLED` set
+edilmediği için **canlı akış aynen api_pay4 ile çalışmaya devam ediyor** (sıfır davranış değişimi).
+
+- **shopierStorefront.ts** (yeni): env JSON ürün haritası (`SHOPIER_PRODUCTS`, 6 plan×dönem),
+  `buildStorefrontRedirectUrl` (quantity+note), `resolvePlanFromProductId` (tier = ürün, note değil),
+  `extractWorkspaceIdFromNote` (note'tan SADECE workspaceId). Güvenlik: note serbest metin →
+  tier productId'den çözülür, spoofing kapalı.
+- **shopierOrderWebhook.ts** (yeni, pure): HS256 imza doğrulama (ham body / `ts.body` adayları,
+  base64+hex) + defensive note/productId çıkarımı (alan adları kesinleşene dek recursive arar).
+- **shopierPaymentSession.ts**: `createShopierStorefrontRedirect` eklendi.
+- **/odeme/launch**: flag açıkken JSON `{ redirectUrl }` döner; **OdemeClient** bunu yakalayıp
+  `window.location`'a yönlendirir (api_pay4 HTML yolu korunur).
+- **/api/payment/shopier**: JSON content-type → `order.created` dalı; ham payload + header'lar
+  **loglanır** (keşif fazı), note→workspace + productId→plan → mevcut `applyLicenseUpgrade`.
+- Testler: shopierStorefront (12) + shopierOrderWebhook (8) = 20 yeni; toplam 106 geçti.
+  `.env.local.example`'a Shopier storefront değişkenleri eklendi.
+
+KALAN (Faz 3): Suat 6 ürün + PAT + webhook kaydı → env değerleri + 1 test siparişi → log'dan
+gerçek payload alanlarını kilitle → `SHOPIER_STOREFRONT_ENABLED=true`.
+
 ## 2026-06-01 — AI tablosu lisans "ÜCRETSİZ" flash düzeltme
 
 - İstatistikler açılış/yenilemede AI Kullanım tablosunda Suat & Elif birkaç saniye **ÜCRETSİZ**
