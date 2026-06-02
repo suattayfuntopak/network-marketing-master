@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-02 — Landing sticky header + pro kart "Ekip Performans İzleme Tablosu" metni
+
+- **Landing header sticky bug:** Header zaten `sticky top-0` idi ama LandingPage kök sarmalayıcıda
+  `overflow-x-hidden` (→ overflow-y:auto scroll-container) sticky'yi bozuyordu. `overflow-x-clip`'e
+  çevrildi (scroll-container oluşturmaz, sticky çalışır, yatay taşma yine kırpılır).
+- **Pro kart metni:** "Ekip Nabzı" → **"Ekip Performans İzleme Tablosu"** (landing planProFeat7 +
+  payment proFeature7, TR+EN); içerik gerçek tabloya göre güncellendi (aday hunisi + içerik/itiraz/
+  video ilerlemesi).
+
 ## 2026-06-02 — Shopier Faz 3: ürünler + PAT + webhook kaydı + secret
 
 - **Naming düzeltildi:** env ürün anahtarları artık **basic/plus/pro** (görünür ad); içeride

@@ -82,7 +82,7 @@ export function LandingPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white overflow-x-hidden font-sans">
+    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white overflow-x-clip font-sans">
       
       {/* ── BACKGROUND NEON ORBS ── */}
       <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full dark:bg-[#534AB7]/10 blur-[130px] pointer-events-none" />
