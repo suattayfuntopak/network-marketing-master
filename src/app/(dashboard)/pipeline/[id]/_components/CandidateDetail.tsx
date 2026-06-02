@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates, useCandidateDetail, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useCandidateDetail, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -47,7 +47,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const [editingFollowUp, setEditingFollowUp] = useState(false)
   const [tempFollowUp, setTempFollowUp] = useState<string>('')
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [translatedNote, setTranslatedNote] = useState<string | null>(null)
+  const [asyncNote, setAsyncNote] = useState<{ key: string; value: string } | null>(null)
   const [isTranslating, setIsTranslating] = useState(false)
 
   const { data: ws, isLoading: wsLoading } = useWorkspace()
@@ -63,63 +63,52 @@ export function CandidateDetail({ candidateId }: Props) {
 
   useBodyScrollLock(stageOpen || confirmOpen || editingFollowUp)
 
-  // Not çevirisi: EN modunda kalıcı ve cache'li AI çevirisi
+  // Anında bilinen EN not — render'da türetilir (localStorage'a/effect'e gerek yok).
+  const immediateNoteEn = useMemo(() => {
+    if (lang !== 'en' || !c) return { value: null as string | null, noteTr: null as string | null }
+    const p = resolveCandidateFields(c)
+    if (p.noteEn) return { value: p.noteEn, noteTr: null as string | null }
+    if (!p.noteTr) return { value: null as string | null, noteTr: null as string | null }
+    return { value: null as string | null, noteTr: p.noteTr } // çeviri gerekiyor
+  }, [lang, c])
+
+  // Not çevirisi: yalnız gerektiğinde (cache veya kalıcı AI çevirisi). Tüm setState'ler
+  // async fonksiyon içinde olduğundan senkron set-state-in-effect yok.
   useEffect(() => {
-    if (lang !== 'en' || !c) {
-      setTranslatedNote(null)
-      return
-    }
-
-    const parsedLocal = resolveCandidateFields(c)
-    if (parsedLocal.noteEn) {
-      setTranslatedNote(parsedLocal.noteEn)
-      return
-    }
-
-    if (!parsedLocal.noteTr) {
-      setTranslatedNote(null)
-      return
-    }
+    const noteTr = immediateNoteEn.noteTr
+    if (!noteTr || !c) return
+    let cancelled = false
 
     let h = 0
-    const rawText = parsedLocal.noteTr
-    for (let i = 0; i < rawText.length; i++) h = (Math.imul(31, h) + rawText.charCodeAt(i)) | 0
+    for (let i = 0; i < noteTr.length; i++) h = (Math.imul(31, h) + noteTr.charCodeAt(i)) | 0
     const cacheKey = `nmm_note_en_${candidateId}_${(h >>> 0).toString(36)}`
-    const cached = localStorage.getItem(cacheKey)
-    if (cached) {
-      setTranslatedNote(cached)
-      // Veritabanına da kaydet ki diğer cihazlarda veya localstorage temizlendiğinde çalışsın
-      if (!attemptedUpdates.current[candidateId]) {
-        attemptedUpdates.current[candidateId] = true
-        update.mutate({
-          id: c.id,
-          ...mergeCandidateContentUpdate(c, { noteEn: cached }),
-        })
-      }
-      return
-    }
 
-    if (isTranslating || attemptedUpdates.current[candidateId]) {
-      return
-    }
-
-    setIsTranslating(true)
-    translateNoteAction(parsedLocal.noteTr)
-      .then((translated: string) => {
-        setTranslatedNote(translated)
-        localStorage.setItem(cacheKey, translated)
-        // Veritabanına kalıcı olarak kaydet
+    const resolve = async () => {
+      setIsTranslating(true)
+      try {
+        const cached = localStorage.getItem(cacheKey)
+        const value = cached ?? (await translateNoteAction(noteTr).catch(() => noteTr))
+        if (cancelled) return
+        setAsyncNote({ key: candidateId, value })
+        if (!cached) localStorage.setItem(cacheKey, value)
+        // Kalıcı: noteEn'i DB'ye yaz (diğer cihaz / cache temizliğinde de çalışsın).
         if (!attemptedUpdates.current[candidateId]) {
           attemptedUpdates.current[candidateId] = true
-          update.mutate({
-            id: c.id,
-            ...mergeCandidateContentUpdate(c, { noteEn: translated }),
-          })
+          update.mutate({ id: c.id, ...mergeCandidateContentUpdate(c, { noteEn: value }) })
         }
-      })
-      .catch(() => setTranslatedNote(parsedLocal.noteTr))
-      .finally(() => setIsTranslating(false))
-  }, [lang, c, candidateId, update, isTranslating])
+      } finally {
+        if (!cancelled) setIsTranslating(false)
+      }
+    }
+    resolve()
+    return () => {
+      cancelled = true
+    }
+  }, [immediateNoteEn, c, candidateId, update])
+
+  // Gösterilecek çeviri: anında türetilen ya da (aynı adaya ait) async sonuç.
+  const translatedNote =
+    immediateNoteEn.value ?? (asyncNote?.key === candidateId ? asyncNote.value : null)
 
   const senderName = ws?.fullName || t('pipelinePage.yourAdvisor')
 
