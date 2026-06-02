@@ -1,10 +1,10 @@
 export const videoTrainingSection = {
   tr: {
     videoTraining: {
-      pageTitle: 'Video eğitimler',
-      pageSubtitle: 'YouTube üzerinden izle, ilerlemeni kaydet — API anahtarı gerekmez.',
-      backToTraining: 'Metin eğitimlere dön',
-      openTraining: 'Video eğitimler',
+      pageTitle: 'Video Eğitimler',
+      pageSubtitle: 'İzle, kendini ve ekibini geliştir, ilerlemeni kaydet.',
+      backToTraining: 'İçeriklere geri dön',
+      openTraining: 'Video Eğitimler',
       started: 'İzlemeye başladım',
       completed: 'Tamamladım',
       watchProgress: 'İzleme ilerlemesi',
@@ -15,10 +15,10 @@ export const videoTrainingSection = {
   },
   en: {
     videoTraining: {
-      pageTitle: 'Video training',
-      pageSubtitle: 'Watch on YouTube and save progress — no API key required.',
-      backToTraining: 'Back to text training',
-      openTraining: 'Video training',
+      pageTitle: 'Video Training',
+      pageSubtitle: 'Watch, grow yourself and your team, save your progress.',
+      backToTraining: 'Back to content',
+      openTraining: 'Video Training',
       started: 'Mark as started',
       completed: 'Mark completed',
       watchProgress: 'Watch progress',

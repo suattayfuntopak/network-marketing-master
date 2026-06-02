@@ -76,9 +76,9 @@ export const landingSection = {
       planProFeat1: 'Plus Planındaki TÜM Özellikler',
       planProFeat2: 'Sınırsız Alt Ekip Takibi',
       planProFeat7:
-        'Ekip Performans İzleme Tablosu: Ekibinizin aday hunisi ile içerik/itiraz/video ilerlemesini özet yüzdelerle tek tabloda izleyin.',
+        'Ekip Performans İzleme Tablosu',
       planProFeat3:
-        'Yapay Zeka Alt Ekip Koçu: Ekibinizdeki ortakların YZ kullanımı ve onboarding takibi (Ekibim).',
+        'Ekip Yapay Zeka Kullanım Takibi',
       planProFeat4: 'Günlük 100 YZ Mesajı',
       planProFeat5: 'Günlük 60 YZ Koçu',
       planProFeat6: 'Günlük {count} Uyum Denetimi',
@@ -170,9 +170,9 @@ export const landingSection = {
       planProFeat1: 'All Plus Plan Features',
       planProFeat2: 'Unlimited Downline Tracking',
       planProFeat7:
-        'Team Performance Tracking Table: monitor your team\'s candidate pipeline and content/objection/video progress with summary percentages in one table.',
+        'Team Performance Tracking Table',
       planProFeat3:
-        'AI downline coaching: team AI usage and onboarding tracking (Team hub).',
+        'Team AI Usage Tracking',
       planProFeat4: 'Daily 100 AI Messages',
       planProFeat5: 'Daily 60 AI Coach sessions',
       planProFeat6: 'Daily {count} Compliance audits',

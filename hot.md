@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-06-02 — Sticky header GERÇEK fix + video sayfa metin/genişlik + landing pro kart
+
+- **Sticky header asıl sebep:** `globals.css` `html, body { overflow-x: hidden }` →
+  `overflow-x: clip`. hidden, overflow-y:auto üretip sticky'yi GLOBAL bozuyordu. clip
+  scroll-container oluşturmaz → landing header artık sabit. (LandingPage overflow-x-clip zaten vardı.)
+- **Vaktin Varsa → Video sayfası:** başlık 'Video eğitimler'→'Video Eğitimler' (pageTitle +
+  openTraining butonu); altyazı → 'İzle, kendini ve ekibini geliştir, ilerlemeni kaydet.';
+  geri linki → 'İçeriklere geri dön'. EN karşılıkları güncellendi.
+- **Video sayfa genişliği:** max-w-3xl kaldırıldı (egitim gibi tam genişlik) + kart listesi grid
+  (sm:2, xl:3 kolon).
+- **Landing pro kart:** planProFeat7 → 'Ekip Performans İzleme Tablosu'; planProFeat3 →
+  'Ekip Yapay Zeka Kullanım Takibi' (TR+EN, açıklama kuyruğu kaldırıldı).
+
+KALAN: video Supabase CRUD (super-admin ekle/düzenle/sil) + Shopier cutover.
+
 ## 2026-06-02 — KÖKTEN: license_type leader/master → basic/plus (her yerde)
 
 İç kimlikler artık **basic/plus/pro** (free dahil). leader/master uygulamadan kalktı.

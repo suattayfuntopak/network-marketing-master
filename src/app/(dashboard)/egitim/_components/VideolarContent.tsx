@@ -29,7 +29,7 @@ export function VideolarContent() {
   if (!ws?.workspaceId) return null
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 px-4 py-6 sm:px-6">
+    <div className="space-y-6 px-4 py-6 sm:px-6">
       <header className="space-y-2">
         <Link
           href="/egitim"
@@ -62,7 +62,7 @@ export function VideolarContent() {
           ))}
         </div>
       ) : (
-        <ul className="space-y-4">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {data?.videos.map(video => (
             <li key={video.key}>
               <TrainingVideoCard
