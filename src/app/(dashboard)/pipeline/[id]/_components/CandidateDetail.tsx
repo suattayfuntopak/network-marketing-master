@@ -256,14 +256,6 @@ export function CandidateDetail({ candidateId }: Props) {
               )}
             </div>
 
-            {/* Sunum Materyalleri */}
-            <PresentationMaterialsCard
-              c={c}
-              workspaceId={ws?.workspaceId}
-              isSuperAdmin={ws?.isSuperAdmin}
-              senderName={senderName}
-            />
-
             {/* Lider Notu */}
             <LeaderNotesCard
               candidateId={candidateId}
@@ -273,6 +265,14 @@ export function CandidateDetail({ candidateId }: Props) {
 
             {/* Aktivite Geçmişi */}
             <ActivityLogCard candidateId={candidateId} workspaceId={ws?.workspaceId ?? ''} />
+
+            {/* Sunum Materyalleri — Aktivite Geçmişi'nin altında, varsayılan kapalı */}
+            <PresentationMaterialsCard
+              c={c}
+              workspaceId={ws?.workspaceId}
+              isSuperAdmin={ws?.isSuperAdmin}
+              senderName={senderName}
+            />
 
             {/* Alt Yerleşim Grubu (Aşama, Takip ve Sil Butonları 3'lü Grid) */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

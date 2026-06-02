@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
-import { Presentation } from 'lucide-react'
+import { Presentation, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -26,6 +26,7 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
   )
   const logPresentationWhatsApp = useLogPresentationWhatsApp(workspaceId ?? '')
   const [selectedMaterialId, setSelectedMaterialId] = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
 
   const candidatePhoneClean = c?.phone?.replace(/\D/g, '') ?? ''
 
@@ -67,23 +68,35 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 text-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
-            <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
-            {t('pipeline.presentationMaterials')}
-          </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
+          <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
+          {t('pipeline.presentationMaterials')}
+        </p>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/pipeline/sunum-materyalleri"
+            className="text-xs font-semibold text-[#534AB7] hover:underline whitespace-nowrap dark:text-[#F5F0E8] dark:hover:text-[#FFF8DC]"
+          >
+            {t('presentationMaterialsPage.manageLink')}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setExpanded(v => !v)}
+            aria-expanded={expanded}
+            aria-label={expanded ? 'Kapat' : 'Aç'}
+            className="flex h-6 w-6 items-center justify-center rounded-lg text-[var(--text-3)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] transition"
+          >
+            <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
+          </button>
+        </div>
+      </div>
+
+      {expanded && (
+        <>
           <p className="mt-2 text-sm leading-relaxed text-[var(--text-3)]">
             {t('pipeline.presentationMaterialsDesc')}
           </p>
-        </div>
-        <Link
-          href="/pipeline/sunum-materyalleri"
-          className="shrink-0 text-xs font-semibold text-[#534AB7] hover:underline whitespace-nowrap dark:text-[#F5F0E8] dark:hover:text-[#FFF8DC]"
-        >
-          {t('presentationMaterialsPage.manageLink')}
-        </Link>
-      </div>
 
       {materialsLoading ? (
         <div className="mt-4 h-10 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
@@ -139,6 +152,8 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
           WhatsApp
         </button>
       </div>
+        </>
+      )}
     </div>
   )
 }

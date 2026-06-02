@@ -124,16 +124,16 @@ body {
   ::view-transition-old(root),
   ::view-transition-new(root) { animation: none; }
 
-  /* Content area: fade by default */
-  ::view-transition-old(main-content) { animation: 160ms ease-in both vt-fade-out; }
-  ::view-transition-new(main-content) { animation: 200ms ease-out 40ms both vt-fade-in; }
+  /* Content area: hızlı fade — gezinme "tık tık" hissetsin */
+  ::view-transition-old(main-content) { animation: 80ms ease-in both vt-fade-out; }
+  ::view-transition-new(main-content) { animation: 100ms ease-out both vt-fade-in; }
 
-  /* Content area: slide on directional nav */
-  html[data-nav-dir="forward"] ::view-transition-old(main-content) { animation: 160ms ease-in both vt-slide-left-out; }
-  html[data-nav-dir="forward"] ::view-transition-new(main-content) { animation: 240ms ease-out 40ms both vt-slide-left-in; }
+  /* Content area: yönlü gezinmede kısa kaydırma */
+  html[data-nav-dir="forward"] ::view-transition-old(main-content) { animation: 80ms ease-in both vt-slide-left-out; }
+  html[data-nav-dir="forward"] ::view-transition-new(main-content) { animation: 120ms ease-out both vt-slide-left-in; }
 
-  html[data-nav-dir="back"] ::view-transition-old(main-content) { animation: 160ms ease-in both vt-slide-right-out; }
-  html[data-nav-dir="back"] ::view-transition-new(main-content) { animation: 240ms ease-out 40ms both vt-slide-right-in; }
+  html[data-nav-dir="back"] ::view-transition-old(main-content) { animation: 80ms ease-in both vt-slide-right-out; }
+  html[data-nav-dir="back"] ::view-transition-new(main-content) { animation: 120ms ease-out both vt-slide-right-in; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -145,10 +145,10 @@ body {
 
 @keyframes vt-fade-out        { to   { opacity: 0; } }
 @keyframes vt-fade-in         { from { opacity: 0; } }
-@keyframes vt-slide-left-out  { to   { opacity: 0; transform: translateX(-20px); } }
-@keyframes vt-slide-left-in   { from { opacity: 0; transform: translateX(20px); } }
-@keyframes vt-slide-right-out { to   { opacity: 0; transform: translateX(20px); } }
-@keyframes vt-slide-right-in  { from { opacity: 0; transform: translateX(-20px); } }
+@keyframes vt-slide-left-out  { to   { opacity: 0; transform: translateX(-12px); } }
+@keyframes vt-slide-left-in   { from { opacity: 0; transform: translateX(12px); } }
+@keyframes vt-slide-right-out { to   { opacity: 0; transform: translateX(12px); } }
+@keyframes vt-slide-right-in  { from { opacity: 0; transform: translateX(-12px); } }
 
 @utility scrollbar-none {
   -ms-overflow-style: none;

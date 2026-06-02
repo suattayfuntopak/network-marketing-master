@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-02 — Cron fix + video kartı + sunum kartı taşı/aç-kapa + hızlı geçişler
+
+- **Cron workflow FIX:** `cron-emails.yml` silinmiş `/api/cron/pulse-rollup` endpoint'ini çağırıyordu
+  (route pulse temizliğinde kaldırılmıştı) → 404 → `curl -f` patlıyor → "All jobs failed". O adım
+  kaldırıldı. Kalan 3 endpoint (trial/license/calendar) mevcut.
+- **Video kartı:** sağ üst status yuvarlakları (CheckCircle2/Play/Circle) kaldırıldı (admin ✏️/🗑️
+  kaldı); süre TR'de '~18 dk' (EN '~18 min').
+- **Sunum Materyalleri kartı:** Aktivite Geçmişi'nin ALTINA taşındı; başlık satırına chevron eklendi,
+  **açılır-kapanır, varsayılan KAPALI** (Materyalleri Düzenle linkinin sağında).
+- **Hız:** view-transition süreleri kısaltıldı (fade 160/200→80/100ms, slide 240→120ms, translate
+  20→12px, delay kaldırıldı) → gezinme "tık tık". (Login/server gecikmesi proxy getUser + Vercel
+  cold-start kaynaklı; auth akışına dokunulmadı — ayrı profil işi.)
+- tsc temiz, 107 test. GitHub "Claude permissions" e-postası = kod sorunu değil (Claude GitHub App).
+
 ## 2026-06-02 — Video kataloğu Supabase'e taşındı + super-admin CRUD
 
 - **Migration 047** `nmm_training_videos` (key/youtube_id/title_tr-en/desc/duration/category/sort_order)

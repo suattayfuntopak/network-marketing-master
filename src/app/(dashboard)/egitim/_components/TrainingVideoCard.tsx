@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle2, Circle, Play, Pencil, Trash2 } from 'lucide-react'
+import { Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { youtubeEmbedUrl } from '@/lib/domain/videoTraining'
@@ -60,7 +60,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
               {localizedVideoTitle(video, lang)}
             </h3>
             <p className="mt-1 text-xs text-[var(--text-3)]">
-              {localizedVideoDescription(video, lang)} · ~{video.durationMin} min
+              {localizedVideoDescription(video, lang)} · ~{video.durationMin} {lang === 'en' ? 'min' : 'dk'}
             </p>
           </div>
           <div className="flex items-center gap-1.5">
@@ -85,13 +85,6 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </>
-            )}
-            {isCompleted ? (
-              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-            ) : isStarted ? (
-              <Play className="h-5 w-5 text-brand" />
-            ) : (
-              <Circle className="h-5 w-5 text-[var(--text-3)]" />
             )}
           </div>
         </div>
