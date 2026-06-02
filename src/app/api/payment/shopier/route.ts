@@ -192,14 +192,23 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
     webhookId: request.headers.get('shopier-webhook-id'),
   })
 
-  // İmza: HS256, ham gövde → hex (Shopier ile doğrulandı). SHOPIER_WEBHOOK_VERIFY=false
-  // ile geçici kapatılabilir; production'da açık olmalı.
-  const secret = process.env.SHOPIER_WEBHOOK_SECRET
+  // İmza: HS256, ham gövde → hex. DİKKAT: her webhook'un AYRI secret'ı var (Shopier
+  // kayıt cevabındaki `token`). order.created → SHOPIER_WEBHOOK_SECRET;
+  // refund.updated → SHOPIER_REFUND_WEBHOOK_SECRET. SHOPIER_WEBHOOK_VERIFY=false ile
+  // geçici kapatılabilir; production'da açık olmalı.
+  const isRefund = event === 'refund.updated'
+  const secret = isRefund
+    ? process.env.SHOPIER_REFUND_WEBHOOK_SECRET
+    : process.env.SHOPIER_WEBHOOK_SECRET
   if (secret && process.env.SHOPIER_WEBHOOK_VERIFY !== 'false') {
     if (!verifyShopierWebhookSignature(raw, signature, secret, timestamp)) {
-      console.warn('[Shopier order.created] signature mismatch')
+      console.warn('[Shopier] signature mismatch', { event })
       return new NextResponse('invalid signature', { status: 401 })
     }
+  } else if (isRefund && !secret) {
+    // İade lisans düşürme kritik → secret yoksa doğrulayamayız, GÜVENLİ TARAF: işleme.
+    console.warn('[Shopier refund] secret yok, iade işlenmedi (SHOPIER_REFUND_WEBHOOK_SECRET ekleyin)')
+    return NextResponse.json({ received: true, refunded: false, reason: 'no-secret' })
   }
 
   let payload: unknown
