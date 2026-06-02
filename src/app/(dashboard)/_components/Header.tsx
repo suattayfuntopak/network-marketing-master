@@ -9,7 +9,7 @@ import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
-import { NotificationsModal, loadNotifications } from '@/components/ui/NotificationsModal'
+import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
 import { useNotifications } from '@/hooks/useNotifications'
 
@@ -75,15 +75,10 @@ export function Header({ visible = true }: { visible?: boolean }) {
   }, [ws?.workspaceId])
 
   const { unreadCount: dbUnreadCount } = useNotifications({ enabled: notificationsReady })
-  const [localUnread, setLocalUnread] = useState(0)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false)
 
-  // Sayfa yüklendiğinde localStorage'dan okunmamış bildirim sayısını al
-  useEffect(() => {
-    setLocalUnread(loadNotifications().filter(n => !n.read).length)
-  }, [])
-
-  const unreadCount = dbUnreadCount + localUnread
+  // Bildirim oku-durumu tamamen Supabase'de — localStorage sayacı kaldırıldı.
+  const unreadCount = dbUnreadCount
 
   const licenseType = ws?.licenseType ?? 'free'
   const licenseExpiresAt = ws?.licenseExpiresAt ?? null
@@ -276,7 +271,6 @@ export function Header({ visible = true }: { visible?: boolean }) {
       {notificationsOpen && (
         <NotificationsModal
           onClose={() => setNotificationsOpen(false)}
-          onUnreadCountChange={(count) => setLocalUnread(count)}
         />
       )}
 

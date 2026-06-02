@@ -53,7 +53,10 @@ const TONES = [
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
 
-const HISTORY_KEY = 'nmm_message_history'
+// DİKKAT: anahtar her zaman userId ile izole edilir — aksi halde aynı tarayıcıda
+// kullanıcı değişince önceki kişinin ürettiği mesajlar yeni kişiye sızar.
+const HISTORY_KEY_BASE = 'nmm_message_history'
+const LEGACY_HISTORY_KEY = 'nmm_message_history' // userId'siz eski global anahtar
 const MAX_HISTORY = 5
 
 interface HistoryEntry {
@@ -63,17 +66,24 @@ interface HistoryEntry {
   timestamp: number
 }
 
-function loadHistory(): HistoryEntry[] {
-  if (typeof window === 'undefined') return []
+function historyKey(userId: string): string {
+  return `${HISTORY_KEY_BASE}_${userId}`
+}
+
+function loadHistory(userId: string | undefined | null): HistoryEntry[] {
+  if (typeof window === 'undefined' || !userId) return []
+  // Eski global anahtarı bir defa temizle (sızıntı kaynağıydı).
+  try { localStorage.removeItem(LEGACY_HISTORY_KEY) } catch { /* ignore */ }
   try {
-    return JSON.parse(localStorage.getItem(HISTORY_KEY) ?? '[]')
+    return JSON.parse(localStorage.getItem(historyKey(userId)) ?? '[]')
   } catch { return [] }
 }
 
-function saveToHistory(entry: HistoryEntry) {
-  const history = loadHistory()
+function saveToHistory(userId: string | undefined | null, entry: HistoryEntry) {
+  if (typeof window === 'undefined' || !userId) return
+  const history = loadHistory(userId)
   const updated = [entry, ...history].slice(0, MAX_HISTORY)
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(updated))
+  localStorage.setItem(historyKey(userId), JSON.stringify(updated))
 }
 
 function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
@@ -272,10 +282,10 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   }, [lang])
 
 
-  // Sayfa yüklenince localStorage'dan history al
+  // Kullanıcı belli olunca userId-izole history'yi yükle.
   useEffect(() => {
-    setHistory(loadHistory())
-  }, [])
+    setHistory(loadHistory(ws?.userId))
+  }, [ws?.userId])
 
   useEffect(() => {
     if (initialName && candidates.length > 0 && !prefilledRef.current) {
@@ -314,10 +324,10 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         messageType,
         timestamp: Date.now(),
       }
-      saveToHistory(entry)
-      setHistory(loadHistory())
+      saveToHistory(ws?.userId, entry)
+      setHistory(loadHistory(ws?.userId))
     }
-  }, [state.message, selected, query, messageType, qc, lang])
+  }, [state.message, selected, query, messageType, qc, lang, ws?.userId])
 
   // Handle global language toggle auto-translation
   useEffect(() => {

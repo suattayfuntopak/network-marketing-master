@@ -16,49 +16,12 @@ import { createClient } from '@/lib/supabase/client'
 
 interface NotificationsModalProps {
   onClose: () => void
-  onUnreadCountChange?: (count: number) => void
 }
 
-export interface NotificationItem {
-  id: string
-  title: string
-  description: string
-  time: string
-  read: boolean
-  icon: 'bell' | 'alert' | 'info' | 'user' | 'calendar'
-}
+/** Bildirim ikon türü — oku/sil durumu Supabase'de (nmm_notifications), localStorage yok. */
+type NotifIconType = 'bell' | 'alert' | 'info' | 'user' | 'calendar'
 
-const DEFAULT_NOTIFICATIONS: NotificationItem[] = []
-
-const NOTIF_DISMISSED_KEY = 'nmm_notif_dismissed_ids'
-const NOTIF_READ_KEY = 'nmm_notif_read_ids'
-
-export function loadNotifications(): NotificationItem[] {
-  try {
-    const dismissed = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY) ?? '[]'))
-    const read = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_READ_KEY) ?? '[]'))
-    return DEFAULT_NOTIFICATIONS
-      .filter(n => !dismissed.has(n.id))
-      .map(n => ({ ...n, read: read.has(n.id) || n.read }))
-  } catch {
-    return DEFAULT_NOTIFICATIONS
-  }
-}
-
-function persistRead(notifications: NotificationItem[]) {
-  const readIds = notifications.filter(n => n.read).map(n => n.id)
-  localStorage.setItem(NOTIF_READ_KEY, JSON.stringify(readIds))
-}
-
-function persistDismissed(ids: string[]) {
-  try {
-    const existing = new Set<string>(JSON.parse(localStorage.getItem(NOTIF_DISMISSED_KEY) ?? '[]'))
-    ids.forEach(id => existing.add(id))
-    localStorage.setItem(NOTIF_DISMISSED_KEY, JSON.stringify([...existing]))
-  } catch {}
-}
-
-function NotifIcon({ type, size = 'sm' }: { type: NotificationItem['icon']; size?: 'sm' | 'lg' }) {
+function NotifIcon({ type, size = 'sm' }: { type: NotifIconType; size?: 'sm' | 'lg' }) {
   const cls = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4'
   if (type === 'alert')    return <AlertCircle    className={`${cls} text-amber-500`} />
   if (type === 'user')     return <UserPlus       className={`${cls} text-[#534AB7]`} />
@@ -67,7 +30,7 @@ function NotifIcon({ type, size = 'sm' }: { type: NotificationItem['icon']; size
   return <Bell className={`${cls} text-[#534AB7]`} />
 }
 
-function NotifIconBg({ type }: { type: NotificationItem['icon'] }) {
+function NotifIconBg({ type }: { type: NotifIconType }) {
   if (type === 'calendar') return 'bg-[#E1F5EE]'
   if (type === 'alert')    return 'bg-amber-50 dark:bg-amber-950/20'
   return 'bg-[#EEEDFE]'
@@ -127,12 +90,11 @@ function formatTimeAgo(
   }
 }
 
-export function NotificationsModal({ onClose, onUnreadCountChange }: NotificationsModalProps) {
+export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const { lang, t } = useTranslation()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [userEmail, setUserEmail]       = useState('')
-  const [localNotifs, setLocalNotifs]   = useState<any[]>([])
   const [selected, setSelected]         = useState<any | null>(null)
 
   useBodyScrollLock()
@@ -148,35 +110,23 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
     deleteNotification: dbDeleteNotification
   } = useNotifications()
 
-  // Derive notifications from DB and Local Storage
-  const mappedDbNotifications = dbNotifications.map(n => ({
+  // Bildirimler tamamen Supabase'den (oku/sil durumu DB'de) — localStorage yok.
+  const notifications = dbNotifications.map(n => ({
     id: n.id,
     title: lang === 'en' ? n.title_en : n.title_tr,
     description: lang === 'en' ? n.description_en : n.description_tr,
     time: formatTimeAgo(n.created_at, t),
     read: n.read,
-    icon: n.type as 'bell' | 'alert' | 'info' | 'user' | 'calendar',
+    icon: n.type as NotifIconType,
     type: n.type,
     candidate_id: n.candidate_id,
     isDb: true,
   }))
 
-  const notifications = [
-    ...mappedDbNotifications,
-    ...localNotifs.map(n => ({ ...n, isDb: false }))
-  ]
-
-  const unreadCount = dbUnreadCount + localNotifs.filter(n => !n.read).length
-
-  // Report local unread count changes to Header so total matches
-  useEffect(() => {
-    const localCount = localNotifs.filter(n => !n.read).length
-    onUnreadCountChange?.(localCount)
-  }, [localNotifs, onUnreadCountChange])
+  const unreadCount = dbUnreadCount
 
   useEffect(() => {
     setMounted(true)
-    setLocalNotifs(loadNotifications())
 
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
@@ -232,29 +182,14 @@ export function NotificationsModal({ onClose, onUnreadCountChange }: Notificatio
 
   function openNotification(n: any) {
     setSelected(n)
-    if (n.isDb) {
-      dbMarkAsRead(n.id)
-    } else {
-      setLocalNotifs(prev => {
-        const updated = prev.map(x => x.id === n.id ? { ...x, read: true } : x)
-        persistRead(updated)
-        return updated
-      })
-    }
-
+    dbMarkAsRead(n.id)
     if (prefs.sound) {
       playNotificationSound()
     }
   }
 
   function markAllRead() {
-    // Clear local storage notifications
-    persistDismissed(localNotifs.map(n => n.id))
-    setLocalNotifs([])
-
-    // Mark database notifications as read
     dbMarkAllRead()
-
     toast.success(t('shellUi.allMarkedRead'))
   }
 
