@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-02 — 🎉 SHOPIER CANLI (storefront-redirect + order.created webhook)
+
+Cutover tamamlandı, uçtan uca test geçti (1 TL gerçek /odeme alışverişi):
+- /odeme → Basic Aylık → Shopier ürününe `?quantity=1&note=<ws>_basic_monthly_<ts>` ile yönlendirdi
+- Webhook geldi, **imza doğrulandı** ve **lisans yükseltildi**:
+  `License updated for workspace 999311ea… (basic) until 2026-07-02` (+30 gün).
+- **İmza şeması: HS256 ham gövde → hex** (`scheme: 'body/hex'`, verifyResult true). verify bunu kapsıyor.
+- **Payload:** `note` üst seviye (Satıcıya notu), `productId` `lineItems[0].productId` (=ürün sayfası id).
+- Webhook id `8ad852392293a891`, secret = kayıt cevabındaki `token` (Vercel `SHOPIER_WEBHOOK_SECRET`).
+- Prod env: `SHOPIER_STOREFRONT_ENABLED=true`, `SHOPIER_PRODUCTS` (6 plan), `SHOPIER_WEBHOOK_SECRET`.
+  `SHOPIER_WEBHOOK_VERIFY` SİLİNDİ (doğrulama açık). Keşif logları temizlendi (PII yok).
+- KALAN (Suat manuel): Basic Aylık fiyatını 499'a geri al, 3 test siparişini iade et.
+
 ## 2026-06-02 — Gelecek Temas popup + optimistic + video "İlgili konu" seçici
 
 - **Gelecek Temas tarih editörü:** inline native datetime-local takvimi sayfa altında kesiliyordu →
