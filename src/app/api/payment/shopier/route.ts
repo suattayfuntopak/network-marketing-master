@@ -10,6 +10,8 @@ import {
 } from '@/lib/domain/shopierOsb'
 import {
   extractOrderFields,
+  extractOrderId,
+  collectIdCandidates,
   verifyShopierWebhookSignature,
 } from '@/lib/domain/shopierOrderWebhook'
 import {
@@ -24,11 +26,31 @@ async function applyLicenseUpgrade(params: {
   daysToAdd: number
   totalAmount: string
   parentId: string | null
-}) {
+  /** Shopier sipariş id'si — idempotency (aynı sipariş tekrar gelirse atla). */
+  orderId?: string | null
+}): Promise<Date | null> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
+
+  // Idempotency: aynı Shopier siparişi ikinci kez lisans uzatmasın.
+  if (params.orderId) {
+    const { error: claimErr } = await supabase.from('nmm_shopier_processed_orders').insert({
+      order_id: params.orderId,
+      workspace_id: params.workspaceId,
+      plan: params.newLicenseType,
+      amount: params.totalAmount,
+    })
+    if (claimErr) {
+      if (claimErr.code === '23505') {
+        console.info('[Shopier] order already processed, skipping', params.orderId)
+        return null
+      }
+      // Dedupe tablosu hatası lisansı bloklamasın (sadece logla).
+      console.error('[Shopier] dedupe insert error (non-fatal):', claimErr.message)
+    }
+  }
 
   const { data: ws, error: wsError } = await supabase
     .from('nmm_workspaces')
@@ -187,12 +209,21 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
     return new NextResponse('invalid json', { status: 400 })
   }
 
+  // İade tamamlandı → lisansı düşür. (refund.requested = sadece talep; erken düşürme yapma.)
+  if (event === 'refund.updated') {
+    return handleRefundWebhook(payload, event)
+  }
+  if (event === 'refund.requested') {
+    console.info('[Shopier refund] requested (refund.updated bekleniyor, aksiyon yok)')
+    return NextResponse.json({ received: true })
+  }
   // Yalnız order.created işlenir (başka event header'ı gelirse yok say).
   if (event && event !== 'order.created') {
     return NextResponse.json({ received: true, ignored: event })
   }
 
   const { note, productId } = extractOrderFields(payload)
+  const orderId = extractOrderId(payload)
   const workspaceId = extractWorkspaceIdFromNote(note)
   const resolved = productId ? resolvePlanFromProductId(productId) : null
 
@@ -213,12 +244,60 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
     daysToAdd: resolved.daysToAdd,
     totalAmount: '',
     parentId: null,
+    orderId,
   })
+
+  if (!newExpiry) {
+    // Idempotency: bu sipariş daha önce işlenmiş → tekrar uzatma.
+    return NextResponse.json({ received: true, applied: false, duplicate: true })
+  }
 
   console.log(
     `[Shopier order.created] License updated for workspace ${workspaceId} (${resolved.plan}) until ${newExpiry.toISOString()}`
   )
   return NextResponse.json({ received: true, applied: true })
+}
+
+/**
+ * Shopier iade (refund) webhook'u → ilgili siparişin workspace'inin lisansını düşürür.
+ * Refund payload alan adları kesin değil; işlenmiş sipariş id'leriyle kesişim kurularak
+ * doğru workspace bulunur (collectIdCandidates). Eşleşme yoksa non-PII özet loglanır.
+ */
+async function handleRefundWebhook(payload: unknown, event: string) {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+  const candidates = collectIdCandidates(payload)
+  if (candidates.length === 0) {
+    console.warn('[Shopier refund] no id candidates', { event })
+    return NextResponse.json({ received: true, refunded: false })
+  }
+
+  const { data: orders } = await supabase
+    .from('nmm_shopier_processed_orders')
+    .select('order_id, workspace_id')
+    .in('order_id', candidates)
+    .eq('status', 'applied')
+
+  if (!orders || orders.length === 0) {
+    console.warn('[Shopier refund] no matching applied order', { event, candidateCount: candidates.length })
+    return NextResponse.json({ received: true, refunded: false })
+  }
+
+  for (const o of orders) {
+    if (!o.workspace_id) continue
+    await supabase
+      .from('nmm_workspaces')
+      .update({ license_type: 'free', license_expires_at: null })
+      .eq('id', o.workspace_id)
+    await supabase
+      .from('nmm_shopier_processed_orders')
+      .update({ status: 'refunded', refunded_at: new Date().toISOString() })
+      .eq('order_id', o.order_id)
+    console.log('[Shopier refund] license revoked', { orderId: o.order_id, workspaceId: o.workspace_id })
+  }
+  return NextResponse.json({ received: true, refunded: true, count: orders.length })
 }
 
 export async function POST(request: NextRequest) {
@@ -281,7 +360,7 @@ export async function POST(request: NextRequest) {
     })
 
     console.log(
-      `[Shopier Webhook] Success! Workspace ${parsed.workspaceId} until ${newExpiry.toISOString()}`
+      `[Shopier Webhook] Success! Workspace ${parsed.workspaceId} until ${newExpiry?.toISOString() ?? 'n/a'}`
     )
     return NextResponse.json({ success: true, message: 'License updated successfully' })
   } catch (err: unknown) {

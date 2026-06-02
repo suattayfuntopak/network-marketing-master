@@ -443,6 +443,36 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_shopier_processed_orders: {
+        Row: {
+          order_id: string
+          workspace_id: string | null
+          plan: string | null
+          amount: string | null
+          status: string
+          processed_at: string
+          refunded_at: string | null
+        }
+        Insert: {
+          order_id: string
+          workspace_id?: string | null
+          plan?: string | null
+          amount?: string | null
+          status?: string
+          processed_at?: string
+          refunded_at?: string | null
+        }
+        Update: {
+          order_id?: string
+          workspace_id?: string | null
+          plan?: string | null
+          amount?: string | null
+          status?: string
+          processed_at?: string
+          refunded_at?: string | null
+        }
+        Relationships: []
+      }
       nmm_custom_objections: {
         Row: {
           id: string

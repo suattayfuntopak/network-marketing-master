@@ -1,6 +1,11 @@
 import { describe, it, expect } from 'vitest'
 import crypto from 'crypto'
-import { verifyShopierWebhookSignature, extractOrderFields } from './shopierOrderWebhook'
+import {
+  verifyShopierWebhookSignature,
+  extractOrderFields,
+  extractOrderId,
+  collectIdCandidates,
+} from './shopierOrderWebhook'
 
 const SECRET = 'webhook_signing_secret'
 
@@ -62,5 +67,31 @@ describe('extractOrderFields', () => {
   it('returns nulls when fields are absent', () => {
     expect(extractOrderFields({ order: { id: 'x' } })).toEqual({ note: null, productId: null })
     expect(extractOrderFields(null)).toEqual({ note: null, productId: null })
+  })
+})
+
+describe('extractOrderId', () => {
+  it('reads the top-level id (Shopier order id)', () => {
+    expect(extractOrderId({ id: '921299125', status: 'paid' })).toBe('921299125')
+    expect(extractOrderId({ id: 921299125 })).toBe('921299125')
+  })
+  it('returns null when no top-level id', () => {
+    expect(extractOrderId({ order: { id: 'x' } })).toBeNull()
+    expect(extractOrderId(null)).toBeNull()
+  })
+})
+
+describe('collectIdCandidates', () => {
+  it('collects 6+ digit numeric leaf values (refund → order matching)', () => {
+    const refund = { id: '50012345', order: { id: '921299125' }, amount: '1.00', items: [{ productId: '47703167' }] }
+    const got = collectIdCandidates(refund)
+    expect(got).toContain('921299125')
+    expect(got).toContain('47703167')
+    expect(got).toContain('50012345')
+    expect(got).not.toContain('1.00') // kısa/ondalık değerler atlanır
+  })
+  it('handles empty/primitive payloads', () => {
+    expect(collectIdCandidates(null)).toEqual([])
+    expect(collectIdCandidates({})).toEqual([])
   })
 })

@@ -86,6 +86,37 @@ export interface ExtractedOrder {
 const NOTE_KEYS = ['note', 'customernote', 'customer_note', 'buyernote', 'buyer_note', 'ordernote']
 const PRODUCT_ID_KEYS = ['productid', 'product_id']
 
+/** Sipariş id'si — order.created/refund payload'ının üst seviye `id` alanı. */
+export function extractOrderId(payload: unknown): string | null {
+  if (payload && typeof payload === 'object') {
+    const id = (payload as Record<string, unknown>).id
+    if (typeof id === 'string' || typeof id === 'number') {
+      const s = String(id).trim()
+      if (s) return s
+    }
+  }
+  return null
+}
+
+/**
+ * Payload'daki tüm string/number yaprak değerlerini toplar (refund eşlemesi için).
+ * Alan adı bilinmese de, içindeki sipariş id'sini saklı sipariş listesiyle kesiştirerek
+ * doğru workspace'i bulmak için kullanılır.
+ */
+export function collectIdCandidates(payload: unknown, depth = 0, acc = new Set<string>()): string[] {
+  if (payload == null || depth > 6) return [...acc]
+  if (Array.isArray(payload)) {
+    for (const v of payload) collectIdCandidates(v, depth + 1, acc)
+  } else if (typeof payload === 'object') {
+    for (const v of Object.values(payload as Record<string, unknown>)) collectIdCandidates(v, depth + 1, acc)
+  } else if (typeof payload === 'string' || typeof payload === 'number') {
+    const s = String(payload).trim()
+    // Sipariş id'leri uzun sayısal dizeler; gürültüyü azaltmak için 6+ haneli sayısalları al.
+    if (/^\d{6,}$/.test(s)) acc.add(s)
+  }
+  return [...acc]
+}
+
 /**
  * Payload'dan `note` + `productId`'yi defensive çıkarır (alan adları kesinleşene
  * dek). note için bilinen anahtarlar recursive aranır; productId için önce
