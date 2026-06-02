@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-02 — Crown Faz B: ekip arama/iletişim + üye aktivite sheet
+
+- **/ekip (B1):** İsim/telefon arama; downline kartlarında DDBR mini çubuk (X/9); Ara / WhatsApp /
+  **Aktivite** hızlı aksiyonlar.
+- **MemberActivitySheet (B2):** Sheet içi dönem Bugün/7g/30g (ekip varsayılan 7g; istatistiklerden
+  açılışta üst period devralınır). 7 saha KPI + Pro öğrenme özeti; not metni yok (KVKK).
+- **/istatistikler:** Sıralama tablosunda Aktivite ikonu → aynı sheet.
+- **API:** `getMemberActivityDetailAction` — `nmm_daily_actions` rollup; migration yok.
+- `mapStatsPeriodToSheet` → `lib/domain/pulse.ts` (client-safe).
+
 ## 2026-06-02 — Crown Faz A: ekip aktivite özeti + video kart görünümü + pano şeritleri
 
 - **İstatistikler (A1):** `TeamActivitySummary` — downline KPI (üye, aktif 7g, arama, WhatsApp),

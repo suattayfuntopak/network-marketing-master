@@ -1,9 +1,10 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
-import { periodStartIso, type PulsePeriod } from '@/lib/domain/pulse'
+import { periodStartIso, parseLearningProgress, ONBOARDING_STEP_COUNT, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 
 export type TeamMemberFieldActivity = {
   userId: string
@@ -20,6 +21,23 @@ export type TeamFieldActivityResult = {
     newCandidates: number
   }
   byUser: Record<string, TeamMemberFieldActivity>
+}
+
+export type MemberActivityDetail = {
+  calls: number
+  whatsapps: number
+  notes: number
+  stageChanges: number
+  aiActions: number
+  newCandidates: number
+  activeDays: number
+  /** Pro nabız — yalnızca sponsor Pro ise dolu */
+  trainingPct?: number
+  objectionPct?: number
+  videoPct?: number
+  videoCompleted?: number
+  videoTotal?: number
+  onboardingDone?: number
 }
 
 async function assertWorkspaceMember(workspaceId: string) {
@@ -135,4 +153,115 @@ export async function getTeamFieldActivityAction(
   }
 
   return { totals, byUser }
+}
+
+export async function getMemberActivityDetailAction(
+  workspaceId: string,
+  memberUserId: string,
+  period: SheetActivityPeriod
+): Promise<MemberActivityDetail> {
+  const empty: MemberActivityDetail = {
+    calls: 0,
+    whatsapps: 0,
+    notes: 0,
+    stageChanges: 0,
+    aiActions: 0,
+    newCandidates: 0,
+    activeDays: 0,
+  }
+
+  const ctx = await assertWorkspaceMember(workspaceId)
+  const { supabase, user } = ctx
+  const licenseType =
+    'licenseType' in ctx && ctx.licenseType
+      ? ctx.licenseType
+      : (
+          await supabase
+            .from('nmm_workspaces')
+            .select('license_type')
+            .eq('id', workspaceId)
+            .single()
+        ).data?.license_type
+
+  if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
+
+  const pulsePeriod: PulsePeriod = period
+  const startIso = periodStartIso(pulsePeriod)
+
+  let actionsQuery = supabase
+    .from('nmm_daily_actions')
+    .select('action_type, created_at')
+    .eq('user_id', memberUserId)
+
+  if (startIso) {
+    actionsQuery = actionsQuery.gte('created_at', startIso)
+  }
+
+  const { data: actions } = await actionsQuery
+
+  const activeDays = new Set<string>()
+  const detail: MemberActivityDetail = { ...empty }
+
+  for (const act of actions ?? []) {
+    activeDays.add(act.created_at.slice(0, 10))
+    switch (act.action_type) {
+      case 'call':
+        detail.calls++
+        break
+      case 'whatsapp':
+        detail.whatsapps++
+        break
+      case 'note':
+        detail.notes++
+        break
+      case 'stage_change':
+        detail.stageChanges++
+        break
+      case 'ai_generate':
+        detail.aiActions++
+        break
+    }
+  }
+  detail.activeDays = activeDays.size
+
+  let candidatesQuery = supabase
+    .from('nmm_candidates')
+    .select('created_at')
+    .eq('owner_id', memberUserId)
+
+  if (startIso) {
+    candidatesQuery = candidatesQuery.gte('created_at', startIso)
+  }
+
+  const { data: newCandidates } = await candidatesQuery
+  detail.newCandidates = newCandidates?.length ?? 0
+
+  if (hasTeamPulseAccess(licenseType, isSuperAdmin(user))) {
+    const [{ data: progressRow }, { data: onboardingRows }] = await Promise.all([
+      supabase
+        .from('nmm_user_progress')
+        .select('read_trainings, read_objections')
+        .eq('user_id', memberUserId)
+        .maybeSingle(),
+      supabase
+        .from('nmm_onboarding_progress')
+        .select('step_id')
+        .eq('user_id', memberUserId),
+    ])
+
+    const learning = parseLearningProgress(progressRow)
+    detail.trainingPct = learning.trainingPct
+    detail.objectionPct = learning.objectionPct
+    detail.onboardingDone = onboardingRows?.length ?? 0
+
+    const videoMap = await getTeamVideoSummaryMapAction([memberUserId])
+    const video = videoMap[memberUserId]
+    if (video) {
+      detail.videoPct = video.pct
+      detail.videoCompleted = video.completed
+      detail.videoTotal = video.total
+    }
+  }
+
+  return detail
 }

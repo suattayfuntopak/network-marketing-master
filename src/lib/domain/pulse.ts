@@ -12,6 +12,15 @@ export const ONBOARDING_STEP_COUNT = 9
 
 export type PulsePeriod = 'today' | '7d' | '30d' | 'ytd' | 'all'
 
+/** Aktivite sheet — sadeleştirilmiş dönem sekmeleri. */
+export type SheetActivityPeriod = 'today' | '7d' | '30d'
+
+export function mapStatsPeriodToSheet(period: PulsePeriod): SheetActivityPeriod {
+  if (period === 'today') return 'today'
+  if (period === '7d') return '7d'
+  return '30d'
+}
+
 export type PeriodLearningSummary = {
   trainingReads: number
   objectionReads: number

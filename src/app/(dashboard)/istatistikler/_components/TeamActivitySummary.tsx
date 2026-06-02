@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { Phone, Trophy, MessageCircle, UserPlus } from 'lucide-react'
+import { Phone, Trophy, MessageCircle, UserPlus, BarChart3 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { TeamMember } from '@/hooks/useTeamMembers'
@@ -19,6 +19,7 @@ interface Props {
   loading: boolean
   teamStatsLocked: boolean
   getMemberHref: (row: { user_id: string; full_name: string | null; isAppUser?: boolean }) => string | null
+  onOpenActivity?: (member: { userId: string; fullName: string | null; pipelineHref: string | null }) => void
 }
 
 function medalForRank(rank: number): string | null {
@@ -34,6 +35,7 @@ export function TeamActivitySummary({
   loading,
   teamStatsLocked,
   getMemberHref,
+  onOpenActivity,
 }: Props) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -222,6 +224,9 @@ export function TeamActivitySummary({
                     <th className="pb-2 pl-2 text-center">
                       <MessageCircle className="mx-auto h-3.5 w-3.5" aria-hidden />
                     </th>
+                    {onOpenActivity && (
+                      <th className="pb-2 pl-2 text-center w-10" aria-label={t('team.activityBtn')} />
+                    )}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)]">
@@ -243,6 +248,25 @@ export function TeamActivitySummary({
                       <td className="py-2.5 pl-2 text-center font-bold tabular-nums text-[var(--text-2)]">
                         {row.activeDays}{t('statsPage.activeDaysSuffix')}
                       </td>
+                      {onOpenActivity && (
+                        <td className="py-2.5 pl-2 text-center">
+                          <button
+                            type="button"
+                            onClick={e => {
+                              e.stopPropagation()
+                              onOpenActivity({
+                                userId: row.userId,
+                                fullName: row.name,
+                                pipelineHref: row.href,
+                              })
+                            }}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/5 text-brand hover:bg-brand/10 transition cursor-pointer"
+                            title={t('team.activityBtn')}
+                          >
+                            <BarChart3 className="h-4 w-4" />
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

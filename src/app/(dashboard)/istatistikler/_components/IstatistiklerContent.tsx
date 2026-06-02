@@ -22,6 +22,8 @@ import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { mapStatsPeriodToSheet } from '@/lib/domain/pulse'
+import { MemberActivitySheet, type MemberActivityTarget } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import type { MemberRow } from '@/lib/team/types'
@@ -58,6 +60,7 @@ export function IstatistiklerContent() {
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')
+  const [activityMember, setActivityMember] = useState<MemberActivityTarget | null>(null)
 
 
   const licenseLabel = useCallback(
@@ -402,6 +405,7 @@ export function IstatistiklerContent() {
             loading={membersLoading || teamActivityLoading}
             teamStatsLocked={teamStatsLocked}
             getMemberHref={getMemberHref}
+            onOpenActivity={member => setActivityMember(member)}
           />
 
           {/* Ekip Performans İzleme Tablosu — kişi bazlı + dönem + Eğitim/İtiraz/Video % + TOPLAM */}
@@ -434,6 +438,16 @@ export function IstatistiklerContent() {
 
         </div>
       </div>
+
+      {activityMember && ws && (
+        <MemberActivitySheet
+          workspaceId={ws.workspaceId}
+          member={activityMember}
+          initialPeriod={mapStatsPeriodToSheet(period)}
+          teamPulseUnlocked={teamPulseUnlocked}
+          onClose={() => setActivityMember(null)}
+        />
+      )}
     </main>
   )
 }

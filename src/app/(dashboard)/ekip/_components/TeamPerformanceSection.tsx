@@ -4,12 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
-  Crown, Check, Trash2, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot, Loader2
+  Crown, Check, Trash2, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot, Loader2,
+  Phone, Search, BarChart3,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
+import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
+import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
@@ -37,6 +40,9 @@ export interface TeamPerformanceSectionProps {
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
   toggleOnboardingStep: (userId: string, stepId: string, isStepDone: boolean) => Promise<void>
   handleInviteMember: (member: MemberRow) => void
+  memberSearch: string
+  onMemberSearchChange: (q: string) => void
+  onOpenActivity: (member: MemberRow) => void
 }
 
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
@@ -46,6 +52,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     expandedOnboardingId, setExpandedOnboardingId, onboardingWeekTab, setOnboardingWeekTab,
     removingId, setMemberToRemove, setCoachingMember, setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
+    memberSearch, onMemberSearchChange, onOpenActivity,
   } = props
   const router = useRouter()
 
@@ -165,6 +172,19 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           </div>
         )}
 
+        {isLeader && visibleMembers.length > 1 && (
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
+            <input
+              type="search"
+              value={memberSearch}
+              onChange={e => onMemberSearchChange(e.target.value)}
+              placeholder={t('team.searchMembers')}
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
+            />
+          </div>
+        )}
+
         {/* Üye performans listesi */}
         <ul className="space-y-5">
           {visibleMembers.map(m => {
@@ -173,6 +193,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
             const isInactive = daysInactive >= 7 && !isCurrentUser
             const isCardExpanded = isCurrentUser || !!expandedMembers[m.user_id]
+            const onboardingDone = m.onboarding_steps?.length ?? 0
+            const onboardingPct = Math.min(100, Math.round((onboardingDone / ONBOARDING_STEP_COUNT) * 100))
+            const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
+            const waQuick = waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
 
             return (
               <li
@@ -315,6 +339,63 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     )}
                   </div>
                 </div>
+
+                {/* DDBR mini + hızlı iletişim — downline, uygulama kullanıcısı */}
+                {!isCurrentUser && m.isAppUser !== false && m.role === 'member' && (
+                  <div className="space-y-3 border-t border-dashed border-[var(--border)] pt-4">
+                    <div className="flex items-center justify-between gap-2 text-xs">
+                      <span className="font-bold uppercase tracking-wide text-[var(--text-3)]">
+                        {t('statsPage.colDqsg')}
+                      </span>
+                      <span className="font-black tabular-nums text-[#854F0B] dark:text-[#fbbf24]">
+                        {onboardingDone}/{ONBOARDING_STEP_COUNT} · %{onboardingPct}
+                      </span>
+                    </div>
+                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
+                      <div
+                        className="h-full rounded-full bg-[#854F0B] dark:bg-[#fbbf24] transition-all"
+                        style={{ width: `${onboardingPct}%` }}
+                      />
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {telHref && (
+                        <a
+                          href={telHref}
+                          onClick={e => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200/60 bg-blue-50/80 dark:bg-blue-950/20 px-3 py-1.5 text-xs font-bold text-blue-700 dark:text-blue-300 transition active:scale-95"
+                        >
+                          <Phone className="h-3.5 w-3.5" />
+                          {t('team.callBtn')}
+                        </a>
+                      )}
+                      {waQuick && (
+                        <a
+                          href={waQuick}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-bold text-white transition active:scale-95"
+                        >
+                          <WhatsAppIcon className="h-3.5 w-3.5 fill-current" />
+                          WhatsApp
+                        </a>
+                      )}
+                      {isLeader && (
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation()
+                            onOpenActivity(m)
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 bg-brand/5 px-3 py-1.5 text-xs font-bold text-brand hover:bg-brand/10 transition active:scale-95 cursor-pointer"
+                        >
+                          <BarChart3 className="h-3.5 w-3.5" />
+                          {t('team.activityBtn')}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {/* Kart Alt Bölümü: Huni Dağılımı ve Onboarding (Collapsible) */}
                 {isCardExpanded && m.isAppUser !== false && (

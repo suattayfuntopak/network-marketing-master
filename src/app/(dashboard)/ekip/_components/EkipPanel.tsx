@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -24,6 +24,8 @@ import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
+import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
+import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
@@ -55,6 +57,8 @@ export function EkipPanel() {
     stepId: string
     phone?: string | null
   } | null>(null)
+  const [memberSearch, setMemberSearch] = useState('')
+  const [activityMember, setActivityMember] = useState<MemberRow | null>(null)
 
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
@@ -94,6 +98,19 @@ export function EkipPanel() {
   const visibleMembers = licenseType === 'plus'
     ? [members[0], ...downlineMembers.slice(0, 50)].filter(Boolean)
     : members
+
+  const filteredVisibleMembers = useMemo(() => {
+    const q = memberSearch.trim().toLowerCase()
+    if (!q) return visibleMembers
+    return visibleMembers.filter(m => {
+      const name = (m.full_name ?? '').toLowerCase()
+      const phone = (m.phone ?? '').replace(/\D/g, '')
+      const qPhone = q.replace(/\D/g, '')
+      return name.includes(q) || (qPhone.length >= 3 && phone.includes(qPhone))
+    })
+  }, [visibleMembers, memberSearch])
+
+  const teamPulseUnlocked = hasTeamPulseAccess(licenseType, ws?.isSuperAdmin)
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
@@ -176,7 +193,7 @@ export function EkipPanel() {
         lang={lang}
         ws={ws}
         members={members}
-        visibleMembers={visibleMembers}
+        visibleMembers={filteredVisibleMembers}
         isLeader={isLeader}
         isSolo={members.length <= 1}
         isPlusCapReached={isPlusCapReached}
@@ -195,6 +212,9 @@ export function EkipPanel() {
         setOnboardingCoachData={setOnboardingCoachData}
         toggleOnboardingStep={toggleOnboardingStep}
         handleInviteMember={handleInviteMember}
+        memberSearch={memberSearch}
+        onMemberSearchChange={setMemberSearch}
+        onOpenActivity={setActivityMember}
       />
 
       {isLeader && (
@@ -240,6 +260,21 @@ export function EkipPanel() {
           stepId={onboardingCoachData.stepId}
           phone={onboardingCoachData.phone}
           onClose={() => setOnboardingCoachData(null)}
+        />
+      )}
+
+      {activityMember && ws && (
+        <MemberActivitySheet
+          workspaceId={ws.workspaceId}
+          member={{
+            userId: activityMember.user_id,
+            fullName: activityMember.full_name,
+            phone: activityMember.phone,
+            pipelineHref: activityMember.pipeline_id ? `/pipeline/${activityMember.pipeline_id}` : null,
+          }}
+          initialPeriod="7d"
+          teamPulseUnlocked={teamPulseUnlocked}
+          onClose={() => setActivityMember(null)}
         />
       )}
     </div>
