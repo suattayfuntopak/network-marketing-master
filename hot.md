@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-02 — Crown Faz A: ekip aktivite özeti + video kart görünümü + pano şeritleri
+
+- **İstatistikler (A1):** `TeamActivitySummary` — downline KPI (üye, aktif 7g, arama, WhatsApp),
+  dönem filtreli bar chart (Arama/WA sekmesi), sıralama tablosu. Veri: `getTeamFieldActivityAction`
+  (`nmm_daily_actions` + yeni aday aggregation, yeni tablo yok).
+- **İstatistikler (A2):** `TeamPerformanceTable` — video hücresi `X/Y video` + yarım uyarı;
+  Tablo/Kart toggle (mobil varsayılan kart); filtre Tümü/Başlamayan/Yarım; Pro video kilidi.
+- **Pano (A3):** `PanoVideoStrip` (→ `/egitim/videolar`), `PanoTeamCoachingAlert` (inaktif/onboarding
+  → `#team-performance`).
+- i18n: `statsPage.teamActivity*`, `videoTraining.panoStrip*`, `dashboard.coaching*`.
+- Build temiz. **Migration yok.** (049 user_settings bu commit'e dahil değil — ayrı iş.)
+
 ## 2026-06-02 — Shopier sağlamlaştırma + favori izolasyon + onboarding fix + lint
 
 - **Shopier idempotency:** `048_shopier_processed_orders` (order_id PK). order.created'da dedupe

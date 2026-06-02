@@ -142,6 +142,10 @@ export const en = {
     remainingPeople: "+{count} more leads waiting",
     onboardingTitle: "Welcome! Add Your First Candidate",
     onboardingDesc: "To start using the app, you need to add your first candidate or join an existing team using your sponsor's invite code.",
+    teamCoachingAlert: "Coaching suggested for {count} partner(s) on your team",
+    coachingReasonInactive: "{count} inactive for 7+ days",
+    coachingReasonOnboarding: "{count} just started onboarding",
+    coachingDetail: "Details",
   },
   pipeline: {
     addCandidate: "Add Candidate",

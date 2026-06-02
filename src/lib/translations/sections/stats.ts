@@ -88,6 +88,20 @@ export const statsSection = {
       quotaWriter: 'YZ Mesajı',
       quotaCompliance: 'Uyum Denetimi',
       quotaUpgrade: 'Plan gerekli',
+
+      teamActivityTitle: 'Ekip aktivite özeti',
+      teamActivitySubtitle: 'Doğrudan ekibinizin seçili dönemdeki saha hareketi',
+      teamActivityFootnote: 'Arama ve WhatsApp, aday kartlarından kaydedilen aksiyonlardan toplanır.',
+      teamCallsChartTitle: 'Bu dönemde aramalar — kişi bazlı',
+      teamCallsChartEmpty: 'Bu dönemde kayıtlı arama yok. Aday kartında Arama aksiyonunu kullanın.',
+      teamRankingTitle: 'Sıralama',
+      kpiTeamMembers: 'Ekip üyesi',
+      kpiActivePartners: 'Aktif ortak (7 gün)',
+      kpiTotalCalls: 'Toplam arama',
+      kpiTotalWhatsApp: 'Toplam WhatsApp',
+      activeDaysSuffix: 'g',
+      teamSubtitleVideoHint:
+        'NMM ortakları ve saha distribütörlerinin huni dağılımı; video sütununda tamamlanan içerik oranı gösterilir.',
     },
   },
   en: {
@@ -179,6 +193,20 @@ export const statsSection = {
       quotaWriter: 'AI Message',
       quotaCompliance: 'Compliance',
       quotaUpgrade: 'Upgrade required',
+
+      teamActivityTitle: 'Team activity summary',
+      teamActivitySubtitle: 'Field activity for your direct downline in the selected period',
+      teamActivityFootnote: 'Calls and WhatsApp are aggregated from actions logged on candidate cards.',
+      teamCallsChartTitle: 'Calls this period — by partner',
+      teamCallsChartEmpty: 'No calls logged this period. Use the Call action on a candidate card.',
+      teamRankingTitle: 'Ranking',
+      kpiTeamMembers: 'Team members',
+      kpiActivePartners: 'Active (7 days)',
+      kpiTotalCalls: 'Total calls',
+      kpiTotalWhatsApp: 'Total WhatsApp',
+      activeDaysSuffix: 'd',
+      teamSubtitleVideoHint:
+        'Pipeline breakdown for NMM partners and field distributors; video column shows completed content ratio.',
     },
   },
 } as const

@@ -15,6 +15,8 @@ import type { NmmCandidate } from '@/types/database.types'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { AccountStatusAlert } from './AccountStatusAlert'
+import { PanoVideoStrip } from './PanoVideoStrip'
+import { PanoTeamCoachingAlert } from './PanoTeamCoachingAlert'
 
 
 function MiniTrend({ candidates }: { candidates: NmmCandidate[] }) {
@@ -148,6 +150,9 @@ export function PanoContent() {
         <SquareButton icon={Shield}                 label={t('nav.uyum')}           color="purple" desktopColor="purple" href="/uyum"          />
         <SquareButton icon={BarChart2}              label={t('nav.istatistikler')}   color="teal"   desktopColor="teal"   href="/istatistikler" />
       </div>
+
+      <PanoVideoStrip />
+      <PanoTeamCoachingAlert />
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}
       {cLoading ? statsSkeleton : (

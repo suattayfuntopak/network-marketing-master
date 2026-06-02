@@ -142,6 +142,10 @@ export const tr = {
     remainingPeople: "+{count} kişi daha bekliyor",
     onboardingTitle: "Hoş Geldiniz! İlk Adayınızı Ekleyin",
     onboardingDesc: "Uygulamayı kullanmaya başlamak için ilk adayınızı eklemeniz veya liderinizin davet koduyla bir ekibe katılmanız gerekir.",
+    teamCoachingAlert: "Ekibinde {count} ortak için koçluk önerilir",
+    coachingReasonInactive: "{count} kişi 7+ gündür inaktif",
+    coachingReasonOnboarding: "{count} kişi Doğru Başlangıç’a yeni başladı",
+    coachingDetail: "Detay",
   },
   pipeline: {
     addCandidate: "Aday Ekle",
