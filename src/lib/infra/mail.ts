@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 import {
   NMM_APP_URL,
   NMM_REPLY_TO,
@@ -251,6 +252,55 @@ export async function sendAdminNewUserEmail(
     return true
   } catch (err) {
     console.error('[Resend] Failed to send admin signup alert email:', err)
+    return false
+  }
+}
+
+/**
+ * KRİTİK: Bir Shopier siparişi (müşteri ödedi) note/productId eşleşmediği için
+ * lisansa dönüştürülemediğinde süper admin'i uyarır. Sessiz başarısızlık =
+ * müşteri ödemiş ama lisans almamış demektir; manuel müdahale gerekir.
+ */
+export async function sendUnresolvedOrderAlertEmail(params: {
+  orderId: string | null
+  note: string | null
+  productId: string | null
+  reason: string
+}): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendUnresolvedOrderAlertEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const subject = `⚠️ ÇÖZÜLEMEYEN ÖDEME — sipariş ${params.orderId ?? '(id yok)'}`
+  const content = [
+    emailHeading('Çözülemeyen ödeme — müdahale gerekli'),
+    emailParagraph(
+      `Bir Shopier siparişi alındı ancak ${emailHighlight('lisansa dönüştürülemedi')}. ` +
+      'Müşteri ödemiş olabilir; lütfen el ile kontrol edip lisansı tanımlayın.'
+    ),
+    emailPlanBox([
+      `<strong>Sipariş ID:</strong> ${params.orderId ?? '—'}`,
+      `<strong>Not (note):</strong> ${params.note ?? '—'}`,
+      `<strong>Ürün ID:</strong> ${params.productId ?? '—'}`,
+      `<strong>Neden:</strong> ${params.reason}`,
+      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+    ]),
+    emailParagraph('Müşteriyi Platform Yönetimi sayfasından bulup lisansını el ile tanımlayabilirsiniz.'),
+    emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Platform Yönetimini Aç'),
+  ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [SUPER_ADMIN_EMAIL, 'info@suattayfuntopak.com'],
+      replyTo: NMM_REPLY_TO,
+      subject,
+      html: buildPremiumEmail(content, 'tr'),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send unresolved order alert email:', err)
     return false
   }
 }

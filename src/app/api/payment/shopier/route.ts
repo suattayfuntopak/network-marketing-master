@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { sendPaymentSuccessEmail } from '@/lib/infra/mail'
+import { sendPaymentSuccessEmail, sendUnresolvedOrderAlertEmail } from '@/lib/infra/mail'
 import { verifyShopierSignature, parseShopierOrderId } from '@/lib/domain/shopierWebhook'
 import {
   getShopierOsbCredentials,
@@ -238,11 +238,19 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
 
   if (!workspaceId || !resolved) {
     // 200 dön ki Shopier sürekli retry etmesin; eksikleri log'dan tamamlayacağız.
+    const reason = !workspaceId
+      ? 'note → workspaceId çözülemedi'
+      : 'productId → plan çözülemedi'
     console.warn('[Shopier order.created] unresolved', {
       note,
       productId,
       hasWorkspace: !!workspaceId,
       hasPlan: !!resolved,
+    })
+    // KRİTİK: order.created = gerçek bir sipariş. Eşleşmezse müşteri ödemiş ama
+    // lisans alamamış olabilir → süper admin'i uyar (sessiz başarısızlığı önle).
+    sendUnresolvedOrderAlertEmail({ orderId, note, productId, reason }).catch((err) => {
+      console.error('[Shopier order.created] unresolved alert email failed:', err)
     })
     return NextResponse.json({ received: true, applied: false })
   }
