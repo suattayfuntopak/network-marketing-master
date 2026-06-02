@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-02 — Crown Faz C: pano saha özeti, seri, üye hedefleri
+
+- **Pano (C1):** `PanoFieldSummary` — saha serisi (`computeFieldStreak` / `nmm_daily_actions`) +
+  haftalık KPI (yeni aday, arama, WA, sunum). `getMyPanoInsightsAction`.
+- **Üye hedefleri (C2):** Migration **`050_member_goals.sql`** — lider downline için kişi/ay hedefi.
+  Aktivite sheet + ekip kart chip; `memberGoalsActions.ts`.
+- **Deploy:** Supabase SQL Editor'da **050** uygula (049 bağımsız — aşağıya bak). Faz C için yalnızca 050 yeterli.
+
 ## 2026-06-02 — Crown Faz B: ekip arama/iletişim + üye aktivite sheet
 
 - **/ekip (B1):** İsim/telefon arama; downline kartlarında DDBR mini çubuk (X/9); Ara / WhatsApp /

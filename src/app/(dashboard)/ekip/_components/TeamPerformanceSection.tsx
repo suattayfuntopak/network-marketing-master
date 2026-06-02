@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
   Crown, Check, Trash2, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot, Loader2,
-  Phone, Search, BarChart3,
+  Phone, Search, BarChart3, Target,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -15,6 +15,7 @@ import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
 import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
+import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -43,6 +44,7 @@ export interface TeamPerformanceSectionProps {
   memberSearch: string
   onMemberSearchChange: (q: string) => void
   onOpenActivity: (member: MemberRow) => void
+  memberGoalsMap?: Record<string, MemberGoalRow>
 }
 
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
@@ -53,6 +55,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     removingId, setMemberToRemove, setCoachingMember, setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange, onOpenActivity,
+    memberGoalsMap = {},
   } = props
   const router = useRouter()
 
@@ -357,6 +360,15 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                         style={{ width: `${onboardingPct}%` }}
                       />
                     </div>
+                    {memberGoalsMap[m.user_id] && (
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                        <Target className="h-3.5 w-3.5 shrink-0" />
+                        {t('team.memberGoalChip', {
+                          people: memberGoalsMap[m.user_id].targetPeople,
+                          months: memberGoalsMap[m.user_id].targetMonths,
+                        })}
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-2">
                       {telHref && (
                         <a

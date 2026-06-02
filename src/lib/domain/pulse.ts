@@ -64,17 +64,10 @@ export function periodStartIso(period: PulsePeriod): string | null {
 
 const LEARNING_STREAK_EVENT_TYPES = ['training_read', 'objection_read'] as const
 
-export function computeLearningStreak(
-  events: { event_type: string; created_at: string }[]
-): number {
-  const dayKeys = new Set<string>()
-  for (const e of events) {
-    if (!LEARNING_STREAK_EVENT_TYPES.includes(e.event_type as (typeof LEARNING_STREAK_EVENT_TYPES)[number])) {
-      continue
-    }
-    dayKeys.add(e.created_at.slice(0, 10))
-  }
-  if (dayKeys.size === 0) return 0
+/** Ardışık takvim günü serisi (bugün dahil; bugün yoksa dünden başlar). */
+export function computeConsecutiveDayStreak(dayKeys: Iterable<string>): number {
+  const set = dayKeys instanceof Set ? dayKeys : new Set(dayKeys)
+  if (set.size === 0) return 0
 
   const toKey = (date: Date) => {
     const y = date.getFullYear()
@@ -85,16 +78,42 @@ export function computeLearningStreak(
 
   const cursor = new Date()
   cursor.setHours(0, 0, 0, 0)
-  if (!dayKeys.has(toKey(cursor))) {
+  if (!set.has(toKey(cursor))) {
     cursor.setDate(cursor.getDate() - 1)
   }
 
   let streak = 0
-  while (dayKeys.has(toKey(cursor))) {
+  while (set.has(toKey(cursor))) {
     streak++
     cursor.setDate(cursor.getDate() - 1)
   }
   return streak
+}
+
+export function computeFieldStreak(
+  actions: { action_type: string; created_at: string }[]
+): number {
+  const fieldTypes = new Set(['call', 'whatsapp', 'stage_change', 'note', 'ai_generate'])
+  const dayKeys = new Set<string>()
+  for (const a of actions) {
+    if (fieldTypes.has(a.action_type)) {
+      dayKeys.add(a.created_at.slice(0, 10))
+    }
+  }
+  return computeConsecutiveDayStreak(dayKeys)
+}
+
+export function computeLearningStreak(
+  events: { event_type: string; created_at: string }[]
+): number {
+  const dayKeys = new Set<string>()
+  for (const e of events) {
+    if (!LEARNING_STREAK_EVENT_TYPES.includes(e.event_type as (typeof LEARNING_STREAK_EVENT_TYPES)[number])) {
+      continue
+    }
+    dayKeys.add(e.created_at.slice(0, 10))
+  }
+  return computeConsecutiveDayStreak(dayKeys)
 }
 
 export function countDistinctReadsInPeriod(

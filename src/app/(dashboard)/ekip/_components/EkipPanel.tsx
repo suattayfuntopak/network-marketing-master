@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -25,7 +25,8 @@ import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
-import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { getMemberGoalsMapAction } from '../memberGoalsActions'
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
@@ -111,6 +112,18 @@ export function EkipPanel() {
   }, [visibleMembers, memberSearch])
 
   const teamPulseUnlocked = hasTeamPulseAccess(licenseType, ws?.isSuperAdmin)
+  const teamPageUnlocked = hasTeamPageAccess(licenseType, ws?.isSuperAdmin)
+
+  const { data: memberGoalsMap = {} } = useQuery({
+    queryKey: ['member-goals', ws?.workspaceId],
+    queryFn: () =>
+      getMemberGoalsMapAction(
+        ws!.workspaceId,
+        downlineMembers.map(m => m.user_id).filter(Boolean)
+      ),
+    enabled: !!ws?.workspaceId && ws.role === 'leader' && teamPageUnlocked,
+    staleTime: 30_000,
+  })
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
@@ -215,6 +228,7 @@ export function EkipPanel() {
         memberSearch={memberSearch}
         onMemberSearchChange={setMemberSearch}
         onOpenActivity={setActivityMember}
+        memberGoalsMap={memberGoalsMap}
       />
 
       {isLeader && (
@@ -274,6 +288,7 @@ export function EkipPanel() {
           }}
           initialPeriod="7d"
           teamPulseUnlocked={teamPulseUnlocked}
+          canEditGoal={isLeader && teamPageUnlocked}
           onClose={() => setActivityMember(null)}
         />
       )}

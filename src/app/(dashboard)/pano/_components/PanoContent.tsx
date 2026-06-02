@@ -16,6 +16,7 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { AccountStatusAlert } from './AccountStatusAlert'
 import { PanoVideoStrip } from './PanoVideoStrip'
+import { PanoFieldSummary } from './PanoFieldSummary'
 import { PanoTeamCoachingAlert } from './PanoTeamCoachingAlert'
 
 
@@ -152,6 +153,7 @@ export function PanoContent() {
       </div>
 
       <PanoVideoStrip />
+      <PanoFieldSummary />
       <PanoTeamCoachingAlert />
 
       {/* ── İstatistik kartları — karelerle aynı genişlik ── */}

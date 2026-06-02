@@ -299,6 +299,39 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_member_goals: {
+        Row: {
+          id: string
+          workspace_id: string
+          member_user_id: string
+          set_by_user_id: string
+          target_people: number
+          target_months: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          member_user_id: string
+          set_by_user_id: string
+          target_people: number
+          target_months: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          member_user_id?: string
+          set_by_user_id?: string
+          target_people?: number
+          target_months?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_onboarding_progress: {
         Row: {
           id: string

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   X, Phone, Bot, Pencil, ArrowRight, UserPlus, CalendarDays,
-  Loader2,
+  Loader2, Target, Trash2,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -14,6 +14,13 @@ import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import {
+  deleteMemberGoalAction,
+  getMemberGoalsMapAction,
+  upsertMemberGoalAction,
+  type MemberGoalRow,
+} from '@/app/(dashboard)/ekip/memberGoalsActions'
+import { toast } from 'sonner'
 
 export type MemberActivityTarget = {
   userId: string
@@ -29,6 +36,7 @@ interface Props {
   member: MemberActivityTarget
   initialPeriod?: SheetActivityPeriod
   teamPulseUnlocked: boolean
+  canEditGoal?: boolean
   onClose: () => void
 }
 
@@ -43,10 +51,15 @@ export function MemberActivitySheet({
   member,
   initialPeriod = '7d',
   teamPulseUnlocked,
+  canEditGoal = false,
   onClose,
 }: Props) {
   const { t } = useTranslation()
   const [period, setPeriod] = useState<SheetActivityPeriod>(initialPeriod)
+  const [goalEditing, setGoalEditing] = useState(false)
+  const [goalPeople, setGoalPeople] = useState('')
+  const [goalMonths, setGoalMonths] = useState('')
+  const [goalSaving, setGoalSaving] = useState(false)
 
   useBodyScrollLock()
 
@@ -55,6 +68,54 @@ export function MemberActivitySheet({
     queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, period),
     staleTime: 15_000,
   })
+
+  const { data: goalMap, refetch: refetchGoal } = useQuery({
+    queryKey: ['member-goal', workspaceId, member.userId],
+    queryFn: () => getMemberGoalsMapAction(workspaceId, [member.userId]),
+    staleTime: 30_000,
+  })
+
+  const goal: MemberGoalRow | undefined = goalMap?.[member.userId]
+
+  const startGoalEdit = () => {
+    setGoalPeople(goal ? String(goal.targetPeople) : '')
+    setGoalMonths(goal ? String(goal.targetMonths) : '')
+    setGoalEditing(true)
+  }
+
+  const handleSaveGoal = async () => {
+    const people = parseInt(goalPeople, 10)
+    const months = parseInt(goalMonths, 10)
+    if (!people || !months) {
+      toast.error(t('team.memberGoalInvalid'))
+      return
+    }
+    setGoalSaving(true)
+    try {
+      await upsertMemberGoalAction(workspaceId, member.userId, people, months)
+      toast.success(t('team.memberGoalSaved'))
+      setGoalEditing(false)
+      await refetchGoal()
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    } finally {
+      setGoalSaving(false)
+    }
+  }
+
+  const handleDeleteGoal = async () => {
+    setGoalSaving(true)
+    try {
+      await deleteMemberGoalAction(workspaceId, member.userId)
+      toast.success(t('team.memberGoalDeleted'))
+      setGoalEditing(false)
+      await refetchGoal()
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    } finally {
+      setGoalSaving(false)
+    }
+  }
 
   const displayName = member.fullName ?? t('statsPage.unnamedMember')
   const telHref = member.phone ? `tel:${member.phone.replace(/\s/g, '')}` : null
@@ -134,6 +195,98 @@ export function MemberActivitySheet({
             </button>
           ))}
         </div>
+
+        {(canEditGoal || goal) && (
+          <div className="mb-4 rounded-xl border border-amber-500/25 bg-amber-50/40 dark:bg-amber-950/20 p-4">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+                <p className="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                  {t('team.memberGoalTitle')}
+                </p>
+              </div>
+              {canEditGoal && !goalEditing && (
+                <button
+                  type="button"
+                  onClick={startGoalEdit}
+                  className="text-xs font-bold text-brand hover:underline"
+                >
+                  {goal ? t('common.edit') : t('team.memberGoalSet')}
+                </button>
+              )}
+            </div>
+
+            {goalEditing ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="block">
+                    <span className="text-[10px] font-bold uppercase text-[var(--text-3)]">
+                      {t('team.memberGoalPeople')}
+                    </span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={10000}
+                      value={goalPeople}
+                      onChange={e => setGoalPeople(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold"
+                      placeholder="100"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-[10px] font-bold uppercase text-[var(--text-3)]">
+                      {t('team.memberGoalMonths')}
+                    </span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={120}
+                      value={goalMonths}
+                      onChange={e => setGoalMonths(e.target.value)}
+                      className="mt-1 w-full rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold"
+                      placeholder="6"
+                    />
+                  </label>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={goalSaving}
+                    onClick={handleSaveGoal}
+                    className="flex-1 rounded-lg bg-brand py-2 text-xs font-bold text-white disabled:opacity-50"
+                  >
+                    {t('common.save')}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={goalSaving}
+                    onClick={() => setGoalEditing(false)}
+                    className="rounded-lg border border-[var(--border)] px-3 py-2 text-xs font-bold text-[var(--text-2)]"
+                  >
+                    {t('common.cancel')}
+                  </button>
+                  {goal && (
+                    <button
+                      type="button"
+                      disabled={goalSaving}
+                      onClick={handleDeleteGoal}
+                      className="rounded-lg border border-red-200 px-3 py-2 text-red-600"
+                      aria-label={t('common.delete')}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : goal ? (
+              <p className="text-sm font-bold text-[var(--text-1)]">
+                {t('team.memberGoalChip', { people: goal.targetPeople, months: goal.targetMonths })}
+              </p>
+            ) : canEditGoal ? (
+              <p className="text-xs text-[var(--text-3)]">{t('team.memberGoalEmpty')}</p>
+            ) : null}
+          </div>
+        )}
 
         {isLoading ? (
           <div className="flex justify-center py-12">

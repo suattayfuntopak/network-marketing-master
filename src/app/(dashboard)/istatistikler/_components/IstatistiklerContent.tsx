@@ -58,6 +58,7 @@ export function IstatistiklerContent() {
   const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
+  const canEditMemberGoal = ws?.role === 'leader' && !teamStatsLocked
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')
   const [activityMember, setActivityMember] = useState<MemberActivityTarget | null>(null)
@@ -445,6 +446,7 @@ export function IstatistiklerContent() {
           member={activityMember}
           initialPeriod={mapStatsPeriodToSheet(period)}
           teamPulseUnlocked={teamPulseUnlocked}
+          canEditGoal={canEditMemberGoal}
           onClose={() => setActivityMember(null)}
         />
       )}
