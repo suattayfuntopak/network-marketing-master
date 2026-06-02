@@ -11,6 +11,7 @@ import {
 import {
   extractOrderFields,
   verifyShopierWebhookSignature,
+  describeShopierSignatureScheme,
 } from '@/lib/domain/shopierOrderWebhook'
 import {
   extractWorkspaceIdFromNote,
@@ -171,6 +172,15 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
   })
 
   const secret = process.env.SHOPIER_WEBHOOK_SECRET
+  // Teşhis: imza şemasını kilitlemek için — VERIFY=false iken bile loglar, bloklamaz.
+  if (secret) {
+    console.info('[Shopier order.created] signature', {
+      headerPresent: !!signature,
+      header: signature ? `${signature.slice(0, 16)}…(${signature.length})` : null,
+      verifyResult: verifyShopierWebhookSignature(raw, signature, secret, timestamp),
+      scheme: describeShopierSignatureScheme(raw, signature, secret, timestamp),
+    })
+  }
   if (secret && process.env.SHOPIER_WEBHOOK_VERIFY !== 'false') {
     if (!verifyShopierWebhookSignature(raw, signature, secret, timestamp)) {
       console.warn('[Shopier order.created] signature mismatch')

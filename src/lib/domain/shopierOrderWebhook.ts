@@ -11,10 +11,38 @@
 
 import crypto from 'crypto'
 
+/** İmzada kullanılmış olabilecek payload varyantları (içerik kesin değil). */
+function signatureCandidates(rawBody: string, timestamp?: string | null): { name: string; payload: string }[] {
+  const out = [{ name: 'body', payload: rawBody }]
+  if (timestamp) {
+    out.push({ name: 'ts.body', payload: `${timestamp}.${rawBody}` })
+    out.push({ name: 'ts+body', payload: `${timestamp}${rawBody}` })
+    out.push({ name: 'body+ts', payload: `${rawBody}${timestamp}` })
+  }
+  return out
+}
+
+function digestEquals(signature: string, mac: Buffer): boolean {
+  const trimmed = signature.trim()
+  for (const enc of ['base64', 'base64url'] as const) {
+    try {
+      const b = Buffer.from(trimmed, enc)
+      if (b.length === mac.length && crypto.timingSafeEqual(b, mac)) return true
+    } catch {
+      /* ignore */
+    }
+  }
+  const lower = trimmed.toLowerCase()
+  if (/^[0-9a-f]+$/.test(lower) && lower.length === mac.length * 2) {
+    if (crypto.timingSafeEqual(Buffer.from(lower, 'hex'), mac)) return true
+  }
+  return false
+}
+
 /**
- * Shopier-Signature: HS256 (HMAC-SHA256). İmzalanan içerik kesinleşene dek iki
- * aday denenir: (1) ham gövde, (2) `<timestamp>.<ham gövde>`. base64 ve hex
- * kodlamaların ikisi de kabul edilir, karşılaştırma sabit-zamanlı.
+ * Shopier-Signature: HS256 (HMAC-SHA256). İmzalanan içerik kesin değil → birkaç
+ * aday (ham gövde, ts.body, ts+body, body+ts) × kodlama (base64/base64url/hex)
+ * denenir. Karşılaştırma sabit-zamanlı.
  */
 export function verifyShopierWebhookSignature(
   rawBody: string,
@@ -23,30 +51,29 @@ export function verifyShopierWebhookSignature(
   timestamp?: string | null
 ): boolean {
   if (!signature || !secret) return false
-  const candidates = [rawBody]
-  if (timestamp) candidates.push(`${timestamp}.${rawBody}`)
-  for (const payload of candidates) {
-    const expected = crypto.createHmac('sha256', secret).update(payload).digest()
-    if (safeEqualEncoded(signature, expected)) return true
+  for (const { payload } of signatureCandidates(rawBody, timestamp)) {
+    const mac = crypto.createHmac('sha256', secret).update(payload).digest()
+    if (digestEquals(signature, mac)) return true
   }
   return false
 }
 
-function safeEqualEncoded(received: string, expected: Buffer): boolean {
-  const trimmed = received.trim()
-  // base64 (veya base64url)
-  try {
-    const b = Buffer.from(trimmed, 'base64')
-    if (b.length === expected.length && crypto.timingSafeEqual(b, expected)) return true
-  } catch {
-    /* ignore */
+/** Teşhis: eşleşen imza şemasının adını ('body/base64' gibi) ya da 'none' döndürür. */
+export function describeShopierSignatureScheme(
+  rawBody: string,
+  signature: string | null | undefined,
+  secret: string | null | undefined,
+  timestamp?: string | null
+): string {
+  if (!signature || !secret) return 'no-input'
+  for (const { name, payload } of signatureCandidates(rawBody, timestamp)) {
+    const mac = crypto.createHmac('sha256', secret).update(payload).digest()
+    for (const enc of ['base64', 'base64url', 'hex'] as const) {
+      const expected = enc === 'hex' ? mac.toString('hex') : mac.toString(enc)
+      if (signature.trim() === expected) return `${name}/${enc}`
+    }
   }
-  // hex
-  const lower = trimmed.toLowerCase()
-  if (/^[0-9a-f]+$/.test(lower) && lower.length === expected.length * 2) {
-    if (crypto.timingSafeEqual(Buffer.from(lower, 'hex'), expected)) return true
-  }
-  return false
+  return 'none'
 }
 
 export interface ExtractedOrder {
