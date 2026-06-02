@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { X, ChevronRight, Users, UserPlus, Rocket } from 'lucide-react'
+import { X, ChevronRight, Users, UserPlus, Rocket, PartyPopper, ArrowRight } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -36,8 +36,20 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
 
   useBodyScrollLock(visible)
 
+  // Gösterim kararı:
+  //  • Tekrar-başlat: Ayarlar'dan gelen tek seferlik geçici işaret (kalıcı veri
+  //    değil) — aday guard'ını bypass eder, kalıcı flag'e dokunmaz.
+  //  • Otomatik: kalıcı flag false + mount'ta aday yoktu (yeni kullanıcı).
   useEffect(() => {
     if (!userId || settingsLoading || dismissedRef.current) return
+    const forceTour =
+      typeof window !== 'undefined' && sessionStorage.getItem('nmm_force_tour') === '1'
+    if (forceTour) {
+      sessionStorage.removeItem('nmm_force_tour')
+      setStep(1)
+      setVisible(true)
+      return
+    }
     if (!settings.onboardingDone && !hadCandidatesAtMount.current) {
       setVisible(true)
     }
@@ -55,24 +67,27 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
     }
   }
 
+  const firstName = ws?.fullName?.trim().split(' ')[0] ?? ''
+
   async function handleAddCandidate() {
     const name = candidateName.trim()
     if (!name) { setStep(3); return }
     await addCandidate.mutateAsync({ full_name: name, phone: null, note: null, stage: 'yeni', last_contact_at: null })
+    toast.success(`İlk adayın eklendi: ${name} 🎉`)
     setStep(3)
   }
 
   async function handleJoin() {
     const code = inviteInput.trim().toUpperCase()
-    if (!code) { dismiss(); return }
-    if (code === inviteCode) { toast.error('Zaten bu çalışma alanındasınız!'); dismiss(); return }
+    if (!code) { setStep(4); return }
+    if (code === inviteCode) { toast.error('Zaten bu çalışma alanındasınız!'); setStep(4); return }
     setJoining(true)
     try {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Oturum yok.')
 
-      const { data, error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
+      const { error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
       if (rpcError) {
         toast.error(rpcError.message?.includes('invalid_invite_code') ? 'Geçersiz davet kodu.' : 'Ekibe katılım sırasında bir hata oluştu.')
         setJoining(false)
@@ -88,15 +103,16 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
     } finally {
       setJoining(false)
     }
-    dismiss()
+    setStep(4)
   }
 
   if (!visible) return null
 
   const steps = [
-    { icon: Rocket,    title: 'Hoş geldin!',          num: 1 },
-    { icon: UserPlus,  title: 'İlk adayını ekle',      num: 2 },
-    { icon: Users,     title: 'Bir ekibe katıl',        num: 3 },
+    { icon: Rocket,       title: 'Hoş geldin!',      num: 1 },
+    { icon: UserPlus,     title: 'İlk adayını ekle',  num: 2 },
+    { icon: Users,        title: 'Bir ekibe katıl',    num: 3 },
+    { icon: PartyPopper,  title: 'Hazırsın!',          num: 4 },
   ]
 
   return (
@@ -123,9 +139,11 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
               <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEEDFE]">
                 <Rocket className="h-7 w-7 text-[#534AB7]" strokeWidth={1.75} />
               </div>
-              <h2 className="text-lg font-bold text-[var(--text-1)]">NMM'ye Hoş Geldin!</h2>
+              <h2 className="text-lg font-bold text-[var(--text-1)]">
+                {firstName ? `Hoş geldin, ${firstName}! 👋` : 'NMM\'ye Hoş Geldin! 👋'}
+              </h2>
               <p className="text-sm text-[var(--text-2)] leading-relaxed">
-                Sana <strong>3 adımda</strong> başlamanı sağlayacağız. Sadece 1 dakika sürer — söz!
+                Seni <strong>3 küçük adımda</strong> kuruluma alalım. Sadece 1 dakika sürer — söz!
               </p>
               <button
                 onClick={() => setStep(2)}
@@ -193,7 +211,33 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
               >
                 {joining ? 'Katılınıyor...' : 'Ekibe Katıl ve Başla'}
               </button>
-              <button onClick={dismiss} className="w-full text-center text-xs text-[var(--text-3)] hover:underline">Liderim yok, tek başıma devam et</button>
+              <button
+                onClick={() => setStep(4)}
+                disabled={joining}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] py-3 text-sm font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] disabled:opacity-60"
+              >
+                Liderim yok, tek başıma devam et
+              </button>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div className="space-y-4 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEEDFE]">
+                <PartyPopper className="h-7 w-7 text-[#534AB7]" strokeWidth={1.75} />
+              </div>
+              <h2 className="text-lg font-bold text-[var(--text-1)]">
+                {firstName ? `Hazırsın, ${firstName}! 🚀` : 'Hazırsın! 🚀'}
+              </h2>
+              <p className="text-sm text-[var(--text-2)] leading-relaxed">
+                Kurulum tamam. Şimdi panonu keşfet — adaylarını ekle, takip et ve ekibini büyüt.
+              </p>
+              <button
+                onClick={dismiss}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white hover:bg-[#453DA0]"
+              >
+                Panomu Keşfet <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           )}
         </div>

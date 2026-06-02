@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Layout, Sun, Moon, Monitor, Loader2, Save } from 'lucide-react'
+import { X, Layout, Sun, Moon, Monitor, Loader2, Save, Rocket } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
@@ -88,6 +88,13 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleReplayTour() {
+    // Tek seferlik, geçici işaret (kalıcı veri değil) — pano'da tur zorla açılır.
+    try { sessionStorage.setItem('nmm_force_tour', '1') } catch { /* ignore */ }
+    onClose()
+    window.location.assign('/pano')
   }
 
   if (!mounted) return null
@@ -202,6 +209,22 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                   )}
                 </button>
               </form>
+            </div>
+
+            {/* Karşılama Turu */}
+            <div className="border-t border-[var(--border)] pt-5 space-y-3">
+              <div>
+                <h3 className="text-sm font-semibold text-[var(--text-1)]">Karşılama Turu</h3>
+                <p className="text-xs text-[var(--text-3)]">İlk kurulum adımlarını yeniden izleyin</p>
+              </div>
+              <button
+                type="button"
+                onClick={handleReplayTour}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 text-sm font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)] active:scale-95"
+              >
+                <Rocket className="h-4 w-4" />
+                Turu Tekrar Başlat
+              </button>
             </div>
           </div>
         )}
