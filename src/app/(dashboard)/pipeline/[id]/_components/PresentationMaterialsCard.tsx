@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { Presentation, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
@@ -38,12 +38,8 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
     return pickDefaultMaterial(presentationMaterials)
   }, [presentationMaterials, selectedMaterialId])
 
-  useEffect(() => {
-    const defaultMaterial = pickDefaultMaterial(presentationMaterials)
-    if (defaultMaterial && !selectedMaterialId) {
-      setSelectedMaterialId(defaultMaterial.id)
-    }
-  }, [presentationMaterials, selectedMaterialId])
+  // Not: default seçim için effect+setState gerekmiyor — activeMaterial zaten
+  // selectedMaterialId yokken pickDefaultMaterial'a düşüyor (set-state-in-effect kaçınıldı).
 
   const getPresentationMessage = useCallback(() => {
     const name = c?.full_name?.trim() || t('pipelinePage.customer')
