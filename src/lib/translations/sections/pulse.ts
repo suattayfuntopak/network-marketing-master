@@ -28,7 +28,8 @@ export const pulseSection = {
       panoFieldWeekTitle: 'Bu hafta saha özeti',
       panoFieldWeekSubtitle: 'Son 7 gün — arama, WhatsApp, yeni aday ve sunum',
       bugunFieldWeekTitle: 'Bu hafta saha özetin',
-      bugunFieldWeekSubtitle: 'Arama ve WhatsApp aksiyonların burada sayılır',
+      bugunFieldWeekSubtitle:
+        'Aday ekleme, sunum ve tüm aramaların (Telefon/WhatsApp) burada görünür',
       fieldStreakDetailTitle: 'Son 7 gün saha kaydı',
       fieldStreakDetailSubtitle: '{active}/7 gün aktif',
       fieldStreakNoActionsDay: 'Bu gün saha aksiyonu yok',
@@ -118,7 +119,8 @@ export const pulseSection = {
       panoFieldWeekTitle: 'This week in the field',
       panoFieldWeekSubtitle: 'Last 7 days — calls, WhatsApp, new leads and presentations',
       bugunFieldWeekTitle: 'Your field summary this week',
-      bugunFieldWeekSubtitle: 'Calls and WhatsApp actions you log count here',
+      bugunFieldWeekSubtitle:
+        'New prospects, presentations, and all calls (phone/WhatsApp) show here',
       fieldStreakDetailTitle: 'Last 7 days field log',
       fieldStreakDetailSubtitle: '{active}/7 active days',
       fieldStreakNoActionsDay: 'No field actions this day',

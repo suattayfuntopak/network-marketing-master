@@ -201,6 +201,16 @@ export function RelatedTopicPicker({
           ))}
         </div>
 
+        <div className="border-t border-[var(--border)] px-4 py-2.5 sm:px-5">
+          <p className="text-sm text-[var(--text-2)]">
+            {draft
+              ? t('videoTraining.selectedTopic', {
+                  label: resolveTopicLabel(draft, lang) ?? draft,
+                })
+              : t('videoTraining.noTopicSelected')}
+          </p>
+        </div>
+
         <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] bg-[var(--bg-subtle)]/50 px-4 py-3.5 sm:px-5">
           <button
             type="button"

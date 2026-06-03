@@ -159,7 +159,7 @@ export function PanoContent() {
           <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.totalPeople')}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">
-          <p className="text-2xl font-bold text-[#534AB7] md:text-3xl">{activeCount}</p>
+          <p className="text-2xl font-bold text-[#534AB7] dark:text-[var(--text-1)] md:text-3xl">{activeCount}</p>
           <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.activeCandidates')}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-5 text-center">

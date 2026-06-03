@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-03 — Dark UX: Takvim, Koç, Pano, Platform + onaylı öneriler
+
+- **Takvim dark:** Takip günü noktaları beyaz; “En yakın takip” ve “Bugüne dön” hover → mor arka plan + beyaz yazı.
+- **Bugün İlgilen:** Saha özeti alt metni güncellendi (aday ekleme, sunum, tüm aramalar).
+- **YZ Koçu:** Banner başlık/açıklama +1pt; dark’ta açıklama başlıkla aynı renk.
+- **Pano:** Aktif Aday rakamı dark’ta beyaz.
+- **Platform:** “Dış Kayıtlar”; Boru Hattı’ma ekle ikonu dark beyaz; tablo `table-fixed` + sıkı padding.
+- **Öneri 1/3/4:** Kullanılmayan hero çeviri anahtarları silindi; ilgili konu seçim özeti; hero kutularında favori yokken toplam rozet.
+- **Dosyalar:** `TakvimClient`, `pulse.ts`, `KoclukForm`, `PanoContent`, `PlatformYonetimContent`, `platform.ts`, `RelatedTopicPicker`, `ItirazlarContent`, `EgitimContent`, `tr.ts`, `en.ts`, `training.ts`, `videoTraining.ts`.
+- **Not:** `EkipPanel.tsx` WIP — commit edilmedi.
+
 ## 2026-06-03 — Sunum materyalleri dark + ilgili konu popup + hero kutuları
 
 - **Sunum Materyalleri dark:** Geri link, chip etiketleri ve “Materyal ekle” butonu

@@ -422,8 +422,6 @@ export const en = {
   training: {
     title: "If You Have Time",
     subtitle: "Useful readings to become a successful networker",
-    heroTitle: "📖 No one is forcing you — but knowledge is leverage",
-    heroDesc: "Each micro-topic takes 4–8 minutes. Read based on your daily needs rather than sequentially for best performance.",
     topicsCount: "{count} topics",
     categoriesCount: "{count} categories",
     readCount: "{read}/{total} read",

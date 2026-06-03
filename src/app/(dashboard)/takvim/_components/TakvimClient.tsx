@@ -285,7 +285,7 @@ export function TakvimClient() {
           <button
             type="button"
             onClick={goToToday}
-            className="flex shrink-0 items-center gap-1 rounded-xl bg-[#EEEDFE] px-2.5 py-1.5 text-xs font-semibold text-[#534AB7] transition hover:bg-[#534AB7]/15"
+            className="flex shrink-0 items-center gap-1 rounded-xl bg-[#EEEDFE] dark:bg-[#534AB7]/15 px-2.5 py-1.5 text-xs font-semibold text-[#534AB7] dark:text-[var(--text-1)] transition hover:bg-[#534AB7]/15 dark:hover:bg-[#534AB7] dark:hover:text-white"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             {t('pagesUi.backToToday')}
@@ -340,7 +340,7 @@ export function TakvimClient() {
                   <span className={`mt-0.5 h-1 w-1 rounded-full ${
                     isSelected ? 'bg-white' :
                     isOverdue ? 'bg-[#72243E]' :
-                    'bg-[#534AB7]'
+                    'bg-[#534AB7] dark:bg-white/90'
                   }`} />
                 )}
               </button>
@@ -373,7 +373,7 @@ export function TakvimClient() {
               <button
                 type="button"
                 onClick={() => selectCalendarDate(nearestDay)}
-                className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#EEEDFE] px-3 py-1.5 text-xs font-semibold text-[#534AB7] transition hover:bg-[#534AB7]/15"
+                className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#EEEDFE] dark:bg-[#534AB7]/15 px-3 py-1.5 text-xs font-semibold text-[#534AB7] dark:text-[var(--text-1)] transition hover:bg-[#534AB7]/15 dark:hover:bg-[#534AB7] dark:hover:text-white"
               >
                 {t('pagesUi.nearestFollowUp', {
                   date: formatCalendarDayKey(nearestDay, lang),

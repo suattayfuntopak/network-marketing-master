@@ -522,7 +522,7 @@ export function PlatformYonetimContent() {
                         className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
                           isAdded
                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
-                            : 'bg-[#534AB7]/10 text-[#534AB7] hover:bg-[#534AB7] hover:text-white disabled:opacity-50'
+                            : 'bg-[#534AB7]/10 text-[#534AB7] dark:text-white dark:bg-white/10 hover:bg-[#534AB7] hover:text-white disabled:opacity-50'
                         }`}
                       >
                         {addingId === w.workspaceId ? (
@@ -556,18 +556,18 @@ export function PlatformYonetimContent() {
         {/* Workspaces Spreadsheet Grid */}
         <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
           <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe" data-no-swipe="true">
-            <table className="w-full text-left border-collapse text-base min-w-[1000px]">
+            <table className="w-full table-fixed text-left border-collapse text-sm">
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                  <th className="p-3 font-semibold">{t('platformPage.thLeaderName')}</th>
-                  <th className="p-3 font-semibold">{t('platformPage.thWorkspaceName')}</th>
-                  <th className="p-3 font-semibold">{t('platformPage.thLicensePlan')}</th>
-                  <th className="p-3 font-semibold text-center">{t('platformPage.thCandidates')}</th>
-                  <th className="p-3 font-semibold text-center">{t('platformPage.thDownlines')}</th>
-                  <th className="p-3 font-semibold">{t('platformPage.thSponsor')}</th>
-                  <th className="p-3 font-semibold text-center">{t('platformPage.thExpiry')}</th>
-                  <th className="p-3 font-semibold text-center">{t('platformPage.thRegistration')}</th>
-                  <th className="p-3 font-semibold text-right">{t('platformPage.thActions')}</th>
+                  <th className="w-[24%] px-2 py-2 font-semibold">{t('platformPage.thLeaderName')}</th>
+                  <th className="w-[12%] px-2 py-2 font-semibold">{t('platformPage.thWorkspaceName')}</th>
+                  <th className="w-[9%] px-2 py-2 font-semibold">{t('platformPage.thLicensePlan')}</th>
+                  <th className="w-[7%] px-2 py-2 font-semibold text-center">{t('platformPage.thCandidates')}</th>
+                  <th className="w-[7%] px-2 py-2 font-semibold text-center">{t('platformPage.thDownlines')}</th>
+                  <th className="w-[14%] px-2 py-2 font-semibold">{t('platformPage.thSponsor')}</th>
+                  <th className="w-[11%] px-2 py-2 font-semibold text-center">{t('platformPage.thExpiry')}</th>
+                  <th className="w-[10%] px-2 py-2 font-semibold text-center">{t('platformPage.thRegistration')}</th>
+                  <th className="w-[6%] px-2 py-2 font-semibold text-right">{t('platformPage.thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
@@ -605,36 +605,32 @@ export function PlatformYonetimContent() {
                         className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''}`}
                       >
                         {/* 1. Leader */}
-                        <td className="p-3 whitespace-nowrap">
-
-
-
-
-                          <div className="flex items-center gap-3">
+                        <td className="px-2 py-2">
+                          <div className="flex items-center gap-2 min-w-0">
                             {w.avatarUrl ? (
-                              <div className="h-8 w-8 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
+                              <div className="h-7 w-7 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
                                 <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
                               </div>
                             ) : (
-                              <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-[10px] font-black text-white shadow-sm`}>
+                              <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-[10px] font-black text-white shadow-sm`}>
                                 {w.ownerName.charAt(0).toUpperCase()}
                               </div>
                             )}
-                            <div>
-                              <div className="font-bold text-[var(--text-1)]">{w.ownerName}</div>
-                              <div className="text-sm text-[var(--text-3)] font-semibold flex items-center gap-1">
+                            <div className="min-w-0">
+                              <div className="font-bold text-[var(--text-1)] truncate">{w.ownerName}</div>
+                              <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1 min-w-0">
                                 <Mail className="h-3 w-3 shrink-0" />
-                                {w.ownerEmail}
+                                <span className="truncate">{w.ownerEmail}</span>
                               </div>
                             </div>
                           </div>
                         </td>
 
                         {/* 2. Workspace name */}
-                        <td className="p-3 font-medium whitespace-nowrap">{w.workspaceName}</td>
+                        <td className="px-2 py-2 font-medium truncate">{w.workspaceName}</td>
 
                         {/* 3. License type */}
-                        <td className="p-3 whitespace-nowrap font-bold">
+                        <td className="px-2 py-2 whitespace-nowrap font-bold">
                           <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
@@ -655,24 +651,24 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 4. Candidates count */}
-                        <td className="p-3 text-center font-bold text-blue-600 dark:text-blue-400 tabular-nums">{w.candidateCount}</td>
+                        <td className="px-2 py-2 text-center font-bold text-blue-600 dark:text-blue-400 tabular-nums">{w.candidateCount}</td>
 
                         {/* 5. Team count */}
-                        <td className="p-3 text-center font-bold text-[#534AB7] tabular-nums">{w.downlineCount}</td>
+                        <td className="px-2 py-2 text-center font-bold text-[#534AB7] tabular-nums">{w.downlineCount}</td>
 
                         {/* 6. Sponsor linkage */}
-                        <td className="p-3 whitespace-nowrap font-semibold">
+                        <td className="px-2 py-2 font-semibold">
                           {w.isIndependent ? (
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/10 px-2 py-0.5 text-[10px] font-black text-purple-600 dark:text-purple-400">
+                            <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-purple-500/10 px-1.5 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400 truncate">
                               💎 {t('platformPage.independentDirect')}
                             </span>
                           ) : (
-                            <span className="max-w-[160px] truncate block text-[var(--text-1)]">{w.sponsorName}</span>
+                            <span className="truncate block text-[var(--text-1)]">{w.sponsorName}</span>
                           )}
                         </td>
 
                         {/* 7. Expiry */}
-                        <td className={`p-3 text-center tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
+                        <td className={`px-2 py-2 text-center tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
                           {isPaidUnlimited ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
                               ♾ {t('platformPage.unlimited')}
@@ -690,10 +686,10 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 8. Registration Date */}
-                        <td className="p-3 text-center text-sm text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
+                        <td className="px-2 py-2 text-center text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
 
                         {/* 9. Actions */}
-                        <td className="p-3 whitespace-nowrap text-right">
+                        <td className="px-2 py-2 whitespace-nowrap text-right">
                           <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
                             {(() => {
                               const waLink = buildPlatformWaLink(w, inviteCode)

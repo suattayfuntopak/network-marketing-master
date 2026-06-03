@@ -152,10 +152,14 @@ export function ItirazlarContent() {
               {t('objectionsPage.subtitle')}
             </p>
           </div>
-          <div className="flex flex-col items-end gap-1">
-            {favCount > 0 && (
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {favCount > 0 ? (
               <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
                 {favCount} {t('objectionsPage.fav')}
+              </span>
+            ) : (
+              <span className="rounded-full bg-[#9B1D47]/10 px-2.5 py-1 text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af]">
+                {tumItirazlar.length} {t('objectionsPage.objections')}
               </span>
             )}
             {readCount > 0 && (

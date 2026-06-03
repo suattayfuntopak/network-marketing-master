@@ -198,9 +198,13 @@ export function EgitimContent() {
             </p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
-            {favCount > 0 && (
+            {favCount > 0 ? (
               <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[9px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
                 {favCount} {t('trainingPage.fav')}
+              </span>
+            ) : (
+              <span className="rounded-full bg-[#3730A3]/10 px-2 py-0.5 text-[9px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
+                {t('training.topicsCount', { count: allTopicsMerged.length })}
               </span>
             )}
             {readCount > 0 && (

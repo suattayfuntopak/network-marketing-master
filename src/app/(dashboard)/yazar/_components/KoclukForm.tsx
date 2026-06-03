@@ -94,10 +94,10 @@ export function KoclukForm() {
           <HelpCircle className="h-4 w-4 text-[#3730A3] dark:text-[#c7d2fe]" />
         </div>
         <div>
-          <p className="text-xs font-bold text-[#3730A3] dark:text-[#c7d2fe]">
+          <p className="text-sm font-bold text-[#3730A3] dark:text-[#c7d2fe]">
             {t('coachUi.askYourCoachTitle')}
           </p>
-          <p className="text-[11px] text-[#3730A3]/70 dark:text-[#c7d2fe]/70 mt-0.5 font-medium">
+          <p className="text-xs text-[#3730A3]/70 dark:text-[#c7d2fe] mt-0.5 font-medium">
             {t('coachUi.askYourCoachDesc')}
           </p>
         </div>
