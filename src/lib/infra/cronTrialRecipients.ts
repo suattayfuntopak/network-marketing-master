@@ -4,6 +4,8 @@ export interface TrialEmailRecipient {
   email: string
   name: string
   workspaceId: string
+  /** Kullanıcının kalıcı arayüz dili (user_metadata.lang) — yoksa 'tr'. */
+  lang: 'tr' | 'en'
 }
 
 /** license_expires_at tam günü = bugün + offsetDays olan free workspace liderleri. */
@@ -47,6 +49,7 @@ export async function fetchFreeTrialRecipients(
     const email = user?.email
     if (!email) continue
 
+    const metaLang = user.user_metadata?.lang
     out.push({
       workspaceId: ws.id,
       email,
@@ -54,6 +57,7 @@ export async function fetchFreeTrialRecipients(
         member.full_name ||
         (user.user_metadata?.full_name as string | undefined) ||
         'Değerli Ortak',
+      lang: metaLang === 'en' ? 'en' : 'tr',
     })
   }
 

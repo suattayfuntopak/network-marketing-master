@@ -76,8 +76,8 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
             emailParagraph(hi),
             emailParagraph(
               lang === 'en'
-                ? `Tomorrow your free trial ends and workspace access will pause until you choose a plan. Pick the plan that fits your team today.`
-                : `Yarın ücretsiz denemeniz bitecek; plan seçene kadar çalışma alanı erişiminiz duraklatılacak. Ekibinize uygun planı bugün seçin.`
+                ? `Tomorrow your free trial ends — your Basic features close and daily AI credits drop to a limited free tier. Pick the plan that fits your team today.`
+                : `Yarın ücretsiz denemeniz bitecek; Basic özellikleriniz kapanacak ve günlük YZ krediniz sınırlı ücretsiz seviyeye düşecek. Ekibinize uygun planı bugün seçin.`
             ),
             planBox(lang),
             emailCta(`${PAYMENT_URL}?${utm}`, cta),

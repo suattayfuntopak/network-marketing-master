@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, 'tr')
+      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang)
       results.push({ kind: job.kind, email: r.email, sent })
     }
   }

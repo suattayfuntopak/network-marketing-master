@@ -15,6 +15,7 @@ import { pagesSection } from '@/lib/translations/sections/pages'
 import { errorsSection } from '@/lib/translations/sections/errors'
 import { pulseSection } from '@/lib/translations/sections/pulse'
 import { videoTrainingSection } from '@/lib/translations/sections/videoTraining'
+import { persistUserLangAction } from '@/app/actions/userLang'
 
 type LangType = 'tr' | 'en'
 
@@ -84,6 +85,8 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     setLangState(newLang)
     localStorage.setItem('nmm_lang', newLang)
     document.documentElement.lang = newLang
+    // Sunucu tarafına kalıcılaştır (cron/e-posta dili için). Oturum yoksa no-op.
+    persistUserLangAction(newLang).catch(() => {})
   }
 
   function t(keyPath: string, variables?: Record<string, string | number>): string {

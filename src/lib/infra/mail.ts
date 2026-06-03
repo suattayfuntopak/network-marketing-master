@@ -42,7 +42,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '📊 <strong>Stats & goal roadmap</strong> — see your daily targets and progress',
         ]),
         emailParagraph(
-          `Your trial lasts ${emailHighlight('14 days')}. If you don't upgrade to a paid plan before it ends, your account access will be ${emailHighlight('restricted')} until you choose a plan — your data stays safe.`
+          `Your trial lasts ${emailHighlight('14 days')}. If you don't upgrade before it ends, your Basic features close and your daily AI credits drop to a ${emailHighlight('limited free tier')} — your data stays safe and you can pick a plan anytime to continue.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'View plans & upgrade'),
         emailParagraph(
@@ -63,7 +63,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
         ]),
         emailParagraph(
-          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre dolmadan ücretli bir plana geçmezseniz, hesap erişiminiz bir plan seçene kadar ${emailHighlight('kısıtlanır')} — verileriniz güvende kalır.`
+          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre dolmadan ücretli bir plana geçmezseniz Basic özellikleriniz kapanır ve günlük YZ krediniz ${emailHighlight('sınırlı ücretsiz seviyeye')} düşer — verileriniz güvende kalır, dilediğinizde plan seçip kaldığınız yerden devam edersiniz.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'Planları gör ve yükselt'),
         emailParagraph(
