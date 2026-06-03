@@ -20,6 +20,35 @@ import {
 } from '@/lib/domain/shopierStorefront'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
+/**
+ * Çözülemeyen siparişi Platform Yönetimi'nde göstermek için DB'ye yazar
+ * (idempotent — order_id PK; mevcut satır 'applied' ise dokunmaz).
+ */
+async function recordUnresolvedOrder(params: {
+  orderId: string | null
+  note: string | null
+  productId: string | null
+}): Promise<void> {
+  if (!params.orderId) return
+  try {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    await supabase.from('nmm_shopier_processed_orders').upsert(
+      {
+        order_id: params.orderId,
+        status: 'unresolved',
+        note: params.note,
+        product_id: params.productId,
+      },
+      { onConflict: 'order_id', ignoreDuplicates: true }
+    )
+  } catch (err) {
+    console.error('[Shopier] recordUnresolvedOrder failed (non-fatal):', err)
+  }
+}
+
 async function applyLicenseUpgrade(params: {
   workspaceId: string
   newLicenseType: string
@@ -248,7 +277,9 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
       hasPlan: !!resolved,
     })
     // KRİTİK: order.created = gerçek bir sipariş. Eşleşmezse müşteri ödemiş ama
-    // lisans alamamış olabilir → süper admin'i uyar (sessiz başarısızlığı önle).
+    // lisans alamamış olabilir → (a) süper admin'e e-posta, (b) Platform
+    // Yönetimi'nde görünmesi için DB'ye yaz (idempotent). Sessiz başarısızlık yok.
+    await recordUnresolvedOrder({ orderId, note, productId })
     sendUnresolvedOrderAlertEmail({ orderId, note, productId, reason }).catch((err) => {
       console.error('[Shopier order.created] unresolved alert email failed:', err)
     })

@@ -330,3 +330,50 @@ export async function deleteUserAction(ownerId: string, email: string): Promise<
   return { success: true }
 }
 
+
+// ─────────────────────────────────────────────────────────────
+// Çözülemeyen Shopier siparişleri (müşteri ödedi, lisans eşleşmedi)
+// ─────────────────────────────────────────────────────────────
+
+export interface UnresolvedOrderItem {
+  orderId: string
+  note: string | null
+  productId: string | null
+  processedAt: string
+}
+
+/** Süper admin: lisansa dönüştürülemeyen siparişler (el ile müdahale bekler). */
+export async function getUnresolvedOrdersAction(): Promise<UnresolvedOrderItem[]> {
+  const { user } = await getAuthUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('nmm_shopier_processed_orders')
+    .select('order_id, note, product_id, processed_at')
+    .eq('status', 'unresolved')
+    .order('processed_at', { ascending: false })
+
+  if (error) throw new Error(error.message)
+  return (data ?? []).map((o) => ({
+    orderId: o.order_id,
+    note: o.note,
+    productId: o.product_id,
+    processedAt: o.processed_at,
+  }))
+}
+
+/** Süper admin lisansı el ile tanımladıktan sonra siparişi listeden düşürür. */
+export async function markOrderResolvedAction(orderId: string): Promise<{ success: boolean }> {
+  const { user } = await getAuthUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('nmm_shopier_processed_orders')
+    .update({ status: 'resolved' })
+    .eq('order_id', orderId)
+
+  if (error) throw new Error(error.message)
+  return { success: true }
+}

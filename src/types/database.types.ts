@@ -485,6 +485,8 @@ export interface Database {
           status: string
           processed_at: string
           refunded_at: string | null
+          note: string | null
+          product_id: string | null
         }
         Insert: {
           order_id: string
@@ -494,6 +496,8 @@ export interface Database {
           status?: string
           processed_at?: string
           refunded_at?: string | null
+          note?: string | null
+          product_id?: string | null
         }
         Update: {
           order_id?: string
@@ -503,6 +507,8 @@ export interface Database {
           status?: string
           processed_at?: string
           refunded_at?: string | null
+          note?: string | null
+          product_id?: string | null
         }
         Relationships: []
       }

@@ -31,6 +31,7 @@ import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
+import { UnresolvedOrdersAlert } from './UnresolvedOrdersAlert'
 
 const getAvatarColor = (name: string) => {
   const colors = [
@@ -360,7 +361,10 @@ export function PlatformYonetimContent() {
   return (
     <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
       <div className="w-full space-y-6">
-        
+
+        {/* Çözülemeyen ödemeler — varsa en üstte uyarı */}
+        <UnresolvedOrdersAlert />
+
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-center gap-3">
