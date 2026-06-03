@@ -281,7 +281,14 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                         )}
                         {isInactive && (
                           <button
-                            onClick={() => setCoachingMember({ member: m, days: daysInactive })}
+                            type="button"
+                            onClick={(e) => {
+                              // Bu buton, profili saran <Link> içinde — tıklama detaya
+                              // gitmesin, sadece YZ Koçu popup'ı açılsın (popup açık kalır).
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setCoachingMember({ member: m, days: daysInactive })
+                            }}
                             className="shrink-0 rounded-full bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/30 border border-amber-200/30 dark:border-amber-900/20 px-3 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-400 flex items-center gap-1.5 animate-pulse hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-sm"
                             title={t('team.aiCoachingScript')}
                           >
@@ -399,7 +406,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                             e.stopPropagation()
                             onOpenActivity(m)
                           }}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 bg-brand/5 px-3 py-1.5 text-xs font-bold text-brand hover:bg-brand/10 transition active:scale-95 cursor-pointer"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 px-3 py-1.5 text-xs font-bold text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 transition active:scale-95 cursor-pointer"
                         >
                           <BarChart3 className="h-3.5 w-3.5" />
                           {t('team.activityBtn')}

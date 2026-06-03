@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import {
   X, Phone, Bot, Pencil, ArrowRight, UserPlus, CalendarDays,
-  Loader2, Target, Trash2,
+  Loader2, Target, Trash2, Activity,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -122,6 +122,10 @@ export function MemberActivitySheet({
   const waCheckIn = t('team.activityWaCheckIn', { name: displayName.split(' ')[0] ?? displayName })
   const waLink = waHref(member.phone, waCheckIn)
 
+  const totalActions =
+    (data?.calls ?? 0) + (data?.whatsapps ?? 0) + (data?.notes ?? 0) +
+    (data?.stageChanges ?? 0) + (data?.aiActions ?? 0)
+
   const metrics = [
     { icon: Phone, label: t('pulse.calls'), value: data?.calls ?? 0, color: 'text-blue-600' },
     { icon: WhatsAppIcon, label: 'WhatsApp', value: data?.whatsapps ?? 0, color: 'text-[#128C7E]', isWa: true },
@@ -130,6 +134,7 @@ export function MemberActivitySheet({
     { icon: Bot, label: t('team.activityAi'), value: data?.aiActions ?? 0, color: 'text-indigo-600' },
     { icon: UserPlus, label: t('team.activityNewLeads'), value: data?.newCandidates ?? 0, color: 'text-emerald-600' },
     { icon: CalendarDays, label: t('team.activityActiveDays'), value: data?.activeDays ?? 0, color: 'text-[var(--text-2)]' },
+    { icon: Activity, label: t('team.activityTotalActions'), value: totalActions, color: 'text-brand' },
   ]
 
   return (

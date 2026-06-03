@@ -373,6 +373,7 @@ export const tr = {
     activityAi: "YZ aksiyon",
     activityNewLeads: "Yeni aday",
     activityActiveDays: "Aktif gün",
+    activityTotalActions: "Toplam aksiyon",
     activityLearningTitle: "Öğrenme özeti (Pro)",
     activityPrivacyNote: "Aday not metinleri paylaşılmaz; yalnızca özet sayılar gösterilir.",
     activityOpenPipeline: "Huni profiline git",

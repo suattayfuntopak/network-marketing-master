@@ -223,7 +223,7 @@ export function TeamActivitySummary({
                                     pipelineHref: row.href,
                                   })
                                 }}
-                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 bg-brand/5 text-brand hover:bg-brand/10 transition cursor-pointer"
+                                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-brand/25 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 transition cursor-pointer"
                                 title={t('team.activityBtn')}
                               >
                                 <BarChart3 className="h-4 w-4" />

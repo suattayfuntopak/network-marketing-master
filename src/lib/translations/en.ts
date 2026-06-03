@@ -373,6 +373,7 @@ export const en = {
     activityAi: "AI actions",
     activityNewLeads: "New leads",
     activityActiveDays: "Active days",
+    activityTotalActions: "Total actions",
     activityLearningTitle: "Learning summary (Pro)",
     activityPrivacyNote: "Candidate note text is not shared; only aggregate counts are shown.",
     activityOpenPipeline: "Open pipeline profile",
