@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   X, Phone, Bot, Pencil, ArrowRight, UserPlus, CalendarDays,
   Loader2, Target, Trash2, Activity,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
@@ -30,6 +31,7 @@ export type MemberActivityTarget = {
 }
 
 const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d']
+const METRICS_GRID_MIN_H = 'min-h-[22rem]'
 
 interface Props {
   workspaceId: string
@@ -46,6 +48,16 @@ function sheetPeriodLabel(t: (key: string) => string, p: SheetActivityPeriod): s
   return t('statsPage.period30d')
 }
 
+function MetricsGridSkeleton() {
+  return (
+    <div className={`grid grid-cols-2 gap-2 ${METRICS_GRID_MIN_H}`}>
+      {Array.from({ length: 8 }).map((_, i) => (
+        <Skeleton key={i} className="h-[4.5rem] rounded-xl" />
+      ))}
+    </div>
+  )
+}
+
 export function MemberActivitySheet({
   workspaceId,
   member,
@@ -55,6 +67,7 @@ export function MemberActivitySheet({
   onClose,
 }: Props) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const [period, setPeriod] = useState<SheetActivityPeriod>(initialPeriod)
   const [goalEditing, setGoalEditing] = useState(false)
   const [goalPeople, setGoalPeople] = useState('')
@@ -63,10 +76,21 @@ export function MemberActivitySheet({
 
   useBodyScrollLock()
 
+  useEffect(() => {
+    for (const p of SHEET_PERIODS) {
+      void queryClient.prefetchQuery({
+        queryKey: ['member-activity', workspaceId, member.userId, p],
+        queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, p),
+        staleTime: 15_000,
+      })
+    }
+  }, [workspaceId, member.userId, queryClient])
+
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['member-activity', workspaceId, member.userId, period],
     queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, period),
     staleTime: 15_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: goalMap, refetch: refetchGoal } = useQuery({
@@ -137,6 +161,8 @@ export function MemberActivitySheet({
     { icon: Activity, label: t('team.activityTotalActions'), value: totalActions, color: 'text-brand' },
   ]
 
+  const showMetricsSkeleton = isLoading && !data
+
   return (
     <>
       <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/40 backdrop-blur-sm`} onClick={onClose} />
@@ -190,10 +216,10 @@ export function MemberActivitySheet({
               key={p}
               type="button"
               onClick={() => setPeriod(p)}
-              className={`flex-1 min-w-[4.5rem] rounded-lg py-1.5 text-xs font-bold transition ${
+              className={`flex-1 min-w-[4.5rem] rounded-lg py-1.5 text-xs transition ${
                 period === p
-                  ? 'bg-[var(--bg-card)] text-brand shadow-sm border border-[var(--border)]'
-                  : 'text-[var(--text-3)]'
+                  ? 'bg-[var(--bg-card)] text-brand dark:text-white font-bold shadow-sm border border-[var(--border)]'
+                  : 'text-[var(--text-3)] dark:text-white/80 font-normal'
               }`}
             >
               {sheetPeriodLabel(t, p)}
@@ -214,7 +240,7 @@ export function MemberActivitySheet({
                 <button
                   type="button"
                   onClick={startGoalEdit}
-                  className="text-xs font-bold text-brand hover:underline"
+                  className="text-xs font-bold text-brand dark:text-white hover:underline"
                 >
                   {goal ? t('common.edit') : t('team.memberGoalSet')}
                 </button>
@@ -293,13 +319,16 @@ export function MemberActivitySheet({
           </div>
         )}
 
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-brand" />
-          </div>
-        ) : (
-          <>
-            <div className={`grid grid-cols-2 gap-2 ${isFetching ? 'opacity-60' : ''}`}>
+        <div className="relative">
+          {isFetching && data && (
+            <div className="absolute right-0 top-0 z-10">
+              <Loader2 className="h-4 w-4 animate-spin text-brand" aria-hidden />
+            </div>
+          )}
+          {showMetricsSkeleton ? (
+            <MetricsGridSkeleton />
+          ) : (
+            <div className={`grid grid-cols-2 gap-2 ${METRICS_GRID_MIN_H} ${isFetching ? 'opacity-70 transition-opacity' : ''}`}>
               {metrics.map(({ icon: Icon, label, value, color, isWa }) => (
                 <div
                   key={label}
@@ -315,45 +344,45 @@ export function MemberActivitySheet({
                 </div>
               ))}
             </div>
+          )}
+        </div>
 
-            {teamPulseUnlocked && data && (
-              <div className="mt-4 rounded-xl border border-teal-500/20 bg-teal-50/40 dark:bg-teal-950/20 p-4 space-y-2">
-                <p className="text-xs font-bold uppercase tracking-wide text-teal-800 dark:text-teal-300">
-                  {t('team.activityLearningTitle')}
-                </p>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <span className="text-[var(--text-2)]">
-                    {t('pulse.colTraining')}: <strong className="text-[var(--text-1)]">%{data.trainingPct ?? 0}</strong>
-                  </span>
-                  <span className="text-[var(--text-2)]">
-                    {t('pulse.colObjections')}: <strong className="text-[var(--text-1)]">%{data.objectionPct ?? 0}</strong>
-                  </span>
-                  <span className="text-[var(--text-2)]">
-                    {t('pulse.colVideos')}: <strong className="text-[var(--text-1)]">%{data.videoPct ?? 0}</strong>
-                    {data.videoTotal != null && data.videoTotal > 0 && (
-                      <span className="text-xs text-[var(--text-3)]">
-                        {' '}({data.videoCompleted}/{data.videoTotal})
-                      </span>
-                    )}
-                  </span>
-                  <span className="text-[var(--text-2)]">
-                    {t('statsPage.colDqsg')}: <strong className="text-[var(--text-1)]">{data.onboardingDone ?? 0}/{ONBOARDING_STEP_COUNT}</strong>
-                  </span>
-                </div>
-              </div>
-            )}
-
-            <p className="mt-4 text-xs italic text-[var(--text-3)] leading-relaxed">
-              {t('team.activityPrivacyNote')}
+        {teamPulseUnlocked && data && (
+          <div className={`mt-4 rounded-xl border border-teal-500/20 bg-teal-50/40 dark:bg-teal-950/20 p-4 space-y-2 ${isFetching ? 'opacity-70' : ''}`}>
+            <p className="text-xs font-bold uppercase tracking-wide text-teal-800 dark:text-teal-300">
+              {t('team.activityLearningTitle')}
             </p>
-          </>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <span className="text-[var(--text-2)]">
+                {t('pulse.colTraining')}: <strong className="text-[var(--text-1)]">%{data.trainingPct ?? 0}</strong>
+              </span>
+              <span className="text-[var(--text-2)]">
+                {t('pulse.colObjections')}: <strong className="text-[var(--text-1)]">%{data.objectionPct ?? 0}</strong>
+              </span>
+              <span className="text-[var(--text-2)]">
+                {t('pulse.colVideos')}: <strong className="text-[var(--text-1)]">%{data.videoPct ?? 0}</strong>
+                {data.videoTotal != null && data.videoTotal > 0 && (
+                  <span className="text-xs text-[var(--text-3)]">
+                    {' '}({data.videoCompleted}/{data.videoTotal})
+                  </span>
+                )}
+              </span>
+              <span className="text-[var(--text-2)]">
+                {t('statsPage.colDqsg')}: <strong className="text-[var(--text-1)]">{data.onboardingDone ?? 0}/{ONBOARDING_STEP_COUNT}</strong>
+              </span>
+            </div>
+          </div>
         )}
+
+        <p className="mt-4 text-xs italic text-[var(--text-3)] leading-relaxed">
+          {t('team.activityPrivacyNote')}
+        </p>
 
         {member.pipelineHref && (
           <Link
             href={member.pipelineHref}
             onClick={onClose}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-brand/5 py-3 text-sm font-bold text-brand hover:bg-brand/10 transition"
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-brand/5 py-3 text-sm font-bold text-brand dark:text-white hover:bg-brand/10 dark:hover:bg-white/5 transition"
           >
             {t('team.activityOpenPipeline')}
             <ArrowRight className="h-4 w-4" />

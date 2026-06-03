@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-04 — Aktivite popup: dark okunabilirlik + stabil boyut
+
+- **Dönem sekmeleri (dark):** Seçili beyaz bold; diğerleri `white/80` normal ağırlık. Light tema değişmedi.
+- **Linkler (dark):** Hedef belirle + Boru Hattı profiline git → `dark:text-white`.
+- **TR metin:** Alt başlık “Seçili dönemdeki saha özeti”; link “Boru Hattı profiline git” (EN aynı).
+- **Zıplama fix:** `keepPreviousData`, 3 dönem prefetch, sabit `min-h` metrik alanı + skeleton ilk yükleme.
+- **Dosyalar:** `MemberActivitySheet.tsx`, `tr.ts`.
+
 ## 2026-06-04 — Ekibim davet/broadcast UX
 
 - **Tüm Ekip / Kişileri Seç:** Seçili yeşil çerçeve `border-whatsapp/35` (dark `/40`) — ince, abartısız.
