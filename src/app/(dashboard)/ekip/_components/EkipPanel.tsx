@@ -26,6 +26,8 @@ import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
+import { TeamActivitySummary } from '@/app/(dashboard)/istatistikler/_components/TeamActivitySummary'
+import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { getMemberGoalsMapAction } from '../memberGoalsActions'
 
@@ -128,6 +130,37 @@ export function EkipPanel() {
     enabled: !!ws?.workspaceId && ws.role === 'leader' && teamPageUnlocked,
     staleTime: 30_000,
   })
+
+  // ── Ekip Aktivite Özeti (İstatistikler'den taşındı) — davet kodu kutusunun üstünde ──
+  const appDownlines = useMemo(
+    () => downlineMembers.filter(m => m.isAppUser !== false),
+    [downlineMembers]
+  )
+  // Sıralı id → SSR prefetch ile aynı cache anahtarı (sıra bağımsız "pat diye" gelir).
+  const activityMemberIds = useMemo(
+    () => appDownlines.map(m => m.user_id).filter(Boolean).sort(),
+    [appDownlines]
+  )
+  const { data: teamActivity, isLoading: teamActivityLoading } = useQuery({
+    queryKey: ['team-field-activity', ws?.workspaceId, '30d', activityMemberIds.join(',')],
+    queryFn: () => getTeamFieldActivityAction(ws!.workspaceId, '30d', activityMemberIds),
+    enabled: !!ws?.workspaceId && activityMemberIds.length > 0 && teamPageUnlocked,
+    staleTime: 30_000,
+  })
+  const getActivityMemberHref = useCallback(
+    (row: { user_id: string }) => {
+      const m = members.find(x => x.user_id === row.user_id)
+      return m?.pipeline_id ? `/pipeline/${m.pipeline_id}` : null
+    },
+    [members]
+  )
+  const handleActivityFromSummary = useCallback(
+    (target: { userId: string }) => {
+      const row = members.find(x => x.user_id === target.userId)
+      if (row) setActivityMember(row)
+    },
+    [members]
+  )
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
@@ -244,6 +277,17 @@ export function EkipPanel() {
         onOpenActivity={setActivityMember}
         memberGoalsMap={memberGoalsMap}
       />
+
+      {isLeader && appDownlines.length > 0 && (
+        <TeamActivitySummary
+          downlines={appDownlines}
+          activity={teamActivity}
+          loading={mLoading || teamActivityLoading}
+          teamStatsLocked={!teamPageUnlocked}
+          getMemberHref={getActivityMemberHref}
+          onOpenActivity={handleActivityFromSummary}
+        />
+      )}
 
       {isLeader && (
         <InviteTeammateSection

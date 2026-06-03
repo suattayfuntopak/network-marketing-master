@@ -6,10 +6,14 @@ import { useRouter } from 'next/navigation'
 import { Phone, Trophy, MessageCircle, UserPlus, BarChart3, ChevronDown } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
-import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 
-type DownlineRow = TeamMember & { full_name: string | null }
+/** Bileşenin gerçekten kullandığı minimal alanlar — TeamMember ve MemberRow ile uyumlu. */
+type DownlineRow = {
+  user_id: string
+  full_name: string | null
+  last_activity_at: string | null
+}
 
 type ChartMode = 'call' | 'whatsapp'
 
@@ -239,6 +243,9 @@ export function TeamActivitySummary({
             )}
           </div>
 
+          {/* Footnote + kişi-bazlı kırılım da aynı chevron ile açılır/kapanır */}
+          {showRanking && (
+            <>
           <p className="text-xs text-[var(--text-3)] italic">{t('statsPage.teamActivityFootnote')}</p>
 
           <div className="space-y-3 rounded-xl border border-[var(--border)] p-4">
@@ -292,6 +299,8 @@ export function TeamActivitySummary({
               </ul>
             )}
           </div>
+            </>
+          )}
         </>
       )}
     </section>

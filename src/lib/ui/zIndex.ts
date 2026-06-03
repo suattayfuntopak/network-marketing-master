@@ -3,6 +3,8 @@
  * @see AGENTS.md — UI conventions
  */
 export const Z = {
+  /** Kart-içi yerel kontrol grubu (kartın kendi içeriğinin üstünde; overlay değil) */
+  cardControls: 'z-10',
   sidebar: 'z-[35]',
   header: 'z-40',
   bottomNav: 'z-50',

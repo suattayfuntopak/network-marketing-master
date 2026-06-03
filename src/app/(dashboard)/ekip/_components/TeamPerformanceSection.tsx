@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
@@ -10,6 +11,7 @@ import {
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
+import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
 import { waHref } from '@/lib/utils/waLink'
@@ -58,6 +60,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberGoalsMap = {},
   } = props
   const router = useRouter()
+  // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
+  const [now] = useState(() => Date.now())
 
   const totalCandidates = members.reduce((s, m) => s + m.candidate_count, 0)
   const totalJoined = members.reduce((s, m) => s + m.katildi_count, 0)
@@ -66,7 +70,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const warmPipelinePotentials = totalTakip + totalSunum
   const activePartnersCount = members.filter(m => {
     if (!m.last_activity_at) return false
-    const days = Math.floor((Date.now() - new Date(m.last_activity_at).getTime()) / 86400000)
+    const days = Math.floor((now - new Date(m.last_activity_at).getTime()) / 86400000)
     return days < 7
   }).length
   const activeRatio = members.length > 0 ? Math.round((activePartnersCount / members.length) * 100) : 0
@@ -193,7 +197,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           {visibleMembers.map(m => {
             const isCurrentUser = m.user_id === ws.userId
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
-            const daysInactive = lastActiveDate ? Math.floor((Date.now() - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
+            const daysInactive = lastActiveDate ? Math.floor((now - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
             const isInactive = daysInactive >= 7 && !isCurrentUser
             const isCardExpanded = isCurrentUser || !!expandedMembers[m.user_id]
             const onboardingDone = m.onboarding_steps?.length ?? 0
@@ -211,7 +215,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               >
                 {/* Kart Sağ Üst Buton Grubu - Sleek, Absolute Positioned */}
                 {!isCurrentUser && m.isAppUser !== false && (
-                  <div className="absolute top-4 right-4 flex items-center gap-2 z-10">
+                  <div className={`absolute top-4 right-4 flex items-center gap-2 ${Z.cardControls}`}>
                     {/* Chevron Açma/Kapama Butonu */}
                     <button
                       type="button"

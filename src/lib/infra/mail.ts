@@ -38,7 +38,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '🎯 <strong>Pipeline & candidates</strong> — track every prospect through your stages',
           '🤖 <strong>AI field rehearsal</strong> — practice objection handling before real talks',
           '📅 <strong>Calendar & reminders</strong> — never miss a follow-up',
-          '👥 <strong>Team panel</strong> — invite partners with your sponsor code',
+          '🛡️ <strong>Compliance check</strong> — keep your posts policy-compliant with AI review',
           '📊 <strong>Stats & goal roadmap</strong> — see your daily targets and progress',
         ]),
         emailParagraph(
@@ -59,7 +59,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '🎯 <strong>Boru hattı & adaylar</strong> — her adayı aşamalar boyunca takip edin',
           '🤖 <strong>YZ saha provası</strong> — gerçek görüşmeden önce itiraz provası yapın',
           '📅 <strong>Takvim & hatırlatmalar</strong> — hiçbir takibi kaçırmayın',
-          '👥 <strong>Ekip paneli</strong> — sponsor kodunuzla ortaklarınızı davet edin',
+          '🛡️ <strong>Uyum denetimi</strong> — paylaşımlarını YZ ile mevzuata uygun tut',
           '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
         ]),
         emailParagraph(

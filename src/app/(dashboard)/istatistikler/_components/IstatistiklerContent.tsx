@@ -17,11 +17,9 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { StatsKpiCards } from './StatsKpiCards'
 import { StatsCharts } from './StatsCharts'
 import { TeamPerformanceTable } from './TeamPerformanceTable'
-import { TeamActivitySummary } from './TeamActivitySummary'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
-import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { mapStatsPeriodToSheet } from '@/lib/domain/pulse'
 import { MemberActivitySheet, type MemberActivityTarget } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import type { PulsePeriod } from '@/lib/domain/pulse'
@@ -113,18 +111,6 @@ export function IstatistiklerContent() {
     queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(',')],
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
     enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
-  })
-
-  const downlineMembers = useMemo(
-    () => sortedMembers.filter(m => m.role === 'member'),
-    [sortedMembers]
-  )
-
-  const { data: teamActivity, isLoading: teamActivityLoading } = useQuery({
-    queryKey: ['team-field-activity', ws?.workspaceId, period, perfMemberIds.join(',')],
-    queryFn: () => getTeamFieldActivityAction(ws!.workspaceId, period, perfMemberIds),
-    enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && !teamStatsLocked,
     staleTime: 30_000,
   })
 
@@ -398,15 +384,6 @@ export function IstatistiklerContent() {
             temperatureData={temperatureData}
             trendBars={trendBars}
             maxTrendCount={maxTrendCount}
-          />
-
-          <TeamActivitySummary
-            downlines={downlineMembers}
-            activity={teamActivity}
-            loading={membersLoading || teamActivityLoading}
-            teamStatsLocked={teamStatsLocked}
-            getMemberHref={getMemberHref}
-            onOpenActivity={member => setActivityMember(member)}
           />
 
           {/* Ekip Performans İzleme Tablosu — kişi bazlı + dönem + Eğitim/İtiraz/Video % + TOPLAM */}

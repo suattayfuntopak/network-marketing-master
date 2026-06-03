@@ -7,6 +7,8 @@ import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
+import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import { queryKeys } from './keys'
 
@@ -71,4 +73,23 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   }
 
   await Promise.all(parallel)
+
+  // Ekip Aktivite Özeti (Ekibim sayfası) — team erişimi olanlarda "pat diye" gelsin.
+  // İstatistikler perfMemberIds ile aynı sıralı-id anahtarı → cache birebir eşleşir.
+  if (hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) {
+    const team = queryClient.getQueryData<{ members: { user_id: string; role: string }[] }>(
+      queryKeys.team(ws.workspaceId)
+    )
+    const ids = (team?.members ?? [])
+      .filter((m) => m.role === 'member')
+      .map((m) => m.user_id)
+      .sort()
+    if (ids.length > 0) {
+      await queryClient.prefetchQuery({
+        queryKey: ['team-field-activity', ws.workspaceId, '30d', ids.join(',')],
+        queryFn: () => getTeamFieldActivityAction(ws.workspaceId, '30d', ids),
+        staleTime: 30_000,
+      })
+    }
+  }
 }
