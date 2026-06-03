@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-03 — Öneri turu: storage hijyeni + çözülmemiş sipariş paneli + webhook testleri + lint
+
+- **userScopedStorage** (`src/lib/ui/userScopedStorage.ts`): scopedKey + read/write +
+  `clearNmmLocalStorage()`. **Çıkışta** (UserMenu) çağrılır → paylaşılan tarayıcıda önceki
+  kullanıcının cihaz-yerel izi kalmaz (dil hariç). Yazar history bu helper'a taşındı.
+- **Çözülemeyen ödeme paneli** (migration **051** — `note`+`product_id` kolonları):
+  order.created unresolved → DB'ye `status='unresolved'` (idempotent) + süper admin e-postası.
+  Platform Yönetimi en üstte **UnresolvedOrdersAlert** → admin lisansı el ile tanımlayıp "Çözüldü".
+  Aksiyonlar: `getUnresolvedOrdersAction`, `markOrderResolvedAction`. **Deploy: SQL Editor → 051.**
+- **Webhook entegrasyon testleri** (`route.test.ts`, 111→115): order.created uygula / unresolved+uyarı /
+  idempotency (23505) / refund.updated → lisans düşür. Yapılandırılabilir Supabase mock (vi.hoisted).
+- **Lint:** güvenli temizlik 119→112; `npm run lint:changed` (yalnız main'e göre değişen TS/TSX) →
+  yeni borç eklemeyi engeller. Büyük kategoriler (any, set-state-in-effect) artımlı bırakıldı.
+
 ## 2026-06-03 — Perf (getUser cache) + onboarding UX + kalıcılık + ödeme uyarısı
 
 - **Perf (giriş→pano):** `src/lib/supabase/authUser.ts` → React `cache()`'li `getAuthUser()`.
