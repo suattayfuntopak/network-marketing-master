@@ -21,7 +21,7 @@ export function getRelatedTopicOptions(lang: 'tr' | 'en'): TopicOption[] {
   for (const cat of getTrainingData(lang)) {
     for (const konu of cat.konular) {
       out.push({
-        value: konu.id, // harf önekli (z1, i1…) → /egitim?id=
+        value: konu.id,
         label: konu.baslik,
         emoji: konu.emoji,
         group: `${lang === 'en' ? 'Content' : 'İçerik'} · ${cat.baslik}`,
@@ -31,7 +31,7 @@ export function getRelatedTopicOptions(lang: 'tr' | 'en'): TopicOption[] {
   }
   for (const it of ITIRAZLAR) {
     out.push({
-      value: String(it.id), // sayısal → /itirazlar?id=
+      value: String(it.id),
       label: it.soru[lang],
       emoji: it.emoji,
       group: `${lang === 'en' ? 'Objection' : 'İtiraz'} · ${it.kategori[lang]}`,
@@ -47,32 +47,67 @@ export function resolveTopicLabel(value: string | null | undefined, lang: 'tr' |
   return getRelatedTopicOptions(lang).find(o => o.value === value)?.label ?? value
 }
 
+function groupLabel(group: string): string {
+  const parts = group.split(' · ')
+  return parts.length > 1 ? parts.slice(1).join(' · ') : group
+}
+
+type Tab = 'content' | 'objection'
+
 export function RelatedTopicPicker({
   current,
   onSelect,
   onClose,
 }: {
   current: string | null
-  onSelect: (value: string) => void
+  onSelect: (value: string | null) => void
   onClose: () => void
 }) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const [q, setQ] = useState('')
+  const [tab, setTab] = useState<Tab>('content')
   const options = useMemo(() => getRelatedTopicOptions(lang), [lang])
 
   const groups = useMemo(() => {
     const s = q.trim().toLowerCase()
-    const filtered = s
-      ? options.filter(o => o.label.toLowerCase().includes(s) || o.group.toLowerCase().includes(s))
-      : options
+    const filtered = options.filter(o => {
+      if (o.kind !== tab) return false
+      if (!s) return true
+      return o.label.toLowerCase().includes(s) || o.group.toLowerCase().includes(s)
+    })
     const map = new Map<string, TopicOption[]>()
     for (const o of filtered) {
-      const arr = map.get(o.group) ?? []
+      const key = groupLabel(o.group)
+      const arr = map.get(key) ?? []
       arr.push(o)
-      map.set(o.group, arr)
+      map.set(key, arr)
     }
     return [...map.entries()]
-  }, [options, q])
+  }, [options, q, tab])
+
+  function handlePick(value: string) {
+    if (current === value) {
+      onSelect(null)
+    } else {
+      onSelect(value)
+    }
+    onClose()
+  }
+
+  const tabBtn = (id: Tab, label: string, Icon: typeof BookOpen) => (
+    <button
+      type="button"
+      onClick={() => setTab(id)}
+      className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition ${
+        tab === id
+          ? 'bg-[var(--bg-subtle)] text-[var(--text-1)] border border-[var(--border)] shadow-sm'
+          : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+      }`}
+    >
+      <Icon className="h-3.5 w-3.5" />
+      {label}
+    </button>
+  )
 
   return (
     <div
@@ -85,7 +120,7 @@ export function RelatedTopicPicker({
       >
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <h3 className="text-base font-bold text-[var(--text-1)]">
-            {lang === 'en' ? 'Pick a related topic' : 'İlgili konuyu seç'}
+            {t('videoTraining.pickRelatedTopic')}
           </h3>
           <button
             type="button"
@@ -96,6 +131,11 @@ export function RelatedTopicPicker({
           </button>
         </div>
 
+        <div className="flex gap-2 border-b border-[var(--border)] px-3 py-2.5">
+          {tabBtn('content', t('videoTraining.contentsTab'), BookOpen)}
+          {tabBtn('objection', t('videoTraining.objectionsTab'), MessageCircleQuestion)}
+        </div>
+
         <div className="border-b border-[var(--border)] p-3">
           <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3">
             <Search className="h-4 w-4 text-[var(--text-3)]" />
@@ -103,7 +143,7 @@ export function RelatedTopicPicker({
               value={q}
               onChange={e => setQ(e.target.value)}
               autoFocus
-              placeholder={lang === 'en' ? 'Search content or objections…' : 'İçerik veya itiraz ara…'}
+              placeholder={t('videoTraining.searchTopics')}
               className="w-full bg-transparent py-2.5 text-sm text-[var(--text-1)] outline-none"
             />
           </div>
@@ -112,7 +152,7 @@ export function RelatedTopicPicker({
         <div className="flex-1 overflow-y-auto p-3 space-y-4">
           {groups.length === 0 && (
             <p className="py-8 text-center text-sm text-[var(--text-3)]">
-              {lang === 'en' ? 'No match.' : 'Eşleşme yok.'}
+              {t('videoTraining.noTopicMatch')}
             </p>
           )}
           {groups.map(([group, items]) => (
@@ -132,19 +172,18 @@ export function RelatedTopicPicker({
                     <li key={`${o.kind}_${o.value}`}>
                       <button
                         type="button"
-                        onClick={() => {
-                          onSelect(o.value)
-                          onClose()
-                        }}
+                        onClick={() => handlePick(o.value)}
                         className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-sm transition ${
                           active
-                            ? 'border-[#534AB7] bg-[#534AB7]/10 text-[var(--text-1)]'
+                            ? 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)]'
                             : 'border-transparent hover:bg-[var(--bg-subtle)] text-[var(--text-2)]'
                         }`}
                       >
                         <span
                           className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${
-                            active ? 'border-[#534AB7] bg-[#534AB7] text-white' : 'border-[var(--border)]'
+                            active
+                              ? 'border-[var(--text-1)] bg-[var(--text-1)] text-[var(--bg-card)]'
+                              : 'border-[var(--border)]'
                           }`}
                         >
                           {active && <Check className="h-3 w-3" />}

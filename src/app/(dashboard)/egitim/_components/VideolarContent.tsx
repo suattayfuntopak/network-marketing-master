@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Film, Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -16,6 +16,8 @@ import { TrainingVideoCard } from './TrainingVideoCard'
 import { VideoEditModal } from './VideoEditModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 
+const PAGE_SIZE = 9
+
 export function VideolarContent() {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
@@ -23,6 +25,7 @@ export function VideolarContent() {
   const isAdmin = !!ws?.isSuperAdmin
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
+  const [page, setPage] = useState(0)
 
   const { data, isLoading } = useQuery({
     queryKey: ['video-catalog', ws?.workspaceId],
@@ -30,6 +33,16 @@ export function VideolarContent() {
     enabled: !!ws?.workspaceId,
     staleTime: 20_000,
   })
+
+  const videos = data?.videos ?? []
+  const totalPages = Math.max(1, Math.ceil(videos.length / PAGE_SIZE))
+
+  const activePage = Math.min(page, Math.max(0, totalPages - 1))
+
+  const pageVideos = useMemo(() => {
+    const start = activePage * PAGE_SIZE
+    return videos.slice(start, start + PAGE_SIZE)
+  }, [videos, activePage])
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: ['video-catalog', ws?.workspaceId] })
@@ -54,14 +67,14 @@ export function VideolarContent() {
       <header className="space-y-2">
         <Link
           href="/egitim"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand dark:text-[var(--text-1)] hover:underline"
         >
-          <ArrowLeft className="h-3.5 w-3.5" />
+          <ArrowLeft className="h-3.5 w-3.5 text-brand dark:text-[var(--text-1)]" />
           {t('videoTraining.backToTraining')}
         </Link>
         <div className="flex items-center justify-between gap-3">
           <h1 className="flex items-center gap-2 text-lg font-bold text-[var(--text-1)]">
-            <Film className="h-5 w-5 text-brand" />
+            <Film className="h-5 w-5 text-brand dark:text-[var(--text-1)]" />
             {t('videoTraining.pageTitle')}
           </h1>
           {isAdmin && (
@@ -90,27 +103,49 @@ export function VideolarContent() {
       </header>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <Skeleton key={i} className="h-40 rounded-2xl" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map(i => (
+            <Skeleton key={i} className="h-[240px] rounded-2xl" />
           ))}
         </div>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {data?.videos.map(video => (
-            <li key={video.key}>
-              <TrainingVideoCard
-                video={video}
-                workspaceId={ws.workspaceId}
-                progress={data.progressByKey[video.key]}
-                onProgressChange={invalidate}
-                isAdmin={isAdmin}
-                onEdit={() => { setEditing(video); setModalOpen(true) }}
-                onDelete={() => handleDelete(video)}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {pageVideos.map(video => (
+              <li key={video.key} className="min-h-[240px]">
+                <TrainingVideoCard
+                  video={video}
+                  workspaceId={ws.workspaceId}
+                  progress={data!.progressByKey[video.key]}
+                  onProgressChange={invalidate}
+                  isAdmin={isAdmin}
+                  onEdit={() => { setEditing(video); setModalOpen(true) }}
+                  onDelete={() => handleDelete(video)}
+                />
+              </li>
+            ))}
+          </ul>
+
+          {totalPages > 1 && (
+            <nav className="flex flex-wrap items-center justify-center gap-2 pt-2" aria-label="Pagination">
+              {Array.from({ length: totalPages }, (_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setPage(i)}
+                  aria-current={activePage === i ? 'page' : undefined}
+                  className={`min-w-[2.25rem] rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                    activePage === i
+                      ? 'border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] shadow-sm'
+                      : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </nav>
+          )}
+        </>
       )}
 
       {modalOpen && (

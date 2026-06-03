@@ -40,7 +40,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   useBodyScrollLock(true)
 
   const set = <K extends keyof VideoInput>(k: K, v: VideoInput[K]) =>
@@ -70,7 +70,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
       <div className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <h2 className="flex items-center gap-2 text-base font-bold text-[var(--text-1)]">
-            <Film className="h-4 w-4 text-brand" />
+            <Film className="h-4 w-4 text-brand dark:text-[var(--text-1)]" />
             {editing ? 'Videoyu Düzenle' : 'Yeni Video Ekle'}
           </h2>
           <button
@@ -136,7 +136,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
               <input type="number" className={inputCls} value={form.sortOrder} onChange={e => set('sortOrder', Number(e.target.value))} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>İlgili konu</label>
+              <label className={labelCls}>{t('videoTraining.relatedTopic')}</label>
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -186,7 +186,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
       {pickerOpen && (
         <RelatedTopicPicker
           current={form.relatedTrainingId ?? null}
-          onSelect={v => set('relatedTrainingId', v)}
+          onSelect={v => set('relatedTrainingId', v ?? '')}
           onClose={() => setPickerOpen(false)}
         />
       )}

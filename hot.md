@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-03 — Video eğitim dark mode UX + kart grid + ilgili konu seçici
+
+- **Dark mode okunabilirlik (light’a dokunulmadı):** Vaktin Varsa sayfasındaki “Video Eğitimler”
+  butonu; videolar sayfasındaki “İçeriklere geri dön”, kategori etiketleri, Video ve İlgili Konu
+  metinleri `dark:text-[var(--text-1)]` ile beyaz tonuna çekildi.
+- **Video kartları:** Sabit min-yükseklik (240px), 3 sütun grid, sayfa başına 9 kart + sayfa
+  sekmeleri (1, 2, 3…); düzenle/sil sağ üst köşede sabit; 4 eşit puntolu aksiyon butonu
+  (Başladım / Tamamladım / Video / İlgili Konu — pasif veya link).
+- **İlgili konu popup:** İçerikler | İtirazlar sekmeleri; seçimi kaldırma (ikinci tık);
+  konu seçimi opsiyonel. TR/EN çeviri anahtarları eklendi.
+- **Dosyalar:** `EgitimContent`, `VideolarContent`, `TrainingVideoCard`, `RelatedTopicPicker`,
+  `VideoEditModal`, `videoTraining.ts`.
+
 ## 2026-06-03 — gstack akışı: güvenlik (052/053) + Hedef→Yol Haritası→Günlük Takip özelliği
 
 - **gstack kontrollü kuruldu** (telemetri off). `/cso` → HIGH güvenlik açığı: nmm_workspaces
