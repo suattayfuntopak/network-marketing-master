@@ -634,6 +634,36 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_user_goals: {
+        Row: {
+          user_id: string
+          workspace_id: string
+          target_people: number
+          target_months: number
+          start_at: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          workspace_id: string
+          target_people: number
+          target_months: number
+          start_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          workspace_id?: string
+          target_people?: number
+          target_months?: number
+          start_at?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_video_progress: {
         Row: {
           user_id: string
