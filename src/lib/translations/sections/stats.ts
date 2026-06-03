@@ -90,7 +90,7 @@ export const statsSection = {
       quotaUpgrade: 'Plan gerekli',
 
       teamActivityTitle: 'Ekip Aktivite Özeti',
-      teamActivitySubtitle: 'Doğrudan ekibinizin seçili dönemdeki saha hareketi',
+      teamActivitySubtitle: 'Saha Çabası — ekibinin seçili dönemde yaptığı arama ve mesaj hareketi',
       teamActivityFootnote: 'Arama ve WhatsApp, aday kartlarından kaydedilen aksiyonlardan toplanır.',
       teamCallsChartTitle: 'Bu dönemde aramalar — kişi bazlı',
       teamCallsChartEmpty: 'Bu dönemde kayıtlı arama yok. Aday kartında Arama aksiyonunu kullanın.',
@@ -101,7 +101,7 @@ export const statsSection = {
       kpiTotalWhatsApp: 'Toplam WhatsApp',
       activeDaysSuffix: 'g',
       teamSubtitleVideoHint:
-        'NMM ortakları ve saha distribütörlerinin huni dağılımı; video sütununda tamamlanan içerik oranı gösterilir.',
+        'Huni Sonuçları — NMM ortakları ve saha distribütörlerinin huni dağılımı; video sütununda tamamlanan içerik oranı gösterilir.',
     },
   },
   en: {
@@ -195,7 +195,7 @@ export const statsSection = {
       quotaUpgrade: 'Upgrade required',
 
       teamActivityTitle: 'Team Activity Summary',
-      teamActivitySubtitle: 'Field activity for your direct downline in the selected period',
+      teamActivitySubtitle: 'Field Effort — calls and messages your downline logged in the selected period',
       teamActivityFootnote: 'Calls and WhatsApp are aggregated from actions logged on candidate cards.',
       teamCallsChartTitle: 'Calls this period — by partner',
       teamCallsChartEmpty: 'No calls logged this period. Use the Call action on a candidate card.',
@@ -206,7 +206,7 @@ export const statsSection = {
       kpiTotalWhatsApp: 'Total WhatsApp',
       activeDaysSuffix: 'd',
       teamSubtitleVideoHint:
-        'Pipeline breakdown for NMM partners and field distributors; video column shows completed content ratio.',
+        'Funnel Results — pipeline breakdown for NMM partners and field distributors; video column shows completed content ratio.',
     },
   },
 } as const
