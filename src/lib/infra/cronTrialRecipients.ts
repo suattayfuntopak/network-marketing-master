@@ -1,4 +1,30 @@
 import type { AdminClient } from '@/lib/supabase/admin'
+import { ACTIVE_STAGES } from '@/lib/domain/stages'
+
+/** Trial e-postalarını kişiselleştirmek için workspace'in canlı boru hattı verisi. */
+export interface TrialUserStats {
+  candidateCount: number
+  activeCount: number
+  upcomingFollowUps: number
+}
+
+/** Bir workspace'in aday/aktif/planlı-takip sayıları (kişiselleştirme için). */
+export async function fetchTrialUserStats(
+  supabase: AdminClient,
+  workspaceId: string
+): Promise<TrialUserStats> {
+  const nowIso = new Date().toISOString()
+  const [totalRes, activeRes, followRes] = await Promise.all([
+    supabase.from('nmm_candidates').select('id', { count: 'exact', head: true }).eq('workspace_id', workspaceId),
+    supabase.from('nmm_candidates').select('id', { count: 'exact', head: true }).eq('workspace_id', workspaceId).in('stage', ACTIVE_STAGES),
+    supabase.from('nmm_candidates').select('id', { count: 'exact', head: true }).eq('workspace_id', workspaceId).gte('next_follow_up_at', nowIso),
+  ])
+  return {
+    candidateCount: totalRes.count ?? 0,
+    activeCount: activeRes.count ?? 0,
+    upcomingFollowUps: followRes.count ?? 0,
+  }
+}
 
 export interface TrialEmailRecipient {
   email: string

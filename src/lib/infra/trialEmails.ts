@@ -11,12 +11,36 @@ import {
   emailPlanBox,
 } from '@/lib/infra/emailTemplate'
 
+import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
+
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
 export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
 
 const PAYMENT_URL = `${NMM_APP_URL}/odeme`
+
+/**
+ * Veri-odaklı kişiselleştirme: kullanıcının kurduğu boru hattını hatırlatır
+ * (sunk-cost + momentum). Veri yoksa ('' döner) e-postaya hiçbir şey eklenmez —
+ * "0 adayınız var" gibi motivasyon kırıcı satır asla gösterilmez.
+ */
+function statsParagraph(stats: TrialUserStats | undefined, lang: 'tr' | 'en'): string {
+  if (!stats || stats.candidateCount < 1) return ''
+  const { candidateCount, activeCount, upcomingFollowUps } = stats
+  if (lang === 'en') {
+    let s = `You've built a pipeline of ${emailHighlight(`${candidateCount} prospect${candidateCount === 1 ? '' : 's'}`)}`
+    if (activeCount > 0) s += `, ${activeCount} in active follow-up`
+    if (upcomingFollowUps > 0) s += `, with ${upcomingFollowUps} reminder${upcomingFollowUps === 1 ? '' : 's'} scheduled`
+    s += '. Keep your momentum going — pick up right where you left off.'
+    return emailParagraph(s)
+  }
+  let s = `Boru hattınızda ${emailHighlight(`${candidateCount} aday`)} var`
+  if (activeCount > 0) s += `, ${activeCount} tanesi aktif takipte`
+  if (upcomingFollowUps > 0) s += `, ${upcomingFollowUps} planlı hatırlatmanız hazır`
+  s += '. Bu emeği boşa harcamayın — kaldığınız yerden devam edin.'
+  return emailParagraph(s)
+}
 
 function planBox(lang: 'tr' | 'en') {
   return lang === 'en'
@@ -32,11 +56,17 @@ function planBox(lang: 'tr' | 'en') {
       ])
 }
 
-function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { subject: string; html: string } {
+function contentFor(
+  kind: TrialEmailKind,
+  name: string,
+  lang: 'tr' | 'en',
+  stats?: TrialUserStats
+): { subject: string; html: string } {
   const hi = lang === 'en' ? `Hi ${name},` : `Merhaba ${name},`
   const cta =
     lang === 'en' ? 'View plans & continue →' : 'Planları incele ve devam et →'
   const utm = `utm_source=nmm_email&utm_campaign=${kind}`
+  const personal = statsParagraph(stats, lang)
 
   switch (kind) {
     case 'trial_mid':
@@ -51,6 +81,7 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
               lang === 'en' ? "You're halfway there 🎯" : 'Tam ortadasınız 🎯'
             ),
             emailParagraph(hi),
+            personal,
             emailParagraph(
               lang === 'en'
                 ? `You've used ${emailHighlight('7 of your 14 trial days')}. The leaders who get the most out of NMM do three simple things in week two — here's your quick checklist:`
@@ -91,6 +122,7 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
               lang === 'en' ? 'Your trial ends in 3 days' : 'Deneme süreniz 3 gün sonra bitiyor'
             ),
             emailParagraph(hi),
+            personal,
             emailParagraph(
               lang === 'en'
                 ? `Your ${emailHighlight('14-day free trial')} on Network Marketing Master ends in ${emailHighlight('3 days')}. You still have full Basic features — pipeline, AI coach, and roleplay.`
@@ -114,6 +146,7 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
               lang === 'en' ? 'Your trial ends tomorrow' : 'Denemeniz yarın sona eriyor'
             ),
             emailParagraph(hi),
+            personal,
             emailParagraph(
               lang === 'en'
                 ? `Tomorrow your free trial ends — your Basic features close and daily AI credits drop to a limited free tier. Pick the plan that fits your team today.`
@@ -137,6 +170,7 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
               lang === 'en' ? 'Your trial has ended' : 'Deneme süreniz tamamlandı'
             ),
             emailParagraph(hi),
+            personal,
             emailParagraph(
               lang === 'en'
                 ? `Your ${emailHighlight('14-day trial')} on Network Marketing Master has ended. We hope you explored the pipeline, AI coach, and roleplay tools.`
@@ -167,6 +201,7 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
                 : 'Ekibinizi büyütmeye devam edin'
             ),
             emailParagraph(hi),
+            personal,
             emailParagraph(
               lang === 'en'
                 ? `It's been ${emailHighlight('15 days')} since your trial ended. The tools to run your network marketing business systematically are still here — pipeline tracking, AI coaching, and team visibility on Plus/Pro.`
@@ -203,14 +238,15 @@ export async function sendTrialLifecycleEmail(
   email: string,
   name: string,
   kind: TrialEmailKind,
-  lang: 'tr' | 'en' = 'tr'
+  lang: 'tr' | 'en' = 'tr',
+  stats?: TrialUserStats
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn('[Resend] Skipping trial email:', kind)
     return false
   }
 
-  const { subject, html } = contentFor(kind, name, lang)
+  const { subject, html } = contentFor(kind, name, lang, stats)
 
   try {
     await resend.emails.send({ from: FROM_EMAIL, to: [email], replyTo: NMM_REPLY_TO, subject, html })

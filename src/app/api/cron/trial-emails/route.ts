@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { cronAuthError } from '@/lib/infra/cronAuth'
 import { claimEmailSend } from '@/lib/infra/emailSentLog'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
-import { fetchFreeTrialRecipients } from '@/lib/infra/cronTrialRecipients'
+import { fetchFreeTrialRecipients, fetchTrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { sendTrialLifecycleEmail, type TrialEmailKind } from '@/lib/infra/trialEmails'
 
 const JOBS: { kind: TrialEmailKind; offsetDays: number }[] = [
@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
         continue
       }
 
-      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang)
+      const stats = await fetchTrialUserStats(supabase, r.workspaceId)
+      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang, stats)
       results.push({ kind: job.kind, email: r.email, sent })
     }
   }
