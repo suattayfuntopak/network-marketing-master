@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim: kutu çerçeveleri yumuşatıldı
+
+- **Sorun:** Geçen oturumdaki `dark:border-white/*` çerçeveler çok sert/kalın görünüyordu.
+- **Çözüm:** Ekibim sayfasındaki tüm ana kutular `border border-[var(--border)]` ile eşitlendi (Davet Kodunu Gir referansı): KPI kartları, skor kartı, iç metrikler, üye kartları (`teamMemberCard.ts` — ring kaldırıldı).
+- **Dosyalar:** `TeamPerformanceSection.tsx`, `teamMemberCard.ts`.
+- **Not:** `EkipPanel.tsx` WIP — commit edilmedi.
+
 ## 2026-06-03 — Eğitim/ekip dark UX: hover, çerçeve, video tipografi
 
 - **Vaktin Varsa:** “Video Eğitimler” butonu hover → mor arka plan (light hafif, dark tam); hero rozetleri +1pt (`10px`).
