@@ -94,7 +94,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
         {/* Haftalık Organizasyon Performans Durumu Kartı */}
         {isLeader && (
-          <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/40 p-6 dark:border-indigo-950/20 dark:bg-indigo-950/5 space-y-5 shadow-sm animate-in fade-in duration-300">
+          <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-indigo-50/40 p-6 dark:border-white/70 dark:bg-indigo-950/5 space-y-5 shadow-sm animate-in fade-in duration-300">
             <button
               type="button"
               onClick={() => setScorecardOpen(!scorecardOpen)}
@@ -118,7 +118,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             {scorecardOpen && (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
                 {/* Metrik 1: Aktif Partner Oranı */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-white/60 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {t('team.activePartnerRatio')}
                   </span>
@@ -136,7 +136,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                 </div>
 
                 {/* Metrik 2: Sıcak Huni Potansiyeli */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-white/60 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {t('team.warmPipeline')}
                   </span>
@@ -154,7 +154,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                 </div>
 
                 {/* Metrik 3: Kayıt Hunisi Momentumu */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-indigo-900/10 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-indigo-100/40 dark:border-white/60 p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
                   <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
                     {t('team.onboardingMomentum')}
                   </span>

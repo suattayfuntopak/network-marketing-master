@@ -30,7 +30,7 @@ type Props = {
 }
 
 const actionBtn =
-  'flex flex-1 items-center justify-center rounded-xl px-1.5 py-1.5 text-[10px] sm:text-xs font-bold transition min-w-0'
+  'flex flex-1 items-center justify-center rounded-xl px-1.5 py-1.5 text-xs sm:text-sm font-bold transition min-w-0'
 
 export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, onEdit, onDelete }: Props) {
   const { lang, t } = useTranslation()
@@ -88,13 +88,13 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
         )}
 
         <div className="flex flex-1 flex-col p-4 pr-4">
-          <p className="pr-14 text-[10px] font-bold uppercase tracking-wider text-brand-readable">
+          <p className="pr-14 text-xs font-bold uppercase tracking-wider text-brand-readable">
             {lang === 'en' ? video.categoryEn : video.categoryTr}
           </p>
-          <h3 className="mt-1 line-clamp-2 pr-14 text-sm font-bold text-[var(--text-1)]">
+          <h3 className="mt-1 line-clamp-2 pr-14 text-base font-bold text-[var(--text-1)]">
             {localizedVideoTitle(video, lang)}
           </h3>
-          <p className="mt-1 line-clamp-2 flex-1 text-xs text-[var(--text-3)]">
+          <p className="mt-1 line-clamp-2 flex-1 text-sm text-[var(--text-3)]">
             {localizedVideoDescription(video, lang)} · ~{video.durationMin} {lang === 'en' ? 'min' : 'dk'}
           </p>
 
@@ -144,7 +144,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
 
           {(isStarted || pct > 0) && !isCompleted && (
             <div className="mt-3 space-y-1">
-              <label className="text-[10px] font-bold text-[var(--text-3)]">
+              <label className="text-xs font-bold text-[var(--text-3)]">
                 {t('videoTraining.watchProgress')}: {pct}%
               </label>
               <input
@@ -186,7 +186,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between border-b border-[var(--border)] px-4 py-3">
-              <h3 className="text-sm font-bold text-[var(--text-1)] line-clamp-1 pr-2">
+              <h3 className="text-base font-bold text-[var(--text-1)] line-clamp-1 pr-2">
                 {t('videoTraining.watchVideoTitle')} — {localizedVideoTitle(video, lang)}
               </h3>
               <button
@@ -197,7 +197,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
                 <X className="h-4 w-4" />
               </button>
             </div>
-            <p className="px-4 pt-2 text-[10px] text-[var(--text-3)]">{t('videoTraining.embedPrivacy')}</p>
+            <p className="px-4 pt-2 text-xs text-[var(--text-3)]">{t('videoTraining.embedPrivacy')}</p>
             <div className="p-3">
               <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
                 <iframe

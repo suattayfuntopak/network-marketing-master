@@ -67,13 +67,13 @@ export function VideolarContent() {
       <header className="space-y-2">
         <Link
           href="/egitim"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-readable hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-readable hover:underline"
         >
-          <ArrowLeft className="h-3.5 w-3.5 text-brand-readable" />
+          <ArrowLeft className="h-4 w-4 text-brand-readable" />
           {t('videoTraining.backToTraining')}
         </Link>
         <div className="flex items-center justify-between gap-3">
-          <h1 className="flex items-center gap-2 text-lg font-bold text-[var(--text-1)]">
+          <h1 className="flex items-center gap-2 text-xl font-bold text-[var(--text-1)]">
             <Film className="h-5 w-5 text-brand-readable" />
             {t('videoTraining.pageTitle')}
           </h1>
@@ -85,18 +85,18 @@ export function VideolarContent() {
               aria-label="Yeni video ekle"
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white shadow-sm transition active:scale-95"
             >
-              <Plus className="h-4 w-4" />
+              <Plus className="h-4 w-4" strokeWidth={2.75} />
             </button>
           )}
         </div>
-        <p className="text-sm text-[var(--text-3)]">{t('videoTraining.pageSubtitle')}</p>
+        <p className="text-base text-[var(--text-3)]">{t('videoTraining.pageSubtitle')}</p>
         {data && data.summary.startedIncomplete > 0 && (
-          <p className="text-xs text-amber-700 dark:text-amber-300">
+          <p className="text-sm text-amber-700 dark:text-amber-300">
             {t('videoTraining.dropoffHint', { count: data.summary.startedIncomplete })}
           </p>
         )}
         {data && (
-          <p className="text-xs font-bold text-[var(--text-2)]">
+          <p className="text-sm font-bold text-[var(--text-2)]">
             {data.summary.completed} / {data.summary.total} · {data.summary.pct}%
           </p>
         )}
@@ -134,7 +134,7 @@ export function VideolarContent() {
                   type="button"
                   onClick={() => setPage(i)}
                   aria-current={activePage === i ? 'page' : undefined}
-                  className={`min-w-[2.25rem] rounded-xl px-3 py-1.5 text-xs font-bold transition ${
+                  className={`min-w-[2.25rem] rounded-xl px-3 py-1.5 text-sm font-bold transition ${
                     activePage === i
                       ? 'border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] shadow-sm'
                       : 'text-[var(--text-3)] hover:text-[var(--text-2)]'

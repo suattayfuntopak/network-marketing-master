@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-03 — Eğitim/ekip dark UX: hover, çerçeve, video tipografi
+
+- **Vaktin Varsa:** “Video Eğitimler” butonu hover → mor arka plan (light hafif, dark tam); hero rozetleri +1pt (`10px`).
+- **Ekibim dark:** Haftalık Organizasyon Performans kartı ve iç metrik kutuları `dark:border-white/*`; distribütör kartları `teamMemberCard.ts` ile beyaz çerçeve.
+- **Video Eğitimler sayfası:** Tüm metinler +1 birim; admin `+` ikonu `strokeWidth={2.75}`.
+- **Dosyalar:** `EgitimContent`, `VideolarContent`, `TrainingVideoCard`, `TeamPerformanceSection`, `teamMemberCard.ts`.
+- **Not:** `EkipPanel.tsx` WIP (paralel ajanda) — commit edilmedi.
+
 ## 2026-06-03 — Dark UX: Takvim, Koç, Pano, Platform + onaylı öneriler
 
 - **Takvim dark:** Takip günü noktaları beyaz; “En yakın takip” ve “Bugüne dön” hover → mor arka plan + beyaz yazı.

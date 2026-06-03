@@ -175,7 +175,7 @@ export function EgitimContent() {
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href="/egitim/videolar"
-              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable hover:border-brand/40 dark:hover:border-[var(--border)] transition"
+              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-[#534AB7]/10 hover:border-[#534AB7]/40 dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7]"
             >
               <Film className="h-3.5 w-3.5 text-brand-readable" />
               <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
@@ -199,16 +199,16 @@ export function EgitimContent() {
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             {favCount > 0 ? (
-              <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[9px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
+              <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
                 {favCount} {t('trainingPage.fav')}
               </span>
             ) : (
-              <span className="rounded-full bg-[#3730A3]/10 px-2 py-0.5 text-[9px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
+              <span className="rounded-full bg-[#3730A3]/10 px-2 py-0.5 text-[10px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
                 {t('training.topicsCount', { count: allTopicsMerged.length })}
               </span>
             )}
             {readCount > 0 && (
-              <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold text-white dark:bg-emerald-500">
+              <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white dark:bg-emerald-500">
                 <CheckCircle2 className="h-2.5 w-2.5" />
                 {readCount}/{allTopicsMerged.length}
               </span>
