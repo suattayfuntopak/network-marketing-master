@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-03 — gstack akışı: güvenlik (052/053) + Hedef→Yol Haritası→Günlük Takip özelliği
+
+- **gstack kontrollü kuruldu** (telemetri off). `/cso` → HIGH güvenlik açığı: nmm_workspaces
+  SELECT herkese açıktı → **052** (own+member) + **053** (downline ekle). `/health` → kalite
+  fotoğrafı; ölü dosya/paket temizliği. `/spec` → özellik tasarımı (`.gstack/specs/`).
+- **YENİ ÖZELLİK — Hedef → Yol Haritası → Günlük Takip** (Crown'dan esinlenme, GENERIC,
+  PV/bonus/rütbe YOK):
+  - **054** `nmm_user_goals` (self-set kişi+ay; RLS self + lider downline-read).
+  - `lib/domain/roadmap.ts` — duplikasyon (geometrik) staging + 4'lü huni türetme
+    (1 üye ← 3 sunum ← 9 tanışma ← 18 arama) + günlük hedef. **12 birim test.**
+  - `hedef/actions.ts` — hedef CRUD + günlük hedef/gerçekleşen türetme. Gerçekleşenler
+    MEVCUT veriden OTOMATİK (çift giriş yok): Arama=daily_actions(call),
+    Tanışma=candidates(created_at), Sunum/Yeni Üye=stage_change note='sunum'/'katildi'.
+    Günlük pencere = İstanbul gün başlangıcı (yerel, UTC değil).
+  - **Pano**: `HedefKart` (hedef seç → günlük huni → açılır yol haritası).
+  - **Bugün İlgilen**: `HedefGunlukKpi` (kompakt 4-kutu günlük KPI, hızlı kontrol).
+- **Bug fix:** telefon doğrulama `[1-9]` baştaki 0'ı reddediyordu (Türk "05xx" + placeholder
+  bile geçmiyordu) → sanitizePhone + `/^\+?\d{7,15}$/`.
+- **Deploy:** Supabase SQL Editor → **052, 053, 054** uygulandı.
+
 ## 2026-06-03 — Öneri turu: storage hijyeni + çözülmemiş sipariş paneli + webhook testleri + lint
 
 - **userScopedStorage** (`src/lib/ui/userScopedStorage.ts`): scopedKey + read/write +
