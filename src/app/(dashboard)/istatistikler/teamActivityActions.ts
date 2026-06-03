@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
-import { periodStartIso, parseLearningProgress, ONBOARDING_STEP_COUNT, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { periodStartIso, parseLearningProgress, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 
 export type TeamMemberFieldActivity = {

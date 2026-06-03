@@ -386,7 +386,7 @@ export default function CompliancePage() {
                               <AlertTriangle className="h-4 w-4 shrink-0 text-red-500 mt-0.5" />
                               <div className="text-sm space-y-0.5">
                                 <p className="font-bold text-[var(--text-1)]">
-                                  "{v.phrase}" <span className="text-[10px] bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 font-bold px-1.5 py-0.5 rounded-full uppercase ml-1.5">{v.category}</span>
+                                  &quot;{v.phrase}&quot; <span className="text-[10px] bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-400 font-bold px-1.5 py-0.5 rounded-full uppercase ml-1.5">{v.category}</span>
                                 </p>
                                 <p className="text-[var(--text-2)] leading-relaxed">{v.reason}</p>
                               </div>

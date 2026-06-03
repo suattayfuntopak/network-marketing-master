@@ -244,7 +244,7 @@ function SearchPageContent() {
                             {category}
                           </span>
                           <h3 className="text-sm font-semibold text-[var(--text-1)] group-hover:text-[#9B1D47] dark:group-hover:text-[#fda4af] transition-colors mt-0.5">
-                            "{question}"
+                            &quot;{question}&quot;
                           </h3>
                         </div>
                       </div>

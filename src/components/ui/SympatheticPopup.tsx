@@ -20,7 +20,7 @@ export function SympatheticPopup({
   title,
   message,
 }: SympatheticPopupProps) {
-  const { t, lang } = useTranslation()
+  const { lang } = useTranslation()
   const [mounted, setMounted] = useState(false)
 
   useBodyScrollLock(open)

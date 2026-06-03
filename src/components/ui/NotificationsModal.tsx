@@ -107,7 +107,6 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
     unreadCount: dbUnreadCount,
     markAllRead: dbMarkAllRead,
     markAsRead: dbMarkAsRead,
-    deleteNotification: dbDeleteNotification
   } = useNotifications()
 
   // Bildirimler tamamen Supabase'den (oku/sil durumu DB'de) — localStorage yok.
