@@ -258,7 +258,7 @@ export const en = {
     performancePanel: "Team Performance Panel",
     loadError: "Team data could not be loaded",
     loadErrorHint: "Check your connection and refresh the page",
-    soloHint: "You don't have any team members yet. Share the invite code above to grow your team.",
+    soloHint: "You don't have any team members yet. Share the invite code below to grow your team.",
     memberHint: "You are a member of a team and do not have team management permissions. You can continue managing your own pipeline and share your performance with your leader.",
     inviteCopied: "Invite code copied!",
     joinSuccess: "You have successfully joined \"{name}\"!",

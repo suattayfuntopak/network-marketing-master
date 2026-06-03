@@ -258,7 +258,7 @@ export const tr = {
     performancePanel: "Ekip Performans Paneli",
     loadError: "Ekip verileri yüklenemedi",
     loadErrorHint: "Bağlantınızı kontrol edip sayfayı yenileyin",
-    soloHint: "Henüz bir ekip üyeniz yok. Yukarıdaki davet kodunu paylaşarak ekibinizi büyütebilirsiniz.",
+    soloHint: "Henüz bir ekip üyeniz yok. Aşağıdaki davet kodunu paylaşarak ekibinizi büyütebilirsiniz.",
     memberHint: "Bir ekibe dahil olduğunuz için ekip yönetimi yetkiniz bulunmamaktadır. Kendi boru hattınızı yönetmeye devam edebilir, performansınızı liderinizle paylaşabilirsiniz.",
     inviteCopied: "Davet kodu kopyalandı!",
     joinSuccess: "\"{name}\" ekibine başarıyla katıldınız!",
