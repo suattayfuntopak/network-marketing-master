@@ -7,7 +7,7 @@ import { STAGES_FORM } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
-import { PHONE_RE } from '@/lib/utils/validation'
+import { PHONE_RE, sanitizePhone } from '@/lib/utils/validation'
 import { createClient } from '@/lib/supabase/client'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -69,7 +69,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
 
     const fd = new FormData(e.currentTarget)
     const fullName = (fd.get('fullName') as string).trim()
-    const phone = (fd.get('phone') as string).trim()
+    const phone = sanitizePhone(fd.get('phone') as string)
     const note = (fd.get('note') as string).trim()
     const stage = (fd.get('stage') as string | null) || 'yeni'
     const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'

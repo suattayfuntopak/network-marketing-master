@@ -9,6 +9,7 @@ import {
   type RoadmapStage,
   type FunnelCounts,
 } from '@/lib/domain/roadmap'
+import { todayCalendarKey, istanbulDayStartIso } from '@/lib/utils/calendarDates'
 
 export interface UserGoal {
   targetPeople: number
@@ -16,10 +17,9 @@ export interface UserGoal {
   startAt: string
 }
 
-/** Bugünün UTC gün başlangıcı (aiUsage ile tutarlı pencere). */
+/** Bugünün İstanbul gün başlangıcı (yerel 00:00) — kullanıcının "bugün"ü ile aynı. */
 function todayStartIso(): string {
-  const n = new Date()
-  return new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate())).toISOString()
+  return istanbulDayStartIso(todayCalendarKey())
 }
 
 async function ownWorkspaceId(
