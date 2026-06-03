@@ -77,7 +77,7 @@ export function SpoilerCode({ code }: { code: string }) {
   return (
     <div
       onClick={() => setRevealed(true)}
-      className="relative flex-1 min-w-0 h-10 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] font-mono text-base font-bold tracking-widest text-[var(--text-1)] cursor-pointer flex items-center justify-center transition-all select-none"
+      className="relative flex-1 min-w-0 h-10 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] font-mono text-lg font-bold tracking-widest text-[var(--text-1)] cursor-pointer flex items-center justify-center transition-all select-none"
     >
       <span className={`transition-all duration-500 ease-out transform ${revealed ? 'scale-100 opacity-100 blur-0' : 'scale-90 opacity-0 blur-md'}`}>
         {code}
@@ -86,7 +86,7 @@ export function SpoilerCode({ code }: { code: string }) {
       {!revealed && (
         <div className="absolute inset-0 z-10 flex items-center justify-center transition-all duration-500 ease-out">
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-          <span className="relative z-20 text-[10px] uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none">
+          <span className="relative z-20 text-xs uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none">
             Açmak için tıkla ✨
           </span>
         </div>

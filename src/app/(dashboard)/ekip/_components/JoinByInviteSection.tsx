@@ -24,7 +24,7 @@ export function JoinByInviteSection({
         {t('team.joinATeam')}
       </h2>
       <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 space-y-4 shadow-sm">
-        <p className="text-sm text-[var(--text-2)] font-medium leading-relaxed">
+        <p className="text-base text-[var(--text-2)] font-medium leading-relaxed">
           {t('team.joinATeamDesc')}
         </p>
         <form onSubmit={onSubmit} className="flex min-w-0 gap-3 overflow-hidden">
@@ -34,7 +34,7 @@ export function JoinByInviteSection({
             value={inviteCodeInput}
             onChange={e => onInviteCodeChange(e.target.value)}
             placeholder={t('team.pasteInvitePlaceholder')}
-            className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all font-medium"
+            className="flex-1 min-w-0 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition-all font-medium"
           />
           <button
             type="submit"

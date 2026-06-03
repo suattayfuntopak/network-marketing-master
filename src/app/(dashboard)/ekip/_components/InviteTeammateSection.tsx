@@ -25,7 +25,7 @@ export function InviteTeammateSection({
         {t('team.inviteTeammate')}
       </h2>
       <div className="w-full overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 space-y-4 shadow-sm">
-        <p className="text-sm text-[var(--text-2)] font-medium leading-relaxed">
+        <p className="text-base text-[var(--text-2)] font-medium leading-relaxed">
           {t('team.inviteTeammateDesc')}
         </p>
         <div className="flex min-w-0 items-center gap-3 overflow-hidden">

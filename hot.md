@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim davet/broadcast UX
+
+- **Tüm Ekip / Kişileri Seç:** Seçili yeşil çerçeve `border-whatsapp/35` (dark `/40`) — ince, abartısız.
+- **Tipografi:** Davet, Davet Kodu ve Ekibe Gönder kutularının iç metinleri +1 birim; `EKİBE GÖNDER` bölüm başlığı diğer iki bölümle aynı (`text-sm font-bold`, `h-5` ikon).
+- **Dosyalar:** `BroadcastPanel`, `InviteTeammateSection`, `JoinByInviteSection`, `SpoilerCode`.
+
 ## 2026-06-04 — Ekibim: kutu çerçeveleri yumuşatıldı
 
 - **Sorun:** Geçen oturumdaki `dark:border-white/*` çerçeveler çok sert/kalın görünüyordu.
