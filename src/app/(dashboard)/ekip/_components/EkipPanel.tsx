@@ -134,13 +134,12 @@ export function EkipPanel() {
     () => downlineMembers.filter(m => m.isAppUser !== false),
     [downlineMembers]
   )
-  // Sıralı id → SSR prefetch ile aynı cache anahtarı (sıra bağımsız "pat diye" gelir).
   const activityMemberIds = useMemo(
-    () => appDownlines.map(m => m.user_id).filter(Boolean).sort(),
+    () => appDownlines.map(m => m.user_id).filter(Boolean),
     [appDownlines]
   )
   const { data: teamActivity, isLoading: teamActivityLoading } = useQuery({
-    queryKey: ['team-field-activity', ws?.workspaceId, '30d', activityMemberIds.join(',')],
+    queryKey: queryKeys.teamFieldActivity(ws?.workspaceId ?? '', '30d', activityMemberIds),
     queryFn: () => getTeamFieldActivityAction(ws!.workspaceId, '30d', activityMemberIds),
     enabled: !!ws?.workspaceId && activityMemberIds.length > 0 && teamPageUnlocked,
     staleTime: 30_000,

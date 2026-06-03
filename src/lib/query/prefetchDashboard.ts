@@ -83,10 +83,9 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     const ids = (team?.members ?? [])
       .filter((m) => m.role === 'member')
       .map((m) => m.user_id)
-      .sort()
     if (ids.length > 0) {
       await queryClient.prefetchQuery({
-        queryKey: ['team-field-activity', ws.workspaceId, '30d', ids.join(',')],
+        queryKey: queryKeys.teamFieldActivity(ws.workspaceId, '30d', ids),
         queryFn: () => getTeamFieldActivityAction(ws.workspaceId, '30d', ids),
         staleTime: 30_000,
       })

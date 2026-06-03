@@ -23,6 +23,8 @@ export function AccountStatusAlert() {
   const { data: ws } = useWorkspace()
   const { t, lang } = useTranslation()
   const [open, setOpen] = useState(false)
+  // Mount anında sabitlenir → render içinde impure Date.now() çağrısı yok.
+  const [now] = useState(() => Date.now())
 
   useBodyScrollLock(open)
 
@@ -40,19 +42,31 @@ export function AccountStatusAlert() {
   const registered = formatDateTime(lifecycle.registeredAt, lang)
   const accessEnd = formatDateTime(lifecycle.freeAccessEndsAt, lang)
 
+  // Faz ayrımı: aktif deneme → sakin amber + gün sayacı; süre dolmuş → güçlü kırmızı.
+  const isLocked = lifecycle.phase === 'access_locked'
+  const daysLeft = Math.max(0, Math.ceil((lifecycle.freeAccessEndsAt.getTime() - now) / 86_400_000))
+  const bannerTitle = isLocked
+    ? t('shellUi.accountAlertLockedTitle')
+    : daysLeft <= 1
+      ? t('shellUi.accountAlertTrialTitleLast')
+      : t('shellUi.accountAlertTrialTitle', { days: daysLeft })
+  const bannerClass = isLocked
+    ? 'from-[#DC2626] to-[#B91C1C] shadow-red-900/40'
+    : 'from-[#D97706] to-[#B45309] shadow-amber-900/30'
+
   return (
     <>
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="account-status-breathe group w-full rounded-2xl border-2 border-white bg-gradient-to-r from-[#DC2626] to-[#B91C1C] px-3.5 py-3 sm:px-4 sm:py-3.5 text-left shadow-lg shadow-red-900/40 transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        className={`account-status-breathe group w-full rounded-2xl border-2 border-white bg-gradient-to-r ${bannerClass} px-3.5 py-3 sm:px-4 sm:py-3.5 text-left shadow-lg transition hover:brightness-110 active:scale-[0.99] focus:outline-none focus-visible:ring-2 focus-visible:ring-white`}
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
             <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.25} />
           </span>
           <p className="flex-1 text-[11px] sm:text-xs font-black uppercase tracking-wide text-white leading-snug">
-            {t('shellUi.accountAlertTitle')}
+            {bannerTitle}
           </p>
           <span className="hidden sm:inline text-[11px] font-semibold text-white/90 underline-offset-2 group-hover:underline shrink-0">
             {t('shellUi.accountAlertTap')}
@@ -75,7 +89,7 @@ export function AccountStatusAlert() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-[var(--text-1)] transition z-10"
+              className={`absolute right-2 top-2 flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-[var(--text-1)] transition ${Z.cardControls}`}
               aria-label={t('shellUi.accountAlertClose')}
             >
               <X className="h-4 w-4" strokeWidth={2.25} />

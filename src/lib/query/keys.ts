@@ -10,6 +10,12 @@ export const queryKeys = {
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   /** Hedef → Yol Haritası → Günlük Takip — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
+  /**
+   * Ekip Aktivite Özeti (saha çabası). memberIds İÇERİDE sıralanır → çağıran tarafın
+   * sıralama derdi yok, prefetch ↔ client cache anahtarı birebir eşleşir.
+   */
+  teamFieldActivity: (workspaceId: string, period: string, memberIds: string[]) =>
+    ['team-field-activity', workspaceId, period, [...memberIds].sort().join(',')] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,
