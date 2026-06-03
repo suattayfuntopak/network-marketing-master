@@ -46,3 +46,6 @@ next-env.d.ts
 # local-only docs (n8n JSON, secrets) — not pushed
 /docs/local/
 
+
+# gstack (Garry Tan skill paketi) yerel çıktıları — güvenlik raporları yerel kalır
+.gstack/
