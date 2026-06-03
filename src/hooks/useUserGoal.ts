@@ -1,53 +1,34 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  fetchUserGoalAction,
-  saveUserGoalAction,
-  getDailyProgressAction,
-  getRoadmapAction,
-} from '@/app/(dashboard)/hedef/actions'
+import { getGoalDashboardAction, saveUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { queryKeys } from '@/lib/query/keys'
 
-const STALE = 2 * 60 * 1000
-
-/** Hedef + bugünün ilerlemesi + yol haritası (hepsi self-scoped). */
+/**
+ * Hedef + bugünün ilerlemesi + yol haritası — TEK konsolide sorgu. Dashboard
+ * layout'ta prefetch edildiği için pano'da anında hazırdır ("sonra dolma" yok).
+ */
 export function useUserGoal() {
   const qc = useQueryClient()
 
-  const goal = useQuery({
-    queryKey: queryKeys.userGoal(),
-    queryFn: fetchUserGoalAction,
-    staleTime: STALE,
-  })
-
-  const progress = useQuery({
-    queryKey: queryKeys.dailyProgress(),
-    queryFn: getDailyProgressAction,
+  const dash = useQuery({
+    queryKey: queryKeys.goalDashboard(),
+    queryFn: getGoalDashboardAction,
     staleTime: 60_000,
-  })
-
-  const roadmap = useQuery({
-    queryKey: queryKeys.roadmap(),
-    queryFn: getRoadmapAction,
-    staleTime: STALE,
-    enabled: !!goal.data,
   })
 
   const save = useMutation({
     mutationFn: saveUserGoalAction,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.userGoal() })
-      qc.invalidateQueries({ queryKey: queryKeys.dailyProgress() })
-      qc.invalidateQueries({ queryKey: queryKeys.roadmap() })
+      qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     },
   })
 
   return {
-    goal: goal.data ?? null,
-    progress: progress.data ?? null,
-    roadmap: roadmap.data ?? [],
-    isLoading: goal.isLoading,
+    goal: dash.data?.goal ?? null,
+    progress: dash.data?.progress ?? null,
+    roadmap: dash.data?.roadmap ?? [],
+    isLoading: dash.isLoading,
     saveGoal: save.mutateAsync,
     isSaving: save.isPending,
   }

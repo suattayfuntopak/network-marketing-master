@@ -89,7 +89,7 @@ export const statsSection = {
       quotaCompliance: 'Uyum Denetimi',
       quotaUpgrade: 'Plan gerekli',
 
-      teamActivityTitle: 'Ekip aktivite özeti',
+      teamActivityTitle: 'Ekip Aktivite Özeti',
       teamActivitySubtitle: 'Doğrudan ekibinizin seçili dönemdeki saha hareketi',
       teamActivityFootnote: 'Arama ve WhatsApp, aday kartlarından kaydedilen aksiyonlardan toplanır.',
       teamCallsChartTitle: 'Bu dönemde aramalar — kişi bazlı',
@@ -194,7 +194,7 @@ export const statsSection = {
       quotaCompliance: 'Compliance',
       quotaUpgrade: 'Upgrade required',
 
-      teamActivityTitle: 'Team activity summary',
+      teamActivityTitle: 'Team Activity Summary',
       teamActivitySubtitle: 'Field activity for your direct downline in the selected period',
       teamActivityFootnote: 'Calls and WhatsApp are aggregated from actions logged on candidate cards.',
       teamCallsChartTitle: 'Calls this period — by partner',

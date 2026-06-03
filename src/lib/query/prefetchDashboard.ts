@@ -5,6 +5,8 @@ import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
+import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
+import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import { queryKeys } from './keys'
 
@@ -38,6 +40,17 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     queryClient.prefetchQuery({
       queryKey: queryKeys.dailyAiUsage(),
       queryFn: fetchAIUsageAction,
+      staleTime: 60_000,
+    }),
+    // Hedef kartı + saha özeti kutuları: prefetch → pano/bugün'de "sonra dolma" yok.
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.goalDashboard(),
+      queryFn: getGoalDashboardAction,
+      staleTime: 60_000,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: ['pano-field-insights', ws.workspaceId],
+      queryFn: () => getMyPanoInsightsAction(ws.workspaceId),
       staleTime: 60_000,
     }),
   ]

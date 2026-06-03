@@ -210,3 +210,69 @@ export async function getRoadmapAction(): Promise<RoadmapStage[]> {
   const teamSize = workspaceId ? await directTeamCount(supabase, user.id, workspaceId) : 0
   return computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize)
 }
+
+export interface GoalDashboard {
+  goal: UserGoal | null
+  progress: DailyProgress
+  roadmap: RoadmapStage[]
+}
+
+/**
+ * HedefKart'ın TÜM verisi TEK geçişte (goal + günlük progress + roadmap). Üç ayrı
+ * action yerine bunu kullan → daha az round-trip, "sonra dolma" yok (prefetch'lenir).
+ */
+export async function getGoalDashboardAction(): Promise<GoalDashboard> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  const emptyProgress: DailyProgress = {
+    hasGoal: false, monthIndex: 1, totalMonths: 0, teamSize: 0,
+    targetTeamSize: 0, targets: EMPTY_FUNNEL, actuals: EMPTY_FUNNEL, stage: null,
+  }
+  if (!user) return { goal: null, progress: emptyProgress, roadmap: [] }
+
+  const workspaceId = await ownWorkspaceId(supabase, user.id)
+  const teamSize = workspaceId ? await directTeamCount(supabase, user.id, workspaceId) : 0
+
+  const { data: goalRow } = await supabase
+    .from('nmm_user_goals')
+    .select('target_people, target_months, start_at')
+    .eq('user_id', user.id)
+    .maybeSingle()
+  const goal: UserGoal | null = goalRow
+    ? { targetPeople: goalRow.target_people, targetMonths: goalRow.target_months, startAt: goalRow.start_at }
+    : null
+
+  // Bugünün gerçekleşenleri (mevcut veriden)
+  const since = todayStartIso()
+  const [callsRes, stageRes, newCandRes] = await Promise.all([
+    supabase.from('nmm_daily_actions').select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id).eq('action_type', 'call').gte('created_at', since),
+    supabase.from('nmm_daily_actions').select('note')
+      .eq('user_id', user.id).eq('action_type', 'stage_change').gte('created_at', since),
+    supabase.from('nmm_candidates').select('id', { count: 'exact', head: true })
+      .eq('owner_id', user.id).gte('created_at', since),
+  ])
+  let sunum = 0, yeniUye = 0
+  for (const row of stageRes.data ?? []) {
+    const note = (row.note ?? '').toLowerCase().trim()
+    if (note === 'sunum' || note === 'sunum yapıldı') sunum++
+    else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
+  }
+  const actuals: FunnelCounts = { arama: callsRes.count ?? 0, tanisma: newCandRes.count ?? 0, sunum, yeniUye }
+
+  if (!goal) return { goal: null, progress: { ...emptyProgress, teamSize, actuals }, roadmap: [] }
+
+  const roadmap = computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize)
+  const monthIndex = currentMonthIndex(new Date(goal.startAt), goal.targetMonths)
+  const stage = roadmap[monthIndex - 1] ?? roadmap[roadmap.length - 1] ?? null
+  const targets = dailyTargetsForMonth(stage ?? undefined)
+
+  return {
+    goal,
+    progress: {
+      hasGoal: true, monthIndex, totalMonths: goal.targetMonths, teamSize,
+      targetTeamSize: goal.targetPeople, targets, actuals, stage,
+    },
+    roadmap,
+  }
+}
