@@ -7,6 +7,8 @@ import { fetchFreeTrialRecipients } from '@/lib/infra/cronTrialRecipients'
 import { sendTrialLifecycleEmail, type TrialEmailKind } from '@/lib/infra/trialEmails'
 
 const JOBS: { kind: TrialEmailKind; offsetDays: number }[] = [
+  // trial_mid: deneme günü ~7 = bitişe 7 gün kala (14 günlük deneme). Aktivasyon maili.
+  { kind: 'trial_mid', offsetDays: 7 },
   { kind: 'trial_3d', offsetDays: 3 },
   { kind: 'trial_1d', offsetDays: 1 },
   { kind: 'trial_ended', offsetDays: -1 },

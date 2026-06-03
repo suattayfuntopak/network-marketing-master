@@ -14,7 +14,7 @@ import {
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
-export type TrialEmailKind = 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
+export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
 
 const PAYMENT_URL = `${NMM_APP_URL}/odeme`
 
@@ -39,6 +39,46 @@ function contentFor(kind: TrialEmailKind, name: string, lang: 'tr' | 'en'): { su
   const utm = `utm_source=nmm_email&utm_campaign=${kind}`
 
   switch (kind) {
+    case 'trial_mid':
+      return {
+        subject:
+          lang === 'en'
+            ? "You're halfway through your trial — your next move"
+            : 'Denemenizin yarısındasınız — sıradaki adım',
+        html: buildPremiumEmail(
+          [
+            emailHeading(
+              lang === 'en' ? "You're halfway there 🎯" : 'Tam ortadasınız 🎯'
+            ),
+            emailParagraph(hi),
+            emailParagraph(
+              lang === 'en'
+                ? `You've used ${emailHighlight('7 of your 14 trial days')}. The leaders who get the most out of NMM do three simple things in week two — here's your quick checklist:`
+                : `${emailHighlight('14 günlük denemenizin 7 günü')} geçti. NMM'den en çok verim alan liderler ikinci hafta üç basit şeyi yapar — işte hızlı kontrol listeniz:`
+            ),
+            emailBulletList(
+              lang === 'en'
+                ? [
+                    '<strong>Add your first 5 prospects</strong> to the pipeline if you haven’t yet',
+                    '<strong>Run one AI roleplay</strong> before your next real conversation',
+                    '<strong>Set a follow-up reminder</strong> on your calendar so no one slips away',
+                  ]
+                : [
+                    'Henüz eklemediyseniz <strong>ilk 5 adayınızı</strong> boru hattına ekleyin',
+                    'Bir sonraki gerçek görüşmeden önce <strong>bir YZ saha provası</strong> yapın',
+                    'Kimse kaybolmasın diye takviminize <strong>bir takip hatırlatması</strong> koyun',
+                  ]
+            ),
+            emailCta(`${NMM_APP_URL}/giris?${utm}`, lang === 'en' ? 'Open your dashboard →' : 'Panona git →'),
+            emailParagraph(
+              lang === 'en'
+                ? `Want to invite your team too? Team features unlock on <a href="${PAYMENT_URL}?${utm}" style="color:#534AB7;font-weight:600;">Plus & Pro</a>.`
+                : `Ekibinizi de davet etmek ister misiniz? Ekip özellikleri <a href="${PAYMENT_URL}?${utm}" style="color:#534AB7;font-weight:600;">Plus ve Pro</a>'da açılır.`
+            ),
+          ].join(''),
+          lang
+        ),
+      }
     case 'trial_3d':
       return {
         subject:
