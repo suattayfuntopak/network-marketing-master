@@ -170,7 +170,6 @@ export function EgitimContent() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
-              <p className="text-base text-[var(--text-3)]">{t('training.subtitle')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -194,11 +193,8 @@ export function EgitimContent() {
         <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
           <span className="text-3xl">📖</span>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-[#3730A3] dark:text-[#a5b4fc]">
-              {t('training.heroTitle')}
-            </p>
-            <p className="text-[11px] text-[#3730A3]/70 dark:text-[#a5b4fc]/70 leading-relaxed truncate">
-              {t('training.heroDesc')}
+            <p className="text-sm font-semibold leading-relaxed text-[#3730A3] dark:text-[#a5b4fc]">
+              {t('training.subtitle')}
             </p>
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">

@@ -66,6 +66,7 @@ export function RelatedTopicPicker({
   const { lang, t } = useTranslation()
   const [q, setQ] = useState('')
   const [tab, setTab] = useState<Tab>('content')
+  const [draft, setDraft] = useState<string | null>(current)
   const options = useMemo(() => getRelatedTopicOptions(lang), [lang])
 
   const groups = useMemo(() => {
@@ -86,11 +87,11 @@ export function RelatedTopicPicker({
   }, [options, q, tab])
 
   function handlePick(value: string) {
-    if (current === value) {
-      onSelect(null)
-    } else {
-      onSelect(value)
-    }
+    setDraft(prev => (prev === value ? null : value))
+  }
+
+  function handleConfirm() {
+    onSelect(draft)
     onClose()
   }
 
@@ -111,34 +112,35 @@ export function RelatedTopicPicker({
 
   return (
     <div
-      className={`fixed inset-0 ${Z.fullscreen} flex items-center justify-center bg-black/55 backdrop-blur-sm p-4`}
+      className={`fixed inset-0 ${Z.fullscreen} flex items-end sm:items-center justify-center bg-black/55 backdrop-blur-sm p-0 sm:p-4`}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl"
+        className="flex max-h-[92vh] sm:max-h-[85vh] w-full sm:max-w-2xl md:max-w-3xl flex-col overflow-hidden rounded-t-2xl sm:rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
-          <h3 className="text-base font-bold text-[var(--text-1)]">
+        <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3.5">
+          <h3 className="text-base font-bold text-[var(--text-1)] sm:text-lg">
             {t('videoTraining.pickRelatedTopic')}
           </h3>
           <button
             type="button"
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
+            aria-label={t('common.close')}
           >
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="flex gap-2 border-b border-[var(--border)] px-3 py-2.5">
+        <div className="flex gap-2 border-b border-[var(--border)] px-4 py-2.5">
           {tabBtn('content', t('videoTraining.contentsTab'), BookOpen)}
           {tabBtn('objection', t('videoTraining.objectionsTab'), MessageCircleQuestion)}
         </div>
 
-        <div className="border-b border-[var(--border)] p-3">
+        <div className="border-b border-[var(--border)] px-4 py-3">
           <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3">
-            <Search className="h-4 w-4 text-[var(--text-3)]" />
+            <Search className="h-4 w-4 shrink-0 text-[var(--text-3)]" />
             <input
               value={q}
               onChange={e => setQ(e.target.value)}
@@ -149,9 +151,9 @@ export function RelatedTopicPicker({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-4">
+        <div className="min-h-[240px] flex-1 overflow-y-auto px-4 py-3 space-y-4 sm:min-h-[320px]">
           {groups.length === 0 && (
-            <p className="py-8 text-center text-sm text-[var(--text-3)]">
+            <p className="py-12 text-center text-sm text-[var(--text-3)]">
               {t('videoTraining.noTopicMatch')}
             </p>
           )}
@@ -165,17 +167,17 @@ export function RelatedTopicPicker({
                 )}
                 {group}
               </p>
-              <ul className="space-y-1">
+              <ul className="grid gap-1 sm:grid-cols-2">
                 {items.map(o => {
-                  const active = current === o.value
+                  const active = draft === o.value
                   return (
                     <li key={`${o.kind}_${o.value}`}>
                       <button
                         type="button"
                         onClick={() => handlePick(o.value)}
-                        className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2 text-left text-sm transition ${
+                        className={`flex w-full items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left text-sm transition ${
                           active
-                            ? 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)]'
+                            ? 'border-[#3730A3]/40 bg-[#3730A3]/10 text-[var(--text-1)] dark:border-[#a5b4fc]/40 dark:bg-[#a5b4fc]/10'
                             : 'border-transparent hover:bg-[var(--bg-subtle)] text-[var(--text-2)]'
                         }`}
                       >
@@ -188,8 +190,8 @@ export function RelatedTopicPicker({
                         >
                           {active && <Check className="h-3 w-3" />}
                         </span>
-                        <span className="shrink-0">{o.emoji}</span>
-                        <span className="line-clamp-1">{o.label}</span>
+                        <span className="shrink-0 text-base">{o.emoji}</span>
+                        <span className="line-clamp-2 leading-snug">{o.label}</span>
                       </button>
                     </li>
                   )
@@ -197,6 +199,23 @@ export function RelatedTopicPicker({
               </ul>
             </div>
           ))}
+        </div>
+
+        <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] bg-[var(--bg-subtle)]/50 px-4 py-3.5 sm:px-5">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+          >
+            {t('common.cancel')}
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            className="rounded-xl bg-gradient-to-r from-[#3730A3] to-[#534AB7] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+          >
+            {t('videoTraining.confirmPick')}
+          </button>
         </div>
       </div>
     </div>

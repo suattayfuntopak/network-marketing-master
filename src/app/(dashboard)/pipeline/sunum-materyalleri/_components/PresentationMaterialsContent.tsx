@@ -205,7 +205,7 @@ export function PresentationMaterialsContent() {
         <button
           type="button"
           onClick={() => router.push('/pipeline')}
-          className="inline-flex items-center gap-1.5 text-base font-semibold text-[var(--text-2)] hover:text-[var(--text-1)] transition"
+          className="inline-flex items-center gap-1.5 text-base font-semibold text-brand-readable hover:underline transition"
         >
           <ArrowLeft className="h-4 w-4" />
           {t('presentationMaterialsPage.backToPipeline')}
@@ -242,7 +242,7 @@ export function PresentationMaterialsContent() {
                 key={chip.token}
                 className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-center"
               >
-                <p className="text-xs font-bold text-[#534AB7]">{chip.label}</p>
+                <p className="text-xs font-bold text-brand-readable">{chip.label}</p>
                 <p className="mt-0.5 text-xs text-[var(--text-3)]">
                   {t('presentationMaterialsPage.chipExample', { example: chip.example })}
                 </p>
@@ -453,7 +453,7 @@ export function PresentationMaterialsContent() {
             <button
               type="button"
               onClick={openCreateForm}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#534AB7]/40 bg-[#534AB7]/5 px-4 py-4 text-base font-bold text-[#534AB7] hover:bg-[#534AB7]/10 transition"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl border border-dashed border-[#534AB7]/40 bg-[#534AB7]/5 px-4 py-4 text-base font-bold text-brand-readable hover:bg-[#534AB7]/10 transition"
             >
               <Plus className="h-4 w-4" />
               {t('presentationMaterialsPage.addButton')}

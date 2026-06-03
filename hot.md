@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-03 — Sunum materyalleri dark + ilgili konu popup + hero kutuları
+
+- **Sunum Materyalleri dark:** Geri link, chip etiketleri ve “Materyal ekle” butonu
+  `text-brand-readable` ile dark’ta okunur (light değişmedi).
+- **İlgili konu popup:** Seçimde kapanmıyor; tıklama ile seç/kaldır; altta İptal + Tamam;
+  genişletilmiş responsive layout (sm:2xl, md:3xl, 2 sütun liste).
+- **İtirazlara Cevaplar / Vaktin Varsa:** Alt başlık metinleri hero kutusuna taşındı;
+  sayaç/ipucu satırları kaldırıldı; sol ikon + sağ favori rozetleri korundu.
+- **Dosyalar:** `PresentationMaterialsContent`, `RelatedTopicPicker`, `ItirazlarContent`,
+  `EgitimContent`, `videoTraining.ts`.
+- **Not:** `EkipPanel.tsx` WIP — commit edilmedi.
+
 ## 2026-06-03 — Saha serisi popup + Bugün İlgilen UX + Boru Hattı dark düzeltmeleri + video önerileri
 
 - **Saha serisi popup:** “Tam hafta — 7/7 gün saha kaydı” kutusu tıklanınca

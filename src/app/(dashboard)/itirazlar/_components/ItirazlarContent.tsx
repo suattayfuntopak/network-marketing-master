@@ -135,7 +135,6 @@ export function ItirazlarContent() {
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
-              <p className="text-base text-[var(--text-3)]">{t('objectionsPage.subtitle')}</p>
             </div>
           </div>
           <button
@@ -148,11 +147,10 @@ export function ItirazlarContent() {
         </div>
         <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
           <span className="text-3xl">🛡️</span>
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-[#9B1D47] dark:text-[#fda4af]">
-              {tumItirazlar.length} {t('objectionsPage.objections')} · {KATEGORILER.length - 2} {t('objectionsPage.categories')}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold leading-relaxed text-[#9B1D47] dark:text-[#fda4af]">
+              {t('objectionsPage.subtitle')}
             </p>
-            <p className="text-[11px] text-[#9B1D47]/70 dark:text-[#fda4af]/70">{t('objectionsPage.heroHint')}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
             {favCount > 0 && (
