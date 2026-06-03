@@ -169,12 +169,6 @@ export function PanoContent() {
       </div>
       )}
 
-      <PanoVideoStrip />
-      <PanoTeamCoachingAlert />
-
-      {/* ── Hedef → Yol Haritası → Günlük Takip ── */}
-      <HedefKart />
-
       {/* ── Bugün Öncelikliler — karelerle aynı genişlik ── */}
       {cLoading ? prioritiesSkeleton : (
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
@@ -229,12 +223,19 @@ export function PanoContent() {
       </div>
       )}
 
+      <PanoTeamCoachingAlert />
+
+      {/* ── Hedef → Yol Haritası → Günlük Takip (içinde günlük sayaç) ── */}
+      <HedefKart />
+
       {/* ── Mini trend (son 7 gün yeni aday) ── */}
       {cLoading ? (
         <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
       ) : (
         <MiniTrend candidates={candidates} />
       )}
+
+      <PanoVideoStrip />
     </div>
   )
 }
