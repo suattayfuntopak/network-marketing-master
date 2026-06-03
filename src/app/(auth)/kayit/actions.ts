@@ -1,6 +1,9 @@
 'use server'
 
+import { after } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { sendWelcomeEmail, sendAdminNewUserEmail } from '@/lib/infra/mail'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 
 interface FormState {
@@ -39,28 +42,34 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     return { error: friendly }
   }
 
-  // Trigger welcome onboarding email, admin notification email, and in-app notification
+  // Kayıt sonrası otomasyonu: hoş geldin e-postası (kullanıcıya), bilgilendirme
+  // e-postası (admin'e) ve uygulama-içi bildirim (admin'e). after() ile yanıt
+  // gönderildikten SONRA güvenle çalışır → Vercel'de fonksiyon, callback bitene
+  // kadar canlı tutulur (eski "fire-and-forget .catch()" yarışında kullanıcının
+  // hoş geldin maili lambda donunca kesiliyordu; admin maili şans eseri geçiyordu).
   if (data.user) {
-    const { sendWelcomeEmail, sendAdminNewUserEmail } = require('@/lib/infra/mail')
-
-    // Welcome email to user
-    sendWelcomeEmail(email, fullName, 'tr').catch((err: any) => {
-      console.error('[signupAction] Welcome email failed in background:', err)
-    })
-
-    // Alert email to admin
-    sendAdminNewUserEmail(SUPER_ADMIN_EMAIL, email, fullName).catch((err: any) => {
-      console.error('[signupAction] Admin notification email failed in background:', err)
-    })
-
-    // In-app DB notification to admin (service role bypasses RLS)
-    ;(async () => {
+    const newUserId = data.user.id
+    after(async () => {
+      // 1) Kullanıcıya hoş geldin e-postası (kritik — önce ve bağımsız)
       try {
-        const { createAdminClient } = await import('@/lib/supabase/admin')
+        await sendWelcomeEmail(email, fullName, 'tr')
+      } catch (err) {
+        console.error('[signupAction] Welcome email failed:', err)
+      }
+
+      // 2) Admin'e bilgilendirme e-postası
+      try {
+        await sendAdminNewUserEmail(SUPER_ADMIN_EMAIL, email, fullName)
+      } catch (err) {
+        console.error('[signupAction] Admin notification email failed:', err)
+      }
+
+      // 3) Admin'e uygulama-içi bildirim (service role RLS'i baypas eder)
+      try {
         const adminSupa = createAdminClient()
         const { data: usersPage } = await adminSupa.auth.admin.listUsers({ page: 1, perPage: 200 })
-        const adminUser = usersPage?.users?.find((u: any) => u.email === SUPER_ADMIN_EMAIL)
-        if (adminUser?.id && adminUser.id !== data.user!.id) {
+        const adminUser = usersPage?.users?.find((u) => u.email === SUPER_ADMIN_EMAIL)
+        if (adminUser?.id && adminUser.id !== newUserId) {
           await adminSupa.from('nmm_notifications').insert({
             user_id: adminUser.id,
             title_tr: 'Yeni Platform Kaydı 🚀',
@@ -73,7 +82,7 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
       } catch (err) {
         console.error('[signupAction] Admin in-app notification failed:', err)
       }
-    })()
+    })
   }
 
   // E-posta onayı zorunlu değilse identities boş gelir (zaten kayıtlı kullanıcı gibi davranır)

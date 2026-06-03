@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin, resolveWorkspaceLicense } from '@/lib/domain/auth'
 import { getEffectiveLicenseType, isTrialPeriodActive } from '@/lib/domain/aiUsage'
@@ -93,6 +94,13 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const { data: { user }, error: userError } = await supabase.auth.getUser()
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
+  // Provizyon (workspace + üyelik oluşturma) bootstrap işlemidir ve service-role
+  // ile yapılır: kullanıcı-client INSERT...RETURNING, 052'deki daraltılmış SELECT
+  // politikası (nmm_visible_workspace_ids) yüzünden aynı statement içinde henüz
+  // görünmeyen yeni satırı politikadan geçiremeyip INSERT'i geri alıyordu → yeni
+  // kullanıcı hiç workspace edinemiyordu. owner_id/user_id DAİMA doğrulanmış
+  // user.id'dir (istemci girdisi değil) → 052'nin kapattığı sızıntı geri açılmaz.
+  const admin_db = createAdminClient()
   const fullName = (user.user_metadata?.full_name as string | undefined) ?? user.email ?? 'Kullanıcı'
   const avatarUrl = (user.user_metadata?.avatar_url as string | undefined) ?? null
   const admin = isSuperAdmin(user)
@@ -107,7 +115,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     .maybeSingle()
 
   if (ownedWorkspace) {
-    const { error: memRepairError } = await supabase.from('nmm_workspace_members').upsert(
+    const { error: memRepairError } = await admin_db.from('nmm_workspace_members').upsert(
       {
         workspace_id: ownedWorkspace.id,
         user_id: user.id,
@@ -156,7 +164,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   const trialExpires = new Date()
   trialExpires.setDate(trialExpires.getDate() + 14)
 
-  const { data: ws, error: wsError } = await supabase
+  const { data: ws, error: wsError } = await admin_db
     .from('nmm_workspaces')
     .insert({
       name: `${fullName}'in Ekibi`,
@@ -176,7 +184,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     throw new Error(`Workspace oluşturulamadı: ${wsError?.message}`)
   }
 
-  const { error: memInsertError } = await supabase.from('nmm_workspace_members').insert({
+  const { error: memInsertError } = await admin_db.from('nmm_workspace_members').insert({
     workspace_id: ws.id,
     user_id: user.id,
     role: 'leader',

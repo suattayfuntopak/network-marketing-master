@@ -270,7 +270,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   required
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
-                  placeholder="Örn: Selda Kıratlı"
+                  placeholder="Örn: Ayşe Yılmaz"
                   className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
                 />
               </div>

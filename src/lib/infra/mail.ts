@@ -31,24 +31,44 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
     ? [
         emailHeading(`Welcome, ${name}!`),
         emailParagraph(
-          `You joined ${emailHighlight('Network Marketing Master')} — your 14-day trial with full Basic features starts now.`
+          `You joined ${emailHighlight('Network Marketing Master')} — your ${emailHighlight('14-day free trial')} with full Basic features starts now.`
         ),
-        emailParagraph('Your first 3 steps:'),
+        emailParagraph('What Basic gives you during the trial:'),
+        emailPlanBox([
+          '🎯 <strong>Pipeline & candidates</strong> — track every prospect through your stages',
+          '🤖 <strong>AI field rehearsal</strong> — practice objection handling before real talks',
+          '📅 <strong>Calendar & reminders</strong> — never miss a follow-up',
+          '👥 <strong>Team panel</strong> — invite partners with your sponsor code',
+          '📊 <strong>Stats & goal roadmap</strong> — see your daily targets and progress',
+        ]),
         emailParagraph(
-          '1. <strong>Build your pipeline</strong> — add prospects and move them through stages.<br>2. <strong>AI roleplay</strong> — rehearse objections before real conversations.<br>3. <strong>Invite your team</strong> — share your sponsor code from the Team panel.'
+          `Your trial lasts ${emailHighlight('14 days')}. If you don't upgrade to a paid plan before it ends, your account access will be ${emailHighlight('restricted')} until you choose a plan — your data stays safe.`
         ),
-        emailCta(`${NMM_APP_URL}/giris`, 'Go to dashboard'),
+        emailCta(`${NMM_APP_URL}/odeme`, 'View plans & upgrade'),
+        emailParagraph(
+          `Or jump straight in: <a href="${NMM_APP_URL}/giris" style="color:#534AB7;font-weight:600;">open your dashboard →</a>`
+        ),
       ].join('')
     : [
         emailHeading(`Hoş geldiniz, ${name}!`),
         emailParagraph(
-          `${emailHighlight('Network Marketing Master')}'a katıldınız — 14 günlük denemeniz Basic özelliklerle başladı.`
+          `${emailHighlight('Network Marketing Master')}'a katıldınız — ${emailHighlight('14 günlük ücretsiz denemeniz')} tüm Basic özellikleriyle şu an başladı.`
         ),
-        emailParagraph('İlk 3 adım:'),
+        emailParagraph('Deneme süresince Basic ile neler yapabilirsiniz:'),
+        emailPlanBox([
+          '🎯 <strong>Boru hattı & adaylar</strong> — her adayı aşamalar boyunca takip edin',
+          '🤖 <strong>YZ saha provası</strong> — gerçek görüşmeden önce itiraz provası yapın',
+          '📅 <strong>Takvim & hatırlatmalar</strong> — hiçbir takibi kaçırmayın',
+          '👥 <strong>Ekip paneli</strong> — sponsor kodunuzla ortaklarınızı davet edin',
+          '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
+        ]),
         emailParagraph(
-          '1. <strong>Boru hattını kurun</strong> — adayları ekleyin ve aşamalara taşıyın.<br>2. <strong>YZ saha provası</strong> — gerçek görüşmeden önce itiraz provası yapın.<br>3. <strong>Ekibinizi davet edin</strong> — Ekip panelinden sponsor kodunuzu paylaşın.'
+          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre dolmadan ücretli bir plana geçmezseniz, hesap erişiminiz bir plan seçene kadar ${emailHighlight('kısıtlanır')} — verileriniz güvende kalır.`
         ),
-        emailCta(`${NMM_APP_URL}/giris`, 'Panoya giriş yap'),
+        emailCta(`${NMM_APP_URL}/odeme`, 'Planları gör ve yükselt'),
+        emailParagraph(
+          `Ya da hemen başlayın: <a href="${NMM_APP_URL}/giris" style="color:#534AB7;font-weight:600;">panonuza giriş yapın →</a>`
+        ),
       ].join('')
 
   try {
