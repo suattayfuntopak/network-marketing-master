@@ -75,7 +75,7 @@ export default function PipelinePage() {
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/pipeline/sunum-materyalleri"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:border-[#534AB7]/40 hover:text-[#534AB7]"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:border-[#534AB7]/40 hover:text-[#534AB7] dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7] dark:hover:text-white"
           >
             <Presentation className="h-4 w-4" />
             {t('presentationMaterialsPage.title')}
@@ -133,7 +133,7 @@ export default function PipelinePage() {
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'takip_zamani'
               ? 'bg-red-500 border-red-500 text-white ring-2 ring-red-500/20 shadow-lg shadow-red-500/10 dark:bg-red-600'
-              : 'bg-red-50 border-red-200 hover:border-red-500/40 dark:bg-red-950/20 dark:border-red-900/50'
+              : 'bg-red-50 border-red-200 hover:border-red-500/40 dark:bg-red-950/20 dark:border-white/70'
           }`}
         >
           <p className={clsx('text-xl font-bold transition-colors', filter === 'takip_zamani' ? 'text-white' : 'text-red-500 dark:text-red-400')}>{counts.takip_zamani}</p>

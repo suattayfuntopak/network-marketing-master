@@ -48,18 +48,18 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
 
   async function submit() {
     if (!form.youtubeUrlOrId.trim() || !form.titleTr.trim()) {
-      toast.error('YouTube bağlantısı ve Başlık (TR) zorunlu.')
+      toast.error(t('videoTraining.requiredFieldsError'))
       return
     }
     setSaving(true)
     try {
       if (editing) await updateTrainingVideoAction(editing.id, form)
       else await createTrainingVideoAction(form)
-      toast.success(editing ? 'Video güncellendi.' : 'Video eklendi.')
+      toast.success(editing ? t('videoTraining.videoUpdated') : t('videoTraining.videoAdded'))
       onSaved()
       onClose()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'İşlem başarısız.')
+      toast.error(err instanceof Error ? err.message : t('videoTraining.operationFailed'))
     } finally {
       setSaving(false)
     }
@@ -70,8 +70,8 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
       <div className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <h2 className="flex items-center gap-2 text-base font-bold text-[var(--text-1)]">
-            <Film className="h-4 w-4 text-brand dark:text-[var(--text-1)]" />
-            {editing ? 'Videoyu Düzenle' : 'Yeni Video Ekle'}
+            <Film className="h-4 w-4 text-brand-readable" />
+            {editing ? t('videoTraining.editVideo') : t('videoTraining.addVideo')}
           </h2>
           <button
             type="button"
@@ -84,55 +84,55 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
 
         <div className="space-y-3 p-5">
           <div className="space-y-1">
-            <label className={labelCls}>YouTube Bağlantısı veya Video ID</label>
+            <label className={labelCls}>{t('videoTraining.youtubeLabel')}</label>
             <input
               className={inputCls}
               value={form.youtubeUrlOrId}
               onChange={e => set('youtubeUrlOrId', e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=... veya 11 haneli ID"
+              placeholder={t('videoTraining.youtubePlaceholder')}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelCls}>Başlık (TR) *</label>
+              <label className={labelCls}>{t('videoTraining.titleTrLabel')}</label>
               <input className={inputCls} value={form.titleTr} onChange={e => set('titleTr', e.target.value)} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>Başlık (EN)</label>
+              <label className={labelCls}>{t('videoTraining.titleEnLabel')}</label>
               <input className={inputCls} value={form.titleEn} onChange={e => set('titleEn', e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelCls}>Açıklama (TR)</label>
+              <label className={labelCls}>{t('videoTraining.descTrLabel')}</label>
               <textarea className={`${inputCls} min-h-[64px]`} value={form.descriptionTr} onChange={e => set('descriptionTr', e.target.value)} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>Açıklama (EN)</label>
+              <label className={labelCls}>{t('videoTraining.descEnLabel')}</label>
               <textarea className={`${inputCls} min-h-[64px]`} value={form.descriptionEn} onChange={e => set('descriptionEn', e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1">
-              <label className={labelCls}>Kategori (TR)</label>
+              <label className={labelCls}>{t('videoTraining.categoryTrLabel')}</label>
               <input className={inputCls} value={form.categoryTr} onChange={e => set('categoryTr', e.target.value)} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>Kategori (EN)</label>
+              <label className={labelCls}>{t('videoTraining.categoryEnLabel')}</label>
               <input className={inputCls} value={form.categoryEn} onChange={e => set('categoryEn', e.target.value)} />
             </div>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1">
-              <label className={labelCls}>Süre (dk)</label>
+              <label className={labelCls}>{t('videoTraining.durationLabel')}</label>
               <input type="number" min={1} className={inputCls} value={form.durationMin} onChange={e => set('durationMin', Number(e.target.value))} />
             </div>
             <div className="space-y-1">
-              <label className={labelCls}>Sıra</label>
+              <label className={labelCls}>{t('videoTraining.sortOrderLabel')}</label>
               <input type="number" className={inputCls} value={form.sortOrder} onChange={e => set('sortOrder', Number(e.target.value))} />
             </div>
             <div className="space-y-1">
@@ -144,7 +144,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
                   className={`${inputCls} flex flex-1 items-center justify-between gap-1 text-left`}
                 >
                   <span className={`line-clamp-1 ${form.relatedTrainingId ? 'text-[var(--text-1)]' : 'text-[var(--text-3)]'}`}>
-                    {resolveTopicLabel(form.relatedTrainingId ?? null, lang) ?? 'Seç…'}
+                    {resolveTopicLabel(form.relatedTrainingId ?? null, lang) ?? t('videoTraining.selectPlaceholder')}
                   </span>
                   <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--text-3)]" />
                 </button>
@@ -152,7 +152,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
                   <button
                     type="button"
                     onClick={() => set('relatedTrainingId', '')}
-                    title="Temizle"
+                    title={t('videoTraining.clearSelection')}
                     className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)] transition hover:bg-red-500/10 hover:text-red-500"
                   >
                     <X className="h-3.5 w-3.5" />
@@ -169,7 +169,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
             onClick={onClose}
             className="rounded-xl border border-[var(--border)] px-4 py-2 text-sm font-bold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
           >
-            Vazgeç
+            {t('videoTraining.cancel')}
           </button>
           <button
             type="button"
@@ -178,7 +178,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
             className="inline-flex items-center gap-2 rounded-xl bg-[#3730A3] hover:bg-[#28227d] px-4 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95 disabled:opacity-60"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
-            {editing ? 'Kaydet' : 'Ekle'}
+            {editing ? t('videoTraining.save') : t('videoTraining.add')}
           </button>
         </div>
       </div>

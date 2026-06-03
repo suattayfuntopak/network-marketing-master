@@ -24,6 +24,14 @@
   --text-3:      #94a3b8; /* Muted steel-slate text */
 }
 
+/* Brand purple on dark backgrounds — readable white text without touching light mode */
+@utility text-brand-readable {
+  color: var(--color-brand);
+  &:where(.dark, .dark *) {
+    color: var(--text-1);
+  }
+}
+
 /* iOS notch / home indicator safe area */
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);

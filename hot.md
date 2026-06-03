@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-06-03 — Saha serisi popup + Bugün İlgilen UX + Boru Hattı dark düzeltmeleri + video önerileri
+
+- **Saha serisi popup:** “Tam hafta — 7/7 gün saha kaydı” kutusu tıklanınca
+  `nmm_daily_actions` tablosundan son 7 günün saha aksiyonları listelenir (kalıcı DB;
+  localStorage yok). `getFieldStreakDetailAction` + `FieldStreakDetailModal`.
+- **Bugün İlgilen:** “Bu hafta saha özeti” → “Bu hafta saha özetin”; sayfa yazı
+  puntoları +1 birim.
+- **Boru Hattı dark:** Sunum Materyalleri hover → mor arka plan + beyaz yazı;
+  Takip Zamanı kutusu çerçevesi `dark:border-white/70`.
+- **Önceki oturum önerileri (4/5):** VideoEditModal i18n; mobil 4 buton
+  `text-[10px] sm:text-xs`; video embed modal/sheet; `text-brand-readable` utility.
+- **Dosyalar:** `FieldWeekSummary`, `FieldStreakDetailModal`, `myPulseActions`,
+  `IlgilenContent`, `bugun/ilgilen/page`, `pipeline/page`, `VideoEditModal`,
+  `TrainingVideoCard`, `globals.css`, `pulse.ts`, `videoTraining.ts`.
+
 ## 2026-06-03 — Video eğitim dark mode UX + kart grid + ilgili konu seçici
 
 - **Dark mode okunabilirlik (light’a dokunulmadı):** Vaktin Varsa sayfasındaki “Video Eğitimler”

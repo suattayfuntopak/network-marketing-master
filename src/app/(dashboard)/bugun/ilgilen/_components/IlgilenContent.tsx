@@ -90,10 +90,10 @@ export function IlgilenContent() {
         <FieldWeekSummary />
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">🎉</p>
-          <p className="text-sm font-semibold text-[var(--text-1)]">
+          <p className="text-base font-semibold text-[var(--text-1)]">
             {t('pagesUi.noPendingFollowUps')}
           </p>
-          <p className="mt-1 text-xs text-[var(--text-2)]">
+          <p className="mt-1 text-sm text-[var(--text-2)]">
             {t('pagesUi.greatJob')}
           </p>
         </div>
@@ -108,7 +108,7 @@ export function IlgilenContent() {
           <FieldWeekSummary />
           {/* Başlık + görünüm toggle */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-[var(--text-2)]">
+            <p className="text-base text-[var(--text-2)]">
               <span className="font-semibold text-[var(--text-1)]">{listData.length}</span> {t('pagesUi.prioritiesLabel')}
               {remaining > 0 && !showAll && (
                 <span className="ml-1 text-[var(--text-3)]">+{remaining} {t('pagesUi.moreWaiting')}</span>
@@ -150,12 +150,12 @@ export function IlgilenContent() {
                 size="md"
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-[var(--text-1)]">{c.full_name}</p>
+                <p className="truncate text-base font-semibold text-[var(--text-1)]">{c.full_name}</p>
                 <div className="mt-0.5 flex items-center gap-2">
-                  <span className={clsx('rounded-full px-2 py-0.5 text-xs font-medium', STAGE_COLOR[c.stage])}>
+                  <span className={clsx('rounded-full px-2 py-0.5 text-sm font-medium', STAGE_COLOR[c.stage])}>
                     {getStageLabel(c.stage, lang)}
                   </span>
-                  <span className="text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
+                  <span className="text-sm text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
                 </div>
               </div>
               {/* Eylem butonları — tıklama propagasyonu engelle */}
@@ -218,18 +218,18 @@ export function IlgilenContent() {
                   imageUrl={resolveCandidateFields(c).avatarUrl}
                   size="sm"
                 />
-                <p className="min-w-0 flex-1 truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
-                <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold', STAGE_COLOR[c.stage])}>
+                <p className="min-w-0 flex-1 truncate text-base font-medium text-[var(--text-1)]">{c.full_name}</p>
+                <span className={clsx('shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold', STAGE_COLOR[c.stage])}>
                   {getStageLabel(c.stage, lang)}
                 </span>
-                <span className="shrink-0 text-xs text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
+                <span className="shrink-0 text-sm text-[var(--text-3)]">{formatDaysAgo(c.daysSinceContact, t)}</span>
               </div>
             ))}
           </div>
         )}
 
         {remaining > 0 && (
-          <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-xs text-[var(--text-3)]">
+          <p className="rounded-2xl border border-dashed border-[var(--border)] py-3 text-center text-sm text-[var(--text-3)]">
             {showAll ? (
               <>
                 {t('today.allPriorityListed')}{' '}

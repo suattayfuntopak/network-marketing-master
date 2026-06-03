@@ -14,10 +14,10 @@ export default function IlgilenPage() {
           <Zap className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">
+          <h1 className="text-2xl font-bold text-[var(--text-1)]">
             {t('pagesUi.todayPrioritiesTitle')}
           </h1>
-          <p className="text-sm text-[var(--text-2)]">
+          <p className="text-base text-[var(--text-2)]">
             {t('pagesUi.todayPrioritiesSubtitle')}
           </p>
         </div>

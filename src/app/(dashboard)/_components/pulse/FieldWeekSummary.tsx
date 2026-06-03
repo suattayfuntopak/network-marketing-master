@@ -1,15 +1,18 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
+import { FieldStreakDetailModal } from './FieldStreakDetailModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 export function FieldWeekSummary() {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
+  const [streakOpen, setStreakOpen] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['pano-field-insights', ws?.workspaceId],
@@ -42,8 +45,10 @@ export function FieldWeekSummary() {
 
   return (
     <div className="space-y-3">
-      <div
-        className={`rounded-2xl border px-4 py-3 flex items-center justify-between gap-3 ${
+      <button
+        type="button"
+        onClick={() => setStreakOpen(true)}
+        className={`w-full rounded-2xl border px-4 py-3 flex items-center justify-between gap-3 text-left transition hover:scale-[1.01] active:scale-[0.99] cursor-pointer ${
           activeDays > 0
             ? 'border-orange-400/35 bg-gradient-to-r from-orange-50/90 to-amber-50/60 dark:from-orange-950/25 dark:to-amber-950/15'
             : 'border-[var(--border)] bg-[var(--bg-subtle)]/60'
@@ -54,39 +59,46 @@ export function FieldWeekSummary() {
             className={`h-5 w-5 shrink-0 ${activeDays > 0 ? 'text-orange-500' : 'text-[var(--text-3)]'}`}
           />
           <div className="min-w-0">
-            <p className="text-sm font-bold text-[var(--text-1)]">
+            <p className="text-base font-bold text-[var(--text-1)]">
               {fullWeek
                 ? t('pulse.fieldStreakFullWeek')
                 : activeDays > 0
                   ? t('pulse.fieldStreakDays', { count: activeDays })
                   : t('pulse.fieldStreakEmpty')}
             </p>
-            <p className="text-xs text-[var(--text-3)] truncate">{t('pulse.fieldStreakHint')}</p>
+            <p className="text-sm text-[var(--text-3)] truncate">{t('pulse.fieldStreakHint')}</p>
           </div>
         </div>
         {activeDays > 0 && (
-          <span className="text-2xl font-black tabular-nums text-orange-600 dark:text-orange-400 shrink-0">
+          <span className="text-3xl font-black tabular-nums text-orange-600 dark:text-orange-400 shrink-0">
             {activeDays}/7
           </span>
         )}
-      </div>
+      </button>
 
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
         <div className="mb-3">
-          <p className="text-sm font-bold text-[var(--text-1)]">{t('pulse.bugunFieldWeekTitle')}</p>
-          <p className="text-xs text-[var(--text-3)] mt-0.5">{t('pulse.bugunFieldWeekSubtitle')}</p>
+          <p className="text-base font-bold text-[var(--text-1)]">{t('pulse.bugunFieldWeekTitle')}</p>
+          <p className="text-sm text-[var(--text-3)] mt-0.5">{t('pulse.bugunFieldWeekSubtitle')}</p>
         </div>
         <div className="grid grid-cols-4 gap-2">
           {kpis.map(({ label, value }) => (
             <div key={label} className="rounded-xl bg-[var(--bg-subtle)]/60 px-2 py-2.5 text-center">
-              <p className="text-lg font-black tabular-nums text-[var(--text-1)]">{value}</p>
-              <p className="text-[9px] font-bold uppercase tracking-wide text-[var(--text-3)] leading-tight mt-0.5">
+              <p className="text-xl font-black tabular-nums text-[var(--text-1)]">{value}</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)] leading-tight mt-0.5">
                 {label}
               </p>
             </div>
           ))}
         </div>
       </div>
+
+      {streakOpen && (
+        <FieldStreakDetailModal
+          workspaceId={ws.workspaceId}
+          onClose={() => setStreakOpen(false)}
+        />
+      )}
     </div>
   )
 }

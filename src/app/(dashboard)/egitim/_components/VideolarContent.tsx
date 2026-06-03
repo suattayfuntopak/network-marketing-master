@@ -67,14 +67,14 @@ export function VideolarContent() {
       <header className="space-y-2">
         <Link
           href="/egitim"
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand dark:text-[var(--text-1)] hover:underline"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-readable hover:underline"
         >
-          <ArrowLeft className="h-3.5 w-3.5 text-brand dark:text-[var(--text-1)]" />
+          <ArrowLeft className="h-3.5 w-3.5 text-brand-readable" />
           {t('videoTraining.backToTraining')}
         </Link>
         <div className="flex items-center justify-between gap-3">
           <h1 className="flex items-center gap-2 text-lg font-bold text-[var(--text-1)]">
-            <Film className="h-5 w-5 text-brand dark:text-[var(--text-1)]" />
+            <Film className="h-5 w-5 text-brand-readable" />
             {t('videoTraining.pageTitle')}
           </h1>
           {isAdmin && (
