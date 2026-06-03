@@ -318,6 +318,7 @@ export const tr = {
     todayShort: "bugün",
     daysAgoShort: "{days} gün önce",
     inviteToNmm: "NMM'e Davet Et 🚀",
+    aiInviteTitle: "YZ ile kişiye özel NMM daveti hazırla",
     plusRequired: "Ekip Plus Lisansı Gereklidir",
     plusRequiredDesc: "Alt ekibinizin aday hunilerini izlemek, 4 haftalık Doğru Başlangıç süreçlerini gerçek zamanlı takip etmek ve koçluk yapmak için aktif bir Ekip Plus lisansı gereklidir.",
     upgradeToMaster: "Ekip Master'ına Yükselt 🚀",

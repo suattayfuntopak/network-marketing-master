@@ -2,6 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
+import { REGISTER_URL } from '@/lib/domain/constants'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -53,78 +54,70 @@ export async function generateCoachMessage(
     })
 
     return { message }
-  } catch (err: any) {
-    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
+  } catch (err: unknown) {
+    return { error: 'Mesaj oluşturulamadı: ' + (err instanceof Error ? err.message : String(err)) }
   }
 }
 
-export async function generateDownlineCoachingMessage(
-  _prev: CoachState,
-  formData: FormData
-): Promise<CoachState> {
+/**
+ * Saha tanıdığı bir kişiye (aday) özel NMM'e KATILIM daveti metni üretir.
+ * Kişinin adı/notu dikkate alınır; sonuna davet linki + kodu eklenir.
+ * Ekibim'deki "Saha Ortağı" robot butonundan, kişinin kendi sayfasında açılır.
+ */
+export async function generateNmmInviteMessage(candidateId: string): Promise<CoachState> {
   if (!process.env.GEMINI_API_KEY) {
-    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
+    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve sunucuyu yeniden başlatın.' }
   }
-
-  const memberName     = (formData.get('memberName')     as string | null)?.trim() ?? ''
-  const candidateCount = parseInt(formData.get('candidateCount') as string ?? '0')
-  const yeniCount      = parseInt(formData.get('yeniCount')      as string ?? '0')
-  const sunumCount     = parseInt(formData.get('sunumCount')     as string ?? '0')
-  const takipCount     = parseInt(formData.get('takipCount')     as string ?? '0')
-  const katildiCount   = parseInt(formData.get('katildiCount')   as string ?? '0')
-  const daysInactive   = parseInt(formData.get('daysInactive')   as string ?? '7')
-
-  if (!memberName) return { error: 'Üye bilgisi eksik.' }
+  if (!candidateId) return { error: 'Kişi bilgisi eksik.' }
 
   const quota = await checkAIQuota('message')
   if (!quota.ok) return { error: quota.message }
 
+  const supabase = await createClient()
+  const { data: cand } = await supabase
+    .from('nmm_candidates')
+    .select('full_name, note_tr, note, workspace_id')
+    .eq('id', candidateId)
+    .maybeSingle()
+  if (!cand) return { error: 'Kişi bulunamadı.' }
+  if (!quota.isSuperAdmin && cand.workspace_id !== quota.workspaceId) {
+    return { error: 'Erişim reddedildi.' }
+  }
+
+  const { data: wsRow } = await supabase
+    .from('nmm_workspaces')
+    .select('invite_code')
+    .eq('id', cand.workspace_id)
+    .maybeSingle()
+  const inviteCode = wsRow?.invite_code ?? ''
+  const name = cand.full_name ?? ''
+  const note = (cand.note_tr ?? cand.note ?? '').slice(0, 500)
+  const linkBlock = `\n\nKayıt linki: ${REGISTER_URL}\nEkibim sayfasından gireceğin kod: ${inviteCode}`
+
   try {
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-pro',
-      systemInstruction: `Sen bir network marketing lideri ve takım koçusun. Ekibindeki downline (alt hat) distribütörlerin sahadaki aktiflik durumuna göre onlara göndermek üzere motive edici, suçlayıcı olmayan, yapıcı ve doğrudan aksiyona yönlendiren mentörlük mesajları hazırlıyorsun.
-Sana distribütörün adı, toplam aday sayısı, aşama dağılımı (yeni aday, sunum, takip, katıldı) ve kaç gündür inaktif (sisteme kayıt girmemiş veya eylem yapmamış) olduğu verilecek.
-Amacın:
-1. Onun durumunu anladığını belirtmek ve empatik olmak (suçlamadan).
-2. İstatistiklerine göre (örneğin: sunum sayısı iyi ama takip yoksa takip yapmasını hatırlatmak; hiç aday yoksa aday listesi yapmayı önermek gibi) nokta atışı pratik saha tavsiyesi vermek.
-3. Onu birebir bir kahve görüşmesine veya yardımlaşma aramasına davet etmek.
-Kısa, samimi, 2-3 emoji içeren ve WhatsApp'tan gönderilmeye uygun Türkçe bir koçluk mesajı yaz. Başka açıklama ekleme.`
+      systemInstruction: `Sen deneyimli, sıcak bir network marketing liderisin. Saha tanıdığın bir kişiyi, "Network Marketing Master" (NMM) adlı dijital iş/CRM uygulaması ve ekibin üzerinden yanına (ekibine) katılmaya davet eden, kişiye özel bir WhatsApp mesajı yazıyorsun.
+Kurallar:
+1. Kişinin adıyla seslen; varsa notundaki bağlamı doğal şekilde kullan (zorlama yok).
+2. Baskıcı/suçlayıcı olma; merak ve fırsat duygusu uyandır.
+3. NMM'in ona katacağını 1-2 cümlede vurgula (adaylarını sistemli takip, YZ koçu/saha provası, ekip desteği).
+4. Mesajın SONUNA sana verilen davet linkini ve kodu AYNEN, değiştirmeden ekle.
+5. 2-3 emoji, kısa (en fazla ~90 kelime), akıcı Türkçe. SADECE mesaj metnini döndür.`
     })
-
     const result = await model.generateContent({
-      contents: [
-        {
-          role: 'user',
-          parts: [
-            {
-              text: `Distribütör Adı: ${memberName}
-Toplam Aday: ${candidateCount}
-Dağılım: ${yeniCount} Yeni, ${sunumCount} Sunum, ${takipCount} Takip, ${katildiCount} Katıldı
-İnaktif Gün: ${daysInactive} gündür sisteme veri girişi yapılmadı.`
-            }
-          ]
-        }
-      ],
-      generationConfig: {
-        maxOutputTokens: 8192,
-        temperature: 0.7,
-      }
+      contents: [{ role: 'user', parts: [{ text: `Kişi adı: ${name}\nNot/bağlam: ${note || '(yok)'}\nMesajın sonuna olduğu gibi eklenecek davet bloğu:${linkBlock}` }] }],
+      generationConfig: { maxOutputTokens: 4096, temperature: 0.8 },
     })
-
-    const message = result.response.text().trim()
-
+    let message = result.response.text().trim()
     if (!message) throw new Error('Boş yanıt döndü.')
+    if (inviteCode && !message.includes(inviteCode)) message += linkBlock
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      note: 'message',
-    })
-
+    await logAIGeneration({ workspaceId: quota.workspaceId, userId: quota.user.id, note: 'message' })
     return { message }
-  } catch (err: any) {
-    console.error('Coaching message error', err)
-    return { error: 'Koçluk mesajı oluşturulamadı: ' + (err?.message || String(err)) }
+  } catch (err: unknown) {
+    console.error('NMM invite message error', err)
+    return { error: 'Davet mesajı oluşturulamadı: ' + (err instanceof Error ? err.message : String(err)) }
   }
 }
 
@@ -178,7 +171,7 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
     })
 
     return { summary }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Notes summary generation error', err)
     return { error: 'Özet oluşturulurken bir hata meydana geldi.' }
   }

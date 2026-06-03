@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, ChevronDown, Trash2, X, Bot, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -29,6 +29,7 @@ import {
   formatFollowUpDate,
 } from './candidateDetailUtils'
 import { CandidateProfileCard } from './CandidateProfileCard'
+import { NmmInviteSheet } from './NmmInviteSheet'
 import { LeaderNotesCard } from './LeaderNotesCard'
 import { ActivityLogCard } from './ActivityLogCard'
 import { PresentationMaterialsCard } from './PresentationMaterialsCard'
@@ -42,6 +43,13 @@ interface Props {
 export function CandidateDetail({ candidateId }: Props) {
   const { lang, t } = useTranslation()
   const router = useRouter()
+  const searchParams = useSearchParams()
+  // ?nmmInvite=1 → davet composer'ı aç (state/effect yok → ekstra re-render yok).
+  const inviteOpen = searchParams.get('nmmInvite') === '1'
+  const closeInvite = useCallback(
+    () => router.replace(`/pipeline/${candidateId}`, { scroll: false }),
+    [router, candidateId]
+  )
   const [editOpen, setEditOpen] = useState(false)
   const [stageOpen, setStageOpen] = useState(false)
   const [editingFollowUp, setEditingFollowUp] = useState(false)
@@ -345,6 +353,13 @@ export function CandidateDetail({ candidateId }: Props) {
         <ConfirmDeleteModal
           onConfirm={handleDeleteConfirmed}
           onCancel={handleConfirmCancel}
+        />
+      )}
+
+      {inviteOpen && c && (
+        <NmmInviteSheet
+          candidate={{ id: candidateId, full_name: c.full_name, phone: c.phone }}
+          onClose={closeInvite}
         />
       )}
 

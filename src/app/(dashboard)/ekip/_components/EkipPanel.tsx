@@ -8,7 +8,6 @@ import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { BroadcastPanel } from './BroadcastPanel'
-import { YZEkipKocuSheet } from './YZEkipKocuSheet'
 import { InviteTeammateSection } from './InviteTeammateSection'
 import { JoinByInviteSection } from './JoinByInviteSection'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
@@ -53,7 +52,6 @@ export function EkipPanel() {
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
-  const [coachingMember, setCoachingMember] = useState<{ member: MemberRow; days: number } | null>(null)
   const [scorecardOpen, setScorecardOpen] = useState(true)
   const [expandedMembers, setExpandedMembers] = useState<Record<string, boolean>>({})
   const [expandedOnboardingId, setExpandedOnboardingId] = useState<string | null>(null)
@@ -268,7 +266,6 @@ export function EkipPanel() {
         setOnboardingWeekTab={setOnboardingWeekTab}
         removingId={removingId}
         setMemberToRemove={setMemberToRemove}
-        setCoachingMember={setCoachingMember}
         setOnboardingCoachData={setOnboardingCoachData}
         toggleOnboardingStep={toggleOnboardingStep}
         handleInviteMember={handleInviteMember}
@@ -315,14 +312,6 @@ export function EkipPanel() {
           message={t('team.removeMemberMsg', { name: memberToRemove.name })}
           onConfirm={handleRemoveMemberConfirmed}
           onCancel={handleMemberRemoveCancel}
-        />
-      )}
-
-      {coachingMember && (
-        <YZEkipKocuSheet
-          member={coachingMember.member}
-          daysInactive={coachingMember.days}
-          onClose={() => setCoachingMember(null)}
         />
       )}
 
