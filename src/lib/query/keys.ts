@@ -8,6 +8,10 @@ export const queryKeys = {
   /** @deprecated use team() — invalidation uyumu için alias */
   members: (workspaceId: string) => ['team', workspaceId] as const,
   dailyAiUsage: () => ['daily-ai-usage'] as const,
+  /** Hedef → Yol Haritası → Günlük Takip döngüsü (self-scoped) */
+  userGoal: () => ['user-goal'] as const,
+  dailyProgress: () => ['daily-progress'] as const,
+  roadmap: () => ['roadmap'] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,

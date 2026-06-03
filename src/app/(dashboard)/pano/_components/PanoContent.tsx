@@ -10,6 +10,7 @@ import { SquareButton } from '@/components/ui/SquareButton'
 import { Zap, TrendingUp, Bot, Users, CalendarDays, Target, MessageCircleQuestion, BookOpen, Shield, BarChart2 } from 'lucide-react'
 import { ACTIVE_STAGES, STAGE_COLOR } from '@/lib/domain/stages'
 import { OnboardingModal } from './OnboardingModal'
+import { HedefKart } from './HedefKart'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { NmmCandidate } from '@/types/database.types'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -170,6 +171,9 @@ export function PanoContent() {
 
       <PanoVideoStrip />
       <PanoTeamCoachingAlert />
+
+      {/* ── Hedef → Yol Haritası → Günlük Takip ── */}
+      <HedefKart />
 
       {/* ── Bugün Öncelikliler — karelerle aynı genişlik ── */}
       {cLoading ? prioritiesSkeleton : (
