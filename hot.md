@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-04 — Pano Faz 1a (kokpit sadeleştirme)
+
+- **Güvenlik:** Tag `ui-sadelestirme-oncesi` @ `68546e1`; branch `feat/pano-cockpit-faz1` (push edildi).
+- **Pano:** 10’lu SquareButton grid + MiniTrend kaldırıldı; sıra: Welcome → Hedef → Bugün CTA → saha serisi → öncelikler (max 3) → KPI → davet chip (≤10 aday).
+- **Yeni:** `WelcomeCard`, `PanoTodayCta`, `PanoInviteChip`; desktop `lg` yan sütunda `PanoVideoStrip`.
+- **DB:** Yok. Welcome dismiss = localStorage.
+- **Geri al:** `git checkout main && git branch -D feat/pano-cockpit-faz1` veya `git checkout ui-sadelestirme-oncesi`.
+- **Sırada:** Faz 1c sidebar hiyerarşisi, Faz 1b Playwright mobil.
+
 ## 2026-06-04 — Aktivite popup: dark okunabilirlik + stabil boyut
 
 - **Dönem sekmeleri (dark):** Seçili beyaz bold; diğerleri `white/80` normal ağırlık. Light tema değişmedi.
