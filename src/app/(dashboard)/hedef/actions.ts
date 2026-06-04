@@ -96,18 +96,15 @@ export async function saveUserGoalAction(input: {
   return { targetPeople, targetMonths, startAt }
 }
 
-/** Mevcut doğrudan downline (ekip) sayısı — roadmap'in currentTeam'i. */
+/**
+ * Mevcut doğrudan downline (ekip) sayısı — roadmap'in currentTeam'i. Kolon-kısıtlı
+ * definer rpc (055) auth.uid()'in downline'ını (her iki parent_id formatı dahil) döndürür.
+ */
 async function directTeamCount(
   supabase: Awaited<ReturnType<typeof createClient>>,
-  userId: string,
-  workspaceId: string,
 ): Promise<number> {
-  // parent_id iki formatta tutulabilir (user id VEYA workspace id) — ikisini de say.
-  const { count } = await supabase
-    .from('nmm_workspaces')
-    .select('id', { count: 'exact', head: true })
-    .or(`parent_id.eq.${userId},parent_id.eq.${workspaceId}`)
-  return count ?? 0
+  const { data } = await supabase.rpc('nmm_leader_downline_workspaces')
+  return data?.length ?? 0
 }
 
 export interface DailyProgress {
@@ -141,7 +138,7 @@ export async function getDailyProgressAction(): Promise<DailyProgress> {
 
   const goal = await fetchUserGoalAction()
   const workspaceId = await ownWorkspaceId(supabase, user.id)
-  const teamSize = workspaceId ? await directTeamCount(supabase, user.id, workspaceId) : 0
+  const teamSize = workspaceId ? await directTeamCount(supabase) : 0
 
   // ── Gerçekleşenler (bugün) — mevcut veriden, çift giriş yok ──
   const since = todayStartIso()
@@ -207,7 +204,7 @@ export async function getRoadmapAction(): Promise<RoadmapStage[]> {
   const goal = await fetchUserGoalAction()
   if (!goal) return []
   const workspaceId = await ownWorkspaceId(supabase, user.id)
-  const teamSize = workspaceId ? await directTeamCount(supabase, user.id, workspaceId) : 0
+  const teamSize = workspaceId ? await directTeamCount(supabase) : 0
   return computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize)
 }
 
@@ -231,7 +228,7 @@ export async function getGoalDashboardAction(): Promise<GoalDashboard> {
   if (!user) return { goal: null, progress: emptyProgress, roadmap: [] }
 
   const workspaceId = await ownWorkspaceId(supabase, user.id)
-  const teamSize = workspaceId ? await directTeamCount(supabase, user.id, workspaceId) : 0
+  const teamSize = workspaceId ? await directTeamCount(supabase) : 0
 
   const { data: goalRow } = await supabase
     .from('nmm_user_goals')

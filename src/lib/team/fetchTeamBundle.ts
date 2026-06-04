@@ -53,10 +53,9 @@ async function resolveAuthAvatars(
     .eq('workspace_id', workspaceId)
   wsMembers?.forEach(m => allowedIds.add(m.user_id))
 
-  const { data: downlineWs } = await supabase
-    .from('nmm_workspaces')
-    .select('owner_id')
-    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+  // Downline keşfi kolon-kısıtlı definer rpc ile (055): nmm_workspaces SELECT politikası
+  // own+member'a daraldı; davet kodu/lisans sızdırmadan id+owner_id alınır.
+  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
 
   downlineWs?.forEach(w => {
     if (w.owner_id) allowedIds.add(w.owner_id)
@@ -220,10 +219,7 @@ async function fetchTeamBundleLegacy(
     uniqueMembersMap[m.user_id] = m
   })
 
-  const { data: downlineWs } = await supabase
-    .from('nmm_workspaces')
-    .select('id, owner_id')
-    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
 
   const downlineWsIds = downlineWs?.map(w => w.id) ?? []
   const downlineOwnerIds = (downlineWs?.map(w => w.owner_id).filter(Boolean) ?? []) as string[]

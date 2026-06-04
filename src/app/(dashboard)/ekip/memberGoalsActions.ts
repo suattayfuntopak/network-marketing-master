@@ -35,15 +35,13 @@ async function assertLeader(workspaceId: string) {
   return { supabase, user, workspaceId }
 }
 
-async function assertDownline(supabase: Awaited<ReturnType<typeof createClient>>, leaderId: string, memberUserId: string) {
-  const { data: downline } = await supabase
-    .from('nmm_workspaces')
-    .select('owner_id')
-    .eq('parent_id', leaderId)
-    .eq('owner_id', memberUserId)
-    .maybeSingle()
-
-  if (!downline) throw new Error('Bu kullanıcı doğrudan downline değil.')
+// Downline doğrulaması kolon-kısıtlı definer rpc ile (055): rpc DAİMA auth.uid()'in kendi
+// downline'ını döndürür → memberUserId çağıranın doğrudan downline'ı mı diye kontrol edilir.
+async function assertDownline(supabase: Awaited<ReturnType<typeof createClient>>, memberUserId: string) {
+  const { data: downline } = await supabase.rpc('nmm_leader_downline_workspaces')
+  if (!downline?.some(w => w.owner_id === memberUserId)) {
+    throw new Error('Bu kullanıcı doğrudan downline değil.')
+  }
 }
 
 export async function getMemberGoalsMapAction(
@@ -87,7 +85,7 @@ export async function upsertMemberGoalAction(
   if (months < 1 || months > 120) throw new Error('Geçersiz hedef süresi.')
 
   const { supabase, user } = await assertLeader(workspaceId)
-  await assertDownline(supabase, user.id, memberUserId)
+  await assertDownline(supabase, memberUserId)
 
   const { error } = await supabase.from('nmm_member_goals').upsert(
     {
@@ -108,8 +106,8 @@ export async function deleteMemberGoalAction(
   workspaceId: string,
   memberUserId: string
 ): Promise<void> {
-  const { supabase, user } = await assertLeader(workspaceId)
-  await assertDownline(supabase, user.id, memberUserId)
+  const { supabase } = await assertLeader(workspaceId)
+  await assertDownline(supabase, memberUserId)
 
   const { error } = await supabase
     .from('nmm_member_goals')

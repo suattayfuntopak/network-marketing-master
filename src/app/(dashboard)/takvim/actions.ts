@@ -201,12 +201,9 @@ export async function fetchTeamCalendarSummaryAction(
     return []
   }
 
-  // parent_id sponsorun user_id'sini saklar (migration 009). Mevcut kullanıcı lider
-  // olduğundan downline'lar parent_id = user.id ile bulunur.
-  const { data: downlineWs } = await supabase
-    .from('nmm_workspaces')
-    .select('id, owner_id')
-    .eq('parent_id', user.id)
+  // Downline keşfi kolon-kısıtlı definer rpc ile (055): workspace SELECT politikası
+  // own+member'a daraldı; davet kodu/lisans sızdırmadan id+owner_id alınır (auth.uid() kapsamı).
+  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
 
   if (!downlineWs?.length) return []
 

@@ -33,10 +33,8 @@ export async function resolveTeamAvatarsAction(
     .eq('workspace_id', workspaceId)
   wsMembers?.forEach(m => allowedIds.add(m.user_id))
 
-  const { data: downlineWs } = await supabase
-    .from('nmm_workspaces')
-    .select('owner_id')
-    .or(`parent_id.eq.${workspaceId},parent_id.eq.${ownWs.owner_id}`)
+  // Downline keşfi kolon-kısıtlı definer rpc ile (055) — davet kodu/lisans sızdırmaz.
+  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
 
   downlineWs?.forEach(w => {
     if (w.owner_id) allowedIds.add(w.owner_id)
@@ -213,12 +211,13 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
       message: generatedText,
       remaining: quota.isSuperAdmin ? undefined : quota.remaining,
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('[generateOnboardingGuidanceAction] error:', err)
+    const msg = err instanceof Error ? err.message : String(err)
     return {
       error: lang === 'en'
-        ? 'Failed to generate guidance message: ' + (err?.message || String(err))
-        : 'Rehberlik mesajı üretilemedi: ' + (err?.message || String(err)),
+        ? 'Failed to generate guidance message: ' + msg
+        : 'Rehberlik mesajı üretilemedi: ' + msg,
     }
   }
 }

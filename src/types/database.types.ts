@@ -792,6 +792,10 @@ export interface Database {
         Args: { p_workspace_id: string }
         Returns: Json
       }
+      nmm_leader_downline_workspaces: {
+        Args: Record<string, never>
+        Returns: { id: string; owner_id: string }[]
+      }
       nmm_count_candidates_per_workspace: {
         Args: Record<string, never>
         Returns: Json
