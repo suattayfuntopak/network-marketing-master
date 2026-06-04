@@ -1,9 +1,15 @@
 # Hot Log
 
+## 2026-06-05 — `feat/pano-cockpit-faz1` → `main` (canlı deploy)
+
+**`main` @ `ac84ca0`** — fast-forward merge + `git push origin main`. Vercel Production birkaç dakika içinde güncellenir; görmüyorsan hard refresh / gizli pencere.
+**Branch:** `feat/pano-cockpit-faz1` ile `main` aynı uçta; yeni iş için yeni branch veya `main` üzerinden devam.
+**Yarın (plan):** **Bugün İlgilen** ve **Ekibim** içinde ek değişiklikler.
+
 ## 2026-06-05 — UI sadeleştirme sprint TAMAMLANDI (commit + push)
 
 **Branch:** `feat/pano-cockpit-faz1` · geri al: `ui-sadelestirme-oncesi` @ `68546e1`  
-**Yarın (plan):** Özellikle **Bugün İlgilen** ve **Ekibim** içinde ek değişiklikler istenecek — bu commit temel layout/nav; hub ve ekip detayları sonraki oturumda.
+**Not:** Aşağıdaki özellikler artık `main`’de.
 
 ### Pano (launcher kokpit)
 - Pano = selamlama + Welcome + **6’lı launcher grid** (modüller panodan çıktı → Bugün İlgilen hub’a taşındı).
