@@ -114,7 +114,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
         }),
       })
       onClose()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
       toast.error('Fotoğraf kaydedilirken hata oluştu.')
     } finally {

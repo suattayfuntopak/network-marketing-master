@@ -83,8 +83,8 @@ export function AddTrainingModal({ open, onClose, onAdd }: Props) {
           onClose()
           setShowSympathetic(true)
         }
-      } catch (err: any) {
-        toast.error(err.message || 'Hata oluştu.')
+      } catch (err: unknown) {
+        toast.error((err instanceof Error ? err.message : '') || 'Hata oluştu.')
       }
     })
   }

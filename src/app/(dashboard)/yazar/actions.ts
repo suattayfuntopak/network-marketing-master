@@ -47,8 +47,8 @@ export async function generateMessageAction(
     })
 
     return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
-  } catch (err: any) {
-    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
+  } catch (err: unknown) {
+    return { error: 'Mesaj oluşturulamadı: ' + ((err instanceof Error ? err.message : String(err))) }
   }
 }
 
@@ -171,11 +171,11 @@ JSON yapısı şu şekilde olmalıdır:
       yzk_improvements: parsed.yzk_improvements,
       remaining: quota.isSuperAdmin ? undefined : quota.remaining
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('YZK Simülasyon Hatası:', err)
     return {
       error: serverError('simulationFailed', l, {
-        detail: err?.message || String(err),
+        detail: (err instanceof Error ? err.message : String(err)),
       }),
     }
   }
@@ -247,7 +247,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
     })
 
     return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Yapay Zeka Koçu Hatası:', err)
     return { error: 'Yanıt oluşturulurken bir hata oluştu.' }
   }

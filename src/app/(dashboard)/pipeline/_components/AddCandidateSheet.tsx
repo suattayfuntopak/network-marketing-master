@@ -120,7 +120,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
 
       formRef.current?.reset()
       onClose()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
       toast.error('Fotoğraf yüklenirken veya aday eklenirken hata oluştu.')
     } finally {

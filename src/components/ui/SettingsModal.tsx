@@ -82,9 +82,9 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       toast.success('Grup adı başarıyla güncellendi')
       onClose()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      toast.error(err.message || 'Güncellenirken bir hata oluştu.')
+      toast.error((err instanceof Error ? err.message : '') || 'Güncellenirken bir hata oluştu.')
     } finally {
       setLoading(false)
     }

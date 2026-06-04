@@ -67,9 +67,9 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
           setMessage(res.message)
           refetchUsage()
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (active) {
-          setError(t('team.guidanceError', { message: err.message }))
+          setError(t('team.guidanceError', { message: err instanceof Error ? err.message : String(err) }))
         }
       } finally {
         if (active) setLoading(false)

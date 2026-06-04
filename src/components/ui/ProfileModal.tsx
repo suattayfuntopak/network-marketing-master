@@ -130,7 +130,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['team'] })
       toast.success('Profil fotoğrafı güncellendi!')
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
       // Bucket might not exist yet — store as base64 in metadata as fallback
       toast.error('Fotoğraf yüklenemedi. Supabase Storage "nmm-avatars" bucket\'ı için upload policy gerekiyor.')
@@ -180,9 +180,9 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       toast.success('Profil güncellendi')
       onClose()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err)
-      toast.error(err.message || 'Güncellenirken bir hata oluştu.')
+      toast.error((err instanceof Error ? err.message : '') || 'Güncellenirken bir hata oluştu.')
     } finally {
       setLoading(false)
     }

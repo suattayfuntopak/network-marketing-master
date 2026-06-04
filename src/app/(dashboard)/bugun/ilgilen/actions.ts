@@ -32,7 +32,7 @@ export async function generateQuickMessageAction(input: {
     })
 
     return { message }
-  } catch (err: any) {
-    return { error: 'Mesaj oluşturulamadı: ' + (err?.message || String(err)) }
+  } catch (err: unknown) {
+    return { error: 'Mesaj oluşturulamadı: ' + ((err instanceof Error ? err.message : String(err))) }
   }
 }

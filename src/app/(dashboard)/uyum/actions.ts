@@ -146,10 +146,10 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       improved_text: parsed.improved_text,
       remaining: quota.isSuperAdmin ? undefined : quota.remaining
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Uyum Denetimi Hatası:', err)
     return {
-      error: serverError('auditFailed', l, { detail: err?.message || String(err) }),
+      error: serverError('auditFailed', l, { detail: (err instanceof Error ? err.message : String(err)) }),
     }
   }
 }
