@@ -15,7 +15,7 @@ export type TopicOption = {
   kind: 'content' | 'objection'
 }
 
-/** İçerik (training) + itiraz başlıklarını tek listede toplar (id → /egitim veya /itirazlar). */
+/** İçerik (training) + itiraz başlıklarını tek listede toplar (deep link → Akademi sekmeleri). */
 export function getRelatedTopicOptions(lang: 'tr' | 'en'): TopicOption[] {
   const out: TopicOption[] = []
   for (const cat of getTrainingData(lang)) {

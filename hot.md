@@ -1,5 +1,37 @@
 # Hot Log
 
+## 2026-06-05 — UI sadeleştirme sprint TAMAMLANDI (commit + push)
+
+**Branch:** `feat/pano-cockpit-faz1` · geri al: `ui-sadelestirme-oncesi` @ `68546e1`  
+**Yarın (plan):** Özellikle **Bugün İlgilen** ve **Ekibim** içinde ek değişiklikler istenecek — bu commit temel layout/nav; hub ve ekip detayları sonraki oturumda.
+
+### Pano (launcher kokpit)
+- Pano = selamlama + Welcome + **6’lı launcher grid** (modüller panodan çıktı → Bugün İlgilen hub’a taşındı).
+- Masaüstü: 3×2 grid, `max-w-5xl` ortalı blok, selamlama `text-center`; mobil: 2×3, sola hizalı (değişmedi).
+- Kutu boyutu: orta (`prominent` — `md:p-7`, ikon ~38px); tam ekran dev kutular yok.
+
+### Nav
+- Sidebar: Pano + 6 modül + İstatistikler + (super admin) Platform Yönetimi.
+- Mobil: 4 sekme + **Diğer** (`NavMoreSheet`); Ekip lisans kilidi → `/odeme`.
+
+### Modül birleştirme
+- **YZ Koçu** (`/yazar`): 4 sekme — Yazar | Koçluk | Saha Provası | Uyum; `/saha-provasi`, `/uyum` → redirect.
+- **Vaktin Varsa** (`/egitim`): 3 sekme — İçerik Bankası | Video Eğitimler | İtirazlara Cevaplar; `/itirazlar`, `/egitim/videolar` redirect; üst video butonu kaldırıldı.
+- **Bugün İlgilen:** `BugunHubSections` (hedef, haftalık lite, öncelikler, KPI, ritüel, davet, ekip uyarısı, video strip).
+
+### Teknik / deploy notları
+- `TrainingCard` iç içe `<button>` hydration fix; `DashboardShell` sidebar `localStorage` sadece `useEffect`.
+- `next.config` redirect’ler; moderation e-posta linkleri `egitim?tab=objections`.
+- `e2e/dashboard-mobile.spec.ts` + Playwright mobil proje.
+- Ritüel/günlük: `DayCloseCard`, `TodayRitualSection`, `DayJournalCard`, `dayRitual.ts` (localStorage).
+
+### Dosya özeti
+`PanoLauncherGrid`, `PanoContent`, `navigation.ts`, `BugunHubSections`, `AkademiContent`, `YzKocuContainer`, `UyumContent`, `NavMoreSheet`, `SquareButton`, çeviri `nav.vaktinVarsa` / coach / training sekmeleri.
+
+## 2026-06-04 — UI sadeleştirme sprint (ara kayıt — üstteki 2026-06-05 ile birleştirildi)
+
+**Not:** Aşağıdaki madde eski WIP özeti; güncel durum = üst bölüm.
+
 ## 2026-06-04 — Pano Faz 1a (kokpit sadeleştirme)
 
 - **Güvenlik:** Tag `ui-sadelestirme-oncesi` @ `68546e1`; branch `feat/pano-cockpit-faz1` (push edildi).

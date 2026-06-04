@@ -16,12 +16,11 @@ export function setNavDir(dir: 'forward' | 'back') {
 const SIDEBAR_KEY = 'nmm_sidebar_collapsed'
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem(SIDEBAR_KEY) === 'true'
-    }
-    return false
-  })
+  const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    setCollapsed(localStorage.getItem(SIDEBAR_KEY) === 'true')
+  }, [])
   const [pendingHref, setPendingHref] = useState<string | null>(null)
   const [visible, setVisible] = useState(true)
   const scrollTimeout = useRef<NodeJS.Timeout | null>(null)

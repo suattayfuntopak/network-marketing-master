@@ -393,8 +393,10 @@ export async function sendModerationApprovedEmail(
     ? `Approved! Your content addition is live 🚀`
     : `Tebrikler! İçerik ekleme talebiniz onaylandı 🚀`
 
-  const targetPath = contentType === 'training' ? 'egitim' : 'itirazlar'
-  const directLink = `${NMM_APP_URL}/${targetPath}?id=${itemKey}`
+  const directLink =
+    contentType === 'training'
+      ? `${NMM_APP_URL}/egitim?id=${itemKey}`
+      : `${NMM_APP_URL}/egitim?tab=objections&id=${itemKey}`
 
   const content = lang === 'en'
     ? [

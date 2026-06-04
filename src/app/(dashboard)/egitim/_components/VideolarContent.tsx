@@ -18,7 +18,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 const PAGE_SIZE = 9
 
-export function VideolarContent() {
+export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
@@ -63,8 +63,9 @@ export function VideolarContent() {
   if (!ws?.workspaceId) return null
 
   return (
-    <div className="space-y-6 px-4 py-6 sm:px-6">
+    <div className={embedded ? 'space-y-6' : 'space-y-6 px-4 py-6 sm:px-6'}>
       <header className="space-y-2">
+        {!embedded && (
         <Link
           href="/egitim"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-readable hover:underline"
@@ -72,11 +73,17 @@ export function VideolarContent() {
           <ArrowLeft className="h-4 w-4 text-brand-readable" />
           {t('videoTraining.backToTraining')}
         </Link>
+        )}
         <div className="flex items-center justify-between gap-3">
+          {!embedded && (
           <h1 className="flex items-center gap-2 text-xl font-bold text-[var(--text-1)]">
             <Film className="h-5 w-5 text-brand-readable" />
             {t('videoTraining.pageTitle')}
           </h1>
+          )}
+          {embedded && (
+            <p className="text-sm text-[var(--text-2)]">{t('videoTraining.pageSubtitle')}</p>
+          )}
           {isAdmin && (
             <button
               type="button"
@@ -89,7 +96,9 @@ export function VideolarContent() {
             </button>
           )}
         </div>
+        {!embedded && (
         <p className="text-base text-[var(--text-3)]">{t('videoTraining.pageSubtitle')}</p>
+        )}
         {data && data.summary.startedIncomplete > 0 && (
           <p className="text-sm text-amber-700 dark:text-amber-300">
             {t('videoTraining.dropoffHint', { count: data.summary.startedIncomplete })}

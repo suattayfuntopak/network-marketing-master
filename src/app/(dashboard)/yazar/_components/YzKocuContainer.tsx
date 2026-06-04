@@ -1,10 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { MessageSquare, HelpCircle } from 'lucide-react'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { MessageSquare, HelpCircle, Target, Shield } from 'lucide-react'
+import { clsx } from 'clsx'
 import { YazarForm } from './YazarForm'
 import { KoclukForm } from './KoclukForm'
+import { ProvaForm } from './ProvaForm'
+import { UyumContent } from '@/app/(dashboard)/uyum/_components/UyumContent'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { parseYazarTab, type YazarTab } from '@/lib/domain/yazarTab'
 
 interface YzKocuContainerProps {
   initialName: string
@@ -12,46 +16,64 @@ interface YzKocuContainerProps {
   initialWarmth: string
 }
 
+const TABS: readonly { key: YazarTab; icon: typeof MessageSquare; labelKey: string; activeClass: string }[] = [
+  { key: 'yazar', icon: MessageSquare, labelKey: 'coachUi.tabMessage', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
+  { key: 'kocluk', icon: HelpCircle, labelKey: 'coachUi.tabCoaching', activeClass: 'bg-[#3730A3] text-white shadow-md' },
+  { key: 'prova', icon: Target, labelKey: 'coachUi.tabProva', activeClass: 'bg-amber-600 text-white shadow-md' },
+  { key: 'uyum', icon: Shield, labelKey: 'coachUi.tabCompliance', activeClass: 'bg-[#C03E1F] text-white shadow-md' },
+]
+
 export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzKocuContainerProps) {
-  const [activeTab, setActiveTab] = useState<'yazar' | 'kocluk'>('yazar')
   const { t } = useTranslation()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const activeTab = parseYazarTab(searchParams.get('tab'))
+
+  function selectTab(tab: YazarTab) {
+    const params = new URLSearchParams()
+    if (tab !== 'yazar') params.set('tab', tab)
+    const name = searchParams.get('name')
+    const note = searchParams.get('note')
+    const warmth = searchParams.get('warmth')
+    if (name) params.set('name', name)
+    if (note) params.set('note', note)
+    if (warmth) params.set('warmth', warmth)
+    const qs = params.toString()
+    router.replace(qs ? `/yazar?${qs}` : '/yazar', { scroll: false })
+  }
 
   return (
     <div className="space-y-6">
-      {/* Premium Segmented Tab Selector */}
-      <div className="flex rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm max-w-md mx-auto w-full">
-        <button
-          onClick={() => setActiveTab('yazar')}
-          className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-3 text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
-            activeTab === 'yazar'
-              ? 'bg-[#0F6E56] text-white shadow-md'
-              : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-          }`}
-        >
-          <MessageSquare className="h-3.5 w-3.5 shrink-0" />
-          <span>{t('coachUi.tabMessage')}</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('kocluk')}
-          className={`flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-3 text-xs sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] ${
-            activeTab === 'kocluk'
-              ? 'bg-[#3730A3] text-white shadow-md'
-              : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
-          }`}
-        >
-          <HelpCircle className="h-3.5 w-3.5 shrink-0" />
-          <span>{t('coachUi.tabCoaching')}</span>
-        </button>
+      <div
+        className="flex max-w-2xl mx-auto w-full overflow-x-auto rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm scrollbar-none"
+        role="tablist"
+        aria-label={t('coachUi.pageTitle')}
+      >
+        {TABS.map(({ key, icon: Icon, labelKey, activeClass }) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === key}
+            onClick={() => selectTab(key)}
+            className={clsx(
+              'flex min-w-[4.5rem] flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-2.5 px-2 text-[11px] sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] shrink-0',
+              activeTab === key ? activeClass : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
+            )}
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{t(labelKey)}</span>
+          </button>
+        ))}
       </div>
 
-      {/* Render Active Component */}
       <div className="animate-in fade-in duration-300">
         {activeTab === 'yazar' && (
           <YazarForm initialName={initialName} initialNote={initialNote} initialWarmth={initialWarmth} />
         )}
-        {activeTab === 'kocluk' && (
-          <KoclukForm />
-        )}
+        {activeTab === 'kocluk' && <KoclukForm />}
+        {activeTab === 'prova' && <ProvaForm />}
+        {activeTab === 'uyum' && <UyumContent embedded />}
       </div>
     </div>
   )

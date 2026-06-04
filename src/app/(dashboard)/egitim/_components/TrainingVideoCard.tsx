@@ -47,7 +47,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
 
   const relatedHref = hasRelated
     ? /^\d+$/.test(video.relatedTrainingId!)
-      ? `/itirazlar?id=${video.relatedTrainingId}`
+      ? `/egitim?tab=objections&id=${video.relatedTrainingId}`
       : `/egitim?id=${video.relatedTrainingId}`
     : '#'
 

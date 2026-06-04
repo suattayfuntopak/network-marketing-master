@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 
-type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow'
+export type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow'
 
 const colorMap: Record<ButtonColor, string> = {
   purple: 'bg-[#EEEDFE] text-[#534AB7] hover:bg-[#E3E1FD] dark:bg-[#2d2a5e] dark:text-[#a09be8] dark:hover:bg-[#383474]',
@@ -19,17 +19,20 @@ const colorMap: Record<ButtonColor, string> = {
   yellow: 'bg-[#FEF9C3] text-[#854D0E] hover:bg-[#FEF08A] dark:bg-[#453A0B] dark:text-[#FACC15] dark:hover:bg-[#5C4D0E]',
 }
 
-const sharedClass = (color: ButtonColor, compact?: boolean, className?: string) =>
+const sharedClass = (
+  color: ButtonColor,
+  opts?: { compact?: boolean; prominent?: boolean; className?: string },
+) =>
   clsx(
     'flex flex-col items-center justify-center',
-    compact ? 'gap-1.5' : 'gap-1.5 md:gap-2.5',
+    opts?.compact ? 'gap-1.5' : opts?.prominent ? 'gap-1.5 md:gap-3' : 'gap-1.5 md:gap-2.5',
     'rounded-[14px] transition-all duration-150',
     'active:scale-95 hover:scale-[1.03]',
     'border border-[var(--border)] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-2px_rgba(0,0,0,0.2)] hover:shadow-lg',
     'md:rounded-[12px]',
-    compact ? 'h-[76px] p-3' : 'aspect-square p-4 md:p-6',
+    opts?.compact ? 'h-[76px] p-3' : opts?.prominent ? 'aspect-square p-4 md:p-7' : 'aspect-square p-4 md:p-6',
     colorMap[color],
-    className
+    opts?.className,
   )
 
 interface SquareButtonProps {
@@ -41,6 +44,8 @@ interface SquareButtonProps {
   onClick?: () => void
   disabled?: boolean
   compact?: boolean
+  /** Pano launcher — larger tiles on md+ */
+  prominent?: boolean
   className?: string
 }
 
@@ -55,6 +60,7 @@ export function SquareButton({
   onClick,
   disabled = false,
   compact = false,
+  prominent = false,
   className,
 }: SquareButtonProps) {
   const [isMobile, setIsMobile] = useState(true)
@@ -66,16 +72,36 @@ export function SquareButton({
   }, [])
 
   const activeColor = (desktopColor && !isMobile) ? desktopColor : color
+  const styleOpts = { compact, prominent, className }
   const content = (
     <>
-      <Icon className={compact ? 'h-5 w-5 shrink-0' : 'h-6 w-6 shrink-0 md:h-9 md:w-9'} strokeWidth={1.75} />
-      <span className={compact ? 'text-center text-xs font-semibold leading-tight' : 'text-center text-xs font-semibold leading-tight md:text-sm'}>{label}</span>
+      <Icon
+        className={
+          compact
+            ? 'h-5 w-5 shrink-0'
+            : prominent
+              ? 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
+              : 'h-6 w-6 shrink-0 md:h-9 md:w-9'
+        }
+        strokeWidth={1.75}
+      />
+      <span
+        className={
+          compact
+            ? 'text-center text-xs font-semibold leading-tight'
+            : prominent
+              ? 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
+              : 'text-center text-xs font-semibold leading-tight md:text-sm'
+        }
+      >
+        {label}
+      </span>
     </>
   )
 
   if (href) {
     return (
-      <Link href={href} prefetch className={sharedClass(activeColor, compact, className)}>
+      <Link href={href} prefetch className={sharedClass(activeColor, styleOpts)}>
         {content}
       </Link>
     )
@@ -85,7 +111,7 @@ export function SquareButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx(sharedClass(activeColor, compact, className), 'disabled:pointer-events-none disabled:opacity-40')}
+      className={clsx(sharedClass(activeColor, styleOpts), 'disabled:pointer-events-none disabled:opacity-40')}
     >
       {content}
     </button>

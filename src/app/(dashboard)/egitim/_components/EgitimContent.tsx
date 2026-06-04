@@ -15,7 +15,7 @@ import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
 import { AddTrainingModal } from './AddTrainingModal'
 
-export function EgitimContent() {
+export function EgitimContent({ embedded = false }: { embedded?: boolean }) {
   const { lang, t } = useTranslation()
   const searchParams = useSearchParams()
   const { data: ws } = useWorkspace()
@@ -160,62 +160,77 @@ export function EgitimContent() {
     } catch {}
   }
 
-  return (
-    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <header className="mb-6">
-        <div className="flex items-center justify-between gap-3 mb-1">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
-              <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+  const body = (
+    <>
+      {!embedded && (
+        <header className="mb-6">
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
+                <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                href="/egitim/videolar"
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-[#534AB7]/10 hover:border-[#534AB7]/40 dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7]"
+              >
+                <Film className="h-3.5 w-3.5 text-brand-readable" />
+                <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
+              </Link>
+              <button
+                onClick={() => setFormOpen(true)}
+                className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>{t('trainingPage.addContent')}</span>
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/egitim/videolar"
-              className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-[#534AB7]/10 hover:border-[#534AB7]/40 dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7]"
-            >
-              <Film className="h-3.5 w-3.5 text-brand-readable" />
-              <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
-            </Link>
-            <button
-              onClick={() => setFormOpen(true)}
-              className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>{t('trainingPage.addContent')}</span>
-            </button>
-          </div>
-        </div>
 
-        <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
-          <span className="text-3xl">📖</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold leading-relaxed text-[#3730A3] dark:text-[#a5b4fc]">
-              {t('training.subtitle')}
-            </p>
+          <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
+            <span className="text-3xl">📖</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold leading-relaxed text-[#3730A3] dark:text-[#a5b4fc]">
+                {t('training.subtitle')}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              {favCount > 0 ? (
+                <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
+                  {favCount} {t('trainingPage.fav')}
+                </span>
+              ) : (
+                <span className="rounded-full bg-[#3730A3]/10 px-2 py-0.5 text-[10px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
+                  {t('training.topicsCount', { count: allTopicsMerged.length })}
+                </span>
+              )}
+              {readCount > 0 && (
+                <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white dark:bg-emerald-500">
+                  <CheckCircle2 className="h-2.5 w-2.5" />
+                  {readCount}/{allTopicsMerged.length}
+                </span>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            {favCount > 0 ? (
-              <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
-                {favCount} {t('trainingPage.fav')}
-              </span>
-            ) : (
-              <span className="rounded-full bg-[#3730A3]/10 px-2 py-0.5 text-[10px] font-bold text-[#3730A3] dark:text-[#a5b4fc]">
-                {t('training.topicsCount', { count: allTopicsMerged.length })}
-              </span>
-            )}
-            {readCount > 0 && (
-              <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white dark:bg-emerald-500">
-                <CheckCircle2 className="h-2.5 w-2.5" />
-                {readCount}/{allTopicsMerged.length}
-              </span>
-            )}
-          </div>
+        </header>
+      )}
+
+      {embedded && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-[var(--text-2)]">{t('training.subtitle')}</p>
+          <button
+            onClick={() => setFormOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#28227d] active:scale-95"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            <span>{t('trainingPage.addContent')}</span>
+          </button>
         </div>
-      </header>
+      )}
 
       <div className="mb-4 relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-3)] pointer-events-none" />
@@ -342,6 +357,14 @@ export function EgitimContent() {
         onClose={() => setFormOpen(false)}
         onAdd={handleAddTraining}
       />
+    </>
+  )
+
+  if (embedded) return <div>{body}</div>
+
+  return (
+    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+      {body}
     </main>
   )
 }

@@ -1,5 +1,5 @@
-import { VideolarContent } from '../_components/VideolarContent'
+import { redirect } from 'next/navigation'
 
 export default function VideolarPage() {
-  return <VideolarContent />
+  redirect('/egitim?tab=videos')
 }

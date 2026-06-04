@@ -233,7 +233,7 @@ function SearchPageContent() {
                 return (
                   <Link
                     key={objection.id}
-                    href={`/itirazlar?id=${objection.id}`}
+                    href={`/egitim?tab=objections&id=${objection.id}`}
                     className="group flex flex-col gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-[#9B1D47]/30 hover:shadow-md"
                   >
                     <div className="flex items-start justify-between gap-3">

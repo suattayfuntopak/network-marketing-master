@@ -8,6 +8,8 @@ export const coachSection = {
       // YzKocuContainer.tsx
       tabMessage: 'YZ Mesajı',
       tabCoaching: 'Koçluk Al',
+      tabProva: 'Saha Provası',
+      tabCompliance: 'Uyum Denetimi',
 
       // KoclukForm.tsx
       answerCopied: 'Cevap kopyalandı!',
@@ -91,6 +93,8 @@ export const coachSection = {
       // YzKocuContainer.tsx
       tabMessage: 'AI Message',
       tabCoaching: 'Get Coaching',
+      tabProva: 'Field Rehearsal',
+      tabCompliance: 'Compliance Check',
 
       // KoclukForm.tsx
       answerCopied: 'Answer copied!',

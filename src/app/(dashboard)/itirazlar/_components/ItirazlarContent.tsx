@@ -13,7 +13,7 @@ import type { CustomItiraz } from '../types'
 import { ItirazCard } from './ItirazCard'
 import { AddObjectionModal } from './AddObjectionModal'
 
-export function ItirazlarContent() {
+export function ItirazlarContent({ embedded = false }: { embedded?: boolean }) {
   const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const searchParams = useSearchParams()
@@ -125,52 +125,67 @@ export function ItirazlarContent() {
 
   const customIds = useMemo(() => new Set(customItirazlar.map(c => c.id)), [customItirazlar])
 
-  return (
-    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <header className="mb-6">
-        <div className="flex items-center justify-between gap-3 mb-1">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1F3] dark:bg-[#3d0a1a]">
-              <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
+  const body = (
+    <>
+      {!embedded && (
+        <header className="mb-6">
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1F3] dark:bg-[#3d0a1a]">
+                <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
+            <button
+              onClick={() => setFormOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>{t('objectionsPage.addObjection')}</span>
+            </button>
+          </div>
+          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
+            <span className="text-3xl">🛡️</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold leading-relaxed text-[#9B1D47] dark:text-[#fda4af]">
+                {t('objectionsPage.subtitle')}
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              {favCount > 0 ? (
+                <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
+                  {favCount} {t('objectionsPage.fav')}
+                </span>
+              ) : (
+                <span className="rounded-full bg-[#9B1D47]/10 px-2.5 py-1 text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af]">
+                  {tumItirazlar.length} {t('objectionsPage.objections')}
+                </span>
+              )}
+              {readCount > 0 && (
+                <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white dark:bg-emerald-500">
+                  <CheckCircle2 className="h-3 w-3" />
+                  {readCount}/{tumItirazlar.length}
+                </span>
+              )}
             </div>
           </div>
+        </header>
+      )}
+
+      {embedded && (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm text-[var(--text-2)]">{t('objectionsPage.subtitle')}</p>
           <button
             onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#801438] active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{t('objectionsPage.addObjection')}</span>
           </button>
         </div>
-        <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
-          <span className="text-3xl">🛡️</span>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold leading-relaxed text-[#9B1D47] dark:text-[#fda4af]">
-              {t('objectionsPage.subtitle')}
-            </p>
-          </div>
-          <div className="flex flex-col items-end gap-1 shrink-0">
-            {favCount > 0 ? (
-              <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
-                {favCount} {t('objectionsPage.fav')}
-              </span>
-            ) : (
-              <span className="rounded-full bg-[#9B1D47]/10 px-2.5 py-1 text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af]">
-                {tumItirazlar.length} {t('objectionsPage.objections')}
-              </span>
-            )}
-            {readCount > 0 && (
-              <span className="flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-[10px] font-bold text-white dark:bg-emerald-500">
-                <CheckCircle2 className="h-3 w-3" />
-                {readCount}/{tumItirazlar.length}
-              </span>
-            )}
-          </div>
-        </div>
-      </header>
+      )}
 
       <div className="mb-4 relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-3)] pointer-events-none" />
@@ -294,6 +309,14 @@ export function ItirazlarContent() {
         onClose={() => setFormOpen(false)}
         onAdd={handleAddObjection}
       />
+    </>
+  )
+
+  if (embedded) return <div>{body}</div>
+
+  return (
+    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+      {body}
     </main>
   )
 }
