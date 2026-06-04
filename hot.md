@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-05 — Mobil alt bar: kayar şerit geri
+
+- **BottomNav:** `overflow-x-auto` + sabit genişlikli sekmeler; tüm sidebar modülleri tek şeritte (Pano + 6 modül + İstatistikler; süper admin + Yönetim).
+- **Kaldırıldı:** 4 sekme + **Diğer** (`NavMoreSheet`) — sheet mobil barda artık yok (`NavMoreSheet.tsx` dosyası duruyor, kullanılmıyor).
+- Ekip kilidi → `/odeme`; aktif sekme `scrollIntoView` korundu.
+- **Dosya:** `BottomNav.tsx` · deploy: `main` push sonrası Vercel Production.
+
 ## 2026-06-05 — `feat/pano-cockpit-faz1` → `main` (canlı deploy)
 
 **`main` @ `ac84ca0`** — fast-forward merge + `git push origin main`. Vercel Production birkaç dakika içinde güncellenir; görmüyorsan hard refresh / gizli pencere.
@@ -18,7 +25,7 @@
 
 ### Nav
 - Sidebar: Pano + 6 modül + İstatistikler + (super admin) Platform Yönetimi.
-- Mobil: 4 sekme + **Diğer** (`NavMoreSheet`); Ekip lisans kilidi → `/odeme`.
+- Mobil: kayar şerit (sidebar modülleri); Ekip lisans kilidi → `/odeme`. *(Diğer sheet kaldırıldı — üst hot bölümü.)*
 
 ### Modül birleştirme
 - **YZ Koçu** (`/yazar`): 4 sekme — Yazar | Koçluk | Saha Provası | Uyum; `/saha-provasi`, `/uyum` → redirect.
