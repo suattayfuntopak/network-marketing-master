@@ -24,6 +24,8 @@ interface Props {
   teamStatsLocked: boolean
   getMemberHref: (row: { user_id: string; full_name: string | null; isAppUser?: boolean }) => string | null
   onOpenActivity?: (member: { userId: string; fullName: string | null; pipelineHref: string | null }) => void
+  /** Hub haftalık/aylık sayfalarında sıralama + grafik varsayılan açık */
+  defaultRankingOpen?: boolean
 }
 
 function medalForRank(rank: number): string | null {
@@ -40,12 +42,12 @@ export function TeamActivitySummary({
   teamStatsLocked,
   getMemberHref,
   onOpenActivity,
+  defaultRankingOpen = false,
 }: Props) {
   const { t } = useTranslation()
   const router = useRouter()
   const [chartMode, setChartMode] = useState<ChartMode>('call')
-  // Sıralama alt-tablosu varsayılan KAPALI — chevron ile açılır (görsel tekrarı azaltır).
-  const [showRanking, setShowRanking] = useState(false)
+  const [showRanking, setShowRanking] = useState(defaultRankingOpen)
   // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
 

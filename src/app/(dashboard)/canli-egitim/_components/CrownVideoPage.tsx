@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { ChevronRight, Film, Video } from 'lucide-react'
+import { ChevronRight, Film, PlayCircle, Video } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -14,7 +14,7 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 export function CrownVideoPage() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
   const { data, isLoading, isFetching } = useQuery({
@@ -26,6 +26,10 @@ export function CrownVideoPage() {
 
   const members = data?.members ?? []
   const videoTotal = data?.videoTotal ?? 0
+  const leaderPct = data?.leaderSummary?.pct ?? 0
+  const teamAvg = data?.teamAvgPct ?? 0
+
+  const videoTitle = (tr: string, en: string) => (lang === 'en' ? en : tr)
 
   return (
     <HubPageShell
@@ -36,6 +40,63 @@ export function CrownVideoPage() {
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'video'] })}
       refreshing={isFetching}
     >
+      <div className="grid gap-3 sm:grid-cols-3">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
+            {t('crown.videoYourProgress')}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-teal-700 dark:text-teal-400">%{leaderPct}</p>
+        </div>
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
+            {t('crown.videoTeamAvg')}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-brand">%{teamAvg}</p>
+        </div>
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
+            {t('crown.videoCatalogCount')}
+          </p>
+          <p className="mt-1 text-2xl font-black tabular-nums text-[var(--text-1)]">{videoTotal}</p>
+        </div>
+      </div>
+
+      {(data?.lastWatched || data?.nextVideo) && (
+        <HubSectionCard title={t('crown.videoContinueTitle')}>
+          <div className="space-y-3">
+            {data?.lastWatched ? (
+              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
+                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
+                  {t('crown.videoLastWatched')}
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-[var(--text-1)]">
+                  {videoTitle(data.lastWatched.titleTr, data.lastWatched.titleEn)}
+                </p>
+              </div>
+            ) : null}
+            {data?.nextVideo ? (
+              <Link
+                href="/egitim/videolar"
+                className="flex items-center gap-3 rounded-xl border border-teal-500/25 bg-teal-50/50 px-3 py-2.5 transition hover:bg-teal-50 dark:bg-teal-950/20"
+              >
+                <PlayCircle className="h-5 w-5 shrink-0 text-teal-700 dark:text-teal-400" />
+                <div className="min-w-0">
+                  <p className="text-[10px] font-bold uppercase tracking-wide text-teal-800/70 dark:text-teal-300/70">
+                    {t('crown.videoUpNext')}
+                  </p>
+                  <p className="truncate text-sm font-semibold text-[var(--text-1)]">
+                    {videoTitle(data.nextVideo.titleTr, data.nextVideo.titleEn)}
+                  </p>
+                </div>
+                <ChevronRight className="ml-auto h-4 w-4 text-[var(--text-3)]" />
+              </Link>
+            ) : (
+              <p className="text-sm text-emerald-600 dark:text-emerald-400">{t('crown.videoAllDone')}</p>
+            )}
+          </div>
+        </HubSectionCard>
+      )}
+
       <PanoVideoStrip />
 
       <HubSectionCard title={t('crown.videoTeamTitle')}>

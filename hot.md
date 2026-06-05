@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-05 — Bugün İlgilen hibrit raporu: 6 hub sayfası tamamlandı ✅
+
+- **Kapsam:** Crown analiz raporundaki tüm maddeler — sadelik korunarak NMM verisiyle hibrit UX.
+- **Bugünkü Takibim:** `HubGoalChipRow` (günlük hedef chip + saha serisi), `HubPriorityStrip` (öncelikli adaylar + WA/arama log → `nmm_daily_actions.candidate_id`).
+- **Ekibim:** 4’lü KPI (`HubKpiRow`), 14g+ sessiz badge, yolunda/geride, inline WA.
+- **Haftalık Özet:** `HubWeeklySelfBar` (hedef vs gerçek + eylem önerisi), sıralama/grafik varsayılan açık.
+- **Aylık Özet:** `HubMonthProgress` (ay içi ilerleme + trend), giriş kartlarında ≥7g risk uyarısı.
+- **İlk 30 Gün:** kalan gün pill, risk rengi, eksik adım kırılımı, WA ping.
+- **Canlı Eğitim:** son izlenen + sıradaki video + ekip ortalaması KPI’ları.
+- **Actions:** `getHubWeeklySelfAction`, `getHubMonthlyInsightsAction`, `logHubContactAction`; team/video/first30 payload genişletildi.
+- **Dosyalar:** `lib/ui/hub/Hub*.tsx`, `crown/actions.ts`, 6 hub sayfası, `TeamActivitySummary`, `crown.ts`, `bugun/ilgilen/page.tsx`.
+
 ## 2026-06-05 — Launcher kutuları pano ile birebir eşitlendi ✅
 
 - **Sorun:** Bugün İlgilen 6’lı grid panodan daha geniş/küçük görünüyordu (tam dashboard genişliği + `aspect-square` link üzerinde).

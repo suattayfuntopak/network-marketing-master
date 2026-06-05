@@ -4,17 +4,20 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ChevronRight, Users } from 'lucide-react'
+import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
 import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
+import { HubKpiRow } from '@/lib/ui/hub/HubKpiRow'
 import { getCrownTeamPageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { clsx } from 'clsx'
+import { waHref } from '@/lib/utils/waLink'
 
 function formatDate(iso: string | null | undefined, lang: string): string {
   if (!iso) return '—'
@@ -23,6 +26,22 @@ function formatDate(iso: string | null | undefined, lang: string): string {
   } catch {
     return iso.slice(0, 10)
   }
+}
+
+function daysSince(iso: string | null | undefined): number {
+  if (!iso) return Infinity
+  return (Date.now() - new Date(iso).getTime()) / 86_400_000
+}
+
+function memberTrackStatus(
+  lastActivity: string | null | undefined,
+  videoPct: number,
+): 'onTrack' | 'behind' | 'neutral' {
+  const days = daysSince(lastActivity)
+  if (days < 7) return 'onTrack'
+  if (days >= 14) return 'behind'
+  if (videoPct >= 30) return 'neutral'
+  return 'behind'
 }
 
 export function CrownEkibimPage() {
@@ -39,14 +58,37 @@ export function CrownEkibimPage() {
   })
 
   const rows = data?.rows ?? []
-  const activeCount = useMemo(() => {
-    const now = Date.now()
-    return rows.filter(m => {
-      if (!m.last_activity_at) return false
-      const days = (now - new Date(m.last_activity_at).getTime()) / 86_400_000
-      return days < 7
-    }).length
-  }, [rows])
+  const stats = data?.stats
+
+  const kpiItems = useMemo(
+    () => [
+      {
+        label: t('crown.teamMembers'),
+        value: data?.totalTeam ?? 0,
+        valueClass: 'text-brand',
+        borderClass: 'border-t-4 border-brand/25',
+      },
+      {
+        label: t('crown.activePeople'),
+        value: stats?.activeCount ?? 0,
+        valueClass: 'text-emerald-600 dark:text-emerald-400',
+        borderClass: 'border-t-4 border-emerald-500/25',
+      },
+      {
+        label: t('crown.totalCalls'),
+        value: stats?.weeklyCalls ?? 0,
+        valueClass: 'text-blue-600 dark:text-blue-400',
+        borderClass: 'border-t-4 border-blue-500/25',
+      },
+      {
+        label: t('crown.totalMembers'),
+        value: stats?.newMembersWeek ?? 0,
+        valueClass: 'text-violet-600 dark:text-violet-400',
+        borderClass: 'border-t-4 border-violet-500/25',
+      },
+    ],
+    [data?.totalTeam, stats, t],
+  )
 
   return (
     <HubPageShell
@@ -63,22 +105,7 @@ export function CrownEkibimPage() {
         </FeatureUpgradeGate>
       ) : (
         <>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-brand/25 bg-[var(--bg-card)] px-3 py-4 text-center">
-              <p className="text-2xl font-black tabular-nums text-brand">{data?.totalTeam ?? 0}</p>
-              <p className="mt-1 text-xs font-semibold text-[var(--text-3)]">{t('crown.totalTeam')}</p>
-            </div>
-            <div className="rounded-2xl border border-emerald-500/25 bg-[var(--bg-card)] px-3 py-4 text-center">
-              <p className="text-2xl font-black tabular-nums text-emerald-600 dark:text-emerald-400">{activeCount}</p>
-              <p className="mt-1 text-xs font-semibold text-[var(--text-3)]">{t('crown.activePeople')}</p>
-            </div>
-            <div className="col-span-2 rounded-2xl border border-violet-500/25 bg-[var(--bg-card)] px-3 py-4 text-center md:col-span-1">
-              <p className="text-2xl font-black tabular-nums text-violet-600 dark:text-violet-400">
-                {rows.reduce((s, m) => s + m.katildi_count, 0)}
-              </p>
-              <p className="mt-1 text-xs font-semibold text-[var(--text-3)]">{t('crown.totalMembers')}</p>
-            </div>
-          </div>
+          <HubKpiRow items={kpiItems} />
 
           <HubSectionCard title={t('crown.teamRoster')}>
             {isLoading ? (
@@ -94,32 +121,56 @@ export function CrownEkibimPage() {
                 {rows.map(row => {
                   const videoPct = data?.videoMap[row.user_id]?.pct ?? 0
                   const goal = data?.goalsMap[row.user_id]
-                  const isInactive = !row.last_activity_at || (
-                    (Date.now() - new Date(row.last_activity_at).getTime()) / 86_400_000 >= 14
-                  )
+                  const inactiveDays = daysSince(row.last_activity_at)
+                  const isSilent = inactiveDays >= 14
+                  const track = memberTrackStatus(row.last_activity_at, videoPct)
+                  const wa = waHref(row.phone)
                   return (
                     <li
                       key={row.user_id}
                       className={clsx(
                         'rounded-xl border p-4',
-                        getTeamMemberCardClasses(row, isInactive),
+                        getTeamMemberCardClasses(row, isSilent),
                       )}
                     >
                       <div className="mb-3 flex items-start gap-3">
                         <PersonAvatar name={row.full_name ?? '?'} size="md" />
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap items-start justify-between gap-2">
                             <p className="font-semibold text-[var(--text-1)]">{row.full_name ?? '—'}</p>
-                            <span
-                              className={clsx(
-                                'shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
-                                row.isAppUser === false
-                                  ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
-                                  : 'bg-violet-100 text-violet-800 dark:bg-violet-950/50 dark:text-violet-300',
-                              )}
-                            >
-                              {row.isAppUser === false ? t('crown.customer') : t('crown.organization')}
-                            </span>
+                            <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+                              {isSilent ? (
+                                <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
+                                  {t('crown.silentBadge', { days: Math.floor(inactiveDays) })}
+                                </span>
+                              ) : null}
+                              <span
+                                className={clsx(
+                                  'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
+                                  track === 'onTrack'
+                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
+                                    : track === 'behind'
+                                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+                                )}
+                              >
+                                {track === 'onTrack'
+                                  ? t('crown.onTrack')
+                                  : track === 'behind'
+                                    ? t('crown.behind')
+                                    : t('crown.neutral')}
+                              </span>
+                              <span
+                                className={clsx(
+                                  'rounded-full px-2 py-0.5 text-[10px] font-bold uppercase',
+                                  row.isAppUser === false
+                                    ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
+                                    : 'bg-violet-100 text-violet-800 dark:bg-violet-950/50 dark:text-violet-300',
+                                )}
+                              >
+                                {row.isAppUser === false ? t('crown.customer') : t('crown.organization')}
+                              </span>
+                            </div>
                           </div>
                           {row.phone ? (
                             <p className="mt-0.5 text-xs text-[var(--text-3)]">{row.phone}</p>
@@ -128,6 +179,17 @@ export function CrownEkibimPage() {
                             {t('crown.registered', { date: formatDate(row.joined_at, lang) })}
                           </p>
                         </div>
+                        {wa ? (
+                          <a
+                            href={wa}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/5 text-[#128C7E] transition hover:bg-[#25D366]/10"
+                            title={t('crown.openWa')}
+                          >
+                            <WhatsAppIcon className="h-4 w-4" />
+                          </a>
+                        ) : null}
                       </div>
                       <div className="mb-2 flex items-center gap-2">
                         <span className="text-xs text-[var(--text-3)]">{t('crown.videoWatching')}</span>
