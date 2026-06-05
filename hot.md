@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Pano launcher: masaüstünde viewport doldurma ✅
+
+- **Sorun:** 6’lı launcher kutuları md+’da kare oranla ortada küçük kalıyor, üst/alt boşluk fazlaydı.
+- **Çözüm:** `LauncherGrid fillViewport` — `grid-rows-2` + `flex-1`, hücreler `md:h-full`; pano `min-h-[calc(100dvh-4rem)]` flex kolon.
+- **Dosyalar:** `LauncherGrid.tsx`, `PanoContent.tsx`, `PanoLauncherGrid.tsx`, `pano/page.tsx`.
+
 ## 2026-06-05 — Bugün İlgilen hibrit raporu: 6 hub sayfası tamamlandı ✅
 
 - **Kapsam:** Crown analiz raporundaki tüm maddeler — sadelik korunarak NMM verisiyle hibrit UX.

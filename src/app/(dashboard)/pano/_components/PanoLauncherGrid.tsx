@@ -15,12 +15,12 @@ export function PanoLauncherGrid() {
   const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
 
   return (
-    <LauncherGrid>
+    <LauncherGrid fillViewport>
       {PANO_LAUNCHER_ITEMS.map(({ href, translationKey, icon, color }) => {
         const isTeamLocked = href === '/ekip' && teamLocked
 
         return (
-          <LauncherGridItem key={href}>
+          <LauncherGridItem key={href} fillViewport>
             <SquareButton
               icon={icon}
               label={t(translationKey)}
