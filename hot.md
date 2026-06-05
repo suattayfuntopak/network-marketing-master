@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-05 — Bugün İlgilen sayfasına hub taşındı (pano sadeleştirildi) ✅
+
+- **Pano:** Sadece selamlama + WelcomeCard + 6’lı launcher; Crown mock ve `BugunHubSections` kaldırıldı.
+- **Bugün İlgilen (`/bugun/ilgilen`):** Üstte Crown mock grid (6 kutu + davet kodu), altında tüm hub modülleri (`BugunHubSections`), en altta günlük takip listesi (`IlgilenContent`).
+- **Navigasyon:** Bugün İlgilen artık toggle değil — doğrudan `/bugun/ilgilen` route.
+- **Dosyalar:** `page.tsx` (ilgilen), `CrownHomeMockGrid.tsx` (ilgilen’e taşındı), `PanoContent.tsx`, `PanoLauncherGrid.tsx`.
+
 ## 2026-06-05 — Pano: 6’lı launcher + Bugün İlgilen → Crown mock
 
 - **Üst grid:** NMM 6 modül (`PANO_LAUNCHER_ITEMS`) crown stil — tıklanınca ilgili sayfaya gider (Boru Hattı, Takvim, Ekibim, YZ Koçu, Vaktin Varsa).

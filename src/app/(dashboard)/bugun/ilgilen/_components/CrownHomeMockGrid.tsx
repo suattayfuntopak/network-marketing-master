@@ -6,7 +6,6 @@ import {
   CalendarRange,
   ClipboardList,
   Key,
-  Lock,
   Users,
   Video,
   type LucideIcon,

@@ -1,13 +1,10 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
-import { CrownHomeMockGrid } from './CrownHomeMockGrid'
-import { BugunHubSections } from '@/app/(dashboard)/bugun/ilgilen/_components/BugunHubSections'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
@@ -15,14 +12,6 @@ export function PanoContent() {
   const { t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
-  const [todayHubOpen, setTodayHubOpen] = useState(false)
-  const todayHubRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (todayHubOpen && todayHubRef.current) {
-      todayHubRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }
-  }, [todayHubOpen])
 
   const hour = new Date().getHours()
   const greeting = hour < 5
@@ -62,18 +51,7 @@ export function PanoContent() {
 
         {!cLoading && <WelcomeCard candidateCount={candidates.length} />}
 
-        <PanoLauncherGrid
-          todayHubOpen={todayHubOpen}
-          onTodayHubToggle={() => setTodayHubOpen(open => !open)}
-        />
-
-        {todayHubOpen && (
-          <div ref={todayHubRef} className="animate-in fade-in slide-in-from-top-2 duration-200">
-            <CrownHomeMockGrid />
-          </div>
-        )}
-
-        <BugunHubSections />
+        <PanoLauncherGrid />
       </div>
     </div>
   )
