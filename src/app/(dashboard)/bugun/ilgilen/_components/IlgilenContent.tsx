@@ -18,8 +18,6 @@ import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { BugunHubSections } from './BugunHubSections'
-
 function formatDaysAgo(days: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
   if (!isFinite(days)) return t('pagesUi.neverContacted')
   if (days < 1) return t('pagesUi.today')
@@ -74,7 +72,6 @@ export function IlgilenContent() {
   if (wsLoading || cLoading) {
     return (
       <div className="space-y-6">
-        <BugunHubSections showFieldWeek />
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
@@ -87,7 +84,6 @@ export function IlgilenContent() {
   if (daily.length === 0) {
     return (
       <div className="space-y-6">
-        <BugunHubSections showFieldWeek />
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-14 text-center">
           <p className="mb-2 text-3xl">🎉</p>
           <p className="text-base font-semibold text-[var(--text-1)]">
@@ -105,7 +101,6 @@ export function IlgilenContent() {
 
       return (
         <div className="space-y-6">
-          <BugunHubSections showFieldWeek />
           {/* Başlık + görünüm toggle */}
           <div className="flex items-center justify-between">
             <p className="text-base text-[var(--text-2)]">

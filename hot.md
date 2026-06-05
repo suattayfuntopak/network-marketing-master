@@ -1,6 +1,15 @@
 # Hot Log
 
-## 2026-06-05 — Pano Crown kutular + Bugün İlgilen hub sheet
+## 2026-06-05 — Pano: Crown Team mock grid + hub modülleri panoda
+
+- **CrownHomeMockGrid:** Crown Team ana sayfa düzeni (mock) — 6 kutu 2×3 mobil / **3×2 masaüstü**, crown stil, **eski marka accent renkleri**; altta davet kodu şeridi.
+- Mock butonlar toast “yakında”; **Ekibim** → `/ekip` (kilit → `/odeme`).
+- **BugunHubSections** pano kutularının altına taşındı; `/bugun/ilgilen` sadece günlük takip listesi.
+- **Kaldırıldı:** `PanoLauncherGrid`, `BugunModuleSheet` (alt sheet).
+- **i18n:** `dashboard.crownMock*` TR/EN.
+- **Dosyalar:** `CrownHomeMockGrid.tsx`, `PanoContent.tsx`, `IlgilenContent.tsx`, `SquareButton.tsx`, `tr.ts`, `en.ts`.
+
+## 2026-06-05 — Pano Crown kutular + Bugün İlgilen hub sheet (geri alındı)
 
 - **SquareButton `crown` variant:** Beyaz kart + üstte renkli accent çizgi (Crown Team estetiği); pano launcher’da kullanılıyor.
 - **PanoLauncherGrid:** 6 kutu `variant="crown"`; **Bugün İlgilen** doğrudan route yerine `BugunModuleSheet` açar.

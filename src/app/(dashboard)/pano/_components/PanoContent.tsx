@@ -4,7 +4,8 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
-import { PanoLauncherGrid } from './PanoLauncherGrid'
+import { CrownHomeMockGrid } from './CrownHomeMockGrid'
+import { BugunHubSections } from '@/app/(dashboard)/bugun/ilgilen/_components/BugunHubSections'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
@@ -50,7 +51,8 @@ export function PanoContent() {
         </header>
 
         {!cLoading && <WelcomeCard candidateCount={candidates.length} />}
-        <PanoLauncherGrid />
+        <CrownHomeMockGrid />
+        <BugunHubSections />
       </div>
     </div>
   )

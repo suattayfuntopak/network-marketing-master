@@ -39,17 +39,18 @@ const filledClass = (
 
 // ─── Crown variant: white card + colored top accent (Crown Team aesthetic) ───
 // Neutral background, 3px colored border-top, dark icon/text — set via borderTopColor style prop
+/** Crown üst çizgi — filled variant ile aynı marka renkleri */
 const crownAccentHex: Record<ButtonColor, string> = {
   purple: '#534AB7',
-  teal:   '#0B7A5C',
-  amber:  '#B45309',
-  pink:   '#BE185D',
+  teal:   '#0F6E56',
+  amber:  '#854F0B',
+  pink:   '#72243E',
   blue:   '#1A56DB',
-  coral:  '#DC2626',
-  rose:   '#E11D48',
-  indigo: '#4338CA',
+  coral:  '#C03E1F',
+  rose:   '#9B1D47',
+  indigo: '#3730A3',
   cyan:   '#0891B2',
-  yellow: '#D97706',
+  yellow: '#854D0E',
 }
 
 const crownClass = (opts?: { compact?: boolean; prominent?: boolean; className?: string }) =>
