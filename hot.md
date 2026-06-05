@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-05 — Crown deneme sayfaları (Bugün İlgilen kutuları) ✅
+
+- **Davet kodu kutusu** `CrownHomeMockGrid` içinden kaldırıldı.
+- **6 kutu → yeni route:** `/bugunku-takibim`, `/canli-egitim`, `/ekibim`, `/haftalik-ozet`, `/aylik-ozet`, `/ilk-30-gun` — mevcut NMM sayfalarına dokunulmadı.
+- **Crown UI:** `CrownPageShell` + `CrownCard` (açık arka plan, lacivert header, Geri → `/bugun/ilgilen`).
+- **Veri:** `crown/actions.ts` — hedef/günlük ilerleme, ekip bundle, video özeti, haftalık/aylık saha aktivitesi, onboarding (9 adım), giriş kayıtları (read-only, mevcut action’ları çağırır).
+- **i18n:** `sections/crown.ts` TR/EN.
+- **Dosyalar:** `crown/actions.ts`, `lib/ui/crown/*`, 6 route klasörü, `CrownHomeMockGrid.tsx`, `LanguageProvider.tsx`.
+
 ## 2026-06-05 — Bugün İlgilen sayfasına hub taşındı (pano sadeleştirildi) ✅
 
 - **Pano:** Sadece selamlama + WelcomeCard + 6’lı launcher; Crown mock ve `BugunHubSections` kaldırıldı.

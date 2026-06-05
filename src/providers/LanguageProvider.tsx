@@ -15,6 +15,7 @@ import { pagesSection } from '@/lib/translations/sections/pages'
 import { errorsSection } from '@/lib/translations/sections/errors'
 import { pulseSection } from '@/lib/translations/sections/pulse'
 import { videoTrainingSection } from '@/lib/translations/sections/videoTraining'
+import { crownSection } from '@/lib/translations/sections/crown'
 import { persistUserLangAction } from '@/app/actions/userLang'
 
 type LangType = 'tr' | 'en'
@@ -40,6 +41,7 @@ const sections = [
   errorsSection,
   pulseSection,
   videoTrainingSection,
+  crownSection,
 ]
 
 type TranslationNamespace = Record<string, string>
