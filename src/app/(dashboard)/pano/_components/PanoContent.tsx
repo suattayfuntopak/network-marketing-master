@@ -38,7 +38,7 @@ export function PanoContent() {
       )}
       <AccountStatusAlert />
 
-      <div className="flex w-full min-h-0 flex-1 flex-col space-y-5 md:mx-auto md:max-w-5xl">
+      <div className="flex w-full min-h-0 flex-1 flex-col space-y-5">
         <header className="shrink-0 md:text-center">
           {wsLoading ? (
             <div className="h-8 w-56 animate-pulse rounded bg-[var(--bg-subtle)] md:mx-auto" />
