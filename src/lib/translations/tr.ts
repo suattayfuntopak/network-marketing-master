@@ -408,6 +408,7 @@ export const tr = {
     waInviteGroup: "Merhaba! Network Marketing Master ekibimize davetlisin!\n\nAşağıdaki bağlantıdan kaydını tamamlayıp \"Ekibim\" sayfasından {code} kodunu girerek aramıza anında katılabilirsin:\n\nKayıt Linki: {link}",
     searchMembers: "İsim veya telefon ile ara…",
     callBtn: "Ara",
+    memberDetailTabs: "Üye detay sekmeleri",
     activityBtn: "Aktivite",
     activitySheetSubtitle: "Seçili dönemdeki saha özeti",
     activityNotes: "Not",

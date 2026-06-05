@@ -408,6 +408,7 @@ export const en = {
     inviteWaMessage: "Hello {name}, you are invited to our Network Marketing Master team!\n\nComplete your registration using the link below, then enter the code {code} on the \"My Team\" page to join us instantly:\n\nRegistration Link: {link}",
     searchMembers: "Search by name or phone…",
     callBtn: "Call",
+    memberDetailTabs: "Member detail tabs",
     activityBtn: "Activity",
     activitySheetSubtitle: "Field summary for the selected period (counts only)",
     activityNotes: "Notes",

@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Ekibim: üye kartı ikon sekmeleri ✅
+
+- **Sorun:** DDBR satırı metin + ayrı huni/iletişim blokları kartı kalabalıklaştırıyordu.
+- **Çözüm:** Downline üye kartlarında DDBR yazısı kaldırıldı; 5 ikon sekmesi (Huni, DDBR, Ara, WhatsApp, Aktivite). DDBR ilerleme çubuğu hafta sekmelerinin altında. Sekme tıklanınca kart açılır ve ilgili panel gösterilir.
+- **Dosyalar:** `TeamPerformanceSection.tsx`, `EkipPanel.tsx`, `tr.ts`, `en.ts`.
+
 ## 2026-06-06 — Pano launcher: Boru Hattı ile aynı yatay sınırlar ✅
 
 - **Sorun:** Pano grid `max-w-5xl` ile pipeline'dan dar kalıyordu.

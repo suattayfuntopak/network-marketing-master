@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ComponentType } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
@@ -33,10 +33,6 @@ export interface TeamPerformanceSectionProps {
   setScorecardOpen: (open: boolean) => void
   expandedMembers: Record<string, boolean>
   setExpandedMembers: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
-  expandedOnboardingId: string | null
-  setExpandedOnboardingId: (id: string | null) => void
-  onboardingWeekTab: 1 | 2 | 3 | 4
-  setOnboardingWeekTab: (tab: 1 | 2 | 3 | 4) => void
   removingId: string | null
   setMemberToRemove: (member: { id: string; name: string } | null) => void
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
@@ -48,11 +44,12 @@ export interface TeamPerformanceSectionProps {
   memberGoalsMap?: Record<string, MemberGoalRow>
 }
 
+type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
+
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
     scorecardOpen, setScorecardOpen, expandedMembers, setExpandedMembers,
-    expandedOnboardingId, setExpandedOnboardingId, onboardingWeekTab, setOnboardingWeekTab,
     removingId, setMemberToRemove, setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange, onOpenActivity,
@@ -61,6 +58,17 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const router = useRouter()
   // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
+  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab>>({})
+  const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
+
+  const selectMemberTab = (userId: string, tab: MemberCardTab) => {
+    setMemberCardTab(prev => ({ ...prev, [userId]: tab }))
+    setExpandedMembers(prev => ({ ...prev, [userId]: true }))
+  }
+
+  const getMemberTab = (userId: string): MemberCardTab => memberCardTab[userId] ?? 'funnel'
+
+  const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
   const totalCandidates = members.reduce((s, m) => s + m.candidate_count, 0)
   const totalJoined = members.reduce((s, m) => s + m.katildi_count, 0)
@@ -352,76 +360,260 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   </div>
                 </div>
 
-                {/* DDBR mini + hızlı iletişim — downline, uygulama kullanıcısı */}
-                {!isCurrentUser && m.isAppUser !== false && m.role === 'member' && (
-                  <div className="space-y-3 border-t border-dashed border-[var(--border)] pt-4">
-                    <div className="flex items-center justify-between gap-2 text-xs">
-                      <span className="font-bold uppercase tracking-wide text-[var(--text-3)]">
-                        {t('statsPage.colDqsg')}
-                      </span>
-                      <span className="font-black tabular-nums text-[#854F0B] dark:text-[#fbbf24]">
-                        {onboardingDone}/{ONBOARDING_STEP_COUNT} · %{onboardingPct}
-                      </span>
-                    </div>
-                    <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
-                      <div
-                        className="h-full rounded-full bg-[#854F0B] dark:bg-[#fbbf24] transition-all"
-                        style={{ width: `${onboardingPct}%` }}
-                      />
-                    </div>
-                    {memberGoalsMap[m.user_id] && (
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
-                        <Target className="h-3.5 w-3.5 shrink-0" />
-                        {t('team.memberGoalChip', {
-                          people: memberGoalsMap[m.user_id].targetPeople,
-                          months: memberGoalsMap[m.user_id].targetMonths,
-                        })}
-                      </div>
-                    )}
-                    <div className="flex flex-wrap justify-end gap-2">
-                      {telHref && (
-                        <a
-                          href={telHref}
-                          onClick={e => e.stopPropagation()}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200/60 bg-blue-50/80 dark:bg-blue-950/20 px-3 py-1.5 text-xs font-bold text-blue-700 dark:text-blue-300 transition active:scale-95"
-                        >
-                          <Phone className="h-3.5 w-3.5" />
-                          {t('team.callBtn')}
-                        </a>
-                      )}
-                      {waQuick && (
-                        <a
-                          href={waQuick}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={e => e.stopPropagation()}
-                          className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-bold text-white transition active:scale-95"
-                        >
-                          <WhatsAppIcon className="h-3.5 w-3.5 fill-current" />
-                          WhatsApp
-                        </a>
-                      )}
-                      {isLeader && (
-                        <button
-                          type="button"
-                          onClick={e => {
-                            e.stopPropagation()
-                            onOpenActivity(m)
-                          }}
-                          className="inline-flex items-center gap-1.5 rounded-lg border border-brand/30 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 px-3 py-1.5 text-xs font-bold text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 transition active:scale-95 cursor-pointer"
-                        >
-                          <BarChart3 className="h-3.5 w-3.5" />
-                          {t('team.activityBtn')}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
+                {/* Downline üye: ikon sekmeleri + sekme içeriği */}
+                {!isCurrentUser && m.isAppUser !== false && m.role === 'member' && (() => {
+                  const activeTab = getMemberTab(m.user_id)
+                  const weekTab = getOnboardingWeek(m.user_id)
+                  const memberTabs: {
+                    id: MemberCardTab
+                    Icon: ComponentType<{ className?: string }>
+                    label: string
+                    show: boolean
+                    wa?: boolean
+                  }[] = [
+                    { id: 'funnel', Icon: TrendingUp, label: t('team.funnelDistribution'), show: true },
+                    { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: true },
+                    { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref },
+                    { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, wa: true },
+                    { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
+                  ]
+                  const visibleTabs = memberTabs.filter(tab => tab.show)
 
-                {/* Kart Alt Bölümü: Huni Dağılımı ve Onboarding (Collapsible) */}
-                {isCardExpanded && m.isAppUser !== false && (
+                  const funnelPanel = (
+                    <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
+                      <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                        <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
+                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
+                      </div>
+                      <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                        <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
+                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
+                      </div>
+                      <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                        <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
+                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
+                      </div>
+                      <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                        <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
+                        <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
+                      </div>
+                    </div>
+                  )
+
+                  return (
+                    <div className="border-t border-dashed border-[var(--border)] pt-4 space-y-4">
+                      <div
+                        className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-1"
+                        role="tablist"
+                        aria-label={t('team.memberDetailTabs')}
+                      >
+                        {visibleTabs.map(({ id, Icon, label, wa }) => (
+                          <button
+                            key={id}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTab === id}
+                            aria-label={label}
+                            title={label}
+                            onClick={e => {
+                              e.stopPropagation()
+                              selectMemberTab(m.user_id, id)
+                            }}
+                            className={clsx(
+                              'flex h-10 flex-1 items-center justify-center rounded-lg transition-all cursor-pointer',
+                              activeTab === id
+                                ? 'bg-[var(--bg-card)] text-brand dark:text-indigo-300 shadow-sm border border-[var(--border)]'
+                                : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                            )}
+                          >
+                            {wa ? (
+                              <WhatsAppIcon className="h-5 w-5 fill-current" />
+                            ) : (
+                              <Icon className="h-5 w-5" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      {memberGoalsMap[m.user_id] && activeTab === 'onboarding' && (
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-amber-700 dark:text-amber-400">
+                          <Target className="h-3.5 w-3.5 shrink-0" />
+                          {t('team.memberGoalChip', {
+                            people: memberGoalsMap[m.user_id].targetPeople,
+                            months: memberGoalsMap[m.user_id].targetMonths,
+                          })}
+                        </div>
+                      )}
+
+                      {isCardExpanded && (
+                        <div
+                          className="animate-in fade-in slide-in-from-top-1 duration-200"
+                          role="tabpanel"
+                        >
+                          {!hasMasterAccess && m.user_id !== ws.userId ? (
+                            <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
+                                <Crown className="h-5 w-5 animate-bounce" />
+                              </div>
+                              <div>
+                                <h4 className="text-sm font-extrabold text-white">
+                                  {t('team.plusRequired')}
+                                </h4>
+                                <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                                  {t('team.plusRequiredDesc')}
+                                </p>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  router.push('/odeme')
+                                }}
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
+                              >
+                                <span>{t('team.upgradeToMaster')}</span>
+                              </button>
+                            </div>
+                          ) : activeTab === 'funnel' ? (
+                            funnelPanel
+                          ) : activeTab === 'onboarding' ? (
+                            <div className="space-y-4">
+                              <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
+                                {([1, 2, 3, 4] as const).map(w => (
+                                  <button
+                                    key={w}
+                                    type="button"
+                                    onClick={() => setOnboardingWeekByMember(prev => ({ ...prev, [m.user_id]: w }))}
+                                    className={clsx(
+                                      'flex-1 text-xs font-extrabold py-2 rounded-lg transition-all cursor-pointer',
+                                      weekTab === w
+                                        ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
+                                        : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                                    )}
+                                  >
+                                    {t('team.weekLabel', { w })}
+                                  </button>
+                                ))}
+                              </div>
+                              <div className="space-y-2">
+                                <div className="flex items-center justify-end gap-2 text-xs">
+                                  <span className="font-black tabular-nums text-[#854F0B] dark:text-[#fbbf24]">
+                                    {onboardingDone}/{ONBOARDING_STEP_COUNT} · %{onboardingPct}
+                                  </span>
+                                </div>
+                                <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
+                                  <div
+                                    className="h-full rounded-full bg-[#854F0B] dark:bg-[#fbbf24] transition-all"
+                                    style={{ width: `${onboardingPct}%` }}
+                                  />
+                                </div>
+                              </div>
+                              <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+                                {ONBOARDING_STEPS.filter(s => s.week === weekTab).map(step => {
+                                  const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
+                                  return (
+                                    <div
+                                      key={step.id}
+                                      className={clsx(
+                                        'w-full flex items-center justify-between gap-3 rounded-xl border p-3.5 transition-all',
+                                        isStepDone
+                                          ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)]'
+                                          : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 text-[var(--text-2)]'
+                                      )}
+                                    >
+                                      <button
+                                        type="button"
+                                        onClick={() => toggleOnboardingStep(m.user_id, step.id, isStepDone)}
+                                        className="flex-1 flex items-center gap-3 text-left cursor-pointer active:scale-[0.99] transition-all"
+                                      >
+                                        <span className={clsx(
+                                          'flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all',
+                                          isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
+                                        )}>
+                                          {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
+                                        </span>
+                                        <span className="text-sm font-semibold leading-tight pr-2">
+                                          {lang === 'en' ? step.label_en : step.label_tr}
+                                        </span>
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={e => {
+                                          e.stopPropagation()
+                                          setOnboardingCoachData({
+                                            memberName: m.full_name || '',
+                                            stepId: step.id,
+                                            phone: m.phone ?? null,
+                                          })
+                                        }}
+                                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
+                                        title={t('team.aiCoachingScript')}
+                                      >
+                                        <Bot className="h-5 w-5" />
+                                      </button>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          ) : activeTab === 'call' && telHref ? (
+                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+                              <p className="text-lg font-black text-[var(--text-1)] tabular-nums">{m.phone}</p>
+                              <a
+                                href={telHref}
+                                onClick={e => e.stopPropagation()}
+                                className="inline-flex items-center gap-2 rounded-xl border border-blue-200/60 bg-blue-50/80 dark:bg-blue-950/20 px-6 py-3 text-sm font-bold text-blue-700 dark:text-blue-300 transition active:scale-95"
+                              >
+                                <Phone className="h-5 w-5" />
+                                {t('team.callBtn')}
+                              </a>
+                            </div>
+                          ) : activeTab === 'whatsapp' && waQuick ? (
+                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+                              <p className="text-sm text-[var(--text-2)] text-center leading-relaxed max-w-sm">
+                                {t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') })}
+                              </p>
+                              <a
+                                href={waQuick}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={e => e.stopPropagation()}
+                                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-6 py-3 text-sm font-bold text-white transition active:scale-95"
+                              >
+                                <WhatsAppIcon className="h-5 w-5 fill-current" />
+                                WhatsApp
+                              </a>
+                            </div>
+                          ) : activeTab === 'activity' && isLeader ? (
+                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+                              {lastActiveDate && (
+                                <p className="text-sm text-[var(--text-2)] text-center">
+                                  {t('team.lastActive')} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
+                                  {' '}({daysInactive === 0 ? t('team.todayShort') : t('team.daysAgoShort', { days: daysInactive })})
+                                </p>
+                              )}
+                              <button
+                                type="button"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  onOpenActivity(m)
+                                }}
+                                className="inline-flex items-center gap-2 rounded-xl border border-brand/30 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 px-6 py-3 text-sm font-bold text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 transition active:scale-95 cursor-pointer"
+                              >
+                                <BarChart3 className="h-5 w-5" />
+                                {t('team.activityBtn')}
+                              </button>
+                            </div>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
+
+                {/* Lider / kendi kartı: huni dağılımı (sekme yok) */}
+                {isCardExpanded && m.isAppUser !== false && (isCurrentUser || m.role !== 'member') && (
                   <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
-                    
                     {!hasMasterAccess && m.user_id !== ws.userId ? (
                       <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
@@ -435,153 +627,43 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                             {t('team.plusRequiredDesc')}
                           </p>
                         </div>
-                        <div>
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              router.push('/odeme')
-                            }}
-                            className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
-                          >
-                            <span>{t('team.upgradeToMaster')}</span>
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          onClick={e => {
+                            e.stopPropagation()
+                            router.push('/odeme')
+                          }}
+                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
+                        >
+                          <span>{t('team.upgradeToMaster')}</span>
+                        </button>
                       </div>
                     ) : (
-                      <>
-                        {/* Aday Hunisi Dağılım Kutusu (Sıfır Bile Olsa Her Zaman Görünür!) */}
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
-                            <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
-                            <span>{t('team.funnelDistribution')}</span>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
+                          <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
+                          <span>{t('team.funnelDistribution')}</span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
+                          <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                            <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
+                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
                           </div>
-                          
-                          <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
-                            <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                              <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
-                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
-                            </div>
-                            <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                              <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
-                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
-                            </div>
-                            <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                              <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
-                              <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
-                            </div>
-                            <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                              <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
-                              <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
-                            </div>
+                          <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                            <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
+                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
+                          </div>
+                          <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                            <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
+                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
+                          </div>
+                          <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
+                            <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
+                            <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
                           </div>
                         </div>
-
-                        {/* ─── Distribütör Başlatma Kontrol Listesi ─── */}
-                        {m.role === 'member' && (
-                          <div className="border-t border-[var(--border)] pt-5 space-y-3">
-                            <button
-                              type="button"
-                              onClick={() => setExpandedOnboardingId(expandedOnboardingId === m.user_id ? null : m.user_id)}
-                              className="flex w-full items-center justify-between text-sm font-extrabold text-[var(--text-2)] hover:text-brand transition cursor-pointer uppercase tracking-wider"
-                            >
-                              <span className="flex items-center gap-2">
-                                <Rocket className="h-5 w-5 text-[#854F0B] dark:text-[#fbbf24]" />
-                                <span>{t('team.correctStartGuide')}</span>
-                              </span>
-                              <span className="flex items-center gap-2.5">
-                                {(() => {
-                                  const doneCount = ONBOARDING_STEPS.filter(s => m.onboarding_steps?.includes(s.id)).length
-                                  const totalCount = ONBOARDING_STEPS.length
-                                  const pct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0
-                                  return (
-                                    <span className="rounded-full bg-[#FAEEDA] dark:bg-[#3a2200] px-3 py-1 text-xs font-black text-[#854F0B] dark:text-[#fbbf24] shadow-sm">
-                                      %{pct}
-                                    </span>
-                                  )
-                                })()}
-                                {expandedOnboardingId === m.user_id ? (
-                                  <ChevronUp className="h-5 w-5" />
-                                ) : (
-                                  <ChevronDown className="h-5 w-5" />
-                                )}
-                              </span>
-                            </button>
-
-                            {expandedOnboardingId === m.user_id && (
-                              <div className="pt-3 border-t border-dashed border-[var(--border)] space-y-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                                {/* 4 Weekly Tabs */}
-                                <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
-                                  {([1, 2, 3, 4] as const).map(w => (
-                                    <button
-                                      key={w}
-                                      type="button"
-                                      onClick={() => setOnboardingWeekTab(w)}
-                                      className={`flex-1 text-xs font-extrabold py-2 rounded-lg transition-all cursor-pointer ${
-                                        onboardingWeekTab === w
-                                          ? 'bg-[var(--bg-card)] dark:bg-zinc-800 text-[#854F0B] dark:text-[#fbbf24] shadow-sm border border-[var(--border)]'
-                                          : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
-                                      }`}
-                                    >
-                                      {t('team.weekLabel', { w })}
-                                    </button>
-                                  ))}
-                                </div>
-
-                                {/* Steps list */}
-                                <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
-                                  {ONBOARDING_STEPS.filter(s => s.week === onboardingWeekTab).map(step => {
-                                    const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
-                                    return (
-                                      <div
-                                        key={step.id}
-                                        className={`w-full flex items-center justify-between gap-3 rounded-xl border p-3.5 transition-all ${
-                                          isStepDone
-                                            ? 'border-emerald-200/50 dark:border-emerald-950/20 bg-emerald-50/5 dark:bg-emerald-950/5 text-[var(--text-1)]'
-                                            : 'border-[var(--border)] bg-[var(--bg-subtle)] dark:bg-zinc-900/30 text-[var(--text-2)]'
-                                        }`}
-                                      >
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleOnboardingStep(m.user_id, step.id, isStepDone)}
-                                          className="flex-1 flex items-center gap-3 text-left cursor-pointer active:scale-[0.99] transition-all"
-                                        >
-                                          <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-all ${
-                                            isStepDone ? 'border-emerald-500 bg-emerald-500' : 'border-[var(--text-3)] bg-transparent'
-                                          }`}>
-                                            {isStepDone && <Check className="h-3.5 w-3.5 text-white" strokeWidth={3.5} />}
-                                          </span>
-                                          <span className="text-sm font-semibold leading-tight pr-2">
-                                            {lang === 'en' ? step.label_en : step.label_tr}
-                                          </span>
-                                        </button>
-
-                                        <button
-                                          type="button"
-                                          onClick={(e) => {
-                                            e.stopPropagation()
-                                            setOnboardingCoachData({
-                                              memberName: m.full_name || '',
-                                              stepId: step.id,
-                                              phone: m.phone ?? null
-                                            })
-                                          }}
-                                          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-[#0F6E56] dark:text-[#5eead4] hover:scale-105 active:scale-95 transition-all shadow-[0_1px_3px_rgba(0,0,0,0.05)] cursor-pointer"
-                                          title={t('team.aiCoachingScript')}
-                                        >
-                                          <Bot className="h-5 w-5" />
-                                        </button>
-                                      </div>
-                                    )
-                                  })}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </>
+                      </div>
                     )}
-
                   </div>
                 )}
               </li>
