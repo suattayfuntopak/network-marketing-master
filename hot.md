@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-05 — Bugün İlgilen hub sayfaları: NMM hibrit (mock shell kaldırıldı) ✅
+
+- **Sorun:** Crown deneme sayfaları lacivert header + `max-w-3xl` + slate renklerle mock hissi veriyordu; veri action’ları gerçek olsa da UI NMM’den kopuktu.
+- **Çözüm:** `HubPageShell` + `HubSectionCard` — standart dashboard genişliği (`max-w-[1360px]` shell), `var(--bg)` / `var(--text-*)`, pano/ekip ile aynı tipografi.
+- **Hibrit içerik (gerçek NMM bileşenleri + veri):**
+  - `/bugunku-takibim` → `HedefKart`, `FieldWeekSummary`, `TodayRitualSection`
+  - `/haftalik-ozet` → `PanoWeeklyLite` + `TeamActivitySummary` (7g)
+  - `/aylik-ozet` → `TeamActivitySummary` (30g) + giriş kayıtları (`crown/actions`)
+  - `/canli-egitim` → `PanoVideoStrip` + ekip video map + link `/egitim/videolar`
+  - `/ekibim` → ekip roster (bundle + video + hedefler), CTA `/ekip`
+  - `/ilk-30-gun` → onboarding % (Supabase), CTA `/ekip`
+- **Kaldırıldı:** `lib/ui/crown/CrownPageShell`, `CrownCard`
+- **Dosyalar:** `lib/ui/hub/*`, 6 hub `_components/*`, `crown.ts` i18n, `IlgilenHubGrid`, `bugun/ilgilen/page.tsx` (`max-w-5xl` kaldırıldı).
+
 ## 2026-06-05 — Crown deneme sayfaları (Bugün İlgilen kutuları) ✅
 
 - **Davet kodu kutusu** `CrownHomeMockGrid` içinden kaldırıldı.

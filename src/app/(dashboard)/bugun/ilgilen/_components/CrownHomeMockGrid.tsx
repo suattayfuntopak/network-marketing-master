@@ -29,7 +29,7 @@ const CROWN_ITEMS: readonly CrownItem[] = [
   { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', href: '/ilk-30-gun' },
 ]
 
-export function CrownHomeMockGrid() {
+export function IlgilenHubGrid() {
   const { t } = useTranslation()
 
   return (
