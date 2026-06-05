@@ -23,7 +23,7 @@ const colorMap: Record<ButtonColor, string> = {
 
 const filledClass = (
   color: ButtonColor,
-  opts?: { compact?: boolean; prominent?: boolean; className?: string },
+  opts?: { compact?: boolean; prominent?: boolean; fill?: boolean; className?: string },
 ) =>
   clsx(
     'flex flex-col items-center justify-center',
@@ -32,7 +32,13 @@ const filledClass = (
     'active:scale-95 hover:scale-[1.03]',
     'border border-[var(--border)] shadow-[0_4px_20px_-2px_rgba(0,0,0,0.05)] dark:shadow-[0_4px_24px_-2px_rgba(0,0,0,0.2)] hover:shadow-lg',
     'md:rounded-[12px]',
-    opts?.compact ? 'h-[76px] p-3' : opts?.prominent ? 'aspect-square p-4 md:p-7' : 'aspect-square p-4 md:p-6',
+    opts?.compact
+      ? 'h-[76px] p-3'
+      : opts?.fill
+        ? 'h-full w-full p-4 md:p-6'
+        : opts?.prominent
+          ? 'aspect-square p-4 md:p-7'
+          : 'aspect-square p-4 md:p-6',
     colorMap[color],
     opts?.className,
   )
@@ -53,7 +59,7 @@ const crownAccentHex: Record<ButtonColor, string> = {
   yellow: '#854D0E',
 }
 
-const crownClass = (opts?: { compact?: boolean; prominent?: boolean; className?: string }) =>
+const crownClass = (opts?: { compact?: boolean; prominent?: boolean; fill?: boolean; className?: string }) =>
   clsx(
     'flex flex-col items-center justify-center',
     opts?.compact ? 'gap-1.5' : 'gap-2 md:gap-3',
@@ -66,9 +72,11 @@ const crownClass = (opts?: { compact?: boolean; prominent?: boolean; className?:
     'hover:bg-[var(--bg-subtle)]',
     opts?.compact
       ? 'h-[76px] p-3'
-      : opts?.prominent
-        ? 'aspect-square p-4 md:p-6'
-        : 'aspect-square p-4 md:p-5',
+      : opts?.fill
+        ? 'h-full w-full p-4 md:p-6'
+        : opts?.prominent
+          ? 'aspect-square p-4 md:p-6'
+          : 'aspect-square p-4 md:p-5',
     opts?.className,
   )
 
@@ -85,6 +93,8 @@ interface SquareButtonProps {
   compact?: boolean
   /** Pano launcher — larger tiles on md+ */
   prominent?: boolean
+  /** LauncherGrid hücresini doldur — pano ile aynı kare boyut */
+  fill?: boolean
   className?: string
 }
 
@@ -98,9 +108,10 @@ export function SquareButton({
   disabled = false,
   compact = false,
   prominent = false,
+  fill = false,
   className,
 }: SquareButtonProps) {
-  const styleOpts = { compact, prominent, className }
+  const styleOpts = { compact, prominent, fill, className }
 
   const buttonClass =
     variant === 'crown'
@@ -134,7 +145,7 @@ export function SquareButton({
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
               ? variant === 'crown'
-                ? 'text-center text-sm font-semibold leading-tight'
+                ? 'line-clamp-2 text-center text-sm font-semibold leading-tight'
                 : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
               : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }

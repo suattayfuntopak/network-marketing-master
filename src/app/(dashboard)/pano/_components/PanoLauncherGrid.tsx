@@ -2,6 +2,7 @@
 
 import { Lock } from 'lucide-react'
 import { SquareButton } from '@/components/ui/SquareButton'
+import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -14,12 +15,12 @@ export function PanoLauncherGrid() {
   const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
 
   return (
-    <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-[1.125rem]">
+    <LauncherGrid>
       {PANO_LAUNCHER_ITEMS.map(({ href, translationKey, icon, color }) => {
         const isTeamLocked = href === '/ekip' && teamLocked
 
         return (
-          <div key={href} className="relative min-w-0">
+          <LauncherGridItem key={href}>
             <SquareButton
               icon={icon}
               label={t(translationKey)}
@@ -27,7 +28,7 @@ export function PanoLauncherGrid() {
               variant="crown"
               href={isTeamLocked ? '/odeme' : href}
               prominent
-              className="w-full"
+              fill
             />
             {isTeamLocked && (
               <span
@@ -37,9 +38,9 @@ export function PanoLauncherGrid() {
                 <Lock className="h-3 w-3 md:h-3.5 md:w-3.5" strokeWidth={2.25} />
               </span>
             )}
-          </div>
+          </LauncherGridItem>
         )
       })}
-    </div>
+    </LauncherGrid>
   )
 }

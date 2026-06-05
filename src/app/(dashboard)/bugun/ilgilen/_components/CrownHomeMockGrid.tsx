@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { SquareButton, type ButtonColor } from '@/components/ui/SquareButton'
+import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 type CrownItem = {
@@ -33,9 +34,9 @@ export function IlgilenHubGrid() {
   const { t } = useTranslation()
 
   return (
-    <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-[1.125rem]">
+    <LauncherGrid>
       {CROWN_ITEMS.map(({ id, labelKey, icon, color, href }) => (
-        <div key={id} className="relative min-w-0">
+        <LauncherGridItem key={id}>
           <SquareButton
             icon={icon}
             label={t(labelKey)}
@@ -43,10 +44,10 @@ export function IlgilenHubGrid() {
             variant="crown"
             href={href}
             prominent
-            className="w-full"
+            fill
           />
-        </div>
+        </LauncherGridItem>
       ))}
-    </div>
+    </LauncherGrid>
   )
 }

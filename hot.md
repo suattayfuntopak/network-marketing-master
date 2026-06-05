@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-05 — Launcher kutuları pano ile birebir eşitlendi ✅
+
+- **Sorun:** Bugün İlgilen 6’lı grid panodan daha geniş/küçük görünüyordu (tam dashboard genişliği + `aspect-square` link üzerinde).
+- **Çözüm:** `LauncherGrid` + `LauncherGridItem` (`aspect-square` hücre) — tek kaynak; `md:max-w-5xl` her iki sayfada aynı.
+- **SquareButton:** `fill` prop — hücreyi `h-full w-full` doldurur; etiket `line-clamp-2`.
+- **Dosyalar:** `LauncherGrid.tsx`, `SquareButton.tsx`, `PanoLauncherGrid.tsx`, `CrownHomeMockGrid.tsx`.
+
 ## 2026-06-05 — Bugün İlgilen hub sayfaları: NMM hibrit (mock shell kaldırıldı) ✅
 
 - **Sorun:** Crown deneme sayfaları lacivert header + `max-w-3xl` + slate renklerle mock hissi veriyordu; veri action’ları gerçek olsa da UI NMM’den kopuktu.
