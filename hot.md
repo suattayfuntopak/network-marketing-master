@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Pano launcher: Boru Hattı ile aynı yatay sınırlar ✅
+
+- **Sorun:** Pano grid `max-w-5xl` ile pipeline'dan dar kalıyordu.
+- **Çözüm:** `PanoContent` içindeki `md:max-w-5xl` kaldırıldı — `px-4` + shell `max-w-[1360px]` (pipeline ile aynı).
+- **Commit:** `1468aa2`
+
 ## 2026-06-06 — Pano launcher: masaüstünde viewport doldurma ✅
 
 - **Sorun:** 6’lı launcher kutuları md+’da kare oranla ortada küçük kalıyor, üst/alt boşluk fazlaydı.
