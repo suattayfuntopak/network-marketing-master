@@ -1,6 +1,13 @@
 # Hot Log
 
-## 2026-06-05 — Pano: Crown Team mock grid + hub modülleri panoda
+## 2026-06-05 — Pano: 6’lı launcher + Bugün İlgilen → Crown mock
+
+- **Üst grid:** NMM 6 modül (`PANO_LAUNCHER_ITEMS`) crown stil — tıklanınca ilgili sayfaya gider (Boru Hattı, Takvim, Ekibim, YZ Koçu, Vaktin Varsa).
+- **Bugün İlgilen:** Sayfaya gitmez; toggle ile altında **Crown mock grid** açılır (Bugünkü Takibim, Canlı Eğitim, … + davet kodu — hepsi mock toast).
+- **Alt blok:** `BugunHubSections` her zaman panoda (hedef, öncelikler, KPI, ritüel, vb.).
+- **Dosyalar:** `PanoLauncherGrid.tsx`, `PanoContent.tsx`, `CrownHomeMockGrid.tsx`.
+
+## 2026-06-05 — Pano: Crown Team mock grid + hub modülleri panoda (revize)
 
 - **CrownHomeMockGrid:** Crown Team ana sayfa düzeni (mock) — 6 kutu 2×3 mobil / **3×2 masaüstü**, crown stil, **eski marka accent renkleri**; altta davet kodu şeridi.
 - Mock butonlar toast “yakında”; **Ekibim** → `/ekip` (kilit → `/odeme`).
