@@ -195,6 +195,7 @@ export const en = {
     dayCloseNotePlaceholder: "Short note for tomorrow (this device only)",
     dayCloseButton: "I closed my day",
     dayCloseDone: "Day complete — see you tomorrow",
+    hubTitle: "Tools & Modules",
     weeklyLiteLink: "Full statistics →",
     journalTitle: "Field journal",
     journalSubtitle: "What happened in the field today? Optional — saved on this device.",

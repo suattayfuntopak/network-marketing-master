@@ -5,7 +5,9 @@ import { type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 
 export type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow'
+export type ButtonVariant = 'filled' | 'crown'
 
+// ─── Filled variant: colored background ──────────────────────────────────────
 const colorMap: Record<ButtonColor, string> = {
   purple: 'bg-[#EEEDFE] text-[#534AB7] hover:bg-[#E3E1FD] dark:bg-[#2d2a5e] dark:text-[#a09be8] dark:hover:bg-[#383474]',
   teal:   'bg-[#E1F5EE] text-[#0F6E56] hover:bg-[#D2EFE4] dark:bg-[#0d3d2e] dark:text-[#4ade80] dark:hover:bg-[#144d3a]',
@@ -19,7 +21,7 @@ const colorMap: Record<ButtonColor, string> = {
   yellow: 'bg-[#FEF9C3] text-[#854D0E] hover:bg-[#FEF08A] dark:bg-[#453A0B] dark:text-[#FACC15] dark:hover:bg-[#5C4D0E]',
 }
 
-const sharedClass = (
+const filledClass = (
   color: ButtonColor,
   opts?: { compact?: boolean; prominent?: boolean; className?: string },
 ) =>
@@ -35,11 +37,47 @@ const sharedClass = (
     opts?.className,
   )
 
+// ─── Crown variant: white card + colored top accent (Crown Team aesthetic) ───
+// Neutral background, 3px colored border-top, dark icon/text — set via borderTopColor style prop
+const crownAccentHex: Record<ButtonColor, string> = {
+  purple: '#534AB7',
+  teal:   '#0B7A5C',
+  amber:  '#B45309',
+  pink:   '#BE185D',
+  blue:   '#1A56DB',
+  coral:  '#DC2626',
+  rose:   '#E11D48',
+  indigo: '#4338CA',
+  cyan:   '#0891B2',
+  yellow: '#D97706',
+}
+
+const crownClass = (opts?: { compact?: boolean; prominent?: boolean; className?: string }) =>
+  clsx(
+    'flex flex-col items-center justify-center',
+    opts?.compact ? 'gap-1.5' : 'gap-2 md:gap-3',
+    'rounded-[14px] md:rounded-[12px]',
+    'transition-all duration-150',
+    'active:scale-95 hover:scale-[1.03]',
+    'bg-[var(--bg-card)] text-[var(--text-1)]',
+    'border border-[var(--border)] border-t-[3px]',
+    'shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] hover:shadow-md dark:shadow-[0_2px_16px_-3px_rgba(0,0,0,0.3)]',
+    'hover:bg-[var(--bg-subtle)]',
+    opts?.compact
+      ? 'h-[76px] p-3'
+      : opts?.prominent
+        ? 'aspect-square p-4 md:p-6'
+        : 'aspect-square p-4 md:p-5',
+    opts?.className,
+  )
+
 interface SquareButtonProps {
   icon: LucideIcon
   label: string
   color?: ButtonColor
+  /** @deprecated desktopColor is unused in crown variant; kept for backward compat */
   desktopColor?: ButtonColor
+  variant?: ButtonVariant
   href?: string
   onClick?: () => void
   disabled?: boolean
@@ -49,13 +87,11 @@ interface SquareButtonProps {
   className?: string
 }
 
-import { useState, useEffect } from 'react'
-
 export function SquareButton({
   icon: Icon,
   label,
   color = 'purple',
-  desktopColor,
+  variant = 'filled',
   href,
   onClick,
   disabled = false,
@@ -63,16 +99,18 @@ export function SquareButton({
   prominent = false,
   className,
 }: SquareButtonProps) {
-  const [isMobile, setIsMobile] = useState(true)
-  useEffect(() => {
-    setIsMobile(window.innerWidth < 768)
-    const onResize = () => setIsMobile(window.innerWidth < 768)
-    window.addEventListener('resize', onResize)
-    return () => window.removeEventListener('resize', onResize)
-  }, [])
-
-  const activeColor = (desktopColor && !isMobile) ? desktopColor : color
   const styleOpts = { compact, prominent, className }
+
+  const buttonClass =
+    variant === 'crown'
+      ? crownClass(styleOpts)
+      : filledClass(color, styleOpts)
+
+  const inlineStyle: React.CSSProperties | undefined =
+    variant === 'crown'
+      ? { borderTopColor: crownAccentHex[color] }
+      : undefined
+
   const content = (
     <>
       <Icon
@@ -80,8 +118,12 @@ export function SquareButton({
           compact
             ? 'h-5 w-5 shrink-0'
             : prominent
-              ? 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
-              : 'h-6 w-6 shrink-0 md:h-9 md:w-9'
+              ? variant === 'crown'
+                ? 'h-8 w-8 shrink-0 md:h-10 md:w-10'
+                : 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
+              : variant === 'crown'
+                ? 'h-7 w-7 shrink-0 md:h-9 md:w-9'
+                : 'h-6 w-6 shrink-0 md:h-9 md:w-9'
         }
         strokeWidth={1.75}
       />
@@ -90,7 +132,9 @@ export function SquareButton({
           compact
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
-              ? 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
+              ? variant === 'crown'
+                ? 'text-center text-sm font-semibold leading-tight'
+                : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
               : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }
       >
@@ -101,7 +145,7 @@ export function SquareButton({
 
   if (href) {
     return (
-      <Link href={href} prefetch className={sharedClass(activeColor, styleOpts)}>
+      <Link href={href} prefetch className={buttonClass} style={inlineStyle}>
         {content}
       </Link>
     )
@@ -111,7 +155,8 @@ export function SquareButton({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={clsx(sharedClass(activeColor, styleOpts), 'disabled:pointer-events-none disabled:opacity-40')}
+      className={clsx(buttonClass, 'disabled:pointer-events-none disabled:opacity-40')}
+      style={inlineStyle}
     >
       {content}
     </button>

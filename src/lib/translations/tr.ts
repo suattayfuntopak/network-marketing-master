@@ -195,6 +195,7 @@ export const tr = {
     dayCloseNotePlaceholder: "Yarın için kısa not (sadece bu cihazda)",
     dayCloseButton: "Günü kapattım",
     dayCloseDone: "Bugün tamam — yarın görüşürüz",
+    hubTitle: "Araçlar & Modüller",
     weeklyLiteLink: "Detaylı istatistikler →",
     journalTitle: "Saha günlüğü",
     journalSubtitle: "Bugün sahada ne oldu? İsteğe bağlı — cihazında saklanır.",

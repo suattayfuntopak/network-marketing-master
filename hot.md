@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-05 — Pano Crown kutular + Bugün İlgilen hub sheet
+
+- **SquareButton `crown` variant:** Beyaz kart + üstte renkli accent çizgi (Crown Team estetiği); pano launcher’da kullanılıyor.
+- **PanoLauncherGrid:** 6 kutu `variant="crown"`; **Bugün İlgilen** doğrudan route yerine `BugunModuleSheet` açar.
+- **BugunModuleSheet:** Alt sheet — “Araçlar & Modüller” 3×N grid (8 modül: Bugün İlgilen, YZ Koçu, Saha Provası, İtirazlar, Uyum, İstatistikler, Takvim, Akademi); `slide-up` animasyonu (`globals.css`).
+- **i18n:** `dashboard.hubTitle` TR/EN.
+- **Dosyalar:** `PanoLauncherGrid.tsx`, `BugunModuleSheet.tsx`, `SquareButton.tsx`, `globals.css`, `tr.ts`, `en.ts`.
+
 ## 2026-06-05 — Mobil alt bar: kayar şerit geri
 
 - **BottomNav:** `overflow-x-auto` + sabit genişlikli sekmeler; tüm sidebar modülleri tek şeritte (Pano + 6 modül + İstatistikler; süper admin + Yönetim).
