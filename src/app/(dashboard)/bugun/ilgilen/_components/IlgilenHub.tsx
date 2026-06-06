@@ -31,8 +31,8 @@ export function IlgilenHub() {
   const v = visitedRef.current
 
   return (
-    <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <div className="w-full md:mx-auto md:max-w-5xl">
+    <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+      <div className="w-full space-y-5">
         <IlgilenHubGrid activeTab={activeTab} />
 
         {v.has('daily')   && <div className={activeTab !== 'daily'   ? 'hidden' : 'mt-5'}><DailyTab /></div>}

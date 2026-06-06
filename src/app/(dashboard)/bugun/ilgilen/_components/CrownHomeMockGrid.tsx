@@ -45,12 +45,12 @@ export function IlgilenHubGrid({ activeTab }: Props) {
   return (
     <header className="space-y-4">
       <h1 className="text-xl font-bold text-[var(--text-1)]">
-        {t('pagesUi.todayPrioritiesTitle')}
+        {t('nav.todayFocus')}
       </h1>
       <nav
         className="no-swipe flex w-full overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 shadow-sm scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
-        aria-label={t('pagesUi.todayPrioritiesTitle')}
+        aria-label={t('nav.todayFocus')}
         data-no-swipe="true"
         onTouchStart={e => e.stopPropagation()}
       >

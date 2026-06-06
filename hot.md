@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-06 — Hızlı Bakış: başlık + sayfa genişliği ✅
+
+**Başlık:** `/bugun/ilgilen` sayfa h1 `pagesUi.todayPrioritiesTitle` ("Bugün İlgilen") → `nav.todayFocus` ("Hızlı Bakış" / Quick Glance); nav aria-label aynı kaynak.
+
+**Genişlik:** `IlgilenHub` ve loading skeleton'dan `md:max-w-5xl` kaldırıldı — diğer dashboard sayfaları gibi tam `w-full` + shell `max-w-[1360px]` hizası.
+
+**Dosyalar:** `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx`, `bugun/ilgilen/page.tsx`
+
 ## 2026-06-06 — VideolarContent ConfirmDialog + PresentationMaterials senderPlaceholder i18n ✅
 
 **VideolarContent window.confirm → ConfirmDialog:**
