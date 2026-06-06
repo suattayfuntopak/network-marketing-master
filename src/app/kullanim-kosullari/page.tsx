@@ -6,7 +6,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 
 export default function TermsPage() {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
 
   const content = {
     tr: {
@@ -156,13 +156,13 @@ export default function TermsPage() {
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
+            <span>{t('landingPage.legalPage.backToHome')}</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
               <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-                {lang === 'en' ? 'LEGAL USER TERMS' : 'YASAL KULLANICI SÖZLEŞMESİ'}
+                {t('landingPage.legalPage.termsBadge')}
               </span>
             </div>
             <LegalPageToolbar />
@@ -174,7 +174,7 @@ export default function TermsPage() {
       <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <FileText className="h-3.5 w-3.5" />
-          <span>{lang === 'en' ? 'Terms' : 'Koşullar'}</span>
+          <span>{t('landingPage.legalPage.termsAbbr')}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}

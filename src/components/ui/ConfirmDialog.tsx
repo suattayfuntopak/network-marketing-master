@@ -12,6 +12,7 @@ interface ConfirmDialogProps {
   title?: string
   confirmLabel?: string
   cancelLabel?: string
+  variant?: 'default' | 'danger'
   onConfirm: () => void
   onCancel: () => void
 }
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   title,
   confirmLabel,
   cancelLabel,
+  variant = 'default',
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -64,7 +66,11 @@ export function ConfirmDialog({
           <button
             type="button"
             onClick={onConfirm}
-            className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0]"
+            className={`flex-1 rounded-xl py-3 text-sm font-semibold text-white transition ${
+              variant === 'danger'
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-[#534AB7] hover:bg-[#453DA0]'
+            }`}
           >
             {confirmLabel ?? t('common.yes')}
           </button>

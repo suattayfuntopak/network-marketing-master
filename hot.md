@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-06 — Legal pages i18n, staleTime hizalama, ConfirmDialog danger variant ✅
+
+**Legal sayfa UI label'ları i18n:**
+- `landing.ts`: `landingPage.legalPage.*` alt anahtarları eklendi (TR + EN): `backToHome`, `kvkkBadge`, `kvkkAbbr`, `termsBadge`, `termsAbbr`
+- `kvkk/page.tsx` + `kullanim-kosullari/page.tsx`: `const { lang, t }` + 3'er `lang === 'en' ?` ternary → `t('landingPage.legalPage.*')` ile değiştirildi
+
+**staleTime hizalama:**
+- `VideolarContent`: `20_000` ms → `5 * 60_000` ms (video kataloğu nadiren değişir)
+- `usePresentationMaterials`: `60_000` ms → `2 * 60_000` ms (global ile uyumlu)
+
+**ConfirmDialog danger variant:**
+- `ConfirmDialog.tsx`: `variant?: 'default' | 'danger'` prop eklendi; danger → kırmızı onay butonu
+- `VideolarContent`: video silme dialog'u `variant="danger"` kullanıyor
+
 ## 2026-06-06 — Hızlı Bakış: başlık + sayfa genişliği ✅
 
 **Başlık:** `/bugun/ilgilen` sayfa h1 `pagesUi.todayPrioritiesTitle` ("Bugün İlgilen") → `nav.todayFocus` ("Hızlı Bakış" / Quick Glance); nav aria-label aynı kaynak.

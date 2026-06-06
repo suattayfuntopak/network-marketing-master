@@ -33,7 +33,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
     queryKey: ['video-catalog', ws?.workspaceId],
     queryFn: () => getVideoCatalogAction(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
-    staleTime: 20_000,
+    staleTime: 5 * 60_000,
   })
 
   const videos = data?.videos ?? []
@@ -172,6 +172,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
       {deletingVideo && (
         <ConfirmDialog
           message={t('videoTraining.confirmDelete', { title: deletingVideo.titleTr })}
+          variant="danger"
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingVideo(null)}
         />

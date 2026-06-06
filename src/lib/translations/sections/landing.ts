@@ -91,6 +91,13 @@ export const landingSection = {
       footerTerms: 'Kullanım Koşulları',
       footerSecurity: 'Güvenlik Bildirgesi',
       footerContact: 'İletişim',
+      legalPage: {
+        backToHome: 'Giriş Sayfası',
+        kvkkBadge: 'KVKK UYUMLU GÜVENLİ VERİ',
+        kvkkAbbr: 'KVKK',
+        termsBadge: 'YASAL KULLANICI SÖZLEŞMESİ',
+        termsAbbr: 'Koşullar',
+      },
     },
   },
   en: {
@@ -185,6 +192,13 @@ export const landingSection = {
       footerTerms: 'Terms of Service',
       footerSecurity: 'Security Statement',
       footerContact: 'Contact Us',
+      legalPage: {
+        backToHome: 'Back to Home',
+        kvkkBadge: 'PDPL COMPLIANT',
+        kvkkAbbr: 'PDPL',
+        termsBadge: 'LEGAL USER TERMS',
+        termsAbbr: 'Terms',
+      },
     },
   },
 } as const

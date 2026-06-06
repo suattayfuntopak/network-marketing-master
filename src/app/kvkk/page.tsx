@@ -7,7 +7,7 @@ import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
 import { Z } from '@/lib/ui/zIndex'
 
 export default function KVKKPage() {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
 
   const content = {
     tr: {
@@ -149,13 +149,13 @@ export default function KVKKPage() {
             className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
+            <span>{t('landingPage.legalPage.backToHome')}</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
-                {lang === 'en' ? 'PDPL COMPLIANT' : 'KVKK UYUMLU GÜVENLİ VERİ'}
+                {t('landingPage.legalPage.kvkkBadge')}
               </span>
             </div>
             <LegalPageToolbar />
@@ -167,7 +167,7 @@ export default function KVKKPage() {
       <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
         <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
           <Shield className="h-3.5 w-3.5" />
-          <span>{lang === 'en' ? 'PDPL' : 'KVKK'}</span>
+          <span>{t('landingPage.legalPage.kvkkAbbr')}</span>
         </div>
         <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-indigo-950 to-indigo-700 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent leading-tight">
           {activeContent.title}

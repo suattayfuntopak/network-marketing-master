@@ -32,7 +32,7 @@ export function usePresentationMaterials(
       return rows
     },
     enabled: !!workspaceId,
-    staleTime: 60_000,
+    staleTime: 2 * 60_000,
   })
 }
 
