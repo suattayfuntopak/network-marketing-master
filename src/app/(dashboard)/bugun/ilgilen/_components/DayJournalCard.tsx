@@ -16,6 +16,7 @@ import {
   readJournalSyncQueue,
 } from '@/lib/domain/journalSyncQueue'
 import { parseSimpleNote } from '@/lib/utils/noteParser'
+import { mergeJournalConflictTexts } from '@/lib/domain/journalMerge'
 import {
   getDayJournalAction,
   mergeDayJournalLangAction,
@@ -159,9 +160,14 @@ export function DayJournalCard() {
     return () => window.removeEventListener('online', onOnline)
   }, [userId, flushJournalQueue, showSyncSuccessToast])
 
-  async function handleResolveConflict(choice: 'local' | 'remote') {
+  async function handleResolveConflict(choice: 'local' | 'remote' | 'merge') {
     if (!userId || !conflictRemote) return
-    const next = choice === 'local' ? text : conflictRemote
+    const next =
+      choice === 'local'
+        ? text
+        : choice === 'remote'
+          ? conflictRemote
+          : mergeJournalConflictTexts(text, conflictRemote)
     dispatch({ type: 'resolveConflict', text: next })
     writeDayJournal(userId, next)
     await persistJournal(next, userId, lang)
@@ -202,6 +208,24 @@ export function DayJournalCard() {
         >
           <p className="font-semibold text-[var(--text-1)]">{t('dashboard.journalConflictTitle')}</p>
           <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.journalConflictHint')}</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-2">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
+                {t('dashboard.journalConflictLocalLabel')}
+              </p>
+              <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-xs text-[var(--text-2)]">
+                {text}
+              </p>
+            </div>
+            <div className="rounded-lg border border-[var(--border)] bg-[var(--bg-card)] p-2">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
+                {t('dashboard.journalConflictRemoteLabel')}
+              </p>
+              <p className="mt-1 line-clamp-4 whitespace-pre-wrap text-xs text-[var(--text-2)]">
+                {conflictRemote}
+              </p>
+            </div>
+          </div>
           <div className="mt-3 flex flex-col gap-2 sm:flex-row">
             <button
               type="button"
@@ -216,6 +240,13 @@ export function DayJournalCard() {
               className="flex-1 rounded-lg border border-[#534AB7]/30 bg-[#EEEDFE]/80 px-3 py-2 text-xs font-semibold text-[#534AB7] hover:bg-[#EEEDFE] dark:bg-[#2d2a5e]/50 dark:text-[#a09be8]"
             >
               {t('dashboard.journalUseRemote')}
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleResolveConflict('merge')}
+              className="flex-1 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+            >
+              {t('dashboard.journalMergeBoth')}
             </button>
           </div>
         </div>

@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-06 — Beşinci sprint: E2E CI, journal birleştir, idempotent moderation ✅
+
+**CI & dokümantasyon:**
+- `.github/workflows/e2e.yml` — build + Playwright chromium (landing smoke her zaman)
+- `docs/deploy/github-secrets.md` — Supabase + E2E secret listesi
+- `playwright.config.ts` — CI'da `npm run start` webServer
+- `migrate-check.yml` — secret doc referansı
+
+**Journal çakışma UX:**
+- Yan yana local/bulut önizleme + **İkisini birleştir** (`journalMerge.ts`)
+- i18n: `journalMergeBoth`, conflict label'ları
+
+**Moderasyon & kopyala:**
+- `moderationApproval` — mevcut `*En` alanları varsa Gemini atlanır (+ unit test)
+- `ItirazCard` — kopyala/WhatsApp aktif dil + i18n etiketler
+- `EgitimContent` — kopyala `maddelerEn` kullanır
+
+**Smoke:**
+- `docs/smoke/day-journal-cross-device.md` — migration verify + conflict + E2E bölümü
+
 ## 2026-06-06 — Dördüncü sprint: E2E auth, journal çakışma, moderation EN, CI remote ✅
 
 **E2E & Playwright:**

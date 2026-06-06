@@ -4,9 +4,16 @@ import { Check, CheckCircle2, ChevronDown, Circle, Copy, Star, Trash2 } from 'lu
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { Itiraz } from '../types'
 
-function buildCopyValue(itiraz: Itiraz, cevap: string): string {
-  if (itiraz.cevap) return cevap
-  return `${itiraz.kisaCevap ? `Kısa Cevap:\n${itiraz.kisaCevap}\n\n` : ''}${itiraz.detayliCevap ? `Detaylı Cevap:\n${itiraz.detayliCevap}\n\n` : ''}${itiraz.ornekDiyalog ? `Örnek Diyalog:\n${itiraz.ornekDiyalog}` : ''}`.trim()
+function buildCopyValue(
+  cevapDisplay: string,
+  hasStructuredCevap: boolean,
+  kisaCevap: string | undefined,
+  detayliCevap: string | undefined,
+  ornekDiyalog: string | undefined,
+  labels: { short: string; detailed: string; dialog: string },
+): string {
+  if (hasStructuredCevap) return cevapDisplay
+  return `${kisaCevap ? `${labels.short}:\n${kisaCevap}\n\n` : ''}${detayliCevap ? `${labels.detailed}:\n${detayliCevap}\n\n` : ''}${ornekDiyalog ? `${labels.dialog}:\n${ornekDiyalog}` : ''}`.trim()
 }
 
 type Props = {
@@ -46,7 +53,18 @@ export function ItirazCard({
   const yaklasim = lang === 'en' && itiraz.yaklasimEn ? itiraz.yaklasimEn : itiraz.yaklasim
   const ornekDiyalog =
     lang === 'en' && itiraz.ornekDiyalogEn ? itiraz.ornekDiyalogEn : itiraz.ornekDiyalog
-  const copyValue = buildCopyValue(itiraz, cevap)
+  const copyValue = buildCopyValue(
+    cevap,
+    !!itiraz.cevap,
+    kisaCevap,
+    detayliCevap,
+    ornekDiyalog,
+    {
+      short: t('objectionsPage.copyShortAnswer'),
+      detailed: t('objectionsPage.copyDetailedAnswer'),
+      dialog: t('objectionsPage.copyExampleDialog'),
+    },
+  )
 
   return (
     <li id={`konu-${itiraz.id}`}>

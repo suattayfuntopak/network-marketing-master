@@ -215,6 +215,9 @@ export const en = {
     journalConflictHint: "Choose which version to keep.",
     journalKeepLocal: "Keep this device",
     journalUseRemote: "Use cloud version",
+    journalMergeBoth: "Merge both",
+    journalConflictLocalLabel: "This device",
+    journalConflictRemoteLabel: "Cloud",
     dayCloseJournalLink: "Full field journal & AI summary → Today page",
   },
   pipeline: {

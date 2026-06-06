@@ -6,6 +6,22 @@ Deploy sonrası cross-device doğrulama checklist'i.
 
 - `057_day_journal.sql` production'da uygulanmış (`nmm_day_journal` tablosu mevcut).
 - Uygulama deploy edilmiş.
+- GitHub Actions secret'ları: bkz. [`docs/deploy/github-secrets.md`](../deploy/github-secrets.md).
+
+## Migration doğrulama
+
+```bash
+npm run migrate:check
+# Linked proje ile drift:
+npm run migrate:check:remote
+```
+
+Supabase Table Editor'da `nmm_day_journal` tablosu görünmeli. Yoksa:
+
+```bash
+supabase db push
+# veya Dashboard → SQL → 057_day_journal.sql
+```
 
 ## Adımlar
 
@@ -16,11 +32,26 @@ Deploy sonrası cross-device doğrulama checklist'i.
 5. **Cihaz B**'de metni düzenle → Cihaz A'da sayfayı yenile → güncel metin gelmeli.
 6. Metni tamamen sil → DB satırı silinmeli (delete-on-empty).
 
+## Çakışma (conflict) UI
+
+1. **Cihaz A** — offline veya sync beklemeden metin yaz.
+2. **Cihaz B** — farklı metin yaz ve sync et.
+3. **Cihaz A** — online olup sayfayı aç → amber uyarı, yan yana önizleme görünmeli.
+4. **Bu cihaz / Bulut / İkisini birleştir** seçeneklerinden birini dene; seçim sonrası textarea düzenlenebilir olmalı.
+
 ## Offline / retry
 
 1. DevTools → Network → Offline.
 2. Günlüğe metin yaz → "Yerel kaydedildi — bulut senkronu bekliyor" toast'u görünmeli.
 3. Online'a dön → birkaç saniye içinde sync tamamlanmalı (toast tekrar etmemeli).
+
+## Otomatik E2E
+
+```bash
+PLAYWRIGHT_TEST_EMAIL=... PLAYWRIGHT_TEST_PASSWORD=... npm run test:e2e
+```
+
+CI: `.github/workflows/e2e.yml` (landing smoke her zaman; auth testleri secret varsa).
 
 ## Başarısızlık
 

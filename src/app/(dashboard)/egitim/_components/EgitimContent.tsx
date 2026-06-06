@@ -315,7 +315,13 @@ export function EgitimContent({ embedded = false }: { embedded?: boolean }) {
                 onToggle={() => toggle(konu.id)}
                 onToggleRead={e => toggleRead(konu.id, e)}
                 onToggleFav={e => toggleFav(konu.id, e)}
-                onCopy={e => copyKonu(konu.maddeler, konu.id, e)}
+                onCopy={e =>
+                  copyKonu(
+                    lang === 'en' && konu.maddelerEn?.length ? konu.maddelerEn : konu.maddeler,
+                    konu.id,
+                    e,
+                  )
+                }
                 onDelete={
                   konu.isCustom
                     ? () => {

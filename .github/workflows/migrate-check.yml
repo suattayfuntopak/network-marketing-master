@@ -48,6 +48,7 @@ jobs:
         run: |
           if [ -z "$SUPABASE_ACCESS_TOKEN" ] || [ -z "$SUPABASE_PROJECT_REF" ]; then
             echo "SUPABASE_ACCESS_TOKEN / SUPABASE_PROJECT_REF not set — remote check skipped"
+            echo "See docs/deploy/github-secrets.md"
             exit 0
           fi
           supabase link --project-ref "$SUPABASE_PROJECT_REF"

@@ -215,6 +215,9 @@ export const tr = {
     journalConflictHint: "Hangisini kullanmak istediğinizi seçin.",
     journalKeepLocal: "Bu cihazdakini kullan",
     journalUseRemote: "Buluttakini kullan",
+    journalMergeBoth: "İkisini birleştir",
+    journalConflictLocalLabel: "Bu cihaz",
+    journalConflictRemoteLabel: "Bulut",
     dayCloseJournalLink: "Uzun saha günlüğü ve YZ özeti → Bugün sayfası",
   },
   pipeline: {

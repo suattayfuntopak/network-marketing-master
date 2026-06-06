@@ -85,6 +85,9 @@ export const trainingSection = {
       copied: 'Kopyalandı!',
       copyAnswer: 'Cevabı Kopyala',
       sendViaWhatsApp: 'WhatsApp İle Gönder',
+      copyShortAnswer: 'Kısa Cevap',
+      copyDetailedAnswer: 'Detaylı Cevap',
+      copyExampleDialog: 'Örnek Diyalog',
     },
   },
   en: {
@@ -173,6 +176,9 @@ export const trainingSection = {
       copied: 'Copied!',
       copyAnswer: 'Copy Answer',
       sendViaWhatsApp: 'Send via WhatsApp',
+      copyShortAnswer: 'Short Answer',
+      copyDetailedAnswer: 'Detailed Answer',
+      copyExampleDialog: 'Example Dialog',
     },
   },
 } as const
