@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-06 — Ekibim: kart sadeleştirme + sekme-only açılım ✅
+
+- Chevron ve sil butonları kaldırıldı; içerik yalnızca sekme tıklanınca açılıyor (aynı sekmeye tekrar tık = kapanır).
+- Profil: avatar + isim + rozet tek satır; tarih, üye/lider alt metni, toplam aday metriği kaldırıldı.
+- Lider (Suat) kartı da aynı sekme yapısına alındı; DDBR sekmesi yalnızca `member` rolünde.
+- **Dosyalar:** `TeamPerformanceSection.tsx`, `EkipPanel.tsx`.
+
 ## 2026-06-06 — Ekibim: Ara + Aktivite sekme düzeltmeleri ✅
 
 - **Ara sekmesi:** Telefon numarası gizlendi; yalnızca Ara butonu (`tel:` satırdaki üyeyi arar).

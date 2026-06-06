@@ -5,13 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
-  Crown, Check, Trash2, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot, Loader2,
+  Crown, Check, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot,
   Phone, Search, BarChart3, Target,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
-import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
 import { waHref } from '@/lib/utils/waLink'
@@ -32,10 +31,6 @@ export interface TeamPerformanceSectionProps {
   hasMasterAccess: boolean
   scorecardOpen: boolean
   setScorecardOpen: (open: boolean) => void
-  expandedMembers: Record<string, boolean>
-  setExpandedMembers: React.Dispatch<React.SetStateAction<Record<string, boolean>>>
-  removingId: string | null
-  setMemberToRemove: (member: { id: string; name: string } | null) => void
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
   toggleOnboardingStep: (userId: string, stepId: string, isStepDone: boolean) => Promise<void>
   handleInviteMember: (member: MemberRow) => void
@@ -51,8 +46,8 @@ type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
-    scorecardOpen, setScorecardOpen, expandedMembers, setExpandedMembers,
-    removingId, setMemberToRemove, setOnboardingCoachData,
+    scorecardOpen, setScorecardOpen,
+    setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange,
     teamPulseUnlocked, teamPageUnlocked,
@@ -61,15 +56,17 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const router = useRouter()
   // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
-  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab>>({})
+  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
-    setMemberCardTab(prev => ({ ...prev, [userId]: tab }))
-    setExpandedMembers(prev => ({ ...prev, [userId]: true }))
+    setMemberCardTab(prev => ({
+      ...prev,
+      [userId]: prev[userId] === tab ? undefined : tab,
+    }))
   }
 
-  const getMemberTab = (userId: string): MemberCardTab => memberCardTab[userId] ?? 'funnel'
+  const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
 
   const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
@@ -209,7 +206,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
             const daysInactive = lastActiveDate ? Math.floor((now - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
             const isInactive = daysInactive >= 7 && !isCurrentUser
-            const isCardExpanded = isCurrentUser || !!expandedMembers[m.user_id]
             const onboardingDone = m.onboarding_steps?.length ?? 0
             const onboardingPct = Math.min(100, Math.round((onboardingDone / ONBOARDING_STEP_COUNT) * 100))
             const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
@@ -219,100 +215,45 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               <li
                 key={m.user_id}
                 className={clsx(
-                  'relative overflow-hidden rounded-2xl border transition-all duration-200 p-6 shadow-sm hover:shadow-md space-y-5',
+                  'overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4',
                   getTeamMemberCardClasses(m, isInactive)
                 )}
               >
-                {/* Kart Sağ Üst Buton Grubu - Sleek, Absolute Positioned */}
-                {!isCurrentUser && m.isAppUser !== false && (
-                  <div className={`absolute top-4 right-4 flex items-center gap-2 ${Z.cardControls}`}>
-                    {/* Chevron Açma/Kapama Butonu */}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setExpandedMembers(prev => ({
-                          ...prev,
-                          [m.user_id]: !prev[m.user_id]
-                        }))
-                      }}
-                      className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] hover:text-[var(--text-1)] transition active:scale-95 cursor-pointer border border-[var(--border)] shadow-sm"
-                      title={isCardExpanded ? t('team.collapseDetails') : t('team.expandDetails')}
-                    >
-                      {isCardExpanded ? <ChevronUp className="h-4.5 w-4.5" /> : <ChevronDown className="h-4.5 w-4.5" />}
-                    </button>
-
-                    {/* Silme Çöp Kutusu Butonu */}
-                    {isLeader && (
-                      <button
-                        type="button"
-                        onClick={() => setMemberToRemove({ id: m.user_id, name: m.full_name ?? t('common.member') })}
-                        disabled={removingId === m.user_id}
-                        className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition active:scale-95 disabled:opacity-50 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 cursor-pointer border border-red-200/20 dark:border-red-900/10 shadow-sm"
-                        title={t('team.removeFromTeam')}
-                      >
-                        {removingId === m.user_id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
-                        )}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Kart Üst Bölümü */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  {/* Sol Taraf: Avatar ve İsim Detayları */}
+                {/* Kart üst: kompakt profil */}
+                <div className={clsx(
+                  'flex items-center gap-3',
+                  m.isAppUser === false && 'flex-col sm:flex-row sm:justify-between'
+                )}>
                   {(() => {
-                    const profileClass = 'flex min-w-0 flex-1 items-center gap-4'
+                    const roleBadge = m.role === 'leader' ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[10px] font-black text-[#854F0B] dark:text-amber-400 leading-none">
+                        <Crown className="h-3 w-3" strokeWidth={2.5} />
+                        <span>{t('common.leader')}</span>
+                      </span>
+                    ) : m.isAppUser !== false ? (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-purple-100 dark:bg-purple-950/40 border border-purple-200/30 dark:border-purple-900/20 px-2 py-0.5 text-[10px] font-black text-purple-700 dark:text-purple-400 leading-none">
+                        <span>💎</span>
+                        <span>{t('team.nmmPartner')}</span>
+                      </span>
+                    ) : (
+                      <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/30 dark:border-zinc-700/20 px-2 py-0.5 text-[10px] font-black text-zinc-600 dark:text-zinc-400 leading-none">
+                        <span>🤝</span>
+                        <span>{t('team.fieldPartner')}</span>
+                      </span>
+                    )
+                    const profileClass = 'flex min-w-0 flex-1 items-center gap-2.5 sm:gap-3'
                     const profileInner = (
                       <>
-                    <PersonAvatar
-                      name={m.full_name ?? '?'}
-                      imageUrl={m.avatar_url}
-                      size="lg"
-                      className="font-black"
-                    />
-                    
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 pr-16 sm:pr-0">
-                        <p className="text-lg font-black text-[var(--text-1)] break-words leading-tight">
-                          {m.full_name ?? 'İsimsiz Üye'}
-                          {isCurrentUser && <span className="ml-2 text-sm font-normal text-[var(--text-3)]">({t('common.you')})</span>}
+                        <PersonAvatar
+                          name={m.full_name ?? '?'}
+                          imageUrl={m.avatar_url}
+                          size="md"
+                          className="font-black shrink-0"
+                        />
+                        <p className="min-w-0 truncate text-sm sm:text-base font-black text-[var(--text-1)] leading-tight">
+                          {m.full_name ?? t('statsPage.unnamedMember')}
                         </p>
-                        {m.role === 'leader' ? (
-                          <Crown className="h-5 w-5 shrink-0 text-[#854F0B]" strokeWidth={2.5} />
-                        ) : m.isAppUser !== false ? (
-                          <span className="shrink-0 rounded-full bg-purple-100 dark:bg-purple-950/40 border border-purple-200/30 dark:border-purple-900/20 px-2.5 py-0.5 text-[10px] font-black text-purple-700 dark:text-purple-400 flex items-center gap-1 shadow-sm leading-none">
-                            <span>💎</span>
-                            <span>{t('team.nmmPartner')}</span>
-                          </span>
-                        ) : (
-                          <span className="shrink-0 rounded-full bg-zinc-100 dark:bg-zinc-800/60 border border-zinc-200/30 dark:border-zinc-700/20 px-2.5 py-0.5 text-[10px] font-black text-zinc-600 dark:text-zinc-400 flex items-center gap-1 shadow-sm leading-none">
-                            <span>🤝</span>
-                            <span>{t('team.fieldPartner')}</span>
-                          </span>
-                        )}
-                      </div>
-                      
-                      <p className="text-sm text-[var(--text-2)] font-medium capitalize flex flex-wrap items-center gap-x-2 gap-y-1 pr-16 sm:pr-0">
-                        <span className="font-extrabold text-[var(--text-1)]">
-                          {m.isAppUser === false
-                            ? t('team.fieldDistributor')
-                            : (m.role === 'leader' ? t('common.leader') : t('common.member'))}
-                        </span>
-                        {m.joined_at && (
-                          <span className="text-xs text-[var(--text-3)]/90">
-                            · {new Date(m.joined_at).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })} {t('team.joined')}
-                          </span>
-                        )}
-                        {lastActiveDate && (
-                          <span className={`text-xs ${isInactive ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-[var(--text-3)]/90'}`}>
-                            · {t('team.lastActive')} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })} ({daysInactive === 0 ? t('team.todayShort') : t('team.daysAgoShort', { days: daysInactive })})
-                          </span>
-                        )}
-                      </p>
-                    </div>
+                        {roleBadge}
                       </>
                     )
                     return m.pipeline_id ? (
@@ -324,47 +265,38 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     )
                   })()}
 
-                  {/* Sağ Taraf: Toplam Aday Göstergesi veya (YZ davet + NMM'e Davet Et) */}
-                  <div className={`flex items-center justify-end gap-3 border-t border-dashed border-[var(--border)] pt-3 sm:pt-0 sm:border-0 w-full sm:w-auto ${m.isAppUser === false ? '' : 'sm:pr-24'}`}>
-                    {m.isAppUser === false ? (
-                      <div className="flex items-center gap-2 shrink-0">
-                        {/* YZ Koçu: kişiye özel NMM davet metnini onun sayfasında hazırlar */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
-                          }}
-                          disabled={!m.pipeline_id}
-                          className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40"
-                          title={t('team.aiInviteTitle')}
-                          aria-label={t('team.aiInviteTitle')}
-                        >
-                          <Bot className="h-5 w-5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleInviteMember(m)
-                          }}
-                          className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-4 py-2.5 text-sm font-black shadow-md cursor-pointer shrink-0"
-                        >
-                          <WhatsAppIcon className="h-4.5 w-4.5 fill-current text-white" />
-                          <span>{t('team.inviteToNmm')}</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="text-right">
-                        <p className="text-3xl font-black text-accent-blue tabular-nums leading-none">{m.candidate_count}</p>
-                        <p className="text-xs text-[var(--text-2)] font-bold uppercase tracking-wider mt-1">{t('team.totalCandidates')}</p>
-                      </div>
-                    )}
-                  </div>
+                  {m.isAppUser === false && (
+                    <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
+                        }}
+                        disabled={!m.pipeline_id}
+                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40"
+                        title={t('team.aiInviteTitle')}
+                        aria-label={t('team.aiInviteTitle')}
+                      >
+                        <Bot className="h-5 w-5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleInviteMember(m)
+                        }}
+                        className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-3 py-2 text-xs font-black shadow-md cursor-pointer shrink-0"
+                      >
+                        <WhatsAppIcon className="h-4 w-4 fill-current text-white" />
+                        <span>{t('team.inviteToNmm')}</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                {/* Downline üye: ikon sekmeleri + sekme içeriği */}
-                {!isCurrentUser && m.isAppUser !== false && m.role === 'member' && (() => {
+                {/* NMM kullanıcıları: ikon sekmeleri + sekme içeriği */}
+                {m.isAppUser !== false && (() => {
                   const activeTab = getMemberTab(m.user_id)
                   const weekTab = getOnboardingWeek(m.user_id)
                   const memberTabs: {
@@ -375,7 +307,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     wa?: boolean
                   }[] = [
                     { id: 'funnel', Icon: TrendingUp, label: t('team.funnelDistribution'), show: true },
-                    { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: true },
+                    { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
                     { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref },
                     { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, wa: true },
                     { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
@@ -448,7 +380,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                         </div>
                       )}
 
-                      {isCardExpanded && (
+                      {activeTab != null && (
                         <div
                           className="animate-in fade-in slide-in-from-top-1 duration-200"
                           role="tabpanel"
@@ -597,7 +529,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                 pipelineHref: m.pipeline_id ? `/pipeline/${m.pipeline_id}` : null,
                               }}
                               teamPulseUnlocked={teamPulseUnlocked}
-                              canEditGoal={isLeader && teamPageUnlocked}
+                              canEditGoal={isLeader && teamPageUnlocked && !isCurrentUser}
                             />
                           ) : null}
                         </div>
@@ -605,62 +537,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     </div>
                   )
                 })()}
-
-                {/* Lider / kendi kartı: huni dağılımı (sekme yok) */}
-                {isCardExpanded && m.isAppUser !== false && (isCurrentUser || m.role !== 'member') && (
-                  <div className="border-t border-[var(--border)] pt-5 space-y-5 animate-in fade-in slide-in-from-top-1 duration-200">
-                    {!hasMasterAccess && m.user_id !== ws.userId ? (
-                      <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
-                          <Crown className="h-5 w-5 animate-bounce" />
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-extrabold text-white">
-                            {t('team.plusRequired')}
-                          </h4>
-                          <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
-                            {t('team.plusRequiredDesc')}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={e => {
-                            e.stopPropagation()
-                            router.push('/odeme')
-                          }}
-                          className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
-                        >
-                          <span>{t('team.upgradeToMaster')}</span>
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm font-extrabold text-[var(--text-2)] uppercase tracking-wider">
-                          <TrendingUp className="h-5 w-5 shrink-0 text-brand" />
-                          <span>{t('team.funnelDistribution')}</span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
-                          <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                            <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
-                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
-                          </div>
-                          <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                            <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
-                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
-                          </div>
-                          <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                            <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
-                            <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
-                          </div>
-                          <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                            <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
-                            <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
               </li>
             )
           })}

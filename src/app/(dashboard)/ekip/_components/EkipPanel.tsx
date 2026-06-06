@@ -53,7 +53,6 @@ export function EkipPanel() {
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
   const [scorecardOpen, setScorecardOpen] = useState(true)
-  const [expandedMembers, setExpandedMembers] = useState<Record<string, boolean>>({})
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
     stepId: string
@@ -255,10 +254,6 @@ export function EkipPanel() {
         hasMasterAccess={hasMasterAccess}
         scorecardOpen={scorecardOpen}
         setScorecardOpen={setScorecardOpen}
-        expandedMembers={expandedMembers}
-        setExpandedMembers={setExpandedMembers}
-        removingId={removingId}
-        setMemberToRemove={setMemberToRemove}
         setOnboardingCoachData={setOnboardingCoachData}
         toggleOnboardingStep={toggleOnboardingStep}
         handleInviteMember={handleInviteMember}
