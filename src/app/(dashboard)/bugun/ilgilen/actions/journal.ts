@@ -33,6 +33,16 @@ export async function saveDayJournalAction(
   if (!user) return { error: 'unauthorized' }
 
   const trimmed = content.trim()
+  if (!trimmed) {
+    const { error } = await supabase
+      .from('nmm_day_journal')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('journal_date', journalDate)
+    if (error) return { error: error.message }
+    return { ok: true }
+  }
+
   const { error } = await supabase.from('nmm_day_journal').upsert(
     {
       user_id: user.id,

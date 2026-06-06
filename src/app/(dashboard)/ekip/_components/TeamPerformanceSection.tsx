@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, type ComponentType } from 'react'
+import { useState, useEffect, useCallback, type ComponentType } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
   Crown, Check, TrendingUp, BarChart2, Rocket, Bot,
@@ -42,7 +42,18 @@ export interface TeamPerformanceSectionProps {
 type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
 type FieldCardTab = 'aiInvite' | 'nmmInvite'
 
+const MEMBER_CARD_TABS: MemberCardTab[] = ['funnel', 'onboarding', 'call', 'whatsapp', 'activity']
+const FIELD_CARD_TABS: FieldCardTab[] = ['aiInvite', 'nmmInvite']
+
 const TEAM_TAB_STORAGE_KEY = 'nmm_team_perf_tabs'
+
+function isMemberCardTab(value: string | null): value is MemberCardTab {
+  return !!value && MEMBER_CARD_TABS.includes(value as MemberCardTab)
+}
+
+function isFieldCardTab(value: string | null): value is FieldCardTab {
+  return !!value && FIELD_CARD_TABS.includes(value as FieldCardTab)
+}
 
 function loadTeamTabState(): {
   member: Record<string, MemberCardTab | undefined>
@@ -72,36 +83,94 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberGoalsMap = {},
   } = props
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [now] = useState(() => Date.now())
-  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>(
-    () => loadTeamTabState().member,
-  )
-  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>(
-    () => loadTeamTabState().field,
-  )
+  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
+  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
+  const [tabsHydrated, setTabsHydrated] = useState(false)
+
+  const syncPerfTabsToUrl = useCallback((
+    member: Record<string, MemberCardTab | undefined>,
+    field: Record<string, FieldCardTab | undefined>,
+  ) => {
+    const params = new URLSearchParams(searchParams.toString())
+    const activeMember = Object.entries(member).find(([, tab]) => tab != null)
+    const activeField = Object.entries(field).find(([, tab]) => tab != null)
+
+    if (activeMember) {
+      params.set('perfMember', activeMember[0])
+      params.set('perfMemberTab', activeMember[1]!)
+    } else {
+      params.delete('perfMember')
+      params.delete('perfMemberTab')
+    }
+
+    if (activeField) {
+      params.set('perfField', activeField[0])
+      params.set('perfFieldTab', activeField[1]!)
+    } else {
+      params.delete('perfField')
+      params.delete('perfFieldTab')
+    }
+
+    const qs = params.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  }, [router, searchParams, pathname])
 
   useEffect(() => {
+    const stored = loadTeamTabState()
+    const member = { ...stored.member }
+    const field = { ...stored.field }
+
+    const urlMemberId = searchParams.get('perfMember')
+    const urlMemberTab = searchParams.get('perfMemberTab')
+    if (urlMemberId && isMemberCardTab(urlMemberTab)) {
+      member[urlMemberId] = urlMemberTab
+    }
+
+    const urlFieldId = searchParams.get('perfField')
+    const urlFieldTab = searchParams.get('perfFieldTab')
+    if (urlFieldId && isFieldCardTab(urlFieldTab)) {
+      field[urlFieldId] = urlFieldTab
+    }
+
+    setMemberCardTab(member)
+    setFieldCardTab(field)
+    setTabsHydrated(true)
+  }, [searchParams])
+
+  useEffect(() => {
+    if (!tabsHydrated) return
     sessionStorage.setItem(
       TEAM_TAB_STORAGE_KEY,
       JSON.stringify({ member: memberCardTab, field: fieldCardTab }),
     )
-  }, [memberCardTab, fieldCardTab])
+  }, [memberCardTab, fieldCardTab, tabsHydrated])
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
-    setMemberCardTab(prev => ({
-      ...prev,
-      [userId]: prev[userId] === tab ? undefined : tab,
-    }))
+    setMemberCardTab(prev => {
+      const next = {
+        ...prev,
+        [userId]: prev[userId] === tab ? undefined : tab,
+      }
+      syncPerfTabsToUrl(next, fieldCardTab)
+      return next
+    })
   }
 
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
 
   const selectFieldTab = (userId: string, tab: FieldCardTab) => {
-    setFieldCardTab(prev => ({
-      ...prev,
-      [userId]: prev[userId] === tab ? undefined : tab,
-    }))
+    setFieldCardTab(prev => {
+      const next = {
+        ...prev,
+        [userId]: prev[userId] === tab ? undefined : tab,
+      }
+      syncPerfTabsToUrl(memberCardTab, next)
+      return next
+    })
   }
 
   const getFieldTab = (userId: string): FieldCardTab | undefined => fieldCardTab[userId]

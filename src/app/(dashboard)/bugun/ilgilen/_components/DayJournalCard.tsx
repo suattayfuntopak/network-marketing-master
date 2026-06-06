@@ -72,10 +72,14 @@ export function DayJournalCard() {
     if (!userId || !hydrated) return
     const id = window.setTimeout(() => {
       writeDayJournal(userId, text)
-      void mergeDayJournalLangAction(text, lang)
+      void mergeDayJournalLangAction(text, lang).then(result => {
+        if ('error' in result) {
+          toast.message(t('dashboard.journalSavedLocal'))
+        }
+      })
     }, 400)
     return () => window.clearTimeout(id)
-  }, [text, userId, hydrated, lang])
+  }, [text, userId, hydrated, lang, t])
 
   async function handlePolish() {
     if (!text.trim()) return

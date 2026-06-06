@@ -20,3 +20,13 @@ Both are already applied in production. Renaming them now would cause Supabase t
 2. Name it descriptively: `019_short_kebab_purpose.sql`.
 3. Test locally first, then apply to staging, then production.
 4. After applying, regenerate types: `supabase gen types typescript --project-id <id> > src/types/database.types.ts` (or update manually — see `src/types/database.types.ts` header).
+
+## Deploy checklist (production öncesi)
+
+1. `npm run migrate:check` — numara çakışması / boşluk uyarıları.
+2. Pending migration'ları staging'e uygula: `supabase db push` (veya Dashboard SQL).
+3. Smoke test: yeni tablo/RLS ile ilgili UI akışını doğrula.
+4. Production'a aynı migration'ları uygula; `hot.md` deploy notuna ekle.
+5. Types drift varsa `database.types.ts` güncelle.
+
+**Pending (2026-06):** `057_day_journal.sql` — `nmm_day_journal` günlük senkronu.

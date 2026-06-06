@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-06 — Follow-up: migration check, lazy activity log, journal UX ✅
+
+**Deploy / migration:**
+- `scripts/check-migrations.mjs` + `npm run migrate:check`
+- `supabase/migrations/README.md` deploy checklist (057 pending)
+
+**Performans:**
+- `ActivityLogCard` — IntersectionObserver ile viewport'ta fetch; `useActivityHistory(enabled)`
+- `PlatformYonetimContent` — modallar `dynamic()` ile lazy chunk
+
+**Journal & i18n:**
+- `saveDayJournalAction` boş içerikte satır siler (delete-on-empty)
+- Supabase hata → `journalSavedLocal` toast; subtitle bulut senkronu yansıtıyor
+- Mobil nav: TR "Bakış", EN "Glance"
+
+**Ekip UX:**
+- `TeamPerformanceSection` — `?perfMember=&perfMemberTab=` URL + sessionStorage
+- `RejectModerationDialog` — her açılışta defaultReason ön-doldurma
+
 ## 2026-06-06 — Refactor sprint: CandidateDetail, admin-actions, günlük Supabase, Hızlı Bakış ✅
 
 **CandidateDetail.tsx (~175 satır azaldı):**

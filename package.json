@@ -10,7 +10,8 @@
     "lint:changed": "FILES=$(git diff --name-only --diff-filter=ACMR origin/main...HEAD -- '*.ts' '*.tsx'); if [ -z \"$FILES\" ]; then echo 'lint:changed — değişen TS/TSX yok'; else eslint $FILES; fi",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "migrate:check": "node scripts/check-migrations.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

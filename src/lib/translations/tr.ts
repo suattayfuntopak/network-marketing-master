@@ -69,7 +69,7 @@ export const tr = {
   },
   navMobile: {
     pano: "Pano",
-    todayFocus: "Hızlı Bakış",
+    todayFocus: "Bakış",
     pipeline: "Boru Hattı",
     takvim: "Takvim",
     ekip: "Ekibim",
@@ -205,10 +205,11 @@ export const tr = {
     crownMockSoon: "Bu özellik yakında — şimdilik mock.",
     weeklyLiteLink: "Detaylı istatistikler →",
     journalTitle: "Saha günlüğü",
-    journalSubtitle: "Bugün sahada ne oldu? İsteğe bağlı — cihazında saklanır.",
+    journalSubtitle: "Bugün sahada ne oldu? İsteğe bağlı — cihazınızda ve bulutta saklanır.",
     journalPlaceholder: "Örn: 3 sunum, Ayşe ile iyi görüşme, yarın takip…",
     journalPolish: "YZ ile özetle",
     journalPolished: "Günlük özet hazır",
+    journalSavedLocal: "Yerel kaydedildi — bulut senkronu bekliyor",
     dayCloseJournalLink: "Uzun saha günlüğü ve YZ özeti → Bugün sayfası",
   },
   pipeline: {

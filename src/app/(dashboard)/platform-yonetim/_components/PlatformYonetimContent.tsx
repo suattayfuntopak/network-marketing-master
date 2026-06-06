@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -9,7 +10,7 @@ import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatfor
 import {
   Crown, Users, ShieldCheck, Search,
   Mail, Sparkles, UserPlus, BookOpen, MessageSquare,
-  Plus, Loader2, X, ArrowUpRight, CheckCircle2
+  Plus, Loader2, X, ArrowUpRight, CheckCircle2, Trash2
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
@@ -28,14 +29,26 @@ import {
   rejectRequestAction,
   type ModerationRequestItem
 } from '@/app/(dashboard)/actions/moderation'
-import { WorkspaceLicenseModal } from './WorkspaceLicenseModal'
-import { ModerationReviewModal } from './ModerationReviewModal'
-import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { RejectModerationDialog } from './RejectModerationDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
-import { UnresolvedOrdersAlert } from './UnresolvedOrdersAlert'
+
+const WorkspaceLicenseModal = dynamic(
+  () => import('./WorkspaceLicenseModal').then(m => ({ default: m.WorkspaceLicenseModal })),
+  { loading: () => null },
+)
+const ModerationReviewModal = dynamic(
+  () => import('./ModerationReviewModal').then(m => ({ default: m.ModerationReviewModal })),
+  { loading: () => null },
+)
+const UnresolvedOrdersAlert = dynamic(
+  () => import('./UnresolvedOrdersAlert').then(m => ({ default: m.UnresolvedOrdersAlert })),
+  { loading: () => null },
+)
+const RejectModerationDialog = dynamic(
+  () => import('./RejectModerationDialog').then(m => ({ default: m.RejectModerationDialog })),
+  { loading: () => null },
+)
 
 const DEFAULT_REJECT_REASON =
   'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'

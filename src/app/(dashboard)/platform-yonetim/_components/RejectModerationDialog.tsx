@@ -22,12 +22,13 @@ export function RejectModerationDialog({ defaultReason, onConfirm, onCancel }: P
 
   useEffect(() => {
     setMounted(true)
+    setReason(defaultReason)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onCancel()
     }
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
-  }, [onCancel])
+  }, [onCancel, defaultReason])
 
   if (!mounted) return null
 

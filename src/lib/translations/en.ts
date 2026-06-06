@@ -69,7 +69,7 @@ export const en = {
   },
   navMobile: {
     pano: "Dashboard",
-    todayFocus: "Today",
+    todayFocus: "Glance",
     pipeline: "Pipeline",
     takvim: "Calendar",
     ekip: "Team",
@@ -205,10 +205,11 @@ export const en = {
     crownMockSoon: "Coming soon — mock for now.",
     weeklyLiteLink: "Full statistics →",
     journalTitle: "Field journal",
-    journalSubtitle: "What happened in the field today? Optional — saved on this device.",
+    journalSubtitle: "What happened in the field today? Optional — saved locally and synced to cloud.",
     journalPlaceholder: "e.g. 3 presentations, good chat with Ayşe, follow up tomorrow…",
     journalPolish: "Summarize with AI",
     journalPolished: "Journal summary ready",
+    journalSavedLocal: "Saved locally — cloud sync pending",
     dayCloseJournalLink: "Full field journal & AI summary → Today page",
   },
   pipeline: {

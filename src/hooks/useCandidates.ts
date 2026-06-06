@@ -287,7 +287,7 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
   })
 }
 
-export function useActivityHistory(candidateId: string) {
+export function useActivityHistory(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
     queryKey: ['activity', candidateId],
     queryFn: async () => {
@@ -301,7 +301,7 @@ export function useActivityHistory(candidateId: string) {
       if (error) throw new Error(error.message)
       return data ?? []
     },
-    enabled: !!candidateId,
+    enabled: !!candidateId && queryEnabled,
   })
 }
 

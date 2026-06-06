@@ -5,6 +5,7 @@ import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import type { CandidateStage } from '@/types/database.types'
 
+/** Aday listesinden dönem metrikleri — İstatistikler sayfası; Akademi vb. için de kullanılabilir. */
 export type CandidateStatsRow = {
   stage: CandidateStage
   created_at: string
