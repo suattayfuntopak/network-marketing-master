@@ -362,6 +362,7 @@ export const en = {
     todayShort: "today",
     daysAgoShort: "{days} d ago",
     inviteToNmm: "Invite to NMM 🚀",
+    inviteBtn: "Invite",
     aiInviteTitle: "Draft a personalized NMM invite with AI",
     plusRequired: "Plus Plan Required",
     plusRequiredDesc: "To track your downline's candidate funnels, view onboarding progress, and receive real-time updates, you need an active Plus license.",

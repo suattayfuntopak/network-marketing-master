@@ -141,10 +141,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                 )}
               >
                 {/* Kart üst: kompakt profil */}
-                <div className={clsx(
-                  'flex items-center gap-3',
-                  m.isAppUser === false && 'flex-col sm:flex-row sm:justify-between'
-                )}>
+                <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                   {(() => {
                     const roleBadge = m.role === 'leader' ? (
                       <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 border border-amber-200/30 dark:border-amber-900/20 px-2 py-0.5 text-[10px] font-black text-[#854F0B] dark:text-amber-400 leading-none">
@@ -187,7 +184,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   })()}
 
                   {m.isAppUser === false && (
-                    <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
+                    <div className="flex shrink-0 items-center gap-1.5">
                       <button
                         type="button"
                         onClick={(e) => {
@@ -195,11 +192,11 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                           if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
                         }}
                         disabled={!m.pipeline_id}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40"
+                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40"
                         title={t('team.aiInviteTitle')}
                         aria-label={t('team.aiInviteTitle')}
                       >
-                        <Bot className="h-5 w-5" />
+                        <Bot className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
@@ -207,10 +204,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                           e.stopPropagation()
                           handleInviteMember(m)
                         }}
-                        className="flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-3 py-2 text-xs font-black shadow-md cursor-pointer shrink-0"
+                        className="flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-2.5 py-2 text-[11px] sm:text-xs font-black shadow-md cursor-pointer whitespace-nowrap"
                       >
-                        <WhatsAppIcon className="h-4 w-4 fill-current text-white" />
-                        <span>{t('team.inviteToNmm')}</span>
+                        <WhatsAppIcon className="h-4 w-4 shrink-0 fill-current text-white" />
+                        <span>{t('team.inviteBtn')}</span>
                       </button>
                     </div>
                   )}
