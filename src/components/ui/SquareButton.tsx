@@ -140,7 +140,7 @@ export function SquareButton({
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
               ? variant === 'crown'
-                ? 'line-clamp-2 text-center text-sm font-semibold leading-tight'
+                ? 'line-clamp-2 text-center text-base font-semibold leading-snug md:text-[17px]'
                 : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
               : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }
