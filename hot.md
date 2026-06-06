@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-06 — Refactor: PlatformYonetimContent bölünmesi + perf-progress düzeltmesi ✅
+
+**PlatformYonetimContent (1192 satır → 808 satır, %32 küçülme):**
+- `WorkspaceLicenseModal` → yeni ayrı dosya; kendi state'ini yönetiyor (licenseType, extensionDays, isUnlimited, isUpdating)
+- `ModerationReviewModal` → yeni ayrı dosya; 10 edit* field + isModerating kendi içinde; lazily initialize from request.data
+- `handleOpenReview()` artık sadece `setSelectedRequest(req)` — karmaşık state senkronizasyonu ortadan kalktı
+- License trigger button artık sadece `setSelectedWorkspace(w)` — modal state'i kendi başlatıyor
+
+**IstatistiklerContent perf-progress staleTime:**
+- `staleTime: 30_000` (30s) → `staleTime: 2 * 60_000` (2dk) — global config ile uyumlu, gereksiz yeniden fetch azaldı
+
+**animate-in fade-in:**
+- Lazy-mount pattern ile zaten çözüldü: sekmeler ilk ziyarette animate olur (doğru UX), sonraki geçişler anlık CSS (animasyon yok = daha iyi)
+
 ## 2026-06-06 — Perf: lazy-mount tab pattern (gerçek düzeltme) ✅
 
 **Sorun:** Önceki "always-mounted" yaklaşım ilk yüklemede TÜM sekmeleri aynı anda render ediyordu.
