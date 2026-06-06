@@ -18,8 +18,8 @@ export function LauncherGrid({ children, fillViewport = false }: LauncherGridPro
     >
       <div
         className={clsx(
-          'grid w-full grid-cols-2 gap-3 md:grid-cols-3 md:gap-[1.125rem]',
-          fillViewport && 'min-h-0 md:h-full md:flex-1 md:grid-rows-2',
+          'grid w-full grid-cols-2 md:grid-cols-3',
+          fillViewport ? 'min-h-0 h-full flex-1 grid-rows-3 gap-2 md:grid-rows-2 md:gap-[1.125rem]' : 'gap-3 md:gap-[1.125rem]',
         )}
       >
         {children}
@@ -41,7 +41,7 @@ export function LauncherGridItem({
     <div
       className={clsx(
         'relative min-w-0',
-        fillViewport ? 'aspect-square md:aspect-auto md:h-full md:min-h-0' : 'aspect-square',
+        fillViewport ? 'h-full min-h-0' : 'aspect-square',
         className,
       )}
     >

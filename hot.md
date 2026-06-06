@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-07 — Pano mobil viewport sığdırma + etiket 15/20px ✅
+
+**Mobil 6 kutu tam görünür:** `aspect-square` kaldırıldı; `grid-rows-3` + `h-full flex-1` ile kalan yükseklik paylaşılıyor. Pano `main` mobilde `h-[calc(100dvh-4rem)] overflow-hidden`, flex zinciri `min-h-0`.
+
+**Etiket puntoları:** Mobil `15px`, masaüstü `20px` (crown + prominent + fill).
+
+**Dosyalar:** `LauncherGrid.tsx`, `pano/page.tsx`, `PanoContent.tsx`, `SquareButton.tsx`
+
 ## 2026-06-06 — Pano launcher kutu etiketleri büyütüldü ✅
 
 **SquareButton crown + prominent:** Kutu isimleri mobilde `text-sm` (14px) → `text-base` (16px), masaüstünde `17px`; `leading-snug` ile iki satırlı etiketler okunaklı.

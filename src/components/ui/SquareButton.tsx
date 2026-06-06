@@ -35,7 +35,7 @@ const filledClass = (
     opts?.compact
       ? 'h-[76px] p-3'
       : opts?.fill
-        ? 'h-full w-full p-4 md:p-6'
+        ? 'h-full w-full p-3 md:p-6'
         : opts?.prominent
           ? 'aspect-square p-4 md:p-7'
           : 'aspect-square p-4 md:p-6',
@@ -63,7 +63,7 @@ const crownClass = (
 ) =>
   clsx(
     'flex flex-col items-center justify-center',
-    opts?.compact ? 'gap-1.5' : 'gap-2 md:gap-3',
+    opts?.compact ? 'gap-1.5' : opts?.fill ? 'gap-1.5 md:gap-3' : 'gap-2 md:gap-3',
     'rounded-[14px] md:rounded-[12px]',
     'transition-all duration-150',
     'active:scale-95 hover:scale-[1.03]',
@@ -73,7 +73,7 @@ const crownClass = (
     opts?.compact
       ? 'h-[76px] p-3'
       : opts?.fill
-        ? 'h-full w-full p-4 md:p-6'
+        ? 'h-full w-full p-3 md:p-6'
         : opts?.prominent
           ? 'aspect-square p-4 md:p-6'
           : 'aspect-square p-4 md:p-5',
@@ -140,7 +140,7 @@ export function SquareButton({
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
               ? variant === 'crown'
-                ? 'line-clamp-2 text-center text-base font-semibold leading-snug md:text-[17px]'
+                ? 'line-clamp-2 text-center text-[15px] font-semibold leading-snug md:text-[20px]'
                 : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
               : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }
