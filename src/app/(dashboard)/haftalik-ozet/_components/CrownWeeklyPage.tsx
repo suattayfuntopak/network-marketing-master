@@ -15,7 +15,7 @@ import { getHubWeeklySelfAction } from '@/app/(dashboard)/crown/actions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { queryKeys } from '@/lib/query/keys'
 
-export function CrownWeeklyPage() {
+export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
@@ -67,6 +67,7 @@ export function CrownWeeklyPage() {
       iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400"
       onRefresh={refresh}
       refreshing={membersLoading || activityLoading || weeklySelfLoading}
+      asTab={asTab}
     >
       <HubWeeklySelfBar data={weeklySelf} loading={weeklySelfLoading} />
       <PanoWeeklyLite />

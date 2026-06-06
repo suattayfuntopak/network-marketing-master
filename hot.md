@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-06 — Bugün İlgilen: gerçek sekme sistemi (SPA) ✅
+
+- Sekme çubuğu artık ayrı sayfalara gitmez; `/bugun/ilgilen?tab=daily|live|team|weekly|monthly|first30` URL search param ile aynı sayfada içerik değişir.
+- **Günlük Takip (daily):** Hedef chip → AI öncelik listesi (IlgilenContent, tüm aksiyonlar + AI mesaj) → HedefKart → FieldWeekSummary → Gün ritüeli.
+- **Diğer 5 sekme:** Canlı Eğitim, Ekibim, Haftalık, Aylık, İlk 30 Gün; Crown sayfa bileşenleri `asTab={true}` ile shell/başlık olmadan render edilir.
+- **Silinen:** `BugunHubSections.tsx` (pano modüllerinin yığıldığı aşırı yüklü bileşen).
+- **Yeni:** `IlgilenHub.tsx` (SPA hub, useSearchParams), `DailyTab.tsx` (temiz günlük içerik).
+- Standalone Crown route'ları (`/bugunku-takibim` vb.) korundu — direkt URL ile erişilince HubPageShell (geri butonu) ile çalışmaya devam eder.
+- **Dosyalar:** `page.tsx`, `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx` (yeni), `DailyTab.tsx` (yeni), `HubPageShell.tsx`, 5 Crown sayfası (asTab prop).
+
 ## 2026-06-04 — Bugün İlgilen: YZ Koçu tarzı sekmeler + swipe kilidi ✅
 
 - Sekmeler belirgin (renkli aktif durum + ikon); ilk sekme varsayılan seçili.

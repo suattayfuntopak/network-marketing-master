@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   BarChart3,
@@ -14,29 +13,33 @@ import {
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
+export const ILGILEN_TAB_IDS = ['daily', 'live', 'team', 'weekly', 'monthly', 'first30'] as const
+export type IlgilenTabId = (typeof ILGILEN_TAB_IDS)[number]
+
 const CROWN_ITEMS: readonly {
-  id: string
+  id: IlgilenTabId
   labelKey: string
-  href: string
   icon: LucideIcon
   activeClass: string
 }[] = [
-  { id: 'daily', labelKey: 'dashboard.crownMockDailyFollow', href: '/bugunku-takibim', icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
-  { id: 'live', labelKey: 'dashboard.crownMockLiveTraining', href: '/canli-egitim', icon: Video, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
-  { id: 'team', labelKey: 'nav.ekip', href: '/ekibim', icon: Users, activeClass: 'bg-amber-600 text-white shadow-md' },
-  { id: 'weekly', labelKey: 'dashboard.crownMockWeeklySummary', href: '/haftalik-ozet', icon: BarChart3, activeClass: 'bg-[#0F6E56] text-white shadow-md' },
-  { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', href: '/aylik-ozet', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
-  { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days', href: '/ilk-30-gun', icon: CalendarDays, activeClass: 'bg-[#C03E1F] text-white shadow-md' },
+  { id: 'daily',   labelKey: 'dashboard.crownMockDailyFollow',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
+  { id: 'live',    labelKey: 'dashboard.crownMockLiveTraining',   icon: Video,         activeClass: 'bg-[#1A56DB] text-white shadow-md' },
+  { id: 'team',    labelKey: 'nav.ekip',                          icon: Users,         activeClass: 'bg-amber-600 text-white shadow-md' },
+  { id: 'weekly',  labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
+  { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
+  { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days',    icon: CalendarDays,  activeClass: 'bg-[#C03E1F] text-white shadow-md' },
 ]
 
-export function IlgilenHubGrid() {
+type Props = {
+  activeTab: IlgilenTabId
+}
+
+export function IlgilenHubGrid({ activeTab }: Props) {
   const { t } = useTranslation()
   const router = useRouter()
-  const [activeId, setActiveId] = useState(CROWN_ITEMS[0].id)
 
-  function selectTab(id: string, href: string) {
-    setActiveId(id)
-    router.push(href)
+  function selectTab(id: IlgilenTabId) {
+    router.replace(`/bugun/ilgilen?tab=${id}`, { scroll: false })
   }
 
   return (
@@ -51,15 +54,15 @@ export function IlgilenHubGrid() {
         data-no-swipe="true"
         onTouchStart={e => e.stopPropagation()}
       >
-        {CROWN_ITEMS.map(({ id, labelKey, href, icon: Icon, activeClass }) => {
-          const isActive = activeId === id
+        {CROWN_ITEMS.map(({ id, labelKey, icon: Icon, activeClass }) => {
+          const isActive = activeTab === id
           return (
             <button
               key={id}
               type="button"
               role="tab"
               aria-selected={isActive}
-              onClick={() => selectTab(id, href)}
+              onClick={() => selectTab(id)}
               className={clsx(
                 'flex min-w-[4.5rem] flex-1 shrink-0 items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] sm:gap-2 sm:text-sm',
                 isActive ? activeClass : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',

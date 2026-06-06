@@ -31,7 +31,7 @@ export function IlgilenContent() {
   const router = useRouter()
   const [viewMode, setViewMode] = useState<'list' | 'compact'>('list')
   const [generatingFor, setGeneratingFor] = useState<string | null>(null)
-  const [copiedFor, setCopiedFor] = useState<string | null>(null)
+  const [copiedFor] = useState<string | null>(null)
   const [showAll, setShowAll] = useState(false)
   const [activeMessage, setActiveMessage] = useState<{
     candidateId: string;

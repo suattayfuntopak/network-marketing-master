@@ -44,7 +44,7 @@ function memberTrackStatus(
   return 'behind'
 }
 
-export function CrownEkibimPage() {
+export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
@@ -98,6 +98,7 @@ export function CrownEkibimPage() {
       iconClassName="bg-[#FAEEDA] text-[#854F0B] dark:bg-amber-950/30 dark:text-amber-400"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'ekibim'] })}
       refreshing={isFetching}
+      asTab={asTab}
     >
       {locked ? (
         <FeatureUpgradeGate feature="team" locked>

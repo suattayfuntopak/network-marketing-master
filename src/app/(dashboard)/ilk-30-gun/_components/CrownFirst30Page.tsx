@@ -17,7 +17,7 @@ import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { waHref } from '@/lib/utils/waLink'
 
-export function CrownFirst30Page() {
+export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
@@ -40,6 +40,7 @@ export function CrownFirst30Page() {
       iconClassName="bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'first30'] })}
       refreshing={isFetching}
+      asTab={asTab}
     >
       {locked ? (
         <FeatureUpgradeGate feature="team" locked>

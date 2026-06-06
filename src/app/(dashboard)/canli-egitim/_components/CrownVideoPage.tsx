@@ -13,7 +13,7 @@ import { getCrownVideoPageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { Skeleton } from '@/components/ui/Skeleton'
 
-export function CrownVideoPage() {
+export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
@@ -39,6 +39,7 @@ export function CrownVideoPage() {
       iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'video'] })}
       refreshing={isFetching}
+      asTab={asTab}
     >
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">

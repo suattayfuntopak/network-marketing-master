@@ -22,7 +22,7 @@ function daysSinceDate(iso: string | null): number {
   return (Date.now() - new Date(iso).getTime()) / 86_400_000
 }
 
-export function CrownMonthlyPage() {
+export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
@@ -82,6 +82,7 @@ export function CrownMonthlyPage() {
       iconClassName="bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400"
       onRefresh={refresh}
       refreshing={membersLoading || activityLoading || entriesLoading || monthLoading}
+      asTab={asTab}
     >
       <HubMonthProgress data={monthInsights} loading={monthLoading} />
 
