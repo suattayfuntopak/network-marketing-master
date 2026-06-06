@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim: saha ortağı tek satır + kompakt davet ✅
+
+- Saha ortağı kartları mobilde de NMM ile aynı yatay satırda (flex-col kaldırıldı).
+- WhatsApp davet butonu: ikon + **Davet Et** (`team.inviteBtn`).
+- **Dosyalar:** `TeamPerformanceSection.tsx`, `tr.ts`, `en.ts`.
+
 ## 2026-06-04 — Ekibim: panel istatistikleri, sekme sırası, aktivite iyileştirmeleri ✅
 
 - Başlık altı açıklama kaldırıldı; panel adı **Lider ve Ekip Performans Paneli**.
