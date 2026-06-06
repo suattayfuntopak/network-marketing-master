@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-06 — UX Performans: always-mounted tabs + cache TTL artışı ✅
+
+### Değişiklikler
+
+**QueryProvider & getQueryClient — global cache TTL iyileştirmesi:**
+- `staleTime` 60s → **2 dk**: Kısa sürede aynı veriyi yeniden çekme azaldı.
+- `gcTime` varsayılan 5dk → **10 dk**: Sayfa geçişi sonrası veri bellekte kalır; geri dönüşte yeniden fetch yok.
+
+**AkademiContent (egitim sekmeler — 3 tab):**
+- `{tab === 'X' && <Comp />}` → `<div className={tab !== 'X' ? 'hidden' : ''}>` always-mounted.
+- İçerik bankası ↔ Videolar ↔ İtirazlar geçişi anlık; VideolarContent'in `useQuery` yeniden tetiklenmez.
+
+**UyumContent (uyum sekmeler — 2 tab):**
+- Auditor ve Library sekmeleri always-mounted.
+- Kullanıcının doldurduğu metin (AI denetim alanı) sekme geçişinde kaybolmaz.
+
+**YzKocuContainer (yazar sekmeler — 4 tab):**
+- Mesaj Yazar ↔ Koçluk ↔ Prova ↔ Uyum sekmeleri always-mounted.
+- UyumContent (embedded) sekme geçişinde yeniden mount olmaz; YazarForm state korunur.
+
+**Dosyalar:** `QueryProvider.tsx`, `getQueryClient.ts`, `AkademiContent.tsx`, `UyumContent.tsx`, `YzKocuContainer.tsx`.
+
 ## 2026-06-06 — Bugün İlgilen sekme geçişi: anlık (always-mounted) ✅
 
 - Önceki: `{activeTab === 'X' && <Component />}` → sekme geçişinde unmount + yeni fetch (yavaş).

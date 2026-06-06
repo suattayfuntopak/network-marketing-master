@@ -67,13 +67,13 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
         ))}
       </div>
 
-      <div className="animate-in fade-in duration-300">
-        {activeTab === 'yazar' && (
+      <div>
+        <div className={activeTab !== 'yazar'   ? 'hidden' : ''}>
           <YazarForm initialName={initialName} initialNote={initialNote} initialWarmth={initialWarmth} />
-        )}
-        {activeTab === 'kocluk' && <KoclukForm />}
-        {activeTab === 'prova' && <ProvaForm />}
-        {activeTab === 'uyum' && <UyumContent embedded />}
+        </div>
+        <div className={activeTab !== 'kocluk'  ? 'hidden' : ''}><KoclukForm /></div>
+        <div className={activeTab !== 'prova'   ? 'hidden' : ''}><ProvaForm /></div>
+        <div className={activeTab !== 'uyum'    ? 'hidden' : ''}><UyumContent embedded /></div>
       </div>
     </div>
   )

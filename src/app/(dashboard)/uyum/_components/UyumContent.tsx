@@ -252,7 +252,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
 
         {/* Page Content */}
         <div className="space-y-6">
-          {activeTab === 'auditor' && (
+          <div className={activeTab !== 'auditor' ? 'hidden' : 'space-y-6'}>
             <>
               {/* YZ Uyum Denetleyicisi Formu */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
@@ -487,9 +487,9 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                 </div>
               </section>
             </>
-          )}
+          </div>
 
-          {activeTab === 'library' && (
+          <div className={activeTab !== 'library' ? 'hidden' : 'space-y-6'}>
             <>
               {/* Onaylı İfadeler Paneli */}
               <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
@@ -553,7 +553,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                 </div>
               </section>
             </>
-          )}
+          </div>
 
           {/* Uyum Denetimi kutusu — Pano'dan taşındı. Free: ödeme upsell, ücretli/super: bilgi */}
           {(() => {

@@ -61,9 +61,9 @@ export function AkademiContent() {
         </div>
       </header>
 
-      {tab === 'training' && <EgitimContent embedded />}
-      {tab === 'videos' && <VideolarContent embedded />}
-      {tab === 'objections' && <ItirazlarContent embedded />}
+      <div className={tab !== 'training'   ? 'hidden' : ''}><EgitimContent embedded /></div>
+      <div className={tab !== 'videos'     ? 'hidden' : ''}><VideolarContent embedded /></div>
+      <div className={tab !== 'objections' ? 'hidden' : ''}><ItirazlarContent embedded /></div>
     </main>
   )
 }
