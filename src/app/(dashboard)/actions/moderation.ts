@@ -5,6 +5,7 @@ import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
+import { rejectReasonForEmail } from '@/lib/domain/moderationDefaults'
 
 interface ContentSubmissionResult {
   success: boolean
@@ -245,7 +246,7 @@ export async function rejectRequestAction(
       row.user_name ?? 'NMM Üyesi',
       contentType,
       title,
-      reason ?? '',
+      rejectReasonForEmail(reason, userLang),
       userLang
     ).catch(err => {
       console.error('[Resend Rejection Email Error]', err)

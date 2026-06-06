@@ -258,6 +258,7 @@ export const tr = {
     selectStage: "Aşama Seç",
     changeStage: "Aşama Değiştir",
     activityHistory: "Aktivite Geçmişi",
+    activityScrollToLoad: "Kaydırınca yüklenecek",
     activityCall: "Arama",
     activityNote: "Not",
     activityStageChange: "Aşama değişti",

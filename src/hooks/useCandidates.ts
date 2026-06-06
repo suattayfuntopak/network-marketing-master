@@ -305,7 +305,7 @@ export function useActivityHistory(candidateId: string, queryEnabled = true) {
   })
 }
 
-export function useCandidateNotes(candidateId: string) {
+export function useCandidateNotes(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
     queryKey: ['candidate-notes', candidateId],
     queryFn: async () => {
@@ -319,7 +319,7 @@ export function useCandidateNotes(candidateId: string) {
       if (error) throw new Error(error.message)
       return data ?? []
     },
-    enabled: !!candidateId,
+    enabled: !!candidateId && queryEnabled,
   })
 }
 

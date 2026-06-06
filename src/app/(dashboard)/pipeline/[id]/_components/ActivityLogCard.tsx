@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import { History, PhoneCall, Bot, Pencil, ArrowRight, Trash2 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
-import { Skeleton } from '@/components/ui/Skeleton'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useActivityHistory, useDeleteActivity } from '@/hooks/useCandidates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
@@ -130,7 +129,9 @@ export function ActivityLogCard({ candidateId, workspaceId }: Props) {
             <History className="h-3.5 w-3.5" />
             {t('pipeline.activityHistory')}
           </p>
-          <Skeleton className="mt-3 h-16 w-full rounded-xl" />
+          <p className="mt-3 text-xs text-[var(--text-3)]">
+            {t('pipeline.activityScrollToLoad')}
+          </p>
         </div>
       )}
     </div>

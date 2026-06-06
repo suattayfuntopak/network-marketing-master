@@ -73,6 +73,46 @@ function loadTeamTabState(): {
   }
 }
 
+function serializeMemberTabs(member: Record<string, MemberCardTab | undefined>): string {
+  return Object.entries(member)
+    .filter((entry): entry is [string, MemberCardTab] => entry[1] != null)
+    .map(([id, tab]) => `${id}:${tab}`)
+    .join(',')
+}
+
+function serializeFieldTabs(field: Record<string, FieldCardTab | undefined>): string {
+  return Object.entries(field)
+    .filter((entry): entry is [string, FieldCardTab] => entry[1] != null)
+    .map(([id, tab]) => `${id}:${tab}`)
+    .join(',')
+}
+
+function parseMemberTabs(raw: string | null): Record<string, MemberCardTab> {
+  if (!raw) return {}
+  const out: Record<string, MemberCardTab> = {}
+  for (const part of raw.split(',')) {
+    const sep = part.indexOf(':')
+    if (sep <= 0) continue
+    const id = part.slice(0, sep)
+    const tab = part.slice(sep + 1)
+    if (isMemberCardTab(tab)) out[id] = tab
+  }
+  return out
+}
+
+function parseFieldTabs(raw: string | null): Record<string, FieldCardTab> {
+  if (!raw) return {}
+  const out: Record<string, FieldCardTab> = {}
+  for (const part of raw.split(',')) {
+    const sep = part.indexOf(':')
+    if (sep <= 0) continue
+    const id = part.slice(0, sep)
+    const tab = part.slice(sep + 1)
+    if (isFieldCardTab(tab)) out[id] = tab
+  }
+  return out
+}
+
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
@@ -96,24 +136,19 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     field: Record<string, FieldCardTab | undefined>,
   ) => {
     const params = new URLSearchParams(searchParams.toString())
-    const activeMember = Object.entries(member).find(([, tab]) => tab != null)
-    const activeField = Object.entries(field).find(([, tab]) => tab != null)
+    const memberSerialized = serializeMemberTabs(member)
+    const fieldSerialized = serializeFieldTabs(field)
 
-    if (activeMember) {
-      params.set('perfMember', activeMember[0])
-      params.set('perfMemberTab', activeMember[1]!)
-    } else {
-      params.delete('perfMember')
-      params.delete('perfMemberTab')
-    }
+    if (memberSerialized) params.set('perfMemberTabs', memberSerialized)
+    else params.delete('perfMemberTabs')
 
-    if (activeField) {
-      params.set('perfField', activeField[0])
-      params.set('perfFieldTab', activeField[1]!)
-    } else {
-      params.delete('perfField')
-      params.delete('perfFieldTab')
-    }
+    if (fieldSerialized) params.set('perfFieldTabs', fieldSerialized)
+    else params.delete('perfFieldTabs')
+
+    params.delete('perfMember')
+    params.delete('perfMemberTab')
+    params.delete('perfField')
+    params.delete('perfFieldTab')
 
     const qs = params.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
@@ -121,8 +156,12 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
   useEffect(() => {
     const stored = loadTeamTabState()
-    const member = { ...stored.member }
-    const field = { ...stored.field }
+    const member: Record<string, MemberCardTab | undefined> = { ...stored.member }
+    const field: Record<string, FieldCardTab | undefined> = { ...stored.field }
+
+    Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
+
+    Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
 
     const urlMemberId = searchParams.get('perfMember')
     const urlMemberTab = searchParams.get('perfMemberTab')

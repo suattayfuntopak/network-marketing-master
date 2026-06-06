@@ -1,5 +1,26 @@
 # Hot Log
 
+## 2026-06-06 — Ek öneriler sprint: CI migrate, journal queue, lazy notes ✅
+
+**CI & deploy:**
+- `.github/workflows/migrate-check.yml` — PR/push'ta `npm run migrate:check`
+- `migrate:check:remote` — linked Supabase drift uyarısı
+- `docs/smoke/day-journal-cross-device.md` — 057 cross-device smoke checklist
+
+**Performans:**
+- `LeaderNotesCard` — viewport / açılışta fetch (`useCandidateNotes(enabled)`)
+- `ActivityLogCard` — skeleton yerine scroll hint metni
+- Platform modalları idle prefetch (1.2s)
+
+**Moderasyon i18n:**
+- `moderationDefaults.ts` — red gerekçesi TR ||| EN
+- `ModerationReviewModal` — `prompt()` kaldırıldı, `RejectModerationDialog`
+- E-posta: `rejectReasonForEmail` ile alıcı diline göre metin
+
+**Journal & ekip UX:**
+- `journalSyncQueue.ts` — offline kuyruk + online retry
+- `TeamPerformanceSection` — çoklu sekme URL (`perfMemberTabs`, `perfFieldTabs`)
+
 ## 2026-06-06 — Follow-up: migration check, lazy activity log, journal UX ✅
 
 **Deploy / migration:**

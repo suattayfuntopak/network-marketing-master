@@ -24,18 +24,38 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
   const { lang, t } = useTranslation()
   const queryClient = useQueryClient()
   const locale = lang === 'en' ? 'en-US' : 'tr-TR'
+  const anchorRef = useRef<HTMLDivElement>(null)
 
+  const [nearViewport, setNearViewport] = useState(false)
   const [notesOpen, setNotesOpen] = useState(false)
   const [showAllNotes, setShowAllNotes] = useState(false)
   const [newNote, setNewNote] = useState('')
   const [aiSummary, setAiSummary] = useState<string | null>(null)
   const [isSummaryPending, setIsSummaryPending] = useState(false)
 
-  const { data: notes = [] } = useCandidateNotes(candidateId)
+  const shouldFetchNotes = nearViewport || notesOpen
+  const { data: notes = [] } = useCandidateNotes(candidateId, shouldFetchNotes)
   const leaderNotes = useMemo(() => notes.filter(isLeaderUserNote), [notes])
   const addNoteMutation = useAddCandidateNote(workspaceId)
 
   const attemptedActionUpdates = useRef<Record<string, boolean>>({})
+
+  useEffect(() => {
+    const el = anchorRef.current
+    if (!el || nearViewport) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setNearViewport(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '240px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [nearViewport])
 
   const handleGenerateSummary = async () => {
     if (leaderNotes.length === 0) return
@@ -95,9 +115,15 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
   }
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300">
+    <div
+      ref={anchorRef}
+      className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 transition-all duration-300"
+    >
       <button
-        onClick={() => setNotesOpen(!notesOpen)}
+        onClick={() => {
+          setNearViewport(true)
+          setNotesOpen(!notesOpen)
+        }}
         className="flex w-full items-center justify-between"
       >
         <div className="flex items-center gap-2">

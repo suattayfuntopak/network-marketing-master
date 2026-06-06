@@ -4,11 +4,17 @@ import { useState, useTransition } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
+import { useTranslation } from '@/providers/LanguageProvider'
+import {
+  defaultRejectReason,
+  toBilingualRejectReason,
+} from '@/lib/domain/moderationDefaults'
 import {
   approveRequestAction,
   rejectRequestAction,
   type ModerationRequestItem,
 } from '@/app/(dashboard)/actions/moderation'
+import { RejectModerationDialog } from './RejectModerationDialog'
 
 interface Props {
   request: ModerationRequestItem
@@ -17,6 +23,8 @@ interface Props {
 }
 
 export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
+  const { lang } = useTranslation()
+  const uiLang = lang === 'en' ? 'en' : 'tr'
   const d = request.data
   const isTraining = request.contentType === 'training'
 
@@ -38,6 +46,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
   const [editTags, setEditTags] = useState<string>(Array.isArray(d.tags) ? d.tags.join(', ') : '')
 
   const [isModerating, startModerationTransition] = useTransition()
+  const [rejectOpen, setRejectOpen] = useState(false)
 
   function handleApproveSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -83,16 +92,13 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
     })
   }
 
-  function handleReject() {
-    const reason = prompt(
-      'Bu talebi reddetmek istediğinize emin misiniz? (Bu işlem geri alınamaz)\n\nKullanıcıya nazikçe iletilecek Red gerekçesini buraya yazabilirsiniz (İsteğe bağlı):',
-      'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'
-    )
-    if (reason === null) return
+  function confirmReject(reason: string) {
+    setRejectOpen(false)
 
     startModerationTransition(async () => {
       try {
-        const res = await rejectRequestAction(request.id, request.contentType, reason)
+        const bilingual = toBilingualRejectReason(reason, uiLang)
+        const res = await rejectRequestAction(request.id, request.contentType, bilingual)
         if (res.success) {
           toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
           onClose()
@@ -192,7 +198,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
           <div className="flex gap-3 pt-3 border-t border-[var(--border)]">
             <button
               type="button"
-              onClick={handleReject}
+              onClick={() => setRejectOpen(true)}
               disabled={isModerating}
               className="flex-1 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 py-3 text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
             >
@@ -212,6 +218,14 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
           </div>
         </form>
       </div>
+
+      {rejectOpen && (
+        <RejectModerationDialog
+          defaultReason={defaultRejectReason(uiLang)}
+          onConfirm={confirmReject}
+          onCancel={() => setRejectOpen(false)}
+        />
+      )}
     </>
   )
 }

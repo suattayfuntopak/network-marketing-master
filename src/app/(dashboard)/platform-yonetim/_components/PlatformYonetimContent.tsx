@@ -32,6 +32,10 @@ import {
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
+import {
+  defaultRejectReason,
+  toBilingualRejectReason,
+} from '@/lib/domain/moderationDefaults'
 
 const WorkspaceLicenseModal = dynamic(
   () => import('./WorkspaceLicenseModal').then(m => ({ default: m.WorkspaceLicenseModal })),
@@ -49,9 +53,6 @@ const RejectModerationDialog = dynamic(
   () => import('./RejectModerationDialog').then(m => ({ default: m.RejectModerationDialog })),
   { loading: () => null },
 )
-
-const DEFAULT_REJECT_REASON =
-  'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'
 
 const getAvatarColor = (name: string) => {
   const colors = [
@@ -71,7 +72,7 @@ const getAvatarColor = (name: string) => {
 }
 
 export function PlatformYonetimContent() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const router = useRouter()
   const queryClient = useQueryClient()
 
@@ -90,6 +91,17 @@ export function PlatformYonetimContent() {
     data: pendingRequests = [],
     isLoading: moderationLoading,
   } = usePlatformModeration(isSuperAdmin)
+
+  useEffect(() => {
+    if (!isSuperAdmin) return
+    const timer = window.setTimeout(() => {
+      void import('./WorkspaceLicenseModal')
+      void import('./ModerationReviewModal')
+      void import('./UnresolvedOrdersAlert')
+      void import('./RejectModerationDialog')
+    }, 1200)
+    return () => window.clearTimeout(timer)
+  }, [isSuperAdmin])
 
   const refreshPlatform = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['platform-workspaces'] })
@@ -158,7 +170,8 @@ export function PlatformYonetimContent() {
 
     startModerationTransition(async () => {
       try {
-        const res = await rejectRequestAction(req.id, req.contentType, reason)
+        const bilingual = toBilingualRejectReason(reason, lang === 'en' ? 'en' : 'tr')
+        const res = await rejectRequestAction(req.id, req.contentType, bilingual)
         if (res.success) {
           toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
           refreshPlatform()
@@ -804,7 +817,7 @@ export function PlatformYonetimContent() {
       )}
       {rejectRequest && (
         <RejectModerationDialog
-          defaultReason={DEFAULT_REJECT_REASON}
+          defaultReason={defaultRejectReason(lang === 'en' ? 'en' : 'tr')}
           onConfirm={confirmRejectRequest}
           onCancel={() => setRejectRequest(null)}
         />

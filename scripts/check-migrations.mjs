@@ -2,10 +2,13 @@
 /**
  * Validates supabase/migrations numbering before deploy.
  * Run: npm run migrate:check
+ * Remote drift (opsiyonel): npm run migrate:check -- --remote
  */
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
+import { execSync } from 'node:child_process'
 
+const REMOTE = process.argv.includes('--remote')
 const MIGRATIONS_DIR = join(process.cwd(), 'supabase/migrations')
 const files = readdirSync(MIGRATIONS_DIR)
   .filter(f => f.endsWith('.sql'))
@@ -45,6 +48,12 @@ for (const n of numbers) {
 
 const latest = numbers.at(-1)
 const latestFile = latest != null ? byNumber.get(latest)?.[0] : null
+const localVersions = new Set(
+  files.map(f => {
+    const m = f.match(/^(\d+)_/)
+    return m ? String(Number(m[1])).padStart(3, '0') : null
+  }).filter(Boolean),
+)
 
 console.log(`\n${files.length} migration dosyası, son: ${latestFile ?? '—'}`)
 
@@ -54,7 +63,40 @@ if (latestFile) {
     console.log('\n📋 Deploy checklist (057_day_journal):')
     console.log('   1. supabase db push  (veya Dashboard SQL editor)')
     console.log('   2. RLS policy doğrula')
-    console.log('   3. Günlük kartında cross-device sync test et')
+    console.log('   3. docs/smoke/day-journal-cross-device.md smoke test')
+  }
+}
+
+if (REMOTE) {
+  console.log('\n🔗 Remote migration diff (supabase CLI — linked project gerekir):')
+  try {
+    const output = execSync('npx supabase migration list --linked 2>&1', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    })
+    const applied = new Set()
+    for (const line of output.split('\n')) {
+      const m = line.match(/\|\s*(\d{3})\s*\|/)
+      if (m) applied.add(m[1])
+    }
+    const pendingLocal = [...localVersions].filter(v => !applied.has(v))
+    const remoteOnly = [...applied].filter(v => !localVersions.has(v))
+    if (pendingLocal.length) {
+      console.warn(`⚠ Remote'da henüz yok (local): ${pendingLocal.join(', ')}`)
+      warnings++
+    }
+    if (remoteOnly.length) {
+      console.warn(`⚠ Remote'da var, repoda yok: ${remoteOnly.join(', ')}`)
+      warnings++
+    }
+    if (!pendingLocal.length && !remoteOnly.length && applied.size > 0) {
+      console.log('✓ Local dosya numaraları ile linked remote listesi uyumlu görünüyor')
+    }
+    if (applied.size === 0) {
+      console.log('ℹ Remote liste boş veya parse edilemedi — `supabase link` + `migration list` kontrol et')
+    }
+  } catch {
+    console.log('ℹ Remote diff atlandı — `supabase link` ve CLI login gerekli (`npm run migrate:check -- --remote`)')
   }
 }
 

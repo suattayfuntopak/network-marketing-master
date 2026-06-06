@@ -258,6 +258,7 @@ export const en = {
     selectStage: "Select Stage",
     changeStage: "Change Stage",
     activityHistory: "Activity History",
+    activityScrollToLoad: "Scroll down to load",
     activityCall: "Call",
     activityNote: "Note",
     activityStageChange: "Stage changed",

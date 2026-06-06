@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "migrate:check": "node scripts/check-migrations.mjs"
+    "migrate:check": "node scripts/check-migrations.mjs",
+    "migrate:check:remote": "node scripts/check-migrations.mjs --remote"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

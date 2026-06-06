@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useReducer, useRef, useState } from 'react'
+import { useEffect, useReducer, useRef, useState, useCallback } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -8,7 +8,13 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import {
   readDayJournal,
   writeDayJournal,
+  todayKey,
 } from '@/lib/domain/dayRitual'
+import {
+  dequeueJournalSync,
+  enqueueJournalSync,
+  readJournalSyncQueue,
+} from '@/lib/domain/journalSyncQueue'
 import { parseSimpleNote } from '@/lib/utils/noteParser'
 import {
   getDayJournalAction,
@@ -39,11 +45,36 @@ export function DayJournalCard() {
   const [polishing, setPolishing] = useState(false)
   const migratedRef = useRef(false)
 
+  const persistJournal = useCallback(
+    async (value: string, uid: string, journalLang: 'tr' | 'en') => {
+      const journalDate = todayKey()
+      writeDayJournal(uid, value)
+      const result = await mergeDayJournalLangAction(value, journalLang)
+      if ('error' in result) {
+        enqueueJournalSync({ userId: uid, journalDate, text: value, lang: journalLang })
+        toast.message(t('dashboard.journalSavedLocal'))
+        return
+      }
+      dequeueJournalSync(uid, journalDate)
+    },
+    [t],
+  )
+
+  const flushJournalQueue = useCallback(async () => {
+    if (!userId) return
+    for (const item of readJournalSyncQueue()) {
+      if (item.userId !== userId) continue
+      const result = await mergeDayJournalLangAction(item.text, item.lang)
+      if ('ok' in result) dequeueJournalSync(item.userId, item.journalDate)
+    }
+  }, [userId])
+
   useEffect(() => {
     if (!userId) return
     let cancelled = false
 
     async function load() {
+      await flushJournalQueue()
       const remote = await getDayJournalAction()
       if (cancelled) return
 
@@ -58,7 +89,7 @@ export function DayJournalCard() {
 
       if (local.trim() && !migratedRef.current) {
         migratedRef.current = true
-        void mergeDayJournalLangAction(local, lang)
+        void persistJournal(local, userId!, lang)
       }
     }
 
@@ -66,20 +97,24 @@ export function DayJournalCard() {
     return () => {
       cancelled = true
     }
-  }, [userId, lang])
+  }, [userId, lang, flushJournalQueue, persistJournal])
 
   useEffect(() => {
     if (!userId || !hydrated) return
     const id = window.setTimeout(() => {
-      writeDayJournal(userId, text)
-      void mergeDayJournalLangAction(text, lang).then(result => {
-        if ('error' in result) {
-          toast.message(t('dashboard.journalSavedLocal'))
-        }
-      })
+      void persistJournal(text, userId, lang)
     }, 400)
     return () => window.clearTimeout(id)
-  }, [text, userId, hydrated, lang, t])
+  }, [text, userId, hydrated, lang, persistJournal])
+
+  useEffect(() => {
+    if (!userId) return
+    const onOnline = () => {
+      void flushJournalQueue()
+    }
+    window.addEventListener('online', onOnline)
+    return () => window.removeEventListener('online', onOnline)
+  }, [userId, flushJournalQueue])
 
   async function handlePolish() {
     if (!text.trim()) return
