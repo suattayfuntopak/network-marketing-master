@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim: saha ortağı davet sekmeleri ✅
+
+- Profil satırından butonlar kaldırıldı — isimler tam genişlikte (Elif/Sinem gibi).
+- Saha ortağı kartlarında 2 sekme: **YZ Davet Metni Üret** (Bot) + **NMM'e Davet Et 🚀** (WhatsApp).
+- Sekme açılınca eski tam butonlar panelde; `inviteToNmm` metni geri.
+- **Dosyalar:** `TeamPerformanceSection.tsx`, `tr.ts`, `en.ts`.
+
 ## 2026-06-04 — Ekibim: saha ortağı tek satır + kompakt davet ✅
 
 - Saha ortağı kartları mobilde de NMM ile aynı yatay satırda (flex-col kaldırıldı).

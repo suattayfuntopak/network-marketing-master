@@ -40,6 +40,7 @@ export interface TeamPerformanceSectionProps {
 }
 
 type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
+type FieldCardTab = 'aiInvite' | 'nmmInvite'
 
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
@@ -54,6 +55,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
+  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
@@ -64,6 +66,15 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   }
 
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
+
+  const selectFieldTab = (userId: string, tab: FieldCardTab) => {
+    setFieldCardTab(prev => ({
+      ...prev,
+      [userId]: prev[userId] === tab ? undefined : tab,
+    }))
+  }
+
+  const getFieldTab = (userId: string): FieldCardTab | undefined => fieldCardTab[userId]
 
   const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
@@ -182,36 +193,97 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                       <div className={profileClass}>{profileInner}</div>
                     )
                   })()}
-
-                  {m.isAppUser === false && (
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
-                        }}
-                        disabled={!m.pipeline_id}
-                        className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40"
-                        title={t('team.aiInviteTitle')}
-                        aria-label={t('team.aiInviteTitle')}
-                      >
-                        <Bot className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleInviteMember(m)
-                        }}
-                        className="flex items-center gap-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-2.5 py-2 text-[11px] sm:text-xs font-black shadow-md cursor-pointer whitespace-nowrap"
-                      >
-                        <WhatsAppIcon className="h-4 w-4 shrink-0 fill-current text-white" />
-                        <span>{t('team.inviteBtn')}</span>
-                      </button>
-                    </div>
-                  )}
                 </div>
+
+                {/* Saha ortağı: davet sekmeleri */}
+                {m.isAppUser === false && (() => {
+                  const activeFieldTab = getFieldTab(m.user_id)
+                  return (
+                    <div className="border-t border-dashed border-[var(--border)] pt-4 space-y-4">
+                      <div
+                        className="flex items-stretch gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-1"
+                        role="tablist"
+                        aria-label={t('team.fieldPartnerTabs')}
+                      >
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={activeFieldTab === 'aiInvite'}
+                          onClick={e => {
+                            e.stopPropagation()
+                            selectFieldTab(m.user_id, 'aiInvite')
+                          }}
+                          className={clsx(
+                            'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[10px] sm:text-xs font-bold transition-all cursor-pointer min-w-0',
+                            activeFieldTab === 'aiInvite'
+                              ? 'bg-[var(--bg-card)] text-[#534AB7] dark:text-indigo-300 shadow-sm border border-[var(--border)]'
+                              : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                          )}
+                        >
+                          <Bot className="h-4 w-4 shrink-0" />
+                          <span className="truncate">{t('team.fieldAiInviteTab')}</span>
+                        </button>
+                        <button
+                          type="button"
+                          role="tab"
+                          aria-selected={activeFieldTab === 'nmmInvite'}
+                          onClick={e => {
+                            e.stopPropagation()
+                            selectFieldTab(m.user_id, 'nmmInvite')
+                          }}
+                          className={clsx(
+                            'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[10px] sm:text-xs font-black transition-all cursor-pointer min-w-0',
+                            activeFieldTab === 'nmmInvite'
+                              ? 'bg-[var(--bg-card)] text-emerald-700 dark:text-emerald-400 shadow-sm border border-[var(--border)]'
+                              : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                          )}
+                        >
+                          <WhatsAppIcon className="h-4 w-4 shrink-0 fill-current" />
+                          <span className="truncate">{t('team.inviteToNmm')}</span>
+                        </button>
+                      </div>
+
+                      {activeFieldTab != null && (
+                        <div
+                          className="animate-in fade-in slide-in-from-top-1 duration-200 flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6"
+                          role="tabpanel"
+                        >
+                          {activeFieldTab === 'aiInvite' ? (
+                            <>
+                              <p className="text-sm text-[var(--text-2)] text-center leading-relaxed max-w-sm">
+                                {t('team.aiInviteTitle')}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
+                                }}
+                                disabled={!m.pipeline_id}
+                                className="inline-flex items-center gap-2 rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40 px-5 py-3 text-sm font-bold"
+                              >
+                                <Bot className="h-5 w-5" />
+                                <span>{t('team.fieldAiInviteTab')}</span>
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={e => {
+                                e.stopPropagation()
+                                handleInviteMember(m)
+                              }}
+                              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-5 py-3 text-sm font-black shadow-md cursor-pointer"
+                            >
+                              <WhatsAppIcon className="h-5 w-5 fill-current text-white" />
+                              <span>{t('team.inviteToNmm')}</span>
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                })()}
 
                 {/* NMM kullanıcıları: ikon sekmeleri + sekme içeriği */}
                 {m.isAppUser !== false && (() => {
