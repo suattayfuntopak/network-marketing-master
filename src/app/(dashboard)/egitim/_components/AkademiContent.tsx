@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BookOpen } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -20,6 +21,10 @@ export function AkademiContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const tab = parseAkademiTab(searchParams.get('tab'))
+
+  const visitedRef = useRef<Set<AkademiTab>>(new Set([tab]))
+  visitedRef.current.add(tab)
+  const v = visitedRef.current
 
   function selectTab(next: AkademiTab) {
     router.replace(akademiHref(next), { scroll: false })
@@ -61,9 +66,9 @@ export function AkademiContent() {
         </div>
       </header>
 
-      <div className={tab !== 'training'   ? 'hidden' : ''}><EgitimContent embedded /></div>
-      <div className={tab !== 'videos'     ? 'hidden' : ''}><VideolarContent embedded /></div>
-      <div className={tab !== 'objections' ? 'hidden' : ''}><ItirazlarContent embedded /></div>
+      {v.has('training')   && <div className={tab !== 'training'   ? 'hidden' : ''}><EgitimContent embedded /></div>}
+      {v.has('videos')     && <div className={tab !== 'videos'     ? 'hidden' : ''}><VideolarContent embedded /></div>}
+      {v.has('objections') && <div className={tab !== 'objections' ? 'hidden' : ''}><ItirazlarContent embedded /></div>}
     </main>
   )
 }

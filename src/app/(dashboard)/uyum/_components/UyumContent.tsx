@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { clsx } from 'clsx'
 import {
@@ -129,6 +129,9 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [copiedImproved, setCopiedImproved] = useState(false)
   const [activeTab, setActiveTab] = useState<'auditor' | 'library'>('auditor')
+  const visitedRef = useRef<Set<'auditor' | 'library'>>(new Set(['auditor']))
+  visitedRef.current.add(activeTab)
+  const v = visitedRef.current
 
   const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
@@ -252,6 +255,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
 
         {/* Page Content */}
         <div className="space-y-6">
+          {v.has('auditor') && (
           <div className={activeTab !== 'auditor' ? 'hidden' : 'space-y-6'}>
             <>
               {/* YZ Uyum Denetleyicisi Formu */}
@@ -488,7 +492,9 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
               </section>
             </>
           </div>
+          )}
 
+          {v.has('library') && (
           <div className={activeTab !== 'library' ? 'hidden' : 'space-y-6'}>
             <>
               {/* Onaylı İfadeler Paneli */}
@@ -554,6 +560,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
               </section>
             </>
           </div>
+          )}
 
           {/* Uyum Denetimi kutusu — Pano'dan taşındı. Free: ödeme upsell, ücretli/super: bilgi */}
           {(() => {

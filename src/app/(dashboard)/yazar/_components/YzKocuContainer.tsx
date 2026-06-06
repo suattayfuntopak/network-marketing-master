@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { MessageSquare, HelpCircle, Target, Shield } from 'lucide-react'
 import { clsx } from 'clsx'
@@ -28,6 +29,10 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeTab = parseYazarTab(searchParams.get('tab'))
+
+  const visitedRef = useRef<Set<YazarTab>>(new Set([activeTab]))
+  visitedRef.current.add(activeTab)
+  const v = visitedRef.current
 
   function selectTab(tab: YazarTab) {
     const params = new URLSearchParams()
@@ -68,12 +73,10 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
       </div>
 
       <div>
-        <div className={activeTab !== 'yazar'   ? 'hidden' : ''}>
-          <YazarForm initialName={initialName} initialNote={initialNote} initialWarmth={initialWarmth} />
-        </div>
-        <div className={activeTab !== 'kocluk'  ? 'hidden' : ''}><KoclukForm /></div>
-        <div className={activeTab !== 'prova'   ? 'hidden' : ''}><ProvaForm /></div>
-        <div className={activeTab !== 'uyum'    ? 'hidden' : ''}><UyumContent embedded /></div>
+        {v.has('yazar')  && <div className={activeTab !== 'yazar'   ? 'hidden' : ''}><YazarForm initialName={initialName} initialNote={initialNote} initialWarmth={initialWarmth} /></div>}
+        {v.has('kocluk') && <div className={activeTab !== 'kocluk'  ? 'hidden' : ''}><KoclukForm /></div>}
+        {v.has('prova')  && <div className={activeTab !== 'prova'   ? 'hidden' : ''}><ProvaForm /></div>}
+        {v.has('uyum')   && <div className={activeTab !== 'uyum'    ? 'hidden' : ''}><UyumContent embedded /></div>}
       </div>
     </div>
   )
