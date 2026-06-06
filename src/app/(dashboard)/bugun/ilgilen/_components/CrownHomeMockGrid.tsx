@@ -44,9 +44,14 @@ export function IlgilenHubGrid({ activeTab }: Props) {
 
   return (
     <header className="space-y-4">
-      <h1 className="text-xl font-bold text-[var(--text-1)]">
-        {t('nav.todayFocus')}
-      </h1>
+      <div>
+        <h1 className="text-xl font-bold text-[var(--text-1)]">
+          {t('nav.todayFocus')}
+        </h1>
+        <p className="mt-1 text-sm text-[var(--text-2)]">
+          {t('pagesUi.todayPrioritiesSubtitle')}
+        </p>
+      </div>
       <nav
         className="no-swipe flex w-full overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 shadow-sm scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"

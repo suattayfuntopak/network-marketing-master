@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Hızlı Bakış alt başlık ✅
+
+**Alt metin:** Hızlı Bakış h1 altına `pagesUi.todayPrioritiesSubtitle` eklendi — TR: "Bugün sen ve ekibin ne durumdasınız, neler yapmalısınız; hızlıca göz at, aksiyona geç!" EN karşılığı.
+
+**Dosyalar:** `CrownHomeMockGrid.tsx`, `pages.ts` (sections)
+
 ## 2026-06-06 — Legal pages i18n, staleTime hizalama, ConfirmDialog danger variant ✅
 
 **Legal sayfa UI label'ları i18n:**

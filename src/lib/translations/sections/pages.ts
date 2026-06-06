@@ -43,7 +43,7 @@ export const pagesSection = {
 
       // bugun/ilgilen/page.tsx
       todayPrioritiesTitle: "Bugün İlgilen",
-      todayPrioritiesSubtitle: "Takip edilmesi gereken adaylar",
+      todayPrioritiesSubtitle: "Bugün sen ve ekibin ne durumdasınız, neler yapmalısınız; hızlıca göz at, aksiyona geç!",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Hiç aranmadı",
@@ -115,7 +115,7 @@ export const pagesSection = {
 
       // bugun/ilgilen/page.tsx
       todayPrioritiesTitle: "Today's Priorities",
-      todayPrioritiesSubtitle: "Prospects to follow up today",
+      todayPrioritiesSubtitle: "See where you and your team stand today and what to do — glance quickly and take action!",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Never contacted",
