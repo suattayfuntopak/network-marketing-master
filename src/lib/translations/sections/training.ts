@@ -88,6 +88,10 @@ export const trainingSection = {
       copyShortAnswer: 'Kısa Cevap',
       copyDetailedAnswer: 'Detaylı Cevap',
       copyExampleDialog: 'Örnek Diyalog',
+      expandShortAnswer: 'Kısa Saha Cevabı',
+      expandDetailedAnswer: 'Detaylı Cevap',
+      expandApproach: 'Yaklaşım',
+      expandExampleDialog: 'Örnek Diyalog',
     },
   },
   en: {
@@ -179,6 +183,10 @@ export const trainingSection = {
       copyShortAnswer: 'Short Answer',
       copyDetailedAnswer: 'Detailed Answer',
       copyExampleDialog: 'Example Dialog',
+      expandShortAnswer: 'Quick Field Answer',
+      expandDetailedAnswer: 'Detailed Answer',
+      expandApproach: 'Approach',
+      expandExampleDialog: 'Example Dialog',
     },
   },
 } as const

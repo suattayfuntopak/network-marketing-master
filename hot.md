@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-06 — ItirazCard i18n, Playwright artifact, README CI bölümü ✅
+
+**ItirazCard expand başlıkları i18n:**
+- `training.ts` (TR + EN): `expandShortAnswer`, `expandDetailedAnswer`, `expandApproach`, `expandExampleDialog` eklendi
+- `ItirazCard.tsx`: "Kısa Saha Cevabı", "Detaylı Cevap", "Yaklaşım", "Örnek Diyalog" → `t('objectionsPage.expandXxx')` ile değiştirildi
+
+**Playwright CI artifact:**
+- `playwright.config.ts`: `reporter: process.env.CI ? 'html' : 'list'` eklendi
+- `e2e.yml`: test sonrası `actions/upload-artifact@v4` adımı; fail'de Actions sekmesinden `playwright-report` indirilebilir (7 gün)
+
+**README Deploy & CI bölümü:**
+- GitHub secrets dokümantasyonu ve Playwright artifact açıklaması eklendi
+
 ## 2026-06-06 — E2E CI fix: korumalı route testleri auth skip ✅
 
 **Sorun:** `dashboard-mobile.spec.ts`'te 3 test (`/egitim?tab=objections` URL check, `/itirazlar` iki redirect testi) `PLAYWRIGHT_TEST_EMAIL` olmadan CI'da `toHaveURL` assertion'da başarısız oluyordu — middleware korunan route'ları `/giris`'e yönlendiriyor.

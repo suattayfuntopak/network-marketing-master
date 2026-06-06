@@ -75,6 +75,12 @@ src/
 supabase/migrations/ numbered SQL migrations (one number = one migration)
 ```
 
+## Deploy & CI
+
+- **GitHub Actions secrets** required for E2E tests and Supabase migration drift checks.
+  Full list: [`docs/deploy/github-secrets.md`](docs/deploy/github-secrets.md).
+- Playwright report is uploaded as an artifact (`playwright-report`) on every CI run — download it from the Actions tab to view traces on failure.
+
 ## Conventions
 
 - **Server Actions by default**; API routes only for external HTTP callers (see `AGENTS.md`).

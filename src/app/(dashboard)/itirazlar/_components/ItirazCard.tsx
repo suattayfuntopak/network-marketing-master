@@ -144,25 +144,25 @@ export function ItirazCard({
                   <>
                     {kisaCevap && (
                       <div>
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Kısa Saha Cevabı</h5>
+                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandShortAnswer')}</h5>
                         <p className="italic font-medium">&quot;{kisaCevap}&quot;</p>
                       </div>
                     )}
                     {detayliCevap && (
                       <div>
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Detaylı Cevap</h5>
+                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandDetailedAnswer')}</h5>
                         <p className="whitespace-pre-wrap">{detayliCevap}</p>
                       </div>
                     )}
                     {yaklasim && (
                       <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
-                        <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ Yaklaşım</h5>
+                        <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ {t('objectionsPage.expandApproach')}</h5>
                         <p className="text-sm text-[var(--text-3)] leading-relaxed">{yaklasim}</p>
                       </div>
                     )}
                     {ornekDiyalog && (
                       <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 Örnek Diyalog</h5>
+                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 {t('objectionsPage.expandExampleDialog')}</h5>
                         <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{ornekDiyalog}&quot;</p>
                       </div>
                     )}
