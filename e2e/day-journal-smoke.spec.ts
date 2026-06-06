@@ -1,4 +1,8 @@
 import { test, expect } from '@playwright/test'
+import fs from 'node:fs'
+import path from 'node:path'
+
+const authFile = path.join(__dirname, '.auth/user.json')
 
 test.describe('Day journal smoke', () => {
   test('ilgilen hub responds without server error', async ({ page }) => {
@@ -8,8 +12,8 @@ test.describe('Day journal smoke', () => {
 
   test('journal section when authenticated', async ({ page }) => {
     test.skip(
-      !process.env.PLAYWRIGHT_STORAGE_STATE,
-      'Set PLAYWRIGHT_STORAGE_STATE to a saved auth storage path',
+      !process.env.PLAYWRIGHT_TEST_EMAIL || !fs.existsSync(authFile),
+      'Requires auth.setup with PLAYWRIGHT_TEST_EMAIL/PASSWORD',
     )
 
     await page.goto('/bugun/ilgilen')

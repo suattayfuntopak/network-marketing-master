@@ -5,9 +5,13 @@ export interface Itiraz {
   cevap?: { tr: string; en: string }
   emoji: string
   kisaCevap?: string
+  kisaCevapEn?: string
   detayliCevap?: string
+  detayliCevapEn?: string
   yaklasim?: string
+  yaklasimEn?: string
   ornekDiyalog?: string
+  ornekDiyalogEn?: string
   tags?: string[]
 }
 

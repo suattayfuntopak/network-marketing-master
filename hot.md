@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-06 — Dördüncü sprint: E2E auth, journal çakışma, moderation EN, CI remote ✅
+
+**E2E & Playwright:**
+- `e2e/auth.setup.ts` — `PLAYWRIGHT_TEST_EMAIL/PASSWORD` ile storage state
+- `playwright.config.ts` — setup + authenticated chromium/mobile projeleri
+- `e2e/day-journal-cross-device.spec.ts` — iki context sync smoke
+- `e2e/day-journal-smoke.spec.ts` — auth fixture ile hizalandı
+- `.gitignore` — `e2e/.auth/`
+
+**Moderasyon & i18n:**
+- `moderationRejectReason.ts` + unit test — `buildBilingualRejectReason` çekirdeği
+- `moderationApproval.ts` — onayda kalıcı EN alanları (`baslikEn`, `kisaCevapEn`, …)
+- `TrainingCard` / `ItirazCard` — `lang === 'en'` iken DB'deki EN alanları gösterir
+
+**Journal & ekip:**
+- `DayJournalCard` — local vs remote çakışma UI (yerel / bulut seçimi)
+- `TeamPerformanceSection` — `hashchange` + `popstate` ile `#perf=` geri/ileri
+- `useLeaderNotesCount` — `note_tr` OR `note_en` RLS uyumu
+
+**CI:**
+- `migrate-check.yml` — haftalık cron + PR'da remote drift (`SUPABASE_PROJECT_REF`)
+
 ## 2026-06-06 — Üçüncü sprint: moderation i18n, AI red çevirisi, perf hash ✅
 
 **Moderasyon:**

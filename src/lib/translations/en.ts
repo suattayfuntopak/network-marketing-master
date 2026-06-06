@@ -211,6 +211,10 @@ export const en = {
     journalPolished: "Journal summary ready",
     journalSavedLocal: "Saved locally — cloud sync pending",
     journalSyncedCloud: "Synced to cloud",
+    journalConflictTitle: "Journal differs on this device and in the cloud",
+    journalConflictHint: "Choose which version to keep.",
+    journalKeepLocal: "Keep this device",
+    journalUseRemote: "Use cloud version",
     dayCloseJournalLink: "Full field journal & AI summary → Today page",
   },
   pipeline: {

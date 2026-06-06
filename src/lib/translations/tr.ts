@@ -211,6 +211,10 @@ export const tr = {
     journalPolished: "Günlük özet hazır",
     journalSavedLocal: "Yerel kaydedildi — bulut senkronu bekliyor",
     journalSyncedCloud: "Bulutla senkronize edildi",
+    journalConflictTitle: "Bu cihaz ile buluttaki günlük farklı",
+    journalConflictHint: "Hangisini kullanmak istediğinizi seçin.",
+    journalKeepLocal: "Bu cihazdakini kullan",
+    journalUseRemote: "Buluttakini kullan",
     dayCloseJournalLink: "Uzun saha günlüğü ve YZ özeti → Bugün sayfası",
   },
   pipeline: {

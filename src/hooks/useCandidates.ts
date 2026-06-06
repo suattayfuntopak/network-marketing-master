@@ -334,8 +334,8 @@ export function useLeaderNotesCount(candidateId: string, queryEnabled = true) {
         .select('*', { count: 'exact', head: true })
         .eq('candidate_id', candidateId)
         .eq('action_type', 'note')
-        .not('note', 'is', null)
         .not('note', 'like', 'system_note:%')
+        .or('note_tr.not.is.null,note_en.not.is.null')
       if (error) throw new Error(error.message)
       return count ?? 0
     },

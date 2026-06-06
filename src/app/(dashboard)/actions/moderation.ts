@@ -6,14 +6,11 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
 import {
-  DEFAULT_REJECT_REASON_BILINGUAL,
   rejectReasonForEmail,
 } from '@/lib/domain/moderationDefaults'
-import { formatSimpleNote } from '@/lib/utils/noteParser'
-import {
-  translateEnToTrAction,
-  translateNoteAction,
-} from '@/app/(dashboard)/pipeline/[id]/actions'
+import { buildBilingualRejectReason } from '@/lib/domain/moderationRejectReason'
+import { enrichApprovedModerationData } from '@/lib/domain/moderationApproval'
+import { translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
 
 interface ContentSubmissionResult {
   success: boolean
@@ -175,11 +172,17 @@ export async function approveRequestAction(
     throw new Error('İçerik kaydı bulunamadı: ' + (fetchErr?.message ?? ''))
   }
 
+  const enrichedData = await enrichApprovedModerationData(
+    contentType,
+    editedData,
+    translateNoteAction,
+  )
+
   // Update table row to approve & merge any admin edits
   const { error: updateErr } = await admin
     .from(table)
     .update({
-      data: editedData,
+      data: enrichedData as import('@/types/database.types').Json,
       is_approved: true,
     })
     .eq('id', id)
@@ -199,8 +202,8 @@ export async function approveRequestAction(
   } catch {}
 
   const title = contentType === 'training'
-    ? (editedData.baslik ?? 'İsimsiz İçerik')
-    : (editedData.soru?.tr ?? editedData.soru?.en ?? editedData.soru ?? 'İsimsiz İtiraz')
+    ? (enrichedData.baslik ?? editedData.baslik ?? 'İsimsiz İçerik')
+    : ((enrichedData.soru as { tr?: string })?.tr ?? editedData.soru?.tr ?? editedData.soru ?? 'İsimsiz İtiraz')
 
   if (row.user_email) {
     sendModerationApprovedEmail(row.user_email, row.user_name ?? 'NMM Üyesi', contentType, title, row.item_key, userLang).catch(err => {
@@ -216,17 +219,13 @@ export async function buildBilingualRejectReasonAction(
   reason: string,
   adminLang: 'tr' | 'en',
 ): Promise<string> {
-  const trimmed = reason.trim()
-  if (!trimmed) return DEFAULT_REJECT_REASON_BILINGUAL
-  if (trimmed.includes('|||')) return trimmed
-
-  if (adminLang === 'tr') {
-    const en = await translateNoteAction(trimmed)
-    return formatSimpleNote(trimmed, en)
-  }
-
-  const tr = await translateEnToTrAction(trimmed)
-  return formatSimpleNote(tr, trimmed)
+  const { translateEnToTrAction, translateNoteAction } = await import(
+    '@/app/(dashboard)/pipeline/[id]/actions'
+  )
+  return buildBilingualRejectReason(reason, adminLang, {
+    translateTrToEn: translateNoteAction,
+    translateEnToTr: translateEnToTrAction,
+  })
 }
 
 /**

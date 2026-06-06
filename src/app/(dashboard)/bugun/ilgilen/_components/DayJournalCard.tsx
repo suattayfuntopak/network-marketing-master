@@ -22,13 +22,23 @@ import {
   polishDayJournalAction,
 } from '../actions/journal'
 
-type JournalState = { text: string; hydrated: boolean }
+type JournalState = { text: string; hydrated: boolean; conflictRemote: string | null }
 type JournalAction =
   | { type: 'hydrate'; text: string }
   | { type: 'update'; text: string }
+  | { type: 'conflict'; local: string; remote: string }
+  | { type: 'resolveConflict'; text: string }
 
 function journalReducer(state: JournalState, action: JournalAction): JournalState {
-  if (action.type === 'hydrate') return { text: action.text, hydrated: true }
+  if (action.type === 'hydrate') {
+    return { text: action.text, hydrated: true, conflictRemote: null }
+  }
+  if (action.type === 'conflict') {
+    return { text: action.local, hydrated: true, conflictRemote: action.remote }
+  }
+  if (action.type === 'resolveConflict') {
+    return { text: action.text, hydrated: true, conflictRemote: null }
+  }
   return { ...state, text: action.text }
 }
 
@@ -41,7 +51,11 @@ export function DayJournalCard() {
   const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
   const userId = ws?.userId
-  const [{ text, hydrated }, dispatch] = useReducer(journalReducer, { text: '', hydrated: false })
+  const [{ text, hydrated, conflictRemote }, dispatch] = useReducer(journalReducer, {
+    text: '',
+    hydrated: false,
+    conflictRemote: null,
+  })
   const [polishing, setPolishing] = useState(false)
   const migratedRef = useRef(false)
   const syncToastShownRef = useRef(false)
@@ -97,13 +111,23 @@ export function DayJournalCard() {
       const remote = await getDayJournalAction()
       if (cancelled) return
 
-      if ('content' in remote && remote.content.trim()) {
-        dispatch({ type: 'hydrate', text: displayTextFromContent(remote.content, lang) })
-        writeDayJournal(userId!, displayTextFromContent(remote.content, lang))
+      const local = readDayJournal(userId!)
+      const remoteText =
+        'content' in remote && remote.content.trim()
+          ? displayTextFromContent(remote.content, lang)
+          : ''
+
+      if (local.trim() && remoteText && local.trim() !== remoteText.trim()) {
+        dispatch({ type: 'conflict', local, remote: remoteText })
         return
       }
 
-      const local = readDayJournal(userId!)
+      if (remoteText) {
+        dispatch({ type: 'hydrate', text: remoteText })
+        writeDayJournal(userId!, remoteText)
+        return
+      }
+
       dispatch({ type: 'hydrate', text: local })
 
       if (local.trim() && !migratedRef.current) {
@@ -119,12 +143,12 @@ export function DayJournalCard() {
   }, [userId, lang, flushJournalQueue, persistJournal, showSyncSuccessToast])
 
   useEffect(() => {
-    if (!userId || !hydrated) return
+    if (!userId || !hydrated || conflictRemote) return
     const id = window.setTimeout(() => {
       void persistJournal(text, userId, lang)
     }, 400)
     return () => window.clearTimeout(id)
-  }, [text, userId, hydrated, lang, persistJournal])
+  }, [text, userId, hydrated, lang, persistJournal, conflictRemote])
 
   useEffect(() => {
     if (!userId) return
@@ -134,6 +158,14 @@ export function DayJournalCard() {
     window.addEventListener('online', onOnline)
     return () => window.removeEventListener('online', onOnline)
   }, [userId, flushJournalQueue, showSyncSuccessToast])
+
+  async function handleResolveConflict(choice: 'local' | 'remote') {
+    if (!userId || !conflictRemote) return
+    const next = choice === 'local' ? text : conflictRemote
+    dispatch({ type: 'resolveConflict', text: next })
+    writeDayJournal(userId, next)
+    await persistJournal(next, userId, lang)
+  }
 
   async function handlePolish() {
     if (!text.trim()) return
@@ -163,17 +195,43 @@ export function DayJournalCard() {
     >
       <h3 className="text-sm font-bold text-[var(--text-1)]">{t('dashboard.journalTitle')}</h3>
       <p className="mt-0.5 text-xs text-[var(--text-3)]">{t('dashboard.journalSubtitle')}</p>
+      {conflictRemote && (
+        <div
+          role="alert"
+          className="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3 text-sm text-[var(--text-2)]"
+        >
+          <p className="font-semibold text-[var(--text-1)]">{t('dashboard.journalConflictTitle')}</p>
+          <p className="mt-1 text-xs text-[var(--text-3)]">{t('dashboard.journalConflictHint')}</p>
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => void handleResolveConflict('local')}
+              className="flex-1 rounded-lg border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-semibold text-[var(--text-1)] hover:bg-[var(--bg-subtle)]"
+            >
+              {t('dashboard.journalKeepLocal')}
+            </button>
+            <button
+              type="button"
+              onClick={() => void handleResolveConflict('remote')}
+              className="flex-1 rounded-lg border border-[#534AB7]/30 bg-[#EEEDFE]/80 px-3 py-2 text-xs font-semibold text-[#534AB7] hover:bg-[#EEEDFE] dark:bg-[#2d2a5e]/50 dark:text-[#a09be8]"
+            >
+              {t('dashboard.journalUseRemote')}
+            </button>
+          </div>
+        </div>
+      )}
       <textarea
         value={text}
         onChange={e => dispatch({ type: 'update', text: e.target.value })}
         rows={4}
+        disabled={!!conflictRemote}
         placeholder={t('dashboard.journalPlaceholder')}
         className="mt-3 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none placeholder:text-[var(--text-3)] focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
       />
       <button
         type="button"
         onClick={handlePolish}
-        disabled={polishing || !text.trim()}
+        disabled={polishing || !text.trim() || !!conflictRemote}
         className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#534AB7]/30 bg-[#EEEDFE]/80 px-4 py-2.5 text-sm font-semibold text-[#534AB7] transition hover:bg-[#EEEDFE] disabled:opacity-50 dark:bg-[#2d2a5e]/50 dark:text-[#a09be8]"
       >
         {polishing ? (

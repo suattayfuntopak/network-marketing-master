@@ -230,6 +230,24 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
   useEffect(() => {
     if (!tabsHydrated) return
+
+    const applyHashPerf = () => {
+      const fromHash = readPerfFromHash()
+      if (!fromHash) return
+      setMemberCardTab(prev => ({ ...prev, ...fromHash.member }))
+      setFieldCardTab(prev => ({ ...prev, ...fromHash.field }))
+    }
+
+    window.addEventListener('hashchange', applyHashPerf)
+    window.addEventListener('popstate', applyHashPerf)
+    return () => {
+      window.removeEventListener('hashchange', applyHashPerf)
+      window.removeEventListener('popstate', applyHashPerf)
+    }
+  }, [tabsHydrated])
+
+  useEffect(() => {
+    if (!tabsHydrated) return
     sessionStorage.setItem(
       TEAM_TAB_STORAGE_KEY,
       JSON.stringify({ member: memberCardTab, field: fieldCardTab }),

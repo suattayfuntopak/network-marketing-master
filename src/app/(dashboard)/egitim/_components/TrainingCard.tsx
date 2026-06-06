@@ -30,7 +30,13 @@ export function TrainingCard({
   onCopy,
   onDelete,
 }: Props) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
+  const baslik = lang === 'en' && konu.baslikEn ? konu.baslikEn : konu.baslik
+  const ozet = lang === 'en' && konu.ozetEn ? konu.ozetEn : konu.ozet
+  const kategoriBaslik =
+    lang === 'en' && konu.kategoriBaslikEn ? konu.kategoriBaslikEn : konu.kategoriBaslik
+  const maddeler =
+    lang === 'en' && konu.maddelerEn?.length ? konu.maddelerEn : konu.maddeler
   const { catTextColor, catBorderColorHover, catBorderColorActive, bulletStyle } =
     getTrainingCategoryStyles(konu.kategoriId)
 
@@ -55,14 +61,14 @@ export function TrainingCard({
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
                 <p className={`text-[10px] font-bold uppercase tracking-wider ${catTextColor}`}>
-                  {konu.kategoriBaslik}
+                  {kategoriBaslik}
                 </p>
                 <span className={`rounded-full px-2 py-0.2 text-[8px] font-black uppercase tracking-wider shrink-0 ${SEVIYE_RENK[konu.seviye]}`}>
                   {konu.seviye}
                 </span>
               </div>
               <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
-                {konu.baslik}
+                {baslik}
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <div className="flex items-center gap-1 text-[11px] text-[var(--text-3)]">
@@ -70,7 +76,7 @@ export function TrainingCard({
                   <span>{konu.sure}</span>
                 </div>
                 <span className="text-[var(--text-3)] text-sm">·</span>
-                <span className="text-[11px] text-[var(--text-3)] truncate block max-w-[200px] sm:max-w-none">{konu.ozet}</span>
+                <span className="text-[11px] text-[var(--text-3)] truncate block max-w-[200px] sm:max-w-none">{ozet}</span>
               </div>
             </div>
             <ChevronDown
@@ -122,7 +128,7 @@ export function TrainingCard({
         {acik && (
           <div className="border-t border-[var(--border)] px-4 pb-4 pt-3 bg-[var(--bg-subtle)]/30 rounded-b-2xl animate-in fade-in duration-200">
             <ul className="space-y-2.5">
-              {konu.maddeler.map((madde, idx) => (
+              {maddeler.map((madde, idx) => (
                 <li key={idx} className="flex items-start gap-2.5">
                   <span className={`mt-0.5 flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[9px] font-bold ${bulletStyle}`}>
                     {idx + 1}
@@ -148,7 +154,7 @@ export function TrainingCard({
               </button>
 
               <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(konu.maddeler.join('\n'))}`}
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(maddeler.join('\n'))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}

@@ -122,6 +122,12 @@ export function getWhatsAppActivityDisplay(
   return null
 }
 
-export function isLeaderUserNote(action: { action_type: string; note: string | null }): boolean {
-  return action.action_type === 'note' && !!action.note && !isSystemActionNote(action.note)
+export function isLeaderUserNote(action: {
+  action_type: string
+  note: string | null
+  note_tr?: string | null
+}): boolean {
+  if (action.action_type !== 'note') return false
+  if (isSystemActionNote(action.note)) return false
+  return !!(action.note?.trim() || action.note_tr?.trim())
 }

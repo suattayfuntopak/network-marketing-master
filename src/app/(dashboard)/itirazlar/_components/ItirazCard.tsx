@@ -40,6 +40,12 @@ export function ItirazCard({
   const soru = lang === 'en' ? itiraz.soru.en : itiraz.soru.tr
   const cevap = lang === 'en' ? itiraz.cevap?.en ?? '' : itiraz.cevap?.tr ?? ''
   const kategori = lang === 'en' ? itiraz.kategori.en : itiraz.kategori.tr
+  const kisaCevap = lang === 'en' && itiraz.kisaCevapEn ? itiraz.kisaCevapEn : itiraz.kisaCevap
+  const detayliCevap =
+    lang === 'en' && itiraz.detayliCevapEn ? itiraz.detayliCevapEn : itiraz.detayliCevap
+  const yaklasim = lang === 'en' && itiraz.yaklasimEn ? itiraz.yaklasimEn : itiraz.yaklasim
+  const ornekDiyalog =
+    lang === 'en' && itiraz.ornekDiyalogEn ? itiraz.ornekDiyalogEn : itiraz.ornekDiyalog
   const copyValue = buildCopyValue(itiraz, cevap)
 
   return (
@@ -118,28 +124,28 @@ export function ItirazCard({
                   <p>{cevap}</p>
                 ) : (
                   <>
-                    {itiraz.kisaCevap && (
+                    {kisaCevap && (
                       <div>
                         <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Kısa Saha Cevabı</h5>
-                        <p className="italic font-medium">&quot;{itiraz.kisaCevap}&quot;</p>
+                        <p className="italic font-medium">&quot;{kisaCevap}&quot;</p>
                       </div>
                     )}
-                    {itiraz.detayliCevap && (
+                    {detayliCevap && (
                       <div>
                         <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">Detaylı Cevap</h5>
-                        <p className="whitespace-pre-wrap">{itiraz.detayliCevap}</p>
+                        <p className="whitespace-pre-wrap">{detayliCevap}</p>
                       </div>
                     )}
-                    {itiraz.yaklasim && (
+                    {yaklasim && (
                       <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
                         <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ Yaklaşım</h5>
-                        <p className="text-sm text-[var(--text-3)] leading-relaxed">{itiraz.yaklasim}</p>
+                        <p className="text-sm text-[var(--text-3)] leading-relaxed">{yaklasim}</p>
                       </div>
                     )}
-                    {itiraz.ornekDiyalog && (
+                    {ornekDiyalog && (
                       <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
                         <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 Örnek Diyalog</h5>
-                        <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{itiraz.ornekDiyalog}&quot;</p>
+                        <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{ornekDiyalog}&quot;</p>
                       </div>
                     )}
                   </>
