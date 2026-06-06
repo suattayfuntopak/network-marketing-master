@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — E2E CI fix: korumalı route testleri auth skip ✅
+
+**Sorun:** `dashboard-mobile.spec.ts`'te 3 test (`/egitim?tab=objections` URL check, `/itirazlar` iki redirect testi) `PLAYWRIGHT_TEST_EMAIL` olmadan CI'da `toHaveURL` assertion'da başarısız oluyordu — middleware korunan route'ları `/giris`'e yönlendiriyor.
+
+**Düzeltme:** Bu 3 teste `test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, ...)` eklendi. Secret yoksa skip, varsa tam doğrulama.
+
 ## 2026-06-06 — Beşinci sprint: E2E CI, journal birleştir, idempotent moderation ✅
 
 **CI & dokümantasyon:**
