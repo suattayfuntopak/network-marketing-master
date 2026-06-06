@@ -14,6 +14,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import {
   deleteMemberGoalAction,
@@ -41,6 +42,8 @@ interface Props {
   canEditGoal?: boolean
   /** Kart sekmesi gibi satır içi gösterim — başlık, iletişim, gizlilik notu yok */
   embedded?: boolean
+  /** Lider kartında DDBR tamamlanmış kabul edilir (9/9) */
+  memberIsLeader?: boolean
   onClose?: () => void
 }
 
@@ -67,6 +70,7 @@ export function MemberActivitySheet({
   teamPulseUnlocked,
   canEditGoal = false,
   embedded = false,
+  memberIsLeader = false,
   onClose,
 }: Props) {
   const { t } = useTranslation()
@@ -100,6 +104,14 @@ export function MemberActivitySheet({
     queryKey: ['member-goal', workspaceId, member.userId],
     queryFn: () => getMemberGoalsMapAction(workspaceId, [member.userId]),
     staleTime: 30_000,
+    enabled: !embedded && canEditGoal,
+  })
+
+  const { data: memberSelfGoal } = useQuery({
+    queryKey: ['member-user-goal', member.userId],
+    queryFn: () => fetchMemberUserGoalAction(member.userId),
+    staleTime: 30_000,
+    enabled: embedded,
   })
 
   const goal: MemberGoalRow | undefined = goalMap?.[member.userId]
@@ -180,7 +192,24 @@ export function MemberActivitySheet({
           ))}
         </div>
 
-        {(canEditGoal || goal) && (
+        {embedded && memberSelfGoal && (
+          <div className="mb-4 rounded-xl border border-amber-500/25 bg-amber-50/40 dark:bg-amber-950/20 p-4">
+            <div className="flex items-center gap-2 mb-1.5">
+              <Target className="h-4 w-4 text-amber-700 dark:text-amber-400" />
+              <p className="text-xs font-bold uppercase tracking-wide text-amber-800 dark:text-amber-300">
+                {t('team.memberSelfGoalTitle')}
+              </p>
+            </div>
+            <p className="text-sm font-bold text-[var(--text-1)]">
+              {t('team.memberGoalChip', {
+                people: memberSelfGoal.targetPeople,
+                months: memberSelfGoal.targetMonths,
+              })}
+            </p>
+          </div>
+        )}
+
+        {!embedded && (canEditGoal || goal) && (
           <div className="mb-4 rounded-xl border border-amber-500/25 bg-amber-50/40 dark:bg-amber-950/20 p-4">
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex items-center gap-2">
@@ -321,7 +350,12 @@ export function MemberActivitySheet({
                 )}
               </span>
               <span className="text-[var(--text-2)]">
-                {t('statsPage.colDqsg')}: <strong className="text-[var(--text-1)]">{data.onboardingDone ?? 0}/{ONBOARDING_STEP_COUNT}</strong>
+                {t('statsPage.colDqsg')}:{' '}
+                <strong className="text-[var(--text-1)]">
+                  {memberIsLeader
+                    ? `${ONBOARDING_STEP_COUNT}/${ONBOARDING_STEP_COUNT}`
+                    : `${data.onboardingDone ?? 0}/${ONBOARDING_STEP_COUNT}`}
+                </strong>
               </span>
             </div>
           </div>

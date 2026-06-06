@@ -52,7 +52,6 @@ export function EkipPanel() {
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [removingId, setRemovingId] = useState<string | null>(null)
-  const [scorecardOpen, setScorecardOpen] = useState(true)
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
     stepId: string
@@ -252,8 +251,6 @@ export function EkipPanel() {
         isSolo={members.length <= 1}
         isPlusCapReached={isPlusCapReached}
         hasMasterAccess={hasMasterAccess}
-        scorecardOpen={scorecardOpen}
-        setScorecardOpen={setScorecardOpen}
         setOnboardingCoachData={setOnboardingCoachData}
         toggleOnboardingStep={toggleOnboardingStep}
         handleInviteMember={handleInviteMember}

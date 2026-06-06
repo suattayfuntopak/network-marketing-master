@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
-  Crown, Check, TrendingUp, BarChart2, ChevronDown, ChevronUp, Rocket, Bot,
+  Crown, Check, TrendingUp, BarChart2, Rocket, Bot,
   Phone, Search, BarChart3, Target,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -29,8 +29,6 @@ export interface TeamPerformanceSectionProps {
   isSolo: boolean
   isPlusCapReached: boolean
   hasMasterAccess: boolean
-  scorecardOpen: boolean
-  setScorecardOpen: (open: boolean) => void
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
   toggleOnboardingStep: (userId: string, stepId: string, isStepDone: boolean) => Promise<void>
   handleInviteMember: (member: MemberRow) => void
@@ -46,7 +44,6 @@ type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
-    scorecardOpen, setScorecardOpen,
     setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange,
@@ -70,17 +67,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
   const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
-  const totalCandidates = members.reduce((s, m) => s + m.candidate_count, 0)
-  const totalJoined = members.reduce((s, m) => s + m.katildi_count, 0)
-  const totalTakip = members.reduce((s, m) => s + m.takip_count, 0)
-  const totalSunum = members.reduce((s, m) => s + m.sunum_count, 0)
-  const warmPipelinePotentials = totalTakip + totalSunum
-  const activePartnersCount = members.filter(m => {
-    if (!m.last_activity_at) return false
-    const days = Math.floor((now - new Date(m.last_activity_at).getTime()) / 86400000)
-    return days < 7
-  }).length
-  const activeRatio = members.length > 0 ? Math.round((activePartnersCount / members.length) * 100) : 0
+  const nmmPartnerCount = members.filter(m => m.role !== 'leader' && m.isAppUser !== false).length
+  const fieldPartnerCount = members.filter(m => m.isAppUser === false).length
+  const leaderPipelineTotal = members.find(m => m.role === 'leader')?.candidate_count ?? 0
+  const pureCandidateCount = Math.max(0, leaderPipelineTotal - nmmPartnerCount - fieldPartnerCount)
 
   return (
       <section className="space-y-5">
@@ -90,101 +80,32 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
         </h2>
 
         {/* Özet istatistik kartları */}
-        <div className="grid grid-cols-2 gap-4">
-          <div className="rounded-2xl border border-[var(--border)] bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-6 shadow-sm">
-            <p className="text-4xl font-black text-[#D4A017]">{members.length}</p>
-            <p className="mt-1 text-sm font-bold uppercase tracking-wider text-[#C9940A]">{t('team.totalMembers')}</p>
-          </div>
-          <div className="rounded-2xl border border-[var(--border)] bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-6 shadow-sm">
-            <p className="text-4xl font-black text-accent-blue">
-              {totalCandidates}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800/80 dark:text-emerald-300/90">
+              {t('team.statLeader')}
             </p>
-            <p className="mt-1 text-sm font-bold uppercase tracking-wider text-[#3658C7]">{t('team.totalCandidates')}</p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-[#D4A017]">{nmmPartnerCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
+              {t('team.statNmmPartner')}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#FEECEC] dark:bg-red-950/25 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-red-600 dark:text-red-400">{fieldPartnerCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-red-700/80 dark:text-red-300/90">
+              {t('team.statFieldPartner')}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-accent-blue">{pureCandidateCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#3658C7]">
+              {t('team.totalCandidates')}
+            </p>
           </div>
         </div>
-
-        {/* Haftalık Organizasyon Performans Durumu Kartı */}
-        {isLeader && (
-          <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-indigo-50/40 p-6 dark:bg-indigo-950/5 space-y-5 shadow-sm animate-in fade-in duration-300">
-            <button
-              type="button"
-              onClick={() => setScorecardOpen(!scorecardOpen)}
-              className="flex w-full items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400">
-                  <TrendingUp className="h-5 w-5" />
-                </div>
-                <span className="text-base font-extrabold text-indigo-950 dark:text-indigo-200">
-                  {t('team.scorecardTitle')}
-                </span>
-              </div>
-              {scorecardOpen ? (
-                <ChevronUp className="h-5 w-5 text-indigo-500" />
-              ) : (
-                <ChevronDown className="h-5 w-5 text-indigo-500" />
-              )}
-            </button>
-
-            {scorecardOpen && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 pt-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                {/* Metrik 1: Aktif Partner Oranı */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-[var(--border)] p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {t('team.activePartnerRatio')}
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
-                      %{activeRatio}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-semibold">
-                      ({activePartnersCount}/{members.length})
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {t('team.activePartnerDesc')}
-                  </p>
-                </div>
-
-                {/* Metrik 2: Sıcak Huni Potansiyeli */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-[var(--border)] p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {t('team.warmPipeline')}
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
-                      {warmPipelinePotentials}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-semibold">
-                      {t('team.leads')}
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {t('team.warmPipelineDesc')}
-                  </p>
-                </div>
-
-                {/* Metrik 3: Kayıt Hunisi Momentumu */}
-                <div className="rounded-xl bg-white/60 dark:bg-zinc-900/40 border border-[var(--border)] p-5 space-y-1.5 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                  <span className="text-xs font-bold text-indigo-600/70 dark:text-indigo-400/70 uppercase tracking-wider block">
-                    {t('team.onboardingMomentum')}
-                  </span>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-3xl font-black text-indigo-950 dark:text-indigo-100">
-                      {totalJoined}
-                    </span>
-                    <span className="text-xs text-zinc-500 font-semibold">
-                      {t('team.joinedLabel')}
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500 leading-tight font-medium">
-                    {t('team.onboardingMomentumDesc')}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {isLeader && visibleMembers.length > 1 && (
           <div className="relative">
@@ -308,9 +229,9 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   }[] = [
                     { id: 'funnel', Icon: TrendingUp, label: t('team.funnelDistribution'), show: true },
                     { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
+                    { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
                     { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref },
                     { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, wa: true },
-                    { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
                   ]
                   const visibleTabs = memberTabs.filter(tab => tab.show)
 
@@ -492,7 +413,13 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                               </div>
                             </div>
                           ) : activeTab === 'call' && telHref ? (
-                            <div className="flex justify-center rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+                            <div className="flex flex-col items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
+                              <p className="text-sm font-semibold text-[var(--text-2)] text-center">
+                                {t('team.callMemberHint', {
+                                  name: (m.full_name ?? '').split(' ')[0] || t('common.member'),
+                                  phone: m.phone ?? '',
+                                })}
+                              </p>
                               <a
                                 href={telHref}
                                 onClick={e => e.stopPropagation()}
@@ -529,7 +456,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                 pipelineHref: m.pipeline_id ? `/pipeline/${m.pipeline_id}` : null,
                               }}
                               teamPulseUnlocked={teamPulseUnlocked}
-                              canEditGoal={isLeader && teamPageUnlocked && !isCurrentUser}
+                              memberIsLeader={m.role === 'leader'}
                             />
                           ) : null}
                         </div>

@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim: panel istatistikleri, sekme sırası, aktivite iyileştirmeleri ✅
+
+- Başlık altı açıklama kaldırıldı; panel adı **Lider ve Ekip Performans Paneli**.
+- 4 özet kutu: Lider (1, pastel yeşil), NMM Ortağı (sarı), Saha Ortağı (açık kırmızı), Toplam Aday (boru hattı − ortaklar).
+- Haftalık Organizasyon Performans Durumu kartı kaldırıldı.
+- Sekme sırası: Huni → DDBR → **Aktivite** → Ara → WhatsApp.
+- Aktivite: lider DDBR 9/9; kendi hedef bilgisi (`nmm_user_goals`); Ara sekmesinde isim+numara ipucu.
+- **Dosyalar:** `page.tsx`, `TeamPerformanceSection.tsx`, `EkipPanel.tsx`, `MemberActivitySheet.tsx`, `hedef/actions.ts`, `tr.ts`, `en.ts`.
+
 ## 2026-06-06 — Ekibim: kart sadeleştirme + sekme-only açılım ✅
 
 - Chevron ve sil butonları kaldırıldı; içerik yalnızca sekme tıklanınca açılıyor (aynı sekmeye tekrar tık = kapanır).

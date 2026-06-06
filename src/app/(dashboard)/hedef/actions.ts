@@ -34,6 +34,26 @@ async function ownWorkspaceId(
   return data?.workspace_id ?? null
 }
 
+/** Downline üyenin kendi belirlediği hedefi (lider okur; yoksa null). */
+export async function fetchMemberUserGoalAction(memberUserId: string): Promise<UserGoal | null> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user || !memberUserId) return null
+
+  const { data } = await supabase
+    .from('nmm_user_goals')
+    .select('target_people, target_months, start_at')
+    .eq('user_id', memberUserId)
+    .maybeSingle()
+
+  if (!data) return null
+  return {
+    targetPeople: data.target_people,
+    targetMonths: data.target_months,
+    startAt: data.start_at,
+  }
+}
+
 /** Kullanıcının kendi hedefi (yoksa null). */
 export async function fetchUserGoalAction(): Promise<UserGoal | null> {
   const supabase = await createClient()
