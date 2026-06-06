@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Ekibim: Ara + Aktivite sekme düzeltmeleri ✅
+
+- **Ara sekmesi:** Telefon numarası gizlendi; yalnızca Ara butonu (`tel:` satırdaki üyeyi arar).
+- **Aktivite sekmesi:** Popup kaldırıldı; `MemberActivitySheet embedded` ile dönem/metrik/hedef içeriği sekme altında. Başlık, ara/WA, gizlilik notu yok.
+- **Dosyalar:** `MemberActivitySheet.tsx`, `TeamPerformanceSection.tsx`, `EkipPanel.tsx`.
+
 ## 2026-06-06 — Ekibim: üye kartı ikon sekmeleri ✅
 
 - **Sorun:** DDBR satırı metin + ayrı huni/iletişim blokları kartı kalabalıklaştırıyordu.

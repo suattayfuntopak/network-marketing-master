@@ -18,6 +18,7 @@ import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
+import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -40,7 +41,8 @@ export interface TeamPerformanceSectionProps {
   handleInviteMember: (member: MemberRow) => void
   memberSearch: string
   onMemberSearchChange: (q: string) => void
-  onOpenActivity: (member: MemberRow) => void
+  teamPulseUnlocked: boolean
+  teamPageUnlocked: boolean
   memberGoalsMap?: Record<string, MemberGoalRow>
 }
 
@@ -52,7 +54,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     scorecardOpen, setScorecardOpen, expandedMembers, setExpandedMembers,
     removingId, setMemberToRemove, setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
-    memberSearch, onMemberSearchChange, onOpenActivity,
+    memberSearch, onMemberSearchChange,
+    teamPulseUnlocked, teamPageUnlocked,
     memberGoalsMap = {},
   } = props
   const router = useRouter()
@@ -557,8 +560,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                               </div>
                             </div>
                           ) : activeTab === 'call' && telHref ? (
-                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
-                              <p className="text-lg font-black text-[var(--text-1)] tabular-nums">{m.phone}</p>
+                            <div className="flex justify-center rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
                               <a
                                 href={telHref}
                                 onClick={e => e.stopPropagation()}
@@ -585,25 +587,18 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                               </a>
                             </div>
                           ) : activeTab === 'activity' && isLeader ? (
-                            <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] p-6">
-                              {lastActiveDate && (
-                                <p className="text-sm text-[var(--text-2)] text-center">
-                                  {t('team.lastActive')} {lastActiveDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short' })}
-                                  {' '}({daysInactive === 0 ? t('team.todayShort') : t('team.daysAgoShort', { days: daysInactive })})
-                                </p>
-                              )}
-                              <button
-                                type="button"
-                                onClick={e => {
-                                  e.stopPropagation()
-                                  onOpenActivity(m)
-                                }}
-                                className="inline-flex items-center gap-2 rounded-xl border border-brand/30 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 px-6 py-3 text-sm font-bold text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 transition active:scale-95 cursor-pointer"
-                              >
-                                <BarChart3 className="h-5 w-5" />
-                                {t('team.activityBtn')}
-                              </button>
-                            </div>
+                            <MemberActivitySheet
+                              embedded
+                              workspaceId={ws.workspaceId}
+                              member={{
+                                userId: m.user_id,
+                                fullName: m.full_name,
+                                phone: m.phone,
+                                pipelineHref: m.pipeline_id ? `/pipeline/${m.pipeline_id}` : null,
+                              }}
+                              teamPulseUnlocked={teamPulseUnlocked}
+                              canEditGoal={isLeader && teamPageUnlocked}
+                            />
                           ) : null}
                         </div>
                       )}

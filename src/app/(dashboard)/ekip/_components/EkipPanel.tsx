@@ -264,7 +264,8 @@ export function EkipPanel() {
         handleInviteMember={handleInviteMember}
         memberSearch={memberSearch}
         onMemberSearchChange={setMemberSearch}
-        onOpenActivity={setActivityMember}
+        teamPulseUnlocked={teamPulseUnlocked}
+        teamPageUnlocked={teamPageUnlocked}
         memberGoalsMap={memberGoalsMap}
       />
 
