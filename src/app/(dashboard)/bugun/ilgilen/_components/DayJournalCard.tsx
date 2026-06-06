@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useReducer, useState } from 'react'
+import { useEffect, useReducer, useRef, useState } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -9,7 +9,12 @@ import {
   readDayJournal,
   writeDayJournal,
 } from '@/lib/domain/dayRitual'
-import { polishDayJournalAction } from '../actions/journal'
+import { parseSimpleNote } from '@/lib/utils/noteParser'
+import {
+  getDayJournalAction,
+  mergeDayJournalLangAction,
+  polishDayJournalAction,
+} from '../actions/journal'
 
 type JournalState = { text: string; hydrated: boolean }
 type JournalAction =
@@ -21,23 +26,56 @@ function journalReducer(state: JournalState, action: JournalAction): JournalStat
   return { ...state, text: action.text }
 }
 
+function displayTextFromContent(content: string, lang: 'tr' | 'en'): string {
+  const parsed = parseSimpleNote(content)
+  return lang === 'en' ? (parsed.en || parsed.tr) : (parsed.tr || parsed.en)
+}
+
 export function DayJournalCard() {
   const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
   const userId = ws?.userId
   const [{ text, hydrated }, dispatch] = useReducer(journalReducer, { text: '', hydrated: false })
   const [polishing, setPolishing] = useState(false)
+  const migratedRef = useRef(false)
 
   useEffect(() => {
     if (!userId) return
-    dispatch({ type: 'hydrate', text: readDayJournal(userId) })
-  }, [userId])
+    let cancelled = false
+
+    async function load() {
+      const remote = await getDayJournalAction()
+      if (cancelled) return
+
+      if ('content' in remote && remote.content.trim()) {
+        dispatch({ type: 'hydrate', text: displayTextFromContent(remote.content, lang) })
+        writeDayJournal(userId!, displayTextFromContent(remote.content, lang))
+        return
+      }
+
+      const local = readDayJournal(userId!)
+      dispatch({ type: 'hydrate', text: local })
+
+      if (local.trim() && !migratedRef.current) {
+        migratedRef.current = true
+        void mergeDayJournalLangAction(local, lang)
+      }
+    }
+
+    void load()
+    return () => {
+      cancelled = true
+    }
+  }, [userId, lang])
 
   useEffect(() => {
     if (!userId || !hydrated) return
-    const id = window.setTimeout(() => writeDayJournal(userId, text), 400)
+    const id = window.setTimeout(() => {
+      writeDayJournal(userId, text)
+      void mergeDayJournalLangAction(text, lang)
+    }, 400)
     return () => window.clearTimeout(id)
-  }, [text, userId, hydrated])
+  }, [text, userId, hydrated, lang])
 
   async function handlePolish() {
     if (!text.trim()) return
@@ -50,6 +88,7 @@ export function DayJournalCard() {
       }
       if (result.text) {
         dispatch({ type: 'update', text: result.text })
+        writeDayJournal(userId!, result.text)
         toast.success(t('dashboard.journalPolished'))
       }
     } finally {

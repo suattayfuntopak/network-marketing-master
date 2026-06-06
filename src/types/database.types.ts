@@ -616,6 +616,27 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_day_journal: {
+        Row: {
+          user_id: string
+          journal_date: string
+          content: string
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          journal_date?: string
+          content?: string
+          updated_at?: string
+        }
+        Update: {
+          user_id?: string
+          journal_date?: string
+          content?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_user_settings: {
         Row: {
           user_id: string

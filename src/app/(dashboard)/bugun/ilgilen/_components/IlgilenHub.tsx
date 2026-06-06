@@ -14,6 +14,10 @@ function isValidTab(s: string | null): s is IlgilenTabId {
   return ILGILEN_TAB_IDS.includes(s as IlgilenTabId)
 }
 
+/**
+ * ?tab= URL ile sekme kalıcılığı kasıtlıdır: sayfa yenilendiğinde son açık sekme korunur.
+ * Varsayılan `daily`; geçersiz param yine daily'ye düşer.
+ */
 export function IlgilenHub() {
   const searchParams = useSearchParams()
   const raw = searchParams.get('tab')

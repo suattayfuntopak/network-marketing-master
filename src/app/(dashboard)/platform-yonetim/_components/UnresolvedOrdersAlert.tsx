@@ -7,7 +7,7 @@ import {
   getUnresolvedOrdersAction,
   markOrderResolvedAction,
   type UnresolvedOrderItem,
-} from '../actions'
+} from '../admin-actions'
 
 /**
  * Çözülemeyen Shopier siparişleri (müşteri ödedi ama note/productId eşleşmedi →

@@ -17,10 +17,12 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import {
-  addIndependentAsCandidateAction,
-  deleteUserAction,
   type PlatformWorkspaceItem
 } from '../actions'
+import {
+  addIndependentAsCandidateAction,
+  deleteUserAction,
+} from '../admin-actions'
 import {
   approveRequestAction,
   rejectRequestAction,
@@ -30,9 +32,13 @@ import { WorkspaceLicenseModal } from './WorkspaceLicenseModal'
 import { ModerationReviewModal } from './ModerationReviewModal'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { RejectModerationDialog } from './RejectModerationDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
 import { UnresolvedOrdersAlert } from './UnresolvedOrdersAlert'
+
+const DEFAULT_REJECT_REASON =
+  'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'
 
 const getAvatarColor = (name: string) => {
   const colors = [
@@ -89,9 +95,10 @@ export function PlatformYonetimContent() {
 
   const [navConfirm, setNavConfirm] = useState<'payment' | 'landing' | null>(null)
   const [selectedRequest, setSelectedRequest] = useState<ModerationRequestItem | null>(null)
+  const [rejectRequest, setRejectRequest] = useState<ModerationRequestItem | null>(null)
   const [, startModerationTransition] = useTransition()
 
-  useBodyScrollLock(!!selectedWorkspace || !!selectedRequest || navConfirm !== null)
+  useBodyScrollLock(!!selectedWorkspace || !!selectedRequest || !!rejectRequest || navConfirm !== null)
 
   useEffect(() => {
     if (!wsLoading && !isSuperAdmin) {
@@ -127,12 +134,14 @@ export function PlatformYonetimContent() {
     })
   }
 
-  async function handleRejectRequest(req: ModerationRequestItem) {
-    const reason = prompt(
-      'Bu talebi reddetmek istediğinize emin misiniz? (Bu işlem geri alınamaz)\n\nKullanıcıya nazikçe iletilecek Red gerekçesini buraya yazabilirsiniz (İsteğe bağlı):',
-      'İçeriğinizin formatı veya uzunluğu platform rehber kurallarına tam olarak uymadığı için şu aşamada onaylanamamıştır.'
-    )
-    if (reason === null) return // Admin cancelled the prompt
+  function handleRejectRequest(req: ModerationRequestItem) {
+    setRejectRequest(req)
+  }
+
+  function confirmRejectRequest(reason: string) {
+    if (!rejectRequest) return
+    const req = rejectRequest
+    setRejectRequest(null)
 
     startModerationTransition(async () => {
       try {
@@ -778,6 +787,13 @@ export function PlatformYonetimContent() {
             router.push('/acilis')
           }}
           onCancel={() => setNavConfirm(null)}
+        />
+      )}
+      {rejectRequest && (
+        <RejectModerationDialog
+          defaultReason={DEFAULT_REJECT_REASON}
+          onConfirm={confirmRejectRequest}
+          onCancel={() => setRejectRequest(null)}
         />
       )}
     </main>

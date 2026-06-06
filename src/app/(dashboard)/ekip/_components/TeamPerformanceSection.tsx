@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type ComponentType } from 'react'
+import { useState, useEffect, type ComponentType } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
@@ -42,6 +42,26 @@ export interface TeamPerformanceSectionProps {
 type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
 type FieldCardTab = 'aiInvite' | 'nmmInvite'
 
+const TEAM_TAB_STORAGE_KEY = 'nmm_team_perf_tabs'
+
+function loadTeamTabState(): {
+  member: Record<string, MemberCardTab | undefined>
+  field: Record<string, FieldCardTab | undefined>
+} {
+  if (typeof window === 'undefined') return { member: {}, field: {} }
+  try {
+    const raw = sessionStorage.getItem(TEAM_TAB_STORAGE_KEY)
+    if (!raw) return { member: {}, field: {} }
+    const parsed = JSON.parse(raw) as {
+      member?: Record<string, MemberCardTab | undefined>
+      field?: Record<string, FieldCardTab | undefined>
+    }
+    return { member: parsed.member ?? {}, field: parsed.field ?? {} }
+  } catch {
+    return { member: {}, field: {} }
+  }
+}
+
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
@@ -52,11 +72,21 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberGoalsMap = {},
   } = props
   const router = useRouter()
-  // Mount anında bir kez sabitlenir → render sırasında impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
-  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
-  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
+  const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>(
+    () => loadTeamTabState().member,
+  )
+  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>(
+    () => loadTeamTabState().field,
+  )
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
+
+  useEffect(() => {
+    sessionStorage.setItem(
+      TEAM_TAB_STORAGE_KEY,
+      JSON.stringify({ member: memberCardTab, field: fieldCardTab }),
+    )
+  }, [memberCardTab, fieldCardTab])
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
     setMemberCardTab(prev => ({

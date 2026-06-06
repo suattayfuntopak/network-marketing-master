@@ -9,7 +9,7 @@ export function usePlatformWorkspaces(enabled: boolean) {
     queryKey: ['platform-workspaces'],
     queryFn: getPlatformWorkspacesAction,
     enabled,
-    staleTime: 60_000,
+    staleTime: 120_000,
   })
 }
 
@@ -18,6 +18,6 @@ export function usePlatformModeration(enabled: boolean) {
     queryKey: ['platform-moderation'],
     queryFn: getPendingRequestsAction,
     enabled,
-    staleTime: 30_000,
+    staleTime: 60_000,
   })
 }

@@ -99,7 +99,7 @@ export const en = {
     groupSecondary: "Tools",
     groupExpert: "Advanced",
     groupAdmin: "Admin",
-    todayFocus: "Today's Focus",
+    todayFocus: "Quick Glance",
     uyum: "Compliance Center",
     istatistikler: "Statistics",
     platformYonetim: "Platform Admin",

@@ -1,5 +1,32 @@
 # Hot Log
 
+## 2026-06-06 — Refactor sprint: CandidateDetail, admin-actions, günlük Supabase, Hızlı Bakış ✅
+
+**CandidateDetail.tsx (~175 satır azaldı):**
+- `CandidateStageCard`, `CandidateFollowUpCard`, `CandidateDeleteCard` ayrı dosyalara çıkarıldı
+- Ana dosya orchestration + lazy-mount kartlara odaklandı
+
+**Platform yönetimi:**
+- Super-admin mutation'lar `admin-actions.ts`'e taşındı (`actions.ts` sadece okuma)
+- `RejectModerationDialog` — `window.prompt` kaldırıldı, i18n reject metinleri eklendi
+
+**Performans / cache:**
+- `StatsSuperAdminSections` periodUsage `staleTime` 30s → 60s
+- `usePlatformWorkspaces` 120s, `usePlatformModeration` 60s staleTime
+- `useCandidateStats` hook — IstatistiklerContent duplicate useMemo kaldırıldı
+
+**DayJournalCard → Supabase:**
+- Migration `057_day_journal.sql` (`nmm_day_journal`, RLS)
+- `journal.ts` server actions: get/save/merge/polish (TR ||| EN)
+- İlk yüklemede localStorage → DB migrasyonu; debounced save
+
+**UX:**
+- Nav: "Bugün İlgilen" → **Hızlı Bakış** / Quick Glance; ikon `Zap` → `ScanEye`
+- IlgilenHub `?tab=` persistence JSDoc ile belgelendi
+- TeamPerformanceSection kart tab state `sessionStorage` ile persist
+
+**Deploy notu:** `057_day_journal.sql` Supabase'e uygulanmalı.
+
 ## 2026-06-06 — Refactor: PlatformYonetimContent bölünmesi + perf-progress düzeltmesi ✅
 
 **PlatformYonetimContent (1192 satır → 808 satır, %32 küçülme):**

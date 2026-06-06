@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, Zap, TrendingUp, Bot, Users,
+  LayoutDashboard, ScanEye, TrendingUp, Bot, Users,
   CalendarDays, BookOpen,
   BarChart2, Crown, Ellipsis,
   type LucideIcon,
@@ -14,7 +14,7 @@ export type NavItem = {
 
 /** Pano mobil grid + sidebar modül listesi (6 kutu) */
 export const NAV_MODULE_ITEMS: readonly NavItem[] = [
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: Zap },
+  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye },
   { href: '/pipeline',      translationKey: 'nav.pipeline',   icon: TrendingUp },
   { href: '/takvim',        translationKey: 'nav.takvim',   icon: CalendarDays },
   { href: '/ekip',          translationKey: 'nav.ekip',     icon: Users },
@@ -83,7 +83,7 @@ export function isNavMoreRouteActive(pathname: string): boolean {
 }
 
 export const PANO_LAUNCHER_ITEMS: readonly PanoLauncherItem[] = [
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: Zap, color: 'purple', desktopColor: 'purple' },
+  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye, color: 'purple', desktopColor: 'purple' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'pink', desktopColor: 'pink' },
   { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },

@@ -105,7 +105,7 @@ export function StatsSuperAdminSections({
     queryKey: ['ai-usage-by-period', appUserIds, period],
     queryFn: () => getAiUsageByPeriodAction(appUserIds, toArchivePeriod(period)),
     enabled: appUserIds.length > 0,
-    staleTime: 30_000,
+    staleTime: 60_000,
   })
 
   // Sıralı tek liste: Lider → NMM → Saha → Dış Kayıt

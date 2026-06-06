@@ -5,7 +5,8 @@ import { X, Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
-import { adminExtendLicenseAction, type PlatformWorkspaceItem } from '../actions'
+import { adminExtendLicenseAction } from '../admin-actions'
+import type { PlatformWorkspaceItem } from '../actions'
 
 interface Props {
   workspace: PlatformWorkspaceItem

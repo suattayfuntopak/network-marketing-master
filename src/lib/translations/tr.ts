@@ -69,7 +69,7 @@ export const tr = {
   },
   navMobile: {
     pano: "Pano",
-    todayFocus: "Bugün İlgilen",
+    todayFocus: "Hızlı Bakış",
     pipeline: "Boru Hattı",
     takvim: "Takvim",
     ekip: "Ekibim",
@@ -99,7 +99,7 @@ export const tr = {
     groupSecondary: "Araçlar",
     groupExpert: "Uzman araçlar",
     groupAdmin: "Yönetim",
-    todayFocus: "Bugün İlgilen",
+    todayFocus: "Hızlı Bakış",
     uyum: "Uyum Merkezi",
     istatistikler: "İstatistikler",
     platformYonetim: "Platform Yönetimi",
