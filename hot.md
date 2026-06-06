@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-06 — Bugün İlgilen sekme geçişi: anlık (always-mounted) ✅
+
+- Önceki: `{activeTab === 'X' && <Component />}` → sekme geçişinde unmount + yeni fetch (yavaş).
+- Yeni: 6 sekme her zaman mount'lu, CSS `hidden` ile gizleniyor.
+- İlk açılışta 6 query **paralel** başlar; sekme geçişi unmount/remount yerine anlık CSS değişimi.
+- **Dosya:** `IlgilenHub.tsx`.
+
 ## 2026-06-06 — DayJournalCard: useReducer ile tek-render hydration ✅
 
 - `setText` + `setHydrated` ayrı ayrı çağrısı → 2 render; `useReducer` ile tek `dispatch` → 1 render.
