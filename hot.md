@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-06 — Perf: lazy-mount tab pattern (gerçek düzeltme) ✅
+
+**Sorun:** Önceki "always-mounted" yaklaşım ilk yüklemede TÜM sekmeleri aynı anda render ediyordu.
+IlgilenHub: 6 Crown bileşeni paralel mount → 6 ayrı Supabase sorgu kümesi → ağır ilk yük.
+
+**Çözüm: `useRef<Set>` lazy-mount pattern**
+- İlk açılışta yalnızca aktif sekme mount edilir → hafif ilk yük.
+- Sekmeye ilk kez tıklanınca mount → tek seferlik fetch (beklenir, kabul edilebilir).
+- Sonraki geçişler: zaten mount'lu → anlık CSS değişimi, sıfır network isteği ✓
+
+**Düzeltilen dosyalar:**
+- `IlgilenHub.tsx` — 6 sekme, artık lazy
+- `AkademiContent.tsx` — 3 sekme, artık lazy
+- `YzKocuContainer.tsx` — 4 sekme, artık lazy
+- `UyumContent.tsx` — 2 sekme, artık lazy (compliance box & disclaimer her zaman görünür)
+
 ## 2026-06-06 — UX Performans: always-mounted tabs + cache TTL artışı ✅
 
 ### Değişiklikler
