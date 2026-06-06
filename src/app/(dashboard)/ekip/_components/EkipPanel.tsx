@@ -1,8 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -24,9 +23,6 @@ import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
-import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
-import { TeamActivitySummary } from '@/app/(dashboard)/istatistikler/_components/TeamActivitySummary'
-import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { getMemberGoalsMapAction } from '../memberGoalsActions'
 
@@ -35,8 +31,6 @@ export type { MemberRow, OnboardingStep }
 
 export function EkipPanel() {
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const searchParams = useSearchParams()
   const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
 
@@ -58,8 +52,6 @@ export function EkipPanel() {
     phone?: string | null
   } | null>(null)
   const [memberSearch, setMemberSearch] = useState('')
-  const [activityMember, setActivityMember] = useState<MemberRow | null>(null)
-  const openedActivityFromUrl = useRef(false)
 
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
@@ -125,47 +117,7 @@ export function EkipPanel() {
     staleTime: 30_000,
   })
 
-  // ── Ekip Aktivite Özeti (İstatistikler'den taşındı) — davet kodu kutusunun üstünde ──
-  const appDownlines = useMemo(
-    () => downlineMembers.filter(m => m.isAppUser !== false),
-    [downlineMembers]
-  )
-  const activityMemberIds = useMemo(
-    () => appDownlines.map(m => m.user_id).filter(Boolean),
-    [appDownlines]
-  )
-  const { data: teamActivity, isLoading: teamActivityLoading } = useQuery({
-    queryKey: queryKeys.teamFieldActivity(ws?.workspaceId ?? '', '30d', activityMemberIds),
-    queryFn: () => getTeamFieldActivityAction(ws!.workspaceId, '30d', activityMemberIds),
-    enabled: !!ws?.workspaceId && activityMemberIds.length > 0 && teamPageUnlocked,
-    staleTime: 30_000,
-  })
-  const getActivityMemberHref = useCallback(
-    (row: { user_id: string }) => {
-      const m = members.find(x => x.user_id === row.user_id)
-      return m?.pipeline_id ? `/pipeline/${m.pipeline_id}` : null
-    },
-    [members]
-  )
-  const handleActivityFromSummary = useCallback(
-    (target: { userId: string }) => {
-      const row = members.find(x => x.user_id === target.userId)
-      if (row) setActivityMember(row)
-    },
-    [members]
-  )
-
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
-
-  useEffect(() => {
-    const activityUserId = searchParams.get('activity')
-    if (!activityUserId || members.length === 0 || openedActivityFromUrl.current) return
-    const member = members.find(m => m.user_id === activityUserId)
-    if (!member || member.role === 'leader') return
-    openedActivityFromUrl.current = true
-    setActivityMember(member)
-    router.replace('/ekip', { scroll: false })
-  }, [searchParams, members, router])
 
   if (wsLoading || mLoading) {
     return (
@@ -261,17 +213,6 @@ export function EkipPanel() {
         memberGoalsMap={memberGoalsMap}
       />
 
-      {isLeader && appDownlines.length > 0 && (
-        <TeamActivitySummary
-          downlines={appDownlines}
-          activity={teamActivity}
-          loading={mLoading || teamActivityLoading}
-          teamStatsLocked={!teamPageUnlocked}
-          getMemberHref={getActivityMemberHref}
-          onOpenActivity={handleActivityFromSummary}
-        />
-      )}
-
       {isLeader && (
         <InviteTeammateSection
           inviteCode={ws.inviteCode}
@@ -310,21 +251,6 @@ export function EkipPanel() {
         />
       )}
 
-      {activityMember && ws && (
-        <MemberActivitySheet
-          workspaceId={ws.workspaceId}
-          member={{
-            userId: activityMember.user_id,
-            fullName: activityMember.full_name,
-            phone: activityMember.phone,
-            pipelineHref: activityMember.pipeline_id ? `/pipeline/${activityMember.pipeline_id}` : null,
-          }}
-          initialPeriod="7d"
-          teamPulseUnlocked={teamPulseUnlocked}
-          canEditGoal={isLeader && teamPageUnlocked}
-          onClose={() => setActivityMember(null)}
-        />
-      )}
     </div>
   )
 }

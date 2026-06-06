@@ -267,17 +267,22 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                               </button>
                             </>
                           ) : (
-                            <button
-                              type="button"
-                              onClick={e => {
-                                e.stopPropagation()
-                                handleInviteMember(m)
-                              }}
-                              className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-5 py-3 text-sm font-black shadow-md cursor-pointer"
-                            >
-                              <WhatsAppIcon className="h-5 w-5 fill-current text-white" />
-                              <span>{t('team.inviteToNmm')}</span>
-                            </button>
+                            <>
+                              <p className="text-sm text-[var(--text-2)] text-center leading-relaxed max-w-sm">
+                                {t('team.fieldNmmInviteHint')}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  handleInviteMember(m)
+                                }}
+                                className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 transition-all text-white px-5 py-3 text-sm font-black shadow-md cursor-pointer"
+                              >
+                                <WhatsAppIcon className="h-5 w-5 fill-current text-white" />
+                                <span>{t('team.inviteToNmm')}</span>
+                              </button>
+                            </>
                           )}
                         </div>
                       )}

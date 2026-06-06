@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-04 — Ekibim özet kaldırıldı; Bugün İlgilen sekme navigasyonu ✅
+
+- **Ekibim:** Ekip Aktivite Özeti kutusu ve ilgili popup/query kaldırıldı.
+- **Saha ortağı sekmeleri:** WhatsApp paneline `Hazır şablon NMM daveti gönder`; YZ metni `…hazırla ve gönder`.
+- **Bugün İlgilen:** 6 kutu → başlık + 6 sekme (tıklanınca eski href’lere gider); alt modüller aynı.
+- **Dosyalar:** `EkipPanel.tsx`, `TeamPerformanceSection.tsx`, `CrownHomeMockGrid.tsx`, `tr.ts`, `en.ts`.
+
 ## 2026-06-04 — Ekibim: saha ortağı davet sekmeleri ✅
 
 - Profil satırından butonlar kaldırıldı — isimler tam genişlikte (Elif/Sinem gibi).

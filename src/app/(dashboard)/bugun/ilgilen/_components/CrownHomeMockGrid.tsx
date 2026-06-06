@@ -1,53 +1,45 @@
 'use client'
 
-import {
-  BarChart3,
-  CalendarDays,
-  CalendarRange,
-  ClipboardList,
-  Users,
-  Video,
-  type LucideIcon,
-} from 'lucide-react'
-import { SquareButton, type ButtonColor } from '@/components/ui/SquareButton'
-import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
+import { useRouter } from 'next/navigation'
+import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-type CrownItem = {
-  id: string
-  labelKey: string
-  icon: LucideIcon
-  color: ButtonColor
-  href: string
-}
-
-const CROWN_ITEMS: readonly CrownItem[] = [
-  { id: 'daily', labelKey: 'dashboard.crownMockDailyFollow', icon: ClipboardList, color: 'purple', href: '/bugunku-takibim' },
-  { id: 'live', labelKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', href: '/canli-egitim' },
-  { id: 'team', labelKey: 'nav.ekip', icon: Users, color: 'amber', href: '/ekibim' },
-  { id: 'weekly', labelKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', href: '/haftalik-ozet' },
-  { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'pink', href: '/aylik-ozet' },
-  { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', href: '/ilk-30-gun' },
-]
+const CROWN_ITEMS = [
+  { id: 'daily', labelKey: 'dashboard.crownMockDailyFollow', href: '/bugunku-takibim' },
+  { id: 'live', labelKey: 'dashboard.crownMockLiveTraining', href: '/canli-egitim' },
+  { id: 'team', labelKey: 'nav.ekip', href: '/ekibim' },
+  { id: 'weekly', labelKey: 'dashboard.crownMockWeeklySummary', href: '/haftalik-ozet' },
+  { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', href: '/aylik-ozet' },
+  { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days', href: '/ilk-30-gun' },
+] as const
 
 export function IlgilenHubGrid() {
   const { t } = useTranslation()
+  const router = useRouter()
 
   return (
-    <LauncherGrid>
-      {CROWN_ITEMS.map(({ id, labelKey, icon, color, href }) => (
-        <LauncherGridItem key={id}>
-          <SquareButton
-            icon={icon}
-            label={t(labelKey)}
-            color={color}
-            variant="crown"
-            href={href}
-            prominent
-            fill
-          />
-        </LauncherGridItem>
-      ))}
-    </LauncherGrid>
+    <header className="space-y-4">
+      <h1 className="text-xl font-bold text-[var(--text-1)]">
+        {t('pagesUi.todayPrioritiesTitle')}
+      </h1>
+      <nav
+        className="flex gap-1 overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label={t('pagesUi.todayPrioritiesTitle')}
+      >
+        {CROWN_ITEMS.map(({ id, labelKey, href }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => router.push(href)}
+            className={clsx(
+              'shrink-0 rounded-lg px-3 py-2.5 text-xs font-bold transition-all cursor-pointer whitespace-nowrap',
+              'text-[var(--text-2)] hover:bg-[var(--bg-card)] hover:text-brand dark:hover:text-indigo-300 hover:shadow-sm hover:border hover:border-[var(--border)]'
+            )}
+          >
+            {t(labelKey)}
+          </button>
+        ))}
+      </nav>
+    </header>
   )
 }
