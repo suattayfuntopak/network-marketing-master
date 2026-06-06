@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-04 — Bugün İlgilen: YZ Koçu tarzı sekmeler + swipe kilidi ✅
+
+- Sekmeler belirgin (renkli aktif durum + ikon); ilk sekme varsayılan seçili.
+- `no-swipe` / `data-no-swipe` ile yatay kaydırma sayfa geçişini tetiklemez.
+- **Dosya:** `CrownHomeMockGrid.tsx`.
+
 ## 2026-06-04 — Ekibim özet kaldırıldı; Bugün İlgilen sekme navigasyonu ✅
 
 - **Ekibim:** Ekip Aktivite Özeti kutusu ve ilgili popup/query kaldırıldı.
