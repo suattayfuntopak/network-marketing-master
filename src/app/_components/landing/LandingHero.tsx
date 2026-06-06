@@ -5,7 +5,7 @@ import { ArrowRight, Play, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function LandingHero() {
-  const { t, lang } = useTranslation()
+  const { t } = useTranslation()
 
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:px-8 text-center space-y-8">
@@ -17,15 +17,11 @@ export function LandingHero() {
 
       {/* Title */}
       <h1 className="mx-auto max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
-        {lang === 'en' ? (
-          <>
-            Build a <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">High-Performance</span> & Active Network Marketing Team!
-          </>
-        ) : (
-          <>
-            Aktif ve <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">Yüksek Performanslı</span> Bir Network Marketing Ekibi İnşa Edin!
-          </>
-        )}
+        {t('landingPage.heroTitle1')}
+        <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
+          {t('landingPage.heroTitleHighlight')}
+        </span>
+        {t('landingPage.heroTitle2')}
       </h1>
 
       {/* Subtitle */}

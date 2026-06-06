@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { HelpCircle } from 'lucide-react'
+import { AlertTriangle, HelpCircle } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -47,8 +47,15 @@ export function ConfirmDialog({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative w-full max-w-xs rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
         <div className="mb-4 flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#EEEDFE] dark:bg-[#2d2a5e]">
-            <HelpCircle className="h-7 w-7 text-[#534AB7] dark:text-[#a09be8]" strokeWidth={1.75} />
+          <div className={`flex h-14 w-14 items-center justify-center rounded-full ${
+            variant === 'danger'
+              ? 'bg-red-50 dark:bg-red-950/30'
+              : 'bg-[#EEEDFE] dark:bg-[#2d2a5e]'
+          }`}>
+            {variant === 'danger'
+              ? <AlertTriangle className="h-7 w-7 text-red-600 dark:text-red-400" strokeWidth={1.75} />
+              : <HelpCircle className="h-7 w-7 text-[#534AB7] dark:text-[#a09be8]" strokeWidth={1.75} />
+            }
           </div>
         </div>
         {title && (

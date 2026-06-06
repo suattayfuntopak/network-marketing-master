@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-06 — LandingHero i18n + ConfirmDialog danger ikon ✅
+
+**LandingHero.tsx `lang ===` kaldırıldı:**
+- `landing.ts` (TR + EN): `heroTitle1 / heroTitleHighlight / heroTitle2` anahtarları eklendi
+- Başlık artık `t()` ile render ediliyor; gradient `<span>` korundu, `lang` import'u kaldırıldı
+
+**ConfirmDialog danger ikonunu kırmızıya çevrildi:**
+- `variant="danger"` → `AlertTriangle` ikonu (`text-red-600`), kırmızı arka plan
+- `variant="default"` → `HelpCircle` ikonu, mor arka plan (değişmedi)
+
 ## 2026-06-06 — Hızlı Bakış alt başlık ✅
 
 **Alt metin:** Hızlı Bakış h1 altına `pagesUi.todayPrioritiesSubtitle` eklendi — TR: "Bugün sen ve ekibin ne durumdasınız, neler yapmalısınız; hızlıca göz at, aksiyona geç!" EN karşılığı.
