@@ -1,10 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { History, PhoneCall, Bot, Pencil, ArrowRight, Trash2 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useDeferredCandidateSection } from '@/hooks/useDeferredCandidateSection'
 import { useActivityHistory, useDeleteActivity } from '@/hooks/useCandidates'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { renderActivityText } from './candidateDetailUtils'
@@ -99,25 +100,7 @@ function ActivityLogCardBody({ candidateId, workspaceId }: Props) {
 /** Viewport'a girince fetch — aday detay ilk yükünü hafifletir. */
 export function ActivityLogCard({ candidateId, workspaceId }: Props) {
   const { t } = useTranslation()
-  const anchorRef = useRef<HTMLDivElement>(null)
-  const [shouldLoad, setShouldLoad] = useState(false)
-
-  useEffect(() => {
-    const el = anchorRef.current
-    if (!el || shouldLoad) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setShouldLoad(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '240px' },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [shouldLoad])
+  const { anchorRef, shouldLoad } = useDeferredCandidateSection()
 
   return (
     <div ref={anchorRef} className="min-h-[1px]">

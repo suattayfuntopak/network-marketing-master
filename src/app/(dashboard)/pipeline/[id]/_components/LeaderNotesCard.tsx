@@ -5,7 +5,8 @@ import { useQueryClient } from '@tanstack/react-query'
 import { StickyNote, ChevronUp, ChevronDown, Bot, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { useCandidateNotes, useAddCandidateNote } from '@/hooks/useCandidates'
+import { useCandidateNotes, useLeaderNotesCount, useAddCandidateNote } from '@/hooks/useCandidates'
+import { useDeferredCandidateSection } from '@/hooks/useDeferredCandidateSection'
 import {
   resolveDailyActionNote,
   displayDailyActionNote,
@@ -24,38 +25,23 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
   const { lang, t } = useTranslation()
   const queryClient = useQueryClient()
   const locale = lang === 'en' ? 'en-US' : 'tr-TR'
-  const anchorRef = useRef<HTMLDivElement>(null)
+  const { anchorRef, shouldLoad, requestLoad } = useDeferredCandidateSection()
 
-  const [nearViewport, setNearViewport] = useState(false)
   const [notesOpen, setNotesOpen] = useState(false)
   const [showAllNotes, setShowAllNotes] = useState(false)
   const [newNote, setNewNote] = useState('')
   const [aiSummary, setAiSummary] = useState<string | null>(null)
   const [isSummaryPending, setIsSummaryPending] = useState(false)
 
-  const shouldFetchNotes = nearViewport || notesOpen
+  const shouldFetchCount = shouldLoad && !notesOpen
+  const shouldFetchNotes = notesOpen
+  const { data: notesCount = 0 } = useLeaderNotesCount(candidateId, shouldFetchCount)
   const { data: notes = [] } = useCandidateNotes(candidateId, shouldFetchNotes)
   const leaderNotes = useMemo(() => notes.filter(isLeaderUserNote), [notes])
+  const noteBadgeCount = notesOpen ? leaderNotes.length : notesCount
   const addNoteMutation = useAddCandidateNote(workspaceId)
 
   const attemptedActionUpdates = useRef<Record<string, boolean>>({})
-
-  useEffect(() => {
-    const el = anchorRef.current
-    if (!el || nearViewport) return
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting) {
-          setNearViewport(true)
-          observer.disconnect()
-        }
-      },
-      { rootMargin: '240px' },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [nearViewport])
 
   const handleGenerateSummary = async () => {
     if (leaderNotes.length === 0) return
@@ -121,7 +107,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
     >
       <button
         onClick={() => {
-          setNearViewport(true)
+          requestLoad()
           setNotesOpen(!notesOpen)
         }}
         className="flex w-full items-center justify-between"
@@ -133,9 +119,9 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
           <span className="text-sm font-bold text-[var(--text-1)]">
             {t('pipelinePage.leaderNote')}
           </span>
-          {leaderNotes.length > 0 && (
+          {noteBadgeCount > 0 && (
             <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
-              {leaderNotes.length}
+              {noteBadgeCount}
             </span>
           )}
         </div>

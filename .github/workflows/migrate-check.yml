@@ -11,6 +11,7 @@ on:
     paths:
       - 'supabase/migrations/**'
       - 'scripts/check-migrations.mjs'
+  workflow_dispatch:
 
 jobs:
   migrate-check:
@@ -21,3 +22,19 @@ jobs:
         with:
           node-version: '20'
       - run: npm run migrate:check
+
+  migrate-check-remote:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: npm run migrate:check:remote
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

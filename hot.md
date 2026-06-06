@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-06-06 — Üçüncü sprint: moderation i18n, AI red çevirisi, perf hash ✅
+
+**Moderasyon:**
+- `ModerationReviewModal` — tüm form/toast metinleri `moderationReview.*` i18n
+- `buildBilingualRejectReasonAction` — admin gerekçesi Gemini ile kalıcı TR|||EN
+- `translateEnToTrAction` — EN admin gerekçesi için ters çeviri
+
+**Performans & UX:**
+- `useDeferredCandidateSection` — ActivityLog + LeaderNotes ortak lazy hook
+- `useLeaderNotesCount` — kapalı kartta rozet, tam liste fetch yok
+- `TeamPerformanceSection` — uzun URL'de `#perf=` hash fallback
+- `DayJournalCard` — kuyruk flush sonrası `journalSyncedCloud` toast
+
+**Test & CI:**
+- `journalSyncQueue.test.ts` — localStorage kuyruk unit test
+- `e2e/day-journal-smoke.spec.ts` — ilgilen yükleme + opsiyonel auth smoke
+- CI `workflow_dispatch` → `migrate:check:remote` (SUPABASE_ACCESS_TOKEN)
+
 ## 2026-06-06 — Ek öneriler sprint: CI migrate, journal queue, lazy notes ✅
 
 **CI & deploy:**

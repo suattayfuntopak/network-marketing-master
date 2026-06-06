@@ -87,6 +87,36 @@ function serializeFieldTabs(field: Record<string, FieldCardTab | undefined>): st
     .join(',')
 }
 
+const PERF_HASH_PREFIX = '#perf='
+const PERF_URL_QUERY_MAX = 120
+
+function buildPerfCompact(memberSerialized: string, fieldSerialized: string): string {
+  return `m:${memberSerialized};f:${fieldSerialized}`
+}
+
+function parsePerfCompact(raw: string): {
+  member: Record<string, MemberCardTab>
+  field: Record<string, FieldCardTab>
+} {
+  const memberRaw = raw.match(/(?:^|;)m:([^;]*)/)?.[1] ?? ''
+  const fieldRaw = raw.match(/(?:^|;)f:([^;]*)/)?.[1] ?? ''
+  return {
+    member: parseMemberTabs(memberRaw || null),
+    field: parseFieldTabs(fieldRaw || null),
+  }
+}
+
+function readPerfFromHash(): ReturnType<typeof parsePerfCompact> | null {
+  if (typeof window === 'undefined') return null
+  const hash = window.location.hash
+  if (!hash.startsWith(PERF_HASH_PREFIX)) return null
+  try {
+    return parsePerfCompact(decodeURIComponent(hash.slice(PERF_HASH_PREFIX.length)))
+  } catch {
+    return null
+  }
+}
+
 function parseMemberTabs(raw: string | null): Record<string, MemberCardTab> {
   if (!raw) return {}
   const out: Record<string, MemberCardTab> = {}
@@ -138,6 +168,21 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     const params = new URLSearchParams(searchParams.toString())
     const memberSerialized = serializeMemberTabs(member)
     const fieldSerialized = serializeFieldTabs(field)
+    const compact = buildPerfCompact(memberSerialized, fieldSerialized)
+
+    params.delete('perfMember')
+    params.delete('perfMemberTab')
+    params.delete('perfField')
+    params.delete('perfFieldTab')
+
+    if (compact.length > PERF_URL_QUERY_MAX) {
+      params.delete('perfMemberTabs')
+      params.delete('perfFieldTabs')
+      const qs = params.toString()
+      const base = qs ? `${pathname}?${qs}` : pathname
+      router.replace(`${base}${PERF_HASH_PREFIX}${encodeURIComponent(compact)}`, { scroll: false })
+      return
+    }
 
     if (memberSerialized) params.set('perfMemberTabs', memberSerialized)
     else params.delete('perfMemberTabs')
@@ -145,12 +190,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     if (fieldSerialized) params.set('perfFieldTabs', fieldSerialized)
     else params.delete('perfFieldTabs')
 
-    params.delete('perfMember')
-    params.delete('perfMemberTab')
-    params.delete('perfField')
-    params.delete('perfFieldTab')
-
     const qs = params.toString()
+    if (typeof window !== 'undefined' && window.location.hash.startsWith(PERF_HASH_PREFIX)) {
+      window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname)
+    }
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }, [router, searchParams, pathname])
 
@@ -159,9 +202,14 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     const member: Record<string, MemberCardTab | undefined> = { ...stored.member }
     const field: Record<string, FieldCardTab | undefined> = { ...stored.field }
 
-    Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
-
-    Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
+    const fromHash = readPerfFromHash()
+    if (fromHash) {
+      Object.assign(member, fromHash.member)
+      Object.assign(field, fromHash.field)
+    } else {
+      Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
+      Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
+    }
 
     const urlMemberId = searchParams.get('perfMember')
     const urlMemberTab = searchParams.get('perfMemberTab')

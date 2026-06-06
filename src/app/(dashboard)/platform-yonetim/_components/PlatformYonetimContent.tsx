@@ -26,6 +26,7 @@ import {
 } from '../admin-actions'
 import {
   approveRequestAction,
+  buildBilingualRejectReasonAction,
   rejectRequestAction,
   type ModerationRequestItem
 } from '@/app/(dashboard)/actions/moderation'
@@ -34,7 +35,6 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
 import {
   defaultRejectReason,
-  toBilingualRejectReason,
 } from '@/lib/domain/moderationDefaults'
 
 const WorkspaceLicenseModal = dynamic(
@@ -170,10 +170,10 @@ export function PlatformYonetimContent() {
 
     startModerationTransition(async () => {
       try {
-        const bilingual = toBilingualRejectReason(reason, lang === 'en' ? 'en' : 'tr')
+        const bilingual = await buildBilingualRejectReasonAction(reason, lang === 'en' ? 'en' : 'tr')
         const res = await rejectRequestAction(req.id, req.contentType, bilingual)
         if (res.success) {
-          toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
+          toast.success(t('moderationReview.rejectedToast'))
           refreshPlatform()
         }
       } catch (err: unknown) {

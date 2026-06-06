@@ -210,6 +210,7 @@ export const tr = {
     journalPolish: "YZ ile özetle",
     journalPolished: "Günlük özet hazır",
     journalSavedLocal: "Yerel kaydedildi — bulut senkronu bekliyor",
+    journalSyncedCloud: "Bulutla senkronize edildi",
     dayCloseJournalLink: "Uzun saha günlüğü ve YZ özeti → Bugün sayfası",
   },
   pipeline: {

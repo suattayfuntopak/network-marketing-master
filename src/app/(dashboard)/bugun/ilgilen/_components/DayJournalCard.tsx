@@ -44,6 +44,33 @@ export function DayJournalCard() {
   const [{ text, hydrated }, dispatch] = useReducer(journalReducer, { text: '', hydrated: false })
   const [polishing, setPolishing] = useState(false)
   const migratedRef = useRef(false)
+  const syncToastShownRef = useRef(false)
+
+  const showSyncSuccessToast = useCallback(
+    (synced: number) => {
+      if (synced <= 0 || syncToastShownRef.current) return
+      syncToastShownRef.current = true
+      toast.success(t('dashboard.journalSyncedCloud'))
+      window.setTimeout(() => {
+        syncToastShownRef.current = false
+      }, 5000)
+    },
+    [t],
+  )
+
+  const flushJournalQueue = useCallback(async (): Promise<number> => {
+    if (!userId) return 0
+    let synced = 0
+    for (const item of readJournalSyncQueue()) {
+      if (item.userId !== userId) continue
+      const result = await mergeDayJournalLangAction(item.text, item.lang)
+      if ('ok' in result) {
+        dequeueJournalSync(item.userId, item.journalDate)
+        synced++
+      }
+    }
+    return synced
+  }, [userId])
 
   const persistJournal = useCallback(
     async (value: string, uid: string, journalLang: 'tr' | 'en') => {
@@ -60,21 +87,13 @@ export function DayJournalCard() {
     [t],
   )
 
-  const flushJournalQueue = useCallback(async () => {
-    if (!userId) return
-    for (const item of readJournalSyncQueue()) {
-      if (item.userId !== userId) continue
-      const result = await mergeDayJournalLangAction(item.text, item.lang)
-      if ('ok' in result) dequeueJournalSync(item.userId, item.journalDate)
-    }
-  }, [userId])
-
   useEffect(() => {
     if (!userId) return
     let cancelled = false
 
     async function load() {
-      await flushJournalQueue()
+      const synced = await flushJournalQueue()
+      if (!cancelled) showSyncSuccessToast(synced)
       const remote = await getDayJournalAction()
       if (cancelled) return
 
@@ -97,7 +116,7 @@ export function DayJournalCard() {
     return () => {
       cancelled = true
     }
-  }, [userId, lang, flushJournalQueue, persistJournal])
+  }, [userId, lang, flushJournalQueue, persistJournal, showSyncSuccessToast])
 
   useEffect(() => {
     if (!userId || !hydrated) return
@@ -110,11 +129,11 @@ export function DayJournalCard() {
   useEffect(() => {
     if (!userId) return
     const onOnline = () => {
-      void flushJournalQueue()
+      void flushJournalQueue().then(showSyncSuccessToast)
     }
     window.addEventListener('online', onOnline)
     return () => window.removeEventListener('online', onOnline)
-  }, [userId, flushJournalQueue])
+  }, [userId, flushJournalQueue, showSyncSuccessToast])
 
   async function handlePolish() {
     if (!text.trim()) return

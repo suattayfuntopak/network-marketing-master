@@ -5,7 +5,15 @@ import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
-import { rejectReasonForEmail } from '@/lib/domain/moderationDefaults'
+import {
+  DEFAULT_REJECT_REASON_BILINGUAL,
+  rejectReasonForEmail,
+} from '@/lib/domain/moderationDefaults'
+import { formatSimpleNote } from '@/lib/utils/noteParser'
+import {
+  translateEnToTrAction,
+  translateNoteAction,
+} from '@/app/(dashboard)/pipeline/[id]/actions'
 
 interface ContentSubmissionResult {
   success: boolean
@@ -201,6 +209,24 @@ export async function approveRequestAction(
   }
 
   return { success: true }
+}
+
+/** Admin red gerekçesini kalıcı TR|||EN formatına çevirir (CLAUDE.md kuralı). */
+export async function buildBilingualRejectReasonAction(
+  reason: string,
+  adminLang: 'tr' | 'en',
+): Promise<string> {
+  const trimmed = reason.trim()
+  if (!trimmed) return DEFAULT_REJECT_REASON_BILINGUAL
+  if (trimmed.includes('|||')) return trimmed
+
+  if (adminLang === 'tr') {
+    const en = await translateNoteAction(trimmed)
+    return formatSimpleNote(trimmed, en)
+  }
+
+  const tr = await translateEnToTrAction(trimmed)
+  return formatSimpleNote(tr, trimmed)
 }
 
 /**

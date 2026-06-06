@@ -323,6 +323,27 @@ export function useCandidateNotes(candidateId: string, queryEnabled = true) {
   })
 }
 
+/** Kapalı kart rozeti — tam not listesi çekmeden lider notu sayısı. */
+export function useLeaderNotesCount(candidateId: string, queryEnabled = true) {
+  return useQuery<number>({
+    queryKey: ['candidate-notes-count', candidateId],
+    queryFn: async () => {
+      const supabase = createClient()
+      const { count, error } = await supabase
+        .from('nmm_daily_actions')
+        .select('*', { count: 'exact', head: true })
+        .eq('candidate_id', candidateId)
+        .eq('action_type', 'note')
+        .not('note', 'is', null)
+        .not('note', 'like', 'system_note:%')
+      if (error) throw new Error(error.message)
+      return count ?? 0
+    },
+    enabled: !!candidateId && queryEnabled,
+    staleTime: 60_000,
+  })
+}
+
 export function useAddCandidateNote(workspaceId: string) {
   const qc = useQueryClient()
   return useMutation({
@@ -350,6 +371,7 @@ export function useAddCandidateNote(workspaceId: string) {
     },
     onSuccess: (_, { candidateId }) => {
       qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
+      qc.invalidateQueries({ queryKey: ['candidate-notes-count', candidateId] })
       qc.invalidateQueries({ queryKey: ['activity', candidateId] })
       toast.success(getLang() === 'en' ? 'Note saved' : 'Not kaydedildi')
     },

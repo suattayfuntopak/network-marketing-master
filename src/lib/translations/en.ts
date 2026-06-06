@@ -210,6 +210,7 @@ export const en = {
     journalPolish: "Summarize with AI",
     journalPolished: "Journal summary ready",
     journalSavedLocal: "Saved locally — cloud sync pending",
+    journalSyncedCloud: "Synced to cloud",
     dayCloseJournalLink: "Full field journal & AI summary → Today page",
   },
   pipeline: {

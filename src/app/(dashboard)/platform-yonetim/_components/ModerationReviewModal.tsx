@@ -5,12 +5,10 @@ import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
-import {
-  defaultRejectReason,
-  toBilingualRejectReason,
-} from '@/lib/domain/moderationDefaults'
+import { defaultRejectReason } from '@/lib/domain/moderationDefaults'
 import {
   approveRequestAction,
+  buildBilingualRejectReasonAction,
   rejectRequestAction,
   type ModerationRequestItem,
 } from '@/app/(dashboard)/actions/moderation'
@@ -23,7 +21,7 @@ interface Props {
 }
 
 export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const uiLang = lang === 'en' ? 'en' : 'tr'
   const d = request.data
   const isTraining = request.contentType === 'training'
@@ -64,7 +62,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
             kategoriBaslik: editCategory,
             kategoriId: editCategory.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, '-'),
             emoji: editEmoji,
-            tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
+            tags: editTags.split(',').map(tg => tg.trim()).filter(Boolean),
           }
         } else {
           edited = {
@@ -76,18 +74,18 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
             detayliCevap: editDetayliCevap,
             yaklasim: editYaklasim,
             ornekDiyalog: editOrnekDiyalog,
-            tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
+            tags: editTags.split(',').map(tg => tg.trim()).filter(Boolean),
           }
         }
 
         const res = await approveRequestAction(request.id, request.contentType, edited)
         if (res.success) {
-          toast.success('İçerik başarıyla onaylandı ve yayına alındı!')
+          toast.success(t('moderationReview.approvedToast'))
           onClose()
           onSuccess()
         }
       } catch (err: unknown) {
-        toast.error((err instanceof Error ? err.message : '') || 'Onaylama başarısız oldu.')
+        toast.error((err instanceof Error ? err.message : '') || t('moderationReview.approveFailed'))
       }
     })
   }
@@ -97,15 +95,15 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
 
     startModerationTransition(async () => {
       try {
-        const bilingual = toBilingualRejectReason(reason, uiLang)
+        const bilingual = await buildBilingualRejectReasonAction(reason, uiLang)
         const res = await rejectRequestAction(request.id, request.contentType, bilingual)
         if (res.success) {
-          toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
+          toast.success(t('moderationReview.rejectedToast'))
           onClose()
           onSuccess()
         }
       } catch (err: unknown) {
-        toast.error((err instanceof Error ? err.message : '') || 'Reddetme işlemi başarısız oldu.')
+        toast.error((err instanceof Error ? err.message : '') || t('moderationReview.rejectFailed'))
       }
     })
   }
@@ -125,7 +123,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
 
         <form onSubmit={handleApproveSubmit} className="p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-[var(--text-1)]">Talebi İncele & Onayla</h3>
+            <h3 className="text-lg font-bold text-[var(--text-1)]">{t('moderationReview.title')}</h3>
             <button
               type="button"
               onClick={onClose}
@@ -136,49 +134,49 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
           </div>
 
           <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
-            <div><strong>Gönderen:</strong> {request.userName} ({request.userEmail})</div>
-            <div><strong>Tür:</strong> {isTraining ? 'Vaktin Varsa (Eğitim)' : 'İtirazlara Cevap'}</div>
+            <div><strong>{t('moderationReview.submitter')}</strong> {request.userName} ({request.userEmail})</div>
+            <div><strong>{t('moderationReview.type')}</strong> {isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}</div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-[var(--text-1)]">
-              {isTraining ? 'Eğitim Başlığı' : 'İtiraz Sorusu'}
+              {isTraining ? t('moderationReview.labelTitleTraining') : t('moderationReview.labelTitleObjection')}
             </label>
             <input type="text" required value={editTitle} onChange={e => setEditTitle(e.target.value)} className={inputClass} />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-sm font-bold text-[var(--text-1)]">Kategori</label>
+            <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelCategory')}</label>
             <input type="text" required value={editCategory} onChange={e => setEditCategory(e.target.value)} className={inputClass} />
           </div>
 
           {isTraining ? (
             <>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">Özet</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelSummary')}</label>
                 <input type="text" required value={editOzet} onChange={e => setEditOzet(e.target.value)} className={inputClass} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">İçerik Maddeleri (Her satır yeni madde)</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelContentItems')}</label>
                 <textarea rows={4} required value={editIcerik} onChange={e => setEditIcerik(e.target.value)} className={textareaClass()} />
               </div>
             </>
           ) : (
             <>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">Kısa Cevap</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelShortAnswer')}</label>
                 <textarea rows={2} value={editKisaCevap} onChange={e => setEditKisaCevap(e.target.value)} className={textareaClass('#9B1D47')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">Detaylı Cevap</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelDetailedAnswer')}</label>
                 <textarea rows={3} value={editDetayliCevap} onChange={e => setEditDetayliCevap(e.target.value)} className={textareaClass('#9B1D47')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">Yaklaşım</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelApproach')}</label>
                 <textarea rows={2} value={editYaklasim} onChange={e => setEditYaklasim(e.target.value)} className={textareaClass('#9B1D47')} />
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-bold text-[var(--text-1)]">Örnek Diyalog</label>
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelExampleDialog')}</label>
                 <textarea rows={2} value={editOrnekDiyalog} onChange={e => setEditOrnekDiyalog(e.target.value)} className={textareaClass('#9B1D47')} />
               </div>
             </>
@@ -186,11 +184,11 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[var(--text-1)]">Emoji</label>
+              <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelEmoji')}</label>
               <input type="text" required value={editEmoji} onChange={e => setEditEmoji(e.target.value)} className={inputClass} />
             </div>
             <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[var(--text-1)]">Etiketler (Virgülle Ayır)</label>
+              <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelTags')}</label>
               <input type="text" value={editTags} onChange={e => setEditTags(e.target.value)} className={inputClass} />
             </div>
           </div>
@@ -202,7 +200,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
               disabled={isModerating}
               className="flex-1 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 py-3 text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
             >
-              Reddet / Sil
+              {t('moderationReview.rejectDelete')}
             </button>
             <button
               type="submit"
@@ -210,9 +208,9 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
               className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-sm font-bold transition active:scale-95 cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5"
             >
               {isModerating ? (
-                <><Loader2 className="h-4 w-4 animate-spin" /><span>Onaylanıyor...</span></>
+                <><Loader2 className="h-4 w-4 animate-spin" /><span>{t('moderationReview.approving')}</span></>
               ) : (
-                <span>Onayla & Yayınla</span>
+                <span>{t('moderationReview.approvePublish')}</span>
               )}
             </button>
           </div>

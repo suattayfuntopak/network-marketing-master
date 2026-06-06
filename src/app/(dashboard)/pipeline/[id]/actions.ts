@@ -208,6 +208,33 @@ export async function translateNoteAction(text: string): Promise<string> {
   }
 }
 
+/** EN → TR kalıcı çeviri (moderasyon red gerekçesi vb.). */
+export async function translateEnToTrAction(text: string): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) return text
+  if (!text?.trim()) return text ?? ''
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  try {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      systemInstruction:
+        'Translate the following English text to natural Turkish. Return ONLY the translated text, no explanations or quotation marks.',
+    })
+
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text }] }],
+      generationConfig: { maxOutputTokens: 8192, temperature: 0.3 },
+    })
+
+    return result.response.text().trim() || text
+  } catch {
+    return text
+  }
+}
+
 /**
  * Lider notunun otomatik EN çevirisini kalıcı saklar — istemci tarafı doğrudan DB
  * yazımı yerine (AGENTS: mutasyonlar server action ile). Oturum zorunlu; RLS owner
