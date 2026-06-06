@@ -17,7 +17,6 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import {
-  adminExtendLicenseAction,
   addIndependentAsCandidateAction,
   deleteUserAction,
   type PlatformWorkspaceItem
@@ -27,6 +26,8 @@ import {
   rejectRequestAction,
   type ModerationRequestItem
 } from '@/app/(dashboard)/actions/moderation'
+import { WorkspaceLicenseModal } from './WorkspaceLicenseModal'
+import { ModerationReviewModal } from './ModerationReviewModal'
 import { Trash2 } from 'lucide-react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -86,29 +87,9 @@ export function PlatformYonetimContent() {
   const [deleteTimerId, setDeleteTimerId] = useState<NodeJS.Timeout | null>(null)
   const [deleteCountdown, setDeleteCountdown] = useState<number>(0)
 
-  // Extension Modal states
-  const [licenseType, setLicenseType] = useState<'free' | 'basic' | 'plus' | 'pro'>('plus')
-  const [extensionDays, setExtensionDays] = useState(30)
-  const [isUnlimited, setIsUnlimited] = useState(false)
-  const [isUpdating, startUpdateTransition] = useTransition()
   const [navConfirm, setNavConfirm] = useState<'payment' | 'landing' | null>(null)
-
-  // Moderation state
   const [selectedRequest, setSelectedRequest] = useState<ModerationRequestItem | null>(null)
-  
-  // Fields for editing submissions
-  const [editTitle, setEditTitle] = useState('')
-  const [editOzet, setEditOzet] = useState('')
-  const [editIcerik, setEditIcerik] = useState('')
-  const [editKisaCevap, setEditKisaCevap] = useState('')
-  const [editDetayliCevap, setEditDetayliCevap] = useState('')
-  const [editYaklasim, setEditYaklasim] = useState('')
-  const [editOrnekDiyalog, setEditOrnekDiyalog] = useState('')
-  const [editEmoji, setEditEmoji] = useState('')
-  const [editTags, setEditTags] = useState('')
-  const [editCategory, setEditCategory] = useState('')
-
-  const [isModerating, startModerationTransition] = useTransition()
+  const [, startModerationTransition] = useTransition()
 
   useBodyScrollLock(!!selectedWorkspace || !!selectedRequest || navConfirm !== null)
 
@@ -127,71 +108,8 @@ export function PlatformYonetimContent() {
 
   function handleOpenReview(req: ModerationRequestItem) {
     setSelectedRequest(req)
-    const d = req.data
-    if (req.contentType === 'training') {
-      setEditTitle(d.baslik ?? '')
-      setEditOzet(d.ozet ?? '')
-      setEditIcerik(Array.isArray(d.maddeler) ? d.maddeler.join('\n') : '')
-      setEditCategory(d.kategoriBaslik ?? 'Zihniyet')
-      setEditEmoji(d.emoji ?? '📖')
-      setEditTags(Array.isArray(d.tags) ? d.tags.join(', ') : '')
-    } else {
-      setEditTitle(d.soru?.tr ?? d.soru ?? '')
-      setEditCategory(d.kategori?.tr ?? d.kategori ?? 'Genel')
-      setEditKisaCevap(d.kisaCevap ?? '')
-      setEditDetayliCevap(d.detayliCevap ?? '')
-      setEditYaklasim(d.yaklasim ?? '')
-      setEditOrnekDiyalog(d.ornekDiyalog ?? '')
-      setEditEmoji(d.emoji ?? '🛡️')
-      setEditTags(Array.isArray(d.tags) ? d.tags.join(', ') : '')
-    }
   }
 
-  function handleApproveSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!selectedRequest) return
-
-    startModerationTransition(async () => {
-      try {
-        let edited: Record<string, unknown> = {}
-        const d = selectedRequest.data
-
-        if (selectedRequest.contentType === 'training') {
-          edited = {
-            ...d,
-            baslik: editTitle,
-            ozet: editOzet || editIcerik.slice(0, 100) + '...',
-            maddeler: editIcerik.split('\n').map(l => l.trim()).filter(Boolean),
-            kategoriBaslik: editCategory,
-            kategoriId: editCategory.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'),
-            emoji: editEmoji,
-            tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
-          }
-        } else {
-          edited = {
-            ...d,
-            kategori: { tr: editCategory, en: editCategory },
-            soru: { tr: editTitle, en: editTitle },
-            emoji: editEmoji,
-            kisaCevap: editKisaCevap,
-            detayliCevap: editDetayliCevap,
-            yaklasim: editYaklasim,
-            ornekDiyalog: editOrnekDiyalog,
-            tags: editTags.split(',').map(t => t.trim()).filter(Boolean),
-          }
-        }
-
-        const res = await approveRequestAction(selectedRequest.id, selectedRequest.contentType, edited)
-        if (res.success) {
-          toast.success('İçerik başarıyla onaylandı ve yayına alındı!')
-          setSelectedRequest(null)
-          refreshPlatform()
-        }
-      } catch (err: unknown) {
-        toast.error((err instanceof Error ? err.message : '') || 'Onaylama başarısız oldu.')
-      }
-    })
-  }
 
   function handleQuickApprove(req: ModerationRequestItem) {
     if (!confirm('Bu içeriği düzenleme yapmadan doğrudan onaylamak istediğinize emin misiniz?')) return
@@ -222,7 +140,6 @@ export function PlatformYonetimContent() {
         if (res.success) {
           toast.success('Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.')
           refreshPlatform()
-          setSelectedRequest(null) // Close the review/edit modal
         }
       } catch (err: unknown) {
         toast.error((err instanceof Error ? err.message : '') || 'Reddetme işlemi başarısız oldu.')
@@ -230,29 +147,7 @@ export function PlatformYonetimContent() {
     })
   }
 
-  function handleSaveLicense(e: React.FormEvent) {
-    e.preventDefault()
-    if (!selectedWorkspace) return
 
-    startUpdateTransition(async () => {
-      try {
-        const res = await adminExtendLicenseAction(
-          selectedWorkspace.workspaceId,
-          licenseType,
-          Number(extensionDays),
-          isUnlimited
-        )
-        if (res.success) {
-          toast.success(t('platformPage.licenseUpdated'))
-          setSelectedWorkspace(null)
-          refreshPlatform() // Reload table
-        }
-      } catch (err: unknown) {
-        console.error(err)
-        toast.error((err instanceof Error ? err.message : '') || 'İşlem başarısız.')
-      }
-    })
-  }
 
   // Filter workspaces based on search query
   const filtered = workspaces.filter(w => {
@@ -713,19 +608,7 @@ export function PlatformYonetimContent() {
 
                             {/* License adjustment trigger */}
                             <button
-                              onClick={() => {
-                                setSelectedWorkspace(w)
-                                setLicenseType(
-                                  w.licenseType === 'free' ||
-                                    w.licenseType === 'basic' ||
-                                    w.licenseType === 'plus' ||
-                                    w.licenseType === 'pro'
-                                    ? w.licenseType
-                                    : 'free'
-                                )
-                                setIsUnlimited(w.licenseType !== 'free' && w.licenseExpiresAt === null)
-                                setExtensionDays(30)
-                              }}
+                              onClick={() => setSelectedWorkspace(w)}
                               title={t('platformPage.manageLicenseTitle')}
                               className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#534AB7]/10 text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white"
                             >
@@ -859,310 +742,20 @@ export function PlatformYonetimContent() {
           )}
         </section>
 
-        {/* Lisans Yönetim Modal */}
         {selectedWorkspace && (
-          <>
-            <div 
-              className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/60 backdrop-blur-sm`} 
-              onClick={() => setSelectedWorkspace(null)} 
-            />
-            <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)] overflow-hidden`}>
-              {/* Header bar */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-[#534AB7] to-amber-500" />
-              
-              <form onSubmit={handleSaveLicense} className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-[var(--text-1)]">
-                    {t('platformPage.manageWorkspaceLicense')}
-                  </h3>
-                  <button 
-                    type="button" 
-                    onClick={() => setSelectedWorkspace(null)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)]">
-                  <div><strong>{t('platformPage.userLabel')}</strong> {selectedWorkspace.ownerName}</div>
-                  <div className="mt-1"><strong>{t('platformPage.emailLabel')}</strong> {selectedWorkspace.ownerEmail}</div>
-                  <div className="mt-1"><strong>{t('platformPage.currentExpiryLabel')}</strong> {
-                    selectedWorkspace.licenseType !== 'free' && !selectedWorkspace.licenseExpiresAt
-                      ? t('platformPage.unlimitedWithIcon')
-                      : selectedWorkspace.licenseExpiresAt
-                        ? new Date(selectedWorkspace.licenseExpiresAt).toLocaleString()
-                        : '-'
-                  }</div>
-                </div>
-
-                {/* Plan select */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-[var(--text-1)]">
-                    {t('platformPage.licenseLevel')}
-                  </label>
-                  <select
-                    value={licenseType}
-                    onChange={e => {
-                      const v = e.target.value as typeof licenseType
-                      setLicenseType(v)
-                      if (v === 'free') setIsUnlimited(false)
-                    }}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                  >
-                    <option value="free">{t('platformPage.freeRevoke')}</option>
-                    <option value="basic">Basic Plan</option>
-                    <option value="plus">Plus Plan</option>
-                    <option value="pro">Pro Plan</option>
-                  </select>
-                </div>
-
-                {/* Süresiz toggle + Gün girişi */}
-                {licenseType !== 'free' && (
-                  <>
-                    {/* Süresiz toggle */}
-                    <button
-                      type="button"
-                      onClick={() => setIsUnlimited(v => !v)}
-                      className={`flex w-full items-center justify-between rounded-xl border px-3 py-2.5 text-sm font-bold transition-colors duration-300 ease-out ${
-                        isUnlimited
-                          ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                          : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]'
-                      }`}
-                    >
-                      <span>{t('platformPage.unlimitedAccess')}</span>
-                      <span className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out ${isUnlimited ? 'bg-emerald-500' : 'bg-[var(--border)]'}`}>
-                        <span className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition-transform duration-300 ease-in-out will-change-transform ${isUnlimited ? 'translate-x-5' : 'translate-x-0'}`} />
-                      </span>
-                    </button>
-
-                    {/* Gün girişi — süreli seçiliyse; süresizde zıplamadan yumuşakça kapanır */}
-                    <div
-                      className={`grid transition-all duration-300 ease-out ${
-                        isUnlimited ? 'grid-rows-[0fr] opacity-0' : 'grid-rows-[1fr] opacity-100'
-                      }`}
-                      aria-hidden={isUnlimited}
-                    >
-                      <div className="overflow-hidden">
-                        <div className="space-y-1.5 pt-2">
-                          <label className="text-sm font-bold text-[var(--text-1)]">
-                            {t('platformPage.extendAccessDays')}
-                            <span className="ml-1 font-normal text-[var(--text-3)]">
-                              {t('platformPage.extendAccessHint')}
-                            </span>
-                          </label>
-                          <input
-                            type="number"
-                            required={!isUnlimited}
-                            disabled={isUnlimited}
-                            min={1}
-                            value={extensionDays}
-                            onChange={e => setExtensionDays(Number(e.target.value))}
-                            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-base font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
-                >
-                  {isUpdating ? (
-                    <><Loader2 className="h-4 w-4 animate-spin" /> {t('platformPage.saving')}</>
-                  ) : (
-                    <><Sparkles className="h-4 w-4" /> {t('platformPage.upgradeSave')}</>
-                  )}
-                </button>
-              </form>
-            </div>
-          </>
+          <WorkspaceLicenseModal
+            workspace={selectedWorkspace}
+            onClose={() => setSelectedWorkspace(null)}
+            onSuccess={refreshPlatform}
+          />
         )}
 
-        {/* Moderasyon Talebi İnceleme Modal */}
         {selectedRequest && (
-          <>
-            <div 
-              className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/60 backdrop-blur-sm`} 
-              onClick={() => setSelectedRequest(null)} 
-            />
-            <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-xl -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)] overflow-hidden my-auto max-h-[85vh] overflow-y-auto`}>
-              <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 to-amber-500" />
-              
-              <form onSubmit={handleApproveSubmit} className="p-6 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-[var(--text-1)]">
-                    Talebi İncele & Onayla
-                  </h3>
-                  <button 
-                    type="button" 
-                    onClick={() => setSelectedRequest(null)}
-                    className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
-                  <div><strong>Gönderen:</strong> {selectedRequest.userName} ({selectedRequest.userEmail})</div>
-                  <div><strong>Tür:</strong> {selectedRequest.contentType === 'training' ? 'Vaktin Varsa (Eğitim)' : 'İtirazlara Cevap'}</div>
-                </div>
-
-                {/* Edit Title/Soru */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-[var(--text-1)]">
-                    {selectedRequest.contentType === 'training' ? 'Eğitim Başlığı' : 'İtiraz Sorusu'}
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={editTitle}
-                    onChange={e => setEditTitle(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                  />
-                </div>
-
-                {/* Edit Category */}
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold text-[var(--text-1)]">Kategori</label>
-                  <input
-                    type="text"
-                    required
-                    value={editCategory}
-                    onChange={e => setEditCategory(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                  />
-                </div>
-
-                {selectedRequest.contentType === 'training' ? (
-                  <>
-                    {/* Training Ozet */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">Özet</label>
-                      <input
-                        type="text"
-                        required
-                        value={editOzet}
-                        onChange={e => setEditOzet(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                      />
-                    </div>
-
-                    {/* Training Icerik (Maddeler) */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">İçerik Maddeleri (Her satır yeni madde)</label>
-                      <textarea
-                        rows={4}
-                        required
-                        value={editIcerik}
-                        onChange={e => setEditIcerik(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition resize-none"
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* Objection Kisa Cevap */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">Kısa Cevap</label>
-                      <textarea
-                        rows={2}
-                        value={editKisaCevap}
-                        onChange={e => setEditKisaCevap(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
-                      />
-                    </div>
-
-                    {/* Objection Detayli Cevap */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">Detaylı Cevap</label>
-                      <textarea
-                        rows={3}
-                        value={editDetayliCevap}
-                        onChange={e => setEditDetayliCevap(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
-                      />
-                    </div>
-
-                    {/* Objection Yaklasim */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">Yaklaşım</label>
-                      <textarea
-                        rows={2}
-                        value={editYaklasim}
-                        onChange={e => setEditYaklasim(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
-                      />
-                    </div>
-
-                    {/* Objection Ornek Diyalog */}
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-bold text-[var(--text-1)]">Örnek Diyalog</label>
-                      <textarea
-                        rows={2}
-                        value={editOrnekDiyalog}
-                        onChange={e => setEditOrnekDiyalog(e.target.value)}
-                        className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[#9B1D47] transition resize-none"
-                      />
-                    </div>
-                  </>
-                )}
-
-                {/* Common Fields: Emoji & Tags */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-[var(--text-1)]">Emoji</label>
-                    <input
-                      type="text"
-                      required
-                      value={editEmoji}
-                      onChange={e => setEditEmoji(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-[var(--text-1)]">Etiketler (Virgülle Ayır)</label>
-                    <input
-                      type="text"
-                      value={editTags}
-                      onChange={e => setEditTags(e.target.value)}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
-                    />
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-3 pt-3 border-t border-[var(--border)]">
-                  <button
-                    type="button"
-                    onClick={() => handleRejectRequest(selectedRequest)}
-                    className="flex-1 rounded-xl border border-red-500/30 bg-red-500/5 hover:bg-red-500 hover:text-white text-red-500 py-3 text-sm font-bold transition active:scale-95 cursor-pointer disabled:opacity-50"
-                    disabled={isModerating}
-                  >
-                    Reddet / Sil
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-3 text-sm font-bold transition active:scale-95 cursor-pointer shadow-md disabled:opacity-50 flex items-center justify-center gap-1.5"
-                    disabled={isModerating}
-                  >
-                    {isModerating ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>Onaylanıyor...</span>
-                      </>
-                    ) : (
-                      <span>Onayla & Yayınla</span>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </>
+          <ModerationReviewModal
+            request={selectedRequest}
+            onClose={() => setSelectedRequest(null)}
+            onSuccess={refreshPlatform}
+          />
         )}
 
       </div>

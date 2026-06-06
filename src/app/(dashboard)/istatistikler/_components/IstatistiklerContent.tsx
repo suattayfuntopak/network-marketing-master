@@ -111,7 +111,7 @@ export function IstatistiklerContent() {
     queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(',')],
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
     enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 2 * 60_000,
   })
 
   // Turkish-aware name normalizer — must match EkipPanel's cleanStr
