@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer, useState } from 'react'
 import { Sparkles, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -11,18 +11,26 @@ import {
 } from '@/lib/domain/dayRitual'
 import { polishDayJournalAction } from '../actions/journal'
 
+type JournalState = { text: string; hydrated: boolean }
+type JournalAction =
+  | { type: 'hydrate'; text: string }
+  | { type: 'update'; text: string }
+
+function journalReducer(state: JournalState, action: JournalAction): JournalState {
+  if (action.type === 'hydrate') return { text: action.text, hydrated: true }
+  return { ...state, text: action.text }
+}
+
 export function DayJournalCard() {
   const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
   const userId = ws?.userId
-  const [text, setText] = useState('')
-  const [hydrated, setHydrated] = useState(false)
+  const [{ text, hydrated }, dispatch] = useReducer(journalReducer, { text: '', hydrated: false })
   const [polishing, setPolishing] = useState(false)
 
   useEffect(() => {
     if (!userId) return
-    setText(readDayJournal(userId))
-    setHydrated(true)
+    dispatch({ type: 'hydrate', text: readDayJournal(userId) })
   }, [userId])
 
   useEffect(() => {
@@ -41,7 +49,7 @@ export function DayJournalCard() {
         return
       }
       if (result.text) {
-        setText(result.text)
+        dispatch({ type: 'update', text: result.text })
         toast.success(t('dashboard.journalPolished'))
       }
     } finally {
@@ -60,7 +68,7 @@ export function DayJournalCard() {
       <p className="mt-0.5 text-xs text-[var(--text-3)]">{t('dashboard.journalSubtitle')}</p>
       <textarea
         value={text}
-        onChange={e => setText(e.target.value)}
+        onChange={e => dispatch({ type: 'update', text: e.target.value })}
         rows={4}
         placeholder={t('dashboard.journalPlaceholder')}
         className="mt-3 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none placeholder:text-[var(--text-3)] focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"

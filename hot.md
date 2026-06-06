@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — DayJournalCard: useReducer ile tek-render hydration ✅
+
+- `setText` + `setHydrated` ayrı ayrı çağrısı → 2 render; `useReducer` ile tek `dispatch` → 1 render.
+- Lint hatası (`react-hooks/set-state-in-effect`) giderildi — gerçek performans iyileştirmesi.
+- **Dosya:** `DayJournalCard.tsx`.
+
 ## 2026-06-06 — Bugün İlgilen: gerçek sekme sistemi (SPA) ✅
 
 - Sekme çubuğu artık ayrı sayfalara gitmez; `/bugun/ilgilen?tab=daily|live|team|weekly|monthly|first30` URL search param ile aynı sayfada içerik değişir.
