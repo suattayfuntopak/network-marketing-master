@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-06 — Pano launcher: tam kutu marka renkleri ✅
+
+**SquareButton crown variant:** Beyaz kutu + 3px üst çizgi kaldırıldı; her kutunun eski üst çizgi hex'i (`crownSolidMap`) tüm yüzeye uygulanıyor — purple `#534AB7`, teal `#0F6E56`, pink `#72243E`, amber `#854F0B`, cyan `#0891B2`, indigo `#3730A3`. Renkler karışmıyor; `PANO_LAUNCHER_ITEMS.color` → kendi kutusu.
+
+**Dosya:** `SquareButton.tsx`
+
 ## 2026-06-06 — LandingHero i18n + ConfirmDialog danger ikon ✅
 
 **LandingHero.tsx `lang ===` kaldırıldı:**

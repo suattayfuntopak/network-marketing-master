@@ -43,33 +43,33 @@ const filledClass = (
     opts?.className,
   )
 
-// ─── Crown variant: white card + colored top accent (Crown Team aesthetic) ───
-// Neutral background, 3px colored border-top, dark icon/text — set via borderTopColor style prop
-/** Crown üst çizgi — filled variant ile aynı marka renkleri */
-const crownAccentHex: Record<ButtonColor, string> = {
-  purple: '#534AB7',
-  teal:   '#0F6E56',
-  amber:  '#854F0B',
-  pink:   '#72243E',
-  blue:   '#1A56DB',
-  coral:  '#C03E1F',
-  rose:   '#9B1D47',
-  indigo: '#3730A3',
-  cyan:   '#0891B2',
-  yellow: '#854D0E',
+// ─── Crown variant: tam kutu — her kutunun kendi marka rengi (eski üst çizgi hex'leri) ───
+const crownSolidMap: Record<ButtonColor, string> = {
+  purple: 'bg-[#534AB7] text-white hover:bg-[#453DA0] dark:bg-[#534AB7] dark:text-white dark:hover:bg-[#453DA0]',
+  teal:   'bg-[#0F6E56] text-white hover:bg-[#0d5c48] dark:bg-[#0F6E56] dark:text-white dark:hover:bg-[#0d5c48]',
+  amber:  'bg-[#854F0B] text-white hover:bg-[#704208] dark:bg-[#854F0B] dark:text-white dark:hover:bg-[#704208]',
+  pink:   'bg-[#72243E] text-white hover:bg-[#601e34] dark:bg-[#72243E] dark:text-white dark:hover:bg-[#601e34]',
+  blue:   'bg-[#1A56DB] text-white hover:bg-[#1648b8] dark:bg-[#1A56DB] dark:text-white dark:hover:bg-[#1648b8]',
+  coral:  'bg-[#C03E1F] text-white hover:bg-[#a5341a] dark:bg-[#C03E1F] dark:text-white dark:hover:bg-[#a5341a]',
+  rose:   'bg-[#9B1D47] text-white hover:bg-[#83193c] dark:bg-[#9B1D47] dark:text-white dark:hover:bg-[#83193c]',
+  indigo: 'bg-[#3730A3] text-white hover:bg-[#2e288a] dark:bg-[#3730A3] dark:text-white dark:hover:bg-[#2e288a]',
+  cyan:   'bg-[#0891B2] text-white hover:bg-[#077a96] dark:bg-[#0891B2] dark:text-white dark:hover:bg-[#077a96]',
+  yellow: 'bg-[#854D0E] text-white hover:bg-[#704208] dark:bg-[#854D0E] dark:text-white dark:hover:bg-[#704208]',
 }
 
-const crownClass = (opts?: { compact?: boolean; prominent?: boolean; fill?: boolean; className?: string }) =>
+const crownClass = (
+  color: ButtonColor,
+  opts?: { compact?: boolean; prominent?: boolean; fill?: boolean; className?: string },
+) =>
   clsx(
     'flex flex-col items-center justify-center',
     opts?.compact ? 'gap-1.5' : 'gap-2 md:gap-3',
     'rounded-[14px] md:rounded-[12px]',
     'transition-all duration-150',
     'active:scale-95 hover:scale-[1.03]',
-    'bg-[var(--bg-card)] text-[var(--text-1)]',
-    'border border-[var(--border)] border-t-[3px]',
-    'shadow-[0_2px_12px_-3px_rgba(0,0,0,0.08)] hover:shadow-md dark:shadow-[0_2px_16px_-3px_rgba(0,0,0,0.3)]',
-    'hover:bg-[var(--bg-subtle)]',
+    'border border-black/5 dark:border-white/10',
+    'shadow-[0_4px_20px_-2px_rgba(0,0,0,0.12)] hover:shadow-lg dark:shadow-[0_4px_24px_-2px_rgba(0,0,0,0.35)]',
+    crownSolidMap[color],
     opts?.compact
       ? 'h-[76px] p-3'
       : opts?.fill
@@ -115,13 +115,8 @@ export function SquareButton({
 
   const buttonClass =
     variant === 'crown'
-      ? crownClass(styleOpts)
+      ? crownClass(color, styleOpts)
       : filledClass(color, styleOpts)
-
-  const inlineStyle: React.CSSProperties | undefined =
-    variant === 'crown'
-      ? { borderTopColor: crownAccentHex[color] }
-      : undefined
 
   const content = (
     <>
@@ -157,7 +152,7 @@ export function SquareButton({
 
   if (href) {
     return (
-      <Link href={href} prefetch className={buttonClass} style={inlineStyle}>
+      <Link href={href} prefetch className={buttonClass}>
         {content}
       </Link>
     )
@@ -168,7 +163,6 @@ export function SquareButton({
       onClick={onClick}
       disabled={disabled}
       className={clsx(buttonClass, 'disabled:pointer-events-none disabled:opacity-40')}
-      style={inlineStyle}
     >
       {content}
     </button>
