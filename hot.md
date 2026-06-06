@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-06 — VideolarContent ConfirmDialog + PresentationMaterials senderPlaceholder i18n ✅
+
+**VideolarContent window.confirm → ConfirmDialog:**
+- `window.confirm()` kaldırıldı; React render döngüsünü bloke eden native dialog yerine `ConfirmDialog` bileşeni kullanılıyor
+- `deletingVideo` state eklendi; silme onayı React katmanında, i18n destekli
+- `videoTraining.ts`: `confirmDelete / videoDeleted / deleteFailed` anahtarları (TR + EN)
+
+**PresentationMaterialsContent senderPlaceholder i18n:**
+- `lang === 'en' ? 'Your name' : 'Adınız'` → `t('pipelinePage.senderPlaceholder')`
+- `tr.ts` + `en.ts`: `pipelinePage.senderPlaceholder` anahtarı eklendi
+
 ## 2026-06-06 — ItirazCard i18n, Playwright artifact, README CI bölümü ✅
 
 **ItirazCard expand başlıkları i18n:**

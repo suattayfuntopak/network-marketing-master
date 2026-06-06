@@ -53,6 +53,9 @@ export const videoTrainingSection = {
       videoAdded: 'Video eklendi.',
       operationFailed: 'İşlem başarısız.',
       watchVideoTitle: 'Video izle',
+      confirmDelete: '"{title}" videosunu silmek istediğine emin misin?',
+      videoDeleted: 'Video silindi.',
+      deleteFailed: 'Silme başarısız.',
     },
   },
   en: {
@@ -109,6 +112,9 @@ export const videoTrainingSection = {
       videoAdded: 'Video added.',
       operationFailed: 'Operation failed.',
       watchVideoTitle: 'Watch video',
+      confirmDelete: 'Are you sure you want to delete "{title}"?',
+      videoDeleted: 'Video deleted.',
+      deleteFailed: 'Delete failed.',
     },
   },
 } as const

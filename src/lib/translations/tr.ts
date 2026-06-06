@@ -280,6 +280,7 @@ export const tr = {
     presentationWarning: "⚠️ DİKKAT: Hazır mesajı gönderebilmek için bu adaya ait telefon numarasını Düzenle bölümünden ekleyin!",
     presentationCopied: "Sunum mesajı kopyalandı!",
     presentationMessageTemplate: "Sayın {name}, sunum materyallerine aşağıdaki bağlantıdan ulaşabilirsiniz:\n\n{url}\n\nSorularınız olursa {sender} ile iletişime geçebilirsiniz.",
+    senderPlaceholder: "Adınız",
     deleteCandidate: "Kişi Sil",
     noteTranslating: "Not çevriliyor...",
   },

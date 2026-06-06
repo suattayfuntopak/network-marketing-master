@@ -280,6 +280,7 @@ export const en = {
     presentationWarning: "⚠️ WARNING: Add this candidate's phone number in Edit to enable sending the ready-made message!",
     presentationCopied: "Presentation message copied!",
     presentationMessageTemplate: "Dear {name}, you can access the presentation materials at the link below:\n\n{url}\n\nIf you have any questions, feel free to contact {sender}.",
+    senderPlaceholder: "Your name",
     deleteCandidate: "Delete Candidate",
     noteTranslating: "Translating note...",
   },

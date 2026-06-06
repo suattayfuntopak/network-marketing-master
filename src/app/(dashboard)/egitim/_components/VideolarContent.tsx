@@ -15,6 +15,7 @@ import {
 import { TrainingVideoCard } from './TrainingVideoCard'
 import { VideoEditModal } from './VideoEditModal'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const PAGE_SIZE = 9
 
@@ -25,6 +26,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
   const isAdmin = !!ws?.isSuperAdmin
   const [modalOpen, setModalOpen] = useState(false)
   const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
+  const [deletingVideo, setDeletingVideo] = useState<TrainingVideoAdmin | null>(null)
   const [page, setPage] = useState(0)
 
   const { data, isLoading } = useQuery({
@@ -49,14 +51,16 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
     qc.invalidateQueries({ queryKey: ['pulse-my', ws?.workspaceId] })
   }
 
-  async function handleDelete(video: TrainingVideoAdmin) {
-    if (!window.confirm(`"${video.titleTr}" videosunu silmek istediğine emin misin?`)) return
+  async function handleConfirmDelete() {
+    if (!deletingVideo) return
+    const video = deletingVideo
+    setDeletingVideo(null)
     try {
       await deleteTrainingVideoAction(video.id)
-      toast.success('Video silindi.')
+      toast.success(t('videoTraining.videoDeleted'))
       invalidate()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Silme başarısız.')
+      toast.error(err instanceof Error ? err.message : t('videoTraining.deleteFailed'))
     }
   }
 
@@ -129,7 +133,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
                   onProgressChange={invalidate}
                   isAdmin={isAdmin}
                   onEdit={() => { setEditing(video); setModalOpen(true) }}
-                  onDelete={() => handleDelete(video)}
+                  onDelete={() => setDeletingVideo(video)}
                 />
               </li>
             ))}
@@ -162,6 +166,14 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
           editing={editing}
           onClose={() => setModalOpen(false)}
           onSaved={invalidate}
+        />
+      )}
+
+      {deletingVideo && (
+        <ConfirmDialog
+          message={t('videoTraining.confirmDelete', { title: deletingVideo.titleTr })}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeletingVideo(null)}
         />
       )}
     </div>
