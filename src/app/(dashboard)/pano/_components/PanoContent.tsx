@@ -5,7 +5,6 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
-import { PanoFooter } from './PanoFooter'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
@@ -57,7 +56,6 @@ export function PanoContent() {
 
         <div className="flex min-h-0 flex-1 flex-col">
           <PanoLauncherGrid />
-          {ws?.inviteCode && <PanoFooter inviteCode={ws.inviteCode} />}
         </div>
       </div>
 

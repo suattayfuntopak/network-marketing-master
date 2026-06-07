@@ -1,7 +1,7 @@
 'use client'
 
-import { CrownDailyPage } from './_components/CrownDailyPage'
+import { DailyTrackPage } from './_components/DailyTrackPage'
 
 export default function BugunkuTakibimPage() {
-  return <CrownDailyPage />
+  return <DailyTrackPage />
 }

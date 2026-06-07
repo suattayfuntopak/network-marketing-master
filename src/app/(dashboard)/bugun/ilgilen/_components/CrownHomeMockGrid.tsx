@@ -23,8 +23,8 @@ const CROWN_ITEMS: readonly {
   icon: LucideIcon
   activeClass: string
 }[] = [
-  { id: 'roadmap', labelKey: 'dashboard.panoRoadmap', icon: Map, activeClass: 'bg-[#3730A3] text-white shadow-md' },
-  { id: 'daily',   labelKey: 'dashboard.crownMockDailyFollow',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
+  { id: 'roadmap', labelKey: 'dashboard.panoActionPlan', icon: Map, activeClass: 'bg-[#3730A3] text-white shadow-md' },
+  { id: 'daily',   labelKey: 'dashboard.panoDailyWhatIDid',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
   { id: 'weekly',  labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
   { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days',    icon: CalendarDays,  activeClass: 'bg-[#C03E1F] text-white shadow-md' },
@@ -40,6 +40,10 @@ export function IlgilenHubGrid({ activeTab }: Props) {
   const router = useRouter()
 
   function selectTab(id: IlgilenTabId) {
+    if (id === 'daily') {
+      router.push('/bugunku-takibim')
+      return
+    }
     router.replace(`/bugun/ilgilen?tab=${id}`, { scroll: false })
   }
 

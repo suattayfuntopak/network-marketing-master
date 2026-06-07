@@ -10,6 +10,7 @@ export const queryKeys = {
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   /** Hedef → Yol Haritası → Günlük Takip — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
+  dailyTrack: (lang: 'tr' | 'en' = 'tr') => ['daily-track', lang] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
   hubWeeklySelf: () => ['hub', 'weekly-self'] as const,
   hubMonthlyInsights: () => ['hub', 'monthly-insights'] as const,

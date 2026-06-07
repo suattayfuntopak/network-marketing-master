@@ -76,7 +76,7 @@ export function getPanoLauncherBadge(
     })
   }
 
-  if (href.includes('tab=daily')) {
+  if (href.includes('/bugunku-takibim') || href.includes('tab=daily')) {
     return t('dashboard.panoBadgeFunnel', {
       done: countFunnelStepsDone(progress),
       total: FUNNEL_KEYS.length,

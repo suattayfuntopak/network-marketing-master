@@ -190,12 +190,29 @@ export async function getDailyProgressAction(): Promise<DailyProgress> {
     else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
   }
 
-  const actuals: FunnelCounts = {
+  const actualsFromActions: FunnelCounts = {
     arama: callsRes.count ?? 0,
     tanisma: newCandRes.count ?? 0,
     sunum,
     yeniUye,
   }
+
+  const logDate = todayCalendarKey()
+  const { data: fieldLog } = await supabase
+    .from('nmm_daily_field_log')
+    .select('calls, contacts, presentations, new_members')
+    .eq('user_id', user.id)
+    .eq('log_date', logDate)
+    .maybeSingle()
+
+  const actuals: FunnelCounts = fieldLog
+    ? {
+        arama: fieldLog.calls,
+        tanisma: fieldLog.contacts,
+        sunum: fieldLog.presentations,
+        yeniUye: fieldLog.new_members,
+      }
+    : actualsFromActions
 
   if (!goal) return { ...empty, teamSize, actuals }
 
@@ -275,7 +292,24 @@ export async function getGoalDashboardAction(): Promise<GoalDashboard> {
     if (note === 'sunum' || note === 'sunum yapıldı') sunum++
     else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
   }
-  const actuals: FunnelCounts = { arama: callsRes.count ?? 0, tanisma: newCandRes.count ?? 0, sunum, yeniUye }
+  const actualsFromActions: FunnelCounts = { arama: callsRes.count ?? 0, tanisma: newCandRes.count ?? 0, sunum, yeniUye }
+
+  const logDate = todayCalendarKey()
+  const { data: fieldLog } = await supabase
+    .from('nmm_daily_field_log')
+    .select('calls, contacts, presentations, new_members')
+    .eq('user_id', user.id)
+    .eq('log_date', logDate)
+    .maybeSingle()
+
+  const actuals: FunnelCounts = fieldLog
+    ? {
+        arama: fieldLog.calls,
+        tanisma: fieldLog.contacts,
+        sunum: fieldLog.presentations,
+        yeniUye: fieldLog.new_members,
+      }
+    : actualsFromActions
 
   if (!goal) return { goal: null, progress: { ...emptyProgress, teamSize, actuals }, roadmap: [] }
 

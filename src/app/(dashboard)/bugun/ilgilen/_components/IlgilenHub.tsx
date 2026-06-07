@@ -26,6 +26,7 @@ export function IlgilenHub() {
 
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip', { scroll: false })
+    if (raw === 'daily') router.replace('/bugunku-takibim', { scroll: false })
   }, [raw, router])
 
   // Lazy mount: ilk ziyaret edildiğinde mount et, sonra asla unmount etme.

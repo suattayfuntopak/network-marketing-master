@@ -85,8 +85,8 @@ export function isNavMoreRouteActive(pathname: string): boolean {
 
 /** Pano — Crown Organizasyon: kişisel yolculuk kutuları (+ YZ Koçu, Vaktin Varsa). */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
-  { href: '/bugun/ilgilen?tab=roadmap', translationKey: 'dashboard.panoRoadmap', icon: Map, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/bugun/ilgilen?tab=daily', translationKey: 'dashboard.crownMockDailyFollow', icon: ClipboardList, color: 'purple', desktopColor: 'purple' },
+  { href: '/bugun/ilgilen?tab=roadmap', translationKey: 'dashboard.panoActionPlan', icon: Map, color: 'indigo', desktopColor: 'indigo' },
+  { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'purple', desktopColor: 'purple' },
   { href: '/bugun/ilgilen?tab=weekly', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', desktopColor: 'teal' },
   { href: '/bugun/ilgilen?tab=monthly', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'pink', desktopColor: 'pink' },
   { href: '/bugun/ilgilen?tab=first30', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
