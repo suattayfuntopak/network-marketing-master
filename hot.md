@@ -10,6 +10,8 @@
 
 **Grid:** 8 kutu — mobil 4 satır, md 3 satır; pano mobilde `overflow-y-auto`.
 
+**Git:** `684a975` — push `main`
+
 **Dosyalar:** `navigation.ts`, `PanoContent.tsx`, `PanoLauncherGrid.tsx`, `LauncherGrid.tsx`, `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx`, `DailyTab.tsx`, `tr.ts`, `en.ts`
 
 ## 2026-06-07 — Freemium sprint (Faz 0→5→1-2→3-4→6) ✅
