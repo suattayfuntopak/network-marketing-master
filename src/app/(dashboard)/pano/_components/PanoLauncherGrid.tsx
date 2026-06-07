@@ -6,6 +6,7 @@ import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { useUserGoal } from '@/hooks/useUserGoal'
+import { useVideoCatalog } from '@/hooks/useVideoCatalog'
 import { PANO_ORGANIZATION_ITEMS } from '@/lib/domain/navigation'
 import { getPanoLauncherBadge } from '@/lib/domain/panoProgress'
 
@@ -13,6 +14,7 @@ export function PanoLauncherGrid() {
   const { t } = useTranslation()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { progress } = useUserGoal()
+  const { data: videoCatalog } = useVideoCatalog()
   const items = PANO_ORGANIZATION_ITEMS
 
   return (
@@ -20,7 +22,7 @@ export function PanoLauncherGrid() {
       <LauncherGrid fillViewport itemCount={items.length}>
         {items.map(({ href, translationKey, icon, color }) => {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
-          const badge = getPanoLauncherBadge(href, progress, t)
+          const badge = getPanoLauncherBadge(href, progress, videoCatalog?.summary, t)
 
           return (
             <LauncherGridItem key={href} fillViewport>

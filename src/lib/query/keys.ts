@@ -10,6 +10,7 @@ export const queryKeys = {
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   /** Hedef → Yol Haritası → Günlük Takip — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
+  videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
   /**
    * Ekip Aktivite Özeti (saha çabası). memberIds İÇERİDE sıralanır → çağıran tarafın
    * sıralama derdi yok, prefetch ↔ client cache anahtarı birebir eşleşir.

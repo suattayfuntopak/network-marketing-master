@@ -44,6 +44,7 @@ export const pagesSection = {
       // bugun/ilgilen/page.tsx
       todayPrioritiesTitle: "Bugün İlgilen",
       todayPrioritiesSubtitle: "Bugün sen ve ekibin ne durumdasınız, neler yapmalısınız; hızlıca göz at, aksiyona geç!",
+      ilgilenHubSubtitle: "Yol haritanız, günlük huni ve özet sekmeleri — pano ile aynı organizasyon.",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Hiç aranmadı",
@@ -116,6 +117,7 @@ export const pagesSection = {
       // bugun/ilgilen/page.tsx
       todayPrioritiesTitle: "Today's Priorities",
       todayPrioritiesSubtitle: "See where you and your team stand today and what to do — glance quickly and take action!",
+      ilgilenHubSubtitle: "Your roadmap, daily funnel, and summary tabs — aligned with the home hub.",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Never contacted",

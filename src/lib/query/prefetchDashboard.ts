@@ -6,6 +6,7 @@ import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
+import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -53,6 +54,11 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     queryClient.prefetchQuery({
       queryKey: ['pano-field-insights', ws.workspaceId],
       queryFn: () => getMyPanoInsightsAction(ws.workspaceId),
+      staleTime: 60_000,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.videoCatalog(ws.workspaceId),
+      queryFn: () => getVideoCatalogAction(ws.workspaceId),
       staleTime: 60_000,
     }),
   ]

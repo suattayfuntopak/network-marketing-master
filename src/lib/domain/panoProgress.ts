@@ -1,5 +1,6 @@
 import type { DailyProgress } from '@/app/(dashboard)/hedef/actions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 
 const FUNNEL_KEYS: (keyof FunnelCounts)[] = ['arama', 'tanisma', 'sunum', 'yeniUye']
 
@@ -17,8 +18,15 @@ export function countFunnelStepsDone(progress: DailyProgress): number {
 export function getPanoLauncherBadge(
   href: string,
   progress: DailyProgress | null | undefined,
+  videoSummary: VideoProgressSummary | null | undefined,
   t: (key: string, vars?: Record<string, string | number>) => string,
 ): string | undefined {
+  if (href.includes('tab=live') && videoSummary && videoSummary.total > 0) {
+    return t('dashboard.panoBadgeVideo', {
+      done: videoSummary.completed,
+      total: videoSummary.total,
+    })
+  }
   if (!progress?.hasGoal) return undefined
   if (href.includes('tab=roadmap')) {
     return t('dashboard.panoBadgeRoadmap', {

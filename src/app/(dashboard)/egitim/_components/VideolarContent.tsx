@@ -7,6 +7,7 @@ import { ArrowLeft, Film, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { queryKeys } from '@/lib/query/keys'
 import {
   getVideoCatalogAction,
   deleteTrainingVideoAction,
@@ -30,7 +31,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
   const [page, setPage] = useState(0)
 
   const { data, isLoading } = useQuery({
-    queryKey: ['video-catalog', ws?.workspaceId],
+    queryKey: queryKeys.videoCatalog(ws?.workspaceId ?? ''),
     queryFn: () => getVideoCatalogAction(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
     staleTime: 5 * 60_000,
@@ -47,7 +48,7 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
   }, [videos, activePage])
 
   const invalidate = () => {
-    qc.invalidateQueries({ queryKey: ['video-catalog', ws?.workspaceId] })
+    qc.invalidateQueries({ queryKey: queryKeys.videoCatalog(ws?.workspaceId ?? '') })
     qc.invalidateQueries({ queryKey: ['pulse-my', ws?.workspaceId] })
   }
 

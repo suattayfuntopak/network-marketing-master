@@ -46,11 +46,14 @@ export function IlgilenHubGrid({ activeTab }: Props) {
   return (
     <header className="space-y-4">
       <div>
-        <h1 className="text-xl font-bold text-[var(--text-1)]">
+        <p className="text-xs font-bold uppercase tracking-widest text-[#534AB7]">
+          {t('dashboard.panoOrgLabel')}
+        </p>
+        <h1 className="mt-1 text-xl font-bold text-[var(--text-1)]">
           {t('nav.todayFocus')}
         </h1>
         <p className="mt-1 text-sm text-[var(--text-2)]">
-          {t('pagesUi.todayPrioritiesSubtitle')}{' '}
+          {t('pagesUi.ilgilenHubSubtitle')}{' '}
           <Link href="/ekip" className="font-semibold text-[#534AB7] hover:underline">
             {t('nav.ekip')} →
           </Link>
