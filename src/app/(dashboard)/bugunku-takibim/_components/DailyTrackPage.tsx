@@ -16,13 +16,12 @@ import { DailyMetricRow } from './DailyMetricRow'
 import { dailyTrackAccent } from './dailyTrackTheme'
 
 const METRIC_KEYS: {
-  key?: keyof FunnelCounts
-  field: 'calls' | 'contacts' | 'pipelineAdds' | 'presentations' | 'newMembers'
+  key: keyof FunnelCounts
+  field: 'calls' | 'contacts' | 'presentations' | 'newMembers'
   labelKey: string
 }[] = [
   { key: 'arama', field: 'calls', labelKey: 'dashboard.dailyTrackMetricCalls' },
   { key: 'tanisma', field: 'contacts', labelKey: 'dashboard.dailyTrackMetricMeetings' },
-  { field: 'pipelineAdds', labelKey: 'dashboard.dailyTrackMetricPipeline' },
   { key: 'sunum', field: 'presentations', labelKey: 'dashboard.dailyTrackMetricPresentations' },
   { key: 'yeniUye', field: 'newMembers', labelKey: 'dashboard.dailyTrackMetricMembers' },
 ]
@@ -40,7 +39,6 @@ export function DailyTrackPage() {
 
   const [calls, setCalls] = useState(0)
   const [contacts, setContacts] = useState(0)
-  const [pipelineAdds, setPipelineAdds] = useState(0)
   const [presentations, setPresentations] = useState(0)
   const [newMembers, setNewMembers] = useState(0)
   const [notes, setNotes] = useState('')
@@ -50,7 +48,6 @@ export function DailyTrackPage() {
     if (!data) return
     setCalls(data.fieldLog.calls)
     setContacts(data.fieldLog.contacts)
-    setPipelineAdds(data.fieldLog.pipelineAdds)
     setPresentations(data.fieldLog.presentations)
     setNewMembers(data.fieldLog.newMembers)
     setNotes(data.notes)
@@ -62,7 +59,6 @@ export function DailyTrackPage() {
       saveDailyTrackAction({
         calls,
         contacts,
-        pipelineAdds,
         presentations,
         newMembers,
         notes,
@@ -83,16 +79,15 @@ export function DailyTrackPage() {
   const setters = {
     calls: setCalls,
     contacts: setContacts,
-    pipelineAdds: setPipelineAdds,
     presentations: setPresentations,
     newMembers: setNewMembers,
   } as const
 
-  const values = { calls, contacts, pipelineAdds, presentations, newMembers }
+  const values = { calls, contacts, presentations, newMembers }
 
   return (
     <HubPageShell
-      title={t('dashboard.dailyTrackTitle')}
+      title={t('dashboard.panoDailyWhatIDid')}
       icon={ClipboardList}
       iconClassName={dailyTrackAccent.icon}
       backHref="/pano"
@@ -121,17 +116,16 @@ export function DailyTrackPage() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-base font-bold text-[var(--text-1)]">{t('crown.performanceTitle')}</h2>
         {isLoading && !initialized ? (
           <div className="space-y-3">
-            {Array.from({ length: 5 }).map((_, i) => (
+            {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="h-[5.5rem] animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
             ))}
           </div>
         ) : (
           <div className="flex flex-col gap-3">
             {METRIC_KEYS.map(({ key, field, labelKey }) => {
-              const target = key && progress?.hasGoal ? progress.targets[key] : 0
+              const target = progress?.hasGoal ? progress.targets[key] : 0
               return (
                 <DailyMetricRow
                   key={field}

@@ -9,16 +9,11 @@ import type { FunnelCounts } from '@/lib/domain/roadmap'
 
 const MONTH_OPTIONS = [3, 6, 9, 12, 18, 24, 36]
 
-type GoalRow =
-  | { kind: 'funnel'; key: keyof FunnelCounts; labelKey: string; color: string }
-  | { kind: 'pipeline'; labelKey: string }
-
-const GOAL_ROWS: GoalRow[] = [
-  { kind: 'funnel', key: 'arama', labelKey: 'hedef.dailyRowCalls', color: '#534AB7' },
-  { kind: 'funnel', key: 'tanisma', labelKey: 'hedef.dailyRowMeetings', color: '#0F6E56' },
-  { kind: 'pipeline', labelKey: 'hedef.dailyRowPipeline' },
-  { kind: 'funnel', key: 'sunum', labelKey: 'hedef.dailyRowPresentations', color: '#854F0B' },
-  { kind: 'funnel', key: 'yeniUye', labelKey: 'hedef.dailyRowMembers', color: '#72243E' },
+const GOAL_ROWS: { key: keyof FunnelCounts; labelKey: string; color: string }[] = [
+  { key: 'arama', labelKey: 'hedef.dailyRowCalls', color: '#534AB7' },
+  { key: 'tanisma', labelKey: 'hedef.dailyRowMeetings', color: '#0F6E56' },
+  { key: 'sunum', labelKey: 'hedef.dailyRowPresentations', color: '#854F0B' },
+  { key: 'yeniUye', labelKey: 'hedef.dailyRowMembers', color: '#72243E' },
 ]
 
 export function HedefKart() {
@@ -154,20 +149,6 @@ export function HedefKart() {
 
       <div className="space-y-3">
         {GOAL_ROWS.map(row => {
-          if (row.kind === 'pipeline') {
-            return (
-              <div
-                key="pipeline"
-                className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/60 px-3 py-2.5"
-              >
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                  <p className="text-sm font-medium text-[var(--text-1)]">{t(row.labelKey)}</p>
-                  <span className="text-xs font-medium text-[var(--text-3)]">{t('hedef.dailyRowNoTarget')}</span>
-                </div>
-              </div>
-            )
-          }
-
           const target = p?.targets[row.key] ?? 0
           const actual = p?.actuals[row.key] ?? 0
           const pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : actual > 0 ? 100 : 0

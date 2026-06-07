@@ -11,7 +11,6 @@ export interface DailyFieldLog {
   logDate: string
   calls: number
   contacts: number
-  pipelineAdds: number
   presentations: number
   newMembers: number
 }
@@ -25,7 +24,6 @@ const EMPTY_LOG = (logDate: string): DailyFieldLog => ({
   logDate,
   calls: 0,
   contacts: 0,
-  pipelineAdds: 0,
   presentations: 0,
   newMembers: 0,
 })
@@ -58,7 +56,7 @@ export async function getDailyTrackAction(
   const [{ data: row }, journal] = await Promise.all([
     supabase
       .from('nmm_daily_field_log')
-      .select('log_date, calls, contacts, pipeline_adds, presentations, new_members')
+      .select('log_date, calls, contacts, presentations, new_members')
       .eq('user_id', user.id)
       .eq('log_date', logDate)
       .maybeSingle(),
@@ -79,7 +77,6 @@ export async function getDailyTrackAction(
       logDate: row.log_date,
       calls: row.calls,
       contacts: row.contacts,
-      pipelineAdds: row.pipeline_adds ?? 0,
       presentations: row.presentations,
       newMembers: row.new_members,
     },
@@ -90,7 +87,6 @@ export async function getDailyTrackAction(
 export async function saveDailyTrackAction(input: {
   calls: number
   contacts: number
-  pipelineAdds: number
   presentations: number
   newMembers: number
   notes: string
@@ -109,7 +105,6 @@ export async function saveDailyTrackAction(input: {
       log_date: logDate,
       calls: clampMetric(input.calls),
       contacts: clampMetric(input.contacts),
-      pipeline_adds: clampMetric(input.pipelineAdds),
       presentations: clampMetric(input.presentations),
       new_members: clampMetric(input.newMembers),
       updated_at: new Date().toISOString(),

@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import {
   BarChart3,
   CalendarDays,
@@ -47,26 +46,15 @@ export function IlgilenHubGrid({ activeTab }: Props) {
     router.replace(`/bugun/ilgilen?tab=${id}`, { scroll: false })
   }
 
+  const activeItem = CROWN_ITEMS.find(item => item.id === activeTab) ?? CROWN_ITEMS[0]
+
   return (
     <header className="space-y-4">
-      <div>
-        <p className="text-xs font-bold uppercase tracking-widest text-[#534AB7]">
-          {t('dashboard.panoOrgLabel')}
-        </p>
-        <h1 className="mt-1 text-xl font-bold text-[var(--text-1)]">
-          {t('nav.todayFocus')}
-        </h1>
-        <p className="mt-1 text-sm text-[var(--text-2)]">
-          {t('pagesUi.ilgilenHubSubtitle')}{' '}
-          <Link href="/ekip" className="font-semibold text-[#534AB7] hover:underline">
-            {t('nav.ekip')} →
-          </Link>
-        </p>
-      </div>
+      <h1 className="text-xl font-bold text-[var(--text-1)]">{t(activeItem.labelKey)}</h1>
       <nav
         className="no-swipe flex w-full overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 shadow-sm scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         role="tablist"
-        aria-label={t('nav.todayFocus')}
+        aria-label={t(activeItem.labelKey)}
         data-no-swipe="true"
         onTouchStart={e => e.stopPropagation()}
       >
