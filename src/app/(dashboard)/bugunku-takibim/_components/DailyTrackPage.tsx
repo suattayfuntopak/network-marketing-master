@@ -129,6 +129,7 @@ export function DailyTrackPage() {
               return (
                 <DailyMetricRow
                   key={field}
+                  metric={key}
                   label={t(labelKey)}
                   value={values[field]}
                   targetLabel={target > 0 ? t('crown.targetSuffix', { target }) : undefined}

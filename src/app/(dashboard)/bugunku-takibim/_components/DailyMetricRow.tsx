@@ -3,22 +3,24 @@
 import { Minus, Plus } from 'lucide-react'
 import { clsx } from 'clsx'
 import { dailyTrackAccent } from './dailyTrackTheme'
+import { FunnelMetricLabel, type FunnelMetricKey } from '@/lib/ui/funnelMetricVisuals'
 
 type Props = {
+  metric: FunnelMetricKey
   label: string
   value: number
   targetLabel?: string
   onChange: (next: number) => void
 }
 
-export function DailyMetricRow({ label, value, targetLabel, onChange }: Props) {
+export function DailyMetricRow({ metric, label, value, targetLabel, onChange }: Props) {
   function bump(delta: number) {
     onChange(Math.min(9999, Math.max(0, value + delta)))
   }
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4">
-      <p className="mb-2 text-sm font-semibold text-[var(--text-1)]">{label}</p>
+      <FunnelMetricLabel metric={metric} label={label} className="mb-2 text-sm font-semibold text-[var(--text-1)]" />
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
           <button

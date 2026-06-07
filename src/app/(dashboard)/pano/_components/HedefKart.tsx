@@ -1,20 +1,28 @@
 'use client'
 
 import { useState } from 'react'
-import { Target, ChevronDown, Pencil, Rocket, Check, Phone, Handshake, Mic } from 'lucide-react'
+import { Target, ChevronDown, Pencil, Rocket, Check } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import {
+  FUNNEL_METRIC_ORDER,
+  FUNNEL_METRIC_VISUAL,
+  FunnelMetricCount,
+  FunnelMetricLabel,
+} from '@/lib/ui/funnelMetricVisuals'
 
 const MONTH_OPTIONS = [3, 6, 9, 12, 18, 24, 36]
 
-const GOAL_ROWS: { key: keyof FunnelCounts; labelKey: string; color: string }[] = [
-  { key: 'arama', labelKey: 'hedef.dailyRowCalls', color: '#534AB7' },
-  { key: 'tanisma', labelKey: 'hedef.dailyRowMeetings', color: '#0F6E56' },
-  { key: 'sunum', labelKey: 'hedef.dailyRowPresentations', color: '#854F0B' },
-  { key: 'yeniUye', labelKey: 'hedef.dailyRowMembers', color: '#72243E' },
-]
+const GOAL_ROW_LABELS: Record<keyof FunnelCounts, string> = {
+  arama: 'hedef.dailyRowCalls',
+  tanisma: 'hedef.dailyRowMeetings',
+  sunum: 'hedef.dailyRowPresentations',
+  yeniUye: 'hedef.dailyRowMembers',
+}
+
+const GOAL_ROWS = FUNNEL_METRIC_ORDER.map(key => ({ key, labelKey: GOAL_ROW_LABELS[key] }))
 
 export function HedefKart() {
   const { t } = useTranslation()
@@ -105,6 +113,7 @@ export function HedefKart() {
   }
 
   const p = progress
+  const memberIcon = FUNNEL_METRIC_VISUAL.yeniUye
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
@@ -144,11 +153,16 @@ export function HedefKart() {
           const actual = p?.actuals[row.key] ?? 0
           const pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : actual > 0 ? 100 : 0
           const done = target > 0 && actual >= target
+          const { barColor } = FUNNEL_METRIC_VISUAL[row.key]
 
           return (
             <div key={row.key} className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
               <div className="mb-1.5 flex items-start justify-between gap-2">
-                <p className="text-sm font-medium leading-snug text-[var(--text-1)]">{t(row.labelKey)}</p>
+                <FunnelMetricLabel
+                  metric={row.key}
+                  label={t(row.labelKey)}
+                  className="text-sm font-medium leading-snug text-[var(--text-1)]"
+                />
                 <span className={clsx('shrink-0 text-xs font-semibold tabular-nums', done ? 'text-[#0F6E56]' : 'text-[var(--text-2)]')}>
                   {done ? <Check className="mr-0.5 inline h-3 w-3" /> : null}
                   {actual} / {target}
@@ -157,7 +171,7 @@ export function HedefKart() {
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
                 <div
                   className="h-full rounded-full transition-all"
-                  style={{ width: `${pct}%`, backgroundColor: row.color }}
+                  style={{ width: `${pct}%`, backgroundColor: barColor }}
                 />
               </div>
             </div>
@@ -197,21 +211,17 @@ export function HedefKart() {
                         {t('hedef.roadmapTeamSize', { n: s.teamSize })}
                       </span>
                       <span className="hidden text-[var(--text-3)] sm:inline">·</span>
-                      <span className="text-[var(--text-2)]">
-                        {t('hedef.roadmapNewMembers', { n: s.newMembers })}
-                      </span>
+                      <FunnelMetricCount metric="arama" value={s.monthly.arama} />
+                      <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} />
+                      <FunnelMetricCount metric="sunum" value={s.monthly.sunum} />
                       <span className="hidden text-[var(--text-3)] sm:inline">·</span>
-                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
-                        <Phone className="h-3 w-3 shrink-0" strokeWidth={2} />
-                        {s.monthly.arama}
-                      </span>
-                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
-                        <Handshake className="h-3 w-3 shrink-0" strokeWidth={2} />
-                        {s.monthly.tanisma}
-                      </span>
-                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
-                        <Mic className="h-3 w-3 shrink-0" strokeWidth={2} />
-                        {s.monthly.sunum}
+                      <span className="inline-flex items-center gap-1 text-[var(--text-2)]">
+                        {t('hedef.roadmapNewMembers', { n: s.newMembers })}
+                        <memberIcon.Icon
+                          className="h-3 w-3 shrink-0"
+                          style={{ color: memberIcon.color }}
+                          strokeWidth={2}
+                        />
                       </span>
                     </div>
                   </li>
