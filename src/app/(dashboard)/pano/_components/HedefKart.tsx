@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Target, ChevronDown, Pencil, Rocket, Check } from 'lucide-react'
+import { Target, ChevronDown, Pencil, Rocket, Check, Phone, Handshake, Mic } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -22,7 +22,7 @@ export function HedefKart() {
   const [editing, setEditing] = useState(false)
   const [people, setPeople] = useState('')
   const [months, setMonths] = useState(12)
-  const [showRoadmap, setShowRoadmap] = useState(false)
+  const [showRoadmap, setShowRoadmap] = useState(true)
 
   if (isLoading) {
     return <div className="h-40 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
@@ -108,26 +108,17 @@ export function HedefKart() {
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2.5">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-start gap-2.5">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] dark:bg-[#1e1b4b]">
             <Target className="h-5 w-5 text-[#534AB7] dark:text-[#a5b4fc]" strokeWidth={1.75} />
           </div>
-          <div className="min-w-0">
-            <h3 className="text-sm font-bold text-[var(--text-1)]">
-              {t('hedef.goalSummary', { people: goal!.targetPeople, months: goal!.targetMonths })}
-            </h3>
-            {p ? (
-              <p className="text-xs text-[var(--text-3)]">
-                {t('hedef.monthProgress', {
-                  current: p.monthIndex,
-                  total: p.totalMonths,
-                  team: p.teamSize,
-                  target: p.targetTeamSize,
-                })}
-              </p>
-            ) : null}
-          </div>
+          <p className="text-sm font-bold leading-snug text-[var(--text-1)]">
+            {t('hedef.myGoalStatement', {
+              people: goal!.targetPeople,
+              months: goal!.targetMonths,
+            })}
+          </p>
         </div>
         <button
           type="button"
@@ -179,31 +170,53 @@ export function HedefKart() {
           <button
             type="button"
             onClick={() => setShowRoadmap(v => !v)}
-            className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
+            className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
           >
             {t('hedef.roadmapTitle')}
             <ChevronDown className={clsx('h-4 w-4 transition-transform', showRoadmap && 'rotate-180')} />
           </button>
           {showRoadmap ? (
-            <ul className="mt-2 space-y-1.5">
-              {roadmap.map(s => (
-                <li
-                  key={s.month}
-                  className={clsx(
-                    'flex items-center justify-between rounded-lg px-3 py-2 text-xs',
-                    p && s.month === p.monthIndex
-                      ? 'border border-[#534AB7]/30 bg-[#EEEDFE]/50 dark:bg-[#1e1b4b]/40'
-                      : 'bg-[var(--bg-subtle)]',
-                  )}
-                >
-                  <span className="font-semibold text-[var(--text-1)]">
-                    {t('hedef.monthN', { n: s.month })} · {t('hedef.teamN', { n: s.teamSize })}
-                  </span>
-                  <span className="text-[var(--text-3)]">
-                    +{s.newMembers} · {s.monthly.arama}/{s.monthly.tanisma}/{s.monthly.sunum}
-                  </span>
-                </li>
-              ))}
+            <ul className="mt-2 max-h-[min(24rem,50vh)] space-y-2 overflow-y-auto pr-0.5">
+              {roadmap.map(s => {
+                const isCurrent = p && s.month === p.monthIndex
+                return (
+                  <li
+                    key={s.month}
+                    className={clsx(
+                      'flex items-center gap-2.5 rounded-xl border px-2.5 py-2',
+                      isCurrent
+                        ? 'border-[#534AB7]/35 bg-[#EEEDFE]/40 dark:border-[#534AB7]/40 dark:bg-[#1e1b4b]/50'
+                        : 'border-[var(--border)] bg-[var(--bg-subtle)]/60',
+                    )}
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-sm font-bold text-white">
+                      {s.month}
+                    </span>
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-tight">
+                      <span className="font-semibold text-[var(--text-1)]">
+                        {t('hedef.roadmapTeamSize', { n: s.teamSize })}
+                      </span>
+                      <span className="hidden text-[var(--text-3)] sm:inline">·</span>
+                      <span className="text-[var(--text-2)]">
+                        {t('hedef.roadmapNewMembers', { n: s.newMembers })}
+                      </span>
+                      <span className="hidden text-[var(--text-3)] sm:inline">·</span>
+                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
+                        <Phone className="h-3 w-3 shrink-0" strokeWidth={2} />
+                        {s.monthly.arama}
+                      </span>
+                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
+                        <Handshake className="h-3 w-3 shrink-0" strokeWidth={2} />
+                        {s.monthly.tanisma}
+                      </span>
+                      <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
+                        <Mic className="h-3 w-3 shrink-0" strokeWidth={2} />
+                        {s.monthly.sunum}
+                      </span>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           ) : null}
         </>
