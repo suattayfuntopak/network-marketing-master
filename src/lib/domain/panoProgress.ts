@@ -1,44 +1,87 @@
 import type { DailyProgress } from '@/app/(dashboard)/hedef/actions'
+import type { HubMonthlyInsights, HubWeeklySelfPayload } from '@/app/(dashboard)/crown/actions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 
 const FUNNEL_KEYS: (keyof FunnelCounts)[] = ['arama', 'tanisma', 'sunum', 'yeniUye']
 
-/** Bugün huni adımlarından kaçı hedefe ulaştı (0–4). */
+export type PanoBadgeContext = {
+  progress?: DailyProgress | null
+  videoSummary?: VideoProgressSummary | null
+  weekly?: HubWeeklySelfPayload | null
+  monthly?: HubMonthlyInsights | null
+  first30ActiveCount?: number | null
+}
+
+/** Huni adımlarından kaçı hedefe ulaştı (0–4). */
 export function countFunnelStepsDone(progress: DailyProgress): number {
   if (!progress.hasGoal) return 0
+  return countFunnelStepsMatching(progress.targets, progress.actuals)
+}
+
+export function countFunnelStepsMatching(
+  targets: FunnelCounts,
+  actuals: FunnelCounts,
+): number {
   return FUNNEL_KEYS.filter(key => {
-    const target = progress.targets[key] ?? 0
-    const actual = progress.actuals[key] ?? 0
+    const target = targets[key] ?? 0
+    const actual = actuals[key] ?? 0
     return target > 0 && actual >= target
   }).length
 }
 
-/** Pano kutu rozeti — yalnız yol haritası ve günlük takip için. */
+/** Pano kutu rozeti — yol haritası, günlük, haftalık, aylık, ilk 30, canlı eğitim. */
 export function getPanoLauncherBadge(
   href: string,
-  progress: DailyProgress | null | undefined,
-  videoSummary: VideoProgressSummary | null | undefined,
+  ctx: PanoBadgeContext,
   t: (key: string, vars?: Record<string, string | number>) => string,
 ): string | undefined {
+  const { progress, videoSummary, weekly, monthly, first30ActiveCount } = ctx
+
   if (href.includes('tab=live') && videoSummary && videoSummary.total > 0) {
     return t('dashboard.panoBadgeVideo', {
       done: videoSummary.completed,
       total: videoSummary.total,
     })
   }
+
+  if (href.includes('tab=weekly') && weekly) {
+    if (weekly.hasGoal) {
+      const done = countFunnelStepsMatching(weekly.weeklyTargets, weekly.weeklyActuals)
+      if (done > 0 || weekly.weeklyTargets.arama > 0) {
+        return t('dashboard.panoBadgeFunnel', { done, total: FUNNEL_KEYS.length })
+      }
+    } else if (weekly.pctOverall > 0) {
+      return t('dashboard.panoBadgeWeeklyPct', { pct: weekly.pctOverall })
+    }
+  }
+
+  if (href.includes('tab=monthly') && monthly) {
+    return t('dashboard.panoBadgeMonth', {
+      day: monthly.dayOfMonth,
+      total: monthly.daysInMonth,
+    })
+  }
+
+  if (href.includes('tab=first30') && first30ActiveCount != null && first30ActiveCount > 0) {
+    return t('dashboard.panoBadgeFirst30', { count: first30ActiveCount })
+  }
+
   if (!progress?.hasGoal) return undefined
+
   if (href.includes('tab=roadmap')) {
     return t('dashboard.panoBadgeRoadmap', {
       current: progress.monthIndex,
       total: progress.totalMonths,
     })
   }
+
   if (href.includes('tab=daily')) {
     return t('dashboard.panoBadgeFunnel', {
       done: countFunnelStepsDone(progress),
       total: FUNNEL_KEYS.length,
     })
   }
+
   return undefined
 }

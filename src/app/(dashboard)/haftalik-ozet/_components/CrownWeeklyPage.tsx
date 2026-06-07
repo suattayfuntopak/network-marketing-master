@@ -33,7 +33,7 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const { data: weeklySelf, isLoading: weeklySelfLoading } = useQuery({
-    queryKey: ['hub', 'weekly-self'],
+    queryKey: queryKeys.hubWeeklySelf(),
     queryFn: getHubWeeklySelfAction,
     staleTime: 30_000,
   })
@@ -56,7 +56,7 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   function refresh() {
     qc.invalidateQueries({ queryKey: ['team-field-activity'] })
     qc.invalidateQueries({ queryKey: ['candidates'] })
-    qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
+    qc.invalidateQueries({ queryKey: queryKeys.hubWeeklySelf() })
   }
 
   return (

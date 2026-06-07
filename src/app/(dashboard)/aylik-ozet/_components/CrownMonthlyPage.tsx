@@ -41,7 +41,7 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const { data: monthInsights, isLoading: monthLoading } = useQuery({
-    queryKey: ['hub', 'monthly-insights'],
+    queryKey: queryKeys.hubMonthlyInsights(),
     queryFn: getHubMonthlyInsightsAction,
     staleTime: 30_000,
   })
@@ -71,7 +71,7 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   function refresh() {
     qc.invalidateQueries({ queryKey: ['team-field-activity'] })
     qc.invalidateQueries({ queryKey: ['crown', 'entries'] })
-    qc.invalidateQueries({ queryKey: ['hub', 'monthly-insights'] })
+    qc.invalidateQueries({ queryKey: queryKeys.hubMonthlyInsights() })
   }
 
   return (

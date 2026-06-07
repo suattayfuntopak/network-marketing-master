@@ -7,6 +7,11 @@ import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
+import {
+  getHubWeeklySelfAction,
+  getHubMonthlyInsightsAction,
+  getCrownFirst30PageAction,
+} from '@/app/(dashboard)/crown/actions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -61,6 +66,16 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
       queryFn: () => getVideoCatalogAction(ws.workspaceId),
       staleTime: 60_000,
     }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubWeeklySelf(),
+      queryFn: getHubWeeklySelfAction,
+      staleTime: 60_000,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubMonthlyInsights(),
+      queryFn: getHubMonthlyInsightsAction,
+      staleTime: 60_000,
+    }),
   ]
 
   if (ws.isSuperAdmin) {
@@ -78,10 +93,19 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     )
   }
 
+  if (hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) {
+    parallel.push(
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.crownFirst30(ws.workspaceId),
+        queryFn: () => getCrownFirst30PageAction(ws.workspaceId),
+        staleTime: 60_000,
+      }),
+    )
+  }
+
   await Promise.all(parallel)
 
   // Ekip Aktivite Özeti (Ekibim sayfası) — team erişimi olanlarda "pat diye" gelsin.
-  // İstatistikler perfMemberIds ile aynı sıralı-id anahtarı → cache birebir eşleşir.
   if (hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) {
     const team = queryClient.getQueryData<{ members: { user_id: string; role: string }[] }>(
       queryKeys.team(ws.workspaceId)

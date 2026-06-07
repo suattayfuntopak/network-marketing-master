@@ -91,7 +91,7 @@ export function SearchPageContent() {
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('common.searchResults')}</h1>
           <p className="text-xs text-[var(--text-3)]">
-            {query ? `${totalResults} ${t('common.searchNoResults').replace('Sonuç bulunamadı.', 'sonuç bulundu')}` : t('common.searchEnterQuery')}
+            {query ? t('common.searchResultsCount', { count: totalResults }) : t('common.searchEnterQuery')}
           </p>
         </div>
       </div>

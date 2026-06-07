@@ -13,6 +13,7 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { queryKeys } from '@/lib/query/keys'
 import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { waHref } from '@/lib/utils/waLink'
@@ -24,7 +25,7 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
   const locked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['crown', 'first30', ws?.workspaceId],
+    queryKey: queryKeys.crownFirst30(ws?.workspaceId ?? ''),
     queryFn: () => getCrownFirst30PageAction(ws!.workspaceId),
     enabled: !!ws?.workspaceId && !locked,
     staleTime: 30_000,
