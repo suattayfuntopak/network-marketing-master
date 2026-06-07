@@ -144,7 +144,7 @@ export const en = {
     calculate: "Calculate My Roadmap",
     calculating: "Calculating...",
     goalSummary: "Goal: {people} people · {months} mo",
-    myGoalStatement: "My goal: reach a {people}-person team in {months} months!",
+    myGoalStatement: "Reach a team of at least {people} people in {months} months!",
     monthProgress: "Month {current}/{total} · team {team}/{target}",
     todayTitle: "Today's Focus",
     dailyRowCalls: "How many people will I talk to?",

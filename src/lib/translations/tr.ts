@@ -144,7 +144,7 @@ export const tr = {
     calculate: "Yol Haritamı Hesapla",
     calculating: "Hesaplanıyor...",
     goalSummary: "Hedefin: {people} kişi · {months} ay",
-    myGoalStatement: "Hedefim: {months} ayda {people} kişilik bir ekibe ulaşmak!",
+    myGoalStatement: "{months} ayda en az {people} kişilik bir ekibe ulaşmak!",
     monthProgress: "{current}/{total}. ay · ekip {team}/{target}",
     todayTitle: "Bugünkü Odağım",
     dailyRowCalls: "Kaç Kişiyle Konuşacağım?",
