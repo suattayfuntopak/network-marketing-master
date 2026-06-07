@@ -86,7 +86,7 @@ export const PANO_LAUNCHER_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye, color: 'purple', desktopColor: 'purple' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'pink', desktopColor: 'pink' },
-  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },
+  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'indigo', desktopColor: 'indigo' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'cyan', desktopColor: 'cyan' },
-  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'indigo', desktopColor: 'indigo' },
+  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'amber', desktopColor: 'amber' },
 ]

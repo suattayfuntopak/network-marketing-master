@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-07 — Pano Ekibim ↔ Vaktin Varsa renk swap ✅
+
+**PANO_LAUNCHER_ITEMS:** Ekibim → mor gradient (`indigo`), Vaktin Varsa → turuncu gradient (`amber`).
+
+**Dosya:** `navigation.ts`
+
 ## 2026-06-07 — Pano kutuları canlı gradient renkler ✅
 
 **SquareButton crown:** Düz koyu renkler → referans paletindeki `bg-gradient-to-br` gradientler. Pano eşlemesi: Hızlı Bakış gökyüzü mavisi, Boru Hattı yeşil, Takvim pembe, Ekibim turuncu, YZ Koçu royal mavi, Vaktin Varsa mor. Beyaz metin + hafif drop-shadow.
