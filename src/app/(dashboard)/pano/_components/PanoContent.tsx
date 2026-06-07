@@ -44,9 +44,6 @@ export function PanoContent() {
             <div className="h-8 w-56 animate-pulse rounded bg-[var(--bg-subtle)] md:mx-auto" />
           ) : (
             <>
-              <p className="text-xs font-bold uppercase tracking-widest text-[#534AB7] md:text-sm">
-                {t('dashboard.panoOrgLabel')}
-              </p>
               <h1 className="text-xl font-bold text-[var(--text-1)] md:text-2xl">
                 {greetingIcon} {greeting} {firstName} 👋🏻
               </h1>

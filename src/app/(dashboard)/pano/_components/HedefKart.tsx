@@ -9,11 +9,16 @@ import type { FunnelCounts } from '@/lib/domain/roadmap'
 
 const MONTH_OPTIONS = [3, 6, 9, 12, 18, 24, 36]
 
-const FUNNEL_ROWS: { key: keyof FunnelCounts; color: string }[] = [
-  { key: 'arama', color: '#534AB7' },
-  { key: 'tanisma', color: '#0F6E56' },
-  { key: 'sunum', color: '#854F0B' },
-  { key: 'yeniUye', color: '#72243E' },
+type GoalRow =
+  | { kind: 'funnel'; key: keyof FunnelCounts; labelKey: string; color: string }
+  | { kind: 'pipeline'; labelKey: string }
+
+const GOAL_ROWS: GoalRow[] = [
+  { kind: 'funnel', key: 'arama', labelKey: 'hedef.dailyRowCalls', color: '#534AB7' },
+  { kind: 'funnel', key: 'tanisma', labelKey: 'hedef.dailyRowMeetings', color: '#0F6E56' },
+  { kind: 'pipeline', labelKey: 'hedef.dailyRowPipeline' },
+  { kind: 'funnel', key: 'sunum', labelKey: 'hedef.dailyRowPresentations', color: '#854F0B' },
+  { kind: 'funnel', key: 'yeniUye', labelKey: 'hedef.dailyRowMembers', color: '#72243E' },
 ]
 
 export function HedefKart() {
@@ -37,7 +42,6 @@ export function HedefKart() {
 
   const showPicker = !goal || editing
 
-  // ── Hedef belirleme / düzenleme ──
   if (showPicker) {
     return (
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
@@ -57,16 +61,17 @@ export function HedefKart() {
           inputMode="numeric"
           min={1}
           value={people}
-          onChange={(e) => setPeople(e.target.value)}
+          onChange={e => setPeople(e.target.value)}
           placeholder={t('hedef.peoplePlaceholder')}
           className="mb-3 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
         />
 
         <label className="mb-1.5 block text-xs font-semibold text-[var(--text-2)]">{t('hedef.monthsLabel')}</label>
         <div className="mb-4 flex flex-wrap gap-1.5">
-          {MONTH_OPTIONS.map((m) => (
+          {MONTH_OPTIONS.map(m => (
             <button
               key={m}
+              type="button"
               onClick={() => setMonths(m)}
               className={clsx(
                 'rounded-lg px-3 py-1.5 text-xs font-semibold transition',
@@ -82,6 +87,7 @@ export function HedefKart() {
 
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={handleSave}
             disabled={isSaving || !people}
             className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-2.5 text-sm font-semibold text-white hover:bg-[#453DA0] disabled:opacity-60"
@@ -89,92 +95,123 @@ export function HedefKart() {
             {isSaving ? t('hedef.calculating') : t('hedef.calculate')}
             {!isSaving && <Rocket className="h-4 w-4" />}
           </button>
-          {goal && (
+          {goal ? (
             <button
+              type="button"
               onClick={() => setEditing(false)}
               className="rounded-xl border border-[var(--border)] px-4 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)]"
             >
               {t('common.cancel')}
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     )
   }
 
-  // ── Günlük takip + yol haritası ──
   const p = progress
+
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE]">
-            <Target className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] dark:bg-[#1e1b4b]">
+            <Target className="h-5 w-5 text-[#534AB7] dark:text-[#a5b4fc]" strokeWidth={1.75} />
           </div>
-          <div>
+          <div className="min-w-0">
             <h3 className="text-sm font-bold text-[var(--text-1)]">
               {t('hedef.goalSummary', { people: goal!.targetPeople, months: goal!.targetMonths })}
             </h3>
-            {p && (
+            {p ? (
               <p className="text-xs text-[var(--text-3)]">
-                {t('hedef.monthProgress', { current: p.monthIndex, total: p.totalMonths, team: p.teamSize, target: p.targetTeamSize })}
+                {t('hedef.monthProgress', {
+                  current: p.monthIndex,
+                  total: p.totalMonths,
+                  team: p.teamSize,
+                  target: p.targetTeamSize,
+                })}
               </p>
-            )}
+            ) : null}
           </div>
         </div>
         <button
-          onClick={() => { setPeople(String(goal!.targetPeople)); setMonths(goal!.targetMonths); setEditing(true) }}
-          className="flex h-8 w-8 items-center justify-center rounded-lg text-[var(--text-3)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
+          type="button"
+          onClick={() => {
+            setPeople(String(goal!.targetPeople))
+            setMonths(goal!.targetMonths)
+            setEditing(true)
+          }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
           aria-label={t('common.edit')}
         >
           <Pencil className="h-4 w-4" />
         </button>
       </div>
 
-      {/* Bugünün huni hedefleri vs gerçekleşen */}
-      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">{t('hedef.todayTitle')}</p>
-      <div className="space-y-2.5">
-        {FUNNEL_ROWS.map(({ key, color }) => {
-          const target = p?.targets[key] ?? 0
-          const actual = p?.actuals[key] ?? 0
+      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+        {t('hedef.todayTitle')}
+      </p>
+
+      <div className="space-y-3">
+        {GOAL_ROWS.map(row => {
+          if (row.kind === 'pipeline') {
+            return (
+              <div
+                key="pipeline"
+                className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/60 px-3 py-2.5"
+              >
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm font-medium text-[var(--text-1)]">{t(row.labelKey)}</p>
+                  <span className="text-xs font-medium text-[var(--text-3)]">{t('hedef.dailyRowNoTarget')}</span>
+                </div>
+              </div>
+            )
+          }
+
+          const target = p?.targets[row.key] ?? 0
+          const actual = p?.actuals[row.key] ?? 0
           const pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : actual > 0 ? 100 : 0
           const done = target > 0 && actual >= target
+
           return (
-            <div key={key}>
-              <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="font-medium text-[var(--text-1)]">{t(`hedef.${key}`)}</span>
-                <span className={clsx('font-semibold', done ? 'text-[#0F6E56]' : 'text-[var(--text-2)]')}>
-                  {done && <Check className="mr-0.5 inline h-3 w-3" />}
+            <div key={row.key} className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
+              <div className="mb-1.5 flex items-start justify-between gap-2">
+                <p className="text-sm font-medium leading-snug text-[var(--text-1)]">{t(row.labelKey)}</p>
+                <span className={clsx('shrink-0 text-xs font-semibold tabular-nums', done ? 'text-[#0F6E56]' : 'text-[var(--text-2)]')}>
+                  {done ? <Check className="mr-0.5 inline h-3 w-3" /> : null}
                   {actual} / {target}
                 </span>
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
-                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pct}%`, backgroundColor: row.color }}
+                />
               </div>
             </div>
           )
         })}
       </div>
 
-      {/* Yol haritası (açılır) */}
-      {roadmap.length > 0 && (
+      {roadmap.length > 0 ? (
         <>
           <button
-            onClick={() => setShowRoadmap((v) => !v)}
+            type="button"
+            onClick={() => setShowRoadmap(v => !v)}
             className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
           >
             {t('hedef.roadmapTitle')}
             <ChevronDown className={clsx('h-4 w-4 transition-transform', showRoadmap && 'rotate-180')} />
           </button>
-          {showRoadmap && (
+          {showRoadmap ? (
             <ul className="mt-2 space-y-1.5">
-              {roadmap.map((s) => (
+              {roadmap.map(s => (
                 <li
                   key={s.month}
                   className={clsx(
                     'flex items-center justify-between rounded-lg px-3 py-2 text-xs',
                     p && s.month === p.monthIndex
-                      ? 'border border-[#534AB7]/30 bg-[#EEEDFE]/50'
+                      ? 'border border-[#534AB7]/30 bg-[#EEEDFE]/50 dark:bg-[#1e1b4b]/40'
                       : 'bg-[var(--bg-subtle)]',
                   )}
                 >
@@ -187,9 +224,9 @@ export function HedefKart() {
                 </li>
               ))}
             </ul>
-          )}
+          ) : null}
         </>
-      )}
+      ) : null}
     </div>
   )
 }
