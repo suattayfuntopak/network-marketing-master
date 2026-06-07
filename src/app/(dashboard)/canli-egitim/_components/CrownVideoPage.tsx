@@ -36,7 +36,8 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
       title={t('dashboard.crownMockLiveTraining')}
       subtitle={t('crown.videoSubtitle')}
       icon={Video}
-      iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400"
+      iconClassName="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+      backHref="/pano"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'video'] })}
       refreshing={isFetching}
       asTab={asTab}

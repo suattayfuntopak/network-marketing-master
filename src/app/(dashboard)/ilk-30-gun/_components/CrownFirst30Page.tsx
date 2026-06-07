@@ -35,10 +35,11 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
 
   return (
     <HubPageShell
-      title={t('crown.first30Title')}
+      title={t('dashboard.crownMockFirst30Days')}
       subtitle={t('crown.first30Subtitle')}
       icon={CalendarDays}
       iconClassName="bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400"
+      backHref="/pano"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'first30'] })}
       refreshing={isFetching}
       asTab={asTab}

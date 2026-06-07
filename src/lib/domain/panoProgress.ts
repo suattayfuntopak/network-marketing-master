@@ -38,14 +38,14 @@ export function getPanoLauncherBadge(
 ): string | undefined {
   const { progress, videoSummary, weekly, monthly, first30ActiveCount } = ctx
 
-  if (href.includes('tab=live') && videoSummary && videoSummary.total > 0) {
+  if (href.includes('/canli-egitim') && videoSummary && videoSummary.total > 0) {
     return t('dashboard.panoBadgeVideo', {
       done: videoSummary.completed,
       total: videoSummary.total,
     })
   }
 
-  if (href.includes('tab=weekly') && weekly) {
+  if (href.includes('/haftalik-ozet') && weekly) {
     if (weekly.hasGoal) {
       const done = countFunnelStepsMatching(weekly.weeklyTargets, weekly.weeklyActuals)
       if (done > 0 || weekly.weeklyTargets.arama > 0) {
@@ -56,27 +56,27 @@ export function getPanoLauncherBadge(
     }
   }
 
-  if (href.includes('tab=monthly') && monthly) {
+  if (href.includes('/aylik-ozet') && monthly) {
     return t('dashboard.panoBadgeMonth', {
       day: monthly.dayOfMonth,
       total: monthly.daysInMonth,
     })
   }
 
-  if (href.includes('tab=first30') && first30ActiveCount != null && first30ActiveCount > 0) {
+  if (href.includes('/ilk-30-gun') && first30ActiveCount != null && first30ActiveCount > 0) {
     return t('dashboard.panoBadgeFirst30', { count: first30ActiveCount })
   }
 
   if (!progress?.hasGoal) return undefined
 
-  if (href.includes('tab=roadmap')) {
+  if (href.includes('/hedefim')) {
     return t('dashboard.panoBadgeRoadmap', {
       current: progress.monthIndex,
       total: progress.totalMonths,
     })
   }
 
-  if (href.includes('/bugunku-takibim') || href.includes('tab=daily')) {
+  if (href.includes('/bugunku-takibim')) {
     return t('dashboard.panoBadgeFunnel', {
       done: countFunnelStepsDone(progress),
       total: FUNNEL_KEYS.length,

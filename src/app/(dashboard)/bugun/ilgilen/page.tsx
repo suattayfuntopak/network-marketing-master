@@ -1,26 +1,45 @@
-import { Suspense } from 'react'
-import { IlgilenHub } from './_components/IlgilenHub'
+'use client'
 
-function PageSkeleton() {
+import { Suspense, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+
+const TAB_REDIRECTS: Record<string, string> = {
+  roadmap: '/hedefim',
+  daily: '/bugunku-takibim',
+  weekly: '/haftalik-ozet',
+  monthly: '/aylik-ozet',
+  first30: '/ilk-30-gun',
+  live: '/canli-egitim',
+  team: '/ekip',
+}
+
+function IlgilenLegacyRedirect() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+
+  useEffect(() => {
+    const tab = searchParams.get('tab')
+    const dest = tab ? TAB_REDIRECTS[tab] ?? '/hedefim' : '/hedefim'
+    router.replace(dest)
+  }, [searchParams, router])
+
   return (
     <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <div className="w-full space-y-5">
-        <div className="h-7 w-40 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-        <div className="h-14 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-        <div className="space-y-3">
-          {[0, 1, 2].map(i => (
-            <div key={i} className="h-20 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-          ))}
-        </div>
-      </div>
+      <div className="h-7 w-40 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
     </main>
   )
 }
 
 export default function IlgilenPage() {
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <IlgilenHub />
+    <Suspense
+      fallback={
+        <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+          <div className="h-7 w-40 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
+        </main>
+      }
+    >
+      <IlgilenLegacyRedirect />
     </Suspense>
   )
 }

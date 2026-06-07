@@ -16,18 +16,38 @@ export const FUNNEL_METRIC_VISUAL: Record<
 
 export const FUNNEL_METRIC_ORDER: FunnelMetricKey[] = ['arama', 'tanisma', 'sunum', 'yeniUye']
 
+/** Hedefim sayfası — dark temada da okunur pastel/vivid ikon renkleri */
+export const FUNNEL_METRIC_VIVID_CLASS: Record<FunnelMetricKey, string> = {
+  arama: 'text-emerald-600 dark:text-emerald-400',
+  tanisma: 'text-sky-500 dark:text-sky-300',
+  sunum: 'text-violet-500 dark:text-violet-300',
+  yeniUye: 'text-amber-500 dark:text-amber-400',
+}
+
 type FunnelMetricLabelProps = {
   metric: FunnelMetricKey
   label: string
   iconClassName?: string
   className?: string
+  /** Hedefim gibi sayfalarda dark-safe vivid renkler */
+  vivid?: boolean
 }
 
-export function FunnelMetricLabel({ metric, label, iconClassName = 'h-4 w-4', className }: FunnelMetricLabelProps) {
+export function FunnelMetricLabel({
+  metric,
+  label,
+  iconClassName = 'h-4 w-4',
+  className,
+  vivid = false,
+}: FunnelMetricLabelProps) {
   const { Icon, color } = FUNNEL_METRIC_VISUAL[metric]
   return (
     <span className={clsx('inline-flex items-center gap-2', className)}>
-      <Icon className={clsx('shrink-0', iconClassName)} style={{ color }} strokeWidth={2} />
+      <Icon
+        className={clsx('shrink-0', iconClassName, vivid && FUNNEL_METRIC_VIVID_CLASS[metric])}
+        style={vivid ? undefined : { color }}
+        strokeWidth={2.25}
+      />
       <span>{label}</span>
     </span>
   )
@@ -37,13 +57,28 @@ type FunnelMetricCountProps = {
   metric: FunnelMetricKey
   value: number
   iconClassName?: string
+  vivid?: boolean
 }
 
-export function FunnelMetricCount({ metric, value, iconClassName = 'h-3 w-3' }: FunnelMetricCountProps) {
+export function FunnelMetricCount({
+  metric,
+  value,
+  iconClassName = 'h-3 w-3',
+  vivid = false,
+}: FunnelMetricCountProps) {
   const { Icon, color } = FUNNEL_METRIC_VISUAL[metric]
   return (
-    <span className="inline-flex items-center gap-1 tabular-nums text-[var(--text-3)]">
-      <Icon className={clsx('shrink-0', iconClassName)} style={{ color }} strokeWidth={2} />
+    <span
+      className={clsx(
+        'inline-flex items-center gap-1 tabular-nums',
+        vivid ? 'text-sm font-medium text-[var(--text-2)]' : 'text-[var(--text-3)]',
+      )}
+    >
+      <Icon
+        className={clsx('shrink-0', iconClassName, vivid && FUNNEL_METRIC_VIVID_CLASS[metric])}
+        style={vivid ? undefined : { color }}
+        strokeWidth={2.25}
+      />
       {value}
     </span>
   )

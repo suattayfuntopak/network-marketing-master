@@ -61,10 +61,11 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
 
   return (
     <HubPageShell
-      title={t('crown.weeklyTitle')}
+      title={t('dashboard.crownMockWeeklySummary')}
       subtitle={t('crown.weeklySubtitle')}
       icon={BarChart3}
       iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400"
+      backHref="/pano"
       onRefresh={refresh}
       refreshing={membersLoading || activityLoading || weeklySelfLoading}
       asTab={asTab}

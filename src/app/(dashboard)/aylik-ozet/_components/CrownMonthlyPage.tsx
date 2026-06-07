@@ -76,10 +76,11 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
 
   return (
     <HubPageShell
-      title={t('crown.monthlyTitle')}
+      title={t('dashboard.crownMockMonthlySummary')}
       subtitle={t('crown.monthlySubtitle')}
       icon={CalendarRange}
       iconClassName="bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400"
+      backHref="/pano"
       onRefresh={refresh}
       refreshing={membersLoading || activityLoading || entriesLoading || monthLoading}
       asTab={asTab}

@@ -7,7 +7,7 @@ const DATA_ROUTES = new Set([
   '/pano',
   '/pipeline',
   '/istatistikler',
-  '/bugun/ilgilen',
+  '/hedefim',
   '/ekip',
   '/takvim',
 ])

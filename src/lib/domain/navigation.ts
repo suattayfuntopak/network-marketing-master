@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, ScanEye, TrendingUp, Bot, Users,
-  CalendarDays, CalendarRange, BookOpen, Map,
+  CalendarDays, CalendarRange, BookOpen, Target,
   BarChart3, ClipboardList, Video,
   BarChart2, Crown, Ellipsis,
   type LucideIcon,
@@ -15,7 +15,7 @@ export type NavItem = {
 
 /** Pano mobil grid + sidebar modül listesi (6 kutu) */
 export const NAV_MODULE_ITEMS: readonly NavItem[] = [
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye },
+  { href: '/pano', translationKey: 'nav.todayFocus', icon: ScanEye },
   { href: '/pipeline',      translationKey: 'nav.pipeline',   icon: TrendingUp },
   { href: '/takvim',        translationKey: 'nav.takvim',   icon: CalendarDays },
   { href: '/ekip',          translationKey: 'nav.ekip',     icon: Users },
@@ -85,12 +85,12 @@ export function isNavMoreRouteActive(pathname: string): boolean {
 
 /** Pano — Crown Organizasyon: kişisel yolculuk kutuları (+ YZ Koçu, Vaktin Varsa). */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
-  { href: '/bugun/ilgilen?tab=roadmap', translationKey: 'dashboard.panoActionPlan', icon: Map, color: 'indigo', desktopColor: 'indigo' },
+  { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
   { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'purple', desktopColor: 'purple' },
-  { href: '/bugun/ilgilen?tab=weekly', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', desktopColor: 'teal' },
-  { href: '/bugun/ilgilen?tab=monthly', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'pink', desktopColor: 'pink' },
-  { href: '/bugun/ilgilen?tab=first30', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
-  { href: '/bugun/ilgilen?tab=live', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', desktopColor: 'blue' },
+  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', desktopColor: 'teal' },
+  { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'pink', desktopColor: 'pink' },
+  { href: '/ilk-30-gun', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
+  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'cyan', desktopColor: 'cyan' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'chick', desktopColor: 'chick' },
 ]

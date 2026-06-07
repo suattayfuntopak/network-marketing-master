@@ -85,7 +85,7 @@ export function DayCloseCard() {
         <p className="mb-3 text-xs text-[var(--text-2)]">
           {t('dashboard.dayClosePending', { count: daily.length + remaining })}
           {' — '}
-          <Link href="/bugun/ilgilen" className="font-semibold text-[#534AB7] hover:underline">
+          <Link href="/bugunku-takibim" className="font-semibold text-[#534AB7] hover:underline">
             {t('dashboard.seeAll')}
           </Link>
         </p>
@@ -110,7 +110,7 @@ export function DayCloseCard() {
       </button>
 
       <p className="mt-3 text-center text-xs text-[var(--text-3)]">
-        <Link href="/bugun/ilgilen#journal" className="font-medium text-[#534AB7] hover:underline">
+        <Link href="/bugunku-takibim" className="font-medium text-[#534AB7] hover:underline">
           {t('dashboard.dayCloseJournalLink')}
         </Link>
       </p>

@@ -29,7 +29,7 @@ export function HubPageShell({
   children,
   onRefresh,
   refreshing,
-  backHref = '/bugun/ilgilen',
+  backHref = '/pano',
   showRefresh = true,
   asTab = false,
 }: HubPageShellProps) {

@@ -8,6 +8,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import {
   FUNNEL_METRIC_ORDER,
+  FUNNEL_METRIC_VIVID_CLASS,
   FUNNEL_METRIC_VISUAL,
   FunnelMetricCount,
   FunnelMetricLabel,
@@ -113,7 +114,6 @@ export function HedefKart() {
   }
 
   const p = progress
-  const memberIcon = FUNNEL_METRIC_VISUAL.yeniUye
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
@@ -122,7 +122,7 @@ export function HedefKart() {
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] dark:bg-[#1e1b4b]">
             <Target className="h-5 w-5 text-[#534AB7] dark:text-[#a5b4fc]" strokeWidth={1.75} />
           </div>
-          <p className="text-sm font-bold leading-snug text-[var(--text-1)]">
+          <p className="text-base font-bold leading-snug text-[var(--text-1)]">
             {t('hedef.myGoalStatement', {
               people: goal!.targetPeople,
               months: goal!.targetMonths,
@@ -143,7 +143,7 @@ export function HedefKart() {
         </button>
       </div>
 
-      <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
+      <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
         {t('hedef.todayTitle')}
       </p>
 
@@ -161,10 +161,12 @@ export function HedefKart() {
                 <FunnelMetricLabel
                   metric={row.key}
                   label={t(row.labelKey)}
-                  className="text-sm font-medium leading-snug text-[var(--text-1)]"
+                  iconClassName="h-[18px] w-[18px]"
+                  vivid
+                  className="text-base font-medium leading-snug text-[var(--text-1)]"
                 />
-                <span className={clsx('shrink-0 text-xs font-semibold tabular-nums', done ? 'text-[#0F6E56]' : 'text-[var(--text-2)]')}>
-                  {done ? <Check className="mr-0.5 inline h-3 w-3" /> : null}
+                <span className={clsx('shrink-0 text-sm font-semibold tabular-nums', done ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-2)]')}>
+                  {done ? <Check className="mr-0.5 inline h-3.5 w-3.5" /> : null}
                   {actual} / {target}
                 </span>
               </div>
@@ -184,7 +186,7 @@ export function HedefKart() {
           <button
             type="button"
             onClick={() => setShowRoadmap(v => !v)}
-            className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
+            className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
           >
             {t('hedef.roadmapTitle')}
             <ChevronDown className={clsx('h-4 w-4 transition-transform', showRoadmap && 'rotate-180')} />
@@ -193,6 +195,7 @@ export function HedefKart() {
             <ul className="mt-2 max-h-[min(24rem,50vh)] space-y-2 overflow-y-auto pr-0.5">
               {roadmap.map(s => {
                 const isCurrent = p && s.month === p.monthIndex
+                const MemberIcon = FUNNEL_METRIC_VISUAL.yeniUye.Icon
                 return (
                   <li
                     key={s.month}
@@ -203,24 +206,27 @@ export function HedefKart() {
                         : 'border-[var(--border)] bg-[var(--bg-subtle)]/60',
                     )}
                   >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-sm font-bold text-white">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-base font-bold text-white">
                       {s.month}
                     </span>
-                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5 text-xs leading-tight">
+                    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-1.5 gap-y-1 text-sm leading-snug">
                       <span className="font-semibold text-[var(--text-1)]">
-                        {t('hedef.roadmapTeamSize', { n: s.teamSize })}
+                        {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
                       </span>
-                      <span className="hidden text-[var(--text-3)] sm:inline">·</span>
-                      <FunnelMetricCount metric="arama" value={s.monthly.arama} />
-                      <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} />
-                      <FunnelMetricCount metric="sunum" value={s.monthly.sunum} />
-                      <span className="hidden text-[var(--text-3)] sm:inline">·</span>
-                      <span className="inline-flex items-center gap-1 text-[var(--text-2)]">
+                      <span className="text-[var(--text-3)]" aria-hidden>
+                        ·
+                      </span>
+                      <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-4 w-4" vivid />
+                      <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-4 w-4" vivid />
+                      <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-4 w-4" vivid />
+                      <span className="text-[var(--text-3)]" aria-hidden>
+                        ·
+                      </span>
+                      <span className="inline-flex items-center gap-1 font-medium text-[var(--text-2)]">
                         {t('hedef.roadmapNewMembers', { n: s.newMembers })}
-                        <memberIcon.Icon
-                          className="h-3 w-3 shrink-0"
-                          style={{ color: memberIcon.color }}
-                          strokeWidth={2}
+                        <MemberIcon
+                          className={clsx('h-4 w-4 shrink-0', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
+                          strokeWidth={2.25}
                         />
                       </span>
                     </div>

@@ -95,7 +95,7 @@ export function DailyTrackPage() {
     >
       {goal && progress?.hasGoal ? (
         <Link
-          href="/bugun/ilgilen?tab=roadmap"
+          href="/hedefim"
           className={clsx(
             'flex items-start gap-3 rounded-2xl border px-4 py-3 transition',
             dailyTrackAccent.banner,

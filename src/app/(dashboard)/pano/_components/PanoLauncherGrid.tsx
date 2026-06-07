@@ -5,34 +5,18 @@ import { SquareButton } from '@/components/ui/SquareButton'
 import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { useUserGoal } from '@/hooks/useUserGoal'
-import { useVideoCatalog } from '@/hooks/useVideoCatalog'
-import { usePanoHubBadges } from '@/hooks/usePanoHubBadges'
 import { PANO_ORGANIZATION_ITEMS } from '@/lib/domain/navigation'
-import { getPanoLauncherBadge } from '@/lib/domain/panoProgress'
 
 export function PanoLauncherGrid() {
   const { t } = useTranslation()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { progress } = useUserGoal()
-  const { data: videoCatalog } = useVideoCatalog()
-  const { weekly, monthly, first30ActiveCount } = usePanoHubBadges()
   const items = PANO_ORGANIZATION_ITEMS
-
-  const badgeCtx = {
-    progress,
-    videoSummary: videoCatalog?.summary,
-    weekly,
-    monthly,
-    first30ActiveCount,
-  }
 
   return (
     <>
       <LauncherGrid fillViewport itemCount={items.length}>
         {items.map(({ href, translationKey, icon, color }) => {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
-          const badge = getPanoLauncherBadge(href, badgeCtx, t)
 
           return (
             <LauncherGridItem key={href} fillViewport>
@@ -45,7 +29,6 @@ export function PanoLauncherGrid() {
                 onClick={isAiLocked ? () => openUpgrade('ai_coach') : undefined}
                 prominent
                 fill
-                badge={badge}
               />
               {isAiLocked && (
                 <span
