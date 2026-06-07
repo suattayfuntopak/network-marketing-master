@@ -521,9 +521,6 @@ export function ProvaForm() {
         <h2 className="text-base font-bold text-[var(--text-1)]">
           {t('coachUi.selectScenarioTitle')}
         </h2>
-        <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed max-w-md mx-auto">
-          {t('coachUi.introDesc')}
-        </p>
         {!isSuperAdmin && (
           <p className="mt-2.5 text-sm font-bold text-[var(--text-3)]">
             {t('coachUi.dailyRoleplayQuota', { used: roleplayUsed, limit: roleplayLimit })}

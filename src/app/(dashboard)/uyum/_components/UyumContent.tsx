@@ -228,28 +228,28 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
         )}
 
         {/* Tab Selector */}
-        <div className="flex rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)] max-w-md mx-auto">
+        <div className="flex w-full max-w-md mx-auto rounded-xl bg-[var(--bg-subtle)] p-1 border border-[var(--border)]">
           <button
             onClick={() => setActiveTab('auditor')}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-2 rounded-lg py-2 px-1.5 text-[11px] sm:text-sm font-bold leading-tight transition-all cursor-pointer ${
               activeTab === 'auditor'
                 ? 'bg-[var(--bg-card)] text-[#C03E1F] shadow-sm border border-[var(--border)]'
                 : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
             }`}
           >
-            <Sparkles className="h-4 w-4" />
-            {t('compliancePage.aiComplianceAuditor')}
+            <Sparkles className="hidden sm:block h-4 w-4 shrink-0" />
+            <span className="text-center whitespace-nowrap">{t('compliancePage.aiComplianceAuditor')}</span>
           </button>
           <button
             onClick={() => setActiveTab('library')}
-            className={`flex-1 flex items-center justify-center gap-2 rounded-lg py-2 text-sm font-bold transition-all cursor-pointer ${
+            className={`flex-1 min-w-0 flex items-center justify-center gap-1 sm:gap-2 rounded-lg py-2 px-1.5 text-[11px] sm:text-sm font-bold leading-tight transition-all cursor-pointer ${
               activeTab === 'library'
                 ? 'bg-[var(--bg-card)] text-[#C03E1F] shadow-sm border border-[var(--border)]'
                 : 'text-[var(--text-2)] hover:text-[var(--text-1)]'
             }`}
           >
-            <HelpCircle className="h-4 w-4" />
-            {t('compliancePage.guidelinesLibrary')}
+            <HelpCircle className="hidden sm:block h-4 w-4 shrink-0" />
+            <span className="text-center whitespace-nowrap">{t('compliancePage.guidelinesLibrary')}</span>
           </button>
         </div>
 

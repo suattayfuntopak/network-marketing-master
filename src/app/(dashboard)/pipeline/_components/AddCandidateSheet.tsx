@@ -131,15 +131,17 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
   return (
     <>
       <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/30 backdrop-blur-sm`} onClick={onClose} />
-      <div className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl`} style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}>
-        <div className="mb-5 flex items-center justify-between">
+      <div
+        className={`fixed left-1/2 top-1/2 ${Z.sheet} flex w-[calc(100%-2rem)] max-w-sm max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-[var(--bg-card)] shadow-2xl`}
+      >
+        <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-6 py-4">
           <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Aday Ekle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Profil Fotoğrafı Upload UI */}
+        <div className="flex-1 overflow-y-auto overscroll-contain px-6 py-5">
         <div className="mb-5">
           <label className={labelClass}>Profil Fotoğrafı</label>
           <div className="flex items-center gap-4">
@@ -249,6 +251,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             ) : 'Aday Ekle'}
           </button>
         </form>
+        </div>
       </div>
     </>
   )

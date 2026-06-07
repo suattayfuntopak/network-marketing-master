@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 
-export type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow'
+export type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow' | 'peach'
 export type ButtonVariant = 'filled' | 'crown'
 
 // ─── Filled variant: colored background ──────────────────────────────────────
@@ -19,6 +19,7 @@ const colorMap: Record<ButtonColor, string> = {
   indigo: 'bg-[#EEF2FF] text-[#3730A3] hover:bg-[#E0E7FF] dark:bg-[#1e1b4b] dark:text-[#a5b4fc] dark:hover:bg-[#272060]',
   cyan:   'bg-[#ECFEFF] text-[#0891B2] hover:bg-[#CFFAFE] dark:bg-[#083344] dark:text-[#22D3EE] dark:hover:bg-[#164E63]',
   yellow: 'bg-[#FEF9C3] text-[#854D0E] hover:bg-[#FEF08A] dark:bg-[#453A0B] dark:text-[#FACC15] dark:hover:bg-[#5C4D0E]',
+  peach:  'bg-[#FFE8D6] text-[#9A4D0A] hover:bg-[#FFD9BD] dark:bg-[#4a2800] dark:text-[#fdba74] dark:hover:bg-[#5c3200]',
 }
 
 const filledClass = (
@@ -55,6 +56,7 @@ const crownSolidMap: Record<ButtonColor, string> = {
   indigo: 'bg-gradient-to-br from-[#9D81FF] to-[#5D44C9] text-white hover:brightness-105',
   cyan:   'bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white hover:brightness-105',
   yellow: 'bg-gradient-to-br from-[#FFD54B] to-[#FF9A00] text-white hover:brightness-105',
+  peach:  'bg-gradient-to-br from-[#FFD4A8] to-[#FFAB5C] text-white hover:brightness-105',
 }
 
 const crownClass = (

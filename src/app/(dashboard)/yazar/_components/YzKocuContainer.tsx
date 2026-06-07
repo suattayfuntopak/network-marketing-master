@@ -62,12 +62,12 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
             aria-selected={activeTab === key}
             onClick={() => selectTab(key)}
             className={clsx(
-              'flex min-w-[4.5rem] flex-1 items-center justify-center gap-1 sm:gap-2 rounded-xl py-2.5 px-2 text-[11px] sm:text-sm font-semibold transition-all duration-200 active:scale-[0.98] shrink-0',
+              'flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 sm:flex-row sm:gap-2 rounded-xl py-2 px-1 sm:py-2.5 sm:px-2 text-[10px] sm:text-sm font-semibold leading-tight transition-all duration-200 active:scale-[0.98]',
               activeTab === key ? activeClass : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
             )}
           >
             <Icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{t(labelKey)}</span>
+            <span className="text-center whitespace-normal line-clamp-2">{t(labelKey)}</span>
           </button>
         ))}
       </div>

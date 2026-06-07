@@ -327,7 +327,11 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
             className={`fixed inset-0 ${Z.confirmBackdrop} bg-black/60 backdrop-blur-sm`}
             onClick={() => setSelected(null)}
           />
-          <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-[27rem] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)] overflow-hidden`}>
+          <div className={`fixed inset-0 ${Z.confirm} flex items-center justify-center p-4`}>
+            <div
+              className="w-full max-w-[27rem] rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)] overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
             {/* Renkli Üst Şerit */}
             <div className={`h-1.5 w-full ${
               selected.icon === 'calendar' ? 'bg-gradient-to-r from-[#0F6E56] to-emerald-400' :
@@ -353,12 +357,12 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
               </p>
 
               {/* Okundu rozeti + aksiyon */}
-              <div className="mt-4 flex items-center justify-between gap-2">
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-[#0F6E56]">
                   <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                   Okundu olarak işaretlendi
                 </span>
-                <div className="flex shrink-0 items-center gap-1.5">
+                <div className="flex flex-wrap items-center justify-end gap-2">
                   {selected.candidate_id && (
                     <button
                       type="button"
@@ -383,6 +387,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                   </button>
                 </div>
               </div>
+            </div>
             </div>
           </div>
         </>

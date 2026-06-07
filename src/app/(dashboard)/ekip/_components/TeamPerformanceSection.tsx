@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, type ComponentType } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   Crown, Check, TrendingUp, BarChart2, Rocket, Bot,
   Phone, Search, BarChart3, Target,
@@ -18,6 +19,8 @@ import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
+import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -155,6 +158,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const queryClient = useQueryClient()
   const [now] = useState(() => Date.now())
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
   const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
@@ -266,6 +270,17 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   }
 
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
+
+  const prefetchMemberActivity = useCallback((userId: string) => {
+    const periods: SheetActivityPeriod[] = ['today', '7d', '30d']
+    for (const p of periods) {
+      void queryClient.prefetchQuery({
+        queryKey: ['member-activity', ws.workspaceId, userId, p],
+        queryFn: () => getMemberActivityDetailAction(ws.workspaceId, userId, p),
+        staleTime: 15_000,
+      })
+    }
+  }, [queryClient, ws.workspaceId])
 
   const selectFieldTab = (userId: string, tab: FieldCardTab) => {
     setFieldCardTab(prev => {
@@ -551,7 +566,11 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                             title={label}
                             onClick={e => {
                               e.stopPropagation()
+                              if (id === 'activity') prefetchMemberActivity(m.user_id)
                               selectMemberTab(m.user_id, id)
+                            }}
+                            onPointerEnter={() => {
+                              if (id === 'activity') prefetchMemberActivity(m.user_id)
                             }}
                             className={clsx(
                               'flex h-10 flex-1 items-center justify-center rounded-lg transition-all cursor-pointer',

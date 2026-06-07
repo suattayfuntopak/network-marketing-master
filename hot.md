@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-07 — Mobil UX düzeltmeleri + pano renk swap ✅
+
+**YZ Koçu:** Üst sekmeler mobilde iki satır (truncate kaldırıldı); uyum alt sekmeleri tek satır; gereksiz alt başlıklar kaldırıldı (sayfa, koçluk, saha provası).
+
+**Mobil popup'lar:** Yeni Aday Ekle, YZ davet mesajı ve bildirim detayı dikey ortalı; sticky başlık + kapat; bildirim footer mobilde wrap.
+
+**Ekibim aktiviteler:** Metrik sorguları paralel; aktivite sekmesinde hover/tık prefetch.
+
+**Pano renkleri:** Hızlı Bakış → pastel turuncu (`peach`); YZ Koçu → eski Hızlı Bakış gökyüzü mavisi (`purple`).
+
+**Dosyalar:** `YzKocuContainer.tsx`, `yazar/page.tsx`, `KoclukForm.tsx`, `ProvaForm.tsx`, `UyumContent.tsx`, `AddCandidateSheet.tsx`, `NmmInviteSheet.tsx`, `NotificationsModal.tsx`, `teamActivityActions.ts`, `TeamPerformanceSection.tsx`, `SquareButton.tsx`, `navigation.ts`
+
 ## 2026-06-07 — Pano Ekibim ↔ Vaktin Varsa renk swap ✅
 
 **PANO_LAUNCHER_ITEMS:** Ekibim → mor gradient (`indigo`), Vaktin Varsa → turuncu gradient (`amber`).

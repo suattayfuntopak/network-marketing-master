@@ -62,10 +62,9 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
     <>
       <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/40 backdrop-blur-sm`} onClick={onClose} />
       <div
-        className={`fixed left-1/2 top-4 md:top-1/2 ${Z.sheet} w-[calc(100%-2rem)] md:w-[440px] -translate-x-1/2 translate-y-0 md:-translate-y-1/2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl`}
-        style={{ maxHeight: 'calc(100dvh - 5.5rem)', overflowY: 'auto' }}
+        className={`fixed left-1/2 top-1/2 ${Z.sheet} flex w-[calc(100%-2rem)] md:w-[440px] max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl`}
       >
-        <div className="mb-4 flex items-start justify-between gap-3 border-b border-[var(--border)] pb-3">
+        <div className="sticky top-0 z-10 flex shrink-0 items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4">
           <div className="flex min-w-0 items-center gap-2">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]/10 text-[#534AB7] dark:text-indigo-300">
               <Bot className="h-4.5 w-4.5" />
@@ -87,6 +86,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
           </button>
         </div>
 
+        <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-5">
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-10 text-[var(--text-3)]">
             <Loader2 className="h-7 w-7 animate-spin text-[#534AB7]" />
@@ -153,6 +153,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
             </div>
           </div>
         )}
+        </div>
       </div>
     </>
   )

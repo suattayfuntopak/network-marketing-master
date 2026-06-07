@@ -24,9 +24,6 @@ export default function YazarPage({ searchParams }: PageProps) {
             <h1 className="text-xl font-bold text-[var(--text-1)]">
               {t('coachUi.pageTitle')}
             </h1>
-            <p className="text-sm text-[var(--text-2)]">
-              {t('coachUi.pageSubtitle')}
-            </p>
           </div>
         </header>
         <YzKocuContainer initialName={name ?? ''} initialNote={note ?? ''} initialWarmth={warmth ?? 'ilik'} />

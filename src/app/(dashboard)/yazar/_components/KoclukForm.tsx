@@ -97,9 +97,6 @@ export function KoclukForm() {
           <p className="text-sm font-bold text-[#3730A3] dark:text-[#c7d2fe]">
             {t('coachUi.askYourCoachTitle')}
           </p>
-          <p className="text-xs text-[#3730A3]/70 dark:text-[#c7d2fe] mt-0.5 font-medium">
-            {t('coachUi.askYourCoachDesc')}
-          </p>
         </div>
       </div>
 

@@ -187,6 +187,7 @@ export async function getMemberActivityDetailAction(
 
   const pulsePeriod: PulsePeriod = period
   const startIso = periodStartIso(pulsePeriod)
+  const pulseEnabled = hasTeamPulseAccess(licenseType, isSuperAdmin(user))
 
   let actionsQuery = supabase
     .from('nmm_daily_actions')
@@ -197,7 +198,36 @@ export async function getMemberActivityDetailAction(
     actionsQuery = actionsQuery.gte('created_at', startIso)
   }
 
-  const { data: actions } = await actionsQuery
+  let candidatesQuery = supabase
+    .from('nmm_candidates')
+    .select('created_at')
+    .eq('owner_id', memberUserId)
+
+  if (startIso) {
+    candidatesQuery = candidatesQuery.gte('created_at', startIso)
+  }
+
+  const [actionsResult, candidatesResult, pulseBundle] = await Promise.all([
+    actionsQuery,
+    candidatesQuery,
+    pulseEnabled
+      ? Promise.all([
+          supabase
+            .from('nmm_user_progress')
+            .select('read_trainings, read_objections')
+            .eq('user_id', memberUserId)
+            .maybeSingle(),
+          supabase
+            .from('nmm_onboarding_progress')
+            .select('step_id')
+            .eq('user_id', memberUserId),
+          getTeamVideoSummaryMapAction([memberUserId]),
+        ])
+      : Promise.resolve(null),
+  ])
+
+  const { data: actions } = actionsResult
+  const { data: newCandidates } = candidatesResult
 
   const activeDays = new Set<string>()
   const detail: MemberActivityDetail = { ...empty }
@@ -223,38 +253,15 @@ export async function getMemberActivityDetailAction(
     }
   }
   detail.activeDays = activeDays.size
-
-  let candidatesQuery = supabase
-    .from('nmm_candidates')
-    .select('created_at')
-    .eq('owner_id', memberUserId)
-
-  if (startIso) {
-    candidatesQuery = candidatesQuery.gte('created_at', startIso)
-  }
-
-  const { data: newCandidates } = await candidatesQuery
   detail.newCandidates = newCandidates?.length ?? 0
 
-  if (hasTeamPulseAccess(licenseType, isSuperAdmin(user))) {
-    const [{ data: progressRow }, { data: onboardingRows }] = await Promise.all([
-      supabase
-        .from('nmm_user_progress')
-        .select('read_trainings, read_objections')
-        .eq('user_id', memberUserId)
-        .maybeSingle(),
-      supabase
-        .from('nmm_onboarding_progress')
-        .select('step_id')
-        .eq('user_id', memberUserId),
-    ])
-
+  if (pulseBundle) {
+    const [{ data: progressRow }, { data: onboardingRows }, videoMap] = pulseBundle
     const learning = parseLearningProgress(progressRow)
     detail.trainingPct = learning.trainingPct
     detail.objectionPct = learning.objectionPct
     detail.onboardingDone = onboardingRows?.length ?? 0
 
-    const videoMap = await getTeamVideoSummaryMapAction([memberUserId])
     const video = videoMap[memberUserId]
     if (video) {
       detail.videoPct = video.pct
