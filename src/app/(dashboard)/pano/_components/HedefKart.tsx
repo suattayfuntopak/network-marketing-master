@@ -217,7 +217,7 @@ export function HedefKart() {
                           <span className="shrink-0 font-semibold text-[var(--text-1)] md:hidden">
                             {t('hedef.roadmapTeamGoalMobile', { n: s.teamSize })}
                           </span>
-                          <span className="shrink-0 text-[var(--text-3)]" aria-hidden>
+                          <span className="shrink-0 text-[var(--text-3)] md:hidden" aria-hidden>
                             ·
                           </span>
                           <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
