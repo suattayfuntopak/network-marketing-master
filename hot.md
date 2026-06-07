@@ -14,6 +14,8 @@
 
 **Deploy:** Migration yok; Supabase değişikliği yok.
 
+**Git:** `1bdcaac` — push `main`
+
 **Dosyalar:** `featureAccess.ts`, `accountLifecycle.ts`, `checkQuota.ts`, `UpgradePrompt.tsx`, `useUpgradePrompt.tsx`, `PanoTodaySummary.tsx`, `PanoContent.tsx`, `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx`, `EkipTabNav.tsx`, `EkipPanel.tsx`, `TeamGenerationTree.tsx`, `ekibim/page.tsx`, çeviri `tr.ts`/`en.ts`, `shell.ts`
 
 ## 2026-06-07 — Vaktin Varsa chick sarısı koyulaştırıldı ✅
