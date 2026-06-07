@@ -643,6 +643,7 @@ export interface Database {
           log_date: string
           calls: number
           contacts: number
+          pipeline_adds: number
           presentations: number
           new_members: number
           updated_at: string
@@ -652,6 +653,7 @@ export interface Database {
           log_date: string
           calls?: number
           contacts?: number
+          pipeline_adds?: number
           presentations?: number
           new_members?: number
           updated_at?: string
@@ -661,6 +663,7 @@ export interface Database {
           log_date?: string
           calls?: number
           contacts?: number
+          pipeline_adds?: number
           presentations?: number
           new_members?: number
           updated_at?: string

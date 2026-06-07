@@ -15,6 +15,8 @@ type HubPageShellProps = {
   onRefresh?: () => void
   refreshing?: boolean
   backHref?: string
+  /** Sağ üst yenile butonu (varsayılan: true) */
+  showRefresh?: boolean
   /** Tab içinde kullanıldığında true — shell başlığı/back butonu gizlenir */
   asTab?: boolean
 }
@@ -28,6 +30,7 @@ export function HubPageShell({
   onRefresh,
   refreshing,
   backHref = '/bugun/ilgilen',
+  showRefresh = true,
   asTab = false,
 }: HubPageShellProps) {
   const { t } = useTranslation()
@@ -83,15 +86,17 @@ export function HubPageShell({
               ) : null}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] disabled:opacity-60"
-          >
-            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            {t('crown.refresh')}
-          </button>
+          {showRefresh ? (
+            <button
+              type="button"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] disabled:opacity-60"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+              {t('crown.refresh')}
+            </button>
+          ) : null}
         </header>
         {children}
       </div>

@@ -2,6 +2,7 @@
 
 import { Minus, Plus } from 'lucide-react'
 import { clsx } from 'clsx'
+import { dailyTrackAccent } from './dailyTrackTheme'
 
 type Props = {
   label: string
@@ -24,7 +25,7 @@ export function DailyMetricRow({ label, value, targetLabel, onChange }: Props) {
             type="button"
             onClick={() => bump(-1)}
             aria-label={`${label} −1`}
-            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:bg-[var(--bg-card)] active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
+            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:border-[#0095DD]/30 hover:bg-[#54C1F0]/10 active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
           >
             <Minus className="h-4 w-4" strokeWidth={2.25} />
           </button>
@@ -35,13 +36,16 @@ export function DailyMetricRow({ label, value, targetLabel, onChange }: Props) {
             max={9999}
             value={value}
             onChange={e => onChange(Math.min(9999, Math.max(0, parseInt(e.target.value, 10) || 0)))}
-            className="h-11 w-full max-w-[5.5rem] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-center text-xl font-bold tabular-nums text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] sm:h-10"
+            className={clsx(
+              'h-11 w-full max-w-[5.5rem] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-center text-xl font-bold tabular-nums text-[var(--text-1)] outline-none focus:ring-2 sm:h-10',
+              dailyTrackAccent.inputFocus,
+            )}
           />
           <button
             type="button"
             onClick={() => bump(1)}
             aria-label={`${label} +1`}
-            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:bg-[var(--bg-card)] active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
+            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:border-[#0095DD]/30 hover:bg-[#54C1F0]/10 active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
           >
             <Plus className="h-4 w-4" strokeWidth={2.25} />
           </button>
