@@ -1,34 +1,40 @@
 'use client'
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useSearchParams } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { CalendarPeriodIcon } from '@/components/ui/CalendarPeriodIcon'
 import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
+import { HubPeriodNavigator } from '@/lib/ui/hub/HubPeriodNavigator'
 import { HubMonthHero } from '@/lib/ui/hub/HubMonthHero'
 import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/lib/ui/hub/HubSelfActivityGrid'
 import { HubPipelineStageTable } from '@/lib/ui/hub/HubPipelineStageTable'
 import { getHubMonthlyInsightsAction, getHubMonthlySelfAction } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
+import { parsePeriodOffset } from '@/lib/utils/hubPeriodRange'
 
 export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
+  const searchParams = useSearchParams()
+  const offset = parsePeriodOffset(searchParams.get('offset'))
 
   const { data: monthlySelf, isLoading: monthlySelfLoading } = useQuery({
-    queryKey: queryKeys.hubMonthlySelf(),
-    queryFn: getHubMonthlySelfAction,
+    queryKey: queryKeys.hubMonthlySelf(offset),
+    queryFn: () => getHubMonthlySelfAction(offset),
     staleTime: 60_000,
     placeholderData: keepPreviousData,
   })
 
   const { data: monthInsights, isLoading: monthInsightsLoading } = useQuery({
-    queryKey: queryKeys.hubMonthlyInsights(),
+    queryKey: queryKeys.hubMonthlyInsights(offset),
     queryFn: getHubMonthlyInsightsAction,
     staleTime: 60_000,
     placeholderData: keepPreviousData,
+    enabled: offset === 0,
   })
 
-  const heroLoading = (monthlySelfLoading || monthInsightsLoading) && !monthlySelf && !monthInsights
+  const heroLoading = (monthlySelfLoading || (offset === 0 && monthInsightsLoading)) && !monthlySelf
 
   return (
     <HubPageShell
@@ -40,12 +46,16 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
       asTab={asTab}
     >
       <div className="space-y-4">
+        <HubPeriodNavigator
+          mode="month"
+          accentClass="border-pink-300/50 bg-pink-50 dark:border-pink-500/30 dark:bg-pink-950/25"
+        />
         <HubMonthHero
           loginDays={monthlySelf?.loginDays ?? 0}
           dayOfMonth={monthlySelf?.dayOfMonth ?? monthInsights?.dayOfMonth ?? 1}
           daysInMonth={monthlySelf?.daysInMonth ?? monthInsights?.daysInMonth ?? 30}
           monthPct={monthlySelf?.monthPct ?? monthInsights?.monthPct ?? 0}
-          insights={monthInsights}
+          insights={offset === 0 ? monthInsights : undefined}
           loading={heroLoading}
         />
         <HubCrownFunnelGrid

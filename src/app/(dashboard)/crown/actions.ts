@@ -21,6 +21,7 @@ import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, istanbulDayStartIso } from '@/lib/utils/calendarDates'
+import { rollingWeekRange, monthRange } from '@/lib/utils/hubPeriodRange'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -28,12 +29,9 @@ function todayStartIso(): string {
   return istanbulDayStartIso(todayCalendarKey())
 }
 
-/** Son 7 takvim günü (bugün dahil) — dönem başlangıcı. */
+/** @deprecated rollingWeekRange(0) kullanın */
 function last7CalendarDaysStartIso(): string {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  d.setDate(d.getDate() - 6)
-  return d.toISOString()
+  return rollingWeekRange(0).sinceIso
 }
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
@@ -394,39 +392,55 @@ export type HubMonthlySelfPayload = {
   pipelineStages: HubPipelineStageCounts
 }
 
-async function loginDaysSince(userId: string, since: string): Promise<{ count: number; weekActive: boolean[] }> {
+async function loginDaysInWindow(
+  userId: string,
+  since: string,
+  until: string,
+  windowStart: Date,
+  windowEnd: Date,
+): Promise<{ count: number; weekActive: boolean[] }> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('nmm_daily_actions')
     .select('created_at')
     .eq('user_id', userId)
     .gte('created_at', since)
+    .lte('created_at', until)
 
   const daySet = new Set<string>()
   for (const row of data ?? []) {
     daySet.add(row.created_at.slice(0, 10))
   }
 
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
   const weekActive: boolean[] = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  const cursor = new Date(windowStart)
+  cursor.setHours(0, 0, 0, 0)
+  const end = new Date(windowEnd)
+  end.setHours(0, 0, 0, 0)
+  while (cursor <= end) {
+    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
     weekActive.push(daySet.has(key))
+    cursor.setDate(cursor.getDate() + 1)
   }
 
   return { count: weekActive.filter(Boolean).length, weekActive }
 }
 
-async function loginDaysInRange(userId: string, since: string): Promise<number> {
+async function loginDaysSince(userId: string, since: string): Promise<{ count: number; weekActive: boolean[] }> {
+  const range = rollingWeekRange(0)
+  return loginDaysInWindow(userId, since, range.untilIso, range.startDate, range.endDate)
+}
+
+async function loginDaysInRange(userId: string, since: string, until?: string): Promise<number> {
   const supabase = await createClient()
-  const { data } = await supabase
+  let query = supabase
     .from('nmm_daily_actions')
     .select('created_at')
     .eq('user_id', userId)
     .gte('created_at', since)
+  if (until) query = query.lte('created_at', until)
+
+  const { data } = await query
 
   const daySet = new Set<string>()
   for (const row of data ?? []) {
@@ -439,6 +453,7 @@ async function selfFieldMetricsSince(
   userId: string,
   workspaceId: string | null,
   since: string | null,
+  until?: string | null,
 ): Promise<HubSelfFieldMetrics> {
   const supabase = await createClient()
 
@@ -448,6 +463,7 @@ async function selfFieldMetricsSince(
     .eq('user_id', userId)
 
   if (since) actionsQuery = actionsQuery.gte('created_at', since)
+  if (until) actionsQuery = actionsQuery.lte('created_at', until)
 
   let candidatesQuery = supabase
     .from('nmm_candidates')
@@ -456,6 +472,7 @@ async function selfFieldMetricsSince(
 
   if (workspaceId) candidatesQuery = candidatesQuery.eq('workspace_id', workspaceId)
   if (since) candidatesQuery = candidatesQuery.gte('created_at', since)
+  if (until) candidatesQuery = candidatesQuery.lte('created_at', until)
 
   const [{ data: actions }, { data: newCandidates }] = await Promise.all([
     actionsQuery,
@@ -519,27 +536,32 @@ async function pipelineStageCountsForUser(
 async function funnelActualsSince(
   userId: string,
   since: string,
+  until?: string,
 ): Promise<FunnelCounts> {
   const supabase = await createClient()
-  const [callsRes, stageRes, newCandRes] = await Promise.all([
-    supabase
-      .from('nmm_daily_actions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', userId)
-      .eq('action_type', 'call')
-      .gte('created_at', since),
-    supabase
-      .from('nmm_daily_actions')
-      .select('note')
-      .eq('user_id', userId)
-      .eq('action_type', 'stage_change')
-      .gte('created_at', since),
-    supabase
-      .from('nmm_candidates')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', userId)
-      .gte('created_at', since),
-  ])
+  let callsQuery = supabase
+    .from('nmm_daily_actions')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('action_type', 'call')
+    .gte('created_at', since)
+  let stageQuery = supabase
+    .from('nmm_daily_actions')
+    .select('note')
+    .eq('user_id', userId)
+    .eq('action_type', 'stage_change')
+    .gte('created_at', since)
+  let newCandQuery = supabase
+    .from('nmm_candidates')
+    .select('id', { count: 'exact', head: true })
+    .eq('owner_id', userId)
+    .gte('created_at', since)
+  if (until) {
+    callsQuery = callsQuery.lte('created_at', until)
+    stageQuery = stageQuery.lte('created_at', until)
+    newCandQuery = newCandQuery.lte('created_at', until)
+  }
+  const [callsRes, stageRes, newCandRes] = await Promise.all([callsQuery, stageQuery, newCandQuery])
   let sunum = 0
   let yeniUye = 0
   for (const row of stageRes.data ?? []) {
@@ -555,10 +577,11 @@ async function funnelActualsSince(
   }
 }
 
-export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
+export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfPayload> {
   const progress = await getDailyProgressAction()
   const { user } = await getAuthUser()
   const workspaceId = await resolveWorkspaceId()
+  const range = rollingWeekRange(offset)
 
   if (!user) {
     return {
@@ -574,11 +597,12 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
     }
   }
 
-  const since = last7CalendarDaysStartIso()
+  const since = range.sinceIso
+  const until = range.untilIso
   const [weeklyActuals, loginInfo, fieldMetrics, pipelineStages] = await Promise.all([
-    funnelActualsSince(user.id, since),
-    loginDaysSince(user.id, since),
-    selfFieldMetricsSince(user.id, workspaceId, since),
+    funnelActualsSince(user.id, since, until),
+    loginDaysInWindow(user.id, since, until, range.startDate, range.endDate),
+    selfFieldMetricsSince(user.id, workspaceId, since, until),
     pipelineStageCountsForUser(user.id, workspaceId),
   ])
 
@@ -620,15 +644,14 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
   }
 }
 
-export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> {
+export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySelfPayload> {
   const progress = await getDailyProgressAction()
   const { user } = await getAuthUser()
   const workspaceId = await resolveWorkspaceId()
-  const now = new Date()
-  const dayOfMonth = now.getDate()
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const monthPct = Math.round((dayOfMonth / daysInMonth) * 100)
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+  const range = monthRange(offset)
+  const { dayOfMonth, daysInMonth, monthPct } = range
+  const monthStart = range.sinceIso
+  const monthEnd = range.untilIso
 
   if (!user) {
     return {
@@ -645,9 +668,9 @@ export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> 
   }
 
   const [monthlyActuals, loginDays, fieldMetrics, pipelineStages] = await Promise.all([
-    funnelActualsSince(user.id, monthStart),
-    loginDaysInRange(user.id, monthStart),
-    selfFieldMetricsSince(user.id, workspaceId, monthStart),
+    funnelActualsSince(user.id, monthStart, monthEnd),
+    loginDaysInRange(user.id, monthStart, monthEnd),
+    selfFieldMetricsSince(user.id, workspaceId, monthStart, monthEnd),
     pipelineStageCountsForUser(user.id, workspaceId),
   ])
 

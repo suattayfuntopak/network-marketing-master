@@ -117,8 +117,8 @@ export function HedefKart() {
 
   return (
     <div className="space-y-5">
-      <section className="flex items-start justify-between gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 sm:gap-3 sm:px-4">
-        <p className="min-w-0 flex-1 text-xs font-semibold leading-snug text-[var(--text-1)] sm:text-sm md:text-base md:font-medium">
+      <section className="flex items-center justify-between gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 sm:gap-3 sm:px-4">
+        <p className="min-w-0 flex-1 truncate whitespace-nowrap text-[13px] font-semibold leading-none text-[var(--text-1)] sm:text-sm md:text-base md:font-medium">
           {t('hedef.myGoalStatement', {
             people: goal!.targetPeople,
             months: goal!.targetMonths,

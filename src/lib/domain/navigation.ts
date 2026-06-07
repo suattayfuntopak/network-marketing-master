@@ -11,19 +11,19 @@ export type NavItem = {
   readonly href: string
   readonly translationKey: string
   readonly icon: LucideIcon
+  /** Sidebar / alt nav — ajanda ikonu (7 haftalık, 30 aylık) */
+  readonly calendarPeriod?: 7 | 30
 }
 
 export type PanoLauncherItem = NavItem & {
   color: ButtonColor
   desktopColor?: ButtonColor
 }
-
-/** Pano — kişisel yolculuk + araç kutuları (12 adet, 4×3 / mobil 2×6). */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
   { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'teal', desktopColor: 'teal' },
-  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'purple', desktopColor: 'purple' },
-  { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'rose', desktopColor: 'rose' },
+  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'purple', desktopColor: 'purple', calendarPeriod: 7 },
+  { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'rose', desktopColor: 'rose', calendarPeriod: 30 },
   { href: '/ilk-30-gun', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
@@ -37,8 +37,8 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
 /** @deprecated Pano artık PANO_ORGANIZATION_ITEMS kullanır */
 export const PANO_LAUNCHER_ITEMS = PANO_ORGANIZATION_ITEMS
 
-function panoToNavItem({ href, translationKey, icon }: PanoLauncherItem): NavItem {
-  return { href, translationKey, icon }
+function panoToNavItem({ href, translationKey, icon, calendarPeriod }: PanoLauncherItem): NavItem {
+  return { href, translationKey, icon, calendarPeriod }
 }
 
 /** Alt nav / sidebar — pano hub + kutularla aynı sıra. */

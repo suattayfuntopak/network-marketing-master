@@ -2,7 +2,6 @@
 
 import { clsx } from 'clsx'
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react'
-import { useMemo } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { HubMonthlyInsights } from '@/app/(dashboard)/crown/actions'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -24,12 +23,7 @@ export function HubMonthHero({
   insights,
   loading,
 }: HubMonthHeroProps) {
-  const { lang, t } = useTranslation()
-
-  const monthLabel = useMemo(() => {
-    const now = new Date()
-    return now.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { month: 'long', year: 'numeric' })
-  }, [lang])
+  const { t } = useTranslation()
 
   if (loading) return <Skeleton className="h-28 rounded-2xl" />
 
@@ -46,8 +40,7 @@ export function HubMonthHero({
     <div className="rounded-2xl border border-[var(--border)] bg-gradient-to-br from-[var(--bg-card)] to-[var(--bg-subtle)]/80 p-4 md:p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-lg font-black capitalize text-[var(--text-1)] md:text-xl">{monthLabel}</p>
-          <p className="mt-0.5 text-xs text-[var(--text-3)]">
+          <p className="text-xs text-[var(--text-3)] md:text-sm">
             {t('crown.monthProgressSubtitle', { day: dayOfMonth, total: daysInMonth, pct: monthPct })}
           </p>
         </div>

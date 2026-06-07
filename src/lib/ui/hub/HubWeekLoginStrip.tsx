@@ -9,9 +9,11 @@ type HubWeekLoginStripProps = {
   weekActive: boolean[]
   loginDays: number
   loading?: boolean
+  /** Hafta penceresinin son günü (offset haftalar için) */
+  weekEnd?: Date
 }
 
-export function HubWeekLoginStrip({ weekActive, loginDays, loading }: HubWeekLoginStripProps) {
+export function HubWeekLoginStrip({ weekActive, loginDays, loading, weekEnd }: HubWeekLoginStripProps) {
   const { lang, t } = useTranslation()
 
   const dayLabels = useMemo(() => {
@@ -19,15 +21,15 @@ export function HubWeekLoginStrip({ weekActive, loginDays, loading }: HubWeekLog
       lang === 'en'
         ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const end = weekEnd ? new Date(weekEnd) : new Date()
+    end.setHours(0, 0, 0, 0)
     return weekActive.map((_, i) => {
-      const d = new Date(today)
+      const d = new Date(end)
       d.setDate(d.getDate() - (6 - i))
       const idx = (d.getDay() + 6) % 7
       return short[idx]
     })
-  }, [weekActive, lang])
+  }, [weekActive, lang, weekEnd])
 
   if (loading) return <Skeleton className="h-24 rounded-2xl" />
 

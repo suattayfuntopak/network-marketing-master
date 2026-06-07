@@ -12,9 +12,9 @@ export const queryKeys = {
   goalDashboard: () => ['goal-dashboard'] as const,
   dailyTrack: (lang: 'tr' | 'en' = 'tr') => ['daily-track', lang] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
-  hubWeeklySelf: () => ['hub', 'weekly-self'] as const,
-  hubMonthlySelf: () => ['hub', 'monthly-self'] as const,
-  hubMonthlyInsights: () => ['hub', 'monthly-insights'] as const,
+  hubWeeklySelf: (offset = 0) => ['hub', 'weekly-self', offset] as const,
+  hubMonthlySelf: (offset = 0) => ['hub', 'monthly-self', offset] as const,
+  hubMonthlyInsights: (offset = 0) => ['hub', 'monthly-insights', offset] as const,
   crownFirst30: (workspaceId: string) => ['crown', 'first30', workspaceId] as const,
   /**
    * Ekip Aktivite Özeti (saha çabası). memberIds İÇERİDE sıralanır → çağıran tarafın

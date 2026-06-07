@@ -18,13 +18,13 @@ export function usePanoHubBadges() {
   const workspaceId = ws?.workspaceId
 
   const weekly = useQuery({
-    queryKey: queryKeys.hubWeeklySelf(),
-    queryFn: getHubWeeklySelfAction,
+    queryKey: queryKeys.hubWeeklySelf(0),
+    queryFn: () => getHubWeeklySelfAction(0),
     staleTime: 60_000,
   })
 
   const monthly = useQuery({
-    queryKey: queryKeys.hubMonthlyInsights(),
+    queryKey: queryKeys.hubMonthlyInsights(0),
     queryFn: getHubMonthlyInsightsAction,
     staleTime: 60_000,
   })

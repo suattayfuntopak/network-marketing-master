@@ -64,17 +64,17 @@ export async function prefetchHubMetrics(
 ) {
   const tasks: Promise<void>[] = [
     queryClient.prefetchQuery({
-      queryKey: queryKeys.hubWeeklySelf(),
-      queryFn: getHubWeeklySelfAction,
+      queryKey: queryKeys.hubWeeklySelf(0),
+      queryFn: () => getHubWeeklySelfAction(0),
       staleTime: METRICS_STALE,
     }),
     queryClient.prefetchQuery({
-      queryKey: queryKeys.hubMonthlySelf(),
-      queryFn: getHubMonthlySelfAction,
+      queryKey: queryKeys.hubMonthlySelf(0),
+      queryFn: () => getHubMonthlySelfAction(0),
       staleTime: METRICS_STALE,
     }),
     queryClient.prefetchQuery({
-      queryKey: queryKeys.hubMonthlyInsights(),
+      queryKey: queryKeys.hubMonthlyInsights(0),
       queryFn: getHubMonthlyInsightsAction,
       staleTime: METRICS_STALE,
     }),

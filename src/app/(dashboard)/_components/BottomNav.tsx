@@ -9,6 +9,7 @@ import { setNavDir } from './DashboardShell'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ADMIN, NAV_SIDEBAR_MODULES, navBarLabelKey } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
+import { NavItemIcon } from '@/components/ui/NavItemIcon'
 import { Z } from '@/lib/ui/zIndex'
 
 interface BottomNavProps {
@@ -60,7 +61,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         visible ? 'translate-y-0' : 'translate-y-full',
       )}
     >
-      {items.map(({ href, translationKey, icon: Icon }) => {
+      {items.map(item => {
+        const { href, translationKey } = item
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
         const isCrown = href === '/platform-yonetim'
@@ -88,7 +90,8 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             )}
           >
             <span className="relative">
-              <Icon
+              <NavItemIcon
+                item={item}
                 className={clsx('h-5 w-5', active && 'drop-shadow-sm', isCrown && !active && 'animate-pulse')}
                 strokeWidth={active || pending || isCrown ? 2.25 : 1.75}
               />

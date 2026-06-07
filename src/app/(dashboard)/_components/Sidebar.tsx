@@ -13,6 +13,7 @@ import {
   type NavItem,
 } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
+import { NavItemIcon } from '@/components/ui/NavItemIcon'
 import { Z } from '@/lib/ui/zIndex'
 
 interface SidebarProps {
@@ -34,7 +35,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   function renderLink(item: NavItem) {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
-    const Icon = item.icon
 
     return (
       <Link
@@ -50,7 +50,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]',
         )}
       >
-        <Icon className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+        <NavItemIcon item={item} />
         {!collapsed && (
           <span className="flex min-w-0 flex-1 items-center gap-2">
             <span className="truncate">{t(item.translationKey)}</span>

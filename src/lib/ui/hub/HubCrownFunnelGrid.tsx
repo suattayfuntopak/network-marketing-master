@@ -1,10 +1,10 @@
 'use client'
 
-import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
   FUNNEL_METRIC_ORDER,
   FUNNEL_METRIC_VISUAL,
+  FunnelMetricLabel,
 } from '@/lib/ui/funnelMetricVisuals'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -17,11 +17,11 @@ type HubCrownFunnelGridProps = {
   loading?: boolean
 }
 
-function metricLabelKey(metric: (typeof FUNNEL_METRIC_ORDER)[number]): string {
-  if (metric === 'arama') return 'crown.metricCall'
-  if (metric === 'tanisma') return 'crown.metricMeet'
-  if (metric === 'sunum') return 'crown.metricPresentation'
-  return 'crown.metricMember'
+const METRIC_LABEL_KEYS: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
+  arama: 'dashboard.dailyTrackMetricCalls',
+  tanisma: 'dashboard.dailyTrackMetricMeetings',
+  sunum: 'dashboard.dailyTrackMetricPresentations',
+  yeniUye: 'dashboard.dailyTrackMetricMembers',
 }
 
 export function HubCrownFunnelGrid({
@@ -46,7 +46,7 @@ export function HubCrownFunnelGrid({
   return (
     <div className="grid grid-cols-2 gap-3">
       {FUNNEL_METRIC_ORDER.map(metric => {
-        const { Icon, color, barColor } = FUNNEL_METRIC_VISUAL[metric]
+        const { barColor } = FUNNEL_METRIC_VISUAL[metric]
         const actual = actuals[metric]
         const target = targets[metric]
         const pct =
@@ -58,17 +58,17 @@ export function HubCrownFunnelGrid({
             className="flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3.5 shadow-sm md:p-4"
           >
             <div className="mb-2 flex items-start justify-between gap-2">
-              <span
-                className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
-                style={{ backgroundColor: `${color}18` }}
-              >
-                <Icon className="h-[18px] w-[18px]" style={{ color }} strokeWidth={2.25} />
-              </span>
+              <FunnelMetricLabel
+                metric={metric}
+                label={t(METRIC_LABEL_KEYS[metric])}
+                iconClassName="h-[18px] w-[18px]"
+                vivid
+                className="min-w-0 text-xs font-semibold text-[var(--text-1)] sm:text-sm"
+              />
               {hasGoal ? (
-                <span className="text-xs font-bold tabular-nums text-[var(--text-3)]">%{pct}</span>
+                <span className="shrink-0 text-xs font-bold tabular-nums text-[var(--text-3)]">%{pct}</span>
               ) : null}
             </div>
-            <p className="text-xs font-semibold text-[var(--text-2)]">{t(metricLabelKey(metric))}</p>
             <p className="mt-1 text-xl font-black tabular-nums text-[var(--text-1)] md:text-2xl">
               {actual}
               {hasGoal ? (
