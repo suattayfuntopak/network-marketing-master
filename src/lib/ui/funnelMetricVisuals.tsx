@@ -57,6 +57,7 @@ type FunnelMetricCountProps = {
   metric: FunnelMetricKey
   value: number
   iconClassName?: string
+  className?: string
   vivid?: boolean
 }
 
@@ -64,6 +65,7 @@ export function FunnelMetricCount({
   metric,
   value,
   iconClassName = 'h-3 w-3',
+  className,
   vivid = false,
 }: FunnelMetricCountProps) {
   const { Icon, color } = FUNNEL_METRIC_VISUAL[metric]
@@ -72,6 +74,7 @@ export function FunnelMetricCount({
       className={clsx(
         'inline-flex items-center gap-1 tabular-nums',
         vivid ? 'text-sm font-medium text-[var(--text-2)]' : 'text-[var(--text-3)]',
+        className,
       )}
     >
       <Icon

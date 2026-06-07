@@ -213,26 +213,44 @@ export function HedefKart() {
                         <span className="hidden min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--text-1)] md:block">
                           {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
                         </span>
-                        <div className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs tabular-nums md:flex-nowrap md:justify-end md:gap-x-1.5 md:text-sm">
+                        <div className="flex w-full min-w-0 items-center justify-between gap-1 md:contents">
                           <span className="shrink-0 font-semibold text-[var(--text-1)] md:hidden">
                             {t('hedef.roadmapTeamGoalMobile', { n: s.teamSize })}
                           </span>
-                          <span className="shrink-0 text-[var(--text-3)] md:hidden" aria-hidden>
-                            ·
-                          </span>
-                          <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
-                          <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
-                          <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
-                          <span className="shrink-0 text-[var(--text-3)]" aria-hidden>
-                            ·
-                          </span>
-                          <span className="inline-flex shrink-0 items-center gap-0.5 font-medium text-[var(--text-2)] md:gap-1">
-                            {t('hedef.roadmapNewMembers', { n: s.newMembers })}
-                            <MemberIcon
-                              className={clsx('h-3.5 w-3.5 shrink-0 md:h-4 md:w-4', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
-                              strokeWidth={2.25}
+                          <div className="flex shrink-0 flex-nowrap items-center gap-x-0.5 text-xs tabular-nums md:gap-x-1.5 md:text-sm">
+                            <FunnelMetricCount
+                              metric="arama"
+                              value={s.monthly.arama}
+                              iconClassName="h-3.5 w-3.5 md:h-4 md:w-4"
+                              className="gap-0.5 md:gap-1"
+                              vivid
                             />
-                          </span>
+                            <FunnelMetricCount
+                              metric="tanisma"
+                              value={s.monthly.tanisma}
+                              iconClassName="h-3.5 w-3.5 md:h-4 md:w-4"
+                              className="gap-0.5 md:gap-1"
+                              vivid
+                            />
+                            <FunnelMetricCount
+                              metric="sunum"
+                              value={s.monthly.sunum}
+                              iconClassName="h-3.5 w-3.5 md:h-4 md:w-4"
+                              className="gap-0.5 md:gap-1"
+                              vivid
+                            />
+                            <span className="shrink-0 text-[var(--text-3)]" aria-hidden>
+                              ·
+                            </span>
+                            <span className="inline-flex shrink-0 items-center gap-0.5 whitespace-nowrap font-medium text-[var(--text-2)] md:gap-1">
+                              <span className="md:hidden">{t('hedef.roadmapNewMembersMobile', { n: s.newMembers })}</span>
+                              <span className="hidden md:inline">{t('hedef.roadmapNewMembers', { n: s.newMembers })}</span>
+                              <MemberIcon
+                                className={clsx('h-3.5 w-3.5 shrink-0 md:h-4 md:w-4', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
+                                strokeWidth={2.25}
+                              />
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
