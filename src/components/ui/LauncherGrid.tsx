@@ -9,14 +9,6 @@ type LauncherGridProps = {
   itemCount?: number
 }
 
-const MOBILE_ROW_CLASS: Record<number, string> = {
-  2: 'grid-rows-2',
-  3: 'grid-rows-3',
-  4: 'grid-rows-4',
-  5: 'grid-rows-5',
-  6: 'grid-rows-6',
-}
-
 const DESKTOP_ROW_CLASS: Record<number, string> = {
   2: 'md:grid-rows-2',
   3: 'md:grid-rows-3',
@@ -26,11 +18,9 @@ const DESKTOP_ROW_CLASS: Record<number, string> = {
 function gridRowsClass(itemCount: number | undefined, fillViewport: boolean): string {
   if (!fillViewport) return 'gap-3 md:gap-[1.125rem]'
   const n = itemCount ?? 6
-  const mobileRows = Math.ceil(n / 2)
   const desktopRows = Math.ceil(n / 4)
-  const mobile = MOBILE_ROW_CLASS[mobileRows] ?? 'grid-rows-6'
   const desktop = DESKTOP_ROW_CLASS[desktopRows] ?? 'md:grid-rows-3'
-  return clsx('min-h-0 h-full flex-1 gap-2 md:gap-[1.125rem]', mobile, desktop)
+  return clsx('gap-2 md:min-h-0 md:h-full md:flex-1 md:gap-[1.125rem]', desktop)
 }
 
 /** Pano + Bugün İlgilen launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
@@ -67,7 +57,7 @@ export function LauncherGridItem({
     <div
       className={clsx(
         'relative min-w-0',
-        fillViewport ? 'h-full min-h-0' : 'aspect-square',
+        fillViewport ? 'aspect-square w-full md:aspect-auto md:h-full md:min-h-0' : 'aspect-square',
         className,
       )}
     >

@@ -7,7 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { NAV_ADMIN, NAV_SIDEBAR_MODULES } from '@/lib/domain/navigation'
+import { NAV_ADMIN, NAV_SIDEBAR_MODULES, navBarLabelKey } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -64,7 +64,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
         const isCrown = href === '/platform-yonetim'
-        const label = t(translationKey.replace('nav.', 'navMobile.'))
+        const label = t(navBarLabelKey(translationKey))
 
         return (
           <button
