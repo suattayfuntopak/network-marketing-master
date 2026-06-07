@@ -117,18 +117,13 @@ export function HedefKart() {
 
   return (
     <div className="space-y-5">
-      <section className="flex items-start justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-        <div className="flex min-w-0 items-center gap-2.5">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] dark:bg-[#1e1b4b]">
-            <Target className="h-5 w-5 text-[#534AB7] dark:text-[#a5b4fc]" strokeWidth={1.75} />
-          </div>
-          <p className="text-base font-bold leading-snug text-[var(--text-1)]">
-            {t('hedef.myGoalStatement', {
-              people: goal!.targetPeople,
-              months: goal!.targetMonths,
-            })}
-          </p>
-        </div>
+      <section className="flex items-start justify-between gap-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 sm:gap-3 sm:px-4">
+        <p className="min-w-0 flex-1 text-xs font-semibold leading-snug text-[var(--text-1)] sm:text-sm md:text-base md:font-medium">
+          {t('hedef.myGoalStatement', {
+            people: goal!.targetPeople,
+            months: goal!.targetMonths,
+          })}
+        </p>
         <button
           type="button"
           onClick={() => {
