@@ -18,12 +18,22 @@ import { getMemberGoalsMapAction } from '@/app/(dashboard)/ekip/memberGoalsActio
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { periodStartIso } from '@/lib/domain/pulse'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import { STAGE_ORDER } from '@/lib/domain/stages'
+import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, istanbulDayStartIso } from '@/lib/utils/calendarDates'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 function todayStartIso(): string {
   return istanbulDayStartIso(todayCalendarKey())
+}
+
+/** Son 7 takvim günü (bugün dahil) — dönem başlangıcı. */
+function last7CalendarDaysStartIso(): string {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  d.setDate(d.getDate() - 6)
+  return d.toISOString()
 }
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
@@ -335,6 +345,30 @@ export async function getCrownFirst30PageAction(workspaceId: string): Promise<Cr
   return { members }
 }
 
+export type HubSelfFieldMetrics = {
+  calls: number
+  whatsapps: number
+  notes: number
+  stageChanges: number
+  aiActions: number
+  newCandidates: number
+  activeDays: number
+  totalActions: number
+}
+
+export type HubPipelineStageCounts = Partial<Record<CandidateStage, number>>
+
+const EMPTY_FIELD_METRICS: HubSelfFieldMetrics = {
+  calls: 0,
+  whatsapps: 0,
+  notes: 0,
+  stageChanges: 0,
+  aiActions: 0,
+  newCandidates: 0,
+  activeDays: 0,
+  totalActions: 0,
+}
+
 export type HubWeeklySelfPayload = {
   hasGoal: boolean
   weeklyTargets: FunnelCounts
@@ -342,8 +376,10 @@ export type HubWeeklySelfPayload = {
   pctOverall: number
   callsGap: number
   loginDays: number
-  /** Son 7 gün — Pazartesi’den başlayarak giriş yapılan günler */
+  /** Son 7 takvim günü — giriş yapılan günler */
   weekActive: boolean[]
+  fieldMetrics: HubSelfFieldMetrics
+  pipelineStages: HubPipelineStageCounts
 }
 
 export type HubMonthlySelfPayload = {
@@ -354,6 +390,8 @@ export type HubMonthlySelfPayload = {
   dayOfMonth: number
   daysInMonth: number
   monthPct: number
+  fieldMetrics: HubSelfFieldMetrics
+  pipelineStages: HubPipelineStageCounts
 }
 
 async function loginDaysSince(userId: string, since: string): Promise<{ count: number; weekActive: boolean[] }> {
@@ -379,7 +417,103 @@ async function loginDaysSince(userId: string, since: string): Promise<{ count: n
     weekActive.push(daySet.has(key))
   }
 
-  return { count: daySet.size, weekActive }
+  return { count: weekActive.filter(Boolean).length, weekActive }
+}
+
+async function loginDaysInRange(userId: string, since: string): Promise<number> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_daily_actions')
+    .select('created_at')
+    .eq('user_id', userId)
+    .gte('created_at', since)
+
+  const daySet = new Set<string>()
+  for (const row of data ?? []) {
+    daySet.add(row.created_at.slice(0, 10))
+  }
+  return daySet.size
+}
+
+async function selfFieldMetricsSince(
+  userId: string,
+  workspaceId: string | null,
+  since: string | null,
+): Promise<HubSelfFieldMetrics> {
+  const supabase = await createClient()
+
+  let actionsQuery = supabase
+    .from('nmm_daily_actions')
+    .select('action_type, created_at')
+    .eq('user_id', userId)
+
+  if (since) actionsQuery = actionsQuery.gte('created_at', since)
+
+  let candidatesQuery = supabase
+    .from('nmm_candidates')
+    .select('created_at')
+    .eq('owner_id', userId)
+
+  if (workspaceId) candidatesQuery = candidatesQuery.eq('workspace_id', workspaceId)
+  if (since) candidatesQuery = candidatesQuery.gte('created_at', since)
+
+  const [{ data: actions }, { data: newCandidates }] = await Promise.all([
+    actionsQuery,
+    candidatesQuery,
+  ])
+
+  const activeDays = new Set<string>()
+  const metrics: HubSelfFieldMetrics = { ...EMPTY_FIELD_METRICS }
+
+  for (const act of actions ?? []) {
+    activeDays.add(act.created_at.slice(0, 10))
+    switch (act.action_type) {
+      case 'call':
+        metrics.calls++
+        break
+      case 'whatsapp':
+        metrics.whatsapps++
+        break
+      case 'note':
+        metrics.notes++
+        break
+      case 'stage_change':
+        metrics.stageChanges++
+        break
+      case 'ai_generate':
+        metrics.aiActions++
+        break
+    }
+  }
+
+  metrics.newCandidates = newCandidates?.length ?? 0
+  metrics.activeDays = activeDays.size
+  metrics.totalActions =
+    metrics.calls + metrics.whatsapps + metrics.notes + metrics.stageChanges + metrics.aiActions
+
+  return metrics
+}
+
+async function pipelineStageCountsForUser(
+  userId: string,
+  workspaceId: string | null,
+): Promise<HubPipelineStageCounts> {
+  if (!workspaceId) return {}
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_candidates')
+    .select('stage')
+    .eq('owner_id', userId)
+    .eq('workspace_id', workspaceId)
+
+  const counts: HubPipelineStageCounts = {}
+  for (const stage of STAGE_ORDER) counts[stage] = 0
+  for (const row of data ?? []) {
+    const stage = row.stage as CandidateStage
+    if (counts[stage] !== undefined) counts[stage]!++
+  }
+  return counts
 }
 
 async function funnelActualsSince(
@@ -424,6 +558,7 @@ async function funnelActualsSince(
 export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
   const progress = await getDailyProgressAction()
   const { user } = await getAuthUser()
+  const workspaceId = await resolveWorkspaceId()
 
   if (!user) {
     return {
@@ -434,13 +569,17 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
       callsGap: 0,
       loginDays: 0,
       weekActive: Array.from({ length: 7 }, () => false),
+      fieldMetrics: EMPTY_FIELD_METRICS,
+      pipelineStages: {},
     }
   }
 
-  const since = periodStartIso('7d') ?? todayStartIso()
-  const [weeklyActuals, loginInfo] = await Promise.all([
+  const since = last7CalendarDaysStartIso()
+  const [weeklyActuals, loginInfo, fieldMetrics, pipelineStages] = await Promise.all([
     funnelActualsSince(user.id, since),
     loginDaysSince(user.id, since),
+    selfFieldMetricsSince(user.id, workspaceId, since),
+    pipelineStageCountsForUser(user.id, workspaceId),
   ])
 
   if (!progress.hasGoal) {
@@ -452,6 +591,8 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
       callsGap: 0,
       loginDays: loginInfo.count,
       weekActive: loginInfo.weekActive,
+      fieldMetrics,
+      pipelineStages,
     }
   }
 
@@ -474,12 +615,15 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
     callsGap,
     loginDays: loginInfo.count,
     weekActive: loginInfo.weekActive,
+    fieldMetrics,
+    pipelineStages,
   }
 }
 
 export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> {
   const progress = await getDailyProgressAction()
   const { user } = await getAuthUser()
+  const workspaceId = await resolveWorkspaceId()
   const now = new Date()
   const dayOfMonth = now.getDate()
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
@@ -495,12 +639,16 @@ export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> 
       dayOfMonth,
       daysInMonth,
       monthPct,
+      fieldMetrics: EMPTY_FIELD_METRICS,
+      pipelineStages: {},
     }
   }
 
-  const [monthlyActuals, loginInfo] = await Promise.all([
+  const [monthlyActuals, loginDays, fieldMetrics, pipelineStages] = await Promise.all([
     funnelActualsSince(user.id, monthStart),
-    loginDaysSince(user.id, monthStart),
+    loginDaysInRange(user.id, monthStart),
+    selfFieldMetricsSince(user.id, workspaceId, monthStart),
+    pipelineStageCountsForUser(user.id, workspaceId),
   ])
 
   if (!progress.hasGoal) {
@@ -508,10 +656,12 @@ export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> 
       hasGoal: false,
       monthlyTargets: EMPTY_FUNNEL,
       monthlyActuals,
-      loginDays: loginInfo.count,
+      loginDays,
       dayOfMonth,
       daysInMonth,
       monthPct,
+      fieldMetrics,
+      pipelineStages,
     }
   }
 
@@ -526,10 +676,12 @@ export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> 
     hasGoal: true,
     monthlyTargets,
     monthlyActuals,
-    loginDays: loginInfo.count,
+    loginDays,
     dayOfMonth,
     daysInMonth,
     monthPct,
+    fieldMetrics,
+    pipelineStages,
   }
 }
 

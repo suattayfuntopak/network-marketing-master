@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
+import type { ReactNode } from 'react'
 
 export type ButtonColor = 'purple' | 'teal' | 'amber' | 'pink' | 'blue' | 'coral' | 'rose' | 'indigo' | 'cyan' | 'yellow' | 'peach' | 'chick'
 export type ButtonVariant = 'filled' | 'crown'
@@ -101,6 +102,8 @@ interface SquareButtonProps {
   fill?: boolean
   /** Pano mini ilerleme rozeti (ör. 3/12 ay, 2/4 huni) */
   badge?: string
+  /** Lucide yerine özel ikon (ör. takvim + 7/30) */
+  iconSlot?: ReactNode
   className?: string
 }
 
@@ -116,6 +119,7 @@ export function SquareButton({
   prominent = false,
   fill = false,
   badge,
+  iconSlot,
   className,
 }: SquareButtonProps) {
   const styleOpts = { compact, prominent, fill, className }
@@ -127,20 +131,22 @@ export function SquareButton({
 
   const content = (
     <>
-      <Icon
-        className={
-          compact
-            ? 'h-5 w-5 shrink-0'
-            : prominent
-              ? variant === 'crown'
-                ? 'h-8 w-8 shrink-0 drop-shadow-sm md:h-10 md:w-10'
-                : 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
-              : variant === 'crown'
-                ? 'h-7 w-7 shrink-0 md:h-9 md:w-9'
-                : 'h-6 w-6 shrink-0 md:h-9 md:w-9'
-        }
-        strokeWidth={1.75}
-      />
+      {iconSlot ?? (
+        <Icon
+          className={
+            compact
+              ? 'h-5 w-5 shrink-0'
+              : prominent
+                ? variant === 'crown'
+                  ? 'h-8 w-8 shrink-0 drop-shadow-sm md:h-10 md:w-10'
+                  : 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
+                : variant === 'crown'
+                  ? 'h-7 w-7 shrink-0 md:h-9 md:w-9'
+                  : 'h-6 w-6 shrink-0 md:h-9 md:w-9'
+          }
+          strokeWidth={1.75}
+        />
+      )}
       <span
         className={
           compact

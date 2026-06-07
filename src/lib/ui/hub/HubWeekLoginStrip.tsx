@@ -52,7 +52,9 @@ export function HubWeekLoginStrip({ weekActive, loginDays, loading }: HubWeekLog
         ))}
       </div>
       <p className="mt-3 text-center text-sm font-semibold text-[var(--text-2)]">
-        {t('crown.hubLoginDaysWeek', { count: loginDays })}
+        {loginDays >= 7
+          ? t('crown.hubLoginDaysWeekFull')
+          : t('crown.hubLoginDaysWeek', { count: loginDays })}
       </p>
     </div>
   )

@@ -11,6 +11,8 @@ type HubPageShellProps = {
   title: string
   subtitle?: string
   icon?: LucideIcon
+  /** Lucide yerine özel ikon (ör. takvim + 7/30) */
+  customIcon?: ReactNode
   iconClassName?: string
   children: ReactNode
   onRefresh?: () => void
@@ -26,6 +28,7 @@ export function HubPageShell({
   title,
   subtitle,
   icon: Icon,
+  customIcon,
   iconClassName = 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#1e1b4b] dark:text-[#a5b4fc]',
   children,
   onRefresh,
@@ -75,7 +78,11 @@ export function HubPageShell({
             >
               <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
             </Link>
-            {Icon ? (
+            {customIcon ? (
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
+                {customIcon}
+              </div>
+            ) : Icon ? (
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
                 <Icon className="h-5 w-5" strokeWidth={1.75} />
               </div>
