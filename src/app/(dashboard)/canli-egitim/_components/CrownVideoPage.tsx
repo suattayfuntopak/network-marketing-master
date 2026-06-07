@@ -12,6 +12,7 @@ import { PanoVideoStrip } from '@/app/(dashboard)/pano/_components/PanoVideoStri
 import { getCrownVideoPageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { videoProgressAccent } from './videoProgressTheme'
 
 export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
@@ -36,7 +37,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
       title={t('dashboard.crownMockLiveTraining')}
       subtitle={t('crown.videoSubtitle')}
       icon={Video}
-      iconClassName="bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400"
+      iconClassName={videoProgressAccent.icon}
       backHref="/pano"
       onRefresh={() => qc.invalidateQueries({ queryKey: ['crown', 'video'] })}
       refreshing={isFetching}
@@ -47,13 +48,13 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
             {t('crown.videoYourProgress')}
           </p>
-          <p className="mt-1 text-2xl font-black tabular-nums text-teal-700 dark:text-teal-400">%{leaderPct}</p>
+          <p className={clsx('mt-1 text-2xl font-black tabular-nums', videoProgressAccent.textDark)}>%{leaderPct}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
             {t('crown.videoTeamAvg')}
           </p>
-          <p className="mt-1 text-2xl font-black tabular-nums text-brand">%{teamAvg}</p>
+          <p className={clsx('mt-1 text-2xl font-black tabular-nums', videoProgressAccent.textDark)}>%{teamAvg}</p>
         </div>
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-3)]">
@@ -79,11 +80,16 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
             {data?.nextVideo ? (
               <Link
                 href="/egitim/videolar"
-                className="flex items-center gap-3 rounded-xl border border-teal-500/25 bg-teal-50/50 px-3 py-2.5 transition hover:bg-teal-50 dark:bg-teal-950/20"
+                className={clsx(
+                  'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition',
+                  videoProgressAccent.border,
+                  videoProgressAccent.surface,
+                  videoProgressAccent.surfaceHover,
+                )}
               >
-                <PlayCircle className="h-5 w-5 shrink-0 text-teal-700 dark:text-teal-400" />
+                <PlayCircle className={clsx('h-5 w-5 shrink-0', videoProgressAccent.textDark)} />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-wide text-teal-800/70 dark:text-teal-300/70">
+                  <p className={clsx('text-[10px] font-bold uppercase tracking-wide opacity-80', videoProgressAccent.textDark)}>
                     {t('crown.videoUpNext')}
                   </p>
                   <p className="truncate text-sm font-semibold text-[var(--text-1)]">
@@ -127,7 +133,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
                       <span
                         className={clsx(
                           'shrink-0 text-sm font-bold tabular-nums',
-                          pct > 0 ? 'text-teal-700 dark:text-teal-400' : 'text-[var(--text-3)]',
+                          pct > 0 ? videoProgressAccent.textDark : 'text-[var(--text-3)]',
                         )}
                       >
                         %{pct}
@@ -135,7 +141,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
                       <div
-                        className="h-full rounded-full bg-teal-600 transition-all"
+                        className={clsx('h-full rounded-full transition-all', videoProgressAccent.progress)}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -155,7 +161,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
         className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 transition hover:bg-[var(--bg-subtle)]"
       >
         <div className="flex items-center gap-2.5">
-          <Film className="h-5 w-5 text-teal-700 dark:text-teal-400" strokeWidth={1.75} />
+          <Film className={clsx('h-5 w-5', videoProgressAccent.textDark)} strokeWidth={1.75} />
           <span className="text-sm font-semibold text-[var(--text-1)]">{t('crown.videoFullCatalog')}</span>
         </div>
         <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />

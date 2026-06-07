@@ -21,13 +21,13 @@ export type PanoLauncherItem = NavItem & {
 /** Pano — kişisel yolculuk + araç kutuları (12 adet, 4×3 / mobil 2×6). */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'purple', desktopColor: 'purple' },
-  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', desktopColor: 'teal' },
+  { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'teal', desktopColor: 'teal' },
+  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'purple', desktopColor: 'purple' },
   { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'rose', desktopColor: 'rose' },
   { href: '/ilk-30-gun', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
-  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'chick', desktopColor: 'chick' },
+  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', desktopColor: 'blue' },
+  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'chick', desktopColor: 'chick' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
   { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'purple', desktopColor: 'purple' },

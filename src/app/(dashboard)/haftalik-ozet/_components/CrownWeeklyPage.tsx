@@ -13,7 +13,7 @@ import { TeamActivitySummary } from '@/app/(dashboard)/istatistikler/_components
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { getHubWeeklySelfAction } from '@/app/(dashboard)/crown/actions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
-import { queryKeys } from '@/lib/query/keys'
+import { weeklyAccent } from './weeklyTheme'
 
 export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
@@ -64,7 +64,7 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
       title={t('dashboard.crownMockWeeklySummary')}
       subtitle={t('crown.weeklySubtitle')}
       icon={BarChart3}
-      iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-400"
+      iconClassName={weeklyAccent.icon}
       backHref="/pano"
       onRefresh={refresh}
       refreshing={membersLoading || activityLoading || weeklySelfLoading}

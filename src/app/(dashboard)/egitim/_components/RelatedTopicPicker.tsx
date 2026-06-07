@@ -222,7 +222,7 @@ export function RelatedTopicPicker({
           <button
             type="button"
             onClick={handleConfirm}
-            className="rounded-xl bg-gradient-to-r from-[#3730A3] to-[#534AB7] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+            className="rounded-xl bg-gradient-to-r from-[#448AFF] to-[#2962FF] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:brightness-105 transition"
           >
             {t('videoTraining.confirmPick')}
           </button>

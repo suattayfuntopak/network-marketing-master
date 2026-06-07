@@ -27,7 +27,10 @@ export function DailyMetricRow({ metric, label, value, targetLabel, onChange }: 
             type="button"
             onClick={() => bump(-1)}
             aria-label={`${label} −1`}
-            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:border-[#0095DD]/30 hover:bg-[#54C1F0]/10 active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
+            className={clsx(
+              'flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none',
+              dailyTrackAccent.btnHover,
+            )}
           >
             <Minus className="h-4 w-4" strokeWidth={2.25} />
           </button>
@@ -47,7 +50,10 @@ export function DailyMetricRow({ metric, label, value, targetLabel, onChange }: 
             type="button"
             onClick={() => bump(1)}
             aria-label={`${label} +1`}
-            className="flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition hover:border-[#0095DD]/30 hover:bg-[#54C1F0]/10 active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none"
+            className={clsx(
+              'flex h-11 min-w-11 flex-1 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-1)] transition active:scale-95 sm:h-10 sm:min-w-10 sm:flex-none',
+              dailyTrackAccent.btnHover,
+            )}
           >
             <Plus className="h-4 w-4" strokeWidth={2.25} />
           </button>

@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { weeklyAccent } from '@/app/(dashboard)/haftalik-ozet/_components/weeklyTheme'
 import type { HubWeeklySelfPayload } from '@/app/(dashboard)/crown/actions'
 
 type HubWeeklySelfBarProps = {
@@ -24,13 +25,13 @@ export function HubWeeklySelfBar({ data, loading }: HubWeeklySelfBarProps) {
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <p className="text-sm font-bold text-[var(--text-1)]">{t('crown.weeklySelfTitle')}</p>
-        <span className={clsx('text-lg font-black tabular-nums', pct >= 100 ? 'text-emerald-600' : 'text-brand')}>
+        <span className={clsx('text-lg font-black tabular-nums', pct >= 100 ? 'text-emerald-600' : weeklyAccent.textDark)}>
           %{pct}
         </span>
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
         <div
-          className={clsx('h-full rounded-full transition-all', pct >= 100 ? 'bg-emerald-500' : 'bg-brand')}
+          className={clsx('h-full rounded-full transition-all', pct >= 100 ? 'bg-emerald-500' : weeklyAccent.progress)}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>
@@ -41,7 +42,7 @@ export function HubWeeklySelfBar({ data, loading }: HubWeeklySelfBarProps) {
         })}
       </p>
       {gap > 0 ? (
-        <p className="rounded-lg bg-[#EEEDFE]/60 px-3 py-2 text-xs font-semibold text-[#534AB7] dark:bg-[#1e1b4b]/50 dark:text-[#a5b4fc]">
+        <p className={clsx('rounded-lg px-3 py-2 text-xs font-semibold', weeklyAccent.surface, weeklyAccent.textDark)}>
           {t('crown.weeklyActionHint', { count: gap })}
         </p>
       ) : (
