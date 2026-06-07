@@ -47,6 +47,9 @@ next-env.d.ts
 # local-only docs (n8n JSON, secrets) — not pushed
 /docs/local/
 
+# agent session hot log — local only, never triggers deploy
+/hot.md
+
 
 # gstack (Garry Tan skill paketi) yerel çıktıları — güvenlik raporları yerel kalır
 .gstack/

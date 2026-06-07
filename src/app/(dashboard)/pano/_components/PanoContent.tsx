@@ -5,6 +5,7 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
+import { PanoFooter } from './PanoFooter'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
@@ -38,7 +39,7 @@ export function PanoContent() {
       )}
       <AccountStatusAlert />
 
-      <div className="flex min-h-0 w-full flex-1 flex-col space-y-3 md:space-y-5">
+      <div className="flex min-h-0 w-full flex-1 flex-col space-y-2 md:space-y-5">
         <header className="shrink-0 space-y-1 md:text-center">
           {wsLoading ? (
             <div className="h-8 w-56 animate-pulse rounded bg-[var(--bg-subtle)] md:mx-auto" />
@@ -54,16 +55,13 @@ export function PanoContent() {
           )}
         </header>
 
-        {!cLoading && (
-          <div className="shrink-0">
-            <WelcomeCard candidateCount={candidates.length} />
-          </div>
-        )}
-
         <div className="flex min-h-0 flex-1 flex-col">
           <PanoLauncherGrid />
+          {ws?.inviteCode && <PanoFooter inviteCode={ws.inviteCode} />}
         </div>
       </div>
+
+      {!cLoading && <WelcomeCard candidateCount={candidates.length} />}
     </div>
   )
 }

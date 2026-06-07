@@ -99,6 +99,8 @@ interface SquareButtonProps {
   prominent?: boolean
   /** LauncherGrid hücresini doldur — pano ile aynı kare boyut */
   fill?: boolean
+  /** Pano mini ilerleme rozeti (ör. 3/12 ay, 2/4 huni) */
+  badge?: string
   className?: string
 }
 
@@ -113,6 +115,7 @@ export function SquareButton({
   compact = false,
   prominent = false,
   fill = false,
+  badge,
   className,
 }: SquareButtonProps) {
   const styleOpts = { compact, prominent, fill, className }
@@ -151,6 +154,16 @@ export function SquareButton({
       >
         {label}
       </span>
+      {badge ? (
+        <span
+          className={clsx(
+            'mt-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold tabular-nums leading-none md:text-[11px]',
+            variant === 'crown' ? 'bg-white/25 text-white' : 'bg-black/5 text-[var(--text-2)] dark:bg-white/10',
+          )}
+        >
+          {badge}
+        </span>
+      ) : null}
     </>
   )
 
