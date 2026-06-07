@@ -116,8 +116,8 @@ export function HedefKart() {
   const p = progress
 
   return (
-    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
-      <div className="mb-4 flex items-center justify-between gap-3">
+    <div className="space-y-5">
+      <section className="flex items-start justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
         <div className="flex min-w-0 items-center gap-2.5">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE] dark:bg-[#1e1b4b]">
             <Target className="h-5 w-5 text-[#534AB7] dark:text-[#a5b4fc]" strokeWidth={1.75} />
@@ -141,13 +141,12 @@ export function HedefKart() {
         >
           <Pencil className="h-4 w-4" />
         </button>
-      </div>
+      </section>
 
-      <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
-        {t('hedef.todayTitle')}
-      </p>
-
-      <div className="space-y-3">
+      <section className="space-y-3">
+        <h2 className="text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
+          {t('hedef.todayTitle')}
+        </h2>
         {GOAL_ROWS.map(row => {
           const target = p?.targets[row.key] ?? 0
           const actual = p?.actuals[row.key] ?? 0
@@ -156,14 +155,14 @@ export function HedefKart() {
           const { barColor } = FUNNEL_METRIC_VISUAL[row.key]
 
           return (
-            <div key={row.key} className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
-              <div className="mb-1.5 flex items-start justify-between gap-2">
+            <div key={row.key} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4">
+              <div className="mb-2 flex items-start justify-between gap-2">
                 <FunnelMetricLabel
                   metric={row.key}
                   label={t(row.labelKey)}
                   iconClassName="h-[18px] w-[18px]"
                   vivid
-                  className="text-base font-medium leading-snug text-[var(--text-1)]"
+                  className="text-sm font-semibold leading-snug text-[var(--text-1)] md:text-base md:font-medium"
                 />
                 <span className={clsx('shrink-0 text-sm font-semibold tabular-nums', done ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-2)]')}>
                   {done ? <Check className="mr-0.5 inline h-3.5 w-3.5" /> : null}
@@ -179,20 +178,20 @@ export function HedefKart() {
             </div>
           )
         })}
-      </div>
+      </section>
 
       {roadmap.length > 0 ? (
-        <>
+        <section className="space-y-3">
           <button
             type="button"
             onClick={() => setShowRoadmap(v => !v)}
-            className="mt-4 flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-3 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--border)]"
+            className="flex w-full items-center justify-between gap-2 text-left"
           >
-            {t('hedef.roadmapTitle')}
-            <ChevronDown className={clsx('h-4 w-4 transition-transform', showRoadmap && 'rotate-180')} />
+            <h2 className="text-base font-bold text-[var(--text-1)]">{t('hedef.roadmapTitle')}</h2>
+            <ChevronDown className={clsx('h-5 w-5 shrink-0 text-[var(--text-3)] transition-transform', showRoadmap && 'rotate-180')} />
           </button>
           {showRoadmap ? (
-            <ul className="mt-2 max-h-[min(24rem,50vh)] space-y-2 overflow-y-auto pr-0.5">
+            <ul className="space-y-2">
               {roadmap.map(s => {
                 const isCurrent = p && s.month === p.monthIndex
                 const MemberIcon = FUNNEL_METRIC_VISUAL.yeniUye.Icon
@@ -200,41 +199,42 @@ export function HedefKart() {
                   <li
                     key={s.month}
                     className={clsx(
-                      'flex items-center gap-2.5 rounded-xl border px-2.5 py-2',
+                      'flex items-center gap-2 rounded-xl border px-2.5 py-2.5',
                       isCurrent
                         ? 'border-[#534AB7]/35 bg-[#EEEDFE]/40 dark:border-[#534AB7]/40 dark:bg-[#1e1b4b]/50'
-                        : 'border-[var(--border)] bg-[var(--bg-subtle)]/60',
+                        : 'border-[var(--border)] bg-[var(--bg-card)]',
                     )}
                   >
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-base font-bold text-white">
                       {s.month}
                     </span>
-                    <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
-                      <span className="min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--text-1)]">
-                        {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
+                    <span className="shrink-0 text-sm font-semibold text-[var(--text-1)] md:hidden">
+                      {t('hedef.roadmapTeamGoalMobile', { n: s.teamSize })}
+                    </span>
+                    <span className="hidden min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--text-1)] md:block">
+                      {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
+                    </span>
+                    <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-x-1.5 text-sm leading-snug">
+                      <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-4 w-4" vivid />
+                      <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-4 w-4" vivid />
+                      <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-4 w-4" vivid />
+                      <span className="text-[var(--text-3)]" aria-hidden>
+                        ·
                       </span>
-                      <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-1.5 gap-y-1 text-sm leading-snug">
-                        <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-4 w-4" vivid />
-                        <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-4 w-4" vivid />
-                        <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-4 w-4" vivid />
-                        <span className="text-[var(--text-3)]" aria-hidden>
-                          ·
-                        </span>
-                        <span className="inline-flex items-center gap-1 font-medium text-[var(--text-2)]">
-                          {t('hedef.roadmapNewMembers', { n: s.newMembers })}
-                          <MemberIcon
-                            className={clsx('h-4 w-4 shrink-0', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
-                            strokeWidth={2.25}
-                          />
-                        </span>
-                      </div>
+                      <span className="inline-flex shrink-0 items-center gap-1 font-medium whitespace-nowrap text-[var(--text-2)]">
+                        {t('hedef.roadmapNewMembers', { n: s.newMembers })}
+                        <MemberIcon
+                          className={clsx('h-4 w-4 shrink-0', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
+                          strokeWidth={2.25}
+                        />
+                      </span>
                     </div>
                   </li>
                 )
               })}
             </ul>
           ) : null}
-        </>
+        </section>
       ) : null}
     </div>
   )

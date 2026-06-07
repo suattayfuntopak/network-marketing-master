@@ -160,6 +160,7 @@ export const en = {
     roadmapTitle: "Month-by-Month Targets",
     roadmapTeamSize: "{n}-person team",
     roadmapTeamGoal: "I should reach a team of at least {n} people!",
+    roadmapTeamGoalMobile: "🎯 {n}",
     roadmapNewMembers: "+{n} new members",
     monthN: "Mo {n}",
     teamN: "{n} people",

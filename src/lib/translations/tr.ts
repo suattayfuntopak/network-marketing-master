@@ -160,6 +160,7 @@ export const tr = {
     roadmapTitle: "Ay Ay Hedef Dökümü",
     roadmapTeamSize: "{n} kişilik ekip",
     roadmapTeamGoal: "En az {n} kişilik ekip sayısına ulaşmış olmalıyım!",
+    roadmapTeamGoalMobile: "🎯 {n}",
     roadmapNewMembers: "+{n} yeni üye",
     monthN: "{n}. ay",
     teamN: "{n} kişi",

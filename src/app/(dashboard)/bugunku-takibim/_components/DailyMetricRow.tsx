@@ -20,7 +20,7 @@ export function DailyMetricRow({ metric, label, value, targetLabel, onChange }: 
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4">
-      <FunnelMetricLabel metric={metric} label={label} className="mb-2 text-sm font-semibold text-[var(--text-1)]" />
+      <FunnelMetricLabel metric={metric} label={label} vivid className="mb-2 text-sm font-semibold text-[var(--text-1)]" />
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start">
           <button
