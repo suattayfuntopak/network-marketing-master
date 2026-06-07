@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, ScanEye, TrendingUp, Bot, Users,
+  LayoutDashboard, TrendingUp, Bot, Users,
   CalendarDays, CalendarRange, BookOpen, Target,
   BarChart3, ClipboardList, Video,
   BarChart2, Crown, Ellipsis,
@@ -13,14 +13,13 @@ export type NavItem = {
   readonly icon: LucideIcon
 }
 
-/** Pano mobil grid + sidebar modül listesi (6 kutu) */
+/** Sidebar modül listesi (pano hub dışı) */
 export const NAV_MODULE_ITEMS: readonly NavItem[] = [
-  { href: '/pano', translationKey: 'nav.todayFocus', icon: ScanEye },
-  { href: '/pipeline',      translationKey: 'nav.pipeline',   icon: TrendingUp },
-  { href: '/takvim',        translationKey: 'nav.takvim',   icon: CalendarDays },
-  { href: '/ekip',          translationKey: 'nav.ekip',     icon: Users },
-  { href: '/yazar',         translationKey: 'nav.yazar',    icon: Bot },
-  { href: '/egitim',        translationKey: 'nav.vaktinVarsa', icon: BookOpen },
+  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp },
+  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays },
+  { href: '/ekip', translationKey: 'nav.ekip', icon: Users },
+  { href: '/yazar', translationKey: 'nav.yazar', icon: Bot },
+  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen },
 ]
 
 export const NAV_PRIMARY: readonly NavItem[] = [
@@ -93,6 +92,9 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'cyan', desktopColor: 'cyan' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'chick', desktopColor: 'chick' },
+  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'rose', desktopColor: 'rose' },
+  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },
+  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'peach', desktopColor: 'peach' },
 ]
 
 /** @deprecated Pano artık PANO_ORGANIZATION_ITEMS kullanır */
