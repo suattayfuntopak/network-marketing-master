@@ -199,35 +199,42 @@ export function HedefKart() {
                   <li
                     key={s.month}
                     className={clsx(
-                      'flex items-center gap-2 rounded-xl border px-2.5 py-2.5',
+                      'rounded-xl border px-2.5 py-2.5',
                       isCurrent
                         ? 'border-[#534AB7]/35 bg-[#EEEDFE]/40 dark:border-[#534AB7]/40 dark:bg-[#1e1b4b]/50'
                         : 'border-[var(--border)] bg-[var(--bg-card)]',
                     )}
                   >
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#F97316] text-base font-bold text-white">
-                      {s.month}
-                    </span>
-                    <span className="shrink-0 text-sm font-semibold text-[var(--text-1)] md:hidden">
-                      {t('hedef.roadmapTeamGoalMobile', { n: s.teamSize })}
-                    </span>
-                    <span className="hidden min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--text-1)] md:block">
-                      {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
-                    </span>
-                    <div className="ml-auto flex shrink-0 flex-nowrap items-center gap-x-1.5 text-sm leading-snug">
-                      <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-4 w-4" vivid />
-                      <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-4 w-4" vivid />
-                      <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-4 w-4" vivid />
-                      <span className="text-[var(--text-3)]" aria-hidden>
-                        ·
+                    <div className="flex items-start gap-2 md:items-center">
+                      <span className="flex h-9 w-9 shrink-0 items-center justify-center self-center rounded-full bg-[#F97316] text-base font-bold text-white">
+                        {s.month}
                       </span>
-                      <span className="inline-flex shrink-0 items-center gap-1 font-medium whitespace-nowrap text-[var(--text-2)]">
-                        {t('hedef.roadmapNewMembers', { n: s.newMembers })}
-                        <MemberIcon
-                          className={clsx('h-4 w-4 shrink-0', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
-                          strokeWidth={2.25}
-                        />
-                      </span>
+                      <div className="min-w-0 flex-1 md:flex md:items-center md:justify-between md:gap-3">
+                        <span className="hidden min-w-0 flex-1 text-sm font-semibold leading-snug text-[var(--text-1)] md:block">
+                          {t('hedef.roadmapTeamGoal', { n: s.teamSize })}
+                        </span>
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-1 gap-y-1 text-xs tabular-nums md:flex-nowrap md:justify-end md:gap-x-1.5 md:text-sm">
+                          <span className="shrink-0 font-semibold text-[var(--text-1)] md:hidden">
+                            {t('hedef.roadmapTeamGoalMobile', { n: s.teamSize })}
+                          </span>
+                          <span className="shrink-0 text-[var(--text-3)]" aria-hidden>
+                            ·
+                          </span>
+                          <FunnelMetricCount metric="arama" value={s.monthly.arama} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
+                          <FunnelMetricCount metric="tanisma" value={s.monthly.tanisma} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
+                          <FunnelMetricCount metric="sunum" value={s.monthly.sunum} iconClassName="h-3.5 w-3.5 md:h-4 md:w-4" vivid />
+                          <span className="shrink-0 text-[var(--text-3)]" aria-hidden>
+                            ·
+                          </span>
+                          <span className="inline-flex shrink-0 items-center gap-0.5 font-medium text-[var(--text-2)] md:gap-1">
+                            {t('hedef.roadmapNewMembers', { n: s.newMembers })}
+                            <MemberIcon
+                              className={clsx('h-3.5 w-3.5 shrink-0 md:h-4 md:w-4', FUNNEL_METRIC_VIVID_CLASS.yeniUye)}
+                              strokeWidth={2.25}
+                            />
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </li>
                 )
