@@ -1,8 +1,10 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo } from 'react'
+import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { STAGE_ORDER, getStageLabel } from '@/lib/domain/stages'
+import { STAGE_ORDER, STAGE_CARD_BG, getStageLabel } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
@@ -44,16 +46,21 @@ export function HubPipelineStageTable({ counts, loading }: HubPipelineStageTable
 
   function renderColumn(col: typeof rows) {
     return (
-      <ul className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/30">
+      <ul className="space-y-2">
         {col.map(row => (
-          <li
-            key={row.stage}
-            className="flex items-center justify-between gap-3 px-3 py-2.5 md:px-4"
-          >
-            <span className="min-w-0 text-sm font-medium text-[var(--text-1)]">{row.label}</span>
-            <span className="shrink-0 rounded-lg bg-[var(--bg-card)] px-2.5 py-0.5 text-sm font-black tabular-nums text-[var(--text-1)]">
-              {row.count}
-            </span>
+          <li key={row.stage}>
+            <Link
+              href={`/pipeline?stage=${row.stage}`}
+              className={clsx(
+                'flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] px-3 py-2.5 transition hover:opacity-90 md:px-4',
+                STAGE_CARD_BG[row.stage],
+              )}
+            >
+              <span className="min-w-0 text-sm font-semibold">{row.label}</span>
+              <span className="shrink-0 rounded-lg bg-[var(--bg-card)]/80 px-2.5 py-0.5 text-sm font-black tabular-nums shadow-sm">
+                {row.count}
+              </span>
+            </Link>
           </li>
         ))}
       </ul>
