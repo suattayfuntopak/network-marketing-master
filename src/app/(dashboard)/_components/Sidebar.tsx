@@ -41,7 +41,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         key={item.href}
         href={item.href}
         title={collapsed ? t(item.translationKey) : undefined}
-        onMouseEnter={() => prefetchRouteData(queryClient, item.href, ws?.workspaceId)}
+        onMouseEnter={() => prefetchRouteData(queryClient, item.href, ws?.workspaceId, ws)}
         className={clsx(
           'flex items-center rounded-xl text-sm font-medium transition-colors',
           collapsed ? 'h-10 w-10 justify-center' : 'gap-3 px-3 py-2.5',

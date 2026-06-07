@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { CalendarRange } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -30,7 +30,6 @@ function daysSinceDate(iso: string | null): number {
 
 export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
-  const qc = useQueryClient()
   const { data: ws } = useWorkspace()
   const wid = ws?.workspaceId
   const { data: members = [], isLoading: membersLoading } = useEkipPanelRows(wid)
@@ -49,34 +48,39 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const { data: monthlySelf, isLoading: monthlySelfLoading } = useQuery({
     queryKey: queryKeys.hubMonthlySelf(),
     queryFn: getHubMonthlySelfAction,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: monthInsights, isLoading: monthInsightsLoading } = useQuery({
     queryKey: queryKeys.hubMonthlyInsights(),
     queryFn: getHubMonthlyInsightsAction,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: crownMonthly, isLoading: crownMonthlyLoading } = useQuery({
     queryKey: ['crown', 'monthly-page', wid],
     queryFn: () => getCrownMonthlyPageAction(wid!),
     enabled: !!wid && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: activity, isLoading: activityLoading } = useQuery({
     queryKey: queryKeys.teamFieldActivity(wid ?? '', '30d', activityMemberIds),
     queryFn: () => getTeamFieldActivityAction(wid!, '30d', activityMemberIds),
     enabled: !!wid && activityMemberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: entriesData, isLoading: entriesLoading } = useQuery({
     queryKey: ['crown', 'entries', wid],
     queryFn: () => getCrownEntriesPageAction(wid!),
     enabled: !!wid && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const teamActivity = crownMonthly?.activity ?? activity
@@ -90,27 +94,15 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
     [members],
   )
 
-  function refresh() {
-    qc.invalidateQueries({ queryKey: ['team-field-activity'] })
-    qc.invalidateQueries({ queryKey: ['crown', 'entries'] })
-    qc.invalidateQueries({ queryKey: ['crown', 'monthly-page'] })
-    qc.invalidateQueries({ queryKey: queryKeys.hubMonthlyInsights() })
-    qc.invalidateQueries({ queryKey: queryKeys.hubMonthlySelf() })
-  }
-
-  const heroLoading = monthlySelfLoading || monthInsightsLoading
+  const heroLoading = (monthlySelfLoading || monthInsightsLoading) && !monthlySelf && !monthInsights
 
   return (
     <HubPageShell
       title={t('dashboard.crownMockMonthlySummary')}
-      subtitle={t('crown.monthlySubtitle')}
       icon={CalendarRange}
       iconClassName="bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400"
       backHref="/pano"
-      onRefresh={refresh}
-      refreshing={
-        membersLoading || activityLoading || entriesLoading || monthlySelfLoading || crownMonthlyLoading
-      }
+      showRefresh={false}
       asTab={asTab}
     >
       <div className="space-y-4">
@@ -127,12 +119,12 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
           targets={monthlySelf?.monthlyTargets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
           hasGoal={monthlySelf?.hasGoal ?? false}
           period="monthly"
-          loading={monthlySelfLoading}
+          loading={monthlySelfLoading && !monthlySelf}
         />
         <HubPeriodTeamPanel
           downlines={downlines}
           activity={teamActivity}
-          loading={membersLoading || activityLoading || crownMonthlyLoading}
+          loading={membersLoading || ((activityLoading || crownMonthlyLoading) && !teamActivity)}
           teamStatsLocked={!teamPulseUnlocked}
           joinedInPeriod={joinedInPeriod}
           period="30d"
@@ -140,7 +132,7 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
         />
         {teamPulseUnlocked ? (
           <HubSectionCard title={t('crown.entries')}>
-            {entriesLoading ? (
+            {entriesLoading && !entriesData ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton key={i} className="h-20 rounded-xl" />

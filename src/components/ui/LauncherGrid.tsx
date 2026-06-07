@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { HTMLAttributes, ReactNode } from 'react'
 import { clsx } from 'clsx'
 
 type LauncherGridProps = {
@@ -48,13 +48,15 @@ export function LauncherGridItem({
   children,
   className,
   fillViewport = false,
+  ...rest
 }: {
   children: ReactNode
   className?: string
   fillViewport?: boolean
-}) {
+} & HTMLAttributes<HTMLDivElement>) {
   return (
     <div
+      {...rest}
       className={clsx(
         'relative min-w-0',
         fillViewport ? 'aspect-square w-full md:aspect-auto md:h-full md:min-h-0' : 'aspect-square',

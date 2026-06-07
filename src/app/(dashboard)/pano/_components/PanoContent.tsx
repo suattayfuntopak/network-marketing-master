@@ -28,7 +28,7 @@ export function PanoContent() {
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
   return (
-    <div className="flex h-full min-h-0 w-full flex-1 flex-col md:min-h-full">
+    <div className="flex min-h-0 w-full flex-1 flex-col md:min-h-full">
       {!cLoading && ws && (
         <OnboardingModal
           workspaceId={ws.workspaceId}

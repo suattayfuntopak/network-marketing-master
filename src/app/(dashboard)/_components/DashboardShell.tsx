@@ -8,6 +8,7 @@ import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
 import { AccountAccessGuard } from './AccountAccessGuard'
+import { useMobileChromeVisibility } from '@/lib/ui/useMobileChromeVisibility'
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
   setTimeout(() => { delete document.documentElement.dataset.navDir }, 500)
@@ -22,10 +23,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     setCollapsed(localStorage.getItem(SIDEBAR_KEY) === 'true')
   }, [])
   const [pendingHref, setPendingHref] = useState<string | null>(null)
-  const [visible, setVisible] = useState(true)
-  const scrollTimeout = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const visible = useMobileChromeVisibility(pathname)
   const touchStart = useRef<{ x: number; y: number } | null>(null)
 
   const { data: ws } = useWorkspace()
@@ -43,41 +43,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   function getRouteIndex(path: string) {
     return routes.findIndex(r => path === r || (r !== '/pano' && path.startsWith(r)))
   }
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-
-      // Always show at the very top of the page
-      if (scrollY < 20) {
-        setVisible(true)
-        if (scrollTimeout.current) {
-          clearTimeout(scrollTimeout.current)
-        }
-        return
-      }
-
-      // Hide immediately during active scroll events
-      setVisible(false)
-
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current)
-      }
-
-      // Re-enable visibility after scroll stops for 400ms
-      scrollTimeout.current = setTimeout(() => {
-        setVisible(true)
-      }, 400)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      if (scrollTimeout.current) {
-        clearTimeout(scrollTimeout.current)
-      }
-    }
-  }, [])
 
   function handleTouchStart(e: React.TouchEvent) {
     let target = e.target as HTMLElement | null

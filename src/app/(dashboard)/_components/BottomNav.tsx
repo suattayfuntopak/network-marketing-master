@@ -41,7 +41,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   }, [pathname])
 
   function navigate(targetHref: string) {
-    prefetchRouteData(queryClient, targetHref, ws?.workspaceId)
+    prefetchRouteData(queryClient, targetHref, ws?.workspaceId, ws)
     const currentIdx = items.findIndex(
       ({ href }) => pathname === href || (href !== '/pano' && pathname.startsWith(href)),
     )
@@ -71,6 +71,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             key={href}
             ref={active ? activeRef : undefined}
             onClick={() => navigate(href)}
+            onPointerEnter={() => prefetchRouteData(queryClient, href, ws?.workspaceId, ws)}
             className={clsx(
               'flex shrink-0 cursor-pointer flex-col items-center gap-1 px-2 py-3 text-center text-[10px] font-bold transition-all duration-150 min-w-[76px] sm:min-w-[84px]',
               active

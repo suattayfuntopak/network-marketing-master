@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useCallback } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { BarChart3 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
@@ -20,7 +20,6 @@ import { weeklyAccent } from './weeklyTheme'
 
 export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
-  const qc = useQueryClient()
   const { data: ws } = useWorkspace()
   const wid = ws?.workspaceId
   const { data: members = [], isLoading: membersLoading } = useEkipPanelRows(wid)
@@ -39,21 +38,24 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const { data: weeklySelf, isLoading: weeklySelfLoading } = useQuery({
     queryKey: queryKeys.hubWeeklySelf(),
     queryFn: getHubWeeklySelfAction,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: crownWeekly, isLoading: crownWeeklyLoading } = useQuery({
     queryKey: ['crown', 'weekly-page', wid],
     queryFn: () => getCrownWeeklyPageAction(wid!),
     enabled: !!wid && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const { data: activity, isLoading: activityLoading } = useQuery({
     queryKey: queryKeys.teamFieldActivity(wid ?? '', '7d', activityMemberIds),
     queryFn: () => getTeamFieldActivityAction(wid!, '7d', activityMemberIds),
     enabled: !!wid && activityMemberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
 
   const teamActivity = crownWeekly?.activity ?? activity
@@ -67,25 +69,16 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
     [members],
   )
 
-  function refresh() {
-    qc.invalidateQueries({ queryKey: ['team-field-activity'] })
-    qc.invalidateQueries({ queryKey: ['candidates'] })
-    qc.invalidateQueries({ queryKey: queryKeys.hubWeeklySelf() })
-    qc.invalidateQueries({ queryKey: ['crown', 'weekly-page'] })
-  }
-
-  const selfLoading = weeklySelfLoading
+  const selfLoading = weeklySelfLoading && !weeklySelf
   const weekActive = weeklySelf?.weekActive ?? Array.from({ length: 7 }, () => false)
 
   return (
     <HubPageShell
       title={t('dashboard.crownMockWeeklySummary')}
-      subtitle={t('crown.weeklySubtitle')}
       icon={BarChart3}
       iconClassName={weeklyAccent.icon}
       backHref="/pano"
-      onRefresh={refresh}
-      refreshing={membersLoading || activityLoading || weeklySelfLoading || crownWeeklyLoading}
+      showRefresh={false}
       asTab={asTab}
     >
       <div className="space-y-4">
@@ -109,7 +102,7 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
         <HubPeriodTeamPanel
           downlines={downlines}
           activity={teamActivity}
-          loading={membersLoading || activityLoading || crownWeeklyLoading}
+          loading={membersLoading || ((activityLoading || crownWeeklyLoading) && !teamActivity)}
           teamStatsLocked={!teamPulseUnlocked}
           joinedInPeriod={joinedInPeriod}
           period="7d"

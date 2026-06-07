@@ -1,16 +1,25 @@
 'use client'
 
 import { Lock } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { SquareButton } from '@/components/ui/SquareButton'
 import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { useWorkspace } from '@/hooks/useWorkspace'
 import { PANO_ORGANIZATION_ITEMS } from '@/lib/domain/navigation'
+import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 
 export function PanoLauncherGrid() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const { data: ws } = useWorkspace()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const items = PANO_ORGANIZATION_ITEMS
+
+  function warmRoute(href: string) {
+    prefetchRouteData(queryClient, href, ws?.workspaceId, ws)
+  }
 
   return (
     <>
@@ -19,7 +28,11 @@ export function PanoLauncherGrid() {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
 
           return (
-            <LauncherGridItem key={href} fillViewport>
+            <LauncherGridItem
+              key={href}
+              fillViewport
+              onPointerEnter={() => warmRoute(href)}
+            >
               <SquareButton
                 icon={icon}
                 label={t(translationKey)}

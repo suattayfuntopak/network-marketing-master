@@ -44,7 +44,7 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
         href={targetHref}
         prefetch
         onClick={onClose}
-        onMouseEnter={() => prefetchRouteData(queryClient, targetHref, ws?.workspaceId)}
+        onMouseEnter={() => prefetchRouteData(queryClient, targetHref, ws?.workspaceId, ws)}
         className={clsx(
           'flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors',
           isCrown
