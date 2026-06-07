@@ -7,13 +7,14 @@ import {
   CalendarDays,
   CalendarRange,
   ClipboardList,
+  Map,
   Video,
   type LucideIcon,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const ILGILEN_TAB_IDS = ['daily', 'weekly', 'monthly', 'first30', 'live'] as const
+export const ILGILEN_TAB_IDS = ['roadmap', 'daily', 'weekly', 'monthly', 'first30', 'live'] as const
 export type IlgilenTabId = (typeof ILGILEN_TAB_IDS)[number]
 
 const CROWN_ITEMS: readonly {
@@ -22,6 +23,7 @@ const CROWN_ITEMS: readonly {
   icon: LucideIcon
   activeClass: string
 }[] = [
+  { id: 'roadmap', labelKey: 'dashboard.panoRoadmap', icon: Map, activeClass: 'bg-[#3730A3] text-white shadow-md' },
   { id: 'daily',   labelKey: 'dashboard.crownMockDailyFollow',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
   { id: 'weekly',  labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },

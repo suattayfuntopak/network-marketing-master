@@ -1,6 +1,7 @@
 import {
   LayoutDashboard, ScanEye, TrendingUp, Bot, Users,
-  CalendarDays, BookOpen,
+  CalendarDays, CalendarRange, BookOpen, Map,
+  BarChart3, ClipboardList, Video,
   BarChart2, Crown, Ellipsis,
   type LucideIcon,
 } from 'lucide-react'
@@ -82,11 +83,17 @@ export function isNavMoreRouteActive(pathname: string): boolean {
   return MORE_ROUTE_PREFIXES.some(p => pathname === p || pathname.startsWith(p))
 }
 
-export const PANO_LAUNCHER_ITEMS: readonly PanoLauncherItem[] = [
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye, color: 'amber', desktopColor: 'amber' },
-  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
-  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'pink', desktopColor: 'pink' },
-  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'purple', desktopColor: 'purple' },
+/** Pano — Crown Organizasyon: kişisel yolculuk kutuları (+ YZ Koçu, Vaktin Varsa). */
+export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
+  { href: '/bugun/ilgilen?tab=roadmap', translationKey: 'dashboard.panoRoadmap', icon: Map, color: 'indigo', desktopColor: 'indigo' },
+  { href: '/bugun/ilgilen?tab=daily', translationKey: 'dashboard.crownMockDailyFollow', icon: ClipboardList, color: 'purple', desktopColor: 'purple' },
+  { href: '/bugun/ilgilen?tab=weekly', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'teal', desktopColor: 'teal' },
+  { href: '/bugun/ilgilen?tab=monthly', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'pink', desktopColor: 'pink' },
+  { href: '/bugun/ilgilen?tab=first30', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
+  { href: '/bugun/ilgilen?tab=live', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'blue', desktopColor: 'blue' },
+  { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'cyan', desktopColor: 'cyan' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'chick', desktopColor: 'chick' },
 ]
+
+/** @deprecated Pano artık PANO_ORGANIZATION_ITEMS kullanır */
+export const PANO_LAUNCHER_ITEMS = PANO_ORGANIZATION_ITEMS

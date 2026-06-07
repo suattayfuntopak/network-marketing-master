@@ -5,7 +5,6 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { HubGoalChipRow } from '@/lib/ui/hub/HubGoalChipRow'
 import { IlgilenContent } from './IlgilenContent'
-import { HedefKart } from '@/app/(dashboard)/pano/_components/HedefKart'
 import { FieldWeekSummary } from '@/app/(dashboard)/_components/pulse/FieldWeekSummary'
 import { TodayRitualSection } from './TodayRitualSection'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
@@ -32,7 +31,6 @@ export function DailyTab() {
         />
       ) : null}
       <IlgilenContent />
-      <HedefKart />
       <FieldWeekSummary />
       <TodayRitualSection />
     </div>

@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-07 — Pano Crown Organizasyon kutuları ✅
+
+**Pano:** 6’lı karışık launcher kaldırıldı → 8 kişisel kutu (`PANO_ORGANIZATION_ITEMS`): Yol Haritam, Bugünkü Takibim, Haftalık, Aylık, İlk 30, Canlı Eğitim + YZ Koçu + Vaktin Varsa. Boru Hattı / Takvim / Ekibim panodan çıktı (nav’da kalır).
+
+**Üst bölüm:** `Organizasyon` etiketi; `PanoTodaySummary` panodan kaldırıldı (kutulara taşındı).
+
+**Hızlı Bakış:** Yeni `roadmap` sekmesi (`HedefKart`); günlük sekmeden hedef kartı ayrıldı.
+
+**Grid:** 8 kutu — mobil 4 satır, md 3 satır; pano mobilde `overflow-y-auto`.
+
+**Dosyalar:** `navigation.ts`, `PanoContent.tsx`, `PanoLauncherGrid.tsx`, `LauncherGrid.tsx`, `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx`, `DailyTab.tsx`, `tr.ts`, `en.ts`
+
 ## 2026-06-07 — Freemium sprint (Faz 0→5→1-2→3-4→6) ✅
 
 **Faz 0:** Free forever — `accountLifecycle` trial sonrası tam kilit kaldırıldı; `featureAccess` matrisi + `UpgradePrompt` / `useUpgradePrompt`.

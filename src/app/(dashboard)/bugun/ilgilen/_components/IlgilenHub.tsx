@@ -8,6 +8,7 @@ import { CrownVideoPage } from '@/app/(dashboard)/canli-egitim/_components/Crown
 import { CrownWeeklyPage } from '@/app/(dashboard)/haftalik-ozet/_components/CrownWeeklyPage'
 import { CrownMonthlyPage } from '@/app/(dashboard)/aylik-ozet/_components/CrownMonthlyPage'
 import { CrownFirst30Page } from '@/app/(dashboard)/ilk-30-gun/_components/CrownFirst30Page'
+import { HedefKart } from '@/app/(dashboard)/pano/_components/HedefKart'
 
 function isValidTab(s: string | null): s is IlgilenTabId {
   return ILGILEN_TAB_IDS.includes(s as IlgilenTabId)
@@ -39,6 +40,7 @@ export function IlgilenHub() {
       <div className="w-full space-y-5">
         <IlgilenHubGrid activeTab={activeTab} />
 
+        {v.has('roadmap') && <div className={activeTab !== 'roadmap' ? 'hidden' : 'mt-5'}><HedefKart /></div>}
         {v.has('daily')   && <div className={activeTab !== 'daily'   ? 'hidden' : 'mt-5'}><DailyTab /></div>}
         {v.has('weekly')  && <div className={activeTab !== 'weekly'  ? 'hidden' : 'mt-5'}><CrownWeeklyPage asTab /></div>}
         {v.has('monthly') && <div className={activeTab !== 'monthly' ? 'hidden' : 'mt-5'}><CrownMonthlyPage asTab /></div>}

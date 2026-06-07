@@ -5,16 +5,17 @@ import { SquareButton } from '@/components/ui/SquareButton'
 import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { PANO_LAUNCHER_ITEMS } from '@/lib/domain/navigation'
+import { PANO_ORGANIZATION_ITEMS } from '@/lib/domain/navigation'
 
 export function PanoLauncherGrid() {
   const { t } = useTranslation()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
+  const items = PANO_ORGANIZATION_ITEMS
 
   return (
     <>
-      <LauncherGrid fillViewport>
-        {PANO_LAUNCHER_ITEMS.map(({ href, translationKey, icon, color }) => {
+      <LauncherGrid fillViewport itemCount={items.length}>
+        {items.map(({ href, translationKey, icon, color }) => {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
 
           return (

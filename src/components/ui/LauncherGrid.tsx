@@ -5,10 +5,22 @@ type LauncherGridProps = {
   children: ReactNode
   /** Masaüstünde kalan viewport yüksekliğini doldur (pano launcher). */
   fillViewport?: boolean
+  /** 2 sütun (mobil) / 3 sütun (md+) grid satır sayısını hesaplar. */
+  itemCount?: number
+}
+
+function gridRowsClass(itemCount: number | undefined, fillViewport: boolean): string {
+  if (!fillViewport) return 'gap-3 md:gap-[1.125rem]'
+  const n = itemCount ?? 6
+  const mobileRows = Math.ceil(n / 2)
+  const desktopRows = Math.ceil(n / 3)
+  const mobile = mobileRows === 4 ? 'grid-rows-4' : mobileRows >= 5 ? 'grid-rows-5' : 'grid-rows-3'
+  const desktop = desktopRows === 3 ? 'md:grid-rows-3' : desktopRows >= 4 ? 'md:grid-rows-4' : 'md:grid-rows-2'
+  return clsx('min-h-0 h-full flex-1 gap-2 md:gap-[1.125rem]', mobile, desktop)
 }
 
 /** Pano + Bugün İlgilen launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
-export function LauncherGrid({ children, fillViewport = false }: LauncherGridProps) {
+export function LauncherGrid({ children, fillViewport = false, itemCount }: LauncherGridProps) {
   return (
     <div
       className={clsx(
@@ -19,7 +31,7 @@ export function LauncherGrid({ children, fillViewport = false }: LauncherGridPro
       <div
         className={clsx(
           'grid w-full grid-cols-2 md:grid-cols-3',
-          fillViewport ? 'min-h-0 h-full flex-1 grid-rows-3 gap-2 md:grid-rows-2 md:gap-[1.125rem]' : 'gap-3 md:gap-[1.125rem]',
+          fillViewport ? gridRowsClass(itemCount, true) : 'gap-3 md:gap-[1.125rem]',
         )}
       >
         {children}
