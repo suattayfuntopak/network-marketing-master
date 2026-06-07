@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-07 — Vercel build fix: /ekip Suspense ✅
+
+**Sorun:** `useSearchParams()` `/ekip` page'de Suspense olmadan — prerender hatası, son 4 deploy fail.
+
+**Çözüm:** `EkipPageContent` client bileşeni + `page.tsx` içinde `<Suspense fallback={EkipPageSkeleton}>` (IlgilenHub ile aynı kalıp).
+
+**Dosyalar:** `ekip/page.tsx`, `ekip/_components/EkipPageContent.tsx`
+
 ## 2026-06-07 — Pano Crown Organizasyon kutuları ✅
 
 **Pano:** 6’lı karışık launcher kaldırıldı → 8 kişisel kutu (`PANO_ORGANIZATION_ITEMS`): Yol Haritam, Bugünkü Takibim, Haftalık, Aylık, İlk 30, Canlı Eğitim + YZ Koçu + Vaktin Varsa. Boru Hattı / Takvim / Ekibim panodan çıktı (nav’da kalır).
