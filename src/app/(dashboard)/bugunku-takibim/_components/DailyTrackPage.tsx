@@ -97,11 +97,11 @@ export function DailyTrackPage() {
         <Link
           href="/hedefim"
           className={clsx(
-            'flex items-start gap-3 rounded-2xl border px-4 py-3 transition',
+            'flex items-center gap-3 rounded-2xl border px-4 py-3 transition',
             dailyTrackAccent.banner,
           )}
         >
-          <Target className={clsx('mt-0.5 h-5 w-5 shrink-0', dailyTrackAccent.bannerIcon)} strokeWidth={1.75} />
+          <Target className={clsx('h-5 w-5 shrink-0', dailyTrackAccent.bannerIcon)} strokeWidth={1.75} />
           <p className={clsx('text-sm font-medium', dailyTrackAccent.bannerText)}>
             {t('crown.goalBanner', {
               months: goal.targetMonths,
