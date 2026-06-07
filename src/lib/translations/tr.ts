@@ -220,7 +220,7 @@ export const tr = {
     dailyTrackAboutToday: "Bugüne Dair",
     dailyTrackNotesPlaceholder: "Bugünü kısaca özetle…",
     dailyTrackSaved: "Bugün kaydedildi",
-    crownMockLiveTraining: "Canlı Eğitim",
+    crownMockLiveTraining: "Eğitim İlerlemem",
     crownMockWeeklySummary: "Haftalık Özet",
     crownMockMonthlySummary: "Aylık Özet",
     crownMockFirst30Days: "İlk 30 Gün",

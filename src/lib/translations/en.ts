@@ -220,7 +220,7 @@ export const en = {
     dailyTrackAboutToday: "About Today",
     dailyTrackNotesPlaceholder: "Summarize your day briefly…",
     dailyTrackSaved: "Today saved",
-    crownMockLiveTraining: "Live Training",
+    crownMockLiveTraining: "My Training Progress",
     crownMockWeeklySummary: "Weekly Summary",
     crownMockMonthlySummary: "Monthly Summary",
     crownMockFirst30Days: "First 30 Days",
