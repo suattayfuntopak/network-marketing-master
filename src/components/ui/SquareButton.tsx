@@ -43,18 +43,18 @@ const filledClass = (
     opts?.className,
   )
 
-// ─── Crown variant: tam kutu — her kutunun kendi marka rengi (eski üst çizgi hex'leri) ───
+// ─── Crown variant: canlı gradient kutular (pano launcher) ───────────────────
 const crownSolidMap: Record<ButtonColor, string> = {
-  purple: 'bg-[#534AB7] text-white hover:bg-[#453DA0] dark:bg-[#534AB7] dark:text-white dark:hover:bg-[#453DA0]',
-  teal:   'bg-[#0F6E56] text-white hover:bg-[#0d5c48] dark:bg-[#0F6E56] dark:text-white dark:hover:bg-[#0d5c48]',
-  amber:  'bg-[#854F0B] text-white hover:bg-[#704208] dark:bg-[#854F0B] dark:text-white dark:hover:bg-[#704208]',
-  pink:   'bg-[#72243E] text-white hover:bg-[#601e34] dark:bg-[#72243E] dark:text-white dark:hover:bg-[#601e34]',
-  blue:   'bg-[#1A56DB] text-white hover:bg-[#1648b8] dark:bg-[#1A56DB] dark:text-white dark:hover:bg-[#1648b8]',
-  coral:  'bg-[#C03E1F] text-white hover:bg-[#a5341a] dark:bg-[#C03E1F] dark:text-white dark:hover:bg-[#a5341a]',
-  rose:   'bg-[#9B1D47] text-white hover:bg-[#83193c] dark:bg-[#9B1D47] dark:text-white dark:hover:bg-[#83193c]',
-  indigo: 'bg-[#3730A3] text-white hover:bg-[#2e288a] dark:bg-[#3730A3] dark:text-white dark:hover:bg-[#2e288a]',
-  cyan:   'bg-[#0891B2] text-white hover:bg-[#077a96] dark:bg-[#0891B2] dark:text-white dark:hover:bg-[#077a96]',
-  yellow: 'bg-[#854D0E] text-white hover:bg-[#704208] dark:bg-[#854D0E] dark:text-white dark:hover:bg-[#704208]',
+  purple: 'bg-gradient-to-br from-[#54C1F0] to-[#0095DD] text-white hover:brightness-105',
+  teal:   'bg-gradient-to-br from-[#90E894] to-[#009688] text-white hover:brightness-105',
+  amber:  'bg-gradient-to-br from-[#FFD54B] to-[#FF9A00] text-white hover:brightness-105',
+  pink:   'bg-gradient-to-br from-[#FF6F91] to-[#E04070] text-white hover:brightness-105',
+  blue:   'bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white hover:brightness-105',
+  coral:  'bg-gradient-to-br from-[#FF9D7A] to-[#FF5722] text-white hover:brightness-105',
+  rose:   'bg-gradient-to-br from-[#FF5252] to-[#D81B60] text-white hover:brightness-105',
+  indigo: 'bg-gradient-to-br from-[#9D81FF] to-[#5D44C9] text-white hover:brightness-105',
+  cyan:   'bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white hover:brightness-105',
+  yellow: 'bg-gradient-to-br from-[#FFD54B] to-[#FF9A00] text-white hover:brightness-105',
 }
 
 const crownClass = (
@@ -67,8 +67,8 @@ const crownClass = (
     'rounded-[14px] md:rounded-[12px]',
     'transition-all duration-150',
     'active:scale-95 hover:scale-[1.03]',
-    'border border-black/5 dark:border-white/10',
-    'shadow-[0_4px_20px_-2px_rgba(0,0,0,0.12)] hover:shadow-lg dark:shadow-[0_4px_24px_-2px_rgba(0,0,0,0.35)]',
+    'border border-white/20',
+    'shadow-[0_4px_20px_-2px_rgba(0,0,0,0.15)] hover:shadow-lg dark:shadow-[0_4px_24px_-2px_rgba(0,0,0,0.4)]',
     crownSolidMap[color],
     opts?.compact
       ? 'h-[76px] p-3'
@@ -126,7 +126,7 @@ export function SquareButton({
             ? 'h-5 w-5 shrink-0'
             : prominent
               ? variant === 'crown'
-                ? 'h-8 w-8 shrink-0 md:h-10 md:w-10'
+                ? 'h-8 w-8 shrink-0 drop-shadow-sm md:h-10 md:w-10'
                 : 'h-6 w-6 shrink-0 md:h-[2.375rem] md:w-[2.375rem]'
               : variant === 'crown'
                 ? 'h-7 w-7 shrink-0 md:h-9 md:w-9'
@@ -140,7 +140,7 @@ export function SquareButton({
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
               ? variant === 'crown'
-                ? 'line-clamp-2 text-center text-[15px] font-semibold leading-snug md:text-[20px]'
+                ? 'line-clamp-2 text-center text-[15px] font-semibold leading-snug drop-shadow-sm md:text-[20px]'
                 : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
               : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }

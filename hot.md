@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-07 — Pano kutuları canlı gradient renkler ✅
+
+**SquareButton crown:** Düz koyu renkler → referans paletindeki `bg-gradient-to-br` gradientler. Pano eşlemesi: Hızlı Bakış gökyüzü mavisi, Boru Hattı yeşil, Takvim pembe, Ekibim turuncu, YZ Koçu royal mavi, Vaktin Varsa mor. Beyaz metin + hafif drop-shadow.
+
+**Dosya:** `SquareButton.tsx`
+
 ## 2026-06-07 — Pano mobil viewport sığdırma + etiket 15/20px ✅
 
 **Mobil 6 kutu tam görünür:** `aspect-square` kaldırıldı; `grid-rows-3` + `h-full flex-1` ile kalan yükseklik paylaşılıyor. Pano `main` mobilde `h-[calc(100dvh-4rem)] overflow-hidden`, flex zinciri `min-h-0`.
