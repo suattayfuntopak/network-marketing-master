@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-07 — Pano Hızlı Bakış ↔ Vaktin Varsa renk swap ✅
+
+**Hızlı Bakış:** Vaktin Varsa'nın turuncu gradient'i (`amber`). **Vaktin Varsa:** pastel civciv sarısı (`chick` — `#FFF8B0` → `#FFE066`).
+
+**Dosyalar:** `navigation.ts`, `SquareButton.tsx`
+
 ## 2026-06-07 — Mobil UX düzeltmeleri + pano renk swap ✅
 
 **YZ Koçu:** Üst sekmeler mobilde iki satır (truncate kaldırıldı); uyum alt sekmeleri tek satır; gereksiz alt başlıklar kaldırıldı (sayfa, koçluk, saha provası).

@@ -83,10 +83,10 @@ export function isNavMoreRouteActive(pathname: string): boolean {
 }
 
 export const PANO_LAUNCHER_ITEMS: readonly PanoLauncherItem[] = [
-  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye, color: 'peach', desktopColor: 'peach' },
+  { href: '/bugun/ilgilen', translationKey: 'nav.todayFocus', icon: ScanEye, color: 'amber', desktopColor: 'amber' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'pink', desktopColor: 'pink' },
   { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'indigo', desktopColor: 'indigo' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'purple', desktopColor: 'purple' },
-  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'amber', desktopColor: 'amber' },
+  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'chick', desktopColor: 'chick' },
 ]
