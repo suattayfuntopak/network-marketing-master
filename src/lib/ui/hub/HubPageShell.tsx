@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, RefreshCw, type LucideIcon } from 'lucide-react'
+import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
@@ -65,7 +66,7 @@ export function HubPageShell({
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <div className="w-full space-y-5">
-        <header className="flex items-start justify-between gap-3">
+        <header className={clsx('flex justify-between gap-3', subtitle ? 'items-start' : 'items-center')}>
           <div className="flex min-w-0 items-center gap-3">
             <Link
               href={backHref}

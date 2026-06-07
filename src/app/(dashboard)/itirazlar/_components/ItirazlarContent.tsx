@@ -13,7 +13,15 @@ import type { CustomItiraz } from '../types'
 import { ItirazCard } from './ItirazCard'
 import { AddObjectionModal } from './AddObjectionModal'
 
-export function ItirazlarContent({ embedded = false }: { embedded?: boolean }) {
+export function ItirazlarContent({
+  embedded = false,
+  addFormOpen: addFormOpenProp,
+  onAddFormOpenChange,
+}: {
+  embedded?: boolean
+  addFormOpen?: boolean
+  onAddFormOpenChange?: (open: boolean) => void
+}) {
   const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const searchParams = useSearchParams()
@@ -30,7 +38,9 @@ export function ItirazlarContent({ embedded = false }: { embedded?: boolean }) {
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
   const [customItirazlar, setCustomItirazlar] = useState<CustomItiraz[]>([])
-  const [formOpen, setFormOpen] = useState(false)
+  const [internalFormOpen, setInternalFormOpen] = useState(false)
+  const formOpen = addFormOpenProp ?? internalFormOpen
+  const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
 
   useEffect(() => {
     let cancelled = false
@@ -174,7 +184,7 @@ export function ItirazlarContent({ embedded = false }: { embedded?: boolean }) {
         </header>
       )}
 
-      {embedded && (
+      {embedded && !onAddFormOpenChange && (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <p className="text-sm text-[var(--text-2)]">{t('objectionsPage.subtitle')}</p>
           <button
@@ -186,6 +196,10 @@ export function ItirazlarContent({ embedded = false }: { embedded?: boolean }) {
           </button>
         </div>
       )}
+
+      {embedded && onAddFormOpenChange ? (
+        <p className="mb-4 text-sm text-[var(--text-2)]">{t('objectionsPage.subtitle')}</p>
+      ) : null}
 
       <div className="mb-4 relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-3)] pointer-events-none" />

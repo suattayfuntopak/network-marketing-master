@@ -2,9 +2,12 @@
 
 import Link from 'next/link'
 import { Film, ChevronRight } from 'lucide-react'
+import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useVideoCatalog } from '@/hooks/useVideoCatalog'
+import { akademiHref } from '@/lib/domain/akademiTab'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { videoProgressAccent } from '@/app/(dashboard)/canli-egitim/_components/videoProgressTheme'
 
 export function PanoVideoStrip() {
   const { t } = useTranslation()
@@ -25,24 +28,29 @@ export function PanoVideoStrip() {
 
   return (
     <Link
-      href="/egitim/videolar"
-      className="block rounded-2xl border border-teal-500/25 bg-gradient-to-br from-teal-50/80 to-emerald-50/50 p-4 shadow-sm transition hover:border-teal-500/40 active:scale-[0.99] dark:from-teal-950/30 dark:to-emerald-950/20"
+      href={akademiHref('videos')}
+      className={clsx(
+        'block rounded-2xl border p-4 shadow-sm transition active:scale-[0.99]',
+        videoProgressAccent.border,
+        videoProgressAccent.surface,
+        videoProgressAccent.surfaceHover,
+      )}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
-          <Film className="h-5 w-5 shrink-0 text-teal-700 dark:text-teal-400" />
+          <Film className={clsx('h-5 w-5 shrink-0', videoProgressAccent.textDark)} />
           <span className="truncate text-sm font-bold text-[var(--text-1)]">
             {t('videoTraining.panoStripTitle')}
           </span>
         </div>
         <div className="flex shrink-0 items-center gap-1">
-          <span className="text-lg font-black tabular-nums text-teal-700 dark:text-teal-400">%{pct}</span>
+          <span className={clsx('text-lg font-black tabular-nums', videoProgressAccent.textDark)}>%{pct}</span>
           <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
         </div>
       </div>
-      <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-white/60 dark:bg-black/20">
+      <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
         <div
-          className="h-full rounded-full bg-teal-600 transition-all"
+          className={clsx('h-full rounded-full transition-all', videoProgressAccent.progress)}
           style={{ width: `${Math.min(100, pct)}%` }}
         />
       </div>

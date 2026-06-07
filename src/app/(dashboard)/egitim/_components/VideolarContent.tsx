@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Film, Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -20,12 +20,26 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 const PAGE_SIZE = 9
 
-export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
+export function VideolarContent({
+  embedded = false,
+  addFormOpen: addFormOpenProp,
+  onAddFormOpenChange,
+}: {
+  embedded?: boolean
+  addFormOpen?: boolean
+  onAddFormOpenChange?: (open: boolean) => void
+}) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const isAdmin = !!ws?.isSuperAdmin
-  const [modalOpen, setModalOpen] = useState(false)
+  const [internalModalOpen, setInternalModalOpen] = useState(false)
+  const modalOpen = addFormOpenProp ?? internalModalOpen
+  const setModalOpen = onAddFormOpenChange ?? setInternalModalOpen
+
+  useEffect(() => {
+    if (addFormOpenProp) setEditing(null)
+  }, [addFormOpenProp])
   const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
   const [deletingVideo, setDeletingVideo] = useState<TrainingVideoAdmin | null>(null)
   const [page, setPage] = useState(0)
@@ -89,15 +103,14 @@ export function VideolarContent({ embedded = false }: { embedded?: boolean }) {
           {embedded && (
             <p className="text-sm text-[var(--text-2)]">{t('videoTraining.pageSubtitle')}</p>
           )}
-          {isAdmin && (
+          {isAdmin && !embedded && (
             <button
               type="button"
               onClick={() => { setEditing(null); setModalOpen(true) }}
-              title="Yeni video ekle"
-              aria-label="Yeni video ekle"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white shadow-sm transition active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#28227d] active:scale-95"
             >
-              <Plus className="h-4 w-4" strokeWidth={2.75} />
+              <Plus className="h-3.5 w-3.5" />
+              <span>{t('videoTraining.addVideoShort')}</span>
             </button>
           )}
         </div>

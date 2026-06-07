@@ -2,10 +2,10 @@ export const trainingSection = {
   tr: {
     akademi: {
       title: 'Vaktin Varsa',
-      subtitle: 'İçerik bankası, video eğitimler ve itiraz cevapları tek yerde',
-      tabContentBank: 'İçerik Bankası',
+      subtitle: 'İçerik kütüphanesi, video eğitimler ve itiraz bankası tek yerde',
+      tabContentBank: 'İçerik Kütüphanesi',
       tabVideos: 'Video Eğitimler',
-      tabObjections: 'İtirazlara Cevaplar',
+      tabObjections: 'İtiraz Bankası',
     },
     trainingPage: {
       contentAdded: 'İçerik başarıyla eklendi!',
@@ -97,10 +97,10 @@ export const trainingSection = {
   en: {
     akademi: {
       title: 'When You Have Time',
-      subtitle: 'Content bank, video training, and objection replies in one place',
-      tabContentBank: 'Content Bank',
+      subtitle: 'Content library, video training, and objection bank in one place',
+      tabContentBank: 'Content Library',
       tabVideos: 'Video Training',
-      tabObjections: 'Objection Replies',
+      tabObjections: 'Objection Bank',
     },
     trainingPage: {
       contentAdded: 'Content added successfully!',

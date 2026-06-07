@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, TrendingUp, Bot, Users,
   CalendarDays, CalendarRange, BookOpen, Target,
-  BarChart3, ClipboardList, Video,
+  BarChart3, ClipboardList, GraduationCap,
   BarChart2, Crown, Ellipsis,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,7 +27,7 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/ilk-30-gun', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: Video, color: 'chick', desktopColor: 'chick' },
+  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
   { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'purple', desktopColor: 'purple' },
