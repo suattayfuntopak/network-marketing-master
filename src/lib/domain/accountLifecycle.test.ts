@@ -9,7 +9,7 @@ describe('getAccountLifecycle', () => {
     expect(getAccountLifecycle({ licenseType: 'leader' }).phase).toBe('paid')
   })
 
-  it('returns trial for active 14-day free access', () => {
+  it('returns trial for active 14-day window', () => {
     expect(
       getAccountLifecycle({
         licenseType: 'free',
@@ -19,13 +19,13 @@ describe('getAccountLifecycle', () => {
     ).toBe('trial')
   })
 
-  it('locks access immediately after trial ends (no limited_free)', () => {
+  it('never blocks access after trial — free phase instead', () => {
     const lc = getAccountLifecycle({
       licenseType: 'free',
       licenseExpiresAt: pastTrial,
       workspaceCreatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
     })
-    expect(lc.phase).toBe('access_locked')
-    expect(lc.isAccessBlocked).toBe(true)
+    expect(lc.phase).toBe('free')
+    expect(lc.isAccessBlocked).toBe(false)
   })
 })

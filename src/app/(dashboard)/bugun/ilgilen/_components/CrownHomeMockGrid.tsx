@@ -1,19 +1,19 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import {
   BarChart3,
   CalendarDays,
   CalendarRange,
   ClipboardList,
-  Users,
   Video,
   type LucideIcon,
 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const ILGILEN_TAB_IDS = ['daily', 'live', 'team', 'weekly', 'monthly', 'first30'] as const
+export const ILGILEN_TAB_IDS = ['daily', 'weekly', 'monthly', 'first30', 'live'] as const
 export type IlgilenTabId = (typeof ILGILEN_TAB_IDS)[number]
 
 const CROWN_ITEMS: readonly {
@@ -23,11 +23,10 @@ const CROWN_ITEMS: readonly {
   activeClass: string
 }[] = [
   { id: 'daily',   labelKey: 'dashboard.crownMockDailyFollow',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
-  { id: 'live',    labelKey: 'dashboard.crownMockLiveTraining',   icon: Video,         activeClass: 'bg-[#1A56DB] text-white shadow-md' },
-  { id: 'team',    labelKey: 'nav.ekip',                          icon: Users,         activeClass: 'bg-amber-600 text-white shadow-md' },
   { id: 'weekly',  labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
   { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days',    icon: CalendarDays,  activeClass: 'bg-[#C03E1F] text-white shadow-md' },
+  { id: 'live',    labelKey: 'dashboard.crownMockLiveTraining',   icon: Video,         activeClass: 'bg-[#1A56DB] text-white shadow-md' },
 ]
 
 type Props = {
@@ -49,7 +48,10 @@ export function IlgilenHubGrid({ activeTab }: Props) {
           {t('nav.todayFocus')}
         </h1>
         <p className="mt-1 text-sm text-[var(--text-2)]">
-          {t('pagesUi.todayPrioritiesSubtitle')}
+          {t('pagesUi.todayPrioritiesSubtitle')}{' '}
+          <Link href="/ekip" className="font-semibold text-[#534AB7] hover:underline">
+            {t('nav.ekip')} →
+          </Link>
         </p>
       </div>
       <nav

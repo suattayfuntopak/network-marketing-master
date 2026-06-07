@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy, Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
@@ -22,6 +22,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { toast } from 'sonner'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 function daysSince(iso: string | null, t: (k: string, v?: Record<string, string | number>) => string): string {
   if (!iso) return t('common.noContact')
@@ -48,8 +49,13 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   const [generating, setGenerating] = useState(false)
   const [activeMessage, setActiveMessage] = useState<string | null>(null)
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   async function handleAIMessage() {
+    if (!hasAiFieldAccess) {
+      openUpgrade('ai_field')
+      return
+    }
     setGenerating(true)
     try {
       const result = await generateQuickMessageAction({
@@ -145,7 +151,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             <button
               onClick={handleAIMessage}
               disabled={generating}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:shadow-md disabled:opacity-50 cursor-pointer animate-all duration-200 active:scale-95"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:shadow-md disabled:opacity-50 cursor-pointer animate-all duration-200 active:scale-95"
               aria-label="AI Mesaj Üret"
               title="AI Mesaj Üret"
             >
@@ -153,6 +159,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
               ) : (
                 <Bot className="h-4 w-4" strokeWidth={1.75} />
+              )}
+              {!hasAiFieldAccess && (
+                <Lock className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]" strokeWidth={2.5} aria-hidden />
               )}
             </button>
             {waLink && (
@@ -447,6 +456,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         </div>,
         document.body
       )}
+      {UpgradePrompt}
     </>
   )
 }

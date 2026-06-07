@@ -5,6 +5,7 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
+import { PanoTodaySummary } from './PanoTodaySummary'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
@@ -50,7 +51,8 @@ export function PanoContent() {
         </header>
 
         {!cLoading && (
-          <div className="shrink-0">
+          <div className="shrink-0 space-y-3">
+            <PanoTodaySummary />
             <WelcomeCard candidateCount={candidates.length} />
           </div>
         )}

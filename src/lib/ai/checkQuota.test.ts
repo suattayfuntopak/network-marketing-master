@@ -80,14 +80,11 @@ describe('checkAIQuota', () => {
     }
   })
 
-  it('allows compliance during active free trial', async () => {
+  it('blocks all AI for free license (including active trial window)', async () => {
     setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: future }, dailyCount: 0 })
     const res = await checkAIQuota('compliance')
-    expect(res.ok).toBe(true)
-    if (res.ok) {
-      expect(res.licenseType).toBe('basic')
-      expect(res.limit).toBe(2)
-    }
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.reason).toBe('feature_unavailable')
   })
 
   it('gates compliance after trial ends', async () => {
@@ -105,8 +102,8 @@ describe('checkAIQuota', () => {
     if (!res.ok) expect(res.reason).toBe('feature_unavailable')
   })
 
-  it('returns limit_reached when daily usage meets the trial limit', async () => {
-    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: future }, dailyCount: 15 })
+  it('returns limit_reached when daily usage meets the plan limit', async () => {
+    setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'basic', license_expires_at: future }, dailyCount: 15 })
     const res = await checkAIQuota('message')
     expect(res.ok).toBe(false)
     if (!res.ok) {
@@ -115,17 +112,17 @@ describe('checkAIQuota', () => {
     }
   })
 
-  it('returns post-trial free message limit when trial expired', async () => {
+  it('blocks free plan message AI regardless of usage', async () => {
     setup({ user: { id: 'u1', email: null }, membership: { workspace_id: 'w1' }, workspace: { license_type: 'free', license_expires_at: past }, dailyCount: 5 })
     const res = await checkAIQuota('message')
     expect(res.ok).toBe(false)
     if (!res.ok) {
-      expect(res.reason).toBe('limit_reached')
-      expect(res.limit).toBe(5)
+      expect(res.reason).toBe('feature_unavailable')
+      expect(res.limit).toBe(0)
     }
   })
 
-  it('infers trial limits from workspace created_at when expiry is missing', async () => {
+  it('blocks free plan when trial inferred from created_at', async () => {
     const recent = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
     setup({
       user: { id: 'u1', email: null },
@@ -138,8 +135,8 @@ describe('checkAIQuota', () => {
       dailyCount: 0,
     })
     const res = await checkAIQuota('compliance')
-    expect(res.ok).toBe(true)
-    if (res.ok) expect(res.limit).toBe(2)
+    expect(res.ok).toBe(false)
+    if (!res.ok) expect(res.reason).toBe('feature_unavailable')
   })
 
   it('returns ok with correct remaining when under the limit', async () => {

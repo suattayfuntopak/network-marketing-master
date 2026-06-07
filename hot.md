@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-07 — Freemium sprint (Faz 0→5→1-2→3-4→6) ✅
+
+**Faz 0:** Free forever — `accountLifecycle` trial sonrası tam kilit kaldırıldı; `featureAccess` matrisi + `UpgradePrompt` / `useUpgradePrompt`.
+
+**Faz 5:** Free planda YZ Koçu + saha AI tam kilit (`checkQuota`, pano launcher 🔒, `/yazar`, pipeline AI, onboarding koç Bot).
+
+**Free ekip (A):** `/ekip` herkese açık — gör + davet; Plus/Pro tam panel. `TeamFreeUpgradeBanner` + kısıtlı üye listesi.
+
+**Faz 1–2:** Pano `PanoTodaySummary` (hedef hunisi mini + Hızlı Bakış CTA). Hızlı Bakış sekmeleri: Günlük → Haftalık → Aylık → İlk 30 → Canlı; `team` sekmesi kaldırıldı → `/ekip` linki.
+
+**Faz 3–4:** `/ekip` yatay sekmeler (Üyeler, Davet, Aktivite, Eğitim, Ağaç). `/ekibim` → `/ekip` redirect. Nesil ağacı (`treeActions` + `TeamGenerationTree`).
+
+**Deploy:** Migration yok; Supabase değişikliği yok.
+
+**Dosyalar:** `featureAccess.ts`, `accountLifecycle.ts`, `checkQuota.ts`, `UpgradePrompt.tsx`, `useUpgradePrompt.tsx`, `PanoTodaySummary.tsx`, `PanoContent.tsx`, `CrownHomeMockGrid.tsx`, `IlgilenHub.tsx`, `EkipTabNav.tsx`, `EkipPanel.tsx`, `TeamGenerationTree.tsx`, `ekibim/page.tsx`, çeviri `tr.ts`/`en.ts`, `shell.ts`
+
 ## 2026-06-07 — Vaktin Varsa chick sarısı koyulaştırıldı ✅
 
 **chick gradient:** `#FFD966` → `#FF9900` (~%50 daha koyu; beyaz etiket okunabilirliği).

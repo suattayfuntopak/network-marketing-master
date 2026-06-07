@@ -11,6 +11,10 @@ import { InviteTeammateSection } from './InviteTeammateSection'
 import { JoinByInviteSection } from './JoinByInviteSection'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
+import { EkipActivityTab } from './EkipActivityTab'
+import { EkipTrainingTab } from './EkipTrainingTab'
+import { TeamGenerationTree } from './TeamGenerationTree'
+import type { EkipTabId } from './EkipTabNav'
 import {
   joinWorkspaceByInviteAction,
   removeTeamMemberAction,
@@ -29,7 +33,7 @@ import { getMemberGoalsMapAction } from '../memberGoalsActions'
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
 
-export function EkipPanel() {
+export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) {
   const queryClient = useQueryClient()
   const { lang, t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
@@ -193,27 +197,38 @@ export function EkipPanel() {
 
   return (
     <div className="space-y-7">
-      <TeamPerformanceSection
-        t={t}
-        lang={lang}
-        ws={ws}
-        members={members}
-        visibleMembers={filteredVisibleMembers}
-        isLeader={isLeader}
-        isSolo={members.length <= 1}
-        isPlusCapReached={isPlusCapReached}
-        hasMasterAccess={hasMasterAccess}
-        setOnboardingCoachData={setOnboardingCoachData}
-        toggleOnboardingStep={toggleOnboardingStep}
-        handleInviteMember={handleInviteMember}
-        memberSearch={memberSearch}
-        onMemberSearchChange={setMemberSearch}
-        teamPulseUnlocked={teamPulseUnlocked}
-        teamPageUnlocked={teamPageUnlocked}
-        memberGoalsMap={memberGoalsMap}
-      />
+      {activeTab === 'members' && (
+        <TeamPerformanceSection
+          t={t}
+          lang={lang}
+          ws={ws}
+          members={members}
+          visibleMembers={filteredVisibleMembers}
+          isLeader={isLeader}
+          isSolo={members.length <= 1}
+          isPlusCapReached={isPlusCapReached}
+          hasMasterAccess={hasMasterAccess}
+          setOnboardingCoachData={setOnboardingCoachData}
+          toggleOnboardingStep={toggleOnboardingStep}
+          handleInviteMember={handleInviteMember}
+          memberSearch={memberSearch}
+          onMemberSearchChange={setMemberSearch}
+          teamPulseUnlocked={teamPulseUnlocked}
+          teamPageUnlocked={teamPageUnlocked}
+          memberGoalsMap={memberGoalsMap}
+        />
+      )}
 
-      {isLeader && (
+      {activeTab === 'training' && (
+        <EkipTrainingTab
+          t={t}
+          lang={lang}
+          members={members}
+          teamPageUnlocked={teamPageUnlocked}
+        />
+      )}
+
+      {activeTab === 'invite' && isLeader && (
         <InviteTeammateSection
           inviteCode={ws.inviteCode}
           copied={copied}
@@ -222,7 +237,7 @@ export function EkipPanel() {
         />
       )}
 
-      {!ws.hasUpline && (
+      {activeTab === 'invite' && !ws.hasUpline && (
         <JoinByInviteSection
           inviteCodeInput={inviteCodeInput}
           joining={joining}
@@ -232,7 +247,21 @@ export function EkipPanel() {
         />
       )}
 
-      <BroadcastPanel members={visibleMembers} t={t} />
+      {activeTab === 'invite' && ws.hasUpline && !isLeader && (
+        <p className="rounded-2xl border border-dashed border-[var(--border)] py-8 text-center text-sm text-[var(--text-3)]">
+          {t('team.inviteMemberOnlyLeader')}
+        </p>
+      )}
+
+      {activeTab === 'activity' && <EkipActivityTab />}
+
+      {activeTab === 'tree' && (
+        <TeamGenerationTree workspaceId={ws.workspaceId} teamPageUnlocked={teamPageUnlocked} />
+      )}
+
+      {activeTab === 'members' && isLeader && teamPageUnlocked && (
+        <BroadcastPanel members={visibleMembers} t={t} />
+      )}
 
       {memberToRemove && (
         <ConfirmDeleteModal

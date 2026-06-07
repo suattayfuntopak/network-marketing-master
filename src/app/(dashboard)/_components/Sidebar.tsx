@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { ChevronLeft, ChevronRight, Crown, Lock } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Crown } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import {
@@ -12,7 +12,6 @@ import {
   NAV_ADMIN,
   type NavItem,
 } from '@/lib/domain/navigation'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -27,7 +26,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
 
   const sidebarItems: NavItem[] = [
     ...NAV_SIDEBAR_MODULES,
@@ -37,13 +35,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
   function renderLink(item: NavItem) {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
     const Icon = item.icon
-    const isTeamLocked = item.href === '/ekip' && teamLocked
-    const href = isTeamLocked ? '/odeme' : item.href
 
     return (
       <Link
         key={item.href}
-        href={href}
+        href={item.href}
         title={collapsed ? t(item.translationKey) : undefined}
         onMouseEnter={() => prefetchRouteData(queryClient, item.href, ws?.workspaceId)}
         className={clsx(
@@ -58,9 +54,6 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {!collapsed && (
           <span className="flex min-w-0 flex-1 items-center gap-2">
             <span className="truncate">{t(item.translationKey)}</span>
-            {isTeamLocked && (
-              <Lock className="h-3.5 w-3.5 shrink-0 text-[var(--text-3)]" strokeWidth={2} aria-hidden />
-            )}
             {item.href === NAV_ADMIN.href && (
               <Crown className="h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={1.75} aria-hidden />
             )}

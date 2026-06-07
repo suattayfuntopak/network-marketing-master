@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ArrowLeft, Phone, Pencil, Bot } from 'lucide-react'
+import { ArrowLeft, Phone, Pencil, Bot, Lock } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidateDetail, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -28,6 +28,7 @@ import { NmmInviteSheet } from './NmmInviteSheet'
 import { LeaderNotesCard } from './LeaderNotesCard'
 import { ActivityLogCard } from './ActivityLogCard'
 import { PresentationMaterialsCard } from './PresentationMaterialsCard'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { CandidateStageCard } from './CandidateStageCard'
 import { CandidateFollowUpCard } from './CandidateFollowUpCard'
 import { CandidateDeleteCard } from './CandidateDeleteCard'
@@ -57,6 +58,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const { data: c, isLoading: cLoading } = useCandidateDetail(ws?.workspaceId, candidateId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   const parsed = c
     ? resolveCandidateFields(c)
@@ -206,11 +208,21 @@ export function CandidateDetail({ candidateId }: Props) {
             {/* Aksiyon butonları */}
             <div className="grid grid-cols-3 gap-3">
               <button
-                onClick={() => router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.noteTr)}&warmth=${parsed.warmth}`)}
-                className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
+                type="button"
+                onClick={() => {
+                  if (!hasAiFieldAccess) {
+                    openUpgrade('ai_field')
+                    return
+                  }
+                  router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.noteTr)}&warmth=${parsed.warmth}`)
+                }}
+                className="relative flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
               >
                 <Bot className="h-4 w-4" strokeWidth={1.75} />
                 {t('pipeline.aiMessage')}
+                {!hasAiFieldAccess && (
+                  <Lock className="absolute right-3 top-3 h-3 w-3 text-[var(--text-3)]" strokeWidth={2.5} aria-hidden />
+                )}
               </button>
               {waLink ? (
                 <a
@@ -295,6 +307,7 @@ export function CandidateDetail({ candidateId }: Props) {
           onClose={closeInvite}
         />
       )}
+      {UpgradePrompt}
     </>
   )
 }

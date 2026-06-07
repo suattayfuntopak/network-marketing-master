@@ -3,7 +3,7 @@
 // block previously duplicated across 7+ action files.
 
 import { createClient } from '@/lib/supabase/server'
-import { getEffectiveLicenseType, getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { getEffectiveLicenseType, getLimitsForLicense, normalizeLicenseType } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'
@@ -74,6 +74,20 @@ export async function checkAIQuota(
       if (licenseType !== 'free' && licenseExpiresAt && new Date(licenseExpiresAt) < new Date()) {
         licenseType = 'free'
       }
+    }
+  }
+
+  const normalized = normalizeLicenseType(licenseType)
+
+  // Free plan: AI tamamen kilitli (trial Basic kredileri YZ Koçu için devre dışı).
+  if (!superAdmin && normalized === 'free') {
+    return {
+      ok: false,
+      reason: 'feature_unavailable',
+      message: lang === 'en'
+        ? 'AI Coach and field AI tools require a paid plan. Choose Basic, Plus, or Pro to continue.'
+        : 'Yapay Zeka Koçu ve saha AI araçları ücretli planlarda açılır. Devam etmek için Basic, Plus veya Pro seçin.',
+      limit: 0,
     }
   }
 

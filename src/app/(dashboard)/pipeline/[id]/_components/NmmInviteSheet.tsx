@@ -9,6 +9,7 @@ import { waHref } from '@/lib/utils/waLink'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateNmmInviteMessage } from '../actions'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 interface Props {
   candidate: { id: string; full_name: string | null; phone: string | null }
@@ -21,13 +22,18 @@ interface Props {
  */
 export function NmmInviteSheet({ candidate, onClose }: Props) {
   const { t } = useTranslation()
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   useBodyScrollLock()
 
-  // İlk üretim: setState yalnız Promise çözülünce → effect içinde senkron setState yok.
   useEffect(() => {
+    if (!hasAiFieldAccess) {
+      setLoading(false)
+      openUpgrade('ai_field')
+      return
+    }
     let cancelled = false
     generateNmmInviteMessage(candidate.id).then((res) => {
       if (cancelled) return
@@ -38,17 +44,20 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
     return () => {
       cancelled = true
     }
-  }, [candidate.id])
+  }, [candidate.id, hasAiFieldAccess, openUpgrade])
 
-  // Yeniden üret (kullanıcı eylemi → setState burada serbest).
   const regenerate = useCallback(async () => {
+    if (!hasAiFieldAccess) {
+      openUpgrade('ai_field')
+      return
+    }
     setLoading(true)
     setError(null)
     const res = await generateNmmInviteMessage(candidate.id)
     if (res.error) setError(res.error)
     else setMessage(res.message ?? '')
     setLoading(false)
-  }, [candidate.id])
+  }, [candidate.id, hasAiFieldAccess, openUpgrade])
 
   const waLink = waHref(candidate.phone, message)
 
@@ -155,6 +164,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
         )}
         </div>
       </div>
+      {UpgradePrompt}
     </>
   )
 }

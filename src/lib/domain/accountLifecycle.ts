@@ -1,16 +1,17 @@
 import { isTrialPeriodActive, TRIAL_DAYS } from '@/lib/domain/aiUsage'
 
-export type AccountPhase = 'paid' | 'trial' | 'access_locked'
+export type AccountPhase = 'paid' | 'trial' | 'free'
 
 export interface AccountLifecycle {
   phase: AccountPhase
   registeredAt: Date
-  /** 14 günlük ücretsiz erişim bitişi */
-  freeAccessEndsAt: Date
+  /** 14 günlük tanıtım dönemi bitişi (bilgilendirme; erişim kilidi yok). */
+  trialEndsAt: Date
+  /** @deprecated Her zaman false — free kullanıcı uygulamada kalır, özellik kilitleri ayrı yönetilir. */
   isAccessBlocked: boolean
 }
 
-function resolveFreeAccessEnd(
+function resolveTrialEnd(
   licenseType: string,
   licenseExpiresAt: string | null | undefined,
   workspaceCreatedAt: string | null | undefined
@@ -28,7 +29,7 @@ function resolveFreeAccessEnd(
   return end
 }
 
-/** SaaS tek dönem: 14 gün Basic kredileri, sonra plan yoksa erişim kilidi. */
+/** Free forever: trial yalnızca bilgilendirme; uygulama geneli asla kilitlenmez. */
 export function getAccountLifecycle(params: {
   licenseType: string | null | undefined
   licenseExpiresAt?: string | null
@@ -40,7 +41,7 @@ export function getAccountLifecycle(params: {
     ? new Date(params.workspaceCreatedAt)
     : new Date()
 
-  const freeAccessEndsAt = resolveFreeAccessEnd(
+  const trialEndsAt = resolveTrialEnd(
     licenseType,
     params.licenseExpiresAt,
     params.workspaceCreatedAt
@@ -50,7 +51,7 @@ export function getAccountLifecycle(params: {
     return {
       phase: 'paid',
       registeredAt,
-      freeAccessEndsAt,
+      trialEndsAt,
       isAccessBlocked: false,
     }
   }
@@ -62,9 +63,9 @@ export function getAccountLifecycle(params: {
   )
 
   return {
-    phase: trialActive ? 'trial' : 'access_locked',
+    phase: trialActive ? 'trial' : 'free',
     registeredAt,
-    freeAccessEndsAt,
-    isAccessBlocked: !trialActive,
+    trialEndsAt,
+    isAccessBlocked: false,
   }
 }

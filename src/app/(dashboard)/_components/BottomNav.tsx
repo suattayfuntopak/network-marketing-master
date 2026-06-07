@@ -4,12 +4,10 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useEffect, useRef, useMemo } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { setNavDir } from './DashboardShell'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ADMIN, NAV_SIDEBAR_MODULES } from '@/lib/domain/navigation'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -26,7 +24,6 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
   const activeRef = useRef<HTMLButtonElement | null>(null)
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
 
   const items = useMemo(
     () => (isSuperAdmin ? [...NAV_SIDEBAR_MODULES, NAV_ADMIN] : NAV_SIDEBAR_MODULES),
@@ -67,14 +64,13 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
         const pending = pendingHref === href
         const isCrown = href === '/platform-yonetim'
-        const isTeamLocked = href === '/ekip' && teamLocked
         const label = t(translationKey.replace('nav.', 'navMobile.'))
 
         return (
           <button
             key={href}
             ref={active ? activeRef : undefined}
-            onClick={() => navigate(isTeamLocked ? '/odeme' : href)}
+            onClick={() => navigate(href)}
             className={clsx(
               'flex shrink-0 cursor-pointer flex-col items-center gap-1 px-2 py-3 text-center text-[10px] font-bold transition-all duration-150 min-w-[76px] sm:min-w-[84px]',
               active
@@ -95,13 +91,6 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
                 className={clsx('h-5 w-5', active && 'drop-shadow-sm', isCrown && !active && 'animate-pulse')}
                 strokeWidth={active || pending || isCrown ? 2.25 : 1.75}
               />
-              {isTeamLocked && (
-                <Lock
-                  className="absolute -right-1 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]"
-                  strokeWidth={2.5}
-                  aria-hidden
-                />
-              )}
             </span>
             <span className="whitespace-nowrap">{label}</span>
           </button>

@@ -4,43 +4,44 @@ import { Lock } from 'lucide-react'
 import { SquareButton } from '@/components/ui/SquareButton'
 import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { useWorkspace } from '@/hooks/useWorkspace'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { PANO_LAUNCHER_ITEMS } from '@/lib/domain/navigation'
 
 export function PanoLauncherGrid() {
   const { t } = useTranslation()
-  const { data: ws } = useWorkspace()
-  const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
+  const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   return (
-    <LauncherGrid fillViewport>
-      {PANO_LAUNCHER_ITEMS.map(({ href, translationKey, icon, color }) => {
-        const isTeamLocked = href === '/ekip' && teamLocked
+    <>
+      <LauncherGrid fillViewport>
+        {PANO_LAUNCHER_ITEMS.map(({ href, translationKey, icon, color }) => {
+          const isAiLocked = href === '/yazar' && !hasAiCoachAccess
 
-        return (
-          <LauncherGridItem key={href} fillViewport>
-            <SquareButton
-              icon={icon}
-              label={t(translationKey)}
-              color={color}
-              variant="crown"
-              href={isTeamLocked ? '/odeme' : href}
-              prominent
-              fill
-            />
-            {isTeamLocked && (
-              <span
-                className="pointer-events-none absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm md:right-3 md:top-3"
-                aria-hidden
-              >
-                <Lock className="h-3 w-3 md:h-3.5 md:w-3.5" strokeWidth={2.25} />
-              </span>
-            )}
-          </LauncherGridItem>
-        )
-      })}
-    </LauncherGrid>
+          return (
+            <LauncherGridItem key={href} fillViewport>
+              <SquareButton
+                icon={icon}
+                label={t(translationKey)}
+                color={color}
+                variant="crown"
+                href={isAiLocked ? undefined : href}
+                onClick={isAiLocked ? () => openUpgrade('ai_coach') : undefined}
+                prominent
+                fill
+              />
+              {isAiLocked && (
+                <span
+                  className="pointer-events-none absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm md:right-3 md:top-3"
+                  aria-hidden
+                >
+                  <Lock className="h-3 w-3 md:h-3.5 md:w-3.5" strokeWidth={2.25} />
+                </span>
+              )}
+            </LauncherGridItem>
+          )
+        })}
+      </LauncherGrid>
+      {UpgradePrompt}
+    </>
   )
 }

@@ -34,34 +34,56 @@ export const shellSection = {
       upgradeMenuDesc: 'Basic, Plus veya Pro — daha yüksek günlük YZ kredileri',
       teamGateTitle: 'Ekibim Plus veya Pro planlarda',
       teamGateDesc:
-        'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Basic plan bireysel liderlik araçlarını kapsar.',
+        'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Ücretsiz planda ekibinizi görebilir ve davet kodunuzla yeni üyeler ekleyebilirsiniz.',
       featureGateTitle: 'Bu özellik planınızda yer almıyor',
       featureGateDesc: 'Devam etmek için planınızı yükseltin.',
+      upgradeAiCoachTitle: 'Yapay Zeka Koçu planınızda açık değil',
+      upgradeAiCoachDesc:
+        'Mesaj yazma, saha provası ve uyum denetimi gibi AI araçları Basic, Plus veya Pro planlarda kullanılabilir. Boru hattı, takvim ve eğitimler ücretsiz planda açık kalır.',
+      upgradeAiFieldTitle: 'Bu AI aracı planınızda açık değil',
+      upgradeAiFieldDesc:
+        'Saha mesajları, davet metinleri ve not özetleri gibi yapay zeka destekli araçlar ücretli planlarda açılır.',
+      upgradeTeamPulseTitle: 'Ekip Nabzı Pro planda',
+      upgradeTeamPulseDesc:
+        'Alt ekibinizin öğrenme ve aktivite nabzını görmek için Pro plana geçin.',
+      upgradeStatsTitle: 'Gelişmiş istatistikler Plus ve Pro planda',
+      upgradeStatsDesc:
+        'Ekip performans tablosu ve gelişmiş metrikler için Plus veya Pro planına geçin.',
+      planLabel_basic: 'Basic',
+      planLabel_plus: 'Plus',
+      planLabel_pro: 'Pro',
+      planBlurb_basic: 'YZ Koçu + günlük krediler',
+      planBlurb_plus: 'Ekibim + yüksek limit',
+      planBlurb_pro: 'Ekip nabzı + tam güç',
+      teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
+      teamFreeBannerDesc:
+        'Davet kodunuzla yeni üyeler ekleyebilirsiniz. Detaylı performans takibi ve ekip nabzı Plus veya Pro planda açılır.',
       accountAlertEyebrow: 'Önemli',
       accountAlertTitle: 'HESAP DURUMU İLE İLGİLİ ÖNEMLİ DUYURU!',
-      accountAlertTrialTitle: 'Deneme süren {days} gün sonra bitiyor — planları gör',
-      accountAlertTrialTitleLast: 'Deneme süren bugün/yarın bitiyor — planları gör',
-      accountAlertLockedTitle: 'Deneme süren doldu — Basic kapandı, devam için plan seç',
+      accountAlertFreeTitle: 'Ücretsiz plandasınız — AI araçları kilitli, planları gör',
+      accountAlertTrialTitle: 'Tanıtım dönemin {days} gün sonra bitiyor — planları gör',
+      accountAlertTrialTitleLast: 'Tanıtım dönemin bugün/yarın bitiyor — planları gör',
+      accountAlertLockedTitle: 'Yapay Zeka Koçu kilitli — plan seçerek açın',
       accountAlertTap: 'Detayları gör',
       accountAlertClose: 'Kapat',
       accountModalTitle: 'HESAP BİLGİLERİNİZ',
       accountModalSectionPlan: 'Plan ve kullanım detayları',
       accountModalRegistered: 'Üyelik başlangıcı: {date}',
       accountModalFreeAccess:
-        'Ücretsiz erişim süresi: Tüm özelliklerin açık olduğu 14 günlük deneme hakkınız {date} tarihine kadar geçerlidir.',
+        'Ücretsiz plan: Boru hattı, takvim, eğitimler ve ekibe davet her zaman açık. Yapay Zeka Koçu ve gelişmiş ekip araçları ücretli planlarda.',
       accountModalTrialBullets:
-        '14 günlük ücretsiz deneme: Deneme süreniz boyunca günlük 15 Yapay Zeka Koçu, 10 Saha Provası ve 2 Uyum Denetimi mesaj hakkı ile Basic plan özelliklerini eksiksiz deneyimleyebilirsiniz.',
+        '14 günlük tanıtım dönemi: Bu süre boyunca platformu keşfedebilirsiniz. YZ Koçu ve AI saha araçları Basic veya üzeri planda açılır.',
       accountModalTeamBullets:
-        'Ekibim sayfası ve yüksek limitler: Plus veya Pro planlarından birine geçiş yaptığınızda Ekibim sayfası erişiminiz aktif hale gelir. İhtiyacınıza göre daha yüksek yapay zeka mesaj limitleri için bu planları tercih edebilirsiniz.',
+        'Ekibim: Ücretsiz planda ekibinizi görür ve davet edersiniz. Detaylı performans takibi Plus veya Pro planda.',
       accountModalFootnote:
-        'Önemli not: 14 günlük deneme sürecinin sonunda bir abonelik başlatılmaması durumunda hesap kullanımına geçici olarak ara verilecektir. ({date})',
+        'Not: Ücretsiz planda uygulama kullanımınız devam eder; yalnızca AI ve gelişmiş ekip özellikleri plan yükseltmesi gerektirir.',
       accountModalFreeAccessDesktop:
-        'Ücretsiz erişim (14 gün, Basic kredileri): {date} tarihine kadar.',
+        'Ücretsiz plan — temel araçlar açık; AI Plus/Basic ile.',
       accountModalTrialBulletsDesktop:
-        'Denemede günlük 15 YZ Koçu, 10 Saha Provası, 2 Uyum Denetimi.',
-      accountModalTeamBulletsDesktop: 'Ekibim ve yüksek limitler: Plus veya Pro plan.',
+        'Tanıtım dönemi bilgilendirme amaçlıdır; AI Basic+ ile açılır.',
+      accountModalTeamBulletsDesktop: 'Ekibim: gör + davet (free); tam panel Plus/Pro.',
       accountModalFootnoteDesktop:
-        'Deneme bitiminde abonelik yoksa erişim duraklatılır ({date}).',
+        'Free planda erişim devam eder; AI ve gelişmiş ekip plan gerektirir.',
     },
   },
   en: {
@@ -99,34 +121,56 @@ export const shellSection = {
       upgradeMenuDesc: 'Basic, Plus, or Pro — higher daily AI credits',
       teamGateTitle: 'Team hub is on Plus or Pro',
       teamGateDesc:
-        'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. Basic covers individual leader tools.',
+        'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. On the free plan you can view your team and invite new members with your code.',
       featureGateTitle: 'This feature is not on your plan',
       featureGateDesc: 'Upgrade your plan to continue.',
+      upgradeAiCoachTitle: 'AI Coach is not on your plan',
+      upgradeAiCoachDesc:
+        'Message writing, roleplay, and compliance tools are available on Basic, Plus, or Pro. Pipeline, calendar, and training stay open on the free plan.',
+      upgradeAiFieldTitle: 'This AI tool is not on your plan',
+      upgradeAiFieldDesc:
+        'Field messages, invite copy, and note summaries require a paid plan.',
+      upgradeTeamPulseTitle: 'Team Pulse is on Pro',
+      upgradeTeamPulseDesc:
+        'See your downline learning and activity pulse with a Pro plan.',
+      upgradeStatsTitle: 'Advanced stats are on Plus and Pro',
+      upgradeStatsDesc:
+        'Unlock the team performance table and advanced metrics with Plus or Pro.',
+      planLabel_basic: 'Basic',
+      planLabel_plus: 'Plus',
+      planLabel_pro: 'Pro',
+      planBlurb_basic: 'AI Coach + daily credits',
+      planBlurb_plus: 'Team hub + higher limits',
+      planBlurb_pro: 'Team pulse + full power',
+      teamFreeBannerTitle: 'Viewing your team',
+      teamFreeBannerDesc:
+        'Invite new members with your code. Detailed performance tracking and Team Pulse unlock on Plus or Pro.',
       accountAlertEyebrow: 'Important',
       accountAlertTitle: 'IMPORTANT NOTICE ABOUT YOUR ACCOUNT!',
-      accountAlertTrialTitle: 'Your trial ends in {days} days — view plans',
+      accountAlertFreeTitle: 'You are on the free plan — AI tools are locked, view plans',
+      accountAlertTrialTitle: 'Your intro period ends in {days} days — view plans',
       accountAlertTrialTitleLast: 'Your trial ends today/tomorrow — view plans',
-      accountAlertLockedTitle: 'Your trial has ended — Basic closed, pick a plan to continue',
+      accountAlertLockedTitle: 'AI Coach is locked — choose a plan to unlock',
       accountAlertTap: 'View details',
       accountAlertClose: 'Close',
       accountModalTitle: 'YOUR ACCOUNT INFORMATION',
       accountModalSectionPlan: 'Plan and usage details',
       accountModalRegistered: 'Membership started: {date}',
       accountModalFreeAccess:
-        'Free access: Your 14-day trial with all features is valid until {date}.',
+        'Free plan: Pipeline, calendar, training, and team invites stay open. AI Coach and advanced team tools require a paid plan.',
       accountModalTrialBullets:
-        '14-day free trial: Enjoy Basic plan features with 15 AI Coach, 10 roleplay, and 2 compliance messages per day throughout your trial.',
+        '14-day intro period: Explore the platform. AI Coach and field AI tools open on Basic or above.',
       accountModalTeamBullets:
-        'Team hub and higher limits: Upgrade to Plus or Pro to unlock the Team page and higher daily AI limits.',
+        'Team: View and invite on the free plan. Detailed performance tracking is on Plus or Pro.',
       accountModalFootnote:
-        'Important: If you do not start a subscription when your 14-day trial ends, account access will be paused until you choose a plan. ({date})',
+        'Note: Your free plan keeps app access; only AI and advanced team features need an upgrade.',
       accountModalFreeAccessDesktop:
-        'Free access (14-day trial, Basic credits): valid until {date}.',
+        'Free plan — core tools open; AI on Basic+.',
       accountModalTrialBulletsDesktop:
-        'During trial: 15 AI Coach, 10 roleplay, 2 compliance messages per day.',
-      accountModalTeamBulletsDesktop: 'Team hub and higher limits: Plus or Pro plan.',
+        'Intro period is informational; AI opens on Basic+.',
+      accountModalTeamBulletsDesktop: 'Team: view + invite (free); full hub Plus/Pro.',
       accountModalFootnoteDesktop:
-        'Without a subscription after trial, access pauses ({date}).',
+        'Free plan access continues; AI and advanced team need a plan.',
     },
   },
 } as const

@@ -40,19 +40,18 @@ export function AccountStatusAlert() {
   if (!lifecycle || lifecycle.phase === 'paid') return null
 
   const registered = formatDateTime(lifecycle.registeredAt, lang)
-  const accessEnd = formatDateTime(lifecycle.freeAccessEndsAt, lang)
+  const trialEnd = formatDateTime(lifecycle.trialEndsAt, lang)
 
-  // Faz ayrımı: aktif deneme → sakin amber + gün sayacı; süre dolmuş → güçlü kırmızı.
-  const isLocked = lifecycle.phase === 'access_locked'
-  const daysLeft = Math.max(0, Math.ceil((lifecycle.freeAccessEndsAt.getTime() - now) / 86_400_000))
-  const bannerTitle = isLocked
-    ? t('shellUi.accountAlertLockedTitle')
-    : daysLeft <= 1
+  const isTrial = lifecycle.phase === 'trial'
+  const daysLeft = Math.max(0, Math.ceil((lifecycle.trialEndsAt.getTime() - now) / 86_400_000))
+  const bannerTitle = isTrial
+    ? daysLeft <= 1
       ? t('shellUi.accountAlertTrialTitleLast')
       : t('shellUi.accountAlertTrialTitle', { days: daysLeft })
-  const bannerClass = isLocked
-    ? 'from-[#DC2626] to-[#B91C1C] shadow-red-900/40'
-    : 'from-[#D97706] to-[#B45309] shadow-amber-900/30'
+    : t('shellUi.accountAlertFreeTitle')
+  const bannerClass = isTrial
+    ? 'from-[#D97706] to-[#B45309] shadow-amber-900/30'
+    : 'from-[#534AB7]/90 to-[#7c3aed]/90 shadow-indigo-900/25'
 
   return (
     <>
@@ -108,10 +107,10 @@ export function AccountStatusAlert() {
               <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
                 <li>{t('shellUi.accountModalRegistered', { date: registered })}</li>
                 <li className="md:hidden">
-                  {t('shellUi.accountModalFreeAccess', { date: accessEnd })}
+                  {t('shellUi.accountModalFreeAccess')}
                 </li>
                 <li className="hidden md:list-item">
-                  {t('shellUi.accountModalFreeAccessDesktop', { date: accessEnd })}
+                  {t('shellUi.accountModalFreeAccessDesktop')}
                 </li>
               </ul>
 
@@ -133,11 +132,16 @@ export function AccountStatusAlert() {
 
               <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)] md:py-2.5 md:text-sm">
                 <span className="md:hidden">
-                  {t('shellUi.accountModalFootnote', { date: accessEnd })}
+                  {t('shellUi.accountModalFootnote')}
                 </span>
                 <span className="hidden md:inline">
-                  {t('shellUi.accountModalFootnoteDesktop', { date: accessEnd })}
+                  {t('shellUi.accountModalFootnoteDesktop')}
                 </span>
+                {isTrial && (
+                  <span className="mt-1 block text-[10px] text-[var(--text-3)]">
+                    {trialEnd}
+                  </span>
+                )}
               </p>
             </div>
 

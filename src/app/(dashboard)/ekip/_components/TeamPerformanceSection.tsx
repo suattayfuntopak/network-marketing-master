@@ -21,6 +21,8 @@ import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
+import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -159,6 +161,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const [now] = useState(() => Date.now())
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
   const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
@@ -302,7 +305,62 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const leaderPipelineTotal = members.find(m => m.role === 'leader')?.candidate_count ?? 0
   const pureCandidateCount = Math.max(0, leaderPipelineTotal - nmmPartnerCount - fieldPartnerCount)
 
+  if (!teamPageUnlocked) {
+    return (
+      <>
+      <section className="space-y-5">
+        <TeamFreeUpgradeBanner />
+        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
+          <BarChart2 className="h-5 w-5" />
+          {t('team.performancePanel')}
+        </h2>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800/80 dark:text-emerald-300/90">
+              {t('team.statLeader')}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-[#D4A017]">{nmmPartnerCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
+              {t('team.statNmmPartner')}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#FEECEC] dark:bg-red-950/25 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-red-600 dark:text-red-400">{fieldPartnerCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-red-700/80 dark:text-red-300/90">
+              {t('team.statFieldPartner')}
+            </p>
+          </div>
+          <div className="rounded-2xl border border-[var(--border)] bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5 sm:p-6 shadow-sm">
+            <p className="text-3xl sm:text-4xl font-black text-accent-blue">{pureCandidateCount}</p>
+            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#3658C7]">
+              {t('team.totalCandidates')}
+            </p>
+          </div>
+        </div>
+        <ul className="space-y-2">
+          {visibleMembers.map(m => (
+            <li
+              key={m.user_id}
+              className="flex items-center justify-between rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm"
+            >
+              <span className="font-semibold text-[var(--text-1)] truncate">{m.full_name ?? t('common.member')}</span>
+              <span className="shrink-0 text-xs text-[var(--text-3)]">
+                {m.role === 'leader' ? t('common.leader') : t('shellUi.roleMember')}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+      {UpgradePrompt}
+      </>
+    )
+  }
+
   return (
+      <>
       <section className="space-y-5">
         <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
           <BarChart2 className="h-5 w-5" />
@@ -693,6 +751,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                         type="button"
                                         onClick={e => {
                                           e.stopPropagation()
+                                          if (!hasAiFieldAccess) {
+                                            openUpgrade('ai_field')
+                                            return
+                                          }
                                           setOnboardingCoachData({
                                             memberName: m.full_name || '',
                                             stepId: step.id,
@@ -801,5 +863,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           </p>
         )}
       </section>
+      {UpgradePrompt}
+      </>
   )
 }

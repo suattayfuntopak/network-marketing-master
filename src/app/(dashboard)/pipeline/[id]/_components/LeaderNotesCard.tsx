@@ -14,6 +14,7 @@ import {
   isLeaderUserNote,
 } from '@/lib/domain/dailyActionNote'
 import { generateNotesSummary, translateNoteAction, persistLeaderNoteTranslationAction } from '../actions'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 interface Props {
   candidateId: string
@@ -40,11 +41,16 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
   const leaderNotes = useMemo(() => notes.filter(isLeaderUserNote), [notes])
   const noteBadgeCount = notesOpen ? leaderNotes.length : notesCount
   const addNoteMutation = useAddCandidateNote(workspaceId)
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   const attemptedActionUpdates = useRef<Record<string, boolean>>({})
 
   const handleGenerateSummary = async () => {
     if (leaderNotes.length === 0) return
+    if (!hasAiFieldAccess) {
+      openUpgrade('ai_field')
+      return
+    }
     setIsSummaryPending(true)
     try {
       const rawNotes = leaderNotes.map(n => resolveDailyActionNote(n).noteTr)
@@ -257,6 +263,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
           </div>
         </div>
       )}
+      {UpgradePrompt}
     </div>
   )
 }
