@@ -8,6 +8,8 @@
 
 **Dosyalar:** `ekip/page.tsx`, `ekip/_components/EkipPageContent.tsx`
 
+**Git:** `3e66797` — push `main`
+
 ## 2026-06-07 — Pano Crown Organizasyon kutuları ✅
 
 **Pano:** 6’lı karışık launcher kaldırıldı → 8 kişisel kutu (`PANO_ORGANIZATION_ITEMS`): Yol Haritam, Bugünkü Takibim, Haftalık, Aylık, İlk 30, Canlı Eğitim + YZ Koçu + Vaktin Varsa. Boru Hattı / Takvim / Ekibim panodan çıktı (nav’da kalır).
