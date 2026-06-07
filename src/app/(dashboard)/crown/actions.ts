@@ -341,6 +341,45 @@ export type HubWeeklySelfPayload = {
   weeklyActuals: FunnelCounts
   pctOverall: number
   callsGap: number
+  loginDays: number
+  /** Son 7 gün — Pazartesi’den başlayarak giriş yapılan günler */
+  weekActive: boolean[]
+}
+
+export type HubMonthlySelfPayload = {
+  hasGoal: boolean
+  monthlyTargets: FunnelCounts
+  monthlyActuals: FunnelCounts
+  loginDays: number
+  dayOfMonth: number
+  daysInMonth: number
+  monthPct: number
+}
+
+async function loginDaysSince(userId: string, since: string): Promise<{ count: number; weekActive: boolean[] }> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_daily_actions')
+    .select('created_at')
+    .eq('user_id', userId)
+    .gte('created_at', since)
+
+  const daySet = new Set<string>()
+  for (const row of data ?? []) {
+    daySet.add(row.created_at.slice(0, 10))
+  }
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const weekActive: boolean[] = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today)
+    d.setDate(d.getDate() - i)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    weekActive.push(daySet.has(key))
+  }
+
+  return { count: daySet.size, weekActive }
 }
 
 async function funnelActualsSince(
@@ -384,17 +423,8 @@ async function funnelActualsSince(
 
 export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
   const progress = await getDailyProgressAction()
-  if (!progress.hasGoal) {
-    return {
-      hasGoal: false,
-      weeklyTargets: EMPTY_FUNNEL,
-      weeklyActuals: EMPTY_FUNNEL,
-      pctOverall: 0,
-      callsGap: 0,
-    }
-  }
-  const supabase = await createClient()
   const { user } = await getAuthUser()
+
   if (!user) {
     return {
       hasGoal: false,
@@ -402,10 +432,29 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
       weeklyActuals: EMPTY_FUNNEL,
       pctOverall: 0,
       callsGap: 0,
+      loginDays: 0,
+      weekActive: Array.from({ length: 7 }, () => false),
     }
   }
+
   const since = periodStartIso('7d') ?? todayStartIso()
-  const weeklyActuals = await funnelActualsSince(user.id, since)
+  const [weeklyActuals, loginInfo] = await Promise.all([
+    funnelActualsSince(user.id, since),
+    loginDaysSince(user.id, since),
+  ])
+
+  if (!progress.hasGoal) {
+    return {
+      hasGoal: false,
+      weeklyTargets: EMPTY_FUNNEL,
+      weeklyActuals,
+      pctOverall: 0,
+      callsGap: 0,
+      loginDays: loginInfo.count,
+      weekActive: loginInfo.weekActive,
+    }
+  }
+
   const weeklyTargets: FunnelCounts = {
     arama: progress.targets.arama * 7,
     tanisma: progress.targets.tanisma * 7,
@@ -417,7 +466,71 @@ export async function getHubWeeklySelfAction(): Promise<HubWeeklySelfPayload> {
       ? Math.min(999, Math.round((weeklyActuals.arama / weeklyTargets.arama) * 100))
       : 0
   const callsGap = Math.max(0, weeklyTargets.arama - weeklyActuals.arama)
-  return { hasGoal: true, weeklyTargets, weeklyActuals, pctOverall, callsGap }
+  return {
+    hasGoal: true,
+    weeklyTargets,
+    weeklyActuals,
+    pctOverall,
+    callsGap,
+    loginDays: loginInfo.count,
+    weekActive: loginInfo.weekActive,
+  }
+}
+
+export async function getHubMonthlySelfAction(): Promise<HubMonthlySelfPayload> {
+  const progress = await getDailyProgressAction()
+  const { user } = await getAuthUser()
+  const now = new Date()
+  const dayOfMonth = now.getDate()
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const monthPct = Math.round((dayOfMonth / daysInMonth) * 100)
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+
+  if (!user) {
+    return {
+      hasGoal: false,
+      monthlyTargets: EMPTY_FUNNEL,
+      monthlyActuals: EMPTY_FUNNEL,
+      loginDays: 0,
+      dayOfMonth,
+      daysInMonth,
+      monthPct,
+    }
+  }
+
+  const [monthlyActuals, loginInfo] = await Promise.all([
+    funnelActualsSince(user.id, monthStart),
+    loginDaysSince(user.id, monthStart),
+  ])
+
+  if (!progress.hasGoal) {
+    return {
+      hasGoal: false,
+      monthlyTargets: EMPTY_FUNNEL,
+      monthlyActuals,
+      loginDays: loginInfo.count,
+      dayOfMonth,
+      daysInMonth,
+      monthPct,
+    }
+  }
+
+  const monthlyTargets: FunnelCounts = {
+    arama: progress.targets.arama * daysInMonth,
+    tanisma: progress.targets.tanisma * daysInMonth,
+    sunum: progress.targets.sunum * daysInMonth,
+    yeniUye: progress.targets.yeniUye * daysInMonth,
+  }
+
+  return {
+    hasGoal: true,
+    monthlyTargets,
+    monthlyActuals,
+    loginDays: loginInfo.count,
+    dayOfMonth,
+    daysInMonth,
+    monthPct,
+  }
 }
 
 export type HubMonthlyInsights = {

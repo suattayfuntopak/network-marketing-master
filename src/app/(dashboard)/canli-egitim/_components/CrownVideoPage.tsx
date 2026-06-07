@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { ChevronRight, GraduationCap, PlayCircle } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -17,10 +17,9 @@ import { videoProgressAccent } from './videoProgressTheme'
 
 export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
-  const qc = useQueryClient()
   const { data: ws } = useWorkspace()
   const progress = usePersonalAkademiProgress()
-  const { data, isFetching } = useQuery({
+  const { data } = useQuery({
     queryKey: ['crown', 'video', ws?.workspaceId],
     queryFn: () => getCrownVideoPageAction(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
@@ -47,11 +46,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
       icon={GraduationCap}
       iconClassName={videoProgressAccent.icon}
       backHref="/pano"
-      onRefresh={() => {
-        qc.invalidateQueries({ queryKey: ['crown', 'video'] })
-        qc.invalidateQueries({ queryKey: ['video-catalog'] })
-      }}
-      refreshing={isFetching}
+      showRefresh={false}
       asTab={asTab}
     >
       <div className="grid grid-cols-3 gap-2 sm:gap-3">

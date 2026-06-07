@@ -9,6 +9,7 @@ import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import {
   getHubWeeklySelfAction,
+  getHubMonthlySelfAction,
   getHubMonthlyInsightsAction,
   getCrownFirst30PageAction,
 } from '@/app/(dashboard)/crown/actions'
@@ -69,6 +70,11 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubWeeklySelf(),
       queryFn: getHubWeeklySelfAction,
+      staleTime: 60_000,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubMonthlySelf(),
+      queryFn: getHubMonthlySelfAction,
       staleTime: 60_000,
     }),
     queryClient.prefetchQuery({

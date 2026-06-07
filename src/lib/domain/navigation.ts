@@ -28,8 +28,8 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
   { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
-  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'teal', desktopColor: 'teal' },
-  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'amber', desktopColor: 'amber' },
+  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'amber', desktopColor: 'amber' },
+  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'teal', desktopColor: 'teal' },
   { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'purple', desktopColor: 'purple' },
   { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2, color: 'coral', desktopColor: 'coral' },
 ]
