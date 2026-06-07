@@ -13,6 +13,7 @@ import { TeamActivitySummary } from '@/app/(dashboard)/istatistikler/_components
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { getHubWeeklySelfAction } from '@/app/(dashboard)/crown/actions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import { queryKeys } from '@/lib/query/keys'
 import { weeklyAccent } from './weeklyTheme'
 
 export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
