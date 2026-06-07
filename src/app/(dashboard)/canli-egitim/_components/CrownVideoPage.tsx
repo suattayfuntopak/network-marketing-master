@@ -9,7 +9,6 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { usePersonalAkademiProgress } from '@/hooks/usePersonalAkademiProgress'
 import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
 import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
-import { PanoVideoStrip } from '@/app/(dashboard)/pano/_components/PanoVideoStrip'
 import { getCrownVideoPageAction } from '@/app/(dashboard)/crown/actions'
 import { akademiHref } from '@/lib/domain/akademiTab'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
@@ -155,24 +154,18 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
         </HubSectionCard>
       )}
 
-      <PanoVideoStrip />
-
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
         {AKADEMI_TABS.map(({ key, labelKey }) => (
-          <div key={key} className="flex min-w-0 flex-col gap-1.5">
-            <p className="text-center text-[10px] font-bold uppercase leading-tight tracking-wide text-[var(--text-3)] sm:text-xs">
-              {t(labelKey)}
-            </p>
-            <Link
-              href={akademiHref(key)}
-              className={clsx(
-                'flex items-center justify-center rounded-xl border px-2 py-3 text-center text-xs font-bold transition active:scale-[0.98] sm:text-sm',
-                AKADEMI_TAB_THEME[key].navButtonClass,
-              )}
-            >
-              {t('crown.openAkademiTab')}
-            </Link>
-          </div>
+          <Link
+            key={key}
+            href={akademiHref(key)}
+            className={clsx(
+              'flex min-w-0 items-center justify-center rounded-xl border px-2 py-3 text-center text-[10px] font-bold leading-tight transition active:scale-[0.98] sm:text-xs',
+              AKADEMI_TAB_THEME[key].navButtonClass,
+            )}
+          >
+            {t(labelKey)}
+          </Link>
         ))}
       </div>
     </HubPageShell>

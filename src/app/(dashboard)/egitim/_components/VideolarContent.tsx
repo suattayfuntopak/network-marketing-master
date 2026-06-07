@@ -93,17 +93,13 @@ export function VideolarContent({
           {t('videoTraining.backToTraining')}
         </Link>
         )}
+        {!embedded && (
         <div className="flex items-center justify-between gap-3">
-          {!embedded && (
           <h1 className="flex items-center gap-2 text-xl font-bold text-[var(--text-1)]">
             <Film className="h-5 w-5 text-brand-readable" />
             {t('videoTraining.pageTitle')}
           </h1>
-          )}
-          {embedded && (
-            <p className="text-sm text-[var(--text-2)]">{t('videoTraining.pageSubtitle')}</p>
-          )}
-          {isAdmin && !embedded && (
+          {isAdmin && (
             <button
               type="button"
               onClick={() => { setEditing(null); setModalOpen(true) }}
@@ -114,6 +110,7 @@ export function VideolarContent({
             </button>
           )}
         </div>
+        )}
         {!embedded && (
         <p className="text-base text-[var(--text-3)]">{t('videoTraining.pageSubtitle')}</p>
         )}

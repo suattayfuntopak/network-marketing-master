@@ -75,15 +75,12 @@ export function AkademiContent() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <header className="mb-5">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
             <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', akademiAccent.icon)}>
               <BookOpen className="h-5 w-5" strokeWidth={1.75} />
             </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('akademi.title')}</h1>
-              <p className="text-sm text-[var(--text-2)]">{t('akademi.subtitle')}</p>
-            </div>
+            <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('akademi.title')}</h1>
           </div>
           {addButton}
         </div>

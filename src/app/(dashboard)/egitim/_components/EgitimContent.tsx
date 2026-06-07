@@ -230,8 +230,7 @@ export function EgitimContent({
       )}
 
       {embedded && !onAddFormOpenChange && (
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-          <p className="text-sm text-[var(--text-2)]">{t('training.subtitle')}</p>
+        <div className="mb-4 flex justify-end">
           <button
             onClick={() => setFormOpen(true)}
             className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#28227d] active:scale-95"
@@ -241,10 +240,6 @@ export function EgitimContent({
           </button>
         </div>
       )}
-
-      {embedded && onAddFormOpenChange ? (
-        <p className="mb-4 text-sm text-[var(--text-2)]">{t('training.subtitle')}</p>
-      ) : null}
 
       <div className="mb-4 relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--text-3)] pointer-events-none" />
