@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-07 — Vaktin Varsa chick sarısı koyulaştırıldı ✅
+
+**chick gradient:** `#FFD966` → `#FF9900` (~%50 daha koyu; beyaz etiket okunabilirliği).
+
+**Dosya:** `SquareButton.tsx`
+
 ## 2026-06-07 — Pano Hızlı Bakış ↔ Vaktin Varsa renk swap ✅
 
 **Hızlı Bakış:** Vaktin Varsa'nın turuncu gradient'i (`amber`). **Vaktin Varsa:** pastel civciv sarısı (`chick` — `#FFF8B0` → `#FFE066`).
