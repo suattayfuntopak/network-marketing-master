@@ -3,6 +3,7 @@
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -308,9 +309,6 @@ export function PlatformYonetimContent() {
                   {t('platformPage.superAdmin')}
                 </span>
               </h1>
-              <p className="text-base text-[var(--text-3)] font-medium">
-                {t('platformPage.consoleSubtitle')}
-              </p>
             </div>
           </div>
           <div className="flex shrink-0 gap-2 self-end sm:self-auto">
@@ -418,7 +416,7 @@ export function PlatformYonetimContent() {
 
                     {w.avatarUrl ? (
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden shadow">
-                        <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
+                        <Image src={w.avatarUrl} alt={w.ownerName} width={36} height={36} unoptimized className="h-full w-full object-cover" />
                       </div>
                     ) : (
                       <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-base font-black text-white shadow`}>
@@ -539,7 +537,7 @@ export function PlatformYonetimContent() {
                           <div className="flex items-center gap-2 min-w-0">
                             {w.avatarUrl ? (
                               <div className="h-7 w-7 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
-                                <img src={w.avatarUrl} alt={w.ownerName} className="h-full w-full object-cover" />
+                                <Image src={w.avatarUrl} alt={w.ownerName} width={28} height={28} unoptimized className="h-full w-full object-cover" />
                               </div>
                             ) : (
                               <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-[10px] font-black text-white shadow-sm`}>
@@ -713,9 +711,10 @@ export function PlatformYonetimContent() {
               {pendingRequests.map(req => {
                 const dateStr = new Date(req.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
                 const isTraining = req.contentType === 'training'
-                const title = isTraining ? (req.data.baslik ?? 'İsimsiz İçerik') : (req.data.soru?.tr ?? req.data.soru ?? 'İsimsiz İtiraz')
-                const category = isTraining ? (req.data.kategoriBaslik ?? 'Zihniyet') : (req.data.kategori?.tr ?? req.data.kategori ?? 'Genel')
-                const preview = isTraining ? (req.data.ozet ?? 'Özet bulunmuyor.') : (req.data.kisaCevap ?? 'Kısa cevap bulunmuyor.')
+                const rd = req.data as unknown as Record<string, Record<string, string> | string | string[] | undefined>
+                const title = isTraining ? (rd.baslik ?? 'İsimsiz İçerik') : ((rd.soru as Record<string, string> | undefined)?.tr ?? rd.soru ?? 'İsimsiz İtiraz')
+                const category = isTraining ? (rd.kategoriBaslik ?? 'Zihniyet') : ((rd.kategori as Record<string, string> | undefined)?.tr ?? rd.kategori ?? 'Genel')
+                const preview = isTraining ? (rd.ozet ?? 'Özet bulunmuyor.') : (rd.kisaCevap ?? 'Kısa cevap bulunmuyor.')
 
                 return (
                   <div key={req.id} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm space-y-3 relative overflow-hidden flex flex-col justify-between">
@@ -733,14 +732,14 @@ export function PlatformYonetimContent() {
 
                       <div>
                         <h3 className="text-sm font-bold text-[var(--text-1)] line-clamp-1 flex items-center gap-1">
-                          <span className="text-base shrink-0">{req.data.emoji}</span>
+                          <span className="text-base shrink-0">{rd.emoji}</span>
                           {title}
                         </h3>
                         <p className="text-[10px] text-[var(--text-3)] font-semibold mt-0.5 truncate">Kategori: {category}</p>
                       </div>
 
                       <p className="text-[11px] text-[var(--text-2)] line-clamp-2 leading-relaxed bg-[var(--bg-subtle)] p-2 rounded-lg border border-[var(--border)] font-medium">
-                        {preview}
+                        {String(preview ?? '')}
                       </p>
 
                       <div className="text-[10px] text-[var(--text-3)] font-semibold space-y-0.5 border-t border-[var(--border)] pt-2">

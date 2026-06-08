@@ -60,7 +60,11 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           <span className="flex min-w-0 flex-1 items-center gap-2">
             <span className="truncate">{t(item.translationKey)}</span>
             {item.href === NAV_ADMIN.href && (
-              <Crown className="h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={1.75} aria-hidden />
+              <Crown
+                className={clsx('h-3.5 w-3.5 shrink-0', panoColor ? 'text-white/90' : 'text-amber-500')}
+                strokeWidth={1.75}
+                aria-hidden
+              />
             )}
           </span>
         )}
