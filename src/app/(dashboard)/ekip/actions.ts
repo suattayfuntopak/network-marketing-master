@@ -4,6 +4,55 @@ import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
+import { getAuthUser } from '@/lib/supabase/authUser'
+import { isSuperAdmin } from '@/lib/domain/auth'
+import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
+import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import type { MemberRow } from '@/lib/team/types'
+
+export type MemberDetailPayload = {
+  member: MemberRow | null
+  weeklyActivity: { calls: number; whatsapps: number }
+  hasAccess: boolean
+}
+
+export async function getMemberDetailAction(
+  workspaceId: string,
+  targetUserId: string,
+): Promise<MemberDetailPayload> {
+  const empty: MemberDetailPayload = {
+    member: null,
+    weeklyActivity: { calls: 0, whatsapps: 0 },
+    hasAccess: false,
+  }
+  const { user } = await getAuthUser()
+  if (!user) return empty
+
+  const supabase = await createClient()
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (ws?.owner_id !== user.id && !isSuperAdmin(user)) return empty
+
+  const bundle = await fetchTeamBundleAction(workspaceId)
+  const member = bundle.ekipRows.find(m => m.user_id === targetUserId) ?? null
+  if (!member) return empty
+
+  const activity = await getTeamFieldActivityAction(workspaceId, '7d', [targetUserId])
+  const ua = activity.byUser[targetUserId]
+
+  return {
+    member,
+    weeklyActivity: {
+      calls: ua?.calls ?? 0,
+      whatsapps: ua?.whatsapps ?? 0,
+    },
+    hasAccess: true,
+  }
+}
 
 /**
  * Resolves profile photo URLs for team members (downlines + workspace members).
@@ -89,6 +138,7 @@ export async function toggleOnboardingStepAction(
 }
 
 type AddTeamMemberAsCandidateOptions = {
+  memberUserId?: string
   memberPhone?: string | null
 }
 
@@ -126,6 +176,16 @@ export async function addTeamMemberAsCandidateAction(
   const pool = leaderCandidates ?? []
   const existingId = findLeaderCandidateForMember(pool, user.id, trimmedName)
   if (existingId) {
+    if (options?.memberUserId) {
+      await supabase.from('nmm_team_pipeline_links').upsert(
+        {
+          workspace_id: workspaceId,
+          member_user_id: options.memberUserId,
+          candidate_id: existingId,
+        },
+        { onConflict: 'workspace_id,member_user_id' },
+      )
+    }
     return { candidateId: existingId, created: false }
   }
 
@@ -156,6 +216,18 @@ export async function addTeamMemberAsCandidateAction(
 
   if (insertErr || !inserted) throw new Error(insertErr?.message ?? 'Aday eklenemedi.')
 
+  const candidateId = inserted.id
+  if (options?.memberUserId) {
+    await supabase.from('nmm_team_pipeline_links').upsert(
+      {
+        workspace_id: workspaceId,
+        member_user_id: options.memberUserId,
+        candidate_id: candidateId,
+      },
+      { onConflict: 'workspace_id,member_user_id' },
+    )
+  }
+
   await supabase.from('nmm_daily_actions').insert([
     {
       workspace_id: workspaceId,
@@ -173,7 +245,7 @@ export async function addTeamMemberAsCandidateAction(
     },
   ])
 
-  return { candidateId: inserted.id, created: true }
+  return { candidateId, created: true }
 }
 
 export async function joinWorkspaceByInviteAction(

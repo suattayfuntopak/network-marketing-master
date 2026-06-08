@@ -9,6 +9,8 @@ import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
 import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { queryKeys } from '@/lib/query/keys'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
+import { getHubDailySelfAction } from '@/app/(dashboard)/crown/actions'
+import type { NotificationType } from '@/types/database.types'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useRouter } from 'next/navigation'
@@ -20,7 +22,7 @@ export interface NotificationItem {
   title_en: string
   description_tr: string
   description_en: string
-  type: 'bell' | 'alert' | 'info' | 'user' | 'calendar'
+  type: NotificationType
   read: boolean
   created_at: string
   candidate_id: string | null
@@ -110,16 +112,36 @@ export function useNotifications(options?: { enabled?: boolean }) {
                 ? t('pagesUi.viewDailySummary')
                 : t('shellUi.view')
 
-            toast(title, {
-              description,
-              duration: 6000,
-              action: {
-                label: actionLabel,
-                onClick: () => {
-                  router.push(targetHref)
+            const showToast = (desc: string) => {
+              toast(title, {
+                description: desc,
+                duration: 6000,
+                action: {
+                  label: actionLabel,
+                  onClick: () => {
+                    router.push(targetHref)
+                  },
                 },
-              },
-            })
+              })
+            }
+
+            if (isTeamJoinNotification(newNotif)) {
+              void getHubDailySelfAction(0).then((hub) => {
+                const a = hub?.dailyActuals
+                const kpi =
+                  a != null
+                    ? t('dashboard.joinNotifKpi', {
+                        arama: a.arama,
+                        tanisma: a.tanisma,
+                        sunum: a.sunum,
+                        yeniUye: a.yeniUye,
+                      })
+                    : null
+                showToast(kpi ? `${description}\n${kpi}` : description)
+              })
+            } else {
+              showToast(description)
+            }
           }
         )
         .subscribe()

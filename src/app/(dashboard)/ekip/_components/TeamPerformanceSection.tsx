@@ -25,6 +25,7 @@ import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { addTeamMemberAsCandidateAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
+import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
 import { UserPlus } from 'lucide-react'
 
@@ -173,9 +174,11 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     setLinkingMemberId(member.user_id)
     try {
       const result = await addTeamMemberAsCandidateAction(ws.workspaceId, member.full_name, {
+        memberUserId: member.user_id,
         memberPhone: member.phone,
       })
       invalidateHubMetrics(queryClient, ws.workspaceId)
+      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
       toast.success(
         result.created ? t('team.linkToPipelineSuccess') : t('team.linkToPipelineExists'),
       )

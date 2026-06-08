@@ -6,7 +6,6 @@ import { useUserGoal } from '@/hooks/useUserGoal'
 import { HubGoalChipRow } from '@/lib/ui/hub/HubGoalChipRow'
 import { IlgilenContent } from './IlgilenContent'
 import { FieldWeekSummary } from '@/app/(dashboard)/_components/pulse/FieldWeekSummary'
-import { TodayRitualSection } from './TodayRitualSection'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 
 export function DailyTab() {
@@ -32,7 +31,6 @@ export function DailyTab() {
       ) : null}
       <IlgilenContent />
       <FieldWeekSummary />
-      <TodayRitualSection />
     </div>
   )
 }

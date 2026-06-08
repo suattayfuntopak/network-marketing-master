@@ -9,7 +9,26 @@ export function cleanMemberName(s: string | null | undefined): string {
     .replace(/[^a-z0-9]/g, '')
 }
 
-type LeaderCandidate = { id: string; full_name: string | null; owner_id: string }
+type LeaderCandidate = { id: string; full_name: string | null; owner_id: string; phone?: string | null }
+
+/** Son 10 hane — `nmm_phone_tail` (063) ile uyumlu. */
+export function phoneTail(phone: string | null | undefined): string {
+  const digits = (phone ?? '').replace(/\D/g, '')
+  return digits.length >= 10 ? digits.slice(-10) : digits
+}
+
+/** Telefon + isim birleşik skor — `nmm_match_sponsor_candidate` ile aynı öncelik. */
+export function scoreMemberCandidateMatch(
+  memberName: string | null | undefined,
+  memberPhone: string | null | undefined,
+  candidateName: string | null | undefined,
+  candidatePhone: string | null | undefined,
+): number {
+  const mTail = phoneTail(memberPhone)
+  const cTail = phoneTail(candidatePhone)
+  if (mTail.length >= 10 && cTail.length >= 10 && mTail === cTail) return 110
+  return scoreMemberCandidateNameMatch(memberName, candidateName)
+}
 
 /** İsim eşleşme skoru — `nmm_match_sponsor_candidate` (063) ile aynı eşikler. */
 export function scoreMemberCandidateNameMatch(
@@ -40,16 +59,19 @@ export function scoreMemberCandidateNameMatch(
 export function findLeaderCandidateForMember(
   candidates: LeaderCandidate[],
   leaderOwnerId: string,
-  memberName: string | null
+  memberName: string | null,
+  memberPhone?: string | null,
 ): string | null {
-  if (!cleanMemberName(memberName)) return null
+  const mf = cleanMemberName(memberName)
+  const mTail = phoneTail(memberPhone)
+  if (!mf && mTail.length < 10) return null
 
   const pool = candidates.filter(c => c.owner_id === leaderOwnerId)
   let bestId: string | null = null
   let bestScore = 0
 
   for (const c of pool) {
-    const score = scoreMemberCandidateNameMatch(memberName, c.full_name)
+    const score = scoreMemberCandidateMatch(memberName, memberPhone, c.full_name, c.phone)
     if (score > bestScore) {
       bestScore = score
       bestId = c.id

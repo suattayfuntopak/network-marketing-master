@@ -10,7 +10,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
-import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 import { createClient } from '@/lib/supabase/client'
 
@@ -363,13 +363,15 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                   Okundu olarak işaretlendi
                 </span>
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                  {selected.candidate_id && (
+                  {selected.candidate_id ? (
                     <button
                       type="button"
                       onClick={() => {
                         router.push(notificationTargetHref({
                           type: selected.type,
                           candidate_id: selected.candidate_id,
+                          title_tr: selected.title_tr,
+                          title_en: selected.title_en,
                         }))
                         setSelected(null)
                         onClose()
@@ -378,7 +380,24 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                     >
                       {t('pagesUi.viewInPipeline')}
                     </button>
-                  )}
+                  ) : isTeamJoinNotification(selected) ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        router.push(notificationTargetHref({
+                          type: selected.type,
+                          candidate_id: selected.candidate_id,
+                          title_tr: selected.title_tr,
+                          title_en: selected.title_en,
+                        }))
+                        setSelected(null)
+                        onClose()
+                      }}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-[#534AB7]/25 bg-[#534AB7]/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-[#534AB7] transition-colors hover:border-[#534AB7]/40 hover:bg-[#534AB7]/12 active:scale-[0.98] dark:border-[#534AB7]/35 dark:bg-[#534AB7]/15 dark:hover:bg-[#534AB7]/22"
+                    >
+                      {t('pagesUi.viewDailySummary')}
+                    </button>
+                  ) : null}
                   <button
                     onClick={() => setSelected(null)}
                     className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-[#534AB7] px-3.5 py-1.5 text-xs font-semibold leading-tight text-white transition-colors hover:bg-[#453da0] active:scale-[0.98]"

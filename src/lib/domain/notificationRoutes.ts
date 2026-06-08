@@ -26,6 +26,7 @@ export function notificationTargetHref(n: NotificationRouteInput): string {
     alert: '/ekip',
     bell: '/pano',
     info: '/pano',
+    overdue_followup: '/takvim',
   }
 
   return routeByType[n.type] ?? '/pano'

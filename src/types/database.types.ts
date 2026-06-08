@@ -20,7 +20,7 @@ export type WorkspaceMemberRole = 'leader' | 'member'
 
 export type ActionType = 'call' | 'whatsapp' | 'note' | 'stage_change' | 'ai_generate'
 
-export type NotificationType = 'bell' | 'alert' | 'info' | 'user' | 'calendar'
+export type NotificationType = 'bell' | 'alert' | 'info' | 'user' | 'calendar' | 'overdue_followup'
 
 export interface Database {
   public: {
@@ -615,6 +615,42 @@ export interface Database {
           updated_at?: string
         }
         Relationships: []
+      }
+      nmm_team_pipeline_links: {
+        Row: {
+          workspace_id: string
+          member_user_id: string
+          candidate_id: string
+          created_at: string
+        }
+        Insert: {
+          workspace_id: string
+          member_user_id: string
+          candidate_id: string
+          created_at?: string
+        }
+        Update: {
+          workspace_id?: string
+          member_user_id?: string
+          candidate_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_team_pipeline_links_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'nmm_team_pipeline_links_candidate_id_fkey'
+            columns: ['candidate_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_candidates'
+            referencedColumns: ['id']
+          },
+        ]
       }
       nmm_day_journal: {
         Row: {

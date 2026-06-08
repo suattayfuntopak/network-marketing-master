@@ -1,7 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import {
   cleanMemberName,
+  phoneTail,
   scoreMemberCandidateNameMatch,
+  scoreMemberCandidateMatch,
   findLeaderCandidateForMember,
 } from './matchCandidate'
 
@@ -27,9 +29,29 @@ describe('scoreMemberCandidateNameMatch', () => {
   })
 })
 
+describe('scoreMemberCandidateMatch', () => {
+  it('phone tail match scores 110', () => {
+    expect(
+      scoreMemberCandidateMatch('X', '+90 532 111 22 33', 'Y', '05321112233'),
+    ).toBe(110)
+  })
+
+  it('phone beats weaker name match', () => {
+    expect(
+      scoreMemberCandidateMatch('Ayşe', '5321112233', 'Mehmet Demir', '5321112233'),
+    ).toBe(110)
+  })
+})
+
+describe('phoneTail', () => {
+  it('normalizes to last 10 digits', () => {
+    expect(phoneTail('+90 (532) 111-22-33')).toBe('5321112233')
+  })
+})
+
 describe('findLeaderCandidateForMember', () => {
   const pool = [
-    { id: 'a1', full_name: 'Ahmet Yılmaz', owner_id: 'leader' },
+    { id: 'a1', full_name: 'Ahmet Yılmaz', owner_id: 'leader', phone: '5321112233' },
     { id: 'a2', full_name: 'Mehmet Demir', owner_id: 'leader' },
     { id: 'a3', full_name: 'Ahmet Y.', owner_id: 'other' },
   ]
@@ -41,5 +63,9 @@ describe('findLeaderCandidateForMember', () => {
 
   it('returns null when score below 80', () => {
     expect(findLeaderCandidateForMember(pool, 'leader', 'Ayşe Topak')).toBeNull()
+  })
+
+  it('matches by phone when name differs', () => {
+    expect(findLeaderCandidateForMember(pool, 'leader', 'A. Y.', '5321112233')).toBe('a1')
   })
 })

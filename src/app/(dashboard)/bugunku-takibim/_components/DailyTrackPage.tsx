@@ -11,7 +11,6 @@ import { HubDayLoginStrip } from '@/lib/ui/hub/HubDayLoginStrip'
 import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/lib/ui/hub/HubSelfActivityGrid'
 import { HubPipelineStageTable } from '@/lib/ui/hub/HubPipelineStageTable'
-import { HubJournalLinkCard } from '@/lib/ui/hub/HubJournalLinkCard'
 import { getHubDailySelfAction } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
 import { calendarDayRange, parsePeriodOffset } from '@/lib/utils/hubPeriodRange'
@@ -61,7 +60,7 @@ export function DailyTrackPage() {
             <p>{t('dashboard.dailyTrackEmptyHint')}</p>
             <Link
               href="/pipeline"
-              className="mt-2 inline-block font-semibold text-brand hover:underline"
+              className="mt-2 inline-block font-semibold text-brand dark:text-[#a09be8] hover:underline"
             >
               {t('dashboard.dailyTrackPipelineCta')} →
             </Link>
@@ -90,7 +89,6 @@ export function DailyTrackPage() {
           loading={selfLoading}
         />
         <HubPipelineStageTable counts={dailySelf?.pipelineStages ?? {}} loading={selfLoading} />
-        <HubJournalLinkCard />
       </div>
     </HubPageShell>
   )

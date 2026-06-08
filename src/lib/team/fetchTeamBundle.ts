@@ -83,6 +83,27 @@ async function resolveAuthAvatars(
   return result
 }
 
+async function fetchPipelineLinks(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<Record<string, string>> {
+  const { data, error } = await supabase
+    .from('nmm_team_pipeline_links')
+    .select('member_user_id, candidate_id')
+    .eq('workspace_id', workspaceId)
+
+  if (error) {
+    console.warn('[fetchTeamBundle] pipeline links:', error.message)
+    return {}
+  }
+
+  const map: Record<string, string> = {}
+  for (const row of data ?? []) {
+    map[row.member_user_id] = row.candidate_id
+  }
+  return map
+}
+
 /** Tek RPC / legacy turunda istatistik + ekip paneli verisi. */
 export async function fetchTeamBundle(
   supabase: SupabaseClient<Database>,
@@ -94,14 +115,16 @@ export async function fetchTeamBundle(
     const allUserIds = members.map(m => m.user_id)
     const authAvatars = await resolveAuthAvatars(supabase, workspaceId, allUserIds)
     const candidates = await enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates)
+    const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
     const { leaderOwnerId } = rpcBundle
     const ownWs = { owner_id: leaderOwnerId }
 
     const registeredMemberRows: MemberRow[] = members.map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
-      const matchedPipelineId = ownWs.owner_id
+      const linkedId = pipelineLinks[m.user_id] ?? null
+      const matchedPipelineId = linkedId ?? (ownWs.owner_id
         ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
-        : null
+        : null)
       const candidateMatch = matchedPipelineId
         ? candidates.find(c => c.id === matchedPipelineId)
         : undefined
@@ -332,12 +355,15 @@ async function fetchTeamBundleLegacy(
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
 
+  const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
+
   const registeredMemberRows: MemberRow[] = finalUniqueMembers.map(m => {
     const mc = candidates.filter(c => c.owner_id === m.user_id)
     const completedSteps = onboarding.filter(o => o.user_id === m.user_id).map(o => o.step_id)
-    const matchedPipelineId = ownWs.owner_id
+    const linkedId = pipelineLinks[m.user_id] ?? null
+    const matchedPipelineId = linkedId ?? (ownWs.owner_id
       ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
-      : null
+      : null)
     const candidateMatch = matchedPipelineId ? candidates.find(c => c.id === matchedPipelineId) : undefined
     const phone = candidateMatch?.phone ?? null
     const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
