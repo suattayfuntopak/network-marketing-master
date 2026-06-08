@@ -60,7 +60,7 @@ export function DailyTrackPage() {
             <p>{t('dashboard.dailyTrackEmptyHint')}</p>
             <Link
               href="/pipeline"
-              className="mt-2 inline-block font-semibold text-brand dark:text-[#a09be8] hover:underline"
+              className="mt-2 inline-block font-semibold text-brand-readable hover:underline"
             >
               {t('dashboard.dailyTrackPipelineCta')} →
             </Link>

@@ -15,6 +15,8 @@ export interface MemberRow {
   avatar_url?: string | null
   /** Candidate id for /pipeline/[id] — never use auth user_id for app users */
   pipeline_id?: string | null
+  /** Kalıcı link tablosundan mı (isim eşleşmesinden değil) */
+  pipeline_link_explicit?: boolean
 }
 
 export interface OnboardingStep {

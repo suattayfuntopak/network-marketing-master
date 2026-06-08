@@ -652,6 +652,32 @@ export interface Database {
           },
         ]
       }
+      nmm_team_pipeline_match_blocks: {
+        Row: {
+          workspace_id: string
+          member_user_id: string
+          created_at: string
+        }
+        Insert: {
+          workspace_id: string
+          member_user_id: string
+          created_at?: string
+        }
+        Update: {
+          workspace_id?: string
+          member_user_id?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_team_pipeline_match_blocks_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       nmm_day_journal: {
         Row: {
           user_id: string

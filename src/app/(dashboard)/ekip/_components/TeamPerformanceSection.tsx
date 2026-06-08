@@ -23,11 +23,11 @@ import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/t
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { addTeamMemberAsCandidateAction } from '../actions'
+import { addTeamMemberAsCandidateAction, unlinkTeamMemberPipelineAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
-import { UserPlus } from 'lucide-react'
+import { UserPlus, Unlink } from 'lucide-react'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -167,7 +167,24 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
+  const [unlinkingMemberId, setUnlinkingMemberId] = useState<string | null>(null)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
+
+  async function handleUnlinkMemberPipeline(member: MemberRow) {
+    if (unlinkingMemberId) return
+    setUnlinkingMemberId(member.user_id)
+    try {
+      await unlinkTeamMemberPipelineAction(ws.workspaceId, member.user_id)
+      invalidateHubMetrics(queryClient, ws.workspaceId)
+      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
+      toast.success(t('team.unlinkPipelineSuccess'))
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('common.error')
+      toast.error(message)
+    } finally {
+      setUnlinkingMemberId(null)
+    }
+  }
 
   async function handleLinkMemberToPipeline(member: MemberRow) {
     if (!member.full_name || linkingMemberId) return
@@ -500,7 +517,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   })()}
                 </div>
 
-                {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id && (
+                {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id ? (
                   <button
                     type="button"
                     disabled={linkingMemberId === m.user_id}
@@ -513,7 +530,22 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     <UserPlus className="h-4 w-4 shrink-0" />
                     <span>{t('team.linkToPipeline')}</span>
                   </button>
-                )}
+                ) : null}
+
+                {isLeader && m.isAppUser !== false && m.role === 'member' && m.pipeline_id ? (
+                  <button
+                    type="button"
+                    disabled={unlinkingMemberId === m.user_id}
+                    onClick={e => {
+                      e.stopPropagation()
+                      void handleUnlinkMemberPipeline(m)
+                    }}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-bold text-[var(--text-2)] transition hover:bg-[var(--bg-card)] hover:text-[var(--text-1)] disabled:opacity-50 sm:w-auto"
+                  >
+                    <Unlink className="h-4 w-4 shrink-0" />
+                    <span>{t('team.unlinkPipeline')}</span>
+                  </button>
+                ) : null}
 
                 {/* Saha ortağı: davet sekmeleri */}
                 {m.isAppUser === false && (() => {

@@ -9,7 +9,8 @@ import { Z } from '@/lib/ui/zIndex'
 import { clsx } from 'clsx'
 
 const DISMISS_PREFIX = 'nmm_pano_welcome_dismissed_'
-const EARLY_CANDIDATE_MAX = 5
+/** Yalnızca boru hattı boşken göster — pano üst alanı sade kalır */
+const EARLY_CANDIDATE_MAX = 1
 
 export function WelcomeCard({ candidateCount }: { candidateCount: number }) {
   const { t } = useTranslation()

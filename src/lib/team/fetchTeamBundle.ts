@@ -104,6 +104,23 @@ async function fetchPipelineLinks(
   return map
 }
 
+async function fetchPipelineMatchBlocks(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<Set<string>> {
+  const { data, error } = await supabase
+    .from('nmm_team_pipeline_match_blocks')
+    .select('member_user_id')
+    .eq('workspace_id', workspaceId)
+
+  if (error) {
+    console.warn('[fetchTeamBundle] pipeline match blocks:', error.message)
+    return new Set()
+  }
+
+  return new Set((data ?? []).map(row => row.member_user_id))
+}
+
 /** Tek RPC / legacy turunda istatistik + ekip paneli verisi. */
 export async function fetchTeamBundle(
   supabase: SupabaseClient<Database>,
@@ -116,15 +133,17 @@ export async function fetchTeamBundle(
     const authAvatars = await resolveAuthAvatars(supabase, workspaceId, allUserIds)
     const candidates = await enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates)
     const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
+    const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
     const { leaderOwnerId } = rpcBundle
     const ownWs = { owner_id: leaderOwnerId }
 
     const registeredMemberRows: MemberRow[] = members.map(m => {
       const mc = candidates.filter(c => c.owner_id === m.user_id)
       const linkedId = pipelineLinks[m.user_id] ?? null
-      const matchedPipelineId = linkedId ?? (ownWs.owner_id
+      const fuzzyId = !linkedId && !matchBlocks.has(m.user_id) && ownWs.owner_id
         ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
-        : null)
+        : null
+      const matchedPipelineId = linkedId ?? fuzzyId
       const candidateMatch = matchedPipelineId
         ? candidates.find(c => c.id === matchedPipelineId)
         : undefined
@@ -148,6 +167,7 @@ export async function fetchTeamBundle(
         isAppUser: true as const,
         avatar_url: resolvedAvatar,
         pipeline_id: matchedPipelineId,
+        pipeline_link_explicit: linkedId != null,
       }
     })
 
@@ -356,14 +376,16 @@ async function fetchTeamBundleLegacy(
     .sort((a, b) => b.candidate_count - a.candidate_count)
 
   const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
+  const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
 
   const registeredMemberRows: MemberRow[] = finalUniqueMembers.map(m => {
     const mc = candidates.filter(c => c.owner_id === m.user_id)
     const completedSteps = onboarding.filter(o => o.user_id === m.user_id).map(o => o.step_id)
     const linkedId = pipelineLinks[m.user_id] ?? null
-    const matchedPipelineId = linkedId ?? (ownWs.owner_id
+    const fuzzyId = !linkedId && !matchBlocks.has(m.user_id) && ownWs.owner_id
       ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
-      : null)
+      : null
+    const matchedPipelineId = linkedId ?? fuzzyId
     const candidateMatch = matchedPipelineId ? candidates.find(c => c.id === matchedPipelineId) : undefined
     const phone = candidateMatch?.phone ?? null
     const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
@@ -386,6 +408,7 @@ async function fetchTeamBundleLegacy(
       isAppUser: true,
       avatar_url: resolvedAvatar,
       pipeline_id: candidateMatch?.id ?? null,
+      pipeline_link_explicit: linkedId != null,
     }
   })
 
