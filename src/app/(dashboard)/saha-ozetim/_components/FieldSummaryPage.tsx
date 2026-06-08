@@ -12,16 +12,14 @@ import { HubDayLoginStrip } from '@/lib/ui/hub/HubDayLoginStrip'
 import { HubWeekLoginStrip } from '@/lib/ui/hub/HubWeekLoginStrip'
 import { HubMonthHero } from '@/lib/ui/hub/HubMonthHero'
 import { HubYearHero } from '@/lib/ui/hub/HubYearHero'
-import { HubAllTimeHero } from '@/lib/ui/hub/HubAllTimeHero'
 import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/lib/ui/hub/HubSelfActivityGrid'
 import {
   HubSummaryTabBar,
   parseSummaryTab,
-  type HubSummaryTab,
+  type HubPeriodTab,
 } from '@/lib/ui/hub/HubSummaryTabBar'
 import {
-  getHubAllTimeSelfAction,
   getHubDailySelfAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
@@ -68,7 +66,7 @@ export function FieldSummaryPage() {
   const weekRange = rollingWeekRange(offset)
 
   const setTab = useCallback(
-    (next: HubSummaryTab) => {
+    (next: HubPeriodTab) => {
       const params = new URLSearchParams()
       params.set('tab', next)
       router.replace(`${pathname}?${params.toString()}`)
@@ -106,14 +104,6 @@ export function FieldSummaryPage() {
     staleTime: 60_000,
     placeholderData: keepPreviousData,
     enabled: tab === 'yearly',
-  })
-
-  const { data: allTimeSelf, isLoading: allTimeLoading } = useQuery({
-    queryKey: queryKeys.hubAllTimeSelf(),
-    queryFn: () => getHubAllTimeSelfAction(),
-    staleTime: 60_000,
-    placeholderData: keepPreviousData,
-    enabled: tab === 'all',
   })
 
   const dailyActuals = dailySelf?.dailyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
@@ -237,25 +227,7 @@ export function FieldSummaryPage() {
       )
     }
 
-    const loading = allTimeLoading && !allTimeSelf
-    return (
-      <>
-        <HubAllTimeHero
-        activeDays={allTimeSelf?.fieldMetrics.activeDays ?? 0}
-        fieldMetrics={allTimeSelf?.fieldMetrics}
-        allTimeActuals={allTimeSelf?.allTimeActuals}
-        loading={loading}
-      />
-        <HubCrownFunnelGrid
-          actuals={allTimeSelf?.allTimeActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-          targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-          hasGoal={false}
-          period="all"
-          loading={loading}
-        />
-        <HubSelfActivityGrid metrics={allTimeSelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
-      </>
-    )
+    return null
   }
 
   return (
@@ -265,7 +237,7 @@ export function FieldSummaryPage() {
       iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400"
       backHref="/pano"
       showRefresh={false}
-      onIconClick={tab === 'all' ? undefined : goToCurrentPeriod}
+      onIconClick={goToCurrentPeriod}
       iconAriaLabel={
         tab === 'daily'
           ? t('crown.hubGoToCurrentDay')

@@ -153,9 +153,11 @@ export function SquareButton({
             ? 'text-center text-xs font-semibold leading-tight'
             : prominent
               ? variant === 'crown'
-                ? 'line-clamp-2 text-center text-[15px] font-semibold leading-snug drop-shadow-sm md:text-[20px]'
+                ? 'line-clamp-2 text-center text-[17px] font-semibold leading-snug drop-shadow-sm md:text-[23px]'
                 : 'text-center text-xs font-semibold leading-tight md:text-sm md:leading-snug'
-              : 'text-center text-xs font-semibold leading-tight md:text-sm'
+              : variant === 'crown'
+                ? 'line-clamp-2 text-center text-sm font-semibold leading-tight md:text-[17px]'
+                : 'text-center text-xs font-semibold leading-tight md:text-sm'
         }
       >
         {label}

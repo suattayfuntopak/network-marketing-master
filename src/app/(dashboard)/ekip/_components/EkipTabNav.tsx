@@ -3,13 +3,18 @@
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
-  Users, UserPlus, BarChart3, GraduationCap, GitBranch,
+  Users, BarChart3, GraduationCap, GitBranch, Wrench,
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const EKIP_TAB_IDS = ['members', 'invite', 'activity', 'training', 'tree'] as const
+export const EKIP_TAB_IDS = ['members', 'summary', 'training', 'tree', 'tools'] as const
 export type EkipTabId = (typeof EKIP_TAB_IDS)[number]
+
+const LEGACY_TAB_MAP: Record<string, EkipTabId> = {
+  activity: 'summary',
+  invite: 'tools',
+}
 
 const TABS: readonly {
   id: EkipTabId
@@ -18,14 +23,20 @@ const TABS: readonly {
   activeClass: string
 }[] = [
   { id: 'members', labelKey: 'team.tabMembers', icon: Users, activeClass: 'bg-[#534AB7] text-white shadow-md' },
-  { id: 'invite', labelKey: 'team.tabInvite', icon: UserPlus, activeClass: 'bg-[#0F6E56] text-white shadow-md' },
-  { id: 'activity', labelKey: 'team.tabActivity', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
+  { id: 'summary', labelKey: 'team.tabSummary', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
   { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: 'bg-[#854F0B] text-white shadow-md' },
   { id: 'tree', labelKey: 'team.tabTree', icon: GitBranch, activeClass: 'bg-[#72243E] text-white shadow-md' },
+  { id: 'tools', labelKey: 'team.tabTools', icon: Wrench, activeClass: 'bg-[#0F6E56] text-white shadow-md' },
 ]
 
 export function isEkipTabId(value: string | null): value is EkipTabId {
   return !!value && EKIP_TAB_IDS.includes(value as EkipTabId)
+}
+
+export function resolveEkipTab(raw: string | null): EkipTabId {
+  if (raw && LEGACY_TAB_MAP[raw]) return LEGACY_TAB_MAP[raw]
+  if (isEkipTabId(raw)) return raw
+  return 'members'
 }
 
 type Props = {

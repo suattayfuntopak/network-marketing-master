@@ -50,7 +50,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
         <div className="rounded-2xl border border-dashed border-[var(--border)] py-10 text-center">
           <p className="text-sm text-[var(--text-2)]">{t('team.treeEmpty')}</p>
           <Link
-            href="/ekip?tab=invite"
+            href="/ekip?tab=tools"
             className="mt-3 inline-block text-xs font-semibold text-[#534AB7] hover:underline"
           >
             {t('team.treeInviteCta')}

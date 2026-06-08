@@ -27,6 +27,8 @@ export const queryKeys = {
    */
   teamFieldActivity: (workspaceId: string, period: string, memberIds: string[]) =>
     ['team-field-activity', workspaceId, period, [...memberIds].sort().join(',')] as const,
+  teamPeriodPulse: (workspaceId: string, period: string) =>
+    ['team-period-pulse', workspaceId, period] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,

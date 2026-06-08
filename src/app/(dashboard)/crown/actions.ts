@@ -18,24 +18,17 @@ import {
 } from '@/app/(dashboard)/egitim/videoActions'
 import { getMemberGoalsMapAction } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
-import { periodStartIso } from '@/lib/domain/pulse'
+import { periodStartIso, type PulsePeriod } from '@/lib/domain/pulse'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
-import { todayCalendarKey, istanbulDayStartIso, toCalendarKey } from '@/lib/utils/calendarDates'
+import { todayCalendarKey, toCalendarKey } from '@/lib/utils/calendarDates'
 import { fetchFunnelActualsForPeriod, funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
 import { calendarDayRange, rollingWeekRange, monthRange, yearRange } from '@/lib/utils/hubPeriodRange'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
-function todayStartIso(): string {
-  return istanbulDayStartIso(todayCalendarKey())
-}
 
-/** @deprecated rollingWeekRange(0) kullanın */
-function last7CalendarDaysStartIso(): string {
-  return rollingWeekRange(0).sinceIso
-}
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
@@ -198,21 +191,22 @@ async function countJoinedInPeriod(
 }
 
 export async function getCrownTeamWeeklyPulseAction(workspaceId: string): Promise<CrownPeriodPayload> {
-  const bundle = await fetchTeamBundleAction(workspaceId)
-  const memberIds = bundle.members.map(m => m.user_id)
-  const [activity, joinedInPeriod] = await Promise.all([
-    getTeamFieldActivityAction(workspaceId, '7d', memberIds),
-    countJoinedInPeriod(memberIds, periodStartIso('7d')),
-  ])
-  return { members: bundle.members, activity, joinedInPeriod }
+  return getCrownTeamPeriodPulseAction(workspaceId, '7d')
 }
 
 export async function getCrownTeamMonthlyPulseAction(workspaceId: string): Promise<CrownPeriodPayload> {
+  return getCrownTeamPeriodPulseAction(workspaceId, '30d')
+}
+
+export async function getCrownTeamPeriodPulseAction(
+  workspaceId: string,
+  period: PulsePeriod,
+): Promise<CrownPeriodPayload> {
   const bundle = await fetchTeamBundleAction(workspaceId)
   const memberIds = bundle.members.map(m => m.user_id)
   const [activity, joinedInPeriod] = await Promise.all([
-    getTeamFieldActivityAction(workspaceId, '30d', memberIds),
-    countJoinedInPeriod(memberIds, periodStartIso('30d')),
+    getTeamFieldActivityAction(workspaceId, period, memberIds),
+    countJoinedInPeriod(memberIds, periodStartIso(period)),
   ])
   return { members: bundle.members, activity, joinedInPeriod }
 }
@@ -424,6 +418,7 @@ export type HubAllTimeSelfPayload = {
   hasGoal: boolean
   allTimeActuals: FunnelCounts
   fieldMetrics: HubSelfFieldMetrics
+  joinedAt: string | null
 }
 
 async function loginDaysInWindow(
@@ -460,10 +455,6 @@ async function loginDaysInWindow(
   return { count: weekActive.filter(Boolean).length, weekActive }
 }
 
-async function loginDaysSince(userId: string, since: string): Promise<{ count: number; weekActive: boolean[] }> {
-  const range = rollingWeekRange(0)
-  return loginDaysInWindow(userId, since, range.untilIso, range.startDate, range.endDate)
-}
 
 async function loginDaysInRange(userId: string, since: string, until?: string): Promise<number> {
   const supabase = await createClient()
@@ -859,15 +850,17 @@ export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> 
   const workspaceId = await resolveWorkspaceId()
   const range = funnelRangeForPulsePeriod('all')
 
-  if (!user) {
+  if (!user || !workspaceId) {
     return {
       hasGoal: false,
       allTimeActuals: EMPTY_FUNNEL,
       fieldMetrics: EMPTY_FIELD_METRICS,
+      joinedAt: null,
     }
   }
 
-  const [allTimeActuals, fieldMetrics] = await Promise.all([
+  const supabase = await createClient()
+  const [allTimeActuals, fieldMetrics, wsData] = await Promise.all([
     funnelActualsSince(
       user.id,
       range.sinceIso,
@@ -876,12 +869,14 @@ export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> 
       range.endCalendarKey,
     ),
     selfFieldMetricsSince(user.id, workspaceId, range.sinceIso, range.untilIso),
+    supabase.from('nmm_workspaces').select('created_at').eq('id', workspaceId).maybeSingle(),
   ])
 
   return {
     hasGoal: progress.hasGoal,
     allTimeActuals,
     fieldMetrics,
+    joinedAt: wsData.data?.created_at ?? null,
   }
 }
 

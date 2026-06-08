@@ -16,6 +16,7 @@ const DEFAULT_PREFS: NotificationPreferences = {
   email: true,
   push: true,
   sound: true,
+  overdueEmailFrequency: 'daily',
 }
 
 export function useNotificationPreferences() {

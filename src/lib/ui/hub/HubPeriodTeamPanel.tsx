@@ -9,6 +9,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { HubKpiRow } from '@/lib/ui/hub/HubKpiRow'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import type { PulsePeriod } from '@/lib/domain/pulse'
 
 type DownlineRow = {
   user_id: string
@@ -24,7 +25,7 @@ type HubPeriodTeamPanelProps = {
   loading: boolean
   teamStatsLocked: boolean
   joinedInPeriod: number
-  period: '7d' | '30d'
+  period: PulsePeriod
   getMemberHref: (row: { user_id: string; full_name: string | null }) => string | null
 }
 
@@ -80,6 +81,7 @@ export function HubPeriodTeamPanel({
           calls: a?.calls ?? 0,
           whatsapps: a?.whatsapps ?? 0,
           newCandidates: a?.newCandidates ?? 0,
+          activeDays: a?.activeDays ?? 0,
           href: getMemberHref(m),
         }
       })
@@ -103,7 +105,13 @@ export function HubPeriodTeamPanel({
 
   const totals = activity?.totals ?? { calls: 0, whatsapps: 0, newCandidates: 0 }
   const callsChartTitle =
-    period === '7d' ? t('crown.callsByPerson') : t('crown.callsByPersonMonth')
+    period === 'today'
+      ? t('crown.callsByPersonDay')
+      : period === '7d'
+        ? t('crown.callsByPerson')
+        : period === '30d'
+          ? t('crown.callsByPersonMonth')
+          : t('crown.callsByPersonYear')
 
   return (
     <section className="space-y-4 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
@@ -120,7 +128,6 @@ export function HubPeriodTeamPanel({
       ) : (
         <>
           <HubKpiRow
-            columns={2}
             items={[
               {
                 label: t('crown.teamMembers'),
@@ -157,12 +164,21 @@ export function HubPeriodTeamPanel({
               </div>
               <ul className="divide-y divide-[var(--border)]">
                 {rankingRows.map((row, idx) => (
-                  <li key={row.userId}>
+                  <li
+                    key={row.userId}
+                    className={
+                      idx === 0
+                        ? 'rounded-lg bg-amber-50/80 dark:bg-amber-950/20'
+                        : idx === 2
+                          ? 'rounded-lg bg-sky-50/80 dark:bg-sky-950/20'
+                          : undefined
+                    }
+                  >
                     <button
                       type="button"
                       onClick={() => row.href && router.push(row.href)}
                       disabled={!row.href}
-                      className="flex w-full items-center gap-2 py-2.5 text-left text-sm disabled:cursor-default"
+                      className="flex w-full items-center gap-2 px-1 py-2.5 text-left text-sm disabled:cursor-default"
                     >
                       <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
                         {medalForRank(idx) ?? idx + 1}
@@ -180,6 +196,9 @@ export function HubPeriodTeamPanel({
                         <UserPlus className="h-3 w-3" aria-hidden />
                         {row.newCandidates}
                       </span>
+                      <span className="w-8 shrink-0 text-right text-xs tabular-nums text-[var(--text-3)]">
+                        {row.activeDays}g
+                      </span>
                       {row.href ? <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-3)]" /> : null}
                     </button>
                   </li>
@@ -190,7 +209,10 @@ export function HubPeriodTeamPanel({
 
           <div className="space-y-3 rounded-xl border border-[var(--border)] p-3 md:p-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h3 className="text-sm font-bold text-[var(--text-1)]">{callsChartTitle}</h3>
+              <h3 className="text-sm font-bold text-[var(--text-1)]">
+                <span aria-hidden>📞 </span>
+                {callsChartTitle}
+              </h3>
               <div className="flex rounded-lg border border-[var(--border)] p-0.5 text-xs font-semibold">
                 <button
                   type="button"

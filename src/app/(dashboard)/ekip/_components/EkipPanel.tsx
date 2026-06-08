@@ -6,12 +6,10 @@ import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { BroadcastPanel } from './BroadcastPanel'
-import { InviteTeammateSection } from './InviteTeammateSection'
-import { JoinByInviteSection } from './JoinByInviteSection'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
-import { EkipActivityTab } from './EkipActivityTab'
+import { EkipSummaryTab } from './EkipSummaryTab'
+import { EkipToolsTab } from './EkipToolsTab'
 import { EkipTrainingTab } from './EkipTrainingTab'
 import { TeamGenerationTree } from './TeamGenerationTree'
 import type { EkipTabId } from './EkipTabNav'
@@ -50,7 +48,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   const [inviteCodeInput, setInviteCodeInput] = useState('')
   const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
-  const [removingId, setRemovingId] = useState<string | null>(null)
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
     stepId: string
@@ -79,13 +76,13 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     try {
       await toggleOnboardingStepAction(userId, stepId, !isStepDone)
       toast.success(isStepDone ? t('team.stepIncomplete') : t('team.stepComplete'))
-      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws!.workspaceId) })
+      if (ws?.workspaceId) queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error('[toggleOnboardingStep] error:', err)
       toast.error(t('team.progressUpdateError', { message }))
     }
-  }, [queryClient, ws?.workspaceId, t])
+  }, [queryClient, ws, t])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useEkipPanelRows(ws?.workspaceId)
 
@@ -182,7 +179,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     const memberId = memberToRemove.id
     const memberName = memberToRemove.name
     setMemberToRemove(null)
-    setRemovingId(memberId)
     try {
       await removeTeamMemberAction(memberId, memberName)
       toast.success(t('team.removeSuccess', { name: memberName }))
@@ -191,8 +187,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
       const message = err instanceof Error ? err.message : String(err)
       console.error(err)
       toast.error(message || t('team.removeError'))
-    } finally {
-      setRemovingId(null)
     }
   }
 
@@ -229,39 +223,26 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
         />
       )}
 
-      {activeTab === 'invite' && isLeader && (
-        <InviteTeammateSection
-          inviteCode={ws.inviteCode}
+      {activeTab === 'summary' && <EkipSummaryTab />}
+
+      {activeTab === 'tools' && (
+        <EkipToolsTab
+          t={t}
+          ws={ws}
+          isLeader={isLeader}
+          teamPageUnlocked={teamPageUnlocked}
+          visibleMembers={visibleMembers}
           copied={copied}
           onCopy={handleCopyInviteCode}
-          t={t}
-        />
-      )}
-
-      {activeTab === 'invite' && !ws.hasUpline && (
-        <JoinByInviteSection
           inviteCodeInput={inviteCodeInput}
           joining={joining}
           onInviteCodeChange={setInviteCodeInput}
-          onSubmit={handleJoinWorkspace}
-          t={t}
+          onJoinSubmit={handleJoinWorkspace}
         />
       )}
 
-      {activeTab === 'invite' && ws.hasUpline && !isLeader && (
-        <p className="rounded-2xl border border-dashed border-[var(--border)] py-8 text-center text-sm text-[var(--text-3)]">
-          {t('team.inviteMemberOnlyLeader')}
-        </p>
-      )}
-
-      {activeTab === 'activity' && <EkipActivityTab />}
-
       {activeTab === 'tree' && (
         <TeamGenerationTree workspaceId={ws.workspaceId} teamPageUnlocked={teamPageUnlocked} />
-      )}
-
-      {activeTab === 'members' && isLeader && teamPageUnlocked && (
-        <BroadcastPanel members={visibleMembers} t={t} />
       )}
 
       {memberToRemove && (

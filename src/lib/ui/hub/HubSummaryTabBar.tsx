@@ -3,20 +3,22 @@
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const HUB_SUMMARY_TABS = ['daily', 'weekly', 'monthly', 'yearly', 'all'] as const
-export type HubSummaryTab = (typeof HUB_SUMMARY_TABS)[number]
+export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly'] as const
+export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
 
-const TAB_KEYS: Record<HubSummaryTab, string> = {
+/** @deprecated Use HubPeriodTab — kept for field summary imports */
+export type HubSummaryTab = HubPeriodTab
+
+const TAB_KEYS: Record<HubPeriodTab, string> = {
   daily: 'dashboard.summaryTabDaily',
   weekly: 'dashboard.summaryTabWeekly',
   monthly: 'dashboard.summaryTabMonthly',
   yearly: 'dashboard.summaryTabYearly',
-  all: 'dashboard.summaryTabAllTime',
 }
 
 type HubSummaryTabBarProps = {
-  active: HubSummaryTab
-  onChange: (tab: HubSummaryTab) => void
+  active: HubPeriodTab
+  onChange: (tab: HubPeriodTab) => void
 }
 
 export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
@@ -28,7 +30,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
       role="tablist"
       aria-label={t('dashboard.summaryTabList')}
     >
-      {HUB_SUMMARY_TABS.map(tab => (
+      {HUB_PERIOD_TABS.map(tab => (
         <button
           key={tab}
           type="button"
@@ -49,9 +51,10 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
   )
 }
 
-export function parseSummaryTab(raw: string | null): HubSummaryTab {
-  if (raw && (HUB_SUMMARY_TABS as readonly string[]).includes(raw)) {
-    return raw as HubSummaryTab
+export function parseSummaryTab(raw: string | null): HubPeriodTab {
+  if (raw === 'all') return 'daily'
+  if (raw && (HUB_PERIOD_TABS as readonly string[]).includes(raw)) {
+    return raw as HubPeriodTab
   }
   return 'daily'
 }

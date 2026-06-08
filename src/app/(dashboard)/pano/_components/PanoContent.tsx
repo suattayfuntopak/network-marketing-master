@@ -45,7 +45,7 @@ export function PanoContent() {
           <div className="h-7 w-56 animate-pulse rounded bg-[var(--bg-subtle)]" />
         ) : (
           <h1 className="text-lg font-bold text-[var(--text-1)] md:text-xl">
-            {greetingIcon} {greeting} {firstName} 👋🏻
+            {greetingIcon} {greeting} {firstName}
           </h1>
         )}
         <p className="text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">

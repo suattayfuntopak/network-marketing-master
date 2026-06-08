@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { EkipPanel } from './EkipPanel'
-import { EkipTabNav, isEkipTabId, type EkipTabId } from './EkipTabNav'
+import { EkipTabNav, resolveEkipTab, type EkipTabId } from './EkipTabNav'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function EkipPageContent() {
@@ -12,10 +12,12 @@ export function EkipPageContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const raw = searchParams.get('tab')
-  const activeTab: EkipTabId = isEkipTabId(raw) ? raw : 'members'
+  const activeTab: EkipTabId = resolveEkipTab(raw)
 
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip?tab=members', { scroll: false })
+    else if (raw === 'activity') router.replace('/ekip?tab=summary', { scroll: false })
+    else if (raw === 'invite') router.replace('/ekip?tab=tools', { scroll: false })
   }, [raw, router])
 
   return (

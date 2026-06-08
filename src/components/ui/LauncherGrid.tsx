@@ -7,7 +7,7 @@ type LauncherGridProps = {
   itemCount?: number
   /** md+ sütun sayısı — pano masaüstü 5×2. */
   columns?: 3 | 4 | 5
-  /** Pano masaüstü: 5×2, genişlik sabit kare kutular (aspect-square). */
+  /** Pano masaüstü: 5×2, genişlik sabit dikdörtgen kutular (yükseklik ~%25 fazla). */
   panoDesktop?: boolean
 }
 
@@ -16,7 +16,7 @@ function gridClass(panoDesktop: boolean): string {
   return 'gap-2.5 md:gap-2.5'
 }
 
-/** Pano + launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
+/** Pano + launcher kutuları — tek kaynak, aynı genişlik; pano dikdörtgen oran. */
 export function LauncherGrid({
   children,
   columns = 4,
@@ -55,7 +55,7 @@ export function LauncherGridItem({
       {...rest}
       className={clsx(
         'relative min-w-0',
-        panoDesktop ? 'aspect-square w-full' : 'aspect-square',
+        panoDesktop ? 'aspect-[4/5] w-full' : 'aspect-square',
         className,
       )}
     >
