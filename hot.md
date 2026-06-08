@@ -1,5 +1,9 @@
 # Hot Log
 
+## 2026-06-09 — Pano mobil kutular kare, masaüstü dikdörtgen ✅
+
+- `LauncherGridItem`: mobil `aspect-square`, md+ `aspect-[4/5]` (ikon/yazı puntosu değişmedi)
+
 ## 2026-06-09 — Pano spacing + Ekibim sıralama tabloları ✅
 
 - **Pano:** Karşılama/tarih sabit; launcher grid bir satır yukarı (`gap-1`, `justify-center` kaldırıldı)

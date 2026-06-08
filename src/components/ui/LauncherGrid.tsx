@@ -55,7 +55,7 @@ export function LauncherGridItem({
       {...rest}
       className={clsx(
         'relative min-w-0',
-        panoDesktop ? 'aspect-[4/5] w-full' : 'aspect-square',
+        panoDesktop ? 'aspect-square md:aspect-[4/5] w-full' : 'aspect-square',
         className,
       )}
     >
