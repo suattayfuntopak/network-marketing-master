@@ -47,7 +47,7 @@ const filledClass = (
   )
 
 // ─── Crown variant: canlı gradient kutular (pano launcher) ───────────────────
-const crownSolidMap: Record<ButtonColor, string> = {
+export const crownSolidMap: Record<ButtonColor, string> = {
   purple: 'bg-gradient-to-br from-[#54C1F0] to-[#0095DD] text-white hover:brightness-105',
   teal:   'bg-gradient-to-br from-[#90E894] to-[#009688] text-white hover:brightness-105',
   amber:  'bg-gradient-to-br from-[#FFD54B] to-[#FF9A00] text-white hover:brightness-105',

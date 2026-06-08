@@ -91,3 +91,12 @@ export function isNavMoreRouteActive(pathname: string): boolean {
 export function navBarLabelKey(translationKey: string): string {
   return translationKey.startsWith('nav.') ? translationKey.replace('nav.', 'navMobile.') : translationKey
 }
+
+const PANO_COLOR_BY_HREF = Object.fromEntries(
+  PANO_ORGANIZATION_ITEMS.map((item) => [item.href, item.color]),
+) as Record<string, ButtonColor>
+
+/** Sidebar aktif vurgusu — pano kutusu rengi (hub/admin hariç). */
+export function getPanoLauncherColor(href: string): ButtonColor | undefined {
+  return PANO_COLOR_BY_HREF[href]
+}

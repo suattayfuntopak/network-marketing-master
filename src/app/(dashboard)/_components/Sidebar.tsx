@@ -10,8 +10,10 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import {
   NAV_SIDEBAR_MODULES,
   NAV_ADMIN,
+  getPanoLauncherColor,
   type NavItem,
 } from '@/lib/domain/navigation'
+import { crownSolidMap } from '@/components/ui/SquareButton'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { NavItemIcon } from '@/components/ui/NavItemIcon'
 import { Z } from '@/lib/ui/zIndex'
@@ -35,6 +37,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
 
   function renderLink(item: NavItem) {
     const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+    const panoColor = isActive ? getPanoLauncherColor(item.href) : undefined
 
     return (
       <Link
@@ -45,12 +48,14 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         className={clsx(
           'flex items-center rounded-xl text-sm font-medium transition-colors',
           collapsed ? 'h-10 w-10 justify-center' : 'gap-3 px-3 py-2.5',
-          isActive
-            ? 'bg-[var(--accent)]/10 text-[var(--accent)]'
-            : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]',
+          panoColor
+            ? clsx(crownSolidMap[panoColor], 'text-white shadow-sm hover:brightness-105')
+            : isActive
+              ? 'bg-[var(--accent)]/10 text-[var(--accent)]'
+              : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]',
         )}
       >
-        <NavItemIcon item={item} />
+        <NavItemIcon item={item} className={panoColor ? 'h-5 w-5 text-white' : 'h-5 w-5'} />
         {!collapsed && (
           <span className="flex min-w-0 flex-1 items-center gap-2">
             <span className="truncate">{t(item.translationKey)}</span>

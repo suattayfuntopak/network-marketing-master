@@ -38,9 +38,9 @@ export function PanoContent() {
       )}
       <AccountStatusAlert />
 
-      <header className="shrink-0 space-y-1 md:text-center">
+      <header className="shrink-0 space-y-1 md:mt-5 md:text-left">
         {wsLoading ? (
-          <div className="h-7 w-56 animate-pulse rounded bg-[var(--bg-subtle)] md:mx-auto" />
+          <div className="h-7 w-56 animate-pulse rounded bg-[var(--bg-subtle)]" />
         ) : (
           <h1 className="text-lg font-bold text-[var(--text-1)] md:text-xl">
             {greetingIcon} {greeting} {firstName} 👋🏻
