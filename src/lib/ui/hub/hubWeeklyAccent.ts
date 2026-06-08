@@ -1,4 +1,4 @@
 import { panoAccent } from '@/lib/ui/panoAccent'
 
-/** Pano launcher `purple` — Haftalık Özet sayfası vurgu renkleri. */
+/** Haftalık özet vurgu renkleri — pano `purple` paleti. */
 export const weeklyAccent = panoAccent('purple')

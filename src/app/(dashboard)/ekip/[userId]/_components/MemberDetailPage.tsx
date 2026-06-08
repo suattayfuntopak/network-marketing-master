@@ -3,12 +3,13 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Bot, Copy, Lock, Phone, Sparkles, X } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { ArrowLeft, Bot, ChevronDown, ChevronUp, Copy, Lock, Phone, Sparkles, X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getMemberDetailAction } from '@/app/(dashboard)/ekip/actions'
+import type { CoachingHistoryItem } from '@/app/(dashboard)/ekip/actions'
 import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -21,6 +22,13 @@ import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 
 type ActivityLevel = 'active' | 'recent' | 'silent'
+
+const TMPL_KEY = (level: ActivityLevel) => `nmm_tmpl_${level}`
+
+function readTemplate(level: ActivityLevel): string {
+  if (typeof window === 'undefined') return ''
+  return localStorage.getItem(TMPL_KEY(level)) ?? ''
+}
 
 function activityLevel(lastActivityAt: string | null): ActivityLevel {
   if (!lastActivityAt) return 'silent'
@@ -65,16 +73,143 @@ function StatBox({ label, value, color }: { label: string; value: number; color:
   )
 }
 
+function ActivityMiniChart({ days, lang }: { days: Array<{ date: string; count: number }>; lang: string }) {
+  const max = Math.max(...days.map(d => d.count), 1)
+  return (
+    <div className="flex items-end gap-1" style={{ height: 52 }}>
+      {days.map(d => {
+        const pct = Math.max(Math.round((d.count / max) * 100), d.count > 0 ? 12 : 5)
+        const dayLabel = new Date(d.date + 'T12:00:00').toLocaleDateString(
+          lang === 'en' ? 'en-GB' : 'tr-TR',
+          { weekday: 'short' },
+        ).slice(0, 2)
+        return (
+          <div key={d.date} className="flex flex-1 flex-col items-center gap-1">
+            <div className="flex w-full items-end justify-center" style={{ height: 36 }}>
+              <div
+                className={clsx(
+                  'w-full rounded-sm transition-all duration-500',
+                  d.count > 0 ? 'bg-emerald-400 dark:bg-emerald-500' : 'bg-[var(--bg-subtle)]',
+                )}
+                style={{ height: `${pct}%` }}
+              />
+            </div>
+            <span className="text-[9px] font-medium text-[var(--text-3)]">{dayLabel}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function CoachHistoryList({ items, t, lang }: {
+  items: CoachingHistoryItem[]
+  t: ReturnType<typeof useTranslation>['t']
+  lang: string
+}) {
+  if (items.length === 0) {
+    return (
+      <p className="text-sm text-[var(--text-3)] px-1">{t('dashboard.memberDetailNoCoachHistory')}</p>
+    )
+  }
+  return (
+    <ul className="space-y-2">
+      {items.map(item => {
+        const dateStr = new Date(item.createdAt).toLocaleDateString(
+          lang === 'en' ? 'en-GB' : 'tr-TR',
+          { day: 'numeric', month: 'short' },
+        )
+        return (
+          <li key={item.id} className="flex items-start gap-2.5">
+            <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-purple-400" />
+            <div className="min-w-0">
+              <p className="truncate text-xs text-[var(--text-2)]">{item.preview}</p>
+              <p className="text-[10px] text-[var(--text-3)]">{dateStr}</p>
+            </div>
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+function TemplateEditor({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
+  const [active, setActive] = useState(readTemplate('active'))
+  const [recent, setRecent] = useState(readTemplate('recent'))
+  const [silent, setSilent] = useState(readTemplate('silent'))
+  const [open, setOpen] = useState(false)
+
+  function save() {
+    localStorage.setItem(TMPL_KEY('active'), active)
+    localStorage.setItem(TMPL_KEY('recent'), recent)
+    localStorage.setItem(TMPL_KEY('silent'), silent)
+    toast.success(t('dashboard.memberDetailTemplateSaved'))
+  }
+
+  return (
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
+      <button
+        type="button"
+        onClick={() => setOpen(v => !v)}
+        className="flex w-full items-center justify-between px-4 py-3"
+      >
+        <span className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+          {t('dashboard.memberDetailTemplateTitle')}
+        </span>
+        {open ? (
+          <ChevronUp className="h-4 w-4 text-[var(--text-3)]" />
+        ) : (
+          <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />
+        )}
+      </button>
+
+      {open && (
+        <div className="space-y-3 px-4 pb-4">
+          {(
+            [
+              { key: 'active' as ActivityLevel, label: t('dashboard.memberDetailTemplateActive'), val: active, set: setActive },
+              { key: 'recent' as ActivityLevel, label: t('dashboard.memberDetailTemplateRecent'), val: recent, set: setRecent },
+              { key: 'silent' as ActivityLevel, label: t('dashboard.memberDetailTemplateSilent'), val: silent, set: setSilent },
+            ] as const
+          ).map(({ label, val, set }) => (
+            <div key={label}>
+              <label className="mb-1 block text-[11px] font-semibold text-[var(--text-2)]">
+                {label}
+              </label>
+              <textarea
+                value={val}
+                onChange={e => set(e.target.value)}
+                rows={3}
+                placeholder={t('dashboard.memberDetailTemplatePlaceholder')}
+                className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[var(--accent)] placeholder:text-[var(--text-3)]"
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={save}
+            className="mt-1 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+          >
+            {t('common.save')}
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function MemberDetailPage({ userId }: { userId: string }) {
   const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
+  const queryClient = useQueryClient()
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const [generating, setGenerating] = useState(false)
   const [activeMessage, setActiveMessage] = useState<string | null>(null)
   const [memberPhone, setMemberPhone] = useState<string | null>(null)
 
+  const qKey = queryKeys.memberDetail(ws?.workspaceId ?? '', userId)
   const { data, isLoading } = useQuery({
-    queryKey: queryKeys.memberDetail(ws?.workspaceId ?? '', userId),
+    queryKey: qKey,
     queryFn: () => getMemberDetailAction(ws!.workspaceId, userId),
     enabled: !!ws?.workspaceId,
     staleTime: 30_000,
@@ -86,12 +221,15 @@ export function MemberDetailPage({ userId }: { userId: string }) {
     if (!m) return
     const days = daysSinceActivity(m.last_activity_at)
     const level = activityLevel(m.last_activity_at)
+    const customContext = readTemplate(level) || undefined
     setGenerating(true)
     try {
       const result = await generateCoachingMessageAction({
         memberName: m.full_name ?? '—',
         activityLevel: level,
         daysSinceActivity: days,
+        targetUserId: userId,
+        customContext,
       })
       if (result.error || !result.message) {
         toast.error(result.error ?? 'Mesaj oluşturulamadı.')
@@ -99,6 +237,8 @@ export function MemberDetailPage({ userId }: { userId: string }) {
       }
       setMemberPhone(m.phone ?? null)
       setActiveMessage(result.message)
+      // Coaching geçmişini yenile
+      void queryClient.invalidateQueries({ queryKey: qKey })
     } catch {
       toast.error('Mesaj oluşturulamadı.')
     } finally {
@@ -178,7 +318,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                   </div>
 
                   {/* Eylem butonları */}
-                  <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {wa && (
                       <a
                         href={wa}
@@ -281,11 +421,33 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       </p>
                     </div>
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
-                      <p className="text-xl font-bold text-[var(--text-1)]">{lastActiveStr}</p>
+                      <p className="text-sm font-bold text-[var(--text-1)] leading-tight">{lastActiveStr}</p>
                       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
                         {t('dashboard.memberDetailLastActive')}
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* 7 günlük aktivite grafiği */}
+                {data.dailyActivity.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+                      {t('dashboard.memberDetailActivityTitle')}
+                    </p>
+                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
+                      <ActivityMiniChart days={data.dailyActivity} lang={lang} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Koçluk geçmişi */}
+                <div className="space-y-2">
+                  <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+                    {t('dashboard.memberDetailCoachHistory')}
+                  </p>
+                  <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
+                    <CoachHistoryList items={data.coachingHistory} t={t} lang={lang} />
                   </div>
                 </div>
 
@@ -296,11 +458,11 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       {t('dashboard.memberDetailOnboarding')}
                     </p>
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-                      <div className="mb-3 flex items-center justify-between">
-                        <span className="text-sm font-semibold text-[var(--text-1)]">
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <span className="shrink-0 text-sm font-semibold text-[var(--text-1)]">
                           {completedSteps} / {totalSteps}
                         </span>
-                        <div className="h-2 flex-1 ml-3 rounded-full bg-[var(--bg-subtle)]">
+                        <div className="h-2 flex-1 rounded-full bg-[var(--bg-subtle)]">
                           <div
                             className="h-2 rounded-full bg-orange-500 transition-all"
                             style={{ width: `${Math.round((completedSteps / totalSteps) * 100)}%` }}
@@ -330,6 +492,9 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                     </div>
                   </div>
                 )}
+
+                {/* Mesaj şablonları */}
+                <TemplateEditor t={t} />
               </>
             )
           })()}

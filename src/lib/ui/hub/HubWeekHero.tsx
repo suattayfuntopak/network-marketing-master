@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { weeklyAccent } from '@/app/(dashboard)/haftalik-ozet/_components/weeklyTheme'
+import { weeklyAccent } from '@/lib/ui/hub/hubWeeklyAccent'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 type HubWeekHeroProps = {

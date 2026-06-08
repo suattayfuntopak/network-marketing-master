@@ -300,7 +300,15 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [coachingId, setCoachingId] = useState<string | null>(null)
   const [activeAiMessage, setActiveAiMessage] = useState<ActiveAiMessage | null>(null)
-  const [showMineOnly, setShowMineOnly] = useState(false)
+  const [showMineOnly, setShowMineOnly] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem('nmm_radar_filter') === 'mine'
+  })
+
+  function toggleMineOnly(val: boolean) {
+    setShowMineOnly(val)
+    localStorage.setItem('nmm_radar_filter', val ? 'mine' : 'all')
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.crownSahaRadar(ws?.workspaceId ?? ''),
@@ -343,11 +351,17 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   async function handleCoachingAI(m: SahaRadarMember) {
     if (!hasAiFieldAccess) { openUpgrade('ai_field'); return }
     setCoachingId(m.userId)
+    const customContext =
+      typeof window !== 'undefined'
+        ? localStorage.getItem(`nmm_tmpl_${m.activityLevel}`) || undefined
+        : undefined
     try {
       const result = await generateCoachingMessageAction({
         memberName: m.fullName,
         activityLevel: m.activityLevel,
         daysSinceActivity: m.daysSinceActivity,
+        targetUserId: m.userId,
+        customContext,
       })
       if (result.error || !result.message) {
         toast.error(result.error ?? 'Mesaj oluşturulamadı.')
@@ -444,7 +458,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setShowMineOnly(false)}
+                      onClick={() => toggleMineOnly(false)}
                       className={clsx(
                         'rounded-full px-3 py-1 text-xs font-semibold transition',
                         !showMineOnly
@@ -457,7 +471,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setShowMineOnly(true)}
+                      onClick={() => toggleMineOnly(true)}
                       className={clsx(
                         'rounded-full px-3 py-1 text-xs font-semibold transition',
                         showMineOnly

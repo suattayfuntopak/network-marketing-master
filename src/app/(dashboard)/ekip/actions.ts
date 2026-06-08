@@ -10,9 +10,17 @@ import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { MemberRow } from '@/lib/team/types'
 
+export type CoachingHistoryItem = {
+  id: string
+  preview: string
+  createdAt: string
+}
+
 export type MemberDetailPayload = {
   member: MemberRow | null
   weeklyActivity: { calls: number; whatsapps: number }
+  coachingHistory: CoachingHistoryItem[]
+  dailyActivity: Array<{ date: string; count: number }>
   hasAccess: boolean
 }
 
@@ -23,6 +31,8 @@ export async function getMemberDetailAction(
   const empty: MemberDetailPayload = {
     member: null,
     weeklyActivity: { calls: 0, whatsapps: 0 },
+    coachingHistory: [],
+    dailyActivity: [],
     hasAccess: false,
   }
   const { user } = await getAuthUser()
@@ -41,8 +51,44 @@ export async function getMemberDetailAction(
   const member = bundle.ekipRows.find(m => m.user_id === targetUserId) ?? null
   if (!member) return empty
 
-  const activity = await getTeamFieldActivityAction(workspaceId, '7d', [targetUserId])
-  const ua = activity.byUser[targetUserId]
+  const now = new Date()
+
+  const [activityResult, coachRows, actRows] = await Promise.all([
+    getTeamFieldActivityAction(workspaceId, '7d', [targetUserId]),
+    supabase
+      .from('nmm_daily_actions')
+      .select('id, note_tr, created_at')
+      .eq('user_id', user.id)
+      .eq('action_type', 'ai_generate')
+      .like('note_tr', `coaching:${targetUserId}:%`)
+      .order('created_at', { ascending: false })
+      .limit(3),
+    supabase
+      .from('nmm_daily_actions')
+      .select('created_at')
+      .eq('user_id', targetUserId)
+      .gte('created_at', new Date(now.getTime() - 7 * 86_400_000).toISOString())
+      .neq('action_type', 'ai_generate'),
+  ])
+
+  const ua = activityResult.byUser[targetUserId]
+
+  const coachingHistory: CoachingHistoryItem[] = (coachRows.data ?? []).map(r => ({
+    id: r.id,
+    preview: (r.note_tr ?? '').replace(`coaching:${targetUserId}:`, ''),
+    createdAt: r.created_at,
+  }))
+
+  const countByDate: Record<string, number> = {}
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(now.getTime() - i * 86_400_000)
+    countByDate[d.toISOString().slice(0, 10)] = 0
+  }
+  for (const r of actRows.data ?? []) {
+    const key = r.created_at.slice(0, 10)
+    if (key in countByDate) countByDate[key]++
+  }
+  const dailyActivity = Object.entries(countByDate).map(([date, count]) => ({ date, count }))
 
   return {
     member,
@@ -50,6 +96,8 @@ export async function getMemberDetailAction(
       calls: ua?.calls ?? 0,
       whatsapps: ua?.whatsapps ?? 0,
     },
+    coachingHistory,
+    dailyActivity,
     hasAccess: true,
   }
 }
