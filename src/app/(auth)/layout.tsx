@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
@@ -46,9 +47,11 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           className="mb-8 block text-center animate-in fade-in slide-in-from-top-4 duration-300 group outline-none"
         >
           <div className={authLogoRingClass}>
-            <img
+            <Image
               src="/logo.png"
               alt="NMM Logo"
+              width={80}
+              height={80}
               className="h-full w-full rounded-full object-cover shadow-[0_0_15px_rgba(168,85,247,0.4)]"
             />
           </div>

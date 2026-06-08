@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -8,8 +8,12 @@ import { ArrowLeft, Bot, ChevronDown, ChevronUp, Copy, Lock, Phone, Sparkles, X 
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getMemberDetailAction } from '@/app/(dashboard)/ekip/actions'
-import type { CoachingHistoryItem } from '@/app/(dashboard)/ekip/actions'
+import {
+  getMemberDetailAction,
+  getCoachingTemplatesAction,
+  saveCoachingTemplatesAction,
+} from '@/app/(dashboard)/ekip/actions'
+import type { CoachingHistoryItem, CoachingTemplates } from '@/app/(dashboard)/ekip/actions'
 import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -133,17 +137,41 @@ function CoachHistoryList({ items, t, lang }: {
   )
 }
 
-function TemplateEditor({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
+function TemplateEditor({
+  t,
+  workspaceId,
+}: {
+  t: ReturnType<typeof useTranslation>['t']
+  workspaceId: string
+}) {
   const [active, setActive] = useState(readTemplate('active'))
   const [recent, setRecent] = useState(readTemplate('recent'))
   const [silent, setSilent] = useState(readTemplate('silent'))
   const [open, setOpen] = useState(false)
+  const [saving, setSaving] = useState(false)
 
-  function save() {
-    localStorage.setItem(TMPL_KEY('active'), active)
-    localStorage.setItem(TMPL_KEY('recent'), recent)
-    localStorage.setItem(TMPL_KEY('silent'), silent)
-    toast.success(t('dashboard.memberDetailTemplateSaved'))
+  // Hydrate from Supabase once on mount
+  useEffect(() => {
+    if (!workspaceId) return
+    getCoachingTemplatesAction(workspaceId).then((tmpl: CoachingTemplates) => {
+      if (tmpl.active) { setActive(tmpl.active); localStorage.setItem(TMPL_KEY('active'), tmpl.active) }
+      if (tmpl.recent) { setRecent(tmpl.recent); localStorage.setItem(TMPL_KEY('recent'), tmpl.recent) }
+      if (tmpl.silent) { setSilent(tmpl.silent); localStorage.setItem(TMPL_KEY('silent'), tmpl.silent) }
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaceId])
+
+  async function save() {
+    setSaving(true)
+    try {
+      await saveCoachingTemplatesAction(workspaceId, { active, recent, silent })
+      localStorage.setItem(TMPL_KEY('active'), active)
+      localStorage.setItem(TMPL_KEY('recent'), recent)
+      localStorage.setItem(TMPL_KEY('silent'), silent)
+      toast.success(t('dashboard.memberDetailTemplateSaved'))
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -188,9 +216,10 @@ function TemplateEditor({ t }: { t: ReturnType<typeof useTranslation>['t'] }) {
           <button
             type="button"
             onClick={save}
-            className="mt-1 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95"
+            disabled={saving}
+            className="mt-1 rounded-xl bg-[var(--accent)] px-4 py-2 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 disabled:opacity-60"
           >
-            {t('common.save')}
+            {saving ? '...' : t('common.save')}
           </button>
         </div>
       )}
@@ -441,6 +470,23 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                   </div>
                 )}
 
+                {/* Üye hedefi */}
+                {data.memberGoal && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+                      {t('dashboard.memberDetailGoalTitle')}
+                    </p>
+                    <div className="rounded-2xl border border-amber-200/60 bg-amber-50/60 px-4 py-3 dark:border-amber-800/30 dark:bg-amber-950/20">
+                      <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
+                        {t('dashboard.memberDetailGoalText', {
+                          people: data.memberGoal.targetPeople,
+                          months: data.memberGoal.targetMonths,
+                        })}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Koçluk geçmişi */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
@@ -494,7 +540,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 )}
 
                 {/* Mesaj şablonları */}
-                <TemplateEditor t={t} />
+                <TemplateEditor t={t} workspaceId={ws?.workspaceId ?? ''} />
               </>
             )
           })()}

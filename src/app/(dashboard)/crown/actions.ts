@@ -969,6 +969,7 @@ export type SahaRadarMember = {
   daysSinceActivity: number | null
   candidateCount: number
   phone: string | null
+  lastCoachedAt: string | null
 }
 
 export type SahaRadarFollowUp = {
@@ -1008,6 +1009,30 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
   const nowIso = new Date(now).toISOString()
   const sevenDaysIso = new Date(now + 7 * 86_400_000).toISOString()
 
+  const teamMemberUserIds = (bundle?.ekipRows ?? [])
+    .filter(m => m.user_id !== user.id)
+    .map(m => m.user_id)
+
+  // Batch-query last coaching records for all team members (last 3 days)
+  const threeDaysAgoIso = new Date(now - 3 * 86_400_000).toISOString()
+  const { data: coachingRows } = teamMemberUserIds.length > 0
+    ? await supabase
+        .from('nmm_daily_actions')
+        .select('note_tr, created_at')
+        .eq('user_id', user.id)
+        .eq('action_type', 'ai_generate')
+        .gte('created_at', threeDaysAgoIso)
+        .like('note_tr', 'coaching:%')
+    : { data: null }
+
+  const lastCoachedMap: Record<string, string> = {}
+  for (const row of coachingRows ?? []) {
+    const targetId = (row.note_tr ?? '').split(':')[1]
+    if (targetId && !lastCoachedMap[targetId]) {
+      lastCoachedMap[targetId] = row.created_at
+    }
+  }
+
   const members: SahaRadarMember[] = (bundle?.ekipRows ?? [])
     .filter(m => m.user_id !== user.id)
     .map(m => {
@@ -1024,6 +1049,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
         daysSinceActivity: days,
         candidateCount: m.candidate_count,
         phone: m.phone ?? null,
+        lastCoachedAt: lastCoachedMap[m.user_id] ?? null,
       }
     })
     .sort((a, b) => {
@@ -1031,10 +1057,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
       return order[a.activityLevel] - order[b.activityLevel]
     })
 
-  const teamMemberIds = teamAccess
-    ? (bundle?.ekipRows ?? []).filter(m => m.user_id !== user.id).map(m => m.user_id)
-    : []
-  const ownerIds = [user.id, ...teamMemberIds]
+  const ownerIds = [user.id, ...(teamAccess ? teamMemberUserIds : [])]
 
   const memberNameMap: Record<string, string> = {}
   for (const m of bundle?.ekipRows ?? []) {

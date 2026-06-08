@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Users, Crown, Lock, Sparkles, LayoutGrid, Table2, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -334,7 +335,7 @@ export function TeamPerformanceTable({
                     <td className="p-3 flex items-center gap-2 whitespace-nowrap">
                       {m.avatar_url ? (
                         <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
-                          <img src={m.avatar_url} alt={m.full_name ?? ''} className="h-full w-full object-cover" />
+                          <Image src={m.avatar_url} alt={m.full_name ?? ''} width={24} height={24} unoptimized className="h-full w-full object-cover" />
                           {isLeader && <Crown className="absolute -top-1 -right-1 h-3 w-3 text-[#854F0B] bg-white rounded-full p-[1px]" strokeWidth={2.5} />}
                         </div>
                       ) : isLeader ? (

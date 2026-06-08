@@ -561,6 +561,65 @@ export async function sendBankTransferNotifyEmail(
   }
 }
 
+/**
+ * Sends an overdue follow-up digest email to a user listing all overdue candidates.
+ */
+export async function sendOverdueDigestEmail(
+  email: string,
+  name: string,
+  candidates: Array<{ name: string; daysOverdue: number }>,
+  lang: 'tr' | 'en' = 'tr',
+): Promise<boolean> {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('[Resend] Skipping sendOverdueDigestEmail: RESEND_API_KEY is not defined.')
+    return false
+  }
+
+  const subject =
+    lang === 'en'
+      ? `You have ${candidates.length} overdue follow-up${candidates.length > 1 ? 's' : ''} ⏰`
+      : `${candidates.length} gecikmiş takibiniz var ⏰`
+
+  const rows = candidates
+    .map(c =>
+      lang === 'en'
+        ? `<li style="padding:4px 0;font-size:13px;color:#374151;"><strong>${c.name}</strong> — ${c.daysOverdue} day${c.daysOverdue > 1 ? 's' : ''} overdue</li>`
+        : `<li style="padding:4px 0;font-size:13px;color:#374151;"><strong>${c.name}</strong> — ${c.daysOverdue} gün gecikmiş</li>`,
+    )
+    .join('')
+
+  const content =
+    lang === 'en'
+      ? [
+          emailHeading('Overdue follow-ups'),
+          emailParagraph(`Hi ${name}, the following candidates have overdue follow-ups in your pipeline:`),
+          `<ul style="padding-left:20px;margin:12px 0;">${rows}</ul>`,
+          emailParagraph('Open your pipeline to schedule new follow-ups and keep your momentum going.'),
+          emailCta(`${NMM_APP_URL}/pipeline`, 'Open Pipeline'),
+        ].join('')
+      : [
+          emailHeading('Gecikmiş takipler'),
+          emailParagraph(`Merhaba ${name}, boru hattınızda aşağıdaki adaylar için planlanan takipler geçti:`),
+          `<ul style="padding-left:20px;margin:12px 0;">${rows}</ul>`,
+          emailParagraph('Yeni tarih belirlemek ve hızınızı korumak için boru hattınızı açın.'),
+          emailCta(`${NMM_APP_URL}/pipeline`, 'Boru Hattını Aç'),
+        ].join('')
+
+  try {
+    await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [email],
+      replyTo: NMM_REPLY_TO,
+      subject,
+      html: buildPremiumEmail(content, lang),
+    })
+    return true
+  } catch (err) {
+    console.error('[Resend] Failed to send overdue digest email:', err)
+    return false
+  }
+}
+
 /** Şifre sıfırlama — NMM logo + premium şablon (Supabase varsayılan N harfi yerine). */
 export async function sendPasswordResetEmail(
   email: string,

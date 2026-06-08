@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
+import Image from 'next/image'
 import { Crown, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { TeamMember } from '@/hooks/useTeamMembers'
@@ -240,7 +241,7 @@ export function StatsSuperAdminSections({
                     <div className="flex items-center gap-2">
                       {row.avatarUrl ? (
                         <div className="relative h-6 w-6 shrink-0 rounded-full overflow-hidden border border-[var(--border)]">
-                          <img src={row.avatarUrl} alt={row.name} className="h-full w-full object-cover" />
+                          <Image src={row.avatarUrl} alt={row.name} width={24} height={24} unoptimized className="h-full w-full object-cover" />
                           {isLeader && (
                             <Crown className="absolute -top-1 -right-1 h-3 w-3 text-[#854F0B] bg-white rounded-full p-[1px]" strokeWidth={2.5} />
                           )}

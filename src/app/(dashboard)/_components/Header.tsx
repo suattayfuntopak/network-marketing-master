@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { UserMenu } from './UserMenu'
@@ -165,7 +166,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
         {/* Sol Taraf: Neon Logo ve Marka */}
         <Link href="/pano" className="flex items-center gap-3 transition-opacity hover:opacity-85">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] cursor-pointer">
-            <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
+            <Image src="/logo.png" alt="NMM Logo" width={40} height={40} className="h-full w-full rounded-full object-cover" />
           </div>
           <div className="hidden flex-col md:flex cursor-pointer">
             <span className="bg-gradient-to-r from-cyan-400 via-indigo-200 to-purple-400 bg-clip-text text-xs font-black tracking-tight text-transparent">

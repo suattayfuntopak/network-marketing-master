@@ -65,7 +65,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
     <>
       <article className="relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
         {isAdmin && (
-          <div className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1">
+          <div className={`absolute right-2.5 top-2.5 ${Z.cardControls} flex items-center gap-1`}>
             <button
               type="button"
               onClick={onEdit}

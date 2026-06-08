@@ -2,6 +2,7 @@
 
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TESTIMONIALS, TESTIMONIAL_CARD } from './constants'
+import { Z } from '@/lib/ui/zIndex'
 
 export function LandingTestimonials() {
   const { t, lang } = useTranslation()
@@ -18,7 +19,7 @@ export function LandingTestimonials() {
       </div>
 
       {/* Fading Glass Overlay Outer Container */}
-      <div className="relative w-full overflow-hidden space-y-6 before:absolute before:left-0 before:top-0 before:h-full before:w-16 sm:before:w-32 before:bg-gradient-to-r before:from-white dark:before:from-[#0A0B10] before:to-transparent before:z-10 after:absolute after:right-0 after:top-0 after:h-full after:w-16 sm:after:w-32 after:bg-gradient-to-l after:from-white dark:after:from-[#0A0B10] after:to-transparent after:z-10">
+      <div className={`relative w-full overflow-hidden space-y-6 before:absolute before:left-0 before:top-0 before:h-full before:w-16 sm:before:w-32 before:bg-gradient-to-r before:from-white dark:before:from-[#0A0B10] before:to-transparent before:${Z.cardControls} after:absolute after:right-0 after:top-0 after:h-full after:w-16 sm:after:w-32 after:bg-gradient-to-l after:from-white dark:after:from-[#0A0B10] after:to-transparent after:${Z.cardControls}`}>
         
         {/* Row 1 - scrolling left */}
         <div className="flex w-max gap-6 py-2">

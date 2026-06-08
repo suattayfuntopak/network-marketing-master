@@ -9,6 +9,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
+import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { TrainingTopic } from '../types'
 
@@ -49,7 +50,7 @@ export function AddTrainingModal({ open, onClose, onAdd }: Props) {
       baslik: newBaslik,
       emoji: newEmoji || '📖',
       sure: '5 dk',
-      seviye: newSeviye as any,
+      seviye: newSeviye,
       ozet: newOzet || newIcerik.slice(0, 100) + '...',
       maddeler: newIcerik.split('\n').map(l => l.trim()).filter(Boolean),
       kategoriId: newKategori.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'),
@@ -65,7 +66,7 @@ export function AddTrainingModal({ open, onClose, onAdd }: Props) {
           'training',
           ws?.workspaceId ?? null,
           itemKey,
-          newObj as unknown as Record<string, any>
+          newObj as unknown as Record<string, Json>
         )
 
         setNewBaslik('')

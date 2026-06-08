@@ -5,6 +5,8 @@
 export const Z = {
   /** Kart-içi yerel kontrol grubu (kartın kendi içeriğinin üstünde; overlay değil) */
   cardControls: 'z-10',
+  /** Kart-içi ikinci katman (cardControls üstünde, lokal overlay değil) */
+  cardControlsUpper: 'z-20',
   sidebar: 'z-[35]',
   header: 'z-40',
   bottomNav: 'z-50',

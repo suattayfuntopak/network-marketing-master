@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import {
   Phone, Shield, BarChart3, Target, Clock, Users, RefreshCw,
   UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, Loader2,
-  Compass
+  Compass, type LucideIcon
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { pickLangField } from '@/lib/utils/pickLang'
@@ -18,7 +18,7 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 interface Scenario {
   id: string
   emoji: string
-  icon: any
+  icon: LucideIcon
   titleTr: string
   titleEn: string
   descTr: string

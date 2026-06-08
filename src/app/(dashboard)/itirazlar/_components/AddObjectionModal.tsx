@@ -9,6 +9,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
+import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { CustomItiraz } from '../types'
 
@@ -72,7 +73,7 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
           'objection',
           ws?.workspaceId ?? null,
           String(itemKey),
-          newObj as unknown as Record<string, any>
+          newObj as unknown as Record<string, Json>
         )
 
         resetForm()

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, LogIn, UserPlus } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
@@ -18,7 +19,7 @@ export function LandingHeader() {
         {/* Logo */}
         <div className="flex flex-1 min-w-0 items-center gap-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] sm:h-9 sm:w-9">
-            <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
+            <Image src="/logo.png" alt="NMM Logo" width={36} height={36} className="h-full w-full rounded-full object-cover" />
           </div>
           <span className="truncate text-xs font-extrabold tracking-tight bg-gradient-to-r from-slate-900 to-indigo-700 dark:from-white dark:to-indigo-100 bg-clip-text text-transparent sm:text-base">
             Network Marketing Master

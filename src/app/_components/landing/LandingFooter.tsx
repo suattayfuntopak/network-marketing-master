@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Mail } from 'lucide-react'
 
@@ -21,7 +22,7 @@ export function LandingFooter() {
           <div className="md:col-span-4 space-y-4">
             <div className="flex items-center gap-2.5">
               <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-                <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
+                <Image src="/logo.png" alt="NMM Logo" width={32} height={32} className="h-full w-full rounded-full object-cover" />
               </div>
               <span className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 dark:from-white dark:via-zinc-200 dark:to-indigo-300 bg-clip-text text-transparent">
                 Network Marketing Master

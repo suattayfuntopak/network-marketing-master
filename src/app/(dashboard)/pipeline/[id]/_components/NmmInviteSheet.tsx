@@ -73,7 +73,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
       <div
         className={`fixed left-1/2 top-1/2 ${Z.sheet} flex w-[calc(100%-2rem)] md:w-[440px] max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl`}
       >
-        <div className="sticky top-0 z-10 flex shrink-0 items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4">
+        <div className={`sticky top-0 ${Z.cardControls} flex shrink-0 items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4`}>
           <div className="flex min-w-0 items-center gap-2">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]/10 text-[#534AB7] dark:text-indigo-300">
               <Bot className="h-4.5 w-4.5" />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { LandingHeader } from './LandingHeader'
@@ -71,7 +72,7 @@ export function LandingPage() {
           <div className="absolute h-16 w-16 animate-ping rounded-full bg-[#534AB7]/20" />
           <div className="absolute h-12 w-12 animate-pulse rounded-full bg-[#534AB7]/40" />
           <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-            <img src="/logo.png" alt="NMM Logo" className="h-full w-full rounded-full object-cover" />
+            <Image src="/logo.png" alt="NMM Logo" width={32} height={32} className="h-full w-full rounded-full object-cover" />
           </div>
         </div>
         <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[var(--text-3)] animate-pulse">

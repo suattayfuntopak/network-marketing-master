@@ -255,7 +255,13 @@ function MemberCard({
           ) : (
             <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
           )}
-          {!hasAiFieldAccess && (
+          {m.lastCoachedAt && (
+            <span
+              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-1 ring-white dark:ring-[var(--bg-card)]"
+              aria-label="Son 3 gün içinde koçluk yapıldı"
+            />
+          )}
+          {!hasAiFieldAccess && !m.lastCoachedAt && (
             <Lock
               className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]"
               strokeWidth={2.5}

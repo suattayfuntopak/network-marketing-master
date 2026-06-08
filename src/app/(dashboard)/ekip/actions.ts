@@ -16,11 +16,18 @@ export type CoachingHistoryItem = {
   createdAt: string
 }
 
+export type CoachingTemplates = {
+  active: string
+  recent: string
+  silent: string
+}
+
 export type MemberDetailPayload = {
   member: MemberRow | null
   weeklyActivity: { calls: number; whatsapps: number }
   coachingHistory: CoachingHistoryItem[]
   dailyActivity: Array<{ date: string; count: number }>
+  memberGoal: { targetPeople: number; targetMonths: number } | null
   hasAccess: boolean
 }
 
@@ -33,6 +40,7 @@ export async function getMemberDetailAction(
     weeklyActivity: { calls: 0, whatsapps: 0 },
     coachingHistory: [],
     dailyActivity: [],
+    memberGoal: null,
     hasAccess: false,
   }
   const { user } = await getAuthUser()
@@ -53,7 +61,7 @@ export async function getMemberDetailAction(
 
   const now = new Date()
 
-  const [activityResult, coachRows, actRows] = await Promise.all([
+  const [activityResult, coachRows, actRows, goalRow] = await Promise.all([
     getTeamFieldActivityAction(workspaceId, '7d', [targetUserId]),
     supabase
       .from('nmm_daily_actions')
@@ -69,6 +77,12 @@ export async function getMemberDetailAction(
       .eq('user_id', targetUserId)
       .gte('created_at', new Date(now.getTime() - 7 * 86_400_000).toISOString())
       .neq('action_type', 'ai_generate'),
+    supabase
+      .from('nmm_member_goals')
+      .select('target_people, target_months')
+      .eq('workspace_id', workspaceId)
+      .eq('member_user_id', targetUserId)
+      .maybeSingle(),
   ])
 
   const ua = activityResult.byUser[targetUserId]
@@ -90,6 +104,10 @@ export async function getMemberDetailAction(
   }
   const dailyActivity = Object.entries(countByDate).map(([date, count]) => ({ date, count }))
 
+  const memberGoal = goalRow.data
+    ? { targetPeople: goalRow.data.target_people, targetMonths: goalRow.data.target_months }
+    : null
+
   return {
     member,
     weeklyActivity: {
@@ -98,8 +116,52 @@ export async function getMemberDetailAction(
     },
     coachingHistory,
     dailyActivity,
+    memberGoal,
     hasAccess: true,
   }
+}
+
+export async function getCoachingTemplatesAction(
+  workspaceId: string,
+): Promise<CoachingTemplates> {
+  const { user } = await getAuthUser()
+  if (!user) return { active: '', recent: '', silent: '' }
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_workspaces')
+    .select('coaching_templates')
+    .eq('id', workspaceId)
+    .single()
+
+  const raw = data?.coaching_templates as Record<string, string> | null
+  return {
+    active: raw?.active ?? '',
+    recent: raw?.recent ?? '',
+    silent: raw?.silent ?? '',
+  }
+}
+
+export async function saveCoachingTemplatesAction(
+  workspaceId: string,
+  templates: CoachingTemplates,
+): Promise<void> {
+  const { user } = await getAuthUser()
+  if (!user) return
+
+  const supabase = await createClient()
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (ws?.owner_id !== user.id && !isSuperAdmin(user)) return
+
+  await supabase
+    .from('nmm_workspaces')
+    .update({ coaching_templates: templates })
+    .eq('id', workspaceId)
 }
 
 /**

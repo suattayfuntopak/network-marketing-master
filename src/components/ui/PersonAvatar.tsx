@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { clsx } from 'clsx'
 import { getPastelAvatarClasses } from '@/lib/ui/avatarColors'
 
@@ -36,9 +37,12 @@ export function PersonAvatar({ name, imageUrl, size = 'md', className }: PersonA
       )}
     >
       {showImage ? (
-        <img
+        <Image
           src={imageUrl!.trim()}
           alt={name}
+          width={80}
+          height={80}
+          unoptimized
           className="h-full w-full object-cover"
           onError={() => setImgFailed(true)}
         />

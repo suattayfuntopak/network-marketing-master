@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
+import type { Json } from '@/types/database.types'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
 import {
   rejectReasonForEmail,
@@ -27,7 +28,7 @@ export async function submitModeratedRequestAction(
   contentType: 'training' | 'objection',
   workspaceId: string | null,
   itemKey: string,
-  data: Record<string, any>
+  data: Record<string, Json>
 ): Promise<ContentSubmissionResult> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -45,7 +46,7 @@ export async function submitModeratedRequestAction(
     user_id: user.id,
     workspace_id: workspaceId,
     item_key: itemKey,
-    data,
+    data: data as Json,
     is_approved: isApproved,
     user_email: userEmail,
     user_name: userName,
@@ -58,7 +59,9 @@ export async function submitModeratedRequestAction(
 
   // If not super admin, alert super admin via email
   if (!isApproved) {
-    const title = contentType === 'training' ? (data.baslik ?? 'İsimsiz İçerik') : (data.soru?.tr ?? data.soru ?? 'İsimsiz İtiraz')
+    const title = contentType === 'training'
+      ? ((data.baslik as string | undefined) ?? 'İsimsiz İçerik')
+      : (((data.soru as Record<string, string> | undefined)?.tr) ?? (data.soru as string | undefined) ?? 'İsimsiz İtiraz')
     // Trigger alerting asynchronously
     sendModerationAlertEmail(userEmail, userName, contentType, title).catch(err => {
       console.error('[Resend Alert Error]', err)
@@ -73,7 +76,7 @@ export interface ModerationRequestItem {
   userId: string
   workspaceId: string | null
   itemKey: string
-  data: any
+  data: Json
   createdAt: string
   isApproved: boolean
   userEmail: string | null
@@ -152,7 +155,7 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
 export async function approveRequestAction(
   id: string,
   contentType: 'training' | 'objection',
-  editedData: Record<string, any>
+  editedData: Json
 ): Promise<{ success: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -174,7 +177,7 @@ export async function approveRequestAction(
 
   const enrichedData = await enrichApprovedModerationData(
     contentType,
-    editedData,
+    editedData as unknown as Record<string, unknown>,
     translateNoteAction,
   )
 
@@ -201,9 +204,12 @@ export async function approveRequestAction(
       .limit(1)
   } catch {}
 
+  const editedRecord = (typeof editedData === 'object' && editedData !== null && !Array.isArray(editedData))
+    ? (editedData as Record<string, unknown>)
+    : null
   const title = contentType === 'training'
-    ? (enrichedData.baslik ?? editedData.baslik ?? 'İsimsiz İçerik')
-    : ((enrichedData.soru as { tr?: string })?.tr ?? editedData.soru?.tr ?? editedData.soru ?? 'İsimsiz İtiraz')
+    ? ((enrichedData.baslik as string | undefined) ?? (editedRecord?.baslik as string | undefined) ?? 'İsimsiz İçerik')
+    : (((enrichedData.soru as Record<string, string> | undefined)?.tr) ?? ((editedRecord?.soru as Record<string, string> | undefined)?.tr) ?? (editedRecord?.soru as string | undefined) ?? 'İsimsiz İtiraz')
 
   if (row.user_email) {
     sendModerationApprovedEmail(row.user_email, row.user_name ?? 'NMM Üyesi', contentType, title, row.item_key, userLang).catch(err => {
@@ -258,10 +264,10 @@ export async function rejectRequestAction(
 
   // Trigger rejection notification asynchronously
   if (row && row.user_email) {
-    const rowData = row.data as any
+    const rowData = row.data as Record<string, Json | undefined>
     const title = contentType === 'training'
-      ? (rowData?.baslik ?? 'İsimsiz İçerik')
-      : (rowData?.soru?.tr ?? rowData?.soru?.en ?? rowData?.soru ?? 'İsimsiz İtiraz')
+      ? ((rowData?.baslik as string | undefined) ?? 'İsimsiz İçerik')
+      : (((rowData?.soru as Record<string, string> | undefined)?.tr) ?? ((rowData?.soru as Record<string, string> | undefined)?.en) ?? (rowData?.soru as string | undefined) ?? 'İsimsiz İtiraz')
 
     // Find lang or default to 'tr'
     const userLang: 'tr' | 'en' = 'tr'

@@ -495,6 +495,8 @@ export const en = {
     memberDetailTemplateRecent: "Low activity member",
     memberDetailTemplateSilent: "Silent member",
     memberDetailTemplateSaved: "Templates saved",
+    memberDetailGoalTitle: "Organization Goal",
+    memberDetailGoalText: "Team of {people} in {months} months",
     memberDetailTemplatePlaceholder: "Leave blank and AI writes freely. Fill in and this text is added as personal context.",
     searchMembers: "Search by name or phone…",
     callBtn: "Call",

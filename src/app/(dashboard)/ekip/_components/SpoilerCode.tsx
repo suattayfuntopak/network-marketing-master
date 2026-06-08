@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { Z } from '@/lib/ui/zIndex'
 
 export function SpoilerCode({ code }: { code: string }) {
   const [revealed, setRevealed] = useState(false)
@@ -84,9 +85,9 @@ export function SpoilerCode({ code }: { code: string }) {
       </span>
 
       {!revealed && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center transition-all duration-500 ease-out">
+        <div className={`absolute inset-0 ${Z.cardControls} flex items-center justify-center transition-all duration-500 ease-out`}>
           <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-          <span className="relative z-20 text-xs uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none">
+          <span className={`relative ${Z.cardControlsUpper} text-xs uppercase tracking-widest text-cyan-200/60 font-sans font-bold animate-pulse pointer-events-none`}>
             Açmak için tıkla ✨
           </span>
         </div>

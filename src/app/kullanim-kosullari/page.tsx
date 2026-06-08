@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft, FileText, CheckCircle2, AlertCircle } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { LegalPageToolbar } from '@/app/_components/legal/LegalPageToolbar'
+import { Z } from '@/lib/ui/zIndex'
 
 export default function TermsPage() {
   const { lang, t } = useTranslation()
@@ -149,7 +150,7 @@ export default function TermsPage() {
       <div className="absolute bottom-[10%] right-[-10%] h-[400px] w-[400px] rounded-full bg-pink-600/5 blur-[140px] pointer-events-none" />
 
       {/* Header Back Bar */}
-      <nav className="sticky top-0 z-40 backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors">
+      <nav className={`sticky top-0 ${Z.header} backdrop-blur-md bg-white/70 dark:bg-[#06070B]/70 border-b border-slate-200 dark:border-white/[0.04] transition-colors`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"

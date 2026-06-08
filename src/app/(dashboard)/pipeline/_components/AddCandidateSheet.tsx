@@ -134,7 +134,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
       <div
         className={`fixed left-1/2 top-1/2 ${Z.sheet} flex w-[calc(100%-2rem)] max-w-sm max-h-[calc(100dvh-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-2xl bg-[var(--bg-card)] shadow-2xl`}
       >
-        <div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-6 py-4">
+        <div className={`sticky top-0 ${Z.cardControls} flex shrink-0 items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-6 py-4`}>
           <h2 className="text-lg font-bold text-[var(--text-1)]">Yeni Aday Ekle</h2>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)]">
             <X className="h-4 w-4" />
@@ -155,7 +155,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="absolute bottom-0 right-0 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60"
+                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60`}
                 title="Fotoğraf Yükle"
               >
                 {uploadingPhoto ? (

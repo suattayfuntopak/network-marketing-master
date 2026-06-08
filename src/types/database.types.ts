@@ -35,6 +35,7 @@ export interface Database {
           license_type: 'free' | 'basic' | 'plus' | 'pro'
           license_expires_at: string | null
           parent_id: string | null
+          coaching_templates: Json | null
         }
         Insert: {
           id?: string
@@ -45,6 +46,7 @@ export interface Database {
           license_type?: 'free' | 'basic' | 'plus' | 'pro'
           license_expires_at?: string | null
           parent_id?: string | null
+          coaching_templates?: Json | null
         }
         Update: {
           id?: string
@@ -55,6 +57,7 @@ export interface Database {
           license_type?: 'free' | 'basic' | 'plus' | 'pro'
           license_expires_at?: string | null
           parent_id?: string | null
+          coaching_templates?: Json | null
         }
         Relationships: []
       }

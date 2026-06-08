@@ -51,7 +51,7 @@ export function EgitimContent({
     loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', ws?.workspaceId ?? null)
       .then(items => {
         if (!cancelled) {
-          const approved = items.filter(it => (it as any).isApproved)
+          const approved = items.filter(it => (it as Record<string, unknown>).isApproved)
           setCustomTrainings(approved as unknown as TrainingTopic[])
         }
       })

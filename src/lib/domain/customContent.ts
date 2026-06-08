@@ -46,8 +46,8 @@ export async function loadCustomContent(
 
   const dbItems = (rows ?? []).map(r => ({
     ...(r.data as CustomItem),
-    isApproved: (r as any).is_approved,
-    userId: (r as any).user_id,
+    isApproved: (r as { is_approved: boolean }).is_approved,
+    userId: (r as { user_id: string }).user_id,
   }))
   const dbKeys = new Set((rows ?? []).map(r => String(r.item_key)))
 

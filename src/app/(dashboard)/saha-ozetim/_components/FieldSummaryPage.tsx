@@ -221,6 +221,8 @@ export function FieldSummaryPage() {
             totalDaysInYear={yearlySelf?.totalDaysInYear ?? 365}
             yearPct={yearlySelf?.yearPct ?? 0}
             isCurrentYear={yearlySelf?.isCurrentYear ?? offset === 0}
+            fieldMetrics={yearlySelf?.fieldMetrics}
+            yearlyActuals={yearlySelf?.yearlyActuals}
             loading={loading}
           />
           <HubCrownFunnelGrid
@@ -238,7 +240,12 @@ export function FieldSummaryPage() {
     const loading = allTimeLoading && !allTimeSelf
     return (
       <>
-        <HubAllTimeHero activeDays={allTimeSelf?.fieldMetrics.activeDays ?? 0} loading={loading} />
+        <HubAllTimeHero
+        activeDays={allTimeSelf?.fieldMetrics.activeDays ?? 0}
+        fieldMetrics={allTimeSelf?.fieldMetrics}
+        allTimeActuals={allTimeSelf?.allTimeActuals}
+        loading={loading}
+      />
         <HubCrownFunnelGrid
           actuals={allTimeSelf?.allTimeActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
           targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}

@@ -494,6 +494,8 @@ export const tr = {
     memberDetailTemplateRecent: "Az aktif üye",
     memberDetailTemplateSilent: "Sessiz üye",
     memberDetailTemplateSaved: "Şablonlar kaydedildi",
+    memberDetailGoalTitle: "Organizasyon Hedefi",
+    memberDetailGoalText: "{months} ayda {people} kişilik ekip",
     memberDetailTemplatePlaceholder: "Boşsa AI kendi tarzında yazar. Doldurursan bu metin kişisel bağlam olarak eklenir.",
     waInviteGroup: "Merhaba!\n\nBenimle Network Marketing Master'ı birlikte kullanmanı istiyorum — sadece platforma kayıt değil, benim sponsorluğum altında aynı sistemle ilerlemek.\n\nKayıt linki: {link}\nEkibim sayfasına girdikten sonra davet kodu: {code}",
     searchMembers: "İsim veya telefon ile ara…",

@@ -23,25 +23,33 @@ interface Props {
 export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
   const { lang, t } = useTranslation()
   const uiLang = lang === 'en' ? 'en' : 'tr'
-  const d = request.data
+  type DVal = Record<string, string> | string | string[] | undefined
+  const d = request.data as unknown as Record<string, DVal>
   const isTraining = request.contentType === 'training'
 
+  function ds(v: DVal, fallback = ''): string {
+    if (v === undefined || v === null) return fallback
+    if (typeof v === 'string') return v || fallback
+    if (Array.isArray(v)) return v.join(', ')
+    return v.tr ?? v.en ?? Object.values(v)[0] ?? fallback
+  }
+
   const [editTitle, setEditTitle] = useState<string>(() =>
-    isTraining ? (d.baslik ?? '') : (d.soru?.tr ?? d.soru ?? '')
+    isTraining ? ds(d.baslik) : ds(d.soru)
   )
   const [editCategory, setEditCategory] = useState<string>(() =>
-    isTraining ? (d.kategoriBaslik ?? 'Zihniyet') : (d.kategori?.tr ?? d.kategori ?? 'Genel')
+    isTraining ? ds(d.kategoriBaslik, 'Zihniyet') : ds(d.kategori, 'Genel')
   )
-  const [editOzet, setEditOzet] = useState<string>(isTraining ? (d.ozet ?? '') : '')
+  const [editOzet, setEditOzet] = useState<string>(isTraining ? ds(d.ozet) : '')
   const [editIcerik, setEditIcerik] = useState<string>(
-    isTraining && Array.isArray(d.maddeler) ? d.maddeler.join('\n') : ''
+    isTraining && Array.isArray(d.maddeler) ? (d.maddeler as string[]).join('\n') : ''
   )
-  const [editKisaCevap, setEditKisaCevap] = useState<string>(!isTraining ? (d.kisaCevap ?? '') : '')
-  const [editDetayliCevap, setEditDetayliCevap] = useState<string>(!isTraining ? (d.detayliCevap ?? '') : '')
-  const [editYaklasim, setEditYaklasim] = useState<string>(!isTraining ? (d.yaklasim ?? '') : '')
-  const [editOrnekDiyalog, setEditOrnekDiyalog] = useState<string>(!isTraining ? (d.ornekDiyalog ?? '') : '')
-  const [editEmoji, setEditEmoji] = useState<string>(d.emoji ?? (isTraining ? '📖' : '🛡️'))
-  const [editTags, setEditTags] = useState<string>(Array.isArray(d.tags) ? d.tags.join(', ') : '')
+  const [editKisaCevap, setEditKisaCevap] = useState<string>(!isTraining ? ds(d.kisaCevap) : '')
+  const [editDetayliCevap, setEditDetayliCevap] = useState<string>(!isTraining ? ds(d.detayliCevap) : '')
+  const [editYaklasim, setEditYaklasim] = useState<string>(!isTraining ? ds(d.yaklasim) : '')
+  const [editOrnekDiyalog, setEditOrnekDiyalog] = useState<string>(!isTraining ? ds(d.ornekDiyalog) : '')
+  const [editEmoji, setEditEmoji] = useState<string>(ds(d.emoji, isTraining ? '📖' : '🛡️'))
+  const [editTags, setEditTags] = useState<string>(Array.isArray(d.tags) ? (d.tags as string[]).join(', ') : '')
 
   const [isModerating, startModerationTransition] = useTransition()
   const [rejectOpen, setRejectOpen] = useState(false)
@@ -78,7 +86,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
           }
         }
 
-        const res = await approveRequestAction(request.id, request.contentType, edited)
+        const res = await approveRequestAction(request.id, request.contentType, edited as unknown as import('@/types/database.types').Json)
         if (res.success) {
           toast.success(t('moderationReview.approvedToast'))
           onClose()

@@ -186,7 +186,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]"
+                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]`}
                 title="Fotoğraf Yükle"
               >
                 <Camera className="h-3.5 w-3.5" />

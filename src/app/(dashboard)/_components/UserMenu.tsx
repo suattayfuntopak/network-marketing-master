@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { LogOut, User, Settings, Bell, ChevronDown, Sparkles } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -67,9 +68,12 @@ export function UserMenu() {
         title={t('shellUi.profileMenu')}
       >
         {avatarUrl ? (
-          <img
+          <Image
             src={avatarUrl}
             alt="Profil"
+            width={28}
+            height={28}
+            unoptimized
             className="h-7 w-7 rounded-full object-cover ring-1 ring-[#534AB7]/30"
           />
         ) : (

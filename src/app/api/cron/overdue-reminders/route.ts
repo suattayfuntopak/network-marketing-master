@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { cronAuthError } from '@/lib/infra/cronAuth'
 import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
+import { claimEmailSend } from '@/lib/infra/emailSentLog'
+import { sendOverdueDigestEmail } from '@/lib/infra/mail'
 
 // Gecikmiş takipler (next_follow_up_at < now, ≤ 14 gün) için in-app bildirim.
 // calendar-reminder aynı günlük takipleri zaten karşılar — bu cron sadece geçmişte kalanları yakalar.
@@ -42,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   const { data: overdueCandidates } = await supabase
     .from('nmm_candidates')
-    .select('id, full_name, owner_id, workspace_id')
+    .select('id, full_name, owner_id, workspace_id, next_follow_up_at')
     .in('workspace_id', wsIds)
     .lt('next_follow_up_at', yesterdayEndIso)
     .gte('next_follow_up_at', fourteenDaysAgo)
@@ -87,6 +89,53 @@ export async function GET(request: NextRequest) {
       console.error(`[overdue-reminders] insert failed for ${c.owner_id}/${c.id}:`, insertError)
     } else {
       alreadySent.add(key)
+    }
+  }
+
+  // ─── Email digest per user ─────────────────────────────────────────────────
+  // Group sent notifications by owner for digest email
+  const sentByOwner: Record<string, Array<{ name: string; daysOverdue: number }>> = {}
+  for (const r of results) {
+    if (!r.sent) continue
+    const c = overdueCandidates?.find(x => x.id === r.candidateId)
+    if (!c) continue
+    const days = c.next_follow_up_at
+      ? Math.max(0, Math.floor((now.getTime() - new Date(c.next_follow_up_at).getTime()) / 86_400_000))
+      : 0
+    if (!sentByOwner[r.userId]) sentByOwner[r.userId] = []
+    sentByOwner[r.userId].push({ name: c.full_name, daysOverdue: days })
+  }
+
+  if (Object.keys(sentByOwner).length > 0) {
+    // Fetch email preferences
+    const { data: prefs } = await supabase
+      .from('nmm_notification_preferences')
+      .select('user_id, email_enabled')
+      .in('user_id', Object.keys(sentByOwner))
+
+    const emailEnabledSet = new Set(
+      (prefs ?? []).filter(p => p.email_enabled).map(p => p.user_id),
+    )
+
+    for (const [ownerId, candidates] of Object.entries(sentByOwner)) {
+      if (!emailEnabledSet.has(ownerId)) continue
+      const ws = activeWs.find(w => w.owner_id === ownerId)
+      if (!ws) continue
+
+      const fresh = await claimEmailSend(supabase, ws.id, 'overdue_digest', todayKey)
+      if (!fresh) continue
+
+      const { data: authUser } = await supabase.auth.admin.getUserById(ownerId)
+      const email = authUser?.user?.email
+      const name =
+        (authUser?.user?.user_metadata?.full_name as string | undefined) ??
+        authUser?.user?.email?.split('@')[0] ??
+        '—'
+      const lang = ((authUser?.user?.user_metadata?.lang as string | undefined) === 'en' ? 'en' : 'tr') as 'tr' | 'en'
+
+      if (email) {
+        await sendOverdueDigestEmail(email, name, candidates, lang)
+      }
     }
   }
 

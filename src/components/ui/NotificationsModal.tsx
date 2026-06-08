@@ -13,6 +13,7 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 import { createClient } from '@/lib/supabase/client'
+import type { NotificationType } from '@/types/database.types'
 
 interface NotificationsModalProps {
   onClose: () => void
@@ -20,6 +21,21 @@ interface NotificationsModalProps {
 
 /** Bildirim ikon türü — oku/sil durumu Supabase'de (nmm_notifications), localStorage yok. */
 type NotifIconType = 'bell' | 'alert' | 'info' | 'user' | 'calendar'
+
+/** UI katmanında render için dönüştürülmüş bildirim nesnesi */
+interface UiNotification {
+  id: string
+  title: string
+  title_tr: string
+  title_en: string
+  description: string
+  time: string
+  read: boolean
+  icon: NotifIconType
+  type: NotificationType
+  candidate_id: string | null
+  isDb: boolean
+}
 
 function NotifIcon({ type, size = 'sm' }: { type: NotifIconType; size?: 'sm' | 'lg' }) {
   const cls = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4'
@@ -95,7 +111,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
   const [userEmail, setUserEmail]       = useState('')
-  const [selected, setSelected]         = useState<any | null>(null)
+  const [selected, setSelected]         = useState<UiNotification | null>(null)
 
   useBodyScrollLock()
 
@@ -110,9 +126,11 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   } = useNotifications()
 
   // Bildirimler tamamen Supabase'den (oku/sil durumu DB'de) — localStorage yok.
-  const notifications = dbNotifications.map(n => ({
+  const notifications: UiNotification[] = dbNotifications.map(n => ({
     id: n.id,
     title: lang === 'en' ? n.title_en : n.title_tr,
+    title_tr: n.title_tr,
+    title_en: n.title_en,
     description: lang === 'en' ? n.description_en : n.description_tr,
     time: formatTimeAgo(n.created_at, t),
     read: n.read,
@@ -179,7 +197,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
     }
   }
 
-  function openNotification(n: any) {
+  function openNotification(n: UiNotification) {
     setSelected(n)
     dbMarkAsRead(n.id)
     if (prefs.sound) {
@@ -204,7 +222,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
            style={{ maxHeight: 'calc(100dvh - 2rem)', overflowY: 'auto' }}>
 
         {/* Başlık */}
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4">
+        <div className={`sticky top-0 ${Z.cardControls} flex items-center justify-between border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4`}>
           <div className="flex items-center gap-2">
             <Bell className="h-4.5 w-4.5 text-[var(--text-2)]" />
             <h2 className="text-base font-bold text-[var(--text-1)]">Bildirimler</h2>

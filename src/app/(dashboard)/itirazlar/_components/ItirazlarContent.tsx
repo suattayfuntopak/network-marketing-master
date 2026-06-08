@@ -47,7 +47,7 @@ export function ItirazlarContent({
     loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', ws?.workspaceId ?? null)
       .then(items => {
         if (!cancelled) {
-          const approved = items.filter(it => (it as any).isApproved)
+          const approved = items.filter(it => (it as Record<string, unknown>).isApproved)
           setCustomItirazlar(approved as unknown as CustomItiraz[])
         }
       })

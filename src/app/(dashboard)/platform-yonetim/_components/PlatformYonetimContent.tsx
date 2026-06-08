@@ -732,10 +732,10 @@ export function PlatformYonetimContent() {
 
                       <div>
                         <h3 className="text-sm font-bold text-[var(--text-1)] line-clamp-1 flex items-center gap-1">
-                          <span className="text-base shrink-0">{rd.emoji}</span>
-                          {title}
+                          <span className="text-base shrink-0">{String(rd.emoji ?? '')}</span>
+                          {String(title ?? '')}
                         </h3>
-                        <p className="text-[10px] text-[var(--text-3)] font-semibold mt-0.5 truncate">Kategori: {category}</p>
+                        <p className="text-[10px] text-[var(--text-3)] font-semibold mt-0.5 truncate">Kategori: {String(category ?? '')}</p>
                       </div>
 
                       <p className="text-[11px] text-[var(--text-2)] line-clamp-2 leading-relaxed bg-[var(--bg-subtle)] p-2 rounded-lg border border-[var(--border)] font-medium">

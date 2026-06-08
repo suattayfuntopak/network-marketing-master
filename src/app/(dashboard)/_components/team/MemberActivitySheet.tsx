@@ -321,7 +321,7 @@ export function MemberActivitySheet({
 
         <div className="relative">
           {isFetching && data && (
-            <div className="absolute right-0 top-0 z-10">
+            <div className={`absolute right-0 top-0 ${Z.cardControls}`}>
               <Loader2 className="h-4 w-4 animate-spin text-brand" aria-hidden />
             </div>
           )}
