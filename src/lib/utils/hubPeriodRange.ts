@@ -1,4 +1,10 @@
-import { fromCalendarKey, istanbulDayStartIso, todayCalendarKey, toCalendarKey } from '@/lib/utils/calendarDates'
+import {
+  fromCalendarKey,
+  istanbulDayEndIso,
+  istanbulDayStartIso,
+  todayCalendarKey,
+  toCalendarKey,
+} from '@/lib/utils/calendarDates'
 
 export type RollingWeekRange = {
   offset: number
@@ -29,10 +35,6 @@ function startOfDay(d: Date): Date {
   const x = new Date(d)
   x.setHours(0, 0, 0, 0)
   return x
-}
-
-function istanbulDayEndIso(key: string): string {
-  return new Date(`${key}T23:59:59.999+03:00`).toISOString()
 }
 
 /** Pazartesi–Pazar takvim haftası (TR/ISO); offset 0 = içinde bulunulan hafta, -1 = geçmiş, +1 = gelecek */

@@ -53,3 +53,7 @@ export function followUpToIsoFromKey(key: string): string {
 export function istanbulDayStartIso(key: string): string {
   return new Date(`${key}T00:00:00+03:00`).toISOString()
 }
+
+export function istanbulDayEndIso(key: string): string {
+  return new Date(`${key}T23:59:59.999+03:00`).toISOString()
+}

@@ -9,17 +9,12 @@ import {
   type RoadmapStage,
   type FunnelCounts,
 } from '@/lib/domain/roadmap'
-import { todayCalendarKey, istanbulDayStartIso } from '@/lib/utils/calendarDates'
+import { fetchFunnelActualsForToday } from '@/lib/domain/funnelActuals'
 
 export interface UserGoal {
   targetPeople: number
   targetMonths: number
   startAt: string
-}
-
-/** Bugünün İstanbul gün başlangıcı (yerel 00:00) — kullanıcının "bugün"ü ile aynı. */
-function todayStartIso(): string {
-  return istanbulDayStartIso(todayCalendarKey())
 }
 
 async function ownWorkspaceId(
@@ -160,59 +155,7 @@ export async function getDailyProgressAction(): Promise<DailyProgress> {
   const workspaceId = await ownWorkspaceId(supabase, user.id)
   const teamSize = workspaceId ? await directTeamCount(supabase) : 0
 
-  // ── Gerçekleşenler (bugün) — mevcut veriden, çift giriş yok ──
-  const since = todayStartIso()
-  const [callsRes, stageRes, newCandRes] = await Promise.all([
-    supabase
-      .from('nmm_daily_actions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'call')
-      .gte('created_at', since),
-    supabase
-      .from('nmm_daily_actions')
-      .select('note')
-      .eq('user_id', user.id)
-      .eq('action_type', 'stage_change')
-      .gte('created_at', since),
-    supabase
-      .from('nmm_candidates')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', user.id)
-      .gte('created_at', since),
-  ])
-
-  let sunum = 0
-  let yeniUye = 0
-  for (const row of stageRes.data ?? []) {
-    const note = (row.note ?? '').toLowerCase().trim()
-    if (note === 'sunum' || note === 'sunum yapıldı') sunum++
-    else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
-  }
-
-  const actualsFromActions: FunnelCounts = {
-    arama: callsRes.count ?? 0,
-    tanisma: newCandRes.count ?? 0,
-    sunum,
-    yeniUye,
-  }
-
-  const logDate = todayCalendarKey()
-  const { data: fieldLog } = await supabase
-    .from('nmm_daily_field_log')
-    .select('calls, contacts, presentations, new_members')
-    .eq('user_id', user.id)
-    .eq('log_date', logDate)
-    .maybeSingle()
-
-  const actuals: FunnelCounts = fieldLog
-    ? {
-        arama: fieldLog.calls,
-        tanisma: fieldLog.contacts,
-        sunum: fieldLog.presentations,
-        yeniUye: fieldLog.new_members,
-      }
-    : actualsFromActions
+  const actuals = await fetchFunnelActualsForToday(supabase, user.id)
 
   if (!goal) return { ...empty, teamSize, actuals }
 
@@ -276,40 +219,7 @@ export async function getGoalDashboardAction(): Promise<GoalDashboard> {
     ? { targetPeople: goalRow.target_people, targetMonths: goalRow.target_months, startAt: goalRow.start_at }
     : null
 
-  // Bugünün gerçekleşenleri (mevcut veriden)
-  const since = todayStartIso()
-  const [callsRes, stageRes, newCandRes] = await Promise.all([
-    supabase.from('nmm_daily_actions').select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id).eq('action_type', 'call').gte('created_at', since),
-    supabase.from('nmm_daily_actions').select('note')
-      .eq('user_id', user.id).eq('action_type', 'stage_change').gte('created_at', since),
-    supabase.from('nmm_candidates').select('id', { count: 'exact', head: true })
-      .eq('owner_id', user.id).gte('created_at', since),
-  ])
-  let sunum = 0, yeniUye = 0
-  for (const row of stageRes.data ?? []) {
-    const note = (row.note ?? '').toLowerCase().trim()
-    if (note === 'sunum' || note === 'sunum yapıldı') sunum++
-    else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
-  }
-  const actualsFromActions: FunnelCounts = { arama: callsRes.count ?? 0, tanisma: newCandRes.count ?? 0, sunum, yeniUye }
-
-  const logDate = todayCalendarKey()
-  const { data: fieldLog } = await supabase
-    .from('nmm_daily_field_log')
-    .select('calls, contacts, presentations, new_members')
-    .eq('user_id', user.id)
-    .eq('log_date', logDate)
-    .maybeSingle()
-
-  const actuals: FunnelCounts = fieldLog
-    ? {
-        arama: fieldLog.calls,
-        tanisma: fieldLog.contacts,
-        sunum: fieldLog.presentations,
-        yeniUye: fieldLog.new_members,
-      }
-    : actualsFromActions
+  const actuals = await fetchFunnelActualsForToday(supabase, user.id)
 
   if (!goal) return { goal: null, progress: { ...emptyProgress, teamSize, actuals }, roadmap: [] }
 

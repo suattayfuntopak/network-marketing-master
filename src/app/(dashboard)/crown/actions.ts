@@ -20,7 +20,8 @@ import { periodStartIso } from '@/lib/domain/pulse'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
-import { todayCalendarKey, istanbulDayStartIso } from '@/lib/utils/calendarDates'
+import { todayCalendarKey, istanbulDayStartIso, toCalendarKey } from '@/lib/utils/calendarDates'
+import { fetchFunnelActualsForPeriod } from '@/lib/domain/funnelActuals'
 import { rollingWeekRange, monthRange } from '@/lib/utils/hubPeriodRange'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
@@ -536,45 +537,19 @@ async function pipelineStageCountsForUser(
 async function funnelActualsSince(
   userId: string,
   since: string,
-  until?: string,
+  until: string,
+  startCalendarKey: string,
+  endCalendarKey: string,
 ): Promise<FunnelCounts> {
   const supabase = await createClient()
-  let callsQuery = supabase
-    .from('nmm_daily_actions')
-    .select('id', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('action_type', 'call')
-    .gte('created_at', since)
-  let stageQuery = supabase
-    .from('nmm_daily_actions')
-    .select('note')
-    .eq('user_id', userId)
-    .eq('action_type', 'stage_change')
-    .gte('created_at', since)
-  let newCandQuery = supabase
-    .from('nmm_candidates')
-    .select('id', { count: 'exact', head: true })
-    .eq('owner_id', userId)
-    .gte('created_at', since)
-  if (until) {
-    callsQuery = callsQuery.lte('created_at', until)
-    stageQuery = stageQuery.lte('created_at', until)
-    newCandQuery = newCandQuery.lte('created_at', until)
-  }
-  const [callsRes, stageRes, newCandRes] = await Promise.all([callsQuery, stageQuery, newCandQuery])
-  let sunum = 0
-  let yeniUye = 0
-  for (const row of stageRes.data ?? []) {
-    const note = (row.note ?? '').toLowerCase().trim()
-    if (note === 'sunum' || note === 'sunum yapıldı') sunum++
-    else if (note === 'katildi' || note === 'katıldı' || note === 'joined') yeniUye++
-  }
-  return {
-    arama: callsRes.count ?? 0,
-    tanisma: newCandRes.count ?? 0,
-    sunum,
-    yeniUye,
-  }
+  return fetchFunnelActualsForPeriod(
+    supabase,
+    userId,
+    since,
+    until,
+    startCalendarKey,
+    endCalendarKey,
+  )
 }
 
 export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfPayload> {
@@ -600,7 +575,7 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
   const since = range.sinceIso
   const until = range.untilIso
   const [weeklyActuals, loginInfo, fieldMetrics, pipelineStages] = await Promise.all([
-    funnelActualsSince(user.id, since, until),
+    funnelActualsSince(user.id, since, until, toCalendarKey(range.startDate), toCalendarKey(range.endDate)),
     loginDaysInWindow(user.id, since, until, range.startDate, range.endDate),
     selfFieldMetricsSince(user.id, workspaceId, since, until),
     pipelineStageCountsForUser(user.id, workspaceId),
@@ -668,7 +643,13 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
   }
 
   const [monthlyActuals, loginDays, fieldMetrics, pipelineStages] = await Promise.all([
-    funnelActualsSince(user.id, monthStart, monthEnd),
+    funnelActualsSince(
+      user.id,
+      monthStart,
+      monthEnd,
+      toCalendarKey(range.startDate),
+      toCalendarKey(range.endDate),
+    ),
     loginDaysInRange(user.id, monthStart, monthEnd),
     selfFieldMetricsSince(user.id, workspaceId, monthStart, monthEnd),
     pipelineStageCountsForUser(user.id, workspaceId),
@@ -721,10 +702,8 @@ export type HubMonthlyInsights = {
 export async function getHubMonthlyInsightsAction(): Promise<HubMonthlyInsights> {
   const supabase = await createClient()
   const { user } = await getAuthUser()
-  const now = new Date()
-  const dayOfMonth = now.getDate()
-  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
-  const monthPct = Math.round((dayOfMonth / daysInMonth) * 100)
+  const range = monthRange(0)
+  const { dayOfMonth, daysInMonth, monthPct } = range
 
   if (!user) {
     return {
@@ -738,45 +717,28 @@ export async function getHubMonthlyInsightsAction(): Promise<HubMonthlyInsights>
     }
   }
 
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
-  const prevMonthEnd = monthStart
-
-  const [currCalls, prevCalls, stageRes, newCandRes] = await Promise.all([
-    supabase
-      .from('nmm_daily_actions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'call')
-      .gte('created_at', monthStart),
-    supabase
-      .from('nmm_daily_actions')
-      .select('id', { count: 'exact', head: true })
-      .eq('user_id', user.id)
-      .eq('action_type', 'call')
-      .gte('created_at', prevMonthStart)
-      .lt('created_at', prevMonthEnd),
-    supabase
-      .from('nmm_daily_actions')
-      .select('note')
-      .eq('user_id', user.id)
-      .eq('action_type', 'stage_change')
-      .gte('created_at', monthStart),
-    supabase
-      .from('nmm_candidates')
-      .select('id', { count: 'exact', head: true })
-      .eq('owner_id', user.id)
-      .gte('created_at', monthStart),
+  const prevRange = monthRange(-1)
+  const [monthFunnel, prevMonthFunnel] = await Promise.all([
+    fetchFunnelActualsForPeriod(
+      supabase,
+      user.id,
+      range.sinceIso,
+      range.untilIso,
+      toCalendarKey(range.startDate),
+      toCalendarKey(range.endDate),
+    ),
+    fetchFunnelActualsForPeriod(
+      supabase,
+      user.id,
+      prevRange.sinceIso,
+      prevRange.untilIso,
+      toCalendarKey(prevRange.startDate),
+      toCalendarKey(prevRange.endDate),
+    ),
   ])
 
-  let presentations = 0
-  for (const row of stageRes.data ?? []) {
-    const note = (row.note ?? '').toLowerCase().trim()
-    if (note === 'sunum' || note === 'sunum yapıldı') presentations++
-  }
-
-  const currMonthCalls = currCalls.count ?? 0
-  const prevMonthCalls = prevCalls.count ?? 0
+  const currMonthCalls = monthFunnel.arama
+  const prevMonthCalls = prevMonthFunnel.arama
   const trend: HubMonthlyInsights['trend'] =
     currMonthCalls > prevMonthCalls ? 'up' : currMonthCalls < prevMonthCalls ? 'down' : 'flat'
 
@@ -785,9 +747,9 @@ export async function getHubMonthlyInsightsAction(): Promise<HubMonthlyInsights>
     daysInMonth,
     monthPct,
     monthActuals: {
-      calls: currMonthCalls,
-      newCandidates: newCandRes.count ?? 0,
-      presentations,
+      calls: monthFunnel.arama,
+      newCandidates: monthFunnel.tanisma,
+      presentations: monthFunnel.sunum,
     },
     prevMonthCalls,
     currMonthCalls,
