@@ -15,6 +15,7 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { StatsKpiCards } from './StatsKpiCards'
+import { StatsFieldFunnelSection } from './StatsFieldFunnelSection'
 import { StatsCharts } from './StatsCharts'
 import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
@@ -284,6 +285,8 @@ export function IstatistiklerContent() {
         <div className="space-y-6">
           {/* KPI Cards */}
           <StatsKpiCards metrics={metrics} />
+
+          <StatsFieldFunnelSection period={period} />
 
           {/* Huni & Grafik Bölümü */}
           <StatsCharts

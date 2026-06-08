@@ -14,6 +14,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import {
@@ -298,6 +299,23 @@ export function MemberActivitySheet({
             ) : canEditGoal ? (
               <p className="text-xs text-[var(--text-3)]">{t('team.memberGoalEmpty')}</p>
             ) : null}
+          </div>
+        )}
+
+        {data && (
+          <div className={`mb-4 space-y-2 ${isFetching ? 'opacity-70' : ''}`}>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-2)]">
+                {t('team.activityFunnelTitle')}
+              </p>
+              <p className="mt-0.5 text-[10px] text-[var(--text-3)]">{t('team.activityFunnelHint')}</p>
+            </div>
+            <HubCrownFunnelGrid
+              actuals={data.funnel}
+              targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+              hasGoal={false}
+              period="monthly"
+            />
           </div>
         )}
 

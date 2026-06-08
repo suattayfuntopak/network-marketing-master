@@ -6,6 +6,33 @@ import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
 import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { normalizeLicenseType } from '@/lib/domain/aiUsage'
+import type { PulsePeriod } from '@/lib/domain/pulse'
+import type { FunnelCounts } from '@/lib/domain/roadmap'
+import {
+  fetchFunnelActualsForPeriod,
+  funnelRangeForPulsePeriod,
+} from '@/lib/domain/funnelActuals'
+
+const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+
+/** Oturum açmış kullanıcının seçili dönem huni gerçekleşenleri — boru hattı tek kaynak. */
+export async function getStatsFunnelActualsAction(period: PulsePeriod): Promise<FunnelCounts> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return EMPTY_FUNNEL
+
+  const range = funnelRangeForPulsePeriod(period)
+  return fetchFunnelActualsForPeriod(
+    supabase,
+    user.id,
+    range.sinceIso,
+    range.untilIso,
+    range.startCalendarKey,
+    range.endCalendarKey,
+  )
+}
 
 export interface IndependentAIUsageRow {
   userId: string

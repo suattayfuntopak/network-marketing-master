@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import type { PulsePeriod, SheetActivityPeriod } from '@/lib/domain/pulse'
 import {
   fromCalendarKey,
   istanbulDayEndIso,
@@ -8,6 +9,13 @@ import {
   todayCalendarKey,
   toCalendarKey,
 } from '@/lib/utils/calendarDates'
+
+export type FunnelPeriodRange = {
+  sinceIso: string
+  untilIso: string
+  startCalendarKey: string
+  endCalendarKey: string
+}
 
 const ISTANBUL = 'Europe/Istanbul'
 
@@ -127,6 +135,49 @@ export async function fetchFunnelActualsForPeriod(
   }
 
   return sumFunnelDays(dayKeys, actionsByDay)
+}
+
+/** İstatistikler / ekip nabzı — PulsePeriod → İstanbul hizalı dönem penceresi. */
+export function funnelRangeForPulsePeriod(period: PulsePeriod): FunnelPeriodRange {
+  const end = todayCalendarKey()
+  const endIso = istanbulDayEndIso(end)
+
+  if (period === 'today') {
+    return {
+      sinceIso: istanbulDayStartIso(end),
+      untilIso: endIso,
+      startCalendarKey: end,
+      endCalendarKey: end,
+    }
+  }
+
+  const endDate = fromCalendarKey(end)
+  let startDate: Date
+
+  if (period === '7d') {
+    startDate = new Date(endDate)
+    startDate.setDate(startDate.getDate() - 6)
+  } else if (period === '30d') {
+    startDate = new Date(endDate)
+    startDate.setDate(startDate.getDate() - 29)
+  } else if (period === 'ytd') {
+    startDate = new Date(endDate.getFullYear(), 0, 1)
+  } else {
+    startDate = new Date(endDate)
+    startDate.setFullYear(startDate.getFullYear() - 5)
+  }
+
+  const start = toCalendarKey(startDate)
+  return {
+    sinceIso: istanbulDayStartIso(start),
+    untilIso: endIso,
+    startCalendarKey: start,
+    endCalendarKey: end,
+  }
+}
+
+export function funnelRangeForSheetPeriod(period: SheetActivityPeriod): FunnelPeriodRange {
+  return funnelRangeForPulsePeriod(period)
 }
 
 /** Bugünün huni gerçekleşenleri — boru hattından otomatik. */

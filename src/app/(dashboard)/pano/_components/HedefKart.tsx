@@ -194,7 +194,9 @@ export function HedefKart() {
                 const isFuture = p && s.month > p.monthIndex
                 const MemberIcon = FUNNEL_METRIC_VISUAL.yeniUye.Icon
                 const monthOffset =
-                  goal && isPast ? calendarMonthOffsetForRoadmapMonth(goal.startAt, s.month) : 0
+                  goal && (isPast || isCurrent)
+                    ? calendarMonthOffsetForRoadmapMonth(goal.startAt, s.month)
+                    : 0
                 const monthlyHref =
                   monthOffset === 0 ? '/aylik-ozet' : `/aylik-ozet?offset=${monthOffset}`
                 const rowClass = clsx(
@@ -271,7 +273,7 @@ export function HedefKart() {
                   </div>
                 )
 
-                if (isPast && goal) {
+                if ((isPast || isCurrent) && goal) {
                   return (
                     <li key={s.month}>
                       <Link href={monthlyHref} className={rowClass} aria-label={ariaLabel}>

@@ -1,0 +1,63 @@
+'use client'
+
+import Link from 'next/link'
+import { useQuery } from '@tanstack/react-query'
+import { Activity, ExternalLink } from 'lucide-react'
+import { useTranslation } from '@/providers/LanguageProvider'
+import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
+import type { PulsePeriod } from '@/lib/domain/pulse'
+import { getStatsFunnelActualsAction } from '../actions'
+
+type Props = {
+  period: PulsePeriod
+}
+
+export function StatsFieldFunnelSection({ period }: Props) {
+  const { t } = useTranslation()
+
+  const { data: actuals, isLoading } = useQuery({
+    queryKey: ['stats-funnel-actuals', period],
+    queryFn: () => getStatsFunnelActualsAction(period),
+    staleTime: 30_000,
+  })
+
+  const funnel = actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+  const hasActivity = funnel.arama + funnel.tanisma + funnel.sunum + funnel.yeniUye > 0
+
+  return (
+    <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
+            <Activity className="h-4 w-4 text-[#534AB7]" />
+            {t('statsPage.fieldFunnelTitle')}
+          </h2>
+          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
+            {t('statsPage.fieldFunnelSubtitle')}
+          </p>
+        </div>
+        <Link
+          href="/pipeline"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/50 px-3 py-2 text-xs font-semibold text-brand transition hover:border-brand/30"
+        >
+          {t('statsPage.fieldFunnelCta')}
+          <ExternalLink className="h-3.5 w-3.5" strokeWidth={2} />
+        </Link>
+      </div>
+
+      {!isLoading && !hasActivity ? (
+        <p className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/40 px-4 py-6 text-center text-sm text-[var(--text-3)]">
+          {t('statsPage.fieldFunnelEmpty')}
+        </p>
+      ) : (
+        <HubCrownFunnelGrid
+          actuals={funnel}
+          targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+          hasGoal={false}
+          period="monthly"
+          loading={isLoading}
+        />
+      )}
+    </section>
+  )
+}

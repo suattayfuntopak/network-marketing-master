@@ -16,6 +16,13 @@ export const statsSection = {
       kpiPresentationRate: 'SUNUM ORANI',
       kpiPresentationRateDesc: 'Yapılan fırsat sunumu',
 
+      fieldFunnelTitle: 'Saha Huni Gerçekleşenleri',
+      fieldFunnelSubtitle:
+        'Arama, yeni aday, sunum ve katılım — yalnızca boru hattındaki kayıtlardan otomatik sayılır. Elle girilen sayılar bu tabloda yer almaz.',
+      fieldFunnelCta: 'Boru hattına git',
+      fieldFunnelEmpty:
+        'Bu dönemde boru hattı kaydı yok. Önce aday ekle, ardından aday kartından arama ve aşama değişikliği kaydet.',
+
       funnelTotalLeads: 'Yeni Aday',
       funnelContacted: 'İletişim Kurulan',
       funnelInvited: 'Davet Edilen',
@@ -120,6 +127,13 @@ export const statsSection = {
       kpiBecameMember: 'became member',
       kpiPresentationRate: 'PRESENTATION RATE',
       kpiPresentationRateDesc: 'Completed pitches',
+
+      fieldFunnelTitle: 'Field Funnel Actuals',
+      fieldFunnelSubtitle:
+        'Calls, new prospects, presentations, and joins — counted automatically from pipeline actions only. Manual counters are not included.',
+      fieldFunnelCta: 'Go to Pipeline',
+      fieldFunnelEmpty:
+        'No pipeline activity in this period. Add a prospect first, then log calls and stage changes from the candidate card.',
 
       funnelTotalLeads: 'Total Leads',
       funnelContacted: 'Contacted',

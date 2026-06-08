@@ -4,6 +4,11 @@ import { createClient } from '@/lib/supabase/server'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { periodStartIso, parseLearningProgress, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import type { FunnelCounts } from '@/lib/domain/roadmap'
+import {
+  fetchFunnelActualsForPeriod,
+  funnelRangeForSheetPeriod,
+} from '@/lib/domain/funnelActuals'
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 
 export type TeamMemberFieldActivity = {
@@ -31,6 +36,8 @@ export type MemberActivityDetail = {
   aiActions: number
   newCandidates: number
   activeDays: number
+  /** Huni gerçekleşenleri — boru hattı tek kaynak (elle sayım yok). */
+  funnel: FunnelCounts
   /** Pro nabız — yalnızca sponsor Pro ise dolu */
   trainingPct?: number
   objectionPct?: number
@@ -168,6 +175,7 @@ export async function getMemberActivityDetailAction(
     aiActions: 0,
     newCandidates: 0,
     activeDays: 0,
+    funnel: { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 },
   }
 
   const ctx = await assertWorkspaceMember(workspaceId)
@@ -207,9 +215,19 @@ export async function getMemberActivityDetailAction(
     candidatesQuery = candidatesQuery.gte('created_at', startIso)
   }
 
-  const [actionsResult, candidatesResult, pulseBundle] = await Promise.all([
+  const funnelRange = funnelRangeForSheetPeriod(period)
+
+  const [actionsResult, candidatesResult, funnel, pulseBundle] = await Promise.all([
     actionsQuery,
     candidatesQuery,
+    fetchFunnelActualsForPeriod(
+      supabase,
+      memberUserId,
+      funnelRange.sinceIso,
+      funnelRange.untilIso,
+      funnelRange.startCalendarKey,
+      funnelRange.endCalendarKey,
+    ),
     pulseEnabled
       ? Promise.all([
           supabase
@@ -254,6 +272,7 @@ export async function getMemberActivityDetailAction(
   }
   detail.activeDays = activeDays.size
   detail.newCandidates = newCandidates?.length ?? 0
+  detail.funnel = funnel
 
   if (pulseBundle) {
     const [{ data: progressRow }, { data: onboardingRows }, videoMap] = pulseBundle

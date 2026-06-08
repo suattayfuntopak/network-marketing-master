@@ -2,8 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
-import { todayCalendarKey } from '@/lib/utils/calendarDates'
-import { fetchFunnelActualsForToday } from '@/lib/domain/funnelActuals'
+import { istanbulDayEndIso, istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
+import { fetchFunnelActualsForPeriod, fetchFunnelActualsForToday } from '@/lib/domain/funnelActuals'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { formatSimpleNote, parseSimpleNote } from '@/lib/utils/noteParser'
 import { translateEnToTrAction, translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
@@ -36,11 +36,17 @@ export async function getDailyTrackAction(
   const { user } = await getAuthUser()
   if (!user) return { actuals: EMPTY_ACTUALS, notes: '' }
 
-  const isToday = logDate === todayCalendarKey()
   const [actuals, journal] = await Promise.all([
-    isToday
+    logDate === todayCalendarKey()
       ? fetchFunnelActualsForToday(supabase, user.id)
-      : Promise.resolve(EMPTY_ACTUALS),
+      : fetchFunnelActualsForPeriod(
+          supabase,
+          user.id,
+          istanbulDayStartIso(logDate),
+          istanbulDayEndIso(logDate),
+          logDate,
+          logDate,
+        ),
     getDayJournalAction(logDate),
   ])
 

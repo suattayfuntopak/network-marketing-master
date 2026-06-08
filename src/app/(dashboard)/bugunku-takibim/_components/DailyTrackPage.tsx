@@ -56,6 +56,9 @@ export function DailyTrackPage() {
   })
 
   const actuals = data?.actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+  const allZero =
+    !isLoading &&
+    actuals.arama + actuals.tanisma + actuals.sunum + actuals.yeniUye === 0
 
   return (
     <HubPageShell
@@ -96,6 +99,12 @@ export function DailyTrackPage() {
       </Link>
 
       <p className="text-xs leading-relaxed text-[var(--text-3)]">{t('dashboard.dailyTrackAutoHint')}</p>
+
+      {allZero ? (
+        <p className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/40 px-4 py-3 text-sm text-[var(--text-3)]">
+          {t('dashboard.dailyTrackEmptyHint')}
+        </p>
+      ) : null}
 
       <section className="space-y-3">
         {isLoading && !initialized ? (
