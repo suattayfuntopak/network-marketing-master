@@ -37,6 +37,10 @@ export function HubPriorityStrip() {
       await logHubContactAction(ws.workspaceId, candidateId, type)
       qc.invalidateQueries({ queryKey: ['goal-dashboard'] })
       qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
+      qc.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
+      qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
+      qc.invalidateQueries({ queryKey: ['hub', 'monthly-self'] })
+      qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
       toast.success(t('crown.contactLogged'))
     } catch (e) {
       toast.error(e instanceof Error ? e.message : t('common.error'))

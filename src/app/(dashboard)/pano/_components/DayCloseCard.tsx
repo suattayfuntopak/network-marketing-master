@@ -110,7 +110,7 @@ export function DayCloseCard() {
       </button>
 
       <p className="mt-3 text-center text-xs text-[var(--text-3)]">
-        <Link href="/bugunku-takibim" className="font-medium text-[#534AB7] hover:underline">
+        <Link href="/pano#journal" className="font-medium text-[#534AB7] hover:underline">
           {t('dashboard.dayCloseJournalLink')}
         </Link>
       </p>

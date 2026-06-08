@@ -4,6 +4,7 @@ import { Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const TAB_REDIRECTS: Record<string, string> = {
+  journal: '/pano#journal',
   roadmap: '/hedefim',
   daily: '/bugunku-takibim',
   weekly: '/haftalik-ozet',

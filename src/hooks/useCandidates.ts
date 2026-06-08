@@ -258,9 +258,20 @@ export function useMarkContacted(workspaceId: string) {
       invalidateCandidateQueries(qc, workspaceId)
       qc.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
       qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
+      qc.invalidateQueries({ queryKey: ['hub', 'monthly-self'] })
       qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
       qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
       qc.invalidateQueries({ queryKey: ['activity', vars.id] })
+      const lang = getLang()
+      toast.success(
+        vars.actionType === 'call'
+          ? lang === 'en'
+            ? 'Call logged'
+            : 'Arama kaydedildi'
+          : lang === 'en'
+            ? 'WhatsApp logged'
+            : 'WhatsApp kaydedildi',
+      )
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
   })

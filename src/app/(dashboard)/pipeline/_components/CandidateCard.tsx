@@ -1,12 +1,12 @@
 'use client'
 
-import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy, Lock } from 'lucide-react'
+import { ChevronDown, Pencil, Trash2, X, RotateCcw, Zap, Calendar, Bot, Sparkles, Copy, Lock, Phone } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
-import { useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useUpdateCandidate, useDeleteCandidate, useMarkContacted } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
@@ -45,6 +45,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
   const [quickActionOpen, setQuickActionOpen] = useState(false)
   const update = useUpdateCandidate(workspaceId)
   const del = useDeleteCandidate(workspaceId)
+  const markContacted = useMarkContacted(workspaceId)
   const parsed = resolveCandidateFields(candidate)
 
   const [generating, setGenerating] = useState(false)
@@ -165,11 +166,27 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               )}
             </button>
             {waLink && (
-              <a href={waLink} target="_blank" rel="noopener noreferrer"
+              <a
+                href={waLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => markContacted.mutate({ id: candidate.id, actionType: 'whatsapp' })}
                 className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
                 aria-label="WhatsApp"
-                title="WhatsApp">
+                title="WhatsApp"
+              >
                 <WhatsAppIcon className="h-4 w-4" />
+              </a>
+            )}
+            {candidate.phone && (
+              <a
+                href={`tel:${candidate.phone}`}
+                onClick={() => markContacted.mutate({ id: candidate.id, actionType: 'call' })}
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+                aria-label={t('pipeline.call')}
+                title={t('pipeline.call')}
+              >
+                <Phone className="h-4 w-4" strokeWidth={1.75} />
               </a>
             )}
           </div>
@@ -443,6 +460,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
+                    markContacted.mutate({ id: candidate.id, actionType: 'whatsapp' })
                     setActiveMessage(null)
                   }}
                   className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"

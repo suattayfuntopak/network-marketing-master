@@ -7,6 +7,7 @@ import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
+import { PanoDayRitualSection } from './PanoDayRitualSection'
 
 export function PanoContent() {
   const { t } = useTranslation()
@@ -57,6 +58,7 @@ export function PanoContent() {
       </div>
 
       {!cLoading && <WelcomeCard candidateCount={candidates.length} />}
+      {!wsLoading && <PanoDayRitualSection />}
     </div>
   )
 }
