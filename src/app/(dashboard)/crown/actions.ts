@@ -10,6 +10,8 @@ import {
 } from '@/app/(dashboard)/hedef/actions'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { isSuperAdmin } from '@/lib/domain/auth'
+import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import {
   getTeamVideoSummaryMapAction,
   getVideoCatalogAction,
@@ -856,4 +858,108 @@ export async function logHubContactAction(
 
 export async function getCrownWorkspaceIdAction(): Promise<string | null> {
   return resolveWorkspaceId()
+}
+
+// ─── Saha Radarı ────────────────────────────────────────────────────────────
+
+export type SahaRadarActivityLevel = 'active' | 'recent' | 'silent'
+
+export type SahaRadarMember = {
+  userId: string
+  fullName: string
+  avatarUrl: string | null
+  activityLevel: SahaRadarActivityLevel
+  daysSinceActivity: number | null
+  candidateCount: number
+}
+
+export type SahaRadarFollowUp = {
+  id: string
+  candidateName: string
+  ownerUserId: string
+  ownerName: string
+  dueAt: string
+  isOverdue: boolean
+  isMine: boolean
+  phone: string | null
+}
+
+export type CrownSahaRadarPayload = {
+  members: SahaRadarMember[]
+  followUps: SahaRadarFollowUp[]
+  myUserId: string
+  hasTeamAccess: boolean
+}
+
+export async function getCrownSahaRadarAction(workspaceId: string): Promise<CrownSahaRadarPayload> {
+  const { user } = await getAuthUser()
+  if (!user) return { members: [], followUps: [], myUserId: '', hasTeamAccess: false }
+
+  const supabase = await createClient()
+  const { data: wsData } = await supabase
+    .from('nmm_workspaces')
+    .select('license_type')
+    .eq('id', workspaceId)
+    .single()
+
+  const teamAccess = hasTeamPageAccess(wsData?.license_type, isSuperAdmin(user))
+
+  const bundle = teamAccess ? await fetchTeamBundleAction(workspaceId) : null
+  const now = Date.now()
+  const nowIso = new Date(now).toISOString()
+  const sevenDaysIso = new Date(now + 7 * 86_400_000).toISOString()
+
+  const members: SahaRadarMember[] = (bundle?.ekipRows ?? [])
+    .filter(m => m.user_id !== user.id)
+    .map(m => {
+      const days = m.last_activity_at
+        ? Math.floor((now - new Date(m.last_activity_at).getTime()) / 86_400_000)
+        : null
+      const level: SahaRadarActivityLevel =
+        days === null ? 'silent' : days <= 3 ? 'active' : days <= 7 ? 'recent' : 'silent'
+      return {
+        userId: m.user_id,
+        fullName: m.full_name ?? '—',
+        avatarUrl: m.avatar_url ?? null,
+        activityLevel: level,
+        daysSinceActivity: days,
+        candidateCount: m.candidate_count,
+      }
+    })
+    .sort((a, b) => {
+      const order: Record<SahaRadarActivityLevel, number> = { active: 0, recent: 1, silent: 2 }
+      return order[a.activityLevel] - order[b.activityLevel]
+    })
+
+  const teamMemberIds = teamAccess
+    ? (bundle?.ekipRows ?? []).filter(m => m.user_id !== user.id).map(m => m.user_id)
+    : []
+  const ownerIds = [user.id, ...teamMemberIds]
+
+  const memberNameMap: Record<string, string> = {}
+  for (const m of bundle?.ekipRows ?? []) {
+    memberNameMap[m.user_id] = m.full_name ?? '—'
+  }
+
+  const { data: candidates } = await supabase
+    .from('nmm_candidates')
+    .select('id, full_name, phone, owner_id, next_follow_up_at')
+    .in('owner_id', ownerIds)
+    .not('next_follow_up_at', 'is', null)
+    .lte('next_follow_up_at', sevenDaysIso)
+    .order('next_follow_up_at', { ascending: true })
+    .limit(60)
+
+  const followUps: SahaRadarFollowUp[] = (candidates ?? []).map(c => ({
+    id: c.id,
+    candidateName: c.full_name,
+    ownerUserId: c.owner_id,
+    ownerName: c.owner_id === user.id ? 'Ben' : (memberNameMap[c.owner_id] ?? '—'),
+    dueAt: c.next_follow_up_at!,
+    isOverdue: c.next_follow_up_at! < nowIso,
+    isMine: c.owner_id === user.id,
+    phone: c.phone ?? null,
+  }))
+
+  return { members, followUps, myUserId: user.id, hasTeamAccess: teamAccess }
 }

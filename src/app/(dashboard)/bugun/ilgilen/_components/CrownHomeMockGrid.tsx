@@ -2,8 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import {
+  Activity,
   BarChart3,
-  CalendarDays,
   CalendarRange,
   ClipboardList,
   Map,
@@ -13,7 +13,7 @@ import {
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const ILGILEN_TAB_IDS = ['roadmap', 'daily', 'weekly', 'monthly', 'first30', 'live'] as const
+export const ILGILEN_TAB_IDS = ['roadmap', 'daily', 'weekly', 'monthly', 'saharadar', 'live'] as const
 export type IlgilenTabId = (typeof ILGILEN_TAB_IDS)[number]
 
 const CROWN_ITEMS: readonly {
@@ -22,12 +22,12 @@ const CROWN_ITEMS: readonly {
   icon: LucideIcon
   activeClass: string
 }[] = [
-  { id: 'roadmap', labelKey: 'dashboard.panoActionPlan', icon: Map, activeClass: 'bg-[#3730A3] text-white shadow-md' },
-  { id: 'daily',   labelKey: 'dashboard.panoDailyWhatIDid',   icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
-  { id: 'weekly',  labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
-  { id: 'monthly', labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
-  { id: 'first30', labelKey: 'dashboard.crownMockFirst30Days',    icon: CalendarDays,  activeClass: 'bg-[#C03E1F] text-white shadow-md' },
-  { id: 'live',    labelKey: 'dashboard.crownMockLiveTraining',   icon: Video,         activeClass: 'bg-[#1A56DB] text-white shadow-md' },
+  { id: 'roadmap',    labelKey: 'dashboard.panoActionPlan',          icon: Map,          activeClass: 'bg-[#3730A3] text-white shadow-md' },
+  { id: 'daily',      labelKey: 'dashboard.panoDailyWhatIDid',       icon: ClipboardList, activeClass: 'bg-[#534AB7] text-white shadow-md' },
+  { id: 'weekly',     labelKey: 'dashboard.crownMockWeeklySummary',  icon: BarChart3,     activeClass: 'bg-[#0F6E56] text-white shadow-md' },
+  { id: 'monthly',    labelKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, activeClass: 'bg-[#72243E] text-white shadow-md' },
+  { id: 'saharadar',  labelKey: 'dashboard.crownMockSahaRadar',      icon: Activity,      activeClass: 'bg-[#C03E1F] text-white shadow-md' },
+  { id: 'live',       labelKey: 'dashboard.crownMockLiveTraining',   icon: Video,         activeClass: 'bg-[#1A56DB] text-white shadow-md' },
 ]
 
 type Props = {
@@ -41,6 +41,10 @@ export function IlgilenHubGrid({ activeTab }: Props) {
   function selectTab(id: IlgilenTabId) {
     if (id === 'daily') {
       router.push('/bugunku-takibim')
+      return
+    }
+    if (id === 'saharadar') {
+      router.push('/saha-radar')
       return
     }
     router.replace(`/bugun/ilgilen?tab=${id}`, { scroll: false })

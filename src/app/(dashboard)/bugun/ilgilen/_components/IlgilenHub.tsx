@@ -7,7 +7,7 @@ import { DailyTab } from './DailyTab'
 import { CrownVideoPage } from '@/app/(dashboard)/canli-egitim/_components/CrownVideoPage'
 import { CrownWeeklyPage } from '@/app/(dashboard)/haftalik-ozet/_components/CrownWeeklyPage'
 import { CrownMonthlyPage } from '@/app/(dashboard)/aylik-ozet/_components/CrownMonthlyPage'
-import { CrownFirst30Page } from '@/app/(dashboard)/ilk-30-gun/_components/CrownFirst30Page'
+import { CrownSahaRadarPage } from '@/app/(dashboard)/saha-radar/_components/CrownSahaRadarPage'
 import { HedefKart } from '@/app/(dashboard)/pano/_components/HedefKart'
 
 function isValidTab(s: string | null): s is IlgilenTabId {
@@ -27,6 +27,7 @@ export function IlgilenHub() {
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip', { scroll: false })
     if (raw === 'daily') router.replace('/bugunku-takibim', { scroll: false })
+    if (raw === 'first30') router.replace('/saha-radar', { scroll: false })
   }, [raw, router])
 
   // Lazy mount: ilk ziyaret edildiğinde mount et, sonra asla unmount etme.
@@ -41,12 +42,12 @@ export function IlgilenHub() {
       <div className="w-full space-y-5">
         <IlgilenHubGrid activeTab={activeTab} />
 
-        {v.has('roadmap') && <div className={activeTab !== 'roadmap' ? 'hidden' : 'mt-5'}><HedefKart /></div>}
-        {v.has('daily')   && <div className={activeTab !== 'daily'   ? 'hidden' : 'mt-5'}><DailyTab /></div>}
-        {v.has('weekly')  && <div className={activeTab !== 'weekly'  ? 'hidden' : 'mt-5'}><CrownWeeklyPage asTab /></div>}
-        {v.has('monthly') && <div className={activeTab !== 'monthly' ? 'hidden' : 'mt-5'}><CrownMonthlyPage asTab /></div>}
-        {v.has('first30') && <div className={activeTab !== 'first30' ? 'hidden' : 'mt-5'}><CrownFirst30Page asTab /></div>}
-        {v.has('live')    && <div className={activeTab !== 'live'    ? 'hidden' : 'mt-5'}><CrownVideoPage asTab /></div>}
+        {v.has('roadmap')    && <div className={activeTab !== 'roadmap'    ? 'hidden' : 'mt-5'}><HedefKart /></div>}
+        {v.has('daily')      && <div className={activeTab !== 'daily'      ? 'hidden' : 'mt-5'}><DailyTab /></div>}
+        {v.has('weekly')     && <div className={activeTab !== 'weekly'     ? 'hidden' : 'mt-5'}><CrownWeeklyPage asTab /></div>}
+        {v.has('monthly')    && <div className={activeTab !== 'monthly'    ? 'hidden' : 'mt-5'}><CrownMonthlyPage asTab /></div>}
+        {v.has('saharadar')  && <div className={activeTab !== 'saharadar'  ? 'hidden' : 'mt-5'}><CrownSahaRadarPage asTab /></div>}
+        {v.has('live')       && <div className={activeTab !== 'live'       ? 'hidden' : 'mt-5'}><CrownVideoPage asTab /></div>}
       </div>
     </main>
   )

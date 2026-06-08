@@ -8,7 +8,8 @@ const TAB_REDIRECTS: Record<string, string> = {
   daily: '/bugunku-takibim',
   weekly: '/haftalik-ozet',
   monthly: '/aylik-ozet',
-  first30: '/ilk-30-gun',
+  first30: '/saha-radar',
+  saharadar: '/saha-radar',
   live: '/canli-egitim',
   team: '/ekip',
 }

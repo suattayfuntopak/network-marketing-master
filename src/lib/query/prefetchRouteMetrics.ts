@@ -4,6 +4,7 @@ import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import {
   getCrownEntriesPageAction,
   getCrownFirst30PageAction,
+  getCrownSahaRadarAction,
   getCrownMonthlyPageAction,
   getCrownVideoPageAction,
   getCrownWeeklyPageAction,
@@ -180,7 +181,7 @@ export function prefetchRouteMetrics(
     '/istatistikler',
     '/haftalik-ozet',
     '/aylik-ozet',
-    '/ilk-30-gun',
+    '/saha-radar',
     '/canli-egitim',
   ])
   if (teamRoutes.has(href)) {
@@ -215,10 +216,10 @@ export function prefetchRouteMetrics(
     })
   }
 
-  if (href === '/ilk-30-gun' && hasTeamPageAccess(wsSlice.licenseType, wsSlice.isSuperAdmin)) {
+  if (href === '/saha-radar') {
     void queryClient.prefetchQuery({
-      queryKey: queryKeys.crownFirst30(workspaceId),
-      queryFn: () => getCrownFirst30PageAction(workspaceId),
+      queryKey: queryKeys.crownSahaRadar(workspaceId),
+      queryFn: () => getCrownSahaRadarAction(workspaceId),
       staleTime: METRICS_STALE,
     })
   }

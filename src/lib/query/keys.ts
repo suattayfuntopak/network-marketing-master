@@ -17,6 +17,7 @@ export const queryKeys = {
   hubMonthlySelf: (offset = 0) => ['hub', 'monthly-self', offset] as const,
   hubMonthlyInsights: (offset = 0) => ['hub', 'monthly-insights', offset] as const,
   crownFirst30: (workspaceId: string) => ['crown', 'first30', workspaceId] as const,
+  crownSahaRadar: (workspaceId: string) => ['crown', 'saha-radar', workspaceId] as const,
   /**
    * Ekip Aktivite Özeti (saha çabası). memberIds İÇERİDE sıralanır → çağıran tarafın
    * sıralama derdi yok, prefetch ↔ client cache anahtarı birebir eşleşir.

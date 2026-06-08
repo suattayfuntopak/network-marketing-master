@@ -10,7 +10,7 @@ export type PanoBadgeContext = {
   videoSummary?: VideoProgressSummary | null
   weekly?: HubWeeklySelfPayload | null
   monthly?: HubMonthlyInsights | null
-  first30ActiveCount?: number | null
+  sahaRadarBadgeCount?: number | null
 }
 
 /** Huni adımlarından kaçı hedefe ulaştı (0–4). */
@@ -36,7 +36,7 @@ export function getPanoLauncherBadge(
   ctx: PanoBadgeContext,
   t: (key: string, vars?: Record<string, string | number>) => string,
 ): string | undefined {
-  const { progress, videoSummary, weekly, monthly, first30ActiveCount } = ctx
+  const { progress, videoSummary, weekly, monthly, sahaRadarBadgeCount } = ctx
 
   if (href.includes('/canli-egitim') && videoSummary && videoSummary.total > 0) {
     return t('dashboard.panoBadgeVideo', {
@@ -63,8 +63,8 @@ export function getPanoLauncherBadge(
     })
   }
 
-  if (href.includes('/ilk-30-gun') && first30ActiveCount != null && first30ActiveCount > 0) {
-    return t('dashboard.panoBadgeFirst30', { count: first30ActiveCount })
+  if (href.includes('/saha-radar') && sahaRadarBadgeCount != null && sahaRadarBadgeCount > 0) {
+    return t('dashboard.panoBadgeSahaRadar', { count: sahaRadarBadgeCount })
   }
 
   if (!progress?.hasGoal) return undefined

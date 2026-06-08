@@ -2,7 +2,7 @@ import {
   LayoutDashboard, TrendingUp, Bot, Users,
   CalendarDays, CalendarRange, BookOpen, Target,
   BarChart3, ClipboardList, GraduationCap,
-  BarChart2, Crown, Ellipsis,
+  BarChart2, Crown, Ellipsis, Activity,
   type LucideIcon,
 } from 'lucide-react'
 import type { ButtonColor } from '@/components/ui/SquareButton'
@@ -24,7 +24,7 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'teal', desktopColor: 'teal' },
   { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'purple', desktopColor: 'purple', calendarPeriod: 7 },
   { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'rose', desktopColor: 'rose', calendarPeriod: 30 },
-  { href: '/ilk-30-gun', translationKey: 'dashboard.crownMockFirst30Days', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
+  { href: '/saha-radar', translationKey: 'dashboard.crownMockSahaRadar', icon: Activity, color: 'coral', desktopColor: 'coral' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
   { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
