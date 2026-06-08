@@ -7,36 +7,18 @@ type LauncherGridProps = {
   itemCount?: number
   /** md+ sütun sayısı — pano masaüstü 5×2. */
   columns?: 3 | 4 | 5
-  /** Pano masaüstü: 5×2, viewport yüksekliğine sığan kompakt kareler (stretch yok). */
+  /** Pano masaüstü: 5×2, genişlik sabit kare kutular (aspect-square). */
   panoDesktop?: boolean
 }
 
-const DESKTOP_ROW_CLASS: Record<number, string> = {
-  2: 'md:grid-rows-2',
-  3: 'md:grid-rows-3',
-  4: 'md:grid-rows-4',
-}
-
-function gridClass(
-  itemCount: number | undefined,
-  panoDesktop: boolean,
-  columns: 3 | 4 | 5,
-): string {
+function gridClass(panoDesktop: boolean): string {
   if (!panoDesktop) return 'gap-3 md:gap-[1.125rem]'
-  const n = itemCount ?? 10
-  const desktopRows = Math.ceil(n / columns)
-  const desktop = DESKTOP_ROW_CLASS[desktopRows] ?? 'md:grid-rows-2'
-  return clsx(
-    'gap-2.5 md:gap-2.5',
-    desktop,
-    'md:h-[min(calc(100dvh-11.5rem),22rem)] md:max-h-[min(calc(100dvh-11.5rem),22rem)]',
-  )
+  return 'gap-2.5 md:gap-2.5'
 }
 
 /** Pano + launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
 export function LauncherGrid({
   children,
-  itemCount,
   columns = 4,
   panoDesktop = false,
 }: LauncherGridProps) {
@@ -49,7 +31,7 @@ export function LauncherGrid({
         className={clsx(
           'grid w-full grid-cols-2',
           mdCols,
-          gridClass(itemCount, panoDesktop, columns),
+          gridClass(panoDesktop),
         )}
       >
         {children}
@@ -73,9 +55,7 @@ export function LauncherGridItem({
       {...rest}
       className={clsx(
         'relative min-w-0',
-        panoDesktop
-          ? 'aspect-square w-full md:aspect-auto md:h-full md:min-h-0'
-          : 'aspect-square',
+        panoDesktop ? 'aspect-square w-full' : 'aspect-square',
         className,
       )}
     >

@@ -19,7 +19,7 @@ export type PanoLauncherItem = NavItem & {
   color: ButtonColor
   desktopColor?: ButtonColor
 }
-/** Pano 5×2 — komşu kutularda aynı renk yok (yatay + dikey). */
+/** Pano 5×2 — komşu kutularda aynı renk yok; Takvim=Saha Özetim (teal), İstatistikler=Hedefim (indigo). */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
   { href: '/saha-ozetim', translationKey: 'dashboard.panoFieldSummary', icon: History, color: 'teal', desktopColor: 'teal' },
@@ -29,8 +29,8 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
   { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'purple', desktopColor: 'purple' },
-  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'yellow', desktopColor: 'yellow' },
-  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart3, color: 'peach', desktopColor: 'peach' },
+  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'teal', desktopColor: 'teal' },
+  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart3, color: 'indigo', desktopColor: 'indigo' },
 ]
 
 /** @deprecated Pano artık PANO_ORGANIZATION_ITEMS kullanır */
