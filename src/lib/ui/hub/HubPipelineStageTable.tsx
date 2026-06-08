@@ -52,12 +52,12 @@ export function HubPipelineStageTable({ counts, loading }: HubPipelineStageTable
             <Link
               href={`/pipeline?stage=${row.stage}`}
               className={clsx(
-                'flex items-center justify-between gap-3 rounded-xl border border-[var(--border)] px-3 py-2.5 transition hover:opacity-90 md:px-4',
+                'flex items-center justify-between gap-3 rounded-xl border border-black/5 px-3 py-2.5 transition hover:brightness-[1.02] active:scale-[0.99] dark:border-white/10 md:px-4',
                 STAGE_CARD_BG[row.stage],
               )}
             >
               <span className="min-w-0 text-sm font-semibold">{row.label}</span>
-              <span className="shrink-0 rounded-lg bg-[var(--bg-card)]/80 px-2.5 py-0.5 text-sm font-black tabular-nums shadow-sm">
+              <span className="shrink-0 rounded-lg bg-black/5 px-2.5 py-0.5 text-sm font-black tabular-nums shadow-sm dark:bg-white/10">
                 {row.count}
               </span>
             </Link>

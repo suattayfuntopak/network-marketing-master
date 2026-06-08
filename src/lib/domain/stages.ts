@@ -13,18 +13,52 @@ export const STAGE_LABEL: Record<CandidateStage, string> = {
   pasif:       'Pasif',
 }
 
-// Tek kaynak: badge + kart arka planı birlikte
+/**
+ * Pano launcher (SquareButton colorMap) ile hizalı aşama renkleri.
+ * STAGE_ORDER’da yan yana aynı aile gelmez; 2 sütunlu huni düzeninde
+ * takip|kararsiz ve diğer komşular da farklı tonlarda.
+ */
 const STAGE_THEME: Record<CandidateStage, { badge: string; card: string }> = {
-  yeni:        { badge: 'bg-[#E8F0FE] text-[#1A56DB] dark:bg-[#1e3a5f] dark:text-[#93c5fd]', card: 'bg-[#E8F0FE] dark:bg-[#222E4D]' },
-  iletisim:    { badge: 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]', card: 'bg-[#EEEDFE] dark:bg-[#2D2A54]' },
-  davetli:     { badge: 'bg-[#FEF0EC] text-[#C03E1F] dark:bg-[#4a1a0a] dark:text-[#fca572]', card: 'bg-[#FEF0EC] dark:bg-[#47221A]' },
-  sunum:       { badge: 'bg-[#E0F2FE] text-[#0369A1] dark:bg-[#0a2f3e] dark:text-[#7dd3fc]', card: 'bg-[#E0F2FE] dark:bg-[#1A384F]' },
-  takip:       { badge: 'bg-[#FAEEDA] text-[#854F0B] dark:bg-[#3d2200] dark:text-[#fcd34d]', card: 'bg-[#FAEEDA] dark:bg-[#42341A]' },
-  kararsiz:    { badge: 'bg-[#FBEAF0] text-[#72243E] dark:bg-[#3d0a1a] dark:text-[#fda4af]', card: 'bg-[#FBEAF0] dark:bg-[#421A2C]' },
-  katildi:     { badge: 'bg-[#D1FAE5] text-[#065F46] dark:bg-[#052e16] dark:text-[#6ee7b7]', card: 'bg-[#D1FAE5] dark:bg-[#143B27]' },
-  ilgilenmedi: { badge: 'bg-[#F3F4F6] text-[#6B7280] dark:bg-[#1f2937] dark:text-[#9ca3af]', card: 'bg-[#F3F4F6] dark:bg-[#2A2E38]' },
-  kayboldu:    { badge: 'bg-[#F3F4F6] text-[#9CA3AF] dark:bg-[#111827] dark:text-[#6b7280]', card: 'bg-[#F3F4F6] dark:bg-[#20242D]' },
-  pasif:       { badge: 'bg-[#F0FDF4] text-[#16A34A] dark:bg-[#052e16] dark:text-[#4ade80]', card: 'bg-[#F0FDF4] dark:bg-[#0d2b1a]' },
+  yeni: {
+    badge: 'bg-[#E8F0FE] text-[#1A56DB] dark:bg-[#0a1f4d] dark:text-[#93c5fd]',
+    card: 'bg-[#E8F0FE] text-[#1A56DB] dark:bg-[#0a1f4d]/40 dark:text-[#93c5fd]',
+  },
+  iletisim: {
+    badge: 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]',
+    card: 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e]/40 dark:text-[#a09be8]',
+  },
+  davetli: {
+    badge: 'bg-[#FEF0EC] text-[#C03E1F] dark:bg-[#3d1409] dark:text-[#fca87d]',
+    card: 'bg-[#FEF0EC] text-[#C03E1F] dark:bg-[#3d1409]/40 dark:text-[#fca87d]',
+  },
+  sunum: {
+    badge: 'bg-[#ECFEFF] text-[#0891B2] dark:bg-[#083344] dark:text-[#22D3EE]',
+    card: 'bg-[#ECFEFF] text-[#0891B2] dark:bg-[#083344]/40 dark:text-[#22D3EE]',
+  },
+  takip: {
+    badge: 'bg-[#FAEEDA] text-[#854F0B] dark:bg-[#3a2200] dark:text-[#fbbf24]',
+    card: 'bg-[#FAEEDA] text-[#854F0B] dark:bg-[#3a2200]/40 dark:text-[#fbbf24]',
+  },
+  kararsiz: {
+    badge: 'bg-[#FBEAF0] text-[#72243E] dark:bg-[#3d0f1f] dark:text-[#f9a8d4]',
+    card: 'bg-[#FBEAF0] text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]',
+  },
+  katildi: {
+    badge: 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]',
+    card: 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e]/40 dark:text-[#4ade80]',
+  },
+  ilgilenmedi: {
+    badge: 'bg-[#EEF2FF] text-[#3730A3] dark:bg-[#1e1b4b] dark:text-[#a5b4fc]',
+    card: 'bg-[#EEF2FF] text-[#3730A3] dark:bg-[#1e1b4b]/40 dark:text-[#a5b4fc]',
+  },
+  pasif: {
+    badge: 'bg-[#FEF9C3] text-[#854D0E] dark:bg-[#453A0B] dark:text-[#FACC15]',
+    card: 'bg-[#FEF9C3] text-[#854D0E] dark:bg-[#453A0B]/40 dark:text-[#FACC15]',
+  },
+  kayboldu: {
+    badge: 'bg-[#FFF1F3] text-[#9B1D47] dark:bg-[#3d0a1a] dark:text-[#fda4af]',
+    card: 'bg-[#FFF1F3] text-[#9B1D47] dark:bg-[#3d0a1a]/40 dark:text-[#fda4af]',
+  },
 }
 
 export const STAGE_COLOR: Record<CandidateStage, string> = Object.fromEntries(
@@ -69,4 +103,3 @@ const STAGE_LABEL_EN: Record<CandidateStage, string> = {
 export function getStageLabel(stage: CandidateStage, lang: string): string {
   return lang === 'en' ? (STAGE_LABEL_EN[stage] || stage) : (STAGE_LABEL[stage] || stage)
 }
-
