@@ -128,6 +128,8 @@ export const crownSection = {
       sahaRadarNoFollowUps: 'Bu hafta için planlı takip yok.',
       sahaRadarPipelineCta: 'Boru hattına git',
       sahaRadarTeamCta: 'Ekip yönetimine git',
+      sahaRadarFilterAll: 'Tüm takipler',
+      sahaRadarFilterMine: 'Sadece benim',
     },
   },
   en: {
@@ -259,6 +261,8 @@ export const crownSection = {
       sahaRadarNoFollowUps: 'No follow-ups scheduled for this week.',
       sahaRadarPipelineCta: 'Go to pipeline',
       sahaRadarTeamCta: 'Manage team',
+      sahaRadarFilterAll: 'All follow-ups',
+      sahaRadarFilterMine: 'Only mine',
     },
   },
 }

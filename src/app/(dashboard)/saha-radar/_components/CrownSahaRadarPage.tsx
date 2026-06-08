@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Clock,
   Copy,
+  Filter,
   Lock,
   Phone,
   Sparkles,
@@ -32,6 +33,7 @@ import { waHref } from '@/lib/utils/waLink'
 import { useMarkContacted } from '@/hooks/useCandidates'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
+import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -41,6 +43,7 @@ type ActiveAiMessage = {
   candidateName: string
   phone: string | null
   candidateId: string
+  isCoaching?: boolean
 }
 
 function ActivityDot({ level }: { level: 'active' | 'recent' | 'silent' }) {
@@ -179,9 +182,15 @@ function FollowUpCard({
 function MemberCard({
   m,
   t,
+  onCoachAI,
+  coachingId,
+  hasAiFieldAccess,
 }: {
   m: SahaRadarMember
   t: ReturnType<typeof useTranslation>['t']
+  onCoachAI: (m: SahaRadarMember) => void
+  coachingId: string | null
+  hasAiFieldAccess: boolean
 }) {
   const router = useRouter()
   const labelKey =
@@ -206,7 +215,7 @@ function MemberCard({
           ? 'border-rose-500/25 bg-rose-50/30 dark:bg-rose-950/15'
           : 'border-[var(--border)] bg-[var(--bg-card)]',
       )}
-      onClick={() => router.push('/ekip')}
+      onClick={() => router.push(`/ekip/${m.userId}`)}
     >
       <PersonAvatar name={m.fullName} imageUrl={m.avatarUrl} size="sm" />
       <div className="min-w-0 flex-1">
@@ -216,12 +225,12 @@ function MemberCard({
         <p className="text-xs text-[var(--text-3)]">{daysBadge}</p>
       </div>
       <div
-        className="flex items-center gap-2 shrink-0"
+        className="flex items-center gap-1.5 shrink-0"
         onClick={e => e.stopPropagation()}
       >
         <span
           className={clsx(
-            'text-[10px] font-bold rounded-full px-2 py-0.5',
+            'text-[10px] font-bold rounded-full px-2 py-0.5 hidden sm:inline',
             m.activityLevel === 'active'
               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
               : m.activityLevel === 'recent'
@@ -232,32 +241,51 @@ function MemberCard({
           {t(labelKey)}
         </span>
         <ActivityDot level={m.activityLevel} />
-        <div className="flex items-center gap-1.5 ml-1">
-          {wa && (
-            <a
-              href={wa}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
-              aria-label="WhatsApp"
-              title="WhatsApp"
-            >
-              <WhatsAppIcon className="h-3.5 w-3.5" />
-            </a>
+        <button
+          type="button"
+          onClick={() => onCoachAI(m)}
+          disabled={coachingId === m.userId}
+          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
+          aria-label="Koçluk Mesajı Üret"
+          title="Koçluk Mesajı Üret"
+        >
+          {coachingId === m.userId ? (
+            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+          ) : (
+            <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
           )}
-          {m.phone && (
-            <a
-              href={`tel:${m.phone}`}
-              onClick={e => e.stopPropagation()}
-              className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
-              aria-label="Ara"
-              title="Ara"
-            >
-              <Phone className="h-3.5 w-3.5" strokeWidth={1.75} />
-            </a>
+          {!hasAiFieldAccess && (
+            <Lock
+              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]"
+              strokeWidth={2.5}
+              aria-hidden
+            />
           )}
-        </div>
+        </button>
+        {wa && (
+          <a
+            href={wa}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
+            aria-label="WhatsApp"
+            title="WhatsApp"
+          >
+            <WhatsAppIcon className="h-3.5 w-3.5" />
+          </a>
+        )}
+        {m.phone && (
+          <a
+            href={`tel:${m.phone}`}
+            onClick={e => e.stopPropagation()}
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+            aria-label="Ara"
+            title="Ara"
+          >
+            <Phone className="h-3.5 w-3.5" strokeWidth={1.75} />
+          </a>
+        )}
       </div>
     </li>
   )
@@ -270,7 +298,9 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const [innerTab, setInnerTab] = useState<InnerTab>('takipler')
   const [generatingId, setGeneratingId] = useState<string | null>(null)
+  const [coachingId, setCoachingId] = useState<string | null>(null)
   const [activeAiMessage, setActiveAiMessage] = useState<ActiveAiMessage | null>(null)
+  const [showMineOnly, setShowMineOnly] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.crownSahaRadar(ws?.workspaceId ?? ''),
@@ -310,8 +340,38 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
     }
   }
 
-  const overdue = data?.followUps.filter(f => f.isOverdue) ?? []
-  const upcoming = data?.followUps.filter(f => !f.isOverdue) ?? []
+  async function handleCoachingAI(m: SahaRadarMember) {
+    if (!hasAiFieldAccess) { openUpgrade('ai_field'); return }
+    setCoachingId(m.userId)
+    try {
+      const result = await generateCoachingMessageAction({
+        memberName: m.fullName,
+        activityLevel: m.activityLevel,
+        daysSinceActivity: m.daysSinceActivity,
+      })
+      if (result.error || !result.message) {
+        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        return
+      }
+      setActiveAiMessage({
+        message: result.message,
+        candidateName: m.fullName,
+        phone: m.phone,
+        candidateId: m.userId,
+        isCoaching: true,
+      })
+    } catch {
+      toast.error('Mesaj oluşturulamadı.')
+    } finally {
+      setCoachingId(null)
+    }
+  }
+
+  const allOverdue = data?.followUps.filter(f => f.isOverdue) ?? []
+  const allUpcoming = data?.followUps.filter(f => !f.isOverdue) ?? []
+  const canFilter = data?.hasTeamAccess && (data?.followUps ?? []).some(f => !f.isMine)
+  const overdue = showMineOnly ? allOverdue.filter(f => f.isMine) : allOverdue
+  const upcoming = showMineOnly ? allUpcoming.filter(f => f.isMine) : allUpcoming
   const activeMembers = data?.members.filter(m => m.activityLevel === 'active').length ?? 0
   const silentMembers = data?.members.filter(m => m.activityLevel === 'silent').length ?? 0
 
@@ -379,6 +439,36 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
             {/* TAB: Takipler */}
             {innerTab === 'takipler' && (
               <div className="space-y-4">
+                {/* Filtre: sadece benim (yalnızca ekip erişimi olan + başkasına ait takip varsa) */}
+                {canFilter && (
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowMineOnly(false)}
+                      className={clsx(
+                        'rounded-full px-3 py-1 text-xs font-semibold transition',
+                        !showMineOnly
+                          ? 'bg-orange-600 text-white shadow-sm'
+                          : 'border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
+                      )}
+                    >
+                      <Filter className="mr-1 inline h-3 w-3" />
+                      {t('crown.sahaRadarFilterAll')}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowMineOnly(true)}
+                      className={clsx(
+                        'rounded-full px-3 py-1 text-xs font-semibold transition',
+                        showMineOnly
+                          ? 'bg-orange-600 text-white shadow-sm'
+                          : 'border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
+                      )}
+                    >
+                      {t('crown.sahaRadarFilterMine')}
+                    </button>
+                  </div>
+                )}
                 {overdue.length === 0 && upcoming.length === 0 ? (
                   <HubSectionCard>
                     <p className="text-center text-sm text-[var(--text-3)]">
@@ -484,7 +574,14 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     </div>
                     <ul className="space-y-2">
                       {data.members.map(m => (
-                        <MemberCard key={m.userId} m={m} t={t} />
+                        <MemberCard
+                          key={m.userId}
+                          m={m}
+                          t={t}
+                          onCoachAI={handleCoachingAI}
+                          coachingId={coachingId}
+                          hasAiFieldAccess={hasAiFieldAccess}
+                        />
                       ))}
                     </ul>
                   </>
@@ -519,7 +616,9 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     <Sparkles className="h-4 w-4 fill-current animate-pulse" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-[var(--text-1)]">Yapay Zeka Mesajı</h2>
+                    <h2 className="text-base font-bold text-[var(--text-1)]">
+                      {activeAiMessage.isCoaching ? 'Koçluk Mesajı' : 'Yapay Zeka Mesajı'}
+                    </h2>
                     <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
                       {activeAiMessage.candidateName} için üretildi
                     </p>

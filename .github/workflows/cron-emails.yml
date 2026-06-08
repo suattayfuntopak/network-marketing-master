@@ -27,3 +27,9 @@ jobs:
           curl -fsS --max-redirs 0 -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/calendar-reminder"
+
+      - name: Overdue follow-up reminders
+        run: |
+          curl -fsS --max-redirs 0 -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.NMM_APP_URL }}/api/cron/overdue-reminders"
