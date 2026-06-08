@@ -871,6 +871,7 @@ export type SahaRadarMember = {
   activityLevel: SahaRadarActivityLevel
   daysSinceActivity: number | null
   candidateCount: number
+  phone: string | null
 }
 
 export type SahaRadarFollowUp = {
@@ -882,6 +883,7 @@ export type SahaRadarFollowUp = {
   isOverdue: boolean
   isMine: boolean
   phone: string | null
+  stage: string
 }
 
 export type CrownSahaRadarPayload = {
@@ -924,6 +926,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
         activityLevel: level,
         daysSinceActivity: days,
         candidateCount: m.candidate_count,
+        phone: m.phone ?? null,
       }
     })
     .sort((a, b) => {
@@ -943,7 +946,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
 
   const { data: candidates } = await supabase
     .from('nmm_candidates')
-    .select('id, full_name, phone, owner_id, next_follow_up_at')
+    .select('id, full_name, phone, owner_id, next_follow_up_at, stage')
     .in('owner_id', ownerIds)
     .not('next_follow_up_at', 'is', null)
     .lte('next_follow_up_at', sevenDaysIso)
@@ -954,11 +957,12 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
     id: c.id,
     candidateName: c.full_name,
     ownerUserId: c.owner_id,
-    ownerName: c.owner_id === user.id ? 'Ben' : (memberNameMap[c.owner_id] ?? '—'),
+    ownerName: memberNameMap[c.owner_id] ?? '—',
     dueAt: c.next_follow_up_at!,
     isOverdue: c.next_follow_up_at! < nowIso,
     isMine: c.owner_id === user.id,
     phone: c.phone ?? null,
+    stage: c.stage,
   }))
 
   return { members, followUps, myUserId: user.id, hasTeamAccess: teamAccess }
