@@ -13,10 +13,12 @@ import { HubPipelineStageTable } from '@/lib/ui/hub/HubPipelineStageTable'
 import { getHubMonthlyInsightsAction, getHubMonthlySelfAction } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
 import { parsePeriodOffset } from '@/lib/utils/hubPeriodRange'
+import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
 
 export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
+  const { goToCurrentPeriod } = useHubPeriodNavigation()
   const offset = parsePeriodOffset(searchParams.get('offset'))
 
   const { data: monthlySelf, isLoading: monthlySelfLoading } = useQuery({
@@ -43,6 +45,8 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
       iconClassName="bg-pink-50 text-pink-700 dark:bg-pink-950/30 dark:text-pink-400"
       backHref="/pano"
       showRefresh={false}
+      onIconClick={goToCurrentPeriod}
+      iconAriaLabel={t('crown.hubGoToCurrentMonth')}
       asTab={asTab}
     >
       <div className="space-y-4">

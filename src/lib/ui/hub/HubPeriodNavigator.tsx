@@ -2,15 +2,14 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
   formatMonthLabel,
   formatWeekRangeLabel,
   monthRange,
-  parsePeriodOffset,
   rollingWeekRange,
 } from '@/lib/utils/hubPeriodRange'
+import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
 
 type HubPeriodNavigatorProps = {
   mode: 'week' | 'month'
@@ -18,12 +17,8 @@ type HubPeriodNavigatorProps = {
 }
 
 export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
   const { lang } = useTranslation()
-
-  const offset = parsePeriodOffset(searchParams.get('offset'))
+  const { offset, go } = useHubPeriodNavigation()
 
   const prevOffset = offset - 1
   const nextOffset = offset + 1
@@ -44,14 +39,6 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
   function labelFor(_o: number, start: Date, end: Date) {
     if (mode === 'week') return formatWeekRangeLabel(start, end, lang)
     return formatMonthLabel(start, lang)
-  }
-
-  function go(toOffset: number) {
-    const params = new URLSearchParams(searchParams.toString())
-    if (toOffset === 0) params.delete('offset')
-    else params.set('offset', String(toOffset))
-    const q = params.toString()
-    router.push(q ? `${pathname}?${q}` : pathname)
   }
 
   const currentLabel =

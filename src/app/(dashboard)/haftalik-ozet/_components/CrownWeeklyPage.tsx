@@ -13,11 +13,13 @@ import { HubPipelineStageTable } from '@/lib/ui/hub/HubPipelineStageTable'
 import { getHubWeeklySelfAction } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
 import { parsePeriodOffset, rollingWeekRange } from '@/lib/utils/hubPeriodRange'
+import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
 import { weeklyAccent } from './weeklyTheme'
 
 export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
+  const { goToCurrentPeriod } = useHubPeriodNavigation()
   const offset = parsePeriodOffset(searchParams.get('offset'))
   const weekRange = rollingWeekRange(offset)
 
@@ -39,6 +41,8 @@ export function CrownWeeklyPage({ asTab = false }: { asTab?: boolean }) {
       iconClassName={weeklyAccent.icon}
       backHref="/pano"
       showRefresh={false}
+      onIconClick={goToCurrentPeriod}
+      iconAriaLabel={t('crown.hubGoToCurrentWeek')}
       asTab={asTab}
     >
       <div className="space-y-4">

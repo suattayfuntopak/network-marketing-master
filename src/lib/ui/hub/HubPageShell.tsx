@@ -22,6 +22,9 @@ type HubPageShellProps = {
   showRefresh?: boolean
   /** Tab içinde kullanıldığında true — shell başlığı/back butonu gizlenir */
   asTab?: boolean
+  /** Başlık ikonuna tıklanınca (ör. içinde bulunulan hafta/aya dön) */
+  onIconClick?: () => void
+  iconAriaLabel?: string
 }
 
 export function HubPageShell({
@@ -36,6 +39,8 @@ export function HubPageShell({
   backHref = '/pano',
   showRefresh = true,
   asTab = false,
+  onIconClick,
+  iconAriaLabel,
 }: HubPageShellProps) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -79,9 +84,23 @@ export function HubPageShell({
               <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
             </Link>
             {customIcon ? (
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
-                {customIcon}
-              </div>
+              onIconClick ? (
+                <button
+                  type="button"
+                  onClick={onIconClick}
+                  aria-label={iconAriaLabel ?? title}
+                  className={clsx(
+                    'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition hover:scale-[1.03] active:scale-95',
+                    iconClassName,
+                  )}
+                >
+                  {customIcon}
+                </button>
+              ) : (
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
+                  {customIcon}
+                </div>
+              )
             ) : Icon ? (
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
                 <Icon className="h-5 w-5" strokeWidth={1.75} />
