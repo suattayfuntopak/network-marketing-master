@@ -5,9 +5,9 @@ import {
   getCrownEntriesPageAction,
   getCrownFirst30PageAction,
   getCrownSahaRadarAction,
-  getCrownMonthlyPageAction,
+  getCrownTeamMonthlyPulseAction,
   getCrownVideoPageAction,
-  getCrownWeeklyPageAction,
+  getCrownTeamWeeklyPulseAction,
   getHubAllTimeSelfAction,
   getHubDailySelfAction,
   getHubYearlySelfAction,
@@ -101,13 +101,13 @@ export async function prefetchHubMetrics(
   if (hasTeamPulseAccess(ws.licenseType, ws.isSuperAdmin)) {
     tasks.push(
       queryClient.prefetchQuery({
-        queryKey: ['crown', 'weekly-page', workspaceId],
-        queryFn: () => getCrownWeeklyPageAction(workspaceId),
+        queryKey: ['crown', 'team-weekly-pulse', workspaceId],
+        queryFn: () => getCrownTeamWeeklyPulseAction(workspaceId),
         staleTime: METRICS_STALE,
       }),
       queryClient.prefetchQuery({
-        queryKey: ['crown', 'monthly-page', workspaceId],
-        queryFn: () => getCrownMonthlyPageAction(workspaceId),
+        queryKey: ['crown', 'team-monthly-pulse', workspaceId],
+        queryFn: () => getCrownTeamMonthlyPulseAction(workspaceId),
         staleTime: METRICS_STALE,
       }),
       queryClient.prefetchQuery({

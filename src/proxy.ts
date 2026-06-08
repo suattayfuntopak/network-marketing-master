@@ -1,6 +1,10 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database.types'
+import {
+  resolveIlgilenRedirect,
+  resolveLegacySummaryRedirect,
+} from '@/lib/domain/legacyRouteRedirects'
 
 const PUBLIC_PATHS = [
   '/giris', 
@@ -16,9 +20,29 @@ const PUBLIC_PATHS = [
   '/guvenlik'
 ]
 
+function redirectTo(request: NextRequest, destination: string) {
+  const target = new URL(destination, request.url)
+  return NextResponse.redirect(target, 308)
+}
+
 export async function proxy(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   const pathname = request.nextUrl.pathname
+
+  const legacySummary = resolveLegacySummaryRedirect(
+    pathname,
+    request.nextUrl.searchParams.get('offset'),
+  )
+  if (legacySummary) {
+    return redirectTo(request, legacySummary)
+  }
+
+  if (pathname === '/bugun/ilgilen') {
+    return redirectTo(
+      request,
+      resolveIlgilenRedirect(request.nextUrl.searchParams.get('tab')),
+    )
+  }
 
   // 1. If on the old vercel domain, client-side redirect to the official domain, mapping wildcards to /sifre-guncelle
   if (hostname === 'network-marketing-master.vercel.app') {

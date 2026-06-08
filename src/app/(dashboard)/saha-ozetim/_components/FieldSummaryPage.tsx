@@ -35,6 +35,7 @@ import {
   rollingWeekRange,
 } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
+import { IlgilenContent } from '@/app/(dashboard)/bugun/ilgilen/_components/IlgilenContent'
 
 const EMPTY_METRICS: HubSelfFieldMetrics = {
   calls: 0,
@@ -155,6 +156,7 @@ export function FieldSummaryPage() {
             loading={loading}
           />
           <HubSelfActivityGrid metrics={dailySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          {offset === 0 ? <IlgilenContent /> : null}
         </>
       )
     }

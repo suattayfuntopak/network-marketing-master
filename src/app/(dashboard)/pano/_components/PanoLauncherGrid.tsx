@@ -23,12 +23,12 @@ export function PanoLauncherGrid() {
 
   return (
     <>
-      <LauncherGrid fillViewport itemCount={9} columns={3}>
+      <LauncherGrid panoDesktop itemCount={10} columns={5}>
         {items.map(({ href, translationKey, icon, color }) => {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
 
           return (
-            <LauncherGridItem key={href} fillViewport onPointerEnter={() => warmRoute(href)}>
+            <LauncherGridItem key={href} panoDesktop onPointerEnter={() => warmRoute(href)}>
               <SquareButton
                 icon={icon}
                 label={t(translationKey)}
@@ -36,7 +36,7 @@ export function PanoLauncherGrid() {
                 variant="crown"
                 href={isAiLocked ? undefined : href}
                 onClick={isAiLocked ? () => openUpgrade('ai_coach') : undefined}
-                prominent
+                fill
               />
               {isAiLocked && (
                 <span

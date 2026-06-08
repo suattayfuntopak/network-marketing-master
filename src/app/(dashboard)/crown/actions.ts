@@ -197,7 +197,7 @@ async function countJoinedInPeriod(
   return count ?? 0
 }
 
-export async function getCrownWeeklyPageAction(workspaceId: string): Promise<CrownPeriodPayload> {
+export async function getCrownTeamWeeklyPulseAction(workspaceId: string): Promise<CrownPeriodPayload> {
   const bundle = await fetchTeamBundleAction(workspaceId)
   const memberIds = bundle.members.map(m => m.user_id)
   const [activity, joinedInPeriod] = await Promise.all([
@@ -207,7 +207,7 @@ export async function getCrownWeeklyPageAction(workspaceId: string): Promise<Cro
   return { members: bundle.members, activity, joinedInPeriod }
 }
 
-export async function getCrownMonthlyPageAction(workspaceId: string): Promise<CrownPeriodPayload> {
+export async function getCrownTeamMonthlyPulseAction(workspaceId: string): Promise<CrownPeriodPayload> {
   const bundle = await fetchTeamBundleAction(workspaceId)
   const memberIds = bundle.members.map(m => m.user_id)
   const [activity, joinedInPeriod] = await Promise.all([

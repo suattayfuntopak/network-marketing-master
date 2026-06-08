@@ -24,9 +24,9 @@
   ],
   "shortcuts": [
     {
-      "name": "Bugün İlgilen",
-      "url": "/bugun/ilgilen",
-      "description": "Bugün takip edilecek adaylar"
+      "name": "Saha Özetim",
+      "url": "/saha-ozetim?tab=daily",
+      "description": "Günlük saha özeti ve öncelikler"
     },
     {
       "name": "Boru Hattı",

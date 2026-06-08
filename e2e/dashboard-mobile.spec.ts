@@ -2,7 +2,7 @@ import { test, expect, devices } from '@playwright/test'
 
 const MOBILE = { ...devices['iPhone 13'] }
 
-const DASHBOARD_ROUTES = ['/pano', '/bugun/ilgilen', '/egitim'] as const
+const DASHBOARD_ROUTES = ['/pano', '/saha-ozetim', '/egitim'] as const
 
 test.describe('dashboard routes (mobile viewport)', () => {
   test.use(MOBILE)

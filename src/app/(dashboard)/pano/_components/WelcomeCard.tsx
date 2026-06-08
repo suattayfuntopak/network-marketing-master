@@ -35,10 +35,10 @@ export function WelcomeCard({ candidateCount }: { candidateCount: number }) {
     <div
       className={clsx(
         Z.cardOverlay,
-        'fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))] md:static md:inset-auto md:bottom-auto',
+        'fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))]',
       )}
     >
-      <div className="relative rounded-2xl border border-[#534AB7]/30 bg-[var(--bg-card)] p-4 shadow-lg shadow-black/10 md:border-[#534AB7]/25 md:bg-gradient-to-br md:from-[#EEEDFE]/90 md:to-[var(--bg-card)] md:p-5 md:shadow-none">
+      <div className="relative rounded-2xl border border-[#534AB7]/30 bg-[var(--bg-card)] p-4 shadow-lg shadow-black/10">
         <button
           type="button"
           onClick={dismiss}

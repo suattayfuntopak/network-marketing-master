@@ -3,12 +3,12 @@ import { clsx } from 'clsx'
 
 type LauncherGridProps = {
   children: ReactNode
-  /** Masaüstünde kalan viewport yüksekliğini doldur (pano launcher). */
-  fillViewport?: boolean
   /** 2 sütun (mobil) / md+ sütun sayısı grid satır hesabı için. */
   itemCount?: number
-  /** md+ sütun sayısı — pano 9 kutu için 3. */
-  columns?: 3 | 4
+  /** md+ sütun sayısı — pano masaüstü 5×2. */
+  columns?: 3 | 4 | 5
+  /** Pano masaüstü: 5×2, viewport yüksekliğine sığan kompakt kareler (stretch yok). */
+  panoDesktop?: boolean
 }
 
 const DESKTOP_ROW_CLASS: Record<number, string> = {
@@ -17,39 +17,39 @@ const DESKTOP_ROW_CLASS: Record<number, string> = {
   4: 'md:grid-rows-4',
 }
 
-function gridRowsClass(
+function gridClass(
   itemCount: number | undefined,
-  fillViewport: boolean,
-  columns: 3 | 4,
+  panoDesktop: boolean,
+  columns: 3 | 4 | 5,
 ): string {
-  if (!fillViewport) return 'gap-3 md:gap-[1.125rem]'
-  const n = itemCount ?? 6
+  if (!panoDesktop) return 'gap-3 md:gap-[1.125rem]'
+  const n = itemCount ?? 10
   const desktopRows = Math.ceil(n / columns)
-  const desktop = DESKTOP_ROW_CLASS[desktopRows] ?? 'md:grid-rows-3'
-  return clsx('gap-2 md:min-h-0 md:h-full md:flex-1 md:gap-[1.125rem]', desktop)
+  const desktop = DESKTOP_ROW_CLASS[desktopRows] ?? 'md:grid-rows-2'
+  return clsx(
+    'gap-2.5 md:gap-2.5',
+    desktop,
+    'md:h-[min(calc(100dvh-11.5rem),22rem)] md:max-h-[min(calc(100dvh-11.5rem),22rem)]',
+  )
 }
 
-/** Pano + Bugün İlgilen launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
+/** Pano + launcher kutuları — tek kaynak, aynı genişlik ve kare oran. */
 export function LauncherGrid({
   children,
-  fillViewport = false,
   itemCount,
   columns = 4,
+  panoDesktop = false,
 }: LauncherGridProps) {
-  const mdCols = columns === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
+  const mdCols =
+    columns === 5 ? 'md:grid-cols-5' : columns === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'
 
   return (
-    <div
-      className={clsx(
-        'w-full',
-        fillViewport && 'flex min-h-0 flex-1 flex-col',
-      )}
-    >
+    <div className={clsx('w-full', panoDesktop && 'md:flex md:min-h-0 md:flex-1 md:flex-col md:justify-center')}>
       <div
         className={clsx(
           'grid w-full grid-cols-2',
           mdCols,
-          fillViewport ? gridRowsClass(itemCount, true, columns) : 'gap-3 md:gap-[1.125rem]',
+          gridClass(itemCount, panoDesktop, columns),
         )}
       >
         {children}
@@ -61,19 +61,21 @@ export function LauncherGrid({
 export function LauncherGridItem({
   children,
   className,
-  fillViewport = false,
+  panoDesktop = false,
   ...rest
 }: {
   children: ReactNode
   className?: string
-  fillViewport?: boolean
+  panoDesktop?: boolean
 } & HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       {...rest}
       className={clsx(
         'relative min-w-0',
-        fillViewport ? 'aspect-square w-full md:aspect-auto md:h-full md:min-h-0' : 'aspect-square',
+        panoDesktop
+          ? 'aspect-square w-full md:aspect-auto md:h-full md:min-h-0'
+          : 'aspect-square',
         className,
       )}
     >
