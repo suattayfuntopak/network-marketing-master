@@ -8,8 +8,10 @@ import { PanoLauncherGrid } from './PanoLauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { AccountStatusAlert } from './AccountStatusAlert'
 import { PanoDayRitualSection } from './PanoDayRitualSection'
+import { useHashScroll } from '@/lib/ui/useHashScroll'
 
 export function PanoContent() {
+  useHashScroll('journal')
   const { t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)

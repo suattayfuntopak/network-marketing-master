@@ -23,6 +23,10 @@ import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/t
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { addTeamMemberAsCandidateAction } from '../actions'
+import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
+import { toast } from 'sonner'
+import { UserPlus } from 'lucide-react'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -161,7 +165,26 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
+  const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
+
+  async function handleLinkMemberToPipeline(member: MemberRow) {
+    if (!member.full_name || linkingMemberId) return
+    setLinkingMemberId(member.user_id)
+    try {
+      const result = await addTeamMemberAsCandidateAction(ws.workspaceId, member.full_name)
+      invalidateHubMetrics(queryClient, ws.workspaceId)
+      toast.success(
+        result.created ? t('team.linkToPipelineSuccess') : t('team.linkToPipelineExists'),
+      )
+      router.push(`/pipeline/${result.candidateId}`)
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : t('common.error')
+      toast.error(message)
+    } finally {
+      setLinkingMemberId(null)
+    }
+  }
   const [now] = useState(() => Date.now())
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
   const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
@@ -471,6 +494,21 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     )
                   })()}
                 </div>
+
+                {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id && (
+                  <button
+                    type="button"
+                    disabled={linkingMemberId === m.user_id}
+                    onClick={e => {
+                      e.stopPropagation()
+                      void handleLinkMemberToPipeline(m)
+                    }}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-4 py-2.5 text-xs font-bold text-brand transition hover:bg-brand/10 disabled:opacity-50 sm:w-auto"
+                  >
+                    <UserPlus className="h-4 w-4 shrink-0" />
+                    <span>{t('team.linkToPipeline')}</span>
+                  </button>
+                )}
 
                 {/* Saha ortağı: davet sekmeleri */}
                 {m.isAppUser === false && (() => {

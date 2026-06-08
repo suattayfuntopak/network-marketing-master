@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 
 /**
  * Resolves profile photo URLs for team members (downlines + workspace members).
@@ -85,6 +86,81 @@ export async function toggleOnboardingStepAction(
       .eq('step_id', stepId)
     if (error) throw new Error(error.message)
   }
+}
+
+/** Ekip üyesini sponsor boru hattına aday olarak bağla (eşleşme yoksa yeni katildi kaydı). */
+export async function addTeamMemberAsCandidateAction(
+  workspaceId: string,
+  memberName: string,
+): Promise<{ candidateId: string; created: boolean }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const trimmedName = memberName.trim()
+  if (!trimmedName) throw new Error('Üye adı gerekli.')
+
+  const { data: ownWs } = await supabase
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (!ownWs || ownWs.owner_id !== user.id) {
+    throw new Error('Bu işlem için lider yetkisi gerekli.')
+  }
+
+  const { data: leaderCandidates, error: candErr } = await supabase
+    .from('nmm_candidates')
+    .select('id, full_name, owner_id, stage')
+    .eq('workspace_id', workspaceId)
+    .eq('owner_id', user.id)
+
+  if (candErr) throw new Error(candErr.message)
+
+  const existingId = findLeaderCandidateForMember(
+    leaderCandidates ?? [],
+    user.id,
+    trimmedName,
+  )
+  if (existingId) {
+    return { candidateId: existingId, created: false }
+  }
+
+  const { data: inserted, error: insertErr } = await supabase
+    .from('nmm_candidates')
+    .insert({
+      workspace_id: workspaceId,
+      owner_id: user.id,
+      full_name: trimmedName,
+      stage: 'katildi',
+      note_tr: 'Ekibimden boru hattına eklendi',
+      note_en: 'Added from my team to pipeline',
+      warmth: 'ilik',
+    })
+    .select('id')
+    .single()
+
+  if (insertErr || !inserted) throw new Error(insertErr?.message ?? 'Aday eklenemedi.')
+
+  await supabase.from('nmm_daily_actions').insert([
+    {
+      workspace_id: workspaceId,
+      user_id: user.id,
+      candidate_id: inserted.id,
+      action_type: 'note',
+      note: 'system_note:candidate_created',
+    },
+    {
+      workspace_id: workspaceId,
+      user_id: user.id,
+      candidate_id: inserted.id,
+      action_type: 'stage_change',
+      note: 'joined',
+    },
+  ])
+
+  return { candidateId: inserted.id, created: true }
 }
 
 export async function joinWorkspaceByInviteAction(

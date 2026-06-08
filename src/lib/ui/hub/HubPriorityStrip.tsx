@@ -1,53 +1,29 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
 import { Phone } from 'lucide-react'
-import { useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidates } from '@/hooks/useCandidates'
+import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
 import { useDailyActions } from '@/hooks/useDailyActions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { STAGE_COLOR } from '@/lib/domain/stages'
 import { waHref } from '@/lib/utils/waLink'
-import { logHubContactAction } from '@/app/(dashboard)/crown/actions'
 import { Skeleton } from '@/components/ui/Skeleton'
 
 const PREVIEW = 3
 
 export function HubPriorityStrip() {
   const { t } = useTranslation()
-  const qc = useQueryClient()
   const { data: ws } = useWorkspace()
   const { candidates, isLoading } = useCandidates(ws?.workspaceId)
   const { daily } = useDailyActions(candidates)
-  const [loggingId, setLoggingId] = useState<string | null>(null)
+  const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
   const preview = daily.slice(0, PREVIEW)
-
-  async function handleLog(candidateId: string, type: 'call' | 'whatsapp') {
-    if (!ws?.workspaceId) return
-    setLoggingId(candidateId)
-    try {
-      await logHubContactAction(ws.workspaceId, candidateId, type)
-      qc.invalidateQueries({ queryKey: ['goal-dashboard'] })
-      qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
-      qc.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
-      qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
-      qc.invalidateQueries({ queryKey: ['hub', 'monthly-self'] })
-      qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
-      toast.success(t('crown.contactLogged'))
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : t('common.error'))
-    } finally {
-      setLoggingId(null)
-    }
-  }
 
   if (isLoading) return <Skeleton className="h-32 rounded-2xl" />
   if (preview.length === 0) return null
@@ -61,7 +37,7 @@ export function HubPriorityStrip() {
         {preview.map(c => {
           const fields = resolveCandidateFields(c)
           const wa = waHref(c.phone)
-          const busy = loggingId === c.id
+          const busy = markContacted.isPending && markContacted.variables?.id === c.id
           return (
             <li
               key={c.id}
@@ -80,7 +56,7 @@ export function HubPriorityStrip() {
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => handleLog(c.id, 'call')}
+                  onClick={() => markContacted.mutate({ id: c.id, actionType: 'call' })}
                   className="flex h-8 w-8 items-center justify-center rounded-lg border border-blue-500/25 bg-blue-500/5 text-blue-600 transition hover:bg-blue-500/10 disabled:opacity-50"
                   title={t('crown.logCall')}
                 >
@@ -91,7 +67,7 @@ export function HubPriorityStrip() {
                     href={wa}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={() => handleLog(c.id, 'whatsapp')}
+                    onClick={() => markContacted.mutate({ id: c.id, actionType: 'whatsapp' })}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/5 text-[#128C7E] transition hover:bg-[#25D366]/10"
                     title={t('crown.openWa')}
                   >

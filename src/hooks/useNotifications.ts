@@ -8,6 +8,7 @@ import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
 import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { queryKeys } from '@/lib/query/keys'
+import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useRouter } from 'next/navigation'
@@ -83,6 +84,11 @@ export function useNotifications(options?: { enabled?: boolean }) {
 
             // 1. Invalidate query to refresh UI lists and badge count instantly
             queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
+
+            // Ekip / davet / pipeline bildirimlerinde sponsor hunisini tazele
+            if (newNotif.type === 'user' || newNotif.type === 'alert') {
+              invalidateHubMetrics(queryClient)
+            }
 
             // 2. Play beautiful synthesized notification chime
             if (isNotificationSoundEnabled()) {

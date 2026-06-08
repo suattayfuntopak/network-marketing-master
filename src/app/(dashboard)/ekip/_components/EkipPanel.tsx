@@ -25,6 +25,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { REGISTER_URL } from '@/lib/domain/constants'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
+import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -166,11 +167,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
       setInviteCodeInput('')
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       queryClient.invalidateQueries({ queryKey: ['team'] })
-      queryClient.invalidateQueries({ queryKey: ['candidates'] })
-      queryClient.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
-      queryClient.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
-      queryClient.invalidateQueries({ queryKey: ['hub', 'monthly-self'] })
-      queryClient.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
+      invalidateHubMetrics(queryClient, ws?.workspaceId)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error(err)

@@ -13,6 +13,7 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
 import { logPresentationWhatsAppAction } from '@/app/(dashboard)/pulse/learningEvents'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
+import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 
 function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string) {
   qc.invalidateQueries({ queryKey: queryKeys.candidates(workspaceId) })
@@ -256,11 +257,7 @@ export function useMarkContacted(workspaceId: string) {
     },
     onSuccess: (_data, vars) => {
       invalidateCandidateQueries(qc, workspaceId)
-      qc.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
-      qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
-      qc.invalidateQueries({ queryKey: ['hub', 'monthly-self'] })
-      qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
-      qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
+      invalidateHubMetrics(qc, workspaceId)
       qc.invalidateQueries({ queryKey: ['activity', vars.id] })
       const lang = getLang()
       toast.success(
