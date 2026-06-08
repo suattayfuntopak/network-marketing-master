@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import {
@@ -545,7 +546,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     )}
                   </>
                 )}
-                <a
+                <Link
                   href="/pipeline"
                   className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 transition hover:bg-[var(--bg-subtle)]"
                 >
@@ -553,7 +554,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     {t('crown.sahaRadarPipelineCta')}
                   </span>
                   <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
-                </a>
+                </Link>
               </div>
             )}
 
@@ -600,7 +601,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     </ul>
                   </>
                 )}
-                <a
+                <Link
                   href="/ekip"
                   className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 transition hover:bg-[var(--bg-subtle)]"
                 >
@@ -608,7 +609,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     {t('crown.sahaRadarTeamCta')}
                   </span>
                   <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
-                </a>
+                </Link>
               </div>
             )}
           </>
