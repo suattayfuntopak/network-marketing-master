@@ -3,6 +3,7 @@ import {
   computeRoadmap,
   dailyTargetsForMonth,
   currentMonthIndex,
+  calendarMonthOffsetForRoadmapMonth,
   FUNNEL,
   WORKING_DAYS_PER_MONTH,
 } from './roadmap'
@@ -88,5 +89,19 @@ describe('currentMonthIndex', () => {
   it('süre dolduysa toplam ayla sınırlanır', () => {
     const start = new Date('2025-01-01T00:00:00Z')
     expect(currentMonthIndex(start, 12, new Date('2026-12-01T00:00:00Z'))).toBe(12)
+  })
+})
+
+describe('calendarMonthOffsetForRoadmapMonth', () => {
+  it('maps roadmap month 1 to offset 0 when now is start month', () => {
+    const start = new Date('2026-06-01T12:00:00')
+    const now = new Date('2026-06-15T12:00:00')
+    expect(calendarMonthOffsetForRoadmapMonth(start, 1, now)).toBe(0)
+  })
+
+  it('maps past roadmap month to negative offset', () => {
+    const start = new Date('2026-04-01T12:00:00')
+    const now = new Date('2026-06-15T12:00:00')
+    expect(calendarMonthOffsetForRoadmapMonth(start, 1, now)).toBe(-2)
   })
 })

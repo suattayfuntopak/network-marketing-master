@@ -3,35 +3,18 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
+import { fetchFunnelActualsForToday } from '@/lib/domain/funnelActuals'
+import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { formatSimpleNote, parseSimpleNote } from '@/lib/utils/noteParser'
 import { translateEnToTrAction, translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
 import { saveDayJournalAction, getDayJournalAction } from '@/app/(dashboard)/bugun/ilgilen/actions/journal'
 
-export interface DailyFieldLog {
-  logDate: string
-  calls: number
-  contacts: number
-  presentations: number
-  newMembers: number
-}
-
 export interface DailyTrackPayload {
-  fieldLog: DailyFieldLog
+  actuals: FunnelCounts
   notes: string
 }
 
-const EMPTY_LOG = (logDate: string): DailyFieldLog => ({
-  logDate,
-  calls: 0,
-  contacts: 0,
-  presentations: 0,
-  newMembers: 0,
-})
-
-function clampMetric(n: number): number {
-  if (!Number.isFinite(n)) return 0
-  return Math.min(9999, Math.max(0, Math.floor(n)))
-}
+const EMPTY_ACTUALS: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 async function buildBilingualNotes(text: string, lang: 'tr' | 'en'): Promise<string> {
   const trimmed = text.trim()
@@ -51,15 +34,13 @@ export async function getDailyTrackAction(
 ): Promise<DailyTrackPayload> {
   const supabase = await createClient()
   const { user } = await getAuthUser()
-  if (!user) return { fieldLog: EMPTY_LOG(logDate), notes: '' }
+  if (!user) return { actuals: EMPTY_ACTUALS, notes: '' }
 
-  const [{ data: row }, journal] = await Promise.all([
-    supabase
-      .from('nmm_daily_field_log')
-      .select('log_date, calls, contacts, presentations, new_members')
-      .eq('user_id', user.id)
-      .eq('log_date', logDate)
-      .maybeSingle(),
+  const isToday = logDate === todayCalendarKey()
+  const [actuals, journal] = await Promise.all([
+    isToday
+      ? fetchFunnelActualsForToday(supabase, user.id)
+      : Promise.resolve(EMPTY_ACTUALS),
     getDayJournalAction(logDate),
   ])
 
@@ -70,49 +51,19 @@ export async function getDailyTrackAction(
           : parseSimpleNote(journal.content).tr || parseSimpleNote(journal.content).en)
       : ''
 
-  if (!row) return { fieldLog: EMPTY_LOG(logDate), notes }
-
-  return {
-    fieldLog: {
-      logDate: row.log_date,
-      calls: row.calls,
-      contacts: row.contacts,
-      presentations: row.presentations,
-      newMembers: row.new_members,
-    },
-    notes,
-  }
+  return { actuals, notes }
 }
 
+/** Yalnızca günlük notları kaydeder; huni metrikleri boru hattından otomatik gelir. */
 export async function saveDailyTrackAction(input: {
-  calls: number
-  contacts: number
-  presentations: number
-  newMembers: number
   notes: string
   lang: 'tr' | 'en'
   logDate?: string
 }): Promise<{ ok: true } | { error: string }> {
-  const supabase = await createClient()
   const { user } = await getAuthUser()
   if (!user) return { error: 'unauthorized' }
 
   const logDate = input.logDate ?? todayCalendarKey()
-
-  const { error: logError } = await supabase.from('nmm_daily_field_log').upsert(
-    {
-      user_id: user.id,
-      log_date: logDate,
-      calls: clampMetric(input.calls),
-      contacts: clampMetric(input.contacts),
-      presentations: clampMetric(input.presentations),
-      new_members: clampMetric(input.newMembers),
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id,log_date' },
-  )
-  if (logError) return { error: logError.message }
-
   const bilingual = await buildBilingualNotes(input.notes, input.lang)
   const journalResult = await saveDayJournalAction(bilingual, logDate)
   if ('error' in journalResult) return journalResult

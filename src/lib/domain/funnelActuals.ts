@@ -33,20 +33,6 @@ export function calendarKeysBetween(startKey: string, endKey: string): string[] 
   return keys
 }
 
-export function fieldLogRowToFunnel(row: {
-  calls: number
-  contacts: number
-  presentations: number
-  new_members: number
-}): FunnelCounts {
-  return {
-    arama: row.calls,
-    tanisma: row.contacts,
-    sunum: row.presentations,
-    yeniUye: row.new_members,
-  }
-}
-
 function stageNoteToFunnelDelta(note: string | null): Pick<FunnelCounts, 'sunum' | 'yeniUye'> {
   const n = (note ?? '').toLowerCase().trim()
   if (n === 'sunum' || n === 'sunum yapıldı') return { sunum: 1, yeniUye: 0 }
@@ -63,22 +49,17 @@ function addFunnel(a: FunnelCounts, b: FunnelCounts): FunnelCounts {
   }
 }
 
-/** Gün bazında: field_log varsa o günün kaydı, yoksa boru hattı aksiyonları. */
-export function mergeFunnelDays(
-  dayKeys: string[],
-  fieldLogByDay: Map<string, FunnelCounts>,
-  actionsByDay: Map<string, FunnelCounts>,
-): FunnelCounts {
+/** Gün bazında boru hattı aksiyonlarını toplar. */
+export function sumFunnelDays(dayKeys: string[], actionsByDay: Map<string, FunnelCounts>): FunnelCounts {
   return dayKeys.reduce(
-    (total, key) => addFunnel(total, fieldLogByDay.get(key) ?? actionsByDay.get(key) ?? EMPTY_FUNNEL),
+    (total, key) => addFunnel(total, actionsByDay.get(key) ?? EMPTY_FUNNEL),
     { ...EMPTY_FUNNEL },
   )
 }
 
 /**
- * Dönem huni gerçekleşenleri — Bugün Ne Yaptım (field_log) + boru hattı (actions/candidates).
- * Günlük hedef ile aynı kural: o gün için field_log varsa elle girilen sayılar geçerli;
- * yoksa otomatik aksiyon sayımı kullanılır. Günler toplanır, çift sayım olmaz.
+ * Dönem huni gerçekleşenleri — tek kaynak: boru hattı (`nmm_daily_actions` + `nmm_candidates`).
+ * Elle girilen field_log sayıları huni metriklerinde kullanılmaz.
  */
 export async function fetchFunnelActualsForPeriod(
   supabase: SupabaseClient<Database>,
@@ -91,13 +72,7 @@ export async function fetchFunnelActualsForPeriod(
   const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
   const dayKeySet = new Set(dayKeys)
 
-  const [fieldLogs, calls, stages, candidates] = await Promise.all([
-    supabase
-      .from('nmm_daily_field_log')
-      .select('log_date, calls, contacts, presentations, new_members')
-      .eq('user_id', userId)
-      .gte('log_date', startCalendarKey)
-      .lte('log_date', endCalendarKey),
+  const [calls, stages, candidates] = await Promise.all([
     supabase
       .from('nmm_daily_actions')
       .select('created_at')
@@ -119,11 +94,6 @@ export async function fetchFunnelActualsForPeriod(
       .gte('created_at', sinceIso)
       .lte('created_at', untilIso),
   ])
-
-  const fieldLogByDay = new Map<string, FunnelCounts>()
-  for (const row of fieldLogs.data ?? []) {
-    fieldLogByDay.set(row.log_date, fieldLogRowToFunnel(row))
-  }
 
   const actionsByDay = new Map<string, FunnelCounts>()
   const ensureDay = (key: string): FunnelCounts => {
@@ -156,10 +126,10 @@ export async function fetchFunnelActualsForPeriod(
     bucket.yeniUye += delta.yeniUye
   }
 
-  return mergeFunnelDays(dayKeys, fieldLogByDay, actionsByDay)
+  return sumFunnelDays(dayKeys, actionsByDay)
 }
 
-/** Bugünün huni gerçekleşenleri — haftalık/aylık ile aynı birleştirme kuralı. */
+/** Bugünün huni gerçekleşenleri — boru hattından otomatik. */
 export async function fetchFunnelActualsForToday(
   supabase: SupabaseClient<Database>,
   userId: string,

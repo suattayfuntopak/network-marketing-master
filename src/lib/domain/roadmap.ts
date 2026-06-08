@@ -104,3 +104,14 @@ export function currentMonthIndex(startAt: Date, totalMonths: number, now: Date 
     (now.getFullYear() - startAt.getFullYear()) * 12 + (now.getMonth() - startAt.getMonth())
   return Math.min(Math.max(1, totalMonths), Math.max(1, months + 1))
 }
+
+/** Yol haritası ay N → aylık özet `?offset=` (takvim ayı farkı). */
+export function calendarMonthOffsetForRoadmapMonth(
+  startAt: string | Date,
+  roadmapMonth: number,
+  now: Date = new Date(),
+): number {
+  const start = typeof startAt === 'string' ? new Date(startAt) : startAt
+  const target = new Date(start.getFullYear(), start.getMonth() + (roadmapMonth - 1), 1)
+  return (target.getFullYear() - now.getFullYear()) * 12 + (target.getMonth() - now.getMonth())
+}

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { ClipboardList, Loader2, Target } from 'lucide-react'
+import { ClipboardList, ExternalLink, Loader2, Target } from 'lucide-react'
 import { toast } from 'sonner'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -12,18 +12,14 @@ import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
 import { queryKeys } from '@/lib/query/keys'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { getDailyTrackAction, saveDailyTrackAction } from '../actions'
-import { DailyMetricRow } from './DailyMetricRow'
+import { DailyMetricReadonlyRow } from './DailyMetricReadonlyRow'
 import { dailyTrackAccent } from './dailyTrackTheme'
 
-const METRIC_KEYS: {
-  key: keyof FunnelCounts
-  field: 'calls' | 'contacts' | 'presentations' | 'newMembers'
-  labelKey: string
-}[] = [
-  { key: 'arama', field: 'calls', labelKey: 'dashboard.dailyTrackMetricCalls' },
-  { key: 'tanisma', field: 'contacts', labelKey: 'dashboard.dailyTrackMetricMeetings' },
-  { key: 'sunum', field: 'presentations', labelKey: 'dashboard.dailyTrackMetricPresentations' },
-  { key: 'yeniUye', field: 'newMembers', labelKey: 'dashboard.dailyTrackMetricMembers' },
+const METRIC_KEYS: { key: keyof FunnelCounts; labelKey: string }[] = [
+  { key: 'arama', labelKey: 'dashboard.dailyTrackMetricCalls' },
+  { key: 'tanisma', labelKey: 'dashboard.dailyTrackMetricMeetings' },
+  { key: 'sunum', labelKey: 'dashboard.dailyTrackMetricPresentations' },
+  { key: 'yeniUye', labelKey: 'dashboard.dailyTrackMetricMembers' },
 ]
 
 export function DailyTrackPage() {
@@ -31,39 +27,23 @@ export function DailyTrackPage() {
   const qc = useQueryClient()
   const { goal, progress } = useUserGoal()
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: queryKeys.dailyTrack(lang),
     queryFn: () => getDailyTrackAction(lang),
     staleTime: 30_000,
   })
 
-  const [calls, setCalls] = useState(0)
-  const [contacts, setContacts] = useState(0)
-  const [presentations, setPresentations] = useState(0)
-  const [newMembers, setNewMembers] = useState(0)
   const [notes, setNotes] = useState('')
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
     if (!data) return
-    setCalls(data.fieldLog.calls)
-    setContacts(data.fieldLog.contacts)
-    setPresentations(data.fieldLog.presentations)
-    setNewMembers(data.fieldLog.newMembers)
     setNotes(data.notes)
     setInitialized(true)
   }, [data])
 
   const save = useMutation({
-    mutationFn: () =>
-      saveDailyTrackAction({
-        calls,
-        contacts,
-        presentations,
-        newMembers,
-        notes,
-        lang,
-      }),
+    mutationFn: () => saveDailyTrackAction({ notes, lang }),
     onSuccess: async result => {
       if ('error' in result) {
         toast.error(result.error)
@@ -71,19 +51,11 @@ export function DailyTrackPage() {
       }
       toast.success(t('dashboard.dailyTrackSaved'))
       await qc.invalidateQueries({ queryKey: queryKeys.dailyTrack(lang) })
-      await qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     },
     onError: () => toast.error(t('common.error')),
   })
 
-  const setters = {
-    calls: setCalls,
-    contacts: setContacts,
-    presentations: setPresentations,
-    newMembers: setNewMembers,
-  } as const
-
-  const values = { calls, contacts, presentations, newMembers }
+  const actuals = data?.actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
   return (
     <HubPageShell
@@ -115,6 +87,16 @@ export function DailyTrackPage() {
         </p>
       )}
 
+      <Link
+        href="/pipeline"
+        className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-4 py-3 text-sm transition hover:border-brand/30 hover:bg-[var(--bg-subtle)]/70"
+      >
+        <span className="text-[var(--text-2)]">{t('dashboard.dailyTrackPipelineCta')}</span>
+        <ExternalLink className="h-4 w-4 shrink-0 text-brand" strokeWidth={2} />
+      </Link>
+
+      <p className="text-xs leading-relaxed text-[var(--text-3)]">{t('dashboard.dailyTrackAutoHint')}</p>
+
       <section className="space-y-3">
         {isLoading && !initialized ? (
           <div className="space-y-3">
@@ -123,17 +105,16 @@ export function DailyTrackPage() {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {METRIC_KEYS.map(({ key, field, labelKey }) => {
+          <div className={clsx('flex flex-col gap-3', isFetching && 'opacity-80')}>
+            {METRIC_KEYS.map(({ key, labelKey }) => {
               const target = progress?.hasGoal ? progress.targets[key] : 0
               return (
-                <DailyMetricRow
-                  key={field}
+                <DailyMetricReadonlyRow
+                  key={key}
                   metric={key}
                   label={t(labelKey)}
-                  value={values[field]}
+                  value={actuals[key]}
                   targetLabel={target > 0 ? t('crown.targetSuffix', { target }) : undefined}
-                  onChange={setters[field]}
                 />
               )
             })}
@@ -166,7 +147,7 @@ export function DailyTrackPage() {
           )}
         >
           {save.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {t('common.save')}
+          {t('dashboard.dailyTrackSaveNotes')}
         </button>
       </section>
     </HubPageShell>
