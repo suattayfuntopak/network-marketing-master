@@ -10,7 +10,7 @@ import { HubMonthHero } from '@/lib/ui/hub/HubMonthHero'
 import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/lib/ui/hub/HubSelfActivityGrid'
 import { HubPipelineStageTable } from '@/lib/ui/hub/HubPipelineStageTable'
-import { getHubMonthlyInsightsAction, getHubMonthlySelfAction } from '@/app/(dashboard)/crown/actions'
+import { getHubMonthlySelfAction } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
 import { parsePeriodOffset } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
@@ -28,15 +28,7 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
     placeholderData: keepPreviousData,
   })
 
-  const { data: monthInsights, isLoading: monthInsightsLoading } = useQuery({
-    queryKey: queryKeys.hubMonthlyInsights(offset),
-    queryFn: getHubMonthlyInsightsAction,
-    staleTime: 60_000,
-    placeholderData: keepPreviousData,
-    enabled: offset === 0,
-  })
-
-  const heroLoading = (monthlySelfLoading || (offset === 0 && monthInsightsLoading)) && !monthlySelf
+  const heroLoading = monthlySelfLoading && !monthlySelf
 
   return (
     <HubPageShell
@@ -56,10 +48,10 @@ export function CrownMonthlyPage({ asTab = false }: { asTab?: boolean }) {
         />
         <HubMonthHero
           loginDays={monthlySelf?.loginDays ?? 0}
-          dayOfMonth={monthlySelf?.dayOfMonth ?? monthInsights?.dayOfMonth ?? 1}
-          daysInMonth={monthlySelf?.daysInMonth ?? monthInsights?.daysInMonth ?? 30}
-          monthPct={monthlySelf?.monthPct ?? monthInsights?.monthPct ?? 0}
-          insights={offset === 0 ? monthInsights : undefined}
+          dayOfMonth={monthlySelf?.dayOfMonth ?? 1}
+          daysInMonth={monthlySelf?.daysInMonth ?? 30}
+          monthPct={monthlySelf?.monthPct ?? 0}
+          isCurrentMonth={offset === 0}
           loading={heroLoading}
         />
         <HubCrownFunnelGrid
