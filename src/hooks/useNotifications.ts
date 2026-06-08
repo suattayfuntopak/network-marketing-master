@@ -6,7 +6,7 @@ import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/s
 import { createClient } from '@/lib/supabase/client'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
-import { notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { queryKeys } from '@/lib/query/keys'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { toast } from 'sonner'
@@ -98,10 +98,17 @@ export function useNotifications(options?: { enabled?: boolean }) {
             // 3. Show stunning interactive toast notification
             const title = lang === 'en' ? newNotif.title_en : newNotif.title_tr
             const description = lang === 'en' ? newNotif.description_en : newNotif.description_tr
-            const targetHref = notificationTargetHref(newNotif)
+            const targetHref = notificationTargetHref({
+              type: newNotif.type,
+              candidate_id: newNotif.candidate_id,
+              title_tr: newNotif.title_tr,
+              title_en: newNotif.title_en,
+            })
             const actionLabel = newNotif.candidate_id
               ? t('pagesUi.viewInPipeline')
-              : t('shellUi.view')
+              : isTeamJoinNotification(newNotif)
+                ? t('pagesUi.viewDailySummary')
+                : t('shellUi.view')
 
             toast(title, {
               description,

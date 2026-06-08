@@ -172,7 +172,9 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     if (!member.full_name || linkingMemberId) return
     setLinkingMemberId(member.user_id)
     try {
-      const result = await addTeamMemberAsCandidateAction(ws.workspaceId, member.full_name)
+      const result = await addTeamMemberAsCandidateAction(ws.workspaceId, member.full_name, {
+        memberPhone: member.phone,
+      })
       invalidateHubMetrics(queryClient, ws.workspaceId)
       toast.success(
         result.created ? t('team.linkToPipelineSuccess') : t('team.linkToPipelineExists'),

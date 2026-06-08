@@ -13,6 +13,16 @@ describe('notificationTargetHref', () => {
     expect(notificationTargetHref({ type: 'alert', candidate_id: null })).toBe('/ekip')
   })
 
+  it('routes new partner join to daily summary', () => {
+    expect(
+      notificationTargetHref({
+        type: 'user',
+        candidate_id: null,
+        title_tr: 'Ekibinize yeni ortak katıldı!',
+      }),
+    ).toBe('/bugunku-takibim')
+  })
+
   it('routes calendar without candidate to takvim', () => {
     expect(notificationTargetHref({ type: 'calendar', candidate_id: null })).toBe('/takvim')
   })

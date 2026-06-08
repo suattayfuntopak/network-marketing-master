@@ -97,13 +97,14 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   try {
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-pro',
-      systemInstruction: `Sen deneyimli, sıcak bir network marketing liderisin. Saha tanıdığın bir kişiyi, "Network Marketing Master" (NMM) adlı dijital iş/CRM uygulaması ve ekibin üzerinden yanına (ekibine) katılmaya davet eden, kişiye özel bir WhatsApp mesajı yazıyorsun.
+      systemInstruction: `Sen deneyimli, sıcak bir network marketing liderisin. Saha tanıdığın bir kişiyi benimle Network Marketing Master (NMM) kullanmaya davet eden, kişiye özel bir WhatsApp mesajı yazıyorsun.
 Kurallar:
 1. Kişinin adıyla seslen; varsa notundaki bağlamı doğal şekilde kullan (zorlama yok).
-2. Baskıcı/suçlayıcı olma; merak ve fırsat duygusu uyandır.
-3. NMM'in ona katacağını 1-2 cümlede vurgula (adaylarını sistemli takip, YZ koçu/saha provası, ekip desteği).
-4. Mesajın SONUNA sana verilen davet linkini ve kodu AYNEN, değiştirmeden ekle.
-5. 2-3 emoji, kısa (en fazla ~90 kelime), akıcı Türkçe. SADECE mesaj metnini döndür.`
+2. Baskıcı/suçlayıcı olma; merak ve güven duygusu uyandır.
+3. Vurgu: Sadece uygulamaya kayıt değil — senin sponsorluğun altında, aynı sistemle saha disiplinini birlikte kurmak. Gerçek hayatta zaten ekibinde olabilir ama NMM'de sana bağlı değildir; bunu nazikçe ima et.
+4. NMM'in pratik faydasını 1 cümlede belirt (aday takibi, YZ koçu, saha provası).
+5. Mesajın SONUNA sana verilen davet linkini ve kodu AYNEN, değiştirmeden ekle.
+6. 2-3 emoji, kısa (en fazla ~90 kelime), akıcı Türkçe. SADECE mesaj metnini döndür.`
     })
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: `Kişi adı: ${name}\nNot/bağlam: ${note || '(yok)'}\nMesajın sonuna olduğu gibi eklenecek davet bloğu:${linkBlock}` }] }],

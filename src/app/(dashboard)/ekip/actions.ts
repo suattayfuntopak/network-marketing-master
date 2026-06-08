@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
+import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
 
 /**
  * Resolves profile photo URLs for team members (downlines + workspace members).
@@ -88,10 +88,15 @@ export async function toggleOnboardingStepAction(
   }
 }
 
+type AddTeamMemberAsCandidateOptions = {
+  memberPhone?: string | null
+}
+
 /** Ekip üyesini sponsor boru hattına aday olarak bağla (eşleşme yoksa yeni katildi kaydı). */
 export async function addTeamMemberAsCandidateAction(
   workspaceId: string,
   memberName: string,
+  options?: AddTeamMemberAsCandidateOptions,
 ): Promise<{ candidateId: string; created: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -112,19 +117,26 @@ export async function addTeamMemberAsCandidateAction(
 
   const { data: leaderCandidates, error: candErr } = await supabase
     .from('nmm_candidates')
-    .select('id, full_name, owner_id, stage')
+    .select('id, full_name, owner_id, stage, phone')
     .eq('workspace_id', workspaceId)
     .eq('owner_id', user.id)
 
   if (candErr) throw new Error(candErr.message)
 
-  const existingId = findLeaderCandidateForMember(
-    leaderCandidates ?? [],
-    user.id,
-    trimmedName,
-  )
+  const pool = leaderCandidates ?? []
+  const existingId = findLeaderCandidateForMember(pool, user.id, trimmedName)
   if (existingId) {
     return { candidateId: existingId, created: false }
+  }
+
+  let resolvedPhone = options?.memberPhone?.trim() || null
+  if (!resolvedPhone) {
+    for (const c of pool) {
+      if (scoreMemberCandidateNameMatch(trimmedName, c.full_name) >= 80 && c.phone?.trim()) {
+        resolvedPhone = c.phone.trim()
+        break
+      }
+    }
   }
 
   const { data: inserted, error: insertErr } = await supabase
@@ -137,6 +149,7 @@ export async function addTeamMemberAsCandidateAction(
       note_tr: 'Ekibimden boru hattına eklendi',
       note_en: 'Added from my team to pipeline',
       warmth: 'ilik',
+      ...(resolvedPhone ? { phone: resolvedPhone } : {}),
     })
     .select('id')
     .single()

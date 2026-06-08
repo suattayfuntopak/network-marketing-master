@@ -826,36 +826,6 @@ export async function getHubMonthlyInsightsAction(): Promise<HubMonthlyInsights>
   }
 }
 
-export async function logHubContactAction(
-  workspaceId: string,
-  candidateId: string,
-  actionType: 'call' | 'whatsapp',
-): Promise<void> {
-  const supabase = await createClient()
-  const { user } = await getAuthUser()
-  if (!user) throw new Error('Oturum bulunamadı.')
-
-  const { data: candidate } = await supabase
-    .from('nmm_candidates')
-    .select('id')
-    .eq('id', candidateId)
-    .eq('workspace_id', workspaceId)
-    .eq('owner_id', user.id)
-    .maybeSingle()
-  if (!candidate) throw new Error('Aday bulunamadı.')
-
-  const now = new Date().toISOString()
-  const { error } = await supabase.from('nmm_daily_actions').insert({
-    workspace_id: workspaceId,
-    user_id: user.id,
-    candidate_id: candidateId,
-    action_type: actionType,
-  })
-  if (error) throw new Error(error.message)
-
-  await supabase.from('nmm_candidates').update({ last_contact_at: now }).eq('id', candidateId)
-}
-
 export async function getCrownWorkspaceIdAction(): Promise<string | null> {
   return resolveWorkspaceId()
 }
