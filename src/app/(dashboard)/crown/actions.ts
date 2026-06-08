@@ -22,7 +22,7 @@ import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, istanbulDayStartIso, toCalendarKey } from '@/lib/utils/calendarDates'
 import { fetchFunnelActualsForPeriod } from '@/lib/domain/funnelActuals'
-import { rollingWeekRange, monthRange } from '@/lib/utils/hubPeriodRange'
+import { calendarDayRange, rollingWeekRange, monthRange } from '@/lib/utils/hubPeriodRange'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -381,6 +381,17 @@ export type HubWeeklySelfPayload = {
   pipelineStages: HubPipelineStageCounts
 }
 
+export type HubDailySelfPayload = {
+  hasGoal: boolean
+  dailyTargets: FunnelCounts
+  dailyActuals: FunnelCounts
+  dayActive: boolean
+  calendarKey: string
+  isToday: boolean
+  fieldMetrics: HubSelfFieldMetrics
+  pipelineStages: HubPipelineStageCounts
+}
+
 export type HubMonthlySelfPayload = {
   hasGoal: boolean
   monthlyTargets: FunnelCounts
@@ -614,6 +625,62 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
     callsGap,
     loginDays: loginInfo.count,
     weekActive: loginInfo.weekActive,
+    fieldMetrics,
+    pipelineStages,
+  }
+}
+
+export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPayload> {
+  const progress = await getDailyProgressAction()
+  const { user } = await getAuthUser()
+  const workspaceId = await resolveWorkspaceId()
+  const range = calendarDayRange(offset)
+  const todayKey = todayCalendarKey()
+
+  if (!user) {
+    return {
+      hasGoal: false,
+      dailyTargets: EMPTY_FUNNEL,
+      dailyActuals: EMPTY_FUNNEL,
+      dayActive: false,
+      calendarKey: range.calendarKey,
+      isToday: range.calendarKey === todayKey,
+      fieldMetrics: EMPTY_FIELD_METRICS,
+      pipelineStages: {},
+    }
+  }
+
+  const since = range.sinceIso
+  const until = range.untilIso
+  const [dailyActuals, loginInfo, fieldMetrics, pipelineStages] = await Promise.all([
+    funnelActualsSince(user.id, since, until, range.calendarKey, range.calendarKey),
+    loginDaysInWindow(user.id, since, until, range.date, range.date),
+    selfFieldMetricsSince(user.id, workspaceId, since, until),
+    pipelineStageCountsForUser(user.id, workspaceId),
+  ])
+
+  const dayActive = loginInfo.weekActive[0] ?? false
+
+  if (!progress.hasGoal) {
+    return {
+      hasGoal: false,
+      dailyTargets: EMPTY_FUNNEL,
+      dailyActuals,
+      dayActive,
+      calendarKey: range.calendarKey,
+      isToday: range.calendarKey === todayKey,
+      fieldMetrics,
+      pipelineStages,
+    }
+  }
+
+  return {
+    hasGoal: true,
+    dailyTargets: progress.targets,
+    dailyActuals,
+    dayActive,
+    calendarKey: range.calendarKey,
+    isToday: range.calendarKey === todayKey,
     fieldMetrics,
     pipelineStages,
   }

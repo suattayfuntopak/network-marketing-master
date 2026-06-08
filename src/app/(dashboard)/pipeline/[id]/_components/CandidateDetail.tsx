@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { ArrowLeft, Phone, Pencil, Bot, Lock } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useCandidateDetail, useUpdateCandidate, useDeleteCandidate } from '@/hooks/useCandidates'
+import { useCandidateDetail, useUpdateCandidate, useDeleteCandidate, useMarkContacted } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { EditCandidateSheet } from '../../_components/EditCandidateSheet'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -58,6 +58,7 @@ export function CandidateDetail({ candidateId }: Props) {
   const { data: c, isLoading: cLoading } = useCandidateDetail(ws?.workspaceId, candidateId)
   const update = useUpdateCandidate(ws?.workspaceId ?? '')
   const del = useDeleteCandidate(ws?.workspaceId ?? '')
+  const markContacted = useMarkContacted(ws?.workspaceId ?? '')
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   const parsed = c
@@ -229,6 +230,7 @@ export function CandidateDetail({ candidateId }: Props) {
                   href={waLink}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => markContacted.mutate({ id: candidateId, actionType: 'whatsapp' })}
                   className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
@@ -242,6 +244,7 @@ export function CandidateDetail({ candidateId }: Props) {
               {c.phone ? (
                 <a
                   href={`tel:${c.phone}`}
+                  onClick={() => markContacted.mutate({ id: candidateId, actionType: 'call' })}
                   className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
                 >
                   <Phone className="h-4 w-4" strokeWidth={1.75} />

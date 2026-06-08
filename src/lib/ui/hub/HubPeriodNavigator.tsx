@@ -4,6 +4,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
+  calendarDayRange,
+  formatDayLabel,
   formatMonthLabel,
   formatWeekRangeLabel,
   monthRange,
@@ -12,7 +14,7 @@ import {
 import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
 
 type HubPeriodNavigatorProps = {
-  mode: 'week' | 'month'
+  mode: 'day' | 'week' | 'month'
   accentClass?: string
 }
 
@@ -23,28 +25,20 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
   const prevOffset = offset - 1
   const nextOffset = offset + 1
 
-  const current =
-    mode === 'week'
-      ? rollingWeekRange(offset)
-      : monthRange(offset)
-  const prev =
-    mode === 'week'
-      ? rollingWeekRange(prevOffset)
-      : monthRange(prevOffset)
-  const next =
-    mode === 'week'
-      ? rollingWeekRange(nextOffset)
-      : monthRange(nextOffset)
-
-  function labelFor(_o: number, start: Date, end: Date) {
-    if (mode === 'week') return formatWeekRangeLabel(start, end, lang)
-    return formatMonthLabel(start, lang)
+  function labelFor(o: number) {
+    if (mode === 'day') {
+      const r = calendarDayRange(o)
+      return formatDayLabel(r.date, lang, o)
+    }
+    if (mode === 'week') {
+      const r = rollingWeekRange(o)
+      return formatWeekRangeLabel(r.startDate, r.endDate, lang)
+    }
+    const r = monthRange(o)
+    return formatMonthLabel(r.startDate, lang)
   }
 
-  const currentLabel =
-    mode === 'week'
-      ? formatWeekRangeLabel(current.startDate, current.endDate, lang)
-      : formatMonthLabel(current.startDate, lang)
+  const currentLabel = labelFor(offset)
 
   return (
     <div className="flex w-full items-stretch gap-1.5 sm:gap-2">
@@ -63,7 +57,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
         className="min-w-0 flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/60 px-2 py-2.5 text-center transition hover:border-brand/25 hover:bg-[var(--bg-subtle)] active:scale-[0.99] sm:px-3"
       >
         <p className="truncate text-[11px] font-semibold text-[var(--text-3)] sm:text-xs">
-          {labelFor(prevOffset, prev.startDate, prev.endDate)}
+          {labelFor(prevOffset)}
         </p>
       </button>
 
@@ -82,7 +76,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
         className="min-w-0 flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/60 px-2 py-2.5 text-center transition hover:border-brand/25 hover:bg-[var(--bg-subtle)] active:scale-[0.99] sm:px-3"
       >
         <p className="truncate text-[11px] font-semibold text-[var(--text-3)] sm:text-xs">
-          {labelFor(nextOffset, next.startDate, next.endDate)}
+          {labelFor(nextOffset)}
         </p>
       </button>
 

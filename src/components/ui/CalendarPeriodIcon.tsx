@@ -1,13 +1,13 @@
 import { clsx } from 'clsx'
 
 type CalendarPeriodIconProps = {
-  days: 7 | 30
+  days: 1 | 7 | 30
   className?: string
 }
 
 /** Ajanda çerçevesi — üst şerit + halkalar, gövdede belirgin dönem numarası (7 / 30). */
 export function CalendarPeriodIcon({ days, className }: CalendarPeriodIconProps) {
-  const fontSize = days === 30 ? 6.5 : 8.5
+  const fontSize = days === 30 ? 6.5 : days === 7 ? 8.5 : 9.5
 
   return (
     <svg

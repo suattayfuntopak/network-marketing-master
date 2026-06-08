@@ -1,13 +1,13 @@
 import type { QueryClient } from '@tanstack/react-query'
 import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
-import { getDailyTrackAction } from '@/app/(dashboard)/bugunku-takibim/actions'
 import {
   getCrownEntriesPageAction,
   getCrownFirst30PageAction,
   getCrownMonthlyPageAction,
   getCrownVideoPageAction,
   getCrownWeeklyPageAction,
+  getHubDailySelfAction,
   getHubMonthlyInsightsAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
@@ -63,6 +63,11 @@ export async function prefetchHubMetrics(
   ws: WsSlice,
 ) {
   const tasks: Promise<void>[] = [
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubDailySelf(0),
+      queryFn: () => getHubDailySelfAction(0),
+      staleTime: METRICS_STALE,
+    }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubWeeklySelf(0),
       queryFn: () => getHubWeeklySelfAction(0),
@@ -134,16 +139,6 @@ export async function prefetchDashboardMetrics(
       queryFn: () => getCrownVideoPageAction(workspaceId),
       staleTime: METRICS_STALE,
     }),
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.dailyTrack('tr'),
-      queryFn: () => getDailyTrackAction('tr'),
-      staleTime: METRICS_STALE,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.dailyTrack('en'),
-      queryFn: () => getDailyTrackAction('en'),
-      staleTime: METRICS_STALE,
-    }),
     prefetchHubMetrics(queryClient, workspaceId, ws),
   ])
 
@@ -206,13 +201,8 @@ export function prefetchRouteMetrics(
 
   if (href === '/bugunku-takibim') {
     void queryClient.prefetchQuery({
-      queryKey: queryKeys.dailyTrack('tr'),
-      queryFn: () => getDailyTrackAction('tr'),
-      staleTime: METRICS_STALE,
-    })
-    void queryClient.prefetchQuery({
-      queryKey: queryKeys.dailyTrack('en'),
-      queryFn: () => getDailyTrackAction('en'),
+      queryKey: queryKeys.hubDailySelf(0),
+      queryFn: () => getHubDailySelfAction(0),
       staleTime: METRICS_STALE,
     })
   }

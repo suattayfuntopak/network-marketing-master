@@ -14,6 +14,14 @@ export type RollingWeekRange = {
   endDate: Date
 }
 
+export type CalendarDayRange = {
+  offset: number
+  sinceIso: string
+  untilIso: string
+  date: Date
+  calendarKey: string
+}
+
 export type MonthRange = {
   offset: number
   sinceIso: string
@@ -58,6 +66,21 @@ export function rollingWeekRange(offset: number): RollingWeekRange {
   }
 }
 
+/** offset 0 = bugün, -1 = dün, +1 = yarın */
+export function calendarDayRange(offset: number): CalendarDayRange {
+  const today = fromCalendarKey(todayCalendarKey())
+  const date = new Date(today)
+  date.setDate(today.getDate() + offset)
+  const calendarKey = toCalendarKey(date)
+  return {
+    offset,
+    sinceIso: istanbulDayStartIso(calendarKey),
+    untilIso: istanbulDayEndIso(calendarKey),
+    date: startOfDay(date),
+    calendarKey,
+  }
+}
+
 /** offset 0 = içinde bulunulan ay */
 export function monthRange(offset: number): MonthRange {
   const now = new Date()
@@ -94,6 +117,14 @@ export function formatWeekRangeLabel(start: Date, end: Date, lang: string): stri
 
 export function formatMonthLabel(date: Date, lang: string): string {
   return date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { month: 'long', year: 'numeric' })
+}
+
+export function formatDayLabel(date: Date, lang: string, offset: number): string {
+  if (offset === 0) return lang === 'en' ? 'Today' : 'Bugün'
+  if (offset === -1) return lang === 'en' ? 'Yesterday' : 'Dün'
+  if (offset === 1) return lang === 'en' ? 'Tomorrow' : 'Yarın'
+  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
+  return date.toLocaleDateString(locale, { day: 'numeric', month: 'long' })
 }
 
 export function parsePeriodOffset(raw: string | null): number {

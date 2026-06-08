@@ -254,8 +254,13 @@ export function useMarkContacted(workspaceId: string) {
         }),
       ])
     },
-    onSuccess: () => {
+    onSuccess: (_data, vars) => {
       invalidateCandidateQueries(qc, workspaceId)
+      qc.invalidateQueries({ queryKey: ['hub', 'daily-self'] })
+      qc.invalidateQueries({ queryKey: ['hub', 'weekly-self'] })
+      qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
+      qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
+      qc.invalidateQueries({ queryKey: ['activity', vars.id] })
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
   })

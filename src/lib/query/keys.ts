@@ -8,9 +8,10 @@ export const queryKeys = {
   /** @deprecated use team() — invalidation uyumu için alias */
   members: (workspaceId: string) => ['team', workspaceId] as const,
   dailyAiUsage: () => ['daily-ai-usage'] as const,
-  /** Hedef → Yol Haritası → Günlük Takip — tek konsolide sorgu (prefetch'lenir) */
+  /** Hedef → Yol Haritası — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
-  dailyTrack: (lang: 'tr' | 'en' = 'tr') => ['daily-track', lang] as const,
+  /** Günlük Özet hub — haftalık/aylık ile aynı veri modeli */
+  hubDailySelf: (offset = 0) => ['hub', 'daily-self', offset] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
   hubWeeklySelf: (offset = 0) => ['hub', 'weekly-self', offset] as const,
   hubMonthlySelf: (offset = 0) => ['hub', 'monthly-self', offset] as const,
