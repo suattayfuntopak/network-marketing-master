@@ -133,6 +133,7 @@ export function useMobileChromeVisibility(pathname: string) {
       mq.removeEventListener('change', onMqChange)
       if (scrollTimeout.current) clearTimeout(scrollTimeout.current)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return visible

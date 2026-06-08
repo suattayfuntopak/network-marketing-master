@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Search, Users, BookOpen, ChevronRight, CornerDownRight, ArrowLeft, MessageCircleQuestion } from 'lucide-react'
+import { Search, Users, BookOpen, ChevronRight, ArrowLeft, MessageCircleQuestion } from 'lucide-react'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -27,9 +27,8 @@ export function SearchPageContent() {
   const [searchInput, setSearchInput] = useState(query)
   const trainingData = getTrainingData(lang)
 
-  useEffect(() => {
-    setSearchInput(query)
-  }, [query])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setSearchInput(query) }, [query])
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault()

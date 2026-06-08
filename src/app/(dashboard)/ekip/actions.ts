@@ -164,6 +164,54 @@ export async function saveCoachingTemplatesAction(
     .eq('id', workspaceId)
 }
 
+/** Per-member coaching templates stored in nmm_workspace_members. */
+export async function getMemberCoachingTemplatesAction(
+  workspaceId: string,
+  targetUserId: string,
+): Promise<CoachingTemplates> {
+  const { user } = await getAuthUser()
+  if (!user) return { active: '', recent: '', silent: '' }
+
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('nmm_workspace_members')
+    .select('coaching_templates')
+    .eq('workspace_id', workspaceId)
+    .eq('user_id', targetUserId)
+    .maybeSingle()
+
+  const raw = data?.coaching_templates as Record<string, string> | null
+  return {
+    active: raw?.active ?? '',
+    recent: raw?.recent ?? '',
+    silent: raw?.silent ?? '',
+  }
+}
+
+export async function saveMemberCoachingTemplatesAction(
+  workspaceId: string,
+  targetUserId: string,
+  templates: CoachingTemplates,
+): Promise<void> {
+  const { user } = await getAuthUser()
+  if (!user) return
+
+  const supabase = await createClient()
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (ws?.owner_id !== user.id && !isSuperAdmin(user)) return
+
+  await supabase
+    .from('nmm_workspace_members')
+    .update({ coaching_templates: templates })
+    .eq('workspace_id', workspaceId)
+    .eq('user_id', targetUserId)
+}
+
 /**
  * Resolves profile photo URLs for team members (downlines + workspace members).
  * Uses auth metadata when workspace_members.avatar_url is null on the sponsor side.

@@ -51,6 +51,7 @@ export function useWorkspace() {
     ) {
       initMutation.mutate()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.isFetched, query.data, query.isLoading, initMutation.isPending, initMutation.isSuccess])
 
   const data = initMutation.data ?? query.data ?? undefined

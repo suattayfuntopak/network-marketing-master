@@ -21,12 +21,11 @@ export function SympatheticPopup({
   message,
 }: SympatheticPopupProps) {
   const { lang } = useTranslation()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock(open)
 
   useEffect(() => {
-    setMounted(true)
     if (open) {
       const onKey = (e: KeyboardEvent) => {
         if (e.key === 'Escape' || e.key === 'Enter') onClose()

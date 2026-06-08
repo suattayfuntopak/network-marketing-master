@@ -15,13 +15,11 @@ interface ConfirmDeleteModalProps {
 
 export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDeleteModalProps) {
   const { t } = useTranslation()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock()
 
-  // Escape tuşuyla kapat
   useEffect(() => {
-    setMounted(true)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onCancel()
     }

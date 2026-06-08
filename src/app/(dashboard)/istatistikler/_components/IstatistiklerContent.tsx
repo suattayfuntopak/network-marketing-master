@@ -43,7 +43,7 @@ const StatsSuperAdminSections = dynamic(
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
 export function IstatistiklerContent() {
-  const { t, lang } = useTranslation()
+  const { t } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates = [], isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { data: usage } = useAIUsage()

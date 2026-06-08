@@ -20,6 +20,7 @@ export function WelcomeCard({ candidateCount }: { candidateCount: number }) {
 
   useEffect(() => {
     if (!userId || typeof window === 'undefined') return
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setDismissed(localStorage.getItem(`${DISMISS_PREFIX}${userId}`) === '1')
   }, [userId])
 

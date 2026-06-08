@@ -31,7 +31,6 @@ export function OdemeClient() {
   const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'plus' | 'pro' | null>(null)
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
 
@@ -39,7 +38,6 @@ export function OdemeClient() {
 
   const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)
-    setSelectedPlan(plan)
     toast.info(t('paymentPage.preparingCheckout'))
 
     try {
@@ -95,7 +93,6 @@ export function OdemeClient() {
         })
       )
       setLoading(false)
-      setSelectedPlan(null)
     }
   }
 

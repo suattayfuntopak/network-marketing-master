@@ -79,7 +79,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
     return () => {
       active = false
     }
-  }, [memberName, stepId, lang, refetchUsage])
+  }, [memberName, stepId, lang, refetchUsage, t])
 
   const handleCopy = () => {
     if (!message) return

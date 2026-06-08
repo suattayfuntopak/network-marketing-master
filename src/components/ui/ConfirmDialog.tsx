@@ -27,12 +27,11 @@ export function ConfirmDialog({
   onCancel,
 }: ConfirmDialogProps) {
   const { t } = useTranslation()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock()
 
   useEffect(() => {
-    setMounted(true)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onCancel()
     }

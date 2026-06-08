@@ -1,5 +1,10 @@
 # Hot Log
 
+## 2026-06-09 — Deploy fix: NotificationPreferences tip uyumu ✅
+
+- Vercel `0c01dc3` build: `overdueEmailFrequency` hook'ta vardı, `NotificationPreferences` tipinde yoktu
+- Push `c6175d0`: `notificationPreferences.ts`, `notificationPrefsStorage.ts`, `database.types.ts`, migration `068_notification_email_frequency.sql`
+
 ## 2026-06-09 — Lint sıfır + HubAllTimeHero joinedAt + Overdue e-posta frekans ✅
 
 ### 3. Lint Borcu — 0 Error/Warning

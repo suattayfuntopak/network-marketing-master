@@ -7,7 +7,6 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
 import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
@@ -22,7 +21,6 @@ type Props = {
 export function AddTrainingModal({ open, onClose, onAdd }: Props) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
-  const { data: aiUsage } = useAIUsage()
   const [isPending, startTransition] = useTransition()
 
   const [newBaslik, setNewBaslik] = useState('')

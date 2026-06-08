@@ -194,15 +194,7 @@ export async function approveRequestAction(
     throw new Error('İçerik onaylanırken hata oluştu: ' + updateErr.message)
   }
 
-  // Fetch user language settings or default to 'tr'
   const userLang: 'tr' | 'en' = 'tr'
-  try {
-    const { data: profile } = await admin
-      .from('nmm_workspace_members')
-      .select('joined_at') // arbitrary, let's just assume we check preference or default
-      .eq('user_id', row.user_id)
-      .limit(1)
-  } catch {}
 
   const editedRecord = (typeof editedData === 'object' && editedData !== null && !Array.isArray(editedData))
     ? (editedData as Record<string, unknown>)

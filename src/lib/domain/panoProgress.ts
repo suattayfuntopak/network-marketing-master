@@ -36,7 +36,7 @@ export function getPanoLauncherBadge(
   ctx: PanoBadgeContext,
   t: (key: string, vars?: Record<string, string | number>) => string,
 ): string | undefined {
-  const { progress, videoSummary, weekly, monthly, sahaRadarBadgeCount } = ctx
+  const { progress, videoSummary, monthly, sahaRadarBadgeCount } = ctx
 
   if (href.includes('/canli-egitim') && videoSummary && videoSummary.total > 0) {
     return t('dashboard.panoBadgeVideo', {

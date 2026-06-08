@@ -261,8 +261,6 @@ export function ProvaForm() {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isPending, setIsPending] = useState(false)
-  const [remainingUsage, setRemainingUsage] = useState<number | null>(null)
-
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { isSuperAdmin, roleplayUsed, limits } = useAILimits()
@@ -337,11 +335,6 @@ export function ProvaForm() {
         setMessages(messages)
       } else if (result.candidate_reply) {
         invalidateTeamAndAIUsage(qc, ws?.workspaceId)
-
-        // Set remaining limits if returned
-        if (typeof result.remaining === 'number') {
-          setRemainingUsage(result.remaining)
-        }
 
         // Append YZK feedback + candidate response
         setMessages(prev => [

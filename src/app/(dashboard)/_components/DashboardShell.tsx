@@ -17,11 +17,9 @@ export function setNavDir(dir: 'forward' | 'back') {
 const SIDEBAR_KEY = 'nmm_sidebar_collapsed'
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false)
-
-  useEffect(() => {
-    setCollapsed(localStorage.getItem(SIDEBAR_KEY) === 'true')
-  }, [])
+  const [collapsed, setCollapsed] = useState(() =>
+    typeof window !== 'undefined' && localStorage.getItem(SIDEBAR_KEY) === 'true'
+  )
   const [pendingHref, setPendingHref] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()

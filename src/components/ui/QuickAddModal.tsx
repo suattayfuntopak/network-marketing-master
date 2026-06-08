@@ -20,7 +20,7 @@ interface QuickAddModalProps {
 }
 
 export function QuickAddModal({ onClose }: QuickAddModalProps) {
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const addCandidate = useAddCandidate(ws?.workspaceId || '')
@@ -33,7 +33,6 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   useBodyScrollLock()
 
   useEffect(() => {
-    setMounted(true)
     const originalScrollY = window.scrollY
     
     // Focus the input automatically on mount without scrolling viewport Y

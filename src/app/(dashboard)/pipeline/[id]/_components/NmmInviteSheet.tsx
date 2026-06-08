@@ -30,6 +30,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
 
   useEffect(() => {
     if (!hasAiFieldAccess) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setLoading(false)
       openUpgrade('ai_field')
       return

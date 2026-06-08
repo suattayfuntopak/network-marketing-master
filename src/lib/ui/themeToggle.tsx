@@ -19,14 +19,11 @@ export function applyThemeToDocument(mode: ThemeMode): void {
 
 export function useThemeCycle() {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [pendingMode, setPendingMode] = useState<ThemeMode | null>(null)
 
-  useEffect(() => setMounted(true), [])
-
-  useEffect(() => {
-    setPendingMode(null)
-  }, [theme])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPendingMode(null) }, [theme])
 
   const displayMode = pendingMode ?? resolveThemeMode(theme)
 
