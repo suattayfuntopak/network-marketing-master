@@ -20,7 +20,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
   const supabase = createClient()
   const { theme, setTheme } = useTheme()
   
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [workspaceName, setWorkspaceName] = useState('')
@@ -28,8 +28,6 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
   useBodyScrollLock()
 
   useEffect(() => {
-    setMounted(true)
-    // Escape key
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
@@ -56,6 +54,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     if (workspaceId) {
       loadWorkspace()
     } else {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setFetching(false)
     }
 

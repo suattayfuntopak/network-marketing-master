@@ -11,10 +11,9 @@ import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatfor
 import {
   Crown, Users, ShieldCheck, Search,
   Mail, Sparkles, UserPlus, BookOpen, MessageSquare,
-  Plus, Loader2, X, ArrowUpRight, CheckCircle2, Trash2
+  Plus, Loader2, ArrowUpRight, CheckCircle2, Trash2
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
@@ -232,7 +231,7 @@ export function PlatformYonetimContent() {
       setDeleteCountdown(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          executeDeleteUser(ownerId, email)
+          executeDeleteUser(ownerId)
           return 0
         }
         return prev - 1
@@ -250,9 +249,9 @@ export function PlatformYonetimContent() {
     toast.info(t('platformPage.userDeletionCancelled'))
   }
 
-  async function executeDeleteUser(ownerId: string, email: string) {
+  async function executeDeleteUser(ownerId: string) {
     try {
-      await deleteUserAction(ownerId, email)
+      await deleteUserAction(ownerId)
       toast.success(t('platformPage.userDeleted'))
       refreshPlatform()
     } catch (err: unknown) {

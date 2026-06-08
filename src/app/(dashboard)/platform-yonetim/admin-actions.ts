@@ -111,7 +111,7 @@ export async function addIndependentAsCandidateAction(
   return { success: true }
 }
 
-export async function deleteUserAction(ownerId: string, _email: string): Promise<{ success: boolean }> {
+export async function deleteUserAction(ownerId: string): Promise<{ success: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 

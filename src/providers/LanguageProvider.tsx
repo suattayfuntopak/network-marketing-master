@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { tr } from '@/lib/translations/tr'
 import { en } from '@/lib/translations/en'
 import { platformSection } from '@/lib/translations/sections/platform'
@@ -65,23 +65,12 @@ const dictionaries = {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<LangType>('tr')
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    // Read from localStorage on mount
+  const [lang, setLangState] = useState<LangType>(() => {
+    if (typeof window === 'undefined') return 'tr'
     const saved = localStorage.getItem('nmm_lang') as LangType | null
-    if (saved === 'tr' || saved === 'en') {
-      setLangState(saved)
-    } else {
-      // Check browser language
-      const navLang = navigator.language.slice(0, 2)
-      if (navLang === 'en') {
-        setLangState('en')
-      }
-    }
-    setMounted(true)
-  }, [])
+    if (saved === 'tr' || saved === 'en') return saved
+    return navigator.language.slice(0, 2) === 'en' ? 'en' : 'tr'
+  })
 
   function setLang(newLang: LangType) {
     setLangState(newLang)

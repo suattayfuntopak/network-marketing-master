@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import Image from 'next/image'
 import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { useQueryClient } from '@tanstack/react-query'
@@ -19,7 +20,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
   const [uploadingAvatar, setUploadingAvatar] = useState(false)
@@ -36,7 +37,6 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   useBodyScrollLock()
 
   useEffect(() => {
-    setMounted(true)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
     }
@@ -227,9 +227,12 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             <div className="flex flex-col items-center gap-3 pb-2">
               <div className="relative">
                 {avatarPreview ? (
-                  <img
+                  <Image
                     src={avatarPreview}
                     alt="Profil fotoğrafı"
+                    width={80}
+                    height={80}
+                    unoptimized
                     className="h-20 w-20 rounded-full object-cover ring-2 ring-[#534AB7]/30"
                   />
                 ) : (

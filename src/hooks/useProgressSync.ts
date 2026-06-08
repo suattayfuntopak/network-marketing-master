@@ -54,6 +54,29 @@ export function useProgressSync() {
   const [isLoading, setIsLoading] = useState(true)
   const loadedForRef = useRef<string | null>(null)
 
+  const saveToSupabase = async (
+    workspaceId: string,
+    uid: string,
+    rt: Set<string>,
+    ft: Set<string>,
+    ro: Set<number>,
+    fo: Set<number>
+  ) => {
+    const supabase = createClient()
+    await supabase.from('nmm_user_progress').upsert(
+      {
+        user_id: uid,
+        workspace_id: workspaceId,
+        read_trainings: Array.from(rt),
+        fav_trainings: Array.from(ft),
+        read_objections: Array.from(ro),
+        fav_objections: Array.from(fo),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id' }
+    )
+  }
+
   // Kullanıcı (userId) belli olunca: önce userId-izole local cache, sonra Supabase.
   useEffect(() => {
     if (!userId || !ws?.workspaceId) return
@@ -162,29 +185,6 @@ export function useProgressSync() {
 
     syncFromSupabase()
   }, [userId, ws?.workspaceId])
-
-  const saveToSupabase = async (
-    workspaceId: string,
-    uid: string,
-    rt: Set<string>,
-    ft: Set<string>,
-    ro: Set<number>,
-    fo: Set<number>
-  ) => {
-    const supabase = createClient()
-    await supabase.from('nmm_user_progress').upsert(
-      {
-        user_id: uid,
-        workspace_id: workspaceId,
-        read_trainings: Array.from(rt),
-        fav_trainings: Array.from(ft),
-        read_objections: Array.from(ro),
-        fav_objections: Array.from(fo),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' }
-    )
-  }
 
   const handleUpdate = (
     type: 'readTraining' | 'favTraining' | 'readObjection' | 'favObjection',

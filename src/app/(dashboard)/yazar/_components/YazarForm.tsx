@@ -2,7 +2,6 @@
 
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
 import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
-import { clsx } from 'clsx'
 import { generateMessageAction, translateTextAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -74,23 +73,6 @@ function saveToHistory(userId: string | undefined | null, entry: HistoryEntry) {
   if (!userId) return
   const updated = [entry, ...loadHistory(userId)].slice(0, MAX_HISTORY)
   writeUserScopedJSON(HISTORY_BASE, userId, updated)
-}
-
-function Pill({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={clsx(
-        'rounded-full border px-3.5 py-1.5 text-sm font-medium transition whitespace-nowrap',
-        active
-          ? 'border-[#0F6E56] bg-[#E1F5EE] text-[#0F6E56]'
-          : 'border-[var(--border)] text-[var(--text-2)] hover:border-[#0F6E56]/50 hover:text-[var(--text-1)]'
-      )}
-    >
-      {children}
-    </button>
-  )
 }
 
 interface Props {
@@ -273,9 +255,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
 
   // Kullanıcı belli olunca userId-izole history'yi yükle.
-  useEffect(() => {
-    setHistory(loadHistory(ws?.userId))
-  }, [ws?.userId])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setHistory(loadHistory(ws?.userId)) }, [ws?.userId])
 
   useEffect(() => {
     if (initialName && candidates.length > 0 && !prefilledRef.current) {
@@ -283,6 +264,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         c => c.full_name.toLowerCase() === initialName.toLowerCase()
       )
       if (match) {
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
         fetchAndFormatCandidateContext(match)
       } else if (cleanInitialNote) {
         setContext(cleanInitialNote)
@@ -301,7 +283,6 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     return () => document.removeEventListener('mousedown', onOutside)
   }, [])
 
-  // Yeni mesaj üretilince history'ye kaydet ve usage query'sini yenile
   useEffect(() => {
     if (state.message && state.message !== prevMessageRef.current) {
       prevMessageRef.current = state.message
@@ -317,12 +298,13 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       saveToHistory(ws?.userId, entry)
       setHistory(loadHistory(ws?.userId))
     }
-  }, [state.message, selected, query, messageType, qc, lang, ws?.userId])
+  }, [state.message, selected, query, messageType, qc, lang, ws?.userId, ws?.workspaceId])
 
   // Handle global language toggle auto-translation
   useEffect(() => {
     if (displayedMessage && lang !== generatedLang) {
       let active = true
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setTranslating(true)
       
       translateTextAction(displayedMessage, lang)

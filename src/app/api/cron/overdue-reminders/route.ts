@@ -110,15 +110,20 @@ export async function GET(request: NextRequest) {
     // Fetch email preferences
     const { data: prefs } = await supabase
       .from('nmm_notification_preferences')
-      .select('user_id, email_enabled')
+      .select('user_id, email_enabled, overdue_email_frequency')
       .in('user_id', Object.keys(sentByOwner))
 
     const emailEnabledSet = new Set(
       (prefs ?? []).filter(p => p.email_enabled).map(p => p.user_id),
     )
+    const freqMap: Record<string, string> = {}
+    for (const p of prefs ?? []) freqMap[p.user_id] = p.overdue_email_frequency ?? 'daily'
+
+    const isMonday = now.getDay() === 1
 
     for (const [ownerId, candidates] of Object.entries(sentByOwner)) {
       if (!emailEnabledSet.has(ownerId)) continue
+      if (freqMap[ownerId] === 'weekly' && !isMonday) continue
       const ws = activeWs.find(w => w.owner_id === ownerId)
       if (!ws) continue
 

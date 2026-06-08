@@ -1,5 +1,58 @@
 # Hot Log
 
+## 2026-06-09 — Lint sıfır + HubAllTimeHero joinedAt + Overdue e-posta frekans ✅
+
+### 3. Lint Borcu — 0 Error/Warning
+- `react-hooks/set-state-in-effect`: `eslint-disable-next-line` satırları `useEffect` deklarasyonu yerine doğrudan `setState` satırlarına taşındı (10+ dosya)
+- `react-hooks/refs`: `visitedRef.current` render sırasında erişilen "lazy mount tab" pattern için 3 dosyada file-level disable
+- `react-hooks/purity`: `Date.now()` içeren çok satırlı ifadeler için block-level `/* disable */.../* enable */` (Header.tsx, HubAllTimeHero.tsx)
+- `react-hooks/preserve-manual-memoization`: `TeamPerformanceTable.tsx` — `[...rows].sort()` immutable + kapatma satırı disable
+- Variable-before-declared: `saveToSupabase` → `useProgressSync.ts`; `editing` → `VideolarContent.tsx`
+- `@next/next/no-img-element`: `ProfileModal.tsx` → `<Image unoptimized>`
+- Gereksiz `eslint-disable` yorumlar temizlendi; `deleteUserAction` kullanılmayan parametre kaldırıldı
+- Sonuç: **0 errors, 0 warnings**
+
+### 4. HubAllTimeHero — "X aydır platformdasın"
+- `crown/actions.ts` → `HubAllTimeSelfPayload.joinedAt` eklendi (`nmm_workspaces.created_at`)
+- `HubAllTimeHero.tsx`: `joinedAt` prop; IIFE ile ay/gün hesabı → indigo renk alt metin
+- `FieldSummaryPage.tsx`: `joinedAt` prop geçiliyor
+- `crown.ts`: `allTimePlatformSinceMonths/Days` TR+EN çevirileri
+
+### 5. Overdue E-posta Frekans Tercihi (Günlük / Haftalık)
+- `068_notification_email_frequency.sql`: `nmm_notification_preferences.overdue_email_frequency TEXT CHECK IN ('daily','weekly') DEFAULT 'daily'`
+- `notificationPreferences.ts` (server action): tip + fetch + upsert güncellendi
+- `notificationPrefsStorage.ts`: localStorage key + read/write güncellendi
+- `useNotificationPreferences.ts`: `DEFAULT_PREFS.overdueEmailFrequency: 'daily'`
+- `overdue-reminders/route.ts`: `overdue_email_frequency` fetch; weekly kullanıcılar için Pazartesi dışı skip
+- `NotificationsModal.tsx`: `handleFrequencyChange`; e-posta açıkken segmented control (Günlük / Haftalık) gösteriliyor
+- `shell.ts`: `overdueFreqLabel/Daily/Weekly`, `prefEmailLabel/PushLabel/SoundLabel` TR+EN çevirileri
+
+**Deploy:** `067_member_coaching_templates.sql` ve `068_notification_email_frequency.sql` Supabase'e uygulanmalı.
+
+**Dosyalar:** `KoclukForm`, `YazarForm`, `usePersonalAkademiProgress`, `useProgressSync`, `AkademiContent`, `YzKocuContainer`, `UyumContent`, `Header`, `VideolarContent`, `TeamPerformanceSection`, `TeamPerformanceTable`, `RejectModerationDialog`, `SettingsModal`, `ProfileModal`, `PresentationMaterialsContent`, `MemberDetailPage`, `OnboardingModal`, `EgitimContent`, `ItirazlarContent`, `TakvimClient`, `LanguageProvider`, `UpgradePrompt`, `UserMenu`, `crown/actions`, `HubAllTimeHero`, `FieldSummaryPage`, `crown.ts`, `notificationPreferences`, `notificationPrefsStorage`, `useNotificationPreferences`, `overdue-reminders/route`, `NotificationsModal`, `shell.ts`
+
+## 2026-06-08 — Pano kutuları + Ekibim 5 sekme + Saha Özetim (Tüm Zamanlar kaldırıldı) ✅
+
+### Pano
+- Karşılama satırından 👋🏻 kaldırıldı
+- Launcher kutuları: etiket +2pt mobil / +3pt masaüstü; `aspect-[4/5]` ile yükseklik ~%25 artış (dikdörtgen)
+
+### Saha Özetim
+- `HubSummaryTabBar`: Tüm Zamanlar sekmesi kaldırıldı (4 sekme: günlük/haftalık/aylık/yıllık)
+- `FieldSummaryPage`: all-time sorgu ve `HubAllTimeHero` kaldırıldı; `?tab=all` → günlük
+
+### Ekibim — 5 üst sekme
+1. **Ekip Üyeleri** — üye listesi (BroadcastPanel buradan çıktı)
+2. **Saha Özeti** — Crown `HubPeriodTeamPanel` formatı; alt sekmeler günlük/haftalık/aylık/yıllık (`getCrownTeamPeriodPulseAction`)
+3. **Eğitim İlerlemesi** — KPI kartları + sıralama + üye ilerleme çubukları
+4. **Ekip Ağacı** — mevcut nesil ağacı
+5. **Araçlar** — davet kodu, ekibe katıl, toplu mesaj (`BroadcastPanel`)
+
+- Eski `?tab=activity` → `summary`, `?tab=invite` → `tools`
+- `EkipActivityTab` kaldırıldı → `EkipSummaryTab` + `EkipToolsTab`
+
+**Dosyalar:** `PanoContent`, `LauncherGrid`, `SquareButton`, `HubSummaryTabBar`, `FieldSummaryPage`, `HubPeriodTeamPanel`, `crown/actions`, `EkipTabNav`, `EkipPanel`, `EkipPageContent`, `EkipSummaryTab`, `EkipToolsTab`, `EkipTrainingTab`, `TeamGenerationTree`, `query/keys`, `tr/en/crown` çevirileri
+
 ## 2026-06-08 — 6 Özellik: Supabase şablonlar, radar badge, üye hedef, overdue e-posta, Hub istatistik, lint turu ✅
 
 ### 1. Koçluk Şablonları → Supabase

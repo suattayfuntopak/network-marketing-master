@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { Sparkles, ArrowRight, Lock, X } from 'lucide-react'
@@ -57,11 +57,9 @@ function descKey(feature: UpgradeFeature): string {
 
 export function UpgradePrompt({ feature, open, onClose }: UpgradePromptProps) {
   const { t } = useTranslation()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock(open)
-
-  useEffect(() => setMounted(true), [])
 
   if (!open || !mounted) return null
 

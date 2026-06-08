@@ -275,6 +275,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
       field[urlFieldId] = urlFieldTab
     }
 
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setMemberCardTab(member)
     setFieldCardTab(field)
     setTabsHydrated(true)

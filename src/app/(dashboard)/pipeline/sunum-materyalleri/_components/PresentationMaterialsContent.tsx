@@ -185,7 +185,7 @@ export function PresentationMaterialsContent() {
       .replace(/\{name\}/g, sampleName)
       .replace(/\{url\}/g, sampleUrl)
       .replace(/\{sender\}/g, sampleSender)
-  }, [form.whatsappTemplate, form.url, ws?.fullName, lang])
+  }, [form.whatsappTemplate, form.url, ws?.fullName, t])
 
   if (wsLoading || isLoading) {
     return (

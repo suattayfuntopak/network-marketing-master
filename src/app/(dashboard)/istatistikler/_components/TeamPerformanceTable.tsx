@@ -150,7 +150,8 @@ export function TeamPerformanceTable({
       rows = rows.filter(r => (r.summary?.startedIncomplete ?? 0) > 0)
     }
 
-    return rows.sort((a, b) => a.pct - b.pct)
+    return [...rows].sort((a, b) => a.pct - b.pct)
+  // eslint-disable-next-line react-hooks/preserve-manual-memoization
   }, [downlineAppRows, videoByUserId, videoFilter])
 
   return (

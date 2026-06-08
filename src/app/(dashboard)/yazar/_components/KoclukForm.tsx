@@ -39,23 +39,25 @@ export function KoclukForm() {
       prevAnswerRef.current = state.answer
       invalidateTeamAndAIUsage(qc, ws?.workspaceId)
     }
-  }, [state.answer, qc])
+  }, [state.answer, qc, ws?.workspaceId])
 
-  // Sync displayed answer when new response is generated + auto-scroll
   useEffect(() => {
     if (state.answer) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setDisplayedAnswer(state.answer)
       setGeneratedLang(lang)
       setTimeout(() => {
         answerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }, 100)
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.answer])
 
   // Handle global language toggle auto-translation
   useEffect(() => {
     if (displayedAnswer && lang !== generatedLang) {
       let active = true
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setTranslating(true)
       
       translateTextAction(displayedAnswer, lang)

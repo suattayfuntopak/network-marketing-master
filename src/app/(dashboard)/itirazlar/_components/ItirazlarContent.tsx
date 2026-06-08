@@ -63,6 +63,7 @@ export function ItirazlarContent({
     return [...base, ...uniq]
   }, [tumItirazlar, lang])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPage(1) }, [search, aktifKategori, lang])
 
   async function copyCevap(cevap: string, id: number, e: React.MouseEvent) {
@@ -118,6 +119,7 @@ export function ItirazlarContent({
     if (isNaN(topicId)) return
     const idx = filtrelenmis.findIndex(item => item.id === topicId)
     if (idx === -1) return
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPage(Math.floor(idx / PAGE_SIZE) + 1)
     setAcikId(topicId)
     setTimeout(() => {

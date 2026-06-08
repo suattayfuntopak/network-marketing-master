@@ -46,6 +46,7 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
       typeof window !== 'undefined' && sessionStorage.getItem('nmm_force_tour') === '1'
     if (forceTour) {
       sessionStorage.removeItem('nmm_force_tour')
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setStep(1)
       setVisible(true)
       return

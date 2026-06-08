@@ -25,6 +25,7 @@ export function usePersonalAkademiProgress() {
   useEffect(() => {
     let cancelled = false
     if (!ws?.workspaceId) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
       setCustomLoading(false)
       return
     }

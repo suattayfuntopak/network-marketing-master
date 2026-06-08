@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable react-hooks/refs */
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
@@ -10,7 +11,6 @@ import {
 import { useTranslation } from '@/providers/LanguageProvider'
 import { auditComplianceMessageAction, type ComplianceAuditState } from '../actions'
 import { toast } from 'sonner'
-import { useAIUsage } from '@/hooks/useAIUsage'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useUserSettings } from '@/hooks/useUserSettings'
@@ -133,7 +133,6 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
   visitedRef.current.add(activeTab)
   const v = visitedRef.current
 
-  const { data: usage } = useAIUsage()
   const { data: ws } = useWorkspace()
   const { settings, patchSettings } = useUserSettings(ws?.userId)
   const qc = useQueryClient()

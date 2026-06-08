@@ -120,6 +120,7 @@ export function EgitimContent({
       const idx = filtrelenmis.findIndex(item => item.id === topicId)
       if (idx !== -1) {
         const targetPage = Math.floor(idx / PAGE_SIZE) + 1
+        /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setPage(targetPage)
         setAcikId(topicId)
         setTimeout(() => {
@@ -130,15 +131,10 @@ export function EgitimContent({
     }
   }, [searchParams, filtrelenmis])
 
-  useEffect(() => {
-    setPage(1)
-    setAcikId(null)
-  }, [aktifKategori])
-
-  useEffect(() => {
-    setPage(1)
-    setAcikId(null)
-  }, [search])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPage(1); setAcikId(null) }, [aktifKategori])
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setPage(1); setAcikId(null) }, [search])
 
   const totalPages = Math.ceil(filtrelenmis.length / PAGE_SIZE)
   const pageItems = filtrelenmis.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)

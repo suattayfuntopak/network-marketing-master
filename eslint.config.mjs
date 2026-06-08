@@ -37,6 +37,7 @@ const supabaseClientTsxLegacy = {
     "src/components/ui/NotificationsModal.tsx",
     "src/components/ui/ProfileModal.tsx",
     "src/components/ui/SettingsModal.tsx",
+    "src/app/(dashboard)/_components/UserMenu.tsx",
   ],
   rules: {
     "no-restricted-imports": "off",

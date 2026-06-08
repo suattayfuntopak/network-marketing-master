@@ -71,6 +71,7 @@ export interface Database {
           created_at: string
           joined_at: string | null
           avatar_url: string | null
+          coaching_templates: Json | null
         }
         Insert: {
           id?: string
@@ -81,6 +82,7 @@ export interface Database {
           created_at?: string
           joined_at?: string | null
           avatar_url?: string | null
+          coaching_templates?: Json | null
         }
         Update: {
           id?: string
@@ -91,6 +93,7 @@ export interface Database {
           created_at?: string
           joined_at?: string | null
           avatar_url?: string | null
+          coaching_templates?: Json | null
         }
         Relationships: [
           {
@@ -260,6 +263,7 @@ export interface Database {
           email_enabled: boolean
           push_enabled: boolean
           sound_enabled: boolean
+          overdue_email_frequency: 'daily' | 'weekly'
           updated_at: string
         }
         Insert: {
@@ -267,6 +271,7 @@ export interface Database {
           email_enabled?: boolean
           push_enabled?: boolean
           sound_enabled?: boolean
+          overdue_email_frequency?: 'daily' | 'weekly'
           updated_at?: string
         }
         Update: {
@@ -274,6 +279,7 @@ export interface Database {
           email_enabled?: boolean
           push_enabled?: boolean
           sound_enabled?: boolean
+          overdue_email_frequency?: 'daily' | 'weekly'
           updated_at?: string
         }
         Relationships: []

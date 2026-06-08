@@ -10,8 +10,8 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
   getMemberDetailAction,
-  getCoachingTemplatesAction,
-  saveCoachingTemplatesAction,
+  getMemberCoachingTemplatesAction,
+  saveMemberCoachingTemplatesAction,
 } from '@/app/(dashboard)/ekip/actions'
 import type { CoachingHistoryItem, CoachingTemplates } from '@/app/(dashboard)/ekip/actions'
 import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
@@ -140,9 +140,11 @@ function CoachHistoryList({ items, t, lang }: {
 function TemplateEditor({
   t,
   workspaceId,
+  targetUserId,
 }: {
   t: ReturnType<typeof useTranslation>['t']
   workspaceId: string
+  targetUserId: string
 }) {
   const [active, setActive] = useState(readTemplate('active'))
   const [recent, setRecent] = useState(readTemplate('recent'))
@@ -150,21 +152,20 @@ function TemplateEditor({
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  // Hydrate from Supabase once on mount
+  // Hydrate per-member templates from Supabase on mount
   useEffect(() => {
-    if (!workspaceId) return
-    getCoachingTemplatesAction(workspaceId).then((tmpl: CoachingTemplates) => {
+    if (!workspaceId || !targetUserId) return
+    getMemberCoachingTemplatesAction(workspaceId, targetUserId).then((tmpl: CoachingTemplates) => {
       if (tmpl.active) { setActive(tmpl.active); localStorage.setItem(TMPL_KEY('active'), tmpl.active) }
       if (tmpl.recent) { setRecent(tmpl.recent); localStorage.setItem(TMPL_KEY('recent'), tmpl.recent) }
       if (tmpl.silent) { setSilent(tmpl.silent); localStorage.setItem(TMPL_KEY('silent'), tmpl.silent) }
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspaceId])
+  }, [workspaceId, targetUserId])
 
   async function save() {
     setSaving(true)
     try {
-      await saveCoachingTemplatesAction(workspaceId, { active, recent, silent })
+      await saveMemberCoachingTemplatesAction(workspaceId, targetUserId, { active, recent, silent })
       localStorage.setItem(TMPL_KEY('active'), active)
       localStorage.setItem(TMPL_KEY('recent'), recent)
       localStorage.setItem(TMPL_KEY('silent'), silent)
@@ -540,7 +541,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 )}
 
                 {/* Mesaj şablonları */}
-                <TemplateEditor t={t} workspaceId={ws?.workspaceId ?? ''} />
+                <TemplateEditor t={t} workspaceId={ws?.workspaceId ?? ''} targetUserId={userId} />
               </>
             )
           })()}

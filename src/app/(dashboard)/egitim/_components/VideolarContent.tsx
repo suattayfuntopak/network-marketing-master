@@ -37,10 +37,11 @@ export function VideolarContent({
   const modalOpen = addFormOpenProp ?? internalModalOpen
   const setModalOpen = onAddFormOpenChange ?? setInternalModalOpen
 
+  const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
   useEffect(() => {
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     if (addFormOpenProp) setEditing(null)
   }, [addFormOpenProp])
-  const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
   const [deletingVideo, setDeletingVideo] = useState<TrainingVideoAdmin | null>(null)
   const [page, setPage] = useState(0)
 
@@ -51,15 +52,15 @@ export function VideolarContent({
     staleTime: 5 * 60_000,
   })
 
-  const videos = data?.videos ?? []
-  const totalPages = Math.max(1, Math.ceil(videos.length / PAGE_SIZE))
+  const totalPages = Math.max(1, Math.ceil((data?.videos?.length ?? 0) / PAGE_SIZE))
 
   const activePage = Math.min(page, Math.max(0, totalPages - 1))
 
   const pageVideos = useMemo(() => {
+    const vids = data?.videos ?? []
     const start = activePage * PAGE_SIZE
-    return videos.slice(start, start + PAGE_SIZE)
-  }, [videos, activePage])
+    return vids.slice(start, start + PAGE_SIZE)
+  }, [data?.videos, activePage])
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: queryKeys.videoCatalog(ws?.workspaceId ?? '') })

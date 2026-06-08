@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -45,7 +45,7 @@ export function TakvimClient() {
   const { data: ws } = useWorkspace()
   const { candidates = [] } = useCandidates(ws?.workspaceId)
 
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [bulkConfirmOpen, setBulkConfirmOpen] = useState(false)
 
   const todayKey = useMemo(() => todayCalendarKey(), [])
@@ -57,9 +57,6 @@ export function TakvimClient() {
   })
   const [selected, setSelected] = useState(() => todayCalendarKey())
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const byDate = useMemo(() => buildCalendarByDate(candidates), [candidates])
 

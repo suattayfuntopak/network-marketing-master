@@ -109,7 +109,7 @@ function formatTimeAgo(
 export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const { lang, t } = useTranslation()
   const router = useRouter()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [userEmail, setUserEmail]       = useState('')
   const [selected, setSelected]         = useState<UiNotification | null>(null)
 
@@ -143,8 +143,6 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const unreadCount = dbUnreadCount
 
   useEffect(() => {
-    setMounted(true)
-
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (user) setUserEmail(user.email ?? '')
@@ -160,6 +158,17 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose, selected])
+
+  async function handleFrequencyChange(freq: 'daily' | 'weekly') {
+    if (prefsSaving || prefsLoading) return
+    try {
+      await savePrefs({ ...prefs, overdueEmailFrequency: freq })
+      toast.success(t('common.notificationSuccess'))
+    } catch (err) {
+      console.error('[NotificationsModal] frequency save failed:', err)
+      toast.error(t('common.error'))
+    }
+  }
 
   async function handleToggle(type: 'email' | 'push' | 'sound') {
     if (prefsSaving || prefsLoading) return
@@ -317,9 +326,9 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
           <div className="space-y-3 rounded-2xl bg-[var(--bg-subtle)] p-4 border border-[var(--border)]">
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-2)]">Tercihler</p>
             {[
-              { type: 'email' as const, icon: Mail,    label: 'E-posta Bildirimleri',  val: prefs.email },
-              { type: 'push'  as const, icon: Monitor, label: 'Tarayıcı Bildirimleri', val: prefs.push  },
-              { type: 'sound' as const, icon: Volume2, label: 'Sesli Uyarılar',        val: prefs.sound },
+              { type: 'email' as const, icon: Mail,    label: t('shellUi.prefEmailLabel'), val: prefs.email },
+              { type: 'push'  as const, icon: Monitor, label: t('shellUi.prefPushLabel'),  val: prefs.push  },
+              { type: 'sound' as const, icon: Volume2, label: t('shellUi.prefSoundLabel'), val: prefs.sound },
             ].map(({ type, icon: Icon, label, val }) => (
               <div key={type} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -334,6 +343,28 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                 />
               </div>
             ))}
+            {prefs.email && (
+              <div className="flex items-center justify-between pl-7">
+                <span className="text-xs font-medium text-[var(--text-2)]">{t('shellUi.overdueFreqLabel')}</span>
+                <div className="flex rounded-lg border border-[var(--border)] bg-[var(--bg-card)] overflow-hidden text-xs font-semibold">
+                  {(['daily', 'weekly'] as const).map(freq => (
+                    <button
+                      key={freq}
+                      type="button"
+                      disabled={prefsLoading || prefsSaving}
+                      onClick={() => void handleFrequencyChange(freq)}
+                      className={`px-3 py-1.5 transition-colors disabled:opacity-50 ${
+                        prefs.overdueEmailFrequency === freq
+                          ? 'bg-[#534AB7] text-white'
+                          : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
+                      }`}
+                    >
+                      {freq === 'daily' ? t('shellUi.overdueFreqDaily') : t('shellUi.overdueFreqWeekly')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -6,12 +6,7 @@ export type NotificationPreferences = {
   email: boolean
   push: boolean
   sound: boolean
-}
-
-const DEFAULTS: NotificationPreferences = {
-  email: true,
-  push: true,
-  sound: true,
+  overdueEmailFrequency: 'daily' | 'weekly'
 }
 
 /** Sunucuda satır yoksa `null` — istemci localStorage ile devam eder. */
@@ -22,7 +17,7 @@ export async function getNotificationPreferencesAction(): Promise<NotificationPr
 
   const { data, error } = await supabase
     .from('nmm_notification_preferences')
-    .select('email_enabled, push_enabled, sound_enabled')
+    .select('email_enabled, push_enabled, sound_enabled, overdue_email_frequency')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -32,6 +27,7 @@ export async function getNotificationPreferencesAction(): Promise<NotificationPr
     email: data.email_enabled,
     push: data.push_enabled,
     sound: data.sound_enabled,
+    overdueEmailFrequency: (data.overdue_email_frequency as 'daily' | 'weekly') ?? 'daily',
   }
 }
 
@@ -49,6 +45,7 @@ export async function updateNotificationPreferencesAction(
       email_enabled: prefs.email,
       push_enabled: prefs.push,
       sound_enabled: prefs.sound,
+      overdue_email_frequency: prefs.overdueEmailFrequency,
       updated_at: new Date().toISOString(),
     })
 

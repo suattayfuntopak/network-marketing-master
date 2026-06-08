@@ -84,6 +84,12 @@ export const shellSection = {
       accountModalTeamBulletsDesktop: 'Ekibim: gör + davet (free); tam panel Plus/Pro.',
       accountModalFootnoteDesktop:
         'Free planda erişim devam eder; AI ve gelişmiş ekip plan gerektirir.',
+      overdueFreqLabel: 'Gecikmiş E-posta Sıklığı',
+      overdueFreqDaily: 'Günlük',
+      overdueFreqWeekly: 'Haftalık (Pzt)',
+      prefEmailLabel: 'E-posta Bildirimleri',
+      prefPushLabel: 'Tarayıcı Bildirimleri',
+      prefSoundLabel: 'Sesli Uyarılar',
     },
   },
   en: {
@@ -171,6 +177,12 @@ export const shellSection = {
       accountModalTeamBulletsDesktop: 'Team: view + invite (free); full hub Plus/Pro.',
       accountModalFootnoteDesktop:
         'Free plan access continues; AI and advanced team need a plan.',
+      overdueFreqLabel: 'Overdue Email Frequency',
+      overdueFreqDaily: 'Daily',
+      overdueFreqWeekly: 'Weekly (Mon)',
+      prefEmailLabel: 'Email Notifications',
+      prefPushLabel: 'Browser Notifications',
+      prefSoundLabel: 'Sound Alerts',
     },
   },
 } as const

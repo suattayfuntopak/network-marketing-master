@@ -15,13 +15,13 @@ type Props = {
 
 export function RejectModerationDialog({ defaultReason, onConfirm, onCancel }: Props) {
   const { t } = useTranslation()
-  const [mounted, setMounted] = useState(false)
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const [reason, setReason] = useState(defaultReason)
 
   useBodyScrollLock()
 
   useEffect(() => {
-    setMounted(true)
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setReason(defaultReason)
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onCancel()

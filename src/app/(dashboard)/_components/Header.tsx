@@ -86,9 +86,11 @@ export function Header({ visible = true }: { visible?: boolean }) {
   const isLicenseExpired = licenseExpiresAt
     ? new Date(licenseExpiresAt) < new Date()
     : false
+  /* eslint-disable react-hooks/purity */
   const remainingDays = licenseExpiresAt
     ? Math.ceil((new Date(licenseExpiresAt).getTime() - Date.now()) / 86400000)
     : 999
+  /* eslint-enable react-hooks/purity */
   const showWarningBar = (licenseType !== 'free') && (isLicenseExpired || (remainingDays >= 0 && remainingDays <= 3))
 
   const getPlanLabel = (type: string) => {
