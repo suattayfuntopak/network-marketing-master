@@ -6,10 +6,11 @@ import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { formatPanoDateLine } from '@/lib/utils/calendarLocale'
 import { AccountStatusAlert } from './AccountStatusAlert'
 
 export function PanoContent() {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
 
@@ -26,6 +27,7 @@ export function PanoContent() {
 
   const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
+  const todayLine = formatPanoDateLine(new Date(), lang)
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col gap-3 md:gap-4 md:overflow-hidden">
@@ -38,7 +40,7 @@ export function PanoContent() {
       )}
       <AccountStatusAlert />
 
-      <header className="shrink-0 space-y-1 md:mt-5 md:text-left">
+      <header className="shrink-0 space-y-0.5 md:mt-5 md:text-left">
         {wsLoading ? (
           <div className="h-7 w-56 animate-pulse rounded bg-[var(--bg-subtle)]" />
         ) : (
@@ -46,6 +48,9 @@ export function PanoContent() {
             {greetingIcon} {greeting} {firstName} 👋🏻
           </h1>
         )}
+        <p className="text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">
+          {todayLine}
+        </p>
       </header>
 
       <div className="min-h-0 flex-1 md:flex md:flex-col md:justify-center">

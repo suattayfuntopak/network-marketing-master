@@ -10,6 +10,16 @@ export function formatCalendarMonth(date: Date, lang: 'tr' | 'en') {
   return new Intl.DateTimeFormat(localeFor(lang), { month: 'long' }).format(date)
 }
 
+/** Pano selamlama altı — 08 Haziran 2026 Pazartesi / Monday, 8 June 2026 */
+export function formatPanoDateLine(date: Date, lang: 'tr' | 'en') {
+  return new Intl.DateTimeFormat(localeFor(lang), {
+    day: lang === 'tr' ? '2-digit' : 'numeric',
+    month: 'long',
+    year: 'numeric',
+    weekday: 'long',
+  }).format(date)
+}
+
 /** Tam tarih: 17 Haziran 2026 / 17 June 2026 */
 export function formatCalendarDayKey(key: string, lang: 'tr' | 'en') {
   return new Intl.DateTimeFormat(localeFor(lang), {
