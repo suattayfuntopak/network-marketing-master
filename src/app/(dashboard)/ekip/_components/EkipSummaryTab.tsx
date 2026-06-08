@@ -6,16 +6,16 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPeriodTeamPanel } from '@/lib/ui/hub/HubPeriodTeamPanel'
 import {
   HubSummaryTabBar,
   parseSummaryTab,
   type HubPeriodTab,
 } from '@/lib/ui/hub/HubSummaryTabBar'
-import { getCrownTeamPeriodPulseAction } from '@/app/(dashboard)/crown/actions'
+import { getTeamRankingMetricsAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { queryKeys } from '@/lib/query/keys'
+import { TeamFieldRankingTable } from './TeamFieldRankingTable'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 
 function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
@@ -51,12 +51,13 @@ export function EkipSummaryTab() {
     [members],
   )
 
+  const memberIds = useMemo(() => downlines.map(m => m.user_id), [downlines])
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
-  const { data: pulse, isLoading: pulseLoading } = useQuery({
-    queryKey: queryKeys.teamPeriodPulse(ws?.workspaceId ?? '', pulsePeriod),
-    queryFn: () => getCrownTeamPeriodPulseAction(ws!.workspaceId, pulsePeriod),
-    enabled: !!ws?.workspaceId && downlines.length > 0 && teamPulseUnlocked,
+  const { data: metrics, isLoading: metricsLoading } = useQuery({
+    queryKey: queryKeys.teamRankingMetrics(ws?.workspaceId ?? '', pulsePeriod, memberIds),
+    queryFn: () => getTeamRankingMetricsAction(ws!.workspaceId, pulsePeriod, memberIds),
+    enabled: !!ws?.workspaceId && memberIds.length > 0 && teamPulseUnlocked,
     staleTime: 30_000,
   })
 
@@ -81,13 +82,10 @@ export function EkipSummaryTab() {
   return (
     <div className="space-y-4">
       <HubSummaryTabBar active={periodTab} onChange={setPeriodTab} />
-      <HubPeriodTeamPanel
+      <TeamFieldRankingTable
         downlines={downlines}
-        activity={pulse?.activity}
-        loading={membersLoading || pulseLoading}
-        teamStatsLocked={false}
-        joinedInPeriod={pulse?.joinedInPeriod ?? 0}
-        period={pulsePeriod}
+        metrics={metrics}
+        loading={membersLoading || metricsLoading}
         getMemberHref={getMemberHref}
       />
     </div>

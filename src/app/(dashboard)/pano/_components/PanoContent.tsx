@@ -30,7 +30,7 @@ export function PanoContent() {
   const todayLine = formatPanoDateLine(new Date(), lang)
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col gap-3 md:gap-4 md:overflow-hidden">
+    <div className="flex min-h-0 w-full flex-1 flex-col gap-1 md:gap-2 md:overflow-hidden">
       {!cLoading && ws && (
         <OnboardingModal
           workspaceId={ws.workspaceId}
@@ -53,7 +53,7 @@ export function PanoContent() {
         </p>
       </header>
 
-      <div className="min-h-0 flex-1 md:flex md:flex-col md:justify-center">
+      <div className="min-h-0 flex-1 md:flex md:flex-col">
         <PanoLauncherGrid />
       </div>
 

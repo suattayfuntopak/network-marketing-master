@@ -28,7 +28,6 @@ export function EkipPageContent() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('team.title')}</h1>
-          <p className="text-sm text-[var(--text-2)]">{t('team.pageSubtitle')}</p>
         </div>
       </header>
       <EkipTabNav activeTab={activeTab} />

@@ -1,6 +1,13 @@
 # Hot Log
 
-## 2026-06-09 — Deploy fix: NotificationPreferences tip uyumu ✅
+## 2026-06-09 — Pano spacing + Ekibim sıralama tabloları ✅
+
+- **Pano:** Karşılama/tarih sabit; launcher grid bir satır yukarı (`gap-1`, `justify-center` kaldırıldı)
+- **Ekibim:** Alt başlık kaldırıldı; Saha Özeti → 10 metrikli ikon sütunlu sıralama tablosu + alt legend
+- **Eğitim:** İçerik/Video/İtiraz sütunlu sıralama tablosu; onboarding sadece isim + çubuk + 0/9
+- **Backend:** `getTeamRankingMetricsAction`, `fetchFunnelActualsBatchForPeriod`
+- Dosyalar: `TeamFieldRankingTable.tsx`, `TeamTrainingRankingTable.tsx`, `EkipSummaryTab.tsx`, `EkipTrainingTab.tsx`, `teamActivityActions.ts`, `funnelActuals.ts`, çeviriler
+
 
 - Vercel `0c01dc3` build: `overdueEmailFrequency` hook'ta vardı, `NotificationPreferences` tipinde yoktu
 - Push `c6175d0`: `notificationPreferences.ts`, `notificationPrefsStorage.ts`, `database.types.ts`, migration `068_notification_email_frequency.sql`

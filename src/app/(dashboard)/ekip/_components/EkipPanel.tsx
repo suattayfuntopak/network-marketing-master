@@ -217,9 +217,9 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
       {activeTab === 'training' && (
         <EkipTrainingTab
           t={t}
-          lang={lang}
           members={members}
           teamPageUnlocked={teamPageUnlocked}
+          teamPulseUnlocked={teamPulseUnlocked}
         />
       )}
 

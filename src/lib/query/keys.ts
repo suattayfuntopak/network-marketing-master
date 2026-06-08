@@ -29,6 +29,10 @@ export const queryKeys = {
     ['team-field-activity', workspaceId, period, [...memberIds].sort().join(',')] as const,
   teamPeriodPulse: (workspaceId: string, period: string) =>
     ['team-period-pulse', workspaceId, period] as const,
+  teamRankingMetrics: (workspaceId: string, period: string, memberIds: string[]) =>
+    ['team-ranking-metrics', workspaceId, period, [...memberIds].sort().join(',')] as const,
+  teamProgressMap: (workspaceId: string, memberIds: string[]) =>
+    ['team-progress-map', workspaceId, [...memberIds].sort().join(',')] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,
