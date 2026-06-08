@@ -198,7 +198,9 @@ export function HedefKart() {
                     ? calendarMonthOffsetForRoadmapMonth(goal.startAt, s.month)
                     : 0
                 const monthlyHref =
-                  monthOffset === 0 ? '/aylik-ozet' : `/aylik-ozet?offset=${monthOffset}`
+                  monthOffset === 0
+                    ? '/saha-ozetim?tab=monthly'
+                    : `/saha-ozetim?tab=monthly&offset=${monthOffset}`
                 const rowClass = clsx(
                   'block w-full rounded-xl border px-2.5 py-2.5 text-left transition',
                   isCurrent &&

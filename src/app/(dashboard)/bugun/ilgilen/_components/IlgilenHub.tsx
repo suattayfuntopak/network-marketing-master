@@ -26,7 +26,9 @@ export function IlgilenHub() {
 
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip', { scroll: false })
-    if (raw === 'daily') router.replace('/bugunku-takibim', { scroll: false })
+    if (raw === 'daily') router.replace('/saha-ozetim?tab=daily', { scroll: false })
+    if (raw === 'weekly') router.replace('/saha-ozetim?tab=weekly', { scroll: false })
+    if (raw === 'monthly') router.replace('/saha-ozetim?tab=monthly', { scroll: false })
     if (raw === 'first30') router.replace('/saha-radar', { scroll: false })
   }, [raw, router])
 

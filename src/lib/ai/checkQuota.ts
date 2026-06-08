@@ -179,6 +179,8 @@ export async function logAIGeneration(params: {
   userId: string
   note: AIActionType
   candidateId?: string | null
+  /** Optional metadata stored in note_tr — does not affect quota counting. */
+  noteTr?: string | null
 }): Promise<void> {
   if (!params.workspaceId) return
   const supabase = await createClient()
@@ -189,6 +191,7 @@ export async function logAIGeneration(params: {
       candidate_id: params.candidateId ?? null,
       action_type: 'ai_generate' as const,
       note: params.note,
+      ...(params.noteTr ? { note_tr: params.noteTr } : {}),
     })
 
     const usageDate = new Date().toISOString().slice(0, 10)

@@ -40,7 +40,7 @@ export function IlgilenHubGrid({ activeTab }: Props) {
 
   function selectTab(id: IlgilenTabId) {
     if (id === 'daily') {
-      router.push('/bugunku-takibim')
+      router.push('/saha-ozetim?tab=daily')
       return
     }
     if (id === 'saharadar') {

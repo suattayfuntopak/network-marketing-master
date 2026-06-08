@@ -1,16 +1,10 @@
-import { Suspense } from 'react'
-import { CrownMonthlyPage } from './_components/CrownMonthlyPage'
+import { redirect } from 'next/navigation'
 
-export default function AylikOzetPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-          <div className="mx-auto h-8 max-w-lg animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-        </main>
-      }
-    >
-      <CrownMonthlyPage />
-    </Suspense>
-  )
+type Props = { searchParams: Promise<{ offset?: string }> }
+
+export default async function AylikOzetPage({ searchParams }: Props) {
+  const { offset } = await searchParams
+  const q = new URLSearchParams({ tab: 'monthly' })
+  if (offset) q.set('offset', offset)
+  redirect(`/saha-ozetim?${q.toString()}`)
 }

@@ -4,11 +4,11 @@ import { Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 
 const TAB_REDIRECTS: Record<string, string> = {
-  journal: '/bugunku-takibim',
+  journal: '/saha-ozetim?tab=daily',
   roadmap: '/hedefim',
-  daily: '/bugunku-takibim',
-  weekly: '/haftalik-ozet',
-  monthly: '/aylik-ozet',
+  daily: '/saha-ozetim?tab=daily',
+  weekly: '/saha-ozetim?tab=weekly',
+  monthly: '/saha-ozetim?tab=monthly',
   first30: '/saha-radar',
   saharadar: '/saha-radar',
   live: '/canli-egitim',

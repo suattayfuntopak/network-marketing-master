@@ -1,8 +1,7 @@
 import {
   LayoutDashboard, TrendingUp, Bot, Users,
-  CalendarDays, CalendarRange, BookOpen, Target,
-  BarChart3, ClipboardList, GraduationCap,
-  BarChart2, Crown, Ellipsis, Activity,
+  CalendarDays, BookOpen, Target,
+  GraduationCap, History, Crown, Ellipsis, Activity,
   type LucideIcon,
 } from 'lucide-react'
 import type { ButtonColor } from '@/components/ui/SquareButton'
@@ -19,19 +18,17 @@ export type PanoLauncherItem = NavItem & {
   color: ButtonColor
   desktopColor?: ButtonColor
 }
+/** Pano 3×3 — renkler komşu kutularda tekrar etmez. */
 export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/bugunku-takibim', translationKey: 'dashboard.panoDailyWhatIDid', icon: ClipboardList, color: 'teal', desktopColor: 'teal' },
-  { href: '/haftalik-ozet', translationKey: 'dashboard.crownMockWeeklySummary', icon: BarChart3, color: 'purple', desktopColor: 'purple', calendarPeriod: 7 },
-  { href: '/aylik-ozet', translationKey: 'dashboard.crownMockMonthlySummary', icon: CalendarRange, color: 'rose', desktopColor: 'rose', calendarPeriod: 30 },
+  { href: '/saha-ozetim', translationKey: 'dashboard.panoFieldSummary', icon: History, color: 'teal', desktopColor: 'teal' },
   { href: '/saha-radar', translationKey: 'dashboard.crownMockSahaRadar', icon: Activity, color: 'coral', desktopColor: 'coral' },
-  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
-  { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'indigo', desktopColor: 'indigo' },
-  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
   { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'amber', desktopColor: 'amber' },
-  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'teal', desktopColor: 'teal' },
-  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'purple', desktopColor: 'purple' },
-  { href: '/istatistikler', translationKey: 'nav.istatistikler', icon: BarChart2, color: 'coral', desktopColor: 'coral' },
+  { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'rose', desktopColor: 'rose' },
+  { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
+  { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },
+  { href: '/yazar', translationKey: 'nav.yazar', icon: Bot, color: 'purple', desktopColor: 'purple' },
+  { href: '/takvim', translationKey: 'nav.takvim', icon: CalendarDays, color: 'coral', desktopColor: 'coral' },
 ]
 
 /** @deprecated Pano artık PANO_ORGANIZATION_ITEMS kullanır */

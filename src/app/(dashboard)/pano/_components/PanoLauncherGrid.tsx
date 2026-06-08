@@ -3,7 +3,6 @@
 import { Lock } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { SquareButton } from '@/components/ui/SquareButton'
-import { CalendarPeriodIcon } from '@/components/ui/CalendarPeriodIcon'
 import { LauncherGrid, LauncherGridItem } from '@/components/ui/LauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
@@ -24,21 +23,14 @@ export function PanoLauncherGrid() {
 
   return (
     <>
-      <LauncherGrid>
+      <LauncherGrid fillViewport itemCount={9} columns={3}>
         {items.map(({ href, translationKey, icon, color }) => {
           const isAiLocked = href === '/yazar' && !hasAiCoachAccess
-          const periodIcon =
-            href === '/haftalik-ozet' ? (
-              <CalendarPeriodIcon days={7} className="h-8 w-8 drop-shadow-sm md:h-10 md:w-10" />
-            ) : href === '/aylik-ozet' ? (
-              <CalendarPeriodIcon days={30} className="h-8 w-8 drop-shadow-sm md:h-10 md:w-10" />
-            ) : undefined
 
           return (
-            <LauncherGridItem key={href} onPointerEnter={() => warmRoute(href)}>
+            <LauncherGridItem key={href} fillViewport onPointerEnter={() => warmRoute(href)}>
               <SquareButton
                 icon={icon}
-                iconSlot={periodIcon}
                 label={t(translationKey)}
                 color={color}
                 variant="crown"

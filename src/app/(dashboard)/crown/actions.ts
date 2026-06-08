@@ -23,8 +23,8 @@ import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, istanbulDayStartIso, toCalendarKey } from '@/lib/utils/calendarDates'
-import { fetchFunnelActualsForPeriod } from '@/lib/domain/funnelActuals'
-import { calendarDayRange, rollingWeekRange, monthRange } from '@/lib/utils/hubPeriodRange'
+import { fetchFunnelActualsForPeriod, funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
+import { calendarDayRange, rollingWeekRange, monthRange, yearRange } from '@/lib/utils/hubPeriodRange'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -406,6 +406,26 @@ export type HubMonthlySelfPayload = {
   pipelineStages: HubPipelineStageCounts
 }
 
+export type HubYearlySelfPayload = {
+  hasGoal: boolean
+  yearlyTargets: FunnelCounts
+  yearlyActuals: FunnelCounts
+  loginDays: number
+  year: number
+  dayOfYear: number
+  daysInPeriod: number
+  totalDaysInYear: number
+  yearPct: number
+  isCurrentYear: boolean
+  fieldMetrics: HubSelfFieldMetrics
+}
+
+export type HubAllTimeSelfPayload = {
+  hasGoal: boolean
+  allTimeActuals: FunnelCounts
+  fieldMetrics: HubSelfFieldMetrics
+}
+
 async function loginDaysInWindow(
   userId: string,
   since: string,
@@ -755,6 +775,113 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
     monthPct,
     fieldMetrics,
     pipelineStages,
+  }
+}
+
+export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfPayload> {
+  const progress = await getDailyProgressAction()
+  const { user } = await getAuthUser()
+  const workspaceId = await resolveWorkspaceId()
+  const range = yearRange(offset)
+
+  if (!user) {
+    return {
+      hasGoal: false,
+      yearlyTargets: EMPTY_FUNNEL,
+      yearlyActuals: EMPTY_FUNNEL,
+      loginDays: 0,
+      year: range.year,
+      dayOfYear: range.dayOfYear,
+      daysInPeriod: range.daysInPeriod,
+      totalDaysInYear: range.totalDaysInYear,
+      yearPct: range.yearPct,
+      isCurrentYear: range.isCurrentYear,
+      fieldMetrics: EMPTY_FIELD_METRICS,
+    }
+  }
+
+  const since = range.sinceIso
+  const until = range.untilIso
+  const [yearlyActuals, loginDays, fieldMetrics] = await Promise.all([
+    funnelActualsSince(
+      user.id,
+      since,
+      until,
+      toCalendarKey(range.startDate),
+      toCalendarKey(range.endDate),
+    ),
+    loginDaysInRange(user.id, since, until),
+    selfFieldMetricsSince(user.id, workspaceId, since, until),
+  ])
+
+  if (!progress.hasGoal) {
+    return {
+      hasGoal: false,
+      yearlyTargets: EMPTY_FUNNEL,
+      yearlyActuals,
+      loginDays,
+      year: range.year,
+      dayOfYear: range.dayOfYear,
+      daysInPeriod: range.daysInPeriod,
+      totalDaysInYear: range.totalDaysInYear,
+      yearPct: range.yearPct,
+      isCurrentYear: range.isCurrentYear,
+      fieldMetrics,
+    }
+  }
+
+  const days = range.daysInPeriod
+  const yearlyTargets: FunnelCounts = {
+    arama: progress.targets.arama * days,
+    tanisma: progress.targets.tanisma * days,
+    sunum: progress.targets.sunum * days,
+    yeniUye: progress.targets.yeniUye * days,
+  }
+
+  return {
+    hasGoal: true,
+    yearlyTargets,
+    yearlyActuals,
+    loginDays,
+    year: range.year,
+    dayOfYear: range.dayOfYear,
+    daysInPeriod: range.daysInPeriod,
+    totalDaysInYear: range.totalDaysInYear,
+    yearPct: range.yearPct,
+    isCurrentYear: range.isCurrentYear,
+    fieldMetrics,
+  }
+}
+
+export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> {
+  const progress = await getDailyProgressAction()
+  const { user } = await getAuthUser()
+  const workspaceId = await resolveWorkspaceId()
+  const range = funnelRangeForPulsePeriod('all')
+
+  if (!user) {
+    return {
+      hasGoal: false,
+      allTimeActuals: EMPTY_FUNNEL,
+      fieldMetrics: EMPTY_FIELD_METRICS,
+    }
+  }
+
+  const [allTimeActuals, fieldMetrics] = await Promise.all([
+    funnelActualsSince(
+      user.id,
+      range.sinceIso,
+      range.untilIso,
+      range.startCalendarKey,
+      range.endCalendarKey,
+    ),
+    selfFieldMetricsSince(user.id, workspaceId, range.sinceIso, range.untilIso),
+  ])
+
+  return {
+    hasGoal: progress.hasGoal,
+    allTimeActuals,
+    fieldMetrics,
   }
 }
 

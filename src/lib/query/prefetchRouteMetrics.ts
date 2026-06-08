@@ -8,7 +8,9 @@ import {
   getCrownMonthlyPageAction,
   getCrownVideoPageAction,
   getCrownWeeklyPageAction,
+  getHubAllTimeSelfAction,
   getHubDailySelfAction,
+  getHubYearlySelfAction,
   getHubMonthlyInsightsAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
@@ -82,6 +84,16 @@ export async function prefetchHubMetrics(
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubMonthlyInsights(0),
       queryFn: getHubMonthlyInsightsAction,
+      staleTime: METRICS_STALE,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubYearlySelf(0),
+      queryFn: () => getHubYearlySelfAction(0),
+      staleTime: METRICS_STALE,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.hubAllTimeSelf(),
+      queryFn: () => getHubAllTimeSelfAction(),
       staleTime: METRICS_STALE,
     }),
   ]
@@ -179,8 +191,7 @@ export function prefetchRouteMetrics(
   const teamRoutes = new Set([
     '/ekip',
     '/istatistikler',
-    '/haftalik-ozet',
-    '/aylik-ozet',
+    '/saha-ozetim',
     '/saha-radar',
     '/canli-egitim',
   ])
@@ -200,12 +211,8 @@ export function prefetchRouteMetrics(
     })
   }
 
-  if (href === '/bugunku-takibim') {
-    void queryClient.prefetchQuery({
-      queryKey: queryKeys.hubDailySelf(0),
-      queryFn: () => getHubDailySelfAction(0),
-      staleTime: METRICS_STALE,
-    })
+  if (href === '/saha-ozetim') {
+    void prefetchHubMetrics(queryClient, workspaceId, wsSlice)
   }
 
   if (href === '/canli-egitim') {
@@ -224,7 +231,4 @@ export function prefetchRouteMetrics(
     })
   }
 
-  if (href === '/haftalik-ozet' || href === '/aylik-ozet') {
-    void prefetchHubMetrics(queryClient, workspaceId, wsSlice)
-  }
 }

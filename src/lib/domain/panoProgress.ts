@@ -45,24 +45,6 @@ export function getPanoLauncherBadge(
     })
   }
 
-  if (href.includes('/haftalik-ozet') && weekly) {
-    if (weekly.hasGoal) {
-      const done = countFunnelStepsMatching(weekly.weeklyTargets, weekly.weeklyActuals)
-      if (done > 0 || weekly.weeklyTargets.arama > 0) {
-        return t('dashboard.panoBadgeFunnel', { done, total: FUNNEL_KEYS.length })
-      }
-    } else if (weekly.pctOverall > 0) {
-      return t('dashboard.panoBadgeWeeklyPct', { pct: weekly.pctOverall })
-    }
-  }
-
-  if (href.includes('/aylik-ozet') && monthly) {
-    return t('dashboard.panoBadgeMonth', {
-      day: monthly.dayOfMonth,
-      total: monthly.daysInMonth,
-    })
-  }
-
   if (href.includes('/saha-radar') && sahaRadarBadgeCount != null && sahaRadarBadgeCount > 0) {
     return t('dashboard.panoBadgeSahaRadar', { count: sahaRadarBadgeCount })
   }
@@ -76,11 +58,19 @@ export function getPanoLauncherBadge(
     })
   }
 
-  if (href.includes('/bugunku-takibim')) {
-    return t('dashboard.panoBadgeFunnel', {
-      done: countFunnelStepsDone(progress),
-      total: FUNNEL_KEYS.length,
-    })
+  if (href.includes('/saha-ozetim')) {
+    if (progress?.hasGoal) {
+      return t('dashboard.panoBadgeFunnel', {
+        done: countFunnelStepsDone(progress),
+        total: FUNNEL_KEYS.length,
+      })
+    }
+    if (monthly) {
+      return t('dashboard.panoBadgeMonth', {
+        day: monthly.dayOfMonth,
+        total: monthly.daysInMonth,
+      })
+    }
   }
 
   return undefined

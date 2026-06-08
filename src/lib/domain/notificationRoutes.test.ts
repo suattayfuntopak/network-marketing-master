@@ -20,7 +20,7 @@ describe('notificationTargetHref', () => {
         candidate_id: null,
         title_tr: 'Ekibinize yeni ortak katıldı!',
       }),
-    ).toBe('/bugunku-takibim')
+    ).toBe('/saha-ozetim?tab=daily')
   })
 
   it('routes calendar without candidate to takvim', () => {

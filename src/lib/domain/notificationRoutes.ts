@@ -18,7 +18,7 @@ export function isTeamJoinNotification(n: Pick<NotificationRouteInput, 'title_tr
 export function notificationTargetHref(n: NotificationRouteInput): string {
   if (n.candidate_id) return `/pipeline/${n.candidate_id}`
 
-  if (isTeamJoinNotification(n)) return '/bugunku-takibim'
+  if (isTeamJoinNotification(n)) return '/saha-ozetim?tab=daily'
 
   const routeByType: Record<NotificationType, string> = {
     user: '/ekip',

@@ -249,7 +249,7 @@ export function TakvimClient() {
               {t('pagesUi.bulkDeferOneDay')}
             </button>
             <Link
-              href="/bugunku-takibim"
+              href="/saha-ozetim?tab=daily"
               className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline"
             >
               {t('pagesUi.viewTodayPriorities')}

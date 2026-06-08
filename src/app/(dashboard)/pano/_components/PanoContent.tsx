@@ -28,7 +28,7 @@ export function PanoContent() {
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
 
   return (
-    <div className="w-full space-y-4 md:space-y-6">
+    <div className="flex min-h-0 w-full flex-1 flex-col gap-4 md:gap-5">
       {!cLoading && ws && (
         <OnboardingModal
           workspaceId={ws.workspaceId}
@@ -38,7 +38,7 @@ export function PanoContent() {
       )}
       <AccountStatusAlert />
 
-      <header className="space-y-1 md:text-center">
+      <header className="shrink-0 space-y-1 md:text-center">
         {wsLoading ? (
           <div className="h-8 w-56 animate-pulse rounded bg-[var(--bg-subtle)] md:mx-auto" />
         ) : (
@@ -48,7 +48,9 @@ export function PanoContent() {
         )}
       </header>
 
-      <PanoLauncherGrid />
+      <div className="min-h-0 flex-1">
+        <PanoLauncherGrid />
+      </div>
 
       {!cLoading && <WelcomeCard candidateCount={candidates.length} />}
     </div>

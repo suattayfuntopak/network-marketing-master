@@ -8,13 +8,15 @@ import {
   formatDayLabel,
   formatMonthLabel,
   formatWeekRangeLabel,
+  formatYearLabel,
   monthRange,
   rollingWeekRange,
+  yearRange,
 } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
 
 type HubPeriodNavigatorProps = {
-  mode: 'day' | 'week' | 'month'
+  mode: 'day' | 'week' | 'month' | 'year'
   accentClass?: string
 }
 
@@ -34,8 +36,12 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
       const r = rollingWeekRange(o)
       return formatWeekRangeLabel(r.startDate, r.endDate, lang)
     }
-    const r = monthRange(o)
-    return formatMonthLabel(r.startDate, lang)
+    if (mode === 'month') {
+      const r = monthRange(o)
+      return formatMonthLabel(r.startDate, lang)
+    }
+    const r = yearRange(o)
+    return formatYearLabel(r.year, lang, o)
   }
 
   const currentLabel = labelFor(offset)

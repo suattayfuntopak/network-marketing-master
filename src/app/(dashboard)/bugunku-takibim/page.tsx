@@ -1,16 +1,10 @@
-import { Suspense } from 'react'
-import { DailyTrackPage } from './_components/DailyTrackPage'
+import { redirect } from 'next/navigation'
 
-export default function BugunkuTakibimPage() {
-  return (
-    <Suspense
-      fallback={
-        <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-          <div className="mx-auto h-8 max-w-lg animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-        </main>
-      }
-    >
-      <DailyTrackPage />
-    </Suspense>
-  )
+type Props = { searchParams: Promise<{ offset?: string }> }
+
+export default async function BugunkuTakibimPage({ searchParams }: Props) {
+  const { offset } = await searchParams
+  const q = new URLSearchParams({ tab: 'daily' })
+  if (offset) q.set('offset', offset)
+  redirect(`/saha-ozetim?${q.toString()}`)
 }

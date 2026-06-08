@@ -33,6 +33,20 @@ export type MonthRange = {
   monthPct: number
 }
 
+export type YearRange = {
+  offset: number
+  sinceIso: string
+  untilIso: string
+  startDate: Date
+  endDate: Date
+  year: number
+  daysInPeriod: number
+  totalDaysInYear: number
+  dayOfYear: number
+  yearPct: number
+  isCurrentYear: boolean
+}
+
 function endOfDay(d: Date): Date {
   const x = new Date(d)
   x.setHours(23, 59, 59, 999)
@@ -117,6 +131,48 @@ export function formatWeekRangeLabel(start: Date, end: Date, lang: string): stri
 
 export function formatMonthLabel(date: Date, lang: string): string {
   return date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { month: 'long', year: 'numeric' })
+}
+
+function daysInCalendarYear(year: number): number {
+  return (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) ? 366 : 365
+}
+
+/** offset 0 = içinde bulunulan takvim yılı */
+export function yearRange(offset: number): YearRange {
+  const now = new Date()
+  const year = now.getFullYear() + offset
+  const startDate = startOfDay(new Date(year, 0, 1))
+  const isCurrentYear = offset === 0
+  const endDate = isCurrentYear ? endOfDay(now) : endOfDay(new Date(year, 11, 31))
+  const startKey = toCalendarKey(startDate)
+  const endKey = toCalendarKey(endDate)
+  const totalDaysInYear = daysInCalendarYear(year)
+  const dayOfYear = isCurrentYear
+    ? Math.floor((startOfDay(now).getTime() - startDate.getTime()) / 86_400_000) + 1
+    : totalDaysInYear
+  const daysInPeriod = dayOfYear
+  const yearPct = isCurrentYear
+    ? Math.round((dayOfYear / totalDaysInYear) * 100)
+    : 100
+
+  return {
+    offset,
+    sinceIso: istanbulDayStartIso(startKey),
+    untilIso: istanbulDayEndIso(endKey),
+    startDate,
+    endDate,
+    year,
+    daysInPeriod,
+    totalDaysInYear,
+    dayOfYear,
+    yearPct,
+    isCurrentYear,
+  }
+}
+
+export function formatYearLabel(year: number, lang: string, offset: number): string {
+  if (offset === 0) return lang === 'en' ? 'This year' : 'Bu yıl'
+  return String(year)
 }
 
 export function formatDayLabel(date: Date, lang: string, offset: number): string {
