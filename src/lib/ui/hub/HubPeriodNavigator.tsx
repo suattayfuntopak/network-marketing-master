@@ -63,7 +63,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
     <div className="flex w-full items-stretch gap-1.5 sm:gap-2">
       <button
         type="button"
-        onClick={() => go(prevOffset - 1)}
+        onClick={() => go(prevOffset)}
         className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-2 text-[var(--text-3)] transition hover:border-brand/30 hover:text-brand active:scale-95 sm:px-2.5"
         aria-label="Previous period"
       >
@@ -101,7 +101,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
 
       <button
         type="button"
-        onClick={() => go(nextOffset + 1)}
+        onClick={() => go(nextOffset)}
         className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-2 text-[var(--text-3)] transition hover:border-brand/30 hover:text-brand active:scale-95 sm:px-2.5"
         aria-label="Next period"
       >

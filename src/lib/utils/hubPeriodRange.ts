@@ -29,10 +29,10 @@ function startOfDay(d: Date): Date {
   return x
 }
 
-/** offset 0 = son 7 takvim günü (bugün dahil); -1 = bir önceki 7 gün, vb. */
+/** offset 0 = son 7 takvim günü (bugün dahil); -1 = geçmiş hafta, +1 = gelecek hafta (aylık ile aynı işaret) */
 export function rollingWeekRange(offset: number): RollingWeekRange {
   const endDate = startOfDay(new Date())
-  endDate.setDate(endDate.getDate() - offset * 7)
+  endDate.setDate(endDate.getDate() + offset * 7)
   const startDate = new Date(endDate)
   startDate.setDate(startDate.getDate() - 6)
   return {
