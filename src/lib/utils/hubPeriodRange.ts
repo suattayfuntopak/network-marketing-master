@@ -1,3 +1,5 @@
+import { fromCalendarKey, istanbulDayStartIso, todayCalendarKey, toCalendarKey } from '@/lib/utils/calendarDates'
+
 export type RollingWeekRange = {
   offset: number
   sinceIso: string
@@ -29,18 +31,28 @@ function startOfDay(d: Date): Date {
   return x
 }
 
-/** offset 0 = son 7 takvim günü (bugün dahil); -1 = geçmiş hafta, +1 = gelecek hafta (aylık ile aynı işaret) */
+function istanbulDayEndIso(key: string): string {
+  return new Date(`${key}T23:59:59.999+03:00`).toISOString()
+}
+
+/** Pazartesi–Pazar takvim haftası (TR/ISO); offset 0 = içinde bulunulan hafta, -1 = geçmiş, +1 = gelecek */
 export function rollingWeekRange(offset: number): RollingWeekRange {
-  const endDate = startOfDay(new Date())
-  endDate.setDate(endDate.getDate() + offset * 7)
-  const startDate = new Date(endDate)
-  startDate.setDate(startDate.getDate() - 6)
+  const today = fromCalendarKey(todayCalendarKey())
+  const daysFromMonday = (today.getDay() + 6) % 7
+  const monday = new Date(today)
+  monday.setDate(today.getDate() - daysFromMonday + offset * 7)
+  const sunday = new Date(monday)
+  sunday.setDate(monday.getDate() + 6)
+
+  const startKey = toCalendarKey(monday)
+  const endKey = toCalendarKey(sunday)
+
   return {
     offset,
-    sinceIso: startDate.toISOString(),
-    untilIso: endOfDay(endDate).toISOString(),
-    startDate,
-    endDate,
+    sinceIso: istanbulDayStartIso(startKey),
+    untilIso: istanbulDayEndIso(endKey),
+    startDate: startOfDay(monday),
+    endDate: startOfDay(sunday),
   }
 }
 

@@ -374,7 +374,7 @@ export type HubWeeklySelfPayload = {
   pctOverall: number
   callsGap: number
   loginDays: number
-  /** Son 7 takvim günü — giriş yapılan günler */
+  /** Pzt–Paz takvim haftası — giriş yapılan günler */
   weekActive: boolean[]
   fieldMetrics: HubSelfFieldMetrics
   pipelineStages: HubPipelineStageCounts
