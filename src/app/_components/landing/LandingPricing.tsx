@@ -83,9 +83,15 @@ export function LandingPricing() {
       <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto lg:grid-cols-3 items-stretch">
         
         {/* Plan A: Basic Plan */}
-        <div className="rounded-3xl border border-brand/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/60 transition duration-300">
+        <div
+          data-testid="plan-basic-card"
+          className="rounded-3xl border border-brand/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/60 transition duration-300"
+        >
           <div className="absolute right-6 top-6">
-            <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30">
+            <span
+              data-testid="plan-basic-popular-badge"
+              className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30"
+            >
               {t('landingPage.planPopularBadge')}
             </span>
           </div>
@@ -108,7 +114,10 @@ export function LandingPricing() {
             {/* Price */}
             <div className="flex flex-col">
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-slate-900 dark:text-white">
+                <span
+                  data-testid="plan-basic-price"
+                  className="text-4xl font-black text-slate-900 dark:text-white"
+                >
                   {formatTryPrice(getDisplayPrice('basic', billingPeriod))}
                 </span>
                 <span className="text-xs text-slate-500 dark:text-zinc-500">
@@ -130,7 +139,9 @@ export function LandingPricing() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span>{t('landingPage.planBasicFeat2', { limit: DAILY_AI_LIMITS.basic })}</span>
+                <span data-testid="plan-basic-ai-limit">
+                  {t('landingPage.planBasicFeat2', { limit: DAILY_AI_LIMITS.basic })}
+                </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />

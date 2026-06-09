@@ -44,7 +44,7 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 | `PLAYWRIGHT_TEST_EMAIL` | E2E test kullanıcısı e-postası |
 | `PLAYWRIGHT_TEST_PASSWORD` | E2E test kullanıcısı şifresi |
 
-`PLAYWRIGHT_TEST_*` yoksa auth setup boş state yazar; landing smoke testleri yine koşar, günlük sync testleri skip edilir.
+**`PLAYWRIGHT_TEST_*` tamamen isteğe bağlıdır.** Tanımlı değilse veya giriş başarısızsa auth setup boş session yazar ve skip eder; landing + mobil smoke testleri yine koşar. Korunan route testleri (egitim/itirazlar redirect) yalnızca geçerli auth varken çalışır. Yanlış secret girmek artık tüm job'u düşürmez.
 
 ### CI testi nasıl çalıştırılır?
 
@@ -53,6 +53,16 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 3. **Yerel:** `.env.local`’e `PLAYWRIGHT_TEST_EMAIL` / `PLAYWRIGHT_TEST_PASSWORD` ekleyip `npm run test:e2e`.
 
 Migration drift için: Actions’ta **Migration check** workflow’unu veya yerelde `npm run migrate:check:remote` (token + ref gerekir).
+
+### GitHub bildirim e-postalarını sadeleştirme
+
+Çift bildirim (Vercel deploy + Actions fail) almak istemiyorsanız:
+
+1. GitHub → profil **Settings → Notifications → Actions**
+2. **Send notifications for failed workflows only** seçin (veya `main` dışı branch’lerde kapatın)
+3. Vercel deploy bildirimleri Dashboard → Project → Settings → Notifications üzerinden ayrı yönetilir
+
+E2E workflow iki job kullanır: **Build** (önce) ve **E2E (chromium)** (`needs: build`). Build kırılırsa Playwright adımı hiç başlamaz — mailde hangi aşamanın düştüğü net görünür.
 
 ---
 
