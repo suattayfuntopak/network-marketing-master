@@ -230,7 +230,11 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
         />
       )}
 
-      {activeTab === 'summary' && <EkipSummaryTab />}
+      {activeTab === 'summary' && (
+        <div className="overflow-x-hidden">
+          <EkipSummaryTab />
+        </div>
+      )}
 
       {activeTab === 'tree' && (
         <TeamGenerationTree workspaceId={ws.workspaceId} teamPageUnlocked={teamPageUnlocked} />

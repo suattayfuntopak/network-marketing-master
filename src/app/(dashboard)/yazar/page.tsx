@@ -4,16 +4,27 @@ import * as React from 'react'
 import { Bot, Lock } from 'lucide-react'
 import { YzKocuContainer } from './_components/YzKocuContainer'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { parseYazarTab, type YazarTab } from '@/lib/domain/yazarTab'
+import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useFeatureAccess } from '@/hooks/useFeatureAccess'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
+const YAZAR_TAB_LABEL_KEYS: Record<YazarTab, string> = {
+  yazar: 'coachUi.tabMessage',
+  kocluk: 'coachUi.tabCoaching',
+  prova: 'coachUi.tabProva',
+  uyum: 'coachUi.tabCompliance',
+}
+
 interface PageProps {
-  searchParams: Promise<{ name?: string; note?: string; warmth?: string }>
+  searchParams: Promise<{ name?: string; note?: string; warmth?: string; tab?: string }>
 }
 
 export default function YazarPage({ searchParams }: PageProps) {
   const { t } = useTranslation()
-  const { name, note, warmth } = React.use(searchParams)
+  const { name, note, warmth, tab: tabParam } = React.use(searchParams)
+  const activeTab = parseYazarTab(tabParam)
+  const pageTitle = formatTabbedPageTitle(t('coachUi.pageTitle'), t(YAZAR_TAB_LABEL_KEYS[activeTab]))
   const { hasAiCoachAccess } = useFeatureAccess()
   const { openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
@@ -32,7 +43,7 @@ export default function YazarPage({ searchParams }: PageProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {t('coachUi.pageTitle')}
+              {pageTitle}
             </h1>
           </div>
         </header>

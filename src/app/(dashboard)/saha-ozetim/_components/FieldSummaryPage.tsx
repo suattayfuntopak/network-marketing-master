@@ -15,9 +15,11 @@ import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/components/hub/HubSelfActivityGrid'
 import {
   HubSummaryTabBar,
+  hubPeriodTabLabel,
   parseSummaryTab,
   type HubPeriodTab,
 } from '@/components/hub/HubSummaryTabBar'
+import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import {
   getHubDailySelfAction,
   getHubMonthlySelfAction,
@@ -208,7 +210,7 @@ export function FieldSummaryPage() {
 
   return (
     <HubPageShell
-      title={t('dashboard.panoFieldSummary')}
+      title={formatTabbedPageTitle(t('dashboard.panoFieldSummary'), hubPeriodTabLabel(t, tab))}
       customIcon={<History className="h-5 w-5" />}
       iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400"
       backHref="/pano"

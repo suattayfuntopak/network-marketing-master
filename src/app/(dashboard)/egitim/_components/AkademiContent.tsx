@@ -13,6 +13,7 @@ import { VideolarContent } from './VideolarContent'
 import { ItirazlarContent } from '@/app/(dashboard)/itirazlar/_components/ItirazlarContent'
 import { akademiAccent } from './akademiTheme'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
+import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 
 export function AkademiContent() {
   const { t } = useTranslation()
@@ -81,15 +82,22 @@ export function AkademiContent() {
             <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', akademiAccent.icon)}>
               <BookOpen className="h-5 w-5" strokeWidth={1.75} />
             </div>
-            <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('akademi.title')}</h1>
+            <h1 className="text-2xl font-bold text-[var(--text-1)]">
+              {formatTabbedPageTitle(
+                t('akademi.title'),
+                t(AKADEMI_TABS.find(row => row.key === tab)?.labelKey ?? 'akademi.tabContentBank'),
+              )}
+            </h1>
           </div>
           {addButton}
         </div>
 
         <div
-          className="mt-4 flex rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1"
+          className="horizontal-scroll-lock no-swipe mt-4 flex rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1"
           role="tablist"
           aria-label={t('akademi.title')}
+          data-no-swipe="true"
+          onTouchStart={e => e.stopPropagation()}
         >
           {AKADEMI_TABS.map(({ key, labelKey }) => (
             <button

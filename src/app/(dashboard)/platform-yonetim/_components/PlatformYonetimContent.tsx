@@ -11,7 +11,7 @@ import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatfor
 import {
   Crown, Users, ShieldCheck, Search,
   Mail, Sparkles, UserPlus, BookOpen, MessageSquare,
-  Plus, Loader2, CheckCircle2, Trash2
+  Plus, Loader2, CheckCircle2, Trash2, CreditCard, LayoutTemplate,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
@@ -314,14 +314,32 @@ export function PlatformYonetimContent() {
             <button
               type="button"
               onClick={() => setNavConfirm('payment')}
-              className="rounded-lg border border-emerald-300/80 bg-emerald-50 px-2 py-1.5 text-[10px] sm:px-3 sm:py-2 sm:text-[11px] font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 whitespace-nowrap"
+              aria-label={t('platformPage.openPaymentPage')}
+              title={t('platformPage.openPaymentPage')}
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-300/80 bg-emerald-50 text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 md:hidden"
+            >
+              <CreditCard className="h-4.5 w-4.5" strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setNavConfirm('landing')}
+              aria-label={t('platformPage.openLandingPage')}
+              title={t('platformPage.openLandingPage')}
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-300/80 bg-violet-50 text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 md:hidden"
+            >
+              <LayoutTemplate className="h-4.5 w-4.5" strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => setNavConfirm('payment')}
+              className="hidden rounded-lg border border-emerald-300/80 bg-emerald-50 px-3 py-2 text-[11px] font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 whitespace-nowrap md:inline-flex"
             >
               {t('platformPage.openPaymentPage')}
             </button>
             <button
               type="button"
               onClick={() => setNavConfirm('landing')}
-              className="rounded-lg border border-violet-300/80 bg-violet-50 px-2 py-1.5 text-[10px] sm:px-3 sm:py-2 sm:text-[11px] font-bold text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 whitespace-nowrap"
+              className="hidden rounded-lg border border-violet-300/80 bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 whitespace-nowrap md:inline-flex"
             >
               {t('platformPage.openLandingPage')}
             </button>
@@ -463,19 +481,19 @@ export function PlatformYonetimContent() {
             <Users className="h-4 w-4 text-brand" />
             {t('platformPage.workspacesTableTitle')}
           </h2>
-          <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-            <table className="w-full min-w-[960px] text-left border-collapse text-sm">
+          <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] md:overflow-x-visible">
+            <table className="w-full max-md:min-w-[920px] text-left border-collapse text-sm md:table-fixed">
               <thead>
-                <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
-                  <th className="px-3 py-2.5 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLeaderName')}</th>
-                  <th className="px-3 py-2.5 font-semibold align-middle whitespace-nowrap">{t('platformPage.thWorkspaceName')}</th>
-                  <th className="px-3 py-2.5 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLicensePlan')}</th>
-                  <th className="px-3 py-2.5 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thCandidates')}</th>
-                  <th className="px-3 py-2.5 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thDownlines')}</th>
-                  <th className="px-3 py-2.5 font-semibold align-middle whitespace-nowrap">{t('platformPage.thSponsor')}</th>
-                  <th className="px-3 py-2.5 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thExpiry')}</th>
-                  <th className="px-3 py-2.5 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thRegistration')}</th>
-                  <th className="px-3 py-2.5 font-semibold text-right align-middle whitespace-nowrap">{t('platformPage.thActions')}</th>
+                <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] text-xs font-bold select-none">
+                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLeaderName')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thWorkspaceName')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLicensePlan')}</th>
+                  <th className="px-1 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thCandidates')}</th>
+                  <th className="px-1 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thDownlines')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thSponsor')}</th>
+                  <th className="px-2 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thExpiry')}</th>
+                  <th className="px-2 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thRegistration')}</th>
+                  <th className="px-2 py-2 font-semibold text-right align-middle whitespace-nowrap">{t('platformPage.thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
@@ -513,7 +531,7 @@ export function PlatformYonetimContent() {
                         className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''}`}
                       >
                         {/* 1. Leader */}
-                        <td className="px-3 py-2.5 align-middle whitespace-nowrap">
+                        <td className="px-2 py-2 align-middle whitespace-nowrap">
                           <div className="flex items-center gap-2 min-w-0">
                             {w.avatarUrl ? (
                               <div className="h-7 w-7 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
@@ -535,10 +553,10 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 2. Workspace name */}
-                        <td className="px-3 py-2.5 align-middle font-medium whitespace-nowrap">{w.workspaceName}</td>
+                        <td className="px-2 py-2 align-middle font-medium whitespace-nowrap">{w.workspaceName}</td>
 
                         {/* 3. License type */}
-                        <td className="px-3 py-2.5 align-middle whitespace-nowrap font-bold">
+                        <td className="px-2 py-2 align-middle whitespace-nowrap font-bold">
                           <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
@@ -559,13 +577,13 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 4. Candidates count */}
-                        <td className="px-3 py-2.5 text-center align-middle font-bold text-blue-600 dark:text-blue-300 tabular-nums whitespace-nowrap">{w.candidateCount}</td>
+                        <td className="px-1 py-2 text-center align-middle font-bold text-blue-600 dark:text-blue-300 tabular-nums whitespace-nowrap">{w.candidateCount}</td>
 
                         {/* 5. Team count */}
-                        <td className="px-3 py-2.5 text-center align-middle font-bold text-brand tabular-nums whitespace-nowrap">{w.downlineCount}</td>
+                        <td className="px-1 py-2 text-center align-middle font-bold text-brand tabular-nums whitespace-nowrap">{w.downlineCount}</td>
 
                         {/* 6. Sponsor linkage */}
-                        <td className="px-3 py-2.5 align-middle font-semibold whitespace-nowrap">
+                        <td className="px-2 py-2 align-middle font-semibold whitespace-nowrap">
                           {w.isIndependent ? (
                             <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-purple-500/10 px-1.5 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400 truncate">
                               💎 {t('platformPage.independentDirect')}
@@ -576,7 +594,7 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 7. Expiry */}
-                        <td className={`px-3 py-2.5 text-center align-middle tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
+                        <td className={`px-2 py-2 text-center align-middle tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
                           {isPaidUnlimited ? (
                             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
                               ♾ {t('platformPage.unlimited')}
@@ -594,10 +612,10 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 8. Registration Date */}
-                        <td className="px-3 py-2.5 text-center align-middle text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
+                        <td className="px-2 py-2 text-center align-middle text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
 
                         {/* 9. Actions */}
-                        <td className="px-3 py-2.5 align-middle whitespace-nowrap text-right">
+                        <td className="px-2 py-2 align-middle whitespace-nowrap text-right">
                           <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
                             {(() => {
                               const waLink = buildPlatformWaLink(w, inviteCode)

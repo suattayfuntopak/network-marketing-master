@@ -4,7 +4,9 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Users } from 'lucide-react'
 import { EkipPanel } from './EkipPanel'
-import { EkipTabNav, resolveEkipTab, type EkipTabId } from './EkipTabNav'
+import { EkipTabNav, ekipTabLabel, resolveEkipTab, type EkipTabId } from './EkipTabNav'
+import { hubPeriodTabLabel, parseSummaryTab } from '@/components/hub/HubSummaryTabBar'
+import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 export function EkipPageContent() {
@@ -13,6 +15,15 @@ export function EkipPageContent() {
   const router = useRouter()
   const raw = searchParams.get('tab')
   const activeTab: EkipTabId = resolveEkipTab(raw)
+  const periodTab = parseSummaryTab(searchParams.get('period'))
+  const pageTitle =
+    activeTab === 'summary'
+      ? formatTabbedPageTitle(
+          t('team.title'),
+          ekipTabLabel(t, activeTab),
+          hubPeriodTabLabel(t, periodTab),
+        )
+      : formatTabbedPageTitle(t('team.title'), ekipTabLabel(t, activeTab))
 
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip?tab=members', { scroll: false })
@@ -27,7 +38,7 @@ export function EkipPageContent() {
           <Users className="h-5 w-5 text-[#854F0B]" strokeWidth={1.75} />
         </div>
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-1)]">{t('team.title')}</h1>
+          <h1 className="text-xl font-bold text-[var(--text-1)]">{pageTitle}</h1>
         </div>
       </header>
       <EkipTabNav activeTab={activeTab} />

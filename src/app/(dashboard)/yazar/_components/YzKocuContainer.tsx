@@ -51,9 +51,11 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
   return (
     <div className="space-y-6">
       <div
-        className="flex max-w-2xl mx-auto w-full overflow-x-auto rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm scrollbar-none"
+        className="horizontal-scroll-lock no-swipe flex max-w-2xl mx-auto w-full overflow-x-auto rounded-2xl bg-[var(--bg-card)] p-1.5 border border-[var(--border)] shadow-sm scrollbar-none"
         role="tablist"
         aria-label={t('coachUi.pageTitle')}
+        data-no-swipe="true"
+        onTouchStart={e => e.stopPropagation()}
       >
         {TABS.map(({ key, icon: Icon, labelKey, activeClass }) => (
           <button

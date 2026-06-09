@@ -9,11 +9,18 @@ export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
 /** @deprecated Use HubPeriodTab — kept for field summary imports */
 export type HubSummaryTab = HubPeriodTab
 
-const TAB_KEYS: Record<HubPeriodTab, string> = {
+export const HUB_PERIOD_TAB_LABEL_KEYS: Record<HubPeriodTab, string> = {
   daily: 'dashboard.summaryTabDaily',
   weekly: 'dashboard.summaryTabWeekly',
   monthly: 'dashboard.summaryTabMonthly',
   yearly: 'dashboard.summaryTabYearly',
+}
+
+export function hubPeriodTabLabel(
+  t: (key: string) => string,
+  tab: HubPeriodTab,
+): string {
+  return t(HUB_PERIOD_TAB_LABEL_KEYS[tab])
 }
 
 type HubSummaryTabBarProps = {
@@ -26,9 +33,11 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
 
   return (
     <div
-      className="flex gap-1 overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1 scrollbar-none"
+      className="horizontal-scroll-lock no-swipe flex gap-1 overflow-x-auto rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1 scrollbar-none"
       role="tablist"
       aria-label={t('dashboard.summaryTabList')}
+      data-no-swipe="true"
+      onTouchStart={e => e.stopPropagation()}
     >
       {HUB_PERIOD_TABS.map(tab => (
         <button
@@ -44,7 +53,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
               : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
           )}
         >
-          {t(TAB_KEYS[tab])}
+          {t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}
         </button>
       ))}
     </div>

@@ -22,6 +22,7 @@ import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubPageShell } from '@/components/hub/HubPageShell'
+import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
 import { getCrownSahaRadarAction } from '@/app/(dashboard)/crown/actions'
 import type { SahaRadarMember, SahaRadarFollowUp } from '@/app/(dashboard)/crown/actions'
@@ -400,7 +401,10 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
     <>
       {UpgradePrompt}
       <HubPageShell
-        title={t('crown.sahaRadarTitle')}
+        title={formatTabbedPageTitle(
+          t('crown.sahaRadarTitle'),
+          innerTab === 'takipler' ? t('crown.sahaRadarTabFollowUps') : t('crown.sahaRadarTabActivity'),
+        )}
         icon={Activity}
         iconClassName="bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400"
         backHref="/pano"
@@ -408,7 +412,12 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
         asTab={asTab}
       >
         {/* Sekme çubuğu */}
-        <div className="flex gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-1">
+        <div
+          className="no-swipe flex gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-1"
+          role="tablist"
+          data-no-swipe="true"
+          onTouchStart={e => e.stopPropagation()}
+        >
           <button
             type="button"
             onClick={() => setInnerTab('takipler')}

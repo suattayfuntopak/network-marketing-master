@@ -39,6 +39,11 @@ export function resolveEkipTab(raw: string | null): EkipTabId {
   return 'members'
 }
 
+export function ekipTabLabel(t: (key: string) => string, id: EkipTabId): string {
+  const tab = TABS.find(row => row.id === id)
+  return tab ? t(tab.labelKey) : ''
+}
+
 type Props = {
   activeTab: EkipTabId
 }
