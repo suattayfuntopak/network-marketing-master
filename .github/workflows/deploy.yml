@@ -1,0 +1,46 @@
+name: Deploy (production)
+
+# Vercel'in Git auto-deploy'u CI'dan BAĞIMSIZ çalışır; kırık bir commit bile
+# anında prod'a gidebilir. Bu workflow, E2E (Playwright) YEŞİL olduğunda Vercel
+# Deploy Hook'unu tetikleyerek prod deploy'u CI'a bağlar (yarış yok — deploy
+# yalnızca E2E tamamlanıp başarılı olunca tetiklenir).
+#
+# AKTİVASYON — yalnızca repo sahibi yapabilir (2 adım):
+#   1) Vercel → Project → Settings → Git → Deploy Hooks → branch "main" için bir
+#      hook oluştur; URL'i GitHub'a `VERCEL_DEPLOY_HOOK_URL` secret'ı olarak ekle.
+#   2) `vercel.json` içine şunu ekle (Git push auto-deploy'u kapatır, gate devreye girer):
+#        "git": { "deploymentEnabled": { "main": false } }
+#      Deploy Hook bu ayardan etkilenmez — yalnızca bu workflow deploy tetikler.
+#
+# Secret YOKKEN bu workflow no-op'tur: hiçbir şeyi bozmaz, Vercel auto-deploy
+# bugünkü gibi çalışmaya devam eder. Aktivasyon dökümanı:
+# docs/deploy/github-secrets.md → "CI-driven deploy (opsiyonel gate)".
+
+on:
+  workflow_run:
+    workflows: ['E2E (Playwright)']
+    types: [completed]
+
+jobs:
+  deploy:
+    name: Trigger Vercel prod deploy
+    # Yalnızca main'e push'tan gelen ve BAŞARILI biten E2E koşusunda deploy et.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy hook (E2E yeşilse)
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "::warning::VERCEL_DEPLOY_HOOK_URL tanımlı değil — CI-driven deploy PASİF."
+            echo "Vercel Git auto-deploy aktif kalmalı. Aktivasyon: docs/deploy/github-secrets.md"
+            exit 0
+          fi
+          echo "E2E yeşil → Vercel prod deploy tetikleniyor (commit ${SHA:0:7})"
+          curl -fsS -X POST "$HOOK_URL" >/dev/null
+          echo "Deploy hook tetiklendi."

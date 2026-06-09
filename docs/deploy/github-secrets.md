@@ -88,6 +88,25 @@ Yeni ürettiğiniz Supabase/Gemini anahtarlarını GitHub’a girdikten sonra **
 
 ---
 
+## CI-driven deploy (opsiyonel gate) — `deploy.yml`
+
+**Amaç:** Şu an Vercel, `main`’e her push’ta CI’dan **bağımsız** deploy eder. Build’i kıran commit zaten Vercel build’inde takılır; ama **derlenip davranışsal bozulan** (E2E’nin yakaladığı) bir commit prod’a gidebilir. Bu gate, prod deploy’u E2E yeşiline bağlar. Yarış yoktur: deploy yalnızca E2E koşusu tamamlanıp başarılı olunca `workflow_run` ile tetiklenir.
+
+`deploy.yml` zaten repoda ve **secret yokken no-op**’tur (hiçbir şeyi bozmaz). Aktive etmek için 2 adım:
+
+1. **Deploy Hook oluştur:** Vercel → Project → **Settings → Git → Deploy Hooks** → ad: `ci-prod`, branch: `main` → **Create**. Verilen URL’i kopyala.
+2. **Secret ekle:** GitHub → repo → **Settings → Secrets and variables → Actions → New repository secret** → ad: `VERCEL_DEPLOY_HOOK_URL`, değer: kopyaladığın URL.
+3. **Auto-deploy’u kapat:** `vercel.json` içine ekle (Git push auto-deploy kapanır; Deploy Hook etkilenmez):
+   ```json
+   { "ignoreCommand": "bash scripts/vercel-should-build.sh", "git": { "deploymentEnabled": { "main": false } } }
+   ```
+
+Bu üçü tamamlanınca: push → E2E koşar → yeşilse `deploy.yml` hook’u tetikler → Vercel deploy eder. Kırmızıysa deploy **gitmez**. Doğrudan-`main`-push akışın değişmez.
+
+> Secret’ı eklemeden 3. adımı yaparsan prod deploy **donar** (ne auto-deploy ne hook). Sıraya uy: önce 1–2, sonra 3.
+
+---
+
 ## Yerel `.env.local`
 
 Geliştirme ve `npm run dev` için Supabase + Gemini zorunlu. E2E koşacaksanız `PLAYWRIGHT_TEST_*` ekleyin. CI-only secret’ları (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`) yalnızca yerelde migration drift kontrolü yapacaksanız ekleyin.
