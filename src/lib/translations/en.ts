@@ -36,6 +36,8 @@ export const en = {
     notifications: "Notifications",
     settings: "Settings",
     logout: "Log Out",
+    appUpdateTitle: "A new version is ready — refresh the page.",
+    appUpdateReload: "Refresh",
     themeDark: "Switch to Dark mode",
     themeLight: "Switch to Light mode",
     themeSystem: "Switch to System mode",

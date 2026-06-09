@@ -2,12 +2,11 @@ import type { QueryClient } from '@tanstack/react-query'
 import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import {
-  getCrownEntriesPageAction,
-  getCrownFirst30PageAction,
   getCrownSahaRadarAction,
-  getCrownTeamMonthlyPulseAction,
   getCrownVideoPageAction,
+  getCrownTeamMonthlyPulseAction,
   getCrownTeamWeeklyPulseAction,
+  getCrownEntriesPageAction,
   getHubYearlySelfAction,
   getHubDailySelfAction,
   getHubMonthlyInsightsAction,
@@ -15,14 +14,15 @@ import {
   getHubWeeklySelfAction,
 } from '@/app/(dashboard)/crown/actions'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
-import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import {
+  getTeamFieldActivityAction,
+  getTeamRankingMetricsBatchAction,
+} from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from './keys'
-
-const DATA_STALE = 2 * 60 * 1000
-const METRICS_STALE = 60 * 1000
+import { QUERY_STALE } from './staleTimes'
 
 type WsSlice = {
   licenseType?: string | null
@@ -48,17 +48,17 @@ async function prefetchTeamFieldPeriods(
     queryClient.prefetchQuery({
       queryKey: queryKeys.teamFieldActivity(workspaceId, '7d', memberIds),
       queryFn: () => getTeamFieldActivityAction(workspaceId, '7d', memberIds),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.teamFieldActivity(workspaceId, '30d', memberIds),
       queryFn: () => getTeamFieldActivityAction(workspaceId, '30d', memberIds),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
   ])
 }
 
-/** Haftalık/aylık hub + ilgili crown metrikleri — layout SSR ve nav hover. */
+/** Saha özeti hub metrikleri — yalnızca /saha-ozetim ve ilgili route'larda. */
 export async function prefetchHubMetrics(
   queryClient: QueryClient,
   workspaceId: string,
@@ -68,27 +68,27 @@ export async function prefetchHubMetrics(
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubDailySelf(0),
       queryFn: () => getHubDailySelfAction(0),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubWeeklySelf(0),
       queryFn: () => getHubWeeklySelfAction(0),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubMonthlySelf(0),
       queryFn: () => getHubMonthlySelfAction(0),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubMonthlyInsights(0),
       queryFn: getHubMonthlyInsightsAction,
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubYearlySelf(0),
       queryFn: () => getHubYearlySelfAction(0),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
   ]
 
@@ -97,17 +97,17 @@ export async function prefetchHubMetrics(
       queryClient.prefetchQuery({
         queryKey: ['crown', 'team-weekly-pulse', workspaceId],
         queryFn: () => getCrownTeamWeeklyPulseAction(workspaceId),
-        staleTime: METRICS_STALE,
+        staleTime: QUERY_STALE.metrics,
       }),
       queryClient.prefetchQuery({
         queryKey: ['crown', 'team-monthly-pulse', workspaceId],
         queryFn: () => getCrownTeamMonthlyPulseAction(workspaceId),
-        staleTime: METRICS_STALE,
+        staleTime: QUERY_STALE.metrics,
       }),
       queryClient.prefetchQuery({
         queryKey: ['crown', 'entries', workspaceId],
         queryFn: () => getCrownEntriesPageAction(workspaceId),
-        staleTime: METRICS_STALE,
+        staleTime: QUERY_STALE.metrics,
       }),
     )
   }
@@ -124,38 +124,48 @@ export async function prefetchHubMetrics(
   }
 }
 
-/** Dashboard layout — sık kullanılan metrikleri paralel ısıt. */
-export async function prefetchDashboardMetrics(
-  queryClient: QueryClient,
-  workspaceId: string,
-  ws: WsSlice,
-) {
+/** Pano — aday listesi + saha nabız özeti. */
+export async function prefetchPanoMetrics(queryClient: QueryClient, workspaceId: string) {
   await Promise.all([
     queryClient.prefetchQuery({
-      queryKey: queryKeys.goalDashboard(),
-      queryFn: getGoalDashboardAction,
-      staleTime: METRICS_STALE,
+      queryKey: queryKeys.candidates(workspaceId),
+      queryFn: () => fetchCandidatesAction(workspaceId),
+      staleTime: QUERY_STALE.data,
     }),
     queryClient.prefetchQuery({
       queryKey: ['pano-field-insights', workspaceId],
       queryFn: () => getMyPanoInsightsAction(workspaceId),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     }),
-    queryClient.prefetchQuery({
-      queryKey: ['crown', 'video', workspaceId],
-      queryFn: () => getCrownVideoPageAction(workspaceId),
-      staleTime: METRICS_STALE,
-    }),
-    prefetchHubMetrics(queryClient, workspaceId, ws),
   ])
+}
 
-  if (hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) {
+/** Ekibim saha özeti — tek batch ranking sorgusu. */
+export async function prefetchEkipRankingMetrics(
+  queryClient: QueryClient,
+  workspaceId: string,
+  ws: WsSlice,
+) {
+  if (!hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) return
+
+  let team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
+  if (!team) {
     await queryClient.prefetchQuery({
-      queryKey: queryKeys.crownFirst30(workspaceId),
-      queryFn: () => getCrownFirst30PageAction(workspaceId),
-      staleTime: METRICS_STALE,
+      queryKey: queryKeys.team(workspaceId),
+      queryFn: () => fetchTeamBundleAction(workspaceId),
+      staleTime: QUERY_STALE.data,
     })
+    team = queryClient.getQueryData(queryKeys.team(workspaceId))
   }
+
+  const memberIds = downlineActivityMemberIds(team?.ekipRows ?? [])
+  if (memberIds.length === 0) return
+
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.teamRankingMetricsBatch(workspaceId, memberIds),
+    queryFn: () => getTeamRankingMetricsBatchAction(workspaceId, memberIds),
+    staleTime: QUERY_STALE.metrics,
+  })
 }
 
 /** Nav / pano kutusu hover — hedef route verisini önceden yükle. */
@@ -178,7 +188,15 @@ export function prefetchRouteMetrics(
     void queryClient.prefetchQuery({
       queryKey: queryKeys.candidates(workspaceId),
       queryFn: () => fetchCandidatesAction(workspaceId),
-      staleTime: DATA_STALE,
+      staleTime: QUERY_STALE.data,
+    })
+  }
+
+  if (href === '/pano') {
+    void queryClient.prefetchQuery({
+      queryKey: ['pano-field-insights', workspaceId],
+      queryFn: () => getMyPanoInsightsAction(workspaceId),
+      staleTime: QUERY_STALE.metrics,
     })
   }
 
@@ -193,7 +211,7 @@ export function prefetchRouteMetrics(
     void queryClient.prefetchQuery({
       queryKey: queryKeys.team(workspaceId),
       queryFn: () => fetchTeamBundleAction(workspaceId),
-      staleTime: DATA_STALE,
+      staleTime: QUERY_STALE.data,
     })
   }
 
@@ -201,7 +219,7 @@ export function prefetchRouteMetrics(
     void queryClient.prefetchQuery({
       queryKey: queryKeys.goalDashboard(),
       queryFn: getGoalDashboardAction,
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     })
   }
 
@@ -209,11 +227,15 @@ export function prefetchRouteMetrics(
     void prefetchHubMetrics(queryClient, workspaceId, wsSlice)
   }
 
+  if (href === '/ekip' || href === '/ekibim') {
+    void prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice)
+  }
+
   if (href === '/canli-egitim') {
     void queryClient.prefetchQuery({
       queryKey: ['crown', 'video', workspaceId],
       queryFn: () => getCrownVideoPageAction(workspaceId),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     })
   }
 
@@ -221,8 +243,7 @@ export function prefetchRouteMetrics(
     void queryClient.prefetchQuery({
       queryKey: queryKeys.crownSahaRadar(workspaceId),
       queryFn: () => getCrownSahaRadarAction(workspaceId),
-      staleTime: METRICS_STALE,
+      staleTime: QUERY_STALE.metrics,
     })
   }
-
 }

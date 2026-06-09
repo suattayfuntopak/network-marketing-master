@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo } from 'react'
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
@@ -11,10 +11,11 @@ import {
   parseSummaryTab,
   type HubPeriodTab,
 } from '@/components/hub/HubSummaryTabBar'
-import { getTeamRankingMetricsAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { getTeamRankingMetricsBatchAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamFieldRankingTable } from './TeamFieldRankingTable'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 
@@ -27,7 +28,6 @@ function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
 
 export function EkipSummaryTab() {
   const { t } = useTranslation()
-  const queryClient = useQueryClient()
   const { data: ws } = useWorkspace()
   const { data: members = [], isLoading: membersLoading } = useEkipPanelRows(ws?.workspaceId)
   const router = useRouter()
@@ -63,25 +63,15 @@ export function EkipSummaryTab() {
   const memberIds = useMemo(() => downlines.map(m => m.user_id), [downlines])
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
-    queryKey: queryKeys.teamRankingMetrics(ws?.workspaceId ?? '', pulsePeriod, memberIds),
-    queryFn: () => getTeamRankingMetricsAction(ws!.workspaceId, pulsePeriod, memberIds),
+  const { data: batch, isLoading: metricsLoading } = useQuery({
+    queryKey: queryKeys.teamRankingMetricsBatch(ws?.workspaceId ?? '', memberIds),
+    queryFn: () => getTeamRankingMetricsBatchAction(ws!.workspaceId, memberIds),
     enabled: !!ws?.workspaceId && memberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 60_000,
+    staleTime: QUERY_STALE.metrics,
     placeholderData: keepPreviousData,
   })
 
-  useEffect(() => {
-    if (!ws?.workspaceId || memberIds.length === 0 || !teamPulseUnlocked) return
-    const periods: PulsePeriod[] = ['today', '7d', '30d', 'ytd']
-    for (const p of periods) {
-      void queryClient.prefetchQuery({
-        queryKey: queryKeys.teamRankingMetrics(ws.workspaceId, p, memberIds),
-        queryFn: () => getTeamRankingMetricsAction(ws.workspaceId, p, memberIds),
-        staleTime: 60_000,
-      })
-    }
-  }, [ws?.workspaceId, memberIds, teamPulseUnlocked, queryClient])
+  const metrics = batch?.[pulsePeriod === 'all' ? 'ytd' : pulsePeriod]
 
   const getMemberHref = useCallback(
     (row: { user_id: string }) => {

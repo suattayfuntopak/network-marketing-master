@@ -8,18 +8,14 @@ import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import { queryKeys } from './keys'
-import { prefetchDashboardMetrics } from './prefetchRouteMetrics'
+import { QUERY_STALE } from './staleTimes'
 
-const WORKSPACE_STALE = 5 * 60 * 1000
-const CANDIDATES_STALE = 2 * 60 * 1000
-const TEAM_STALE = 2 * 60 * 1000
-
-/** Dashboard layout SSR: kritik veriyi bekler; ağır hub metriklerini arka planda ısıtır. */
+/** Dashboard layout SSR: yalnızca kritik veri; route metrikleri nav/hover ile ısınır. */
 export async function prefetchDashboardQueries(queryClient: QueryClient): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: queryKeys.workspace(),
     queryFn: fetchWorkspaceAction,
-    staleTime: WORKSPACE_STALE,
+    staleTime: QUERY_STALE.workspace,
   })
 
   const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
@@ -29,27 +25,26 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     queryClient.prefetchQuery({
       queryKey: queryKeys.candidates(ws.workspaceId),
       queryFn: () => fetchCandidatesAction(ws.workspaceId),
-      staleTime: CANDIDATES_STALE,
+      staleTime: QUERY_STALE.data,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.team(ws.workspaceId),
       queryFn: () => fetchTeamBundleAction(ws.workspaceId),
-      staleTime: TEAM_STALE,
+      staleTime: QUERY_STALE.data,
     }),
     queryClient.prefetchQuery({
       queryKey: queryKeys.dailyAiUsage(),
       queryFn: fetchAIUsageAction,
-      staleTime: 60_000,
+      staleTime: QUERY_STALE.usage,
     }),
   ])
 
-  const background: Promise<void>[] = [
+  const background: Promise<unknown>[] = [
     queryClient.prefetchQuery({
       queryKey: queryKeys.videoCatalog(ws.workspaceId),
       queryFn: () => getVideoCatalogAction(ws.workspaceId),
-      staleTime: 60_000,
+      staleTime: QUERY_STALE.usage,
     }),
-    prefetchDashboardMetrics(queryClient, ws.workspaceId, ws),
   ]
 
   if (ws.isSuperAdmin) {
@@ -57,12 +52,12 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
       queryClient.prefetchQuery({
         queryKey: queryKeys.platformWorkspaces(),
         queryFn: getPlatformWorkspacesAction,
-        staleTime: 60_000,
+        staleTime: QUERY_STALE.usage,
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.platformModeration(),
         queryFn: getPendingRequestsAction,
-        staleTime: 30_000,
+        staleTime: QUERY_STALE.metrics,
       }),
     )
   }

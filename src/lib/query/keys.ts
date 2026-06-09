@@ -30,6 +30,9 @@ export const queryKeys = {
     ['team-period-pulse', workspaceId, period] as const,
   teamRankingMetrics: (workspaceId: string, period: string, memberIds: string[]) =>
     ['team-ranking-metrics', workspaceId, period, [...memberIds].sort().join(',')] as const,
+  /** Tüm dönemler tek round-trip — Ekibim saha özeti sekmesi */
+  teamRankingMetricsBatch: (workspaceId: string, memberIds: string[]) =>
+    ['team-ranking-metrics-batch', workspaceId, [...memberIds].sort().join(',')] as const,
   teamProgressMap: (workspaceId: string, memberIds: string[]) =>
     ['team-progress-map', workspaceId, [...memberIds].sort().join(',')] as const,
   notifications: () => ['notifications'] as const,

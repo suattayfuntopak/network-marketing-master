@@ -49,10 +49,6 @@ export function OdemeClient() {
   const basicDeepLinkLogged = useRef(false)
 
   useEffect(() => {
-    if (highlightYearly) setBillingPeriod('yearly')
-  }, [highlightYearly])
-
-  useEffect(() => {
     if (highlightBasic && basicPlanRef.current) {
       basicPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }

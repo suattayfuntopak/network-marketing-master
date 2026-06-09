@@ -1,6 +1,15 @@
 import type { NextConfig } from "next";
 
+const buildId = (
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  process.env.GITHUB_SHA ??
+  "dev"
+).slice(0, 7);
+
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_BUILD_ID: buildId,
+  },
   experimental: {
     viewTransition: true,
   },

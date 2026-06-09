@@ -36,6 +36,8 @@ export const tr = {
     notifications: "Bildirimler",
     settings: "Ayarlar",
     logout: "Çıkış Yap",
+    appUpdateTitle: "Yeni sürüm hazır — sayfayı yenileyin.",
+    appUpdateReload: "Yenile",
     themeDark: "Dark moduna geç",
     themeLight: "Light moduna geç",
     themeSystem: "System moduna geç",

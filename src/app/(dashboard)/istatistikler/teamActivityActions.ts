@@ -179,31 +179,13 @@ export async function getTeamFieldActivityAction(
   return { totals, byUser }
 }
 
-export async function getTeamRankingMetricsAction(
-  workspaceId: string,
+const RANKING_BATCH_PERIODS: PulsePeriod[] = ['today', '7d', '30d', 'ytd']
+
+async function computeTeamRankingMetrics(
+  supabase: Awaited<ReturnType<typeof createClient>>,
   period: PulsePeriod,
-  memberUserIds: string[],
+  uniqueIds: string[],
 ): Promise<TeamRankingMetricsResult> {
-  const empty: TeamRankingMetricsResult = { byUser: {} }
-
-  const ctx = await assertWorkspaceMember(workspaceId)
-  const { supabase, user } = ctx
-  const licenseType =
-    'licenseType' in ctx && ctx.licenseType
-      ? ctx.licenseType
-      : (
-          await supabase
-            .from('nmm_workspaces')
-            .select('license_type')
-            .eq('id', workspaceId)
-            .single()
-        ).data?.license_type
-
-  if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
-
-  const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
-  if (uniqueIds.length === 0) return empty
-
   const funnelRange = funnelRangeForPulsePeriod(period)
   const startIso = periodStartIso(period)
 
@@ -273,6 +255,80 @@ export async function getTeamRankingMetricsAction(
   }
 
   return { byUser }
+}
+
+export type TeamRankingMetricsBatchResult = Record<
+  'today' | '7d' | '30d' | 'ytd',
+  TeamRankingMetricsResult
+>
+
+export async function getTeamRankingMetricsBatchAction(
+  workspaceId: string,
+  memberUserIds: string[],
+): Promise<TeamRankingMetricsBatchResult> {
+  const emptyPeriod = (): TeamRankingMetricsResult => ({ byUser: {} })
+  const empty: TeamRankingMetricsBatchResult = {
+    today: emptyPeriod(),
+    '7d': emptyPeriod(),
+    '30d': emptyPeriod(),
+    ytd: emptyPeriod(),
+  }
+
+  const ctx = await assertWorkspaceMember(workspaceId)
+  const { supabase, user } = ctx
+  const licenseType =
+    'licenseType' in ctx && ctx.licenseType
+      ? ctx.licenseType
+      : (
+          await supabase
+            .from('nmm_workspaces')
+            .select('license_type')
+            .eq('id', workspaceId)
+            .single()
+        ).data?.license_type
+
+  if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
+
+  const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
+  if (uniqueIds.length === 0) return empty
+
+  const entries = await Promise.all(
+    RANKING_BATCH_PERIODS.map(async period => [
+      period,
+      await computeTeamRankingMetrics(supabase, period, uniqueIds),
+    ] as const),
+  )
+
+  return Object.fromEntries(entries) as TeamRankingMetricsBatchResult
+}
+
+export async function getTeamRankingMetricsAction(
+  workspaceId: string,
+  period: PulsePeriod,
+  memberUserIds: string[],
+): Promise<TeamRankingMetricsResult> {
+  const empty: TeamRankingMetricsResult = { byUser: {} }
+
+  const ctx = await assertWorkspaceMember(workspaceId)
+  const { supabase, user } = ctx
+  const licenseType =
+    'licenseType' in ctx && ctx.licenseType
+      ? ctx.licenseType
+      : (
+          await supabase
+            .from('nmm_workspaces')
+            .select('license_type')
+            .eq('id', workspaceId)
+            .single()
+        ).data?.license_type
+
+  if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
+
+  const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
+  if (uniqueIds.length === 0) return empty
+
+  const normalized = period === 'all' ? 'ytd' : period
+  return computeTeamRankingMetrics(supabase, normalized, uniqueIds)
 }
 
 export async function getMemberActivityDetailAction(
