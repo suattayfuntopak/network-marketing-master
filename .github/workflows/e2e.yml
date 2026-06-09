@@ -32,8 +32,11 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '22'
           cache: npm
+
+      - name: Node & npm versions
+        run: node --version && npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -59,7 +62,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '22'
           cache: npm
 
       - name: Install dependencies
