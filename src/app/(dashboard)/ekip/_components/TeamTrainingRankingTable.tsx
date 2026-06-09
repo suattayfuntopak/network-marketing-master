@@ -4,6 +4,7 @@ import { useMemo } from 'react'
 import { BookOpen, PlayCircle, Shield, Trophy } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { PerfLearningMap } from '@/app/(dashboard)/istatistikler/_components/TeamPerformanceTable'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
@@ -77,7 +78,7 @@ export function TeamTrainingRankingTable({
         <Trophy className="h-4 w-4 text-amber-500" />
         {t('crown.ranking')}
       </div>
-      <div className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none">
+      <HorizontalScrollLock className="rounded-xl border border-[var(--border)]">
         <table className="w-full min-w-[420px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]">
@@ -132,7 +133,7 @@ export function TeamTrainingRankingTable({
             ))}
           </tbody>
         </table>
-      </div>
+      </HorizontalScrollLock>
     </div>
   )
 }

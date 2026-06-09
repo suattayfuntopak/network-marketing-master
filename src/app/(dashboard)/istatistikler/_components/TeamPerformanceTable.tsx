@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Users, Crown, Lock, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
@@ -115,11 +116,7 @@ export function TeamPerformanceTable({
           {t('statsPage.teamEmpty')}
         </div>
       ) : (
-        <div
-          className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] no-swipe"
-          data-no-swipe="true"
-          onTouchStart={e => e.stopPropagation()}
-        >
+        <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
           <table className="w-full text-left border-collapse text-sm min-w-[800px]">
             <thead>
               <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
@@ -237,7 +234,7 @@ export function TeamPerformanceTable({
               )}
             </tbody>
           </table>
-        </div>
+        </HorizontalScrollLock>
       )}
 
       {teamStatsLocked && performanceRows.length > 0 && (

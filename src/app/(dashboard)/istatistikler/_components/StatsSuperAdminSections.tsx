@@ -15,6 +15,7 @@ import {
   type AIUsageArchivePeriod,
 } from '../actions'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 
@@ -183,10 +184,7 @@ export function StatsSuperAdminSections({
         <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
       </div>
 
-      <div
-        className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
-        onTouchStart={e => e.stopPropagation()}
-      >
+      <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
         <table className="w-full text-left border-collapse text-sm min-w-[640px]">
           <thead>
             <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
@@ -255,7 +253,7 @@ export function StatsSuperAdminSections({
             )}
           </tbody>
         </table>
-      </div>
+      </HorizontalScrollLock>
     </section>
   )
 }

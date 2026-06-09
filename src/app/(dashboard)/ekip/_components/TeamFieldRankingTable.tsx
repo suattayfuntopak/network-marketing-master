@@ -14,6 +14,7 @@ import {
 import { clsx } from 'clsx'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
 import {
   FUNNEL_METRIC_ORDER,
@@ -63,10 +64,6 @@ function rowStickyBg(idx: number): string {
   if (idx === 0) return 'bg-amber-50/70 dark:bg-amber-950/20'
   if (idx === 2) return 'bg-sky-50/70 dark:bg-sky-950/20'
   return 'bg-[var(--bg-card)]'
-}
-
-function stopSwipePropagation(e: React.TouchEvent) {
-  e.stopPropagation()
 }
 
 export function TeamFieldRankingTable({
@@ -135,13 +132,7 @@ export function TeamFieldRankingTable({
         {loading ? (
           <Skeleton className="h-48 rounded-xl" />
         ) : (
-          <div
-            className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none no-swipe overscroll-x-contain touch-pan-x"
-            data-no-swipe="true"
-            onTouchStart={stopSwipePropagation}
-            onTouchMove={stopSwipePropagation}
-            onTouchEnd={stopSwipePropagation}
-          >
+          <HorizontalScrollLock className="rounded-xl border border-[var(--border)]">
             <table className="w-full min-w-[640px] border-collapse text-sm">
               <thead>
                 <tr className="border-b border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]">
@@ -223,7 +214,7 @@ export function TeamFieldRankingTable({
                 })}
               </tbody>
             </table>
-          </div>
+          </HorizontalScrollLock>
         )}
       </section>
 

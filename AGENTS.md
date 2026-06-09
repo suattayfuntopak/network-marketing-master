@@ -14,6 +14,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Use `import { Z } from '@/lib/ui/zIndex'` and `Z.confirm`, `Z.sheet`, `Z.fullscreen`, etc.
 - Do **not** add new raw Tailwind `z-[NN]` classes; extend `zIndex.ts` if a new layer is needed.
 
+### Horizontal scroll (mobile)
+- Yatay kaydırılan tablo/kutu için `HorizontalScrollLock` (`@/components/ui/HorizontalScrollLock`) kullanın — sayfa swipe ile çakışmaz.
+- Ham `overflow-x-auto` + `no-swipe` yerine bu bileşeni tercih edin.
+
 ### i18n
 - User-visible copy: `useTranslation()` → `t('section.key', { vars })`.
 - Avoid `lang === 'en' ? ... : ...` in components; add keys to `src/lib/translations/tr.ts` and `en.ts`.

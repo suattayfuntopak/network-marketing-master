@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Phone, Trophy, MessageCircle, UserPlus, BarChart3, ChevronDown } from 'lucide-react'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
@@ -175,7 +176,7 @@ export function TeamActivitySummary({
 
             {showRanking && (
               <div className="px-4 pb-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                <div className="overflow-x-auto scrollbar-none" data-no-swipe="true" onTouchStart={e => e.stopPropagation()}>
+                <HorizontalScrollLock>
                   <table className="w-full min-w-[480px] text-left text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border)] text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
@@ -240,7 +241,7 @@ export function TeamActivitySummary({
                       ))}
                     </tbody>
                   </table>
-                </div>
+                </HorizontalScrollLock>
               </div>
             )}
           </div>

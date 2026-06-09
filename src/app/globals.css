@@ -195,6 +195,13 @@ body {
   }
 }
 
+/* Yatay kaydırma alanları — pan-x, sayfa swipe ile çakışmaz (no-swipe + data-no-swipe ile kullanın) */
+@utility horizontal-scroll-lock {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  touch-action: pan-x;
+}
+
 /* Bottom sheet slide-up animation */
 @keyframes slide-up {
   from { transform: translateY(100%); opacity: 0.6; }
