@@ -15,7 +15,11 @@ import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import { ODEME_BASIC_YEARLY_DEEP_LINK } from '@/lib/domain/paymentRoutes'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
 export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
@@ -283,7 +287,7 @@ export async function sendTrialLifecycleEmail(
   const { subject, html } = contentFor(kind, name, lang, stats)
 
   try {
-    await resend.emails.send({ from: FROM_EMAIL, to: [email], replyTo: NMM_REPLY_TO, subject, html })
+    await getResend().emails.send({ from: FROM_EMAIL, to: [email], replyTo: NMM_REPLY_TO, subject, html })
     return true
   } catch (err) {
     console.error('[Resend] trial email failed:', kind, err)

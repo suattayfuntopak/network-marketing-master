@@ -11,7 +11,11 @@ import {
   emailPlanBox,
 } from '@/lib/infra/emailTemplate'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+let _resend: Resend | null = null
+function getResend(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
 /**
@@ -72,7 +76,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
       ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [email],
       replyTo: NMM_REPLY_TO,
@@ -152,7 +156,7 @@ export async function sendPaymentSuccessEmail(
       ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [email],
       replyTo: NMM_REPLY_TO,
@@ -221,7 +225,7 @@ export async function sendLicenseExpiryEmail(
       ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [email],
       replyTo: NMM_REPLY_TO,
@@ -261,7 +265,7 @@ export async function sendAdminNewUserEmail(
   ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [adminEmail],
       replyTo: newUserEmail,
@@ -311,7 +315,7 @@ export async function sendUnresolvedOrderAlertEmail(params: {
   ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [SUPER_ADMIN_EMAIL, 'info@suattayfuntopak.com'],
       replyTo: NMM_REPLY_TO,
@@ -360,7 +364,7 @@ export async function sendModerationAlertEmail(
   ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: ['info@suattayfuntopak.com'],
       replyTo: userEmail,
@@ -431,7 +435,7 @@ export async function sendModerationApprovedEmail(
       ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [userEmail],
       replyTo: NMM_REPLY_TO,
@@ -509,7 +513,7 @@ export async function sendModerationRejectedEmail(
       ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [userEmail],
       replyTo: NMM_REPLY_TO,
@@ -560,7 +564,7 @@ export async function sendBankTransferNotifyEmail(
   ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: ['info@suattayfuntopak.com'],
       replyTo: userEmail,
@@ -619,7 +623,7 @@ export async function sendOverdueDigestEmail(
         ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [email],
       replyTo: NMM_REPLY_TO,
@@ -673,7 +677,7 @@ export async function sendPasswordResetEmail(
         ].join('')
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_EMAIL,
       to: [email],
       replyTo: NMM_REPLY_TO,

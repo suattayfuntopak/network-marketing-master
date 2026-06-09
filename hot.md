@@ -1,5 +1,245 @@
 # Hot Log
 
+## 2026-06-09 — İsteğe bağlı takip: sponsor derinliği, SW precache, E2E docs ✅
+
+### Ekip Ağacı — gerçek nesil derinliği
+- Migration `076_team_tree_parent_rpc.sql`: `nmm_leader_downline_workspace_tree()` (parent_id ile recursive downline).
+- `memberGeneration.ts` + test: sponsor zincirinden nesil hesabı (lider=0, doğrudan=1, …).
+- `treeActions.ts` flat 1/2 yerine RPC + `computeMemberGeneration`.
+
+### PWA
+- `sw.js`: `/pano` + `/manifest.json` install precache (`nmm-shell-v2`).
+
+### E2E dokümantasyon
+- `docs/deploy/github-secrets.md` + README: secret yoksa E2E job skip, adım adım kurulum.
+
+### Dosyalar
+`076_team_tree_parent_rpc.sql`, `memberGeneration.ts`, `memberGeneration.test.ts`, `treeActions.ts`, `sw.js`, `database.types.ts`, `github-secrets.md`, `README.md`.
+
+## 2026-06-09 — Ekip Ağacı avatar + 5 ek öneri ✅
+
+### Ekip Ağacı
+- `GenerationTreeNode.avatarUrl` — RPC'den gelen `avatar_url` ağaç sekmesinde `PersonAvatar` ile gösteriliyor.
+
+### Ek öneriler (1–5)
+1. **Ranking DB:** Batch action tek `daily_actions` sorgusu + bellek içi dönem filtresi; 4 ayrı action sorgusu kaldırıldı.
+2. **CI lint:** `eslint --max-warnings 0`; dead code ve unused import temizliği.
+3. **Pano SSR prefetch:** `pano/page.tsx` server-side `prefetchPanoMetrics` + `HydrationBoundary`.
+4. **PWA SW:** `public/sw.js` + `ServiceWorkerRegister`; statik asset cache, AppVersionGuard ile `SKIP_WAITING`.
+5. **Playwright:** Secret yoksa E2E bilinçli skip (workflow warning + yeşil job).
+
+### Dosyalar
+`treeActions.ts`, `TeamGenerationTree.tsx`, `teamActivityActions.ts`, `pano/page.tsx`, `sw.js`, `ServiceWorkerRegister.tsx`, `AppVersionGuard.tsx`, `DashboardShell.tsx`, `TeamPerformanceSection.tsx`, `TeamPerformanceTable.tsx`, `ekip/actions.ts`, `trialPush.ts`, `trial-emails/route.ts`, `package.json`, `e2e.yml`.
+
+## 2026-06-09 — Performans 2–5 + CI lint + deploy sürüm koruması ✅
+
+### Onaylanan öneriler (2–5)
+- **2 Prefetch daraltma:** Layout artık hub/hedef/pano metriklerini ısıtmıyor; `/pano` → pano insights, `/saha-ozetim` → hub, `/ekip` → ranking batch (nav hover).
+- **3 Batch ranking:** `getTeamRankingMetricsBatchAction` — tek auth, 4 dönem paralel; Ekibim Saha Özeti sekmeleri anında geçiş.
+- **4 staleTime:** `QUERY_STALE` (`staleTimes.ts`) — data 120s, metrics 90s, workspace 5dk.
+- **5 Deploy guard:** `NEXT_PUBLIC_BUILD_ID` + `/api/app-version` + `AppVersionGuard` (visibilitychange → yenile toast).
+
+### CI
+- `OdemeClient`: gereksiz `useEffect(setBillingPeriod)` kaldırıldı (eslint error).
+- Build job'a `npm run lint` eklendi.
+
+### Dosyalar
+`staleTimes.ts`, `buildId.ts`, `AppVersionGuard.tsx`, `app-version/route.ts`, `next.config.ts`, `teamActivityActions.ts`, `EkipSummaryTab.tsx`, `prefetchDashboard.ts`, `prefetchRouteMetrics.ts`, `keys.ts`, `DashboardShell.tsx`, `OdemeClient.tsx`, `e2e.yml`, `tr.ts`, `en.ts`.
+
+## 2026-06-09 — İstatistikler UI + Saha Özeti mobil + performans ✅
+
+### UI
+- İstatistikler: dark temada başlık `TrendingUp` ikonu görünür (`dark:text-sky-300`, stroke 2).
+- Aday Dönüşüm Hunisi alt açıklama metni kaldırıldı.
+- `PulsePeriodTabs`: HubSummaryTabBar ile aynı geçiş (parlama/`transition-all`/`text-brand` kaldırıldı).
+- Ekibim Saha Özeti: mobil yatay sürüklemeyi kilitle (`overflow-x-clip`, `no-swipe`, `touch-pan-y`).
+
+### Yıllık / legacy URL
+- `?period=all` / `?tab=all` → `yearly` yönlendirmesi (Ekibim özet, Saha Özetim).
+- `normalizePulsePeriod`: eski `all` dönemi yıllık (`ytd`) sayılır.
+
+### Performans
+- Dashboard layout prefetch: yalnız workspace + aday + ekip + AI kotası **beklenir**; hub/video/metrik ısıtması **arka planda**.
+- Saha Özeti dönem sekmeleri: `keepPreviousData` + tüm dönemler için arka plan prefetch.
+
+### Dosyalar
+`PulsePeriodTabs`, `StatsCharts`, `IstatistiklerContent`, `EkipSummaryTab`, `EkipPanel`, `TeamFieldRankingTable`, `FieldSummaryPage`, `prefetchDashboard.ts`, `pulse.ts`, `useCandidateStats.ts`.
+
+## 2026-06-09 — Yıllık sekmesi geri + saha ortağı davet + CI build fix ✅
+
+### Ürün
+- Saha Özetim / Ekibim özet / İstatistikler: **Tümü → Yıllık** geri (`yearly` / `ytd`).
+- Saha ortağı kartı: YZ davet sekmesi kaldırıldı; tam genişlik **Uygulamaya Davet Et** → WhatsApp hazır metin.
+- `team.inviteWaMessage` yeni davet metni (TR/EN).
+
+### CI (354745c Build fail)
+Build job prod Supabase secret'larıyla derleniyordu; CI compile adımı artık **placeholder env** kullanıyor. E2E job gerçek secret'ları koruyor. `NODE_OPTIONS=6144MB`.
+
+### Dosyalar
+`HubSummaryTabBar`, `FieldSummaryPage`, `PulsePeriodTabs`, `pulse.ts`, `EkipSummaryTab`, `TeamPerformanceSection`, `MemberActivitySheet`, `HubCrownFunnelGrid`, `keys.ts`, `prefetchRouteMetrics.ts`, `tr.ts`, `en.ts`, `.github/workflows/e2e.yml`.
+
+## 2026-06-09 — Vercel d2a6dce build + CI önerileri (1–3, 5) ✅
+
+### d2a6dce Vercel hatası
+`extractYoutubeId` `'use server'` export — **9e82591** ile zaten düzeltildi (`youtubeId.ts`). Yeni push sonrası Vercel yeşil geçmeli.
+
+### Onaylanan öneriler
+1. **PLAYWRIGHT_* isteğe bağlı** — `github-secrets.md` netleştirildi (auth fail → skip).
+2. **data-testid** — `plan-basic-popular-badge`, `plan-basic-price`, `plan-basic-ai-limit`; E2E selector güncellendi.
+3. **Bildirim sadeleştirme** — `github-secrets.md` GitHub Actions notification rehberi.
+5. **CI iki job** — `e2e.yml`: `Build` → `E2E (chromium)` (`needs: build`).
+
+### Dosyalar
+`LandingPricing.tsx`, `landing.spec.ts`, `e2e.yml`, `github-secrets.md`, `README.md`.
+
+## 2026-06-09 — E2E CI düzeltmesi (deploy sonrası fail maili) ✅
+
+### Kök nedenler
+1. **Build kırığı:** `extractYoutubeId` `'use server'` dosyasından export ediliyordu → `npm run build` CI'da düşüyordu.
+2. **Eski E2E assertion:** Günlük sekmede öncelik listesi kaldırıldıktan sonra auth'lu test hâlâ `öncelik` arıyordu.
+3. **Landing pricing testi:** EN rozet metni `Popular` (test `Most Popular` arıyordu).
+4. **Auth setup:** Hatalı secret'larda tüm job fail oluyordu → soft-skip eklendi.
+
+### Düzeltmeler
+- `youtubeId.ts` util; `videoActions` / `moderation` import güncellendi.
+- `auth.setup.ts` try/catch + boş session fallback.
+- `day-journal-smoke.spec.ts` → Günlük sekme yükleme testi.
+- `landing.spec.ts` → Popular / Daily 20 AI Messages metinleri.
+- `e2e.yml` Node 22; `playwright.config` list+html reporter.
+
+### Dosyalar
+`youtubeId.ts`, `videoActions.ts`, `moderation.ts`, `auth.setup.ts`, `landing.spec.ts`, `day-journal-smoke.spec.ts`, `e2e.yml`, `playwright.config.ts`.
+
+## 2026-06-09 — Eğitim onay masası, Ekibim sadeleştirme, Yıllık→Tümü ✅
+
+### Uygulananlar
+1. **Platform Yönetimi:** 4. KPI kutusu **Eğitim Talepleri** (onay bekleyen sayı); onay masası başlığı **İçerik/Video/İtiraz Talepleri Onay Masası**; video talepleri masaya dahil.
+2. **Video moderasyonu:** Super admin dışı video ekleme → onay kuyruğu; migration `075_training_videos_moderation.sql`; super admin anında yayın.
+3. **Vaktin Varsa (mobil):** + İçerik / + Video / + İtiraz butonları kare ikon-only; masaüstünde metin korundu.
+4. **Ekibim:** Sekme butonları mobilde ikon-only; lider performans paneli başlığı kaldırıldı; listede lider gizlendi; saha özeti legend kutusu kaldırıldı; boru hattı bağlantısını kaldır butonu silindi.
+5. **Dönem sekmeleri:** Bugün/7g/30g → Günlük/Haftalık/Aylık/Tümü (Saha Özetim, aktivite özeti, istatistikler); Yıllık metrik kaldırıldı.
+
+### Dosyalar
+`PlatformYonetimContent.tsx`, `moderation.ts`, `videoActions.ts`, `075_training_videos_moderation.sql`, `AkademiContent.tsx`, `VideoEditModal.tsx`, `TeamPerformanceSection.tsx`, `EkipPanel.tsx`, `EkipTabNav.tsx`, `TeamFieldRankingTable.tsx`, `MemberActivitySheet.tsx`, `FieldSummaryPage.tsx`, `HubSummaryTabBar.tsx`, `platform.ts`, `database.types.ts`.
+
+## 2026-06-09 — Mobil UX: sekme başlıkları, Platform Yönetimi, pano hizalama ✅
+
+### Uygulananlar
+1. **Platform Yönetimi (mobil):** Ödeme / Açılış sayfası butonları metinsiz 40×40 ikon kareleri (`CreditCard`, `LayoutTemplate`); masaüstünde metinli butonlar korundu.
+2. **Kullanıcı tablosu (masaüstü):** Sütun padding sıkılaştırıldı (`px-1` aday/ekip); `md:table-fixed`, `text-xs` başlık, `md:overflow-x-visible` — kutuya tam oturma.
+3. **Sekmeli sayfa başlıkları:** `formatTabbedPageTitle` — Saha Özetim / Günlük, Ekibim / Saha Özeti / Haftalık, Saha Radarı / Takipler, Vaktin Varsa / sekme, YZ Koçu / sekme.
+4. **Ekibim Saha Özeti:** `overflow-x-hidden` + tab bar `horizontal-scroll-lock`; panel sarmalayıcı eklendi.
+5. **Pano (masaüstü):** Tarih satırı selamlama ile aynı hizada, sağa yaslı (`md:flex-row md:justify-between`).
+
+### Dosyalar
+`tabbedPageTitle.ts`, `HubSummaryTabBar.tsx`, `PlatformYonetimContent.tsx`, `FieldSummaryPage.tsx`, `EkipPageContent.tsx`, `EkipSummaryTab.tsx`, `EkipPanel.tsx`, `CrownSahaRadarPage.tsx`, `AkademiContent.tsx`, `yazar/page.tsx`, `YzKocuContainer.tsx`, `EkipTabNav.tsx`, `PanoContent.tsx`.
+
+## 2026-06-09 — Saha özeti günlük sadeleştirme + Ekibim araçları accordion ✅
+
+### Uygulananlar
+1. **Saha özeti / Günlük:** Boş aktivite metinleri ve `dailyTrackEmptyHint` kutusu kaldırıldı; `HubDayLoginStrip` yalnız takvim ikonu (gün numarası) + tarih; `hubLoginDayInactive` satırı silindi.
+2. **Öncelikli aday listesi:** Günlük sekmeden `IlgilenContent` tamamen kaldırıldı (öncelik sayacı, liste, Tümünü Gör — Saha Radarı'nda mevcut).
+3. **Ekibim:** Davet kodu, katıl ve ekibe gönder bölümleri **Ekibim Araçları (Davet Kodu vd)** accordion içinde; varsayılan kapalı, sağda chevron.
+
+### Dosyalar
+`FieldSummaryPage.tsx`, `HubDayLoginStrip.tsx`, `TeamPerformanceSection.tsx`, `tr.ts`, `en.ts`.
+
+## 2026-06-09 — Platform Yönetimi sayfa düzeni + yatay kaydırma standardı ✅
+
+### Uygulananlar
+1. **Başlık:** Platform Yönetim Masası → **Platform Yönetimi** (`platform.ts`).
+2. **KPI:** TOPLAM ADAY HACMİ kartı kaldırıldı; diğer 3 kartın alt açıklamaları silindi (3 sütun grid).
+3. **Arama:** Dış Kayıtlar altı arama kutusu tam genişlik (`max-w-md` kaldırıldı).
+4. **Kullanıcı tablosu:** Başlık **Kullanıcı ve Lisans Listesi**; `table-fixed` → `min-w-[960px]` + `HorizontalScrollLock`; hücre `align-middle`.
+5. **Mobil header:** Ödeme / Açılış sayfası butonları sağ üstte kalır (`flex-row justify-between`).
+6. **Yatay kaydırma standardı:** `HorizontalScrollLock` bileşeni + `horizontal-scroll-lock` utility; Platform, İstatistikler, Saha özeti tablolarına uygulandı; `AGENTS.md` kuralı eklendi.
+
+### Dosyalar
+`PlatformYonetimContent.tsx`, `platform.ts`, `HorizontalScrollLock.tsx`, `globals.css`, `TeamPerformanceTable.tsx`, `TeamFieldRankingTable.tsx`, `StatsSuperAdminSections.tsx`, `TeamTrainingRankingTable.tsx`, `TeamActivitySummary.tsx`, `AGENTS.md`.
+
+## 2026-06-09 — İstatistikler sadeleştirme + dark tema mor okunabilirlik ✅
+
+### Uygulananlar
+1. **Kaldırılanlar:** Saha Huni Gerçekleşenleri kutusu; sayfa alt başlığı; KPI kart açıklama satırları; ekip tablosu `*` dipnotu/KVKK linki; tablo/kart sekmeleri; AI admin MODEL KULLANIMI ve DÖNÜŞÜM HUNİSİ kutuları; AI tablo alt açıklaması.
+2. **Ekip Performans tablosu:** Yalnız tablo; isim hücresi `align-middle` düzeltmesi; sütun sırası içerik → video → itiraz; ilerleme barları ve `0/3 video` metni kaldırıldı.
+3. **YZ kota kartı (süper admin):** Yalnız başlık + 👑 SINIRSIZ SÜPER ADMİN HESABI.
+4. **Dark tema mor:** `.dark` içinde `--color-brand` / `--color-brand-accent` açıldı; istatistik tablo renkleri `dark:*-300` tonlarına çekildi.
+
+### Dosyalar
+`IstatistiklerContent.tsx`, `StatsKpiCards.tsx`, `TeamPerformanceTable.tsx`, `StatsSuperAdminSections.tsx`, `MyAIUsageQuotaCard.tsx`, `globals.css`.
+
+## 2026-06-09 — YZ sayaç düzeltmesi, hesap popup sadeleştirme, Ekibim & saha özeti UX ✅
+
+### Uygulananlar
+1. **YZ kotası güncellenmiyordu:** `fetchAIUsageAction` İstanbul gün başlangıcı (`istanbulDayStartIso`) ile `checkAIQuota` hizalandı; üye koçluk ve onboarding koçu sonrası `invalidateTeamAndAIUsage` ile sayaç + istatistikler yenileniyor.
+2. **Hesap bilgileri popup:** Turuncu bar + modal metinleri sadeleştirildi — üyelik tarihi, deneme/ücretsiz özet, tek footnote; mükerrer madde listeleri kaldırıldı (`shell.ts`, `AccountStatusAlert.tsx`).
+3. **Ekibim Araçlar sekmesi kaldırıldı:** Davet et, davet kodu gir, ekibe gönder modülleri **Ekibim** sekmesinin altına taşındı (`EkipTabNav`, `TeamPerformanceSection`).
+4. **Saha özeti legend:** `SÜTUN AÇIKLAMALARI` başlığı kaldırıldı; dark temada huni ikonları `FUNNEL_METRIC_VIVID_CLASS` ile görünür.
+5. **3. tekil şahıs etiketler:** Kaç Kişiyle Konuştu/Tanıştı/Sunum Yaptı, Ekibine Kaç Kişi Katıldı; lider günlük takipte Ekibime Kaç Kişi Katıldı (`tr.ts`, `en.ts`).
+6. **Saha özeti tablo (mobil):** Yatay kaydırma sayfa swipe’ını engeller (`no-swipe`, `touch-pan-x`); ikon kare arka planları kaldırıldı; sticky isim sütunu z-index/arka plan ile metrik bleed-through düzeltildi.
+
+### Dosyalar
+`aiUsage.ts`, `MemberDetailPage.tsx`, `YZOnboardingKocuModal.tsx`, `AccountStatusAlert.tsx`, `shell.ts`, `EkipTabNav.tsx`, `EkipPanel.tsx`, `EkipPageContent.tsx`, `TeamPerformanceSection.tsx`, `TeamGenerationTree.tsx`, `TeamFieldRankingTable.tsx`, `tr.ts`, `en.ts`.
+
+## 2026-06-09 — 5 ileri öneri (model paneli, Pro rozeti, huni raporu, şablon limiti, yıllık deep link) + env rehberi ✅
+
+### Uygulananlar
+1. **Model kullanım paneli:** migration `074` `ai_model`; `logAIGeneration` + süper admin İstatistikler Flash/Pro özeti.
+2. **Pro Premium AI rozeti:** `KoclukForm` + `ProvaForm` (`effectiveLicenseType === 'pro'`).
+3. **Ürün hunisi raporu:** `getProductFunnelStatsAction` — pricing görünüm, upgrade CTA, ödeme deep link.
+4. **Koçluk şablonu 1500:** `MemberDetailPage` `TemplateEditor` textarea `maxLength`.
+5. **Deneme yıllık deep link:** `?plan=basic&period=yearly` — trial e-posta, bildirim, UpgradeGate, AccountStatusAlert, `OdemeClient` yıllık toggle.
+6. **Env rehberi:** `docs/deploy/github-secrets.md` — GitHub vs Vercel vs `.env.local` matrisi.
+
+### Dosyalar
+`074_daily_actions_ai_model.sql`, `paymentRoutes.ts`, `checkQuota.ts`, `istatistikler/actions.ts`, `StatsSuperAdminSections.tsx`, `KoclukForm.tsx`, `ProvaForm.tsx`, `MemberDetailPage.tsx`, `trialEmails.ts`, `notificationRoutes.ts`, `OdemeClient.tsx`, `github-secrets.md`, çeviriler.
+
+**Not:** Migration `074` Supabase’e uygulanmalı.
+
+## 2026-06-09 — Hibrit Gemini, 1500 karakter kalkanı, huni analitiği, deneme push ✅
+
+### Uygulananlar
+1. **Hibrit model:** `resolveGeminiModel` — Basic/Plus/deneme → Flash; Pro'da yalnızca derin koçluk (YZ Koçu, saha provası, ekip onboarding rehberi) → Gemini Pro. Not özeti, davet mesajı, saha mesajları → Flash.
+2. **Token kalkanı:** `AI_USER_INPUT_MAX_CHARS = 1500` — UI (`YazarForm`, `KoclukForm`, `ProvaForm`, `UyumContent`) + sunucu doğrulama; roleplay geçmişi/not özeti `6000` aggregate trim.
+3. **Ürün hunisi:** `072`/`073` product_events, landing görünüm + upgrade CTA + `/odeme?plan=basic` olayları.
+4. **Deneme yaşam döngüsü:** trial e-posta `?plan=basic`, in-app push (`trialPush`), bildirim rotası, `AccountStatusAlert` trial bitti UX.
+5. **Super admin YZ tab:** `nmm_ai_usage_daily.ai_count` rollup (fallback: daily_actions).
+6. **Davet WA metinleri** “Uygulamaya Davet Et” hizası.
+7. **Shopier/fiyat doğrulandı:** 399/899/1499 aylık; yıllık 3588/8088/13488 (₺299/674/1124 ay).
+
+### Dosyalar
+`resolveModel.ts`, `aiInputLimit.ts`, `yazar/actions.ts`, `pipeline/[id]/actions.ts`, `ekip/actions.ts`, `uyum/actions.ts`, `saha-radar/actions.ts`, `generateMessage.ts`, `072`/`073` migrations, `productEvents*`, `trialPush.ts`, `trialEmails.ts`, `istatistikler/actions.ts`, `LandingPricing.tsx`, `UpgradeGate.tsx`, `OdemeClient.tsx`, `AccountStatusAlert.tsx`, formlar, çeviriler.
+
+## 2026-06-09 — 5 ileri öneri: fiyat, Basic popüler, ai_count RPC, deneme sonu UX, E2E ✅
+
+### Uygulananlar
+1. **Fiyat revizyonu:** Basic ₺399, Plus ₺899, Pro ₺1499 (`pricing.ts` + testler).
+2. **"En Çok Satan" rozeti Basic'e** taşındı (landing + `/odeme`); Plus sade kart.
+3. **Migration 071:** `nmm_ai_usage_daily.ai_count` + RPC birleşik havuz; `logAIGeneration` → `p_kind: 'ai'`.
+4. **Deneme sonu UX:** `UpgradeGate` trial bittiğinde `/odeme?plan=basic` deep link, Basic vurgusu, özel CTA metni.
+5. **E2E:** `landing.spec.ts` — popüler rozet, ₺399, günlük 20 YZ limiti.
+6. **Davet butonu:** `team.inviteToNmm` → **Uygulamaya Davet Et** (TR) / Invite to the App (EN).
+
+### Dosyalar
+`pricing.ts`, `071_ai_usage_unified_count.sql`, `checkQuota.ts`, `database.types.ts`, `LandingPricing.tsx`, `OdemeClient.tsx`, `OdemePageClient.tsx`, `UpgradeGate.tsx`, `shell.ts`, `tr.ts`, `en.ts`, `e2e/landing.spec.ts`, testler.
+
+## 2026-06-09 — Birleşik YZ kotası (20/45/100), plan kartları sadeleştirme, freemium uyumu ✅
+
+### Tek kaynak: `DAILY_AI_LIMITS` (`aiUsage.ts` + `planLimits.ts`)
+- Basic **20**, Plus **45**, Pro **100** — mesaj, koç, prova ve uyum aynı günlük havuzdan düşer.
+- `checkAIQuota` tüm `ai_generate` aksiyonlarını tek sayaçta toplar; deneme bitince `dailyLimit: 0`.
+- `useAILimits` / `fetchAIUsageAction` → `aiUsed` + `dailyLimit` (ayrı message/roleplay/compliance kaldırıldı).
+
+### UI
+- İstatistikler YZ kotası: tek çizgi (`MyAIUsageQuotaCard`); süper admin tablosu tek sütun.
+- Landing + `/odeme` plan kartları: `{limit}` dinamik, madde sayısı azaltıldı; 14 gün deneme + deneme sonrası YZ kilit mesajı.
+- Saha Radarı boş ekip: `/ekibim` davet CTA.
+- `hasTeamTeaserAccess` kaldırıldı; `NavMoreSheet` ekip linki artık kilitlenmiyor.
+- TR: Onboarding → **İşe Başlatma** (`crown.ts`, `payment.ts` plusFeature4, `landing.ts` planPlusFeat4).
+
+### Dosyalar
+`aiUsage.ts`, `planLimits.ts`, `checkQuota.ts`, `useAILimits.ts`, `aiUsage.ts` (action), `MyAIUsageQuotaCard.tsx`, `StatsSuperAdminSections.tsx`, `LandingPricing.tsx`, `OdemeClient.tsx`, `landing.ts`, `payment.ts`, `stats.ts`, `coach.ts`, `crown.ts`, `CrownSahaRadarPage.tsx`, `teamAccess.ts`, `NavMoreSheet.tsx`, formlar (Yazar/Prova/Kocluk/Uyum).
+
 ## 2026-06-09 — Plan kartı yenileme: Basic'te Ekibim yok, Saha Radarı eklendi, AI limitleri sıralı ✅
 
 ### Değişiklikler (`payment.ts` + `landing.ts`, TR + EN)
