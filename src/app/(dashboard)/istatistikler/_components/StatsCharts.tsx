@@ -47,9 +47,6 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
             <Target className="h-4 w-4 text-[#1A56DB]" />
             {t('statsPage.funnelTitle')}
           </h2>
-          <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-            {t('statsPage.funnelSubtitle')}
-          </p>
         </div>
 
         {total === 0 ? (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { History } from 'lucide-react'
@@ -62,6 +62,15 @@ export function FieldSummaryPage() {
 
   const tab = parseSummaryTab(searchParams.get('tab'))
   const offset = parsePeriodOffset(searchParams.get('offset'))
+
+  useEffect(() => {
+    const rawTab = searchParams.get('tab')
+    if (rawTab !== 'all') return
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', 'yearly')
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [pathname, router, searchParams])
+
   const dayRange = calendarDayRange(offset)
   const weekRange = rollingWeekRange(offset)
   const yearRangeData = yearRange(offset)

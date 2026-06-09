@@ -1,5 +1,6 @@
 'use client'
 
+import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 
@@ -26,17 +27,26 @@ export function PulsePeriodTabs({ period, onChange, comfortableTypography = fals
   const btnCls = comfortableTypography ? 'text-sm px-2.5 py-1' : 'text-[10px] px-2 py-1'
 
   return (
-    <div className="flex flex-wrap gap-0.5 self-start rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-0.5">
+    <div
+      className="no-swipe flex flex-wrap gap-1 self-start rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1"
+      role="tablist"
+      data-no-swipe="true"
+      onTouchStart={e => e.stopPropagation()}
+    >
       {PULSE_PERIOD_OPTIONS.map(p => (
         <button
           key={p}
           type="button"
+          role="tab"
+          aria-selected={period === p}
           onClick={() => onChange(p)}
-          className={`rounded-lg font-bold transition-all ${btnCls} ${
+          className={clsx(
+            'rounded-lg font-bold transition',
+            btnCls,
             period === p
-              ? 'border border-[var(--border)] bg-[var(--bg-card)] text-brand shadow-sm'
-              : 'text-[var(--text-2)]'
-          }`}
+              ? 'bg-[var(--bg-card)] text-[var(--text-1)] shadow-sm'
+              : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
+          )}
         >
           {pulsePeriodLabel(t, p)}
         </button>

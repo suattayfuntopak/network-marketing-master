@@ -122,8 +122,8 @@ export function TeamFieldRankingTable({
     )
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4 no-swipe">
+    <div className="max-w-full min-w-0 space-y-4 overflow-x-clip">
+      <section className="max-w-full min-w-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4 no-swipe">
         <div className="mb-3 flex items-center gap-2 text-sm font-bold text-[var(--text-1)]">
           <Trophy className="h-4 w-4 text-amber-500" />
           {t('crown.ranking')}

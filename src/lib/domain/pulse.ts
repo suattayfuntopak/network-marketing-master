@@ -12,6 +12,11 @@ export const ONBOARDING_STEP_COUNT = 9
 
 export type PulsePeriod = 'today' | '7d' | '30d' | 'ytd' | 'all'
 
+/** Eski `all` / Tümü sekmesi → yıllık dönem. */
+export function normalizePulsePeriod(period: PulsePeriod): PulsePeriod {
+  return period === 'all' ? 'ytd' : period
+}
+
 /** Aktivite sheet — sadeleştirilmiş dönem sekmeleri. */
 export type SheetActivityPeriod = 'today' | '7d' | '30d' | 'ytd'
 

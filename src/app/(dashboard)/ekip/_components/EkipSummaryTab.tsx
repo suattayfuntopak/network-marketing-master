@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useMemo } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo } from 'react'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
@@ -27,6 +27,7 @@ function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
 
 export function EkipSummaryTab() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const { data: ws } = useWorkspace()
   const { data: members = [], isLoading: membersLoading } = useEkipPanelRows(ws?.workspaceId)
   const router = useRouter()
@@ -35,6 +36,14 @@ export function EkipSummaryTab() {
 
   const periodTab = parseSummaryTab(searchParams.get('period'))
   const pulsePeriod = mapSummaryTabToPulse(periodTab)
+
+  useEffect(() => {
+    if (searchParams.get('period') !== 'all') return
+    const params = new URLSearchParams(searchParams.toString())
+    params.set('tab', 'summary')
+    params.set('period', 'yearly')
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
+  }, [pathname, router, searchParams])
 
   const setPeriodTab = useCallback(
     (next: HubPeriodTab) => {
@@ -58,8 +67,21 @@ export function EkipSummaryTab() {
     queryKey: queryKeys.teamRankingMetrics(ws?.workspaceId ?? '', pulsePeriod, memberIds),
     queryFn: () => getTeamRankingMetricsAction(ws!.workspaceId, pulsePeriod, memberIds),
     enabled: !!ws?.workspaceId && memberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: 60_000,
+    placeholderData: keepPreviousData,
   })
+
+  useEffect(() => {
+    if (!ws?.workspaceId || memberIds.length === 0 || !teamPulseUnlocked) return
+    const periods: PulsePeriod[] = ['today', '7d', '30d', 'ytd']
+    for (const p of periods) {
+      void queryClient.prefetchQuery({
+        queryKey: queryKeys.teamRankingMetrics(ws.workspaceId, p, memberIds),
+        queryFn: () => getTeamRankingMetricsAction(ws.workspaceId, p, memberIds),
+        staleTime: 60_000,
+      })
+    }
+  }, [ws?.workspaceId, memberIds, teamPulseUnlocked, queryClient])
 
   const getMemberHref = useCallback(
     (row: { user_id: string }) => {
@@ -80,7 +102,11 @@ export function EkipSummaryTab() {
   }
 
   return (
-    <div className="space-y-4 overflow-x-hidden">
+    <div
+      className="max-w-full min-w-0 space-y-4 overflow-x-clip overscroll-x-none touch-pan-y no-swipe"
+      data-no-swipe="true"
+      onTouchStart={e => e.stopPropagation()}
+    >
       <HubSummaryTabBar active={periodTab} onChange={setPeriodTab} />
       <TeamFieldRankingTable
         downlines={downlines}

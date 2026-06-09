@@ -258,14 +258,14 @@ export function IstatistiklerContent() {
   }
 
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
+    <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <div className="w-full space-y-6">
         
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] dark:bg-[#0a1f4d]">
-              <TrendingUp className="h-5 w-5 text-[#1A56DB]" strokeWidth={1.75} />
+              <TrendingUp className="h-5 w-5 text-[#1A56DB] dark:text-sky-300" strokeWidth={2} />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-1)]">

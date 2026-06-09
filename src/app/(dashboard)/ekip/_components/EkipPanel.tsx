@@ -231,7 +231,11 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
       )}
 
       {activeTab === 'summary' && (
-        <div className="overflow-x-hidden">
+        <div
+          className="max-w-full min-w-0 overflow-x-clip overscroll-x-none touch-pan-y no-swipe"
+          data-no-swipe="true"
+          onTouchStart={e => e.stopPropagation()}
+        >
           <EkipSummaryTab />
         </div>
       )}

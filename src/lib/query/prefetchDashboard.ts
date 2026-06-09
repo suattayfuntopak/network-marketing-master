@@ -14,7 +14,7 @@ const WORKSPACE_STALE = 5 * 60 * 1000
 const CANDIDATES_STALE = 2 * 60 * 1000
 const TEAM_STALE = 2 * 60 * 1000
 
-/** Dashboard layout SSR: workspace + paralel aday/ekip/metrik verisi önbelleğe alınır. */
+/** Dashboard layout SSR: kritik veriyi bekler; ağır hub metriklerini arka planda ısıtır. */
 export async function prefetchDashboardQueries(queryClient: QueryClient): Promise<void> {
   await queryClient.prefetchQuery({
     queryKey: queryKeys.workspace(),
@@ -25,7 +25,7 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
   if (!ws?.workspaceId) return
 
-  const parallel: Promise<void>[] = [
+  await Promise.all([
     queryClient.prefetchQuery({
       queryKey: queryKeys.candidates(ws.workspaceId),
       queryFn: () => fetchCandidatesAction(ws.workspaceId),
@@ -41,6 +41,9 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
       queryFn: fetchAIUsageAction,
       staleTime: 60_000,
     }),
+  ])
+
+  const background: Promise<void>[] = [
     queryClient.prefetchQuery({
       queryKey: queryKeys.videoCatalog(ws.workspaceId),
       queryFn: () => getVideoCatalogAction(ws.workspaceId),
@@ -50,7 +53,7 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   ]
 
   if (ws.isSuperAdmin) {
-    parallel.push(
+    background.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.platformWorkspaces(),
         queryFn: getPlatformWorkspacesAction,
@@ -64,5 +67,5 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
     )
   }
 
-  await Promise.all(parallel)
+  void Promise.all(background)
 }
