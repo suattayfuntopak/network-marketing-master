@@ -28,9 +28,9 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
       GEMINI_API_KEY: placeholder-gemini
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
@@ -55,9 +55,9 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key' }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY != '' && secrets.GEMINI_API_KEY || 'placeholder-gemini' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: '22'
           cache: npm
@@ -94,7 +94,7 @@ jobs:
         run: echo "E2E skipped — add PLAYWRIGHT_TEST_EMAIL and PLAYWRIGHT_TEST_PASSWORD secrets to enable."
 
       - name: Upload Playwright report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: steps.e2e_creds.outputs.skip != 'true' && !cancelled()
         with:
           name: playwright-report
