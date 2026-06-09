@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-09 — Council Triad Faz A-D: 17 kritik düzeltme + kod kalitesi ✅
+
+### FAZ A — Kritik Hatalar
+- **checkQuota.ts timezone bug:** `setHours(0,0,0,0)` (UTC) → `istanbulDayStartIso(todayCalendarKey())` (TR+3). Günlük kota sıfırlaması artık Istanbul saatine göre çalışır.
+- **Migration 004 çakışması:** `004_note_length_constraint.sql` `.DUPLICATE_RETIRED` olarak yeniden adlandırıldı, `069_note_length_constraint.sql` olarak yeniden oluşturuldu.
+- **Shopier idempotency gap:** Form-encoded webhook yoluna `orderId: platform_order_id` eklendi; tekrar ödeme işlemi önlendi.
+- **scratch/ temizliği:** `simulate_shopier_webhook.js` git takibinden çıkarıldı; `scratch/**` ESLint `globalIgnores`'a eklendi.
+
+### FAZ B — Güvenlik + Teknik Borç
+- **Shopier timestamp window:** 5 dakika staleness kontrolü (`verifyShopierWebhookSignature` içinde).
+- **Gemini model sabitleri:** `lib/ai/models.ts` oluşturuldu; `GEMINI_PRO`/`GEMINI_FLASH` 4 action dosyasında hardcode string yerine kullanılıyor.
+- **Skeleton + zIndex + toLang:** PanoContent `animate-pulse` → `<Skeleton>`, `headerSearch: z-50 → z-[51]` çakışma giderildi, yazar/uyum `toLang` import sırası düzeltildi.
+
+### FAZ C — UX + Mimari
+- **UpgradeGate unifikasyonu:** `UpgradeGate.tsx` (`variant="modal|overlay|banner"`) oluşturuldu. `FeatureUpgradeGate`, `UpgradePrompt`, `TeamFreeUpgradeBanner` ince wrapper'a dönüştürüldü. 10+ caller değişmedi.
+- **Ekibim teaser (Basic):** `hasTeamTeaserAccess` eklendi; Basic kullanıcılar artık `/odeme`'ye yönlendirilmiyor, `/ekip`'i görebiliyor (özellikler kilitli).
+- **Post-trial UI:** `AlertTriangle → Rocket` ikonu, `from-[#4338ca]` gradient, teşvik mesajı: "Harika bir başlangıç yaptın — planını seç, büyümeye devam et".
+- **Hub bileşen migrasyonu:** `lib/ui/hub/` (20 dosya) → `components/hub/`; 13 caller dosyasında import güncellendi.
+
+### FAZ D — Performans + Ölçeklenme
+- **checkQuota JOIN:** `workspace_members → workspaces` 2 seri sorgu tek FK JOIN ile birleştirildi (-1 DB round-trip).
+- **Migration 070:** `nmm_daily_actions` 90 günlük TTL pg_cron ile otomatik temizlik (her gece 03:30).
+- **Cursor pagination:** `fetchCandidatesPageAction` (sayfa=50, cursor=updated_at) eklendi; `fetchCandidatesAction` 1000 kayıt güvenlik limiti.
+- **overdue-reminders optimizasyonu:** `getUserById` seri döngü → `Promise.all` paralel + önceden `authMap` oluşturuldu.
+- **Design token sistemi:** `globals.css @theme`'e 25 semantik token eklendi (`--color-brand-subtle`, `--color-crown`, vb.); `#534AB7`, `#EEEDFE`, `#7c3aed`, `#4338ca`, `#25D366` → `brand`/`whatsapp` token'larına geçildi (400+ yer, 121 dosya).
+
 ## 2026-06-09 — Pano mobil kutular kare, masaüstü dikdörtgen ✅
 
 - `LauncherGridItem`: mobil `aspect-square`, md+ `aspect-[4/5]` (ikon/yazı puntosu değişmedi)
