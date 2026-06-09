@@ -1,17 +1,30 @@
 /* NMM — hafif PWA: statik asset cache + deploy güncelleme */
-const CACHE = 'nmm-shell-v1'
+const CACHE = 'nmm-shell-v2'
+const PRECACHE = ['/pano', '/manifest.json']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE).then(() => self.skipWaiting()),
+    caches
+      .open(CACHE)
+      .then((cache) =>
+        Promise.all(
+          PRECACHE.map((url) =>
+            cache.add(url).catch(() => {
+              /* auth redirect veya offline install — sessiz */
+            }),
+          ),
+        ),
+      )
+      .then(() => self.skipWaiting()),
   )
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))),
-    ).then(() => self.clients.claim()),
+    caches
+      .keys()
+      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      .then(() => self.clients.claim()),
   )
 })
 

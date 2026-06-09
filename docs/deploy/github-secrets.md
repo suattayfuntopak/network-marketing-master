@@ -37,14 +37,22 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 
 | Secret | Açıklama |
 |--------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Production/staging Supabase URL |
+| `NEXT_PUBLIC_SUPABASE_URL` | Production/staging Supabase URL (E2E job build; Build job placeholder kullanır) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key |
-| `SUPABASE_SERVICE_ROLE_KEY` | Build + server actions için |
+| `SUPABASE_SERVICE_ROLE_KEY` | E2E build + server actions |
 | `GEMINI_API_KEY` | AI özellikleri (build sırasında import) |
-| `PLAYWRIGHT_TEST_EMAIL` | E2E test kullanıcısı e-postası |
-| `PLAYWRIGHT_TEST_PASSWORD` | E2E test kullanıcısı şifresi |
+| `PLAYWRIGHT_TEST_EMAIL` | E2E giriş test kullanıcısı e-postası |
+| `PLAYWRIGHT_TEST_PASSWORD` | E2E giriş test kullanıcısı şifresi |
 
-**`PLAYWRIGHT_TEST_*` tamamen isteğe bağlıdır.** Tanımlı değilse veya giriş başarısızsa auth setup boş session yazar ve skip eder; landing + mobil smoke testleri yine koşar. Korunan route testleri (egitim/itirazlar redirect) yalnızca geçerli auth varken çalışır. Yanlış secret girmek artık tüm job'u düşürmez.
+**`PLAYWRIGHT_TEST_*` yoksa E2E job bilinçli olarak atlanır** (workflow uyarısı + yeşil job). Build job yine lint + derleme çalıştırır. Auth’lu senaryoları CI’da koşturmak için aşağıdaki adımları uygulayın.
+
+#### E2E secret ekleme (adım adım)
+
+1. Supabase’de yalnızca test için bir kullanıcı oluşturun (veya mevcut staging hesabını kullanın).
+2. GitHub → repo → **Settings → Secrets and variables → Actions → New repository secret**.
+3. Sırayla ekleyin: `PLAYWRIGHT_TEST_EMAIL`, `PLAYWRIGHT_TEST_PASSWORD`.
+4. (Önerilen) Aynı Supabase/Gemini değerlerini `NEXT_PUBLIC_SUPABASE_*`, `SUPABASE_SERVICE_ROLE_KEY`, `GEMINI_API_KEY` olarak da ekleyin — E2E job gerçek ortamda build eder.
+5. **Actions → E2E (Playwright) → Run workflow** ile doğrulayın; “E2E skipped” adımı yerine Playwright raporu yüklenmeli.
 
 ### CI testi nasıl çalıştırılır?
 

@@ -77,8 +77,8 @@ supabase/migrations/ numbered SQL migrations (one number = one migration)
 
 ## Deploy & CI
 
-- **GitHub Actions:** `E2E (Playwright)` runs **Build** then **E2E (chromium)**; `PLAYWRIGHT_TEST_*` secrets are optional (smoke tests run without auth).
-  Full list: [`docs/deploy/github-secrets.md`](docs/deploy/github-secrets.md).
+- **GitHub Actions:** `E2E (Playwright)` runs **Build** (lint + compile) then **E2E (chromium)** when `PLAYWRIGHT_TEST_*` secrets exist; otherwise E2E is skipped with a warning.
+  Full list and setup steps: [`docs/deploy/github-secrets.md`](docs/deploy/github-secrets.md).
 - Playwright report is uploaded as an artifact (`playwright-report`) on every CI run — download it from the Actions tab to view traces on failure.
 
 ## Conventions

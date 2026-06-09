@@ -969,6 +969,10 @@ export interface Database {
         Args: Record<string, never>
         Returns: { id: string; owner_id: string }[]
       }
+      nmm_leader_downline_workspace_tree: {
+        Args: Record<string, never>
+        Returns: { id: string; owner_id: string; parent_id: string | null }[]
+      }
       nmm_count_candidates_per_workspace: {
         Args: Record<string, never>
         Returns: Json
