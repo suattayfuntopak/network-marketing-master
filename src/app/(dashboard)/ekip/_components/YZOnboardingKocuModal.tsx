@@ -51,7 +51,12 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
   const { lang, t } = useTranslation()
   const { data: usage, refetch: refetchUsage } = useAIUsage()
   const { data: modalWs } = useWorkspace()
-  const { messageLimit } = getLimitsForLicense(modalWs?.licenseType)
+  const { dailyLimit } = getLimitsForLicense(
+    modalWs?.licenseType,
+    modalWs?.isSuperAdmin,
+    modalWs?.licenseExpiresAt,
+    modalWs?.workspaceCreatedAt
+  )
 
   useBodyScrollLock()
 
@@ -201,8 +206,8 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
               <span>{t('team.dailyCoachingQuota')}</span>
               <span className="font-extrabold text-[#0F6E56] dark:text-[#5eead4]">
                 {t('team.usedQuota', {
-                  used: usage?.messageUsed ?? 0,
-                  limit: messageLimit,
+                  used: usage?.aiUsed ?? 0,
+                  limit: dailyLimit,
                 })}
               </span>
             </div>

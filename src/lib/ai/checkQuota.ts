@@ -3,7 +3,7 @@
 // block previously duplicated across 7+ action files.
 
 import { createClient } from '@/lib/supabase/server'
-import { getEffectiveLicenseType, getLimitsForLicense, normalizeLicenseType } from '@/lib/domain/aiUsage'
+import { getEffectiveLicenseType, getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
 
@@ -77,20 +77,6 @@ export async function checkAIQuota(
     }
   }
 
-  const normalized = normalizeLicenseType(licenseType)
-
-  // Free plan: AI tamamen kilitli (trial Basic kredileri YZ Koçu için devre dışı).
-  if (!superAdmin && normalized === 'free') {
-    return {
-      ok: false,
-      reason: 'feature_unavailable',
-      message: lang === 'en'
-        ? 'AI Coach and field AI tools require a paid plan. Choose Basic, Plus, or Pro to continue.'
-        : 'Yapay Zeka Koçu ve saha AI araçları ücretli planlarda açılır. Devam etmek için Basic, Plus veya Pro seçin.',
-      limit: 0,
-    }
-  }
-
   const effectiveLicense = getEffectiveLicenseType(
     licenseType,
     licenseExpiresAt,
@@ -102,19 +88,16 @@ export async function checkAIQuota(
     licenseExpiresAt,
     workspaceCreatedAt
   )
-  const limit =
-    actionType === 'roleplay' ? limits.roleplayLimit
-    : actionType === 'compliance' ? limits.complianceLimit
-    : limits.messageLimit
+  const limit = limits.dailyLimit
 
-  // Compliance with limit === 0 means the feature is gated behind paid plans.
-  if (!superAdmin && actionType === 'compliance' && limit === 0) {
+  // Deneme süresi bittiğinde veya ücretsiz planda YZ tamamen kilitli; sayfalar açık kalır.
+  if (!superAdmin && (effectiveLicense === 'free' || limit === 0)) {
     return {
       ok: false,
       reason: 'feature_unavailable',
       message: lang === 'en'
-        ? 'Compliance auditing requires a paid plan. Please upgrade to access this feature.'
-        : 'Uyum denetimi özelliği ücretli planlarda kullanılabilir. Bu özelliğe erişmek için planınızı yükseltin.',
+        ? 'Your 14-day trial has ended. Upgrade to Basic, Plus, or Pro to use AI features again.'
+        : '14 günlük deneme süreniz bitti. Yapay zeka özelliklerini kullanmak için Basic, Plus veya Pro plana geçin.',
       limit: 0,
     }
   }
@@ -123,38 +106,22 @@ export async function checkAIQuota(
   if (!superAdmin) {
     const dayStartIso = istanbulDayStartIso(todayCalendarKey())
 
-    let query = supabase
+    const { count } = await supabase
       .from('nmm_daily_actions')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('action_type', 'ai_generate')
       .gte('created_at', dayStartIso)
 
-    if (actionType === 'roleplay') {
-      query = query.eq('note', 'roleplay')
-    } else if (actionType === 'compliance') {
-      query = query.eq('note', 'compliance')
-    } else {
-      // message: null note is legacy (older rows) — count both
-      query = query.or('note.is.null,note.eq.message')
-    }
-
-    const { count } = await query
     used = count ?? 0
 
     if (used >= limit) {
-      const label =
-        actionType === 'roleplay'
-          ? (lang === 'en' ? 'roleplay' : 'prova')
-          : actionType === 'compliance'
-          ? (lang === 'en' ? 'compliance audit' : 'uyum denetleme')
-          : (lang === 'en' ? 'message' : 'mesaj')
       return {
         ok: false,
         reason: 'limit_reached',
         message: lang === 'en'
-          ? `You have reached your daily ${limit} ${label} limit. Try again tomorrow.`
-          : `Günlük ${limit} ${label} limitinize ulaştınız. Yarın tekrar deneyin.`,
+          ? `You have reached your daily limit of ${limit} AI messages. Try again tomorrow.`
+          : `Günlük ${limit} yapay zeka mesajı limitinize ulaştınız. Yarın tekrar deneyin.`,
         limit,
       }
     }

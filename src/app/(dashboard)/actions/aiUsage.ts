@@ -5,9 +5,8 @@ import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
 export interface AIUsageData {
-  roleplayUsed: number
-  complianceUsed: number
-  messageUsed: number
+  /** Tüm YZ aksiyonları (mesaj, koç, prova, uyum) — birleşik günlük kota. */
+  aiUsed: number
   isSuperAdmin: boolean
 }
 
@@ -18,9 +17,7 @@ export async function fetchAIUsageAction(): Promise<AIUsageData> {
 
   if (userError || !user) {
     return {
-      roleplayUsed: 0,
-      complianceUsed: 0,
-      messageUsed: 0,
+      aiUsed: 0,
       isSuperAdmin: false,
     }
   }
@@ -38,20 +35,8 @@ export async function fetchAIUsageAction(): Promise<AIUsageData> {
 
   if (error) throw new Error(error.message)
 
-  let roleplayUsed = 0
-  let complianceUsed = 0
-  let messageUsed = 0
-
-  for (const act of data ?? []) {
-    if (act.note === 'roleplay') roleplayUsed++
-    else if (act.note === 'compliance') complianceUsed++
-    else messageUsed++
-  }
-
   return {
-    roleplayUsed,
-    complianceUsed,
-    messageUsed,
+    aiUsed: data?.length ?? 0,
     isSuperAdmin: superAdmin,
   }
 }

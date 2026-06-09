@@ -202,9 +202,9 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
   const isAllChecked = checkedCount === checklist.length
 
   const {
-    limits: { complianceLimit },
-    complianceUsed,
-    complianceRemaining,
+    dailyLimit,
+    aiUsed,
+    aiRemaining,
     isSuperAdmin: limitsSuperAdmin,
   } = useAILimits()
 
@@ -283,8 +283,8 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                       disabled={
                         isAuditing ||
                         !inputText.trim() ||
-                        (!limitsSuperAdmin && complianceLimit === 0) ||
-                        (!limitsSuperAdmin && complianceRemaining <= 0)
+                        (!limitsSuperAdmin && dailyLimit === 0) ||
+                        (!limitsSuperAdmin && aiRemaining <= 0)
                       }
                       className="flex max-w-full items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-4 py-2.5 text-sm sm:text-base font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer whitespace-nowrap"
                     >
@@ -298,8 +298,8 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                           <Shield className="h-4 w-4" />
                           {formatCreditButtonLabel(
                             t('compliancePage.startAiAudit'),
-                            complianceUsed,
-                            complianceLimit,
+                            aiUsed,
+                            dailyLimit,
                             limitsSuperAdmin,
                             lang
                           )}
@@ -568,7 +568,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                 <div className="flex items-center gap-3">
                   <div className={clsx(
                     'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
-                    complianceLimit === 0
+                    dailyLimit === 0
                       ? 'bg-[#C03E1F]/10 text-[#C03E1F]'
                       : 'bg-[#1A56DB]/10 text-[#1A56DB] dark:text-[#93c5fd]'
                   )}>
@@ -577,36 +577,36 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                   <div>
                     <p className={clsx(
                       'text-sm font-bold',
-                      complianceLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
+                      dailyLimit === 0 ? 'text-[#C03E1F]' : 'text-[#1A56DB] dark:text-[#93c5fd]'
                     )}>
-                      {complianceLimit === 0
+                      {dailyLimit === 0
                         ? t('compliancePage.unlockComplianceAudit')
                         : t('compliancePage.complianceAudit')}
                     </p>
                     <p className={clsx(
                       'text-[11px] mt-0.5',
-                      complianceLimit === 0 ? 'text-[#C03E1F]/70' : 'text-[#1A56DB]/70 dark:text-[#93c5fd]/70'
+                      dailyLimit === 0 ? 'text-[#C03E1F]/70' : 'text-[#1A56DB]/70 dark:text-[#93c5fd]/70'
                     )}>
-                      {complianceLimit === 0
+                      {dailyLimit === 0
                         ? t('compliancePage.complianceAuditUpsell')
-                        : complianceLimit === Infinity
+                        : dailyLimit === Infinity
                           ? t('compliancePage.complianceAuditUnlimited')
-                          : t('compliancePage.creditsInfo', { count: complianceLimit })}
+                          : t('compliancePage.creditsInfo', { count: dailyLimit })}
                     </p>
                   </div>
                 </div>
-                {complianceLimit === 0 && (
+                {dailyLimit === 0 && (
                   <ArrowRight className="h-4 w-4 shrink-0 text-[#C03E1F]/60" />
                 )}
               </>
             )
             const boxClass = clsx(
               'flex items-center justify-between gap-3 rounded-2xl border px-4 py-3.5',
-              complianceLimit === 0
+              dailyLimit === 0
                 ? 'border-[#C03E1F]/30 bg-[#FEF0EC] dark:bg-[#47221A]/40 dark:border-[#C03E1F]/20 transition-all hover:opacity-90 active:scale-[0.99]'
                 : 'border-[#E8F0FE] bg-[#E8F0FE] dark:bg-[#222E4D]/60 dark:border-[#1e3a5f]'
             )
-            return complianceLimit === 0 ? (
+            return dailyLimit === 0 ? (
               <Link href="/odeme" className={boxClass}>{content}</Link>
             ) : (
               <div className={boxClass}>{content}</div>

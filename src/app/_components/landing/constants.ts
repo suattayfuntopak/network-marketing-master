@@ -1,7 +1,3 @@
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
-
-export const PRO_LIMITS = getLimitsForLicense('pro')
-
 export { NEXT_THEME } from '@/lib/ui/themeToggle'
 
 export const NEXT_THEME_LABEL: Record<string, string> = {

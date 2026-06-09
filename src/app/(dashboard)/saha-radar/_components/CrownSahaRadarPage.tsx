@@ -568,9 +568,19 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
             {innerTab === 'aktivite' && (
               <div className="space-y-4">
                 {(data?.members.length ?? 0) === 0 ? (
-                  <p className="text-center text-sm text-[var(--text-3)]">
-                    {t('crown.emptyTeam')}
-                  </p>
+                  <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-6 text-center space-y-3">
+                    <p className="text-sm text-[var(--text-3)]">{t('crown.emptyTeam')}</p>
+                    <p className="text-xs text-[var(--text-3)] leading-relaxed">
+                      {t('crown.sahaRadarEmptyTeamHint')}
+                    </p>
+                    <Link
+                      href="/ekibim"
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
+                    >
+                      {t('crown.sahaRadarEmptyTeamCta')}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </div>
                 ) : (
                   <>
                     <div className="flex gap-2">

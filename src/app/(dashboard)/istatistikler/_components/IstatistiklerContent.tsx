@@ -54,7 +54,7 @@ export function IstatistiklerContent() {
     ws?.licenseExpiresAt,
     ws?.workspaceCreatedAt
   )
-  const { messageLimit, roleplayLimit, complianceLimit } = teamLimits
+  const { dailyLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
   const canEditMemberGoal = ws?.role === 'leader' && !teamStatsLocked
@@ -318,12 +318,7 @@ export function IstatistiklerContent() {
           )}
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
-          <MyAIUsageQuotaCard
-            usage={usage}
-            messageLimit={messageLimit}
-            roleplayLimit={roleplayLimit}
-            complianceLimit={complianceLimit}
-          />
+          <MyAIUsageQuotaCard usage={usage} dailyLimit={dailyLimit} />
 
         </div>
       </div>

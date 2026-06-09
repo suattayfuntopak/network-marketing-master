@@ -29,9 +29,7 @@ type StatsSuperAdminSectionsProps = {
   licenseLabel: (licenseType: string) => string
 }
 
-type AiRowType = 'leader' | 'nmm' | 'saha' | 'external'
-
-type Triple = { message: number; roleplay: number; compliance: number }
+type AiRowType = 'leader' | 'nmm' | 'external' | 'saha'
 
 type AiRow = {
   key: string
@@ -41,21 +39,17 @@ type AiRow = {
   type: AiRowType
   license: string | null
   href: string | null
-  usage: Triple | null
-  /** Süper admin için true → limit ∞ gösterilir. */
+  aiUsed: number | null
   unlimited: boolean
-  /** Plan limitleri; saha (uygulama dışı) için null. */
-  limits: Triple | null
-  /** Lisans profili henüz yüklenmedi → free fallback yerine iskelet göster. */
+  dailyLimit: number | null
   loading?: boolean
 }
 
-/** "kullanım / limit" — süper admin ∞, saha —. */
-function usageCell(usage: Triple | null, key: keyof Triple, unlimited: boolean, limits: Triple | null): string {
-  if (!usage) return '—'
-  if (unlimited) return `${usage[key]} / ∞`
-  if (limits) return `${usage[key]} / ${limits[key]}`
-  return String(usage[key])
+function usageCell(aiUsed: number | null, unlimited: boolean, dailyLimit: number | null): string {
+  if (aiUsed === null) return '—'
+  if (unlimited) return `${aiUsed} / ∞`
+  if (dailyLimit !== null) return `${aiUsed} / ${dailyLimit}`
+  return String(aiUsed)
 }
 
 const TYPE_BADGE: Record<AiRowType, { icon: string; labelKey: string }> = {
@@ -65,7 +59,6 @@ const TYPE_BADGE: Record<AiRowType, { icon: string; labelKey: string }> = {
   external: { icon: '🌐', labelKey: 'statsPage.typeExternal' },
 }
 
-/** Pulse dönem tipi (today/7d/30d/ytd/all) → arşiv dönem tipi (aynı değerler). */
 function toArchivePeriod(p: PulsePeriod): AIUsageArchivePeriod {
   return p as AIUsageArchivePeriod
 }
@@ -109,7 +102,6 @@ export function StatsSuperAdminSections({
     staleTime: 60_000,
   })
 
-  // Sıralı tek liste: Lider → NMM → Saha → Dış Kayıt
   const rows = useMemo((): AiRow[] => {
     const out: AiRow[] = []
     const leaders = sortedMembers.filter(m => m.role === 'leader')
@@ -117,7 +109,6 @@ export function StatsSuperAdminSections({
 
     const memberRow = (m: TeamMember, type: AiRowType): AiRow => {
       const profile = memberLicenses[m.user_id]
-      // Profil henüz yüklenmedi → free fallback gösterme (ÜCRETSİZ yanıp sönmesi).
       const loading = !profile
       const isAdmin = !!profile?.isSuperAdmin
       const lim = isAdmin || !profile
@@ -140,11 +131,9 @@ export function StatsSuperAdminSections({
             ? t('statsPage.licensePlanSuperAdmin')
             : licenseLabel(profile.licenseType),
         href: getMemberHref({ ...m, isAppUser: true }),
-        usage: periodUsage[m.user_id] ?? { message: 0, roleplay: 0, compliance: 0 },
+        aiUsed: periodUsage[m.user_id]?.ai ?? 0,
         unlimited: isAdmin,
-        limits: lim
-          ? { message: lim.messageLimit, roleplay: lim.roleplayLimit, compliance: lim.complianceLimit }
-          : null,
+        dailyLimit: lim?.dailyLimit ?? null,
         loading,
       }
     }
@@ -160,9 +149,9 @@ export function StatsSuperAdminSections({
         type: 'saha',
         license: null,
         href: `/pipeline/${s.id}`,
-        usage: null,
+        aiUsed: null,
         unlimited: false,
-        limits: null,
+        dailyLimit: null,
       })
     }
     for (const r of independentUsage) {
@@ -174,22 +163,15 @@ export function StatsSuperAdminSections({
         type: 'external',
         license: licenseLabel(r.licenseType),
         href: null,
-        usage: periodUsage[r.userId] ?? { message: 0, roleplay: 0, compliance: 0 },
+        aiUsed: periodUsage[r.userId]?.ai ?? 0,
         unlimited: false,
-        limits: { message: r.messageLimit, roleplay: r.roleplayLimit, compliance: r.complianceLimit },
+        dailyLimit: r.dailyLimit,
       })
     }
     return out
   }, [sortedMembers, sahaRows, independentUsage, memberLicenses, periodUsage, getMemberHref, licenseLabel, t])
 
-  const totals = rows.reduce(
-    (acc, r) => ({
-      message: acc.message + (r.usage?.message ?? 0),
-      roleplay: acc.roleplay + (r.usage?.roleplay ?? 0),
-      compliance: acc.compliance + (r.usage?.compliance ?? 0),
-    }),
-    { message: 0, roleplay: 0, compliance: 0 }
-  )
+  const totalAi = rows.reduce((acc, r) => acc + (r.aiUsed ?? 0), 0)
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
@@ -210,20 +192,14 @@ export function StatsSuperAdminSections({
         className="overflow-x-auto rounded-xl border border-[var(--border)] scrollbar-none bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]"
         onTouchStart={e => e.stopPropagation()}
       >
-        <table className="w-full text-left border-collapse text-sm min-w-[800px]">
+        <table className="w-full text-left border-collapse text-sm min-w-[640px]">
           <thead>
             <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
               <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
               <th className="p-3 font-semibold text-center">{t('statsPage.colType')}</th>
               <th className="p-3 font-semibold">{t('statsPage.colLicense')}</th>
-              <th className="p-3 font-semibold text-center bg-emerald-50/20 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400">
-                {t('statsPage.aiColMessage')}
-              </th>
-              <th className="p-3 font-semibold text-center bg-purple-50/20 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400">
-                {t('statsPage.aiColCoach')}
-              </th>
-              <th className="p-3 font-semibold text-center bg-red-50/20 dark:bg-red-950/5 text-red-600 dark:text-red-400">
-                {t('statsPage.aiColCompliance')}
+              <th className="p-3 font-semibold text-center bg-brand/5 text-brand">
+                {t('statsPage.aiColUnified')}
               </th>
             </tr>
           </thead>
@@ -264,14 +240,12 @@ export function StatsSuperAdminSections({
                   <td className="p-3 text-sm text-[var(--text-2)] font-semibold uppercase">
                     {row.loading ? <Skeleton className="h-3.5 w-14 rounded" /> : (row.license ?? '—')}
                   </td>
-                  <td className="p-3 text-center tabular-nums bg-emerald-50/10 dark:bg-emerald-950/5 text-emerald-700 dark:text-emerald-400 font-black">
-                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'message', row.unlimited, row.limits)}
-                  </td>
-                  <td className="p-3 text-center tabular-nums bg-purple-50/10 dark:bg-purple-950/5 text-purple-700 dark:text-purple-400 font-semibold">
-                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'roleplay', row.unlimited, row.limits)}
-                  </td>
-                  <td className="p-3 text-center tabular-nums bg-red-50/10 dark:bg-red-950/5 text-red-600 dark:text-red-400 font-semibold">
-                    {row.loading ? <Skeleton className="mx-auto h-3.5 w-12 rounded" /> : usageCell(row.usage, 'compliance', row.unlimited, row.limits)}
+                  <td className="p-3 text-center tabular-nums bg-brand/5 text-brand font-black">
+                    {row.loading ? (
+                      <Skeleton className="mx-auto h-3.5 w-12 rounded" />
+                    ) : (
+                      usageCell(row.aiUsed, row.unlimited, row.dailyLimit)
+                    )}
                   </td>
                 </tr>
               )
@@ -281,9 +255,7 @@ export function StatsSuperAdminSections({
                 <td className="p-3 uppercase tracking-wide">{t('statsPage.colTotal')}</td>
                 <td className="p-3" />
                 <td className="p-3" />
-                <td className="p-3 text-center tabular-nums text-emerald-700 dark:text-emerald-400">{totals.message}</td>
-                <td className="p-3 text-center tabular-nums text-purple-700 dark:text-purple-400">{totals.roleplay}</td>
-                <td className="p-3 text-center tabular-nums text-red-600 dark:text-red-400">{totals.compliance}</td>
+                <td className="p-3 text-center tabular-nums text-brand">{totalAi}</td>
               </tr>
             )}
           </tbody>

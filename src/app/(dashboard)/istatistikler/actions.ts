@@ -43,9 +43,7 @@ export interface IndependentAIUsageRow {
   licenseType: string
   licenseExpiresAt: string | null
   registeredAt: string
-  messageLimit: number
-  roleplayLimit: number
-  complianceLimit: number
+  dailyLimit: number
 }
 
 export type ActionWithWarning<T> = { data: T; warning: string | null }
@@ -179,9 +177,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
         licenseType: owner.licenseType,
         licenseExpiresAt: owner.licenseExpiresAt,
         registeredAt: owner.registeredAt,
-        messageLimit: limits.messageLimit,
-        roleplayLimit: limits.roleplayLimit,
-        complianceLimit: limits.complianceLimit,
+        dailyLimit: limits.dailyLimit,
       }
     })
     .sort((a, b) => new Date(b.registeredAt).getTime() - new Date(a.registeredAt).getTime())
@@ -313,10 +309,7 @@ async function aggregateAiUsageFromDailyActions(
   })
 }
 
-export type AiUsageByPeriod = Record<
-  string,
-  { message: number; roleplay: number; compliance: number }
->
+export type AiUsageByPeriod = Record<string, { ai: number }>
 
 /**
  * Süper admin: verilen kullanıcıların seçili dönemdeki YZ kullanım sayıları
@@ -343,7 +336,7 @@ export async function getAiUsageByPeriodAction(
   const result: AiUsageByPeriod = {}
   for (const [uid, agg] of byUser) {
     if (!idSet.has(uid)) continue
-    result[uid] = { message: agg.message, roleplay: agg.roleplay, compliance: agg.compliance }
+    result[uid] = { ai: agg.message + agg.roleplay + agg.compliance }
   }
   return result
 }

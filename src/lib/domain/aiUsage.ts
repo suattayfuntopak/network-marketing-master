@@ -1,25 +1,29 @@
-// Günlük AI mesaj limitleri — tek kaynak, tüm server action'lar ve UI bu fonksiyonu kullanır.
+// Günlük YZ limitleri — tek kaynak; tüm server action'lar, UI ve plan kartları buradan türetilir.
 
 export type LicenseTier = 'free' | 'basic' | 'plus' | 'pro'
 
+/** Plan başına günlük birleşik YZ kotası (mesaj, koç, prova, uyum — hepsi aynı havuzdan düşer). */
+export const DAILY_AI_LIMITS = {
+  basic: 20,
+  plus: 45,
+  pro: 100,
+} as const
+
 export interface AILimits {
-  messageLimit: number
-  roleplayLimit: number
-  complianceLimit: number
+  dailyLimit: number
 }
 
 export const TRIAL_DAYS = 14
 
-const PAID_LIMITS: Record<Exclude<LicenseTier, 'free'>, AILimits> = {
-  pro: { messageLimit: 100, roleplayLimit: 60, complianceLimit: 15 },
-  plus: { messageLimit: 40, roleplayLimit: 25, complianceLimit: 5 },
-  basic: { messageLimit: 15, roleplayLimit: 10, complianceLimit: 2 },
+const POST_TRIAL_FREE_LIMITS: AILimits = { dailyLimit: 0 }
+
+function limitsForTier(tier: Exclude<LicenseTier, 'free'>): AILimits {
+  return { dailyLimit: DAILY_AI_LIMITS[tier] }
 }
 
 /**
  * DB'deki license_type değerini kanonik forma indirger. Eski (legacy) değerler
- * leader→basic, master→plus ile eşlenir; basic/plus/pro/free aynen geçer. Bu,
- * 028 migration'ı ile deploy'un sırasını önemsizleştirir (kimse boşta kalmaz).
+ * leader→basic, master→plus ile eşlenir; basic/plus/pro/free aynen geçer.
  */
 export function normalizeLicenseType(raw: string | null | undefined): LicenseTier {
   switch (raw) {
@@ -34,12 +38,6 @@ export function normalizeLicenseType(raw: string | null | undefined): LicenseTie
     default:
       return 'free'
   }
-}
-
-const POST_TRIAL_FREE_LIMITS: AILimits = {
-  messageLimit: 5,
-  roleplayLimit: 3,
-  complianceLimit: 0,
 }
 
 /** 14-day signup trial uses Basic daily credits while license_type stays `free`. */
@@ -78,11 +76,7 @@ export function getLimitsForLicense(
   workspaceCreatedAt?: string | null
 ): AILimits {
   if (isSuperAdmin) {
-    return {
-      messageLimit: Infinity,
-      roleplayLimit: Infinity,
-      complianceLimit: Infinity,
-    }
+    return { dailyLimit: Infinity }
   }
 
   const effective = getEffectiveLicenseType(licenseType, licenseExpiresAt, workspaceCreatedAt)
@@ -91,7 +85,18 @@ export function getLimitsForLicense(
     return POST_TRIAL_FREE_LIMITS
   }
 
-  return PAID_LIMITS[effective]
+  return limitsForTier(effective)
+}
+
+/** Plan kartları ve ödeme sayfası için dinamik YZ limit metni. */
+export function formatDailyAiLimitLabel(
+  tier: Exclude<LicenseTier, 'free'>,
+  lang: 'tr' | 'en' = 'tr'
+): string {
+  const n = DAILY_AI_LIMITS[tier]
+  return lang === 'en'
+    ? `Daily ${n} AI Messages`
+    : `Günlük ${n} Yapay Zeka Mesajı`
 }
 
 export function formatAIUsageDisplay(

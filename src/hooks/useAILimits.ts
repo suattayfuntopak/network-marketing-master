@@ -17,19 +17,17 @@ export function useAILimits() {
       ws?.licenseExpiresAt,
       ws?.workspaceCreatedAt
     )
-    const messageUsed = usage?.messageUsed ?? 0
-    const roleplayUsed = usage?.roleplayUsed ?? 0
-    const complianceUsed = usage?.complianceUsed ?? 0
+    const aiUsed = usage?.aiUsed ?? 0
+    const dailyLimit = limits.dailyLimit
 
     return {
       limits,
+      dailyLimit,
       isSuperAdmin,
-      messageUsed,
-      roleplayUsed,
-      complianceUsed,
-      messageRemaining: Math.max(0, limits.messageLimit - messageUsed),
-      roleplayRemaining: Math.max(0, limits.roleplayLimit - roleplayUsed),
-      complianceRemaining: Math.max(0, limits.complianceLimit - complianceUsed),
+      aiUsed,
+      aiRemaining: Number.isFinite(dailyLimit)
+        ? Math.max(0, dailyLimit - aiUsed)
+        : Infinity,
       isTrialActive: isTrialPeriodActive(
         ws?.licenseType,
         ws?.licenseExpiresAt,

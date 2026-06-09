@@ -3,11 +3,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
-import { X, Lock } from 'lucide-react'
+import { X } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { hasTeamTeaserAccess } from '@/lib/domain/teamAccess'
 import { NAV_MORE_ITEMS, NAV_ADMIN, type NavItem } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
@@ -24,8 +23,6 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const teamLocked = !hasTeamTeaserAccess(ws?.licenseType, isSuperAdmin, ws?.isTrialActive)
-
   useBodyScrollLock(open)
 
   if (!open) return null
@@ -34,17 +31,13 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
     const active = pathname === href || (href !== '/pano' && pathname.startsWith(href))
     const label = t(translationKey.replace('nav.', 'navMobile.'))
     const isCrown = href === '/platform-yonetim'
-    const isTeamLocked = href === '/ekip' && teamLocked
-
-    const targetHref = isTeamLocked ? '/odeme' : href
-
     return (
       <Link
         key={href}
-        href={targetHref}
+        href={href}
         prefetch
         onClick={onClose}
-        onMouseEnter={() => prefetchRouteData(queryClient, targetHref, ws?.workspaceId, ws)}
+        onMouseEnter={() => prefetchRouteData(queryClient, href, ws?.workspaceId, ws)}
         className={clsx(
           'flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-colors',
           isCrown
@@ -59,7 +52,6 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
         <Icon className="h-5 w-5 shrink-0" strokeWidth={active ? 2.25 : 1.75} />
         <span className="flex min-w-0 flex-1 items-center gap-1.5">
           <span className="truncate">{label}</span>
-          {isTeamLocked && <Lock className="h-3.5 w-3.5 shrink-0 opacity-50" aria-hidden />}
         </span>
       </Link>
     )

@@ -172,12 +172,11 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const { data: ws } = useWorkspace()
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const {
-    limits,
+    dailyLimit,
     isSuperAdmin,
-    messageUsed,
-    messageRemaining: remaining,
+    aiUsed,
+    aiRemaining: remaining,
   } = useAILimits()
-  const activeMessageLimit = limits.messageLimit
   const qc = useQueryClient()
   const limitReached = !isSuperAdmin && remaining <= 0
 
@@ -528,7 +527,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           </button>
         ) : limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
-            {t('coachUi.dailyLimitMessage', { limit: activeMessageLimit })}
+            {t('coachUi.dailyLimitMessage', { limit: dailyLimit })}
           </div>
         ) : (
           <button
@@ -543,8 +542,8 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                   <Bot className="h-4 w-4" />{' '}
                   {formatCreditButtonLabel(
                     t('coachUi.generate'),
-                    messageUsed,
-                    activeMessageLimit,
+                    aiUsed,
+                    dailyLimit,
                     isSuperAdmin,
                     lang
                   )}
