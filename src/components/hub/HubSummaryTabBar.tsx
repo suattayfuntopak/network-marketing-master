@@ -2,6 +2,7 @@
 
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { crownSolidMap, type ButtonColor } from '@/components/ui/SquareButton'
 
 export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly'] as const
 export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
@@ -14,6 +15,14 @@ export const HUB_PERIOD_TAB_LABEL_KEYS: Record<HubPeriodTab, string> = {
   weekly: 'dashboard.summaryTabWeekly',
   monthly: 'dashboard.summaryTabMonthly',
   yearly: 'dashboard.summaryTabYearly',
+}
+
+/** Pano launcher ilk 4 kutu — Hedefim, Saha Özetim, Saha Radarı, Boru Hattı */
+const HUB_TAB_PANO_COLORS: Record<HubPeriodTab, ButtonColor> = {
+  daily: 'indigo',
+  weekly: 'teal',
+  monthly: 'coral',
+  yearly: 'amber',
 }
 
 export function hubPeriodTabLabel(
@@ -39,23 +48,27 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
       data-no-swipe="true"
       onTouchStart={e => e.stopPropagation()}
     >
-      {HUB_PERIOD_TABS.map(tab => (
-        <button
-          key={tab}
-          type="button"
-          role="tab"
-          aria-selected={active === tab}
-          onClick={() => onChange(tab)}
-          className={clsx(
-            'min-w-[4.5rem] flex-1 shrink-0 rounded-lg px-2 py-2 text-center text-[11px] font-bold transition sm:min-w-0 sm:px-3 sm:text-xs',
-            active === tab
-              ? 'bg-[var(--bg-card)] text-[var(--text-1)] shadow-sm'
-              : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
-          )}
-        >
-          {t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}
-        </button>
-      ))}
+      {HUB_PERIOD_TABS.map(tab => {
+        const isActive = active === tab
+        const panoColor = HUB_TAB_PANO_COLORS[tab]
+        return (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={isActive}
+            onClick={() => onChange(tab)}
+            className={clsx(
+              'min-w-[4.5rem] flex-1 shrink-0 rounded-lg px-2 py-2 text-center text-[11px] font-bold transition sm:min-w-0 sm:px-3 sm:text-xs',
+              isActive
+                ? clsx(crownSolidMap[panoColor], 'text-white shadow-sm border border-white/20')
+                : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
+            )}
+          >
+            {t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}
+          </button>
+        )
+      })}
     </div>
   )
 }

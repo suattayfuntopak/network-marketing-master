@@ -523,7 +523,7 @@ export const tr = {
     activityTotalActions: "Toplam aksiyon",
     activityFunnelTitle: "Huni gerçekleşenleri",
     activityFunnelHint: "Boru hattı kayıtlarından otomatik — elle sayım yok.",
-    activityLearningTitle: "Öğrenme özeti (Pro)",
+    activityLearningTitle: "Öğrenme özeti",
     activityPrivacyNote: "Aday not metinleri paylaşılmaz; yalnızca özet sayılar gösterilir.",
     activityOpenPipeline: "Boru Hattı profiline git",
     activityWaCheckIn: "Merhaba {name}, nasıl gidiyor? Bu hafta saha hedeflerinde sana destek olmak isterim.",

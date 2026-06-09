@@ -523,7 +523,7 @@ export const en = {
     activityTotalActions: "Total actions",
     activityFunnelTitle: "Funnel actuals",
     activityFunnelHint: "Automatic from pipeline — no manual counters.",
-    activityLearningTitle: "Learning summary (Pro)",
+    activityLearningTitle: "Learning summary",
     activityPrivacyNote: "Candidate note text is not shared; only aggregate counts are shown.",
     activityOpenPipeline: "Open pipeline profile",
     activityWaCheckIn: "Hi {name}, how is it going? I'd love to support you with your field goals this week.",

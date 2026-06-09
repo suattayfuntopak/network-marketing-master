@@ -359,14 +359,14 @@ export function MemberActivitySheet({
             <p className="text-xs font-bold uppercase tracking-wide text-teal-800 dark:text-teal-300">
               {t('team.activityLearningTitle')}
             </p>
-            <div className="grid grid-cols-2 gap-2 text-sm">
-              <span className="text-[var(--text-2)]">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+              <span className="text-left text-[var(--text-2)]">
                 {t('pulse.colTraining')}: <strong className="text-[var(--text-1)]">%{data.trainingPct ?? 0}</strong>
               </span>
-              <span className="text-[var(--text-2)]">
+              <span className="text-right text-[var(--text-2)]">
                 {t('pulse.colObjections')}: <strong className="text-[var(--text-1)]">%{data.objectionPct ?? 0}</strong>
               </span>
-              <span className="text-[var(--text-2)]">
+              <span className="text-left text-[var(--text-2)]">
                 {t('pulse.colVideos')}: <strong className="text-[var(--text-1)]">%{data.videoPct ?? 0}</strong>
                 {data.videoTotal != null && data.videoTotal > 0 && (
                   <span className="text-xs text-[var(--text-3)]">
@@ -374,7 +374,7 @@ export function MemberActivitySheet({
                   </span>
                 )}
               </span>
-              <span className="text-[var(--text-2)]">
+              <span className="text-right text-[var(--text-2)]">
                 {t('statsPage.colDqsg')}:{' '}
                 <strong className="text-[var(--text-1)]">
                   {memberIsLeader
