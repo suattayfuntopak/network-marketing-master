@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-09 — Plan kartı yenileme: Basic'te Ekibim yok, Saha Radarı eklendi, AI limitleri sıralı ✅
+
+### Değişiklikler (`payment.ts` + `landing.ts`, TR + EN)
+- **Basic:** Ekibim referansı tamamen kaldırıldı; bireysel odak korundu. YZ Koçu satırına "& Saha Provası" eklendi.
+- **Plus:** "Alt Ekip Takibi (Maks 50 Üye)" ve "4 Haftalık Rehber" → "Saha Radarı & Alt Ekip Aktivite Takibi" ve "Alt Ekip Yönetimi & Onboarding Takibi" ile değiştirildi. AI limit sıralaması öne alındı.
+- **Pro:** "Sınırsız Alt Ekip Takibi" → "Günlük 100 YZ Mesajı" olarak feat2 slotuna taşındı; "Ekip Performans & Analiz Tablosu" feat6'ya geçti; feat5 "Sınırsız Alt Ekip Büyüklüğü" oldu.
+- **Plan açıklamaları:** Plus = "Basic + yüksek YZ limitleri, Saha Radarı ve alt ekip takibi"; Pro = "Plus + maksimum YZ limitleri ve sınırsız alt ekip büyüklüğü"
+- Mantık: her plan, bir önceki plan + daha yüksek AI limitleri; basit ve tutarlı.
+
 ## 2026-06-09 — Freemium Model: Sayfa kilitleri kaldırıldı, AI buton kilidi, trial rebrand ✅
 
 ### FAZ 1 — Sayfa kilitleri kaldırıldı
