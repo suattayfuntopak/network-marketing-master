@@ -64,7 +64,7 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
     !ws.isSuperAdmin &&
     ws.licenseType === 'free' &&
     !ws.isTrialActive
-  const paymentHref = trialEnded ? '/odeme?plan=basic' : '/odeme'
+  const paymentHref = trialEnded ? '/odeme?plan=basic&period=yearly' : '/odeme'
 
   return createPortal(
     <div

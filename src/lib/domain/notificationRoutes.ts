@@ -1,4 +1,5 @@
 import type { NotificationType } from '@/types/database.types'
+import { ODEME_BASIC_YEARLY_DEEP_LINK } from '@/lib/domain/paymentRoutes'
 
 type NotificationRouteInput = {
   type: NotificationType
@@ -34,7 +35,7 @@ export function notificationTargetHref(n: NotificationRouteInput): string {
 
   if (isTeamJoinNotification(n)) return '/saha-ozetim?tab=daily'
 
-  if (isTrialUpgradeNotification(n)) return '/odeme?plan=basic'
+  if (isTrialUpgradeNotification(n)) return ODEME_BASIC_YEARLY_DEEP_LINK
 
   const routeByType: Record<NotificationType, string> = {
     user: '/ekip',

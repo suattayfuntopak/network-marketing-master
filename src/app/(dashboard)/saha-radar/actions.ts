@@ -2,6 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { GEMINI_FLASH } from '@/lib/ai/models'
 import { clampAIUserInput } from '@/lib/domain/aiInputLimit'
 
 export async function generateCoachingMessageAction(input: {
@@ -55,6 +56,7 @@ export async function generateCoachingMessageAction(input: {
       userId: quota.user.id,
       note: 'message',
       noteTr: input.targetUserId ? `coaching:${input.targetUserId}:${preview}` : undefined,
+      aiModel: GEMINI_FLASH,
     })
 
     return { message }

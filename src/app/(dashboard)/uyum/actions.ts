@@ -2,8 +2,8 @@
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
-import { serverError } from '@/lib/utils/serverError'
 import { GEMINI_FLASH } from '@/lib/ai/models'
+import { serverError } from '@/lib/utils/serverError'
 import { clampAIUserInput, rejectIfAIInputTooLong } from '@/lib/domain/aiInputLimit'
 
 function toLang(lang: string): 'tr' | 'en' {
@@ -143,6 +143,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'compliance',
+      aiModel: GEMINI_FLASH,
     })
 
     return {

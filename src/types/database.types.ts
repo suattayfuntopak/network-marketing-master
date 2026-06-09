@@ -177,6 +177,7 @@ export interface Database {
           note: string | null
           note_tr: string | null
           note_en: string | null
+          ai_model: string | null
           created_at: string
         }
         Insert: {
@@ -188,6 +189,7 @@ export interface Database {
           note?: string | null
           note_tr?: string | null
           note_en?: string | null
+          ai_model?: string | null
           created_at?: string
         }
         Update: {
@@ -199,6 +201,7 @@ export interface Database {
           note?: string | null
           note_tr?: string | null
           note_en?: string | null
+          ai_model?: string | null
           created_at?: string
         }
         Relationships: [

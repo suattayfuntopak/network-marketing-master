@@ -45,7 +45,7 @@ export function AccountStatusAlert() {
   const isTrial = lifecycle.phase === 'trial'
   const daysLeft = Math.max(0, Math.ceil((lifecycle.trialEndsAt.getTime() - now) / 86_400_000))
   const trialEnded = lifecycle.phase === 'free'
-  const paymentHref = trialEnded ? '/odeme?plan=basic' : '/odeme'
+  const paymentHref = trialEnded ? '/odeme?plan=basic&period=yearly' : '/odeme'
   const bannerTitle = isTrial
     ? daysLeft <= 1
       ? t('shellUi.accountAlertTrialTitleLast')

@@ -546,9 +546,11 @@ export async function generateOnboardingGuidanceAction(
     ? (ONBOARDING_STEPS_EN[stepId] || stepId)
     : (ONBOARDING_STEPS_TR[stepId] || stepId)
 
+  const coachModel = resolveGeminiModel('deep_coach', quota.licenseType)
+
   try {
     const model = genAI.getGenerativeModel({
-      model: resolveGeminiModel('deep_coach', quota.licenseType),
+      model: coachModel,
       systemInstruction: lang === 'en'
         ? `You are an expert Network Marketing (MLM) AI Leadership Coach. Your task is to generate a highly motivational, professional, and practical message/script written from the perspective of a supportive sponsor (team leader) to their new team member ${memberName} to guide them through their onboarding checklist step: "${stepLabel}".
 The message should be action-oriented, encouraging, include a few relevant emojis, and contain a small, actionable pro-tip tailored to that specific step (e.g. for listing, remind them not to prejudge; for a 3-way call, mention edification and validation).
@@ -573,6 +575,7 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: coachModel,
     })
 
     return {

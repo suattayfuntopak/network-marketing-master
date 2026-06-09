@@ -53,6 +53,7 @@ export async function generateCoachMessage(
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: GEMINI_FLASH,
     })
 
     return { message }
@@ -116,7 +117,12 @@ Kurallar:
     if (!message) throw new Error('Boş yanıt döndü.')
     if (inviteCode && !message.includes(inviteCode)) message += linkBlock
 
-    await logAIGeneration({ workspaceId: quota.workspaceId, userId: quota.user.id, note: 'message' })
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+      aiModel: GEMINI_FLASH,
+    })
     return { message }
   } catch (err: unknown) {
     console.error('NMM invite message error', err)
@@ -173,6 +179,7 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: GEMINI_FLASH,
     })
 
     return { summary }

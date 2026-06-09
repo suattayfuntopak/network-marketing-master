@@ -14,6 +14,7 @@ export const coachSection = {
       // KoclukForm.tsx
       answerCopied: 'Cevap kopyalandı!',
       askYourCoachTitle: 'Yapay Zeka Koçuna Sor',
+      premiumEngineBadge: 'Premium AI motoru',
       askYourCoachDesc: 'Network marketing ve liderlikle ilgili merak ettiğin her şeyi sor.',
       unlimited: 'Sınırsız',
       dailyQuota: 'Günlük Limit',
@@ -100,6 +101,7 @@ export const coachSection = {
       // KoclukForm.tsx
       answerCopied: 'Answer copied!',
       askYourCoachTitle: 'Ask Your AI Coach',
+      premiumEngineBadge: 'Premium AI engine',
       askYourCoachDesc: 'Ask anything related to Network Marketing and strategy.',
       unlimited: 'Unlimited',
       dailyQuota: 'Daily AI Quota',

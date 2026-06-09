@@ -2,6 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { GEMINI_FLASH } from '@/lib/ai/models'
 
 export async function generateQuickMessageAction(input: {
   name: string
@@ -29,6 +30,7 @@ export async function generateQuickMessageAction(input: {
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: GEMINI_FLASH,
     })
 
     return { message }

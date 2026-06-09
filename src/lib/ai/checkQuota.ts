@@ -147,6 +147,8 @@ export async function logAIGeneration(params: {
   candidateId?: string | null
   /** Optional metadata stored in note_tr — does not affect quota counting. */
   noteTr?: string | null
+  /** Gemini model id — süper admin maliyet paneli. */
+  aiModel?: string | null
 }): Promise<void> {
   if (!params.workspaceId) return
   const supabase = await createClient()
@@ -158,6 +160,7 @@ export async function logAIGeneration(params: {
       action_type: 'ai_generate' as const,
       note: params.note,
       ...(params.noteTr ? { note_tr: params.noteTr } : {}),
+      ...(params.aiModel ? { ai_model: params.aiModel } : {}),
     })
 
     const usageDate = new Date().toISOString().slice(0, 10)

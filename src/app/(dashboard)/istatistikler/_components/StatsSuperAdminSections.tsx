@@ -12,6 +12,8 @@ import {
   getIndependentSignupAIUsageAction,
   getMemberLicenseProfilesAction,
   getAiUsageByPeriodAction,
+  getAiModelMixAction,
+  getProductFunnelStatsAction,
   type AIUsageArchivePeriod,
 } from '../actions'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
@@ -102,6 +104,18 @@ export function StatsSuperAdminSections({
     staleTime: 60_000,
   })
 
+  const { data: modelMix } = useQuery({
+    queryKey: ['ai-model-mix', period],
+    queryFn: () => getAiModelMixAction(toArchivePeriod(period)),
+    staleTime: 60_000,
+  })
+
+  const { data: funnelStats } = useQuery({
+    queryKey: ['product-funnel-stats', period],
+    queryFn: () => getProductFunnelStatsAction(toArchivePeriod(period)),
+    staleTime: 60_000,
+  })
+
   const rows = useMemo((): AiRow[] => {
     const out: AiRow[] = []
     const leaders = sortedMembers.filter(m => m.role === 'leader')
@@ -186,6 +200,31 @@ export function StatsSuperAdminSections({
           </p>
         </div>
         <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+            {t('statsPage.aiModelMixTitle')}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-4 text-sm font-semibold tabular-nums text-[var(--text-1)]">
+            <span>{t('statsPage.aiModelFlash')}: {modelMix?.flash ?? '—'}</span>
+            <span className="text-brand">{t('statsPage.aiModelPro')}: {modelMix?.pro ?? '—'}</span>
+            {(modelMix?.unknown ?? 0) > 0 && (
+              <span className="text-[var(--text-3)]">{t('statsPage.aiModelUnknown')}: {modelMix?.unknown}</span>
+            )}
+          </div>
+        </div>
+        <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
+            {t('statsPage.productFunnelTitle')}
+          </p>
+          <div className="mt-2 space-y-1 text-sm text-[var(--text-2)]">
+            <p>{t('statsPage.productFunnelPricing')}: <span className="font-bold tabular-nums text-[var(--text-1)]">{funnelStats?.pricingSectionView ?? '—'}</span></p>
+            <p>{t('statsPage.productFunnelUpgradeCta')}: <span className="font-bold tabular-nums text-[var(--text-1)]">{funnelStats?.upgradeGateCtaClick ?? '—'}</span></p>
+            <p>{t('statsPage.productFunnelOdemeLink')}: <span className="font-bold tabular-nums text-[var(--text-1)]">{funnelStats?.odemeBasicDeepLink ?? '—'}</span></p>
+          </div>
+        </div>
       </div>
 
       <div

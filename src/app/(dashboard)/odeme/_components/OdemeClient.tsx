@@ -37,8 +37,11 @@ export function OdemeClient() {
   const searchParams = useSearchParams()
   const basicPlanRef = useRef<HTMLDivElement>(null)
   const highlightBasic = searchParams.get('plan') === 'basic'
+  const highlightYearly = searchParams.get('period') === 'yearly'
 
-  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
+  const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(
+    highlightYearly ? 'yearly' : 'monthly',
+  )
   const [loading, setLoading] = useState(false)
 
   useBodyScrollLock(loading)
@@ -46,14 +49,21 @@ export function OdemeClient() {
   const basicDeepLinkLogged = useRef(false)
 
   useEffect(() => {
+    if (highlightYearly) setBillingPeriod('yearly')
+  }, [highlightYearly])
+
+  useEffect(() => {
     if (highlightBasic && basicPlanRef.current) {
       basicPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
     if (highlightBasic && !basicDeepLinkLogged.current) {
       basicDeepLinkLogged.current = true
-      void logProductEventAction(PRODUCT_EVENTS.odemeBasicDeepLink, { source: 'query' })
+      void logProductEventAction(PRODUCT_EVENTS.odemeBasicDeepLink, {
+        source: 'query',
+        period: highlightYearly ? 'yearly' : 'monthly',
+      })
     }
-  }, [highlightBasic])
+  }, [highlightBasic, highlightYearly])
 
   const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)

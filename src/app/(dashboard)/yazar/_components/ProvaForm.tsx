@@ -267,6 +267,7 @@ export function ProvaForm() {
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { isSuperAdmin, aiUsed, dailyLimit } = useAILimits()
+  const isProEngine = ws?.effectiveLicenseType === 'pro'
 
   const chatEndRef = useRef<HTMLDivElement>(null)
 
@@ -384,6 +385,11 @@ export function ProvaForm() {
           </button>
           
           <div className="flex items-center gap-2">
+            {isProEngine && (
+              <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                {t('coachUi.premiumEngineBadge')}
+              </span>
+            )}
             <span className={`flex items-center gap-1 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider ${activeScenario.color}`}>
               <Sparkles className="h-3 w-3 shrink-0 animate-pulse" />
               {scTitle}

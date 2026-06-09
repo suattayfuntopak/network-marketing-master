@@ -12,6 +12,8 @@ import {
   fetchFunnelActualsForPeriod,
   funnelRangeForPulsePeriod,
 } from '@/lib/domain/funnelActuals'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { GEMINI_FLASH, GEMINI_PRO } from '@/lib/ai/models'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -359,4 +361,96 @@ export async function getAiUsageByPeriodAction(
     result[uid] = { ai: agg.ai }
   }
   return result
+}
+
+export type AiModelMix = {
+  flash: number
+  pro: number
+  unknown: number
+}
+
+/** Süper admin: seçili dönemde Flash vs Pro çağrı sayıları. */
+export async function getAiModelMixAction(period: AIUsageArchivePeriod): Promise<AiModelMix> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const { fromDate, toDate } = archiveDateRange(period)
+
+  let q = admin
+    .from('nmm_daily_actions')
+    .select('ai_model')
+    .eq('action_type', 'ai_generate')
+
+  if (fromDate) {
+    q = q
+      .gte('created_at', `${fromDate}T00:00:00.000Z`)
+      .lte('created_at', `${toDate}T23:59:59.999Z`)
+  }
+
+  const { data, error } = await q
+  if (error) {
+    console.error('[getAiModelMixAction]', error)
+    return { flash: 0, pro: 0, unknown: 0 }
+  }
+
+  const mix: AiModelMix = { flash: 0, pro: 0, unknown: 0 }
+  for (const row of data ?? []) {
+    if (row.ai_model === GEMINI_PRO) mix.pro++
+    else if (row.ai_model === GEMINI_FLASH) mix.flash++
+    else mix.unknown++
+  }
+  return mix
+}
+
+export type ProductFunnelCounts = {
+  pricingSectionView: number
+  upgradeGateCtaClick: number
+  odemeBasicDeepLink: number
+}
+
+/** Süper admin: ürün hunisi olay sayıları (landing → upgrade CTA → ödeme deep link). */
+export async function getProductFunnelStatsAction(
+  period: AIUsageArchivePeriod,
+): Promise<ProductFunnelCounts> {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const { fromDate, toDate } = archiveDateRange(period)
+
+  let q = admin.from('nmm_product_events').select('event_name')
+  if (fromDate) {
+    q = q
+      .gte('created_at', `${fromDate}T00:00:00.000Z`)
+      .lte('created_at', `${toDate}T23:59:59.999Z`)
+  }
+
+  const { data, error } = await q
+  if (error) {
+    console.error('[getProductFunnelStatsAction]', error)
+    return {
+      pricingSectionView: 0,
+      upgradeGateCtaClick: 0,
+      odemeBasicDeepLink: 0,
+    }
+  }
+
+  const counts: ProductFunnelCounts = {
+    pricingSectionView: 0,
+    upgradeGateCtaClick: 0,
+    odemeBasicDeepLink: 0,
+  }
+  for (const row of data ?? []) {
+    if (row.event_name === PRODUCT_EVENTS.pricingSectionView) counts.pricingSectionView++
+    else if (row.event_name === PRODUCT_EVENTS.upgradeGateCtaClick) counts.upgradeGateCtaClick++
+    else if (row.event_name === PRODUCT_EVENTS.odemeBasicDeepLink) counts.odemeBasicDeepLink++
+  }
+  return counts
 }

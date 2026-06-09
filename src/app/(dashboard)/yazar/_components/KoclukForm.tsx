@@ -29,6 +29,7 @@ export function KoclukForm() {
   const qc = useQueryClient()
   const { dailyLimit, isSuperAdmin, aiUsed, aiRemaining } = useAILimits()
   const limitReached = !isSuperAdmin && aiRemaining <= 0
+  const isProEngine = ws?.effectiveLicenseType === 'pro'
 
   const prevAnswerRef = useRef<string | undefined>(undefined)
   const answerRef = useRef<HTMLDivElement>(null)
@@ -95,10 +96,17 @@ export function KoclukForm() {
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#E0E7FF] dark:bg-[#2e2a75]">
           <HelpCircle className="h-4 w-4 text-[#3730A3] dark:text-[#c7d2fe]" />
         </div>
-        <div>
-          <p className="text-sm font-bold text-[#3730A3] dark:text-[#c7d2fe]">
-            {t('coachUi.askYourCoachTitle')}
-          </p>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm font-bold text-[#3730A3] dark:text-[#c7d2fe]">
+              {t('coachUi.askYourCoachTitle')}
+            </p>
+            {isProEngine && (
+              <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
+                {t('coachUi.premiumEngineBadge')}
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

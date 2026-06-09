@@ -60,6 +60,7 @@ export async function generateMessageAction(
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: GEMINI_FLASH,
     })
 
     return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
@@ -185,6 +186,7 @@ JSON yapısı şu şekilde olmalıdır:
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'roleplay',
+      aiModel: coachModel,
     })
 
     return {
@@ -272,6 +274,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
       note: 'message',
+      aiModel: coachModel,
     })
 
     return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }

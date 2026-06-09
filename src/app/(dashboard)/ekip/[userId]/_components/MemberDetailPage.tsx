@@ -24,6 +24,7 @@ import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
+import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 
 type ActivityLevel = 'active' | 'recent' | 'silent'
 
@@ -209,6 +210,7 @@ function TemplateEditor({
                 value={val}
                 onChange={e => set(e.target.value)}
                 rows={3}
+                maxLength={AI_USER_INPUT_MAX_CHARS}
                 placeholder={t('dashboard.memberDetailTemplatePlaceholder')}
                 className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[var(--accent)] placeholder:text-[var(--text-3)]"
               />
