@@ -12,7 +12,7 @@ import {
 import { buildBilingualRejectReason } from '@/lib/domain/moderationRejectReason'
 import { enrichApprovedModerationData } from '@/lib/domain/moderationApproval'
 import { translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
-import { extractYoutubeId } from '@/app/(dashboard)/egitim/videoActions'
+import { extractYoutubeId } from '@/lib/utils/youtubeId'
 
 export type ModerationContentType = 'training' | 'objection' | 'video'
 

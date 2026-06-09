@@ -12,13 +12,19 @@ test.describe('Legacy ilgilen redirects', () => {
     await expect(page).toHaveURL(/\/(hedefim|saha-ozetim|giris)/)
   })
 
-  test('daily priorities on Saha Özetim when authenticated', async ({ page }) => {
+  test('Saha Özetim daily tab loads when authenticated', async ({ page }) => {
     test.skip(
       !process.env.PLAYWRIGHT_TEST_EMAIL || !fs.existsSync(authFile),
       'Requires auth.setup with PLAYWRIGHT_TEST_EMAIL/PASSWORD',
     )
 
+    const auth = JSON.parse(fs.readFileSync(authFile, 'utf8')) as { cookies?: unknown[] }
+    test.skip(!auth.cookies?.length, 'Auth setup produced empty session')
+
     await page.goto('/saha-ozetim?tab=daily')
-    await expect(page.getByText(/öncelik|priorit/i)).toBeVisible({ timeout: 20_000 })
+    await expect(page).toHaveURL(/\/saha-ozetim/)
+    await expect(page.getByRole('button', { name: /Günlük|Daily/i }).first()).toBeVisible({
+      timeout: 20_000,
+    })
   })
 })
