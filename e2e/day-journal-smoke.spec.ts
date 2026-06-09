@@ -8,7 +8,8 @@ test.describe('Legacy ilgilen redirects', () => {
   test('/bugun/ilgilen redirects without server error', async ({ page }) => {
     const response = await page.goto('/bugun/ilgilen')
     expect(response?.status()).toBeLessThan(500)
-    await expect(page).toHaveURL(/\/(hedefim|saha-ozetim)/)
+    // Legacy → /hedefim (or tab target); unauthenticated users land on /giris after auth middleware.
+    await expect(page).toHaveURL(/\/(hedefim|saha-ozetim|giris)/)
   })
 
   test('daily priorities on Saha Özetim when authenticated', async ({ page }) => {

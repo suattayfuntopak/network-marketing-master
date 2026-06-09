@@ -1,11 +1,16 @@
 import { test, expect, devices } from '@playwright/test'
 
-const MOBILE = { ...devices['iPhone 13'] }
+/** Viewport-only — full `devices[...]` spread sets defaultBrowserType and breaks inside describe. */
+const MOBILE_VIEWPORT = {
+  viewport: devices['iPhone 13'].viewport,
+  isMobile: true,
+  hasTouch: true,
+}
 
 const DASHBOARD_ROUTES = ['/pano', '/saha-ozetim', '/egitim'] as const
 
 test.describe('dashboard routes (mobile viewport)', () => {
-  test.use(MOBILE)
+  test.use(MOBILE_VIEWPORT)
 
   for (const path of DASHBOARD_ROUTES) {
     test(`${path} responds without server error`, async ({ page }) => {
@@ -36,7 +41,7 @@ test.describe('dashboard routes (mobile viewport)', () => {
 })
 
 test.describe('mobile shell (unauthenticated)', () => {
-  test.use(MOBILE)
+  test.use(MOBILE_VIEWPORT)
 
   test('login page is usable on narrow screens', async ({ page }) => {
     await page.goto('/giris')
