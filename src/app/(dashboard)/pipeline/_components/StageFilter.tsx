@@ -48,7 +48,7 @@ export function StageFilter({ active, onChange, counts }: StageFilterProps) {
             active === key
               ? isStage
                 ? clsx(stageChip, 'ring-2 ring-offset-1 ring-offset-[var(--bg-page)] ring-current shadow-sm')
-                : 'bg-brand text-white'
+                : 'bg-brand text-white dark:bg-[#5D44C9] dark:text-white dark:hover:bg-[#4a38b0]'
               : isStage
                 ? clsx(stageChip, 'opacity-90 hover:opacity-100')
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-[var(--bg-subtle)] dark:text-[var(--text-2)] dark:hover:bg-[var(--border)]',

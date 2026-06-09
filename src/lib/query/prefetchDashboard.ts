@@ -6,7 +6,15 @@ import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
+import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
+import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
+import type { MemberRow } from '@/lib/team/types'
+import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import {
+  downlineActivityMemberIds,
+  prefetchEkipRankingMetrics,
+} from './prefetchRouteMetrics'
 import { queryKeys } from './keys'
 import { QUERY_STALE } from './staleTimes'
 
@@ -63,4 +71,44 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   }
 
   void Promise.all(background)
+
+  // Metrikleri arka planda ısıt — sayfa/sekme açılışında boş ekran beklemesini azaltır.
+  void warmDashboardMetrics(queryClient, ws)
+}
+
+/** Kritik veri yüklendikten sonra ekip/istatistik/pano metriklerini önceden çek. */
+export async function warmDashboardMetrics(
+  queryClient: QueryClient,
+  ws: WorkspaceContext,
+): Promise<void> {
+  const { workspaceId, licenseType, isSuperAdmin } = ws
+  const wsSlice = { licenseType, isSuperAdmin }
+
+  const warmTasks: Promise<unknown>[] = [
+    queryClient.prefetchQuery({
+      queryKey: ['pano-field-insights', workspaceId],
+      queryFn: () => getMyPanoInsightsAction(workspaceId),
+      staleTime: QUERY_STALE.metrics,
+    }),
+  ]
+
+  if (hasTeamPageAccess(licenseType, isSuperAdmin)) {
+    warmTasks.push(prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice))
+  }
+
+  if (hasTeamPulseAccess(licenseType, isSuperAdmin)) {
+    const team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
+    const memberIds = downlineActivityMemberIds(team?.ekipRows ?? [])
+    if (memberIds.length > 0) {
+      warmTasks.push(
+        queryClient.prefetchQuery({
+          queryKey: queryKeys.teamProgressMap(workspaceId, memberIds),
+          queryFn: () => getTeamProgressMapAction(workspaceId, memberIds),
+          staleTime: QUERY_STALE.metrics,
+        }),
+      )
+    }
+  }
+
+  await Promise.all(warmTasks)
 }

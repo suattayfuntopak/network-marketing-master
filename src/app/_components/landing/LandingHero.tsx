@@ -10,15 +10,15 @@ export function LandingHero() {
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-16 pb-20 sm:px-6 lg:px-8 text-center space-y-8">
       {/* Glow badge */}
-      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-indigo-500/30 dark:border-indigo-500/30 bg-indigo-50 dark:bg-indigo-500/5 px-4.5 py-2 text-xs sm:text-sm font-extrabold text-indigo-950 dark:text-indigo-300 animate-pulse shadow-md shadow-indigo-500/10 dark:shadow-indigo-500/5">
-        <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+      <div className="inline-flex items-center gap-1.5 rounded-full border-2 border-[#009688]/30 bg-[#E1F5EE] dark:bg-[#009688]/10 px-4.5 py-2 text-xs sm:text-sm font-extrabold text-[#0F6E56] dark:text-[#4ade80] animate-pulse shadow-md shadow-[#009688]/10">
+        <Sparkles className="h-4 w-4 text-[#009688]" />
         <span>{t('landingPage.heroBadge')}</span>
       </div>
 
       {/* Title */}
       <h1 className="mx-auto max-w-4xl text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
         {t('landingPage.heroTitle1')}
-        <span className="bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 bg-clip-text text-transparent">
+        <span className="bg-gradient-to-r from-[#90E894] via-[#5D44C9] to-[#FF9A00] bg-clip-text text-transparent">
           {t('landingPage.heroTitleHighlight')}
         </span>
         {t('landingPage.heroTitle2')}

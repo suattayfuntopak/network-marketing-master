@@ -4,7 +4,7 @@ import { useState, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
-import { TrendingUp } from 'lucide-react'
+import { BarChart3 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -25,6 +25,8 @@ import { MemberActivitySheet, type MemberActivityTarget } from '@/app/(dashboard
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import type { MemberRow } from '@/lib/team/types'
+import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -108,10 +110,10 @@ export function IstatistiklerContent() {
     [pulseMemberRows]
   )
   const { data: perfProgress } = useQuery({
-    queryKey: ['perf-progress', ws?.workspaceId, perfMemberIds.join(',')],
+    queryKey: queryKeys.teamProgressMap(ws?.workspaceId ?? '', perfMemberIds),
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
     enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 2 * 60_000,
+    staleTime: QUERY_STALE.metrics,
   })
 
   // Turkish-aware name normalizer — must match EkipPanel's cleanStr
@@ -242,7 +244,9 @@ export function IstatistiklerContent() {
 
   const maxTrendCount = Math.max(...trendBars.map(b => b.count), 1)
 
-  if (wsLoading || cLoading) {
+  const showInitialSkeleton = (wsLoading && !ws) || (cLoading && candidates.length === 0)
+
+  if (showInitialSkeleton) {
     return (
       <div className="w-full space-y-4 px-4 pt-6">
         <div className="h-6 w-32 animate-pulse rounded bg-[var(--bg-subtle)]" />
@@ -264,8 +268,8 @@ export function IstatistiklerContent() {
         {/* Header */}
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] dark:bg-[#0a1f4d]">
-              <TrendingUp className="h-5 w-5 text-[#1A56DB] dark:text-sky-300" strokeWidth={2} />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
+              <BarChart3 className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2} />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-[var(--text-1)]">

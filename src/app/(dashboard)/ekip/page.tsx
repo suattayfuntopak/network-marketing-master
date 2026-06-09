@@ -1,6 +1,11 @@
 import { Suspense } from 'react'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { EkipPageContent } from './_components/EkipPageContent'
+import { getQueryClient } from '@/lib/query/getQueryClient'
+import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
+import { prefetchEkipRankingMetrics } from '@/lib/query/prefetchRouteMetrics'
+import { queryKeys } from '@/lib/query/keys'
 
 function EkipPageSkeleton() {
   return (
@@ -21,10 +26,22 @@ function EkipPageSkeleton() {
   )
 }
 
-export default function EkipPage() {
+export default async function EkipPage() {
+  const queryClient = getQueryClient()
+  const ws = await queryClient.ensureQueryData({
+    queryKey: queryKeys.workspace(),
+    queryFn: fetchWorkspaceAction,
+  })
+
+  if (ws?.workspaceId) {
+    await prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
+  }
+
   return (
-    <Suspense fallback={<EkipPageSkeleton />}>
-      <EkipPageContent />
-    </Suspense>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Suspense fallback={<EkipPageSkeleton />}>
+        <EkipPageContent />
+      </Suspense>
+    </HydrationBoundary>
   )
 }

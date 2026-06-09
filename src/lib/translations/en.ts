@@ -265,6 +265,8 @@ export const en = {
     notes: "Notes & History",
     lastContact: "Last Contact",
     nextContact: "Next Follow-up",
+    followUpQuick3: "+3 Days",
+    followUpQuick7: "+7 Days",
     socialMedia: "Social Profile",
     city: "City",
     job: "Occupation",

@@ -39,6 +39,21 @@ export function toInputDateTime(iso: string | null): string {
   return `${YYYY}-${MM}-${DD}T${hh}:${mm}`
 }
 
+/** Bugünden `days` gün sonra; mevcut takip saati korunur, yoksa 15:00. */
+export function quickFollowUpFromToday(days: number, existingIso: string | null): string {
+  const result = new Date()
+  result.setDate(result.getDate() + days)
+  if (existingIso) {
+    const existing = new Date(existingIso)
+    if (!isNaN(existing.getTime())) {
+      result.setHours(existing.getHours(), existing.getMinutes(), 0, 0)
+      return result.toISOString()
+    }
+  }
+  result.setHours(15, 0, 0, 0)
+  return result.toISOString()
+}
+
 export function formatFollowUpDate(iso: string | null, lang: string): string {
   if (!iso) return ''
   const d = new Date(iso)

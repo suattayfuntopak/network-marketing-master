@@ -265,6 +265,8 @@ export const tr = {
     notes: "Notlar",
     lastContact: "Son Temas",
     nextContact: "Gelecek Temas",
+    followUpQuick3: "+3 Gün",
+    followUpQuick7: "+7 Gün",
     socialMedia: "Sosyal Medya",
     city: "Şehir",
     job: "Meslek",

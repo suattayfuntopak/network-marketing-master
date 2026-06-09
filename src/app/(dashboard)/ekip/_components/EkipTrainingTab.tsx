@@ -8,6 +8,7 @@ import type { MemberRow } from '@/lib/team/types'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamTrainingRankingTable } from './TeamTrainingRankingTable'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 
@@ -28,7 +29,7 @@ export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocke
     queryKey: queryKeys.teamProgressMap(ws?.workspaceId ?? '', memberIds),
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, memberIds),
     enabled: !!ws?.workspaceId && memberIds.length > 0 && teamPulseUnlocked,
-    staleTime: 30_000,
+    staleTime: QUERY_STALE.metrics,
   })
 
   const ranked = useMemo(() => {

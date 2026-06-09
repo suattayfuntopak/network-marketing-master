@@ -110,7 +110,7 @@ export function PipelinePageContent() {
           </Link>
           <button
             onClick={() => setSheetOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
+            className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] dark:bg-[#5D44C9] dark:hover:bg-[#4a38b0] active:scale-95 shadow-md"
           >
             <Plus className="h-4 w-4" />
             {t('pipeline.addCandidate')}
@@ -123,8 +123,8 @@ export function PipelinePageContent() {
           onClick={() => setFilter('tumü')}
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'tumü'
-              ? 'bg-[var(--bg-subtle)] border-brand ring-2 ring-[#534AB7]/20 shadow-md shadow-[#534AB7]/5'
-              : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-brand/40'
+              ? 'bg-[var(--bg-subtle)] border-brand ring-2 ring-[#534AB7]/20 shadow-md shadow-[#534AB7]/5 dark:border-[#5D44C9] dark:ring-[#5D44C9]/30 dark:shadow-[#5D44C9]/10'
+              : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-brand/40 dark:hover:border-[#5D44C9]/50'
           }`}
         >
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>

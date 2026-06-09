@@ -2,11 +2,13 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { BottomNav } from './BottomNav'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
+import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { AccountAccessGuard } from './AccountAccessGuard'
 import { AppVersionGuard } from '@/components/AppVersionGuard'
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
@@ -25,6 +27,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const [pendingHref, setPendingHref] = useState<string | null>(null)
   const router = useRouter()
   const pathname = usePathname()
+  const queryClient = useQueryClient()
   const visible = useMobileChromeVisibility(pathname)
   const touchStart = useRef<{ x: number; y: number } | null>(null)
 
@@ -39,6 +42,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     routes.forEach(href => router.prefetch(href))
   }, [routes, router])
+
+  useEffect(() => {
+    if (!ws?.workspaceId) return
+    const match = routes.find(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))
+    if (match) prefetchRouteData(queryClient, match, ws.workspaceId, ws)
+  }, [pathname, ws, routes, queryClient])
 
   function getRouteIndex(path: string) {
     return routes.findIndex(r => path === r || (r !== '/pano' && path.startsWith(r)))

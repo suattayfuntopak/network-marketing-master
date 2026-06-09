@@ -5,7 +5,7 @@ import { Check, Pencil, X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { daysSince, toInputDateTime } from './candidateDetailUtils'
+import { daysSince, toInputDateTime, quickFollowUpFromToday } from './candidateDetailUtils'
 
 type Props = {
   nextFollowUpAt: string | null
@@ -61,7 +61,7 @@ export function CandidateFollowUpCard({
             <Pencil className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="mt-2 flex flex-1 flex-col justify-end">
+        <div className="mt-2 flex flex-1 flex-col justify-end gap-2">
           <div className="flex w-full items-baseline justify-between">
             <p className="truncate text-sm font-semibold text-brand">
               {nextFollowLabel ?? '—'}
@@ -69,6 +69,22 @@ export function CandidateFollowUpCard({
             <span className="ml-1 shrink-0 text-[10px] text-[var(--text-3)]">
               ({daysSince(lastContactAt, t)})
             </span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={() => onSave(quickFollowUpFromToday(3, nextFollowUpAt))}
+              className="flex-1 rounded-lg border border-brand/25 bg-brand/5 px-2 py-1.5 text-xs font-bold text-brand transition hover:bg-brand/10 active:scale-95"
+            >
+              {t('pipeline.followUpQuick3')}
+            </button>
+            <button
+              type="button"
+              onClick={() => onSave(quickFollowUpFromToday(7, nextFollowUpAt))}
+              className="flex-1 rounded-lg border border-brand/25 bg-brand/5 px-2 py-1.5 text-xs font-bold text-brand transition hover:bg-brand/10 active:scale-95"
+            >
+              {t('pipeline.followUpQuick7')}
+            </button>
           </div>
         </div>
       </div>

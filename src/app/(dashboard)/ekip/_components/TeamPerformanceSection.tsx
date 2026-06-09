@@ -76,6 +76,16 @@ function isFieldCardTab(value: string | null): value is FieldCardTab {
   return !!value && FIELD_CARD_TABS.includes(value as FieldCardTab)
 }
 
+function stripActivityTabs(
+  member: Record<string, MemberCardTab | undefined>,
+): Record<string, MemberCardTab | undefined> {
+  const out: Record<string, MemberCardTab | undefined> = {}
+  for (const [id, tab] of Object.entries(member)) {
+    if (tab !== 'activity') out[id] = tab
+  }
+  return out
+}
+
 function loadTeamTabState(): {
   member: Record<string, MemberCardTab | undefined>
   field: Record<string, FieldCardTab | undefined>
@@ -88,7 +98,10 @@ function loadTeamTabState(): {
       member?: Record<string, MemberCardTab | undefined>
       field?: Record<string, FieldCardTab | undefined>
     }
-    return { member: parsed.member ?? {}, field: parsed.field ?? {} }
+    return {
+      member: stripActivityTabs(parsed.member ?? {}),
+      field: parsed.field ?? {},
+    }
   } catch {
     return { member: {}, field: {} }
   }
@@ -254,16 +267,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
     const fromHash = readPerfFromHash()
     if (fromHash) {
-      Object.assign(member, fromHash.member)
+      Object.assign(member, stripActivityTabs(fromHash.member))
       Object.assign(field, fromHash.field)
     } else {
-      Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
+      Object.assign(member, stripActivityTabs(parseMemberTabs(searchParams.get('perfMemberTabs'))))
       Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
     }
 
     const urlMemberId = searchParams.get('perfMember')
     const urlMemberTab = searchParams.get('perfMemberTab')
-    if (urlMemberId && isMemberCardTab(urlMemberTab)) {
+    if (urlMemberId && isMemberCardTab(urlMemberTab) && urlMemberTab !== 'activity') {
       member[urlMemberId] = urlMemberTab
     }
 
@@ -285,7 +298,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     const applyHashPerf = () => {
       const fromHash = readPerfFromHash()
       if (!fromHash) return
-      setMemberCardTab(prev => ({ ...prev, ...fromHash.member }))
+      setMemberCardTab(prev => ({ ...prev, ...stripActivityTabs(fromHash.member) }))
       setFieldCardTab(prev => ({ ...prev, ...fromHash.field }))
     }
 
@@ -341,13 +354,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
       <>
       <section className="space-y-5">
         <TeamFreeUpgradeBanner />
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
-            <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
-            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800/80 dark:text-emerald-300/90">
-              {t('team.statLeader')}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <div className="rounded-2xl border border-[var(--border)] bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-[#D4A017]">{nmmPartnerCount}</p>
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
@@ -389,13 +396,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   return (
       <>
       <section className="space-y-5">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
-            <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
-            <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-emerald-800/80 dark:text-emerald-300/90">
-              {t('team.statLeader')}
-            </p>
-          </div>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           <div className="rounded-2xl border border-[var(--border)] bg-[#FFFBE6] dark:bg-[#3a3000]/30 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-[#D4A017]">{nmmPartnerCount}</p>
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
