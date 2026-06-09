@@ -22,6 +22,10 @@
   --text-1:      #f8fafc; /* Pure slate-white high-contrast text */
   --text-2:      #cbd5e1; /* Silver slate-gray text */
   --text-3:      #94a3b8; /* Muted steel-slate text */
+  /* Brand purple — lighter on dark surfaces for readable text & accents */
+  --color-brand:        #b4aff0;
+  --color-brand-accent: #c4b5fd;
+  --color-brand-subtle: #2d2a5e;
 }
 
 /* Brand purple on dark backgrounds — readable white text without touching light mode */

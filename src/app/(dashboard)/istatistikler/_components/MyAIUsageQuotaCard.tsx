@@ -24,29 +24,17 @@ export function MyAIUsageQuotaCard({ usage, dailyLimit }: Props) {
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFFBEB] dark:bg-[#201600]">
           <Sparkles className="h-4 w-4 text-[#D97706]" strokeWidth={2} />
         </div>
-        <div>
-          <h2 className="text-base font-bold text-[var(--text-1)]">
-            {t('statsPage.quotaTitle')}
-          </h2>
-          <p className="text-sm text-[var(--text-3)]">
-            {t('statsPage.quotaSubtitle')}
-          </p>
-        </div>
+        <h2 className="text-base font-bold text-[var(--text-1)]">
+          {t('statsPage.quotaTitle')}
+        </h2>
       </div>
 
       {usage?.isSuperAdmin ? (
-        <div className="relative overflow-hidden rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent p-4 shadow-inner">
-          <div className="flex items-start gap-3">
-            <div className="text-2xl mt-0.5 animate-bounce">👑</div>
-            <div className="space-y-1">
-              <h3 className="text-base font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                {t('statsPage.quotaSuperTitle')}
-              </h3>
-              <p className="text-sm leading-relaxed text-[var(--text-2)] font-semibold">
-                {t('statsPage.quotaSuperDesc')}
-              </p>
-            </div>
-          </div>
+        <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent p-4">
+          <span className="text-2xl">👑</span>
+          <h3 className="text-base font-black text-amber-600 dark:text-amber-300 uppercase tracking-widest">
+            {t('statsPage.quotaSuperTitle')}
+          </h3>
         </div>
       ) : (
         <div className="space-y-1.5 pt-1">
