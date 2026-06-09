@@ -52,13 +52,13 @@ export function HubAllTimeHero({ activeDays, fieldMetrics, allTimeActuals, joine
           <div className="flex flex-col items-center rounded-xl bg-[var(--bg-subtle)] px-2 py-2 text-center">
             <span className="text-base font-bold text-[var(--text-1)]">{calls}</span>
             <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-              {t('dashboard.memberDetailWeeklyCalls')}
+              {t('team.memberDetailWeeklyCalls')}
             </span>
           </div>
           <div className="flex flex-col items-center rounded-xl bg-[var(--bg-subtle)] px-2 py-2 text-center">
             <span className="text-base font-bold text-[var(--text-1)]">{whatsapps}</span>
             <span className="mt-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-              {t('dashboard.memberDetailWeeklyWA')}
+              {t('team.memberDetailWeeklyWA')}
             </span>
           </div>
           <div className="flex flex-col items-center rounded-xl bg-[var(--bg-subtle)] px-2 py-2 text-center">
