@@ -1,7 +1,9 @@
 'use client'
 
+import { Suspense } from 'react'
 import { CreditCard } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { Skeleton } from '@/components/ui/Skeleton'
 import { OdemeClient } from './OdemeClient'
 
 export function OdemePageClient() {
@@ -20,7 +22,9 @@ export function OdemePageClient() {
         </div>
       </header>
 
-      <OdemeClient />
+      <Suspense fallback={<Skeleton className="h-[520px] w-full rounded-3xl" />}>
+        <OdemeClient />
+      </Suspense>
     </main>
   )
 }

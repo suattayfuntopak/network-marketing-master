@@ -165,7 +165,7 @@ export async function logAIGeneration(params: {
       p_user_id: params.userId,
       p_workspace_id: params.workspaceId,
       p_usage_date: usageDate,
-      p_kind: params.note,
+      p_kind: 'ai',
     })
   } catch (err) {
     console.error('[logAIGeneration] insert failed:', err)

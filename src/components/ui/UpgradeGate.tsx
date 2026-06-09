@@ -7,6 +7,8 @@ import { Sparkles, ArrowRight, Lock, Users, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
 
 export type UpgradeFeature = GatedFeature | 'team'
@@ -50,9 +52,17 @@ interface ModalProps {
 
 function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
   const { t } = useTranslation()
+  const { data: ws } = useWorkspace()
   const [mounted] = useState(() => typeof window !== 'undefined')
   useBodyScrollLock(open)
   if (!open || !mounted) return null
+
+  const trialEnded =
+    !!ws &&
+    !ws.isSuperAdmin &&
+    ws.licenseType === 'free' &&
+    !ws.isTrialActive
+  const paymentHref = trialEnded ? '/odeme?plan=basic' : '/odeme'
 
   return createPortal(
     <div
@@ -79,35 +89,41 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
           <Lock className="h-6 w-6" strokeWidth={1.75} />
         </div>
         <h2 id="upgrade-gate-title" className="text-base sm:text-lg font-bold text-[var(--text-1)] pr-8">
-          {t(titleKey(feature))}
+          {trialEnded ? t('shellUi.upgradeTrialEndedTitle') : t(titleKey(feature))}
         </h2>
         <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[var(--text-2)]">
-          {t(descKey(feature))}
+          {trialEnded
+            ? t('shellUi.upgradeTrialEndedDesc', { limit: DAILY_AI_LIMITS.basic })
+            : t(descKey(feature))}
         </p>
 
         <div className="mt-4 grid grid-cols-3 gap-2 text-left">
           {(['basic', 'plus', 'pro'] as const).map(plan => (
             <div
               key={plan}
-              className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-2.5 py-2.5"
+              className={`rounded-xl border px-2.5 py-2.5 ${
+                trialEnded && plan === 'basic'
+                  ? 'border-brand/40 bg-brand/5 ring-1 ring-brand/25'
+                  : 'border-[var(--border)] bg-[var(--bg-subtle)]'
+              }`}
             >
               <p className="text-[10px] font-black uppercase tracking-wide text-[var(--text-3)]">
                 {t(`shellUi.planLabel_${plan}`)}
               </p>
               <p className="mt-0.5 text-[10px] leading-snug text-[var(--text-2)]">
-                {t(`shellUi.planBlurb_${plan}`)}
+                {t(`shellUi.planBlurb_${plan}`, { limit: DAILY_AI_LIMITS[plan] })}
               </p>
             </div>
           ))}
         </div>
 
         <Link
-          href="/odeme"
+          href={paymentHref}
           onClick={onClose}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
         >
           <Sparkles className="h-4 w-4" />
-          {t('shellUi.upgradeBannerCta')}
+          {trialEnded ? t('shellUi.upgradeTrialEndedCta') : t('shellUi.upgradeBannerCta')}
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>

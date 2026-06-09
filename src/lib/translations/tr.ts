@@ -427,7 +427,7 @@ export const tr = {
     lastActive: "Son aktiflik:",
     todayShort: "bugün",
     daysAgoShort: "{days} gün önce",
-    inviteToNmm: "Ekibime Davet Et",
+    inviteToNmm: "Uygulamaya Davet Et",
     fieldAiInviteTab: "YZ Davet Metni Üret",
     fieldPartnerTabs: "Saha ortağı davet sekmeleri",
     fieldNmmInviteHint: "Benimle NMM'i birlikte kullanması için hazır davet gönder",

@@ -17,7 +17,7 @@ describe('POST /odeme/launch', () => {
       API_key: 'test-key',
       signature: 'sig+test=',
       platform_order_id: 'ws_basic_monthly_1',
-      total_order_value: '499',
+      total_order_value: '399',
     })
 
     const formData = new FormData()
@@ -31,7 +31,7 @@ describe('POST /odeme/launch', () => {
     const html = await res.text()
     expect(html).toContain('api_pay4.php')
     expect(html).toContain('multipart/form-data')
-    expect(html).toContain('value="499"')
+    expect(html).toContain('value="399"')
     expect(createShopierPaymentSession).toHaveBeenCalledWith('basic', 'monthly')
   })
 

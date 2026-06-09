@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { CheckCircle2, Sparkles, Loader2, Calendar, ArrowRight } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -31,11 +32,20 @@ const YEARLY_DISCOUNT_BADGE =
 export function OdemeClient() {
   const { t, lang } = useTranslation()
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
-  
+  const searchParams = useSearchParams()
+  const basicPlanRef = useRef<HTMLDivElement>(null)
+  const highlightBasic = searchParams.get('plan') === 'basic'
+
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
   const [loading, setLoading] = useState(false)
 
   useBodyScrollLock(loading)
+
+  useEffect(() => {
+    if (highlightBasic && basicPlanRef.current) {
+      basicPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [highlightBasic])
 
   const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)
@@ -224,17 +234,30 @@ export function OdemeClient() {
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 items-stretch max-w-6xl mx-auto">
         
         {/* Basic Plan */}
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-8 flex flex-col justify-between hover:border-indigo-300/60 dark:hover:border-zinc-600/50 transition duration-300 relative shadow-sm">
+        <div
+          ref={basicPlanRef}
+          id="plan-basic"
+          className={`rounded-3xl border bg-[var(--bg-card)] p-8 flex flex-col justify-between relative transition duration-300 ${
+            highlightBasic
+              ? 'border-brand/50 ring-2 ring-[#534AB7]/30 shadow-lg shadow-indigo-500/10'
+              : 'border-brand/35 ring-2 ring-[#534AB7]/20 shadow-lg shadow-indigo-500/5 hover:border-brand/50'
+          }`}
+        >
+          <div className="absolute right-6 top-6 flex items-center gap-2">
+            {isBasicActive && (
+              <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {t('paymentPage.active')}
+              </span>
+            )}
+            <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-300 bg-indigo-500/15 px-2 py-0.5 rounded-full uppercase tracking-wider">
+              {t('paymentPage.popular')}
+            </span>
+          </div>
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-lg uppercase tracking-wider">
                 {t('paymentPage.soloBuilderTag')}
               </span>
-              {isBasicActive && (
-                <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                  {t('paymentPage.active')}
-                </span>
-              )}
             </div>
 
             <div>
@@ -307,17 +330,14 @@ export function OdemeClient() {
         </div>
 
         {/* Plus Plan */}
-        <div className="rounded-3xl border border-brand/35 bg-[var(--bg-card)] dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/20 dark:ring-[#534AB7]/30 shadow-lg shadow-indigo-500/5 dark:shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/50 transition duration-300">
-          <div className="absolute right-6 top-6 flex items-center gap-2">
-            {isPlusActive && (
+        <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-8 flex flex-col justify-between relative hover:border-indigo-300/60 dark:hover:border-zinc-600/50 transition duration-300 shadow-sm">
+          {isPlusActive && (
+            <div className="absolute right-6 top-6">
               <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
                 {t('paymentPage.active')}
               </span>
-            )}
-            <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-300 bg-indigo-500/15 px-2 py-0.5 rounded-full uppercase tracking-wider">
-              {t('paymentPage.popular')}
-            </span>
-          </div>
+            </div>
+          )}
 
           <div className="space-y-6">
             <div>

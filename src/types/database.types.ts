@@ -562,6 +562,7 @@ export interface Database {
           user_id: string
           workspace_id: string | null
           usage_date: string
+          ai_count: number
           message_count: number
           roleplay_count: number
           compliance_count: number
@@ -571,6 +572,7 @@ export interface Database {
           user_id: string
           workspace_id?: string | null
           usage_date: string
+          ai_count?: number
           message_count?: number
           roleplay_count?: number
           compliance_count?: number
@@ -580,6 +582,7 @@ export interface Database {
           user_id?: string
           workspace_id?: string | null
           usage_date?: string
+          ai_count?: number
           message_count?: number
           roleplay_count?: number
           compliance_count?: number

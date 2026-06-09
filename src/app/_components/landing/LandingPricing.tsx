@@ -69,7 +69,12 @@ export function LandingPricing() {
       <div className="grid grid-cols-1 gap-8 max-w-6xl mx-auto lg:grid-cols-3 items-stretch">
         
         {/* Plan A: Basic Plan */}
-        <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
+        <div className="rounded-3xl border border-brand/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/60 transition duration-300">
+          <div className="absolute right-6 top-6">
+            <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30">
+              {t('landingPage.planPopularBadge')}
+            </span>
+          </div>
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-extrabold text-indigo-800 dark:text-indigo-400 bg-indigo-100 dark:bg-indigo-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -135,13 +140,7 @@ export function LandingPricing() {
         </div>
 
         {/* Plan B: Plus Plan */}
-        <div className="rounded-3xl border border-brand/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/60 transition duration-300">
-          <div className="absolute right-6 top-6 animate-pulse">
-            <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30">
-              {t('landingPage.planPopularBadge')}
-            </span>
-          </div>
-
+        <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
           <div className="space-y-6">
             <div>
               <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">

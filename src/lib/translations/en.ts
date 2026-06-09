@@ -427,7 +427,7 @@ export const en = {
     lastActive: "Last active:",
     todayShort: "today",
     daysAgoShort: "{days} d ago",
-    inviteToNmm: "Invite to My Team",
+    inviteToNmm: "Invite to the App",
     fieldAiInviteTab: "Generate AI Invite",
     fieldPartnerTabs: "Field partner invite tabs",
     fieldNmmInviteHint: "Send a ready invite to use NMM under your sponsorship",
