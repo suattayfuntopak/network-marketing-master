@@ -371,6 +371,7 @@ export const en = {
     totalMembers: "Team Members",
     funnelDistribution: "Funnel Distribution",
     noTeamCandidates: "This member has no candidates in the pipeline yet.",
+    toolsCollapsibleTitle: "My Team Tools (invite code, etc.)",
     inviteTeammate: "Invite a Teammate",
     inviteTeammateDesc: "Have your team members sign up with their own accounts, then enter the code below from the 'My Team' page to join your workspace.",
     joinATeam: "Enter Invite Code",

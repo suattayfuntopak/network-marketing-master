@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useCallback } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
@@ -33,8 +32,6 @@ import {
   rollingWeekRange,
 } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
-import { IlgilenContent } from '@/app/(dashboard)/bugun/ilgilen/_components/IlgilenContent'
-
 const EMPTY_METRICS: HubSelfFieldMetrics = {
   calls: 0,
   whatsapps: 0,
@@ -107,11 +104,6 @@ export function FieldSummaryPage() {
   })
 
   const dailyActuals = dailySelf?.dailyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
-  const showEmptyHint =
-    tab === 'daily' &&
-    dailySelf?.isToday &&
-    !(dailyLoading && !dailySelf) &&
-    dailyActuals.arama + dailyActuals.tanisma + dailyActuals.sunum + dailyActuals.yeniUye === 0
 
   const weekActive = weeklySelf?.weekActive ?? Array.from({ length: 7 }, () => false)
   const weekLoginDays = Math.min(7, weeklySelf?.loginDays ?? weekActive.filter(Boolean).length)
@@ -122,22 +114,7 @@ export function FieldSummaryPage() {
       return (
         <>
           <HubPeriodNavigator mode="day" accentClass={ACCENT.daily} />
-          <HubDayLoginStrip
-            dayActive={dailySelf?.dayActive ?? false}
-            loading={loading}
-            dayDate={dayRange.date}
-          />
-          {showEmptyHint ? (
-            <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] px-4 py-3.5 text-sm text-[var(--text-2)]">
-              <p>{t('dashboard.dailyTrackEmptyHint')}</p>
-              <Link
-                href="/pipeline"
-                className="mt-2 inline-block font-semibold text-brand-readable hover:underline"
-              >
-                {t('dashboard.dailyTrackPipelineCta')} →
-              </Link>
-            </div>
-          ) : null}
+          <HubDayLoginStrip loading={loading} dayDate={dayRange.date} />
           <HubCrownFunnelGrid
             actuals={dailyActuals}
             targets={dailySelf?.dailyTargets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
@@ -146,7 +123,6 @@ export function FieldSummaryPage() {
             loading={loading}
           />
           <HubSelfActivityGrid metrics={dailySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
-          {offset === 0 ? <IlgilenContent /> : null}
         </>
       )
     }

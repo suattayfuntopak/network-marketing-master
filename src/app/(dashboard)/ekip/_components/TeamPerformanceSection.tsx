@@ -7,7 +7,7 @@ import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
 import {
   Crown, Check, TrendingUp, BarChart2, Rocket, Bot,
-  Phone, Search, BarChart3, Target,
+  Phone, Search, BarChart3, Target, ChevronDown,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -181,7 +181,9 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
   const [unlinkingMemberId, setUnlinkingMemberId] = useState<string | null>(null)
+  const [toolsOpen, setToolsOpen] = useState(false)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
+  const hasTeamTools = isLeader || !hasUpline
 
   async function handleUnlinkMemberPipeline(member: MemberRow) {
     if (unlinkingMemberId) return
@@ -952,30 +954,52 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           </p>
         )}
 
-        <div className="space-y-6 pt-2">
-          {isLeader && (
-            <InviteTeammateSection
-              inviteCode={inviteCode}
-              copied={copied}
-              onCopy={onCopyInviteCode}
-              t={t}
-            />
-          )}
+        {hasTeamTools ? (
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] pt-2">
+            <button
+              type="button"
+              onClick={() => setToolsOpen(v => !v)}
+              aria-expanded={toolsOpen}
+              className="flex w-full items-center justify-between gap-2 px-4 py-3 cursor-pointer"
+            >
+              <span className="text-sm font-bold text-[var(--text-1)]">
+                {t('team.toolsCollapsibleTitle')}
+              </span>
+              <ChevronDown
+                className={clsx(
+                  'h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform',
+                  toolsOpen && 'rotate-180',
+                )}
+              />
+            </button>
+            {toolsOpen ? (
+              <div className="space-y-6 border-t border-[var(--border)] px-4 pb-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
+                {isLeader ? (
+                  <InviteTeammateSection
+                    inviteCode={inviteCode}
+                    copied={copied}
+                    onCopy={onCopyInviteCode}
+                    t={t}
+                  />
+                ) : null}
 
-          {!hasUpline && (
-            <JoinByInviteSection
-              inviteCodeInput={inviteCodeInput}
-              joining={joining}
-              onInviteCodeChange={onInviteCodeChange}
-              onSubmit={onJoinSubmit}
-              t={t}
-            />
-          )}
+                {!hasUpline ? (
+                  <JoinByInviteSection
+                    inviteCodeInput={inviteCodeInput}
+                    joining={joining}
+                    onInviteCodeChange={onInviteCodeChange}
+                    onSubmit={onJoinSubmit}
+                    t={t}
+                  />
+                ) : null}
 
-          {isLeader && teamPageUnlocked && (
-            <BroadcastPanel members={visibleMembers} t={t} />
-          )}
-        </div>
+                {isLeader && teamPageUnlocked ? (
+                  <BroadcastPanel members={visibleMembers} t={t} />
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </section>
       {UpgradePrompt}
       </>

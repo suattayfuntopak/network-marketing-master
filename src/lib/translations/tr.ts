@@ -371,6 +371,7 @@ export const tr = {
     totalMembers: "Ekip Üyesi",
     funnelDistribution: "Aday Hunisi Dağılımı",
     noTeamCandidates: "Bu üyenin henüz boru hattında kayıtlı adayı bulunmuyor.",
+    toolsCollapsibleTitle: "Ekibim Araçları (Davet Kodu vd)",
     inviteTeammate: "Ekip Arkadaşını Davet Et",
     inviteTeammateDesc: "Ekip üyelerinizin uygulamaya kendi hesaplarıyla üye olmasını sağlayın. Ardından aşağıdaki kodu 'Ekibim' sayfasından girerek ekibinize dahil olmalarını isteyin.",
     joinATeam: "Davet Kodunu Gir",
