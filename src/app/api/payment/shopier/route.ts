@@ -186,14 +186,19 @@ async function handleOsbNotification(res: string, hash: string) {
     return new NextResponse('invalid order', { status: 400 })
   }
 
-  await applyLicenseUpgrade({
+  const osbExpiry = await applyLicenseUpgrade({
     workspaceId: parsed.workspaceId,
     newLicenseType: parsed.plan,
     daysToAdd: parsed.daysToAdd,
     totalAmount: String(payload.price ?? ''),
     parentId: null,
+    orderId: payload.orderid,
   })
 
+  if (!osbExpiry) {
+    console.info(`[Shopier OSB] Already processed for workspace ${parsed.workspaceId}`)
+    return new NextResponse('already-processed', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
+  }
   console.log(`[Shopier OSB] License updated for workspace ${parsed.workspaceId}`)
   return new NextResponse('success', {
     status: 200,
@@ -405,10 +410,15 @@ export async function POST(request: NextRequest) {
       daysToAdd: parsed.daysToAdd,
       totalAmount: total_amount,
       parentId: null,
+      orderId: platform_order_id,
     })
 
+    if (!newExpiry) {
+      return NextResponse.json({ success: true, message: 'Already processed', duplicate: true })
+    }
+
     console.log(
-      `[Shopier Webhook] Success! Workspace ${parsed.workspaceId} until ${newExpiry?.toISOString() ?? 'n/a'}`
+      `[Shopier Webhook] Success! Workspace ${parsed.workspaceId} until ${newExpiry.toISOString()}`
     )
     return NextResponse.json({ success: true, message: 'License updated successfully' })
   } catch (err: unknown) {

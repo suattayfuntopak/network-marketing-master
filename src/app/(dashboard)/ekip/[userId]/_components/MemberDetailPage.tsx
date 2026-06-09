@@ -354,7 +354,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                         href={wa}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:scale-105 hover:shadow-md"
+                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md"
                         aria-label="WhatsApp"
                         title="WhatsApp"
                       >
@@ -375,11 +375,11 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       type="button"
                       onClick={handleCoachingAI}
                       disabled={generating}
-                      className="relative flex h-10 items-center gap-2 rounded-xl bg-[#EEEDFE] px-3 text-[#534AB7] text-xs font-semibold transition hover:scale-[1.02] hover:shadow-md disabled:opacity-50 active:scale-95"
+                      className="relative flex h-10 items-center gap-2 rounded-xl bg-brand-subtle px-3 text-brand text-xs font-semibold transition hover:scale-[1.02] hover:shadow-md disabled:opacity-50 active:scale-95"
                       title={t('dashboard.memberDetailCoachCta')}
                     >
                       {generating ? (
-                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+                        <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
                       ) : (
                         <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                       )}
@@ -560,7 +560,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
             <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-brand">
                     <Sparkles className="h-4 w-4 fill-current animate-pulse" />
                   </div>
                   <div>
@@ -595,7 +595,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                     navigator.clipboard.writeText(activeMessage)
                     toast.success('Mesaj kopyalandı!')
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand active:scale-95"
                   title="Kopyala"
                 >
                   <Copy className="h-4 w-4" />
@@ -606,7 +606,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => setActiveMessage(null)}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)]"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)]"
                     title="WhatsApp ile Gönder"
                   >
                     <WhatsAppIcon className="h-4 w-4" />

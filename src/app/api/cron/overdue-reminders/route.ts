@@ -107,17 +107,28 @@ export async function GET(request: NextRequest) {
   }
 
   if (Object.keys(sentByOwner).length > 0) {
-    // Fetch email preferences
-    const { data: prefs } = await supabase
-      .from('nmm_notification_preferences')
-      .select('user_id, email_enabled, overdue_email_frequency')
-      .in('user_id', Object.keys(sentByOwner))
+    const ownerIdsForEmail = Object.keys(sentByOwner)
+
+    // Batch: email prefs + auth user lookups in parallel (no serial per-owner calls)
+    const [{ data: prefs }, authResults] = await Promise.all([
+      supabase
+        .from('nmm_notification_preferences')
+        .select('user_id, email_enabled, overdue_email_frequency')
+        .in('user_id', ownerIdsForEmail),
+      Promise.all(ownerIdsForEmail.map(id => supabase.auth.admin.getUserById(id))),
+    ])
 
     const emailEnabledSet = new Set(
       (prefs ?? []).filter(p => p.email_enabled).map(p => p.user_id),
     )
     const freqMap: Record<string, string> = {}
     for (const p of prefs ?? []) freqMap[p.user_id] = p.overdue_email_frequency ?? 'daily'
+
+    const authMap = new Map(
+      authResults
+        .filter(r => r.data?.user)
+        .map(r => [r.data!.user!.id, r.data!.user!]),
+    )
 
     const isMonday = now.getDay() === 1
 
@@ -130,13 +141,13 @@ export async function GET(request: NextRequest) {
       const fresh = await claimEmailSend(supabase, ws.id, 'overdue_digest', todayKey)
       if (!fresh) continue
 
-      const { data: authUser } = await supabase.auth.admin.getUserById(ownerId)
-      const email = authUser?.user?.email
+      const authUser = authMap.get(ownerId)
+      const email = authUser?.email
       const name =
-        (authUser?.user?.user_metadata?.full_name as string | undefined) ??
-        authUser?.user?.email?.split('@')[0] ??
+        (authUser?.user_metadata?.full_name as string | undefined) ??
+        authUser?.email?.split('@')[0] ??
         '—'
-      const lang = ((authUser?.user?.user_metadata?.lang as string | undefined) === 'en' ? 'en' : 'tr') as 'tr' | 'en'
+      const lang = ((authUser?.user_metadata?.lang as string | undefined) === 'en' ? 'en' : 'tr') as 'tr' | 'en'
 
       if (email) {
         await sendOverdueDigestEmail(email, name, candidates, lang)

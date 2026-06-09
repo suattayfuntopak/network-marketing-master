@@ -49,11 +49,11 @@ export function ConfirmDialog({
           <div className={`flex h-14 w-14 items-center justify-center rounded-full ${
             variant === 'danger'
               ? 'bg-red-50 dark:bg-red-950/30'
-              : 'bg-[#EEEDFE] dark:bg-[#2d2a5e]'
+              : 'bg-brand-subtle dark:bg-[#2d2a5e]'
           }`}>
             {variant === 'danger'
               ? <AlertTriangle className="h-7 w-7 text-red-600 dark:text-red-400" strokeWidth={1.75} />
-              : <HelpCircle className="h-7 w-7 text-[#534AB7] dark:text-[#a09be8]" strokeWidth={1.75} />
+              : <HelpCircle className="h-7 w-7 text-brand dark:text-[#a09be8]" strokeWidth={1.75} />
             }
           </div>
         </div>
@@ -75,7 +75,7 @@ export function ConfirmDialog({
             className={`flex-1 rounded-xl py-3 text-sm font-semibold text-white transition ${
               variant === 'danger'
                 ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-[#534AB7] hover:bg-[#453DA0]'
+                : 'bg-brand hover:bg-[#453DA0]'
             }`}
           >
             {confirmLabel ?? t('common.yes')}

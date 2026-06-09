@@ -55,7 +55,7 @@ export function CandidateFollowUpCard({
           <button
             type="button"
             onClick={openEditor}
-            className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-[#534AB7]"
+            className="flex h-5 w-5 items-center justify-center rounded-md text-[var(--text-3)] transition hover:text-brand"
             title={t('common.edit')}
           >
             <Pencil className="h-3.5 w-3.5" />
@@ -63,7 +63,7 @@ export function CandidateFollowUpCard({
         </div>
         <div className="mt-2 flex flex-1 flex-col justify-end">
           <div className="flex w-full items-baseline justify-between">
-            <p className="truncate text-sm font-semibold text-[#534AB7]">
+            <p className="truncate text-sm font-semibold text-brand">
               {nextFollowLabel ?? '—'}
             </p>
             <span className="ml-1 shrink-0 text-[10px] text-[var(--text-3)]">
@@ -88,7 +88,7 @@ export function CandidateFollowUpCard({
               value={tempFollowUp}
               onChange={e => setTempFollowUp(e.target.value)}
               autoFocus
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7]"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-brand"
             />
             <div className="flex items-center justify-between gap-2">
               <button

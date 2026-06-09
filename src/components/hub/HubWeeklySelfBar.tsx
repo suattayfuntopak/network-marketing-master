@@ -2,7 +2,7 @@
 
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { weeklyAccent } from '@/lib/ui/hub/hubWeeklyAccent'
+import { weeklyAccent } from '@/components/hub/hubWeeklyAccent'
 import type { HubWeeklySelfPayload } from '@/app/(dashboard)/crown/actions'
 
 type HubWeeklySelfBarProps = {

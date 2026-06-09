@@ -288,7 +288,7 @@ export function TeamActivitySummary({
                     <div className="flex min-w-0 flex-1 items-center gap-2">
                       <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
                         <div
-                          className={`h-full rounded-full transition-all ${chartMode === 'call' ? 'bg-blue-600' : 'bg-[#25D366]'}`}
+                          className={`h-full rounded-full transition-all ${chartMode === 'call' ? 'bg-blue-600' : 'bg-whatsapp'}`}
                           style={{ width: `${Math.max((row.value / maxBar) * 100, row.value > 0 ? 8 : 0)}%` }}
                         />
                       </div>

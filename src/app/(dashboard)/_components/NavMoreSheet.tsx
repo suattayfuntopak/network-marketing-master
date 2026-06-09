@@ -7,7 +7,7 @@ import { X, Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { hasTeamTeaserAccess } from '@/lib/domain/teamAccess'
 import { NAV_MORE_ITEMS, NAV_ADMIN, type NavItem } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { Z } from '@/lib/ui/zIndex'
@@ -24,7 +24,7 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
-  const teamLocked = !hasTeamPageAccess(ws?.licenseType, isSuperAdmin)
+  const teamLocked = !hasTeamTeaserAccess(ws?.licenseType, isSuperAdmin, ws?.isTrialActive)
 
   useBodyScrollLock(open)
 
@@ -52,7 +52,7 @@ export function NavMoreSheet({ open, onClose }: NavMoreSheetProps) {
               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
               : 'text-amber-600/90 dark:text-amber-400/90 hover:bg-amber-500/10'
             : active
-              ? 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]'
+              ? 'bg-brand-subtle text-brand dark:bg-[#2d2a5e] dark:text-[#a09be8]'
               : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]',
         )}
       >

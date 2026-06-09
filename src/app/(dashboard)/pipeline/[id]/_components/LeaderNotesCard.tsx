@@ -119,14 +119,14 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
         className="flex w-full items-center justify-between"
       >
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-subtle text-brand">
             <StickyNote className="h-4.5 w-4.5" />
           </div>
           <span className="text-sm font-bold text-[var(--text-1)]">
             {t('pipelinePage.leaderNote')}
           </span>
           {noteBadgeCount > 0 && (
-            <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 text-xs font-bold text-[#534AB7]">
+            <span className="rounded-full bg-brand-subtle px-2 py-0.5 text-xs font-bold text-brand">
               {noteBadgeCount}
             </span>
           )}
@@ -231,7 +231,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
                 <button
                   type="button"
                   onClick={() => setShowAllNotes(!showAllNotes)}
-                  className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline py-1 transition active:scale-95"
+                  className="w-full text-center text-xs font-bold text-brand hover:underline py-1 transition active:scale-95"
                 >
                   {showAllNotes
                     ? t('pipelinePage.showLess')
@@ -245,7 +245,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
               value={newNote}
               onChange={(e) => setNewNote(e.target.value)}
               placeholder={t('pipelinePage.writeLeaderNotePlaceholder', { name: candidateName })}
-              className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-[#534AB7] transition-all"
+              className="w-full min-h-[80px] max-h-[200px] rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none focus:border-brand transition-all"
               rows={3}
               maxLength={1000}
             />
@@ -254,7 +254,7 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
                 type="button"
                 disabled={!newNote.trim() || addNoteMutation.isPending}
                 onClick={handleSaveNote}
-                className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
+                className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-xs font-bold text-white transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 shadow-md hover:shadow-indigo-500/10 active:scale-95"
               >
                 <Check className="h-3.5 w-3.5" />
                 {t('pipelinePage.saveNote')}

@@ -114,7 +114,7 @@ export function IlgilenContent() {
                 onClick={() => setViewMode('list')}
                 className={clsx(
                   'flex h-9 w-9 items-center justify-center transition-colors',
-                  viewMode === 'list' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
+                  viewMode === 'list' ? 'bg-brand text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
                 )}
               >
                 <List className="h-4 w-4" />
@@ -123,7 +123,7 @@ export function IlgilenContent() {
                 onClick={() => setViewMode('compact')}
                 className={clsx(
                   'flex h-9 w-9 items-center justify-center transition-colors',
-                  viewMode === 'compact' ? 'bg-[#534AB7] text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
+                  viewMode === 'compact' ? 'bg-brand text-white' : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
                 )}
               >
                 <LayoutList className="h-4 w-4" />
@@ -137,7 +137,7 @@ export function IlgilenContent() {
             <li
               key={c.id}
               onClick={() => router.push(`/pipeline/${c.id}`)}
-              className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition-colors hover:border-[#534AB7]/30 active:scale-[0.99]"
+              className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm transition-colors hover:border-brand/30 active:scale-[0.99]"
             >
               <PersonAvatar
                 name={c.full_name}
@@ -159,12 +159,12 @@ export function IlgilenContent() {
                 <button
                   onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null, c.phone ?? null)}
                   disabled={generatingFor === c.id}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition hover:opacity-80 disabled:opacity-50"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand transition hover:opacity-80 disabled:opacity-50"
                   aria-label={t('pagesUi.generateAiMessage')}
                   title={t('pagesUi.generateAndCopyAiMessage')}
                 >
                   {generatingFor === c.id ? (
-                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
                   ) : copiedFor === c.id ? (
                     <Check className="h-4 w-4" />
                   ) : (
@@ -177,7 +177,7 @@ export function IlgilenContent() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => markContacted.mutate({ id: c.id, actionType: 'whatsapp' })}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white"
                     aria-label="WhatsApp"
                   >
                     <WhatsAppIcon className="h-4 w-4" />
@@ -187,7 +187,7 @@ export function IlgilenContent() {
                   <a
                     href={`tel:${c.phone}`}
                     onClick={() => markContacted.mutate({ id: c.id, actionType: 'call' })}
-                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7]"
+                    className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand"
                     aria-label={t('pagesUi.call')}
                   >
                     <Phone className="h-4 w-4" strokeWidth={1.75} />
@@ -240,7 +240,7 @@ export function IlgilenContent() {
                 {t('today.moreLeadsPending', { remaining, count: daily.length })}{' '}
                 <button
                   onClick={() => setShowAll(true)}
-                  className="font-bold text-[#534AB7] hover:underline ml-1"
+                  className="font-bold text-brand hover:underline ml-1"
                 >
                   {t('today.showAll')}
                 </button>
@@ -258,7 +258,7 @@ export function IlgilenContent() {
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-brand">
                   <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
                 </div>
                 <div>
@@ -296,7 +296,7 @@ export function IlgilenContent() {
                   navigator.clipboard.writeText(activeMessage.message)
                   toast.success(t('pagesUi.messageCopied'))
                 }}
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand active:scale-95 cursor-pointer"
               >
                 <Copy className="h-3.5 w-3.5" />
                 {t('pagesUi.copy')}
@@ -314,7 +314,7 @@ export function IlgilenContent() {
                     }
                     setActiveMessage(null)
                   }}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#25D366] px-5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-xl bg-whatsapp px-5 py-2.5 text-xs font-semibold text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   {t('pagesUi.sendViaWhatsApp')}

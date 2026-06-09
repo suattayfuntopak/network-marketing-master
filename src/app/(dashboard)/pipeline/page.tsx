@@ -6,7 +6,7 @@ export default function PipelinePage() {
     <Suspense
       fallback={
         <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-          <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+          <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
         </main>
       }
     >

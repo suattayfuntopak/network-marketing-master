@@ -182,7 +182,7 @@ export function EgitimContent({
             <div className="flex items-center gap-2 shrink-0">
               <Link
                 href="/egitim/videolar"
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-[#534AB7]/10 hover:border-[#534AB7]/40 dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7]"
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-brand/10 hover:border-brand/40 dark:hover:bg-brand dark:hover:border-brand"
               >
                 <Film className="h-3.5 w-3.5 text-brand-readable" />
                 <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>

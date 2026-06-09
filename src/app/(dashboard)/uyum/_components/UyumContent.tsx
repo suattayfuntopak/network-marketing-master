@@ -414,7 +414,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                           href={`https://api.whatsapp.com/send?text=${encodeURIComponent(auditResult.improved_text!)}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition active:scale-95 hover:scale-105 hover:shadow-md cursor-pointer"
+                          className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white transition active:scale-95 hover:scale-105 hover:shadow-md cursor-pointer"
                           title={t('compliancePage.shareViaWhatsApp')}
                         >
                           <WhatsAppIcon className="h-4.5 w-4.5" />

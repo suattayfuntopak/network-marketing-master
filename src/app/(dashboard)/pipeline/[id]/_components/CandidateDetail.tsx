@@ -141,7 +141,7 @@ export function CandidateDetail({ candidateId }: Props) {
           <p className="text-sm font-semibold text-[var(--text-1)]">{t('pipeline.candidateNotFound')}</p>
           <button
             onClick={() => router.push('/pipeline')}
-            className="mt-4 rounded-xl bg-[#534AB7] px-4 py-2 text-sm font-semibold text-white"
+            className="mt-4 rounded-xl bg-brand px-4 py-2 text-sm font-semibold text-white"
           >
             {t('pipeline.backToPipeline')}
           </button>
@@ -189,7 +189,7 @@ export function CandidateDetail({ candidateId }: Props) {
           </button>
           <button
             onClick={() => setEditOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[var(--bg-subtle)] px-3 py-2 text-sm font-medium text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7]"
+            className="flex items-center gap-1.5 rounded-xl bg-[var(--bg-subtle)] px-3 py-2 text-sm font-medium text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand"
           >
             <Pencil className="h-4 w-4" />
             {t('common.edit')}
@@ -217,7 +217,7 @@ export function CandidateDetail({ candidateId }: Props) {
                   }
                   router.push(`/yazar?name=${encodeURIComponent(c.full_name)}&note=${encodeURIComponent(parsed.noteTr)}&warmth=${parsed.warmth}`)
                 }}
-                className="relative flex items-center justify-center gap-1.5 rounded-2xl bg-[#EEEDFE] py-4 text-sm font-semibold text-[#534AB7] transition hover:opacity-90 animate-all duration-200 active:scale-95"
+                className="relative flex items-center justify-center gap-1.5 rounded-2xl bg-brand-subtle py-4 text-sm font-semibold text-brand transition hover:opacity-90 animate-all duration-200 active:scale-95"
               >
                 <Bot className="h-4 w-4" strokeWidth={1.75} />
                 {t('pipeline.aiMessage')}
@@ -231,7 +231,7 @@ export function CandidateDetail({ candidateId }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => markContacted.mutate({ id: candidateId, actionType: 'whatsapp' })}
-                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-whatsapp py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
                 >
                   <WhatsAppIcon className="h-4 w-4" />
                   WhatsApp

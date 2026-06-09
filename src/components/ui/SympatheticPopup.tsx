@@ -56,7 +56,7 @@ export function SympatheticPopup({
       <div className="relative w-full max-w-sm rounded-3xl border border-[#EEEDFE]/40 dark:border-white/[0.04] bg-white dark:bg-[#0d0e14] p-7 shadow-3xl text-center overflow-hidden animate-in fade-in zoom-in-95 duration-250">
         
         {/* Modern ambient glow in background */}
-        <div className="absolute -top-12 -left-12 h-24 w-24 rounded-full bg-[#534AB7]/10 blur-xl pointer-events-none" />
+        <div className="absolute -top-12 -left-12 h-24 w-24 rounded-full bg-brand/10 blur-xl pointer-events-none" />
         <div className="absolute -bottom-12 -right-12 h-24 w-24 rounded-full bg-emerald-500/10 blur-xl pointer-events-none" />
 
         <div className="mb-5 flex justify-center relative">
@@ -78,7 +78,7 @@ export function SympatheticPopup({
         <button
           type="button"
           onClick={onClose}
-          className="w-full rounded-2xl bg-gradient-to-r from-[#534AB7] to-[#6359E9] py-3 text-xs md:text-sm font-bold text-white shadow-lg shadow-[#534AB7]/25 transition hover:opacity-95 active:scale-[0.98] cursor-pointer"
+          className="w-full rounded-2xl bg-gradient-to-r from-brand to-[#6359E9] py-3 text-xs md:text-sm font-bold text-white shadow-lg shadow-[#534AB7]/25 transition hover:opacity-95 active:scale-[0.98] cursor-pointer"
         >
           {buttonLabel}
         </button>

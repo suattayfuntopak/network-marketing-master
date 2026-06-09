@@ -37,11 +37,36 @@
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Semantic color tokens — brand, whatsapp, accent-blue */
+/* Design token system — all NMM semantic colors in one place */
 @theme {
-  --color-brand: #534AB7;
-  --color-whatsapp: #25D366;
-  --color-accent-blue: #4169E1;
+  /* ── Brand purple scale ──────────────────────────── */
+  --color-brand:        #534AB7; /* Primary purple — text, bg, border */
+  --color-brand-subtle: #EEEDFE; /* Brand tint 50 — subtle backgrounds */
+  --color-brand-dark:   #3730A3; /* Brand 700 — pressed/hover states */
+  --color-brand-muted:  #453DA0; /* Brand mid-dark — hover fills */
+  --color-brand-deep:   #1e1b4b; /* Brand 950 — dark card fills */
+  --color-brand-accent: #7c3aed; /* Violet 600 — gradient destination */
+  --color-brand-indigo: #4338ca; /* Indigo 600 — gradient source alt */
+  --color-brand-light:  #a09be8; /* Indigo light — dark mode text */
+  --color-brand-faint:  #EEF2FF; /* Indigo 50 — very soft background */
+
+  /* ── Crown / NMM identity colors ────────────────── */
+  --color-crown:        #72243E; /* Crown dark rose — identity accent */
+  --color-crown-dark:   #9B1D47; /* Crown deep — borders, text */
+  --color-crown-subtle: #FBEAF0; /* Crown tint 50 — subtle backgrounds */
+
+  /* ── WhatsApp ─────────────────────────────────────  */
+  --color-whatsapp:     #25D366; /* WhatsApp official green */
+
+  /* ── Semantic / status ───────────────────────────── */
+  --color-emerald-dark:   #0F6E56; /* Emerald text on light bg */
+  --color-emerald-subtle: #E1F5EE; /* Emerald tint background */
+  --color-amber-dark:     #854F0B; /* Amber text on light bg */
+  --color-amber-subtle:   #FAEEDA; /* Amber tint background */
+  --color-blue-brand:     #1A56DB; /* Brand blue — links, badges */
+  --color-blue-subtle:    #E8F0FE; /* Blue tint background */
+  --color-accent-blue:    #4169E1; /* Accent blue — highlights */
+  --color-orange-dark:    #C03E1F; /* Orange dark — warm accents */
 
   /* Scale all font sizes up by another 1px globally for improved readability */
   --font-size-xs: 0.875rem;     /* 13px -> 14px */

@@ -127,10 +127,10 @@ export default function SecurityPage() {
   const activeContent = lang === 'en' ? content.en : content.tr
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#06070B] dark:text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white font-sans transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-[#06070B] dark:text-[#E2E8F0] selection:bg-brand selection:text-white font-sans transition-colors duration-300">
       
       {/* Background Orbs */}
-      <div className="absolute top-[5%] left-[-10%] h-[300px] w-[300px] rounded-full bg-[#534AB7]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[5%] left-[-10%] h-[300px] w-[300px] rounded-full bg-brand/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[10%] right-[-10%] h-[400px] w-[400px] rounded-full bg-pink-600/5 blur-[140px] pointer-events-none" />
 
       {/* Header Back Bar */}
@@ -138,14 +138,14 @@ export default function SecurityPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             href="/acilis"
-            className="flex items-center gap-2 text-xs font-bold text-[#534AB7] dark:text-[#a09be8] hover:opacity-80 transition"
+            className="flex items-center gap-2 text-xs font-bold text-brand dark:text-[#a09be8] hover:opacity-80 transition"
           >
             <ArrowLeft className="h-4 w-4" />
             <span>{lang === 'en' ? 'Back to Home' : 'Giriş Sayfası'}</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden sm:flex items-center gap-2">
-              <Lock className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0" />
+              <Lock className="h-4 w-4 text-brand dark:text-[#a09be8] shrink-0" />
               <span className="text-[10px] font-bold text-slate-500 dark:text-zinc-500 uppercase tracking-widest">
                 {lang === 'en' ? 'HIGH INFRASTRUCTURE SECURITY' : 'YÜKSEK ALTYAPI GÜVENLİĞİ'}
               </span>
@@ -157,7 +157,7 @@ export default function SecurityPage() {
 
       {/* Title Hero */}
       <header className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-10 pb-6 text-center space-y-3">
-        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-[#534AB7] dark:text-[#a09be8]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-brand dark:text-[#a09be8]">
           <ShieldCheck className="h-3.5 w-3.5" />
           <span>{lang === 'en' ? 'Security' : 'Güvenlik'}</span>
         </div>
@@ -197,7 +197,7 @@ export default function SecurityPage() {
                   <ul className="space-y-2.5 pl-2 font-medium">
                     {section.bullets.map((bullet, idx) => (
                       <li key={idx} className="text-xs md:text-sm text-slate-600 dark:text-zinc-400 flex items-start gap-2.5">
-                        <CheckCircle2 className="h-4 w-4 text-[#534AB7] dark:text-[#a09be8] shrink-0 mt-0.5" />
+                        <CheckCircle2 className="h-4 w-4 text-brand dark:text-[#a09be8] shrink-0 mt-0.5" />
                         <span>{bullet}</span>
                       </li>
                     ))}

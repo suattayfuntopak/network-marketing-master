@@ -7,9 +7,9 @@ import { ChevronRight, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
-import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
-import { HubKpiRow } from '@/lib/ui/hub/HubKpiRow'
+import { HubPageShell } from '@/components/hub/HubPageShell'
+import { HubSectionCard } from '@/components/hub/HubSectionCard'
+import { HubKpiRow } from '@/components/hub/HubKpiRow'
 import { getCrownTeamPageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -185,7 +185,7 @@ export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
                             href={wa}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/5 text-[#128C7E] transition hover:bg-[#25D366]/10"
+                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[#25D366]/30 bg-whatsapp/5 text-[#128C7E] transition hover:bg-whatsapp/10"
                             title={t('crown.openWa')}
                           >
                             <WhatsAppIcon className="h-4 w-4" />
@@ -201,10 +201,10 @@ export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
                       </div>
                       {goal ? (
                         <div className="flex flex-wrap gap-2">
-                          <span className="rounded-lg bg-[#EEEDFE] px-2 py-0.5 text-xs font-medium text-[#534AB7] dark:bg-[#1e1b4b] dark:text-[#a5b4fc]">
+                          <span className="rounded-lg bg-brand-subtle px-2 py-0.5 text-xs font-medium text-brand dark:bg-[#1e1b4b] dark:text-[#a5b4fc]">
                             {t('crown.goalPeople', { count: goal.targetPeople })}
                           </span>
-                          <span className="rounded-lg bg-[#EEEDFE] px-2 py-0.5 text-xs font-medium text-[#534AB7] dark:bg-[#1e1b4b] dark:text-[#a5b4fc]">
+                          <span className="rounded-lg bg-brand-subtle px-2 py-0.5 text-xs font-medium text-brand dark:bg-[#1e1b4b] dark:text-[#a5b4fc]">
                             {t('crown.goalMonths', { count: goal.targetMonths })}
                           </span>
                         </div>

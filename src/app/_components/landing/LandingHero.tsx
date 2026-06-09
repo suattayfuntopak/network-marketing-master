@@ -33,7 +33,7 @@ export function LandingHero() {
       <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
         <Link
           href="/kayit"
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-6 py-3.5 text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
+          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white px-6 py-3.5 text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
         >
           <span>{t('landingPage.startFreeTrial')}</span>
           <ArrowRight className="h-4 w-4" />

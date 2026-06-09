@@ -15,7 +15,7 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
 
-const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
+const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
 
 // localStorage helpers deleted
@@ -186,7 +186,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0]`}
+                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white shadow-md transition hover:bg-[#453DA0]`}
                 title="Fotoğraf Yükle"
               >
                 <Camera className="h-3.5 w-3.5" />
@@ -196,7 +196,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7]"
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand"
               >
                 <Upload className="h-3.5 w-3.5" />
                 Fotoğraf Yükle
@@ -259,7 +259,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <textarea id="edit-note" name="note" rows={3} maxLength={1000} defaultValue={parsed.noteTr} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           <div className="flex gap-3 pt-1">
-            <button type="submit" disabled={update.isPending || uploadingPhoto} className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
+            <button type="submit" disabled={update.isPending || uploadingPhoto} className="flex-1 rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
               {update.isPending || uploadingPhoto ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
             <button type="button" onClick={handleDelete} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FBEAF0] text-[#72243E] transition hover:bg-[#f5d4e0]">

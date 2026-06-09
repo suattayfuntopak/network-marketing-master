@@ -63,7 +63,7 @@ export function TakvimConfirmModal({
             type="button"
             onClick={onConfirm}
             disabled={isLoading}
-            className="flex-1 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#4338a8] disabled:opacity-50"
+            className="flex-1 rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#4338a8] disabled:opacity-50"
           >
             {isLoading ? '…' : confirmLabel}
           </button>

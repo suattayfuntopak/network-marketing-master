@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { Activity, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
+import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { getStatsFunnelActualsAction } from '../actions'
 
@@ -29,7 +29,7 @@ export function StatsFieldFunnelSection({ period }: Props) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-            <Activity className="h-4 w-4 text-[#534AB7]" />
+            <Activity className="h-4 w-4 text-brand" />
             {t('statsPage.fieldFunnelTitle')}
           </h2>
           <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">

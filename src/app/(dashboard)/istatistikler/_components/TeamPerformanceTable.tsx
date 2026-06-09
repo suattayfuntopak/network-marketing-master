@@ -429,11 +429,11 @@ export function TeamPerformanceTable({
 
       {teamStatsLocked && performanceRows.length > 0 && (
         <div
-          className={`absolute inset-0 ${Z.cardOverlay} flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-[#534AB7]/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
+          className={`absolute inset-0 ${Z.cardOverlay} flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-brand/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}
           aria-hidden={false}
         >
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10 text-indigo-200 shadow-lg">
-            <Lock className="h-6 w-6 text-[#534AB7] dark:text-indigo-200" strokeWidth={1.75} />
+            <Lock className="h-6 w-6 text-brand dark:text-indigo-200" strokeWidth={1.75} />
           </div>
           <div className="max-w-sm space-y-1">
             <p className="text-sm font-bold text-[var(--text-1)]">{t('statsPage.teamLockedTitle')}</p>
@@ -441,7 +441,7 @@ export function TeamPerformanceTable({
           </div>
           <Link
             href="/odeme"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
           >
             <Sparkles className="h-4 w-4" />
             {t('statsPage.teamLockedCta')}

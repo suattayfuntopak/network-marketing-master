@@ -34,7 +34,7 @@ export function HubGoalChipRow({ targets, actuals, hasGoal, fieldStreak }: HubGo
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
-          <Target className="h-4 w-4 text-[#534AB7]" strokeWidth={1.75} />
+          <Target className="h-4 w-4 text-brand" strokeWidth={1.75} />
           <p className="text-sm font-bold text-[var(--text-1)]">{t('crown.todayGoalTitle')}</p>
         </div>
         {fieldStreak != null && fieldStreak > 0 ? (

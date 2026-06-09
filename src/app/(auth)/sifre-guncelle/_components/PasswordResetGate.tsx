@@ -129,7 +129,7 @@ export function PasswordResetGate() {
   if (status === 'loading') {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
         <p className={`text-xs ${authMutedClass}`}>Bağlantı doğrulanıyor…</p>
       </div>
     )

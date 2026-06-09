@@ -46,8 +46,8 @@ export function TakvimTeamCalendar({
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
       <div className="mb-3 flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#EEEDFE]">
-          <Users className="h-4 w-4 text-[#534AB7]" />
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-subtle">
+          <Users className="h-4 w-4 text-brand" />
         </div>
         <div>
           <p className="text-sm font-semibold text-[var(--text-1)]">{title}</p>
@@ -73,7 +73,7 @@ export function TakvimTeamCalendar({
                     className="flex items-center justify-between text-[11px] text-[var(--text-2)]"
                   >
                     <span>{formatCalendarDayKey(day.dateKey, lang)}</span>
-                    <span className="rounded-full bg-[#EEEDFE] px-2 py-0.5 font-semibold text-[#534AB7]">
+                    <span className="rounded-full bg-brand-subtle px-2 py-0.5 font-semibold text-brand">
                       {day.count}
                     </span>
                   </li>

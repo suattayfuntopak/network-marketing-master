@@ -52,7 +52,7 @@ export function WorkspaceLicenseModal({ workspace, onClose, onSuccess }: Props) 
         onClick={onClose}
       />
       <div className={`fixed left-1/2 top-1/2 ${Z.confirm} w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)] overflow-hidden`}>
-        <div className="h-1.5 w-full bg-gradient-to-r from-[#534AB7] to-amber-500" />
+        <div className="h-1.5 w-full bg-gradient-to-r from-brand to-amber-500" />
 
         <form onSubmit={handleSaveLicense} className="p-6 space-y-4">
           <div className="flex items-center justify-between">
@@ -91,7 +91,7 @@ export function WorkspaceLicenseModal({ workspace, onClose, onSuccess }: Props) 
                 setLicenseType(v)
                 if (v === 'free') setIsUnlimited(false)
               }}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-brand transition"
             >
               <option value="free">{t('platformPage.freeRevoke')}</option>
               <option value="basic">Basic Plan</option>
@@ -138,7 +138,7 @@ export function WorkspaceLicenseModal({ workspace, onClose, onSuccess }: Props) 
                       min={1}
                       value={extensionDays}
                       onChange={e => setExtensionDays(Number(e.target.value))}
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-brand transition"
                     />
                   </div>
                 </div>
@@ -149,7 +149,7 @@ export function WorkspaceLicenseModal({ workspace, onClose, onSuccess }: Props) 
           <button
             type="submit"
             disabled={isUpdating}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-base font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-base font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50"
           >
             {isUpdating ? (
               <><Loader2 className="h-4 w-4 animate-spin" /> {t('platformPage.saving')}</>

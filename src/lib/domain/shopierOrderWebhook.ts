@@ -39,10 +39,13 @@ function digestEquals(signature: string, mac: Buffer): boolean {
   return false
 }
 
+/** Timestamp freshness window — 5 dakika (300 saniye). */
+const WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS = 300
+
 /**
  * Shopier-Signature: HS256 (HMAC-SHA256). İmzalanan içerik kesin değil → birkaç
  * aday (ham gövde, ts.body, ts+body, body+ts) × kodlama (base64/base64url/hex)
- * denenir. Karşılaştırma sabit-zamanlı.
+ * denenir. Karşılaştırma sabit-zamanlı. Timestamp varsa tazelik kontrolü de yapılır.
  */
 export function verifyShopierWebhookSignature(
   rawBody: string,
@@ -51,6 +54,20 @@ export function verifyShopierWebhookSignature(
   timestamp?: string | null
 ): boolean {
   if (!signature || !secret) return false
+
+  // Timestamp tazelik kontrolü — replay saldırılarına karşı 5 dk pencere
+  if (timestamp) {
+    const ts = Number(timestamp)
+    if (!isNaN(ts)) {
+      const nowSeconds = Math.floor(Date.now() / 1000)
+      const ageSecs = Math.abs(nowSeconds - ts)
+      if (ageSecs > WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS) {
+        console.warn('[Shopier] webhook timestamp too old', { ageSecs, limit: WEBHOOK_TIMESTAMP_TOLERANCE_SECONDS })
+        return false
+      }
+    }
+  }
+
   for (const { payload } of signatureCandidates(rawBody, timestamp)) {
     const mac = crypto.createHmac('sha256', secret).update(payload).digest()
     if (digestEquals(signature, mac)) return true

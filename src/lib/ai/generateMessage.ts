@@ -1,6 +1,7 @@
 'use server'
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GEMINI_FLASH } from '@/lib/ai/models'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -95,7 +96,7 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const ctxStr   = cleanContext ? `Ek bilgi: ${cleanContext}\n` : ''
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: GEMINI_FLASH,
     systemInstruction: `Sen bir network marketing danışmanısın. Üç görevin var:
 
 1. MESAJ ÜRETME: Kişi adı, boru hattı aşaması, ilişki sıcaklığı ve ek bilgiler verildiğinde o kişiye WhatsApp'tan gönderilecek Türkçe mesaj yaz. Kısa (max 3 paragraf), samimi, 2-3 emoji, satış baskısı yok.

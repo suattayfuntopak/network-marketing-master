@@ -10,7 +10,7 @@ import {
   HubSummaryTabBar,
   parseSummaryTab,
   type HubPeriodTab,
-} from '@/lib/ui/hub/HubSummaryTabBar'
+} from '@/components/hub/HubSummaryTabBar'
 import { getTeamRankingMetricsAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { PulsePeriod } from '@/lib/domain/pulse'

@@ -76,7 +76,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
       >
         <div className={`sticky top-0 ${Z.cardControls} flex shrink-0 items-start justify-between gap-3 border-b border-[var(--border)] bg-[var(--bg-card)] px-5 py-4`}>
           <div className="flex min-w-0 items-center gap-2">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#534AB7]/10 text-[#534AB7] dark:text-indigo-300">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand dark:text-indigo-300">
               <Bot className="h-4.5 w-4.5" />
             </div>
             <div className="min-w-0">
@@ -99,7 +99,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
         <div className="flex-1 overflow-y-auto overscroll-contain px-5 pb-5">
         {loading ? (
           <div className="flex flex-col items-center gap-3 py-10 text-[var(--text-3)]">
-            <Loader2 className="h-7 w-7 animate-spin text-[#534AB7]" />
+            <Loader2 className="h-7 w-7 animate-spin text-brand" />
             <p className="text-sm">{t('coachUi.inviteGenerating')}</p>
           </div>
         ) : error ? (
@@ -121,7 +121,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={8}
-              className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-1)] outline-none transition focus:border-[#534AB7]"
+              className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-1)] outline-none transition focus:border-brand"
             />
             <p className="text-xs italic text-[var(--text-3)]">{t('coachUi.inviteHint')}</p>
             <div className="flex gap-2">
@@ -147,7 +147,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={onClose}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#25D366] px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-whatsapp px-3 py-2.5 text-sm font-bold text-white shadow-sm transition hover:opacity-90 active:scale-95"
                 >
                   <WhatsAppIcon className="h-4 w-4 fill-current" /> {t('coachUi.inviteSend')}
                 </a>
@@ -155,7 +155,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
                 <button
                   type="button"
                   disabled
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#25D366]/50 px-3 py-2.5 text-sm font-bold text-white"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-whatsapp/50 px-3 py-2.5 text-sm font-bold text-white"
                 >
                   <WhatsAppIcon className="h-4 w-4 fill-current" /> {t('coachUi.inviteSend')}
                 </button>

@@ -22,7 +22,7 @@ const TABS: readonly {
   icon: LucideIcon
   activeClass: string
 }[] = [
-  { id: 'members', labelKey: 'team.tabMembers', icon: Users, activeClass: 'bg-[#534AB7] text-white shadow-md' },
+  { id: 'members', labelKey: 'team.tabMembers', icon: Users, activeClass: 'bg-brand text-white shadow-md' },
   { id: 'summary', labelKey: 'team.tabSummary', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
   { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: 'bg-[#854F0B] text-white shadow-md' },
   { id: 'tree', labelKey: 'team.tabTree', icon: GitBranch, activeClass: 'bg-[#72243E] text-white shadow-md' },

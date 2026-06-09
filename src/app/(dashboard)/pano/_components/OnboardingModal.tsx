@@ -124,7 +124,7 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
         <div className="flex border-b border-[var(--border)]">
           {steps.map(s => (
             <div key={s.num} className={`flex-1 py-2.5 text-center text-[10px] font-semibold uppercase tracking-widest transition-colors
-              ${step === s.num ? 'bg-[#534AB7] text-white' : step > s.num ? 'bg-[#EEEDFE] text-[#534AB7]' : 'text-[var(--text-3)]'}`}>
+              ${step === s.num ? 'bg-brand text-white' : step > s.num ? 'bg-brand-subtle text-brand' : 'text-[var(--text-3)]'}`}>
               {s.num}
             </div>
           ))}
@@ -137,8 +137,8 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
 
           {step === 1 && (
             <div className="space-y-4 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEEDFE]">
-                <Rocket className="h-7 w-7 text-[#534AB7]" strokeWidth={1.75} />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-subtle">
+                <Rocket className="h-7 w-7 text-brand" strokeWidth={1.75} />
               </div>
               <h2 className="text-lg font-bold text-[var(--text-1)]">
                 {firstName ? `Hoş geldin, ${firstName}! 👋` : 'NMM\'ye Hoş Geldin! 👋'}
@@ -148,7 +148,7 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
               </p>
               <button
                 onClick={() => setStep(2)}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white hover:bg-[#453DA0]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-white hover:bg-[#453DA0]"
               >
                 Başlayalım <ChevronRight className="h-4 w-4" />
               </button>
@@ -224,8 +224,8 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
 
           {step === 4 && (
             <div className="space-y-4 text-center">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEEDFE]">
-                <PartyPopper className="h-7 w-7 text-[#534AB7]" strokeWidth={1.75} />
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-subtle">
+                <PartyPopper className="h-7 w-7 text-brand" strokeWidth={1.75} />
               </div>
               <h2 className="text-lg font-bold text-[var(--text-1)]">
                 {firstName ? `Hazırsın, ${firstName}! 🚀` : 'Hazırsın! 🚀'}
@@ -235,7 +235,7 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
               </p>
               <button
                 onClick={dismiss}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white hover:bg-[#453DA0]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-white hover:bg-[#453DA0]"
               >
                 Panomu Keşfet <ArrowRight className="h-4 w-4" />
               </button>

@@ -152,12 +152,12 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             <button
               onClick={handleAIMessage}
               disabled={generating}
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:bg-[#EEEDFE] hover:shadow-md disabled:opacity-50 cursor-pointer animate-all duration-200 active:scale-95"
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:bg-brand-subtle hover:shadow-md disabled:opacity-50 cursor-pointer animate-all duration-200 active:scale-95"
               aria-label="AI Mesaj Üret"
               title="AI Mesaj Üret"
             >
               {generating ? (
-                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+                <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
               ) : (
                 <Bot className="h-4 w-4" strokeWidth={1.75} />
               )}
@@ -171,7 +171,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => markContacted.mutate({ id: candidate.id, actionType: 'whatsapp' })}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
                 aria-label="WhatsApp"
                 title="WhatsApp"
               >
@@ -244,7 +244,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                             setQuickActionOpen(false)
                             setStageOpen(true)
                           }}
-                          className="flex w-full items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-left text-xs font-semibold text-[var(--text-1)] hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:border-[#534AB7]/30 transition"
+                          className="flex w-full items-center gap-2.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2.5 text-left text-xs font-semibold text-[var(--text-1)] hover:bg-brand-subtle hover:text-brand hover:border-brand/30 transition"
                         >
                           <Zap className="h-4 w-4 text-amber-500" />
                           <span>{t('pipelinePage.changeStageAction')}</span>
@@ -301,7 +301,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                             setQuickActionOpen(false)
                             setEditOpen(true)
                           }}
-                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-2.5 py-2 text-center text-xs font-semibold text-[var(--text-1)] hover:bg-[#EEEDFE] hover:text-[#534AB7] hover:border-[#534AB7]/30 transition active:scale-95 cursor-pointer"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-2.5 py-2 text-center text-xs font-semibold text-[var(--text-1)] hover:bg-brand-subtle hover:text-brand hover:border-brand/30 transition active:scale-95 cursor-pointer"
                           title={t('common.edit')}
                         >
                           <Pencil className="h-3.5 w-3.5 shrink-0" />
@@ -331,7 +331,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <button
                 onClick={() => update.mutate({ id: candidate.id, stage: 'iletisim' })}
                 disabled={update.isPending}
-                className="flex items-center gap-1 rounded-full border border-[#534AB7]/30 bg-[#EEEDFE] px-2.5 py-1 text-[10px] font-semibold text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white disabled:opacity-50"
+                className="flex items-center gap-1 rounded-full border border-brand/30 bg-brand-subtle px-2.5 py-1 text-[10px] font-semibold text-brand transition hover:bg-brand hover:text-white disabled:opacity-50"
                 title={t('pipeline.reactivateTitle')}
               >
                 <RotateCcw className="h-2.5 w-2.5" />
@@ -393,7 +393,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                     onClick={() => changeStage(s)}
                     className={clsx(
                       'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition hover:bg-[var(--bg-subtle)]',
-                      s === candidate.stage ? 'text-[#534AB7]' : 'text-[var(--text-1)]'
+                      s === candidate.stage ? 'text-brand' : 'text-[var(--text-1)]'
                     )}
                   >
                     <span className={clsx('inline-block h-2 w-2 shrink-0 rounded-full', STAGE_COLOR[s].split(' ')[0])} />
@@ -413,7 +413,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-brand">
                   <Sparkles className="h-4.5 w-4.5 fill-current animate-pulse" />
                 </div>
                 <div>
@@ -447,7 +447,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                   navigator.clipboard.writeText(activeMessage)
                   toast.success('Mesaj kopyalandı!')
                 }}
-                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95 cursor-pointer"
+                className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand active:scale-95 cursor-pointer"
                 title="Kopyala"
               >
                 <Copy className="h-4 w-4" />
@@ -463,7 +463,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                     markContacted.mutate({ id: candidate.id, actionType: 'whatsapp' })
                     setActiveMessage(null)
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)] cursor-pointer"
                   title="WhatsApp ile Gönder"
                 >
                   <WhatsAppIcon className="h-4 w-4" />

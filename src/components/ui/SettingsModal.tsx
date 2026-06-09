@@ -124,7 +124,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
 
         {fetching ? (
           <div className="flex h-48 flex-col items-center justify-center gap-2">
-            <Loader2 className="h-8 w-8 animate-spin text-[#534AB7]" />
+            <Loader2 className="h-8 w-8 animate-spin text-brand" />
             <p className="text-sm text-[var(--text-2)]">Yükleniyor...</p>
           </div>
         ) : (
@@ -140,7 +140,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                 {/* Light Theme */}
                 <button
                   onClick={() => setTheme('light')}
-                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'light' ? 'bg-[#EEEDFE]/50 border-[#534AB7] text-[#534AB7] font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'light' ? 'bg-brand-subtle/50 border-brand text-brand font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
                 >
                   <Sun className="h-5 w-5" />
                   Açık
@@ -149,7 +149,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                 {/* Dark Theme */}
                 <button
                   onClick={() => setTheme('dark')}
-                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'dark' ? 'bg-[#EEEDFE]/50 border-[#534AB7] text-[#534AB7] font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'dark' ? 'bg-brand-subtle/50 border-brand text-brand font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
                 >
                   <Moon className="h-5 w-5" />
                   Koyu
@@ -158,7 +158,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                 {/* System Theme */}
                 <button
                   onClick={() => setTheme('system')}
-                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'system' ? 'bg-[#EEEDFE]/50 border-[#534AB7] text-[#534AB7] font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
+                  className={`flex flex-col items-center justify-center gap-2 rounded-xl p-3 border text-sm transition-all ${theme === 'system' ? 'bg-brand-subtle/50 border-brand text-brand font-semibold' : 'bg-[var(--bg-subtle)] border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--border)]'}`}
                 >
                   <Monitor className="h-5 w-5" />
                   Sistem
@@ -184,7 +184,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                       value={workspaceName}
                       onChange={e => setWorkspaceName(e.target.value)}
                       placeholder="Örn: Benim Ekibim"
-                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+                      className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
                     />
                   </div>
                 </div>
@@ -193,7 +193,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
                 >
                   {loading ? (
                     <>

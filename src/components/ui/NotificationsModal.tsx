@@ -40,16 +40,16 @@ interface UiNotification {
 function NotifIcon({ type, size = 'sm' }: { type: NotifIconType; size?: 'sm' | 'lg' }) {
   const cls = size === 'lg' ? 'h-6 w-6' : 'h-4 w-4'
   if (type === 'alert')    return <AlertCircle    className={`${cls} text-amber-500`} />
-  if (type === 'user')     return <UserPlus       className={`${cls} text-[#534AB7]`} />
+  if (type === 'user')     return <UserPlus       className={`${cls} text-brand`} />
   if (type === 'calendar') return <CalendarClock  className={`${cls} text-[#0F6E56]`} />
-  if (type === 'info')     return <Info           className={`${cls} text-[#534AB7]`} />
-  return <Bell className={`${cls} text-[#534AB7]`} />
+  if (type === 'info')     return <Info           className={`${cls} text-brand`} />
+  return <Bell className={`${cls} text-brand`} />
 }
 
 function NotifIconBg({ type }: { type: NotifIconType }) {
   if (type === 'calendar') return 'bg-[#E1F5EE]'
   if (type === 'alert')    return 'bg-amber-50 dark:bg-amber-950/20'
-  return 'bg-[#EEEDFE]'
+  return 'bg-brand-subtle'
 }
 
 function PreferenceToggle({
@@ -72,7 +72,7 @@ function PreferenceToggle({
       disabled={disabled}
       onClick={onToggle}
       className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-300 ease-in-out disabled:cursor-not-allowed disabled:opacity-60 ${
-        checked ? 'bg-[#534AB7]' : 'bg-[var(--border)]'
+        checked ? 'bg-brand' : 'bg-[var(--border)]'
       }`}
     >
       <span
@@ -257,7 +257,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllRead}
-                  className="flex items-center gap-1 text-xs font-semibold text-[#534AB7] transition hover:underline"
+                  className="flex items-center gap-1 text-xs font-semibold text-brand transition hover:underline"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" />
                   Tümünü Okundu Yap
@@ -279,7 +279,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                       className={`group w-full rounded-xl border p-3.5 text-left transition-all hover:shadow-sm active:scale-[0.99]
                         ${n.read
                           ? 'border-[var(--border)] bg-[var(--bg-card)] opacity-70 hover:opacity-100'
-                          : 'border-[#534AB7]/20 bg-[#f0f4ff]/60 dark:bg-[#534AB7]/8 hover:border-[#534AB7]/40'
+                          : 'border-brand/20 bg-[#f0f4ff]/60 dark:bg-brand/8 hover:border-brand/40'
                         }`}
                     >
                       <div className="flex items-start gap-3">
@@ -292,7 +292,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-1.5">
                             {!n.read && (
-                              <span className="h-2 w-2 shrink-0 rounded-full bg-[#534AB7]" />
+                              <span className="h-2 w-2 shrink-0 rounded-full bg-brand" />
                             )}
                             <p className={`truncate text-sm font-semibold ${n.read ? 'text-[var(--text-2)]' : 'text-[var(--text-1)]'}`}>
                               {n.title}
@@ -332,7 +332,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
             ].map(({ type, icon: Icon, label, val }) => (
               <div key={type} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <Icon className="h-4 w-4 text-[#534AB7]" />
+                  <Icon className="h-4 w-4 text-brand" />
                   <span className="text-sm font-medium text-[var(--text-1)]">{label}</span>
                 </div>
                 <PreferenceToggle
@@ -355,7 +355,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                       onClick={() => void handleFrequencyChange(freq)}
                       className={`px-3 py-1.5 transition-colors disabled:opacity-50 ${
                         prefs.overdueEmailFrequency === freq
-                          ? 'bg-[#534AB7] text-white'
+                          ? 'bg-brand text-white'
                           : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'
                       }`}
                     >
@@ -385,7 +385,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
             <div className={`h-1.5 w-full ${
               selected.icon === 'calendar' ? 'bg-gradient-to-r from-[#0F6E56] to-emerald-400' :
               selected.icon === 'alert'    ? 'bg-gradient-to-r from-amber-400 to-yellow-300' :
-              'bg-gradient-to-r from-[#534AB7] to-indigo-400'
+              'bg-gradient-to-r from-brand to-indigo-400'
             }`} />
 
             <div className="p-6">
@@ -425,7 +425,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                         setSelected(null)
                         onClose()
                       }}
-                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-[#534AB7]/25 bg-[#534AB7]/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-[#534AB7] transition-colors hover:border-[#534AB7]/40 hover:bg-[#534AB7]/12 active:scale-[0.98] dark:border-[#534AB7]/35 dark:bg-[#534AB7]/15 dark:hover:bg-[#534AB7]/22"
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-brand transition-colors hover:border-brand/40 hover:bg-brand/12 active:scale-[0.98] dark:border-brand/35 dark:bg-brand/15 dark:hover:bg-brand/22"
                     >
                       {t('pagesUi.viewInPipeline')}
                     </button>
@@ -442,14 +442,14 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                         setSelected(null)
                         onClose()
                       }}
-                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-[#534AB7]/25 bg-[#534AB7]/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-[#534AB7] transition-colors hover:border-[#534AB7]/40 hover:bg-[#534AB7]/12 active:scale-[0.98] dark:border-[#534AB7]/35 dark:bg-[#534AB7]/15 dark:hover:bg-[#534AB7]/22"
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-brand transition-colors hover:border-brand/40 hover:bg-brand/12 active:scale-[0.98] dark:border-brand/35 dark:bg-brand/15 dark:hover:bg-brand/22"
                     >
                       {t('pagesUi.viewDailySummary')}
                     </button>
                   ) : null}
                   <button
                     onClick={() => setSelected(null)}
-                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-[#534AB7] px-3.5 py-1.5 text-xs font-semibold leading-tight text-white transition-colors hover:bg-[#453da0] active:scale-[0.98]"
+                    className="inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-brand px-3.5 py-1.5 text-xs font-semibold leading-tight text-white transition-colors hover:bg-[#453da0] active:scale-[0.98]"
                   >
                     Kapat
                   </button>

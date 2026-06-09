@@ -75,6 +75,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Geçici geliştirici scriptleri — lint kapsamı dışında
+    "scratch/**",
   ]),
 ]);
 

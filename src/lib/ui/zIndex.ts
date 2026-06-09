@@ -10,7 +10,7 @@ export const Z = {
   sidebar: 'z-[35]',
   header: 'z-40',
   bottomNav: 'z-50',
-  headerSearch: 'z-50',
+  headerSearch: 'z-[51]',
   dropdown: 'z-[55]',
   cardOverlay: 'z-[60]',
   cardPopover: 'z-[65]',

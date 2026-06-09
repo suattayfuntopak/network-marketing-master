@@ -184,7 +184,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
                 <button
                   type="button"
                   onClick={handleSendWhatsApp}
-                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#25D366] text-white hover:bg-[#20ba59] transition shadow-md hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                  className="flex h-12 w-12 items-center justify-center rounded-2xl bg-whatsapp text-white hover:bg-[#20ba59] transition shadow-md hover:shadow-emerald-500/20 active:scale-95 cursor-pointer"
                   title={t('team.sendWhatsApp')}
                 >
                   <WhatsAppIcon className="h-5 w-5 fill-white" />

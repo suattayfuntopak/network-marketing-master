@@ -137,12 +137,12 @@ export function LandingFaq() {
               <button
                 type="button"
                 onClick={() => toggleItem(faq.id)}
-                className="w-full flex items-center justify-between text-left gap-4 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-zinc-200 hover:text-[#534AB7] dark:hover:text-white transition duration-200 cursor-pointer"
+                className="w-full flex items-center justify-between text-left gap-4 py-2 text-xs sm:text-sm font-bold text-slate-800 dark:text-zinc-200 hover:text-brand dark:hover:text-white transition duration-200 cursor-pointer"
               >
                 <span>{faq.question}</span>
                 <ChevronDown
                   className={`h-4 w-4 shrink-0 text-slate-400 dark:text-zinc-500 transition-transform duration-300 ${
-                    isOpen ? 'rotate-180 text-[#534AB7] dark:text-[#a09be8]' : ''
+                    isOpen ? 'rotate-180 text-brand dark:text-[#a09be8]' : ''
                   }`}
                 />
               </button>
@@ -153,7 +153,7 @@ export function LandingFaq() {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-zinc-400 leading-relaxed font-medium pl-1 border-l-2 border-[#534AB7]/30 dark:border-[#a09be8]/20">
+                  <p className="text-[11px] sm:text-xs text-slate-500 dark:text-zinc-400 leading-relaxed font-medium pl-1 border-l-2 border-brand/30 dark:border-[#a09be8]/20">
                     {faq.answer}
                   </p>
                 </div>

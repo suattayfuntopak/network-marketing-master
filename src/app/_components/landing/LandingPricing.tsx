@@ -36,7 +36,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
                 billingPeriod === 'monthly'
-                  ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                  ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
                   : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
               }`}
             >
@@ -47,7 +47,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('yearly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
                 billingPeriod === 'yearly'
-                  ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                  ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
                   : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
               }`}
             >
@@ -139,7 +139,7 @@ export function LandingPricing() {
         </div>
 
         {/* Plan B: Plus Plan */}
-        <div className="rounded-3xl border border-[#534AB7]/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/60 transition duration-300">
+        <div className="rounded-3xl border border-brand/40 bg-indigo-50 dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/30 shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/60 transition duration-300">
           <div className="absolute right-6 top-6 animate-pulse">
             <span className="text-[9px] font-black text-indigo-900 dark:text-indigo-300 bg-indigo-100 dark:bg-indigo-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider border border-indigo-200 dark:border-indigo-500/30">
               {t('landingPage.planPopularBadge')}
@@ -212,7 +212,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className="block text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 cursor-pointer"
+              className="block text-center rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 cursor-pointer"
             >
               {t('landingPage.planPlusCta')}
             </Link>

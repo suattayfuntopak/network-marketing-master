@@ -21,8 +21,8 @@ import {
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
-import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
+import { HubPageShell } from '@/components/hub/HubPageShell'
+import { HubSectionCard } from '@/components/hub/HubSectionCard'
 import { getCrownSahaRadarAction } from '@/app/(dashboard)/crown/actions'
 import type { SahaRadarMember, SahaRadarFollowUp } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -128,12 +128,12 @@ function FollowUpCard({
           type="button"
           onClick={() => onAIClick(f)}
           disabled={generatingId === f.id}
-          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
+          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
           aria-label="AI Mesaj Üret"
           title="AI Mesaj Üret"
         >
           {generatingId === f.id ? (
-            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
           ) : (
             <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
           )}
@@ -154,7 +154,7 @@ function FollowUpCard({
               e.stopPropagation()
               onWaClick(f.id)
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
             aria-label="WhatsApp"
             title="WhatsApp"
           >
@@ -246,12 +246,12 @@ function MemberCard({
           type="button"
           onClick={() => onCoachAI(m)}
           disabled={coachingId === m.userId}
-          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-[#EEEDFE] text-[#534AB7] transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
+          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
           aria-label="Koçluk Mesajı Üret"
           title="Koçluk Mesajı Üret"
         >
           {coachingId === m.userId ? (
-            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
           ) : (
             <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
           )}
@@ -275,7 +275,7 @@ function MemberCard({
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#25D366] text-white transition-all hover:scale-105 hover:shadow-md"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
             aria-label="WhatsApp"
             title="WhatsApp"
           >
@@ -633,7 +633,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
             <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-[#534AB7]">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-brand">
                     <Sparkles className="h-4 w-4 fill-current animate-pulse" />
                   </div>
                   <div>
@@ -668,7 +668,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     navigator.clipboard.writeText(activeAiMessage.message)
                     toast.success('Mesaj kopyalandı!')
                   }}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] active:scale-95"
+                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand active:scale-95"
                   title="Kopyala"
                 >
                   <Copy className="h-4 w-4" />
@@ -686,7 +686,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                         })
                         setActiveAiMessage(null)
                       }}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#25D366] text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)]"
+                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)]"
                       title="WhatsApp ile Gönder"
                     >
                       <WhatsAppIcon className="h-4.5 w-4.5" />

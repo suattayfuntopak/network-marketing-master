@@ -127,7 +127,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder={t('common.quickAddNamePlaceholder')}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
             />
           </div>
 
@@ -141,7 +141,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
               onChange={(e) => setNotes(e.target.value)}
               placeholder={t('common.quickAddInfoPlaceholder')}
               rows={3}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10 resize-none"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10 resize-none"
             />
           </div>
 

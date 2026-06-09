@@ -2,7 +2,7 @@
 
 import { Target } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
+import { HubPageShell } from '@/components/hub/HubPageShell'
 import { HedefKart } from '@/app/(dashboard)/pano/_components/HedefKart'
 import { hedefAccent } from './hedefTheme'
 

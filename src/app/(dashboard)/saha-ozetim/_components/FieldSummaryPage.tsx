@@ -6,19 +6,19 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { History } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
-import { HubPeriodNavigator } from '@/lib/ui/hub/HubPeriodNavigator'
-import { HubDayLoginStrip } from '@/lib/ui/hub/HubDayLoginStrip'
-import { HubWeekLoginStrip } from '@/lib/ui/hub/HubWeekLoginStrip'
-import { HubMonthHero } from '@/lib/ui/hub/HubMonthHero'
-import { HubYearHero } from '@/lib/ui/hub/HubYearHero'
-import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
-import { HubSelfActivityGrid } from '@/lib/ui/hub/HubSelfActivityGrid'
+import { HubPageShell } from '@/components/hub/HubPageShell'
+import { HubPeriodNavigator } from '@/components/hub/HubPeriodNavigator'
+import { HubDayLoginStrip } from '@/components/hub/HubDayLoginStrip'
+import { HubWeekLoginStrip } from '@/components/hub/HubWeekLoginStrip'
+import { HubMonthHero } from '@/components/hub/HubMonthHero'
+import { HubYearHero } from '@/components/hub/HubYearHero'
+import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
+import { HubSelfActivityGrid } from '@/components/hub/HubSelfActivityGrid'
 import {
   HubSummaryTabBar,
   parseSummaryTab,
   type HubPeriodTab,
-} from '@/lib/ui/hub/HubSummaryTabBar'
+} from '@/components/hub/HubSummaryTabBar'
 import {
   getHubDailySelfAction,
   getHubMonthlySelfAction,
@@ -32,7 +32,7 @@ import {
   parsePeriodOffset,
   rollingWeekRange,
 } from '@/lib/utils/hubPeriodRange'
-import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
+import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
 import { IlgilenContent } from '@/app/(dashboard)/bugun/ilgilen/_components/IlgilenContent'
 
 const EMPTY_METRICS: HubSelfFieldMetrics = {

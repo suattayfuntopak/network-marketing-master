@@ -1,12 +1,13 @@
 'use server'
 
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
+import { GEMINI_FLASH } from '@/lib/ai/models'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
 }
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -68,7 +69,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_FLASH,
       systemInstruction: systemPrompt,
     })
 

@@ -72,7 +72,7 @@ export function CandidateStageCard({ stage, onChangeStage }: Props) {
                     onClick={() => select(s)}
                     className={clsx(
                       'flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium transition hover:bg-[var(--bg-subtle)]',
-                      s === stage ? 'text-[#534AB7]' : 'text-[var(--text-1)]',
+                      s === stage ? 'text-brand' : 'text-[var(--text-1)]',
                     )}
                   >
                     <span

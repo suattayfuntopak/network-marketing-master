@@ -78,7 +78,7 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-sm font-bold text-[var(--text-1)]">
               <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-[#534AB7]" />
+                <span className="h-2 w-2 rounded-full bg-brand" />
                 {t('statsPage.quotaCoach')}
               </span>
               <span className="font-extrabold text-[var(--text-2)] tabular-nums">
@@ -87,7 +87,7 @@ export function MyAIUsageQuotaCard({ usage, messageLimit, roleplayLimit, complia
             </div>
             <div className="h-2 w-full rounded-full bg-[var(--bg-subtle)] border border-[var(--border)] overflow-hidden">
               <div
-                className="h-full rounded-full bg-[#534AB7] transition-all duration-500"
+                className="h-full rounded-full bg-brand transition-all duration-500"
                 style={{ width: `${aiUsageProgressPercent(usage?.roleplayUsed ?? 0, roleplayLimit)}%` }}
               />
             </div>

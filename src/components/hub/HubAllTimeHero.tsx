@@ -43,7 +43,7 @@ export function HubAllTimeHero({ activeDays, fieldMetrics, allTimeActuals, joine
         {t('crown.allTimeHeroSubtitle', { days: activeDays })}
       </p>
       {platformSinceLabel && (
-        <p className="mt-0.5 text-xs font-medium text-[#534AB7] dark:text-indigo-300 md:text-sm">
+        <p className="mt-0.5 text-xs font-medium text-brand dark:text-indigo-300 md:text-sm">
           {platformSinceLabel}
         </p>
       )}

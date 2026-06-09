@@ -69,8 +69,8 @@ export function LandingPage() {
       <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-[#0A0B10] text-[var(--text-1)]">
         <div className="relative flex items-center justify-center">
           {/* Glowing pulse ring */}
-          <div className="absolute h-16 w-16 animate-ping rounded-full bg-[#534AB7]/20" />
-          <div className="absolute h-12 w-12 animate-pulse rounded-full bg-[#534AB7]/40" />
+          <div className="absolute h-16 w-16 animate-ping rounded-full bg-brand/20" />
+          <div className="absolute h-12 w-12 animate-pulse rounded-full bg-brand/40" />
           <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
             <Image src="/logo.png" alt="NMM Logo" width={32} height={32} className="h-full w-full rounded-full object-cover" />
           </div>
@@ -83,10 +83,10 @@ export function LandingPage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-[#534AB7] selection:text-white overflow-x-clip font-sans">
+    <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-brand selection:text-white overflow-x-clip font-sans">
       
       {/* ── BACKGROUND NEON ORBS ── */}
-      <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full dark:bg-[#534AB7]/10 blur-[130px] pointer-events-none" />
+      <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full dark:bg-brand/10 blur-[130px] pointer-events-none" />
       <div className="absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full dark:bg-blue-600/5 blur-[150px] pointer-events-none" />
       <div className="absolute bottom-[10%] left-[20%] h-[450px] w-[450px] rounded-full dark:bg-pink-600/5 blur-[130px] pointer-events-none" />
 

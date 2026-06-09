@@ -6,8 +6,8 @@ import { CalendarDays, ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { HubPageShell } from '@/lib/ui/hub/HubPageShell'
-import { HubSectionCard } from '@/lib/ui/hub/HubSectionCard'
+import { HubPageShell } from '@/components/hub/HubPageShell'
+import { HubSectionCard } from '@/components/hub/HubSectionCard'
 import { getCrownFirst30PageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -123,7 +123,7 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
                           href={wa}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/5 text-[#128C7E]"
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#25D366]/30 bg-whatsapp/5 text-[#128C7E]"
                           title={t('crown.openWa')}
                         >
                           <WhatsAppIcon className="h-3.5 w-3.5" />

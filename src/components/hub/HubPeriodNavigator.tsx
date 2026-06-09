@@ -13,7 +13,7 @@ import {
   rollingWeekRange,
   yearRange,
 } from '@/lib/utils/hubPeriodRange'
-import { useHubPeriodNavigation } from '@/lib/ui/hub/useHubPeriodNavigation'
+import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
 
 type HubPeriodNavigatorProps = {
   mode: 'day' | 'week' | 'month' | 'year'

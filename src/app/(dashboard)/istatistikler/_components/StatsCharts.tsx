@@ -148,7 +148,7 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
 
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-1.5 font-bold">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#534AB7]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-brand" />
                     <span>{t('statsPage.tempWarm')}</span>
                   </div>
                   <span className="text-[var(--text-3)] font-bold tabular-nums">%{temperatureData.warmPct} ({temperatureData.warm})</span>

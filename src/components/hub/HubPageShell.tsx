@@ -32,7 +32,7 @@ export function HubPageShell({
   subtitle,
   icon: Icon,
   customIcon,
-  iconClassName = 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#1e1b4b] dark:text-[#a5b4fc]',
+  iconClassName = 'bg-brand-subtle text-brand dark:bg-[#1e1b4b] dark:text-[#a5b4fc]',
   children,
   onRefresh,
   refreshing,

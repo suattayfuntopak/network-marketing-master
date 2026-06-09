@@ -475,14 +475,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
                     onMouseDown={() => selectCandidate(c)}
                     className="flex w-full items-center gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition hover:bg-[var(--bg-subtle)] last:border-b-0"
                   >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-[#534AB7]">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand">
                       {c.full_name.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
                       {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
                     </div>
-                    <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-semibold text-[#534AB7]">
+                    <span className="shrink-0 rounded-full bg-brand-subtle px-2 py-0.5 text-[10px] font-semibold text-brand">
                       {getStageLabel(c.stage as CandidateStage, lang)}
                     </span>
                   </button>
@@ -560,7 +560,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               {waLink && (
                 <button
                   onClick={() => window.open(waLink, '_blank')}
-                  className="flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
+                  className="flex items-center gap-1.5 rounded-lg bg-whatsapp px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
                 >
                   <WhatsAppIcon className="h-3.5 w-3.5" />
                   WhatsApp

@@ -103,12 +103,12 @@ export function SearchPageContent() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t('common.searchPlaceholder')}
-            className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-4 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
+            className="h-11 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-10 pr-4 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
           />
         </div>
         <button
           type="submit"
-          className="rounded-xl bg-[#534AB7] px-6 text-sm font-semibold text-white shadow-md transition hover:bg-[#453DA0] active:scale-95"
+          className="rounded-xl bg-brand px-6 text-sm font-semibold text-white shadow-md transition hover:bg-[#453DA0] active:scale-95"
         >
           {t('common.search')}
         </button>
@@ -128,7 +128,7 @@ export function SearchPageContent() {
                   <Link
                     key={c.id}
                     href={`/pipeline/${c.id}`}
-                    className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-[#534AB7]/30 hover:shadow-md"
+                    className="group flex items-center justify-between rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 transition-all hover:border-brand/30 hover:shadow-md"
                   >
                     <div className="flex min-w-0 items-center gap-3">
                       <PersonAvatar
@@ -138,7 +138,7 @@ export function SearchPageContent() {
                         className="h-9 w-9 text-sm"
                       />
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-sm font-semibold text-[var(--text-1)] transition-colors group-hover:text-[#534AB7]">
+                        <h3 className="truncate text-sm font-semibold text-[var(--text-1)] transition-colors group-hover:text-brand">
                           {c.full_name}
                         </h3>
                         <div className="mt-0.5 flex min-w-0 flex-wrap gap-x-2 gap-y-0.5 text-xs text-[var(--text-3)]">

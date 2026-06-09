@@ -116,7 +116,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
     })
   }
 
-  const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition'
+  const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-brand transition'
   const textareaClass = (accent = '#534AB7') =>
     `w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 text-sm text-[var(--text-1)] outline-none focus:border-[${accent}] transition resize-none`
 

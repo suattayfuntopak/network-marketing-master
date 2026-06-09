@@ -34,7 +34,7 @@ export function TakvimCandidateRow({
   const stage = candidate.stage as CandidateStage | null
 
   return (
-    <li className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] transition hover:border-[#534AB7]/30 hover:shadow-sm">
+    <li className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] transition hover:border-brand/30 hover:shadow-sm">
       <button
         type="button"
         onClick={onOpen}

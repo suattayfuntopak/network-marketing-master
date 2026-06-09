@@ -38,8 +38,8 @@ export function StatsKpiCards({ metrics }: Props) {
           {t('statsPage.kpiActiveLeads')}
         </span>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-2xl font-black text-[#534AB7]">{metrics.active}</span>
-          <Activity className="h-4 w-4 text-[#534AB7] ml-auto" />
+          <span className="text-2xl font-black text-brand">{metrics.active}</span>
+          <Activity className="h-4 w-4 text-brand ml-auto" />
         </div>
         <p className="text-sm text-[var(--text-3)] mt-1 font-semibold">
           {t('statsPage.kpiActiveLeadsDesc')}

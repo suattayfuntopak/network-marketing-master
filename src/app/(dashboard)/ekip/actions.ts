@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GEMINI_FLASH } from '@/lib/ai/models'
 import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
@@ -546,7 +547,7 @@ export async function generateOnboardingGuidanceAction(
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_FLASH,
       systemInstruction: lang === 'en'
         ? `You are an expert Network Marketing (MLM) AI Leadership Coach. Your task is to generate a highly motivational, professional, and practical message/script written from the perspective of a supportive sponsor (team leader) to their new team member ${memberName} to guide them through their onboarding checklist step: "${stepLabel}".
 The message should be action-oriented, encouraging, include a few relevant emojis, and contain a small, actionable pro-tip tailored to that specific step (e.g. for listing, remind them not to prejudge; for a 3-way call, mention edification and validation).

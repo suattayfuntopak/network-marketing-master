@@ -39,7 +39,7 @@ export function WelcomeCard({ candidateCount }: { candidateCount: number }) {
         'fixed inset-x-3 bottom-[calc(4.75rem+env(safe-area-inset-bottom))]',
       )}
     >
-      <div className="relative rounded-2xl border border-[#534AB7]/30 bg-[var(--bg-card)] p-4 shadow-lg shadow-black/10">
+      <div className="relative rounded-2xl border border-brand/30 bg-[var(--bg-card)] p-4 shadow-lg shadow-black/10">
         <button
           type="button"
           onClick={dismiss}
@@ -50,10 +50,10 @@ export function WelcomeCard({ candidateCount }: { candidateCount: number }) {
         </button>
         <p className="pr-10 text-sm font-bold text-[var(--text-1)]">{t('dashboard.welcomeTitle')}</p>
         <p className="mt-1 text-sm text-[var(--text-2)]">{t('dashboard.welcomeBody')}</p>
-        <p className="mt-2 text-xs font-semibold text-[#534AB7]">{t('dashboard.welcomeTask')}</p>
+        <p className="mt-2 text-xs font-semibold text-brand">{t('dashboard.welcomeTask')}</p>
         <Link
           href="/pipeline"
-          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] px-4 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-[0.99]"
+          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-[0.99]"
         >
           <UserPlus className="h-4 w-4" strokeWidth={1.75} />
           {t('dashboard.welcomeAddCandidate')}

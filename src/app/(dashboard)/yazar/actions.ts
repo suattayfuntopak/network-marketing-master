@@ -1,13 +1,14 @@
 'use server'
 
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
+import { GEMINI_PRO, GEMINI_FLASH } from '@/lib/ai/models'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
 }
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -110,7 +111,7 @@ JSON yapısı şu şekilde olmalıdır:
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-pro',
+      model: GEMINI_PRO,
       systemInstruction: systemPrompt,
     })
 
@@ -217,7 +218,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-pro',
+      model: GEMINI_PRO,
       systemInstruction: systemPrompt,
     })
 
@@ -272,7 +273,7 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_FLASH,
       systemInstruction: systemPrompt,
     })
 

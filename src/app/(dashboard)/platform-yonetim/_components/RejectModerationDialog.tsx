@@ -46,7 +46,7 @@ export function RejectModerationDialog({ defaultReason, onConfirm, onCancel }: P
           value={reason}
           onChange={e => setReason(e.target.value)}
           rows={4}
-          className="mt-4 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
+          className="mt-4 w-full resize-y rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-brand focus:ring-2 focus:ring-[#EEEDFE]"
         />
         <div className="mt-4 flex gap-3">
           <button

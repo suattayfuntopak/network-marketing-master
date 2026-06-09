@@ -569,7 +569,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                           className={clsx(
                             'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2.5 text-[10px] sm:text-xs font-bold transition-all cursor-pointer min-w-0',
                             activeFieldTab === 'aiInvite'
-                              ? 'bg-[var(--bg-card)] text-[#534AB7] dark:text-indigo-300 shadow-sm border border-[var(--border)]'
+                              ? 'bg-[var(--bg-card)] text-brand dark:text-indigo-300 shadow-sm border border-[var(--border)]'
                               : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
                           )}
                         >
@@ -613,7 +613,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                   if (m.pipeline_id) router.push(`/pipeline/${m.pipeline_id}?nmmInvite=1`)
                                 }}
                                 disabled={!m.pipeline_id}
-                                className="inline-flex items-center gap-2 rounded-xl border border-[#534AB7]/30 dark:border-indigo-400/40 bg-[#534AB7]/5 dark:bg-indigo-400/10 text-[#534AB7] dark:text-indigo-300 hover:bg-[#534AB7]/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40 px-5 py-3 text-sm font-bold"
+                                className="inline-flex items-center gap-2 rounded-xl border border-brand/30 dark:border-indigo-400/40 bg-brand/5 dark:bg-indigo-400/10 text-brand dark:text-indigo-300 hover:bg-brand/10 dark:hover:bg-indigo-400/20 active:scale-95 transition cursor-pointer disabled:opacity-40 px-5 py-3 text-sm font-bold"
                               >
                                 <Bot className="h-5 w-5" />
                                 <span>{t('team.fieldAiInviteTab')}</span>
@@ -738,8 +738,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                           role="tabpanel"
                         >
                           {!hasMasterAccess && m.user_id !== ws.userId ? (
-                            <div className="rounded-2xl border border-[#534AB7]/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
-                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#534AB7]/10 mx-auto text-[#534AB7]">
+                            <div className="rounded-2xl border border-brand/30 bg-[#12111E]/40 p-6 text-center space-y-4 max-w-xl mx-auto my-3 backdrop-blur-xl">
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand/10 mx-auto text-brand">
                                 <Crown className="h-5 w-5 animate-bounce" />
                               </div>
                               <div>
@@ -756,7 +756,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                   e.stopPropagation()
                                   router.push('/odeme')
                                 }}
-                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
+                                className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
                               >
                                 <span>{t('team.upgradeToMaster')}</span>
                               </button>
@@ -874,7 +874,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={e => e.stopPropagation()}
-                                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366] px-6 py-3 text-sm font-bold text-white transition active:scale-95"
+                                className="inline-flex items-center gap-2 rounded-xl bg-whatsapp px-6 py-3 text-sm font-bold text-white transition active:scale-95"
                               >
                                 <WhatsAppIcon className="h-5 w-5 fill-current" />
                                 WhatsApp

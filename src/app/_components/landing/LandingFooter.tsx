@@ -13,7 +13,7 @@ export function LandingFooter() {
     <footer className="relative border-t border-slate-200/80 dark:border-white/[0.04] bg-slate-50 dark:bg-[#06070B] pt-16 pb-8 transition-colors duration-300 overflow-hidden">
       
       {/* Background Decorative Blur Orb */}
-      <div className="absolute bottom-[-100px] left-[50%] -translate-x-[50%] h-[250px] w-[500px] rounded-full bg-[#534AB7]/5 blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-[-100px] left-[50%] -translate-x-[50%] h-[250px] w-[500px] rounded-full bg-brand/5 blur-[80px] pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-12 border-b border-slate-200/60 dark:border-white/[0.03]">
@@ -40,17 +40,17 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/acilis#ozellikler" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#ozellikler" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'Features' : 'Özellikler'}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/acilis#nasil-calisir" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#nasil-calisir" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'How it Works' : 'Nasıl Çalışır?'}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/acilis#ucretlendirme" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#ucretlendirme" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'Pricing' : 'Fiyatlandırma'}
                   </Link>
                 </li>
@@ -64,17 +64,17 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/kvkk" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/kvkk" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {t('landingPage.footerKvkk')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/kullanim-kosullari" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/kullanim-kosullari" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {t('landingPage.footerTerms')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/guvenlik" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/guvenlik" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {t('landingPage.footerSecurity')}
                   </Link>
                 </li>
@@ -88,12 +88,12 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/giris" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/giris" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {t('landingPage.logIn')}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/kayit" className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200">
+                  <Link href="/kayit" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {t('landingPage.footerSignUp')}
                   </Link>
                 </li>
@@ -109,9 +109,9 @@ export function LandingFooter() {
                 <li>
                   <a
                     href="mailto:info@suattayfuntopak.com"
-                    className="hover:text-[#534AB7] dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5 group"
+                    className="hover:text-brand dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5 group"
                   >
-                    <Mail className="h-3.5 w-3.5 text-[#534AB7] dark:text-[#a09be8] group-hover:scale-110 transition-transform duration-200 shrink-0" />
+                    <Mail className="h-3.5 w-3.5 text-brand dark:text-[#a09be8] group-hover:scale-110 transition-transform duration-200 shrink-0" />
                     <span className="break-all md:break-normal text-[11px] sm:text-xs">info@suattayfuntopak.com</span>
                   </a>
                 </li>

@@ -6,6 +6,7 @@ import { REGISTER_URL } from '@/lib/domain/constants'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
+import { GEMINI_PRO, GEMINI_FLASH } from '@/lib/ai/models'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface CoachState {
@@ -96,7 +97,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-pro',
+      model: GEMINI_PRO,
       systemInstruction: `Sen deneyimli, sıcak bir network marketing liderisin. Saha tanıdığın bir kişiyi benimle Network Marketing Master (NMM) kullanmaya davet eden, kişiye özel bir WhatsApp mesajı yazıyorsun.
 Kurallar:
 1. Kişinin adıyla seslen; varsa notundaki bağlamı doğal şekilde kullan (zorlama yok).
@@ -134,7 +135,7 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-pro',
+      model: GEMINI_PRO,
       systemInstruction: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
 Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net bir özet ve hemen atılması gereken 1 cümlelik aksiyon planı üreteceksin.
 Ürettiğin yanıtı hem Türkçe hem İngilizce olarak hazırlayacak ve tam olarak şu formatta döneceksin:
@@ -193,7 +194,7 @@ export async function translateNoteAction(text: string): Promise<string> {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_FLASH,
       systemInstruction:
         'Translate the following Turkish text to natural English. Return ONLY the translated text, no explanations or quotation marks.',
     })
@@ -220,7 +221,7 @@ export async function translateEnToTrAction(text: string): Promise<string> {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: GEMINI_FLASH,
       systemInstruction:
         'Translate the following English text to natural Turkish. Return ONLY the translated text, no explanations or quotation marks.',
     })

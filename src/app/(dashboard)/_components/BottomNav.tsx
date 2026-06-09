@@ -79,14 +79,14 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
               active
                 ? isCrown
                   ? 'text-amber-500'
-                  : 'text-[#534AB7] dark:text-[#FACC15]'
+                  : 'text-brand dark:text-[#FACC15]'
                 : isCrown
                   ? 'font-medium text-amber-600/80 hover:text-amber-700 dark:text-amber-400/80 dark:hover:text-amber-300'
                   : 'text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400',
               pending &&
                 (isCrown
                   ? 'scale-110 text-amber-500 dark:text-amber-400'
-                  : 'scale-110 text-[#534AB7] dark:text-[#FACC15]'),
+                  : 'scale-110 text-brand dark:text-[#FACC15]'),
             )}
           >
             <span className="relative">

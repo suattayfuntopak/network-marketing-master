@@ -436,7 +436,7 @@ export function PlatformYonetimContent() {
                             target="_blank"
                             rel="noreferrer"
                             title={t('platformPage.shareInviteWhatsApp')}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-whatsapp/10 text-[#25D366] transition hover:bg-whatsapp hover:text-white"
                           >
                             <WhatsAppIcon className="h-3.5 w-3.5" />
                           </a>
@@ -449,7 +449,7 @@ export function PlatformYonetimContent() {
                         className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
                           isAdded
                             ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
-                            : 'bg-[#534AB7]/10 text-[#534AB7] dark:text-white dark:bg-white/10 hover:bg-[#534AB7] hover:text-white disabled:opacity-50'
+                            : 'bg-brand/10 text-brand dark:text-white dark:bg-white/10 hover:bg-brand hover:text-white disabled:opacity-50'
                         }`}
                       >
                         {addingId === w.workspaceId ? (
@@ -476,7 +476,7 @@ export function PlatformYonetimContent() {
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder={t('platformPage.searchPlaceholder')}
-            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-4 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
           />
         </div>
 
@@ -581,7 +581,7 @@ export function PlatformYonetimContent() {
                         <td className="px-2 py-2 text-center font-bold text-blue-600 dark:text-blue-400 tabular-nums">{w.candidateCount}</td>
 
                         {/* 5. Team count */}
-                        <td className="px-2 py-2 text-center font-bold text-[#534AB7] tabular-nums">{w.downlineCount}</td>
+                        <td className="px-2 py-2 text-center font-bold text-brand tabular-nums">{w.downlineCount}</td>
 
                         {/* 6. Sponsor linkage */}
                         <td className="px-2 py-2 font-semibold">
@@ -631,7 +631,7 @@ export function PlatformYonetimContent() {
                                       ? t('platformPage.shareInviteWhatsApp')
                                       : t('platformPage.openWhatsAppChat')
                                   }
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#25D366]/10 text-[#25D366] transition hover:bg-[#25D366] hover:text-white"
+                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-whatsapp/10 text-[#25D366] transition hover:bg-whatsapp hover:text-white"
                                 >
                                   <WhatsAppIcon className="h-4 w-4" />
                                 </a>
@@ -642,7 +642,7 @@ export function PlatformYonetimContent() {
                             <button
                               onClick={() => setSelectedWorkspace(w)}
                               title={t('platformPage.manageLicenseTitle')}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#534AB7]/10 text-[#534AB7] transition hover:bg-[#534AB7] hover:text-white"
+                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand transition hover:bg-brand hover:text-white"
                             >
                               <Plus className="h-4 w-4" />
                             </button>

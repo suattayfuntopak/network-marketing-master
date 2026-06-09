@@ -77,7 +77,7 @@ export function UserMenu() {
             className="h-7 w-7 rounded-full object-cover ring-1 ring-[#534AB7]/30"
           />
         ) : (
-          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EEEDFE] text-[10px] font-bold text-[#534AB7]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-subtle text-[10px] font-bold text-brand">
             {initials}
           </div>
         )}

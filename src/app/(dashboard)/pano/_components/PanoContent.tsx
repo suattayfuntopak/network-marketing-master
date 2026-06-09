@@ -8,6 +8,7 @@ import { PanoLauncherGrid } from './PanoLauncherGrid'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { formatPanoDateLine } from '@/lib/utils/calendarLocale'
 import { AccountStatusAlert } from './AccountStatusAlert'
+import { Skeleton } from '@/components/ui/Skeleton'
 
 export function PanoContent() {
   const { t, lang } = useTranslation()
@@ -42,7 +43,7 @@ export function PanoContent() {
 
       <header className="shrink-0 space-y-0.5 md:mt-5 md:text-left">
         {wsLoading ? (
-          <div className="h-7 w-56 animate-pulse rounded bg-[var(--bg-subtle)]" />
+          <Skeleton className="h-7 w-56" />
         ) : (
           <h1 className="text-lg font-bold text-[var(--text-1)] md:text-xl">
             {greetingIcon} {greeting} {firstName}

@@ -51,8 +51,8 @@ export function HedefKart() {
     return (
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 md:p-5">
         <div className="mb-3 flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#EEEDFE]">
-            <Target className="h-5 w-5 text-[#534AB7]" strokeWidth={1.75} />
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle">
+            <Target className="h-5 w-5 text-brand" strokeWidth={1.75} />
           </div>
           <div>
             <h3 className="text-sm font-bold text-[var(--text-1)]">{t('hedef.title')}</h3>
@@ -68,7 +68,7 @@ export function HedefKart() {
           value={people}
           onChange={e => setPeople(e.target.value)}
           placeholder={t('hedef.peoplePlaceholder')}
-          className="mb-3 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]"
+          className="mb-3 w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm text-[var(--text-1)] outline-none focus:border-brand focus:ring-2 focus:ring-[#EEEDFE]"
         />
 
         <label className="mb-1.5 block text-xs font-semibold text-[var(--text-2)]">{t('hedef.monthsLabel')}</label>
@@ -81,7 +81,7 @@ export function HedefKart() {
               className={clsx(
                 'rounded-lg px-3 py-1.5 text-xs font-semibold transition',
                 months === m
-                  ? 'bg-[#534AB7] text-white'
+                  ? 'bg-brand text-white'
                   : 'border border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
               )}
             >
@@ -95,7 +95,7 @@ export function HedefKart() {
             type="button"
             onClick={handleSave}
             disabled={isSaving || !people}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-2.5 text-sm font-semibold text-white hover:bg-[#453DA0] disabled:opacity-60"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-brand py-2.5 text-sm font-semibold text-white hover:bg-[#453DA0] disabled:opacity-60"
           >
             {isSaving ? t('hedef.calculating') : t('hedef.calculate')}
             {!isSaving && <Rocket className="h-4 w-4" />}
@@ -204,7 +204,7 @@ export function HedefKart() {
                 const rowClass = clsx(
                   'block w-full rounded-xl border px-2.5 py-2.5 text-left transition',
                   isCurrent &&
-                    'border-[#534AB7]/40 bg-[#EEEDFE]/50 shadow-sm dark:border-[#534AB7]/45 dark:bg-[#1e1b4b]/55',
+                    'border-brand/40 bg-brand-subtle/50 shadow-sm dark:border-brand/45 dark:bg-[#1e1b4b]/55',
                   isPast &&
                     'border-emerald-200/80 bg-emerald-50/70 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:hover:border-emerald-700/60',
                   isFuture && 'border-[var(--border)] bg-[var(--bg-subtle)]/45 opacity-80',

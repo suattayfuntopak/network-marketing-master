@@ -17,9 +17,47 @@ export async function fetchCandidatesAction(workspaceId: string): Promise<NmmCan
     .eq('workspace_id', workspaceId)
     .eq('owner_id', user.id)
     .order('updated_at', { ascending: false })
+    .limit(1_000)
 
   if (error) throw new Error(error.message)
   return (data ?? []) as NmmCandidate[]
+}
+
+/**
+ * Cursor-based sayfalama — Kanban yerine düz liste kullanan görünümler için.
+ * cursor = önceki sayfanın son satırının updated_at ISO string'i.
+ */
+export async function fetchCandidatesPageAction(
+  workspaceId: string,
+  cursor?: string,
+): Promise<{ rows: NmmCandidate[]; hasMore: boolean; nextCursor: string | null }> {
+  const PAGE = 50
+  const supabase = await createClient()
+  const { user, error: userError } = await getAuthUser()
+  if (userError || !user) throw new Error('Oturum bulunamadı.')
+
+  let query = supabase
+    .from('nmm_candidates')
+    .select(CANDIDATE_LIST_SELECT)
+    .eq('workspace_id', workspaceId)
+    .eq('owner_id', user.id)
+    .order('updated_at', { ascending: false })
+    .limit(PAGE + 1)
+
+  if (cursor) query = query.lt('updated_at', cursor)
+
+  const { data, error } = await query
+  if (error) throw new Error(error.message)
+
+  const rows = (data ?? []) as NmmCandidate[]
+  const hasMore = rows.length > PAGE
+  if (hasMore) rows.pop()
+
+  return {
+    rows,
+    hasMore,
+    nextCursor: hasMore ? rows[rows.length - 1].updated_at : null,
+  }
 }
 
 /** Pipeline detay — tek aday, tam satır. */

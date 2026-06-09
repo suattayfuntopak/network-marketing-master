@@ -22,7 +22,7 @@ type Props = {
 }
 
 const inputCls =
-  'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-[#534AB7] transition'
+  'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-brand transition'
 const labelCls = 'text-xs font-bold text-[var(--text-2)]'
 
 export function VideoEditModal({ editing, onClose, onSaved }: Props) {

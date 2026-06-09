@@ -192,7 +192,7 @@ export function OdemeClient() {
             onClick={() => setBillingPeriod('monthly')}
             className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
               billingPeriod === 'monthly'
-                ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
                 : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
             }`}
           >
@@ -203,7 +203,7 @@ export function OdemeClient() {
             onClick={() => setBillingPeriod('yearly')}
             className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
               billingPeriod === 'yearly'
-                ? 'bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white shadow-md'
+                ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
                 : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
             }`}
           >
@@ -310,7 +310,7 @@ export function OdemeClient() {
         </div>
 
         {/* Plus Plan */}
-        <div className="rounded-3xl border border-[#534AB7]/35 bg-[var(--bg-card)] dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/20 dark:ring-[#534AB7]/30 shadow-lg shadow-indigo-500/5 dark:shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-[#534AB7]/50 transition duration-300">
+        <div className="rounded-3xl border border-brand/35 bg-[var(--bg-card)] dark:bg-[#12111E]/40 p-8 flex flex-col justify-between relative ring-2 ring-[#534AB7]/20 dark:ring-[#534AB7]/30 shadow-lg shadow-indigo-500/5 dark:shadow-[0_20px_50px_rgba(83,74,183,0.15)] hover:border-brand/50 transition duration-300">
           <div className="absolute right-6 top-6 flex items-center gap-2">
             {isPlusActive && (
               <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -387,7 +387,7 @@ export function OdemeClient() {
             <button
               onClick={() => handlePayment('plus')}
               disabled={loading || (billingPeriod === 'monthly' ? isPlusActive : false)}
-              className={`w-full text-center rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
+              className={`w-full text-center rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
                 isPlusActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >

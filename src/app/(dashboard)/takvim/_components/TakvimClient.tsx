@@ -198,7 +198,7 @@ export function TakvimClient() {
   if (!mounted || !ws?.workspaceId) {
     return (
       <div className="flex h-48 flex-col items-center justify-center gap-2">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
       </div>
     )
   }
@@ -282,7 +282,7 @@ export function TakvimClient() {
           <button
             type="button"
             onClick={goToToday}
-            className="flex shrink-0 items-center gap-1 rounded-xl bg-[#EEEDFE] dark:bg-[#534AB7]/15 px-2.5 py-1.5 text-xs font-semibold text-[#534AB7] dark:text-[var(--text-1)] transition hover:bg-[#534AB7]/15 dark:hover:bg-[#534AB7] dark:hover:text-white"
+            className="flex shrink-0 items-center gap-1 rounded-xl bg-brand-subtle dark:bg-brand/15 px-2.5 py-1.5 text-xs font-semibold text-brand dark:text-[var(--text-1)] transition hover:bg-brand/15 dark:hover:bg-brand dark:hover:text-white"
           >
             <RotateCcw className="h-3.5 w-3.5" />
             {t('pagesUi.backToToday')}
@@ -326,8 +326,8 @@ export function TakvimClient() {
                 type="button"
                 onClick={() => setSelected(key)}
                 className={`relative flex flex-col items-center justify-center rounded-xl py-2 text-sm font-medium transition-colors
-                  ${isSelected ? 'bg-[#534AB7] text-white' :
-                    isToday ? 'bg-[#EEEDFE] text-[#534AB7]' :
+                  ${isSelected ? 'bg-brand text-white' :
+                    isToday ? 'bg-brand-subtle text-brand' :
                     isOverdue ? 'text-[#72243E]' :
                     'text-[var(--text-1)] hover:bg-[var(--bg-subtle)]'}
                   ${isPast && !isOverdue ? 'opacity-40' : ''}`}
@@ -337,7 +337,7 @@ export function TakvimClient() {
                   <span className={`mt-0.5 h-1 w-1 rounded-full ${
                     isSelected ? 'bg-white' :
                     isOverdue ? 'bg-[#72243E]' :
-                    'bg-[#534AB7] dark:bg-white/90'
+                    'bg-brand dark:bg-white/90'
                   }`} />
                 )}
               </button>
@@ -370,7 +370,7 @@ export function TakvimClient() {
               <button
                 type="button"
                 onClick={() => selectCalendarDate(nearestDay)}
-                className="mt-3 inline-flex items-center gap-1 rounded-full bg-[#EEEDFE] dark:bg-[#534AB7]/15 px-3 py-1.5 text-xs font-semibold text-[#534AB7] dark:text-[var(--text-1)] transition hover:bg-[#534AB7]/15 dark:hover:bg-[#534AB7] dark:hover:text-white"
+                className="mt-3 inline-flex items-center gap-1 rounded-full bg-brand-subtle dark:bg-brand/15 px-3 py-1.5 text-xs font-semibold text-brand dark:text-[var(--text-1)] transition hover:bg-brand/15 dark:hover:bg-brand dark:hover:text-white"
               >
                 {t('pagesUi.nearestFollowUp', {
                   date: formatCalendarDayKey(nearestDay, lang),
@@ -418,7 +418,7 @@ export function TakvimClient() {
                 className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]"
               >
                 <span className="text-sm text-[var(--text-1)]">{formatCalendarDayKey(k, lang)}</span>
-                <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
+                <span className="rounded-full bg-brand-subtle px-2.5 py-0.5 text-xs font-semibold text-brand">
                   {byDate[k].length}{' '}
                   {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
                 </span>
@@ -445,7 +445,7 @@ export function TakvimClient() {
                   className="flex w-full items-center justify-between rounded-xl bg-[var(--bg-subtle)] px-4 py-3 text-left transition hover:bg-[var(--border)]"
                 >
                   <span className="text-sm text-[var(--text-1)]">{formatCalendarDayKey(k, lang)}</span>
-                  <span className="rounded-full bg-[#EEEDFE] px-2.5 py-0.5 text-xs font-semibold text-[#534AB7]">
+                  <span className="rounded-full bg-brand-subtle px-2.5 py-0.5 text-xs font-semibold text-brand">
                     {byDate[k].length}{' '}
                     {byDate[k].length === 1 ? t('pagesUi.prospectSingular') : t('pagesUi.prospectPlural')}
                   </span>

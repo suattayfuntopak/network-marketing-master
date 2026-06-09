@@ -24,8 +24,8 @@ const STAGE_THEME: Record<CandidateStage, { badge: string; card: string }> = {
     card: 'bg-[#E8F0FE] text-[#1A56DB] dark:bg-[#0a1f4d]/40 dark:text-[#93c5fd]',
   },
   iletisim: {
-    badge: 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e] dark:text-[#a09be8]',
-    card: 'bg-[#EEEDFE] text-[#534AB7] dark:bg-[#2d2a5e]/40 dark:text-[#a09be8]',
+    badge: 'bg-brand-subtle text-brand dark:bg-[#2d2a5e] dark:text-[#a09be8]',
+    card: 'bg-brand-subtle text-brand dark:bg-[#2d2a5e]/40 dark:text-[#a09be8]',
   },
   davetli: {
     badge: 'bg-[#FEF0EC] text-[#C03E1F] dark:bg-[#3d1409] dark:text-[#fca87d]',

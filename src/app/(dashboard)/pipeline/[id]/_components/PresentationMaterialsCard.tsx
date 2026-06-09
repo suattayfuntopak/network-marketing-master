@@ -66,13 +66,13 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 text-sm">
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
-          <Presentation className="h-3.5 w-3.5 text-[#534AB7]" />
+          <Presentation className="h-3.5 w-3.5 text-brand" />
           {t('pipeline.presentationMaterials')}
         </p>
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/pipeline/sunum-materyalleri"
-            className="text-xs font-semibold text-[#534AB7] hover:underline whitespace-nowrap dark:text-[#F5F0E8] dark:hover:text-[#FFF8DC]"
+            className="text-xs font-semibold text-brand hover:underline whitespace-nowrap dark:text-[#F5F0E8] dark:hover:text-[#FFF8DC]"
           >
             {t('presentationMaterialsPage.manageLink')}
           </Link>
@@ -109,7 +109,7 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
             <select
               value={activeMaterial?.id ?? ''}
               onChange={e => setSelectedMaterialId(e.target.value)}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-[#534AB7] focus:ring-2 focus:ring-[#534AB7]/15"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg)] px-3 py-2.5 text-base text-[var(--text-1)] outline-none focus:border-brand focus:ring-2 focus:ring-[#534AB7]/15"
             >
               {presentationMaterials.map(material => (
                 <option key={material.id} value={material.id}>
@@ -142,7 +142,7 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
           type="button"
           disabled={!candidatePhoneClean || !activeMaterial}
           onClick={handleSendWhatsApp}
-          className="flex w-1/3 items-center justify-center gap-1.5 rounded-2xl bg-[#25D366] py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center disabled:pointer-events-none disabled:opacity-40 cursor-pointer shadow-md hover:shadow-green-500/20"
+          className="flex w-1/3 items-center justify-center gap-1.5 rounded-2xl bg-whatsapp py-4 text-sm font-semibold text-white transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center disabled:pointer-events-none disabled:opacity-40 cursor-pointer shadow-md hover:shadow-green-500/20"
         >
           <WhatsAppIcon className="h-4 w-4 shrink-0" />
           WhatsApp

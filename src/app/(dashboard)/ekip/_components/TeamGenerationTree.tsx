@@ -51,7 +51,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
           <p className="text-sm text-[var(--text-2)]">{t('team.treeEmpty')}</p>
           <Link
             href="/ekip?tab=tools"
-            className="mt-3 inline-block text-xs font-semibold text-[#534AB7] hover:underline"
+            className="mt-3 inline-block text-xs font-semibold text-brand hover:underline"
           >
             {t('team.treeInviteCta')}
           </Link>
@@ -74,7 +74,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
                 )}
               </div>
               {node.generation === 0 && (
-                <span className="shrink-0 rounded-full bg-[#EEEDFE] px-2 py-0.5 text-[10px] font-bold text-[#534AB7]">
+                <span className="shrink-0 rounded-full bg-brand-subtle px-2 py-0.5 text-[10px] font-bold text-brand">
                   {t('team.treeYou')}
                 </span>
               )}

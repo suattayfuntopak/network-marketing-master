@@ -187,7 +187,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t('common.searchPlaceholder')}
-              className="h-10 w-full rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] pl-10 pr-12 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition-[border-color,box-shadow] focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
+              className="h-10 w-full rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] pl-10 pr-12 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition-[border-color,box-shadow] focus:border-brand focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
             />
             <kbd className="absolute right-3.5 top-1/2 hidden -translate-y-1/2 rounded-md border border-[var(--border)] bg-[var(--bg-card)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--text-3)] sm:inline-block">
               ⌘K

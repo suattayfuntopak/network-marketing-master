@@ -5,6 +5,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getEffectiveLicenseType, getLimitsForLicense, normalizeLicenseType } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/domain/auth'
+import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
 
 export type AIActionType = 'message' | 'roleplay' | 'compliance'
 
@@ -52,9 +53,10 @@ export async function checkAIQuota(
 
   const superAdmin = isSuperAdmin(user)
 
+  // Single JOIN: workspace_members → workspaces eliminates a serial round-trip.
   const { data: membership } = await supabase
     .from('nmm_workspace_members')
-    .select('workspace_id')
+    .select('workspace_id, nmm_workspaces!nmm_workspace_members_workspace_id_fkey(license_type, license_expires_at, created_at)')
     .eq('user_id', user.id)
     .maybeSingle()
 
@@ -62,11 +64,9 @@ export async function checkAIQuota(
   let licenseExpiresAt: string | null = null
   let workspaceCreatedAt: string | null = null
   if (membership) {
-    const { data: ws } = await supabase
-      .from('nmm_workspaces')
-      .select('license_type, license_expires_at, created_at')
-      .eq('id', membership.workspace_id)
-      .maybeSingle()
+    const ws = Array.isArray(membership.nmm_workspaces)
+      ? membership.nmm_workspaces[0]
+      : membership.nmm_workspaces
     if (ws) {
       licenseType = ws.license_type ?? 'free'
       licenseExpiresAt = ws.license_expires_at ?? null
@@ -121,15 +121,14 @@ export async function checkAIQuota(
 
   let used = 0
   if (!superAdmin) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
+    const dayStartIso = istanbulDayStartIso(todayCalendarKey())
 
     let query = supabase
       .from('nmm_daily_actions')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .eq('action_type', 'ai_generate')
-      .gte('created_at', today.toISOString())
+      .gte('created_at', dayStartIso)
 
     if (actionType === 'roleplay') {
       query = query.eq('note', 'roleplay')

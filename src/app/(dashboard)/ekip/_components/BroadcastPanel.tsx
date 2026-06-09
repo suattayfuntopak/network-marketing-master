@@ -225,7 +225,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                             ? <CheckSquare className="h-4 w-4 text-brand" />
                             : <Square className="h-4 w-4" />}
                         </button>
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#EEEDFE] text-xs font-bold text-brand">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand">
                           {(m.full_name ?? '?').charAt(0).toUpperCase()}
                         </span>
                         <span className="flex-1 truncate text-sm font-semibold text-[var(--text-1)]">

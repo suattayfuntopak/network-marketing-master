@@ -231,7 +231,7 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
                 href={waHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-2.5 text-xs font-bold text-white transition hover:opacity-90 active:scale-95"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-whatsapp px-4 py-2.5 text-xs font-bold text-white transition hover:opacity-90 active:scale-95"
               >
                 <WhatsAppIcon className="h-4 w-4" />
                 {t('paymentPage.bankNotifyWhatsapp')}

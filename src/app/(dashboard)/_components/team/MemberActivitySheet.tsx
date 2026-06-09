@@ -14,7 +14,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
-import { HubCrownFunnelGrid } from '@/lib/ui/hub/HubCrownFunnelGrid'
+import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import {
@@ -445,7 +445,7 @@ export function MemberActivitySheet({
                 href={waLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#25D366] py-2.5 text-sm font-bold text-white transition active:scale-[0.98]"
+                className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-whatsapp py-2.5 text-sm font-bold text-white transition active:scale-[0.98]"
               >
                 <WhatsAppIcon className="h-4 w-4 fill-current" />
                 WhatsApp

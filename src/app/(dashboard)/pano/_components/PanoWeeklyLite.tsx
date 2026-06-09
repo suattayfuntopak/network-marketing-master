@@ -49,7 +49,7 @@ export function PanoWeeklyLite() {
         <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
           {t('shellUi.last7DaysTrend')}
         </p>
-        <span className="text-xs font-bold text-[#534AB7]">
+        <span className="text-xs font-bold text-brand">
           {total} {t('shellUi.candidatesLabel')}
         </span>
       </div>
@@ -61,7 +61,7 @@ export function PanoWeeklyLite() {
             </span>
             <div
               className={`w-full rounded-t-md transition-all ${
-                b.isToday ? 'bg-[#534AB7]' : 'bg-[#EEEDFE] dark:bg-[#534AB7]/25'
+                b.isToday ? 'bg-brand' : 'bg-brand-subtle dark:bg-brand/25'
               }`}
               style={{
                 height: `${Math.max((b.count / max) * 40, b.count > 0 ? 6 : 2)}px`,
@@ -69,7 +69,7 @@ export function PanoWeeklyLite() {
             />
             <span
               className={`text-[9px] font-semibold ${
-                b.isToday ? 'text-[#534AB7]' : 'text-[var(--text-3)]'
+                b.isToday ? 'text-brand' : 'text-[var(--text-3)]'
               }`}
             >
               {b.label}
@@ -79,7 +79,7 @@ export function PanoWeeklyLite() {
       </div>
       <Link
         href="/istatistikler"
-        className="mt-3 inline-block text-xs font-medium text-[#534AB7] hover:underline"
+        className="mt-3 inline-block text-xs font-medium text-brand hover:underline"
       >
         {t('dashboard.weeklyLiteLink')}
       </Link>

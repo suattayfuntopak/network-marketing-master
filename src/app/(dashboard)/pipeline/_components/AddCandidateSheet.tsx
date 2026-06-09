@@ -13,7 +13,7 @@ import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
 
-const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE]'
+const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE]'
 const labelClass = 'mb-1.5 block text-sm font-medium text-[var(--text-1)]'
 
 interface AddCandidateSheetProps {
@@ -155,7 +155,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60`}
+                className={`absolute bottom-0 right-0 ${Z.cardControls} flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white shadow-md transition hover:bg-[#453DA0] disabled:opacity-60`}
                 title="Fotoğraf Yükle"
               >
                 {uploadingPhoto ? (
@@ -170,7 +170,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingPhoto}
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[#EEEDFE] hover:text-[#534AB7] disabled:opacity-60"
+                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand disabled:opacity-60"
               >
                 <Upload className="h-3.5 w-3.5" />
                 Fotoğraf Seç
@@ -243,7 +243,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
           {add.isError && (
             <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">Kişi eklenemedi. Tekrar dene.</p>
           )}
-          <button type="submit" disabled={add.isPending || uploadingPhoto} className="w-full rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
+          <button type="submit" disabled={add.isPending || uploadingPhoto} className="w-full rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
             {add.isPending || uploadingPhoto ? (
               <span className="flex items-center justify-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" /> Ekleniyor...

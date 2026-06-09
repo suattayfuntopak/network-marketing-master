@@ -42,7 +42,7 @@ export function LandingRoiCalculator() {
             </label>
             <div className="flex items-center justify-between">
               <span className="text-3xl font-black text-slate-900 dark:text-white">{teamSize}</span>
-              <span className="text-xs font-bold text-[#534AB7] bg-[#EEEDFE]/10 px-2.5 py-1 rounded-lg">
+              <span className="text-xs font-bold text-brand bg-brand-subtle/10 px-2.5 py-1 rounded-lg">
                 {t('landingPage.roiPartners')}
               </span>
             </div>
@@ -103,7 +103,7 @@ export function LandingRoiCalculator() {
               {t('landingPage.roiHoursLabel')}
             </p>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-black text-[#534AB7]">{calculatedSavedHours} {t('landingPage.roiHoursUnit')}</span>
+              <span className="text-3xl font-black text-brand">{calculatedSavedHours} {t('landingPage.roiHoursUnit')}</span>
             </div>
             <p className="text-[11px] text-slate-500 dark:text-zinc-500">
               {t('landingPage.roiHoursDesc')}

@@ -217,7 +217,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
         {fetching ? (
           <div className="flex h-48 flex-col items-center justify-center gap-2">
-            <Loader2 className="h-8 w-8 animate-spin text-[#534AB7]" />
+            <Loader2 className="h-8 w-8 animate-spin text-brand" />
             <p className="text-sm text-[var(--text-2)]">Yükleniyor...</p>
           </div>
         ) : (
@@ -236,7 +236,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                     className="h-20 w-20 rounded-full object-cover ring-2 ring-[#534AB7]/30"
                   />
                 ) : (
-                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#EEEDFE] text-2xl font-bold text-[#534AB7]">
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-subtle text-2xl font-bold text-brand">
                     {initials}
                   </div>
                 )}
@@ -244,7 +244,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingAvatar}
-                  className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-[#534AB7] text-white shadow-md transition hover:bg-[#433a9f] disabled:opacity-60"
+                  className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full bg-brand text-white shadow-md transition hover:bg-[#433a9f] disabled:opacity-60"
                   title="Fotoğraf değiştir"
                 >
                   {uploadingAvatar
@@ -274,7 +274,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   value={fullName}
                   onChange={e => setFullName(e.target.value)}
                   placeholder="Örn: Ayşe Yılmaz"
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
                 />
               </div>
             </div>
@@ -290,7 +290,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   placeholder="ornek@domain.com"
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
                 />
               </div>
             </div>
@@ -311,7 +311,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                     onChange={e => setPassword(e.target.value)}
                     placeholder="En az 6 karakter"
                     minLength={6}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
                   />
                 </div>
               </div>
@@ -325,7 +325,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
                     onChange={e => setPasswordConfirm(e.target.value)}
                     placeholder="Şifreyi onaylayın"
                     minLength={6}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#534AB7] focus:ring-1 focus:ring-[#534AB7] transition-all"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand focus:ring-1 focus:ring-[#534AB7] transition-all"
                   />
                 </div>
               </div>
@@ -335,7 +335,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
             <button
               type="submit"
               disabled={loading}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#534AB7] py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#433a9f] active:scale-95 disabled:opacity-50 disabled:active:scale-100"
             >
               {loading ? (
                 <><Loader2 className="h-4 w-4 animate-spin" />Güncelleniyor...</>

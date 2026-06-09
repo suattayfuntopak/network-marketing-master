@@ -68,7 +68,7 @@ export function HubPriorityStrip() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => markContacted.mutate({ id: c.id, actionType: 'whatsapp' })}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#25D366]/30 bg-[#25D366]/5 text-[#128C7E] transition hover:bg-[#25D366]/10"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#25D366]/30 bg-whatsapp/5 text-[#128C7E] transition hover:bg-whatsapp/10"
                     title={t('crown.openWa')}
                   >
                     <WhatsAppIcon className="h-3.5 w-3.5" />

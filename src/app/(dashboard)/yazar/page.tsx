@@ -45,7 +45,7 @@ export default function YazarPage({ searchParams }: PageProps) {
             <button
               type="button"
               onClick={() => openUpgrade('ai_coach')}
-              className="mt-4 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+              className="mt-4 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-5 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
             >
               {t('shellUi.upgradeBannerCta')}
             </button>

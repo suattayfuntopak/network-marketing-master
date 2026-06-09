@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { AlertTriangle, Sparkles, X } from 'lucide-react'
+import { AlertTriangle, Sparkles, Rocket, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getAccountLifecycle } from '@/lib/domain/accountLifecycle'
@@ -51,7 +51,7 @@ export function AccountStatusAlert() {
     : t('shellUi.accountAlertFreeTitle')
   const bannerClass = isTrial
     ? 'from-[#D97706] to-[#B45309] shadow-amber-900/30'
-    : 'from-[#534AB7]/90 to-[#7c3aed]/90 shadow-indigo-900/25'
+    : 'from-brand-indigo to-brand-accent shadow-indigo-900/30'
 
   return (
     <>
@@ -62,7 +62,10 @@ export function AccountStatusAlert() {
       >
         <div className="flex items-center gap-2.5 sm:gap-3">
           <span className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white/15 text-white">
-            <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.25} />
+            {isTrial
+              ? <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2.25} />
+              : <Rocket className="h-4 w-4 sm:h-5 sm:w-5" strokeWidth={2} />
+            }
           </span>
           <p className="flex-1 text-[11px] sm:text-xs font-black uppercase tracking-wide text-white leading-snug">
             {bannerTitle}
@@ -156,7 +159,7 @@ export function AccountStatusAlert() {
               <Link
                 href="/odeme"
                 onClick={() => setOpen(false)}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-[#534AB7] to-[#7c3aed] px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
               >
                 <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 {t('shellUi.upgradeBannerCta')}

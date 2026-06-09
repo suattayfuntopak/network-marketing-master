@@ -103,14 +103,14 @@ export function PipelinePageContent() {
         <div className="flex items-center gap-2 shrink-0">
           <Link
             href="/pipeline/sunum-materyalleri"
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:border-[#534AB7]/40 hover:text-[#534AB7] dark:hover:bg-[#534AB7] dark:hover:border-[#534AB7] dark:hover:text-white"
+            className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 text-xs font-semibold text-[var(--text-2)] transition hover:border-brand/40 hover:text-brand dark:hover:bg-brand dark:hover:border-brand dark:hover:text-white"
           >
             <Presentation className="h-4 w-4" />
             {t('presentationMaterialsPage.title')}
           </Link>
           <button
             onClick={() => setSheetOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#534AB7] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
+            className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] active:scale-95 shadow-md"
           >
             <Plus className="h-4 w-4" />
             {t('pipeline.addCandidate')}
@@ -123,8 +123,8 @@ export function PipelinePageContent() {
           onClick={() => setFilter('tumü')}
           className={`rounded-2xl p-3 text-center border transition-all hover:scale-[1.02] active:scale-95 ${
             filter === 'tumü'
-              ? 'bg-[var(--bg-subtle)] border-[#534AB7] ring-2 ring-[#534AB7]/20 shadow-md shadow-[#534AB7]/5'
-              : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-[#534AB7]/40'
+              ? 'bg-[var(--bg-subtle)] border-brand ring-2 ring-[#534AB7]/20 shadow-md shadow-[#534AB7]/5'
+              : 'bg-[var(--bg-subtle)] border-[var(--border)] hover:border-brand/40'
           }`}
         >
           <p className="text-xl font-bold text-[var(--text-1)]">{counts.tumü}</p>
@@ -172,7 +172,7 @@ export function PipelinePageContent() {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder={t('pipeline.searchCandidate')}
-          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-9 pr-9 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#534AB7] focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
+          className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] py-2.5 pl-9 pr-9 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE] dark:focus:ring-[#534AB7]/10"
         />
         {searchQuery && (
           <button
@@ -230,7 +230,7 @@ function PageShell({ children }: { children: React.ReactNode }) {
 function Spinner() {
   return (
     <div className="flex justify-center py-12">
-      <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#534AB7] border-t-transparent" />
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
     </div>
   )
 }

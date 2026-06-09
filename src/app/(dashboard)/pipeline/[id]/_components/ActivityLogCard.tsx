@@ -49,9 +49,9 @@ function ActivityLogCardBody({ candidateId, workspaceId }: Props) {
           {(showAllActivity ? activityLog : activityLog.slice(0, 5)).map(a => (
             <li key={a.id} className="group flex items-start gap-2.5 text-sm py-0.5 animate-in fade-in duration-200">
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] mt-0.5">
-                {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-[#534AB7]" />}
+                {a.action_type === 'call'         && <PhoneCall className="h-3.5 w-3.5 text-brand" />}
                 {a.action_type === 'whatsapp'     && <WhatsAppIcon className="h-3.5 w-3.5 text-[#25D366]" />}
-                {a.action_type === 'ai_generate'   && <Bot className="h-3.5 w-3.5 text-[#534AB7]" />}
+                {a.action_type === 'ai_generate'   && <Bot className="h-3.5 w-3.5 text-brand" />}
                 {a.action_type === 'note'         && <Pencil className="h-3.5 w-3.5 text-[var(--text-3)]" />}
                 {a.action_type === 'stage_change' && <ArrowRight className="h-3.5 w-3.5 text-[#854F0B]" />}
               </span>
@@ -77,7 +77,7 @@ function ActivityLogCardBody({ candidateId, workspaceId }: Props) {
           <button
             type="button"
             onClick={() => setShowAllActivity(!showAllActivity)}
-            className="w-full text-center text-xs font-bold text-[#534AB7] hover:underline pt-2 border-t border-[var(--border)] transition active:scale-95"
+            className="w-full text-center text-xs font-bold text-brand hover:underline pt-2 border-t border-[var(--border)] transition active:scale-95"
           >
             {showAllActivity
               ? t('pipelinePage.showLess')
