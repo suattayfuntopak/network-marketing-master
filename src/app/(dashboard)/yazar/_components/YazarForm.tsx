@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
-import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock } from 'lucide-react'
+import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock, Lock } from 'lucide-react'
 import { generateMessageAction, translateTextAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -21,6 +21,7 @@ import { Z } from '@/lib/ui/zIndex'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { displayDailyActionNote, isLeaderUserNote, getWhatsAppActivityDisplay } from '@/lib/domain/dailyActionNote'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -169,6 +170,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
   const [translating, setTranslating] = useState(false)
 
   const { data: ws } = useWorkspace()
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const {
     limits,
     isSuperAdmin,
@@ -514,7 +516,17 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">{state.error}</p>
         )}
 
-        {limitReached ? (
+        {!hasAiFieldAccess ? (
+          <button
+            type="button"
+            onClick={() => openUpgrade('ai_field')}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E56] py-3.5 text-sm font-semibold text-white transition hover:bg-[#0a5a44]"
+            title={t('pagesUi.unlockAiBasic')}
+          >
+            <Lock className="h-4 w-4" />
+            {t('pagesUi.unlockAiBasic')}
+          </button>
+        ) : limitReached ? (
           <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E]">
             {t('coachUi.dailyLimitMessage', { limit: activeMessageLimit })}
           </div>
@@ -625,6 +637,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
           )}
         </div>
       )}
+      {UpgradePrompt}
     </div>
   )
 }

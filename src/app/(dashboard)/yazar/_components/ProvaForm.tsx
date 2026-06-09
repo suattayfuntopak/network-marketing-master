@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import {
   Phone, Shield, BarChart3, Target, Clock, Users, RefreshCw,
   UserCheck, Heart, UserPlus, ArrowLeft, Send, Sparkles, Loader2,
-  Compass, type LucideIcon
+  Compass, Lock, type LucideIcon
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { pickLangField } from '@/lib/utils/pickLang'
@@ -14,6 +14,7 @@ import { useAILimits } from '@/hooks/useAILimits'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 
 interface Scenario {
   id: string
@@ -263,6 +264,7 @@ export function ProvaForm() {
   const [isPending, setIsPending] = useState(false)
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
+  const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { isSuperAdmin, roleplayUsed, limits } = useAILimits()
   const roleplayLimit = limits.roleplayLimit
 
@@ -299,6 +301,7 @@ export function ProvaForm() {
 
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
+    if (!hasAiCoachAccess) { openUpgrade('ai_coach'); return }
     if (!inputValue.trim() || isPending || !activeScenario) return
 
     const userMessage = inputValue.trim()
@@ -364,6 +367,7 @@ export function ProvaForm() {
   if (activeScenario) {
     const scTitle = pickLangField(activeScenario.titleTr, activeScenario.titleEn, lang as 'tr' | 'en')
     return (
+      <>
       <div className="w-full bg-[var(--bg-card)] border border-[var(--border)] rounded-3xl p-5 shadow-xl animate-in fade-in zoom-in duration-200">
         
         {/* Chat Header */}
@@ -494,14 +498,20 @@ export function ProvaForm() {
           <button
             type="submit"
             disabled={!inputValue.trim() || isPending}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#D97706] text-white shadow-md transition hover:bg-[#b45309] active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#D97706] text-white shadow-md transition hover:bg-[#b45309] active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
+            title={!hasAiCoachAccess ? t('pagesUi.unlockAiBasic') : undefined}
           >
             <Send className="h-4 w-4" />
+            {!hasAiCoachAccess && (
+              <Lock className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-white/80" strokeWidth={2.5} aria-hidden />
+            )}
           </button>
         </form>
 
         {/* Usage notification */}
       </div>
+      {UpgradePrompt}
+      </>
     )
   }
 

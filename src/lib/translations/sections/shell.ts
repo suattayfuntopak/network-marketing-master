@@ -24,10 +24,10 @@ export const shellSection = {
       view: 'Görüntüle',
       last7DaysTrend: 'Son 7 Gün — Yeni Aday Trendi',
       candidatesLabel: 'aday',
-      upgradeBannerTrialTitle: 'Deneme süreniz aktif — planınızı yükseltin',
-      upgradeBannerTrialDesc: 'Plus veya Pro ile ekibinizi büyütün, daha yüksek günlük YZ kredileri ve uyum denetimi limitlerine geçin.',
-      upgradeBannerExpiredTitle: 'Deneme süreniz sona erdi',
-      upgradeBannerExpiredDesc: 'Basic, Plus veya Pro planlardan birini seçerek tüm özelliklere ve günlük YZ kredilerine devam edin.',
+      upgradeBannerTrialTitle: '14 günlük ücretsiz Basic denemeniz aktif',
+      upgradeBannerTrialDesc: 'Deneme süresi boyunca tüm AI araçlarına erişebilirsiniz. Süre bitince NMM kullanımınız devam eder; AI için Basic veya üzeri bir plan seçebilirsiniz.',
+      upgradeBannerExpiredTitle: 'Denemeniz sona erdi — AI kilitlendi, NMM devam ediyor',
+      upgradeBannerExpiredDesc: 'Boru hattı, takvim, eğitimler ve ekibiniz açık kalmaya devam ediyor. Yapay zekayı yeniden açmak için Basic, Plus veya Pro planını seçin.',
       upgradeBannerCta: 'Planları Gör & Yükselt',
       upgradeMenuTrialTitle: 'Planı Yükselt',
       upgradeMenuExpiredTitle: 'Planı Yükselt',
@@ -61,9 +61,9 @@ export const shellSection = {
       accountAlertEyebrow: 'Önemli',
       accountAlertTitle: 'HESAP DURUMU İLE İLGİLİ ÖNEMLİ DUYURU!',
       accountAlertFreeTitle: 'Harika bir başlangıç yaptın — planını seç, büyümeye devam et',
-      accountAlertTrialTitle: 'Tanıtım dönemin {days} gün sonra bitiyor — planları gör',
-      accountAlertTrialTitleLast: 'Tanıtım dönemin bugün/yarın bitiyor — planları gör',
-      accountAlertLockedTitle: 'Yapay Zeka Koçu kilitli — plan seçerek açın',
+      accountAlertTrialTitle: 'Ücretsiz Basic denemen {days} gün sonra bitiyor — planları gör',
+      accountAlertTrialTitleLast: 'Ücretsiz Basic denemen bugün/yarın bitiyor — planları gör',
+      accountAlertLockedTitle: 'AI kilitlendi — NMM kullanımın devam ediyor, plan seçerek AI\'ı aç',
       accountAlertTap: 'Detayları gör',
       accountAlertClose: 'Kapat',
       accountModalTitle: 'HESAP BİLGİLERİNİZ',
@@ -72,7 +72,7 @@ export const shellSection = {
       accountModalFreeAccess:
         'Ücretsiz plan: Boru hattı, takvim, eğitimler ve ekibe davet her zaman açık. Yapay Zeka Koçu ve gelişmiş ekip araçları ücretli planlarda.',
       accountModalTrialBullets:
-        '14 günlük tanıtım dönemi: Bu süre boyunca platformu keşfedebilirsiniz. YZ Koçu ve AI saha araçları Basic veya üzeri planda açılır.',
+        '14 günlük ücretsiz Basic denemesi: Tüm AI araçlarına ücretsiz erişin. Süre sonunda NMM devam eder; AI için Basic veya üzeri plan seçebilirsiniz.',
       accountModalTeamBullets:
         'Ekibim: Ücretsiz planda ekibinizi görür ve davet edersiniz. Detaylı performans takibi Plus veya Pro planda.',
       accountModalFootnote:
@@ -80,7 +80,7 @@ export const shellSection = {
       accountModalFreeAccessDesktop:
         'Ücretsiz plan — temel araçlar açık; AI Plus/Basic ile.',
       accountModalTrialBulletsDesktop:
-        'Tanıtım dönemi bilgilendirme amaçlıdır; AI Basic+ ile açılır.',
+        'Ücretsiz 14 gün Basic; süre sonunda NMM devam, AI Basic+ ile açılır.',
       accountModalTeamBulletsDesktop: 'Ekibim: gör + davet (free); tam panel Plus/Pro.',
       accountModalFootnoteDesktop:
         'Free planda erişim devam eder; AI ve gelişmiş ekip plan gerektirir.',
@@ -117,10 +117,10 @@ export const shellSection = {
       view: 'View',
       last7DaysTrend: 'Last 7 Days — New Candidate Trend',
       candidatesLabel: 'candidates',
-      upgradeBannerTrialTitle: 'Your trial is active — upgrade your plan',
-      upgradeBannerTrialDesc: 'Move to Plus or Pro for team tools, higher daily AI credits, and compliance limits.',
-      upgradeBannerExpiredTitle: 'Your trial has ended',
-      upgradeBannerExpiredDesc: 'Choose Basic, Plus, or Pro to continue with full features and daily AI credits.',
+      upgradeBannerTrialTitle: 'Your free 14-day Basic trial is active',
+      upgradeBannerTrialDesc: 'You have full AI access during the trial. When it ends, NMM continues — choose a plan to keep AI.',
+      upgradeBannerExpiredTitle: 'Trial ended — AI locked, NMM continues',
+      upgradeBannerExpiredDesc: 'Pipeline, calendar, training, and your team stay open. Pick Basic, Plus, or Pro to unlock AI again.',
       upgradeBannerCta: 'View Plans & Upgrade',
       upgradeMenuTrialTitle: 'Upgrade plan',
       upgradeMenuExpiredTitle: 'Upgrade plan',
@@ -154,9 +154,9 @@ export const shellSection = {
       accountAlertEyebrow: 'Important',
       accountAlertTitle: 'IMPORTANT NOTICE ABOUT YOUR ACCOUNT!',
       accountAlertFreeTitle: 'Great start — choose a plan and keep growing',
-      accountAlertTrialTitle: 'Your intro period ends in {days} days — view plans',
-      accountAlertTrialTitleLast: 'Your trial ends today/tomorrow — view plans',
-      accountAlertLockedTitle: 'AI Coach is locked — choose a plan to unlock',
+      accountAlertTrialTitle: 'Your free Basic trial ends in {days} days — view plans',
+      accountAlertTrialTitleLast: 'Your free Basic trial ends today/tomorrow — view plans',
+      accountAlertLockedTitle: 'AI locked — NMM keeps running, pick a plan to re-enable AI',
       accountAlertTap: 'View details',
       accountAlertClose: 'Close',
       accountModalTitle: 'YOUR ACCOUNT INFORMATION',
@@ -165,7 +165,7 @@ export const shellSection = {
       accountModalFreeAccess:
         'Free plan: Pipeline, calendar, training, and team invites stay open. AI Coach and advanced team tools require a paid plan.',
       accountModalTrialBullets:
-        '14-day intro period: Explore the platform. AI Coach and field AI tools open on Basic or above.',
+        '14-day free Basic trial: Full AI access during the trial. When it ends, NMM continues — choose Basic or above to keep AI.',
       accountModalTeamBullets:
         'Team: View and invite on the free plan. Detailed performance tracking is on Plus or Pro.',
       accountModalFootnote:
@@ -173,7 +173,7 @@ export const shellSection = {
       accountModalFreeAccessDesktop:
         'Free plan — core tools open; AI on Basic+.',
       accountModalTrialBulletsDesktop:
-        'Intro period is informational; AI opens on Basic+.',
+        'Free 14-day Basic trial; NMM continues after, AI on Basic+.',
       accountModalTeamBulletsDesktop: 'Team: view + invite (free); full hub Plus/Pro.',
       accountModalFootnoteDesktop:
         'Free plan access continues; AI and advanced team need a plan.',

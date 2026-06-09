@@ -15,17 +15,18 @@ export function useFeatureAccess() {
 
   return useMemo(() => {
     const licenseType = ws?.licenseType
+    const effectiveLicenseType = ws?.effectiveLicenseType ?? licenseType
     const isSuperAdmin = ws?.isSuperAdmin ?? false
 
     return {
       licenseType,
       isSuperAdmin,
-      isPaid: isPaidLicense(licenseType, isSuperAdmin),
-      hasAiCoachAccess: hasAiCoachAccess(licenseType, isSuperAdmin),
-      hasAiFieldAccess: hasAiFieldAccess(licenseType, isSuperAdmin),
+      isPaid: isPaidLicense(effectiveLicenseType, isSuperAdmin),
+      hasAiCoachAccess: hasAiCoachAccess(effectiveLicenseType, isSuperAdmin),
+      hasAiFieldAccess: hasAiFieldAccess(effectiveLicenseType, isSuperAdmin),
       hasTeamFullAccess: hasTeamPageAccess(licenseType, isSuperAdmin),
       hasTeamPulseAccess: hasTeamPulseAccess(licenseType, isSuperAdmin),
-      hasStatsAdvancedAccess: hasStatsAdvancedAccess(licenseType, isSuperAdmin),
+      hasStatsAdvancedAccess: hasStatsAdvancedAccess(effectiveLicenseType, isSuperAdmin),
     }
   }, [ws])
 }

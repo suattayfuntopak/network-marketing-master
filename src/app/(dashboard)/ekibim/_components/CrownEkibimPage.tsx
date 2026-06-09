@@ -14,8 +14,7 @@ import { getCrownTeamPageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
-import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
+
 import { Skeleton } from '@/components/ui/Skeleton'
 import { waHref } from '@/lib/utils/waLink'
 
@@ -48,12 +47,10 @@ export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
-  const locked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
-
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['crown', 'ekibim', ws?.workspaceId],
     queryFn: () => getCrownTeamPageAction(ws!.workspaceId),
-    enabled: !!ws?.workspaceId && !locked,
+    enabled: !!ws?.workspaceId,
     staleTime: 30_000,
   })
 
@@ -100,12 +97,7 @@ export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
       refreshing={isFetching}
       asTab={asTab}
     >
-      {locked ? (
-        <FeatureUpgradeGate feature="team" locked>
-          {null}
-        </FeatureUpgradeGate>
-      ) : (
-        <>
+      <>
           <HubKpiRow items={kpiItems} />
 
           <HubSectionCard title={t('crown.teamRoster')}>
@@ -224,7 +216,6 @@ export function CrownEkibimPage({ asTab = false }: { asTab?: boolean }) {
             <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
           </Link>
         </>
-      )}
     </HubPageShell>
   )
 }

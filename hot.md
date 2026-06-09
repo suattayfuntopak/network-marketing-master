@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-09 — Freemium Model: Sayfa kilitleri kaldırıldı, AI buton kilidi, trial rebrand ✅
+
+### FAZ 1 — Sayfa kilitleri kaldırıldı
+- **`hasTeamPageAccess` → her zaman `true`:** `/ekibim`, `/saha-radar`, `/ilk-30-gun` tüm planlarda (free dahil) açık. Freemium modeli: yalnızca AI butonları kilitli.
+- **`CrownEkibimPage`, `CrownFirst30Page`, `CrownSahaRadarPage`:** `locked` koşulu ve `FeatureUpgradeGate` overlay kaldırıldı. Veri sorguları `!locked` koşulsuz çalışıyor.
+
+### FAZ 2 — AI buton-seviyesi kilit
+- **`useFeatureAccess` → `effectiveLicenseType`:** Trial sırasında `licenseType=free` iken AI erişimi açık kalıyor (effectiveLicenseType=basic); trial bitince kilitleniyor.
+- **`IlgilenContent.tsx`:** Bot butonu + `useUpgradePrompt` eklendi; kilitliyken lock ikonu + tooltip gösteriliyor.
+- **`YazarForm.tsx`:** Üret butonu kilitliyken `type="button"` Lock buton gösteriyor; ödeme teşviki açılıyor.
+- **`ProvaForm.tsx`:** Send butonu kilitliyken lock ikonu + `openUpgrade('ai_coach')` tetikleniyor.
+- **`pagesUi.unlockAiBasic`** translation key eklendi (TR + EN).
+
+### FAZ 3 — Trial rebrand
+- `upgradeBannerTrialTitle` → "14 günlük ücretsiz Basic denemeniz aktif"
+- `upgradeBannerExpiredTitle` → "Denemeniz sona erdi — AI kilitlendi, NMM devam ediyor"
+- `accountAlertTrialTitle/TitleLast/LockedTitle` freemium mesajlarıyla güncellendi.
+- `accountModalTrialBullets` açıklamalar güncellendi.
+
+### FAZ 4 — E-posta copy güncellemesi
+- **`trialEmails.ts`:** `trial_1d` → AI kilitleniyor ama NMM açık mesajı. `trial_ended` → yeni bullet listesi (✅ açık: pipeline/takvim/ekibim/eğitim; 🔒 kilitli: AI araçları). Ekibim artık kilitli listede yok.
+- **`mail.ts` welcome email:** "Basic features close" → "sadece AI araçları kilitlenir, NMM devam eder" freemium mesajına güncellendi.
+
 ## 2026-06-09 — Council Triad Faz A-D: 17 kritik düzeltme + kod kalitesi ✅
 
 ### FAZ A — Kritik Hatalar

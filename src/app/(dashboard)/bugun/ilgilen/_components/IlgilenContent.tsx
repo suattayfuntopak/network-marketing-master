@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
-import { List, LayoutList, Phone, Bot, Copy, Check, Sparkles, X } from 'lucide-react'
+import { List, LayoutList, Phone, Bot, Copy, Check, Sparkles, X, Lock } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates, useMarkContacted } from '@/hooks/useCandidates'
@@ -18,6 +18,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 function formatDaysAgo(days: number, t: (key: string, vars?: Record<string, string | number>) => string): string {
   if (!isFinite(days)) return t('pagesUi.neverContacted')
   if (days < 1) return t('pagesUi.today')
@@ -42,12 +43,14 @@ export function IlgilenContent() {
 
   useBodyScrollLock(!!activeMessage)
 
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   const { daily, remaining, all } = useDailyActions(candidates)
   const markContacted = useMarkContacted(ws?.workspaceId ?? '')
 
   async function handleAIMessage(id: string, name: string, stage: string, note: string | null, phone: string | null) {
+    if (!hasAiFieldAccess) { openUpgrade('ai_field'); return }
     setGeneratingFor(id)
     try {
       const result = await generateQuickMessageAction({ name, stage, note })
@@ -159,9 +162,9 @@ export function IlgilenContent() {
                 <button
                   onClick={() => handleAIMessage(c.id, c.full_name, c.stage, c.note ?? null, c.phone ?? null)}
                   disabled={generatingFor === c.id}
-                  className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand transition hover:opacity-80 disabled:opacity-50"
+                  className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand transition hover:opacity-80 disabled:opacity-50"
                   aria-label={t('pagesUi.generateAiMessage')}
-                  title={t('pagesUi.generateAndCopyAiMessage')}
+                  title={hasAiFieldAccess ? t('pagesUi.generateAndCopyAiMessage') : t('pagesUi.unlockAiBasic')}
                 >
                   {generatingFor === c.id ? (
                     <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
@@ -169,6 +172,9 @@ export function IlgilenContent() {
                     <Check className="h-4 w-4" />
                   ) : (
                     <Bot className="h-4 w-4" strokeWidth={1.75} />
+                  )}
+                  {!hasAiFieldAccess && (
+                    <Lock className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]" strokeWidth={2.5} aria-hidden />
                   )}
                 </button>
                 {waHref(c.phone) && (
@@ -325,6 +331,7 @@ export function IlgilenContent() {
         </div>,
         document.body
       )}
+      {UpgradePrompt}
     </div>
   )
 }

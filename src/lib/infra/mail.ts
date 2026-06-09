@@ -42,7 +42,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '📊 <strong>Stats & goal roadmap</strong> — see your daily targets and progress',
         ]),
         emailParagraph(
-          `Your trial lasts ${emailHighlight('14 days')}. If you don't upgrade before it ends, your Basic features close and your daily AI credits drop to a ${emailHighlight('limited free tier')} — your data stays safe and you can pick a plan anytime to continue.`
+          `Your trial lasts ${emailHighlight('14 days')}. After that, NMM keeps running — pipeline, calendar, team, and training stay fully open. ${emailHighlight('Only AI tools lock')} on the free plan. Pick a plan anytime to re-enable AI.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'View plans & upgrade'),
         emailParagraph(
@@ -63,7 +63,7 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
           '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
         ]),
         emailParagraph(
-          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre dolmadan ücretli bir plana geçmezseniz Basic özellikleriniz kapanır ve günlük YZ krediniz ${emailHighlight('sınırlı ücretsiz seviyeye')} düşer — verileriniz güvende kalır, dilediğinizde plan seçip kaldığınız yerden devam edersiniz.`
+          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre sonunda NMM çalışmaya devam eder — boru hattı, takvim, ekip ve eğitimler tamamen açık kalır. ${emailHighlight('Yalnızca yapay zeka araçları')} ücretsiz planda kilitlenir. İstediğiniz zaman plan seçerek AI'ı yeniden açabilirsiniz.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'Planları gör ve yükselt'),
         emailParagraph(

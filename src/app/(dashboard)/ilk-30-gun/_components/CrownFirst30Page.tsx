@@ -12,9 +12,7 @@ import { getCrownFirst30PageAction } from '@/app/(dashboard)/crown/actions'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { queryKeys } from '@/lib/query/keys'
-import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { waHref } from '@/lib/utils/waLink'
 
@@ -22,12 +20,10 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
   const qc = useQueryClient()
   const { data: ws } = useWorkspace()
-  const locked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
-
   const { data, isLoading, isFetching } = useQuery({
     queryKey: queryKeys.crownFirst30(ws?.workspaceId ?? ''),
     queryFn: () => getCrownFirst30PageAction(ws!.workspaceId),
-    enabled: !!ws?.workspaceId && !locked,
+    enabled: !!ws?.workspaceId,
     staleTime: 30_000,
   })
 
@@ -44,12 +40,7 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
       refreshing={isFetching}
       asTab={asTab}
     >
-      {locked ? (
-        <FeatureUpgradeGate feature="team" locked>
-          {null}
-        </FeatureUpgradeGate>
-      ) : (
-        <>
+      <>
           <HubSectionCard>
             <p className="text-sm text-[var(--text-2)] leading-relaxed">{t('crown.first30Hint')}</p>
           </HubSectionCard>
@@ -152,7 +143,6 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
             <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
           </Link>
         </>
-      )}
     </HubPageShell>
   )
 }

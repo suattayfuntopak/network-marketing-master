@@ -28,7 +28,7 @@ import type { SahaRadarMember, SahaRadarFollowUp } from '@/app/(dashboard)/crown
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { FeatureUpgradeGate } from '@/components/ui/FeatureUpgradeGate'
+
 import { queryKeys } from '@/lib/query/keys'
 import { waHref } from '@/lib/utils/waLink'
 import { useMarkContacted } from '@/hooks/useCandidates'
@@ -567,11 +567,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
             {/* TAB: Aktivite */}
             {innerTab === 'aktivite' && (
               <div className="space-y-4">
-                {!data?.hasTeamAccess ? (
-                  <FeatureUpgradeGate feature="team" locked>
-                    {null}
-                  </FeatureUpgradeGate>
-                ) : data.members.length === 0 ? (
+                {(data?.members.length ?? 0) === 0 ? (
                   <p className="text-center text-sm text-[var(--text-3)]">
                     {t('crown.emptyTeam')}
                   </p>
@@ -594,7 +590,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                       )}
                     </div>
                     <ul className="space-y-2">
-                      {data.members.map(m => (
+                      {(data?.members ?? []).map(m => (
                         <MemberCard
                           key={m.userId}
                           m={m}

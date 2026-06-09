@@ -138,8 +138,8 @@ function contentFor(
       return {
         subject:
           lang === 'en'
-            ? 'Last day — your NMM trial ends tomorrow'
-            : 'Son gün — NMM denemeniz yarın bitiyor',
+            ? 'Last day — your free Basic trial ends tomorrow'
+            : 'Son gün — ücretsiz Basic denemeniz yarın bitiyor',
         html: buildPremiumEmail(
           [
             emailHeading(
@@ -149,8 +149,8 @@ function contentFor(
             personal,
             emailParagraph(
               lang === 'en'
-                ? `Tomorrow your free trial ends — your Basic features close and daily AI credits drop to a limited free tier. Pick the plan that fits your team today.`
-                : `Yarın ücretsiz denemeniz bitecek; Basic özellikleriniz kapanacak ve günlük YZ krediniz sınırlı ücretsiz seviyeye düşecek. Ekibinize uygun planı bugün seçin.`
+                ? `Tomorrow your free Basic trial ends. Your ${emailHighlight('AI access will be locked')} — but pipeline, calendar, team, training, and all your NMM data stay fully open. Pick the plan that fits you to keep AI running.`
+                : `Yarın ücretsiz Basic denemeniz bitecek. ${emailHighlight('Yapay zeka erişimi kilitlenecek')} — ancak boru hattı, takvim, ekip, eğitimler ve tüm verileriniz açık kalmaya devam ediyor. Yapay zekayı aktif tutmak için bugün planınızı seçin.`
             ),
             planBox(lang),
             emailCta(`${PAYMENT_URL}?${utm}`, cta),
@@ -162,44 +162,41 @@ function contentFor(
       return {
         subject:
           lang === 'en'
-            ? 'Your NMM trial has ended — here\'s what changed'
-            : 'NMM deneme süreniz bitti — işte değişenler',
+            ? 'Your free Basic trial ended — AI locked, NMM continues'
+            : 'Ücretsiz Basic denemeniz bitti — AI kilitlendi, NMM devam ediyor',
         html: buildPremiumEmail(
           [
             emailHeading(
-              lang === 'en' ? 'Your trial has ended' : 'Deneme süreniz tamamlandı'
+              lang === 'en' ? 'Trial ended — AI locked, NMM continues' : 'Deneme bitti — AI kilitlendi, NMM devam ediyor'
             ),
             emailParagraph(hi),
             personal,
             emailParagraph(
               lang === 'en'
-                ? `Your ${emailHighlight('14-day trial')} on Network Marketing Master has ended. Your account has moved to the free tier — here's exactly what changed:`
-                : `Network Marketing Master'daki ${emailHighlight('14 günlük denemeniz')} sona erdi. Hesabınız ücretsiz plana geçti — işte tam olarak ne değişti:`
+                ? `Your ${emailHighlight('14-day free Basic trial')} on Network Marketing Master has ended. ${emailHighlight('AI features are now locked')} — but everything else keeps running:`
+                : `Network Marketing Master'daki ${emailHighlight('14 günlük ücretsiz Basic denemeniz')} sona erdi. ${emailHighlight('Yapay zeka özellikleri kilitlendi')} — ancak geri kalan her şey çalışmaya devam ediyor:`
             ),
             emailBulletList(
               lang === 'en'
                 ? [
-                    '🔒 <strong>AI Coach messages:</strong> 15/day → 5/day',
-                    '🔒 <strong>AI Roleplay (field practice):</strong> 10/day → 3/day',
-                    '🔒 <strong>Compliance Auditor:</strong> no longer available on free plan',
-                    '🔒 <strong>Team Hub (Ekibim):</strong> requires Plus or Pro',
+                    '✅ <strong>Pipeline & candidate notes</strong> — fully open',
+                    '✅ <strong>Calendar & follow-up reminders</strong> — fully open',
+                    '✅ <strong>Team hub (Ekibim)</strong> — fully open',
+                    '✅ <strong>Training library</strong> — fully open',
+                    '🔒 <strong>AI Coach, roleplay & field AI tools</strong> — locked on free plan',
                   ]
                 : [
-                    '🔒 <strong>YZ Koçu mesajları:</strong> günde 15 → günde 5\'e düştü',
-                    '🔒 <strong>Saha Provası (roleplay):</strong> günde 10 → günde 3\'e düştü',
-                    '🔒 <strong>Uyum Denetleyicisi:</strong> ücretsiz planda artık kullanılamıyor',
-                    '🔒 <strong>Ekibim sayfası:</strong> Plus veya Pro planı gerekli',
+                    '✅ <strong>Boru hattı ve aday notları</strong> — tamamen açık',
+                    '✅ <strong>Takvim ve takip hatırlatmaları</strong> — tamamen açık',
+                    '✅ <strong>Ekibim sayfası</strong> — tamamen açık',
+                    '✅ <strong>Eğitim kütüphanesi</strong> — tamamen açık',
+                    '🔒 <strong>YZ Koçu, saha provası ve AI araçları</strong> — ücretsiz planda kilitli',
                   ]
             ),
             emailParagraph(
               lang === 'en'
-                ? '✅ <strong>Everything else stays open:</strong> your pipeline, candidate notes, follow-up reminders, and activity history are fully accessible — no data is lost.'
-                : '✅ <strong>Geri kalan her şey açık:</strong> boru hattınız, aday notları, takip hatırlatmaları ve aktivite geçmişi tam erişilebilir — hiçbir veri kaybolmadı.'
-            ),
-            emailParagraph(
-              lang === 'en'
-                ? 'Upgrade to restore full AI credits and unlock your team:'
-                : 'Tam YZ kredilerinizi geri almak ve ekibinizi açmak için plan seçin:'
+                ? 'Pick a plan to unlock AI and keep building your business:'
+                : 'AI\'ı yeniden açmak ve işinizi büyütmeye devam etmek için plan seçin:'
             ),
             planBox(lang),
             emailCta(`${PAYMENT_URL}?${utm}`, cta),

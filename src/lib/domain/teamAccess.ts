@@ -1,13 +1,11 @@
 import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 
-/** Ekibim (alt ekip takibi) — Plus ve Pro planlarda; Basic / ücretsiz denemede kapalı. */
+/** Ekibim/saha-radar/ilk-30-gun — freemium modelde tüm planlar erişebilir; yalnızca AI butonları kilitli. */
 export function hasTeamPageAccess(
-  licenseType: string | null | undefined,
-  isSuperAdmin?: boolean
+  licenseType?: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
+  isSuperAdmin?: boolean // eslint-disable-line @typescript-eslint/no-unused-vars
 ): boolean {
-  if (isSuperAdmin) return true
-  const type = normalizeLicenseType(licenseType)
-  return type === 'plus' || type === 'pro'
+  return true
 }
 
 /**
