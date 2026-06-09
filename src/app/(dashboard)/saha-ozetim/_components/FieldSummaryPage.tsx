@@ -134,8 +134,13 @@ export function FieldSummaryPage() {
             hasGoal={dailySelf?.hasGoal ?? false}
             period="daily"
             loading={loading}
+            panoVariant
           />
-          <HubSelfActivityGrid metrics={dailySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          <HubSelfActivityGrid
+            metrics={dailySelf?.fieldMetrics ?? EMPTY_METRICS}
+            loading={loading}
+            panoVariant
+          />
         </>
       )
     }
@@ -157,8 +162,13 @@ export function FieldSummaryPage() {
             hasGoal={weeklySelf?.hasGoal ?? false}
             period="weekly"
             loading={loading}
+            panoVariant
           />
-          <HubSelfActivityGrid metrics={weeklySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          <HubSelfActivityGrid
+            metrics={weeklySelf?.fieldMetrics ?? EMPTY_METRICS}
+            loading={loading}
+            panoVariant
+          />
         </>
       )
     }
@@ -182,8 +192,13 @@ export function FieldSummaryPage() {
             hasGoal={monthlySelf?.hasGoal ?? false}
             period="monthly"
             loading={loading}
+            panoVariant
           />
-          <HubSelfActivityGrid metrics={monthlySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          <HubSelfActivityGrid
+            metrics={monthlySelf?.fieldMetrics ?? EMPTY_METRICS}
+            loading={loading}
+            panoVariant
+          />
         </>
       )
     }
@@ -210,8 +225,13 @@ export function FieldSummaryPage() {
             hasGoal={yearlySelf?.hasGoal ?? false}
             period="yearly"
             loading={loading}
+            panoVariant
           />
-          <HubSelfActivityGrid metrics={yearlySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          <HubSelfActivityGrid
+            metrics={yearlySelf?.fieldMetrics ?? EMPTY_METRICS}
+            loading={loading}
+            panoVariant
+          />
         </>
       )
     }
