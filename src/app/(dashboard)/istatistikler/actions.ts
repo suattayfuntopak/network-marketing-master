@@ -261,11 +261,39 @@ function archiveDateRange(period: AIUsageArchivePeriod): {
 }
 
 type UsageAgg = {
-  message: number
-  roleplay: number
-  compliance: number
-  days: Set<string>
-  workspaceId: string | null
+  ai: number
+}
+
+async function aggregateAiUsageFromRollup(
+  admin: AdminClient,
+  byUser: Map<string, UsageAgg>,
+  fromDate: string | null,
+  toDate: string
+): Promise<boolean> {
+  let q = admin
+    .from('nmm_ai_usage_daily')
+    .select('user_id, usage_date, ai_count, message_count, roleplay_count, compliance_count')
+
+  if (fromDate) {
+    q = q.gte('usage_date', fromDate).lte('usage_date', toDate)
+  }
+
+  const { data: rows, error } = await q
+  if (error) {
+    console.error('[aggregateAiUsageFromRollup]', error)
+    return false
+  }
+  if (!rows?.length) return false
+
+  rows.forEach(row => {
+    const legacy =
+      (row.message_count ?? 0) + (row.roleplay_count ?? 0) + (row.compliance_count ?? 0)
+    const count = row.ai_count > 0 ? row.ai_count : legacy
+    const bucket = byUser.get(row.user_id) ?? { ai: 0 }
+    bucket.ai += count
+    byUser.set(row.user_id, bucket)
+  })
+  return true
 }
 
 async function aggregateAiUsageFromDailyActions(
@@ -276,7 +304,7 @@ async function aggregateAiUsageFromDailyActions(
 ): Promise<void> {
   let q = admin
     .from('nmm_daily_actions')
-    .select('user_id, workspace_id, note, created_at')
+    .select('user_id, created_at')
     .eq('action_type', 'ai_generate')
 
   if (fromDate) {
@@ -292,19 +320,8 @@ async function aggregateAiUsageFromDailyActions(
   }
 
   actions?.forEach(act => {
-    const day = act.created_at.slice(0, 10)
-    const bucket = byUser.get(act.user_id) ?? {
-      message: 0,
-      roleplay: 0,
-      compliance: 0,
-      days: new Set<string>(),
-      workspaceId: act.workspace_id,
-    }
-    if (act.note === 'roleplay') bucket.roleplay++
-    else if (act.note === 'compliance') bucket.compliance++
-    else bucket.message++
-    bucket.days.add(day)
-    if (!bucket.workspaceId && act.workspace_id) bucket.workspaceId = act.workspace_id
+    const bucket = byUser.get(act.user_id) ?? { ai: 0 }
+    bucket.ai++
     byUser.set(act.user_id, bucket)
   })
 }
@@ -313,7 +330,7 @@ export type AiUsageByPeriod = Record<string, { ai: number }>
 
 /**
  * Süper admin: verilen kullanıcıların seçili dönemdeki YZ kullanım sayıları
- * (mesaj/koç/uyum) — ham `nmm_daily_actions`'tan, UTC-tutarlı bugünü kapsayan aralık.
+ * Birleşik `ai_count` rollup (`nmm_ai_usage_daily`); yoksa `nmm_daily_actions` fallback.
  * "Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol Tablosu" için tek kaynak.
  */
 export async function getAiUsageByPeriodAction(
@@ -330,13 +347,16 @@ export async function getAiUsageByPeriodAction(
   const admin = createAdminClient()
   const { fromDate, toDate } = archiveDateRange(period)
   const byUser = new Map<string, UsageAgg>()
-  await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
+  const usedRollup = await aggregateAiUsageFromRollup(admin, byUser, fromDate, toDate)
+  if (!usedRollup) {
+    await aggregateAiUsageFromDailyActions(admin, byUser, fromDate, toDate)
+  }
 
   const idSet = new Set(userIds)
   const result: AiUsageByPeriod = {}
   for (const [uid, agg] of byUser) {
     if (!idSet.has(uid)) continue
-    result[uid] = { ai: agg.message + agg.roleplay + agg.compliance }
+    result[uid] = { ai: agg.ai }
   }
   return result
 }

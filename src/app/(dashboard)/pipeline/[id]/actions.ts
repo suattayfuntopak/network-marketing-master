@@ -6,7 +6,8 @@ import { REGISTER_URL } from '@/lib/domain/constants'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { GEMINI_PRO, GEMINI_FLASH } from '@/lib/ai/models'
+import { GEMINI_FLASH } from '@/lib/ai/models'
+import { clampAIUserInput, trimAggregateContext } from '@/lib/domain/aiInputLimit'
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
 export interface CoachState {
@@ -97,7 +98,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
 
   try {
     const model = genAI.getGenerativeModel({
-      model: GEMINI_PRO,
+      model: GEMINI_FLASH,
       systemInstruction: `Sen deneyimli, sıcak bir network marketing liderisin. Saha tanıdığın bir kişiyi benimle Network Marketing Master (NMM) kullanmaya davet eden, kişiye özel bir WhatsApp mesajı yazıyorsun.
 Kurallar:
 1. Kişinin adıyla seslen; varsa notundaki bağlamı doğal şekilde kullan (zorlama yok).
@@ -135,7 +136,7 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
 
   try {
     const model = genAI.getGenerativeModel({
-      model: GEMINI_PRO,
+      model: GEMINI_FLASH,
       systemInstruction: `Sen bir network marketing mentörüsün. Sana sunulan lider notlarını cerrah titizliğiyle analiz edeceksin.
 Bu notlardan yola çıkarak adayın genel durumunu anlatan 1 cümlelik çok net bir özet ve hemen atılması gereken 1 cümlelik aksiyon planı üreteceksin.
 Ürettiğin yanıtı hem Türkçe hem İngilizce olarak hazırlayacak ve tam olarak şu formatta döneceksin:
@@ -153,7 +154,9 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
           role: 'user',
           parts: [
             {
-              text: `Lider Notları:\n${notes.map((n, i) => `${i + 1}. ${n}`).join('\n')}`
+              text: `Lider Notları:\n${trimAggregateContext(
+                notes.map((n, i) => `${i + 1}. ${clampAIUserInput(n)}`).join('\n'),
+              )}`
             }
           ]
         }

@@ -15,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 
 interface Scenario {
   id: string
@@ -489,8 +490,9 @@ export function ProvaForm() {
           <input
             type="text"
             value={inputValue}
-            onChange={e => setInputValue(e.target.value)}
+            onChange={e => setInputValue(e.target.value.slice(0, AI_USER_INPUT_MAX_CHARS))}
             disabled={isPending}
+            maxLength={AI_USER_INPUT_MAX_CHARS}
             placeholder={t('coachUi.practiceInputPlaceholder')}
             className="flex-1 rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-base text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#D97706] focus:ring-2 focus:ring-amber-100 dark:focus:ring-amber-950/20 disabled:opacity-60"
           />

@@ -2,6 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { clampAIUserInput } from '@/lib/domain/aiInputLimit'
 
 export async function generateCoachingMessageAction(input: {
   memberName: string
@@ -30,8 +31,11 @@ export async function generateCoachingMessageAction(input: {
           ? 'Bu kişi ekip üyendir (aday değil). Henüz hiç giriş yapmamış — sıcak bir şekilde başlamalarını teşvik et.'
           : `Bu kişi ekip üyendir (aday değil). ${daysSinceActivity} gündür aktif değil — endişeyle değil sevgiyle yeniden bağlantı kur.`
 
-  const context = input.customContext?.trim()
-    ? `${baseContext}\n\nLider'in kişisel mesaj stili / şablon notu: ${input.customContext.trim()}`
+  const custom = input.customContext?.trim()
+    ? clampAIUserInput(input.customContext.trim())
+    : ''
+  const context = custom
+    ? `${baseContext}\n\nLider'in kişisel mesaj stili / şablon notu: ${custom}`
     : baseContext
 
   try {

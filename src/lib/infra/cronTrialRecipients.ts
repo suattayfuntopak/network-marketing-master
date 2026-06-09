@@ -27,6 +27,7 @@ export async function fetchTrialUserStats(
 }
 
 export interface TrialEmailRecipient {
+  userId: string
   email: string
   name: string
   workspaceId: string
@@ -77,6 +78,7 @@ export async function fetchFreeTrialRecipients(
 
     const metaLang = user.user_metadata?.lang
     out.push({
+      userId: member.user_id,
       workspaceId: ws.id,
       email,
       name:

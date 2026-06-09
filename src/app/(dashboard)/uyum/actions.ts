@@ -4,6 +4,7 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
 import { GEMINI_FLASH } from '@/lib/ai/models'
+import { clampAIUserInput, rejectIfAIInputTooLong } from '@/lib/domain/aiInputLimit'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -32,6 +33,10 @@ export async function auditComplianceMessageAction(
   if (!textToAudit.trim()) {
     return { error: serverError('auditInputRequired', l) }
   }
+  const lengthErr = rejectIfAIInputTooLong(textToAudit, l)
+  if (lengthErr) return { error: lengthErr }
+
+  const safeText = clampAIUserInput(textToAudit)
 
   const quota = await checkAIQuota('compliance', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
@@ -79,7 +84,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
           role: 'user',
           parts: [
             {
-              text: `Denetlenecek Metin:\n"${textToAudit}"\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
+              text: `Denetlenecek Metin:\n"${safeText}"\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
             }
           ]
         }

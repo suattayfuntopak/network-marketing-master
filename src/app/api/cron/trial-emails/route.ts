@@ -5,6 +5,7 @@ import { claimEmailSend } from '@/lib/infra/emailSentLog'
 import { todayCalendarKey } from '@/lib/utils/calendarDates'
 import { fetchFreeTrialRecipients, fetchTrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { sendTrialLifecycleEmail, type TrialEmailKind } from '@/lib/infra/trialEmails'
+import { sendTrialLifecyclePush, shouldSendTrialPush } from '@/lib/infra/trialPush'
 
 const JOBS: { kind: TrialEmailKind; offsetDays: number }[] = [
   // trial_mid: deneme günü ~7 = bitişe 7 gün kala (14 günlük deneme). Aktivasyon maili.
@@ -37,6 +38,14 @@ export async function GET(request: NextRequest) {
 
       const stats = await fetchTrialUserStats(supabase, r.workspaceId)
       const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang, stats)
+
+      if (sent && shouldSendTrialPush(job.kind)) {
+        const pushFresh = await claimEmailSend(supabase, r.workspaceId, `push_${job.kind}`, todayKey)
+        if (pushFresh) {
+          await sendTrialLifecyclePush(supabase, r.userId, job.kind, r.lang)
+        }
+      }
+
       results.push({ kind: job.kind, email: r.email, sent })
     }
   }

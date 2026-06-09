@@ -598,6 +598,33 @@ export interface Database {
           }
         ]
       }
+      nmm_product_events: {
+        Row: {
+          id: string
+          event_name: string
+          user_id: string | null
+          session_id: string | null
+          metadata: Json
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_name: string
+          user_id?: string | null
+          session_id?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_name?: string
+          user_id?: string | null
+          session_id?: string | null
+          metadata?: Json
+          created_at?: string
+        }
+        Relationships: []
+      }
       nmm_user_progress: {
         Row: {
           user_id: string

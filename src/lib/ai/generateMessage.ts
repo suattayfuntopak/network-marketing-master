@@ -2,6 +2,7 @@
 
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
+import { clampAIUserInput } from '@/lib/domain/aiInputLimit'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -87,8 +88,12 @@ export async function generateMessage(input: GenerateMessageInput): Promise<stri
   const warmthInfo = warmth ? (WARMTH_CONTEXT[warmth] ?? '') : ''
 
   // Clean translation delimiters if present
-  const cleanNote = note && note.includes('|||') ? note.split('|||')[0].trim() : note
-  const cleanContext = context && context.includes('|||') ? context.split('|||')[0].trim() : context
+  const cleanNote = clampAIUserInput(
+    note && note.includes('|||') ? note.split('|||')[0].trim() : note,
+  )
+  const cleanContext = clampAIUserInput(
+    context && context.includes('|||') ? context.split('|||')[0].trim() : context,
+  )
 
   const stageStr = stage && stageInfo ? `Aşama: ${stage} — ${stageInfo}\n` : ''
   const warmthStr = warmth && warmthInfo ? `İlişki Sıcaklığı: ${warmth} — ${warmthInfo}\n` : ''

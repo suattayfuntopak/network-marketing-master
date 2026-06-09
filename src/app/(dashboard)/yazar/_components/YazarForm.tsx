@@ -22,6 +22,7 @@ import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { displayDailyActionNote, isLeaderUserNote, getWhatsAppActivityDisplay } from '@/lib/domain/dailyActionNote'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 
 const MESSAGE_TYPES = [
   { value: 'genel', label: 'Genel' },
@@ -503,7 +504,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             id="context"
             name="context"
             rows={4}
-            maxLength={1500}
+            maxLength={AI_USER_INPUT_MAX_CHARS}
             value={context}
             onChange={e => setContext(e.target.value)}
             placeholder={t('coachUi.extraContextPlaceholder')}

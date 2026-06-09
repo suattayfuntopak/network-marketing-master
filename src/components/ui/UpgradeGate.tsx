@@ -10,6 +10,8 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 
 export type UpgradeFeature = GatedFeature | 'team'
 
@@ -119,7 +121,13 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
 
         <Link
           href={paymentHref}
-          onClick={onClose}
+          onClick={() => {
+            void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
+              trialEnded,
+              feature: resolveFeature(feature),
+            })
+            onClose()
+          }}
           className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
         >
           <Sparkles className="h-4 w-4" />

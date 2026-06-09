@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -13,10 +13,24 @@ import {
 import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
 import { BankTransferCard } from '@/components/payment/BankTransferCard'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
 
 export function LandingPricing() {
   const { t } = useTranslation()
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>('monthly')
+  const pricingLogged = useRef(false)
+
+  useEffect(() => {
+    if (pricingLogged.current) return
+    pricingLogged.current = true
+    void logProductEventAction(
+      PRODUCT_EVENTS.pricingSectionView,
+      { variant: 'basic_popular' },
+      getAnalyticsSessionId(),
+    )
+  }, [])
 
   return (
     <section id="ucretlendirme" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 space-y-12">

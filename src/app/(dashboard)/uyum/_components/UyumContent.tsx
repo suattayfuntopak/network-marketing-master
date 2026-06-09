@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { auditComplianceMessageAction, type ComplianceAuditState } from '../actions'
+import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -274,6 +275,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                     value={inputText}
                     onChange={e => setInputText(e.target.value)}
                     required
+                    maxLength={AI_USER_INPUT_MAX_CHARS}
                     placeholder={t('compliancePage.auditPlaceholder')}
                     className="w-full h-32 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3.5 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#C03E1F] transition-all resize-none"
                   />

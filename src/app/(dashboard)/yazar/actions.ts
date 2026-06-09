@@ -4,7 +4,13 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
-import { GEMINI_PRO, GEMINI_FLASH } from '@/lib/ai/models'
+import { GEMINI_FLASH } from '@/lib/ai/models'
+import { resolveGeminiModel } from '@/lib/ai/resolveModel'
+import {
+  clampAIUserInput,
+  rejectIfAIInputTooLong,
+  trimAggregateContext,
+} from '@/lib/domain/aiInputLimit'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -34,12 +40,21 @@ export async function generateMessageAction(
   const warmth      = (formData.get('warmth')      as string | null)?.trim() ?? 'ilik'
 
   if (!name) return { error: 'Kişi adı zorunlu.' }
+  const contextErr = rejectIfAIInputTooLong(context)
+  if (contextErr) return { error: contextErr }
 
   const quota = await checkAIQuota('message')
   if (!quota.ok) return { error: quota.message, remaining: 0 }
 
   try {
-    const message = await generateMessage({ name, stage, context, tone, messageType, warmth })
+    const message = await generateMessage({
+      name,
+      stage,
+      context: clampAIUserInput(context),
+      tone,
+      messageType,
+      warmth,
+    })
 
     await logAIGeneration({
       workspaceId: quota.workspaceId,
@@ -73,11 +88,16 @@ export async function generateRoleplayResponseAction(
     return { error: serverError('geminiMissing', l) }
   }
 
+  const replyErr = rejectIfAIInputTooLong(userReply, l)
+  if (replyErr) return { error: replyErr }
+
   const quota = await checkAIQuota('roleplay', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
 
+  const safeReply = clampAIUserInput(userReply)
+
   // Construct message history string
-  const promptHistory = messageHistory.map(m => {
+  const promptHistory = trimAggregateContext(messageHistory.map(m => {
     if (m.role === 'candidate') {
       return `Aday: ${m.text}`
     } else if (m.role === 'user') {
@@ -85,13 +105,15 @@ export async function generateRoleplayResponseAction(
     } else {
       return `YZK Notu: Puan: ${m.score}, Güçlü Yönler: ${m.strengths?.join(', ')}, Tavsiye: ${m.improvements}`
     }
-  }).join('\n')
+  }).join('\n'))
+
+  const coachModel = resolveGeminiModel('deep_coach', quota.licenseType)
 
   const systemPrompt = `Sen bir Network Marketing simülatörü ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
 
 GÖREVİN:
-1. ADAY ROLÜ (SIMÜLASYON): Seçilen senaryoya (${scenarioId}) uygun olarak davran. Distribütörün en son yazdığı yanıta (${userReply}) karşılık, gerçek bir adaymışsın gibi bir sonraki yanıtını Türkçe olarak yaz. Gerçekçi, hafif itiraz eden, sohbete açık bir duruş sergile. Cevabı JSON'daki "candidate_reply" alanına yerleştir.
-2. MENTÖR KOÇ ROLÜ: Distribütörün son yazdığı yanıtı (${userReply}) network marketing ilkelerine (empati kurma, merak uyandırma, profesyonellik) göre değerlendir:
+1. ADAY ROLÜ (SIMÜLASYON): Seçilen senaryoya (${scenarioId}) uygun olarak davran. Distribütörün en son yazdığı yanıta (${safeReply}) karşılık, gerçek bir adaymışsın gibi bir sonraki yanıtını Türkçe olarak yaz. Gerçekçi, hafif itiraz eden, sohbete açık bir duruş sergile. Cevabı JSON'daki "candidate_reply" alanına yerleştir.
+2. MENTÖR KOÇ ROLÜ: Distribütörün son yazdığı yanıtı (${safeReply}) network marketing ilkelerine (empati kurma, merak uyandırma, profesyonellik) göre değerlendir:
    - 0 ile 100 arasında bir liderlik puanı belirle ve JSON'daki "yzk_score" alanına yerleştir.
    - En fazla 2 adet çok net ve pozitif güçlü yönünü belirtip JSON'daki "yzk_strengths" dizisine yerleştir.
    - Distribütörün bir sonraki sefere daha iyi yapması için en fazla 1 adet motivasyonel ve eyleme dökülebilir tavsiye yazıp JSON'daki "yzk_improvements" alanına yerleştir.
@@ -111,7 +133,7 @@ JSON yapısı şu şekilde olmalıdır:
 
   try {
     const model = genAI.getGenerativeModel({
-      model: GEMINI_PRO,
+      model: coachModel,
       systemInstruction: systemPrompt,
     })
 
@@ -121,7 +143,7 @@ JSON yapısı şu şekilde olmalıdır:
           role: 'user',
           parts: [
             {
-              text: `Konuşma Geçmişi:\n${promptHistory}\n\nDistribütörün Son Yanıtı: ${userReply}\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
+              text: `Konuşma Geçmişi:\n${promptHistory}\n\nDistribütörün Son Yanıtı: ${safeReply}\n\nDil Parametresi: ${lang === 'en' ? 'en' : 'tr'}`
             }
           ]
         }
@@ -201,9 +223,14 @@ export async function askCoachAction(
   }
 
   if (!question) return { error: l === 'en' ? 'Please enter a question.' : 'Lütfen bir soru yazın.' }
+  const questionErr = rejectIfAIInputTooLong(question, l)
+  if (questionErr) return { error: questionErr }
 
   const quota = await checkAIQuota('message', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
+
+  const safeQuestion = clampAIUserInput(question)
+  const coachModel = resolveGeminiModel('deep_coach', quota.licenseType)
 
   const systemPrompt = `Sen bir Network Marketing Uzmanı ve Lider Gelişim Koçusun (Yapay Zeka Koçu).
 Kullanıcı sana network marketing sektörü, aday ilişkileri, takım kurma, sponsorluk, liderlik, satış teknikleri, zaman yönetimi veya bu sektörle doğrudan ilgili herhangi bir konuda soru soruyor.
@@ -218,7 +245,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
 
   try {
     const model = genAI.getGenerativeModel({
-      model: GEMINI_PRO,
+      model: coachModel,
       systemInstruction: systemPrompt,
     })
 
@@ -228,7 +255,7 @@ Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Tür
           role: 'user',
           parts: [
             {
-              text: `Kullanıcı Sorusu: ${question}\n\nDil Parametresi: ${lang}`
+              text: `Kullanıcı Sorusu: ${safeQuestion}\n\nDil Parametresi: ${lang}`
             }
           ]
         }
@@ -260,6 +287,8 @@ export async function translateTextAction(text: string, targetLang: 'tr' | 'en')
   }
 
   if (!text) return {}
+  const textErr = rejectIfAIInputTooLong(text, targetLang)
+  if (textErr) return { error: textErr }
 
   const quota = await checkAIQuota('message', { lang: targetLang })
   if (!quota.ok) {
@@ -283,7 +312,7 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
           role: 'user',
           parts: [
             {
-              text: text
+              text: clampAIUserInput(text)
             }
           ]
         }

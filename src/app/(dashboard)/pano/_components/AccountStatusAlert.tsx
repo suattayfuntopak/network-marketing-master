@@ -44,11 +44,13 @@ export function AccountStatusAlert() {
 
   const isTrial = lifecycle.phase === 'trial'
   const daysLeft = Math.max(0, Math.ceil((lifecycle.trialEndsAt.getTime() - now) / 86_400_000))
+  const trialEnded = lifecycle.phase === 'free'
+  const paymentHref = trialEnded ? '/odeme?plan=basic' : '/odeme'
   const bannerTitle = isTrial
     ? daysLeft <= 1
       ? t('shellUi.accountAlertTrialTitleLast')
       : t('shellUi.accountAlertTrialTitle', { days: daysLeft })
-    : t('shellUi.accountAlertFreeTitle')
+    : t('shellUi.accountAlertLockedTitle')
   const bannerClass = isTrial
     ? 'from-[#D97706] to-[#B45309] shadow-amber-900/30'
     : 'from-brand-indigo to-brand-accent shadow-indigo-900/30'
@@ -157,12 +159,12 @@ export function AccountStatusAlert() {
                 {t('shellUi.accountAlertClose')}
               </button>
               <Link
-                href="/odeme"
+                href={paymentHref}
                 onClick={() => setOpen(false)}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
               >
                 <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {t('shellUi.upgradeBannerCta')}
+                {trialEnded ? t('shellUi.upgradeTrialEndedCta') : t('shellUi.upgradeBannerCta')}
               </Link>
             </div>
           </div>

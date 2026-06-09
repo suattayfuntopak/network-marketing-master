@@ -26,4 +26,21 @@ describe('notificationTargetHref', () => {
   it('routes calendar without candidate to takvim', () => {
     expect(notificationTargetHref({ type: 'calendar', candidate_id: null })).toBe('/takvim')
   })
+
+  it('routes trial upgrade notifications to odeme basic deep link', () => {
+    expect(
+      notificationTargetHref({
+        type: 'alert',
+        candidate_id: null,
+        title_tr: 'Deneme bitti — Basic ile devam et',
+      }),
+    ).toBe('/odeme?plan=basic')
+    expect(
+      notificationTargetHref({
+        type: 'info',
+        candidate_id: null,
+        title_en: '3 days left on your trial',
+      }),
+    ).toBe('/odeme?plan=basic')
+  })
 })

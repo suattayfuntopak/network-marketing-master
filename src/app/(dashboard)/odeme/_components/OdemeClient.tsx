@@ -18,6 +18,8 @@ import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
 import { BankTransferCard } from '@/components/payment/BankTransferCard'
 import { notifyBankTransferAction } from '../actions'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 
 const ACTIVE_PLAN_BTN =
   'opacity-100 cursor-not-allowed !bg-neutral-100 dark:!bg-neutral-900 !text-black dark:!text-white hover:shadow-none border border-[var(--border)]'
@@ -41,9 +43,15 @@ export function OdemeClient() {
 
   useBodyScrollLock(loading)
 
+  const basicDeepLinkLogged = useRef(false)
+
   useEffect(() => {
     if (highlightBasic && basicPlanRef.current) {
       basicPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    if (highlightBasic && !basicDeepLinkLogged.current) {
+      basicDeepLinkLogged.current = true
+      void logProductEventAction(PRODUCT_EVENTS.odemeBasicDeepLink, { source: 'query' })
     }
   }, [highlightBasic])
 

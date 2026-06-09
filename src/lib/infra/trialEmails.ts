@@ -12,6 +12,7 @@ import {
 } from '@/lib/infra/emailTemplate'
 
 import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
+import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
@@ -19,6 +20,18 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>
 export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
 
 const PAYMENT_URL = `${NMM_APP_URL}/odeme`
+
+function paymentUrlForTrialKind(kind: TrialEmailKind): string {
+  if (kind === 'trial_3d' || kind === 'trial_1d' || kind === 'trial_ended') {
+    return `${PAYMENT_URL}?plan=basic`
+  }
+  return PAYMENT_URL
+}
+
+function paymentCtaUrl(kind: TrialEmailKind, utm: string): string {
+  const base = paymentUrlForTrialKind(kind)
+  return base.includes('?') ? `${base}&${utm}` : `${base}?${utm}`
+}
 
 /**
  * Veri-odaklı kişiselleştirme: kullanıcının kurduğu boru hattını hatırlatır
@@ -43,16 +56,19 @@ function statsParagraph(stats: TrialUserStats | undefined, lang: 'tr' | 'en'): s
 }
 
 function planBox(lang: 'tr' | 'en') {
+  const b = DAILY_AI_LIMITS.basic
+  const p = DAILY_AI_LIMITS.plus
+  const pr = DAILY_AI_LIMITS.pro
   return lang === 'en'
     ? emailPlanBox([
-        '<strong>Basic</strong> — Individual pipeline, AI coach & roleplay',
-        '<strong>Plus</strong> — Team hub + higher daily AI limits',
-        '<strong>Pro</strong> — Maximum limits for growing leaders',
+        `<strong>Basic</strong> — ${b} daily AI messages, coach & roleplay`,
+        `<strong>Plus</strong> — Team hub + ${p} daily AI messages`,
+        `<strong>Pro</strong> — ${pr} daily AI messages for growing leaders`,
       ])
     : emailPlanBox([
-        '<strong>Basic</strong> — Bireysel boru hattı, YZ koçu ve saha provası',
-        '<strong>Plus</strong> — Ekibim sayfası + yüksek günlük YZ limitleri',
-        '<strong>Pro</strong> — Büyüyen liderler için maksimum limitler',
+        `<strong>Basic</strong> — Günlük ${b} YZ mesajı, koç ve saha provası`,
+        `<strong>Plus</strong> — Ekibim + günlük ${p} YZ mesajı`,
+        `<strong>Pro</strong> — Büyüyen liderler için günlük ${pr} YZ mesajı`,
       ])
 }
 
@@ -129,7 +145,7 @@ function contentFor(
                 : `${emailHighlight('14 günlük ücretsiz denemeniz')} Network Marketing Master'da ${emailHighlight('3 gün')} içinde sona erecek. Basic özelliklerin tamamı hâlâ açık — boru hattı, YZ koçu ve saha provası.`
             ),
             planBox(lang),
-            emailCta(`${PAYMENT_URL}?${utm}`, cta),
+            emailCta(paymentCtaUrl(kind, utm), cta),
           ].join(''),
           lang
         ),
@@ -153,7 +169,7 @@ function contentFor(
                 : `Yarın ücretsiz Basic denemeniz bitecek. ${emailHighlight('Yapay zeka erişimi kilitlenecek')} — ancak boru hattı, takvim, ekip, eğitimler ve tüm verileriniz açık kalmaya devam ediyor. Yapay zekayı aktif tutmak için bugün planınızı seçin.`
             ),
             planBox(lang),
-            emailCta(`${PAYMENT_URL}?${utm}`, cta),
+            emailCta(paymentCtaUrl(kind, utm), cta),
           ].join(''),
           lang
         ),
@@ -199,7 +215,7 @@ function contentFor(
                 : 'AI\'ı yeniden açmak ve işinizi büyütmeye devam etmek için plan seçin:'
             ),
             planBox(lang),
-            emailCta(`${PAYMENT_URL}?${utm}`, cta),
+            emailCta(paymentCtaUrl(kind, utm), cta),
           ].join(''),
           lang
         ),

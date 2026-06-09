@@ -67,7 +67,7 @@ export const platformSection = {
       rejectRequestTitle: 'Talebi reddet',
       rejectRequestMessage: 'Bu işlem geri alınamaz. Kullanıcıya e-posta ile iletilecek gerekçeyi düzenleyebilirsiniz.',
       rejectRequestConfirm: 'Reddet',
-      inviteWaMessage: 'Merhaba {name},\n\nBenimle Network Marketing Master\'ı birlikte kullanmanı istiyorum — sadece platforma kayıt değil, benim sponsorluğum altında aynı sistemle ilerlemek.\n\nKayıt linki: {link}\nEkibim sayfasına girdikten sonra davet kodu: {code}',
+      inviteWaMessage: 'Merhaba {name},\n\nNetwork Marketing Master uygulamasına seni davet ediyorum — benim sponsorluğum altında aynı sistemle ilerleyelim.\n\nKayıt linki: {link}\nUygulamada Ekibim sayfasına girdikten sonra davet kodu: {code}',
     },
     moderationReview: {
       title: 'Talebi İncele & Onayla',
@@ -163,7 +163,7 @@ export const platformSection = {
       rejectRequestTitle: 'Reject request',
       rejectRequestMessage: 'This cannot be undone. You can edit the reason sent to the user by email.',
       rejectRequestConfirm: 'Reject',
-      inviteWaMessage: 'Hello {name},\n\nI\'d like you to use Network Marketing Master with me — not just platform access, but growing under my sponsorship with the same system.\n\nRegistration link: {link}\nAfter opening My Team, enter invite code: {code}',
+      inviteWaMessage: 'Hello {name},\n\nI\'m inviting you to the Network Marketing Master app — let\'s grow under my sponsorship with the same system.\n\nRegistration link: {link}\nIn the app, open My Team and enter invite code: {code}',
     },
     moderationReview: {
       title: 'Review & Approve Request',

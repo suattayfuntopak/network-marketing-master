@@ -8,6 +8,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useAILimits } from '@/hooks/useAILimits'
@@ -116,6 +117,7 @@ export function KoclukForm() {
             disabled={isPending || limitReached}
             placeholder={t('coachUi.questionPlaceholder')}
             rows={4}
+            maxLength={AI_USER_INPUT_MAX_CHARS}
             className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#3730A3] focus:ring-2 focus:ring-[#EEF2FF] dark:focus:ring-[#1e1b4b] disabled:opacity-50"
           />
         </div>
