@@ -1,6 +1,5 @@
 'use client'
 
-import { useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -83,7 +82,9 @@ export function TeamPerformanceTable({
   const displayRows = performanceRows.filter(r => r.role !== 'leader')
   const appRows = displayRows.filter(r => r.isAppUser !== false)
 
-  const totals = useMemo(() => {
+  // React Compiler memoize eder — manuel useMemo, defaultlu `{}` parametreleri
+  // her render'da yeniden ürettiği için preserve-manual-memoization hatası veriyordu.
+  const totals = (() => {
     const sum = (sel: (r: PerformanceRow) => number) =>
       appRows.reduce((a, r) => a + (sel(r) || 0), 0)
     const avg = (sel: (r: PerformanceRow) => number) =>
@@ -101,7 +102,7 @@ export function TeamPerformanceTable({
       objectionAvg: avg(r => progressByUserId[r.user_id]?.objectionPct ?? 0),
       videoAvg: avg(r => videoByUserId[r.user_id]?.pct ?? 0),
     }
-  }, [appRows, progressByUserId, videoByUserId])
+  })()
 
   return (
     <section
