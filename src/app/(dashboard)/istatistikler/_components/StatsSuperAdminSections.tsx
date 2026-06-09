@@ -105,7 +105,6 @@ export function StatsSuperAdminSections({
 
   const rows = useMemo((): AiRow[] => {
     const out: AiRow[] = []
-    const leaders = sortedMembers.filter(m => m.role === 'leader')
     const nmms = sortedMembers.filter(m => m.role !== 'leader')
 
     const memberRow = (m: TeamMember, type: AiRowType): AiRow => {
@@ -139,7 +138,6 @@ export function StatsSuperAdminSections({
       }
     }
 
-    for (const m of leaders) out.push(memberRow(m, 'leader'))
     for (const m of nmms) out.push(memberRow(m, 'nmm'))
     for (const s of sahaRows) {
       out.push({

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -27,6 +27,7 @@ import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { getMemberGoalsMapAction } from '../memberGoalsActions'
+import { prefetchEkipRankingMetrics } from '@/lib/query/prefetchRouteMetrics'
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
@@ -84,6 +85,12 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   }, [queryClient, ws, t])
 
   const { data: members = [], isLoading: mLoading, isError: mError, error: queryError } = useEkipPanelRows(ws?.workspaceId)
+
+  useEffect(() => {
+    if (!ws?.workspaceId || members.length === 0) return
+    if (!hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) return
+    void prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
+  }, [queryClient, ws, members.length])
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
@@ -236,7 +243,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           data-no-swipe="true"
           onTouchStart={e => e.stopPropagation()}
         >
-          <EkipSummaryTab />
+          <EkipSummaryTab members={members} membersLoading={mLoading} />
         </div>
       )}
 

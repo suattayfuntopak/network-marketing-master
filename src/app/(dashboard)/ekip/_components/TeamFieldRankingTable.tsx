@@ -204,9 +204,7 @@ export function TeamFieldRankingTable({
                       ))}
                       {ACTIVITY_COLUMNS.map(col => (
                         <td key={col.id} className="bg-inherit p-2 text-center tabular-nums text-[var(--text-1)]">
-                          {col.id === 'active'
-                            ? `${metricValue(row, col.id)}${t('team.dayShort')}`
-                            : metricValue(row, col.id)}
+                          {metricValue(row, col.id)}
                         </td>
                       ))}
                     </tr>

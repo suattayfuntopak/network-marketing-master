@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { useEkipPanelRows } from '@/hooks/useTeamMembers'
+import type { MemberRow } from '@/lib/team/types'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
   HubSummaryTabBar,
@@ -26,10 +26,19 @@ function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
   return 'ytd'
 }
 
-export function EkipSummaryTab() {
+type EkipSummaryTabProps = {
+  members?: MemberRow[]
+  membersLoading?: boolean
+}
+
+export function EkipSummaryTab({
+  members: membersProp = [],
+  membersLoading: membersLoadingProp = false,
+}: EkipSummaryTabProps = {}) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
-  const { data: members = [], isLoading: membersLoading } = useEkipPanelRows(ws?.workspaceId)
+  const members = membersProp
+  const membersLoading = membersLoadingProp
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -63,7 +72,7 @@ export function EkipSummaryTab() {
   const memberIds = useMemo(() => downlines.map(m => m.user_id), [downlines])
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
-  const { data: batch, isLoading: metricsLoading } = useQuery({
+  const { data: batch, isLoading: metricsLoading, isFetching: metricsFetching } = useQuery({
     queryKey: queryKeys.teamRankingMetricsBatch(ws?.workspaceId ?? '', memberIds),
     queryFn: () => getTeamRankingMetricsBatchAction(ws!.workspaceId, memberIds),
     enabled: !!ws?.workspaceId && memberIds.length > 0 && teamPulseUnlocked,
@@ -101,7 +110,10 @@ export function EkipSummaryTab() {
       <TeamFieldRankingTable
         downlines={downlines}
         metrics={metrics}
-        loading={membersLoading || metricsLoading}
+        loading={
+          (membersLoading && downlines.length === 0) ||
+          (metricsLoading && !batch && metricsFetching)
+        }
         getMemberHref={getMemberHref}
       />
     </div>

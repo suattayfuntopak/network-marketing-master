@@ -493,18 +493,29 @@ export function PlatformYonetimContent() {
             {t('platformPage.workspacesTableTitle')}
           </h2>
           <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] md:overflow-x-visible">
-            <table className="w-full max-md:min-w-[920px] text-left border-collapse text-sm md:table-fixed">
+            <table className="w-full max-md:min-w-[920px] text-left border-collapse text-sm">
+              <colgroup>
+                <col className="md:w-[18%]" />
+                <col className="md:w-[14%]" />
+                <col className="md:w-[8%]" />
+                <col className="md:w-[6%]" />
+                <col className="md:w-[6%]" />
+                <col className="md:w-[14%]" />
+                <col className="md:w-[10%]" />
+                <col className="md:w-[10%]" />
+                <col className="md:w-[14%]" />
+              </colgroup>
               <thead>
                 <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] text-xs font-bold select-none">
-                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLeaderName')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thWorkspaceName')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thLicensePlan')}</th>
-                  <th className="px-1 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thCandidates')}</th>
-                  <th className="px-1 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thDownlines')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle whitespace-nowrap">{t('platformPage.thSponsor')}</th>
-                  <th className="px-2 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thExpiry')}</th>
-                  <th className="px-2 py-2 font-semibold text-center align-middle whitespace-nowrap">{t('platformPage.thRegistration')}</th>
-                  <th className="px-2 py-2 font-semibold text-right align-middle whitespace-nowrap">{t('platformPage.thActions')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thLeaderName')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thWorkspaceName')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thLicensePlan')}</th>
+                  <th className="px-1 py-2 font-semibold text-center align-middle">{t('platformPage.thCandidates')}</th>
+                  <th className="px-1 py-2 font-semibold text-center align-middle">{t('platformPage.thDownlines')}</th>
+                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thSponsor')}</th>
+                  <th className="px-2 py-2 font-semibold text-center align-middle">{t('platformPage.thExpiry')}</th>
+                  <th className="px-2 py-2 font-semibold text-center align-middle">{t('platformPage.thRegistration')}</th>
+                  <th className="px-2 py-2 font-semibold text-right align-middle">{t('platformPage.thActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
@@ -564,10 +575,10 @@ export function PlatformYonetimContent() {
                         </td>
 
                         {/* 2. Workspace name */}
-                        <td className="px-2 py-2 align-middle font-medium whitespace-nowrap">{w.workspaceName}</td>
+                        <td className="px-2 py-2 align-middle font-medium whitespace-normal break-words">{w.workspaceName}</td>
 
                         {/* 3. License type */}
-                        <td className="px-2 py-2 align-middle whitespace-nowrap font-bold">
+                        <td className="px-2 py-2 align-middle font-bold shrink-0">
                           <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
                             w.licenseType === 'pro'
                               ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
@@ -594,13 +605,13 @@ export function PlatformYonetimContent() {
                         <td className="px-1 py-2 text-center align-middle font-bold text-brand tabular-nums whitespace-nowrap">{w.downlineCount}</td>
 
                         {/* 6. Sponsor linkage */}
-                        <td className="px-2 py-2 align-middle font-semibold whitespace-nowrap">
+                        <td className="px-2 py-2 align-middle font-semibold whitespace-normal break-words">
                           {w.isIndependent ? (
-                            <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-purple-500/10 px-1.5 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400 truncate">
+                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-1.5 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400">
                               💎 {t('platformPage.independentDirect')}
                             </span>
                           ) : (
-                            <span className="truncate block text-[var(--text-1)]">{w.sponsorName}</span>
+                            <span className="block text-[var(--text-1)]">{w.sponsorName}</span>
                           )}
                         </td>
 

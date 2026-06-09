@@ -14,6 +14,7 @@ import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import {
   downlineActivityMemberIds,
   prefetchEkipRankingMetrics,
+  prefetchHubMetrics,
 } from './prefetchRouteMetrics'
 import { queryKeys } from './keys'
 import { QUERY_STALE } from './staleTimes'
@@ -72,8 +73,8 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
 
   void Promise.all(background)
 
-  // Metrikleri arka planda ısıt — sayfa/sekme açılışında boş ekran beklemesini azaltır.
-  void warmDashboardMetrics(queryClient, ws)
+  // Metrikleri SSR sırasında ısıt — sekme açılışında boş ekran beklemesini önler.
+  await warmDashboardMetrics(queryClient, ws)
 }
 
 /** Kritik veri yüklendikten sonra ekip/istatistik/pano metriklerini önceden çek. */
@@ -94,6 +95,10 @@ export async function warmDashboardMetrics(
 
   if (hasTeamPageAccess(licenseType, isSuperAdmin)) {
     warmTasks.push(prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice))
+  }
+
+  if (hasTeamPulseAccess(licenseType, isSuperAdmin)) {
+    warmTasks.push(prefetchHubMetrics(queryClient, workspaceId, wsSlice))
   }
 
   if (hasTeamPulseAccess(licenseType, isSuperAdmin)) {

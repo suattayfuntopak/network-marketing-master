@@ -80,7 +80,8 @@ export function TeamPerformanceTable({
   const { t } = useTranslation()
   const router = useRouter()
 
-  const appRows = performanceRows.filter(r => r.isAppUser !== false)
+  const displayRows = performanceRows.filter(r => r.role !== 'leader')
+  const appRows = displayRows.filter(r => r.isAppUser !== false)
 
   const totals = useMemo(() => {
     const sum = (sel: (r: PerformanceRow) => number) =>
@@ -114,7 +115,7 @@ export function TeamPerformanceTable({
 
       {loading ? (
         <div className="h-32 animate-pulse rounded-xl bg-[var(--bg-subtle)]" />
-      ) : performanceRows.length === 0 ? (
+      ) : displayRows.length === 0 ? (
         <div className="py-10 text-center text-sm text-[var(--text-3)] italic">
           {t('statsPage.teamEmpty')}
         </div>
@@ -143,7 +144,7 @@ export function TeamPerformanceTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
-              {performanceRows.map(m => {
+              {displayRows.map(m => {
                 const isLeader = m.role === 'leader'
                 const isAppUser = m.isAppUser !== false
                 const lastActive = m.last_activity_at ? new Date(m.last_activity_at) : null

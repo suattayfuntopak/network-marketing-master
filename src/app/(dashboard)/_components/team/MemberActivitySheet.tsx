@@ -368,11 +368,6 @@ export function MemberActivitySheet({
               </span>
               <span className="text-left text-[var(--text-2)]">
                 {t('pulse.colVideos')}: <strong className="text-[var(--text-1)]">%{data.videoPct ?? 0}</strong>
-                {data.videoTotal != null && data.videoTotal > 0 && (
-                  <span className="text-xs text-[var(--text-3)]">
-                    {' '}({data.videoCompleted}/{data.videoTotal})
-                  </span>
-                )}
               </span>
               <span className="text-right text-[var(--text-2)]">
                 {t('statsPage.colDqsg')}:{' '}
