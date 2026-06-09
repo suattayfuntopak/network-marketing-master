@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { BookOpen, Plus } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { useWorkspace } from '@/hooks/useWorkspace'
 import { parseAkademiTab, akademiHref, type AkademiTab } from '@/lib/domain/akademiTab'
 import { EgitimContent } from './EgitimContent'
 import { VideolarContent } from './VideolarContent'
@@ -19,10 +18,7 @@ export function AkademiContent() {
   const { t } = useTranslation()
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { data: ws } = useWorkspace()
   const tab = parseAkademiTab(searchParams.get('tab'))
-  const isAdmin = !!ws?.isSuperAdmin
-
   const [trainingFormOpen, setTrainingFormOpen] = useState(false)
   const [videoFormOpen, setVideoFormOpen] = useState(false)
   const [objectionFormOpen, setObjectionFormOpen] = useState(false)
@@ -35,42 +31,42 @@ export function AkademiContent() {
     router.replace(akademiHref(next), { scroll: false })
   }
 
+  const addButtonClass = (theme: keyof typeof AKADEMI_TAB_THEME) =>
+    clsx(
+      'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-sm transition active:scale-95 sm:h-auto sm:w-auto sm:gap-1.5 sm:px-3.5 sm:py-2 sm:text-sm sm:font-bold',
+      AKADEMI_TAB_THEME[theme].addButtonClass,
+    )
+
   const addButton =
     tab === 'training' ? (
       <button
         type="button"
         onClick={() => setTrainingFormOpen(true)}
-        className={clsx(
-          'flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95',
-          AKADEMI_TAB_THEME.training.addButtonClass,
-        )}
+        aria-label={t('trainingPage.addContent')}
+        className={addButtonClass('training')}
       >
-        <Plus className="h-3.5 w-3.5" />
-        <span>{t('trainingPage.addContent')}</span>
+        <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+        <span className="hidden sm:inline">{t('trainingPage.addContent')}</span>
       </button>
-    ) : tab === 'videos' && isAdmin ? (
+    ) : tab === 'videos' ? (
       <button
         type="button"
         onClick={() => setVideoFormOpen(true)}
-        className={clsx(
-          'flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95',
-          AKADEMI_TAB_THEME.videos.addButtonClass,
-        )}
+        aria-label={t('videoTraining.addVideoShort')}
+        className={addButtonClass('videos')}
       >
-        <Plus className="h-3.5 w-3.5" />
-        <span>{t('videoTraining.addVideoShort')}</span>
+        <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+        <span className="hidden sm:inline">{t('videoTraining.addVideoShort')}</span>
       </button>
     ) : tab === 'objections' ? (
       <button
         type="button"
         onClick={() => setObjectionFormOpen(true)}
-        className={clsx(
-          'flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95',
-          AKADEMI_TAB_THEME.objections.addButtonClass,
-        )}
+        aria-label={t('objectionsPage.addObjection')}
+        className={addButtonClass('objections')}
       >
-        <Plus className="h-3.5 w-3.5" />
-        <span>{t('objectionsPage.addObjection')}</span>
+        <Plus className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+        <span className="hidden sm:inline">{t('objectionsPage.addObjection')}</span>
       </button>
     ) : null
 

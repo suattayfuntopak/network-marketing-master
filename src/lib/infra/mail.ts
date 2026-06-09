@@ -331,7 +331,7 @@ export async function sendUnresolvedOrderAlertEmail(params: {
 export async function sendModerationAlertEmail(
   userEmail: string,
   userName: string,
-  contentType: 'training' | 'objection',
+  contentType: 'training' | 'objection' | 'video',
   contentTitle: string
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
@@ -339,7 +339,12 @@ export async function sendModerationAlertEmail(
     return false
   }
 
-  const typeLabel = contentType === 'training' ? 'İçerik (Vaktin Varsa)' : 'İtirazlara Cevap'
+  const typeLabel =
+    contentType === 'training'
+      ? 'İçerik (Vaktin Varsa)'
+      : contentType === 'video'
+        ? 'Video Eğitim'
+        : 'İtirazlara Cevap'
   const subject = `Yeni Moderasyon Talebi: ${contentTitle}`
   const content = [
     emailHeading('Yeni İçerik/İtiraz Ekleme Talebi'),
@@ -375,7 +380,7 @@ export async function sendModerationAlertEmail(
 export async function sendModerationApprovedEmail(
   userEmail: string,
   userName: string,
-  contentType: 'training' | 'objection',
+  contentType: 'training' | 'objection' | 'video',
   contentTitle: string,
   itemKey: string,
   lang: 'tr' | 'en' = 'tr'
@@ -385,9 +390,12 @@ export async function sendModerationApprovedEmail(
     return false
   }
 
-  const typeLabel = contentType === 'training'
-    ? (lang === 'en' ? 'Training content' : 'İçerik')
-    : (lang === 'en' ? 'Objection handler' : 'İtiraz')
+  const typeLabel =
+    contentType === 'training'
+      ? (lang === 'en' ? 'Training content' : 'İçerik')
+      : contentType === 'video'
+        ? (lang === 'en' ? 'Training video' : 'Video')
+        : (lang === 'en' ? 'Objection handler' : 'İtiraz')
 
   const subject = lang === 'en'
     ? `Approved! Your content addition is live 🚀`
@@ -396,7 +404,9 @@ export async function sendModerationApprovedEmail(
   const directLink =
     contentType === 'training'
       ? `${NMM_APP_URL}/egitim?id=${itemKey}`
-      : `${NMM_APP_URL}/egitim?tab=objections&id=${itemKey}`
+      : contentType === 'video'
+        ? `${NMM_APP_URL}/egitim?tab=videos`
+        : `${NMM_APP_URL}/egitim?tab=objections&id=${itemKey}`
 
   const content = lang === 'en'
     ? [
@@ -441,7 +451,7 @@ export async function sendModerationApprovedEmail(
 export async function sendModerationRejectedEmail(
   userEmail: string,
   userName: string,
-  contentType: 'training' | 'objection',
+  contentType: 'training' | 'objection' | 'video',
   contentTitle: string,
   reason: string,
   lang: 'tr' | 'en' = 'tr'
@@ -451,9 +461,12 @@ export async function sendModerationRejectedEmail(
     return false
   }
 
-  const typeLabel = contentType === 'training'
-    ? (lang === 'en' ? 'Training content' : 'İçerik')
-    : (lang === 'en' ? 'Objection handler' : 'İtiraz')
+  const typeLabel =
+    contentType === 'training'
+      ? (lang === 'en' ? 'Training content' : 'İçerik')
+      : contentType === 'video'
+        ? (lang === 'en' ? 'Training video' : 'Video')
+        : (lang === 'en' ? 'Objection handler' : 'İtiraz')
 
   const subject = lang === 'en'
     ? `Update regarding your content addition request`

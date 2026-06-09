@@ -6,7 +6,7 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  Crown, Check, TrendingUp, BarChart2, Rocket, Bot,
+  Crown, Check, TrendingUp, Rocket, Bot,
   Phone, Search, BarChart3, Target, ChevronDown,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -26,11 +26,11 @@ import { InviteTeammateSection } from './InviteTeammateSection'
 import { JoinByInviteSection } from './JoinByInviteSection'
 import { BroadcastPanel } from './BroadcastPanel'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { addTeamMemberAsCandidateAction, unlinkTeamMemberPipelineAction } from '../actions'
+import { addTeamMemberAsCandidateAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
-import { UserPlus, Unlink } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -180,26 +180,9 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
-  const [unlinkingMemberId, setUnlinkingMemberId] = useState<string | null>(null)
   const [toolsOpen, setToolsOpen] = useState(false)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const hasTeamTools = isLeader || !hasUpline
-
-  async function handleUnlinkMemberPipeline(member: MemberRow) {
-    if (unlinkingMemberId) return
-    setUnlinkingMemberId(member.user_id)
-    try {
-      await unlinkTeamMemberPipelineAction(ws.workspaceId, member.user_id)
-      invalidateHubMetrics(queryClient, ws.workspaceId)
-      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
-      toast.success(t('team.unlinkPipelineSuccess'))
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : t('common.error')
-      toast.error(message)
-    } finally {
-      setUnlinkingMemberId(null)
-    }
-  }
 
   async function handleLinkMemberToPipeline(member: MemberRow) {
     if (!member.full_name || linkingMemberId) return
@@ -336,7 +319,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
 
   const prefetchMemberActivity = useCallback((userId: string) => {
-    const periods: SheetActivityPeriod[] = ['today', '7d', '30d']
+    const periods: SheetActivityPeriod[] = ['today', '7d', '30d', 'all']
     for (const p of periods) {
       void queryClient.prefetchQuery({
         queryKey: ['member-activity', ws.workspaceId, userId, p],
@@ -371,10 +354,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
       <>
       <section className="space-y-5">
         <TeamFreeUpgradeBanner />
-        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
-          <BarChart2 className="h-5 w-5" />
-          {t('team.performancePanel')}
-        </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
@@ -423,12 +402,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   return (
       <>
       <section className="space-y-5">
-        <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
-          <BarChart2 className="h-5 w-5" />
-          {t('team.performancePanel')}
-        </h2>
-
-        {/* Özet istatistik kartları */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
           <div className="rounded-2xl border border-[var(--border)] bg-[#E8F5E9] dark:bg-emerald-950/25 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-emerald-700 dark:text-emerald-400">1</p>
@@ -545,21 +518,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   >
                     <UserPlus className="h-4 w-4 shrink-0" />
                     <span>{t('team.linkToPipeline')}</span>
-                  </button>
-                ) : null}
-
-                {isLeader && m.isAppUser !== false && m.role === 'member' && m.pipeline_id ? (
-                  <button
-                    type="button"
-                    disabled={unlinkingMemberId === m.user_id}
-                    onClick={e => {
-                      e.stopPropagation()
-                      void handleUnlinkMemberPipeline(m)
-                    }}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-xs font-bold text-[var(--text-2)] transition hover:bg-[var(--bg-card)] hover:text-[var(--text-1)] disabled:opacity-50 sm:w-auto"
-                  >
-                    <Unlink className="h-4 w-4 shrink-0" />
-                    <span>{t('team.unlinkPipeline')}</span>
                   </button>
                 ) : null}
 

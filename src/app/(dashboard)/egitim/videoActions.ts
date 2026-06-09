@@ -2,7 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { assertSuperAdmin } from '@/lib/domain/auth'
+import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
+import { sendModerationAlertEmail } from '@/lib/infra/mail'
 import { type TrainingVideoDef } from '@/lib/domain/trainingVideos'
 import {
   summarizeVideoProgress,
@@ -57,7 +58,7 @@ function rowToDef(r: VideoRow): TrainingVideoAdmin {
 }
 
 /** YouTube URL'sinden (veya ham id'den) 11 karakterlik video id'sini çıkarır. */
-function extractYoutubeId(input: string): string {
+export function extractYoutubeId(input: string): string {
   const raw = input.trim()
   const patterns = [
     /youtu\.be\/([A-Za-z0-9_-]{11})/,
@@ -359,12 +360,19 @@ async function assertAdmin() {
   return createAdminClient()
 }
 
-export async function createTrainingVideoAction(input: VideoInput): Promise<void> {
-  const admin = await assertAdmin()
+export async function createTrainingVideoAction(
+  workspaceId: string,
+  input: VideoInput,
+): Promise<{ success: boolean; isApproved: boolean }> {
+  const { user } = await assertMember(workspaceId)
   const youtubeId = extractYoutubeId(input.youtubeUrlOrId)
   if (!youtubeId) throw new Error('Geçerli bir YouTube video bağlantısı/ID girin.')
   if (!input.titleTr.trim()) throw new Error('Başlık (TR) gerekli.')
 
+  const admin = createAdminClient()
+  const isApproved = isSuperAdmin(user)
+  const userEmail = user.email ?? ''
+  const userName = (user.user_metadata?.full_name as string) ?? user.email?.split('@')[0] ?? 'NMM Üyesi'
   const key = `vid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
 
   const { error } = await admin.from('nmm_training_videos').insert({
@@ -379,8 +387,21 @@ export async function createTrainingVideoAction(input: VideoInput): Promise<void
     category_en: input.categoryEn.trim(),
     related_training_id: input.relatedTrainingId || null,
     sort_order: input.sortOrder ?? 999,
+    is_approved: isApproved,
+    user_id: user.id,
+    workspace_id: workspaceId,
+    user_email: userEmail,
+    user_name: userName,
   })
   if (error) throw new Error('Video eklenemedi: ' + error.message)
+
+  if (!isApproved) {
+    sendModerationAlertEmail(userEmail, userName, 'video', input.titleTr.trim()).catch(err => {
+      console.error('[Resend Alert Error]', err)
+    })
+  }
+
+  return { success: true, isApproved }
 }
 
 export async function updateTrainingVideoAction(id: string, input: VideoInput): Promise<void> {

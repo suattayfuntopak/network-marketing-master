@@ -209,7 +209,7 @@ export const en = {
     summaryTabDaily: "Daily",
     summaryTabWeekly: "Weekly",
     summaryTabMonthly: "Monthly",
-    summaryTabYearly: "Yearly",
+    summaryTabAll: "All",
     summaryTabAllTime: "All Time",
     crownMockDailySummary: "Daily Summary",
     dailyTrackTitle: "Your Daily Action Summary",

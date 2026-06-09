@@ -244,11 +244,18 @@ export function funnelRangeForPulsePeriod(period: PulsePeriod): FunnelPeriodRang
   } else if (period === '30d') {
     startDate = new Date(endDate)
     startDate.setDate(startDate.getDate() - 29)
+  } else if (period === 'all') {
+    return {
+      sinceIso: '1970-01-01T00:00:00.000Z',
+      untilIso: endIso,
+      startCalendarKey: '1970-01-01',
+      endCalendarKey: end,
+    }
   } else if (period === 'ytd') {
     startDate = new Date(endDate.getFullYear(), 0, 1)
   } else {
     startDate = new Date(endDate)
-    startDate.setFullYear(startDate.getFullYear() - 5)
+    startDate.setDate(startDate.getDate() - 29)
   }
 
   const start = toCalendarKey(startDate)

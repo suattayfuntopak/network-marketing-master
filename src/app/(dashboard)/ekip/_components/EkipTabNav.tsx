@@ -73,13 +73,15 @@ export function EkipTabNav({ activeTab }: Props) {
             role="tab"
             aria-selected={isActive}
             onClick={() => selectTab(id)}
+            aria-label={t(labelKey)}
+            title={t(labelKey)}
             className={clsx(
-              'flex min-w-[4.5rem] flex-1 shrink-0 items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] sm:gap-2 sm:text-sm',
+              'flex h-10 min-w-0 flex-1 shrink-0 items-center justify-center gap-1 rounded-xl px-2 py-2.5 text-[11px] font-semibold transition-all duration-200 active:scale-[0.98] sm:gap-2 sm:h-auto sm:min-w-[4.5rem] sm:py-2.5 sm:text-sm',
               isActive ? activeClass : 'text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
             )}
           >
-            <Icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">{t(labelKey)}</span>
+            <Icon className="h-4 w-4 shrink-0 sm:h-3.5 sm:w-3.5" />
+            <span className="hidden truncate sm:inline">{t(labelKey)}</span>
           </button>
         )
       })}

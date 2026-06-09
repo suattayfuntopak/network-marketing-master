@@ -26,6 +26,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
   type DVal = Record<string, string> | string | string[] | undefined
   const d = request.data as unknown as Record<string, DVal>
   const isTraining = request.contentType === 'training'
+  const isVideo = request.contentType === 'video'
 
   function ds(v: DVal, fallback = ''): string {
     if (v === undefined || v === null) return fallback
@@ -35,10 +36,15 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
   }
 
   const [editTitle, setEditTitle] = useState<string>(() =>
-    isTraining ? ds(d.baslik) : ds(d.soru)
+    isVideo ? ds(d.titleTr) : isTraining ? ds(d.baslik) : ds(d.soru)
   )
   const [editCategory, setEditCategory] = useState<string>(() =>
-    isTraining ? ds(d.kategoriBaslik, 'Zihniyet') : ds(d.kategori, 'Genel')
+    isVideo ? ds(d.categoryTr, 'Genel') : isTraining ? ds(d.kategoriBaslik, 'Zihniyet') : ds(d.kategori, 'Genel')
+  )
+  const [editYoutube, setEditYoutube] = useState<string>(() => (isVideo ? ds(d.youtubeUrlOrId) : ''))
+  const [editDescription, setEditDescription] = useState<string>(() => (isVideo ? ds(d.descriptionTr) : ''))
+  const [editDuration, setEditDuration] = useState<string>(() =>
+    isVideo ? String(d.durationMin ?? 10) : '10',
   )
   const [editOzet, setEditOzet] = useState<string>(isTraining ? ds(d.ozet) : '')
   const [editIcerik, setEditIcerik] = useState<string>(
@@ -61,7 +67,20 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
       try {
         let edited: Record<string, unknown> = {}
 
-        if (isTraining) {
+        if (isVideo) {
+          edited = {
+            youtubeUrlOrId: editYoutube,
+            titleTr: editTitle,
+            titleEn: editTitle,
+            descriptionTr: editDescription,
+            descriptionEn: editDescription,
+            durationMin: Number(editDuration) || 10,
+            categoryTr: editCategory,
+            categoryEn: editCategory,
+            relatedTrainingId: d.relatedTrainingId ?? null,
+            sortOrder: d.sortOrder ?? 999,
+          }
+        } else if (isTraining) {
           edited = {
             ...d,
             baslik: editTitle,
@@ -143,12 +162,12 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
 
           <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
             <div><strong>{t('moderationReview.submitter')}</strong> {request.userName} ({request.userEmail})</div>
-            <div><strong>{t('moderationReview.type')}</strong> {isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}</div>
+            <div><strong>{t('moderationReview.type')}</strong> {isVideo ? t('moderationReview.typeVideo') : isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}</div>
           </div>
 
           <div className="space-y-1.5">
             <label className="text-sm font-bold text-[var(--text-1)]">
-              {isTraining ? t('moderationReview.labelTitleTraining') : t('moderationReview.labelTitleObjection')}
+              {isVideo ? t('videoTraining.titleTrLabel') : isTraining ? t('moderationReview.labelTitleTraining') : t('moderationReview.labelTitleObjection')}
             </label>
             <input type="text" required value={editTitle} onChange={e => setEditTitle(e.target.value)} className={inputClass} />
           </div>
@@ -158,7 +177,22 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
             <input type="text" required value={editCategory} onChange={e => setEditCategory(e.target.value)} className={inputClass} />
           </div>
 
-          {isTraining ? (
+          {isVideo ? (
+            <>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelYoutube')}</label>
+                <input type="text" required value={editYoutube} onChange={e => setEditYoutube(e.target.value)} className={inputClass} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelDescription')}</label>
+                <textarea rows={3} value={editDescription} onChange={e => setEditDescription(e.target.value)} className={textareaClass('#5B21B6')} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelDuration')}</label>
+                <input type="number" min={1} required value={editDuration} onChange={e => setEditDuration(e.target.value)} className={inputClass} />
+              </div>
+            </>
+          ) : isTraining ? (
             <>
               <div className="space-y-1.5">
                 <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelSummary')}</label>
@@ -190,16 +224,18 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
             </>
           )}
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelEmoji')}</label>
-              <input type="text" required value={editEmoji} onChange={e => setEditEmoji(e.target.value)} className={inputClass} />
+          {!isVideo && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelEmoji')}</label>
+                <input type="text" required value={editEmoji} onChange={e => setEditEmoji(e.target.value)} className={inputClass} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelTags')}</label>
+                <input type="text" value={editTags} onChange={e => setEditTags(e.target.value)} className={inputClass} />
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-[var(--text-1)]">{t('moderationReview.labelTags')}</label>
-              <input type="text" value={editTags} onChange={e => setEditTags(e.target.value)} className={inputClass} />
-            </div>
-          </div>
+          )}
 
           <div className="flex gap-3 pt-3 border-t border-[var(--border)]">
             <button

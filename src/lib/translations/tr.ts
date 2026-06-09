@@ -209,7 +209,7 @@ export const tr = {
     summaryTabDaily: "Günlük",
     summaryTabWeekly: "Haftalık",
     summaryTabMonthly: "Aylık",
-    summaryTabYearly: "Yıllık",
+    summaryTabAll: "Tümü",
     summaryTabAllTime: "Tüm Zamanlar",
     crownMockDailySummary: "Günlük Özet",
     dailyTrackTitle: "Günlük Aksiyon Özetin",

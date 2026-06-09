@@ -14,6 +14,8 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { hubPeriodTabLabel } from '@/components/hub/HubSummaryTabBar'
+import type { HubPeriodTab } from '@/components/hub/HubSummaryTabBar'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
@@ -32,7 +34,7 @@ export type MemberActivityTarget = {
   pipelineHref?: string | null
 }
 
-const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d']
+const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d', 'all']
 const METRICS_GRID_MIN_H = 'min-h-[22rem]'
 
 interface Props {
@@ -48,10 +50,15 @@ interface Props {
   onClose?: () => void
 }
 
+const SHEET_TO_HUB_TAB: Record<SheetActivityPeriod, HubPeriodTab> = {
+  today: 'daily',
+  '7d': 'weekly',
+  '30d': 'monthly',
+  all: 'all',
+}
+
 function sheetPeriodLabel(t: (key: string) => string, p: SheetActivityPeriod): string {
-  if (p === 'today') return t('pulse.periodToday')
-  if (p === '7d') return t('statsPage.period7d')
-  return t('statsPage.period30d')
+  return hubPeriodTabLabel(t, SHEET_TO_HUB_TAB[p])
 }
 
 function MetricsGridSkeleton() {

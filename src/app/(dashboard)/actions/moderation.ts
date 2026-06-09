@@ -12,6 +12,9 @@ import {
 import { buildBilingualRejectReason } from '@/lib/domain/moderationRejectReason'
 import { enrichApprovedModerationData } from '@/lib/domain/moderationApproval'
 import { translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
+import { extractYoutubeId } from '@/app/(dashboard)/egitim/videoActions'
+
+export type ModerationContentType = 'training' | 'objection' | 'video'
 
 interface ContentSubmissionResult {
   success: boolean
@@ -41,7 +44,6 @@ export async function submitModeratedRequestAction(
   const table = contentType === 'training' ? 'nmm_custom_trainings' : 'nmm_custom_objections'
   const isApproved = isSuperAdmin(user)
 
-  // Insert content
   const { error } = await admin.from(table).insert({
     user_id: user.id,
     workspace_id: workspaceId,
@@ -57,12 +59,10 @@ export async function submitModeratedRequestAction(
     throw new Error('İçerik eklenirken bir hata oluştu: ' + error.message)
   }
 
-  // If not super admin, alert super admin via email
   if (!isApproved) {
     const title = contentType === 'training'
       ? ((data.baslik as string | undefined) ?? 'İsimsiz İçerik')
       : (((data.soru as Record<string, string> | undefined)?.tr) ?? (data.soru as string | undefined) ?? 'İsimsiz İtiraz')
-    // Trigger alerting asynchronously
     sendModerationAlertEmail(userEmail, userName, contentType, title).catch(err => {
       console.error('[Resend Alert Error]', err)
     })
@@ -81,7 +81,33 @@ export interface ModerationRequestItem {
   isApproved: boolean
   userEmail: string | null
   userName: string | null
-  contentType: 'training' | 'objection'
+  contentType: ModerationContentType
+}
+
+function videoRowToModerationData(row: {
+  youtube_id: string
+  title_tr: string
+  title_en: string
+  description_tr: string
+  description_en: string
+  duration_min: number
+  category_tr: string
+  category_en: string
+  related_training_id: string | null
+  sort_order: number
+}): Json {
+  return {
+    youtubeUrlOrId: row.youtube_id,
+    titleTr: row.title_tr,
+    titleEn: row.title_en,
+    descriptionTr: row.description_tr,
+    descriptionEn: row.description_en,
+    durationMin: row.duration_min,
+    categoryTr: row.category_tr,
+    categoryEn: row.category_en,
+    relatedTrainingId: row.related_training_id,
+    sortOrder: row.sort_order,
+  } as Json
 }
 
 /**
@@ -93,7 +119,7 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
 
   const admin = createAdminClient()
 
-  const [trainingsResult, objectionsResult] = await Promise.all([
+  const [trainingsResult, objectionsResult, videosResult] = await Promise.all([
     admin
       .from('nmm_custom_trainings')
       .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
@@ -104,6 +130,11 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
       .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
       .eq('is_approved', false)
       .order('created_at', { ascending: false }),
+    admin
+      .from('nmm_training_videos')
+      .select('id, key, user_id, workspace_id, youtube_id, title_tr, title_en, description_tr, description_en, duration_min, category_tr, category_en, related_training_id, sort_order, created_at, is_approved, user_email, user_name')
+      .eq('is_approved', false)
+      .order('created_at', { ascending: false }),
   ])
 
   const { data: trainings, error: tErr } = trainingsResult
@@ -111,6 +142,9 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
 
   const { data: objections, error: oErr } = objectionsResult
   if (oErr) console.error('[getPendingRequestsAction] objections fetch error:', oErr)
+
+  const { data: videos, error: vErr } = videosResult
+  if (vErr) console.error('[getPendingRequestsAction] videos fetch error:', vErr)
 
   const list: ModerationRequestItem[] = []
 
@@ -144,7 +178,21 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
     })
   })
 
-  // Sort combined list by created_at desc
+  videos?.forEach(item => {
+    list.push({
+      id: item.id,
+      userId: item.user_id ?? '',
+      workspaceId: item.workspace_id,
+      itemKey: item.key,
+      data: videoRowToModerationData(item),
+      createdAt: item.created_at,
+      isApproved: item.is_approved,
+      userEmail: item.user_email,
+      userName: item.user_name,
+      contentType: 'video',
+    })
+  })
+
   return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 }
 
@@ -154,7 +202,7 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
  */
 export async function approveRequestAction(
   id: string,
-  contentType: 'training' | 'objection',
+  contentType: ModerationContentType,
   editedData: Json
 ): Promise<{ success: boolean }> {
   const supabase = await createClient()
@@ -162,9 +210,63 @@ export async function approveRequestAction(
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
+
+  if (contentType === 'video') {
+    const edited = editedData as Record<string, unknown>
+    const { data: row, error: fetchErr } = await admin
+      .from('nmm_training_videos')
+      .select('user_email, user_name, key')
+      .eq('id', id)
+      .single()
+
+    if (fetchErr || !row) {
+      throw new Error('Video kaydı bulunamadı: ' + (fetchErr?.message ?? ''))
+    }
+
+    const youtubeId = extractYoutubeId(String(edited.youtubeUrlOrId ?? edited.youtube_id ?? ''))
+    if (!youtubeId) throw new Error('Geçerli bir YouTube video bağlantısı/ID gerekli.')
+
+    const { error: updateErr } = await admin
+      .from('nmm_training_videos')
+      .update({
+        youtube_id: youtubeId,
+        title_tr: String(edited.titleTr ?? edited.title_tr ?? '').trim(),
+        title_en: String(edited.titleEn ?? edited.title_en ?? edited.titleTr ?? '').trim(),
+        description_tr: String(edited.descriptionTr ?? edited.description_tr ?? '').trim(),
+        description_en: String(edited.descriptionEn ?? edited.description_en ?? '').trim(),
+        duration_min: Math.max(1, Math.round(Number(edited.durationMin ?? edited.duration_min ?? 10))),
+        category_tr: String(edited.categoryTr ?? edited.category_tr ?? '').trim(),
+        category_en: String(edited.categoryEn ?? edited.category_en ?? '').trim(),
+        related_training_id: (edited.relatedTrainingId ?? edited.related_training_id ?? null) as string | null,
+        sort_order: Number(edited.sortOrder ?? edited.sort_order ?? 999),
+        is_approved: true,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id)
+
+    if (updateErr) {
+      throw new Error('Video onaylanırken hata oluştu: ' + updateErr.message)
+    }
+
+    const title = String(edited.titleTr ?? edited.title_tr ?? 'İsimsiz Video')
+    if (row.user_email) {
+      sendModerationApprovedEmail(
+        row.user_email,
+        row.user_name ?? 'NMM Üyesi',
+        'video',
+        title,
+        row.key,
+        'tr',
+      ).catch(err => {
+        console.error('[Resend Approval Notification Error]', err)
+      })
+    }
+
+    return { success: true }
+  }
+
   const table = contentType === 'training' ? 'nmm_custom_trainings' : 'nmm_custom_objections'
 
-  // Fetch the submission row to know the submitter's info & language preference
   const { data: row, error: fetchErr } = await admin
     .from(table)
     .select('user_email, user_name, item_key, user_id')
@@ -181,7 +283,6 @@ export async function approveRequestAction(
     translateNoteAction,
   )
 
-  // Update table row to approve & merge any admin edits
   const { error: updateErr } = await admin
     .from(table)
     .update({
@@ -232,7 +333,7 @@ export async function buildBilingualRejectReasonAction(
  */
 export async function rejectRequestAction(
   id: string,
-  contentType: 'training' | 'objection',
+  contentType: ModerationContentType,
   reason?: string
 ): Promise<{ success: boolean }> {
   const supabase = await createClient()
@@ -240,9 +341,37 @@ export async function rejectRequestAction(
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
+
+  if (contentType === 'video') {
+    const { data: row } = await admin
+      .from('nmm_training_videos')
+      .select('user_email, user_name, title_tr')
+      .eq('id', id)
+      .single()
+
+    const { error } = await admin.from('nmm_training_videos').delete().eq('id', id)
+    if (error) {
+      throw new Error('Video reddedilirken silinemedi: ' + error.message)
+    }
+
+    if (row?.user_email) {
+      sendModerationRejectedEmail(
+        row.user_email,
+        row.user_name ?? 'NMM Üyesi',
+        'video',
+        row.title_tr ?? 'İsimsiz Video',
+        rejectReasonForEmail(reason, 'tr'),
+        'tr',
+      ).catch(err => {
+        console.error('[Resend Rejection Email Error]', err)
+      })
+    }
+
+    return { success: true }
+  }
+
   const table = contentType === 'training' ? 'nmm_custom_trainings' : 'nmm_custom_objections'
 
-  // Fetch the submission row first to retrieve user contact details and the title before deletion
   const { data: row } = await admin
     .from(table)
     .select('user_email, user_name, data')
@@ -254,14 +383,12 @@ export async function rejectRequestAction(
     throw new Error('İçerik reddedilirken silinemedi: ' + error.message)
   }
 
-  // Trigger rejection notification asynchronously
   if (row && row.user_email) {
     const rowData = row.data as Record<string, Json | undefined>
     const title = contentType === 'training'
       ? ((rowData?.baslik as string | undefined) ?? 'İsimsiz İçerik')
       : (((rowData?.soru as Record<string, string> | undefined)?.tr) ?? ((rowData?.soru as Record<string, string> | undefined)?.en) ?? (rowData?.soru as string | undefined) ?? 'İsimsiz İtiraz')
 
-    // Find lang or default to 'tr'
     const userLang: 'tr' | 'en' = 'tr'
 
     sendModerationRejectedEmail(

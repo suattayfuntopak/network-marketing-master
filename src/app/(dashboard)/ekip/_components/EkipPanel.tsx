@@ -90,8 +90,8 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   const isPlusCapReached = licenseType === 'plus' && totalDownlineCount > 50
 
   const visibleMembers = licenseType === 'plus'
-    ? [members[0], ...downlineMembers.slice(0, 50)].filter(Boolean)
-    : members
+    ? downlineMembers.slice(0, 50)
+    : downlineMembers
 
   const filteredVisibleMembers = useMemo(() => {
     const q = memberSearch.trim().toLowerCase()

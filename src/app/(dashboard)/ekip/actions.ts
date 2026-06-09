@@ -418,43 +418,6 @@ export async function addTeamMemberAsCandidateAction(
   return { candidateId, created: true }
 }
 
-/** Üye ↔ boru hattı bağlantısını kaldır; otomatik isim eşleşmesini de sustur. */
-export async function unlinkTeamMemberPipelineAction(
-  workspaceId: string,
-  memberUserId: string,
-): Promise<void> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Oturum bulunamadı.')
-
-  const { data: ownWs } = await supabase
-    .from('nmm_workspaces')
-    .select('id, owner_id')
-    .eq('id', workspaceId)
-    .single()
-
-  if (!ownWs || ownWs.owner_id !== user.id) {
-    throw new Error('Bu işlem için lider yetkisi gerekli.')
-  }
-
-  const { error: linkErr } = await supabase
-    .from('nmm_team_pipeline_links')
-    .delete()
-    .eq('workspace_id', workspaceId)
-    .eq('member_user_id', memberUserId)
-
-  if (linkErr) throw new Error(linkErr.message)
-
-  const { error: blockErr } = await supabase
-    .from('nmm_team_pipeline_match_blocks')
-    .upsert(
-      { workspace_id: workspaceId, member_user_id: memberUserId },
-      { onConflict: 'workspace_id,member_user_id' },
-    )
-
-  if (blockErr) throw new Error(blockErr.message)
-}
-
 export async function joinWorkspaceByInviteAction(
   inviteCode: string
 ): Promise<{ workspace_name?: string }> {

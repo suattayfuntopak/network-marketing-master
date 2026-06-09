@@ -10,7 +10,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatformAdmin'
 import {
   Crown, Users, ShieldCheck, Search,
-  Mail, Sparkles, UserPlus, BookOpen, MessageSquare,
+  Mail, Sparkles, UserPlus, BookOpen, MessageSquare, Film,
   Plus, Loader2, CheckCircle2, Trash2, CreditCard, LayoutTemplate,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -275,8 +275,8 @@ export function PlatformYonetimContent() {
       <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
         <div className="w-full space-y-6">
           <Skeleton className="h-16 w-full max-w-md rounded-2xl" />
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, i) => (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, i) => (
               <Skeleton key={i} className="h-24 rounded-2xl" />
             ))}
           </div>
@@ -347,7 +347,7 @@ export function PlatformYonetimContent() {
         </header>
 
         {/* Platform KPIs */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {/* KPI 1 */}
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
             <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
@@ -378,6 +378,17 @@ export function PlatformYonetimContent() {
             <div className="mt-1 flex items-baseline gap-2">
               <span className="text-3xl font-black text-emerald-700 dark:text-emerald-300">{totalPaidCount}</span>
               <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-300 ml-auto" />
+            </div>
+          </div>
+
+          {/* KPI 4 — onay bekleyen eğitim talepleri */}
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
+            <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-amber-600 dark:text-amber-300">
+              {t('platformPage.kpiTrainingRequests')}
+            </span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-3xl font-black text-amber-700 dark:text-amber-300">{pendingRequests.length}</span>
+              <BookOpen className="h-4.5 w-4.5 text-amber-600 dark:text-amber-300 ml-auto" />
             </div>
           </div>
         </div>
@@ -675,22 +686,17 @@ export function PlatformYonetimContent() {
           </HorizontalScrollLock>
         </section>
 
-        {/* İçerik ve İtiraz Talepleri Onay Masası */}
+        {/* İçerik/Video/İtiraz Onay Masası */}
         <section className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-4">
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
               <ShieldCheck className="h-4 w-4" />
             </div>
-            <h2 className="text-base font-bold text-[var(--text-1)]">
-              İçerik ve İtiraz Talepleri Onay Masası
-              {pendingRequests.length > 0 && (
-                <span className="ml-2 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-black text-white">
-                  {pendingRequests.length}
-                </span>
-              )}
+            <h2 className="min-w-0 text-sm font-bold text-[var(--text-1)] sm:text-base whitespace-nowrap">
+              {t('platformPage.moderationDeskTitle')}
             </h2>
             <span className="text-[10px] text-[var(--text-3)] font-semibold ml-auto hidden sm:block">
-              NMM ailesinden gelen özgün içerik ve itiraz ekleme taleplerini inceleyin.
+              {t('platformPage.moderationDeskHint')}
             </span>
           </div>
 
@@ -702,17 +708,30 @@ export function PlatformYonetimContent() {
             </div>
           ) : pendingRequests.length === 0 ? (
             <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-8 text-center text-sm text-[var(--text-3)] italic">
-              Bekleyen herhangi bir onay talebi bulunmamaktadır. 🎉 Ekip üyeleri içerik ekledikçe burada listelenecektir.
+              {t('platformPage.moderationDeskEmpty')}
             </div>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {pendingRequests.map(req => {
                 const dateStr = new Date(req.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
                 const isTraining = req.contentType === 'training'
-                const rd = req.data as unknown as Record<string, Record<string, string> | string | string[] | undefined>
-                const title = isTraining ? (rd.baslik ?? 'İsimsiz İçerik') : ((rd.soru as Record<string, string> | undefined)?.tr ?? rd.soru ?? 'İsimsiz İtiraz')
-                const category = isTraining ? (rd.kategoriBaslik ?? 'Zihniyet') : ((rd.kategori as Record<string, string> | undefined)?.tr ?? rd.kategori ?? 'Genel')
-                const preview = isTraining ? (rd.ozet ?? 'Özet bulunmuyor.') : (rd.kisaCevap ?? 'Kısa cevap bulunmuyor.')
+                const isVideo = req.contentType === 'video'
+                const rd = req.data as unknown as Record<string, Record<string, string> | string | string[] | number | undefined>
+                const title = isVideo
+                  ? (rd.titleTr ?? 'İsimsiz Video')
+                  : isTraining
+                    ? (rd.baslik ?? 'İsimsiz İçerik')
+                    : ((rd.soru as Record<string, string> | undefined)?.tr ?? rd.soru ?? 'İsimsiz İtiraz')
+                const category = isVideo
+                  ? (rd.categoryTr ?? 'Genel')
+                  : isTraining
+                    ? (rd.kategoriBaslik ?? 'Zihniyet')
+                    : ((rd.kategori as Record<string, string> | undefined)?.tr ?? rd.kategori ?? 'Genel')
+                const preview = isVideo
+                  ? (rd.descriptionTr ?? 'Açıklama bulunmuyor.')
+                  : isTraining
+                    ? (rd.ozet ?? 'Özet bulunmuyor.')
+                    : (rd.kisaCevap ?? 'Kısa cevap bulunmuyor.')
 
                 return (
                   <div key={req.id} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm space-y-3 relative overflow-hidden flex flex-col justify-between">
@@ -720,10 +739,14 @@ export function PlatformYonetimContent() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
                         <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
-                          isTraining ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400' : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                          isVideo
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                            : isTraining
+                              ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
+                              : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                         }`}>
-                          {isTraining ? <BookOpen className="h-2.5 w-2.5" /> : <MessageSquare className="h-2.5 w-2.5" />}
-                          {isTraining ? 'Vaktin Varsa' : 'İtiraz'}
+                          {isVideo ? <Film className="h-2.5 w-2.5" /> : isTraining ? <BookOpen className="h-2.5 w-2.5" /> : <MessageSquare className="h-2.5 w-2.5" />}
+                          {isVideo ? t('moderationReview.typeVideo') : isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}
                         </span>
                         <span className="text-[9px] text-[var(--text-3)] font-bold">{dateStr}</span>
                       </div>

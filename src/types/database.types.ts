@@ -451,6 +451,11 @@ export interface Database {
           category_en: string
           related_training_id: string | null
           sort_order: number
+          is_approved: boolean
+          user_id: string | null
+          workspace_id: string | null
+          user_email: string | null
+          user_name: string | null
           created_at: string
           updated_at: string
         }
@@ -467,6 +472,11 @@ export interface Database {
           category_en?: string
           related_training_id?: string | null
           sort_order?: number
+          is_approved?: boolean
+          user_id?: string | null
+          workspace_id?: string | null
+          user_email?: string | null
+          user_name?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -483,6 +493,11 @@ export interface Database {
           category_en?: string
           related_training_id?: string | null
           sort_order?: number
+          is_approved?: boolean
+          user_id?: string | null
+          workspace_id?: string | null
+          user_email?: string | null
+          user_name?: string | null
           created_at?: string
           updated_at?: string
         }

@@ -13,6 +13,8 @@ import {
   type TrainingVideoAdmin,
   type VideoInput,
 } from '@/app/(dashboard)/egitim/videoActions'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 
 type Props = {
   /** null → yeni ekle; dolu → düzenle */
@@ -40,7 +42,9 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
   })
   const [saving, setSaving] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
+  const [showSympathetic, setShowSympathetic] = useState(false)
   const { lang, t } = useTranslation()
+  const { data: ws } = useWorkspace()
   useBodyScrollLock(true)
 
   const set = <K extends keyof VideoInput>(k: K, v: VideoInput[K]) =>
@@ -51,13 +55,25 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
       toast.error(t('videoTraining.requiredFieldsError'))
       return
     }
+    if (!ws?.workspaceId) return
     setSaving(true)
     try {
-      if (editing) await updateTrainingVideoAction(editing.id, form)
-      else await createTrainingVideoAction(form)
-      toast.success(editing ? t('videoTraining.videoUpdated') : t('videoTraining.videoAdded'))
-      onSaved()
-      onClose()
+      if (editing) {
+        await updateTrainingVideoAction(editing.id, form)
+        toast.success(t('videoTraining.videoUpdated'))
+        onSaved()
+        onClose()
+      } else {
+        const res = await createTrainingVideoAction(ws.workspaceId, form)
+        if (res.isApproved) {
+          toast.success(t('videoTraining.videoAdded'))
+          onSaved()
+          onClose()
+        } else {
+          onClose()
+          setShowSympathetic(true)
+        }
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : t('videoTraining.operationFailed'))
     } finally {
@@ -190,6 +206,8 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
           onClose={() => setPickerOpen(false)}
         />
       )}
+
+      <SympatheticPopup open={showSympathetic} onClose={() => setShowSympathetic(false)} />
     </div>
   )
 }

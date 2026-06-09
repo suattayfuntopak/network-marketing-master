@@ -218,39 +218,6 @@ export function TeamFieldRankingTable({
         )}
       </section>
 
-      {!loading && rows.length > 0 && (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 p-4">
-          <div className="grid grid-cols-2 gap-x-3 gap-y-2.5 sm:grid-cols-3 md:grid-cols-5">
-            {FUNNEL_METRIC_ORDER.map(metric => {
-              const { Icon } = FUNNEL_METRIC_VISUAL[metric]
-              return (
-                <div key={metric} className="flex items-center gap-2 text-xs text-[var(--text-2)]">
-                  <Icon
-                    className={clsx('h-3.5 w-3.5 shrink-0', FUNNEL_METRIC_VIVID_CLASS[metric])}
-                    strokeWidth={2.25}
-                    aria-hidden
-                  />
-                  <span>{t(FUNNEL_LABEL_KEYS[metric])}</span>
-                </div>
-              )
-            })}
-            {ACTIVITY_COLUMNS.map(col => (
-              <div key={col.id} className="flex items-center gap-2 text-xs text-[var(--text-2)]">
-                {col.id === 'whatsapp' ? (
-                  <WhatsAppIcon className="h-3.5 w-3.5 shrink-0 text-[#128C7E]" aria-hidden />
-                ) : col.Icon ? (
-                  <col.Icon
-                    className={clsx('h-3.5 w-3.5 shrink-0', activityIconClass(col.id))}
-                    strokeWidth={2.25}
-                    aria-hidden
-                  />
-                ) : null}
-                <span>{t(col.labelKey)}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

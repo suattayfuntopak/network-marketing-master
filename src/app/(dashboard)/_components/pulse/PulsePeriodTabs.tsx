@@ -3,15 +3,14 @@
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 
-export const PULSE_PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
+export const PULSE_PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'all']
 
-/** Dönem etiketleri pulse + statsPage anahtarlarından gelir (mevcut konvansiyon). */
+/** Dönem etiketleri — Saha Özetim sekmeleriyle aynı (Günlük/Haftalık/Aylık/Tümü). */
 export function pulsePeriodLabel(t: (key: string) => string, p: PulsePeriod): string {
-  if (p === 'today') return t('pulse.periodToday')
-  if (p === '7d') return t('statsPage.period7d')
-  if (p === '30d') return t('statsPage.period30d')
-  if (p === 'ytd') return t('pulse.periodYtd')
-  return t('statsPage.periodAll')
+  if (p === 'today') return t('dashboard.summaryTabDaily')
+  if (p === '7d') return t('dashboard.summaryTabWeekly')
+  if (p === '30d') return t('dashboard.summaryTabMonthly')
+  return t('dashboard.summaryTabAll')
 }
 
 type Props = {
