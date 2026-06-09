@@ -1,5 +1,46 @@
 # Hot Log
 
+## 2026-06-10 — Saha Özetim sekmeleri + öğrenme özeti düzeltmeleri ✅
+
+### Özet
+- Landing page pano renk değişikliği geri alındı (`LandingHero`, `LandingFeatures`, `panoAccentColors.ts` silindi).
+- Saha Özetim / Ekibim dönem sekmeleri (Günlük/Haftalık/Aylık/Yıllık) pano ilk 4 crown rengiyle boyandı: indigo, teal, coral, amber.
+- Öğrenme özeti başlığından "(Pro)" kaldırıldı; İtiraz % ve DDBR sağa yaslandı.
+
+### Dosyalar
+`HubSummaryTabBar.tsx`, `MemberActivitySheet.tsx`, `LandingFeatures.tsx`, `LandingHero.tsx`, `tr.ts`, `en.ts` (panoAccentColors silindi).
+
+## 2026-06-10 — CI dayanıklılığı: action sürüm bump + smoke kapsamı ✅
+
+### Item 4 — Node 20 deprecation borcu kapatıldı
+- `e2e.yml` ve `migrate-check.yml`: `actions/checkout@v4→v6`, `actions/setup-node@v4→v6`, `actions/upload-artifact@v4→v7` (hepsi Node 24 runtime).
+- `migrate-check.yml` `node-version: '20'→'22'` (e2e ile hizalı).
+- 16 Haziran 2026'da Actions Node 24'e zorlayacaktı; bump ile gelecekteki kırılma önlendi. `cron-emails.yml` sadece `curl` kullanıyor — dokunulmadı.
+
+### Item 3 — Kritik rota smoke kapsamı genişletildi
+- Yeni `e2e/critical-routes-smoke.spec.ts`: public (`/giris`, `/kayit`) + auth-gated (`/pano`, `/hedefim`, `/ekip`, `/crown`) için HTTP <500 + URL doğrulaması.
+- İlke: kırılgan element sorguları YOK — sadece status + URL (tab ARIA regresyonundan çıkarılan ders). Auth rotaları kimlik yoksa skip.
+
+### Item 1 & 2 — deploy-gating / PR akışı: BİLİNÇLİ olarak kullanıcıya bırakıldı
+- Branch protection + required check → solo + çok-ajanlı doğrudan-`main`-push workflow'unu kırar (PR zorunlu).
+- Gerçek "kırmızıysa deploy gitmez" garantisi Vercel tarafı erişim ister (VERCEL_TOKEN/secrets veya dashboard) — ajan erişemiyor. Karar kullanıcıya bırakıldı.
+
+### Dosyalar
+`.github/workflows/e2e.yml`, `.github/workflows/migrate-check.yml`, `e2e/critical-routes-smoke.spec.ts`. (Commit 716587a)
+
+## 2026-06-10 — UI iyileştirmeleri + metrik prefetch performansı ✅
+
+### Özet
+- Aday detay: Aktivite Geçmişi chevron (varsayılan açık), Gelecek Temas +3/+7 hızlı takip.
+- Boru Hattı dark: Tümü sekmesi ve Aday Ekle koyu mor (#5D44C9); light dokunulmadı.
+- İstatistikler başlık ikonu → BarChart3 (sidebar ile aynı).
+- Ekibim: üst özet 4→3 kutu (lider kutusu kaldırıldı); üye kartı aktivite sekmesi varsayılan kapalı.
+- Landing: pano crown renkleri (turkuaz, mor, turuncu) hero + özellik kartları.
+- Performans: `warmDashboardMetrics`, Ekibim/İstatistikler SSR prefetch, route değişiminde otomatik ısınma.
+
+### Dosyalar
+`ActivityLogCard.tsx`, `CandidateFollowUpCard.tsx`, `candidateDetailUtils.ts`, `PipelinePageContent.tsx`, `StageFilter.tsx`, `TeamPerformanceSection.tsx`, `EkipTrainingTab.tsx`, `ekip/page.tsx`, `IstatistiklerContent.tsx`, `istatistikler/page.tsx`, `DashboardShell.tsx`, `prefetchDashboard.ts`, `panoAccentColors.ts`, `LandingFeatures.tsx`, `LandingHero.tsx`, `tr.ts`, `en.ts`.
+
 ## 2026-06-10 — E2E kalıcı çözüm: tab ARIA rolü uyumsuzluğu ✅
 
 ### Kök neden
