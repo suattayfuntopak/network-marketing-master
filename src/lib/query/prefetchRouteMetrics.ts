@@ -8,7 +8,7 @@ import {
   getCrownTeamMonthlyPulseAction,
   getCrownVideoPageAction,
   getCrownTeamWeeklyPulseAction,
-  getHubAllTimeSelfAction,
+  getHubYearlySelfAction,
   getHubDailySelfAction,
   getHubMonthlyInsightsAction,
   getHubMonthlySelfAction,
@@ -86,8 +86,8 @@ export async function prefetchHubMetrics(
       staleTime: METRICS_STALE,
     }),
     queryClient.prefetchQuery({
-      queryKey: queryKeys.hubAllTimeSelf(),
-      queryFn: () => getHubAllTimeSelfAction(),
+      queryKey: queryKeys.hubYearlySelf(0),
+      queryFn: () => getHubYearlySelfAction(0),
       staleTime: METRICS_STALE,
     }),
   ]

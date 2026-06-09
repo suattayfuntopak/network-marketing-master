@@ -13,7 +13,7 @@ type HubCrownFunnelGridProps = {
   actuals: FunnelCounts
   targets: FunnelCounts
   hasGoal: boolean
-  period: 'daily' | 'weekly' | 'monthly' | 'all'
+  period: 'daily' | 'weekly' | 'monthly' | 'yearly'
   loading?: boolean
 }
 
@@ -95,7 +95,7 @@ export function HubCrownFunnelGrid({
                     ? t('crown.hubWeeklyTarget')
                     : period === 'monthly'
                       ? t('crown.hubMonthlyTarget')
-                      : t('crown.hubAllTimeActual')}
+                      : t('crown.hubYearlyTarget')}
               </p>
             ) : (
               <p className="mt-1.5 text-[10px] font-medium text-[var(--text-3)]">{t('crown.noGoal')}</p>

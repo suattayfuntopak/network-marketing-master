@@ -34,7 +34,7 @@ export type MemberActivityTarget = {
   pipelineHref?: string | null
 }
 
-const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d', 'all']
+const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd']
 const METRICS_GRID_MIN_H = 'min-h-[22rem]'
 
 interface Props {
@@ -54,7 +54,7 @@ const SHEET_TO_HUB_TAB: Record<SheetActivityPeriod, HubPeriodTab> = {
   today: 'daily',
   '7d': 'weekly',
   '30d': 'monthly',
-  all: 'all',
+  ytd: 'yearly',
 }
 
 function sheetPeriodLabel(t: (key: string) => string, p: SheetActivityPeriod): string {

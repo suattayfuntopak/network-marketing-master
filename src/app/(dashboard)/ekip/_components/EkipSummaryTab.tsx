@@ -22,7 +22,7 @@ function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
   if (tab === 'daily') return 'today'
   if (tab === 'weekly') return '7d'
   if (tab === 'monthly') return '30d'
-  return 'all'
+  return 'ytd'
 }
 
 export function EkipSummaryTab() {

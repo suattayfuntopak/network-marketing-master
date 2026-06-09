@@ -10,6 +10,7 @@ import { HubPeriodNavigator } from '@/components/hub/HubPeriodNavigator'
 import { HubDayLoginStrip } from '@/components/hub/HubDayLoginStrip'
 import { HubWeekLoginStrip } from '@/components/hub/HubWeekLoginStrip'
 import { HubMonthHero } from '@/components/hub/HubMonthHero'
+import { HubYearHero } from '@/components/hub/HubYearHero'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/components/hub/HubSelfActivityGrid'
 import {
@@ -23,7 +24,7 @@ import {
   getHubDailySelfAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
-  getHubAllTimeSelfAction,
+  getHubYearlySelfAction,
   type HubSelfFieldMetrics,
 } from '@/app/(dashboard)/crown/actions'
 import { queryKeys } from '@/lib/query/keys'
@@ -31,6 +32,7 @@ import {
   calendarDayRange,
   parsePeriodOffset,
   rollingWeekRange,
+  yearRange,
 } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
 const EMPTY_METRICS: HubSelfFieldMetrics = {
@@ -48,7 +50,7 @@ const ACCENT = {
   daily: 'border-teal-300/50 bg-teal-50 dark:border-teal-500/30 dark:bg-teal-950/25',
   weekly: 'border-violet-300/50 bg-violet-50 dark:border-violet-500/30 dark:bg-violet-950/25',
   monthly: 'border-pink-300/50 bg-pink-50 dark:border-pink-500/30 dark:bg-pink-950/25',
-  all: 'border-amber-300/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/25',
+  yearly: 'border-amber-300/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/25',
 } as const
 
 export function FieldSummaryPage() {
@@ -62,6 +64,7 @@ export function FieldSummaryPage() {
   const offset = parsePeriodOffset(searchParams.get('offset'))
   const dayRange = calendarDayRange(offset)
   const weekRange = rollingWeekRange(offset)
+  const yearRangeData = yearRange(offset)
 
   const setTab = useCallback(
     (next: HubPeriodTab) => {
@@ -96,12 +99,12 @@ export function FieldSummaryPage() {
     enabled: tab === 'monthly',
   })
 
-  const { data: allTimeSelf, isLoading: allTimeLoading } = useQuery({
-    queryKey: queryKeys.hubAllTimeSelf(),
-    queryFn: () => getHubAllTimeSelfAction(),
+  const { data: yearlySelf, isLoading: yearlyLoading } = useQuery({
+    queryKey: queryKeys.hubYearlySelf(offset),
+    queryFn: () => getHubYearlySelfAction(offset),
     staleTime: 60_000,
     placeholderData: keepPreviousData,
-    enabled: tab === 'all',
+    enabled: tab === 'yearly',
   })
 
   const dailyActuals = dailySelf?.dailyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
@@ -176,18 +179,30 @@ export function FieldSummaryPage() {
       )
     }
 
-    if (tab === 'all') {
-      const loading = allTimeLoading && !allTimeSelf
+    if (tab === 'yearly') {
+      const loading = yearlyLoading && !yearlySelf
       return (
         <>
-          <HubCrownFunnelGrid
-            actuals={allTimeSelf?.allTimeActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-            targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-            hasGoal={allTimeSelf?.hasGoal ?? false}
-            period="all"
+          <HubPeriodNavigator mode="year" accentClass={ACCENT.yearly} />
+          <HubYearHero
+            loginDays={yearlySelf?.loginDays ?? 0}
+            year={yearlySelf?.year ?? yearRangeData.year}
+            dayOfYear={yearlySelf?.dayOfYear ?? yearRangeData.dayOfYear}
+            totalDaysInYear={yearlySelf?.totalDaysInYear ?? yearRangeData.totalDaysInYear}
+            yearPct={yearlySelf?.yearPct ?? yearRangeData.yearPct}
+            isCurrentYear={yearlySelf?.isCurrentYear ?? offset === 0}
+            fieldMetrics={yearlySelf?.fieldMetrics}
+            yearlyActuals={yearlySelf?.yearlyActuals}
             loading={loading}
           />
-          <HubSelfActivityGrid metrics={allTimeSelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
+          <HubCrownFunnelGrid
+            actuals={yearlySelf?.yearlyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+            targets={yearlySelf?.yearlyTargets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+            hasGoal={yearlySelf?.hasGoal ?? false}
+            period="yearly"
+            loading={loading}
+          />
+          <HubSelfActivityGrid metrics={yearlySelf?.fieldMetrics ?? EMPTY_METRICS} loading={loading} />
         </>
       )
     }
@@ -210,7 +225,9 @@ export function FieldSummaryPage() {
             ? t('crown.hubGoToCurrentWeek')
             : tab === 'monthly'
               ? t('crown.hubGoToCurrentMonth')
-              : undefined
+              : tab === 'yearly'
+                ? t('crown.hubGoToCurrentYear')
+                : undefined
       }
     >
       <div className="space-y-4">

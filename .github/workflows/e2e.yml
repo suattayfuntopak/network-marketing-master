@@ -12,16 +12,21 @@ on:
 
 env:
   CI: true
-  NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
-  SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key' }}
-  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'placeholder-gemini' }}
+  NEXT_TELEMETRY_DISABLED: '1'
+  NODE_OPTIONS: '--max-old-space-size=6144'
 
+# Derleme adımı prod secret'lara bağlanmamalı — yalnızca compile doğrulaması.
+# E2E job'unda gerçek secret'lar (auth testleri için) kullanılır.
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+      SUPABASE_SERVICE_ROLE_KEY: placeholder-service-key
+      GEMINI_API_KEY: placeholder-gemini
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +46,11 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key' }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY != '' && secrets.GEMINI_API_KEY || 'placeholder-gemini' }}
     steps:
       - uses: actions/checkout@v4
 

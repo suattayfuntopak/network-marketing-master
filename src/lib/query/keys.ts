@@ -15,7 +15,7 @@ export const queryKeys = {
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
   hubWeeklySelf: (offset = 0) => ['hub', 'weekly-self', offset] as const,
   hubMonthlySelf: (offset = 0) => ['hub', 'monthly-self', offset] as const,
-  hubAllTimeSelf: () => ['hub', 'all-time-self'] as const,
+  hubYearlySelf: (offset = 0) => ['hub', 'yearly-self', offset] as const,
   hubMonthlyInsights: (offset = 0) => ['hub', 'monthly-insights', offset] as const,
   crownFirst30: (workspaceId: string) => ['crown', 'first30', workspaceId] as const,
   crownSahaRadar: (workspaceId: string) => ['crown', 'saha-radar', workspaceId] as const,

@@ -3,7 +3,7 @@
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'all'] as const
+export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly'] as const
 export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
 
 /** @deprecated Use HubPeriodTab — kept for field summary imports */
@@ -13,7 +13,7 @@ export const HUB_PERIOD_TAB_LABEL_KEYS: Record<HubPeriodTab, string> = {
   daily: 'dashboard.summaryTabDaily',
   weekly: 'dashboard.summaryTabWeekly',
   monthly: 'dashboard.summaryTabMonthly',
-  all: 'dashboard.summaryTabAll',
+  yearly: 'dashboard.summaryTabYearly',
 }
 
 export function hubPeriodTabLabel(
@@ -61,7 +61,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
 }
 
 export function parseSummaryTab(raw: string | null): HubPeriodTab {
-  if (raw === 'yearly') return 'all'
+  if (raw === 'all') return 'yearly'
   if (raw && (HUB_PERIOD_TABS as readonly string[]).includes(raw)) {
     return raw as HubPeriodTab
   }
