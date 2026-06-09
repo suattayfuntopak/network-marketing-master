@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-10 — Deploy gate UÇTAN UCA DOĞRULANDI + lint fix ✅
+
+### Gate canlı çalıştı (gerçek kanıt)
+- `vercel.json` `git.deploymentEnabled.main=false` push'landı (c1a523d).
+- İlk push'ta (ea7a020) E2E **kırmızıydı** → gate **doğru davrandı**, deploy tetiklenmedi. Kök neden: diğer ajanın 127ab27'sinde lint hatası.
+- **Lint fix (f08407c):** `TeamPerformanceTable.tsx` — 127ab27'de eklenen `useMemo` React Compiler `preserve-manual-memoization` hatası veriyordu (defaultlu `{}` paramları + her render yeniden üretilen `appRows`). Manuel `useMemo` kaldırıldı, compiler memoize ediyor. `npm run lint` exit 0.
+- f08407c push → E2E **yeşil** → `deploy.yml` **gerçek hook'u tetikledi**: log'da `HOOK_URL: ***`, `E2E yeşil → ... tetikleniyor (f08407c)`, `Deploy hook tetiklendi.` (PASİF değil).
+
+### Artık üretim akışı
+- Push → E2E koşar → **yeşilse** Vercel Deploy Hook → prod deploy. **Kırmızıysa deploy YOK.**
+- Vercel Git push auto-deploy kapalı; tek deploy yolu hook (E2E sonrası). Doğrudan-`main`-push korunuyor.
+- Kullanıcı Vercel → Deployments'ta f08407c için "Deploy Hook" kaynaklı tek deploy görmeli (Git push değil).
+
+### Dosyalar
+`vercel.json` (c1a523d), `TeamPerformanceTable.tsx` (f08407c). Scaffold: `deploy.yml` (e32e5dc).
+
+## 2026-06-10 — Saha Özetim yıllık hero çeviri anahtarı ✅
+
+### Özet
+- `HubYearHero` / `HubAllTimeHero`: `dashboard.memberDetailWeekly*` → `team.memberDetailWeekly*` (Arama / WhatsApp).
+
+### Dosyalar
+`HubYearHero.tsx`, `HubAllTimeHero.tsx`. (Commit a58b807)
+
 ## 2026-06-10 — Deploy gate AKTİF: prod deploy artık E2E-gated ✅
 
 ### Aktivasyon tamamlandı (kullanıcı 1-3, ajan 4)
@@ -27,7 +51,7 @@
 - Performans: dashboard SSR'da `warmDashboardMetrics` await + hub/ranking prefetch; EkipPanel mount + Saha Özeti tab hover prefetch; önbellek varken skeleton gösterilmez.
 
 ### Dosyalar
-`MemberActivitySheet.tsx`, `TeamFieldRankingTable.tsx`, `TeamPerformanceTable.tsx`, `StatsSuperAdminSections.tsx`, `PlatformYonetimContent.tsx`, `prefetchDashboard.ts`, `EkipPanel.tsx`, `EkipSummaryTab.tsx`, `EkipTabNav.tsx`
+`MemberActivitySheet.tsx`, `TeamFieldRankingTable.tsx`, `TeamPerformanceTable.tsx`, `StatsSuperAdminSections.tsx`, `PlatformYonetimContent.tsx`, `prefetchDashboard.ts`, `EkipPanel.tsx`, `EkipSummaryTab.tsx`, `EkipTabNav.tsx`. (Commit 127ab27)
 
 ## 2026-06-10 — Saha Özetim metrik kutuları pano renkleri ✅
 
