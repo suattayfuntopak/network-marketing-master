@@ -65,12 +65,19 @@ const dictionaries = {
 }
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [lang, setLangState] = useState<LangType>(() => {
-    if (typeof window === 'undefined') return 'tr'
+  const [lang, setLangState] = useState<LangType>('tr')
+
+  React.useEffect(() => {
     const saved = localStorage.getItem('nmm_lang') as LangType | null
-    if (saved === 'tr' || saved === 'en') return saved
-    return navigator.language.slice(0, 2) === 'en' ? 'en' : 'tr'
-  })
+    if (saved === 'tr' || saved === 'en') {
+      setLangState(saved)
+    } else {
+      const detected = navigator.language.slice(0, 2) === 'en' ? 'en' : 'tr'
+      if (detected !== 'tr') {
+        setLangState(detected)
+      }
+    }
+  }, [])
 
   function setLang(newLang: LangType) {
     setLangState(newLang)

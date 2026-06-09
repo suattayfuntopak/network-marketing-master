@@ -1,5 +1,8 @@
 import { test, expect } from '@playwright/test'
 
+// Landing page redirects authenticated users to /pano — run these tests without auth.
+test.use({ storageState: { cookies: [], origins: [] } })
+
 test('landing page shows product name', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText(/Network Marketing Master/i).first()).toBeVisible()

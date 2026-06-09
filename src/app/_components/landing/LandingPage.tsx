@@ -20,7 +20,14 @@ export function LandingPage() {
   const [checkingSession, setCheckingSession] = useState(true)
 
   useEffect(() => {
-    const supabase = createClient()
+    let active = true
+    let supabase: any
+    try {
+      supabase = createClient()
+    } catch (err) {
+      if (active) setCheckingSession(false)
+      return
+    }
 
     // Şifre sıfırlama linki ana sayfaya düşerse hash/query korunarak yönlendir
     const hash = window.location.hash
@@ -37,30 +44,44 @@ export function LandingPage() {
     }
 
     // 1. Initial active session check
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const onLandingPreview = window.location.pathname.startsWith('/acilis')
-      if (session && !onLandingPreview) {
-        router.push('/pano')
-      } else {
-        setCheckingSession(false)
-      }
-    })
+    supabase.auth.getSession()
+      .then((res: any) => {
+        const session = res?.data?.session
+        const onLandingPreview = window.location.pathname.startsWith('/acilis')
+        if (session && !onLandingPreview) {
+          router.push('/pano')
+        } else {
+          if (active) setCheckingSession(false)
+        }
+      })
+      .catch(() => {
+        if (active) setCheckingSession(false)
+      })
 
     // 2. Auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        router.replace('/sifre-guncelle')
-        return
-      }
-      if (session && !window.location.pathname.startsWith('/acilis')) {
-        router.push('/pano')
-      } else {
-        setCheckingSession(false)
-      }
-    })
+    let subscription: any
+    try {
+      const authStateChangeResult = supabase.auth.onAuthStateChange((event: any, session: any) => {
+        if (event === 'PASSWORD_RECOVERY') {
+          router.replace('/sifre-guncelle')
+          return
+        }
+        if (session && !window.location.pathname.startsWith('/acilis')) {
+          router.push('/pano')
+        } else {
+          if (active) setCheckingSession(false)
+        }
+      })
+      subscription = authStateChangeResult?.data?.subscription
+    } catch (err) {
+      if (active) setCheckingSession(false)
+    }
 
     return () => {
-      subscription.unsubscribe()
+      active = false
+      if (subscription) {
+        subscription.unsubscribe()
+      }
     }
   }, [router])
 

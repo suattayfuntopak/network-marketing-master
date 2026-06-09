@@ -4821,3 +4821,17 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
   - Türkçe içeriklerde yer alan **YZ** (Yapay Zeka) kısaltmaları, İngilizce sürümde **AI (Artificial Intelligence)** olarak revize edilip zenginleştirildi.
 
 
+
+
+## 2026-06-10 — Playwright E2E Testleri ve Hydration Mismatch Hatalarının Giderilmesi
+
+### fix: E2E Landing Sayfası Yönlendirme ve Oturum Asılı Kalma Çözümü
+- Playwright E2E testlerinde, ana sayfadaki session kontrolü sırasında Supabase istemci bağlantısı veya ağ hataları oluştuğunda sayfanın `Oturum Doğrulanıyor...` ekranında sonsuza dek asılı kalması engellendi. `supabase.auth.getSession()` işlemine `.catch()` hata yakalama blokları ve genel `try/catch` sarmalaması eklenerek sistemin hata anında da arayüzü başarıyla yüklemesi garanti edildi.
+- Landing sayfasının testlerinde tarayıcının otomatik dashboard sayfasına yönlenmesini önlemek için [e2e/landing.spec.ts](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/e2e/landing.spec.ts) dosyasına temiz `storageState` ataması yapılarak oturumsuz test senaryoları stabilize edildi.
+
+### fix: LanguageProvider ve ThemeToggle Hydration Mismatch Hatalarının Düzeltilmesi
+- **Dil Hydration Hatası**: Next.js SSR derleme aşamasında sunucunun Türkçe ürettiği HTML'in, test tarayıcısının dili İngilizce olduğunda client-side hydration uyuşmazlığına yol açması çözüldü. [LanguageProvider.tsx](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/src/providers/LanguageProvider.tsx) içinde dil durumu statik bir 'tr' ile başlatılıp, tarayıcı/local storage dili `useEffect` içinde client-side tespit edilerek güncellendi.
+- **Tema Hydration Hatası**: [themeToggle.tsx](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/src/lib/ui/themeToggle.tsx) içindeki `mounted` durumunun client/server uyuşmazlığı düzeltildi. `mounted` durumu ilk başta `false` başlatılıp `useEffect` içinde `true` durumuna çekilerek sunucudaki `div` ve istemcideki `button` uyuşmazlığı tamamen ortadan kaldırıldı.
+
+### fix: Next.js Dev Origin Geliştirici Sunucusu WebSocket Hata Engeli
+- Playwright test çalıştırıcısının `127.0.0.1` üzerinden yaptığı isteklerin Next.js dev server tarafından çapraz kökenli (cross-origin) WebSocket/HMR isteği olarak algılanıp engellenmesi çözüldü. [next.config.ts](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/next.config.ts) dosyasına `allowedDevOrigins: ['127.0.0.1']` eklendi.

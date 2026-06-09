@@ -7,6 +7,7 @@ const buildId = (
 ).slice(0, 7);
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['127.0.0.1'],
   env: {
     NEXT_PUBLIC_BUILD_ID: buildId,
   },
