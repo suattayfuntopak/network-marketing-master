@@ -1,5 +1,43 @@
 # Hot Log
 
+## 2026-06-10 — Deploy gate AKTİF: prod deploy artık E2E-gated ✅
+
+### Aktivasyon tamamlandı (kullanıcı 1-3, ajan 4)
+- Kullanıcı: Vercel Deploy Hook (`ci-prod`, branch main) oluşturdu + `VERCEL_DEPLOY_HOOK_URL` secret ekledi.
+- Ajan doğrulama: GitHub Actions secret listesinde `VERCEL_DEPLOY_HOOK_URL` **var** (11 secret) — `vercel.json` değiştirilmeden önce teyit edildi (yoksa prod donardı).
+- Ajan: `vercel.json` → `git.deploymentEnabled.main=false` (commit c1a523d). `ignoreCommand` korundu.
+
+### Yeni akış (artık canlı)
+- Push → E2E (Playwright) koşar → **yeşilse** `deploy.yml` (workflow_run) Vercel Deploy Hook'unu tetikler → prod deploy.
+- **Kırmızıysa deploy GİTMEZ.** Vercel Git push auto-deploy kapalı; deploy yalnızca hook'tan (E2E sonrası) gelir → yarış yok.
+- Doğrudan-`main`-push akışı değişmedi; PR zorunluluğu YOK.
+
+### Geri alma (gerekirse)
+- `vercel.json`'dan `git` bloğunu kaldır → Vercel push auto-deploy geri gelir (eski davranış).
+
+### Dosyalar
+`vercel.json`. (Commit c1a523d). İlgili scaffold: `deploy.yml` (e32e5dc).
+
+## 2026-06-10 — Ekip/istatistik UI + Saha Özeti yükleme kalıcılığı ✅
+
+### Özet
+- Öğrenme özeti video satırından `(0/3)` kaldırıldı; Saha Özeti aktif gün sütunundan `g` kaldırıldı.
+- Platform lisans tablosu: sütun çakışması/kesilme düzeltildi (`table-auto`, `break-words`, colgroup).
+- İstatistikler: Ekip Performans + YZ limit tablolarında lider satırı gizlendi (metrikler arka planda).
+- Performans: dashboard SSR'da `warmDashboardMetrics` await + hub/ranking prefetch; EkipPanel mount + Saha Özeti tab hover prefetch; önbellek varken skeleton gösterilmez.
+
+### Dosyalar
+`MemberActivitySheet.tsx`, `TeamFieldRankingTable.tsx`, `TeamPerformanceTable.tsx`, `StatsSuperAdminSections.tsx`, `PlatformYonetimContent.tsx`, `prefetchDashboard.ts`, `EkipPanel.tsx`, `EkipSummaryTab.tsx`, `EkipTabNav.tsx`
+
+## 2026-06-10 — Saha Özetim metrik kutuları pano renkleri ✅
+
+### Özet
+- Huni 4 kutu + Saha Aktivitesi 6 kutu pano crown gradient ile boyandı (`panoVariant`, yalnız `/saha-ozetim`).
+- Renk yerleşimi komşu hücrelerde tekrar yok: indigo/teal | coral/amber | rose/blue | chick/purple | teal/indigo.
+
+### Dosyalar
+`hubPanoMetricColors.ts`, `HubCrownFunnelGrid.tsx`, `HubSelfActivityGrid.tsx`, `FieldSummaryPage.tsx`. (Commit 5cb4a0d)
+
 ## 2026-06-10 — Deploy gate: prod deploy E2E yeşiline bağlandı (skip-safe scaffold) ✅
 
 ### Karar (sahibi gibi düşün)
