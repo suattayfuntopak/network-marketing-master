@@ -9,6 +9,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
 import { AccountAccessGuard } from './AccountAccessGuard'
 import { AppVersionGuard } from '@/components/AppVersionGuard'
+import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 import { useMobileChromeVisibility } from '@/lib/ui/useMobileChromeVisibility'
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
@@ -96,6 +97,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
       <AppVersionGuard />
+      <ServiceWorkerRegister />
       <Header visible={visible} />
       <Sidebar
         collapsed={collapsed}

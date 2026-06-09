@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getTeamGenerationTreeAction } from '../treeActions'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 
 type Props = {
@@ -21,7 +22,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
     queryKey: ['team-generation-tree', workspaceId],
     queryFn: () => getTeamGenerationTreeAction(workspaceId),
     enabled: !!workspaceId,
-    staleTime: 60_000,
+    staleTime: QUERY_STALE.metrics,
   })
 
   if (isLoading) {
@@ -64,7 +65,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
               className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5"
               style={{ marginInlineStart: `${node.generation * 12}px` }}
             >
-              <PersonAvatar name={node.name} size="sm" />
+              <PersonAvatar name={node.name} imageUrl={node.avatarUrl} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{node.name}</p>
                 {node.generation > 0 && (

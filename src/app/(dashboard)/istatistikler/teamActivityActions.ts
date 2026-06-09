@@ -181,14 +181,24 @@ export async function getTeamFieldActivityAction(
 
 const RANKING_BATCH_PERIODS: PulsePeriod[] = ['today', '7d', '30d', 'ytd']
 
-async function computeTeamRankingMetrics(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  period: PulsePeriod,
-  uniqueIds: string[],
-): Promise<TeamRankingMetricsResult> {
-  const funnelRange = funnelRangeForPulsePeriod(period)
-  const startIso = periodStartIso(period)
+type DailyActionRow = {
+  user_id: string
+  action_type: string
+  created_at: string
+}
 
+function earliestPeriodStartIso(periods: PulsePeriod[]): string | null {
+  const starts = periods
+    .map(p => periodStartIso(p))
+    .filter((iso): iso is string => iso != null)
+  if (starts.length === 0) return null
+  return starts.reduce((earliest, iso) => (iso < earliest ? iso : earliest))
+}
+
+function initRankingBuckets(uniqueIds: string[]): {
+  byUser: Record<string, TeamMemberRankingMetrics>
+  activeDaySets: Record<string, Set<string>>
+} {
   const byUser: Record<string, TeamMemberRankingMetrics> = {}
   const activeDaySets: Record<string, Set<string>> = {}
   for (const uid of uniqueIds) {
@@ -204,29 +214,20 @@ async function computeTeamRankingMetrics(
     }
     activeDaySets[uid] = new Set()
   }
+  return { byUser, activeDaySets }
+}
 
-  let actionsQuery = supabase
-    .from('nmm_daily_actions')
-    .select('user_id, action_type, created_at')
-    .in('user_id', uniqueIds)
+function aggregateRankingFromActions(
+  actions: DailyActionRow[],
+  period: PulsePeriod,
+  uniqueIds: string[],
+  funnelByUser: Record<string, FunnelCounts>,
+): TeamRankingMetricsResult {
+  const startIso = periodStartIso(period)
+  const { byUser, activeDaySets } = initRankingBuckets(uniqueIds)
 
-  if (startIso) {
-    actionsQuery = actionsQuery.gte('created_at', startIso)
-  }
-
-  const [actionsResult, funnelByUser] = await Promise.all([
-    actionsQuery,
-    fetchFunnelActualsBatchForPeriod(
-      supabase,
-      uniqueIds,
-      funnelRange.sinceIso,
-      funnelRange.untilIso,
-      funnelRange.startCalendarKey,
-      funnelRange.endCalendarKey,
-    ),
-  ])
-
-  for (const act of actionsResult.data ?? []) {
+  for (const act of actions) {
+    if (startIso && act.created_at < startIso) continue
     const bucket = byUser[act.user_id]
     if (!bucket) continue
     activeDaySets[act.user_id]?.add(act.created_at.slice(0, 10))
@@ -255,6 +256,38 @@ async function computeTeamRankingMetrics(
   }
 
   return { byUser }
+}
+
+async function computeTeamRankingMetrics(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  period: PulsePeriod,
+  uniqueIds: string[],
+): Promise<TeamRankingMetricsResult> {
+  const funnelRange = funnelRangeForPulsePeriod(period)
+  const startIso = periodStartIso(period)
+
+  let actionsQuery = supabase
+    .from('nmm_daily_actions')
+    .select('user_id, action_type, created_at')
+    .in('user_id', uniqueIds)
+
+  if (startIso) {
+    actionsQuery = actionsQuery.gte('created_at', startIso)
+  }
+
+  const [actionsResult, funnelByUser] = await Promise.all([
+    actionsQuery,
+    fetchFunnelActualsBatchForPeriod(
+      supabase,
+      uniqueIds,
+      funnelRange.sinceIso,
+      funnelRange.untilIso,
+      funnelRange.startCalendarKey,
+      funnelRange.endCalendarKey,
+    ),
+  ])
+
+  return aggregateRankingFromActions(actionsResult.data ?? [], period, uniqueIds, funnelByUser)
 }
 
 export type TeamRankingMetricsBatchResult = Record<
@@ -292,12 +325,37 @@ export async function getTeamRankingMetricsBatchAction(
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
   if (uniqueIds.length === 0) return empty
 
-  const entries = await Promise.all(
-    RANKING_BATCH_PERIODS.map(async period => [
-      period,
-      await computeTeamRankingMetrics(supabase, period, uniqueIds),
-    ] as const),
-  )
+  const batchStartIso = earliestPeriodStartIso(RANKING_BATCH_PERIODS)
+  let actionsQuery = supabase
+    .from('nmm_daily_actions')
+    .select('user_id, action_type, created_at')
+    .in('user_id', uniqueIds)
+  if (batchStartIso) {
+    actionsQuery = actionsQuery.gte('created_at', batchStartIso)
+  }
+
+  const funnelFetches = RANKING_BATCH_PERIODS.map(period => {
+    const funnelRange = funnelRangeForPulsePeriod(period)
+    return fetchFunnelActualsBatchForPeriod(
+      supabase,
+      uniqueIds,
+      funnelRange.sinceIso,
+      funnelRange.untilIso,
+      funnelRange.startCalendarKey,
+      funnelRange.endCalendarKey,
+    )
+  })
+
+  const [actionsResult, ...funnelByPeriod] = await Promise.all([
+    actionsQuery,
+    ...funnelFetches,
+  ])
+
+  const actions = (actionsResult.data ?? []) as DailyActionRow[]
+  const entries = RANKING_BATCH_PERIODS.map((period, index) => [
+    period,
+    aggregateRankingFromActions(actions, period, uniqueIds, funnelByPeriod[index] ?? {}),
+  ] as const)
 
   return Object.fromEntries(entries) as TeamRankingMetricsBatchResult
 }

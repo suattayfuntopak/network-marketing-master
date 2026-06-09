@@ -11,7 +11,6 @@ export async function sendTrialLifecyclePush(
   supabase: AdminClient,
   userId: string,
   kind: TrialEmailKind,
-  lang: 'tr' | 'en',
 ): Promise<boolean> {
   if (!shouldSendTrialPush(kind)) return false
 

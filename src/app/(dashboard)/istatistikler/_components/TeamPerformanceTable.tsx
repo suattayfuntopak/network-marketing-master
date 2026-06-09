@@ -82,22 +82,25 @@ export function TeamPerformanceTable({
 
   const appRows = performanceRows.filter(r => r.isAppUser !== false)
 
-  const sum = (sel: (r: PerformanceRow) => number) => appRows.reduce((a, r) => a + (sel(r) || 0), 0)
-  const avg = (sel: (r: PerformanceRow) => number) =>
-    appRows.length ? Math.round(sum(sel) / appRows.length) : 0
+  const totals = useMemo(() => {
+    const sum = (sel: (r: PerformanceRow) => number) =>
+      appRows.reduce((a, r) => a + (sel(r) || 0), 0)
+    const avg = (sel: (r: PerformanceRow) => number) =>
+      appRows.length ? Math.round(sum(sel) / appRows.length) : 0
 
-  const totals = useMemo(() => ({
-    candidate: sum(r => r.candidate_count ?? 0),
-    yeni: sum(r => r.yeni_count ?? 0),
-    iletisim: sum(r => r.iletisim_count ?? 0),
-    davetli: sum(r => r.davetli_count ?? 0),
-    sunum: sum(r => r.sunum_count ?? 0),
-    takip: sum(r => r.takip_count ?? 0),
-    katildi: sum(r => r.katildi_count ?? 0),
-    trainingAvg: avg(r => progressByUserId[r.user_id]?.trainingPct ?? 0),
-    objectionAvg: avg(r => progressByUserId[r.user_id]?.objectionPct ?? 0),
-    videoAvg: avg(r => videoByUserId[r.user_id]?.pct ?? 0),
-  }), [appRows, progressByUserId, videoByUserId])
+    return {
+      candidate: sum(r => r.candidate_count ?? 0),
+      yeni: sum(r => r.yeni_count ?? 0),
+      iletisim: sum(r => r.iletisim_count ?? 0),
+      davetli: sum(r => r.davetli_count ?? 0),
+      sunum: sum(r => r.sunum_count ?? 0),
+      takip: sum(r => r.takip_count ?? 0),
+      katildi: sum(r => r.katildi_count ?? 0),
+      trainingAvg: avg(r => progressByUserId[r.user_id]?.trainingPct ?? 0),
+      objectionAvg: avg(r => progressByUserId[r.user_id]?.objectionPct ?? 0),
+      videoAvg: avg(r => videoByUserId[r.user_id]?.pct ?? 0),
+    }
+  }, [appRows, progressByUserId, videoByUserId])
 
   return (
     <section

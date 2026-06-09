@@ -68,18 +68,34 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      - name: Check E2E credentials
+        id: e2e_creds
+        run: |
+          if [ -z "${{ secrets.PLAYWRIGHT_TEST_EMAIL }}" ] || [ -z "${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::PLAYWRIGHT_TEST_EMAIL/PASSWORD tanımlı değil — E2E atlanıyor."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build application (for next start)
+        if: steps.e2e_creds.outputs.skip != 'true'
         run: npm run build
 
       - name: Run Playwright (chromium)
+        if: steps.e2e_creds.outputs.skip != 'true'
         run: npx playwright test --project=chromium
         env:
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
 
+      - name: E2E skipped (no credentials)
+        if: steps.e2e_creds.outputs.skip == 'true'
+        run: echo "E2E skipped — add PLAYWRIGHT_TEST_EMAIL and PLAYWRIGHT_TEST_PASSWORD secrets to enable."
+
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
-        if: ${{ !cancelled() }}
+        if: steps.e2e_creds.outputs.skip != 'true' && !cancelled()
         with:
           name: playwright-report
           path: playwright-report/

@@ -329,19 +329,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     }
   }, [queryClient, ws.workspaceId])
 
-  const selectFieldTab = (userId: string, tab: FieldCardTab) => {
-    setFieldCardTab(prev => {
-      const next = {
-        ...prev,
-        [userId]: prev[userId] === tab ? undefined : tab,
-      }
-      syncPerfTabsToUrl(memberCardTab, next)
-      return next
-    })
-  }
-
-  const getFieldTab = (userId: string): FieldCardTab | undefined => fieldCardTab[userId]
-
   const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
   const nmmPartnerCount = members.filter(m => m.role !== 'leader' && m.isAppUser !== false).length

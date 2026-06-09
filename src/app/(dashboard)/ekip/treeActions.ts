@@ -6,6 +6,7 @@ import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 export type GenerationTreeNode = {
   id: string
   name: string
+  avatarUrl: string | null
   generation: number
   isAppUser: boolean
   joinedAt: string | null
@@ -33,6 +34,7 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
   return members.map(m => ({
     id: m.user_id,
     name: m.full_name ?? '—',
+    avatarUrl: m.avatar_url ?? null,
     generation: m.user_id === leader.user_id ? 0 : directIds.has(m.user_id) ? 1 : 2,
     isAppUser: true,
     joinedAt: m.joined_at,

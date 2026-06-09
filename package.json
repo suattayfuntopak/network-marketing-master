@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint --max-warnings 0",
     "lint:changed": "FILES=$(git diff --name-only --diff-filter=ACMR origin/main...HEAD -- '*.ts' '*.tsx'); if [ -z \"$FILES\" ]; then echo 'lint:changed — değişen TS/TSX yok'; else eslint $FILES; fi",
     "test": "vitest run",
     "test:watch": "vitest",

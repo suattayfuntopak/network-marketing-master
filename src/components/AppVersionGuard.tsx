@@ -22,6 +22,11 @@ export function AppVersionGuard() {
         const { buildId } = (await res.json()) as { buildId?: string }
         if (!buildId || buildId === BOOT_BUILD_ID) return
         prompted.current = true
+        if (navigator.serviceWorker?.controller) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.waiting?.postMessage({ type: 'SKIP_WAITING' })
+          })
+        }
         toast(t('common.appUpdateTitle'), {
           duration: Infinity,
           action: {

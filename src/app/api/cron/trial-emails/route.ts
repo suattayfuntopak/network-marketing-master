@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       if (sent && shouldSendTrialPush(job.kind)) {
         const pushFresh = await claimEmailSend(supabase, r.workspaceId, `push_${job.kind}`, todayKey)
         if (pushFresh) {
-          await sendTrialLifecyclePush(supabase, r.userId, job.kind, r.lang)
+          await sendTrialLifecyclePush(supabase, r.userId, job.kind)
         }
       }
 

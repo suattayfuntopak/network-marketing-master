@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
-import { GEMINI_FLASH } from '@/lib/ai/models'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
 import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
 import { getAuthUser } from '@/lib/supabase/authUser'
