@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-10 — Deploy gate: prod deploy E2E yeşiline bağlandı (skip-safe scaffold) ✅
+
+### Karar (sahibi gibi düşün)
+- Items 1&2 için kullanıcı "sen hangisini öneriyorsan onu yap" dedi → **B (CI-driven deploy)** seçildi.
+- Gerekçe: canlı/ödeme alan uygulamada `main`'e her push CI'dan bağımsız prod'a gidiyor. Build'i kıran commit zaten Vercel build'inde takılır; asıl açık **derlenip davranışsal bozulan** (E2E'nin yakaladığı) commit. Branch protection (C) doğrudan-push + çok-ajanlı akışı kırardı → reddedildi.
+
+### Yapılan (otonom, kırılmayan)
+- Yeni `.github/workflows/deploy.yml`: `workflow_run` ile E2E (Playwright) **başarılı** bitince Vercel Deploy Hook'unu tetikler. Yarış yok (deploy E2E sonrası). `head_branch==main && event==push` guard'ı.
+- **Skip-safe:** `VERCEL_DEPLOY_HOOK_URL` secret yokken no-op (warning + exit 0). Bugün hiçbir şey değişmez; Vercel auto-deploy aynen çalışır.
+- `docs/deploy/github-secrets.md` → "CI-driven deploy (opsiyonel gate)": 3 adımlık aktivasyon (hook oluştur → secret ekle → `vercel.json` `git.deploymentEnabled.main=false`). Sıra uyarısı dahil.
+
+### Kullanıcı tarafı (gate'i aktive etmek için — ajan erişemez)
+1. Vercel Deploy Hook (branch main) oluştur, 2. `VERCEL_DEPLOY_HOOK_URL` secret ekle, 3. `vercel.json`'a `git.deploymentEnabled.main=false`. Üçü olmadan gate pasif (zarar yok).
+
+### Dosyalar
+`.github/workflows/deploy.yml`, `docs/deploy/github-secrets.md`. (Commit e32e5dc)
+
+## 2026-06-10 — Landing dark CTA turuncu (coral) ✅
+
+### Özet
+- Dark temada landing birincil butonları soluk mor yerine pano Aylık sekmesi coral gradient (#FF9D7A → #FF5722): Hemen Başla, Hemen Ücretsiz Dene, Aylık/Yıllık ödeme toggler, Ekibi Güçlendir.
+- Light tema değişmedi (`from-brand to-brand-accent` korundu).
+
+### Dosyalar
+`constants.ts`, `LandingHeader.tsx`, `LandingHero.tsx`, `LandingPricing.tsx`.
+
 ## 2026-06-10 — Saha Özetim sekmeleri + öğrenme özeti düzeltmeleri ✅
 
 ### Özet
