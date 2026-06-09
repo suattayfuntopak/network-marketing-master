@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowRight, Play, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { LANDING_PRIMARY_CTA, LANDING_PRIMARY_CTA_HOVER } from './constants'
 
 export function LandingHero() {
   const { t } = useTranslation()
@@ -33,7 +34,7 @@ export function LandingHero() {
       <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
         <Link
           href="/kayit"
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white px-6 py-3.5 text-sm font-bold shadow-lg hover:shadow-indigo-500/20 hover:opacity-95 transition active:scale-95 cursor-pointer"
+          className={`flex items-center gap-2 rounded-xl ${LANDING_PRIMARY_CTA} px-6 py-3.5 text-sm font-bold shadow-lg ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 cursor-pointer`}
         >
           <span>{t('landingPage.startFreeTrial')}</span>
           <ArrowRight className="h-4 w-4" />

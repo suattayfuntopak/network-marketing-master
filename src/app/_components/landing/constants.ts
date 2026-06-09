@@ -1,5 +1,15 @@
 export { NEXT_THEME } from '@/lib/ui/themeToggle'
 
+/** Pano Aylık sekmesi (coral) — landing birincil CTA; light modda brand mor kalır */
+export const LANDING_PRIMARY_CTA =
+  'bg-gradient-to-r from-brand to-brand-accent dark:from-[#FF9D7A] dark:to-[#FF5722] text-white'
+
+export const LANDING_PRIMARY_CTA_SHADOW =
+  'shadow-md dark:shadow-[#FF5722]/25'
+
+export const LANDING_PRIMARY_CTA_HOVER =
+  'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-[#FF5722]/30'
+
 export const NEXT_THEME_LABEL: Record<string, string> = {
   dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',
 }

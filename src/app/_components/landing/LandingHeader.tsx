@@ -7,7 +7,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { Z } from '@/lib/ui/zIndex'
-import { NEXT_THEME_LABEL } from './constants'
+import { LANDING_PRIMARY_CTA, LANDING_PRIMARY_CTA_SHADOW, NEXT_THEME_LABEL } from './constants'
 import type { ThemeMode } from '@/lib/ui/themeToggle'
 
 export function LandingHeader() {
@@ -73,7 +73,7 @@ export function LandingHeader() {
           <Link
             href="/kayit"
             title={t('landingPage.getStarted')}
-            className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-r from-brand to-brand-accent text-white shadow-md transition hover:opacity-90 active:scale-95 sm:h-auto sm:w-auto sm:gap-1 sm:rounded-lg sm:px-3.5 sm:py-1.5"
+            className={`flex h-7 w-7 items-center justify-center rounded-lg ${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} transition hover:opacity-90 active:scale-95 sm:h-auto sm:w-auto sm:gap-1 sm:rounded-lg sm:px-3.5 sm:py-1.5`}
           >
             <UserPlus className="h-3.5 w-3.5 sm:hidden" />
             <span className="hidden text-xs font-bold sm:inline">{t('landingPage.getStarted')}</span>

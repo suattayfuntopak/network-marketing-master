@@ -16,6 +16,7 @@ import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
+import { LANDING_PRIMARY_CTA, LANDING_PRIMARY_CTA_HOVER } from './constants'
 
 export function LandingPricing() {
   const { t } = useTranslation()
@@ -50,7 +51,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
                 billingPeriod === 'monthly'
-                  ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
+                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25`
                   : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
               }`}
             >
@@ -61,7 +62,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('yearly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
                 billingPeriod === 'yearly'
-                  ? 'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md'
+                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25`
                   : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
               }`}
             >
@@ -220,7 +221,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className="block text-center rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 cursor-pointer"
+              className={`block text-center rounded-xl ${LANDING_PRIMARY_CTA} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 cursor-pointer`}
             >
               {t('landingPage.planPlusCta')}
             </Link>
