@@ -3,17 +3,18 @@
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import {
-  Users, BarChart3, GraduationCap, GitBranch, Wrench,
+  Users, BarChart3, GraduationCap, GitBranch,
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-export const EKIP_TAB_IDS = ['members', 'summary', 'training', 'tree', 'tools'] as const
+export const EKIP_TAB_IDS = ['members', 'summary', 'training', 'tree'] as const
 export type EkipTabId = (typeof EKIP_TAB_IDS)[number]
 
 const LEGACY_TAB_MAP: Record<string, EkipTabId> = {
   activity: 'summary',
-  invite: 'tools',
+  invite: 'members',
+  tools: 'members',
 }
 
 const TABS: readonly {
@@ -26,7 +27,6 @@ const TABS: readonly {
   { id: 'summary', labelKey: 'team.tabSummary', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
   { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: 'bg-[#854F0B] text-white shadow-md' },
   { id: 'tree', labelKey: 'team.tabTree', icon: GitBranch, activeClass: 'bg-[#72243E] text-white shadow-md' },
-  { id: 'tools', labelKey: 'team.tabTools', icon: Wrench, activeClass: 'bg-[#0F6E56] text-white shadow-md' },
 ]
 
 export function isEkipTabId(value: string | null): value is EkipTabId {

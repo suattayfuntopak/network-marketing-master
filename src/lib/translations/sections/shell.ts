@@ -71,23 +71,15 @@ export const shellSection = {
       accountAlertTap: 'Detayları gör',
       accountAlertClose: 'Kapat',
       accountModalTitle: 'HESAP BİLGİLERİNİZ',
-      accountModalSectionPlan: 'Plan ve kullanım detayları',
       accountModalRegistered: 'Üyelik başlangıcı: {date}',
-      accountModalFreeAccess:
-        'Ücretsiz plan: Boru hattı, takvim, eğitimler ve ekibe davet her zaman açık. Yapay Zeka Koçu ve gelişmiş ekip araçları ücretli planlarda.',
-      accountModalTrialBullets:
-        '14 günlük ücretsiz Basic denemesi: Tüm AI araçlarına ücretsiz erişin. Süre sonunda NMM devam eder; AI için Basic veya üzeri plan seçebilirsiniz.',
-      accountModalTeamBullets:
-        'Ekibim: Ücretsiz planda ekibinizi görür ve davet edersiniz. Detaylı performans takibi Plus veya Pro planda.',
-      accountModalFootnote:
-        'Not: Ücretsiz planda uygulama kullanımınız devam eder; yalnızca AI ve gelişmiş ekip özellikleri plan yükseltmesi gerektirir.',
-      accountModalFreeAccessDesktop:
-        'Ücretsiz plan — temel araçlar açık; AI Plus/Basic ile.',
-      accountModalTrialBulletsDesktop:
-        'Ücretsiz 14 gün Basic; süre sonunda NMM devam, AI Basic+ ile açılır.',
-      accountModalTeamBulletsDesktop: 'Ekibim: gör + davet (free); tam panel Plus/Pro.',
-      accountModalFootnoteDesktop:
-        'Free planda erişim devam eder; AI ve gelişmiş ekip plan gerektirir.',
+      accountModalTrialBody:
+        '14 günlük Basic denemeniz aktif. Bu sürede tüm AI araçları açık. Boru hattı, takvim, eğitimler ve ekip daveti deneme bitse de ücretsiz kalır.',
+      accountModalTrialFootnote:
+        'Deneme bitince uygulama kullanımınız devam eder. AI ve gelişmiş ekip özellikleri için Basic, Plus veya Pro seçebilirsiniz.',
+      accountModalLockedBody:
+        'Deneme süreniz bitti. Boru hattı, takvim, eğitimler ve ekip daveti açık kalmaya devam ediyor.',
+      accountModalLockedFootnote:
+        'Yapay zeka ve gelişmiş ekip özelliklerini yeniden açmak için bir plan seçin.',
       overdueFreqLabel: 'Gecikmiş E-posta Sıklığı',
       overdueFreqDaily: 'Günlük',
       overdueFreqWeekly: 'Haftalık (Pzt)',
@@ -168,23 +160,15 @@ export const shellSection = {
       accountAlertTap: 'View details',
       accountAlertClose: 'Close',
       accountModalTitle: 'YOUR ACCOUNT INFORMATION',
-      accountModalSectionPlan: 'Plan and usage details',
       accountModalRegistered: 'Membership started: {date}',
-      accountModalFreeAccess:
-        'Free plan: Pipeline, calendar, training, and team invites stay open. AI Coach and advanced team tools require a paid plan.',
-      accountModalTrialBullets:
-        '14-day free Basic trial: Full AI access during the trial. When it ends, NMM continues — choose Basic or above to keep AI.',
-      accountModalTeamBullets:
-        'Team: View and invite on the free plan. Detailed performance tracking is on Plus or Pro.',
-      accountModalFootnote:
-        'Note: Your free plan keeps app access; only AI and advanced team features need an upgrade.',
-      accountModalFreeAccessDesktop:
-        'Free plan — core tools open; AI on Basic+.',
-      accountModalTrialBulletsDesktop:
-        'Free 14-day Basic trial; NMM continues after, AI on Basic+.',
-      accountModalTeamBulletsDesktop: 'Team: view + invite (free); full hub Plus/Pro.',
-      accountModalFootnoteDesktop:
-        'Free plan access continues; AI and advanced team need a plan.',
+      accountModalTrialBody:
+        'Your 14-day Basic trial is active. All AI tools are open during the trial. Pipeline, calendar, training, and team invites stay free after the trial.',
+      accountModalTrialFootnote:
+        'When the trial ends, the app keeps working. Choose Basic, Plus, or Pro to unlock AI and advanced team features.',
+      accountModalLockedBody:
+        'Your trial has ended. Pipeline, calendar, training, and team invites stay open.',
+      accountModalLockedFootnote:
+        'Choose a plan to unlock AI and advanced team features again.',
       overdueFreqLabel: 'Overdue Email Frequency',
       overdueFreqDaily: 'Daily',
       overdueFreqWeekly: 'Weekly (Mon)',

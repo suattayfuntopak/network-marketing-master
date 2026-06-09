@@ -22,6 +22,9 @@ import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberAc
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
+import { InviteTeammateSection } from './InviteTeammateSection'
+import { JoinByInviteSection } from './JoinByInviteSection'
+import { BroadcastPanel } from './BroadcastPanel'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { addTeamMemberAsCandidateAction, unlinkTeamMemberPipelineAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
@@ -47,6 +50,14 @@ export interface TeamPerformanceSectionProps {
   teamPulseUnlocked: boolean
   teamPageUnlocked: boolean
   memberGoalsMap?: Record<string, MemberGoalRow>
+  inviteCode: string
+  hasUpline: boolean
+  copied: boolean
+  onCopyInviteCode: () => void
+  inviteCodeInput: string
+  joining: boolean
+  onInviteCodeChange: (value: string) => void
+  onJoinSubmit: (e: React.FormEvent) => void
 }
 
 type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
@@ -161,6 +172,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberSearch, onMemberSearchChange,
     teamPulseUnlocked, teamPageUnlocked,
     memberGoalsMap = {},
+    inviteCode, hasUpline, copied, onCopyInviteCode,
+    inviteCodeInput, joining, onInviteCodeChange, onJoinSubmit,
   } = props
   const router = useRouter()
   const pathname = usePathname()
@@ -938,6 +951,31 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             {t('team.memberHint')}
           </p>
         )}
+
+        <div className="space-y-6 pt-2">
+          {isLeader && (
+            <InviteTeammateSection
+              inviteCode={inviteCode}
+              copied={copied}
+              onCopy={onCopyInviteCode}
+              t={t}
+            />
+          )}
+
+          {!hasUpline && (
+            <JoinByInviteSection
+              inviteCodeInput={inviteCodeInput}
+              joining={joining}
+              onInviteCodeChange={onInviteCodeChange}
+              onSubmit={onJoinSubmit}
+              t={t}
+            />
+          )}
+
+          {isLeader && teamPageUnlocked && (
+            <BroadcastPanel members={visibleMembers} t={t} />
+          )}
+        </div>
       </section>
       {UpgradePrompt}
       </>

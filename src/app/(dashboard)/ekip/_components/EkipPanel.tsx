@@ -9,7 +9,6 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
 import { EkipSummaryTab } from './EkipSummaryTab'
-import { EkipToolsTab } from './EkipToolsTab'
 import { EkipTrainingTab } from './EkipTrainingTab'
 import { TeamGenerationTree } from './TeamGenerationTree'
 import type { EkipTabId } from './EkipTabNav'
@@ -211,6 +210,14 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           teamPulseUnlocked={teamPulseUnlocked}
           teamPageUnlocked={teamPageUnlocked}
           memberGoalsMap={memberGoalsMap}
+          inviteCode={ws.inviteCode}
+          hasUpline={ws.hasUpline}
+          copied={copied}
+          onCopyInviteCode={handleCopyInviteCode}
+          inviteCodeInput={inviteCodeInput}
+          joining={joining}
+          onInviteCodeChange={setInviteCodeInput}
+          onJoinSubmit={handleJoinWorkspace}
         />
       )}
 
@@ -224,22 +231,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
       )}
 
       {activeTab === 'summary' && <EkipSummaryTab />}
-
-      {activeTab === 'tools' && (
-        <EkipToolsTab
-          t={t}
-          ws={ws}
-          isLeader={isLeader}
-          teamPageUnlocked={teamPageUnlocked}
-          visibleMembers={visibleMembers}
-          copied={copied}
-          onCopy={handleCopyInviteCode}
-          inviteCodeInput={inviteCodeInput}
-          joining={joining}
-          onInviteCodeChange={setInviteCodeInput}
-          onJoinSubmit={handleJoinWorkspace}
-        />
-      )}
 
       {activeTab === 'tree' && (
         <TeamGenerationTree workspaceId={ws.workspaceId} teamPageUnlocked={teamPageUnlocked} />

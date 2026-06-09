@@ -23,7 +23,6 @@ export function AccountStatusAlert() {
   const { data: ws } = useWorkspace()
   const { t, lang } = useTranslation()
   const [open, setOpen] = useState(false)
-  // Mount anında sabitlenir → render içinde impure Date.now() çağrısı yok.
   const [now] = useState(() => Date.now())
 
   useBodyScrollLock(open)
@@ -108,42 +107,19 @@ export function AccountStatusAlert() {
               </h2>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3.5 text-xs leading-relaxed text-[var(--text-2)] sm:px-5 sm:py-4 sm:text-sm md:flex-none md:overflow-visible md:space-y-2 md:px-6 md:py-4 md:text-base">
-              <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
-                <li>{t('shellUi.accountModalRegistered', { date: registered })}</li>
-                <li className="md:hidden">
-                  {t('shellUi.accountModalFreeAccess')}
-                </li>
-                <li className="hidden md:list-item">
-                  {t('shellUi.accountModalFreeAccessDesktop')}
-                </li>
-              </ul>
-
-              <div>
-                <h3 className="text-[10px] sm:text-xs md:text-sm font-bold uppercase tracking-wide text-[var(--text-1)] mb-1.5 md:mb-1">
-                  {t('shellUi.accountModalSectionPlan')}
-                </h3>
-                <ul className="space-y-1.5 list-disc pl-4 md:space-y-1">
-                  <li className="md:hidden">{t('shellUi.accountModalTrialBullets')}</li>
-                  <li className="hidden md:list-item">
-                    {t('shellUi.accountModalTrialBulletsDesktop')}
-                  </li>
-                  <li className="md:hidden">{t('shellUi.accountModalTeamBullets')}</li>
-                  <li className="hidden md:list-item">
-                    {t('shellUi.accountModalTeamBulletsDesktop')}
-                  </li>
-                </ul>
-              </div>
-
-              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[11px] sm:text-xs text-[var(--text-2)] md:py-2.5 md:text-sm">
-                <span className="md:hidden">
-                  {t('shellUi.accountModalFootnote')}
-                </span>
-                <span className="hidden md:inline">
-                  {t('shellUi.accountModalFootnoteDesktop')}
-                </span>
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3.5 text-sm leading-relaxed text-[var(--text-2)] sm:px-5 sm:py-4 md:px-6 md:py-4 md:text-base space-y-3">
+              <p>{t('shellUi.accountModalRegistered', { date: registered })}</p>
+              <p>
+                {isTrial
+                  ? t('shellUi.accountModalTrialBody')
+                  : t('shellUi.accountModalLockedBody')}
+              </p>
+              <p className="rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5 text-[var(--text-2)]">
+                {isTrial
+                  ? t('shellUi.accountModalTrialFootnote')
+                  : t('shellUi.accountModalLockedFootnote')}
                 {isTrial && (
-                  <span className="mt-1 block text-[10px] text-[var(--text-3)]">
+                  <span className="mt-1.5 block text-xs text-[var(--text-3)]">
                     {trialEnd}
                   </span>
                 )}

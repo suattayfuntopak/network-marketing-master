@@ -17,7 +17,7 @@ export function EkipPageContent() {
   useEffect(() => {
     if (raw === 'team') router.replace('/ekip?tab=members', { scroll: false })
     else if (raw === 'activity') router.replace('/ekip?tab=summary', { scroll: false })
-    else if (raw === 'invite') router.replace('/ekip?tab=tools', { scroll: false })
+    else if (raw === 'invite' || raw === 'tools') router.replace('/ekip?tab=members', { scroll: false })
   }, [raw, router])
 
   return (

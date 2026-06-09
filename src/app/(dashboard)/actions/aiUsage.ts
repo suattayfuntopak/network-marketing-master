@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
+import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
 
 export interface AIUsageData {
   /** Tüm YZ aksiyonları (mesaj, koç, prova, uyum) — birleşik günlük kota. */
@@ -23,15 +24,14 @@ export async function fetchAIUsageAction(): Promise<AIUsageData> {
   }
 
   const superAdmin = isSuperAdmin(user)
-  const now = new Date()
-  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()))
+  const dayStartIso = istanbulDayStartIso(todayCalendarKey())
 
   const { data, error } = await supabase
     .from('nmm_daily_actions')
     .select('note')
     .eq('user_id', user.id)
     .eq('action_type', 'ai_generate')
-    .gte('created_at', today.toISOString())
+    .gte('created_at', dayStartIso)
 
   if (error) throw new Error(error.message)
 

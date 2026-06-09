@@ -5,8 +5,10 @@ import { Bot, Copy, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useQueryClient } from '@tanstack/react-query'
 import { useAIUsage } from '@/hooks/useAIUsage'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref } from '@/lib/utils/waLink'
@@ -49,6 +51,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
   const { lang, t } = useTranslation()
+  const queryClient = useQueryClient()
   const { data: usage, refetch: refetchUsage } = useAIUsage()
   const { data: modalWs } = useWorkspace()
   const { dailyLimit } = getLimitsForLicense(
@@ -70,7 +73,8 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
           setError(res.error)
         } else if (res.message) {
           setMessage(res.message)
-          refetchUsage()
+          invalidateTeamAndAIUsage(queryClient, modalWs?.workspaceId)
+          void refetchUsage()
         }
       } catch (err: unknown) {
         if (active) {
@@ -84,7 +88,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
     return () => {
       active = false
     }
-  }, [memberName, stepId, lang, refetchUsage, t])
+  }, [memberName, stepId, lang, refetchUsage, t, queryClient, modalWs?.workspaceId])
 
   const handleCopy = () => {
     if (!message) return

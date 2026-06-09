@@ -19,6 +19,7 @@ import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { queryKeys } from '@/lib/query/keys'
+import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { waHref } from '@/lib/utils/waLink'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { toast } from 'sonner'
@@ -269,7 +270,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
       }
       setMemberPhone(m.phone ?? null)
       setActiveMessage(result.message)
-      // Coaching geçmişini yenile
+      invalidateTeamAndAIUsage(queryClient, ws?.workspaceId)
       void queryClient.invalidateQueries({ queryKey: qKey })
     } catch {
       toast.error('Mesaj oluşturulamadı.')
