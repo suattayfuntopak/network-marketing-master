@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-06-10 — E2E kalıcı çözüm: tab ARIA rolü uyumsuzluğu ✅
+
+### Kök neden
+- CI'da tekrar tekrar düşen tek test: `day-journal-smoke.spec.ts:15` → "Saha Özetim daily tab loads when authenticated".
+- Sekmeler `a8aa0de` (council triad faz A-D) ile `HubSummaryTabBar`'da açık `role="tab"` ile render edilmeye başlandı. Açık `role="tab"`, `<button>`'un örtük button rolünü **ezer** → hesaplanan ARIA rolü `tab` olur.
+- Test ise hâlâ `getByRole('button', { name: /Günlük|Daily/i })` ile arıyordu. Bu locator role="tab" öğesiyle **asla** eşleşmez; bu yüzden timeout/retry artırmak (önceki denemeler) sorunu çözmedi — 20sn boyunca olmayan bir button bekleniyordu.
+
+### Çözüm
+- Test locator'ı doğru ARIA rolüyle hizalandı: `getByRole('tab', { name: /Günlük|Daily/i })`.
+- Açıklayıcı yorum eklendi (regresyon tekrarını önlemek için).
+- CI yalnızca `--project=chromium` çalıştırıyor; tek dosya/tek assertion düzeltmesi kapsamı tam karşılıyor. ESLint temiz, `playwright --list` parse temiz.
+
+### Dosyalar
+`e2e/day-journal-smoke.spec.ts`.
+
 ## 2026-06-09 — İsteğe bağlı takip: sponsor derinliği, SW precache, E2E docs ✅
 
 ### Ekip Ağacı — gerçek nesil derinliği
