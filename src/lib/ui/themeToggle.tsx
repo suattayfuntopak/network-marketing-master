@@ -23,6 +23,7 @@ export function useThemeCycle() {
   const [pendingMode, setPendingMode] = useState<ThemeMode | null>(null)
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true)
   }, [])
 

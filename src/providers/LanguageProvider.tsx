@@ -67,6 +67,7 @@ const dictionaries = {
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<LangType>('tr')
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   React.useEffect(() => {
     const saved = localStorage.getItem('nmm_lang') as LangType | null
     if (saved === 'tr' || saved === 'en') {
@@ -78,6 +79,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       }
     }
   }, [])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   function setLang(newLang: LangType) {
     setLangState(newLang)

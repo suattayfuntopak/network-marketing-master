@@ -21,13 +21,7 @@ export function LandingPage() {
 
   useEffect(() => {
     let active = true
-    let supabase: any
-    try {
-      supabase = createClient()
-    } catch (err) {
-      if (active) setCheckingSession(false)
-      return
-    }
+    let subscription: { unsubscribe: () => void } | undefined
 
     // Şifre sıfırlama linki ana sayfaya düşerse hash/query korunarak yönlendir
     const hash = window.location.hash
@@ -43,25 +37,26 @@ export function LandingPage() {
       return
     }
 
-    // 1. Initial active session check
-    supabase.auth.getSession()
-      .then((res: any) => {
-        const session = res?.data?.session
-        const onLandingPreview = window.location.pathname.startsWith('/acilis')
-        if (session && !onLandingPreview) {
-          router.push('/pano')
-        } else {
-          if (active) setCheckingSession(false)
-        }
-      })
-      .catch(() => {
-        if (active) setCheckingSession(false)
-      })
-
-    // 2. Auth state change listener
-    let subscription: any
     try {
-      const authStateChangeResult = supabase.auth.onAuthStateChange((event: any, session: any) => {
+      const supabase = createClient()
+      
+      // 1. Initial active session check
+      supabase.auth.getSession()
+        .then((res) => {
+          const session = res?.data?.session
+          const onLandingPreview = window.location.pathname.startsWith('/acilis')
+          if (session && !onLandingPreview) {
+            router.push('/pano')
+          } else {
+            if (active) setCheckingSession(false)
+          }
+        })
+        .catch(() => {
+          if (active) setCheckingSession(false)
+        })
+
+      // 2. Auth state change listener
+      const authStateChangeResult = supabase.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           router.replace('/sifre-guncelle')
           return
@@ -73,7 +68,8 @@ export function LandingPage() {
         }
       })
       subscription = authStateChangeResult?.data?.subscription
-    } catch (err) {
+    } catch {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (active) setCheckingSession(false)
     }
 
