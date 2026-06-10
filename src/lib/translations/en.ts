@@ -203,7 +203,7 @@ export const en = {
     inviteCopied: "Copied",
     todayCtaTitle: "Today's focus",
     todayCtaSubtitle: "Priority leads and field summary",
-    joinNotifKpi: "Today: {arama} calls · {tanisma} contacts · {sunum} presentations · {yeniUye} new members",
+    joinNotifKpi: "Today: {arama} calls · {tanisma} added · {sunum} presentations · {yeniUye} new members",
     hubTitle: "Tools & Modules",
     crownMockDailyFollow: "Today's Follow-up",
     panoFieldSummary: "My Field Summary",

@@ -1,7 +1,7 @@
 'use client'
 
-import { useMemo } from 'react'
-import { BookOpen, PlayCircle, Shield, Trophy } from 'lucide-react'
+import { useMemo, useState } from 'react'
+import { BookOpen, ChevronDown, PlayCircle, Shield, Trophy } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
@@ -20,6 +20,15 @@ type TeamTrainingRankingTableProps = {
   progressByUserId: PerfLearningMap
   videoByUserId: Record<string, VideoProgressSummary>
   loading?: boolean
+}
+
+type TrainingRow = {
+  userId: string
+  name: string
+  trainingPct: number
+  objectionPct: number
+  videoPct: number
+  avg: number
 }
 
 function medalForRank(rank: number): string | null {
@@ -52,6 +61,39 @@ function PctCell({ value }: { value: number }) {
   )
 }
 
+function MobileTrainingMetricGrid({
+  row,
+  t,
+}: {
+  row: TrainingRow
+  t: (key: string) => string
+}) {
+  const cells = [
+    { label: t('team.colContentLibrary'), value: row.trainingPct, icon: BookOpen, iconClass: 'text-brand' },
+    { label: t('team.colVideoTraining'), value: row.videoPct, icon: PlayCircle, iconClass: 'text-teal-600 dark:text-teal-400' },
+    { label: t('team.colObjectionBank'), value: row.objectionPct, icon: Shield, iconClass: 'text-amber-600 dark:text-amber-400' },
+  ] as const
+
+  return (
+    <div className="grid grid-cols-2 gap-2 border-t border-[var(--border)] bg-[var(--bg-subtle)]/40 p-3 sm:grid-cols-3">
+      {cells.map(({ label, value, icon: Icon, iconClass }) => (
+        <div
+          key={label}
+          className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-2.5"
+        >
+          <div className="mb-1 flex items-center gap-1.5 text-[var(--text-3)]">
+            <Icon className={clsx('h-4 w-4 shrink-0', iconClass)} strokeWidth={2.25} aria-hidden />
+            <span className="min-w-0 text-[10px] font-bold uppercase leading-tight tracking-wide">
+              {label}
+            </span>
+          </div>
+          <p className="text-lg font-black tabular-nums text-[var(--text-1)]">%{value}</p>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export function TeamTrainingRankingTable({
   members,
   progressByUserId,
@@ -59,8 +101,9 @@ export function TeamTrainingRankingTable({
   loading,
 }: TeamTrainingRankingTableProps) {
   const { t } = useTranslation()
+  const [expandedId, setExpandedId] = useState<string | null>(null)
 
-  const rows = useMemo(() => {
+  const rows = useMemo((): TrainingRow[] => {
     return members
       .map(m => {
         const trainingPct = progressByUserId[m.user_id]?.trainingPct ?? 0
@@ -91,7 +134,36 @@ export function TeamTrainingRankingTable({
         <Trophy className="h-4 w-4 text-amber-500" />
         {t('crown.ranking')}
       </div>
-      <HorizontalScrollLock className="rounded-xl border border-[var(--border)]">
+
+      <ul className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] md:hidden">
+        {rows.map((row, idx) => {
+          const open = expandedId === row.userId
+          return (
+            <li key={row.userId} className={rowBg(idx)}>
+              <div className="flex items-center gap-2 p-3">
+                <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--text-1)]">
+                  <span className="mr-1.5 tabular-nums text-[var(--text-3)]">
+                    {medalForRank(idx) ?? idx + 1}
+                  </span>
+                  {row.name}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setExpandedId(open ? null : row.userId)}
+                  aria-expanded={open}
+                  aria-label={t('team.expandMetrics')}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]"
+                >
+                  <ChevronDown className={clsx('h-4 w-4 transition-transform', open && 'rotate-180')} />
+                </button>
+              </div>
+              {open ? <MobileTrainingMetricGrid row={row} t={t} /> : null}
+            </li>
+          )
+        })}
+      </ul>
+
+      <HorizontalScrollLock className="hidden rounded-xl border border-[var(--border)] md:block">
         <table className="w-full min-w-[420px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]">
@@ -122,32 +194,33 @@ export function TeamTrainingRankingTable({
             {rows.map((row, idx) => {
               const stickyBg = rowStickyBg(idx)
               return (
-              <tr key={row.userId} className={rowBg(idx)}>
-                <td
-                  className={clsx(
-                    'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
-                    Z.cardControlsUpper,
-                    stickyBg,
-                  )}
-                >
-                  <span className="inline-flex items-center gap-1.5">
-                    <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
-                      {medalForRank(idx) ?? idx + 1}
+                <tr key={row.userId} className={rowBg(idx)}>
+                  <td
+                    className={clsx(
+                      'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
+                      Z.cardControlsUpper,
+                      stickyBg,
+                    )}
+                  >
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
+                        {medalForRank(idx) ?? idx + 1}
+                      </span>
+                      <span className="truncate font-medium text-[var(--text-1)]">{row.name}</span>
                     </span>
-                    <span className="truncate font-medium text-[var(--text-1)]">{row.name}</span>
-                  </span>
-                </td>
-                <td className="bg-inherit p-2.5 text-center">
-                  <PctCell value={row.trainingPct} />
-                </td>
-                <td className="bg-inherit p-2.5 text-center">
-                  <PctCell value={row.videoPct} />
-                </td>
-                <td className="bg-inherit p-2.5 text-center">
-                  <PctCell value={row.objectionPct} />
-                </td>
-              </tr>
-            )})}
+                  </td>
+                  <td className="bg-inherit p-2.5 text-center">
+                    <PctCell value={row.trainingPct} />
+                  </td>
+                  <td className="bg-inherit p-2.5 text-center">
+                    <PctCell value={row.videoPct} />
+                  </td>
+                  <td className="bg-inherit p-2.5 text-center">
+                    <PctCell value={row.objectionPct} />
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </HorizontalScrollLock>

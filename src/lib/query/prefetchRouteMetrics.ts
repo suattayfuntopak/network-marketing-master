@@ -3,7 +3,6 @@ import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import {
   getCrownSahaRadarAction,
-  getCrownVideoPageAction,
   getCrownTeamMonthlyPulseAction,
   getCrownTeamWeeklyPulseAction,
   getCrownEntriesPageAction,
@@ -20,6 +19,7 @@ import {
 } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
+import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from './keys'
@@ -266,9 +266,9 @@ export function prefetchRouteMetrics(
 
   if (href === '/canli-egitim') {
     void queryClient.prefetchQuery({
-      queryKey: ['crown', 'video', workspaceId],
-      queryFn: () => getCrownVideoPageAction(workspaceId),
-      staleTime: QUERY_STALE.metrics,
+      queryKey: queryKeys.videoCatalog(workspaceId),
+      queryFn: () => getVideoCatalogAction(workspaceId),
+      staleTime: QUERY_STALE.usage,
     })
   }
 

@@ -21,6 +21,7 @@ import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
+import { VirtualizedMemberList } from './VirtualizedMemberList'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { InviteTeammateSection } from './InviteTeammateSection'
 import { JoinByInviteSection } from './JoinByInviteSection'
@@ -429,8 +430,11 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
         )}
 
         {/* Üye performans listesi */}
-        <ul className="space-y-5">
-          {visibleMembers.map(m => {
+        <VirtualizedMemberList
+          items={visibleMembers}
+          getKey={m => m.user_id}
+          measureKey={serializeMemberTabs(memberCardTab)}
+          renderItem={m => {
             const isCurrentUser = m.user_id === ws.userId
             const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
             const daysInactive = lastActiveDate ? Math.floor((now - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
@@ -441,7 +445,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             const waQuick = waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
 
             return (
-              <li
+              <div
                 key={m.user_id}
                 className={clsx(
                   'overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4',
@@ -756,10 +760,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     </div>
                   )
                 })()}
-              </li>
+              </div>
             )
-          })}
-        </ul>
+          }}
+        />
 
         {isPlusCapReached && (
           <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-r from-pink-500/5 to-rose-500/5 p-8 text-center space-y-4 shadow-lg my-6">

@@ -26,6 +26,8 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
+import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
+import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 
 type ActivityLevel = 'active' | 'recent' | 'silent'
 
@@ -67,15 +69,6 @@ function ActivityBadge({ level, t }: { level: ActivityLevel; t: ReturnType<typeo
       )} />
       {label}
     </span>
-  )
-}
-
-function StatBox({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div className={clsx('flex flex-col items-center rounded-xl border px-3 py-3 text-center', color)}>
-      <span className="text-2xl font-bold">{value}</span>
-      <span className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide">{label}</span>
-    </div>
   )
 }
 
@@ -394,41 +387,27 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                   </div>
                 </div>
 
-                {/* Pipeline dağılımı */}
+                {/* Aktivite özeti — Ekip Üyeleri kartı ile aynı düzen */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('dashboard.memberDetailPipelineTitle')}
+                    {t('team.activityFunnelTitle')}
                   </p>
-                  {m.candidate_count === 0 ? (
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-                      <p className="text-sm text-[var(--text-3)]">
-                        {t('dashboard.memberDetailNoCandidates')}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-4 gap-2">
-                      <StatBox
-                        label={t('stages.yeni')}
-                        value={m.yeni_count}
-                        color="border-blue-200 bg-blue-50 text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-300"
-                      />
-                      <StatBox
-                        label={t('stages.takip')}
-                        value={m.takip_count}
-                        color="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300"
-                      />
-                      <StatBox
-                        label={t('stages.sunum')}
-                        value={m.sunum_count}
-                        color="border-cyan-200 bg-cyan-50 text-cyan-800 dark:border-cyan-900/40 dark:bg-cyan-950/20 dark:text-cyan-300"
-                      />
-                      <StatBox
-                        label={t('stages.katildi')}
-                        value={m.katildi_count}
-                        color="border-teal-200 bg-teal-50 text-teal-800 dark:border-teal-900/40 dark:bg-teal-950/20 dark:text-teal-300"
-                      />
-                    </div>
-                  )}
+                  <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+                    <MemberActivitySheet
+                      embedded
+                      workspaceId={ws!.workspaceId}
+                      member={{
+                        userId: m.user_id,
+                        fullName: m.full_name,
+                        phone: m.phone,
+                        pipelineHref: m.pipeline_id ? `/pipeline/${m.pipeline_id}` : null,
+                      }}
+                      teamPulseUnlocked={hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)}
+                      memberIsLeader={m.role === 'leader'}
+                      pipelineTakipCount={m.takip_count ?? 0}
+                      pipelineKatildiCount={m.katildi_count ?? 0}
+                    />
+                  </div>
                 </div>
 
                 {/* Bu hafta aktivitesi */}

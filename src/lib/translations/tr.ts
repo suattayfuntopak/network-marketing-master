@@ -203,7 +203,7 @@ export const tr = {
     inviteCopied: "Kopyalandı",
     todayCtaTitle: "Bugün ilgilen",
     todayCtaSubtitle: "Öncelikli adaylar ve saha özeti",
-    joinNotifKpi: "Bugün: {arama} arama · {tanisma} tanışma · {sunum} sunum · {yeniUye} yeni üye",
+    joinNotifKpi: "Bugün: {arama} arama · {tanisma} ekleme · {sunum} sunum · {yeniUye} yeni üye",
     hubTitle: "Araçlar & Modüller",
     crownMockDailyFollow: "Bugünkü Takibim",
     panoFieldSummary: "Saha Özetim",
