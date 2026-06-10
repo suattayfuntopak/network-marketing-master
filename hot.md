@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-10 — CI: doküman-only commit'ler E2E/Vitest/deploy tetiklemesin ✅
+
+`e2e.yml` ve `unit-test.yml` **push (main)** trigger'larına `paths-ignore` (`**.md`, `docs/**`, `hot.md`) eklendi — PR trigger'larında zaten vardı. Artık yalnızca hot.md/dokümana dokunan commit'ler boşuna 5dk E2E + Vitest + prod deploy tetiklemiyor. Karışık (kod+md) commit'ler etkilenmez. `migrate-check.yml` (zaten `paths:` filtreli) ve `lint-pr.yml` (yalnız PR) dokunulmadı.
+
+### Dosyalar
+`.github/workflows/e2e.yml`, `.github/workflows/unit-test.yml`
+
 ## 2026-06-10 — Deploy gate düzeltildi: saha-radar E2E testi (prod deploy zinciri açıldı) ✅
 
 ### Sorun

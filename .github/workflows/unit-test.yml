@@ -8,6 +8,10 @@ on:
       - 'hot.md'
   push:
     branches: [main]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'hot.md'
   workflow_dispatch:
 
 jobs:
