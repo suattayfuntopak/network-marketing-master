@@ -6,7 +6,7 @@ import { getTrainingData } from '@/lib/domain/trainingData'
 import { ITIRAZLAR } from '@/app/(dashboard)/itirazlar/data/itirazlar'
 import {
   getAkademiCustomCountsAction,
-  getSelfUserProgressAction,
+  getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useVideoCatalog } from '@/hooks/useVideoCatalog'
@@ -28,8 +28,9 @@ export function usePersonalAkademiProgress() {
 
   const { data: progressSnapshot } = useQuery({
     queryKey: queryKeys.selfUserProgress(),
-    queryFn: getSelfUserProgressAction,
-    staleTime: QUERY_STALE.usage,
+    queryFn: getFullSelfUserProgressAction,
+    staleTime: QUERY_STALE.progress,
+    refetchOnWindowFocus: true,
   })
 
   const { data: customCounts } = useQuery({

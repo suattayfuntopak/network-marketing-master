@@ -212,6 +212,8 @@ export const en = {
     summaryTabWeekly: "Weekly",
     summaryTabMonthly: "Monthly",
     summaryTabYearly: "Yearly",
+    summaryPeriodPrev: "Previous period",
+    summaryPeriodNext: "Next period",
     summaryTabAll: "All",
     summaryTabAllTime: "All Time",
     crownMockDailySummary: "Daily Summary",

@@ -77,7 +77,9 @@ export function useProgressSync() {
     queryKey: queryKeys.selfUserProgress(),
     queryFn: getFullSelfUserProgressAction,
     enabled: !!userId && !!ws?.workspaceId,
-    staleTime: QUERY_STALE.usage,
+    staleTime: QUERY_STALE.progress,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   })
 
   useEffect(() => {

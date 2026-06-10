@@ -3,7 +3,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { AkademiContent } from './_components/AkademiContent'
 import {
   getAkademiCustomCountsAction,
-  getSelfUserProgressAction,
+  getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { getQueryClient } from '@/lib/query/getQueryClient'
@@ -21,8 +21,8 @@ export default async function EgitimPage() {
     await Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.selfUserProgress(),
-        queryFn: getSelfUserProgressAction,
-        staleTime: QUERY_STALE.usage,
+        queryFn: getFullSelfUserProgressAction,
+        staleTime: QUERY_STALE.progress,
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.akademiCustomCounts(ws.workspaceId),

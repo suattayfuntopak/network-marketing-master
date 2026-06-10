@@ -8,4 +8,6 @@ export const QUERY_STALE = {
   workspace: 5 * 60_000,
   /** AI kotası, video katalog */
   usage: 90_000,
+  /** Akademi okundu/favori — çoklu cihazda pencere odağında tazelenir */
+  progress: 60_000,
 } as const

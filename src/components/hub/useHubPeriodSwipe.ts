@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState, type RefObject } from 'react'
-
-const SWIPE_THRESHOLD_PX = 52
-const DRAG_RESISTANCE = 0.45
+import {
+  applyHubPeriodDragResistance,
+  resolveHubPeriodSwipe,
+} from '@/lib/ui/hubPeriodSwipe'
 
 type UseHubPeriodSwipeOptions = {
   onSwipePrev: () => void
@@ -43,7 +44,7 @@ export function useHubPeriodSwipe(
       if (!activeRef.current || e.touches.length !== 1) return
       const dx = e.touches[0].clientX - startXRef.current
       if (Math.abs(dx) > 6) e.preventDefault()
-      const resisted = dx * DRAG_RESISTANCE
+      const resisted = applyHubPeriodDragResistance(dx)
       dragXRef.current = resisted
       setDragX(resisted)
     }
@@ -55,8 +56,9 @@ export function useHubPeriodSwipe(
       const dx = dragXRef.current
       dragXRef.current = 0
       setDragX(0)
-      if (dx > SWIPE_THRESHOLD_PX) onPrevRef.current()
-      else if (dx < -SWIPE_THRESHOLD_PX) onNextRef.current()
+      const direction = resolveHubPeriodSwipe(dx)
+      if (direction === 'prev') onPrevRef.current()
+      else if (direction === 'next') onNextRef.current()
     }
 
     el.addEventListener('touchstart', onStart, { passive: true })

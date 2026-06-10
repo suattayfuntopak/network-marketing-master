@@ -45,7 +45,7 @@ function PeriodLabel({
 }
 
 export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProps) {
-  const { lang } = useTranslation()
+  const { lang, t } = useTranslation()
   const { offset, go } = useHubPeriodNavigation()
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -104,6 +104,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
       ref={containerRef}
       className="no-swipe w-full touch-pan-x select-none"
       data-no-swipe="true"
+      data-testid="hub-period-navigator"
       onTouchStart={e => e.stopPropagation()}
       style={{
         transform: dragX ? `translateX(${dragX}px)` : undefined,
@@ -115,7 +116,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
           type="button"
           onClick={goPrev}
           className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-1.5 text-[var(--text-3)] transition hover:border-brand/30 hover:text-brand active:scale-95 sm:px-2.5"
-          aria-label="Previous period"
+          aria-label={t('dashboard.summaryPeriodPrev')}
         >
           <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
         </button>
@@ -149,7 +150,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
           type="button"
           onClick={goNext}
           className="flex shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-1.5 text-[var(--text-3)] transition hover:border-brand/30 hover:text-brand active:scale-95 sm:px-2.5"
-          aria-label="Next period"
+          aria-label={t('dashboard.summaryPeriodNext')}
         >
           <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
         </button>

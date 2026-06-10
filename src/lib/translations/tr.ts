@@ -212,6 +212,8 @@ export const tr = {
     summaryTabWeekly: "Haftalık",
     summaryTabMonthly: "Aylık",
     summaryTabYearly: "Yıllık",
+    summaryPeriodPrev: "Önceki dönem",
+    summaryPeriodNext: "Sonraki dönem",
     summaryTabAll: "Tümü",
     summaryTabAllTime: "Tüm Zamanlar",
     crownMockDailySummary: "Günlük Özet",

@@ -21,7 +21,7 @@ import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import {
   getAkademiCustomCountsAction,
-  getSelfUserProgressAction,
+  getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
@@ -32,6 +32,19 @@ import { QUERY_STALE } from './staleTimes'
 type WsSlice = {
   licenseType?: string | null
   isSuperAdmin?: boolean
+}
+
+function prefetchAkademiProgressBundle(queryClient: QueryClient, workspaceId: string) {
+  void queryClient.prefetchQuery({
+    queryKey: queryKeys.selfUserProgress(),
+    queryFn: getFullSelfUserProgressAction,
+    staleTime: QUERY_STALE.progress,
+  })
+  void queryClient.prefetchQuery({
+    queryKey: queryKeys.akademiCustomCounts(workspaceId),
+    queryFn: getAkademiCustomCountsAction,
+    staleTime: QUERY_STALE.usage,
+  })
 }
 
 export type RoutePrefetchWs = WsSlice
@@ -274,16 +287,11 @@ export function prefetchRouteMetrics(
       queryFn: () => getVideoCatalogAction(workspaceId),
       staleTime: QUERY_STALE.usage,
     })
-    void queryClient.prefetchQuery({
-      queryKey: queryKeys.selfUserProgress(),
-      queryFn: getSelfUserProgressAction,
-      staleTime: QUERY_STALE.usage,
-    })
-    void queryClient.prefetchQuery({
-      queryKey: queryKeys.akademiCustomCounts(workspaceId),
-      queryFn: getAkademiCustomCountsAction,
-      staleTime: QUERY_STALE.usage,
-    })
+    prefetchAkademiProgressBundle(queryClient, workspaceId)
+  }
+
+  if (href === '/egitim') {
+    prefetchAkademiProgressBundle(queryClient, workspaceId)
   }
 
   if (href === '/saha-radar') {

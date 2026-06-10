@@ -2,7 +2,7 @@ import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { CrownVideoPage } from './_components/CrownVideoPage'
 import {
   getAkademiCustomCountsAction,
-  getSelfUserProgressAction,
+  getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
@@ -26,8 +26,8 @@ export default async function CanliEgitimPage() {
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.selfUserProgress(),
-        queryFn: getSelfUserProgressAction,
-        staleTime: QUERY_STALE.usage,
+        queryFn: getFullSelfUserProgressAction,
+        staleTime: QUERY_STALE.progress,
       }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.akademiCustomCounts(ws.workspaceId),
