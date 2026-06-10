@@ -15,6 +15,15 @@ import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
 import { AddTrainingModal } from './AddTrainingModal'
 
+type SeviyeKey = 'all' | 'beginner' | 'intermediate' | 'advanced'
+
+/** Seviye etiketleri TR/EN + custom içerik için çoklu değer eşlemesi. */
+const SEVIYE_GRUPLARI: Record<Exclude<SeviyeKey, 'all'>, string[]> = {
+  beginner: ['Temel', 'Basic', 'Başlangıç'],
+  intermediate: ['Orta', 'Medium', 'Intermediate'],
+  advanced: ['İleri', 'Advanced'],
+}
+
 export function EgitimContent({
   embedded = false,
   addFormOpen: addFormOpenProp,
@@ -30,6 +39,7 @@ export function EgitimContent({
 
   const [search, setSearch] = useState('')
   const [aktifKategori, setAktifKategori] = useState(0)
+  const [aktifSeviye, setAktifSeviye] = useState<SeviyeKey>('all')
   const [page, setPage] = useState(1)
   const [acikId, setAcikId] = useState<string | null>(null)
 
@@ -96,9 +106,13 @@ export function EgitimContent({
     const q = search.trim().toLowerCase()
 
     return allTopicsMerged.filter(konu => {
-      if (isFavFilter) return favs.has(konu.id)
-      const matchesCategory = isAll || konu.kategoriBaslik === activeLabel
-      if (!matchesCategory) return false
+      if (isFavFilter && !favs.has(konu.id)) return false
+      if (!isFavFilter) {
+        const matchesCategory = isAll || konu.kategoriBaslik === activeLabel
+        if (!matchesCategory) return false
+      }
+
+      if (aktifSeviye !== 'all' && !SEVIYE_GRUPLARI[aktifSeviye].includes(konu.seviye)) return false
 
       if (!q) return true
       const baslikMatch = konu.baslik.toLowerCase().includes(q)
@@ -106,7 +120,7 @@ export function EgitimContent({
       const maddelerMatch = konu.maddeler.some(m => m.toLowerCase().includes(q))
       return baslikMatch || ozetMatch || maddelerMatch
     })
-  }, [search, aktifKategori, favs, allTopicsMerged, KATEGORILER])
+  }, [search, aktifKategori, aktifSeviye, favs, allTopicsMerged, KATEGORILER])
 
   function handleAddTraining(topic: TrainingTopic) {
     const updated = [topic, ...customTrainings]
@@ -132,7 +146,7 @@ export function EgitimContent({
   }, [searchParams, filtrelenmis])
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setPage(1); setAcikId(null) }, [aktifKategori])
+  useEffect(() => { setPage(1); setAcikId(null) }, [aktifKategori, aktifSeviye])
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPage(1); setAcikId(null) }, [search])
 
@@ -222,6 +236,21 @@ export function EgitimContent({
               )}
             </div>
           </div>
+
+          {readCount > 0 && allTopicsMerged.length > 0 && (
+            <div className="mt-3 animate-in fade-in duration-300">
+              <div className="mb-1 flex items-center justify-between text-[11px] font-semibold text-[var(--text-3)]">
+                <span>{t('trainingPage.progressLabel')}</span>
+                <span>%{Math.round((readCount / allTopicsMerged.length) * 100)}</span>
+              </div>
+              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
+                <div
+                  className="h-full rounded-full bg-emerald-500 transition-all duration-500"
+                  style={{ width: `${Math.round((readCount / allTopicsMerged.length) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
         </header>
       )}
 
@@ -274,6 +303,31 @@ export function EgitimContent({
                 {favCount}
               </span>
             )}
+          </button>
+        ))}
+      </div>
+
+      {/* Seviye filtresi — kategoriden ayrı, ikincil bir satır */}
+      <div className="mb-5 flex flex-wrap items-center gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
+          {t('trainingPage.fieldLevel')}
+        </span>
+        {([
+          { key: 'all', label: t('trainingPage.allLevels') },
+          { key: 'beginner', label: t('trainingPage.levelBeginner') },
+          { key: 'intermediate', label: t('trainingPage.levelIntermediate') },
+          { key: 'advanced', label: t('trainingPage.levelAdvanced') },
+        ] as { key: SeviyeKey; label: string }[]).map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setAktifSeviye(key)}
+            className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
+              aktifSeviye === key
+                ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
+                : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:text-[var(--text-1)]'
+            }`}
+          >
+            {label}
           </button>
         ))}
       </div>

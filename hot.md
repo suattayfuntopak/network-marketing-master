@@ -1,5 +1,55 @@
 # Hot Log
 
+## 2026-06-10 — Akademi: seviye filtresi + ilerleme çubuğu + itiraz zenginleştirme altyapısı ✅
+
+### Özet
+- **Seviye filtresi (Genel #2 + #4):** İçerik kütüphanesine Tüm Seviyeler / Başlangıç / Orta / İleri filtre satırı eklendi (`SEVIYE_GRUPLARI` TR+EN+custom değer eşlemesi). Arama + kategori + favori + seviye birlikte çalışır.
+- **İlerleme çubuğu (Genel #3 görünürlük):** Başlıkta `%` + ince yeşil çubuk (okunan/toplam). Not: okundu-takibi (`toggleRead`, rozet) ve % hook'u zaten vardı; artık görsel çubukla pekiştirildi.
+- **İtiraz zenginleştirme altyapısı (Öneri #2):** `ItirazCard` artık `cevap` ile birlikte `detayliCevap` + `yaklasim` + `ornekDiyalog`'u (varsa) katman katman gösteriyor (eskiden yalnız `cevap` yoksa görünürdü). `buildCopyValue` da bu katmanları kopyalıyor → mevcut 37 itiraz cevabını korur, zenginleştirilenler derinlik kazanır (mükerrersiz).
+- **Örnek zenginleştirme:** #36 (ürün etkinliği) ve #37 (sen de kazanmıyorsun) itirazları detaylı cevap + örnek WhatsApp diyaloğu + yaklaşım ile TR+EN dolduruldu.
+- **Durum tespiti:** Genel #3 (tamamlama) ve Genel #5 (içerik DB+editör → mevcut `nmm_custom_trainings/objections` + moderasyon altyapısı) zaten kısmen/tam mevcut; raporda detaylandırıldı.
+
+### Dosyalar
+`EgitimContent.tsx`, `ItirazCard.tsx`, `itirazlar/data/itirazlar.ts`, `translations/sections/training.ts`
+
+## 2026-06-10 — CI lint fix + sprint önerileri + deploy zinciri dokümantasyonu ✅
+
+### Özet
+- **Kök neden:** E2E **Build** job `useHubPeriodSwipe.ts` react-hooks/refs lint hatası → E2E fail → `vercel.json` main auto-deploy kapalı olduğu için prod deploy **skipped** (son prod ~6e4d0f4).
+- **Fix:** ref güncellemesi `useEffect` içine alındı; lint + build yeşil.
+- **Sprint:** Saha Radarı E2E (`saha-radar-activity.spec.ts`), pipelineId yok toast, hub prefetch debug kartı (Platform Yönetimi), `MemberRow` JSDoc, branch protection + troubleshooting `github-secrets.md`.
+- **Vitest 188/188**
+
+### Dosyalar
+`useHubPeriodSwipe.ts`, `hubPeriodPrefetch.ts`, `prefetchRouteMetrics.ts`, `CrownSahaRadarPage.tsx`, `HubPrefetchDebugCard.tsx`, `PlatformYonetimContent.tsx`, `types.ts`, `crown.ts`, `platform.ts`, `saha-radar-activity.spec.ts`, `github-secrets.md`, `hub-metrics.md`, `AGENTS.md`
+
+## 2026-06-10 — 5 genel öneri + Saha Radarı aktivite kartı pipeline linki ✅
+
+### Özet
+- **Saha Radarı aktivite** — `MemberCard` tıklanınca `pipeline_id` → `/pipeline/[id]` (ör. Elif Sinem Topak); eşleşme yoksa `/ekip/[userId]`.
+- **Hover prefetch inceltme** — `writeStoredHubActiveTab` / `readStoredHubActiveTab` (`nmm_hub_active_tab`); nav hover son sekme + komşu offset.
+- **Prefetch debug log** — development + Vercel preview'da `console.debug('[prefetchHubMetrics]', …)`.
+- **E2E sekme geçişi** — `hub-summary-tab-*` testid + monthly/yearly tıklama testi.
+- **CI Vitest paralel job** — `.github/workflows/unit-test.yml`; e2e build'den kaldırıldı.
+- **Dokümantasyon** — `docs/hub-metrics.md` + `AGENTS.md` hub bölümü.
+- **Vitest 188/188**
+
+### Dosyalar
+`crown/actions.ts`, `CrownSahaRadarPage.tsx`, `hubPeriodPrefetch.ts`, `hubPeriodPrefetch.test.ts`, `prefetchRouteMetrics.ts`, `FieldSummaryPage.tsx`, `HubSummaryTabBar.tsx`, `dashboard-mobile.spec.ts`, `unit-test.yml`, `e2e.yml`, `docs/hub-metrics.md`, `AGENTS.md`
+
+## 2026-06-10 — 5 genel öneri: hub SSR prefetch, placeholder, CI Vitest, mobile E2E, prefetch maliyet ✅
+
+### Özet
+- **Saha Özetim SSR prefetch** — `saha-ozetim/page.tsx` workspace + `prefetchHubMetrics` + `HydrationBoundary` (URL `tab` ile aktif sekme).
+- **Paylaşımlı hub dönem modülü** — `hubPeriodPrefetch.ts` (`HUB_PERIOD_NEIGHBOR_OFFSETS`, `parseSummaryTab`, offset seçici); `HubSummaryTabBar` re-export.
+- **Flicker azaltma** — `FieldSummaryPage` `placeholderData` → önbellekteki aynı query key verisi (SSR/hover prefetch).
+- **Prefetch maliyet kontrolü** — `prefetchHubMetrics({ activeTab })`: komşu offset yalnızca aktif sekmede; hover/SSR dışı → offset 0.
+- **CI** — `e2e.yml` build job'a `npm test`; Playwright `chromium` + `mobile-chrome`.
+- **Vitest 187/187** — `hubPeriodPrefetch.test.ts`.
+
+### Dosyalar
+`hubPeriodPrefetch.ts`, `hubPeriodPrefetch.test.ts`, `prefetchRouteMetrics.ts`, `saha-ozetim/page.tsx`, `FieldSummaryPage.tsx`, `HubSummaryTabBar.tsx`, `.github/workflows/e2e.yml`
+
 ## 2026-06-10 — İçerik Kütüphanesi: 34 yeni global NM konusu (Öneri #1 dahil) ✅
 
 ### Özet

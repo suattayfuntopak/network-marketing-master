@@ -12,8 +12,12 @@ function buildCopyValue(
   ornekDiyalog: string | undefined,
   labels: { short: string; detailed: string; dialog: string },
 ): string {
-  if (hasStructuredCevap) return cevapDisplay
-  return `${kisaCevap ? `${labels.short}:\n${kisaCevap}\n\n` : ''}${detayliCevap ? `${labels.detailed}:\n${detayliCevap}\n\n` : ''}${ornekDiyalog ? `${labels.dialog}:\n${ornekDiyalog}` : ''}`.trim()
+  const parts: string[] = []
+  if (hasStructuredCevap && cevapDisplay) parts.push(cevapDisplay)
+  else if (kisaCevap) parts.push(`${labels.short}:\n${kisaCevap}`)
+  if (detayliCevap) parts.push(`${labels.detailed}:\n${detayliCevap}`)
+  if (ornekDiyalog) parts.push(`${labels.dialog}:\n${ornekDiyalog}`)
+  return parts.join('\n\n').trim()
 }
 
 type Props = {
@@ -138,35 +142,34 @@ export function ItirazCard({
                 <span className="text-[10px]">💡</span>
               </div>
               <div className="flex-1 text-base leading-relaxed text-[var(--text-2)] space-y-3">
-                {itiraz.cevap ? (
-                  <p>{cevap}</p>
-                ) : (
-                  <>
-                    {kisaCevap && (
-                      <div>
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandShortAnswer')}</h5>
-                        <p className="italic font-medium">&quot;{kisaCevap}&quot;</p>
-                      </div>
-                    )}
-                    {detayliCevap && (
-                      <div>
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandDetailedAnswer')}</h5>
-                        <p className="whitespace-pre-wrap">{detayliCevap}</p>
-                      </div>
-                    )}
-                    {yaklasim && (
-                      <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
-                        <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ {t('objectionsPage.expandApproach')}</h5>
-                        <p className="text-sm text-[var(--text-3)] leading-relaxed">{yaklasim}</p>
-                      </div>
-                    )}
-                    {ornekDiyalog && (
-                      <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
-                        <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 {t('objectionsPage.expandExampleDialog')}</h5>
-                        <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{ornekDiyalog}&quot;</p>
-                      </div>
-                    )}
-                  </>
+                {/* Özlü cevap (cevap) varsa ana yanıt olarak gösterilir; yoksa
+                    kisaCevap kullanılır. detayliCevap / yaklasim / ornekDiyalog
+                    varsa HER İKİ durumda da altta katman katman eklenir → mevcut
+                    itirazlar cevabını korur, zenginleştirilenler derinlik kazanır. */}
+                {itiraz.cevap && <p>{cevap}</p>}
+                {!itiraz.cevap && kisaCevap && (
+                  <div>
+                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandShortAnswer')}</h5>
+                    <p className="italic font-medium">&quot;{kisaCevap}&quot;</p>
+                  </div>
+                )}
+                {detayliCevap && (
+                  <div>
+                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-0.5">{t('objectionsPage.expandDetailedAnswer')}</h5>
+                    <p className="whitespace-pre-wrap">{detayliCevap}</p>
+                  </div>
+                )}
+                {yaklasim && (
+                  <div className="bg-[var(--bg-subtle)] p-3 rounded-xl border border-[var(--border)] mt-2">
+                    <h5 className="text-[10px] font-bold text-[var(--text-2)] uppercase tracking-wider mb-1 flex items-center gap-1">🛡️ {t('objectionsPage.expandApproach')}</h5>
+                    <p className="text-sm text-[var(--text-3)] leading-relaxed">{yaklasim}</p>
+                  </div>
+                )}
+                {ornekDiyalog && (
+                  <div className="bg-[#FFF1F3]/40 dark:bg-[#3d0a1a]/20 p-3 rounded-xl border border-[#FFE4EA] dark:border-[#3d0a1a]/40 mt-2">
+                    <h5 className="text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af] uppercase tracking-wider mb-1 flex items-center gap-1">💬 {t('objectionsPage.expandExampleDialog')}</h5>
+                    <p className="text-sm italic leading-relaxed whitespace-pre-wrap">&quot;{ornekDiyalog}&quot;</p>
+                  </div>
                 )}
               </div>
             </div>
