@@ -3,9 +3,14 @@
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { crownSolidMap, type ButtonColor } from '@/components/ui/SquareButton'
+import {
+  HUB_PERIOD_TABS,
+  type HubPeriodTab,
+  parseSummaryTab,
+} from '@/lib/domain/hubPeriodPrefetch'
 
-export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly'] as const
-export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
+export { HUB_PERIOD_TABS, parseSummaryTab }
+export type { HubPeriodTab }
 
 /** @deprecated Use HubPeriodTab — kept for field summary imports */
 export type HubSummaryTab = HubPeriodTab
@@ -73,10 +78,3 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
   )
 }
 
-export function parseSummaryTab(raw: string | null): HubPeriodTab {
-  if (raw === 'all') return 'yearly'
-  if (raw && (HUB_PERIOD_TABS as readonly string[]).includes(raw)) {
-    return raw as HubPeriodTab
-  }
-  return 'daily'
-}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { History } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -55,6 +55,7 @@ const ACCENT = {
 
 export function FieldSummaryPage() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -84,11 +85,14 @@ export function FieldSummaryPage() {
     [pathname, router],
   )
 
+  const hubCachedPlaceholder = <T,>(key: readonly unknown[]) => (prev: T | undefined) =>
+    queryClient.getQueryData<T>(key) ?? prev
+
   const { data: dailySelf, isLoading: dailyLoading } = useQuery({
     queryKey: queryKeys.hubDailySelf(offset),
     queryFn: () => getHubDailySelfAction(offset),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: hubCachedPlaceholder(queryKeys.hubDailySelf(offset)),
     enabled: tab === 'daily',
   })
 
@@ -96,7 +100,7 @@ export function FieldSummaryPage() {
     queryKey: queryKeys.hubWeeklySelf(offset),
     queryFn: () => getHubWeeklySelfAction(offset),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: hubCachedPlaceholder(queryKeys.hubWeeklySelf(offset)),
     enabled: tab === 'weekly',
   })
 
@@ -104,7 +108,7 @@ export function FieldSummaryPage() {
     queryKey: queryKeys.hubMonthlySelf(offset),
     queryFn: () => getHubMonthlySelfAction(offset),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: hubCachedPlaceholder(queryKeys.hubMonthlySelf(offset)),
     enabled: tab === 'monthly',
   })
 
@@ -112,7 +116,7 @@ export function FieldSummaryPage() {
     queryKey: queryKeys.hubYearlySelf(offset),
     queryFn: () => getHubYearlySelfAction(offset),
     staleTime: 60_000,
-    placeholderData: keepPreviousData,
+    placeholderData: hubCachedPlaceholder(queryKeys.hubYearlySelf(offset)),
     enabled: tab === 'yearly',
   })
 

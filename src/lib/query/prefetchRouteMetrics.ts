@@ -24,6 +24,10 @@ import {
   getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
+import {
+  hubPeriodOffsetsForPrefetch,
+  type HubPeriodTab,
+} from '@/lib/domain/hubPeriodPrefetch'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from './keys'
@@ -53,8 +57,10 @@ export async function prefetchAkademiProgressBundle(
   ])
 }
 
-/** Saha özeti dönem şeridi — komşu offset'ler (swipe/ok ile anında metrik). */
-const HUB_PERIOD_NEIGHBOR_OFFSETS = [-1, 0, 1] as const
+export type HubMetricsPrefetchOpts = {
+  /** SSR veya URL'den gelen sekme — komşu offset yalnızca bu sekmede. */
+  activeTab?: HubPeriodTab
+}
 
 export type RoutePrefetchWs = WsSlice
 
@@ -90,25 +96,40 @@ export async function prefetchHubMetrics(
   queryClient: QueryClient,
   workspaceId: string,
   ws: WsSlice,
+  opts?: HubMetricsPrefetchOpts,
 ) {
+  const activeTab = opts?.activeTab
   const tasks: Promise<void>[] = []
-  for (const offset of HUB_PERIOD_NEIGHBOR_OFFSETS) {
+
+  for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'daily')) {
     tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubDailySelf(offset),
         queryFn: () => getHubDailySelfAction(offset),
         staleTime: QUERY_STALE.metrics,
       }),
+    )
+  }
+  for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'weekly')) {
+    tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubWeeklySelf(offset),
         queryFn: () => getHubWeeklySelfAction(offset),
         staleTime: QUERY_STALE.metrics,
       }),
+    )
+  }
+  for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'monthly')) {
+    tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubMonthlySelf(offset),
         queryFn: () => getHubMonthlySelfAction(offset),
         staleTime: QUERY_STALE.metrics,
       }),
+    )
+  }
+  for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'yearly')) {
+    tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubYearlySelf(offset),
         queryFn: () => getHubYearlySelfAction(offset),
