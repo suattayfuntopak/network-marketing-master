@@ -222,19 +222,25 @@ export async function getGoalDashboardAction(): Promise<GoalDashboard> {
   }
   if (!user) return { goal: null, progress: emptyProgress, roadmap: [] }
 
-  const workspaceId = await ownWorkspaceId(supabase, user.id)
+  // workspaceId / goalRow / actuals bağımsız — ardışık 3 sorgu yerine tek
+  // paralel dalga. teamSize workspace'e bağlı olduğu için sonraki dalgada kalır.
+  // (/hedefim client sayfası, SSR prefetch yok → bu zincir doğrudan kullanıcıyı
+  // bekletiyordu; ~5 round-trip → ~3.)
+  const [workspaceId, goalRes, actuals] = await Promise.all([
+    ownWorkspaceId(supabase, user.id),
+    supabase
+      .from('nmm_user_goals')
+      .select('target_people, target_months, start_at')
+      .eq('user_id', user.id)
+      .maybeSingle(),
+    fetchFunnelActualsForToday(supabase, user.id),
+  ])
   const teamSize = workspaceId ? await directTeamCount(supabase) : 0
 
-  const { data: goalRow } = await supabase
-    .from('nmm_user_goals')
-    .select('target_people, target_months, start_at')
-    .eq('user_id', user.id)
-    .maybeSingle()
+  const goalRow = goalRes.data
   const goal: UserGoal | null = goalRow
     ? { targetPeople: goalRow.target_people, targetMonths: goalRow.target_months, startAt: goalRow.start_at }
     : null
-
-  const actuals = await fetchFunnelActualsForToday(supabase, user.id)
 
   if (!goal) return { goal: null, progress: { ...emptyProgress, teamSize, actuals }, roadmap: [] }
 

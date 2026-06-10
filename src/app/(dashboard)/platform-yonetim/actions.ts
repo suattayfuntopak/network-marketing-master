@@ -60,6 +60,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     workspacesResult,
     countRpcResult,
     adminCandidatesResult,
+    memberAvatarsResult,
   ] = await Promise.all([
     listAllAuthUsers(admin),
     admin
@@ -71,6 +72,12 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
       .from('nmm_candidates')
       .select('id, owner_id, full_name, phone')
       .eq('owner_id', user.id),
+    // Avatarlar eskiden workspaces sonucundan türeyen ownerIds'e bağlı AYRI bir
+    // 2. dalgaydı; tüm üye avatarlarını burada paralelde çekip bağımlılığı kaldırıyoruz.
+    admin
+      .from('nmm_workspace_members')
+      .select('user_id, avatar_url')
+      .not('avatar_url', 'is', null),
   ])
 
   const { data: workspaces, error: wsError } = workspacesResult
@@ -109,22 +116,12 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   const workspaceById = new Map<string, typeof workspaces[0]>()
   workspaces.forEach(w => workspaceById.set(w.id, w))
 
-  const ownerIdsForAvatars = [
-    ...new Set(workspaces.map(w => w.owner_id).filter((id): id is string => !!id)),
-  ]
   const avatarByOwnerId = new Map<string, string>()
-  if (ownerIdsForAvatars.length > 0) {
-    const { data: memberAvatars } = await admin
-      .from('nmm_workspace_members')
-      .select('user_id, avatar_url')
-      .in('user_id', ownerIdsForAvatars)
-      .not('avatar_url', 'is', null)
-    memberAvatars?.forEach(row => {
-      if (row.avatar_url && !avatarByOwnerId.has(row.user_id)) {
-        avatarByOwnerId.set(row.user_id, row.avatar_url)
-      }
-    })
-  }
+  memberAvatarsResult.data?.forEach(row => {
+    if (row.avatar_url && !avatarByOwnerId.has(row.user_id)) {
+      avatarByOwnerId.set(row.user_id, row.avatar_url)
+    }
+  })
 
   const { data: adminCandidates } = adminCandidatesResult
 

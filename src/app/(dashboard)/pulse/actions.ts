@@ -16,22 +16,28 @@ async function assertWorkspaceMember(workspaceId: string) {
   const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
+  // license_type'ı üyelik sorgusuna JOIN et → çağıranlar ayrı bir license
+  // round-trip'i atmadan ctx.licenseType kullanır.
   const { data: membership } = await supabase
     .from('nmm_workspace_members')
-    .select('workspace_id')
+    .select('workspace_id, nmm_workspaces(license_type)')
     .eq('workspace_id', workspaceId)
     .eq('user_id', user.id)
     .maybeSingle()
 
-  if (membership) return { supabase, user }
+  if (membership) {
+    const licenseType =
+      (membership.nmm_workspaces as { license_type: string | null } | null)?.license_type ?? null
+    return { supabase, user, licenseType }
+  }
 
   const { data: ws } = await supabase
     .from('nmm_workspaces')
-    .select('owner_id')
+    .select('owner_id, license_type')
     .eq('id', workspaceId)
     .maybeSingle()
 
-  if (ws?.owner_id === user.id) return { supabase, user }
+  if (ws?.owner_id === user.id) return { supabase, user, licenseType: ws.license_type }
 
   throw new Error('Bu workspace için yetkiniz yok.')
 }
@@ -50,32 +56,30 @@ export async function getTeamProgressMapAction(
   progressByUserId: TeamProgressMap
   videoByUserId: Record<string, VideoProgressSummary>
 }> {
-  const { supabase, user } = await assertWorkspaceMember(workspaceId)
+  // assertWorkspaceMember artık licenseType döndürüyor → ayrı license sorgusu
+  // (eski `ws` select) kaldırıldı; owner_id zaten kullanılmıyordu.
+  const { supabase, user, licenseType } = await assertWorkspaceMember(workspaceId)
 
-  const { data: ws } = await supabase
-    .from('nmm_workspaces')
-    .select('license_type, owner_id')
-    .eq('id', workspaceId)
-    .single()
-
-  const locked = !hasTeamPulseAccess(ws?.license_type, isSuperAdmin(user))
+  const locked = !hasTeamPulseAccess(licenseType, isSuperAdmin(user))
 
   if (locked || memberUserIds.length === 0) {
     return { locked, progressByUserId: {}, videoByUserId: {} }
   }
 
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
-  const { data: rows } = await supabase
-    .from('nmm_user_progress')
-    .select('user_id, read_trainings, fav_trainings, read_objections, fav_objections')
-    .in('user_id', uniqueIds)
+  // user_progress ile video summary bağımsız — ardışık değil paralel.
+  const [{ data: rows }, videoByUserId] = await Promise.all([
+    supabase
+      .from('nmm_user_progress')
+      .select('user_id, read_trainings, fav_trainings, read_objections, fav_objections')
+      .in('user_id', uniqueIds),
+    getTeamVideoSummaryMapAction(uniqueIds),
+  ])
 
   const progressByUserId: TeamProgressMap = {}
   for (const row of rows ?? []) {
     progressByUserId[row.user_id] = parseLearningProgress(row)
   }
-
-  const videoByUserId = await getTeamVideoSummaryMapAction(uniqueIds)
 
   return { locked: false, progressByUserId, videoByUserId }
 }
