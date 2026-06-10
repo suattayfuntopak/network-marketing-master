@@ -1,5 +1,66 @@
 # Hot Log
 
+## 2026-06-10 — İtiraz Bankası: eski projeden eksik itirazların ithali ✅
+
+### Özet
+- **Eski repo karşılaştırması (`network-marketing-ultimate`):** İçerik kütüphanesi + itiraz bankası eski projeyle satır satır karşılaştırıldı.
+- **İçerik kütüphanesi:** Eski repodaki 19 elle yazılmış eğitim konusunun **tamamı zaten NMM'de mevcut** (proje bunlardan kurulmuş). Kalan 72 kayıt prosedürel/templated kombinasyon (12 konu × 6 şablon) ve NMM'in küratörlü konularıyla semantik mükerrer → premium/sade ilkesi (CLAUDE.md #1) gereği **toplu ithal edilmedi**.
+- **İtiraz bankası:** Eski repodaki 26 spesifik itirazdan **2 tanesi** NMM'de yoktu, ithal edildi (35 → 37):
+  - **#36 (Ürün & Sistem):** "Bu ürünler gerçekten işe yarıyor mu?" — ürün etkinliğine duyulan şüphe (NMM'deki fiyat/market/kargo itirazlarından farklı).
+  - **#37 (Güven & Şüphe):** "Sen de para kazanmıyorsundur zaten." — tavsiye edenin kendi başarısının sorgulanması (NMM'deki "sadece benden kazanmak için" itirazından farklı).
+- Cevaplar NMM premium formatına (özlü `cevap` {tr,en}) damıtıldı; eski içerikteki `[placeholder]` ifadeleri temizlendi. Mükerrer olmamasına dikkat edildi.
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts`
+
+## 2026-06-10 — Akademi mobil etiketler + Eğitim İlerlemem hız + Ekibim cilası ✅
+
+### Özet
+- **Vaktin Varsa / Eğitim İlerlemem mobil:** `AkademiTabLabel` — Kütüphane / Videolar / İtirazlar (sm+ tam metin); `whitespace-nowrap`.
+- **6 kutu metrik gecikmesi:** SSR prefetch (`selfUserProgress`, `akademiCustomCounts`, `videoCatalog`); `useProgressSync` local-first; TanStack query snapshot.
+- **Ekibim:** Saha mobil satırda toplam aksiyon rozeti; eğitim mobilde ortalama %; boş eğitim sıralaması mesajı; üye detayda tekrarlayan mini grafik kaldırıldı; `MEMBER_LIST_VIRTUALIZE_THRESHOLD` export; E2E `/canli-egitim` smoke.
+
+### Dosyalar
+`AkademiTabLabel.tsx`, `akademiTabTheme.ts`, `training.ts`, `akademiProgressActions.ts`, `usePersonalAkademiProgress.ts`, `useProgressSync.ts`, `canli-egitim/page.tsx`, `CrownVideoPage.tsx`, `AkademiContent.tsx`, `TeamFieldRankingTable.tsx`, `TeamTrainingRankingTable.tsx`, `MemberDetailPage.tsx`, `prefetchRouteMetrics.ts`, `keys.ts`, `critical-routes-smoke.spec.ts`, `tr.ts`, `en.ts`
+
+## 2026-06-10 — Ekibim 5 takip önerisi (sanallaştırma, eğitim mobil, prefetch, detay sayfası) ✅
+
+### Özet
+- **Üye listesi sanallaştırma:** 20+ üyede `@tanstack/react-virtual` + `measureKey` (sekme aç/kapa yeniden ölçüm).
+- **Eğitim sıralaması mobil:** Saha Özeti ile aynı chevron + 2–3 sütun metrik grid; masaüstü tablo korundu.
+- **Canlı Eğitim prefetch:** SSR `videoCatalog` hydrate; hover prefetch ağır `getCrownVideoPageAction` yerine katalog.
+- **Üye detay:** Pipeline 4×StatBox → gömülü `MemberActivitySheet` (Ekip kartlarıyla aynı aktivite özeti).
+- **Çeviri:** `joinNotifKpi` — “tanışma” → “ekleme” / “contacts” → “added”.
+
+### Dosyalar
+`VirtualizedMemberList.tsx`, `TeamPerformanceSection.tsx`, `TeamTrainingRankingTable.tsx`, `MemberDetailPage.tsx`, `canli-egitim/page.tsx`, `prefetchRouteMetrics.ts`, `tr.ts`, `en.ts`
+
+## 2026-06-10 — Ekibim mobil UX + aktivite sekmesi + eğitim hızlandırma ✅
+
+### Özet
+- **Saha Özeti mobil:** İsim + chevron; açılınca 2–3 sütun metrik grid. Masaüstü tablo aynı.
+- **Mobil davet:** Saha ortağında ikon-only (UserPlus + WhatsApp); metin `sm+`.
+- **Aktivite sekmesi:** `stripActivityTabs` kaldırıldı — aç/kapa toggle düzgün çalışıyor.
+- **Aktivite UI:** Huni sekmesi kaldırıldı; Takipte/Katıldı aktivite metriklerine taşındı; “Henüz hedef…” alt yazısı gizlendi; başlık “Aktivite Özeti”.
+- **Çeviri:** “Kaç Kişiyle Tanıştım?” → “Kaç Kişi Ekledim?” (hedef + pano + saha metrikleri).
+- **Eğitim İlerlemem:** “İzlemeye devam et” kutusu `useVideoCatalog` + `deriveVideoContinueFromCatalog` ile anında.
+- **Performans:** Ranking için tek YTD huni fetch; Ekibim sekmeleri `dynamic()` lazy; eğitim tablosu sticky opak sütun; `@tanstack/react-virtual` eklendi (liste sanallaştırma sonraki adım).
+
+### Dosyalar
+`TeamFieldRankingTable.tsx`, `TeamPerformanceSection.tsx`, `MemberActivitySheet.tsx`, `HubCrownFunnelGrid.tsx`, `CrownVideoPage.tsx`, `videoContinue.ts`, `EkipPanel.tsx`, `TeamTrainingRankingTable.tsx`, `funnelActuals.ts`, `teamActivityActions.ts`, `tr.ts`, `en.ts`, `package.json`
+
+## 2026-06-10 — Ekibim UX + performans sprinti ✅
+
+### Özet
+- Saha ortağı satırında **NMM'e Davet Et** butonu tekrar sağa yaslandı (tüm breakpoint'ler).
+- WhatsApp davet metni yeni şablona güncellendi (davet kodu + Ekibim kutusu talimatı).
+- **Ekibim Araçları** chevron varsayılan açık.
+- Saha Özeti tablosunda sticky isim sütunu opak — yatay kaydırmada metrikler altta görünmez.
+- Sekme geçişi hızlandırıldı: SSR'da ranking prefetch bloklaması kaldırıldı, sekme bazlı skeleton, eğitim prefetch.
+
+### Dosyalar
+`TeamPerformanceSection.tsx`, `TeamFieldRankingTable.tsx`, `EkipPanel.tsx`, `EkipTabNav.tsx`, `ekip/page.tsx`, `prefetchRouteMetrics.ts`, `tr.ts`, `en.ts`
+
 ## 2026-06-10 — Deploy gate UÇTAN UCA DOĞRULANDI + lint fix ✅
 
 ### Gate canlı çalıştı (gerçek kanıt)

@@ -362,6 +362,26 @@ export const ITIRAZLAR: Itiraz[] = [
     },
     emoji: '⚖️',
   },
+  {
+    id: 36,
+    kategori: { tr: 'Ürün & Sistem', en: 'Product & System' },
+    soru: { tr: 'Bu ürünler gerçekten işe yarıyor mu?', en: 'Do these products actually work?' },
+    cevap: {
+      tr: 'Şüpheyle başlamak çok sağlıklı — ben de başlamadan önce aynı soruyu sormuştum. Güven üç katmanda kurulur: (1) kişisel deneyim — önce ürünü kendin dene ve farkı hisset; (2) belgelenmiş kanıt — sertifikalar, içerik şeffaflığı ve bağımsız değerlendirmeler; (3) düşük riskli deneme koşulları. Ürüne inanmadan bu işi yapmak hem sürdürülemez hem de etik değil; o yüzden önce ürünü tanıyalım, fark hissedersen gerisi çok daha kolay gelir.',
+      en: "Healthy skepticism is a good start—I asked the exact same thing before I began. Trust is built in three layers: (1) personal experience—try the product yourself and feel the difference; (2) documented evidence—certifications, ingredient transparency and independent reviews; (3) low-risk trial terms. Building this business on a product you don't believe in is neither sustainable nor ethical, so let's get to know the product first—once you feel the difference, everything else gets much easier.",
+    },
+    emoji: '🔬',
+  },
+  {
+    id: 37,
+    kategori: { tr: 'Güven & Şüphe', en: 'Trust & Skepticism' },
+    soru: { tr: 'Sen de para kazanmıyorsundur zaten.', en: "You probably don't earn money either." },
+    cevap: {
+      tr: 'Bunu sormaya hakkın var ve dürüst olacağım: bu işte herkes aynı anda aynı miktarı kazanmaz — kazanç emeğe, beceriye ve döneme göre değişir. İstersen ne iddia edip ne iddia etmediğimi açıkça göstereyim ve şirketin resmi kazanç belgelerine birlikte bakalım. Amacım abartı değil, şeffaflık.',
+      en: "You're allowed to ask, and I'll be honest: nobody earns \"the same amount\" on demand—income varies with effort, skill and season. If it helps, I'll show you exactly what I do and don't claim, and we can look at the company's official compensation documents together. My goal isn't hype—it's transparency.",
+    },
+    emoji: '🤨',
+  },
 ]
 
 export const PAGE_SIZE = 10
