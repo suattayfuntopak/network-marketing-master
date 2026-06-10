@@ -1,5 +1,6 @@
 'use server'
 
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import {
@@ -136,7 +137,17 @@ export interface DailyProgress {
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 /** Bugünün huni hedefleri (hedeften türetilmiş) + gerçekleşenleri (mevcut veriden). */
+/**
+ * Server action sarmalayıcısı — gerçek iş `cache()`'li impl'de. Tek bir render
+ * içinde birden çok hub action bunu çağırdığında (örn. saha-ozetim SSR prefetch'i
+ * 4 hub periyodunu birden ısıtırken) hesaplama 4 kez değil 1 kez yapılır.
+ * ('use server' export'u async fonksiyon olmalı; bu yüzden cache impl'i sarmalanır.)
+ */
 export async function getDailyProgressAction(): Promise<DailyProgress> {
+  return getDailyProgressCached()
+}
+
+const getDailyProgressCached = cache(async (): Promise<DailyProgress> => {
   const supabase = await createClient()
   const { user } = await getAuthUser()
   const empty: DailyProgress = {
@@ -178,7 +189,7 @@ export async function getDailyProgressAction(): Promise<DailyProgress> {
     actuals,
     stage,
   }
-}
+})
 
 /** Yol haritası kademeleri (UI için) — hedeften türetilir. */
 export async function getRoadmapAction(): Promise<RoadmapStage[]> {

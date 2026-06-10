@@ -1,5 +1,6 @@
 'use server'
 
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import {
@@ -37,7 +38,9 @@ import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/te
 
 const ONBOARDING_TOTAL = ONBOARDING_STEPS.length
 
-async function resolveWorkspaceId(): Promise<string | null> {
+// cache(): tek render içinde birden çok hub action çağrıldığında (saha-ozetim
+// SSR prefetch'i 4 periyodu birden ısıtır) workspace lookup 4 kez değil 1 kez yapılır.
+const resolveWorkspaceId = cache(async (): Promise<string | null> => {
   const supabase = await createClient()
   const { user } = await getAuthUser()
   if (!user) return null
@@ -53,7 +56,7 @@ async function resolveWorkspaceId(): Promise<string | null> {
     .eq('owner_id', user.id)
     .maybeSingle()
   return owned?.id ?? null
-}
+})
 
 export type CrownDailyPayload = {
   progress: DailyProgress
