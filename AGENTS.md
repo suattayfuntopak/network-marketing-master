@@ -47,3 +47,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Hub metrics (Saha Özetim)
 - Dönem prefetch, offset maliyeti ve placeholder stratejisi: `docs/hub-metrics.md`.
 - Paylaşımlı sekme/offset mantığı: `src/lib/domain/hubPeriodPrefetch.ts` — yeni hub sorgusu eklerken komşu prefetch regresyonuna dikkat.
+
+### Ekip üyesi → detay sayfası
+- Uygulama kullanıcısı (`isAppUser`) için detay **her zaman** `MemberRow.pipeline_id` → `/pipeline/[id]`.
+- `user_id` ile `/ekip/[userId]` yalnızca ekip yönetimi bağlamında; liste kartlarında `pipeline_id` yoksa toast, sessiz yönlendirme yok.

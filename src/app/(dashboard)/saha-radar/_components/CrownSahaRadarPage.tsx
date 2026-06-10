@@ -217,9 +217,14 @@ function MemberCard({
           ? 'border-rose-500/25 bg-rose-50/30 dark:bg-rose-950/15'
           : 'border-[var(--border)] bg-[var(--bg-card)]',
       )}
+      data-testid="saha-radar-member-card"
+      data-pipeline-id={m.pipelineId ?? ''}
       onClick={() => {
-        if (m.pipelineId) router.push(`/pipeline/${m.pipelineId}`)
-        else router.push(`/ekip/${m.userId}`)
+        if (m.pipelineId) {
+          router.push(`/pipeline/${m.pipelineId}`)
+          return
+        }
+        toast.info(t('crown.sahaRadarNoPipelineMatch'))
       }}
     >
       <PersonAvatar name={m.fullName} imageUrl={m.avatarUrl} size="sm" />
@@ -448,6 +453,8 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
           </button>
           <button
             type="button"
+            role="tab"
+            data-testid="saha-radar-tab-activity"
             onClick={() => setInnerTab('aktivite')}
             className={clsx(
               'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition',

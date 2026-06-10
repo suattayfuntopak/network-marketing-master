@@ -53,3 +53,38 @@ export function shouldLogHubPrefetch(): boolean {
   if (process.env.NODE_ENV === 'development') return true
   return process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
 }
+
+export type HubPrefetchStats = {
+  at: string
+  activeTab: string
+  hubSelfQueries: number
+  totalTasks: number
+}
+
+const HUB_PREFETCH_STATS_KEY = 'nmm_hub_prefetch_last'
+
+/** Son hub prefetch özeti — Platform Yönetimi debug kartı (super admin). */
+export function recordHubPrefetchStats(
+  stats: Omit<HubPrefetchStats, 'at'>,
+): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(
+      HUB_PREFETCH_STATS_KEY,
+      JSON.stringify({ ...stats, at: new Date().toISOString() }),
+    )
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readHubPrefetchStats(): HubPrefetchStats | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = sessionStorage.getItem(HUB_PREFETCH_STATS_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as HubPrefetchStats
+  } catch {
+    return null
+  }
+}

@@ -20,6 +20,7 @@ import { waHref } from '@/lib/utils/waLink'
 import {
   type PlatformWorkspaceItem
 } from '../actions'
+import { HubPrefetchDebugCard } from './HubPrefetchDebugCard'
 import {
   addIndependentAsCandidateAction,
   deleteUserAction,
@@ -345,6 +346,8 @@ export function PlatformYonetimContent() {
             </button>
           </div>
         </header>
+
+        <HubPrefetchDebugCard />
 
         {/* Platform KPIs */}
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">

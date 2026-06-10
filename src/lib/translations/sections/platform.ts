@@ -102,6 +102,11 @@ export const platformSection = {
       approveFailed: 'Onaylama başarısız oldu.',
       rejectedToast: 'Talep reddedildi ve kullanıcı gerekçeli e-posta ile bilgilendirildi.',
       rejectFailed: 'Reddetme işlemi başarısız oldu.',
+      hubPrefetchTitle: 'Hub prefetch (son oturum)',
+      hubPrefetchEmpty: 'Henüz hub prefetch kaydı yok — Saha Özetim veya nav hover sonrası güncellenir.',
+      hubPrefetchTab: 'Sekme',
+      hubPrefetchSelf: 'Hub-self sorguları',
+      hubPrefetchTotal: 'Toplam görev',
     },
   },
   en: {
@@ -207,6 +212,11 @@ export const platformSection = {
       approveFailed: 'Approval failed.',
       rejectedToast: 'Request rejected and the user was notified by email.',
       rejectFailed: 'Rejection failed.',
+      hubPrefetchTitle: 'Hub prefetch (last session)',
+      hubPrefetchEmpty: 'No hub prefetch recorded yet — visit Field Summary or hover nav links.',
+      hubPrefetchTab: 'Tab',
+      hubPrefetchSelf: 'Hub-self queries',
+      hubPrefetchTotal: 'Total tasks',
     },
   },
 } as const

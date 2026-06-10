@@ -146,6 +146,7 @@ export const crownSection = {
       sahaRadarTeamCta: 'Ekip yönetimine git',
       sahaRadarFilterAll: 'Tüm takipler',
       sahaRadarFilterMine: 'Sadece benim',
+      sahaRadarNoPipelineMatch: 'Bu üye için boru hattı kaydı bulunamadı. Ekip sayfasından aday eşleştirmesi yapabilirsiniz.',
     },
   },
   en: {
@@ -295,6 +296,7 @@ export const crownSection = {
       sahaRadarTeamCta: 'Manage team',
       sahaRadarFilterAll: 'All follow-ups',
       sahaRadarFilterMine: 'Only mine',
+      sahaRadarNoPipelineMatch: 'No pipeline record for this member. Link a candidate from the Team page.',
     },
   },
 }

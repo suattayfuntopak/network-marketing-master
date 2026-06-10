@@ -24,8 +24,10 @@ export function useHubPeriodSwipe(
   const onPrevRef = useRef(onSwipePrev)
   const onNextRef = useRef(onSwipeNext)
 
-  onPrevRef.current = onSwipePrev
-  onNextRef.current = onSwipeNext
+  useEffect(() => {
+    onPrevRef.current = onSwipePrev
+    onNextRef.current = onSwipeNext
+  }, [onSwipePrev, onSwipeNext])
 
   useEffect(() => {
     const el = containerRef.current

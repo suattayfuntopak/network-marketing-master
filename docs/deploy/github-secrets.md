@@ -105,6 +105,25 @@ Bu üçü tamamlanınca: push → E2E koşar → yeşilse `deploy.yml` hook’u 
 
 > Secret’ı eklemeden 3. adımı yaparsan prod deploy **donar** (ne auto-deploy ne hook). Sıraya uy: önce 1–2, sonra 3.
 
+### Prod'da değişiklik görünmüyorsa (sık nedenler)
+
+| Belirti | Muhtemel neden | Çözüm |
+|---------|----------------|--------|
+| GitHub'da **E2E (Playwright) kırmızı**, Deploy **skipped** | `vercel.json` → `deploymentEnabled.main: false`; prod yalnızca E2E yeşil + Deploy Hook ile gider | Actions → failed run → **Build** job logunu aç (çoğunlukla `npm run lint` veya `npm run build`) |
+| Vercel son deploy eski commit | Hook tetiklenmemiş veya E2E fail | E2E'yi yeşile getir; `VERCEL_DEPLOY_HOOK_URL` secret'ının tanımlı olduğunu doğrula |
+| Unit test yeşil, E2E kırmızı | E2E ayrı job; build lint/build fail veya Playwright fail | `unit-test.yml` ile `e2e.yml` **Build** ayrı — ikisini de kontrol et |
+
+**Zincir:** `main` push → `E2E (Playwright)` Build (lint + build) → Playwright → başarılıysa `Deploy (production)` → Vercel Deploy Hook.
+
+### Branch protection (önerilen)
+
+GitHub → **Settings → Branches → Branch protection rule** (`main`):
+
+- Require status checks: **Build** (`E2E (Playwright)`), **Vitest** (`Unit tests (Vitest)`), isteğe bağlı **E2E (chromium)**
+- Require branches up to date before merging
+
+Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'i ile birlikte çalışır.
+
 ---
 
 ## Yerel `.env.local`

@@ -1,3 +1,8 @@
+/**
+ * Ekip satırı — uygulama kullanıcısı detayı için `user_id` değil `pipeline_id` kullanın.
+ * Kişi kartı / liste tıklaması: `pipeline_id ? /pipeline/[id] : bilgi toast` (Saha Radarı, Ekip, İstatistikler).
+ * `isAppUser === false` satırlarında `user_id` zaten aday id'sidir; `pipeline_id` aynı değeri taşır.
+ */
 export interface MemberRow {
   user_id: string
   full_name: string | null

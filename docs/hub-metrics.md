@@ -29,6 +29,8 @@ Komşu offset'ler dönem şeridi swipe/ok ile anında geçiş içindir — yeni 
 
 `shouldLogHubPrefetch()` → development ve Vercel preview'da `console.debug('[prefetchHubMetrics]', …)`.
 
+İstemci prefetch özeti `sessionStorage` (`nmm_hub_prefetch_last`) — **Platform Yönetimi** üstündeki debug kartında (super admin) görünür.
+
 ## Ekip detay linki
 
 Ekip üyesi detayı = liderin pipeline adayı (`pipeline_id` / `findLeaderCandidateForMember`). Saha Radarı aktivite kartları `/pipeline/[pipelineId]` kullanır; eşleşme yoksa `/ekip/[userId]` yedek.

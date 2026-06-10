@@ -27,6 +27,7 @@ import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import {
   hubPeriodOffsetsForPrefetch,
   readStoredHubActiveTab,
+  recordHubPrefetchStats,
   shouldLogHubPrefetch,
   type HubPeriodTab,
 } from '@/lib/domain/hubPeriodPrefetch'
@@ -174,12 +175,16 @@ export async function prefetchHubMetrics(
 
   await Promise.all(tasks)
 
+  const prefetchSummary = {
+    activeTab: activeTab ?? 'none',
+    hubSelfQueries: hubSelfPrefetchCount,
+    totalTasks: tasks.length,
+  }
   if (shouldLogHubPrefetch()) {
-    console.debug('[prefetchHubMetrics]', {
-      activeTab: activeTab ?? 'none',
-      hubSelfQueries: hubSelfPrefetchCount,
-      totalTasks: tasks.length,
-    })
+    console.debug('[prefetchHubMetrics]', prefetchSummary)
+  }
+  if (typeof window !== 'undefined') {
+    recordHubPrefetchStats(prefetchSummary)
   }
 
   const team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
