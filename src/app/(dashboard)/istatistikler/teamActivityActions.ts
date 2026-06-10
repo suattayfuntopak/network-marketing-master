@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { periodStartIso, parseLearningProgress, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
@@ -66,19 +67,24 @@ export type TeamRankingMetricsResult = {
 
 async function assertWorkspaceMember(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
+  // license_type'ı üyelik sorgusuna JOIN et → üye yolundaki AYRI lisans
+  // round-trip'i silinir (çağıranların 'licenseType' in ctx fallback'i artık
+  // tetiklenmez). ekip + istatistikler team action'larından bir sıralı dalga kalkar.
   const { data: membership } = await supabase
     .from('nmm_workspace_members')
-    .select('workspace_id')
+    .select('workspace_id, nmm_workspaces(license_type)')
     .eq('workspace_id', workspaceId)
     .eq('user_id', user.id)
     .maybeSingle()
 
-  if (membership) return { supabase, user }
+  if (membership) {
+    const licenseType =
+      (membership.nmm_workspaces as { license_type: string | null } | null)?.license_type ?? null
+    return { supabase, user, licenseType }
+  }
 
   const { data: ws } = await supabase
     .from('nmm_workspaces')

@@ -128,11 +128,13 @@ export type CrownVideoPayload = {
 export async function getCrownVideoPageAction(workspaceId: string): Promise<CrownVideoPayload> {
   const bundle = await fetchTeamBundleAction(workspaceId)
   const memberIds = bundle.members.map(m => m.user_id)
-  const [catalog, videoMap] = await Promise.all([
+  // user (cached getClaims) bağımsız — katalog/videoMap ile aynı dalgada çekilir,
+  // ardışık ekstra bir round-trip kalmaz.
+  const [catalog, videoMap, { user }] = await Promise.all([
     getVideoCatalogAction(workspaceId),
     getTeamVideoSummaryMapAction(memberIds),
+    getAuthUser(),
   ])
-  const { user } = await getAuthUser()
   const leaderSummary = user ? (videoMap[user.id] ?? null) : null
 
   const sorted = [...catalog.videos].sort((a, b) => a.sortOrder - b.sortOrder)
