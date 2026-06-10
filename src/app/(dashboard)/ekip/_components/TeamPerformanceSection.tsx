@@ -6,8 +6,8 @@ import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  Crown, Check, TrendingUp, Rocket, Bot,
-  Phone, Search, BarChart3, Target, ChevronDown,
+  Crown, Check, Rocket, Bot,
+  Phone, Search, BarChart3, Target, ChevronDown, UserPlus,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -30,8 +30,6 @@ import { addTeamMemberAsCandidateAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
-import { UserPlus } from 'lucide-react'
-
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
   lang: string
@@ -60,10 +58,10 @@ export interface TeamPerformanceSectionProps {
   onJoinSubmit: (e: React.FormEvent) => void
 }
 
-type MemberCardTab = 'funnel' | 'onboarding' | 'call' | 'whatsapp' | 'activity'
+type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity'
 type FieldCardTab = 'aiInvite' | 'nmmInvite'
 
-const MEMBER_CARD_TABS: MemberCardTab[] = ['funnel', 'onboarding', 'call', 'whatsapp', 'activity']
+const MEMBER_CARD_TABS: MemberCardTab[] = ['onboarding', 'call', 'whatsapp', 'activity']
 const FIELD_CARD_TABS: FieldCardTab[] = ['aiInvite', 'nmmInvite']
 
 const TEAM_TAB_STORAGE_KEY = 'nmm_team_perf_tabs'
@@ -74,16 +72,6 @@ function isMemberCardTab(value: string | null): value is MemberCardTab {
 
 function isFieldCardTab(value: string | null): value is FieldCardTab {
   return !!value && FIELD_CARD_TABS.includes(value as FieldCardTab)
-}
-
-function stripActivityTabs(
-  member: Record<string, MemberCardTab | undefined>,
-): Record<string, MemberCardTab | undefined> {
-  const out: Record<string, MemberCardTab | undefined> = {}
-  for (const [id, tab] of Object.entries(member)) {
-    if (tab !== 'activity') out[id] = tab
-  }
-  return out
 }
 
 function loadTeamTabState(): {
@@ -99,7 +87,7 @@ function loadTeamTabState(): {
       field?: Record<string, FieldCardTab | undefined>
     }
     return {
-      member: stripActivityTabs(parsed.member ?? {}),
+      member: parsed.member ?? {},
       field: parsed.field ?? {},
     }
   } catch {
@@ -160,6 +148,16 @@ function parseMemberTabs(raw: string | null): Record<string, MemberCardTab> {
     const id = part.slice(0, sep)
     const tab = part.slice(sep + 1)
     if (isMemberCardTab(tab)) out[id] = tab
+  }
+  return out
+}
+
+function sanitizeMemberTabs(
+  member: Record<string, MemberCardTab | undefined>,
+): Record<string, MemberCardTab | undefined> {
+  const out: Record<string, MemberCardTab | undefined> = {}
+  for (const [id, tab] of Object.entries(member)) {
+    if (tab && isMemberCardTab(tab)) out[id] = tab
   }
   return out
 }
@@ -267,16 +265,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
     const fromHash = readPerfFromHash()
     if (fromHash) {
-      Object.assign(member, stripActivityTabs(fromHash.member))
+      Object.assign(member, fromHash.member)
       Object.assign(field, fromHash.field)
     } else {
-      Object.assign(member, stripActivityTabs(parseMemberTabs(searchParams.get('perfMemberTabs'))))
+      Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
       Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
     }
 
     const urlMemberId = searchParams.get('perfMember')
     const urlMemberTab = searchParams.get('perfMemberTab')
-    if (urlMemberId && isMemberCardTab(urlMemberTab) && urlMemberTab !== 'activity') {
+    if (urlMemberId && isMemberCardTab(urlMemberTab)) {
       member[urlMemberId] = urlMemberTab
     }
 
@@ -287,7 +285,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     }
 
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
-    setMemberCardTab(member)
+    setMemberCardTab(sanitizeMemberTabs(member))
     setFieldCardTab(field)
     setTabsHydrated(true)
   }, [searchParams])
@@ -298,7 +296,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     const applyHashPerf = () => {
       const fromHash = readPerfFromHash()
       if (!fromHash) return
-      setMemberCardTab(prev => ({ ...prev, ...stripActivityTabs(fromHash.member) }))
+      setMemberCardTab(prev => ({ ...prev, ...fromHash.member }))
       setFieldCardTab(prev => ({ ...prev, ...fromHash.field }))
     }
 
@@ -499,10 +497,12 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                         e.stopPropagation()
                         handleInviteMember(m)
                       }}
-                      className="ml-auto inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 text-xs font-black text-white shadow-md transition-all hover:bg-emerald-600 active:scale-[0.98] cursor-pointer sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"
+                      className="ml-auto inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-2.5 py-2 text-xs font-black text-white shadow-md transition-all hover:bg-emerald-600 active:scale-[0.98] cursor-pointer sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"
+                      aria-label={t('team.inviteToNmm')}
                     >
+                      <UserPlus className="h-4 w-4 shrink-0 sm:hidden" strokeWidth={2.5} />
                       <WhatsAppIcon className="h-4 w-4 shrink-0 fill-current text-white sm:h-5 sm:w-5" />
-                      <span className="whitespace-nowrap">{t('team.inviteToNmm')}</span>
+                      <span className="hidden whitespace-nowrap sm:inline">{t('team.inviteToNmm')}</span>
                     </button>
                   ) : null}
                 </div>
@@ -533,34 +533,12 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     show: boolean
                     wa?: boolean
                   }[] = [
-                    { id: 'funnel', Icon: TrendingUp, label: t('team.funnelDistribution'), show: true },
                     { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
                     { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
                     { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref },
                     { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, wa: true },
                   ]
                   const visibleTabs = memberTabs.filter(tab => tab.show)
-
-                  const funnelPanel = (
-                    <div className="grid grid-cols-2 gap-3 pt-1 text-center sm:grid-cols-4">
-                      <div className="rounded-2xl bg-blue-50/50 dark:bg-blue-950/10 p-4 border border-blue-100/30 dark:border-blue-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                        <span className="block text-xl font-black text-blue-600 dark:text-blue-400 tabular-nums">{m.yeni_count || 0}</span>
-                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.yeni')}</span>
-                      </div>
-                      <div className="rounded-2xl bg-emerald-50/50 dark:bg-emerald-950/10 p-4 border border-emerald-100/30 dark:border-emerald-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                        <span className="block text-xl font-black text-emerald-600 dark:text-emerald-400 tabular-nums">{m.sunum_count || 0}</span>
-                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.sunum')}</span>
-                      </div>
-                      <div className="rounded-2xl bg-amber-50/50 dark:bg-amber-950/10 p-4 border border-amber-100/30 dark:border-amber-900/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                        <span className="block text-xl font-black text-amber-600 dark:text-amber-400 tabular-nums">{m.takip_count || 0}</span>
-                        <span className="text-xs text-[var(--text-2)] font-bold block mt-1">{t('stages.takip')}</span>
-                      </div>
-                      <div className="rounded-2xl bg-[#FAEEDA]/50 dark:bg-[#3a2200]/20 p-4 border border-[#FAEEDA]/30 dark:border-[#3a2200]/10 shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-                        <span className="block text-xl font-black text-[#854F0B] dark:text-[#fcd34d] tabular-nums">{m.katildi_count || 0}</span>
-                        <span className="text-xs font-black text-[#854F0B] dark:text-[#fcd34d] block mt-1">{t('stages.katildi')}</span>
-                      </div>
-                    </div>
-                  )
 
                   return (
                     <div className="border-t border-dashed border-[var(--border)] pt-4 space-y-4">
@@ -640,8 +618,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                                 <span>{t('team.upgradeToMaster')}</span>
                               </button>
                             </div>
-                          ) : activeTab === 'funnel' ? (
-                            funnelPanel
                           ) : activeTab === 'onboarding' ? (
                             <div className="space-y-4">
                               <div className="flex gap-2 bg-[var(--bg-subtle)] dark:bg-zinc-900/50 p-1 rounded-xl border border-[var(--border)]">
@@ -771,6 +747,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                               }}
                               teamPulseUnlocked={teamPulseUnlocked}
                               memberIsLeader={m.role === 'leader'}
+                              pipelineTakipCount={m.takip_count ?? 0}
+                              pipelineKatildiCount={m.katildi_count ?? 0}
                             />
                           ) : null}
                         </div>

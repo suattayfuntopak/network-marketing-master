@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   X, Phone, Bot, Pencil, ArrowRight, UserPlus, CalendarDays,
-  Loader2, Target, Trash2, Activity,
+  Loader2, Target, Trash2, Activity, Users,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -47,6 +47,9 @@ interface Props {
   embedded?: boolean
   /** Lider kartında DDBR tamamlanmış kabul edilir (9/9) */
   memberIsLeader?: boolean
+  /** Boru hattı aşama sayıları (Takipte / Katıldı) — gömülü aktivite sekmesi */
+  pipelineTakipCount?: number
+  pipelineKatildiCount?: number
   onClose?: () => void
 }
 
@@ -79,6 +82,8 @@ export function MemberActivitySheet({
   canEditGoal = false,
   embedded = false,
   memberIsLeader = false,
+  pipelineTakipCount = 0,
+  pipelineKatildiCount = 0,
   onClose,
 }: Props) {
   const { t } = useTranslation()
@@ -175,6 +180,12 @@ export function MemberActivitySheet({
     { icon: ArrowRight, label: t('team.activityStageChanges'), value: data?.stageChanges ?? 0, color: 'text-amber-600' },
     { icon: Bot, label: t('team.activityAi'), value: data?.aiActions ?? 0, color: 'text-indigo-600' },
     { icon: UserPlus, label: t('team.activityNewLeads'), value: data?.newCandidates ?? 0, color: 'text-emerald-600' },
+    ...(embedded
+      ? [
+          { icon: ArrowRight, label: t('stages.takip'), value: pipelineTakipCount, color: 'text-amber-600' },
+          { icon: Users, label: t('stages.katildi'), value: pipelineKatildiCount, color: 'text-[#854F0B] dark:text-[#fcd34d]' },
+        ]
+      : []),
     { icon: CalendarDays, label: t('team.activityActiveDays'), value: data?.activeDays ?? 0, color: 'text-[var(--text-2)]' },
     { icon: Activity, label: t('team.activityTotalActions'), value: totalActions, color: 'text-brand' },
   ]
@@ -315,13 +326,16 @@ export function MemberActivitySheet({
               <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-2)]">
                 {t('team.activityFunnelTitle')}
               </p>
-              <p className="mt-0.5 text-[10px] text-[var(--text-3)]">{t('team.activityFunnelHint')}</p>
+              {!embedded ? (
+                <p className="mt-0.5 text-[10px] text-[var(--text-3)]">{t('team.activityFunnelHint')}</p>
+              ) : null}
             </div>
             <HubCrownFunnelGrid
               actuals={data.funnel}
               targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
               hasGoal={false}
               period="monthly"
+              hideNoGoalFooter={embedded}
             />
           </div>
         )}

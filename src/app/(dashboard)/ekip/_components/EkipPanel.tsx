@@ -1,5 +1,6 @@
 'use client'
 
+import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -8,9 +9,6 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
-import { EkipSummaryTab } from './EkipSummaryTab'
-import { EkipTrainingTab } from './EkipTrainingTab'
-import { TeamGenerationTree } from './TeamGenerationTree'
 import type { EkipTabId } from './EkipTabNav'
 import {
   joinWorkspaceByInviteAction,
@@ -31,6 +29,19 @@ import {
   prefetchEkipRankingMetrics,
   prefetchEkipTrainingMetrics,
 } from '@/lib/query/prefetchRouteMetrics'
+
+const EkipSummaryTab = dynamic(
+  () => import('./EkipSummaryTab').then(m => ({ default: m.EkipSummaryTab })),
+  { loading: () => <Skeleton className="h-48 rounded-2xl" /> },
+)
+const EkipTrainingTab = dynamic(
+  () => import('./EkipTrainingTab').then(m => ({ default: m.EkipTrainingTab })),
+  { loading: () => <Skeleton className="h-48 rounded-2xl" /> },
+)
+const TeamGenerationTree = dynamic(
+  () => import('./TeamGenerationTree').then(m => ({ default: m.TeamGenerationTree })),
+  { loading: () => <Skeleton className="h-64 rounded-2xl" /> },
+)
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }

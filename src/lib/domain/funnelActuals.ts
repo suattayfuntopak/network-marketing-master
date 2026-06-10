@@ -221,6 +221,92 @@ export async function fetchFunnelActualsBatchForPeriod(
   return result
 }
 
+/** Çoklu dönem ranking — tek DB turunda günlük huni haritası (bellekte dilimlenir). */
+export async function fetchFunnelActualsBatchUserDays(
+  supabase: SupabaseClient<Database>,
+  userIds: string[],
+  sinceIso: string,
+  untilIso: string,
+  startCalendarKey: string,
+  endCalendarKey: string,
+): Promise<Map<string, Map<string, FunnelCounts>>> {
+  const uniqueIds = [...new Set(userIds.filter(Boolean))]
+  const actionsByUserDay = new Map<string, Map<string, FunnelCounts>>()
+  if (uniqueIds.length === 0) return actionsByUserDay
+
+  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
+  const dayKeySet = new Set(dayKeys)
+
+  const ensureUserDay = (userId: string, dayKey: string): FunnelCounts => {
+    let userMap = actionsByUserDay.get(userId)
+    if (!userMap) {
+      userMap = new Map()
+      actionsByUserDay.set(userId, userMap)
+    }
+    let bucket = userMap.get(dayKey)
+    if (!bucket) {
+      bucket = { ...EMPTY_FUNNEL }
+      userMap.set(dayKey, bucket)
+    }
+    return bucket
+  }
+
+  const [calls, stages, candidates] = await Promise.all([
+    supabase
+      .from('nmm_daily_actions')
+      .select('user_id, created_at')
+      .in('user_id', uniqueIds)
+      .eq('action_type', 'call')
+      .gte('created_at', sinceIso)
+      .lte('created_at', untilIso),
+    supabase
+      .from('nmm_daily_actions')
+      .select('user_id, created_at, note')
+      .in('user_id', uniqueIds)
+      .eq('action_type', 'stage_change')
+      .gte('created_at', sinceIso)
+      .lte('created_at', untilIso),
+    supabase
+      .from('nmm_candidates')
+      .select('owner_id, created_at')
+      .in('owner_id', uniqueIds)
+      .gte('created_at', sinceIso)
+      .lte('created_at', untilIso),
+  ])
+
+  for (const row of calls.data ?? []) {
+    const key = istanbulCalendarKeyFromIso(row.created_at)
+    if (!dayKeySet.has(key)) continue
+    ensureUserDay(row.user_id, key).arama++
+  }
+
+  for (const row of candidates.data ?? []) {
+    const key = istanbulCalendarKeyFromIso(row.created_at)
+    if (!dayKeySet.has(key)) continue
+    ensureUserDay(row.owner_id, key).tanisma++
+  }
+
+  for (const row of stages.data ?? []) {
+    const key = istanbulCalendarKeyFromIso(row.created_at)
+    if (!dayKeySet.has(key)) continue
+    const delta = stageNoteToFunnelDelta(row.note)
+    const bucket = ensureUserDay(row.user_id, key)
+    bucket.sunum += delta.sunum
+    bucket.yeniUye += delta.yeniUye
+  }
+
+  return actionsByUserDay
+}
+
+export function funnelTotalsForUserInRange(
+  userDayMap: Map<string, FunnelCounts> | undefined,
+  startCalendarKey: string,
+  endCalendarKey: string,
+): FunnelCounts {
+  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
+  return sumFunnelDays(dayKeys, userDayMap ?? new Map())
+}
+
 /** İstatistikler / ekip nabzı — PulsePeriod → İstanbul hizalı dönem penceresi. */
 export function funnelRangeForPulsePeriod(period: PulsePeriod): FunnelPeriodRange {
   const end = todayCalendarKey()

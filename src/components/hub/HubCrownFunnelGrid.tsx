@@ -20,6 +20,8 @@ type HubCrownFunnelGridProps = {
   loading?: boolean
   /** Saha Özetim: pano crown gradient kutular */
   panoVariant?: boolean
+  /** Hedef yokken alt bilgi satırını gizle (üye aktivite özeti vb.) */
+  hideNoGoalFooter?: boolean
 }
 
 const METRIC_LABEL_KEYS: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
@@ -36,6 +38,7 @@ export function HubCrownFunnelGrid({
   period,
   loading,
   panoVariant = false,
+  hideNoGoalFooter = false,
 }: HubCrownFunnelGridProps) {
   const { t } = useTranslation()
 
@@ -138,7 +141,7 @@ export function HubCrownFunnelGrid({
                       ? t('crown.hubMonthlyTarget')
                       : t('crown.hubYearlyTarget')}
               </p>
-            ) : (
+            ) : hideNoGoalFooter ? null : (
               <p
                 className={clsx(
                   'mt-1.5 text-[10px] font-medium',

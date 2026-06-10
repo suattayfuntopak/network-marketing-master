@@ -9,6 +9,8 @@ import type { FunnelCounts } from '@/lib/domain/roadmap'
 import {
   fetchFunnelActualsForPeriod,
   fetchFunnelActualsBatchForPeriod,
+  fetchFunnelActualsBatchUserDays,
+  funnelTotalsForUserInRange,
   funnelRangeForSheetPeriod,
   funnelRangeForPulsePeriod,
 } from '@/lib/domain/funnelActuals'
@@ -340,28 +342,32 @@ export async function getTeamRankingMetricsBatchAction(
     actionsQuery = actionsQuery.gte('created_at', batchStartIso)
   }
 
-  const funnelFetches = RANKING_BATCH_PERIODS.map(period => {
-    const funnelRange = funnelRangeForPulsePeriod(period)
-    return fetchFunnelActualsBatchForPeriod(
+  const ytdRange = funnelRangeForPulsePeriod('ytd')
+  const [actionsResult, funnelUserDays] = await Promise.all([
+    actionsQuery,
+    fetchFunnelActualsBatchUserDays(
       supabase,
       uniqueIds,
-      funnelRange.sinceIso,
-      funnelRange.untilIso,
-      funnelRange.startCalendarKey,
-      funnelRange.endCalendarKey,
-    )
-  })
-
-  const [actionsResult, ...funnelByPeriod] = await Promise.all([
-    actionsQuery,
-    ...funnelFetches,
+      ytdRange.sinceIso,
+      ytdRange.untilIso,
+      ytdRange.startCalendarKey,
+      ytdRange.endCalendarKey,
+    ),
   ])
 
   const actions = (actionsResult.data ?? []) as DailyActionRow[]
-  const entries = RANKING_BATCH_PERIODS.map((period, index) => [
-    period,
-    aggregateRankingFromActions(actions, period, uniqueIds, funnelByPeriod[index] ?? {}),
-  ] as const)
+  const entries = RANKING_BATCH_PERIODS.map(period => {
+    const range = funnelRangeForPulsePeriod(period)
+    const funnelByUser: Record<string, FunnelCounts> = {}
+    for (const uid of uniqueIds) {
+      funnelByUser[uid] = funnelTotalsForUserInRange(
+        funnelUserDays.get(uid),
+        range.startCalendarKey,
+        range.endCalendarKey,
+      )
+    }
+    return [period, aggregateRankingFromActions(actions, period, uniqueIds, funnelByUser)] as const
+  })
 
   return Object.fromEntries(entries) as TeamRankingMetricsBatchResult
 }

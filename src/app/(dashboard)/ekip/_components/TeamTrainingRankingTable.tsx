@@ -6,6 +6,7 @@ import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Z } from '@/lib/ui/zIndex'
 import type { PerfLearningMap } from '@/app/(dashboard)/istatistikler/_components/TeamPerformanceTable'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 
@@ -26,6 +27,18 @@ function medalForRank(rank: number): string | null {
   if (rank === 1) return '🥈'
   if (rank === 2) return '🥉'
   return null
+}
+
+function rowStickyBg(idx: number): string {
+  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
+  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
+  return 'bg-[var(--bg-card)]'
+}
+
+function rowBg(idx: number): string {
+  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
+  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
+  return ''
 }
 
 function PctCell({ value }: { value: number }) {
@@ -82,7 +95,9 @@ export function TeamTrainingRankingTable({
         <table className="w-full min-w-[420px] border-collapse text-sm">
           <thead>
             <tr className="border-b border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)]">
-              <th className="p-2.5 text-left font-semibold">{t('team.colPerson')}</th>
+              <th className={`sticky left-0 ${Z.cardControlsUpper} bg-[var(--bg-subtle)] p-2.5 text-left font-semibold shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]`}>
+                {t('team.colPerson')}
+              </th>
               <th className="p-2.5 text-center font-semibold">
                 <span className="inline-flex items-center justify-center gap-1.5">
                   <BookOpen className="h-3.5 w-3.5 text-brand" strokeWidth={2.25} aria-hidden />
@@ -104,15 +119,17 @@ export function TeamTrainingRankingTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)]">
-            {rows.map((row, idx) => (
-              <tr
-                key={row.userId}
-                className={clsx(
-                  idx === 0 && 'bg-amber-50/70 dark:bg-amber-950/20',
-                  idx === 2 && 'bg-sky-50/70 dark:bg-sky-950/20',
-                )}
-              >
-                <td className="p-2.5">
+            {rows.map((row, idx) => {
+              const stickyBg = rowStickyBg(idx)
+              return (
+              <tr key={row.userId} className={rowBg(idx)}>
+                <td
+                  className={clsx(
+                    'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
+                    Z.cardControlsUpper,
+                    stickyBg,
+                  )}
+                >
                   <span className="inline-flex items-center gap-1.5">
                     <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
                       {medalForRank(idx) ?? idx + 1}
@@ -120,17 +137,17 @@ export function TeamTrainingRankingTable({
                     <span className="truncate font-medium text-[var(--text-1)]">{row.name}</span>
                   </span>
                 </td>
-                <td className="p-2.5 text-center">
+                <td className="bg-inherit p-2.5 text-center">
                   <PctCell value={row.trainingPct} />
                 </td>
-                <td className="p-2.5 text-center">
+                <td className="bg-inherit p-2.5 text-center">
                   <PctCell value={row.videoPct} />
                 </td>
-                <td className="p-2.5 text-center">
+                <td className="bg-inherit p-2.5 text-center">
                   <PctCell value={row.objectionPct} />
                 </td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       </HorizontalScrollLock>

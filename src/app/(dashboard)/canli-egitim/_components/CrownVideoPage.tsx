@@ -1,15 +1,15 @@
 'use client'
 
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { ChevronRight, GraduationCap, PlayCircle } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { usePersonalAkademiProgress } from '@/hooks/usePersonalAkademiProgress'
+import { useVideoCatalog } from '@/hooks/useVideoCatalog'
+import { deriveVideoContinueFromCatalog } from '@/lib/domain/videoContinue'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
-import { getCrownVideoPageAction } from '@/app/(dashboard)/crown/actions'
 import { akademiHref } from '@/lib/domain/akademiTab'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -17,14 +17,12 @@ import { videoProgressAccent } from './videoProgressTheme'
 
 export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
-  const { data: ws } = useWorkspace()
   const progress = usePersonalAkademiProgress()
-  const { data } = useQuery({
-    queryKey: ['crown', 'video', ws?.workspaceId],
-    queryFn: () => getCrownVideoPageAction(ws!.workspaceId),
-    enabled: !!ws?.workspaceId,
-    staleTime: 30_000,
-  })
+  const { data: catalog, isLoading: catalogLoading } = useVideoCatalog()
+  const { lastWatched, nextVideo } = useMemo(
+    () => deriveVideoContinueFromCatalog(catalog),
+    [catalog],
+  )
 
   const videoTitle = (tr: string, en: string) => (lang === 'en' ? en : tr)
 
@@ -108,42 +106,48 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
         </div>
       </div>
 
-      {(data?.lastWatched || data?.nextVideo) && (
+      {(catalogLoading || lastWatched || nextVideo) && (
         <HubSectionCard title={t('crown.videoContinueTitle')}>
           <div className="space-y-3">
-            {data?.lastWatched ? (
-              <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
-                <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
-                  {t('crown.videoLastWatched')}
-                </p>
-                <p className="mt-0.5 text-sm font-medium text-[var(--text-1)]">
-                  {videoTitle(data.lastWatched.titleTr, data.lastWatched.titleEn)}
-                </p>
-              </div>
-            ) : null}
-            {data?.nextVideo ? (
-              <Link
-                href={akademiHref('videos')}
-                className={clsx(
-                  'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition',
-                  videoProgressAccent.border,
-                  videoProgressAccent.surface,
-                  videoProgressAccent.surfaceHover,
-                )}
-              >
-                <PlayCircle className={clsx('h-5 w-5 shrink-0', videoProgressAccent.textDark)} />
-                <div className="min-w-0">
-                  <p className={clsx('text-[10px] font-bold uppercase tracking-wide opacity-80', videoProgressAccent.textDark)}>
-                    {t('crown.videoUpNext')}
-                  </p>
-                  <p className="truncate text-sm font-semibold text-[var(--text-1)]">
-                    {videoTitle(data.nextVideo.titleTr, data.nextVideo.titleEn)}
-                  </p>
-                </div>
-                <ChevronRight className="ml-auto h-4 w-4 text-[var(--text-3)]" />
-              </Link>
+            {catalogLoading ? (
+              <Skeleton className="h-16 rounded-xl" />
             ) : (
-              <p className="text-sm text-emerald-600 dark:text-emerald-400">{t('crown.videoAllDone')}</p>
+              <>
+                {lastWatched ? (
+                  <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/40 px-3 py-2.5">
+                    <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
+                      {t('crown.videoLastWatched')}
+                    </p>
+                    <p className="mt-0.5 text-sm font-medium text-[var(--text-1)]">
+                      {videoTitle(lastWatched.titleTr, lastWatched.titleEn)}
+                    </p>
+                  </div>
+                ) : null}
+                {nextVideo ? (
+                  <Link
+                    href={akademiHref('videos')}
+                    className={clsx(
+                      'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition',
+                      videoProgressAccent.border,
+                      videoProgressAccent.surface,
+                      videoProgressAccent.surfaceHover,
+                    )}
+                  >
+                    <PlayCircle className={clsx('h-5 w-5 shrink-0', videoProgressAccent.textDark)} />
+                    <div className="min-w-0">
+                      <p className={clsx('text-[10px] font-bold uppercase tracking-wide opacity-80', videoProgressAccent.textDark)}>
+                        {t('crown.videoUpNext')}
+                      </p>
+                      <p className="truncate text-sm font-semibold text-[var(--text-1)]">
+                        {videoTitle(nextVideo.titleTr, nextVideo.titleEn)}
+                      </p>
+                    </div>
+                    <ChevronRight className="ml-auto h-4 w-4 text-[var(--text-3)]" />
+                  </Link>
+                ) : (
+                  <p className="text-sm text-emerald-600 dark:text-emerald-400">{t('crown.videoAllDone')}</p>
+                )}
+              </>
             )}
           </div>
         </HubSectionCard>
