@@ -577,9 +577,14 @@ async function funnelActualsSince(
 }
 
 export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfPayload> {
-  const progress = await getDailyProgressAction()
-  const { user } = await getAuthUser()
-  const workspaceId = await resolveWorkspaceId()
+  // Bağımsız üç okuma — ardışık değil paralel. Üçü de aynı istekteki React
+  // cache'li getUser()'ı paylaşır (tek auth round-trip); DB sorguları aynı anda
+  // gider. Action başına ~2 gereksiz round-trip (~460ms) silinir.
+  const [progress, { user }, workspaceId] = await Promise.all([
+    getDailyProgressAction(),
+    getAuthUser(),
+    resolveWorkspaceId(),
+  ])
   const range = rollingWeekRange(offset)
 
   if (!user) {
@@ -644,9 +649,14 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
 }
 
 export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPayload> {
-  const progress = await getDailyProgressAction()
-  const { user } = await getAuthUser()
-  const workspaceId = await resolveWorkspaceId()
+  // Bağımsız üç okuma — ardışık değil paralel. Üçü de aynı istekteki React
+  // cache'li getUser()'ı paylaşır (tek auth round-trip); DB sorguları aynı anda
+  // gider. Action başına ~2 gereksiz round-trip (~460ms) silinir.
+  const [progress, { user }, workspaceId] = await Promise.all([
+    getDailyProgressAction(),
+    getAuthUser(),
+    resolveWorkspaceId(),
+  ])
   const range = calendarDayRange(offset)
   const todayKey = todayCalendarKey()
 
@@ -700,9 +710,14 @@ export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPay
 }
 
 export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySelfPayload> {
-  const progress = await getDailyProgressAction()
-  const { user } = await getAuthUser()
-  const workspaceId = await resolveWorkspaceId()
+  // Bağımsız üç okuma — ardışık değil paralel. Üçü de aynı istekteki React
+  // cache'li getUser()'ı paylaşır (tek auth round-trip); DB sorguları aynı anda
+  // gider. Action başına ~2 gereksiz round-trip (~460ms) silinir.
+  const [progress, { user }, workspaceId] = await Promise.all([
+    getDailyProgressAction(),
+    getAuthUser(),
+    resolveWorkspaceId(),
+  ])
   const range = monthRange(offset)
   const { dayOfMonth, daysInMonth, monthPct } = range
   const monthStart = range.sinceIso
@@ -770,9 +785,14 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
 }
 
 export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfPayload> {
-  const progress = await getDailyProgressAction()
-  const { user } = await getAuthUser()
-  const workspaceId = await resolveWorkspaceId()
+  // Bağımsız üç okuma — ardışık değil paralel. Üçü de aynı istekteki React
+  // cache'li getUser()'ı paylaşır (tek auth round-trip); DB sorguları aynı anda
+  // gider. Action başına ~2 gereksiz round-trip (~460ms) silinir.
+  const [progress, { user }, workspaceId] = await Promise.all([
+    getDailyProgressAction(),
+    getAuthUser(),
+    resolveWorkspaceId(),
+  ])
   const range = yearRange(offset)
 
   if (!user) {
@@ -845,9 +865,14 @@ export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfP
 }
 
 export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> {
-  const progress = await getDailyProgressAction()
-  const { user } = await getAuthUser()
-  const workspaceId = await resolveWorkspaceId()
+  // Bağımsız üç okuma — ardışık değil paralel. Üçü de aynı istekteki React
+  // cache'li getUser()'ı paylaşır (tek auth round-trip); DB sorguları aynı anda
+  // gider. Action başına ~2 gereksiz round-trip (~460ms) silinir.
+  const [progress, { user }, workspaceId] = await Promise.all([
+    getDailyProgressAction(),
+    getAuthUser(),
+    resolveWorkspaceId(),
+  ])
   const range = funnelRangeForPulsePeriod('all')
 
   if (!user || !workspaceId) {

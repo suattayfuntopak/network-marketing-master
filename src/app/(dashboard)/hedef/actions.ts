@@ -151,11 +151,15 @@ export async function getDailyProgressAction(): Promise<DailyProgress> {
   }
   if (!user) return empty
 
-  const goal = await fetchUserGoalAction()
-  const workspaceId = await ownWorkspaceId(supabase, user.id)
+  // goal / workspaceId / actuals birbirinden bağımsız — ardışık değil paralel
+  // çekilir (uzak DB'ye ~3 round-trip yerine 1 dalga). teamSize workspace'in
+  // varlığına bağlı olduğu için sonraki dalgada kalır.
+  const [goal, workspaceId, actuals] = await Promise.all([
+    fetchUserGoalAction(),
+    ownWorkspaceId(supabase, user.id),
+    fetchFunnelActualsForToday(supabase, user.id),
+  ])
   const teamSize = workspaceId ? await directTeamCount(supabase) : 0
-
-  const actuals = await fetchFunnelActualsForToday(supabase, user.id)
 
   if (!goal) return { ...empty, teamSize, actuals }
 
