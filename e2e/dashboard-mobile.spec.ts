@@ -1,5 +1,4 @@
 import { test, expect, devices } from '@playwright/test'
-import { swipeHubPeriodRibbon } from './helpers/hubPeriodSwipe'
 
 /** Viewport-only — full `devices[...]` spread sets defaultBrowserType and breaks inside describe. */
 const MOBILE_VIEWPORT = {
@@ -27,21 +26,21 @@ test.describe('dashboard routes (mobile viewport)', () => {
     await expect(page).toHaveURL(/\/egitim/)
   })
 
-  test('/saha-ozetim daily ribbon swipe left advances offset', async ({ page }) => {
+  test('/saha-ozetim daily ribbon next arrow advances offset', async ({ page }) => {
     test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
     await page.goto('/saha-ozetim?tab=daily')
     const ribbon = page.getByTestId('hub-period-navigator')
     await expect(ribbon).toBeVisible()
-    await swipeHubPeriodRibbon(ribbon, 'left')
+    await page.getByTestId('hub-period-next').click()
     await expect(page).toHaveURL(/offset=1/)
   })
 
-  test('/saha-ozetim weekly ribbon swipe right goes to previous week', async ({ page }) => {
+  test('/saha-ozetim weekly ribbon prev arrow goes to previous week', async ({ page }) => {
     test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
     await page.goto('/saha-ozetim?tab=weekly')
     const ribbon = page.getByTestId('hub-period-navigator')
     await expect(ribbon).toBeVisible()
-    await swipeHubPeriodRibbon(ribbon, 'right')
+    await page.getByTestId('hub-period-prev').click()
     await expect(page).toHaveURL(/offset=-1/)
   })
 

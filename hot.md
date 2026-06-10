@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-10 — Dönem şeridi akan-şerit (sabit oklar) + platform debug kartı kaldırıldı ✅
+
+### Dönem şeridi yeniden tasarımı (Saha Özetim — gün/hafta/ay/yıl)
+- Eski swipe transform-tabanlıydı: oklar da hareket ediyor, lastik gibi esniyor, bir kaydırma = bir adım.
+- Yeni `HubPeriodNavigator`: **native scroll-snap şerit** — dönem butonları **sabit ◀ ▶ okların ALTINDAN** akar (köprü etkisi; oklar opak bg + halo ile slotları gizler). Parmakla serbestçe kaydır (native momentum + snap bedava), istediğin dönemde dur; snap oturunca **o dönemin metrikleri yüklenir**. Oklar tek adım için aynen çalışır; bir slota dokunmak da o döneme götürür. 4 sekmenin hepsinde.
+- Feedback-loop guard'ları: programatik ortalama (`syncingRef`) ve scroll-settle kaynaklı offset değişiminde tekrar-ortalamama (`settledByScrollRef`).
+- Eski makine silindi: `useHubPeriodSwipe.ts`, `lib/ui/hubPeriodSwipe.ts(+test)`, `e2e/helpers/hubPeriodSwipe.ts`. E2E swipe testleri **ok-tabanlı** (stabil) yapıldı (`hub-period-prev/next` testid).
+
+### Platform Yönetimi temizliği
+- `HubPrefetchDebugCard` (perf çalışması için eklenen geliştirici telemetri kartı — ham log + i18n anahtarı sızdırıyordu) **production UI'dan kaldırıldı** (premium/sade ilkesi). Telemetri altyapısı (cron/actions) durur; istenirse düzgün bir monitör görünümü ayrıca yapılabilir.
+
+### Doğrulama
+build + tsc + lint + unit (183/183) yeşil.
+
+### Dosyalar
+`components/hub/HubPeriodNavigator.tsx`, `platform-yonetim/_components/PlatformYonetimContent.tsx`, `e2e/dashboard-mobile.spec.ts` (+4 dosya silindi)
+
 ## 2026-06-10 — Deploy hızlandırıldı: hızlı CI Gate + E2E advisory ✅
 
 ### Sorun
