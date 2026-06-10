@@ -15,11 +15,29 @@ env:
   NEXT_TELEMETRY_DISABLED: '1'
   NODE_OPTIONS: '--max-old-space-size=6144'
 
-# Derleme adımı prod secret'lara bağlanmamalı — yalnızca compile doğrulaması.
-# E2E job'unda gerçek secret'lar (auth testleri için) kullanılır.
+# lint → build → playwright (desktop + mobile paralel, ayrı artifact).
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
   build:
     name: Build
+    needs: lint
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -38,13 +56,10 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
       - name: Build application
         run: npm run build
 
-  playwright:
+  playwright-chromium:
     name: E2E (chromium)
     needs: build
     runs-on: ubuntu-latest
@@ -65,7 +80,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browsers
+      - name: Install Playwright (chromium)
         run: npx playwright install --with-deps chromium
 
       - name: Check E2E credentials
@@ -82,9 +97,9 @@ jobs:
         if: steps.e2e_creds.outputs.skip != 'true'
         run: npm run build
 
-      - name: Run Playwright (chromium + mobile-chrome)
+      - name: Run Playwright (chromium)
         if: steps.e2e_creds.outputs.skip != 'true'
-        run: npx playwright test --project=chromium --project=mobile-chrome
+        run: npx playwright test --project=chromium
         env:
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
@@ -93,10 +108,62 @@ jobs:
         if: steps.e2e_creds.outputs.skip == 'true'
         run: echo "E2E skipped — add PLAYWRIGHT_TEST_EMAIL and PLAYWRIGHT_TEST_PASSWORD secrets to enable."
 
-      - name: Upload Playwright report
+      - name: Upload Playwright report (chromium)
         uses: actions/upload-artifact@v7
         if: steps.e2e_creds.outputs.skip != 'true' && !cancelled()
         with:
-          name: playwright-report
+          name: playwright-report-chromium
+          path: playwright-report/
+          retention-days: 7
+
+  playwright-mobile:
+    name: E2E (mobile-chrome)
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL != '' && secrets.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co' }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' && secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-anon-key' }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY != '' && secrets.SUPABASE_SERVICE_ROLE_KEY || 'placeholder-service-key' }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY != '' && secrets.GEMINI_API_KEY || 'placeholder-gemini' }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright (chromium — mobile-chrome aynı motor)
+        run: npx playwright install --with-deps chromium
+
+      - name: Check E2E credentials
+        id: e2e_creds
+        run: |
+          if [ -z "${{ secrets.PLAYWRIGHT_TEST_EMAIL }}" ] || [ -z "${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build application (for next start)
+        if: steps.e2e_creds.outputs.skip != 'true'
+        run: npm run build
+
+      - name: Run Playwright (mobile-chrome)
+        if: steps.e2e_creds.outputs.skip != 'true'
+        run: npx playwright test --project=mobile-chrome
+        env:
+          PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
+          PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+
+      - name: Upload Playwright report (mobile)
+        uses: actions/upload-artifact@v7
+        if: steps.e2e_creds.outputs.skip != 'true' && !cancelled()
+        with:
+          name: playwright-report-mobile
           path: playwright-report/
           retention-days: 7

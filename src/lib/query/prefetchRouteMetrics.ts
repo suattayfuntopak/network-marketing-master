@@ -24,6 +24,7 @@ import {
   getFullSelfUserProgressAction,
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
+import { recordHubPrefetchEventAction } from '@/app/(dashboard)/platform-yonetim/hubPrefetchActions'
 import {
   hubPeriodOffsetsForPrefetch,
   readStoredHubActiveTab,
@@ -186,6 +187,13 @@ export async function prefetchHubMetrics(
   if (typeof window !== 'undefined') {
     recordHubPrefetchStats(prefetchSummary)
   }
+  void recordHubPrefetchEventAction({
+    workspaceId,
+    activeTab: prefetchSummary.activeTab,
+    hubSelfQueries: prefetchSummary.hubSelfQueries,
+    totalTasks: prefetchSummary.totalTasks,
+    source: typeof window === 'undefined' ? 'ssr' : 'hover',
+  })
 
   const team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
   if (team && hasTeamPulseAccess(ws.licenseType, ws.isSuperAdmin)) {

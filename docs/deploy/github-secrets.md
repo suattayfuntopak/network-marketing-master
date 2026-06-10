@@ -70,7 +70,9 @@ Migration drift için: Actions’ta **Migration check** workflow’unu veya yere
 2. **Send notifications for failed workflows only** seçin (veya `main` dışı branch’lerde kapatın)
 3. Vercel deploy bildirimleri Dashboard → Project → Settings → Notifications üzerinden ayrı yönetilir
 
-E2E workflow iki job kullanır: **Build** (önce) ve **E2E (chromium)** (`needs: build`). Build kırılırsa Playwright adımı hiç başlamaz — mailde hangi aşamanın düştüğü net görünür.
+E2E workflow: **Lint** (~30 sn) → **Build** → **E2E (chromium)** + **E2E (mobile-chrome)** (paralel, ayrı Playwright artifact). Lint kırılırsa build başlamaz.
+
+**PR preview deploy:** `vercel.json` yalnızca `main` auto-deploy'u kapatır; PR/preview branch'leri Vercel'de normal build alır (`scripts/vercel-should-build.sh` preview'da her zaman build eder). Prod gate ayrıdır (E2E + Deploy Hook).
 
 ---
 
@@ -113,13 +115,15 @@ Bu üçü tamamlanınca: push → E2E koşar → yeşilse `deploy.yml` hook’u 
 | Vercel son deploy eski commit | Hook tetiklenmemiş veya E2E fail | E2E'yi yeşile getir; `VERCEL_DEPLOY_HOOK_URL` secret'ının tanımlı olduğunu doğrula |
 | Unit test yeşil, E2E kırmızı | E2E ayrı job; build lint/build fail veya Playwright fail | `unit-test.yml` ile `e2e.yml` **Build** ayrı — ikisini de kontrol et |
 
-**Zincir:** `main` push → `E2E (Playwright)` Build (lint + build) → Playwright → başarılıysa `Deploy (production)` → Vercel Deploy Hook.
+**Zincir:** `main` push → Lint → Build → Playwright (desktop + mobile) → başarılıysa `Deploy (production)` → Vercel Deploy Hook → **prod smoke** (`/pano` HTTP 200/307, en fazla ~6 dk).
+
+Opsiyonel repo variable: `NMM_PROD_URL` (varsayılan `https://nmm.suattayfuntopak.com`).
 
 ### Branch protection (önerilen)
 
 GitHub → **Settings → Branches → Branch protection rule** (`main`):
 
-- Require status checks: **Build** (`E2E (Playwright)`), **Vitest** (`Unit tests (Vitest)`), isteğe bağlı **E2E (chromium)**
+- Require status checks: **Lint**, **Build**, **Vitest** (`Unit tests (Vitest)`), **E2E (chromium)**, **E2E (mobile-chrome)**
 - Require branches up to date before merging
 
 Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'i ile birlikte çalışır.

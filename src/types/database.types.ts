@@ -643,6 +643,47 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_hub_prefetch_events: {
+        Row: {
+          id: string
+          workspace_id: string
+          user_id: string
+          active_tab: string
+          hub_self_queries: number
+          total_tasks: number
+          source: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          user_id: string
+          active_tab: string
+          hub_self_queries: number
+          total_tasks: number
+          source: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          user_id?: string
+          active_tab?: string
+          hub_self_queries?: number
+          total_tasks?: number
+          source?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_hub_prefetch_events_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       nmm_user_progress: {
         Row: {
           user_id: string

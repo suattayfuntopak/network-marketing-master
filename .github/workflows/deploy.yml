@@ -44,3 +44,29 @@ jobs:
           echo "E2E yeşil → Vercel prod deploy tetikleniyor (commit ${SHA:0:7})"
           curl -fsS -X POST "$HOOK_URL" >/dev/null
           echo "Deploy hook tetiklendi."
+
+      - name: Prod smoke (pano)
+        env:
+          HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
+          PROD_URL: ${{ vars.NMM_PROD_URL || 'https://nmm.suattayfuntopak.com' }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "Deploy hook pasif — smoke atlanıyor."
+            exit 0
+          fi
+          echo "Prod smoke: $PROD_URL/pano (deploy tamamlanana kadar bekleniyor)"
+          ok=0
+          for i in $(seq 1 12); do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" "$PROD_URL/pano" || echo "000")
+            if [ "$code" = "200" ] || [ "$code" = "307" ] || [ "$code" = "308" ]; then
+              echo "Prod healthy (HTTP $code) — attempt $i"
+              ok=1
+              break
+            fi
+            echo "Attempt $i: HTTP $code — 30s bekleniyor..."
+            sleep 30
+          done
+          if [ "$ok" -ne 1 ]; then
+            echo "::error::Prod smoke failed after deploy hook — $PROD_URL/pano yanıt vermedi."
+            exit 1
+          fi

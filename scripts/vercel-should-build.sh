@@ -7,6 +7,11 @@ if [ "${VERCEL_GIT_COMMIT_REF:-}" = "" ]; then
   exit 1
 fi
 
+# PR / preview deploy'lar her zaman build edilir (prod gate ayrı: deploy hook + main kapalı).
+if [ "${VERCEL_ENV:-}" = "preview" ]; then
+  exit 1
+fi
+
 # İlk deploy veya tek commit yoksa build et
 if ! git rev-parse HEAD^ >/dev/null 2>&1; then
   exit 1
