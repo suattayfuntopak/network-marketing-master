@@ -1,5 +1,50 @@
 # Hot Log
 
+## 2026-06-10 — İçerik Kütüphanesi: 34 yeni global NM konusu (Öneri #1 dahil) ✅
+
+### Özet
+- **İçerik kütüphanesi 30 → 64 konu** (TR+EN, `getTrainingData` ikilisi). Network marketing dünyası global olarak analiz edilip NMM'de **olmayan** 34 yeni konu, 8 mevcut kategoriye küratörlü dağıtıldı (mükerrer değil).
+- **Öneri #1 içine işlendi:** "En Sık 5 Hata" serisi (z9 Yeni Başlayan, i8 Takip, e9 Liderlik) + "Rol Oyunu" pratikleri (d8 Davet Diyaloğu, sk7 İtiraz Karşılama).
+- **Yeni konular:** Zihniyet (Hedef & Neden, Bolluk vs Kıtlık, Alışkanlık İnşası, 5 Hata); İletişim (Aktif Dinleme, FORM Formülü, Beden Dili & Ses, Hikaye Anlatımı, Takipte 5 Hata); Davet (Soğuk vs Sıcak Pazar, Tavsiye İsteme, Edification, Etkinliğe Davet, Rol Oyunu); Sunum (Üçlü Görüşme, Araçların Gücü, Takip Sıralaması, Rol Oyunu); Ekip (Hızlı Başlangıç 48 Saat, Örnek Liderlik, Tanıma & Takdir, Online Ekip, Liderlikte 5 Hata); Strateji (İçerik Takvimi, Çekim Pazarlaması, Etkinliklerin Gücü, Zaman Bloklama, KPI Takibi, **YZ Araçları**); Uyum (Gelir Beyanı Etiği, Spam & İzin); Ürün (Ürün Hikayesi, Otomatik Sipariş, Müşteri Sadakati).
+- Her konu NMM premium formatında: başlık + emoji + süre + seviye + özet + 5 madde, TR & EN ayrı. Build + tsc + lint temiz.
+
+### Dosyalar
+`lib/domain/trainingData.ts`
+
+## 2026-06-10 — 5 takip önerisi: prefetch DRY, hub offset, test fix, E2E helper ✅
+
+### Özet
+- **`getSelfUserProgressAction` kaldırıldı** — tek kaynak `getFullSelfUserProgressAction`.
+- **`prefetchAkademiProgressBundle` export** — `egitim` + `canli-egitim` SSR sayfaları ortak helper kullanıyor.
+- **Hub prefetch komşu offset'ler** — `prefetchHubMetrics` daily/weekly/monthly/yearly için offset -1, 0, 1.
+- **Vitest 184/184** — `teamAccess`, `checkQuota` (JOIN mock + trial beklentisi), `shopierOrderWebhook` (taze timestamp).
+- **E2E helper** — `e2e/helpers/hubPeriodSwipe.ts`; günlük sol + haftalık sağ swipe testleri.
+
+### Dosyalar
+`akademiProgressActions.ts`, `prefetchRouteMetrics.ts`, `egitim/page.tsx`, `canli-egitim/page.tsx`, `teamAccess.test.ts`, `checkQuota.test.ts`, `shopierOrderWebhook.test.ts`, `e2e/helpers/hubPeriodSwipe.ts`, `dashboard-mobile.spec.ts`
+
+## 2026-06-10 — 5 takip önerisi: test, tam prefetch, i18n, E2E swipe, focus refetch ✅
+
+### Özet
+- **Vitest:** `hubPeriodSwipe.test.ts` (eşik/yön), `hubPeriodRange.test.ts` (kompakt etiketler, offset parse).
+- **Tam progress prefetch:** `getFullSelfUserProgressAction` — `egitim`, `canli-egitim`, hover prefetch, `usePersonalAkademiProgress` (favori/okundu SSR hydrate).
+- **i18n:** `dashboard.summaryPeriodPrev` / `summaryPeriodNext` + `data-testid="hub-period-navigator"`.
+- **E2E:** Mobil `/saha-ozetim` dönem şeridi swipe → `offset=1`.
+- **Çoklu cihaz:** `QUERY_STALE.progress` (60s) + `refetchOnWindowFocus` / `refetchOnReconnect` on progress query.
+
+### Dosyalar
+`hubPeriodSwipe.ts`, `hubPeriodSwipe.test.ts`, `hubPeriodRange.test.ts`, `useHubPeriodSwipe.ts`, `HubPeriodNavigator.tsx`, `staleTimes.ts`, `useProgressSync.ts`, `usePersonalAkademiProgress.ts`, `egitim/page.tsx`, `canli-egitim/page.tsx`, `prefetchRouteMetrics.ts`, `tr.ts`, `en.ts`, `dashboard-mobile.spec.ts`
+
+## 2026-06-10 — Üye detay çeviri, dönem şeridi swipe, Akademi prefetch + progress TanStack ✅
+
+### Özet
+- **Üye detay başlık:** `MemberDetailPage` çeviri anahtarları `dashboard.memberDetail*` → `team.memberDetail*` (Saha Radarı → Aktivite tıklanınca artık “Üye Detayı”).
+- **Saha Özetim dönem şeridi:** `HubPeriodNavigator` mobil yatay kaydırma (`useHubPeriodSwipe`, `no-swipe`, `preventDefault`); `router.replace` + `scroll: false`; hafta/ay için kompakt etiketler (`formatWeekRangeLabelCompact`, `formatMonthLabelCompact`).
+- **5 öneri:** `useProgressSync` → TanStack Query + server actions; `egitim/page.tsx` SSR prefetch; `invalidateHubMetrics` + progress/custom counts; E2E mobil tab tek satır + `/egitim` smoke.
+
+### Dosyalar
+`MemberDetailPage.tsx`, `HubPeriodNavigator.tsx`, `useHubPeriodSwipe.ts`, `useHubPeriodNavigation.ts`, `hubPeriodRange.ts`, `useProgressSync.ts`, `akademiProgressActions.ts`, `egitim/page.tsx`, `invalidateHubMetrics.ts`, `dashboard-mobile.spec.ts`, `critical-routes-smoke.spec.ts`
+
 ## 2026-06-10 — İtiraz Bankası: eski projeden eksik itirazların ithali ✅
 
 ### Özet
