@@ -19,6 +19,10 @@ import {
 } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
+import {
+  getAkademiCustomCountsAction,
+  getSelfUserProgressAction,
+} from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { MemberRow } from '@/lib/team/types'
@@ -268,6 +272,16 @@ export function prefetchRouteMetrics(
     void queryClient.prefetchQuery({
       queryKey: queryKeys.videoCatalog(workspaceId),
       queryFn: () => getVideoCatalogAction(workspaceId),
+      staleTime: QUERY_STALE.usage,
+    })
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.selfUserProgress(),
+      queryFn: getSelfUserProgressAction,
+      staleTime: QUERY_STALE.usage,
+    })
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.akademiCustomCounts(workspaceId),
+      queryFn: getAkademiCustomCountsAction,
       staleTime: QUERY_STALE.usage,
     })
   }

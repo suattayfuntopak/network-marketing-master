@@ -1,13 +1,19 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { getTrainingData } from '@/lib/domain/trainingData'
-import { loadCustomContent } from '@/lib/domain/customContent'
 import { ITIRAZLAR } from '@/app/(dashboard)/itirazlar/data/itirazlar'
+import {
+  getAkademiCustomCountsAction,
+  getSelfUserProgressAction,
+} from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useVideoCatalog } from '@/hooks/useVideoCatalog'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 
 function pct(read: number, total: number) {
   return total > 0 ? Math.round((read / total) * 100) : 0
@@ -16,46 +22,40 @@ function pct(read: number, total: number) {
 export function usePersonalAkademiProgress() {
   const { lang } = useTranslation()
   const { data: ws } = useWorkspace()
-  const { readTrainings, readObjections, isLoading: progressLoading } = useProgressSync()
-  const { data: videoData, isLoading: videoLoading } = useVideoCatalog()
-  const [customContentCount, setCustomContentCount] = useState(0)
-  const [customObjectionCount, setCustomObjectionCount] = useState(0)
-  const [customLoading, setCustomLoading] = useState(true)
+  const workspaceId = ws?.workspaceId
+  const { readTrainings, readObjections, isLoading: syncLoading } = useProgressSync()
+  const { data: videoData, isLoading: videoLoading, isFetched: videoFetched } = useVideoCatalog()
 
-  useEffect(() => {
-    let cancelled = false
-    if (!ws?.workspaceId) {
-      /* eslint-disable-next-line react-hooks/set-state-in-effect */
-      setCustomLoading(false)
-      return
-    }
-    setCustomLoading(true)
-    Promise.all([
-      loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', ws.workspaceId),
-      loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', ws.workspaceId),
-    ])
-      .then(([trainings, objections]) => {
-        if (cancelled) return
-        setCustomContentCount(trainings.filter(it => (it as { isApproved?: boolean }).isApproved).length)
-        setCustomObjectionCount(objections.filter(it => (it as { isApproved?: boolean }).isApproved).length)
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setCustomLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [ws?.workspaceId])
+  const { data: progressSnapshot } = useQuery({
+    queryKey: queryKeys.selfUserProgress(),
+    queryFn: getSelfUserProgressAction,
+    staleTime: QUERY_STALE.usage,
+  })
+
+  const { data: customCounts } = useQuery({
+    queryKey: queryKeys.akademiCustomCounts(workspaceId ?? ''),
+    queryFn: getAkademiCustomCountsAction,
+    enabled: !!workspaceId,
+    staleTime: QUERY_STALE.usage,
+  })
+
+  const contentRead = readTrainings.size > 0
+    ? readTrainings.size
+    : (progressSnapshot?.readTrainings.length ?? 0)
+
+  const objectionRead = readObjections.size > 0
+    ? readObjections.size
+    : (progressSnapshot?.readObjections.length ?? 0)
+
+  const customContentCount = customCounts?.training ?? 0
+  const customObjectionCount = customCounts?.objection ?? 0
 
   const contentTotal = useMemo(() => {
     const staticCount = getTrainingData(lang).reduce((sum, cat) => sum + cat.konular.length, 0)
     return staticCount + customContentCount
   }, [lang, customContentCount])
 
-  const contentRead = readTrainings.size
   const objectionTotal = ITIRAZLAR.length + customObjectionCount
-  const objectionRead = readObjections.size
   const videoTotal = videoData?.summary.total ?? 0
   const videoRead = videoData?.summary.completed ?? 0
 
@@ -67,11 +67,14 @@ export function usePersonalAkademiProgress() {
   const totalItems = contentTotal + videoTotal + objectionTotal
   const totalPct = pct(totalRead, totalItems)
 
+  const waitingProgress = syncLoading && readTrainings.size === 0 && !progressSnapshot
+  const waitingVideo = videoLoading && !videoFetched
+
   return {
     content: { read: contentRead, total: contentTotal, pct: contentPct },
     video: { read: videoRead, total: videoTotal, pct: videoPct },
     objection: { read: objectionRead, total: objectionTotal, pct: objectionPct },
     totalPct,
-    isLoading: progressLoading || videoLoading || customLoading,
+    isLoading: waitingProgress || waitingVideo,
   }
 }

@@ -126,7 +126,13 @@ export function TeamTrainingRankingTable({
     return <Skeleton className="h-40 rounded-2xl" />
   }
 
-  if (rows.length === 0) return null
+  if (!loading && rows.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+        <p className="text-sm text-[var(--text-3)]">{t('team.emptyTrainingRanking')}</p>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4">
@@ -147,6 +153,9 @@ export function TeamTrainingRankingTable({
                   </span>
                   {row.name}
                 </p>
+                <span className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand">
+                  %{row.avg}
+                </span>
                 <button
                   type="button"
                   onClick={() => setExpandedId(open ? null : row.userId)}

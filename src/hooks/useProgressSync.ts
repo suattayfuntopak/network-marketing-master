@@ -97,16 +97,14 @@ export function useProgressSync() {
     setFavTrainings(localFT)
     setReadObjections(localRO)
     setFavObjections(localFO)
+    setIsLoading(false)
 
     const syncFromSupabase = async () => {
       const supabase = createClient()
       const {
         data: { user },
       } = await supabase.auth.getUser()
-      if (!user) {
-        setIsLoading(false)
-        return
-      }
+      if (!user) return
 
       try {
         const { data } = await supabase
@@ -178,12 +176,10 @@ export function useProgressSync() {
         }
       } catch (err) {
         console.error('Error syncing progress with Supabase:', err)
-      } finally {
-        setIsLoading(false)
       }
     }
 
-    syncFromSupabase()
+    void syncFromSupabase()
   }, [userId, ws?.workspaceId])
 
   const handleUpdate = (

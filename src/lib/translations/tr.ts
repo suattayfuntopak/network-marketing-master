@@ -540,6 +540,7 @@ export const tr = {
     fieldMetricCalls: "Kaç Kişiyle Konuştu?",
     fieldMetricMeetings: "Kaç Kişi Ekledi?",
     expandMetrics: "Metrikleri göster",
+    emptyTrainingRanking: "Henüz eğitim ilerlemesi görüntülenecek ekip üyesi yok.",
     fieldMetricPresentations: "Kaç Kişiye Sunum Yaptı?",
     fieldMetricMembers: "Ekibine Kaç Kişi Katıldı?",
     dayShort: "g",

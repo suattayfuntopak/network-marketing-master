@@ -11,6 +11,7 @@ import { EgitimContent } from './EgitimContent'
 import { VideolarContent } from './VideolarContent'
 import { ItirazlarContent } from '@/app/(dashboard)/itirazlar/_components/ItirazlarContent'
 import { akademiAccent } from './akademiTheme'
+import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 
@@ -95,7 +96,7 @@ export function AkademiContent() {
           data-no-swipe="true"
           onTouchStart={e => e.stopPropagation()}
         >
-          {AKADEMI_TABS.map(({ key, labelKey }) => (
+          {AKADEMI_TABS.map(({ key }) => (
             <button
               key={key}
               type="button"
@@ -103,11 +104,11 @@ export function AkademiContent() {
               aria-selected={tab === key}
               onClick={() => selectTab(key)}
               className={clsx(
-                'flex-1 rounded-xl px-2 py-2.5 text-xs font-bold transition sm:px-3 sm:text-sm',
+                'flex-1 whitespace-nowrap rounded-xl px-1.5 py-2.5 text-[11px] font-bold transition sm:px-3 sm:text-sm',
                 tab === key ? AKADEMI_TAB_THEME[key].activeTabClass : 'text-[var(--text-2)] hover:text-[var(--text-1)]',
               )}
             >
-              {t(labelKey)}
+              <AkademiTabLabel tab={key} />
             </button>
           ))}
         </div>

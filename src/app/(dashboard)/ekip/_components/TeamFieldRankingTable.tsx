@@ -221,6 +221,9 @@ export function TeamFieldRankingTable({
                         </span>
                         {row.name}
                       </button>
+                      <span className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand">
+                        {row.totalActions}
+                      </span>
                       <button
                         type="button"
                         onClick={() => setExpandedId(open ? null : row.userId)}

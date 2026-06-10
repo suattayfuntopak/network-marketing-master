@@ -72,35 +72,6 @@ function ActivityBadge({ level, t }: { level: ActivityLevel; t: ReturnType<typeo
   )
 }
 
-function ActivityMiniChart({ days, lang }: { days: Array<{ date: string; count: number }>; lang: string }) {
-  const max = Math.max(...days.map(d => d.count), 1)
-  return (
-    <div className="flex items-end gap-1" style={{ height: 52 }}>
-      {days.map(d => {
-        const pct = Math.max(Math.round((d.count / max) * 100), d.count > 0 ? 12 : 5)
-        const dayLabel = new Date(d.date + 'T12:00:00').toLocaleDateString(
-          lang === 'en' ? 'en-GB' : 'tr-TR',
-          { weekday: 'short' },
-        ).slice(0, 2)
-        return (
-          <div key={d.date} className="flex flex-1 flex-col items-center gap-1">
-            <div className="flex w-full items-end justify-center" style={{ height: 36 }}>
-              <div
-                className={clsx(
-                  'w-full rounded-sm transition-all duration-500',
-                  d.count > 0 ? 'bg-emerald-400 dark:bg-emerald-500' : 'bg-[var(--bg-subtle)]',
-                )}
-                style={{ height: `${pct}%` }}
-              />
-            </div>
-            <span className="text-[9px] font-medium text-[var(--text-3)]">{dayLabel}</span>
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 function CoachHistoryList({ items, t, lang }: {
   items: CoachingHistoryItem[]
   t: ReturnType<typeof useTranslation>['t']
@@ -440,18 +411,6 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                     </div>
                   </div>
                 </div>
-
-                {/* 7 günlük aktivite grafiği */}
-                {data.dailyActivity.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                      {t('dashboard.memberDetailActivityTitle')}
-                    </p>
-                    <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
-                      <ActivityMiniChart days={data.dailyActivity} lang={lang} />
-                    </div>
-                  </div>
-                )}
 
                 {/* Üye hedefi */}
                 {data.memberGoal && (

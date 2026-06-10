@@ -540,6 +540,7 @@ export const en = {
     fieldMetricCalls: "How many people did they talk to?",
     fieldMetricMeetings: "How many people did they add?",
     expandMetrics: "Show metrics",
+    emptyTrainingRanking: "No team members to show training progress for yet.",
     fieldMetricPresentations: "How many presentations did they give?",
     fieldMetricMembers: "How many people joined their team?",
     dayShort: "d",

@@ -3,7 +3,9 @@
 import { useEffect, type ReactNode } from 'react'
 import { useWindowVirtualizer } from '@tanstack/react-virtual'
 
-const VIRTUALIZE_THRESHOLD = 20
+/** 20+ üyede pencere sanallaştırması — değiştirmek için tek kaynak. */
+export const MEMBER_LIST_VIRTUALIZE_THRESHOLD = 20
+const VIRTUALIZE_THRESHOLD = MEMBER_LIST_VIRTUALIZE_THRESHOLD
 const ROW_GAP_PX = 20
 
 type VirtualizedMemberListProps<T> = {

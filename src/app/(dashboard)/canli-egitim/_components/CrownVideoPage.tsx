@@ -11,6 +11,7 @@ import { deriveVideoContinueFromCatalog } from '@/lib/domain/videoContinue'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
 import { akademiHref } from '@/lib/domain/akademiTab'
+import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { videoProgressAccent } from './videoProgressTheme'
@@ -27,9 +28,9 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
   const videoTitle = (tr: string, en: string) => (lang === 'en' ? en : tr)
 
   const countCards = [
-    { key: 'training' as const, labelKey: 'akademi.tabContentBank', ...progress.content },
-    { key: 'videos' as const, labelKey: 'akademi.tabVideos', read: progress.video.read, total: progress.video.total, pct: progress.video.pct },
-    { key: 'objections' as const, labelKey: 'akademi.tabObjections', ...progress.objection },
+    { key: 'training' as const, ...progress.content },
+    { key: 'videos' as const, read: progress.video.read, total: progress.video.total, pct: progress.video.pct },
+    { key: 'objections' as const, ...progress.objection },
   ]
 
   const pctCards = [
@@ -48,13 +49,13 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
       asTab={asTab}
     >
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {countCards.map(({ key, labelKey, read, total }) => (
+        {countCards.map(({ key, read, total }) => (
           <div
             key={`count-${key}`}
             className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 sm:p-4"
           >
-            <p className="text-[10px] font-bold uppercase leading-tight tracking-wide text-[var(--text-3)] sm:text-xs">
-              {t(labelKey)}
+            <p className="whitespace-nowrap text-[10px] font-bold uppercase leading-tight tracking-wide text-[var(--text-3)] sm:text-xs">
+              <AkademiTabLabel tab={key} />
             </p>
             {progress.isLoading ? (
               <Skeleton className="mt-2 h-7 w-16" />
@@ -154,16 +155,16 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
       )}
 
       <div className="grid grid-cols-3 gap-2 sm:gap-3">
-        {AKADEMI_TABS.map(({ key, labelKey }) => (
+        {AKADEMI_TABS.map(({ key }) => (
           <Link
             key={key}
             href={akademiHref(key)}
             className={clsx(
-              'flex min-w-0 items-center justify-center rounded-xl border px-2 py-3 text-center text-[10px] font-bold leading-tight transition active:scale-[0.98] sm:text-xs',
+              'flex min-w-0 items-center justify-center whitespace-nowrap rounded-xl border px-1.5 py-3 text-center text-[10px] font-bold leading-tight transition active:scale-[0.98] sm:px-2 sm:text-xs',
               AKADEMI_TAB_THEME[key].navButtonClass,
             )}
           >
-            {t(labelKey)}
+            <AkademiTabLabel tab={key} />
           </Link>
         ))}
       </div>

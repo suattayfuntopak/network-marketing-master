@@ -13,6 +13,8 @@ export const queryKeys = {
   /** Günlük Özet hub — haftalık/aylık ile aynı veri modeli */
   hubDailySelf: (offset = 0) => ['hub', 'daily-self', offset] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,
+  selfUserProgress: () => ['self-user-progress'] as const,
+  akademiCustomCounts: (workspaceId: string) => ['akademi-custom-counts', workspaceId] as const,
   hubWeeklySelf: (offset = 0) => ['hub', 'weekly-self', offset] as const,
   hubMonthlySelf: (offset = 0) => ['hub', 'monthly-self', offset] as const,
   hubYearlySelf: (offset = 0) => ['hub', 'yearly-self', offset] as const,

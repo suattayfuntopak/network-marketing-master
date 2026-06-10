@@ -37,8 +37,12 @@ export const AKADEMI_TAB_THEME: Record<
   },
 }
 
-export const AKADEMI_TABS: readonly { key: AkademiTab; labelKey: string }[] = [
-  { key: 'training', labelKey: 'akademi.tabContentBank' },
-  { key: 'videos', labelKey: 'akademi.tabVideos' },
-  { key: 'objections', labelKey: 'akademi.tabObjections' },
+export const AKADEMI_TABS: readonly {
+  key: AkademiTab
+  labelKey: string
+  labelKeyMobile: string
+}[] = [
+  { key: 'training', labelKey: 'akademi.tabContentBank', labelKeyMobile: 'akademi.tabContentBankShort' },
+  { key: 'videos', labelKey: 'akademi.tabVideos', labelKeyMobile: 'akademi.tabVideosShort' },
+  { key: 'objections', labelKey: 'akademi.tabObjections', labelKeyMobile: 'akademi.tabObjectionsShort' },
 ]
