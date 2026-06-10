@@ -4,15 +4,27 @@ import { FieldSummaryPage } from './_components/FieldSummaryPage'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { parseSummaryTab } from '@/lib/domain/hubPeriodPrefetch'
 import { getQueryClient } from '@/lib/query/getQueryClient'
-import { prefetchHubMetrics } from '@/lib/query/prefetchRouteMetrics'
 import { queryKeys } from '@/lib/query/keys'
+import {
+  getHubDailySelfAction,
+  getHubMonthlySelfAction,
+  getHubWeeklySelfAction,
+  getHubYearlySelfAction,
+} from '@/app/(dashboard)/crown/actions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
-type Props = { searchParams: Promise<{ tab?: string }> }
+type Props = { searchParams: Promise<{ tab?: string; offset?: string }> }
 
+/**
+ * Giriş hızı: ESKİDEN `await prefetchHubMetrics` 4 dönem × birçok offset + ekip
+ * nabzı = ~15 uzak sorgu BLOKLUYORDU (uzak Supabase ~230ms/sorgu → saniyeler).
+ * Artık yalnızca AÇIK sekmenin GÖRÜNEN dönemi (tek sorgu) await edilir; komşu
+ * dönemler ve diğer sekmeler istemcide ısıtılır (FieldSummaryInner prefetch).
+ */
 export default async function SahaOzetimPage({ searchParams }: Props) {
-  const { tab: tabRaw } = await searchParams
+  const { tab: tabRaw, offset: offsetRaw } = await searchParams
   const activeTab = parseSummaryTab(tabRaw ?? null)
+  const offset = Number.parseInt(offsetRaw ?? '0', 10) || 0
 
   const queryClient = getQueryClient()
   await queryClient.prefetchQuery({
@@ -22,12 +34,15 @@ export default async function SahaOzetimPage({ searchParams }: Props) {
 
   const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
   if (ws?.workspaceId) {
-    await prefetchHubMetrics(
-      queryClient,
-      ws.workspaceId,
-      { licenseType: ws.licenseType, isSuperAdmin: ws.isSuperAdmin },
-      { activeTab },
-    )
+    const active: { key: readonly unknown[]; fn: () => Promise<unknown> } =
+      activeTab === 'daily'
+        ? { key: queryKeys.hubDailySelf(offset), fn: () => getHubDailySelfAction(offset) }
+        : activeTab === 'weekly'
+          ? { key: queryKeys.hubWeeklySelf(offset), fn: () => getHubWeeklySelfAction(offset) }
+          : activeTab === 'monthly'
+            ? { key: queryKeys.hubMonthlySelf(offset), fn: () => getHubMonthlySelfAction(offset) }
+            : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
+    await queryClient.prefetchQuery({ queryKey: active.key, queryFn: active.fn, staleTime: 60_000 })
   }
 
   return (

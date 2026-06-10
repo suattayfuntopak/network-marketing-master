@@ -1,5 +1,30 @@
 # Hot Log
 
+## 2026-06-10 — Şerit 3-buton + Saha Özetim "pat pat" hız + davet senkronizasyonu + telemetri monitörü ✅
+
+Tek oturumda 4 iş; build + tsc + lint + unit (183/183) yeşil.
+
+### 1) Dönem şeridi düzeltmeleri (`HubPeriodNavigator`)
+- **5 değil 3 öğe**: görünür pencere artık tam 3 buton (`basis-1/3` + `px-[33.333%]`) — Dün · Bugün · Yarın.
+- **Ayrı butonlar + belirgin ara çizgi**: her slot kendi çerçeveli iç-kartı (`border` + net boşluk), pasif kartlar da görünür kenarlı — düz şerit değil.
+- **Gecikmesiz oturma**: `scrollend` olayı (destekleyen tarayıcıda anında; yoksa 90ms fallback) → parmağı çekince ortadaki dönem hemen seçilir, metrik client-state'ten ANINDA gelir (aşağıdaki perf işiyle).
+- **Yıl etiketi**: "Bu yıl" yerine içinde bulunduğumuz yıl sayısı (2026). `formatYearLabel(year)` artık her zaman yıl sayısı döndürür.
+
+### 2) Saha Özetim "pat pat" hız (Aktivite sekmesi modeli her yere)
+- **Kök neden**: sekme/offset `router.replace` ile değişiyordu → her değişimde RSC turu + `page.tsx` server'da `await prefetchHubMetrics` (~15 uzak Supabase sorgusu, ~230ms/sorgu → saniyeler) BLOKLUYORDU.
+- **Çözüm**: hub gezintisi tamamen **istemci state** (`HubPeriodProvider` context + `window.history.replaceState`) — RSC turu yok. `page.tsx` artık yalnızca AÇIK sekmenin görünen dönemini (tek sorgu) await eder; komşu dönemler + diğer sekmeler istemcide ısıtılır (`MemberActivitySheet` modeli: prefetch + `placeholderData`). Sonuç: girişler ~1 round-trip, geçişler önbellekten anında.
+
+### 3) Davet senkronizasyonu (Ezgi Şagar "iki kişi" sorunu)
+- **Kök neden**: WhatsApp davet linki yalnızca düz `/kayit` idi; linkten kaydolan kişi davet kodunu elle girmeyince `parent_id` boş kalıyor → "dış kayıt" olarak görünüyor + boru hattındaki "katıldı" adayıyla eşleşmeyip **çift** sayılıyordu.
+- **Kalıcı (4A)**: davet linki artık token taşır (`?ref=KOD&aday=ID`). `SignupForm` token'ı gizli alana, `signupAction` `user_metadata.pending_invite_code`'a yazar; ilk workspace oluşturulurken (`ensureWorkspaceAction`, yalnızca ilk kez) `nmm_join_workspace` ile **otomatik bağlanır** = kodu elle girmekle birebir aynı. Bir daha "dış kayıt"/çift sayım olmaz.
+- **Mevcut kayıt (4B)**: Platform > Dış Kayıtlar'da her satıra **"Ekibime Bağla"** (Link2) butonu → `claimIndependentSignupToTeamAction` hedef workspace'in `parent_id`'sini süper admin workspace'ine set eder (060 `nmm_join_workspace` ile aynı format; başka lidere bağlıysa korur). Tek tıkla Ezgi dış kayıt olmaktan çıkar + tek kişi olur.
+
+### 4) Telemetri monitörü (debug kart yerine — "şimdi yap")
+- `HubPrefetchMonitorCard`: süper admin için **katlanabilir** (`<details>`), premium kart — 7 günlük mini sütun trendi + son sunucu olayları, ham log/çiğ anahtar SIZDIRMAZ, zarif boş durum. Platform sayfasının altına "Sistem telemetrisi" olarak mount edildi (varsayılan kapalı).
+
+### Dosyalar
+`components/hub/HubPeriodNavigator.tsx`, `components/hub/useHubPeriodNavigation.ts` (→ context provider), `saha-ozetim/page.tsx`, `saha-ozetim/_components/FieldSummaryPage.tsx`, `lib/utils/hubPeriodRange.ts`, `platform-yonetim/_components/HubPrefetchMonitorCard.tsx` (yeni) + `PlatformYonetimContent.tsx`, `platform-yonetim/admin-actions.ts`, `actions/workspace.ts`, `(auth)/kayit/_components/SignupForm.tsx` + `actions.ts`, `pipeline/[id]/actions.ts`, `lib/translations/sections/platform.ts`
+
 ## 2026-06-10 — Dönem şeridi akan-şerit (sabit oklar) + platform debug kartı kaldırıldı ✅
 
 ### Dönem şeridi yeniden tasarımı (Saha Özetim — gün/hafta/ay/yıl)

@@ -111,6 +111,61 @@ export async function addIndependentAsCandidateAction(
   return { success: true }
 }
 
+/**
+ * Mevcut bir "dış kayıt"ı (bağımsız workspace) süper admin'in ekibine BAĞLAR:
+ * hedef workspace'in parent_id'sini süper admin workspace'ine set eder. Bu, kişinin
+ * davet kodunu elle girmesiyle aynı sonucu verir → artık "dış kayıt" olarak görünmez
+ * ve liderin boru hattındaki aynı isimli "katıldı" adayıyla eşleşip çift sayılmaz.
+ * (Örn. WhatsApp davet linkinden kaydolup kodu girmemiş saha ortağı.)
+ * Başka bir lidere zaten bağlı kullanıcı KORUNUR (sponsor çalınmaz).
+ */
+export async function claimIndependentSignupToTeamAction(
+  targetWorkspaceId: string,
+): Promise<{ success: boolean }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+
+  const { data: myWs, error: myErr } = await admin
+    .from('nmm_workspaces')
+    .select('id')
+    .eq('owner_id', user.id)
+    .single()
+
+  if (myErr || !myWs) throw new Error('Çalışma alanınız bulunamadı.')
+  if (targetWorkspaceId === myWs.id) throw new Error('Kendi çalışma alanı bağlanamaz.')
+
+  const { data: target, error: tErr } = await admin
+    .from('nmm_workspaces')
+    .select('id, parent_id')
+    .eq('id', targetWorkspaceId)
+    .single()
+
+  if (tErr || !target) throw new Error('Hedef çalışma alanı bulunamadı.')
+
+  // Zaten BAŞKA bir lidere bağlıysa dokunma (idempotent: bize bağlıysa no-op).
+  if (target.parent_id && target.parent_id !== myWs.id && target.parent_id !== user.id) {
+    throw new Error('Bu kullanıcı zaten başka bir lidere bağlı.')
+  }
+
+  if (target.parent_id === myWs.id) return { success: true }
+
+  const { error: updErr } = await admin
+    .from('nmm_workspaces')
+    .update({ parent_id: myWs.id })
+    .eq('id', targetWorkspaceId)
+
+  if (updErr) {
+    console.error('[claimIndependentSignupToTeamAction] update error:', updErr)
+    throw new Error('Ekibe bağlama başarısız.')
+  }
+
+  return { success: true }
+}
+
 export async function deleteUserAction(ownerId: string): Promise<{ success: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

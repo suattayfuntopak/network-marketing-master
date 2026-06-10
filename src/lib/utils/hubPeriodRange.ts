@@ -186,8 +186,9 @@ export function yearRange(offset: number): YearRange {
   }
 }
 
-export function formatYearLabel(year: number, lang: string, offset: number): string {
-  if (offset === 0) return lang === 'en' ? 'This year' : 'Bu yıl'
+export function formatYearLabel(year: number): string {
+  // Yıl şeridinde her zaman gerçek yıl sayısı gösterilir (içinde bulunduğumuz yıl
+  // dâhil: "Bu yıl" yerine 2026). Gün şeridi Dün/Bugün/Yarın olarak kalır.
   return String(year)
 }
 

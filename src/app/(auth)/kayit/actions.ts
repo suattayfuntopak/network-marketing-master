@@ -24,6 +24,10 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   const email = (formData.get('email') as string | null)?.trim() ?? ''
   const password = (formData.get('password') as string | null) ?? ''
   const fullName = (formData.get('fullName') as string | null)?.trim() ?? ''
+  // Sponsor davet token'ı (?ref=KOD&aday=ID) — varsa user_metadata'ya yazılır;
+  // ilk workspace oluşturulurken otomatik ekip bağlaması için kullanılır.
+  const inviteCode = (formData.get('ref') as string | null)?.trim().toUpperCase() ?? ''
+  const inviteCandidateId = (formData.get('aday') as string | null)?.trim() ?? ''
 
   if (!email || !password || !fullName) {
     return { error: 'Tüm alanları doldurmak zorunlu.' }
@@ -33,7 +37,13 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { full_name: fullName } },
+    options: {
+      data: {
+        full_name: fullName,
+        ...(inviteCode ? { pending_invite_code: inviteCode } : {}),
+        ...(inviteCandidateId ? { pending_candidate_id: inviteCandidateId } : {}),
+      },
+    },
   })
 
   if (error) {

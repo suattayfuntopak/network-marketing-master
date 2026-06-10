@@ -25,8 +25,10 @@ type HubPeriodNavigatorProps = {
 
 /**
  * Dönem şeridi: sabit ◀ ▶ okların ALTINDAN akan, parmakla serbestçe kaydırılan
- * (native scroll-snap → momentum + snap bedava) bir şerit. Kullanıcı istediği
- * dönemde durur; snap o döneme oturunca offset güncellenir ve metrikleri yüklenir.
+ * (native scroll-snap → momentum + snap bedava) bir şerit. Görünür pencere TAM 3
+ * ayrı buton genişliğindedir (örn. Dün · Bugün · Yarın) — her biri kendi
+ * çerçevesiyle belirgin, aralarında net boşluk. Kullanıcı parmağını çekince
+ * scroll durur, ORTADA kalan dönem anında seçilir (`go`) ve metrikleri yüklenir.
  * Oklar tek tek adım için aynen çalışır.
  */
 const RANGE = 24 // görünür offset penceresi (-24..+24) — pratikte sonsuz his
@@ -58,6 +60,10 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
   const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const syncingRef = useRef(false) // programatik scroll sırasında settle'ı bastır
   const settledByScrollRef = useRef<number | null>(null) // offset değişimi scroll'dan mı geldi
+  const offsetRef = useRef(offset)
+  useEffect(() => {
+    offsetRef.current = offset
+  }, [offset])
 
   const offsets = useMemo(() => {
     const arr: number[] = []
@@ -78,7 +84,7 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
         const r = monthRange(o)
         return compact ? formatMonthLabelCompact(r.startDate, lang) : formatMonthLabel(r.startDate, lang)
       }
-      return formatYearLabel(yearRange(o).year, lang, o)
+      return formatYearLabel(yearRange(o).year)
     },
     [lang, mode],
   )
@@ -90,10 +96,53 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
     const target = slot.offsetLeft - (el.clientWidth - slot.clientWidth) / 2
     syncingRef.current = true
     el.scrollTo({ left: Math.max(0, target), behavior: smooth ? 'smooth' : 'auto' })
-    window.setTimeout(() => {
-      syncingRef.current = false
-    }, smooth ? 450 : 80)
+    if (settleTimer.current) clearTimeout(settleTimer.current)
+    settleTimer.current = setTimeout(
+      () => {
+        syncingRef.current = false
+      },
+      smooth ? 420 : 60,
+    )
   }, [])
+
+  // Şerit durunca ORTADAKİ dönemi seç (anında — debounce yok, `scrollend`/momentum
+  // bitişinde tetiklenir). Programatik kaydırmada (`syncingRef`) sessiz kal.
+  const settle = useCallback(() => {
+    if (syncingRef.current) return
+    const el = scrollRef.current
+    if (!el) return
+    const center = el.scrollLeft + el.clientWidth / 2
+    let nearest = offsetRef.current
+    let best = Infinity
+    for (const [o, slot] of slotRefs.current) {
+      const slotCenter = slot.offsetLeft + slot.clientWidth / 2
+      const d = Math.abs(slotCenter - center)
+      if (d < best) {
+        best = d
+        nearest = o
+      }
+    }
+    if (nearest !== offsetRef.current) {
+      settledByScrollRef.current = nearest
+      go(nearest) // dönem değişti → client-state güncellenir, metrikleri anında yüklenir
+    }
+  }, [go])
+
+  // `scrollend` destekleyen tarayıcılarda anında; desteklemeyenlerde kısa debounce.
+  const handleScroll = useCallback(() => {
+    if (syncingRef.current) return
+    if (typeof window !== 'undefined' && 'onscrollend' in window) return // scrollend halleder
+    if (settleTimer.current) clearTimeout(settleTimer.current)
+    settleTimer.current = setTimeout(settle, 90)
+  }, [settle])
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    const onEnd = () => settle()
+    el.addEventListener('scrollend', onEnd)
+    return () => el.removeEventListener('scrollend', onEnd)
+  }, [settle])
 
   // İlk montaj: mevcut offset'i ortala (layout hazır olunca).
   useEffect(() => {
@@ -112,30 +161,6 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
     centerOffset(offset, true)
   }, [offset, centerOffset])
 
-  const handleScroll = useCallback(() => {
-    if (syncingRef.current) return
-    if (settleTimer.current) clearTimeout(settleTimer.current)
-    settleTimer.current = setTimeout(() => {
-      const el = scrollRef.current
-      if (!el) return
-      const center = el.scrollLeft + el.clientWidth / 2
-      let nearest = offset
-      let best = Infinity
-      for (const [o, slot] of slotRefs.current) {
-        const slotCenter = slot.offsetLeft + slot.clientWidth / 2
-        const d = Math.abs(slotCenter - center)
-        if (d < best) {
-          best = d
-          nearest = o
-        }
-      }
-      if (nearest !== offset) {
-        settledByScrollRef.current = nearest
-        go(nearest) // dönem değişti → metrikleri yüklenir
-      }
-    }, 130)
-  }, [offset, go])
-
   const labelClass =
     mode === 'week' || mode === 'month'
       ? 'text-[10px] leading-tight sm:text-xs'
@@ -144,17 +169,17 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
   // Oklar JSX'te şeritten SONRA gelir → sonra boyanır → şeridin üstünde durur
   // (raw z-index'e gerek yok). Opak bg + halo, altlarından akan slotları gizler.
   const arrowClass =
-    'absolute inset-y-0 flex w-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-3)] shadow-[0_0_14px_6px_var(--bg-card)] transition hover:border-brand/30 hover:text-brand active:scale-95'
+    'absolute inset-y-0 flex w-9 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-3)] shadow-[0_0_14px_7px_var(--bg-card)] transition hover:border-brand/30 hover:text-brand active:scale-95'
 
   return (
     <div className="relative w-full select-none">
-      {/* Kayan şerit — native scroll-snap (momentum + snap bedava). */}
+      {/* Kayan şerit — native scroll-snap. Görünür pencere = 3 buton (basis-1/3). */}
       <div
         ref={scrollRef}
         onScroll={handleScroll}
         data-no-swipe="true"
         data-testid="hub-period-navigator"
-        className="no-swipe scrollbar-hide flex snap-x snap-mandatory touch-pan-x overflow-x-auto overscroll-x-contain px-[30%]"
+        className="no-swipe scrollbar-hide flex snap-x snap-mandatory touch-pan-x overflow-x-auto overscroll-x-contain px-[33.333%]"
       >
         {offsets.map(o => {
           const active = o === offset
@@ -168,14 +193,22 @@ export function HubPeriodNavigator({ mode, accentClass }: HubPeriodNavigatorProp
                 else slotRefs.current.delete(o)
               }}
               onClick={() => go(o)}
-              className={clsx(
-                'flex shrink-0 basis-[40%] snap-center items-center justify-center rounded-xl border px-1 py-2.5 text-center font-semibold transition-colors',
-                active
-                  ? clsx(accentClass ?? 'border-brand/35 bg-brand/10 dark:bg-brand/15', 'font-black text-[var(--text-1)]')
-                  : 'border-transparent text-[var(--text-3)] opacity-70',
-              )}
+              className="flex shrink-0 basis-1/3 snap-center items-stretch px-1 py-0.5"
             >
-              <PeriodLabel text={labelFor(o)} compactText={labelFor(o, true)} className={labelClass} />
+              {/* İç kart = belirgin "ayrı buton" çerçevesi + net ara boşluk. */}
+              <span
+                className={clsx(
+                  'flex w-full items-center justify-center rounded-xl border px-1 py-2.5 text-center font-semibold transition-colors',
+                  active
+                    ? clsx(
+                        accentClass ?? 'border-brand/35 bg-brand/10 dark:bg-brand/15',
+                        'font-black text-[var(--text-1)] shadow-sm',
+                      )
+                    : 'border-[var(--border)] bg-[var(--bg-subtle)]/40 text-[var(--text-3)]',
+                )}
+              >
+                <PeriodLabel text={labelFor(o)} compactText={labelFor(o, true)} className={labelClass} />
+              </span>
             </button>
           )
         })}

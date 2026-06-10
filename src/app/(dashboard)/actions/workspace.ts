@@ -196,6 +196,32 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     throw new Error(`Üyelik oluşturulamadı: ${memInsertError.message}`)
   }
 
+  // Otomatik ekip bağlaması: kullanıcı sponsor davet linkinden (?ref=KOD) geldiyse
+  // `pending_invite_code` user_metadata'da olur. Workspace YENİ oluşturulduğunda (bu
+  // dal yalnızca ilk kez çalışır → hot-path'e yük binmez) sponsor koduyla otomatik
+  // katılım yapılır = kullanıcının kodu elle girmesiyle birebir aynı `nmm_join_workspace`.
+  // Sonuç: kişi liderin boru hattındaki "katıldı" adayıyla eşleşir, "dış kayıt" olarak
+  // GÖRÜNMEZ ve istatistiklerde çift sayılmaz. Hatalı/eski kod sessizce temizlenir.
+  let claimedUpline = false
+  const pendingCode = (user.user_metadata?.pending_invite_code as string | undefined)?.trim()
+  if (pendingCode) {
+    try {
+      const { error: joinErr } = await supabase.rpc('nmm_join_workspace', {
+        p_invite_code: pendingCode.toUpperCase(),
+      })
+      if (joinErr) console.error('[ensureWorkspaceAction] auto-join failed:', joinErr.message)
+      else claimedUpline = true
+    } catch (joinEx) {
+      console.error('[ensureWorkspaceAction] auto-join exception:', joinEx)
+    }
+    // Kodu tekrar denememek için her durumda temizle.
+    try {
+      await supabase.auth.updateUser({ data: { pending_invite_code: null, pending_candidate_id: null } })
+    } catch {
+      /* metadata temizliği kritik değil */
+    }
+  }
+
   const license = resolveWorkspaceLicense(user, {
     license_type: 'free',
     license_expires_at: ws.license_expires_at,
@@ -219,7 +245,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     workspaceCreatedAt: ws.created_at ?? null,
     isTrialActive: true,
     isSuperAdmin: admin,
-    hasUpline: !!ws.parent_id,
+    hasUpline: claimedUpline || !!ws.parent_id,
     email: user.email,
   }
 }

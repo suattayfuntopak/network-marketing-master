@@ -11,7 +11,7 @@ import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatfor
 import {
   Crown, Users, ShieldCheck, Search,
   Mail, Sparkles, UserPlus, BookOpen, MessageSquare, Film,
-  Plus, Loader2, CheckCircle2, Trash2, CreditCard, LayoutTemplate,
+  Plus, Loader2, CheckCircle2, Trash2, CreditCard, LayoutTemplate, Link2,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
@@ -22,8 +22,10 @@ import {
 } from '../actions'
 import {
   addIndependentAsCandidateAction,
+  claimIndependentSignupToTeamAction,
   deleteUserAction,
 } from '../admin-actions'
+import { HubPrefetchMonitorCard } from './HubPrefetchMonitorCard'
 import {
   approveRequestAction,
   buildBilingualRejectReasonAction,
@@ -115,6 +117,7 @@ export function PlatformYonetimContent() {
   // Independent users — add as candidate state
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
+  const [claimingId, setClaimingId] = useState<string | null>(null)
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null)
   const [deleteTimerId, setDeleteTimerId] = useState<NodeJS.Timeout | null>(null)
   const [deleteCountdown, setDeleteCountdown] = useState<number>(0)
@@ -219,6 +222,19 @@ export function PlatformYonetimContent() {
       toast.error((err instanceof Error ? err.message : '') || t('platformPage.operationFailed'))
     } finally {
       setAddingId(null)
+    }
+  }
+
+  async function handleClaimToTeam(workspaceId: string, name: string) {
+    setClaimingId(workspaceId)
+    try {
+      await claimIndependentSignupToTeamAction(workspaceId)
+      toast.success(t('platformPage.linkedToTeam', { name }))
+      refreshPlatform()
+    } catch (err: unknown) {
+      toast.error((err instanceof Error ? err.message : '') || t('platformPage.operationFailed'))
+    } finally {
+      setClaimingId(null)
     }
   }
 
@@ -448,6 +464,18 @@ export function PlatformYonetimContent() {
                           </a>
                         )
                       })()}
+                      <button
+                        onClick={() => handleClaimToTeam(w.workspaceId, w.ownerName)}
+                        disabled={claimingId === w.workspaceId}
+                        title={t('platformPage.linkToTeamTitle')}
+                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 transition hover:bg-purple-600 hover:text-white disabled:opacity-50 dark:text-purple-300"
+                      >
+                        {claimingId === w.workspaceId ? (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                          <Link2 className="h-3.5 w-3.5" />
+                        )}
+                      </button>
                       <button
                         onClick={() => handleAddAsCandidate(w.workspaceId, w.ownerEmail, w.ownerName)}
                         disabled={addingId === w.workspaceId || isAdded}
@@ -807,6 +835,9 @@ export function PlatformYonetimContent() {
             </div>
           )}
         </section>
+
+        {/* Sistem telemetrisi — hub prefetch monitörü (katlanabilir, premium) */}
+        <HubPrefetchMonitorCard />
 
         {selectedWorkspace && (
           <WorkspaceLicenseModal

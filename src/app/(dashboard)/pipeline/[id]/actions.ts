@@ -95,7 +95,13 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   const inviteCode = wsRow?.invite_code ?? ''
   const name = cand.full_name ?? ''
   const note = (cand.note_tr ?? cand.note ?? '').slice(0, 500)
-  const linkBlock = `\n\nKayıt linki: ${REGISTER_URL}\nEkibim sayfasından gireceğin kod: ${inviteCode}`
+  // Link sponsor kodunu + aday id'sini taşır: kişi linkten kaydolunca workspace'i
+  // oluşturulurken (ensureWorkspaceAction) otomatik olarak liderin ekibine bağlanır
+  // (parent_id) → "dış kayıt"/çift sayım olmadan. Kod, link açılmazsa yedek olarak kalır.
+  const inviteLink = inviteCode
+    ? `${REGISTER_URL}?ref=${encodeURIComponent(inviteCode)}&aday=${encodeURIComponent(candidateId)}`
+    : REGISTER_URL
+  const linkBlock = `\n\nKayıt linki: ${inviteLink}\n(Linkten kaydolunca ekibime otomatik bağlanırsın. Kod istenirse: ${inviteCode})`
 
   try {
     const model = genAI.getGenerativeModel({

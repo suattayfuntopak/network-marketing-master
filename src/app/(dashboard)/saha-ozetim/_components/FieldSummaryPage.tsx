@@ -1,8 +1,7 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { History } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubPageShell } from '@/components/hub/HubPageShell'
@@ -16,9 +15,8 @@ import { HubSelfActivityGrid } from '@/components/hub/HubSelfActivityGrid'
 import {
   HubSummaryTabBar,
   hubPeriodTabLabel,
-  parseSummaryTab,
-  type HubPeriodTab,
 } from '@/components/hub/HubSummaryTabBar'
+import type { HubPeriodTab } from '@/lib/domain/hubPeriodPrefetch'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import {
   getHubDailySelfAction,
@@ -30,12 +28,12 @@ import {
 import { queryKeys } from '@/lib/query/keys'
 import {
   calendarDayRange,
-  parsePeriodOffset,
   rollingWeekRange,
   yearRange,
 } from '@/lib/utils/hubPeriodRange'
-import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
+import { HubPeriodProvider, useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
 import { writeStoredHubActiveTab } from '@/lib/domain/hubPeriodPrefetch'
+
 const EMPTY_METRICS: HubSelfFieldMetrics = {
   calls: 0,
   whatsapps: 0,
@@ -54,41 +52,38 @@ const ACCENT = {
   yearly: 'border-amber-300/50 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-950/25',
 } as const
 
-export function FieldSummaryPage() {
+/** Aktif sekmenin verilen offset'i için query anahtarı + fetcher (tip silinmiş). */
+function hubQueryFor(
+  tab: HubPeriodTab,
+  o: number,
+): { key: readonly unknown[]; fn: () => Promise<unknown> } {
+  if (tab === 'daily') return { key: queryKeys.hubDailySelf(o), fn: () => getHubDailySelfAction(o) }
+  if (tab === 'weekly') return { key: queryKeys.hubWeeklySelf(o), fn: () => getHubWeeklySelfAction(o) }
+  if (tab === 'monthly') return { key: queryKeys.hubMonthlySelf(o), fn: () => getHubMonthlySelfAction(o) }
+  return { key: queryKeys.hubYearlySelf(o), fn: () => getHubYearlySelfAction(o) }
+}
+
+function FieldSummaryInner() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const { goToCurrentPeriod } = useHubPeriodNavigation()
-
-  const tab = parseSummaryTab(searchParams.get('tab'))
-  const offset = parsePeriodOffset(searchParams.get('offset'))
-
-  useEffect(() => {
-    const rawTab = searchParams.get('tab')
-    if (rawTab !== 'all') return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('tab', 'yearly')
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [pathname, router, searchParams])
+  const { tab, offset, setTab, goToCurrentPeriod } = useHubPeriodNavigation()
 
   useEffect(() => {
     writeStoredHubActiveTab(tab)
   }, [tab])
 
+  // Komşu dönemleri (önceki/şu an/sonraki) önbelleğe ısıt → şerit durduğunda veya
+  // ok'a basıldığında metrikler önbellekten ANINDA gelir (MemberActivitySheet modeli).
+  useEffect(() => {
+    for (const o of [offset - 1, offset, offset + 1]) {
+      const { key, fn } = hubQueryFor(tab, o)
+      void queryClient.prefetchQuery({ queryKey: key, queryFn: fn, staleTime: 60_000 })
+    }
+  }, [tab, offset, queryClient])
+
   const dayRange = calendarDayRange(offset)
   const weekRange = rollingWeekRange(offset)
   const yearRangeData = yearRange(offset)
-
-  const setTab = useCallback(
-    (next: HubPeriodTab) => {
-      const params = new URLSearchParams()
-      params.set('tab', next)
-      router.replace(`${pathname}?${params.toString()}`)
-    },
-    [pathname, router],
-  )
 
   const hubCachedPlaceholder = <T,>(key: readonly unknown[]) => (prev: T | undefined) =>
     queryClient.getQueryData<T>(key) ?? prev
@@ -273,5 +268,13 @@ export function FieldSummaryPage() {
         {renderBody()}
       </div>
     </HubPageShell>
+  )
+}
+
+export function FieldSummaryPage() {
+  return (
+    <HubPeriodProvider>
+      <FieldSummaryInner />
+    </HubPeriodProvider>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { signupAction } from '../actions'
@@ -27,6 +27,16 @@ export function SignupForm() {
     {}
   )
 
+  // Sponsor davet linkinden gelen token (?ref=KOD&aday=ID). Kayıt sonrası
+  // workspace oluşturulurken otomatik ekip bağlamasında kullanılır.
+  const [invite, setInvite] = useState<{ ref: string; aday: string } | null>(null)
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search)
+    const ref = sp.get('ref')?.trim()
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    if (ref) setInvite({ ref, aday: sp.get('aday')?.trim() ?? '' })
+  }, [])
+
   useEffect(() => {
     if (state.success && state.shouldRedirect) {
       const timer = setTimeout(() => {
@@ -46,6 +56,12 @@ export function SignupForm() {
 
   return (
     <form action={action} className="space-y-5">
+      {invite && (
+        <>
+          <input type="hidden" name="ref" value={invite.ref} />
+          <input type="hidden" name="aday" value={invite.aday} />
+        </>
+      )}
       <div>
         <label className={authLabelClass} htmlFor="fullName">
           {t('auth.nameLabel')}
