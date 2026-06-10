@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type RefObject } from 'react'
 import {
   applyHubPeriodDragResistance,
-  resolveHubPeriodSwipe,
+  resolveHubPeriodGesture,
 } from '@/lib/ui/hubPeriodSwipe'
 
 type UseHubPeriodSwipeOptions = {
@@ -19,7 +19,9 @@ export function useHubPeriodSwipe(
   const [dragX, setDragX] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const dragXRef = useRef(0)
+  const rawDxRef = useRef(0)
   const startXRef = useRef(0)
+  const startTimeRef = useRef(0)
   const activeRef = useRef(false)
   const onPrevRef = useRef(onSwipePrev)
   const onNextRef = useRef(onSwipeNext)
@@ -38,7 +40,9 @@ export function useHubPeriodSwipe(
       activeRef.current = true
       setIsDragging(true)
       startXRef.current = e.touches[0].clientX
+      startTimeRef.current = Date.now()
       dragXRef.current = 0
+      rawDxRef.current = 0
       setDragX(0)
     }
 
@@ -46,6 +50,7 @@ export function useHubPeriodSwipe(
       if (!activeRef.current || e.touches.length !== 1) return
       const dx = e.touches[0].clientX - startXRef.current
       if (Math.abs(dx) > 6) e.preventDefault()
+      rawDxRef.current = dx
       const resisted = applyHubPeriodDragResistance(dx)
       dragXRef.current = resisted
       setDragX(resisted)
@@ -55,10 +60,13 @@ export function useHubPeriodSwipe(
       if (!activeRef.current) return
       activeRef.current = false
       setIsDragging(false)
-      const dx = dragXRef.current
+      const rawDx = rawDxRef.current
+      const elapsedMs = Date.now() - startTimeRef.current
       dragXRef.current = 0
+      rawDxRef.current = 0
       setDragX(0)
-      const direction = resolveHubPeriodSwipe(dx)
+      // Mesafe (yavaş sürükleme) VEYA hız (kısa-hızlı fiske) eşiğini geçince git.
+      const direction = resolveHubPeriodGesture(rawDx, elapsedMs)
       if (direction === 'prev') onPrevRef.current()
       else if (direction === 'next') onNextRef.current()
     }

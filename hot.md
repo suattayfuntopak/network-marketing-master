@@ -1,5 +1,12 @@
 # Hot Log
 
+## 2026-06-10 — Saha Özetim dönem şeridi: hızlı fiske (flick) ile kaydırma ✅
+
+Dönem şeridinde (Dün/Bugün/Yarın — gün/hafta/ay/yıl, 4 sekme) parmakla kaydırma zaten vardı (mesafe-tabanlı, ~116px sürükleme gerekiyordu). Artık **kısa ama hızlı fiske** de dönem değiştiriyor: `useHubPeriodSwipe` jest süresini izliyor, `resolveHubPeriodGesture(rawDx, elapsedMs)` hem mesafe hem **hız eşiğini** (≥0.45 px/ms, ≥24px) değerlendiriyor. Yön korunur: sola hızlı kaydır → ileri (next), sağa → geri (prev). Oklar tek tek tıklama için aynen çalışır. Mevcut yavaş-sürükleme davranışı + E2E (tam swipe) bozulmadı; 5 yeni unit test eklendi (10 passed).
+
+### Dosyalar
+`lib/ui/hubPeriodSwipe.ts`, `components/hub/useHubPeriodSwipe.ts`, `lib/ui/hubPeriodSwipe.test.ts`
+
 ## 2026-06-10 — CI: doküman-only commit'ler E2E/Vitest/deploy tetiklemesin ✅
 
 `e2e.yml` ve `unit-test.yml` **push (main)** trigger'larına `paths-ignore` (`**.md`, `docs/**`, `hot.md`) eklendi — PR trigger'larında zaten vardı. Artık yalnızca hot.md/dokümana dokunan commit'ler boşuna 5dk E2E + Vitest + prod deploy tetiklemiyor. Karışık (kod+md) commit'ler etkilenmez. `migrate-check.yml` (zaten `paths:` filtreli) ve `lint-pr.yml` (yalnız PR) dokunulmadı.
