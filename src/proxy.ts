@@ -152,7 +152,11 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  // getClaims(): asimetrik signing key'de JWT YEREL doğrulanır (ağ yok); simetrik
+  // anahtarda getUser()'a düşer. Her giriş yapmış navigasyondaki ~230ms'lik auth
+  // round-trip'ini asimetrik anahtara geçilince sıfırlar. user truthy = geçerli oturum.
+  const { data: claimsData } = await supabase.auth.getClaims()
+  const user = claimsData?.claims ?? null
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()

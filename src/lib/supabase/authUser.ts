@@ -20,7 +20,27 @@ import { createClient } from './server'
 export const getAuthUser = cache(
   async (): Promise<{ user: User | null; error: Error | null }> => {
     const supabase = await createClient()
-    const { data, error } = await supabase.auth.getUser()
-    return { user: data.user, error: (error as Error | null) ?? null }
+
+    // getClaims(): proje ASİMETRİK JWT signing key kullanıyorsa imza YEREL
+    // doğrulanır (WebCrypto + cache'li JWKS) — ağ round-trip'i YOK (~0ms).
+    // Proje hâlâ SİMETRİK (HS256, eski varsayılan) ise getClaims otomatik olarak
+    // getUser()'a (ağ ~230ms) düşer → davranış birebir aynı, regresyon yok.
+    // Dashboard'dan asimetrik anahtara geçilince HER server action'dan ~230ms
+    // auth doğrulaması kalkar. Kod yalnızca id/email/user_metadata okuduğu için
+    // (doğrulanmış) claims'ten güvenle minimal User kurulur.
+    const { data, error } = await supabase.auth.getClaims()
+    if (error || !data?.claims) {
+      return { user: null, error: (error as Error | null) ?? null }
+    }
+    const c = data.claims
+    const user = {
+      id: c.sub,
+      email: c.email ?? undefined,
+      user_metadata: c.user_metadata ?? {},
+      app_metadata: c.app_metadata ?? {},
+      aud: typeof c.aud === 'string' ? c.aud : '',
+      created_at: '',
+    } as unknown as User
+    return { user, error: null }
   }
 )
