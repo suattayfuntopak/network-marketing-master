@@ -34,18 +34,27 @@ type WsSlice = {
   isSuperAdmin?: boolean
 }
 
-function prefetchAkademiProgressBundle(queryClient: QueryClient, workspaceId: string) {
-  void queryClient.prefetchQuery({
-    queryKey: queryKeys.selfUserProgress(),
-    queryFn: getFullSelfUserProgressAction,
-    staleTime: QUERY_STALE.progress,
-  })
-  void queryClient.prefetchQuery({
-    queryKey: queryKeys.akademiCustomCounts(workspaceId),
-    queryFn: getAkademiCustomCountsAction,
-    staleTime: QUERY_STALE.usage,
-  })
+/** Eğitim / canlı eğitim — tam progress + özel içerik sayıları. */
+export async function prefetchAkademiProgressBundle(
+  queryClient: QueryClient,
+  workspaceId: string,
+) {
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.selfUserProgress(),
+      queryFn: getFullSelfUserProgressAction,
+      staleTime: QUERY_STALE.progress,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.akademiCustomCounts(workspaceId),
+      queryFn: getAkademiCustomCountsAction,
+      staleTime: QUERY_STALE.usage,
+    }),
+  ])
 }
+
+/** Saha özeti dönem şeridi — komşu offset'ler (swipe/ok ile anında metrik). */
+const HUB_PERIOD_NEIGHBOR_OFFSETS = [-1, 0, 1] as const
 
 export type RoutePrefetchWs = WsSlice
 
@@ -82,33 +91,38 @@ export async function prefetchHubMetrics(
   workspaceId: string,
   ws: WsSlice,
 ) {
-  const tasks: Promise<void>[] = [
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.hubDailySelf(0),
-      queryFn: () => getHubDailySelfAction(0),
-      staleTime: QUERY_STALE.metrics,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.hubWeeklySelf(0),
-      queryFn: () => getHubWeeklySelfAction(0),
-      staleTime: QUERY_STALE.metrics,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.hubMonthlySelf(0),
-      queryFn: () => getHubMonthlySelfAction(0),
-      staleTime: QUERY_STALE.metrics,
-    }),
+  const tasks: Promise<void>[] = []
+  for (const offset of HUB_PERIOD_NEIGHBOR_OFFSETS) {
+    tasks.push(
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.hubDailySelf(offset),
+        queryFn: () => getHubDailySelfAction(offset),
+        staleTime: QUERY_STALE.metrics,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.hubWeeklySelf(offset),
+        queryFn: () => getHubWeeklySelfAction(offset),
+        staleTime: QUERY_STALE.metrics,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.hubMonthlySelf(offset),
+        queryFn: () => getHubMonthlySelfAction(offset),
+        staleTime: QUERY_STALE.metrics,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.hubYearlySelf(offset),
+        queryFn: () => getHubYearlySelfAction(offset),
+        staleTime: QUERY_STALE.metrics,
+      }),
+    )
+  }
+  tasks.push(
     queryClient.prefetchQuery({
       queryKey: queryKeys.hubMonthlyInsights(0),
       queryFn: getHubMonthlyInsightsAction,
       staleTime: QUERY_STALE.metrics,
     }),
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.hubYearlySelf(0),
-      queryFn: () => getHubYearlySelfAction(0),
-      staleTime: QUERY_STALE.metrics,
-    }),
-  ]
+  )
 
   if (hasTeamPulseAccess(ws.licenseType, ws.isSuperAdmin)) {
     tasks.push(
@@ -287,11 +301,11 @@ export function prefetchRouteMetrics(
       queryFn: () => getVideoCatalogAction(workspaceId),
       staleTime: QUERY_STALE.usage,
     })
-    prefetchAkademiProgressBundle(queryClient, workspaceId)
+    void prefetchAkademiProgressBundle(queryClient, workspaceId)
   }
 
   if (href === '/egitim') {
-    prefetchAkademiProgressBundle(queryClient, workspaceId)
+    void prefetchAkademiProgressBundle(queryClient, workspaceId)
   }
 
   if (href === '/saha-radar') {

@@ -3,11 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 
-export type SelfUserProgressSnapshot = {
-  readTrainings: string[]
-  readObjections: number[]
-}
-
 export type FullUserProgressSnapshot = {
   readTrainings: string[]
   favTrainings: string[]
@@ -71,18 +66,7 @@ async function fetchRemoteProgress(userId: string): Promise<FullUserProgressSnap
   }
 }
 
-/** Eğitim İlerlemem kutuları — SSR prefetch için hafif okuma sayacı. */
-export async function getSelfUserProgressAction(): Promise<SelfUserProgressSnapshot | null> {
-  const { user } = await getAuthUser()
-  if (!user) return null
-  const full = await fetchRemoteProgress(user.id)
-  return {
-    readTrainings: full.readTrainings,
-    readObjections: full.readObjections,
-  }
-}
-
-/** useProgressSync — tam ilerleme + favoriler (TanStack Query). */
+/** Akademi ilerleme — okundu + favori (tek kaynak, TanStack + SSR prefetch). */
 export async function getFullSelfUserProgressAction(): Promise<FullUserProgressSnapshot | null> {
   const { user } = await getAuthUser()
   if (!user) return null

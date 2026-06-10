@@ -25,7 +25,7 @@ describe('verifyShopierWebhookSignature', () => {
   })
 
   it('accepts the timestamp.body signing variant', () => {
-    const ts = '1700000000'
+    const ts = String(Math.floor(Date.now() / 1000))
     const sig = hmac(`${ts}.${body}`, 'base64')
     expect(verifyShopierWebhookSignature(body, sig, SECRET, ts)).toBe(true)
   })

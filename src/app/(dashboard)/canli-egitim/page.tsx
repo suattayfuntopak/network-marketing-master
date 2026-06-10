@@ -1,12 +1,9 @@
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { CrownVideoPage } from './_components/CrownVideoPage'
-import {
-  getAkademiCustomCountsAction,
-  getFullSelfUserProgressAction,
-} from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { getQueryClient } from '@/lib/query/getQueryClient'
+import { prefetchAkademiProgressBundle } from '@/lib/query/prefetchRouteMetrics'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 
@@ -24,16 +21,7 @@ export default async function CanliEgitimPage() {
         queryFn: () => getVideoCatalogAction(ws.workspaceId),
         staleTime: QUERY_STALE.usage,
       }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.selfUserProgress(),
-        queryFn: getFullSelfUserProgressAction,
-        staleTime: QUERY_STALE.progress,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.akademiCustomCounts(ws.workspaceId),
-        queryFn: getAkademiCustomCountsAction,
-        staleTime: QUERY_STALE.usage,
-      }),
+      prefetchAkademiProgressBundle(queryClient, ws.workspaceId),
     ])
   }
 

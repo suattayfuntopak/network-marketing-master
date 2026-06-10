@@ -1,14 +1,10 @@
 import { Suspense } from 'react'
 import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
 import { AkademiContent } from './_components/AkademiContent'
-import {
-  getAkademiCustomCountsAction,
-  getFullSelfUserProgressAction,
-} from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { getQueryClient } from '@/lib/query/getQueryClient'
+import { prefetchAkademiProgressBundle } from '@/lib/query/prefetchRouteMetrics'
 import { queryKeys } from '@/lib/query/keys'
-import { QUERY_STALE } from '@/lib/query/staleTimes'
 
 export default async function EgitimPage() {
   const queryClient = getQueryClient()
@@ -18,18 +14,7 @@ export default async function EgitimPage() {
   })
 
   if (ws?.workspaceId) {
-    await Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.selfUserProgress(),
-        queryFn: getFullSelfUserProgressAction,
-        staleTime: QUERY_STALE.progress,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.akademiCustomCounts(ws.workspaceId),
-        queryFn: getAkademiCustomCountsAction,
-        staleTime: QUERY_STALE.usage,
-      }),
-    ])
+    await prefetchAkademiProgressBundle(queryClient, ws.workspaceId)
   }
 
   return (

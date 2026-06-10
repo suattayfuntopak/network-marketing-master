@@ -7,9 +7,10 @@ describe('hasTeamPageAccess', () => {
     expect(hasTeamPageAccess('pro')).toBe(true)
   })
 
-  it('denies free trial and basic', () => {
-    expect(hasTeamPageAccess('free')).toBe(false)
-    expect(hasTeamPageAccess('leader')).toBe(false)
+  it('allows all license tiers (freemium — ekip sayfaları açık)', () => {
+    expect(hasTeamPageAccess('free')).toBe(true)
+    expect(hasTeamPageAccess('leader')).toBe(true)
+    expect(hasTeamPageAccess('basic')).toBe(true)
   })
 
   it('allows super admin', () => {

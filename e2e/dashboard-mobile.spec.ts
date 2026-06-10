@@ -1,4 +1,5 @@
 import { test, expect, devices } from '@playwright/test'
+import { swipeHubPeriodRibbon } from './helpers/hubPeriodSwipe'
 
 /** Viewport-only — full `devices[...]` spread sets defaultBrowserType and breaks inside describe. */
 const MOBILE_VIEWPORT = {
@@ -26,70 +27,22 @@ test.describe('dashboard routes (mobile viewport)', () => {
     await expect(page).toHaveURL(/\/egitim/)
   })
 
-  test('/saha-ozetim period ribbon swipe advances offset', async ({ page }) => {
+  test('/saha-ozetim daily ribbon swipe left advances offset', async ({ page }) => {
     test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
     await page.goto('/saha-ozetim?tab=daily')
     const ribbon = page.getByTestId('hub-period-navigator')
     await expect(ribbon).toBeVisible()
-
-    await ribbon.evaluate(el => {
-      const rect = el.getBoundingClientRect()
-      const y = rect.top + rect.height / 2
-      const startX = rect.left + rect.width * 0.78
-      const endX = rect.left + rect.width * 0.12
-
-      const touch = (clientX: number): Touch =>
-        new Touch({
-          identifier: 1,
-          target: el,
-          clientX,
-          clientY: y,
-          pageX: clientX,
-          pageY: y,
-          screenX: clientX,
-          screenY: y,
-          radiusX: 1,
-          radiusY: 1,
-          rotationAngle: 0,
-          force: 1,
-        })
-
-      el.dispatchEvent(
-        new TouchEvent('touchstart', {
-          bubbles: true,
-          cancelable: true,
-          touches: [touch(startX)],
-          targetTouches: [touch(startX)],
-          changedTouches: [touch(startX)],
-        }),
-      )
-
-      const steps = 10
-      for (let i = 1; i <= steps; i++) {
-        const x = startX + ((endX - startX) * i) / steps
-        el.dispatchEvent(
-          new TouchEvent('touchmove', {
-            bubbles: true,
-            cancelable: true,
-            touches: [touch(x)],
-            targetTouches: [touch(x)],
-            changedTouches: [touch(x)],
-          }),
-        )
-      }
-
-      el.dispatchEvent(
-        new TouchEvent('touchend', {
-          bubbles: true,
-          cancelable: true,
-          touches: [],
-          targetTouches: [],
-          changedTouches: [touch(endX)],
-        }),
-      )
-    })
-
+    await swipeHubPeriodRibbon(ribbon, 'left')
     await expect(page).toHaveURL(/offset=1/)
+  })
+
+  test('/saha-ozetim weekly ribbon swipe right goes to previous week', async ({ page }) => {
+    test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
+    await page.goto('/saha-ozetim?tab=weekly')
+    const ribbon = page.getByTestId('hub-period-navigator')
+    await expect(ribbon).toBeVisible()
+    await swipeHubPeriodRibbon(ribbon, 'right')
+    await expect(page).toHaveURL(/offset=-1/)
   })
 
   test('/egitim tab bar stays single-line on mobile', async ({ page }) => {
