@@ -45,6 +45,15 @@ test.describe('dashboard routes (mobile viewport)', () => {
     await expect(page).toHaveURL(/offset=-1/)
   })
 
+  test('/saha-ozetim tab bar switches period via click', async ({ page }) => {
+    test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
+    await page.goto('/saha-ozetim?tab=daily')
+    await page.getByTestId('hub-summary-tab-monthly').click()
+    await expect(page).toHaveURL(/tab=monthly/)
+    await page.getByTestId('hub-summary-tab-yearly').click()
+    await expect(page).toHaveURL(/tab=yearly/)
+  })
+
   test('/egitim tab bar stays single-line on mobile', async ({ page }) => {
     test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
     await page.goto('/egitim')

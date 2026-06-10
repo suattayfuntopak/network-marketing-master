@@ -988,6 +988,8 @@ export type SahaRadarActivityLevel = 'active' | 'recent' | 'silent'
 
 export type SahaRadarMember = {
   userId: string
+  /** Lider pipeline adayı — /pipeline/[id] detay sayfası */
+  pipelineId: string | null
   fullName: string
   avatarUrl: string | null
   activityLevel: SahaRadarActivityLevel
@@ -1068,6 +1070,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
         days === null ? 'silent' : days <= 3 ? 'active' : days <= 7 ? 'recent' : 'silent'
       return {
         userId: m.user_id,
+        pipelineId: m.pipeline_id ?? null,
         fullName: m.full_name ?? '—',
         avatarUrl: m.avatar_url ?? null,
         activityLevel: level,

@@ -26,6 +26,8 @@ import {
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import {
   hubPeriodOffsetsForPrefetch,
+  readStoredHubActiveTab,
+  shouldLogHubPrefetch,
   type HubPeriodTab,
 } from '@/lib/domain/hubPeriodPrefetch'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
@@ -100,8 +102,10 @@ export async function prefetchHubMetrics(
 ) {
   const activeTab = opts?.activeTab
   const tasks: Promise<void>[] = []
+  let hubSelfPrefetchCount = 0
 
   for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'daily')) {
+    hubSelfPrefetchCount += 1
     tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubDailySelf(offset),
@@ -111,6 +115,7 @@ export async function prefetchHubMetrics(
     )
   }
   for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'weekly')) {
+    hubSelfPrefetchCount += 1
     tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubWeeklySelf(offset),
@@ -120,6 +125,7 @@ export async function prefetchHubMetrics(
     )
   }
   for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'monthly')) {
+    hubSelfPrefetchCount += 1
     tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubMonthlySelf(offset),
@@ -129,6 +135,7 @@ export async function prefetchHubMetrics(
     )
   }
   for (const offset of hubPeriodOffsetsForPrefetch(activeTab, 'yearly')) {
+    hubSelfPrefetchCount += 1
     tasks.push(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubYearlySelf(offset),
@@ -166,6 +173,14 @@ export async function prefetchHubMetrics(
   }
 
   await Promise.all(tasks)
+
+  if (shouldLogHubPrefetch()) {
+    console.debug('[prefetchHubMetrics]', {
+      activeTab: activeTab ?? 'none',
+      hubSelfQueries: hubSelfPrefetchCount,
+      totalTasks: tasks.length,
+    })
+  }
 
   const team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
   if (team && hasTeamPulseAccess(ws.licenseType, ws.isSuperAdmin)) {
@@ -308,7 +323,10 @@ export function prefetchRouteMetrics(
   }
 
   if (href === '/saha-ozetim') {
-    void prefetchHubMetrics(queryClient, workspaceId, wsSlice)
+    const storedTab = readStoredHubActiveTab()
+    void prefetchHubMetrics(queryClient, workspaceId, wsSlice, {
+      activeTab: storedTab,
+    })
   }
 
   if (href === '/ekip' || href === '/ekibim') {

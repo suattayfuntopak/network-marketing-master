@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import {
   hubPeriodOffsetsForPrefetch,
   HUB_PERIOD_NEIGHBOR_OFFSETS,
   parseSummaryTab,
+  readStoredHubActiveTab,
+  writeStoredHubActiveTab,
 } from './hubPeriodPrefetch'
 
 describe('hubPeriodPrefetch', () => {
@@ -21,5 +23,20 @@ describe('hubPeriodPrefetch', () => {
     expect(hubPeriodOffsetsForPrefetch('daily', 'daily')).toEqual(HUB_PERIOD_NEIGHBOR_OFFSETS)
     expect(hubPeriodOffsetsForPrefetch('daily', 'weekly')).toEqual([0])
     expect(hubPeriodOffsetsForPrefetch('monthly', 'monthly')).toEqual([-1, 0, 1])
+  })
+
+  it('writeStoredHubActiveTab persists for hover prefetch', () => {
+    const store: Record<string, string> = {}
+    const sessionStorage = {
+      getItem: (k: string) => store[k] ?? null,
+      setItem: (k: string, v: string) => {
+        store[k] = v
+      },
+    }
+    vi.stubGlobal('window', {})
+    vi.stubGlobal('sessionStorage', sessionStorage)
+    writeStoredHubActiveTab('weekly')
+    expect(readStoredHubActiveTab()).toBe('weekly')
+    vi.unstubAllGlobals()
   })
 })

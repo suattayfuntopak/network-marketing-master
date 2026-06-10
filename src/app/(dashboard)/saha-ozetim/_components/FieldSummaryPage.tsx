@@ -35,6 +35,7 @@ import {
   yearRange,
 } from '@/lib/utils/hubPeriodRange'
 import { useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
+import { writeStoredHubActiveTab } from '@/lib/domain/hubPeriodPrefetch'
 const EMPTY_METRICS: HubSelfFieldMetrics = {
   calls: 0,
   whatsapps: 0,
@@ -71,6 +72,10 @@ export function FieldSummaryPage() {
     params.set('tab', 'yearly')
     router.replace(`${pathname}?${params.toString()}`, { scroll: false })
   }, [pathname, router, searchParams])
+
+  useEffect(() => {
+    writeStoredHubActiveTab(tab)
+  }, [tab])
 
   const dayRange = calendarDayRange(offset)
   const weekRange = rollingWeekRange(offset)

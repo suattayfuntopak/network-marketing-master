@@ -43,3 +43,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Migrations
 - One number = one migration; never edit an already-applied migration — add the next number. See `supabase/migrations/README.md`.
 - After schema changes, update `src/types/database.types.ts`.
+
+### Hub metrics (Saha Özetim)
+- Dönem prefetch, offset maliyeti ve placeholder stratejisi: `docs/hub-metrics.md`.
+- Paylaşımlı sekme/offset mantığı: `src/lib/domain/hubPeriodPrefetch.ts` — yeni hub sorgusu eklerken komşu prefetch regresyonuna dikkat.

@@ -62,6 +62,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
             type="button"
             role="tab"
             aria-selected={isActive}
+            data-testid={`hub-summary-tab-${tab}`}
             onClick={() => onChange(tab)}
             className={clsx(
               'min-w-[4.5rem] flex-1 shrink-0 rounded-lg px-2 py-2 text-center text-[11px] font-bold transition sm:min-w-0 sm:px-3 sm:text-xs',

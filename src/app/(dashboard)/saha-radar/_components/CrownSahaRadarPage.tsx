@@ -217,7 +217,10 @@ function MemberCard({
           ? 'border-rose-500/25 bg-rose-50/30 dark:bg-rose-950/15'
           : 'border-[var(--border)] bg-[var(--bg-card)]',
       )}
-      onClick={() => router.push(`/ekip/${m.userId}`)}
+      onClick={() => {
+        if (m.pipelineId) router.push(`/pipeline/${m.pipelineId}`)
+        else router.push(`/ekip/${m.userId}`)
+      }}
     >
       <PersonAvatar name={m.fullName} imageUrl={m.avatarUrl} size="sm" />
       <div className="min-w-0 flex-1">

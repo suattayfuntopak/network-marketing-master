@@ -23,3 +23,33 @@ export function hubPeriodOffsetsForPrefetch(
   if (activeTab === period) return HUB_PERIOD_NEIGHBOR_OFFSETS
   return [0]
 }
+
+const HUB_ACTIVE_TAB_STORAGE_KEY = 'nmm_hub_active_tab'
+
+/** Son ziyaret edilen Saha Özetim sekmesi — nav hover prefetch için. */
+export function readStoredHubActiveTab(): HubPeriodTab | undefined {
+  if (typeof window === 'undefined') return undefined
+  try {
+    const raw = sessionStorage.getItem(HUB_ACTIVE_TAB_STORAGE_KEY)
+    if (!raw) return undefined
+    const parsed = parseSummaryTab(raw)
+    return parsed
+  } catch {
+    return undefined
+  }
+}
+
+export function writeStoredHubActiveTab(tab: HubPeriodTab): void {
+  if (typeof window === 'undefined') return
+  try {
+    sessionStorage.setItem(HUB_ACTIVE_TAB_STORAGE_KEY, tab)
+  } catch {
+    /* ignore quota / private mode */
+  }
+}
+
+/** Hover prefetch maliyetini development/preview'da konsola yazar. */
+export function shouldLogHubPrefetch(): boolean {
+  if (process.env.NODE_ENV === 'development') return true
+  return process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview'
+}
