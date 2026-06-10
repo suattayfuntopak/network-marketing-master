@@ -193,7 +193,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
-  const [toolsOpen, setToolsOpen] = useState(false)
+  const [toolsOpen, setToolsOpen] = useState(true)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const hasTeamTools = isLeader || !hasUpline
 
@@ -450,7 +450,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                   getTeamMemberCardClasses(m, isInactive)
                 )}
               >
-                {/* Kart üst: kompakt profil */}
+                {/* Kart üst: profil + sağda davet */}
                 <div className="flex min-w-0 items-center gap-2 sm:gap-3">
                   {(() => {
                     const roleBadge = m.role === 'leader' ? (
@@ -492,6 +492,19 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                       <div className={profileClass}>{profileInner}</div>
                     )
                   })()}
+                  {m.isAppUser === false && isLeader ? (
+                    <button
+                      type="button"
+                      onClick={e => {
+                        e.stopPropagation()
+                        handleInviteMember(m)
+                      }}
+                      className="ml-auto inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-emerald-500 px-3 py-2 text-xs font-black text-white shadow-md transition-all hover:bg-emerald-600 active:scale-[0.98] cursor-pointer sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"
+                    >
+                      <WhatsAppIcon className="h-4 w-4 shrink-0 fill-current text-white sm:h-5 sm:w-5" />
+                      <span className="whitespace-nowrap">{t('team.inviteToNmm')}</span>
+                    </button>
+                  ) : null}
                 </div>
 
                 {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id ? (
@@ -507,23 +520,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                     <UserPlus className="h-4 w-4 shrink-0" />
                     <span>{t('team.linkToPipeline')}</span>
                   </button>
-                ) : null}
-
-                {/* Saha ortağı: tek tık WhatsApp daveti (lider) */}
-                {m.isAppUser === false && isLeader ? (
-                  <div className="border-t border-dashed border-[var(--border)] pt-4">
-                    <button
-                      type="button"
-                      onClick={e => {
-                        e.stopPropagation()
-                        handleInviteMember(m)
-                      }}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-black text-white shadow-md transition-all hover:bg-emerald-600 active:scale-[0.98] cursor-pointer"
-                    >
-                      <WhatsAppIcon className="h-5 w-5 shrink-0 fill-current text-white" />
-                      <span>{t('team.inviteToNmm')}</span>
-                    </button>
-                  </div>
                 ) : null}
 
                 {/* NMM kullanıcıları: ikon sekmeleri + sekme içeriği */}

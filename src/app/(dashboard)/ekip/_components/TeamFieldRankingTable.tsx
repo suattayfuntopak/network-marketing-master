@@ -61,9 +61,15 @@ const FUNNEL_LABEL_KEYS: Record<FunnelMetricKey, string> = {
 }
 
 function rowStickyBg(idx: number): string {
-  if (idx === 0) return 'bg-amber-50/70 dark:bg-amber-950/20'
-  if (idx === 2) return 'bg-sky-50/70 dark:bg-sky-950/20'
+  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
+  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
   return 'bg-[var(--bg-card)]'
+}
+
+function rowBg(idx: number): string {
+  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
+  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
+  return ''
 }
 
 export function TeamFieldRankingTable({
@@ -170,10 +176,7 @@ export function TeamFieldRankingTable({
                   return (
                     <tr
                       key={row.userId}
-                      className={clsx(
-                        idx === 0 && 'bg-amber-50/70 dark:bg-amber-950/20',
-                        idx === 2 && 'bg-sky-50/70 dark:bg-sky-950/20',
-                      )}
+                      className={rowBg(idx)}
                     >
                       <td className={clsx(
                         'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',

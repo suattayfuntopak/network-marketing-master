@@ -3,7 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { prefetchEkipRankingMetrics } from '@/lib/query/prefetchRouteMetrics'
+import {
+  prefetchEkipRankingMetrics,
+  prefetchEkipTrainingMetrics,
+} from '@/lib/query/prefetchRouteMetrics'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { clsx } from 'clsx'
 import {
@@ -63,8 +66,14 @@ export function EkipTabNav({ activeTab }: Props) {
     void prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
   }
 
+  function warmTrainingMetrics() {
+    if (!ws?.workspaceId) return
+    void prefetchEkipTrainingMetrics(queryClient, ws.workspaceId, ws)
+  }
+
   function selectTab(id: EkipTabId) {
     if (id === 'summary') warmSummaryMetrics()
+    if (id === 'training') warmTrainingMetrics()
     router.replace(`/ekip?tab=${id}`, { scroll: false })
   }
 
@@ -84,8 +93,20 @@ export function EkipTabNav({ activeTab }: Props) {
             type="button"
             role="tab"
             aria-selected={isActive}
-            onMouseEnter={id === 'summary' ? warmSummaryMetrics : undefined}
-            onFocus={id === 'summary' ? warmSummaryMetrics : undefined}
+            onMouseEnter={
+              id === 'summary'
+                ? warmSummaryMetrics
+                : id === 'training'
+                  ? warmTrainingMetrics
+                  : undefined
+            }
+            onFocus={
+              id === 'summary'
+                ? warmSummaryMetrics
+                : id === 'training'
+                  ? warmTrainingMetrics
+                  : undefined
+            }
             onClick={() => selectTab(id)}
             aria-label={t(labelKey)}
             title={t(labelKey)}

@@ -4,8 +4,13 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { EkipPageContent } from './_components/EkipPageContent'
 import { getQueryClient } from '@/lib/query/getQueryClient'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
-import { prefetchEkipRankingMetrics } from '@/lib/query/prefetchRouteMetrics'
+import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
+import {
+  prefetchEkipRankingMetrics,
+  prefetchEkipTrainingMetrics,
+} from '@/lib/query/prefetchRouteMetrics'
 import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 
 function EkipPageSkeleton() {
   return (
@@ -34,7 +39,13 @@ export default async function EkipPage() {
   })
 
   if (ws?.workspaceId) {
-    await prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.team(ws.workspaceId),
+      queryFn: () => fetchTeamBundleAction(ws.workspaceId),
+      staleTime: QUERY_STALE.data,
+    })
+    void prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
+    void prefetchEkipTrainingMetrics(queryClient, ws.workspaceId, ws)
   }
 
   return (

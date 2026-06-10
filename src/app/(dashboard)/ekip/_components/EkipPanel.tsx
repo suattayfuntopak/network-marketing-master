@@ -27,7 +27,10 @@ import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { getMemberGoalsMapAction } from '../memberGoalsActions'
-import { prefetchEkipRankingMetrics } from '@/lib/query/prefetchRouteMetrics'
+import {
+  prefetchEkipRankingMetrics,
+  prefetchEkipTrainingMetrics,
+} from '@/lib/query/prefetchRouteMetrics'
 
 export { ONBOARDING_STEPS }
 export type { MemberRow, OnboardingStep }
@@ -90,6 +93,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     if (!ws?.workspaceId || members.length === 0) return
     if (!hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) return
     void prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
+    void prefetchEkipTrainingMetrics(queryClient, ws.workspaceId, ws)
   }, [queryClient, ws, members.length])
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
@@ -121,13 +125,27 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
         ws!.workspaceId,
         downlineMembers.map(m => m.user_id).filter(Boolean)
       ),
-    enabled: !!ws?.workspaceId && ws.role === 'leader' && teamPageUnlocked,
+    enabled:
+      activeTab === 'members' &&
+      !!ws?.workspaceId &&
+      ws.role === 'leader' &&
+      teamPageUnlocked,
     staleTime: 30_000,
   })
 
   const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
-  if (wsLoading || mLoading) {
+  if (wsLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map(i => (
+          <Skeleton key={i} className="h-20 rounded-2xl" />
+        ))}
+      </div>
+    )
+  }
+
+  if (mLoading && activeTab === 'members' && members.length === 0) {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map(i => (
