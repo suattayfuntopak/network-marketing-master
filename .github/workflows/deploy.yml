@@ -1,9 +1,11 @@
 name: Deploy (production)
 
 # Vercel'in Git auto-deploy'u CI'dan BAĞIMSIZ çalışır; kırık bir commit bile
-# anında prod'a gidebilir. Bu workflow, E2E (Playwright) YEŞİL olduğunda Vercel
-# Deploy Hook'unu tetikleyerek prod deploy'u CI'a bağlar (yarış yok — deploy
-# yalnızca E2E tamamlanıp başarılı olunca tetiklenir).
+# anında prod'a gidebilir. Bu workflow, "CI Gate" (lint + unit + build, ~2 dk)
+# YEŞİL olduğunda Vercel Deploy Hook'unu tetikleyerek prod deploy'u CI'a bağlar.
+# Playwright E2E (e2e.yml) ADVISORY'dir — ayrı koşar, sonucu görünür ama deploy'u
+# BLOKLAMAZ. Böylece deploy hızlı kalır (commit→push→~2 dk prod) ama lint/unit/
+# build geçmeyen commit prod'a gitmez. (Vercel build de kırık derlemeyi promote etmez.)
 #
 # AKTİVASYON — yalnızca repo sahibi yapabilir (2 adım):
 #   1) Vercel → Project → Settings → Git → Deploy Hooks → branch "main" için bir
@@ -18,7 +20,7 @@ name: Deploy (production)
 
 on:
   workflow_run:
-    workflows: ['E2E (Playwright)']
+    workflows: ['CI Gate']
     types: [completed]
 
 permissions:
@@ -29,31 +31,16 @@ permissions:
 jobs:
   deploy:
     name: Trigger Vercel prod deploy
-    # Yalnızca main'e push'tan gelen ve BAŞARILI biten E2E koşusunda deploy et.
+    # Yalnızca main'e push'tan gelen ve BAŞARILI biten CI Gate koşusunda deploy et.
+    # CI Gate conclusion=success ⇒ lint + unit + build geçti (Playwright advisory,
+    # ayrı workflow). Ek bir job doğrulamasına gerek yok.
     if: >-
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_branch == 'main' &&
       github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     steps:
-      - name: Verify E2E (chromium) passed
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
-        run: |
-          conclusion=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" \
-            --jq '.jobs[] | select(.name=="E2E (chromium)") | .conclusion' | head -1)
-          if [ -z "$conclusion" ]; then
-            echo "::error::E2E (chromium) job bulunamadı — deploy iptal."
-            exit 1
-          fi
-          if [ "$conclusion" != "success" ]; then
-            echo "::error::E2E (chromium) conclusion=$conclusion — deploy iptal (mobile advisory olabilir)."
-            exit 1
-          fi
-          echo "E2E (chromium) success — deploy devam ediyor."
-
-      - name: Deploy hook (E2E yeşilse)
+      - name: Deploy hook (CI Gate yeşilse)
         id: hook
         env:
           HOOK_URL: ${{ secrets.VERCEL_DEPLOY_HOOK_URL }}
@@ -66,7 +53,7 @@ jobs:
             exit 0
           fi
           echo "hook_active=true" >> "$GITHUB_OUTPUT"
-          echo "E2E yeşil → Vercel prod deploy tetikleniyor (commit ${SHA:0:7})"
+          echo "CI Gate yeşil → Vercel prod deploy tetikleniyor (commit ${SHA:0:7})"
           curl -fsS -X POST "$HOOK_URL" >/dev/null
           echo "Deploy hook tetiklendi."
 

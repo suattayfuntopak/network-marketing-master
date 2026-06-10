@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-10 — Deploy hızlandırıldı: hızlı CI Gate + E2E advisory ✅
+
+### Sorun
+Prod deploy tam E2E (Playwright, 5-6 dk + kırılgan tarayıcı testleri) bitişine bağlıydı. `workflow_run` workflow'un TAMAMI bitince ateşlendiği için, Playwright advisory yapılsa bile deploy onu beklerdi. Sonuç: yavaş deploy + kırılgan testin hattı kilitlemesi.
+
+### Çözüm (gate kaldırılmadı, dozu ayarlandı)
+- **`unit-test.yml` → "CI Gate"**: lint + unit + build (~2 dk) tek hızlı workflow. Deploy buna bağlandı.
+- **`deploy.yml`**: `workflow_run` artık `CI Gate`'i dinliyor; "E2E (chromium) doğrula" adımı kaldırıldı (CI Gate conclusion=success ⇒ lint+unit+build geçti). Prod smoke + smoke-alert korundu.
+- **`e2e.yml`** (Playwright): dokunulmadı — artık **advisory**; ayrı koşar, sonucu görünür ama deploy'u BLOKLAMAZ.
+
+### Sonuç
+commit→push→**~2 dk'da prod** (eski hız geri geldi). Koruma durur: lint/unit/build geçmeyen commit prod'a gitmez (Vercel build de kırık derlemeyi promote etmez). Kırılgan bir E2E testi bir daha deploy hattını kilitleyemez. YAML'ler doğrulandı (js-yaml).
+
+### Dosyalar
+`.github/workflows/unit-test.yml` (→ CI Gate), `.github/workflows/deploy.yml`
+
 ## 2026-06-10 — Saha Özetim dönem şeridi: hızlı fiske (flick) ile kaydırma ✅
 
 Dönem şeridinde (Dün/Bugün/Yarın — gün/hafta/ay/yıl, 4 sekme) parmakla kaydırma zaten vardı (mesafe-tabanlı, ~116px sürükleme gerekiyordu). Artık **kısa ama hızlı fiske** de dönem değiştiriyor: `useHubPeriodSwipe` jest süresini izliyor, `resolveHubPeriodGesture(rawDx, elapsedMs)` hem mesafe hem **hız eşiğini** (≥0.45 px/ms, ≥24px) değerlendiriyor. Yön korunur: sola hızlı kaydır → ileri (next), sağa → geri (prev). Oklar tek tek tıklama için aynen çalışır. Mevcut yavaş-sürükleme davranışı + E2E (tam swipe) bozulmadı; 5 yeni unit test eklendi (10 passed).
