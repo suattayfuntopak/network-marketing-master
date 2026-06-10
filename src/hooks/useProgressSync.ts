@@ -1,9 +1,16 @@
 'use client'
 
 import { useEffect, useState, useRef } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { recordProgressChangeAction } from '@/app/(dashboard)/pulse/learningEvents'
+import {
+  getFullSelfUserProgressAction,
+  upsertSelfUserProgressAction,
+  type FullUserProgressSnapshot,
+} from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { useWorkspace } from './useWorkspace'
+import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 
 export interface ProgressData {
   readTrainings: string[]
@@ -12,9 +19,6 @@ export interface ProgressData {
   favObjections: number[]
 }
 
-// localStorage anahtar tabanları. DİKKAT: gerçek anahtar her zaman userId ile
-// izole edilir (`<base>_<userId>`) — aksi halde aynı tarayıcıda kullanıcı değişince
-// önceki kullanıcının favori/okumaları sızar ve yanlış kişiye yazılır.
 const BASE = {
   readTraining: 'nmm_egitim_read',
   favTraining: 'nmm_egitim_favori',
@@ -22,7 +26,6 @@ const BASE = {
   favObjection: 'nmm_itiraz_favori',
 } as const
 
-/** Eski (userId'siz) global anahtarlar — kullanıcılar arası sızıntı kaynağıydı, temizlenir. */
 const LEGACY_KEYS = Object.values(BASE)
 
 function scopedKey(base: string, userId: string): string {
@@ -44,7 +47,22 @@ function saveLocalSet<T>(key: string, set: Set<T>) {
   localStorage.setItem(key, JSON.stringify(Array.from(set)))
 }
 
+function snapshotFromSets(
+  rt: Set<string>,
+  ft: Set<string>,
+  ro: Set<number>,
+  fo: Set<number>,
+): FullUserProgressSnapshot {
+  return {
+    readTrainings: Array.from(rt),
+    favTrainings: Array.from(ft),
+    readObjections: Array.from(ro),
+    favObjections: Array.from(fo),
+  }
+}
+
 export function useProgressSync() {
+  const queryClient = useQueryClient()
   const { data: ws } = useWorkspace()
   const userId = ws?.userId
   const [readTrainings, setReadTrainings] = useState<Set<string>>(new Set())
@@ -53,42 +71,25 @@ export function useProgressSync() {
   const [favObjections, setFavObjections] = useState<Set<number>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const loadedForRef = useRef<string | null>(null)
+  const lastMergedAtRef = useRef(0)
 
-  const saveToSupabase = async (
-    workspaceId: string,
-    uid: string,
-    rt: Set<string>,
-    ft: Set<string>,
-    ro: Set<number>,
-    fo: Set<number>
-  ) => {
-    const supabase = createClient()
-    await supabase.from('nmm_user_progress').upsert(
-      {
-        user_id: uid,
-        workspace_id: workspaceId,
-        read_trainings: Array.from(rt),
-        fav_trainings: Array.from(ft),
-        read_objections: Array.from(ro),
-        fav_objections: Array.from(fo),
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: 'user_id' }
-    )
-  }
+  const { data: remoteProgress, dataUpdatedAt } = useQuery({
+    queryKey: queryKeys.selfUserProgress(),
+    queryFn: getFullSelfUserProgressAction,
+    enabled: !!userId && !!ws?.workspaceId,
+    staleTime: QUERY_STALE.usage,
+  })
 
-  // Kullanıcı (userId) belli olunca: önce userId-izole local cache, sonra Supabase.
   useEffect(() => {
     if (!userId || !ws?.workspaceId) return
     if (loadedForRef.current === userId) return
     loadedForRef.current = userId
+    lastMergedAtRef.current = 0
 
-    // Eski global anahtarları bir defa temizle (sızıntı kaynağıydı).
     if (typeof window !== 'undefined') {
       for (const lk of LEGACY_KEYS) localStorage.removeItem(lk)
     }
 
-    // Hızlı UI için kullanıcıya özel local cache.
     const localRT = loadLocalSet<string>(scopedKey(BASE.readTraining, userId))
     const localFT = loadLocalSet<string>(scopedKey(BASE.favTraining, userId))
     const localRO = loadLocalSet<number>(scopedKey(BASE.readObjection, userId))
@@ -98,94 +99,51 @@ export function useProgressSync() {
     setReadObjections(localRO)
     setFavObjections(localFO)
     setIsLoading(false)
-
-    const syncFromSupabase = async () => {
-      const supabase = createClient()
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      if (!user) return
-
-      try {
-        const { data } = await supabase
-          .from('nmm_user_progress')
-          .select('read_trainings, fav_trainings, read_objections, fav_objections')
-          .eq('user_id', user.id)
-          .maybeSingle()
-
-        let remoteProgress: ProgressData = {
-          readTrainings: [],
-          favTrainings: [],
-          readObjections: [],
-          favObjections: [],
-        }
-
-        if (data) {
-          remoteProgress = {
-            readTrainings: (data.read_trainings as string[]) ?? [],
-            favTrainings: (data.fav_trainings as string[]) ?? [],
-            readObjections: (data.read_objections as number[]) ?? [],
-            favObjections: (data.fav_objections as number[]) ?? [],
-          }
-        } else {
-          // Tek seferlik legacy göç (nmm_daily_actions) — yine user.id'ye özel.
-          const { data: legacy } = await supabase
-            .from('nmm_daily_actions')
-            .select('note')
-            .eq('user_id', user.id)
-            .is('candidate_id', null)
-            .eq('action_type', 'note')
-            .like('note', 'nmm_progress_v1:%')
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .maybeSingle()
-          if (legacy?.note) {
-            try {
-              remoteProgress = JSON.parse(legacy.note.replace('nmm_progress_v1:', ''))
-            } catch (e) {
-              console.error('Failed to parse legacy progress JSON', e)
-            }
-          }
-        }
-
-        // Merge — local + remote AYNI kullanıcıya ait olduğu için güvenli (offline düzenlemeler korunur).
-        const mergedRT = new Set([...localRT, ...(remoteProgress.readTrainings || [])])
-        const mergedFT = new Set([...localFT, ...(remoteProgress.favTrainings || [])])
-        const mergedRO = new Set([...localRO, ...(remoteProgress.readObjections || [])])
-        const mergedFO = new Set([...localFO, ...(remoteProgress.favObjections || [])])
-
-        setReadTrainings(mergedRT)
-        setFavTrainings(mergedFT)
-        setReadObjections(mergedRO)
-        setFavObjections(mergedFO)
-
-        saveLocalSet(scopedKey(BASE.readTraining, user.id), mergedRT)
-        saveLocalSet(scopedKey(BASE.favTraining, user.id), mergedFT)
-        saveLocalSet(scopedKey(BASE.readObjection, user.id), mergedRO)
-        saveLocalSet(scopedKey(BASE.favObjection, user.id), mergedFO)
-
-        const hasDifferences =
-          localRT.size !== mergedRT.size ||
-          localFT.size !== mergedFT.size ||
-          localRO.size !== mergedRO.size ||
-          localFO.size !== mergedFO.size ||
-          !data
-
-        if (hasDifferences) {
-          await saveToSupabase(ws.workspaceId, user.id, mergedRT, mergedFT, mergedRO, mergedFO)
-        }
-      } catch (err) {
-        console.error('Error syncing progress with Supabase:', err)
-      }
-    }
-
-    void syncFromSupabase()
   }, [userId, ws?.workspaceId])
+
+  useEffect(() => {
+    if (!userId || !ws?.workspaceId || !remoteProgress) return
+    if (lastMergedAtRef.current === dataUpdatedAt) return
+    lastMergedAtRef.current = dataUpdatedAt
+
+    const localRT = loadLocalSet<string>(scopedKey(BASE.readTraining, userId))
+    const localFT = loadLocalSet<string>(scopedKey(BASE.favTraining, userId))
+    const localRO = loadLocalSet<number>(scopedKey(BASE.readObjection, userId))
+    const localFO = loadLocalSet<number>(scopedKey(BASE.favObjection, userId))
+
+    const mergedRT = new Set([...localRT, ...(remoteProgress.readTrainings || [])])
+    const mergedFT = new Set([...localFT, ...(remoteProgress.favTrainings || [])])
+    const mergedRO = new Set([...localRO, ...(remoteProgress.readObjections || [])])
+    const mergedFO = new Set([...localFO, ...(remoteProgress.favObjections || [])])
+
+    setReadTrainings(mergedRT)
+    setFavTrainings(mergedFT)
+    setReadObjections(mergedRO)
+    setFavObjections(mergedFO)
+
+    saveLocalSet(scopedKey(BASE.readTraining, userId), mergedRT)
+    saveLocalSet(scopedKey(BASE.favTraining, userId), mergedFT)
+    saveLocalSet(scopedKey(BASE.readObjection, userId), mergedRO)
+    saveLocalSet(scopedKey(BASE.favObjection, userId), mergedFO)
+
+    const hasDifferences =
+      localRT.size !== mergedRT.size ||
+      localFT.size !== mergedFT.size ||
+      localRO.size !== mergedRO.size ||
+      localFO.size !== mergedFO.size
+
+    if (hasDifferences) {
+      void upsertSelfUserProgressAction(
+        ws.workspaceId,
+        snapshotFromSets(mergedRT, mergedFT, mergedRO, mergedFO),
+      )
+    }
+  }, [remoteProgress, dataUpdatedAt, userId, ws?.workspaceId])
 
   const handleUpdate = (
     type: 'readTraining' | 'favTraining' | 'readObjection' | 'favObjection',
     id: string | number,
-    add: boolean
+    add: boolean,
   ) => {
     if (type === 'readTraining' || type === 'favTraining') {
       const cur = type === 'readTraining' ? readTrainings : favTrainings
@@ -206,9 +164,13 @@ export function useProgressSync() {
     }
 
     if (ws?.workspaceId) {
-      recordProgressChangeAction(ws.workspaceId, type, id, add).catch(err => {
-        console.error('Progress sync failed:', err)
-      })
+      recordProgressChangeAction(ws.workspaceId, type, id, add)
+        .then(() => {
+          void queryClient.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
+        })
+        .catch(err => {
+          console.error('Progress sync failed:', err)
+        })
     }
   }
 

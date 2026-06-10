@@ -79,7 +79,7 @@ function CoachHistoryList({ items, t, lang }: {
 }) {
   if (items.length === 0) {
     return (
-      <p className="text-sm text-[var(--text-3)] px-1">{t('dashboard.memberDetailNoCoachHistory')}</p>
+      <p className="text-sm text-[var(--text-3)] px-1">{t('team.memberDetailNoCoachHistory')}</p>
     )
   }
   return (
@@ -135,7 +135,7 @@ function TemplateEditor({
       localStorage.setItem(TMPL_KEY('active'), active)
       localStorage.setItem(TMPL_KEY('recent'), recent)
       localStorage.setItem(TMPL_KEY('silent'), silent)
-      toast.success(t('dashboard.memberDetailTemplateSaved'))
+      toast.success(t('team.memberDetailTemplateSaved'))
     } finally {
       setSaving(false)
     }
@@ -149,7 +149,7 @@ function TemplateEditor({
         className="flex w-full items-center justify-between px-4 py-3"
       >
         <span className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-          {t('dashboard.memberDetailTemplateTitle')}
+          {t('team.memberDetailTemplateTitle')}
         </span>
         {open ? (
           <ChevronUp className="h-4 w-4 text-[var(--text-3)]" />
@@ -162,9 +162,9 @@ function TemplateEditor({
         <div className="space-y-3 px-4 pb-4">
           {(
             [
-              { key: 'active' as ActivityLevel, label: t('dashboard.memberDetailTemplateActive'), val: active, set: setActive },
-              { key: 'recent' as ActivityLevel, label: t('dashboard.memberDetailTemplateRecent'), val: recent, set: setRecent },
-              { key: 'silent' as ActivityLevel, label: t('dashboard.memberDetailTemplateSilent'), val: silent, set: setSilent },
+              { key: 'active' as ActivityLevel, label: t('team.memberDetailTemplateActive'), val: active, set: setActive },
+              { key: 'recent' as ActivityLevel, label: t('team.memberDetailTemplateRecent'), val: recent, set: setRecent },
+              { key: 'silent' as ActivityLevel, label: t('team.memberDetailTemplateSilent'), val: silent, set: setSilent },
             ] as const
           ).map(({ label, val, set }) => (
             <div key={label}>
@@ -176,7 +176,7 @@ function TemplateEditor({
                 onChange={e => set(e.target.value)}
                 rows={3}
                 maxLength={AI_USER_INPUT_MAX_CHARS}
-                placeholder={t('dashboard.memberDetailTemplatePlaceholder')}
+                placeholder={t('team.memberDetailTemplatePlaceholder')}
                 className="w-full resize-none rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-xs text-[var(--text-1)] outline-none focus:border-[var(--accent)] placeholder:text-[var(--text-3)]"
               />
             </div>
@@ -254,12 +254,12 @@ export function MemberDetailPage({ userId }: { userId: string }) {
             <Link
               href="/ekip"
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
-              aria-label={t('dashboard.memberDetailBack')}
+              aria-label={t('team.memberDetailBack')}
             >
               <ArrowLeft className="h-5 w-5" strokeWidth={1.75} />
             </Link>
             <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {t('dashboard.memberDetailTitle')}
+              {t('team.memberDetailTitle')}
             </h1>
           </div>
 
@@ -271,7 +271,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
             </div>
           ) : !data?.hasAccess || !data.member ? (
             <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 text-center">
-              <p className="text-sm text-[var(--text-3)]">{t('dashboard.memberDetailNotFound')}</p>
+              <p className="text-sm text-[var(--text-3)]">{t('team.memberDetailNotFound')}</p>
             </div>
           ) : (() => {
             const m = data.member
@@ -305,7 +305,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       <p className="text-lg font-bold text-[var(--text-1)]">{m.full_name ?? '—'}</p>
                       {joinedStr && (
                         <p className="text-xs text-[var(--text-3)]">
-                          {t('dashboard.memberDetailJoinedDate', { date: joinedStr })}
+                          {t('team.memberDetailJoinedDate', { date: joinedStr })}
                         </p>
                       )}
                       <div className="mt-2">
@@ -343,14 +343,14 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       onClick={handleCoachingAI}
                       disabled={generating}
                       className="relative flex h-10 items-center gap-2 rounded-xl bg-brand-subtle px-3 text-brand text-xs font-semibold transition hover:scale-[1.02] hover:shadow-md disabled:opacity-50 active:scale-95"
-                      title={t('dashboard.memberDetailCoachCta')}
+                      title={t('team.memberDetailCoachCta')}
                     >
                       {generating ? (
                         <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
                       ) : (
                         <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
                       )}
-                      {t('dashboard.memberDetailCoachCta')}
+                      {t('team.memberDetailCoachCta')}
                       {!hasAiFieldAccess && (
                         <Lock className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
                       )}
@@ -384,7 +384,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 {/* Bu hafta aktivitesi */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('dashboard.memberDetailWeekTitle')}
+                    {t('team.memberDetailWeekTitle')}
                   </p>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
@@ -392,7 +392,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                         {data.weeklyActivity.calls}
                       </p>
                       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                        {t('dashboard.memberDetailWeeklyCalls')}
+                        {t('team.memberDetailWeeklyCalls')}
                       </p>
                     </div>
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
@@ -400,13 +400,13 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                         {data.weeklyActivity.whatsapps}
                       </p>
                       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                        {t('dashboard.memberDetailWeeklyWA')}
+                        {t('team.memberDetailWeeklyWA')}
                       </p>
                     </div>
                     <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
                       <p className="text-sm font-bold text-[var(--text-1)] leading-tight">{lastActiveStr}</p>
                       <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                        {t('dashboard.memberDetailLastActive')}
+                        {t('team.memberDetailLastActive')}
                       </p>
                     </div>
                   </div>
@@ -416,11 +416,11 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 {data.memberGoal && (
                   <div className="space-y-2">
                     <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                      {t('dashboard.memberDetailGoalTitle')}
+                      {t('team.memberDetailGoalTitle')}
                     </p>
                     <div className="rounded-2xl border border-amber-200/60 bg-amber-50/60 px-4 py-3 dark:border-amber-800/30 dark:bg-amber-950/20">
                       <p className="text-sm font-semibold text-amber-900 dark:text-amber-300">
-                        {t('dashboard.memberDetailGoalText', {
+                        {t('team.memberDetailGoalText', {
                           people: data.memberGoal.targetPeople,
                           months: data.memberGoal.targetMonths,
                         })}
@@ -432,7 +432,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 {/* Koçluk geçmişi */}
                 <div className="space-y-2">
                   <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('dashboard.memberDetailCoachHistory')}
+                    {t('team.memberDetailCoachHistory')}
                   </p>
                   <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
                     <CoachHistoryList items={data.coachingHistory} t={t} lang={lang} />
@@ -443,7 +443,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                 {completedSteps > 0 && (
                   <div className="space-y-2">
                     <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                      {t('dashboard.memberDetailOnboarding')}
+                      {t('team.memberDetailOnboarding')}
                     </p>
                     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3">
                       <div className="mb-3 flex items-center justify-between gap-3">
@@ -506,7 +506,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                   </div>
                   <div>
                     <h2 className="text-base font-bold text-[var(--text-1)]">
-                      {t('dashboard.memberDetailCoachCta')}
+                      {t('team.memberDetailCoachCta')}
                     </h2>
                     <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
                       {data?.member?.full_name}

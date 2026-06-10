@@ -15,7 +15,7 @@ export function useHubPeriodNavigation() {
     if (toOffset === 0) params.delete('offset')
     else params.set('offset', String(toOffset))
     const q = params.toString()
-    router.push(q ? `${pathname}?${q}` : pathname)
+    router.replace(q ? `${pathname}?${q}` : pathname, { scroll: false })
   }
 
   function goToCurrentPeriod() {

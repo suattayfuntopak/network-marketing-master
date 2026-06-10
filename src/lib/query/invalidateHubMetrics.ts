@@ -9,7 +9,9 @@ export function invalidateHubMetrics(qc: QueryClient, workspaceId?: string) {
   qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
   qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
   qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
+  qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
   if (workspaceId) {
+    qc.invalidateQueries({ queryKey: queryKeys.akademiCustomCounts(workspaceId) })
     qc.invalidateQueries({ queryKey: queryKeys.candidates(workspaceId) })
     qc.invalidateQueries({ queryKey: queryKeys.team(workspaceId) })
   } else {

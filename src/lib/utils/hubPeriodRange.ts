@@ -129,8 +129,24 @@ export function formatWeekRangeLabel(start: Date, end: Date, lang: string): stri
   return `${a} – ${b}`
 }
 
+/** Mobil dönem şeridi — kısa ay adları, tek satıra sığar */
+export function formatWeekRangeLabelCompact(start: Date, end: Date, lang: string): string {
+  const locale = lang === 'en' ? 'en-US' : 'tr-TR'
+  const month = end.toLocaleDateString(locale, { month: 'short' })
+  if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+    return `${start.getDate()}–${end.getDate()} ${month}`
+  }
+  const a = start.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+  const b = end.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
+  return `${a}–${b}`
+}
+
 export function formatMonthLabel(date: Date, lang: string): string {
   return date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { month: 'long', year: 'numeric' })
+}
+
+export function formatMonthLabelCompact(date: Date, lang: string): string {
+  return date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { month: 'short', year: 'numeric' })
 }
 
 function daysInCalendarYear(year: number): number {

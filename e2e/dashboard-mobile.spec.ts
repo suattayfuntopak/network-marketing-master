@@ -26,6 +26,23 @@ test.describe('dashboard routes (mobile viewport)', () => {
     await expect(page).toHaveURL(/\/egitim/)
   })
 
+  test('/egitim tab bar stays single-line on mobile', async ({ page }) => {
+    test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
+    await page.goto('/egitim')
+    const tablist = page.getByRole('tablist').first()
+    await expect(tablist).toBeVisible()
+    const box = await tablist.boundingBox()
+    expect(box).not.toBeNull()
+    if (box) {
+      expect(box.height).toBeLessThan(56)
+    }
+    const tabs = tablist.getByRole('tab')
+    await expect(tabs).toHaveCount(3)
+    for (let i = 0; i < 3; i++) {
+      await expect(tabs.nth(i)).toBeVisible()
+    }
+  })
+
   test('/itirazlar redirects into akademi objections tab', async ({ page }) => {
     test.skip(!process.env.PLAYWRIGHT_TEST_EMAIL, 'Protected route redirects to /giris when unauthenticated')
     await page.goto('/itirazlar')

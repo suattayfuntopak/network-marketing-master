@@ -8,27 +8,107 @@ export type SelfUserProgressSnapshot = {
   readObjections: number[]
 }
 
+export type FullUserProgressSnapshot = {
+  readTrainings: string[]
+  favTrainings: string[]
+  readObjections: number[]
+  favObjections: number[]
+}
+
 export type AkademiCustomCounts = {
   training: number
   objection: number
 }
 
-/** Eğitim İlerlemem kutuları — SSR prefetch için hafif okuma sayacı. */
-export async function getSelfUserProgressAction(): Promise<SelfUserProgressSnapshot | null> {
+async function fetchRemoteProgress(userId: string): Promise<FullUserProgressSnapshot> {
   const supabase = await createClient()
-  const { user } = await getAuthUser()
-  if (!user) return null
 
   const { data } = await supabase
     .from('nmm_user_progress')
-    .select('read_trainings, read_objections')
-    .eq('user_id', user.id)
+    .select('read_trainings, fav_trainings, read_objections, fav_objections')
+    .eq('user_id', userId)
     .maybeSingle()
 
-  return {
-    readTrainings: (data?.read_trainings as string[]) ?? [],
-    readObjections: (data?.read_objections as number[]) ?? [],
+  if (data) {
+    return {
+      readTrainings: (data.read_trainings as string[]) ?? [],
+      favTrainings: (data.fav_trainings as string[]) ?? [],
+      readObjections: (data.read_objections as number[]) ?? [],
+      favObjections: (data.fav_objections as number[]) ?? [],
+    }
   }
+
+  const { data: legacy } = await supabase
+    .from('nmm_daily_actions')
+    .select('note')
+    .eq('user_id', userId)
+    .is('candidate_id', null)
+    .eq('action_type', 'note')
+    .like('note', 'nmm_progress_v1:%')
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
+  if (legacy?.note) {
+    try {
+      const parsed = JSON.parse(legacy.note.replace('nmm_progress_v1:', '')) as Partial<FullUserProgressSnapshot>
+      return {
+        readTrainings: parsed.readTrainings ?? [],
+        favTrainings: parsed.favTrainings ?? [],
+        readObjections: parsed.readObjections ?? [],
+        favObjections: parsed.favObjections ?? [],
+      }
+    } catch {
+      /* boş dön */
+    }
+  }
+
+  return {
+    readTrainings: [],
+    favTrainings: [],
+    readObjections: [],
+    favObjections: [],
+  }
+}
+
+/** Eğitim İlerlemem kutuları — SSR prefetch için hafif okuma sayacı. */
+export async function getSelfUserProgressAction(): Promise<SelfUserProgressSnapshot | null> {
+  const { user } = await getAuthUser()
+  if (!user) return null
+  const full = await fetchRemoteProgress(user.id)
+  return {
+    readTrainings: full.readTrainings,
+    readObjections: full.readObjections,
+  }
+}
+
+/** useProgressSync — tam ilerleme + favoriler (TanStack Query). */
+export async function getFullSelfUserProgressAction(): Promise<FullUserProgressSnapshot | null> {
+  const { user } = await getAuthUser()
+  if (!user) return null
+  return fetchRemoteProgress(user.id)
+}
+
+export async function upsertSelfUserProgressAction(
+  workspaceId: string,
+  progress: FullUserProgressSnapshot,
+): Promise<void> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user) return
+
+  await supabase.from('nmm_user_progress').upsert(
+    {
+      user_id: user.id,
+      workspace_id: workspaceId,
+      read_trainings: progress.readTrainings,
+      fav_trainings: progress.favTrainings,
+      read_objections: progress.readObjections,
+      fav_objections: progress.favObjections,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' },
+  )
 }
 
 /** Onaylı + kullanıcının kendi özel içerikleri — toplam sayı için. */
