@@ -42,6 +42,7 @@ export function EgitimContent({
   const [aktifSeviye, setAktifSeviye] = useState<SeviyeKey>('all')
   const [page, setPage] = useState(1)
   const [acikId, setAcikId] = useState<string | null>(null)
+  const [pendingOpenId, setPendingOpenId] = useState<string | null>(null)
 
   const {
     readTrainings: read,
@@ -122,6 +123,25 @@ export function EgitimContent({
     })
   }, [search, aktifKategori, aktifSeviye, favs, allTopicsMerged, KATEGORILER])
 
+  // Öğrenme yolu: okunmamış konular arasında seviye sırasına göre (Başlangıç →
+  // Orta → İleri) ilk konu. Kullanıcıya "sıradaki adım"ı önerir.
+  const nextTopic = useMemo(() => {
+    const rank = (s: string) =>
+      SEVIYE_GRUPLARI.beginner.includes(s) ? 0
+        : SEVIYE_GRUPLARI.intermediate.includes(s) ? 1 : 2
+    const unread = allTopicsMerged.filter(k => !read.has(k.id))
+    if (unread.length === 0) return null
+    return [...unread].sort((a, b) => rank(a.seviye) - rank(b.seviye))[0]
+  }, [allTopicsMerged, read])
+
+  function goToNextTopic() {
+    if (!nextTopic) return
+    setSearch('')
+    setAktifKategori(0)
+    setAktifSeviye('all')
+    setPendingOpenId(nextTopic.id)
+  }
+
   function handleAddTraining(topic: TrainingTopic) {
     const updated = [topic, ...customTrainings]
     setCustomTrainings(updated)
@@ -144,6 +164,21 @@ export function EgitimContent({
       }
     }
   }, [searchParams, filtrelenmis])
+
+  // Öğrenme yolu "Devam et" → filtreler sıfırlandıktan sonra hedef konuyu aç + sayfasına git.
+  useEffect(() => {
+    if (!pendingOpenId) return
+    const idx = filtrelenmis.findIndex(k => k.id === pendingOpenId)
+    if (idx === -1) return
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setPage(Math.floor(idx / PAGE_SIZE) + 1)
+    setAcikId(pendingOpenId)
+    const id = pendingOpenId
+    setPendingOpenId(null)
+    setTimeout(() => {
+      document.getElementById(`konu-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 150)
+  }, [pendingOpenId, filtrelenmis])
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPage(1); setAcikId(null) }, [aktifKategori, aktifSeviye])
@@ -331,6 +366,25 @@ export function EgitimContent({
           </button>
         ))}
       </div>
+
+      {/* Öğrenme yolu — sıradaki okunmamış konuyu öner (arama yokken) */}
+      {!search && nextTopic && (
+        <button
+          onClick={goToNextTopic}
+          className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-gradient-to-r from-[#EEF2FF] to-[#F5F3FF] dark:from-[#1e1b4b]/70 dark:to-[#2a1b4b]/50 px-4 py-3 text-left transition hover:border-[#3730A3] dark:hover:border-[#a5b4fc] active:scale-[0.99]"
+        >
+          <span className="text-2xl shrink-0">📚</span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3730A3] dark:text-[#a5b4fc]">
+              {t('trainingPage.learningPathNext')}
+            </p>
+            <p className="truncate text-sm font-bold text-[var(--text-1)]">{nextTopic.baslik}</p>
+          </div>
+          <span className="shrink-0 rounded-xl bg-[#3730A3] px-3 py-1.5 text-xs font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
+            {t('trainingPage.learningPathContinue')}
+          </span>
+        </button>
+      )}
 
       {search && (
         <p className="mb-3 text-sm text-[var(--text-3)]">

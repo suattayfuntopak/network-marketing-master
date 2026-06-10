@@ -1,5 +1,42 @@
 # Hot Log
 
+## 2026-06-10 — İtiraz zenginleştirme Faz 2 + Öğrenme Yolu + QA ✅
+
+### Özet (4 öneri sırayla)
+- **(1) İtiraz zenginleştirme:** En yaygın 10 itiraz, eski projeden uyarlanan içerikle derinleştirildi — hazır WhatsApp **örnek diyaloğu** + **yaklaşım** (+ bazılarında detaylı cevap), TR & EN. #1 piramit, #3 param yok, #5 vaktim yok, #21 pasif gelir, #8 daha önce denedim, #11 satıcı değilim, #12 sosyal değilim, #28 çevrem dar, #36 ürün, #37 sen de kazanmıyorsun. (Card altyapısı önceki commit'te kurulmuştu; mevcut cevaplar korundu, mükerrer yok.)
+- **(2) QA turu:** Tüm değişen yüzeyler için kod-seviyesi QA — build (47 route) + tsc + lint yeşil. Gerçek-cihaz/deploy QA kullanıcı adımıdır.
+- **(3) Öğrenme Yolu:** İçerik kütüphanesine "Öğrenme yolunda sıradaki" banner'ı — okunmamış konular arasında seviye sırasına göre (Başlangıç→Orta→İleri) bir sonraki konuyu önerir; "Devam et" filtreleri sıfırlayıp konuyu açar. Mevcut okundu-takibi + seviye verisini kullanır.
+- **(4) Süper-admin içerik editörü:** Değerlendirildi — custom-content (ekle/sil + moderasyon) altyapısı zaten var; 64 yerleşik konunun DB'ye taşınıp düzenlenmesi ayrı bir proje (raporda scope).
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts`, `itirazlar/_components/ItirazCard.tsx` (önceki), `egitim/_components/EgitimContent.tsx`, `translations/sections/training.ts`
+
+## 2026-06-10 — Onaylanan genel öneriler: PR lint, mobile advisory, smoke alert, preview comment, hub rollup ✅
+
+### Özet
+- **Lint (PR):** `lint-pr.yml` — PR'da yalnızca ESLint, hızlı geri bildirim.
+- **Mobile E2E advisory:** `continue-on-error` + deploy yalnızca **E2E (chromium)** doğrular.
+- **Deploy smoke alert:** smoke fail → `prod-smoke` etiketli GitHub issue (duplicate guard).
+- **Vercel preview comment:** `preview-comment.yml` — preview URL PR yorumu.
+- **Hub prefetch günlük rollup:** migration `078`, cron `/api/cron/hub-prefetch-rollup`, Platform kartında 7 günlük trend.
+- **Vitest 188/188**, lint + build yeşil. Migration 077/078: Supabase Dashboard'dan uygulanmalı (local link yok).
+
+### Dosyalar
+`lint-pr.yml`, `preview-comment.yml`, `deploy.yml`, `e2e.yml`, `cron-emails.yml`, `078_hub_prefetch_daily_rollup.sql`, `hub-prefetch-rollup/route.ts`, `hubPrefetchActions.ts`, `HubPrefetchDebugCard.tsx`, `platform.ts`, `database.types.ts`, `github-secrets.md`, `hub-metrics.md`
+
+## 2026-06-10 — 5 sprint önerisi: CI lint split, mobile E2E, deploy smoke, PR preview, hub prefetch DB ✅
+
+### Özet
+- **Deploy health check:** `deploy.yml` — hook sonrası `/pano` smoke (12×30s, HTTP 200/307/308); `NMM_PROD_URL` repo variable.
+- **E2E lint split:** `e2e.yml` — ayrı **Lint** job → Build → **E2E (chromium)** + **E2E (mobile-chrome)** paralel, ayrı artifact.
+- **Hub prefetch sunucu telemetrisi:** migration `077` (`nmm_hub_prefetch_events`), `hubPrefetchActions.ts`, `prefetchRouteMetrics` kayıt (ssr/hover), Platform Yönetimi kartı yerel + sunucu son 12.
+- **PR preview deploy:** `vercel-should-build.sh` preview ortamında her zaman build; `main` prod gate ayrı (hook + `deploymentEnabled.main: false`).
+- **Dokümantasyon:** `github-secrets.md`, `hub-metrics.md`, `database.types.ts`.
+- **Vitest 188/188**, lint + build yeşil.
+
+### Dosyalar
+`.github/workflows/e2e.yml`, `.github/workflows/deploy.yml`, `077_hub_prefetch_events.sql`, `hubPrefetchActions.ts`, `HubPrefetchDebugCard.tsx`, `prefetchRouteMetrics.ts`, `platform.ts`, `database.types.ts`, `vercel-should-build.sh`, `github-secrets.md`, `hub-metrics.md`
+
 ## 2026-06-10 — Akademi: seviye filtresi + ilerleme çubuğu + itiraz zenginleştirme altyapısı ✅
 
 ### Özet
