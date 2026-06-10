@@ -13,6 +13,17 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     viewTransition: true,
+    // lucide-react 120+ dosyada import ediliyor — barrel import yerine
+    // ikon-başına otomatik tree-shake; client bundle'ını küçültür (daha hızlı
+    // JS indir/parse → sayfa/sekme geçişleri "pat pat").
+    optimizePackageImports: ['lucide-react'],
+    // Client router cache: dinamik segmentlerin RSC payload'unu kısa süre sakla
+    // → aynı sekmeye/geri dönüşte middleware(getUser ~320ms)+RSC yeniden
+    // çekilmez, anında geçer. Veri tazeliği TanStack staleTime'larıyla korunur.
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   async redirects() {
     return [

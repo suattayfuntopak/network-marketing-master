@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import {
   parseLearningProgress,
@@ -12,9 +13,7 @@ import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActi
 
 async function assertWorkspaceMember(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
   const { data: membership } = await supabase

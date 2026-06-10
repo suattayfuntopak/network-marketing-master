@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import {
   computeFieldStreak,
   periodStartIso,
@@ -46,9 +47,7 @@ export async function getFieldStreakDetailAction(workspaceId: string): Promise<F
   const empty: FieldStreakDetail = { activeDays: 0, days: [] }
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return empty
 
   const weekStart = periodStartIso('7d')!
@@ -106,9 +105,7 @@ export async function getMyPanoInsightsAction(workspaceId: string): Promise<MyPa
   }
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return { fieldWeek: emptyField, fieldStreak: 0 }
 
   const weekStart = periodStartIso('7d')!

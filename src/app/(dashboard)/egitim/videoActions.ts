@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail } from '@/lib/infra/mail'
 import { type TrainingVideoDef } from '@/lib/domain/trainingVideos'
@@ -60,9 +61,7 @@ function rowToDef(r: VideoRow): TrainingVideoAdmin {
 
 async function assertMember(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
   const { data: membership } = await supabase
