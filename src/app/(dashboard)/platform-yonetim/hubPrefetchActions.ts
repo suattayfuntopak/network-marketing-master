@@ -18,6 +18,13 @@ export type HubPrefetchEventRow = {
   created_at: string
 }
 
+export type HubPrefetchDailyRow = {
+  day: string
+  event_count: number
+  sum_hub_self_queries: number
+  sum_total_tasks: number
+}
+
 export async function recordHubPrefetchEventAction(input: {
   workspaceId: string
   activeTab: string
@@ -56,4 +63,38 @@ export async function listHubPrefetchEventsAction(
 
   if (error) throw new Error(error.message)
   return (data ?? []) as HubPrefetchEventRow[]
+}
+
+/** Platform geneli günlük rollup (workspace satırları gün bazında toplanır). */
+export async function listHubPrefetchDailyRollupsAction(
+  limitDays = 7,
+): Promise<HubPrefetchDailyRow[]> {
+  const { user } = await getAuthUser()
+  assertSuperAdmin(user)
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('nmm_hub_prefetch_daily')
+    .select('day, event_count, sum_hub_self_queries, sum_total_tasks')
+    .order('day', { ascending: false })
+    .limit(200)
+
+  if (error) throw new Error(error.message)
+
+  const byDay = new Map<string, HubPrefetchDailyRow>()
+  for (const row of data ?? []) {
+    const existing = byDay.get(row.day) ?? {
+      day: row.day,
+      event_count: 0,
+      sum_hub_self_queries: 0,
+      sum_total_tasks: 0,
+    }
+    existing.event_count += row.event_count
+    existing.sum_hub_self_queries += row.sum_hub_self_queries
+    existing.sum_total_tasks += row.sum_total_tasks
+    byDay.set(row.day, existing)
+  }
+
+  return [...byDay.values()]
+    .sort((a, b) => b.day.localeCompare(a.day))
+    .slice(0, limitDays)
 }

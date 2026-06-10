@@ -72,6 +72,12 @@ Migration drift için: Actions’ta **Migration check** workflow’unu veya yere
 
 E2E workflow: **Lint** (~30 sn) → **Build** → **E2E (chromium)** + **E2E (mobile-chrome)** (paralel, ayrı Playwright artifact). Lint kırılırsa build başlamaz.
 
+**Lint (PR)** (`lint-pr.yml`): PR açılınca yalnızca ESLint — Build/E2E beklemeden hızlı geri bildirim. Branch protection'da **Lint (PR)** zorunlu yapılabilir.
+
+**Mobile E2E advisory:** `E2E (mobile-chrome)` `continue-on-error: true` — prod deploy gate yalnızca **E2E (chromium)** job'unu doğrular (`deploy.yml`).
+
+**PR preview yorumu:** `preview-comment.yml` — Vercel preview deploy hazır olunca PR'a URL yorumu (GitHub ↔ Vercel entegrasyonu gerekir).
+
 **PR preview deploy:** `vercel.json` yalnızca `main` auto-deploy'u kapatır; PR/preview branch'leri Vercel'de normal build alır (`scripts/vercel-should-build.sh` preview'da her zaman build eder). Prod gate ayrıdır (E2E + Deploy Hook).
 
 ---
@@ -115,15 +121,18 @@ Bu üçü tamamlanınca: push → E2E koşar → yeşilse `deploy.yml` hook’u 
 | Vercel son deploy eski commit | Hook tetiklenmemiş veya E2E fail | E2E'yi yeşile getir; `VERCEL_DEPLOY_HOOK_URL` secret'ının tanımlı olduğunu doğrula |
 | Unit test yeşil, E2E kırmızı | E2E ayrı job; build lint/build fail veya Playwright fail | `unit-test.yml` ile `e2e.yml` **Build** ayrı — ikisini de kontrol et |
 
-**Zincir:** `main` push → Lint → Build → Playwright (desktop + mobile) → başarılıysa `Deploy (production)` → Vercel Deploy Hook → **prod smoke** (`/pano` HTTP 200/307, en fazla ~6 dk).
+**Zincir:** `main` push → Lint → Build → Playwright (desktop zorunlu, mobile advisory) → başarılıysa `Deploy (production)` → **chromium job doğrulama** → Vercel Deploy Hook → **prod smoke** (`/pano` HTTP 200/307, en fazla ~6 dk). Smoke fail → `prod-smoke` etiketli GitHub issue.
 
 Opsiyonel repo variable: `NMM_PROD_URL` (varsayılan `https://nmm.suattayfuntopak.com`).
+
+**Hub prefetch rollup cron:** `cron-emails.yml` günlük `GET /api/cron/hub-prefetch-rollup` (migration `078` + `CRON_SECRET`).
 
 ### Branch protection (önerilen)
 
 GitHub → **Settings → Branches → Branch protection rule** (`main`):
 
-- Require status checks: **Lint**, **Build**, **Vitest** (`Unit tests (Vitest)`), **E2E (chromium)**, **E2E (mobile-chrome)**
+- Require status checks: **Lint (PR)** (PR'lar), **Lint**, **Build**, **Vitest** (`Unit tests (Vitest)`), **E2E (chromium)** (zorunlu prod gate)
+- İsteğe bağlı (advisory): **E2E (mobile-chrome)** — branch protection'a eklemeyin; flake prod'u bloklamasın
 - Require branches up to date before merging
 
 Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'i ile birlikte çalışır.

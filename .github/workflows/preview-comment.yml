@@ -1,0 +1,70 @@
+# Vercel preview deploy hazır olunca PR'a URL yorumu (GitHub ↔ Vercel entegrasyonu gerekir).
+name: Vercel preview comment
+
+on:
+  deployment_status:
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  comment:
+    name: Post preview URL
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      (github.event.deployment_status.environment == 'Preview' ||
+       github.event.deployment_status.environment == 'preview')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const sha = context.payload.deployment.sha
+            const status = context.payload.deployment_status
+            const url = status.environment_url || status.target_url
+            if (!url) {
+              core.warning('Preview URL yok — yorum atlanıyor.')
+              return
+            }
+
+            const { data: prs } = await github.rest.repos.listPullRequestsAssociatedWithCommit({
+              owner,
+              repo,
+              commit_sha: sha,
+            })
+            const pr = prs.find((p) => p.state === 'open')
+            if (!pr) {
+              core.info('Açık PR bulunamadı — yorum atlanıyor.')
+              return
+            }
+
+            const marker = '<!-- nmm-vercel-preview -->'
+            const body = `${marker}\n✅ **Vercel Preview** hazır: ${url}\n\n_Commit: \`${sha.slice(0, 7)}\`_`
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: pr.number,
+              per_page: 100,
+            })
+            const existing = comments.find((c) => c.body?.includes(marker))
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: existing.id,
+                body,
+              })
+              core.info(`Preview yorumu güncellendi: PR #${pr.number}`)
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body,
+              })
+              core.info(`Preview yorumu eklendi: PR #${pr.number}`)
+            }

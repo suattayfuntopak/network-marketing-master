@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
+  listHubPrefetchDailyRollupsAction,
   listHubPrefetchEventsAction,
+  type HubPrefetchDailyRow,
   type HubPrefetchEventRow,
 } from '@/app/(dashboard)/platform-yonetim/hubPrefetchActions'
 import {
@@ -12,7 +14,7 @@ import {
   type HubPrefetchStats,
 } from '@/lib/domain/hubPeriodPrefetch'
 
-/** Super admin — hub prefetch (istemci + sunucu aggregate). */
+/** Super admin — hub prefetch (istemci + sunucu aggregate + günlük trend). */
 export function HubPrefetchDebugCard() {
   const { t } = useTranslation()
   const [localStats, setLocalStats] = useState<HubPrefetchStats | null>(() =>
@@ -23,6 +25,12 @@ export function HubPrefetchDebugCard() {
     queryKey: ['platform', 'hub-prefetch-events'],
     queryFn: () => listHubPrefetchEventsAction(12),
     staleTime: 30_000,
+  })
+
+  const { data: dailyRollups = [], isLoading: dailyLoading } = useQuery({
+    queryKey: ['platform', 'hub-prefetch-daily'],
+    queryFn: () => listHubPrefetchDailyRollupsAction(7),
+    staleTime: 60_000,
   })
 
   useEffect(() => {
@@ -53,6 +61,28 @@ export function HubPrefetchDebugCard() {
       ) : (
         <p className="text-[var(--text-3)]">{t('platformPage.hubPrefetchEmpty')}</p>
       )}
+
+      <div className="space-y-1">
+        <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
+          {t('platformPage.hubPrefetchDaily')}
+        </p>
+        {dailyLoading ? (
+          <p className="text-[var(--text-3)]">…</p>
+        ) : dailyRollups.length === 0 ? (
+          <p className="text-[var(--text-3)]">{t('platformPage.hubPrefetchDailyEmpty')}</p>
+        ) : (
+          <ul className="max-h-28 space-y-1 overflow-y-auto font-mono text-[10px]">
+            {dailyRollups.map((row: HubPrefetchDailyRow) => (
+              <li key={row.day} className="flex flex-wrap gap-x-2 text-[var(--text-2)]">
+                <span>{row.day}</span>
+                <span>
+                  {row.event_count}× · {row.sum_hub_self_queries}/{row.sum_total_tasks}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <div className="space-y-1">
         <p className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">

@@ -33,3 +33,9 @@ jobs:
           curl -fsS --max-redirs 0 -X GET \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             "${{ secrets.NMM_APP_URL }}/api/cron/overdue-reminders"
+
+      - name: Hub prefetch daily rollup
+        run: |
+          curl -fsS --max-redirs 0 -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            "${{ secrets.NMM_APP_URL }}/api/cron/hub-prefetch-rollup"

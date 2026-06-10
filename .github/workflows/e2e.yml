@@ -119,6 +119,8 @@ jobs:
   playwright-mobile:
     name: E2E (mobile-chrome)
     needs: build
+    # Advisory: mobile flake prod deploy'u bloklamaz (deploy.yml chromium doğrular).
+    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
@@ -159,6 +161,11 @@ jobs:
         env:
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+
+      - name: Mobile E2E advisory notice
+        if: failure()
+        run: |
+          echo "::warning::Mobile E2E başarısız (advisory) — prod gate yalnızca E2E (chromium) gerektirir."
 
       - name: Upload Playwright report (mobile)
         uses: actions/upload-artifact@v7

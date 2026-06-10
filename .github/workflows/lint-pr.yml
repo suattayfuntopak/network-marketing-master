@@ -1,0 +1,31 @@
+# PR'larda hızlı geri bildirim — Build/E2E beklemeden yalnızca ESLint.
+name: Lint (PR)
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'hot.md'
+
+env:
+  CI: true
+
+jobs:
+  lint:
+    name: Lint (PR)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint

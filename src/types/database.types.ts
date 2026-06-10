@@ -684,6 +684,41 @@ export interface Database {
           },
         ]
       }
+      nmm_hub_prefetch_daily: {
+        Row: {
+          workspace_id: string
+          day: string
+          event_count: number
+          sum_hub_self_queries: number
+          sum_total_tasks: number
+          updated_at: string
+        }
+        Insert: {
+          workspace_id: string
+          day: string
+          event_count?: number
+          sum_hub_self_queries?: number
+          sum_total_tasks?: number
+          updated_at?: string
+        }
+        Update: {
+          workspace_id?: string
+          day?: string
+          event_count?: number
+          sum_hub_self_queries?: number
+          sum_total_tasks?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'nmm_hub_prefetch_daily_workspace_id_fkey'
+            columns: ['workspace_id']
+            isOneToOne: false
+            referencedRelation: 'nmm_workspaces'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       nmm_user_progress: {
         Row: {
           user_id: string
@@ -1026,6 +1061,10 @@ export interface Database {
           p_kind: string
         }
         Returns: undefined
+      }
+      nmm_rollup_hub_prefetch_daily: {
+        Args: { p_day?: string }
+        Returns: number
       }
     }
     Enums: { [_ in never]: never }

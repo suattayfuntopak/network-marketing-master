@@ -29,7 +29,7 @@ Komşu offset'ler dönem şeridi swipe/ok ile anında geçiş içindir — yeni 
 
 `shouldLogHubPrefetch()` → development ve Vercel preview'da `console.debug('[prefetchHubMetrics]', …)`.
 
-İstemci prefetch özeti `sessionStorage` (`nmm_hub_prefetch_last`) + sunucu telemetrisi `nmm_hub_prefetch_events` (migration `077`) — **Platform Yönetimi** debug kartında (super admin). Kayıt: `recordHubPrefetchEventAction` (`ssr` / `hover`).
+İstemci prefetch özeti `sessionStorage` (`nmm_hub_prefetch_last`) + sunucu telemetrisi `nmm_hub_prefetch_events` (migration `077`) + günlük rollup `nmm_hub_prefetch_daily` (migration `078`, cron `/api/cron/hub-prefetch-rollup`) — **Platform Yönetimi** debug kartında (super admin). Kayıt: `recordHubPrefetchEventAction` (`ssr` / `hover`).
 
 ## Ekip detay linki
 
