@@ -102,6 +102,33 @@ export async function proxy(request: NextRequest) {
     })
   }
 
+  const isShopierWebhook =
+    pathname === '/api/payment/shopier' || pathname === '/api/payment/shopier/'
+  const isCronRoute = pathname.startsWith('/api/cron/')
+  const isPublic =
+    pathname === '/' ||
+    isShopierWebhook ||
+    isCronRoute ||
+    PUBLIC_PATHS.some(p => p !== '/api/payment/shopier' && pathname.startsWith(p))
+
+  // Supabase SSR oturum cookie'si yoksa kullanıcı KESİN çıkış yapmış demektir.
+  // Bu durumda `getUser()` (Supabase auth sunucusuna ~230ms'lik ağ doğrulaması)
+  // gereksizdir — landing/giriş/kayıt gibi public sayfaların her açılışına
+  // boşuna bir round-trip biniyordu. Cookie yoksa: public ise doğrudan geç,
+  // değilse girişe yönlendir. Tek bir auth gidiş-dönüşü bile yapma.
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some(c => c.name.startsWith('sb-') && c.name.includes('-auth-token'))
+
+  if (!hasAuthCookie) {
+    if (!isPublic) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/giris'
+      return NextResponse.redirect(url)
+    }
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient<Database>(
@@ -126,15 +153,6 @@ export async function proxy(request: NextRequest) {
   )
 
   const { data: { user } } = await supabase.auth.getUser()
-
-  const isShopierWebhook =
-    pathname === '/api/payment/shopier' || pathname === '/api/payment/shopier/'
-  const isCronRoute = pathname.startsWith('/api/cron/')
-  const isPublic =
-    pathname === '/' ||
-    isShopierWebhook ||
-    isCronRoute ||
-    PUBLIC_PATHS.some(p => p !== '/api/payment/shopier' && pathname.startsWith(p))
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
