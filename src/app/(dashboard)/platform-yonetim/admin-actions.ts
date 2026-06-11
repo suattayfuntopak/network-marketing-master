@@ -150,15 +150,15 @@ export async function claimIndependentSignupToTeamAction(
   if (tErr || !target || !target.owner_id) throw new Error('Hedef çalışma alanı bulunamadı.')
 
   // Zaten BAŞKA bir lidere bağlıysa dokunma.
-  if (target.parent_id && target.parent_id !== myWs.id && target.parent_id !== user.id) {
+  if (target.parent_id && target.parent_id !== myWs.id) {
     throw new Error('Bu kullanıcı zaten başka bir lidere bağlı.')
   }
 
-  // 1) parent_id set → kişi downline olur (referans kısıtı için parent_id = leader user_id set edilmelidir)
-  if (target.parent_id !== user.id) {
+  // 1) parent_id set → kişi downline olur (referans kısıtı: parent_id = leader workspace_id)
+  if (target.parent_id !== myWs.id) {
     const { error: updErr } = await admin
       .from('nmm_workspaces')
-      .update({ parent_id: user.id })
+      .update({ parent_id: myWs.id })
       .eq('id', targetWorkspaceId)
     if (updErr) {
       console.error('[claimIndependentSignupToTeamAction] parent_id update failed:', updErr)

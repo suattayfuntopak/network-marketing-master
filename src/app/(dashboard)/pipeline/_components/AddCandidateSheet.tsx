@@ -4,13 +4,15 @@ import { useRef, useState } from 'react'
 import { X, Camera, Upload, Trash2, Loader2 } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
 import { STAGES_FORM } from '@/lib/domain/stages'
-import type { CandidateStage } from '@/types/database.types'
+import type { CandidateStage, NmmCandidate } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PHONE_RE, sanitizePhone } from '@/lib/utils/validation'
 import { uploadAvatarAction } from '@/app/(dashboard)/actions/profile'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-brand focus:ring-2 focus:ring-[#EEEDFE]'
@@ -33,6 +35,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
   const [draftName, setDraftName] = useState('')
 
   const add = useAddCandidate(workspaceId)
+  const queryClient = useQueryClient()
 
   useBodyScrollLock()
 
@@ -75,6 +78,37 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
     const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'
     
     if (!fullName) return
+
+    const candidates = queryClient.getQueryData<NmmCandidate[]>(queryKeys.candidates(workspaceId)) || []
+    const trMap: Record<string, string> = {
+      'ı': 'i', 'İ': 'i', 'i': 'i',
+      'ğ': 'g', 'Ğ': 'g',
+      'ü': 'u', 'Ü': 'u',
+      'ş': 's', 'Ş': 's',
+      'ö': 'o', 'Ö': 'o',
+      'ç': 'c', 'Ç': 'c'
+    }
+    const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9ıiğüşöç]/g, '').split('').map(c => trMap[c] || c).join('')
+    const cleanNewName = clean(fullName)
+
+    const nameExists = candidates.some(c => clean(c.full_name) === cleanNewName)
+    if (nameExists) {
+      if (!window.confirm('Bu isimde bir aday zaten listenizde kayıtlı. Yine de eklemek istiyor musunuz?')) {
+        return
+      }
+    }
+
+    if (phone) {
+      const cleanNewPhone = phone.replace(/[^0-9]/g, '')
+      const phoneExists = candidates.some(c => {
+        const cPhone = (c.phone || '').replace(/[^0-9]/g, '')
+        return cPhone && cPhone.endsWith(cleanNewPhone.slice(-10))
+      })
+      if (phoneExists) {
+        toast.error('Bu telefon numarasıyla başka bir aday zaten listenizde kayıtlı.')
+        return
+      }
+    }
     if (phone && !PHONE_RE.test(phone)) {
       setPhoneError('Geçerli bir numara girin (ör. 05xx xxx xx xx)')
       return

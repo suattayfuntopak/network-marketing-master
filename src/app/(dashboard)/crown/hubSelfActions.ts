@@ -538,7 +538,7 @@ export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfP
     }
   }
 
-  const days = range.daysInPeriod
+  const days = range.totalDaysInYear
   const yearlyTargets: FunnelCounts = {
     arama: progress.targets.arama * days,
     tanisma: progress.targets.tanisma * days,

@@ -5,6 +5,9 @@ import { createPortal } from 'react-dom'
 import { X, Zap, Loader2 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAddCandidate } from '@/hooks/useCandidates'
+import { useQueryClient } from '@tanstack/react-query'
+import { queryKeys } from '@/lib/query/keys'
+import type { NmmCandidate } from '@/types/database.types'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
@@ -24,6 +27,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const addCandidate = useAddCandidate(ws?.workspaceId || '')
+  const queryClient = useQueryClient()
   
   const [fullName, setFullName] = useState('')
   const [notes, setNotes] = useState('')
@@ -52,6 +56,25 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!ws?.workspaceId || !fullName.trim()) return
+
+    const candidates = queryClient.getQueryData<NmmCandidate[]>(queryKeys.candidates(ws.workspaceId)) || []
+    const trMap: Record<string, string> = {
+      'ı': 'i', 'İ': 'i', 'i': 'i',
+      'ğ': 'g', 'Ğ': 'g',
+      'ü': 'u', 'Ü': 'u',
+      'ş': 's', 'Ş': 's',
+      'ö': 'o', 'Ö': 'o',
+      'ç': 'c', 'Ç': 'c'
+    }
+    const clean = (s: string) => s.toLowerCase().replace(/[^a-z0-9ıiğüşöç]/g, '').split('').map(c => trMap[c] || c).join('')
+    const cleanNewName = clean(fullName)
+
+    const nameExists = candidates.some(c => clean(c.full_name) === cleanNewName)
+    if (nameExists) {
+      if (!window.confirm('Bu isimde bir aday zaten listenizde kayıtlı. Yine de eklemek istiyor musunuz?')) {
+        return
+      }
+    }
 
     setLoading(true)
     try {

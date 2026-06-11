@@ -277,7 +277,15 @@ async function maybeNotifyAllVideosComplete(
     .eq('owner_id', memberUserId)
     .maybeSingle()
 
-  const leaderId = sponsorWs?.parent_id
+  let leaderId: string | null = null
+  if (sponsorWs?.parent_id) {
+    const { data: parentWs } = await supabase
+      .from('nmm_workspaces')
+      .select('owner_id')
+      .eq('id', sponsorWs.parent_id)
+      .maybeSingle()
+    leaderId = parentWs?.owner_id ?? null
+  }
   if (!leaderId || leaderId === memberUserId) return
 
   await supabase.from('nmm_notifications').insert({

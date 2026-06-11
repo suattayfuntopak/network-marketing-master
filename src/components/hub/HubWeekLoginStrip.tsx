@@ -7,13 +7,12 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 type HubWeekLoginStripProps = {
   weekActive: boolean[]
-  loginDays: number
   loading?: boolean
   /** Hafta penceresinin son günü (offset haftalar için) */
   weekEnd?: Date
 }
 
-export function HubWeekLoginStrip({ weekActive, loginDays, loading, weekEnd }: HubWeekLoginStripProps) {
+export function HubWeekLoginStrip({ weekActive, loading, weekEnd }: HubWeekLoginStripProps) {
   const { lang, t } = useTranslation()
 
   const dayLabels = useMemo(() => {
@@ -53,11 +52,7 @@ export function HubWeekLoginStrip({ weekActive, loginDays, loading, weekEnd }: H
           </div>
         ))}
       </div>
-      <p className="mt-3 text-center text-sm font-semibold text-[var(--text-2)]">
-        {loginDays >= 7
-          ? t('crown.hubLoginDaysWeekFull')
-          : t('crown.hubLoginDaysWeek', { count: loginDays })}
-      </p>
+
     </div>
   )
 }

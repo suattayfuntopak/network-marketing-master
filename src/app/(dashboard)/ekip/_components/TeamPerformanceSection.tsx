@@ -195,6 +195,22 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
   const [toolsOpen, setToolsOpen] = useState(true)
+  const [localSearch, setLocalSearch] = useState(memberSearch)
+  const [prevSearch, setPrevSearch] = useState(memberSearch)
+
+  if (memberSearch !== prevSearch) {
+    setPrevSearch(memberSearch)
+    setLocalSearch(memberSearch)
+  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (localSearch !== memberSearch) {
+        onMemberSearchChange(localSearch)
+      }
+    }, 250)
+    return () => clearTimeout(timer)
+  }, [localSearch, memberSearch, onMemberSearchChange])
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const hasTeamTools = isLeader || !hasUpline
 
@@ -448,15 +464,18 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
             <input
               type="search"
-              value={memberSearch}
-              onChange={e => onMemberSearchChange(e.target.value)}
+              value={localSearch}
+              onChange={e => setLocalSearch(e.target.value)}
               placeholder={t('team.searchMembers')}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
             />
-            {hasMemberSearch && (
+            {localSearch.trim().length > 0 && (
               <button
                 type="button"
-                onClick={() => onMemberSearchChange('')}
+                onClick={() => {
+                  setLocalSearch('')
+                  onMemberSearchChange('')
+                }}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-3)] hover:text-[var(--text-1)] rounded-lg hover:bg-[var(--bg-subtle-hover)] transition cursor-pointer"
                 aria-label="Clear search"
               >

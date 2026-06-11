@@ -16,12 +16,14 @@ type HubCrownFunnelGridProps = {
   actuals: FunnelCounts
   targets: FunnelCounts
   hasGoal: boolean
-  period: 'daily' | 'weekly' | 'monthly' | 'yearly'
+  period: 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all'
   loading?: boolean
   /** Saha Özetim: pano crown gradient kutular */
   panoVariant?: boolean
   /** Hedef yokken alt bilgi satırını gizle (üye aktivite özeti vb.) */
   hideNoGoalFooter?: boolean
+  /** Saha Özetim: hedef durum/uyarı satırını tamamen gizle */
+  hideFooter?: boolean
 }
 
 const METRIC_LABEL_KEYS: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
@@ -39,6 +41,7 @@ export function HubCrownFunnelGrid({
   loading,
   panoVariant = false,
   hideNoGoalFooter = false,
+  hideFooter = false,
 }: HubCrownFunnelGridProps) {
   const { t } = useTranslation()
 
@@ -90,7 +93,7 @@ export function HubCrownFunnelGrid({
                   className="min-w-0 text-xs font-semibold text-[var(--text-1)] sm:text-sm"
                 />
               )}
-              {hasGoal ? (
+              {hasGoal && period !== 'all' ? (
                 <span className="shrink-0 text-xs font-bold tabular-nums text-[var(--text-3)]">
                   %{pct}
                 </span>
@@ -101,7 +104,7 @@ export function HubCrownFunnelGrid({
               {hasGoal ? (
                 <span className="text-sm font-bold text-[var(--text-3)]">
                   {' '}
-                  / {target}
+                  / {period === 'all' ? '∞' : target}
                 </span>
               ) : null}
             </p>
@@ -115,7 +118,7 @@ export function HubCrownFunnelGrid({
                 }}
               />
             </div>
-            {hasGoal ? (
+            {hideFooter ? null : hasGoal ? (
               <p className="mt-1.5 text-[10px] font-medium text-[var(--text-3)]">
                 {period === 'daily'
                   ? t('crown.hubDailyTarget')

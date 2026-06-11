@@ -1,5 +1,41 @@
 # Hot Log
 
+## 2026-06-11 — Saha Özetim UI, Arama Debounce, Mükerrer Aday Kontrolü & parent_id FK Güncellemesi ✅
+
+### Veritabanı Şeması & parent_id Dönüşümü (Migration 082)
+- `parent_id` (sponsor) ilişkisi `auth.users(id)` yerine `nmm_workspaces(id)` tablosuna yönlendirildi.
+- SQL migrasyonu (`082_update_workspace_parent_id_fk.sql`) ile mevcut `parent_id` değerleri kullanıcıların ilişkili workspace ID'leri ile güncellendi, yabancı anahtar kısıtı `nmm_workspaces(id)` olarak değiştirildi.
+- Aşağıdaki RLS politikaları, trigger'lar ve definer fonksiyonlar güncellendi:
+  - `nmm_leader_downline_workspace_ids()`
+  - `nmm_leader_downline_workspaces()`
+  - `nmm_leader_downline_workspace_tree()`
+  - `nmm_fetch_team_with_downlines()`
+  - `nmm_onboarding_progress_trigger_func()`
+  - `nmm_candidate_change_trigger_fn()`
+  - `nmm_onboarding_progress` tablosundaki RLS politikası.
+- Server Actions (`admin-actions.ts`, `videoActions.ts`) yeni workspace-to-workspace parent_id yapısına göre uyarlanarak lider ID çözümlemeleri ve claim işlemleri düzeltildi.
+
+### Ekip Arama Debounce Entegrasyonu (TeamPerformanceSection.tsx)
+- Ekip arama çubuğuna 250ms debounce uygulandı. Yazma esnasında kasma olmadan akıcı arama girdisi sağlanırken, render-time state adjustment ile ESLint `react-hooks/set-state-in-effect` hatası önlendi.
+
+### Mükerrer Aday Kontrolleri (AddCandidateSheet.tsx & QuickAddModal.tsx)
+- Boru hattına yeni aday ekleme (`AddCandidateSheet`) ve hızlı aday ekleme (`QuickAddModal`) adımlarında client-side duplicate check yapısı kuruldu.
+- Aynı telefon numarasına (son 10 hane bazında) sahip bir aday zaten varsa ekleme engellenip toast uyarısı verilir.
+- Benzer isimde aday varsa ekleme öncesinde kullanıcıya onay (confirm) penceresi gösterilir.
+
+### Saha Özetim UI/UX Düzenlemeleri
+- İlk 4 KPI kutusunun altındaki "Günlük Hedef/Haftalık Hedef/... Henüz hedef belirlenmedi" gibi durum/yönlendirme metinleri tamamen kaldırıldı (`HubCrownFunnelGrid`).
+- Haftalık sekmesindeki "Bu hafta X/7 gün giriş yapıldı" yazısı kaldırıldı (`HubWeekLoginStrip`).
+- Aylık sekmesindeki "Bugün ayın X. günü..." metni kaldırıldı ve çizgi barın altındaki "Bu ay X gün giriş yapıldı" metni ortalandı (`HubMonthHero`).
+- Yıllık hedeflerin paydası 365 gün (`totalDaysInYear`) olarak ayarlandı (`hubSelfActions.ts`).
+- Tüm Zamanlar hedeflerinin paydası sonsuz (`∞`) olarak gösterildi (`HubCrownFunnelGrid`).
+- Yıllık ve Tüm Zamanlar sekmelerindeki alt detay kutuları (arama, whatsapp, yeni üye, yeni aday) kaldırıldı (`HubYearHero`, `HubAllTimeHero`).
+- Tüm Zamanlar üst kartındaki "X gündür platformdasın" yazısı kaldırılarak "Listede kayıtlı X aktif gün" yazısı ortalandı (`HubAllTimeHero`).
+- Yıllık üst kartındaki "2026 yılı" başlığı kaldırıldı ve "Yılın X. günü · Y aktif gün" yazısı ortalandı (`HubYearHero`).
+
+### Dosyalar
+`supabase/migrations/082_update_workspace_parent_id_fk.sql`, `admin-actions.ts`, `videoActions.ts`, `TeamPerformanceSection.tsx`, `AddCandidateSheet.tsx`, `QuickAddModal.tsx`, `HubCrownFunnelGrid.tsx`, `FieldSummaryPage.tsx`, `HubWeekLoginStrip.tsx`, `HubMonthHero.tsx`, `HubYearHero.tsx`, `HubAllTimeHero.tsx`, `hubSelfActions.ts`
+
 ## 2026-06-11 — Ekip arama sıralama, mobil grafik taşması, e-postasız davet kaydı, ekibe bağla düzeltmesi ✅
 
 ### Ekip Arama ve Sıralama (TeamPerformanceSection.tsx)

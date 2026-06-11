@@ -134,7 +134,6 @@ function FieldSummaryInner() {
   const dailyActuals = dailySelf?.dailyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
   const weekActive = weeklySelf?.weekActive ?? Array.from({ length: 7 }, () => false)
-  const weekLoginDays = Math.min(7, weeklySelf?.loginDays ?? weekActive.filter(Boolean).length)
 
   function renderBody() {
     if (tab === 'daily') {
@@ -150,6 +149,7 @@ function FieldSummaryInner() {
             period="daily"
             loading={loading}
             panoVariant
+            hideFooter
           />
           <HubSelfActivityGrid
             metrics={dailySelf?.fieldMetrics ?? EMPTY_METRICS}
@@ -167,7 +167,6 @@ function FieldSummaryInner() {
           <HubPeriodNavigator mode="week" accentClass={ACCENT.weekly} />
           <HubWeekLoginStrip
             weekActive={weekActive}
-            loginDays={weekLoginDays}
             loading={loading}
             weekEnd={weekRange.endDate}
           />
@@ -178,6 +177,7 @@ function FieldSummaryInner() {
             period="weekly"
             loading={loading}
             panoVariant
+            hideFooter
           />
           <HubSelfActivityGrid
             metrics={weeklySelf?.fieldMetrics ?? EMPTY_METRICS}
@@ -195,10 +195,7 @@ function FieldSummaryInner() {
           <HubPeriodNavigator mode="month" accentClass={ACCENT.monthly} />
           <HubMonthHero
             loginDays={monthlySelf?.loginDays ?? 0}
-            dayOfMonth={monthlySelf?.dayOfMonth ?? 1}
-            daysInMonth={monthlySelf?.daysInMonth ?? 30}
             monthPct={monthlySelf?.monthPct ?? 0}
-            isCurrentMonth={offset === 0}
             loading={loading}
           />
           <HubCrownFunnelGrid
@@ -208,6 +205,7 @@ function FieldSummaryInner() {
             period="monthly"
             loading={loading}
             panoVariant
+            hideFooter
           />
           <HubSelfActivityGrid
             metrics={monthlySelf?.fieldMetrics ?? EMPTY_METRICS}
@@ -230,8 +228,6 @@ function FieldSummaryInner() {
             totalDaysInYear={yearlySelf?.totalDaysInYear ?? yearRangeData.totalDaysInYear}
             yearPct={yearlySelf?.yearPct ?? yearRangeData.yearPct}
             isCurrentYear={yearlySelf?.isCurrentYear ?? offset === 0}
-            fieldMetrics={yearlySelf?.fieldMetrics}
-            yearlyActuals={yearlySelf?.yearlyActuals}
             loading={loading}
           />
           <HubCrownFunnelGrid
@@ -241,6 +237,7 @@ function FieldSummaryInner() {
             period="yearly"
             loading={loading}
             panoVariant
+            hideFooter
           />
           <HubSelfActivityGrid
             metrics={yearlySelf?.fieldMetrics ?? EMPTY_METRICS}
@@ -259,18 +256,16 @@ function FieldSummaryInner() {
         <>
           <HubAllTimeHero
             activeDays={metrics.activeDays}
-            fieldMetrics={allTimeSelf?.fieldMetrics}
-            allTimeActuals={allTimeSelf?.allTimeActuals}
-            joinedAt={allTimeSelf?.joinedAt ?? null}
             loading={loading}
           />
           <HubCrownFunnelGrid
             actuals={allTimeSelf?.allTimeActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
             targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-            hasGoal={false}
-            period="yearly"
+            hasGoal={true}
+            period="all"
             loading={loading}
             panoVariant
+            hideFooter
           />
           <HubSelfActivityGrid metrics={metrics} loading={loading} panoVariant />
         </>
