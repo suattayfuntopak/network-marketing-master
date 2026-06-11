@@ -1,5 +1,114 @@
 # Hot Log
 
+## 2026-06-11 — Ekip arama sıralama, mobil grafik taşması, e-postasız davet kaydı, ekibe bağla düzeltmesi ✅
+
+### Ekip Arama ve Sıralama (TeamPerformanceSection.tsx)
+- Ekip arama çubuğu artık üyeleri doğru filtreliyor ve en yüksek eşleşme puanına göre (tam eşleşme, ön ek eşleşmesi, alt metin eşleşmesi) yukarıdan aşağıya sıralıyor.
+- Arama yapıldığında, sağ kısımda pratik bir temizleme (X) butonu gösteriliyor.
+- Kart sekmelerine tıklandığında veya üye etkileşimi tetiklendiğinde arama otomatik temizleniyor.
+
+### Mobil Grafik Taşması (StatsCharts.tsx)
+- Aday Kazanım İvmesi trend barları `HorizontalScrollLock` bileşeniyle sarmalandı. Mobil ekranlarda taşıma yapmadan yatay kaydırma imkanı tanındı, masaüstündeki görünüm ise korundu.
+
+### E-postası Olmayan Davet Kayıtları (SignupForm.tsx)
+- E-postası bulunmayan boru hattı adayları için davet linkiyle kayıtta oluşan form kilitlenmesi kaldırıldı.
+- Adayın e-postası boş ise e-posta alanı düzenlenebilir bırakılarak yeni kayıt aşamasında üyenin e-postasını girmesi sağlandı ve mükerrerliğin önüne geçildi.
+
+### Ekibime Bağla Geliştirmesi (admin-actions.ts)
+- Platform Yönetimi'ndeki "Ekibime Bağla" komutunun veri tabanı referans kısıtı (`parent_id`'nin `users.id` yerine `workspace_id` atanmasından kaynaklı) giderildi. Sponsor `parent_id` değeri artık liderin `user.id`'sini tutuyor.
+- Bağlama gerçekleştiğinde aday e-postaları senkronize ediliyor.
+- Kullanıcı daha önce almadıysa otomatik olarak NMM hoş geldin e-postası (`sendWelcomeEmail`) tetikleniyor.
+- Hem lidere hem de bağlanan kullanıcıya detaylı Türkçe/İngilizce in-app bildirimleri gönderiliyor.
+
+### Dosyalar
+`TeamPerformanceSection.tsx`, `StatsCharts.tsx`, `SignupForm.tsx`, `admin-actions.ts`
+
+## 2026-06-11 — Davet mesajı + kısa link + mobil E2E fix + öneri paketi ✅
+
+### Davet (Ekibim)
+- `team.inviteWaMessage` metni güncellendi (siz dili, yeni paragraf).
+- Kişiye özel link: `/d/{ref}/{8hex}` → `/kayit?ref&aday` yönlendirme (~60 karakter kısalma).
+- `proxy.ts` `/d/` public.
+
+### Önceki öneriler (2–6)
+- Migration `081`: join sonrası aday e-posta sync + backfill.
+- Listem: e-postasız adayda ✉️ uyarı rozeti.
+- `platform-yonetim/loading.tsx`, `istatistikler/loading.tsx`.
+- Mobil E2E: `hub-summary-tab-daily` testid (Günlük metni mobilde yok).
+
+### Doğrulama
+lint + vitest **193/193** yeşil.
+
+### Dosyalar
+`inviteLink.ts`, `inviteSignup.ts`, `app/d/[ref]/[token]/page.tsx`, `tr.ts`, `en.ts`, `081_join_email_sync_and_backfill.sql`, `CandidateCard.tsx`, `day-journal-smoke.spec.ts`, loading.tsx×2
+
+## 2026-06-11 — Öneri paketi: E2E davet, ∞ tab, backfill, hub docs, pano loading ✅
+
+### Uygulanan öneriler (2–6)
+- **E2E davet:** `e2e/invite-signup.spec.ts` — geçersiz ref/aday hata, normal kayıt, opsiyonel `PLAYWRIGHT_INVITE_REF`/`ADAY` prefill; `SignupForm` testid'leri; CI env.
+- **İstatistikler ∞:** `PulsePeriodTabs` — Saha Özetim ile aynı `text-lg font-black` / `text-base sm:text-sm`.
+- **E-posta backfill:** `supabase/scripts/backfill_candidate_email.sql` (team_pipeline_links + telefon eşleşmesi).
+- **hub-metrics.md:** `crownSoftMap` / `panoVariant` görsel notu.
+- **Pano loading:** `pano/loading.tsx` — 5×2 launcher iskeleti, layout shift azaltma.
+
+### Doğrulama
+lint + vitest **192/192** yeşil.
+
+### Dosyalar
+`e2e/invite-signup.spec.ts`, `SignupForm.tsx`, `PulsePeriodTabs.tsx`, `backfill_candidate_email.sql`, `docs/hub-metrics.md`, `pano/loading.tsx`, `.github/workflows/e2e.yml`
+
+## 2026-06-11 — CI lint fix + UI/UX turu + Admin/İstatistik prefetch ✅
+
+### CI / deploy (öncelik)
+- `SignupForm`: `useSearchParams` + `hasInviteParams` türetilmiş; effect içi senkron `setState` kaldırıldı → `react-hooks/set-state-in-effect` lint geçer, E2E/CI Gate deploy edilebilir.
+
+### UI
+- Sidebar: `/pano` seçiliyken purple crown vurgusu (Admin gibi).
+- Listem mobil: kartta yalnızca ad + sıcaklık; telefon/not gizli; masaüstünde arama butonu yok, YZ sol / WA sağ.
+- Saha Özetim: `crownSoftMap` (%25 opak gradient); ∞ sekmesi mobil/desktop büyütüldü.
+- Ekibim arama: liste filtreleme yerine soluklaştırma + ilk eşleşmeye scroll (Listem benzeri UX).
+- Vaktin Varsa mobil: süre + özet satırı gizli (başlık/etiketler duruyor).
+
+### Performans
+- `platform-yonetim/page.tsx`: SSR `HydrationBoundary` + `prefetchPlatformAdminQueries`.
+- Sidebar hover: Admin, İstatistikler, Pano prefetch genişletildi.
+
+### Doğrulama
+lint + vitest **192/192** yeşil.
+
+### Dosyalar
+`SignupForm.tsx`, `navigation.ts`, `SquareButton.ts`, `HubCrownFunnelGrid.tsx`, `HubSelfActivityGrid.tsx`, `HubSummaryTabBar.tsx`, `CandidateCard.tsx`, `EkipPanel.tsx`, `TeamPerformanceSection.tsx`, `memberSearch.ts`, `TrainingCard.tsx`, `platform-yonetim/page.tsx`, `prefetchPlatformAdmin.ts`, `prefetchRouteMetrics.ts`, `prefetchDashboard.ts`
+
+## 2026-06-11 — Davet kayıt otomasyonu + Admin claim fix + Saha Özetim navigasyon + mail TZ ✅
+
+### Önceki oturum commit/push
+- `main` zaten `origin/main` ile senkrondu; yarım kalan push yoktu.
+
+### Admin — dış kayıtı ekibe bağlama (Server Components hatası)
+- `claimIndependentSignupToTeamAction`: `nmm_workspace_members` sorgusu yalnızca `user_id` ile `.maybeSingle()` kullanıyordu → çoklu üyelikte PostgREST hata fırlatıyordu. `workspace_id` filtresi + fallback isim + `revalidatePath('/platform-yonetim')`.
+
+### Katıldı → NMM davet kayıt akışı (otomatik ekip + isim senkronu)
+- Migration **080**: `nmm_candidates.email`; `nmm_join_workspace(ref, candidate_id?)` — liderin Listem kaydındaki ad/telefon ile workspace üyeliği, pipeline bağlama, fuzzy eşleşme atlanır. Eski tek-arg RPC `DROP` edildi.
+- `inviteSignup.ts`: `?ref=&aday=` ile kayıt formunda ad+e-posta ön-dolum (şifre only); `resolveInviteSignupName` signup'ta liderin adını zorlar.
+- `SignupForm`: readonly ad/e-posta → kayıt → `ensureWorkspaceAction` → `/pano`.
+- `EditCandidateSheet`: e-posta alanı (davet için zorunlu).
+- Davet metinleri (WA/AI): davet kodu satırı kaldırıldı; ref linki yeterli.
+
+### Saha Özetim — dönem navigasyonu
+- Yatay swipe/snap şerit **kaldırıldı**; ◀ | önceki | **seçili** | sonraki | ▶ (Dün/Bugün/Yarın ve hafta/ay/yıl karşılıkları). Oklar ±1 offset, sınırsız geçmiş/gelecek.
+
+### E-posta saatleri (UTC+3)
+- `emailDateTime.ts` (`Europe/Istanbul`); `mail.ts` admin/moderasyon/lisans maillerinde kullanılıyor. Resend/GitHub tarafında ek ayar gerekmez — sunucu TZ'den bağımsız formatlama.
+
+### Doğrulama
+- `tsc --noEmit` + vitest **189/189** yeşil.
+
+### Dosyalar
+`080_candidate_email_invite_join.sql`, `inviteSignup.ts`, `emailDateTime.ts(+test)`, `admin-actions.ts`, `SignupForm.tsx`, `kayit/actions.ts`, `workspace.ts`, `EditCandidateSheet.tsx`, `pipeline/[id]/actions.ts`, `HubPeriodNavigator.tsx`, `mail.ts`, `database.types.ts`, `tr.ts/en.ts/platform.ts`
+
+### Deploy notu
+- **080 migration** Supabase'e uygulanmalı (staging/prod) — davet e-posta ön-dolumu ve otomatik join için.
+
 ## 2026-06-11 — Tüm Zamanlar sekmesi + mobil scroll fix + Admin rename + davet helper ✅
 
 ### Mobil scroll fix (T2) — kök neden

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
-import { Search, ChevronDown } from 'lucide-react'
+import { Search, ChevronDown, X } from 'lucide-react'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
@@ -167,6 +167,17 @@ function parseFieldTabs(raw: string | null): Record<string, FieldCardTab> {
   return out
 }
 
+function getSearchScore(fullName: string | null, query: string): number {
+  const name = (fullName ?? '').toLowerCase()
+  const q = query.toLowerCase().trim()
+  if (!q) return 0
+  if (name === q) return 100
+  if (name.startsWith(q)) return 90
+  const index = name.indexOf(q)
+  if (index !== -1) return 80 - index
+  return 0
+}
+
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
     t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
@@ -189,23 +200,28 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
   const searchQ = memberSearch.trim()
   const hasMemberSearch = searchQ.length > 0
-  const searchMatchCount = useMemo(
-    () =>
-      hasMemberSearch
-        ? visibleMembers.filter(m => memberMatchesSearch(m, searchQ)).length
-        : visibleMembers.length,
-    [visibleMembers, hasMemberSearch, searchQ],
-  )
+
+  const searchedMembers = useMemo(() => {
+    if (!hasMemberSearch) return visibleMembers
+    const matches = visibleMembers.filter(m => memberMatchesSearch(m, searchQ))
+    return [...matches].sort((a, b) => {
+      const scoreA = getSearchScore(a.full_name, searchQ)
+      const scoreB = getSearchScore(b.full_name, searchQ)
+      return scoreB - scoreA
+    })
+  }, [visibleMembers, hasMemberSearch, searchQ])
+
+  const searchMatchCount = searchedMembers.length
 
   useEffect(() => {
     if (!hasMemberSearch) return
-    const first = visibleMembers.find(m => memberMatchesSearch(m, searchQ))
+    const first = searchedMembers[0]
     if (!first) return
     document.getElementById(`ekip-member-${first.user_id}`)?.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     })
-  }, [hasMemberSearch, searchQ, visibleMembers])
+  }, [hasMemberSearch, searchQ, searchedMembers])
 
   async function handleLinkMemberToPipeline(member: MemberRow) {
     if (!member.full_name || linkingMemberId) return
@@ -435,8 +451,18 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               value={memberSearch}
               onChange={e => onMemberSearchChange(e.target.value)}
               placeholder={t('team.searchMembers')}
-              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
+              className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
             />
+            {hasMemberSearch && (
+              <button
+                type="button"
+                onClick={() => onMemberSearchChange('')}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 p-1 text-[var(--text-3)] hover:text-[var(--text-1)] rounded-lg hover:bg-[var(--bg-subtle-hover)] transition cursor-pointer"
+                aria-label="Clear search"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
             {hasMemberSearch && searchMatchCount === 0 && (
               <p className="mt-2 text-center text-xs text-[var(--text-3)]">{t('common.searchNoResults')}</p>
             )}
@@ -445,7 +471,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
         {/* Üye performans listesi */}
         <VirtualizedMemberList
-          items={visibleMembers}
+          items={searchedMembers}
           getKey={m => m.user_id}
           measureKey={serializeMemberTabs(memberCardTab)}
           renderItem={m => (
@@ -463,12 +489,12 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               lang={lang}
               t={t}
               hasAiFieldAccess={hasAiFieldAccess}
-              onSelectTab={tab => selectMemberTab(m.user_id, tab)}
+              onSelectTab={tab => { onMemberSearchChange(''); selectMemberTab(m.user_id, tab) }}
               onPrefetchActivity={() => prefetchMemberActivity(m.user_id)}
               onSetOnboardingWeek={week => setOnboardingWeekByMember(prev => ({ ...prev, [m.user_id]: week }))}
-              onToggleOnboardingStep={(stepId, isDone) => void toggleOnboardingStep(m.user_id, stepId, isDone)}
-              onLinkToPipeline={() => void handleLinkMemberToPipeline(m)}
-              onInviteMember={() => handleInviteMember(m)}
+              onToggleOnboardingStep={(stepId, isDone) => { onMemberSearchChange(''); void toggleOnboardingStep(m.user_id, stepId, isDone) }}
+              onLinkToPipeline={() => { onMemberSearchChange(''); void handleLinkMemberToPipeline(m) }}
+              onInviteMember={() => { onMemberSearchChange(''); handleInviteMember(m) }}
               onSetOnboardingCoachData={setOnboardingCoachData}
               onOpenUpgrade={openUpgrade}
             />

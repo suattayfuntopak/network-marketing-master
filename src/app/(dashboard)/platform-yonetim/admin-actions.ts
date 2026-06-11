@@ -7,6 +7,7 @@ import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
+import { sendWelcomeEmail } from '@/lib/infra/mail'
 
 /**
  * Securely upgrades or extends a workspace's license.
@@ -133,7 +134,7 @@ export async function claimIndependentSignupToTeamAction(
 
   const { data: myWs, error: myErr } = await admin
     .from('nmm_workspaces')
-    .select('id')
+    .select('id, name')
     .eq('owner_id', user.id)
     .single()
 
@@ -153,23 +154,19 @@ export async function claimIndependentSignupToTeamAction(
     throw new Error('Bu kullanıcı zaten başka bir lidere bağlı.')
   }
 
-  // 1) parent_id set → kişi downline olur (fetchTeamBundle dedup'ı tetiklenir,
-  //    "dış kayıt" sınıfından çıkar). Zaten bağlıysa atla.
-  if (target.parent_id !== myWs.id) {
+  // 1) parent_id set → kişi downline olur (referans kısıtı için parent_id = leader user_id set edilmelidir)
+  if (target.parent_id !== user.id) {
     const { error: updErr } = await admin
       .from('nmm_workspaces')
-      .update({ parent_id: myWs.id })
+      .update({ parent_id: user.id })
       .eq('id', targetWorkspaceId)
     if (updErr) {
-      console.error('[claimIndependentSignupToTeamAction] parent_id:', updErr)
+      console.error('[claimIndependentSignupToTeamAction] parent_id update failed:', updErr)
       throw new Error('Ekibe bağlama başarısız.')
     }
   }
 
-  // 2) Tam reconcile (nmm_join_workspace ile aynı sonuç): kişiyi liderin boru
-  //    hattındaki "katıldı" adayıyla eşleştir/oluştur + KALICI member↔aday bağı kur
-  //    + stage katıldı. Böylece kişi Listem'de, detay sayfası açık, NMM Ortağı olur
-  //    ve MÜKERRER kayıt oluşmaz (mevcut Saha adayı bu üyeye bağlanır, ayrıca listelenmez).
+  // 2) Hedef üyenin bilgilerini çek
   const { data: targetMember } = await admin
     .from('nmm_workspace_members')
     .select('full_name')
@@ -177,19 +174,20 @@ export async function claimIndependentSignupToTeamAction(
     .eq('workspace_id', targetWorkspaceId)
     .maybeSingle()
 
-  let targetName = (targetMember?.full_name ?? '').trim()
-  let targetPhone: string | null = null
+  const { data: authUser } = await admin.auth.admin.getUserById(target.owner_id)
+  const targetEmail = authUser?.user?.email ?? ''
+  let targetName = (targetMember?.full_name ?? authUser?.user?.user_metadata?.full_name as string | undefined)?.trim() ?? ''
+  const targetPhone = (authUser?.user?.user_metadata?.phone as string | undefined)?.trim() || null
 
   if (!targetName) {
-    const { data: authUser } = await admin.auth.admin.getUserById(target.owner_id)
-    targetName = (authUser?.user?.user_metadata?.full_name as string | undefined)?.trim() ?? ''
-    targetPhone = (authUser?.user?.user_metadata?.phone as string | undefined)?.trim() || null
+    targetName = targetEmail ? targetEmail.split('@')[0] : 'Yeni Ortak'
   }
 
+  // 3) Reconcile pipeline candidates
   if (targetName) {
     const { data: leaderCands } = await admin
       .from('nmm_candidates')
-      .select('id, full_name, owner_id, stage, phone')
+      .select('id, full_name, owner_id, stage, phone, email')
       .eq('workspace_id', myWs.id)
       .eq('owner_id', user.id)
 
@@ -198,8 +196,18 @@ export async function claimIndependentSignupToTeamAction(
 
     if (candidateId) {
       const matched = pool.find(c => c.id === candidateId)
+      const updates: { stage?: 'katildi'; email?: string; phone?: string } = {}
       if (matched && matched.stage !== 'katildi') {
-        await admin.from('nmm_candidates').update({ stage: 'katildi' }).eq('id', candidateId)
+        updates.stage = 'katildi'
+      }
+      if (matched && (!matched.email || !matched.email.trim()) && targetEmail) {
+        updates.email = targetEmail
+      }
+      if (matched && (!matched.phone || !matched.phone.trim()) && targetPhone) {
+        updates.phone = targetPhone
+      }
+      if (Object.keys(updates).length > 0) {
+        await admin.from('nmm_candidates').update(updates).eq('id', candidateId)
       }
     } else {
       const { data: inserted } = await admin
@@ -208,6 +216,8 @@ export async function claimIndependentSignupToTeamAction(
           workspace_id: myWs.id,
           owner_id: user.id,
           full_name: targetName,
+          email: targetEmail || null,
+          phone: targetPhone || null,
           stage: 'katildi',
           warmth: 'ilik',
           ...buildCandidateContentFields({ noteTr: 'Dış kayıt ekibe bağlandı', noteEn: 'External signup linked to team' }),
@@ -225,6 +235,63 @@ export async function claimIndependentSignupToTeamAction(
           { onConflict: 'workspace_id,member_user_id' },
         )
     }
+  }
+
+  // 4) Hoş geldin e-postası (welcome email) kontrolü ve gönderimi
+  if (targetEmail) {
+    const { data: emailLog } = await admin
+      .from('nmm_email_sent_log')
+      .select('id')
+      .eq('workspace_id', targetWorkspaceId)
+      .eq('kind', 'welcome')
+      .maybeSingle()
+
+    if (!emailLog) {
+      try {
+        await sendWelcomeEmail(targetEmail, targetName, 'tr')
+        await admin.from('nmm_email_sent_log').insert({
+          workspace_id: targetWorkspaceId,
+          kind: 'welcome',
+          sent_date: new Date().toISOString().slice(0, 10),
+        })
+      } catch (emailErr) {
+        console.error('[claimIndependentSignupToTeamAction] Welcome email failed:', emailErr)
+      }
+    }
+  }
+
+  // 5) Uygulama-içi bildirimlerin gönderimi
+  const { data: myMember } = await admin
+    .from('nmm_workspace_members')
+    .select('full_name')
+    .eq('user_id', user.id)
+    .eq('workspace_id', myWs.id)
+    .maybeSingle()
+
+  const sponsorName = myMember?.full_name ?? 'Sponsorunuz'
+
+  try {
+    // Lidere bildirim:
+    await admin.from('nmm_notifications').insert({
+      user_id: user.id,
+      title_tr: 'Ekibe bağlama başarılı! 🎉',
+      title_en: 'Team linking successful! 🎉',
+      description_tr: `${targetName} (${targetEmail || 'E-posta yok'}) ekibinize bağlandı ve dış kayıtlar tablosundan çıkarıldı.`,
+      description_en: `${targetName} (${targetEmail || 'No email'}) linked to your team and removed from external signups.`,
+      type: 'user',
+    })
+
+    // Bağlanan kullanıcıya bildirim:
+    await admin.from('nmm_notifications').insert({
+      user_id: target.owner_id,
+      title_tr: 'Ekibe hoş geldiniz! 💎',
+      title_en: 'Welcome to the team! 💎',
+      description_tr: `${sponsorName} sizi kendi ekibine bağladı. Artık tüm eğitim ve koçluk araçlarına erişebilirsiniz.`,
+      description_en: `${sponsorName} linked you to their team. You now have access to all training and coaching features.`,
+      type: 'user',
+    })
+  } catch (notifErr) {
+    console.error('[claimIndependentSignupToTeamAction] Notifications insert failed:', notifErr)
   }
 
   revalidatePath('/platform-yonetim')

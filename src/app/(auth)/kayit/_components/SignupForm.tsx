@@ -51,10 +51,6 @@ export function SignupForm() {
           setInviteError(t('auth.invitePrefillInvalid'))
           return
         }
-        if (!prefill.email) {
-          setInviteError(t('auth.invitePrefillNoEmail'))
-          return
-        }
         setInvite(prefill)
       })
       .catch(() => {
@@ -80,6 +76,8 @@ export function SignupForm() {
   }
 
   const inviteReady = !!invite
+  const emailReadOnly = Boolean(invite?.email)
+  const nameReadOnly = Boolean(invite?.fullName)
   const submitBlocked = inviteLoading || (hasInviteParams && !!inviteError)
 
   return (
@@ -88,8 +86,8 @@ export function SignupForm() {
         <>
           <input type="hidden" name="ref" value={invite.ref} />
           <input type="hidden" name="aday" value={invite.aday} />
-          <input type="hidden" name="fullName" value={invite.fullName} />
-          <input type="hidden" name="email" value={invite.email} />
+          {nameReadOnly && <input type="hidden" name="fullName" value={invite.fullName} />}
+          {emailReadOnly && <input type="hidden" name="email" value={invite.email} />}
         </>
       )}
 
@@ -105,14 +103,14 @@ export function SignupForm() {
         </label>
         <input
           id="fullName"
-          name={inviteReady ? undefined : 'fullName'}
+          name={nameReadOnly ? undefined : 'fullName'}
           type="text"
-          required={!inviteReady}
-          readOnly={inviteReady}
-          defaultValue={invite?.fullName}
+          required
+          readOnly={nameReadOnly}
+          defaultValue={invite?.fullName ?? ''}
           autoComplete="name"
           placeholder="John Doe"
-          className={inviteReady ? readonlyInputClass : authInputClass}
+          className={nameReadOnly ? readonlyInputClass : authInputClass}
         />
       </div>
 
@@ -122,14 +120,14 @@ export function SignupForm() {
         </label>
         <input
           id="email"
-          name={inviteReady ? undefined : 'email'}
+          name={emailReadOnly ? undefined : 'email'}
           type="email"
-          required={!inviteReady}
-          readOnly={inviteReady}
-          defaultValue={invite?.email}
+          required
+          readOnly={emailReadOnly}
+          defaultValue={invite?.email ?? ''}
           autoComplete="email"
           placeholder="email@example.com"
-          className={inviteReady ? readonlyInputClass : authInputClass}
+          className={emailReadOnly ? readonlyInputClass : authInputClass}
         />
       </div>
 
