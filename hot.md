@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-11 — Migration güvenliği: CI'da gerçek-Postgres uygula + tip drift + kontrollü prod push ✅
+
+Önceki turdaki 4 öneri uygulandı. Amaç: "063/064 phone bug" gibi şema-referans hatalarının bir daha prod'a sızmaması.
+
+### #1 — CI'da migration'ları GERÇEK Postgres'e uygula (en yüksek değer)
+- `migrate-check.yml` → yeni **`migrate-apply`** job: `postgres:16` service + `scripts/ci/supabase-shim.sql` (auth şeması + roller anon/authenticated/service_role + auth.uid/jwt — migration'ların kullandığı yüzey, grep ile bulundu) → tüm `migrations/*.sql` sırayla `psql ON_ERROR_STOP=1` ile uygulanır. Olmayan kolon/tablo referansı artık **PR'da kırmızı verir** (migrate:check yalnızca dosya numarası doğruluyordu). Deploy'u gate'lemez (CI Gate ayrı).
+- **Önkoşul düzeltmesi:** 063/064 hâlâ olmayan `workspace_members.phone`'u okuyordu → bir `db reset` patlardı **ve sizin gelecekteki `supabase db push`'unuzu kilitlerdi**. İkisi de minimal düzeltildi (gövde zaten 079 ile değişiyor; sadece temiz uygulanmaları için). 062 zaten temizdi.
+
+### #2 — Tip drift denetimi (database.types.ts)
+- `migrate-apply` içinde **advisory** adım: `supabase gen types --db-url <local>` ile üretilip committed dosyayla diff'lenir → şema-tip uyuşmazlığı uyarısı (joined_at/phone gibi). Bloklamaz.
+- `npm run db:gen-types` (`supabase link` ile linked projeden yeniden üretir).
+
+### #3 — Kontrollü prod migration push
+- `db-push.yml` (yeni): **yalnızca elle** (`workflow_dispatch`), `mode=dry-run` (bekleyenleri listeler) veya `mode=apply` + confirm `PUSH`. Otomatik değil (kötü migration sessizce prod'a gitmesin). `npm run db:push` kısayolu. Secret: `SUPABASE_DB_PASSWORD` eklenmeli (docs/deploy/github-secrets.md güncellendi).
+
+### #4 — Davet token uçtan uca testi
+Manuel doğrulama (079 sonrası deploy'da test ediliyor). Yukarıdaki CI iyileştirmeleri bu sınıf hatayı zaten önler.
+
+### Doğrulama
+migrate:check + YAML (js-yaml) + package.json + lint yeşil. (CI'daki gerçek-apply ilk koşuda doğrulanacak; shim eksikse genişletilir — kırmızı = sinyal.)
+
+### Dosyalar
+`.github/workflows/migrate-check.yml` (migrate-apply job), `.github/workflows/db-push.yml` (yeni), `scripts/ci/supabase-shim.sql` (yeni), `supabase/migrations/063,064` (phone fix), `package.json` (db:gen-types, db:push), `docs/deploy/github-secrets.md`, `supabase/migrations/README.md`
+
 ## 2026-06-11 — KRİTİK: davet kodu fix + gelir ifadeleri + Boru Hattı→Listem + telemetri kaldır ✅
 
 ### #3 (KRİTİK) — Davet kodu kabulü çalışmıyordu → migration 079

@@ -24,7 +24,8 @@ Both are already applied in production. Renaming them now would cause Supabase t
 ## Deploy checklist (production öncesi)
 
 1. `npm run migrate:check` — numara çakışması / boşluk uyarıları (CI: `.github/workflows/migrate-check.yml`).
-2. Opsiyonel drift: `npm run migrate:check:remote` (`supabase link` gerekir).
+   - **`migrate-apply` job** ayrıca tüm migration'ları gerçek bir Postgres'e uygular (CI) → şema-referans hataları (olmayan kolon/tablo) PR'da yakalanır.
+2. Opsiyonel drift: `npm run migrate:check:remote` (`supabase link` gerekir). Types: `npm run db:gen-types`. Prod'a uygulama: `npm run db:push` **veya** GitHub Actions → **DB migrate (prod)** (elle, onaylı).
 2. Pending migration'ları staging'e uygula: `supabase db push` (veya Dashboard SQL).
 3. Smoke test: yeni tablo/RLS ile ilgili UI akışını doğrula.
 4. Production'a aynı migration'ları uygula; `hot.md` deploy notuna ekle.
