@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-11 — Veritabanı Rol Düzeltme Migrasyonu & Yükleme İskeletleri (Skeleton Uyumlamaları) ✅
+
+### Veritabanı Seviyesinde Rol Düzeltmesi (Migration 084)
+- **`084_fix_team_rpc_role.sql`:** `nmm_fetch_team_with_downlines` RPC fonksiyonu güncellendi. Ekip listesindeki downline sahiplerinin (örneğin Elif Sinem Topak, Selda Kıratlı, Ezgi Şagar) rollerinin, veritabanındaki join ilişkilerinden kaynaklı olarak `leader` gelmesi ve listede kaybolması sorunu, SQL sorgusunda rol ataması `CASE WHEN wl.user_id = v_owner_id THEN 'leader' ELSE 'member' END` şeklinde zorlanarak doğrudan veritabanı düzeyinde kalıcı olarak çözüldü.
+
+### Skeleton Uyumlamaları & Görsel Kaymaların Önlenmesi
+- **Hedefim Yükleme Ekranı:** `/hedefim/loading.tsx` dosyası oluşturuldu. Sayfa yüklenirken hedefler, DDBR listesi ve kart yapısı ile tam uyumlu bir iskelet yüklenmesi sağlandı.
+- **Saha Özetim Yükleme Ekranı:** `/saha-ozetim/loading.tsx` dosyası oluşturuldu. Sekme çubuğu, dönem navigasyonu ve KPI kutuları ile birebir eşleşen bir iskelet yüklenmesi sağlandı.
+
+### Dosyalar
+`supabase/migrations/084_fix_team_rpc_role.sql`, `src/app/(dashboard)/hedefim/loading.tsx`, `src/app/(dashboard)/saha-ozetim/loading.tsx`
+
 ## 2026-06-11 — Performans Optimizasyonları, Rol Düzeltmeleri, Tab Sıralaması & Aday Kartı Tasarım Güncellemeleri ✅
 
 ### Hız Optimizasyonları
