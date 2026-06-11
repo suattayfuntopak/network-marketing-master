@@ -34,7 +34,7 @@ export const platformSection = {
       sendInviteWhatsApp: 'WhatsApp ile Davet Gönder',
       linkToTeamTitle: 'Ekibime Bağla (sponsorum olarak işaretle)',
       linkedToTeam: '{name} ekibine bağlandı — artık dış kayıt olarak görünmeyecek.',
-      addToPipelineTitle: "Boru Hattı'ma Aday Olarak Ekle",
+      addToPipelineTitle: "Listeme Aday Olarak Ekle",
       searchPlaceholder: 'İsim, e-posta ya da sponsor ile ara...',
       thLeaderName: 'Kullanıcı / Lider',
       thWorkspaceName: 'Grup / Çalışma Alanı',

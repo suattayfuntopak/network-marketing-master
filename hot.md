@@ -1,5 +1,34 @@
 # Hot Log
 
+## 2026-06-11 — KRİTİK: davet kodu fix + gelir ifadeleri + Boru Hattı→Listem + telemetri kaldır ✅
+
+### #3 (KRİTİK) — Davet kodu kabulü çalışmıyordu → migration 079
+- **Kök neden:** `nmm_join_workspace` RPC (063/064) `SELECT full_name, phone FROM nmm_workspace_members` yapıyordu ama bu tabloda **`phone` kolonu YOK** (001: id, workspace_id, user_id, role, full_name, created_at). Postgres `check_function_bodies=on` ile CREATE FUNCTION anında patlar → 063/064 **canlıya hiç uygulanamamış** → davet kodu girince uzun İngilizce hata, kişi ağaca eklenmiyordu. (`migrate:check` yalnızca dosya numarası doğrular, SQL çalıştırmaz; bu yüzden yakalanmamıştı.)
+- **Çözüm:** `079_fix_join_workspace_member_phone.sql` — **self-contained** (tablo + yardımcı fonksiyonlar + RPC, IF NOT EXISTS / OR REPLACE). phone artık auth metadata + adaylardan alınır; lider bildirimi best-effort (EXCEPTION-safe). Tek başına uygulanınca tüm akış çalışır: parent_id + üyelik + aday eşleşme (isim/telefon) + pipeline link → kişi NMM Ortağı olur, istatistiklerde (NMM) görünür, çift sayılmaz.
+- **`joinWorkspaceByInviteAction`:** ham Postgres hatası artık kullanıcıya gösterilmiyor; sunucuya loglanıp temiz Türkçe mesaja çevriliyor.
+- **⚠️ UYGULAMA GEREKİR:** migration'lar elle uygulanıyor → 079 Supabase'e push edilmeli (`supabase db push` veya dashboard SQL).
+
+### #4b — Ezgi/Selda "Dış Kayıt" görünümü
+079 sonrası davet kodu çalışınca yeni katılımlar doğru. Mevcut iki kişi için Platform > **Dış Kayıtlar**'daki "Ekibime Bağla" (🔗) butonu `parent_id`'yi set eder (admin-client, RPC'den bağımsız → migration beklemeden çalışır).
+
+### #1 — "artık gelir" tamamen kaldırıldı
+- Kullanıcının nefret ettiği **"artık gelir" / "residual income"** her yerden silindi → **"hak edilmiş gelir" / "earned income"** (itiraz #21). "garantilenmiş gelir" seçilmedi: itirazların kendisi "garanti kazanç vaadi etik değil" diyor — çelişki olurdu.
+- Saha provası da bu itiraz bankasını (KB) kullandığından otomatik düzeldi.
+- Korunan "pasif gelir"/"passive income": yalnızca itirazın KENDİSİ + uyum/yasaklı-ifade uyarıları (terimi eleştiren/yasaklayan yerler) — kullanıcının duruşunu pekiştirir. `generateMessage.ts` konu listesi: "pasif gelir" → "gelir modelleri".
+
+### #2 — TR yeniden adlandırma (İngilizce "pipeline" korundu)
+- **Boru Hattı → Listem/Liste** (bağlama göre, sonekler doğru: "Boru Hattına"→"Listeme/Listene", "Boru Hattınız"→"Listeniz" vb.) — nav, pano launcher, mobil bottom bar, sayfa başlıkları, trial e-postaları, yasal sayfalar (49 yer). Çevirilerde 0 "boru hattı" kaldı (yalnızca kod yorumları).
+- **Saha Radarı → Saha Radarım**, **Yapay Zeka Koçu → Yapay Zeka Koçum** (sonekler: "Koçuna"→"Koçuma", "Koçunun"→"Koçumun"). AI system-prompt'ları + yasal ToS formal isimleri korundu.
+
+### #4a — Hub prefetch telemetri kartı kaldırıldı
+Kullanıcı gereksiz buldu (geliştirici telemetri monitörüydü) → `HubPrefetchMonitorCard` mount + dosya silindi. (Not: ham anahtar görünmesinin sebebi de düzeltilmişti — anahtarlar yanlışlıkla moderationReview'daydı, platformPage'e taşınmıştı.)
+
+### Doğrulama
+tsc + lint + unit (183/183) + build + migrate:check yeşil.
+
+### Dosyalar
+`supabase/migrations/079_...sql` (yeni), `ekip/actions.ts` (hata mesajı), `itirazlar/data/itirazlar.ts` (#21), `lib/ai/generateMessage.ts`, `lib/translations/{tr.ts, sections/*}`, `lib/infra/{mail.ts, trialEmails.ts}`, `app/{kvkk,kullanim-kosullari,guvenlik}/page.tsx`, `app/_components/landing/*`, `platform-yonetim/_components/PlatformYonetimContent.tsx` (kart kaldır), `HubPrefetchMonitorCard.tsx` (silindi)
+
 ## 2026-06-11 — Moderasyon: in-app bildirim + telemetri ham-anahtar bug FIX ✅
 
 ### Ham-anahtar bug'ı KÖK NEDEN bulundu & çözüldü

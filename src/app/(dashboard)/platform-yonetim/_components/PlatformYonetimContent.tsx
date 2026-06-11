@@ -25,7 +25,6 @@ import {
   claimIndependentSignupToTeamAction,
   deleteUserAction,
 } from '../admin-actions'
-import { HubPrefetchMonitorCard } from './HubPrefetchMonitorCard'
 import {
   approveRequestAction,
   buildBilingualRejectReasonAction,
@@ -835,9 +834,6 @@ export function PlatformYonetimContent() {
             </div>
           )}
         </section>
-
-        {/* Sistem telemetrisi — hub prefetch monitörü (katlanabilir, premium) */}
-        <HubPrefetchMonitorCard />
 
         {selectedWorkspace && (
           <WorkspaceLicenseModal

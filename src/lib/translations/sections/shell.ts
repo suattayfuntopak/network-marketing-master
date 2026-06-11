@@ -27,7 +27,7 @@ export const shellSection = {
       upgradeBannerTrialTitle: '14 günlük ücretsiz Basic denemeniz aktif',
       upgradeBannerTrialDesc: 'Deneme süresi boyunca tüm AI araçlarına erişebilirsiniz. Süre bitince NMM kullanımınız devam eder; AI için Basic veya üzeri bir plan seçebilirsiniz.',
       upgradeBannerExpiredTitle: 'Denemeniz sona erdi — AI kilitlendi, NMM devam ediyor',
-      upgradeBannerExpiredDesc: 'Boru hattı, takvim, eğitimler ve ekibiniz açık kalmaya devam ediyor. Yapay zekayı yeniden açmak için Basic, Plus veya Pro planını seçin.',
+      upgradeBannerExpiredDesc: 'Liste, takvim, eğitimler ve ekibiniz açık kalmaya devam ediyor. Yapay zekayı yeniden açmak için Basic, Plus veya Pro planını seçin.',
       upgradeBannerCta: 'Planları Gör & Yükselt',
       upgradeMenuTrialTitle: 'Planı Yükselt',
       upgradeMenuExpiredTitle: 'Planı Yükselt',
@@ -37,9 +37,9 @@ export const shellSection = {
         'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Ücretsiz planda ekibinizi görebilir ve davet kodunuzla yeni üyeler ekleyebilirsiniz.',
       featureGateTitle: 'Bu özellik planınızda yer almıyor',
       featureGateDesc: 'Devam etmek için planınızı yükseltin.',
-      upgradeAiCoachTitle: 'Yapay Zeka Koçu planınızda açık değil',
+      upgradeAiCoachTitle: 'Yapay Zeka Koçum planınızda açık değil',
       upgradeAiCoachDesc:
-        'Mesaj yazma, saha provası ve uyum denetimi gibi AI araçları Basic, Plus veya Pro planlarda kullanılabilir. Boru hattı, takvim ve eğitimler ücretsiz planda açık kalır.',
+        'Mesaj yazma, saha provası ve uyum denetimi gibi AI araçları Basic, Plus veya Pro planlarda kullanılabilir. Liste, takvim ve eğitimler ücretsiz planda açık kalır.',
       upgradeAiFieldTitle: 'Bu AI aracı planınızda açık değil',
       upgradeAiFieldDesc:
         'Saha mesajları, davet metinleri ve not özetleri gibi yapay zeka destekli araçlar ücretli planlarda açılır.',
@@ -57,7 +57,7 @@ export const shellSection = {
       planBlurb_pro: 'Günlük {limit} YZ + tam güç',
       upgradeTrialEndedTitle: '14 günlük denemen bitti — YZ kilitlendi',
       upgradeTrialEndedDesc:
-        'Boru hattı, takvim ve ekibin açık kalır. Basic ile günlük {limit} yapay zeka mesajına hemen devam edebilirsin.',
+        'Liste, takvim ve ekibin açık kalır. Basic ile günlük {limit} yapay zeka mesajına hemen devam edebilirsin.',
       upgradeTrialEndedCta: 'Basic ile devam et',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
@@ -73,11 +73,11 @@ export const shellSection = {
       accountModalTitle: 'HESAP BİLGİLERİNİZ',
       accountModalRegistered: 'Üyelik başlangıcı: {date}',
       accountModalTrialBody:
-        '14 günlük Basic denemeniz aktif. Bu sürede tüm AI araçları açık. Boru hattı, takvim, eğitimler ve ekip daveti deneme bitse de ücretsiz kalır.',
+        '14 günlük Basic denemeniz aktif. Bu sürede tüm AI araçları açık. Liste, takvim, eğitimler ve ekip daveti deneme bitse de ücretsiz kalır.',
       accountModalTrialFootnote:
         'Deneme bitince uygulama kullanımınız devam eder. AI ve gelişmiş ekip özellikleri için Basic, Plus veya Pro seçebilirsiniz.',
       accountModalLockedBody:
-        'Deneme süreniz bitti. Boru hattı, takvim, eğitimler ve ekip daveti açık kalmaya devam ediyor.',
+        'Deneme süreniz bitti. Liste, takvim, eğitimler ve ekip daveti açık kalmaya devam ediyor.',
       accountModalLockedFootnote:
         'Yapay zeka ve gelişmiş ekip özelliklerini yeniden açmak için bir plan seçin.',
       overdueFreqLabel: 'Gecikmiş E-posta Sıklığı',

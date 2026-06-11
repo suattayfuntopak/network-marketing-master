@@ -60,14 +60,14 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
         ),
         emailParagraph('Deneme süresince Basic ile neler yapabilirsiniz:'),
         emailPlanBox([
-          '🎯 <strong>Boru hattı & adaylar</strong> — her adayı aşamalar boyunca takip edin',
+          '🎯 <strong>Liste & adaylar</strong> — her adayı aşamalar boyunca takip edin',
           '🤖 <strong>YZ saha provası</strong> — gerçek görüşmeden önce itiraz provası yapın',
           '📅 <strong>Takvim & hatırlatmalar</strong> — hiçbir takibi kaçırmayın',
           '🛡️ <strong>Uyum denetimi</strong> — paylaşımlarını YZ ile mevzuata uygun tut',
           '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
         ]),
         emailParagraph(
-          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre sonunda NMM çalışmaya devam eder — boru hattı, takvim, ekip ve eğitimler tamamen açık kalır. ${emailHighlight('Yalnızca yapay zeka araçları')} ücretsiz planda kilitlenir. İstediğiniz zaman plan seçerek AI'ı yeniden açabilirsiniz.`
+          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre sonunda NMM çalışmaya devam eder — liste, takvim, ekip ve eğitimler tamamen açık kalır. ${emailHighlight('Yalnızca yapay zeka araçları')} ücretsiz planda kilitlenir. İstediğiniz zaman plan seçerek AI'ı yeniden açabilirsiniz.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'Planları gör ve yükselt'),
         emailParagraph(
@@ -220,7 +220,7 @@ export async function sendLicenseExpiryEmail(
         emailParagraph(
           `Merhaba ${name}, ${emailHighlight(planLabel)} lisansınız ${emailHighlight(daysLabel)} içinde sona eriyor (${dateFormatted}).`
         ),
-        emailParagraph('YZ kredileri, boru hattı ve ekip araçları için kesintisiz erişim için yenileyin.'),
+        emailParagraph('YZ kredileri, liste ve ekip araçları için kesintisiz erişim için yenileyin.'),
         emailCta(`${NMM_APP_URL}/odeme`, 'Hemen yenile →'),
       ].join('')
 
@@ -616,10 +616,10 @@ export async function sendOverdueDigestEmail(
         ].join('')
       : [
           emailHeading('Gecikmiş takipler'),
-          emailParagraph(`Merhaba ${name}, boru hattınızda aşağıdaki adaylar için planlanan takipler geçti:`),
+          emailParagraph(`Merhaba ${name}, listenizde aşağıdaki adaylar için planlanan takipler geçti:`),
           `<ul style="padding-left:20px;margin:12px 0;">${rows}</ul>`,
-          emailParagraph('Yeni tarih belirlemek ve hızınızı korumak için boru hattınızı açın.'),
-          emailCta(`${NMM_APP_URL}/pipeline`, 'Boru Hattını Aç'),
+          emailParagraph('Yeni tarih belirlemek ve hızınızı korumak için listenizi açın.'),
+          emailCta(`${NMM_APP_URL}/pipeline`, 'Listeyi Aç'),
         ].join('')
 
   try {

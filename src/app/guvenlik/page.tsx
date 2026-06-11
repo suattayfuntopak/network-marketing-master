@@ -20,7 +20,7 @@ export default function SecurityPage() {
           title: '1. Satır Düzeyinde Veri Yalıtımı (RLS)',
           text: 'Platformumuzda veri güvenliği, veri tabanı katmanında tavizsiz bir şekilde tasarlanmıştır. Supabase altyapısında "Row-Level Security" (RLS - Satır Düzeyinde Güvenlik) teknolojisi aktif olarak kullanılmaktadır:',
           bullets: [
-            'Oluşturduğunuz aday listeleri, notlar ve boru hattı (pipeline) hareketleri tamamen sizin kullanıcı kimliğinize (auth.uid) bağlanır.',
+            'Oluşturduğunuz aday listeleri, notlar ve liste (pipeline) hareketleri tamamen sizin kullanıcı kimliğinize (auth.uid) bağlanır.',
             'Alt ekibinizin (downline) durumunu izlerken, onların adaylarının ad, soyad ve detay verileri RLS kuralları ile otomatik olarak engellenir; liderler yalnızca anonimleştirilmiş sayısal metrikleri görebilir.',
             'Hiçbir kullanıcı, veri tabanı sorgusu doğrudan manipüle edilse dahi bir başkasına ait veriye erişemez ve değiştiremez.',
           ],

@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       candidate_id: c.id,
       title_tr: 'Gecikmiş takip',
       title_en: 'Overdue Follow-up',
-      description_tr: `${c.full_name} için planlanan takip geçti — boru hattından güncelleyebilirsin.`,
+      description_tr: `${c.full_name} için planlanan takip geçti — listenden güncelleyebilirsin.`,
       description_en: `Planned follow-up for ${c.full_name} is overdue — update it from the pipeline.`,
       type: 'overdue_followup',
     })

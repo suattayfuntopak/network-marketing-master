@@ -52,7 +52,7 @@ export function LandingFaq() {
       {
         id: 'faq-8',
         question: 'Farklı modüller gerçekten birlikte çalışıyor mu?',
-        answer: 'Evet, tamamen entegre çalışır. Örneğin, boru hattına eklediğiniz bir adayın geçmişi ve son notları, YZ Mesaj üreticisine otomatik bağlam sağlar. Böylece yapay zeka, adayın tüm geçmişini bilerek en uygun takip mesajını hazırlar.',
+        answer: 'Evet, tamamen entegre çalışır. Örneğin, listeye eklediğiniz bir adayın geçmişi ve son notları, YZ Mesaj üreticisine otomatik bağlam sağlar. Böylece yapay zeka, adayın tüm geçmişini bilerek en uygun takip mesajını hazırlar.',
       },
       {
         id: 'faq-9',

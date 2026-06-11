@@ -25,7 +25,7 @@ export default function TermsPage() {
           title: '2. Sunulan SaaS Hizmeti ve Lisans',
           text: 'Platform, abonelik (SaaS) modeliyle sunulan yapay zeka destekli bir MLM (Ağ Pazarlaması) hızlandırıcı yazılımıdır. Kullanıcıya, seçtiği üyelik planı (Basic, Plus, Pro) limitleri dahilinde;',
           bullets: [
-            'Aday Boru Hattı (Pipeline) yönetimi ve aday takip veritabanına erişim,',
+            'Aday Listesi (Pipeline) yönetimi ve aday takip veritabanına erişim,',
             'Yapay Zeka Koçu, YZ Mesaj Yazarı ve YZ Saha Provası simülasyon araçlarının kullanımı,',
             'Doğru Başlangıç (Onboarding) rehberleri ve ekip üyelerinin ilerleme koordinasyonu,',
             'Kişisel kullanım için devredilemez, münhasır olmayan, iptal edilebilir bir kullanım hakkı verilir.',
