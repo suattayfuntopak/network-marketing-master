@@ -1,5 +1,32 @@
 # Hot Log
 
+## 2026-06-11 — Onaylanan öneriler: #1 içerik editörü + #2 AI koç entegrasyonu + #5 E2E (+ #4 zaten vardı) ✅
+
+Kullanıcı 1-2-4-5 önerilerini onayladı (3 = Frankfurt taşıma hariç).
+
+### #4 — İtiraz okundu/favori DB persistence → ZATEN VARDI
+İnceleme: `useProgressSync` + `nmm_user_progress` (migration 022; `read_objections`/`fav_objections`/`read_trainings`/`fav_trainings`) ile çoktan DB-destekli ve cihazlar arası senkron; localStorage yalnızca tek seferlik legacy migration kaynağı. **Yeniden yapılmadı** (gereksiz risk önlendi). Öneri stale bir hafızaya dayanıyormuş.
+
+### #2 — İtiraz Bankası → AI Saha Koçu & Prova entegrasyonu
+- `buildObjectionKnowledgeBase(lang)` (itirazlar.ts): 37 küratörlü itirazı kompakt "bilgi tabanı" metnine (soru + yaklaşım + örnek diyalog + tags) çevirir.
+- `askCoachAction` system prompt'una eklendi → koç, bir saha itirazıyla ilgili soruya cevap verirken ÖNCELİKLE bankadaki onaylı yaklaşım/diyaloglara dayanır, marka tonunu (empati → çerçeveleme → şeffaflık → "karar sende") korur.
+- `generateRoleplayResponseAction` (Prova) system prompt'una eklendi → simülasyondaki aday küratörlü itirazlar üretir, koçluk puanı/tavsiyesi banka yaklaşımına hizalanır.
+- Faz 2'de eklenen yapılandırılmış alanlar (yaklasim/ornekDiyalog/tags) ikinci kez değer üretiyor.
+
+### #1 — Süper-admin içerik editörü: kalıcı TR↔EN çeviri + düzenleme
+- **Kalıcı çeviri (CLAUDE.md Dil Politikası):** Eskiden custom itiraz `tr=en` (aynı metin) kaydediliyordu → EN kullanıcı Türkçe görüyordu (kural ihlali). Artık `translateObjectionFieldsAction` ile kaydederken kullanıcının dilindeki alanlar KARŞI dile çevrilip hem TR hem EN kalıcı saklanıyor (tek Gemini-flash JSON çağrısı; AI kotasına yazılmaz; hata/anahtar yoksa kaynağa düşer, akış bloklanmaz). Moderasyon akışından da geçer (payload çeviriyi taşır).
+- **Düzenleme:** `updateCustomContent` (customContent.ts) + `AddObjectionModal` edit modu (mevcut itirazla WYSIWYG ön-doldurma, kaydet→güncelle) + `ItirazCard`'da kalem butonu (yalnızca **sahip** olunan custom kartlarda; RLS `user_id` ile tutarlı).
+- Yeni i18n anahtarları (TR+EN): editObjection, addObjectionHint, objectionUpdated, savingTranslating, addBtn, update, editObjectionTitle.
+
+### #5 — Dayanıklı çekirdek-akış E2E (advisory)
+- `e2e/core-flow.spec.ts`: giriş → pano → saha özetim (şerit testid'i + sekme geçişi tab=monthly/yearly) → akademi itirazları. İlke: kırılgan seçici YOK, yalnızca HTTP<500 + URL + kararlı `data-testid`. Boş workspace'te geçer; auth yoksa zarifçe atlar. **Advisory** kalır (deploy hızını korur — kullanıcının net tercihi).
+
+### Doğrulama
+tsc + lint (--max-warnings 0) + unit (183/183) + build yeşil.
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts` (KB), `itirazlar/actions.ts` (çeviri, yeni), `yazar/actions.ts` (koç+prova KB), `itirazlar/_components/{AddObjectionModal,ItirazCard,ItirazlarContent}.tsx`, `lib/domain/customContent.ts` (update), `lib/translations/sections/training.ts`, `e2e/core-flow.spec.ts` (yeni)
+
 ## 2026-06-11 — İtiraz Bankası Faz 2 zenginleştirmesi TAMAMLANDI (yarım kalan iş) ✅
 
 Vercel/GitHub Actions acil işleri araya girince **yarım kalan** itiraz bankası zenginleştirmesi bitirildi.

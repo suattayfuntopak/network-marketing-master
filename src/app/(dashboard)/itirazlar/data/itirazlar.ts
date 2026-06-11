@@ -644,3 +644,24 @@ export const ITIRAZLAR: Itiraz[] = [
 ]
 
 export const PAGE_SIZE = 10
+
+/**
+ * Küratörlü itiraz bankasını AI Saha Koçu / Prova için kompakt bir "bilgi tabanı"
+ * metnine dönüştürür. Koç, bir itirazla ilgili soruya cevap verirken bu bankadaki
+ * onaylı yaklaşım + örnek diyaloglara dayanır → marka tonu (empati, baskısızlık,
+ * "karar sende") tüm AI yanıtlarında tutarlı kalır. Token bütçesi için her itiraz
+ * tek satıra sıkıştırılır.
+ */
+export function buildObjectionKnowledgeBase(lang: 'tr' | 'en'): string {
+  const en = lang === 'en'
+  return ITIRAZLAR.map(i => {
+    const soru = en ? i.soru.en : i.soru.tr
+    const yaklasim = (en ? i.yaklasimEn ?? i.yaklasim : i.yaklasim) ?? ''
+    const diyalog = (en ? i.ornekDiyalogEn ?? i.ornekDiyalog : i.ornekDiyalog) ?? ''
+    const tags = (i.tags ?? []).join(', ')
+    const diyalogTek = diyalog.replace(/\s*\n\s*/g, ' ⏎ ').trim()
+    const label = en ? 'Approach' : 'Yaklaşım'
+    const exLabel = en ? 'Example' : 'Örnek'
+    return `• "${soru}" [${tags}]\n  ${label}: ${yaklasim}\n  ${exLabel}: ${diyalogTek}`
+  }).join('\n')
+}

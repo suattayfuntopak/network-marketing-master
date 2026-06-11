@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, CheckCircle2, ChevronDown, Circle, Copy, Star, Trash2 } from 'lucide-react'
+import { Check, CheckCircle2, ChevronDown, Circle, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { Itiraz } from '../types'
 
@@ -32,6 +32,7 @@ type Props = {
   onToggleRead: (e: React.MouseEvent) => void
   onCopy: (value: string, e: React.MouseEvent) => void
   onDelete: () => void
+  onEdit?: () => void
 }
 
 export function ItirazCard({
@@ -46,6 +47,7 @@ export function ItirazCard({
   onToggleRead,
   onCopy,
   onDelete,
+  onEdit,
 }: Props) {
   const { lang, t } = useTranslation()
   const soru = lang === 'en' ? itiraz.soru.en : itiraz.soru.tr
@@ -104,6 +106,19 @@ export function ItirazCard({
           >
             {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
           </button>
+
+          {isCustom && onEdit && (
+            <button
+              onClick={e => {
+                e.stopPropagation()
+                onEdit()
+              }}
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] hover:bg-[#FFF1F3] dark:hover:bg-[#3d0a1a]/30 transition-all hover:scale-105"
+              title={t('objectionsPage.editObjectionTitle')}
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+          )}
 
           {isCustom && (
             <button

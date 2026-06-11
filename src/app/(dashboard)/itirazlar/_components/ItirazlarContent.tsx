@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
+import { loadCustomContent, addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
 import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
@@ -38,6 +38,7 @@ export function ItirazlarContent({
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
   const [customItirazlar, setCustomItirazlar] = useState<CustomItiraz[]>([])
+  const [editingObjection, setEditingObjection] = useState<CustomItiraz | null>(null)
   const [internalFormOpen, setInternalFormOpen] = useState(false)
   const formOpen = addFormOpenProp ?? internalFormOpen
   const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
@@ -82,6 +83,12 @@ export function ItirazlarContent({
     const updated = [newObj, ...customItirazlar]
     setCustomItirazlar(updated)
     addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, newObj as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+  }
+
+  function handleUpdateObjection(updatedObj: CustomItiraz) {
+    setCustomItirazlar(prev => prev.map(c => (c.id === updatedObj.id ? updatedObj : c)))
+    updateCustomContent('nmm_custom_objections', updatedObj.id, updatedObj as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+    setEditingObjection(null)
   }
 
   const filtrelenmis = useMemo(() => {
@@ -153,7 +160,7 @@ export function ItirazlarContent({
               </div>
             </div>
             <button
-              onClick={() => setFormOpen(true)}
+              onClick={() => { setEditingObjection(null); setFormOpen(true) }}
               className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -191,7 +198,7 @@ export function ItirazlarContent({
       {embedded && !onAddFormOpenChange && (
         <div className="mb-4 flex justify-end">
           <button
-            onClick={() => setFormOpen(true)}
+            onClick={() => { setEditingObjection(null); setFormOpen(true) }}
             className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#801438] active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
@@ -283,6 +290,15 @@ export function ItirazlarContent({
                   toggleObjectionRead(itiraz.id)
                 }}
                 onCopy={(value, e) => copyCevap(value, itiraz.id, e)}
+                onEdit={
+                  customIds.has(itiraz.id) &&
+                  (itiraz as unknown as { userId?: string }).userId === ws?.userId
+                    ? () => {
+                        setEditingObjection(itiraz as CustomItiraz)
+                        setFormOpen(true)
+                      }
+                    : undefined
+                }
                 onDelete={() => {
                   if (!confirm(t('objectionsPage.confirmDelete'))) return
                   setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
@@ -319,8 +335,13 @@ export function ItirazlarContent({
 
       <AddObjectionModal
         open={formOpen}
-        onClose={() => setFormOpen(false)}
+        onClose={() => {
+          setFormOpen(false)
+          setEditingObjection(null)
+        }}
         onAdd={handleAddObjection}
+        editing={editingObjection}
+        onUpdate={handleUpdateObjection}
       />
     </>
   )

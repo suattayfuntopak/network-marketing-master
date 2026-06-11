@@ -11,6 +11,7 @@ import {
   rejectIfAIInputTooLong,
   trimAggregateContext,
 } from '@/lib/domain/aiInputLimit'
+import { buildObjectionKnowledgeBase } from '@/app/(dashboard)/itirazlar/data/itirazlar'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -121,6 +122,10 @@ GÖREVİN:
 
 DİL POLİTİKASI:
 Eğer dil (language) parametresi 'en' ise, tüm JSON içeriğini (candidate_reply, yzk_strengths, yzk_improvements) tamamen İngilizce yaz. Eğer 'tr' ise tamamen Türkçe yaz.
+
+MARKA İTİRAZ BANKASI (KÜRATÖRLÜ):
+Aşağıda uygulamamızın onaylı İtiraz Bankası var. ADAY ROLÜNDE gerçekçi ve markamızın senaryolarına uygun itirazlar üretmek için bu bankadan ilham al; MENTÖR KOÇ ROLÜNDE distribütörün yanıtını puanlarken bu bankadaki yaklaşımı (empati → yeniden çerçeveleme → şeffaflık → "karar sende") referans al ve "yzk_improvements" tavsiyeni mümkünse ilgili itirazın yaklaşımına/örnek diyaloğuna dayandır.
+${buildObjectionKnowledgeBase(l)}
 
 FORMAT KURALI:
 JSON yapısı şu şekilde olmalıdır:
@@ -243,7 +248,11 @@ GÖREVİN:
 Kullanıcının sorusu network marketing (ağ pazarlaması), doğrudan satış, liderlik, kişisel gelişim, aday ilişkileri, takım yönetimi vb. ile ilgili DEĞİLSE, nazik, son derece profesyonel ve samimi bir dille bu konunun ilgi alanının dışında olduğunu belirt. Sadece Network Marketing ve ilgili konularla ilgili soruları cevaplayabileceğini söyle. Başka hiçbir genel kültüre, kod yazmaya, ilgisiz akademik konuya vb. cevap verme.
 
 DİL POLİTİKASI:
-Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.`;
+Elbette dil (language) parametresi 'en' ise cevabını İngilizce, 'tr' ise Türkçe olarak yaz.
+
+MARKA İTİRAZ BANKASI (KÜRATÖRLÜ — ÖNCELİKLİ KAYNAK):
+Aşağıda uygulamamızın onaylı İtiraz Bankası var. Kullanıcının sorusu bir saha itirazıyla ilgiliyse (örn. "param yok", "vaktim yok", "piramit mi", "ailem karşı", "satıcı değilim"), cevabını ÖNCELİKLE bu bankadaki yaklaşım ve örnek diyaloglara dayandır; markanın tonunu (empati → yeniden çerçeveleme → şeffaflık/resmi belge → "karar sende", baskısızlık, ürün-önce, etik) birebir koru. Bankada birebir karşılık yoksa AYNI ilkelerle yanıt üret. Asla baskıcı, garanti-vaat eden veya manipülatif dil kullanma.
+${buildObjectionKnowledgeBase(l)}`;
 
   try {
     const model = genAI.getGenerativeModel({
