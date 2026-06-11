@@ -27,13 +27,13 @@ export function CandidateProfileCard({ c, parsed, translatedNote, isTranslating 
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
             {parsed.warmth === 'sicak' && (
-              <span className="inline-flex items-center rounded-full bg-red-50 dark:bg-red-950/30 px-2 py-0.5 text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
+              <span className="inline-flex items-center rounded-full bg-red-100/60 dark:bg-red-950/40 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
             )}
             {parsed.warmth === 'ilik' && (
-              <span className="inline-flex items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-2 py-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {t('pipelinePage.warmthWarm')}</span>
+              <span className="inline-flex items-center rounded-full bg-amber-100/60 dark:bg-amber-950/40 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40">☀️ {t('pipelinePage.warmthWarm')}</span>
             )}
             {parsed.warmth === 'soguk' && (
-              <span className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
+              <span className="inline-flex items-center rounded-full bg-blue-100/60 dark:bg-blue-950/40 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40">❄️ {t('pipelinePage.warmthCold')}</span>
             )}
           </div>
           {c.phone && (

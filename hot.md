@@ -1,5 +1,107 @@
 # Hot Log
 
+## 2026-06-12 — AI Offline Fallback, Sıcaklık Rozetleri Kontrastı & React Query Standardizasyonu ✅
+
+### Yapay Zeka Yerel Çevrimdışı Taslakları (AI Fallbacks)
+- **`aiFallback.ts` (Yeni):** Gemini API'nin rate-limit veya offline olduğu durumlarda kullanılmak üzere, adayın boru hattı aşamasına (`yeni`, `iletisim`, `davetli`, `sunum`, `takip` vb.) ve sıcaklık derecesine göre kişiselleştirilmiş, samimi/profesyonel tonlarda Türkçe taslaklar oluşturan `generateLocalFallbackMessage` fonksiyonu yazıldı.
+- **Yerel Koç (Local Coach Answers):** İtiraz bankasındaki küratörlü bilgilere dayanarak "para", "zaman", "piramit", "çevre" gibi konularda çevrimdışı rehberlik sunan `generateLocalCoachAnswer` fonksiyonu eklendi.
+- **Actions Entegrasyonu:** `generateQuickMessageAction` (`bugun/ilgilen/actions.ts`), `generateMessageAction` ve `askCoachAction` (`yazar/actions.ts`) sunucu aksiyonları, Gemini API bağlantı sorunlarında bu yerel taslakları/koç yanıtlarını döndürecek şekilde hata yakalama (try/catch ve API key kontrolleri) katmanlarıyla güncellendi.
+
+### Sıcaklık Rozetleri Makyajı (Warmth Badge Contrast)
+- **Contrast & Styling:** `CandidateCard.tsx` ve `CandidateProfileCard.tsx` içindeki Sıcak (`🔥`), Ilık (`☀️`) ve Soğuk (`❄️`) rozetlerinin renk kombinasyonları, hem açık hem koyu modda WCAG AAA kontrast standartlarına tam uyumlu ve premium hissettirecek şekilde (açık modda text-700/bg-100, koyu modda text-300/bg-950) revize edildi.
+
+### React Query Standardizasyonu (Standardized Invalidation)
+- **`invalidator.ts` (Yeni):** React Query `invalidateQueries` çağrılarının dağınık yapılmasını önlemek ve veri tutarsızlığını engellemek için `queryInvalidator` isimli merkezi bir önbellek temizleme yöneticisi yazıldı.
+- **Uyumlaştırma:** Aday güncellemeleri, ekip değişiklikleri, hedef atamaları ve profil/workspace güncellemelerindeki dağınık inline invalidation blokları bu merkezi yöneticiye taşındı. `invalidateHubMetrics.ts`, `invalidateTeamAndAI.ts`, `useCandidates.ts`, `useUserGoal.ts`, `SettingsModal.tsx`, `ProfileModal.tsx`, `TeamPerformanceSection.tsx` ve `EkipPanel.tsx` dosyaları refaktör edildi.
+- **Lint Temizliği:** Invalidation standartlaşması sonrası oluşan kullanılmayan importlar (EkipPanel'deki `queryKeys`, useCandidates'teki `invalidateHubMetrics`) temizlenerek `npm run lint` ve `npm run build` kontrollerinin tamamen sıfır hata ile geçmesi sağlandı.
+
+### Dosyalar
+`src/lib/domain/aiFallback.ts` (yeni), `src/lib/query/invalidator.ts` (yeni), `src/app/(dashboard)/bugun/ilgilen/actions.ts`, `src/app/(dashboard)/yazar/actions.ts`, `src/app/(dashboard)/pipeline/_components/CandidateCard.tsx`, `src/app/(dashboard)/pipeline/[id]/_components/CandidateProfileCard.tsx`, `src/hooks/useCandidates.ts`, `src/hooks/useUserGoal.ts`, `src/components/ui/SettingsModal.tsx`, `src/components/ui/ProfileModal.tsx`, `src/app/(dashboard)/ekip/_components/TeamPerformanceSection.tsx`, `src/app/(dashboard)/ekip/_components/EkipPanel.tsx`, `src/lib/query/invalidateHubMetrics.ts`, `src/lib/query/invalidateTeamAndAI.ts`
+
+## 2026-06-12 — Avatar own-file, öneriler paketi, SW Safari fix ✅
+
+### Selda ↔ Ezgi (kök neden düzeltmesi)
+089/591eb80 **çapraz** URL varsayımı yanlıştı — storage dosya adları doğru kişiye ait.
+- `partnerAvatarFix.ts`: Selda→00fa3484, Ezgi→001a2b65 (own-file, kod tek kaynak).
+- **090 migration** + script güncellemesi.
+- `data-testid` pipeline/ekip kartları + vitest + `e2e/team-partner-smoke.spec.ts`.
+
+### Onaylı öneriler
+- **metricLabels.ts** — `team.fieldMetric*` / `dashboard.dailyTrackMetric*` tek modül.
+- **Ekip sıralama `all`** — batch’e `all` eklendi, ytd normalizasyonu kaldırıldı, EkipSummaryTab ∞ sekmesi.
+- **Saha Radarı** — `fetchSahaRadarMemberRows` (tam bundle yerine hafif RPC yolu).
+- **SW v3** — navigasyon intercept kaldırıldı, eski SW unregister (Safari context closed).
+
+### Dosyalar
+`partnerAvatarFix.ts`, `090_*`, `metricLabels.ts`, `fetchTeamBundle.ts`, `saha-radar/actions.ts`, `teamActivityActions.ts`, `EkipSummaryTab.tsx`, `HubCrownFunnelGrid.tsx`, `TeamFieldRankingTable.tsx`, `MemberActivitySheet.tsx`, `public/sw.js`, `ServiceWorkerRegister.tsx`, `e2e/team-partner-smoke.spec.ts`
+
+## 2026-06-12 — Selda/Ezgi avatar: çift swap bug fix (canonical URL) ✅
+
+### Kök neden
+087/088 DB’de URL’leri zaten çapraz atıyordu; `swapSeldaEzgiDisplayAvatars` kodda **tekrar** swap yapınca fotoğraflar yeniden ters dönüyordu.
+
+### Çözüm
+- `canonicalPartnerAvatarUrl` — Selda/Ezgi için sabit doğru storage URL (kod swap kaldırıldı).
+- `resolveCandidateFields` + `fetchTeamBundle` — pipeline/liste/ekip aynı URL.
+- **089 migration** + güncellenmiş `swap_selda_ezgi_avatars.sql` (idempotent SET).
+
+### Dosyalar
+`partnerAvatarFix.ts`, `fetchTeamBundle.ts`, `candidateFields.ts`, `089_*`, `swap_selda_ezgi_avatars.sql`
+
+## 2026-06-12 — Selda/Ezgi avatar swap, ekip aktivite 3. şahıs, Saha Radarı perf & UI ✅
+
+### Selda ↔ Ezgi profil fotoğrafları
+- **Görüntüleme katmanı:** `partnerAvatarFix.ts` + `fetchTeamBundle` — URL’ler karşılıklı swap (SQL 088 yedek).
+- **088 migration:** `nmm_workspace_members`, auth metadata, candidate satırları (idempotent).
+- **Ekip Ağacı:** avatar `teamBundle.ekipRows` üzerinden (swap sonrası).
+
+### Ekip üyesi aktivite sekmesi
+- **3. tekil etiketler:** Hunide + metrik kutularında `team.fieldMetric*` (Konuştu / Ekledi / Sunum / Ekibe katıldı).
+- **Tüm Zamanlar:** `MemberActivityPeriodTabs` — masaüstü metin, mobil 1/7/30/365/∞ (Saha Özetim ile aynı boyut).
+- **Huni periyodu:** `sheetPeriodToHubTab(period)` ile sekme senkronu.
+
+### İstatistikler
+- Süreç Sıcaklık + Aday Kazanım İvmesi alt açıklamaları kaldırıldı.
+- İvme grafiği: masaüstünde dikey küçük punto; mobilde yatay (punto değişmez).
+
+### Saha Radarım
+- Sunucu tarafı prefetch (`page.tsx` + HydrationBoundary).
+- `staleTime: QUERY_STALE.metrics`; sekmeler `hidden` ile DOM’da tutulur.
+- Takipler/Aktivite satırları: masaüstü AI + WhatsApp (sağa yaslı); mobilde + Ara.
+
+### Ekip Ağacı
+- Satır tıklama → `/pipeline/[pipeline_id]` (`treeActions` pipelineId).
+
+### Öneriler 1,3,4,5
+- Avatar upload UUID/path doğrulama (`profile.ts`).
+- `npm run db:smoke:focus-team` → `verify_focus_team_identity.sql`.
+- `brandGradients.ts` — Ekip sekmeleri / Ekibe Mesaj.
+
+### Dosyalar
+`partnerAvatarFix.ts`, `fetchTeamBundle.ts`, `MemberActivitySheet.tsx`, `MemberActivityPeriodTabs.tsx`, `HubCrownFunnelGrid.tsx`, `StatsCharts.tsx`, `CrownSahaRadarPage.tsx`, `saha-radar/page.tsx`, `SahaRadarCards.tsx`, `treeActions.ts`, `TeamGenerationTree.tsx`, `profile.ts`, `brandGradients.ts`, `088_*`, `package.json`
+
+## 2026-06-12 — Ekibim WhatsApp sekmesi, UI renkleri, ivme grafiği & Selda/Ezgi avatar migrasyonu ✅
+
+### Ekip üyesi kartları
+- **WhatsApp:** NMM ortaklarında üçüncü sekme (sağda) masaüstünde görünür; tıklanınca doğrudan `wa.me` açılır (davet değil, serbest mesaj).
+- **Sekme sırası:** Aktivite → DDBR → WhatsApp → (mobil) Telefon.
+
+### Ekibim sayfa makyajı (dark tema)
+- **Ekip Üyeleri** sekmesi + **Ekibe Mesaj** butonu: Pro plan `pink-600 → rose-500` gradyanı (`dark:` only).
+- **Eğitim İlerlemesi** sekmesi: Pano Saha Özetim teal gradyanı.
+- **Ekip Ağacı** sekmesi: Pano İstatistikler indigo gradyanı.
+
+### İstatistikler
+- **Aday Kazanım İvmesi (aylık):** Gün etiketleri dikey (`writing-mode: vertical-rl`) — üst üste binme giderildi.
+
+### Veritabanı (prod’da uygulanacak)
+- **087:** Selda/Ezgi pipeline link, isim ve avatar URL swap (086 sonrası).
+- **085–086:** Focus Team downline + RPC downline definer (önceki oturum).
+- Script: `supabase/scripts/swap_selda_ezgi_avatars.sql` (yalnız avatar swap).
+
+### Dosyalar
+`TeamMemberCard.tsx`, `TeamPerformanceSection.tsx`, `EkipTabNav.tsx`, `BroadcastPanel.tsx`, `StatsCharts.tsx`, `085`–`087` migrations, `supabase/scripts/*selda*`, `verify_focus_team_*`
+
 ## 2026-06-11 — İstatistik Grafiklerinde Ertelenmiş Yükleme (next/dynamic) & E2E Smoke Rota Güncellemeleri ✅
 
 ### İstatistik Grafikleri Performans İyileştirmesi

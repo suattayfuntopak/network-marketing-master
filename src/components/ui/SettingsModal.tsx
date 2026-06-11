@@ -10,6 +10,8 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
+import { queryInvalidator } from '@/lib/query/invalidator'
+
 interface SettingsModalProps {
   workspaceId: string
   onClose: () => void
@@ -66,7 +68,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     try {
       await updateWorkspaceNameAction(workspaceId, workspaceName)
 
-      queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      queryInvalidator.invalidateWorkspace(queryClient)
       toast.success('Grup adı başarıyla güncellendi')
       onClose()
     } catch (err: unknown) {

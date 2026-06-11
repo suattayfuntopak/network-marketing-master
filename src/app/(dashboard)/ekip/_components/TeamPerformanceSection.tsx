@@ -16,8 +16,7 @@ import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { BroadcastPanel } from './BroadcastPanel'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { addTeamMemberAsCandidateAction } from '../actions'
-import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
-import { queryKeys } from '@/lib/query/keys'
+import { queryInvalidator } from '@/lib/query/invalidator'
 import { toast } from 'sonner'
 import { memberMatchesSearch } from '@/lib/team/memberSearch'
 
@@ -235,8 +234,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
         memberUserId: member.user_id,
         memberPhone: member.phone,
       })
-      invalidateHubMetrics(queryClient, ws.workspaceId)
-      queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
+      queryInvalidator.invalidateHub(queryClient, ws.workspaceId)
+      queryInvalidator.invalidateTeam(queryClient, ws.workspaceId)
       toast.success(
         result.created ? t('team.linkToPipelineSuccess') : t('team.linkToPipelineExists'),
       )

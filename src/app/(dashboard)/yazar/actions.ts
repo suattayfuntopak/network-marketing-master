@@ -13,6 +13,7 @@ import {
   trimAggregateContext,
 } from '@/lib/domain/aiInputLimit'
 import { buildObjectionKnowledgeBase } from '@/app/(dashboard)/itirazlar/data/itirazlar'
+import { generateLocalFallbackMessage, generateLocalCoachAnswer } from '@/lib/domain/aiFallback'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -30,10 +31,6 @@ export async function generateMessageAction(
   _prev: YazarFormState,
   formData: FormData
 ): Promise<YazarFormState> {
-  if (!process.env.GEMINI_API_KEY) {
-    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
-  }
-
   const name        = (formData.get('name')        as string | null)?.trim() ?? ''
   const stage       = (formData.get('stage')       as string | null)?.trim() ?? ''
   const context     = (formData.get('context')     as string | null)?.trim() ?? ''
@@ -44,6 +41,12 @@ export async function generateMessageAction(
   if (!name) return { error: 'Kişi adı zorunlu.' }
   const contextErr = rejectIfAIInputTooLong(context)
   if (contextErr) return { error: contextErr }
+
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY eksik, yerel taslak oluşturuluyor.')
+    const message = generateLocalFallbackMessage({ name, stage, context, tone, warmth })
+    return { message }
+  }
 
   const quota = await checkAIQuota('message')
   if (!quota.ok) return { error: quota.message, remaining: 0 }
@@ -67,7 +70,9 @@ export async function generateMessageAction(
 
     return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: unknown) {
-    return { error: 'Mesaj oluşturulamadı: ' + ((err instanceof Error ? err.message : String(err))) }
+    console.error('Gemini API hatası, yerel taslağa geçiliyor:', err)
+    const message = generateLocalFallbackMessage({ name, stage, context, tone, warmth })
+    return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   }
 }
 
@@ -226,13 +231,15 @@ export async function askCoachAction(
   const lang     = (formData.get('lang')     as string | null)?.trim() ?? 'tr'
 
   const l = toLang(lang)
-  if (!process.env.GEMINI_API_KEY) {
-    return { error: serverError('geminiMissing', l) }
-  }
-
   if (!question) return { error: l === 'en' ? 'Please enter a question.' : 'Lütfen bir soru yazın.' }
   const questionErr = rejectIfAIInputTooLong(question, l)
   if (questionErr) return { error: questionErr }
+
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY eksik, yerel koç yanıtı oluşturuluyor.')
+    const answer = generateLocalCoachAnswer(question, l)
+    return { answer }
+  }
 
   const quota = await checkAIQuota('message', { lang: l })
   if (!quota.ok) return { error: quota.message, remaining: 0 }
@@ -244,7 +251,7 @@ export async function askCoachAction(
 Kullanıcı sana network marketing sektörü, aday ilişkileri, takım kurma, sponsorluk, liderlik, satış teknikleri, zaman yönetimi veya bu sektörle doğrudan ilgili herhangi bir konuda soru soruyor.
 
 GÖREVİN:
-1. Kullanıcıya son derece profesyonel, yapıcı, ilham verici ve eyleme dökülebilir tavsiyeler ver. Cevapların kısa, net ve anlaşılır olsun.
+1. Kullanıcıya son derece profesyonel, yapıcı, ilham verici ve eyleme dökülebilir tavsiyeler ver. Cevapların kısa, net and anlaşılır olsun.
 2. GÜVENLİK FİLTRESİ / KAPSAM DIŞI KURALI:
 Kullanıcının sorusu network marketing (ağ pazarlaması), doğrudan satış, liderlik, kişisel gelişim, aday ilişkileri, takım yönetimi vb. ile ilgili DEĞİLSE, nazik, son derece profesyonel ve samimi bir dille bu konunun ilgi alanının dışında olduğunu belirt. Sadece Network Marketing ve ilgili konularla ilgili soruları cevaplayabileceğini söyle. Başka hiçbir genel kültüre, kod yazmaya, ilgisiz akademik konuya vb. cevap verme.
 
@@ -289,8 +296,9 @@ ${buildObjectionKnowledgeBase(l)}`;
 
     return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: unknown) {
-    console.error('Yapay Zeka Koçu Hatası:', err)
-    return { error: 'Yanıt oluşturulurken bir hata oluştu.' }
+    console.error('Yapay Zeka Koçu Hatası, yerel koç yanıtına geçiliyor:', err)
+    const answer = generateLocalCoachAnswer(question, l)
+    return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   }
 }
 

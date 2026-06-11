@@ -18,7 +18,7 @@ import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
-import { queryKeys } from '@/lib/query/keys'
+import { queryInvalidator } from '@/lib/query/invalidator'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -86,7 +86,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     try {
       await toggleOnboardingStepAction(userId, stepId, !isStepDone)
       toast.success(isStepDone ? t('team.stepIncomplete') : t('team.stepComplete'))
-      if (ws?.workspaceId) queryClient.invalidateQueries({ queryKey: queryKeys.team(ws.workspaceId) })
+      if (ws?.workspaceId) queryInvalidator.invalidateTeam(queryClient, ws.workspaceId, userId)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error('[toggleOnboardingStep] error:', err)
@@ -173,7 +173,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     try {
       await removeTeamMemberAction(memberId, memberName)
       toast.success(t('team.removeSuccess', { name: memberName }))
-      queryClient.invalidateQueries({ queryKey: ['team'] })
+      queryInvalidator.invalidateTeam(queryClient, ws?.workspaceId)
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err)
       console.error(err)

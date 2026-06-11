@@ -3,16 +3,25 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
+import { generateLocalFallbackMessage } from '@/lib/domain/aiFallback'
 
 export async function generateQuickMessageAction(input: {
   name: string
   stage: string
   note?: string | null
 }): Promise<{ message?: string; error?: string }> {
-  if (!process.env.GEMINI_API_KEY) {
-    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
-  }
   if (!input.name) return { error: 'Kişi adı eksik.' }
+
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn('GEMINI_API_KEY eksik, yerel taslak oluşturuluyor.')
+    const fallbackMessage = generateLocalFallbackMessage({
+      name: input.name,
+      stage: input.stage,
+      context: input.note ?? '',
+      tone: 'samimi',
+    })
+    return { message: fallbackMessage }
+  }
 
   const quota = await checkAIQuota('message')
   if (!quota.ok) return { error: quota.message }
@@ -35,6 +44,13 @@ export async function generateQuickMessageAction(input: {
 
     return { message }
   } catch (err: unknown) {
-    return { error: 'Mesaj oluşturulamadı: ' + ((err instanceof Error ? err.message : String(err))) }
+    console.error('Gemini API hatası, yerel taslağa geçiliyor:', err)
+    const fallbackMessage = generateLocalFallbackMessage({
+      name: input.name,
+      stage: input.stage,
+      context: input.note ?? '',
+      tone: 'samimi',
+    })
+    return { message: fallbackMessage }
   }
 }

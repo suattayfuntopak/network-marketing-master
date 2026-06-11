@@ -16,6 +16,8 @@ import imageCompression from 'browser-image-compression'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
+import { queryInvalidator } from '@/lib/query/invalidator'
+
 interface ProfileModalProps {
   onClose: () => void
 }
@@ -110,8 +112,8 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
       setAvatarUrl(publicUrl)
       setAvatarPreview(publicUrl)
-      queryClient.invalidateQueries({ queryKey: ['workspace'] })
-      queryClient.invalidateQueries({ queryKey: ['team'] })
+      queryInvalidator.invalidateWorkspace(queryClient)
+      queryInvalidator.invalidateTeam(queryClient)
       toast.success('Profil fotoğrafı güncellendi!')
     } catch (err: unknown) {
       console.error(err)
@@ -149,7 +151,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
         setPasswordConfirm('')
       }
 
-      queryClient.invalidateQueries({ queryKey: ['workspace'] })
+      queryInvalidator.invalidateWorkspace(queryClient)
       toast.success('Profil güncellendi')
       onClose()
     } catch (err: unknown) {

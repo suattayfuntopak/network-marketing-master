@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getGoalDashboardAction, saveUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { queryKeys } from '@/lib/query/keys'
+import { queryInvalidator } from '@/lib/query/invalidator'
 
 /**
  * Hedef + bugünün ilerlemesi + yol haritası — TEK konsolide sorgu. Dashboard
@@ -20,7 +21,7 @@ export function useUserGoal() {
   const save = useMutation({
     mutationFn: saveUserGoalAction,
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
+      queryInvalidator.invalidateGoals(qc)
     },
   })
 

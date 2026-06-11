@@ -13,11 +13,10 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
 import { logPresentationWhatsAppAction } from '@/app/(dashboard)/pulse/learningEvents'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
-import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
+import { queryInvalidator } from '@/lib/query/invalidator'
 
-function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string) {
-  qc.invalidateQueries({ queryKey: queryKeys.candidates(workspaceId) })
-  qc.invalidateQueries({ queryKey: ['candidate', workspaceId] })
+function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string, candidateId?: string) {
+  queryInvalidator.invalidateCandidates(qc, workspaceId, candidateId)
 }
 
 export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'kaybolanlar' | 'yeni' | 'iletisim' | 'davetli' | 'sunum' | 'takip' | 'kararsiz' | 'katildi' | 'ilgilenmedi' | 'pasif' | 'kayboldu'
@@ -205,9 +204,8 @@ export function useUpdateCandidate(workspaceId: string) {
       )
       return { prevDetail, prevList, detailKey, listKey }
     },
-    onSuccess: () => {
-      invalidateCandidateQueries(qc, workspaceId)
-      qc.invalidateQueries({ queryKey: ['activity'] })
+    onSuccess: (_, vars) => {
+      invalidateCandidateQueries(qc, workspaceId, vars.id)
       invalidateTeamAndAIUsage(qc, workspaceId)
       toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
     },
@@ -256,9 +254,7 @@ export function useMarkContacted(workspaceId: string) {
       ])
     },
     onSuccess: (_data, vars) => {
-      invalidateCandidateQueries(qc, workspaceId)
-      invalidateHubMetrics(qc, workspaceId)
-      qc.invalidateQueries({ queryKey: ['activity', vars.id] })
+      invalidateCandidateQueries(qc, workspaceId, vars.id)
       const lang = getLang()
       toast.success(
         vars.actionType === 'call'
@@ -287,8 +283,7 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
       await logPresentationWhatsAppAction(workspaceId, candidateId, materialTitle)
     },
     onSuccess: (_data, vars) => {
-      invalidateCandidateQueries(qc, workspaceId)
-      qc.invalidateQueries({ queryKey: ['activity', vars.candidateId] })
+      invalidateCandidateQueries(qc, workspaceId, vars.candidateId)
       invalidateTeamAndAIUsage(qc, workspaceId)
     },
     onError: (e: Error) =>
@@ -383,9 +378,7 @@ export function useAddCandidateNote(workspaceId: string) {
       if (error) throw new Error(error.message)
     },
     onSuccess: (_, { candidateId }) => {
-      qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes-count', candidateId] })
-      qc.invalidateQueries({ queryKey: ['activity', candidateId] })
+      invalidateCandidateQueries(qc, workspaceId, candidateId)
       toast.success(getLang() === 'en' ? 'Note saved' : 'Not kaydedildi')
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to save note: ${e.message}` : `Not kaydedilemedi: ${e.message}`),
@@ -404,8 +397,7 @@ export function useDeleteActivity(workspaceId: string) {
       if (error) throw new Error(error.message)
     },
     onSuccess: (_, { candidateId }) => {
-      qc.invalidateQueries({ queryKey: ['activity', candidateId] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
+      invalidateCandidateQueries(qc, workspaceId, candidateId)
       invalidateTeamAndAIUsage(qc, workspaceId)
     },
     onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`),
