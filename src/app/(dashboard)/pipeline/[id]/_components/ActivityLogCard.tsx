@@ -42,21 +42,22 @@ function ActivityLogCardBody({ candidateId, workspaceId }: Props) {
   return (
     <>
       <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 space-y-3">
-        <div className="flex items-center justify-between gap-2">
+        {/* Tüm başlık satırı tıklanabilir — sadece chevron değil (aç/kapa). */}
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+          aria-label={expanded ? t('common.collapse') : t('common.expand')}
+          className="flex w-full items-center justify-between gap-2 text-left"
+        >
           <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[var(--text-3)]">
             <History className="h-3.5 w-3.5" />
             {t('pipeline.activityHistory')}
           </p>
-          <button
-            type="button"
-            onClick={() => setExpanded(v => !v)}
-            aria-expanded={expanded}
-            aria-label={expanded ? t('common.collapse') : t('common.expand')}
-            className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
-          >
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)]">
             <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`} />
-          </button>
-        </div>
+          </span>
+        </button>
         {expanded && (
           <>
             <ul className="space-y-2">

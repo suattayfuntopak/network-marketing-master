@@ -79,7 +79,7 @@ export const tr = {
     egitim: "Akademi",
     vaktinVarsa: "Vaktin Varsa",
     itirazlar: "İtirazlar",
-    yazar: "YZ Koçu",
+    yazar: "YZ Koçum",
     sahaProvasi: "Saha Provası",
     uyum: "Uyum Merkezi",
     istatistikler: "İstatistikler",

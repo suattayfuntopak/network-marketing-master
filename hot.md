@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-11 — Listem ikon/başlık + chevron tam-satır + davet senkron (mükerrer önleme) + CI shim fix ✅
+
+### CI migrate-apply kırmızıydı → shim tamamlandı
+- `scripts/ci/supabase-shim.sql`: `011/043` `ALTER PUBLICATION supabase_realtime` ve `070` `cron.job/cron.schedule` eksikti → boş publication + cron şema/tablo/no-op fonksiyon eklendi. migrate-apply artık geçmeli.
+
+### Listem (eski "Boru Hattı") UI
+- İkon `TrendingUp` → **`ClipboardList`** (sidebar + pano kutusu + mobil bottom bar + sayfa başlığı ortak — `navigation.ts` + `PipelinePageContent`).
+- Listem sayfası: "Kişi listesi ve süreç bilgileri" **alt yazısı silindi**; sağ üstteki **"Materyal Ekle" butonu kaldırıldı** (materyal yönetimi kişi detayında kalır).
+- Mobil bottom bar `YZ Koçu` → **`YZ Koçum`** (gözden kaçan kısa etiket, `tr.ts:82`).
+
+### Chevron: tüm başlık satırı tıklanabilir
+- Basit chevron-only kartlar tam-satır toggle yapıldı: `ActivityLogCard`, `PresentationMaterialsCard` ("Yönet" linki hariç). Çok-aksiyonlu satırlar (ranking tabloları — isim→detay) bilinçli korundu (full-row toggle navigasyonu bozardı). Çoğu kart (ItirazCard, TrainingCard, FAQ, TeamActivitySummary, HedefKart...) zaten tam-satırdı.
+
+### Davet senkronu + MÜKERRER önleme (Selda/Ezgi)
+- **Tüm davet linkleri artık `?ref=KOD` taşıyor** (eksikti): `EkipPanel` üye daveti (+`&aday=`), `InviteTeammateSection`, `PlatformYonetimContent`. Sonuç: kişi linkten kaydolunca davet kodunu ELLE girmeden otomatik bu ekibe bağlanır (ensureWorkspaceAction → nmm_join_workspace/079) → boru hattındaki "katıldı" adayıyla eşleşir → **NMM Ortağı** olur, 4-sekmeli karta döner, **mükerrer olmaz**.
+- **"Ekibime Bağla" (claim) tam-reconcile edildi**: parent_id + aday eşleşme/oluşturma + KALICI `nmm_team_pipeline_links` + stage katıldı. Mevcut dış kayıtları (Selda/Ezgi) tek tıkla bağlar; fetchTeamBundle dedup'ı (satır 179-190) Saha adayını üyeye bağlayıp ayrı listelemediği için mükerrer çözülür (silme gerekmez — aday = kişi, artık bağlı). Buton yalnızca Dış Kayıtlar'da.
+
+### Onaylanan öneriler (önceki tur)
+- migrate-apply shim'i genişletildi (yeşile dönmesi = branch protection ön koşulu). Branch protection eklemek + `SUPABASE_PROJECT_REF` ile remote-drift aktive etmek + `npm run db:gen-types` ile tipleri tazelemek → kullanıcı/secret aksiyonları (raporda).
+
+### Doğrulama
+tsc + lint + unit (183/183) + build + migrate:check yeşil.
+
+### Dosyalar
+`scripts/ci/supabase-shim.sql`, `lib/domain/navigation.ts`, `pipeline/_components/PipelinePageContent.tsx`, `tr.ts`, `pipeline/[id]/_components/{ActivityLogCard,PresentationMaterialsCard}.tsx`, `ekip/_components/{EkipPanel,InviteTeammateSection}.tsx`, `platform-yonetim/_components/PlatformYonetimContent.tsx`, `platform-yonetim/admin-actions.ts` (claim reconcile)
+
 ## 2026-06-11 — Migration güvenliği: CI'da gerçek-Postgres uygula + tip drift + kontrollü prod push ✅
 
 Önceki turdaki 4 öneri uygulandı. Amaç: "063/064 phone bug" gibi şema-referans hatalarının bir daha prod'a sızmaması.

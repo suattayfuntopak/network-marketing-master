@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, TrendingUp, Bot, Users,
+  LayoutDashboard, ClipboardList, Bot, Users,
   CalendarDays, BookOpen, Target,
   GraduationCap, History, Crown, Ellipsis, Activity,
   BarChart3,
@@ -24,7 +24,7 @@ export const PANO_ORGANIZATION_ITEMS: readonly PanoLauncherItem[] = [
   { href: '/hedefim', translationKey: 'dashboard.panoActionPlan', icon: Target, color: 'indigo', desktopColor: 'indigo' },
   { href: '/saha-ozetim', translationKey: 'dashboard.panoFieldSummary', icon: History, color: 'teal', desktopColor: 'teal' },
   { href: '/saha-radar', translationKey: 'dashboard.crownMockSahaRadar', icon: Activity, color: 'coral', desktopColor: 'coral' },
-  { href: '/pipeline', translationKey: 'nav.pipeline', icon: TrendingUp, color: 'amber', desktopColor: 'amber' },
+  { href: '/pipeline', translationKey: 'nav.pipeline', icon: ClipboardList, color: 'amber', desktopColor: 'amber' },
   { href: '/ekip', translationKey: 'nav.ekip', icon: Users, color: 'rose', desktopColor: 'rose' },
   { href: '/egitim', translationKey: 'nav.vaktinVarsa', icon: BookOpen, color: 'blue', desktopColor: 'blue' },
   { href: '/canli-egitim', translationKey: 'dashboard.crownMockLiveTraining', icon: GraduationCap, color: 'chick', desktopColor: 'chick' },

@@ -40,7 +40,7 @@ export function InviteTeammateSection({
           </button>
           <a
             href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              t('team.waInviteGroup', { code: inviteCode, link: REGISTER_URL })
+              t('team.waInviteGroup', { code: inviteCode, link: inviteCode ? `${REGISTER_URL}?ref=${encodeURIComponent(inviteCode)}` : REGISTER_URL })
             )}`}
             target="_blank"
             rel="noopener noreferrer"

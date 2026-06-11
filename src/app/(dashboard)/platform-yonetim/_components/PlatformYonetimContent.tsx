@@ -200,7 +200,8 @@ export function PlatformYonetimContent() {
   })
 
   function buildInviteWaLink(code: string, name: string): string {
-    const msg = t('platformPage.inviteWaMessage', { name, link: REGISTER_URL, code })
+    const link = code ? `${REGISTER_URL}?ref=${encodeURIComponent(code)}` : REGISTER_URL
+    const msg = t('platformPage.inviteWaMessage', { name, link, code })
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 

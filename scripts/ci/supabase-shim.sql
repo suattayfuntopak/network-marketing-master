@@ -39,3 +39,26 @@ CREATE OR REPLACE FUNCTION auth.role() RETURNS text
 
 -- Roller auth şemasını görebilsin (RLS politikaları auth.uid() çağırır).
 GRANT USAGE ON SCHEMA auth TO anon, authenticated, service_role;
+
+-- Supabase Realtime publication (011/043 `ALTER PUBLICATION supabase_realtime ADD TABLE`,
+-- 044 DROP). Vanilla PG'de yok → boş bir publication oluştur.
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    CREATE PUBLICATION supabase_realtime;
+  END IF;
+END $$;
+
+-- pg_cron taklidi (070 `cron.job` / `cron.schedule`). CI'da gerçek zamanlayıcı yok;
+-- şema + tablo + no-op fonksiyon, migration'ın temiz uygulanması için yeterli.
+CREATE SCHEMA IF NOT EXISTS cron;
+CREATE TABLE IF NOT EXISTS cron.job (
+  jobid    bigint GENERATED ALWAYS AS IDENTITY,
+  jobname  text,
+  schedule text,
+  command  text
+);
+CREATE OR REPLACE FUNCTION cron.schedule(job_name text, schedule text, command text)
+  RETURNS bigint LANGUAGE sql AS $$
+    INSERT INTO cron.job (jobname, schedule, command) VALUES (job_name, schedule, command)
+    RETURNING jobid;
+  $$;
