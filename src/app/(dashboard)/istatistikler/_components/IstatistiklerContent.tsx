@@ -257,6 +257,42 @@ export function IstatistiklerContent() {
       return monthlyBars
     }
 
+    if (period === 'all') {
+      // Tüm Zamanlar: ilk adaydan bugüne TAKVİM ayı bazlı kovalar — her bar
+      // ayrı bir ay (etiketler benzersiz ve okunur). Çok uzun aralıkta yıllık.
+      if (candidates.length === 0) return []
+      const earliest = candidates.reduce(
+        (m, c) => Math.min(m, new Date(c.created_at).getTime()),
+        now,
+      )
+      const eIst = new Date(earliest + ISTANBUL_OFFSET)
+      const startY = eIst.getUTCFullYear()
+      const startM = eIst.getUTCMonth()
+      const monthsSpan = (todayYear - startY) * 12 + (todayMonth - startM) + 1
+
+      if (monthsSpan <= 18) {
+        return Array.from({ length: monthsSpan }, (_, i) => {
+          const y = startY + Math.floor((startM + i) / 12)
+          const m = (startM + i) % 12
+          const count = candidates.filter(c => {
+            const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
+            return cDate.getUTCFullYear() === y && cDate.getUTCMonth() === m
+          }).length
+          return { label: `${monthsTr[m]} ${String(y).slice(2)}`, count }
+        })
+      }
+
+      // 18 aydan uzun geçmiş → yıllık kovalar
+      return Array.from({ length: todayYear - startY + 1 }, (_, i) => {
+        const y = startY + i
+        const count = candidates.filter(c => {
+          const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
+          return cDate.getUTCFullYear() === y
+        }).length
+        return { label: String(y), count }
+      })
+    }
+
     // Default legacy/bucket logic for other periods, aligned with Istanbul Time
     const BUCKETS = 7
     const dayMs = 86_400_000

@@ -13,6 +13,7 @@ import {
   type TrainingVideoDef,
 } from '@/lib/domain/trainingVideos'
 import { VIDEO_COMPLETE_PERCENT, type VideoProgressRow } from '@/lib/domain/videoProgress'
+import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 import { reportVideoWatchAction } from '@/app/(dashboard)/egitim/videoActions'
 
 type Props = {
@@ -204,7 +205,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             <button
               type="button"
               onClick={() => setShowEmbed(true)}
-              className={`${actionBtn} bg-brand text-white hover:opacity-95`}
+              className={`${actionBtn} bg-brand text-white hover:opacity-95 ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`}
             >
               <Play className="h-4 w-4" />
               {t('videoTraining.watchVideoBtn')}

@@ -38,6 +38,10 @@ interface Props {
 export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, maxTrendCount }: Props) {
   const { t } = useTranslation()
 
+  // Az kova (ör. Tüm Zamanlar aylık/yıllık) → masaüstünde de yatay, okunur
+  // etiket. Yoğun görünümler (30g ≈ 31 bar) dikey-küçük kalır.
+  const fewTrendBars = trendBars.length <= 8
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -192,12 +196,18 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
                     <span className="block w-full truncate text-center text-xs font-semibold text-[var(--text-3)] md:hidden">
                       {bar.label}
                     </span>
-                    <span
-                      className="hidden md:block h-8 text-[8px] font-medium leading-none text-[var(--text-3)]"
-                      style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
-                    >
-                      {bar.label}
-                    </span>
+                    {fewTrendBars ? (
+                      <span className="hidden md:block w-full truncate text-center text-xs font-semibold text-[var(--text-3)]">
+                        {bar.label}
+                      </span>
+                    ) : (
+                      <span
+                        className="hidden md:block h-8 text-[8px] font-medium leading-none text-[var(--text-3)]"
+                        style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+                      >
+                        {bar.label}
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

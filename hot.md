@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-12 — Serinin ilk 3 videosu, dark video buton rengi, Tüm Zamanlar grafiği ✅
+
+### Crown Team serisinin ilk 3 videosu (1–3)
+- 093/094 ile seri tamamlandı: **1·Hayaller ve Hedefler, 2·Odaklanma ve Taahhüt, 3·Kişisel Gelişim** (sıra 1-3) eklendi. Artık tam 9 videoluk seri.
+- **`trainingVideos.ts`** kanonik liste + **`094_crown_team_video_series_intro.sql`** (UPSERT). TR + kalıcı EN. Süreler: 3·Kişisel Gelişim=21dk (slayttan), 1-2 tahminî.
+- Kullanıcı ricasıyla 1. videonun başlığına "1 · " ön eki eklendi (orijinal YouTube başlığında numara yoktu).
+
+### Dark tema: video buton rengi
+- **`TrainingVideoCard.tsx`:** "Video" izleme butonu dark temada Ekibim/Ekip Üyeleri sekmesiyle aynı pembe→gül gradyanı (`PRO_CTA_GRADIENT_ACTIVE_DARK_SM`). Light tema değişmedi (`bg-brand`).
+
+### İstatistikler — "Tüm Zamanlar" Aday Kazanım İvmesi grafiği
+- **Sorun:** Tüm Zamanlar'da 7 eşit-zaman kovası kullanılıyordu; kısa veri aralığında kovalar aynı aya düşüp etiketler "May 26"/"Haz 26" diye tekrarlıyor, üstelik masaüstünde 8px dikey yazı okunmuyordu.
+- **Çözüm (`IstatistiklerContent.tsx`):** Tüm Zamanlar artık **takvim ayı bazlı** kovalar (ilk adaydan bugüne); her bar ayrı bir ay, etiket benzersiz (`Ay 'YY`). 18 aydan uzun geçmişte otomatik **yıllık** kovalara (`YYYY`) düşer.
+- **Çözüm (`StatsCharts.tsx`):** Kova sayısı ≤8 ise (Tüm Zamanlar aylık/yıllık, 7g) masaüstünde de **yatay, okunur** (`text-xs`) etiket; yoğun görünüm (30g ≈ 31 bar) dikey-küçük kalır.
+
+### Dosyalar
+`src/lib/domain/trainingVideos.ts`, `supabase/migrations/094_crown_team_video_series_intro.sql`, `src/app/(dashboard)/egitim/_components/TrainingVideoCard.tsx`, `src/app/(dashboard)/istatistikler/_components/IstatistiklerContent.tsx`, `src/app/(dashboard)/istatistikler/_components/StatsCharts.tsx`
+
+### Canlı için: 093 + 094 migration'ları db-push.yml (apply/PUSH) ile elle uygulanmalı.
+
 ## 2026-06-12 — Seviye düzeltmesi + Crown Team gerçek video serisi ✅
 
 ### Seviye: rozet geri, yalnız "SEVİYE" kelimesi gizli
