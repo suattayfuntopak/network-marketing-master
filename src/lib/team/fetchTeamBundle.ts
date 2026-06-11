@@ -501,25 +501,44 @@ export async function fetchSahaRadarMemberRows(
     fetchPipelineLinks(supabase, workspaceId),
   ])
 
-  return members.map(m => ({
-    user_id: m.user_id,
-    full_name: m.full_name,
-    role: m.user_id === leaderOwnerId ? 'leader' : 'member',
-    joined_at: m.joined_at,
-    candidate_count: m.candidate_count,
-    yeni_count: m.yeni_count,
-    sunum_count: m.sunum_count,
-    takip_count: m.takip_count,
-    katildi_count: m.katildi_count,
-    last_activity_at: m.last_activity_at,
-    onboarding_steps: m.onboarding_steps,
-    phone: null,
-    isAppUser: true as const,
-    avatar_url: canonicalPartnerAvatarUrl(
-      m.user_id,
-      m.avatar_url ?? authAvatars[m.user_id] ?? null,
-    ),
-    pipeline_id: pipelineLinks[m.user_id] ?? null,
-    pipeline_link_explicit: pipelineLinks[m.user_id] != null,
-  }))
+  const candidateIds = Object.values(pipelineLinks).filter(Boolean)
+  const { data: candidates } = candidateIds.length > 0
+    ? await supabase
+        .from('nmm_candidates')
+        .select('id, phone')
+        .in('id', candidateIds)
+    : { data: [] }
+
+  const candidatePhones: Record<string, string> = {}
+  for (const c of candidates ?? []) {
+    if (c.phone) {
+      candidatePhones[c.id] = c.phone
+    }
+  }
+
+  return members.map(m => {
+    const candidateId = pipelineLinks[m.user_id]
+    const phone = candidateId ? candidatePhones[candidateId] ?? null : null
+    return {
+      user_id: m.user_id,
+      full_name: m.full_name,
+      role: m.user_id === leaderOwnerId ? 'leader' : 'member',
+      joined_at: m.joined_at,
+      candidate_count: m.candidate_count,
+      yeni_count: m.yeni_count,
+      sunum_count: m.sunum_count,
+      takip_count: m.takip_count,
+      katildi_count: m.katildi_count,
+      last_activity_at: m.last_activity_at,
+      onboarding_steps: m.onboarding_steps,
+      phone,
+      isAppUser: true as const,
+      avatar_url: canonicalPartnerAvatarUrl(
+        m.user_id,
+        m.avatar_url ?? authAvatars[m.user_id] ?? null,
+      ),
+      pipeline_id: candidateId ?? null,
+      pipeline_link_explicit: candidateId != null,
+    }
+  })
 }

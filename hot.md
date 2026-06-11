@@ -9,15 +9,19 @@
 - **`globals.css`:** Defined candidate warmth colors (`Hot`, `Warm`, `Cold`) as CSS design variables under `:root` and `.dark` blocks, and mapped them in the `@theme` block as custom Tailwind utility colors (`bg-warmth-hot-bg`, `text-warmth-hot-text`, etc.).
 - **`CandidateCard.tsx` & `CandidateProfileCard.tsx`:** Updated warmth badges to consume the semantic theme tokens, centralizing colors in the design system.
 
-### Type-Safe i18n Autocomplete
+### Type-Safe i18n Autocomplete & Consistency Tests
 - **`LanguageProvider.tsx`:** Defined type-safe `TranslationKey` mapping all nested translation keys across the core dictionary and 13 sections. Typed `t` parameter using `TranslationKey | (string & {})` to preserve editor autocomplete suggestions while allowing dynamic variables.
+- **`translations.test.ts` [NEW]:** Added a unit test to dynamically compare tree properties of all TR and EN core language files and modular sections to assert 100% key tree matches.
 
-### Local RLS Testing Automation
+### Local RLS Testing & Reset Automation
 - **`verify_rls_policies.sql`:** Created SQL test suite simulating JWT auth claims to assert workspace boundary data isolation on `public.nmm_candidates`.
-- **`package.json`:** Added `"db:test:rls"` command script and corrected command executor syntax to `supabase db query -f`.
+- **`package.json`:** Added `"db:test:rls"` command script and corrected command executor syntax to `supabase db query -f`. Added `"db:reset:test"` to automate full schema reset and test.
+
+### Saha Radarı WhatsApp Button Restoration
+- **`fetchTeamBundle.ts` (`fetchSahaRadarMemberRows`):** Resolved member phone numbers from matching pipeline candidates using explicit links (`nmm_team_pipeline_links`), restoring the WhatsApp action button on the Saha Radarı Member Activity cards.
 
 ### Dosyalar
-`src/hooks/useCandidates.ts`, `src/app/globals.css`, `src/app/(dashboard)/pipeline/_components/CandidateCard.tsx`, `src/app/(dashboard)/pipeline/[id]/_components/CandidateProfileCard.tsx`, `src/providers/LanguageProvider.tsx`, `supabase/scripts/verify_rls_policies.sql`, `package.json`
+`src/hooks/useCandidates.ts`, `src/app/globals.css`, `src/app/(dashboard)/pipeline/_components/CandidateCard.tsx`, `src/app/(dashboard)/pipeline/[id]/_components/CandidateProfileCard.tsx`, `src/providers/LanguageProvider.tsx`, `src/lib/translations/translations.test.ts`, `supabase/scripts/verify_rls_policies.sql`, `package.json`, `src/lib/team/fetchTeamBundle.ts`
 
 ## 2026-06-11 — Kalan 4 öneri paketi ✅
 

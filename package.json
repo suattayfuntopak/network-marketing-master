@@ -16,7 +16,8 @@
     "db:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
     "db:push": "supabase db push",
     "db:smoke:focus-team": "supabase db query -f supabase/scripts/verify_focus_team_identity.sql",
-    "db:test:rls": "supabase db query -f supabase/scripts/verify_rls_policies.sql"
+    "db:test:rls": "supabase db query -f supabase/scripts/verify_rls_policies.sql",
+    "db:reset:test": "supabase db reset && npm run db:test:rls"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
