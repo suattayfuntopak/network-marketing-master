@@ -253,6 +253,50 @@ export function useMarkContacted(workspaceId: string) {
         }),
       ])
     },
+    onMutate: async ({ id, actionType }) => {
+      const detailKey = queryKeys.candidateDetail(workspaceId, id)
+      const listKey = queryKeys.candidates(workspaceId)
+      const activityKey = ['activity', id]
+
+      await Promise.all([
+        qc.cancelQueries({ queryKey: detailKey }),
+        qc.cancelQueries({ queryKey: listKey }),
+        qc.cancelQueries({ queryKey: activityKey }),
+      ])
+
+      const prevDetail = qc.getQueryData<NmmCandidate>(detailKey)
+      const prevList = qc.getQueryData<NmmCandidate[]>(listKey)
+      const prevActivity = qc.getQueryData<NmmDailyAction[]>(activityKey)
+
+      const nowIso = new Date().toISOString()
+
+      qc.setQueryData<NmmCandidate | undefined>(detailKey, old =>
+        old ? { ...old, last_contact_at: nowIso } : old
+      )
+
+      qc.setQueryData<NmmCandidate[] | undefined>(listKey, old =>
+        old?.map(c => (c.id === id ? { ...c, last_contact_at: nowIso } : c))
+      )
+
+      const fakeAction: NmmDailyAction = {
+        id: 'temp-contact-' + Date.now(),
+        workspace_id: workspaceId,
+        user_id: '',
+        candidate_id: id,
+        action_type: actionType,
+        note: null,
+        note_tr: null,
+        note_en: null,
+        ai_model: null,
+        created_at: nowIso,
+      }
+
+      qc.setQueryData<NmmDailyAction[] | undefined>(activityKey, old =>
+        old ? [fakeAction, ...old] : [fakeAction]
+      )
+
+      return { prevDetail, prevList, prevActivity, detailKey, listKey, activityKey }
+    },
     onSuccess: (_data, vars) => {
       invalidateCandidateQueries(qc, workspaceId, vars.id)
       const lang = getLang()
@@ -266,7 +310,12 @@ export function useMarkContacted(workspaceId: string) {
             : 'WhatsApp kaydedildi',
       )
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`),
+    onError: (e: Error, vars, ctx) => {
+      if (ctx?.prevDetail !== undefined) qc.setQueryData(ctx.detailKey, ctx.prevDetail)
+      if (ctx?.prevList !== undefined) qc.setQueryData(ctx.listKey, ctx.prevList)
+      if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
+      toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`)
+    },
   })
 }
 
@@ -377,11 +426,48 @@ export function useAddCandidateNote(workspaceId: string) {
       })
       if (error) throw new Error(error.message)
     },
+    onMutate: async ({ candidateId, noteTr, noteEn }) => {
+      const notesKey = ['candidate-notes', candidateId]
+      const activityKey = ['activity', candidateId]
+      await Promise.all([
+        qc.cancelQueries({ queryKey: notesKey }),
+        qc.cancelQueries({ queryKey: activityKey }),
+      ])
+      const prevNotes = qc.getQueryData<NmmDailyAction[]>(notesKey)
+      const prevActivity = qc.getQueryData<NmmDailyAction[]>(activityKey)
+
+      const nowIso = new Date().toISOString()
+      const fakeAction: NmmDailyAction = {
+        id: 'temp-note-' + Date.now(),
+        workspace_id: workspaceId,
+        user_id: '',
+        candidate_id: candidateId,
+        action_type: 'note',
+        note: noteTr || null,
+        note_tr: noteTr || null,
+        note_en: noteEn || null,
+        ai_model: null,
+        created_at: nowIso,
+      }
+
+      qc.setQueryData<NmmDailyAction[] | undefined>(notesKey, old =>
+        old ? [fakeAction, ...old] : [fakeAction]
+      )
+      qc.setQueryData<NmmDailyAction[] | undefined>(activityKey, old =>
+        old ? [fakeAction, ...old] : [fakeAction]
+      )
+
+      return { prevNotes, prevActivity, notesKey, activityKey }
+    },
     onSuccess: (_, { candidateId }) => {
       invalidateCandidateQueries(qc, workspaceId, candidateId)
       toast.success(getLang() === 'en' ? 'Note saved' : 'Not kaydedildi')
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to save note: ${e.message}` : `Not kaydedilemedi: ${e.message}`),
+    onError: (e: Error, _vars, ctx) => {
+      if (ctx?.prevNotes !== undefined) qc.setQueryData(ctx.notesKey, ctx.prevNotes)
+      if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
+      toast.error(getLang() === 'en' ? `Failed to save note: ${e.message}` : `Not kaydedilemedi: ${e.message}`)
+    },
   })
 }
 
@@ -396,10 +482,33 @@ export function useDeleteActivity(workspaceId: string) {
         .eq('id', activityId)
       if (error) throw new Error(error.message)
     },
+    onMutate: async ({ activityId, candidateId }) => {
+      const notesKey = ['candidate-notes', candidateId]
+      const activityKey = ['activity', candidateId]
+      await Promise.all([
+        qc.cancelQueries({ queryKey: notesKey }),
+        qc.cancelQueries({ queryKey: activityKey }),
+      ])
+      const prevNotes = qc.getQueryData<NmmDailyAction[]>(notesKey)
+      const prevActivity = qc.getQueryData<NmmDailyAction[]>(activityKey)
+
+      qc.setQueryData<NmmDailyAction[] | undefined>(notesKey, old =>
+        old?.filter(a => a.id !== activityId)
+      )
+      qc.setQueryData<NmmDailyAction[] | undefined>(activityKey, old =>
+        old?.filter(a => a.id !== activityId)
+      )
+
+      return { prevNotes, prevActivity, notesKey, activityKey }
+    },
     onSuccess: (_, { candidateId }) => {
       invalidateCandidateQueries(qc, workspaceId, candidateId)
       invalidateTeamAndAIUsage(qc, workspaceId)
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`),
+    onError: (e: Error, _vars, ctx) => {
+      if (ctx?.prevNotes !== undefined) qc.setQueryData(ctx.notesKey, ctx.prevNotes)
+      if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
+      toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`)
+    },
   })
 }

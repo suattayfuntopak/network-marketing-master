@@ -12,6 +12,19 @@
   --text-1:      #0f172a; /* Slate 900 for extremely readable, high-contrast headings */
   --text-2:      #334155; /* Slate 700 for readable body texts */
   --text-3:      #64748b; /* Slate 500 for captions and secondary labels */
+
+  /* Candidate Warmth Colors */
+  --warmth-hot-bg:      #fef2f2;
+  --warmth-hot-text:    #dc2626;
+  --warmth-hot-border:  rgba(254, 202, 202, 0.5);
+
+  --warmth-warm-bg:     #fffbeb;
+  --warmth-warm-text:   #d97706;
+  --warmth-warm-border: rgba(253, 230, 138, 0.5);
+
+  --warmth-cold-bg:     #f0f9ff;
+  --warmth-cold-text:   #0284c7;
+  --warmth-cold-border: rgba(186, 230, 253, 0.5);
 }
 
 .dark {
@@ -26,6 +39,19 @@
   --color-brand:        #b4aff0;
   --color-brand-accent: #c4b5fd;
   --color-brand-subtle: #2d2a5e;
+
+  /* Candidate Warmth Colors */
+  --warmth-hot-bg:      rgba(69, 10, 10, 0.3);
+  --warmth-hot-text:    #f87171;
+  --warmth-hot-border:  rgba(127, 29, 29, 0.3);
+
+  --warmth-warm-bg:     rgba(120, 53, 4, 0.3);
+  --warmth-warm-text:   #fbbf24;
+  --warmth-warm-border: rgba(146, 64, 14, 0.3);
+
+  --warmth-cold-bg:     rgba(30, 58, 138, 0.3);
+  --warmth-cold-text:   #60a5fa;
+  --warmth-cold-border: rgba(30, 58, 138, 0.3);
 }
 
 /* Brand purple on dark backgrounds — readable white text without touching light mode */
@@ -71,6 +97,19 @@
   --color-blue-subtle:    #E8F0FE; /* Blue tint background */
   --color-accent-blue:    #4169E1; /* Accent blue — highlights */
   --color-orange-dark:    #C03E1F; /* Orange dark — warm accents */
+
+  /* Candidate Warmth Semantic Badges */
+  --color-warmth-hot-bg:      var(--warmth-hot-bg);
+  --color-warmth-hot-text:    var(--warmth-hot-text);
+  --color-warmth-hot-border:  var(--warmth-hot-border);
+
+  --color-warmth-warm-bg:     var(--warmth-warm-bg);
+  --color-warmth-warm-text:   var(--warmth-warm-text);
+  --color-warmth-warm-border: var(--warmth-warm-border);
+
+  --color-warmth-cold-bg:     var(--warmth-cold-bg);
+  --color-warmth-cold-text:   var(--warmth-cold-text);
+  --color-warmth-cold-border: var(--warmth-cold-border);
 
   /* Scale all font sizes up by another 1px globally for improved readability */
   --font-size-xs: 0.875rem;     /* 13px -> 14px */

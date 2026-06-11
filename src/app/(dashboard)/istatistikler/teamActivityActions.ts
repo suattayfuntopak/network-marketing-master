@@ -17,8 +17,6 @@ import {
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 import { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
 
-export { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
-
 export type TeamMemberFieldActivity = {
   userId: string
   calls: number

@@ -129,17 +129,17 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <div className="flex items-center gap-1.5 min-w-0">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
                 {parsed.warmth === 'sicak' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-warmth-hot-bg px-1.5 py-0.5 text-[9px] font-bold text-warmth-hot-text border border-warmth-hot-border animate-pulse">
                     🔥<span className="hidden sm:inline"> {t('pipelinePage.warmthHot')}</span>
                   </span>
                 )}
                 {parsed.warmth === 'ilik' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-warmth-warm-bg px-1.5 py-0.5 text-[9px] font-bold text-warmth-warm-text border border-warmth-warm-border">
                     ☀️<span className="hidden sm:inline"> {t('pipelinePage.warmthWarm')}</span>
                   </span>
                 )}
                 {parsed.warmth === 'soguk' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-warmth-cold-bg px-1.5 py-0.5 text-[9px] font-bold text-warmth-cold-text border border-warmth-cold-border">
                     ❄️<span className="hidden sm:inline"> {t('pipelinePage.warmthCold')}</span>
                   </span>
                 )}

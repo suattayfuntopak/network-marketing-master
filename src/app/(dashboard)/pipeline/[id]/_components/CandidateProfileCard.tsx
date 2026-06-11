@@ -27,13 +27,13 @@ export function CandidateProfileCard({ c, parsed, translatedNote, isTranslating 
           <div className="flex items-center gap-2 flex-wrap">
             <h1 className="text-lg font-bold text-[var(--text-1)]">{c.full_name}</h1>
             {parsed.warmth === 'sicak' && (
-              <span className="inline-flex items-center rounded-full bg-red-100/60 dark:bg-red-950/40 px-2 py-0.5 text-[10px] font-bold text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/40 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
+              <span className="inline-flex items-center rounded-full bg-warmth-hot-bg px-2 py-0.5 text-[10px] font-bold text-warmth-hot-text border border-warmth-hot-border animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
             )}
             {parsed.warmth === 'ilik' && (
-              <span className="inline-flex items-center rounded-full bg-amber-100/60 dark:bg-amber-950/40 px-2 py-0.5 text-[10px] font-bold text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/40">☀️ {t('pipelinePage.warmthWarm')}</span>
+              <span className="inline-flex items-center rounded-full bg-warmth-warm-bg px-2 py-0.5 text-[10px] font-bold text-warmth-warm-text border border-warmth-warm-border">☀️ {t('pipelinePage.warmthWarm')}</span>
             )}
             {parsed.warmth === 'soguk' && (
-              <span className="inline-flex items-center rounded-full bg-blue-100/60 dark:bg-blue-950/40 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/40">❄️ {t('pipelinePage.warmthCold')}</span>
+              <span className="inline-flex items-center rounded-full bg-warmth-cold-bg px-2 py-0.5 text-[10px] font-bold text-warmth-cold-text border border-warmth-cold-border">❄️ {t('pipelinePage.warmthCold')}</span>
             )}
           </div>
           {c.phone && (

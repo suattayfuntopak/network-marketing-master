@@ -1,5 +1,57 @@
 # Hot Log
 
+## 2026-06-12 — Developer & UX Improvements (Phase 2) ✅
+
+### UX Optimistic Updates
+- **`useCandidates.ts`:** Integrated optimistic cache updates for `useMarkContacted`, `useAddCandidateNote`, and `useDeleteActivity`. Implemented query cancellation, cache snapshots, optimistic data mutations, and automatic query cache rollbacks on error for candidate list, detail, and activity queries. Added missing `ai_model: null` typing.
+
+### Semantic CSS Variables for Warmth Levels
+- **`globals.css`:** Defined candidate warmth colors (`Hot`, `Warm`, `Cold`) as CSS design variables under `:root` and `.dark` blocks, and mapped them in the `@theme` block as custom Tailwind utility colors (`bg-warmth-hot-bg`, `text-warmth-hot-text`, etc.).
+- **`CandidateCard.tsx` & `CandidateProfileCard.tsx`:** Updated warmth badges to consume the semantic theme tokens, centralizing colors in the design system.
+
+### Type-Safe i18n Autocomplete
+- **`LanguageProvider.tsx`:** Defined type-safe `TranslationKey` mapping all nested translation keys across the core dictionary and 13 sections. Typed `t` parameter using `TranslationKey | (string & {})` to preserve editor autocomplete suggestions while allowing dynamic variables.
+
+### Local RLS Testing Automation
+- **`verify_rls_policies.sql`:** Created SQL test suite simulating JWT auth claims to assert workspace boundary data isolation on `public.nmm_candidates`.
+- **`package.json`:** Added `"db:test:rls"` command script and corrected command executor syntax to `supabase db query -f`.
+
+### Dosyalar
+`src/hooks/useCandidates.ts`, `src/app/globals.css`, `src/app/(dashboard)/pipeline/_components/CandidateCard.tsx`, `src/app/(dashboard)/pipeline/[id]/_components/CandidateProfileCard.tsx`, `src/providers/LanguageProvider.tsx`, `supabase/scripts/verify_rls_policies.sql`, `package.json`
+
+## 2026-06-11 — Kalan 4 öneri paketi ✅
+
+### Avatar upload atomik + eski dosya temizliği
+- `avatarStorage.ts`: public URL → storage path, `removeAvatarObjectByPublicUrl`.
+- `uploadAvatarAction`: `scope=candidate` → ownership + `nmm_candidates.avatar_url` güncelleme; `oldAvatarUrl` ile eski obje silme.
+- `EditCandidateSheet` + `ProfileModal`: `oldAvatarUrl` FormData.
+
+### Partner avatar tek kaynak (DB + TS seed)
+- **092 migration:** `nmm_partner_avatar_overrides`, `nmm_partner_avatar_url`, `nmm_resolve_team_avatars` tablo lookup.
+- `partnerAvatarOverrides.ts` — TS seed (092 ile senkron); `partnerAvatarFix.ts` ince sarmalayıcı.
+
+### Saha Radarı follow-ups RPC
+- `nmm_saha_radar_follow_ups` — workspace + owner_ids doğrulama, 7 gün horizon.
+- `saha-radar/actions.ts` doğrudan `nmm_candidates` sorgusu yerine RPC.
+
+### Prefetch audit
+- `teamRankingBatch.ts` — `TEAM_RANKING_BATCH_PERIODS` (`all` dahil) + vitest.
+- `prefetchEkipRankingMetrics` JSDoc — batch dönemleri belgelendi.
+
+### Dosyalar
+`092_*`, `avatarStorage.ts`, `profile.ts`, `partnerAvatarOverrides.ts`, `partnerAvatarFix.ts`, `saha-radar/actions.ts`, `teamRankingBatch.ts`, `prefetchRouteMetrics.ts`, `database.types.ts`, `EditCandidateSheet.tsx`, `ProfileModal.tsx`
+
+## 2026-06-12 — Öneri paketi: avatar RPC, upload path, follow-up idx ✅
+
+### Uygulanan hızlı kazanımlar
+- **091 migration:** `nmm_resolve_team_avatars` Selda/Ezgi own-file; `idx_nmm_candidates_owner_follow_up` (Saha Radarı).
+- **`avatarStoragePath.ts`:** Upload path `candidate_{uuid}` kilidi + vitest; `uploadAvatarAction` refactor.
+- **RPC çıkışı:** `fetchTeamBundle` + `ekip/actions` resolve → `canonicalPartnerAvatarUrl`.
+- **Ölü kod:** `normalizePulsePeriod` (all→ytd alias) kaldırıldı.
+
+### Dosyalar
+`091_*`, `avatarStoragePath.ts`, `profile.ts`, `fetchTeamBundle.ts`, `ekip/actions.ts`, `pulse.ts`
+
 ## 2026-06-12 — AI Offline Fallback, Sıcaklık Rozetleri Kontrastı & React Query Standardizasyonu ✅
 
 ### Yapay Zeka Yerel Çevrimdışı Taslakları (AI Fallbacks)

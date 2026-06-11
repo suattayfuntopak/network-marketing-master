@@ -20,10 +20,40 @@ import { persistUserLangAction } from '@/app/actions/userLang'
 
 type LangType = 'tr' | 'en'
 
+type BaseDict = typeof tr
+type MergedDict = BaseDict &
+  typeof platformSection['tr'] &
+  typeof shellSection['tr'] &
+  typeof trainingSection['tr'] &
+  typeof landingSection['tr'] &
+  typeof pipelineSection['tr'] &
+  typeof statsSection['tr'] &
+  typeof paymentSection['tr'] &
+  typeof coachSection['tr'] &
+  typeof pagesSection['tr'] &
+  typeof errorsSection['tr'] &
+  typeof pulseSection['tr'] &
+  typeof videoTrainingSection['tr'] &
+  typeof crownSection['tr']
+
+type DottedKeys<T> = {
+  [K in keyof T]: K extends string
+    ? T[K] extends Record<string, unknown>
+      ? {
+          [SubK in keyof T[K]]: SubK extends string
+            ? `${K}.${SubK}`
+            : never
+        }[keyof T[K]]
+      : never
+    : never
+}[keyof T]
+
+export type TranslationKey = DottedKeys<MergedDict>
+
 interface LanguageContextType {
   lang: LangType
   setLang: (lang: LangType) => void
-  t: (keyPath: string, variables?: Record<string, string | number>) => string
+  t: (keyPath: TranslationKey | (string & {}), variables?: Record<string, string | number>) => string
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined)
@@ -89,7 +119,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     persistUserLangAction(newLang).catch(() => {})
   }
 
-  function t(keyPath: string, variables?: Record<string, string | number>): string {
+  function t(keyPath: TranslationKey | (string & {}), variables?: Record<string, string | number>): string {
     const keys = keyPath.split('.')
     let current: unknown = dictionaries[lang]
 

@@ -15,7 +15,8 @@
     "migrate:check:remote": "node scripts/check-migrations.mjs --remote",
     "db:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
     "db:push": "supabase db push",
-    "db:smoke:focus-team": "supabase db execute --file supabase/scripts/verify_focus_team_identity.sql"
+    "db:smoke:focus-team": "supabase db query -f supabase/scripts/verify_focus_team_identity.sql",
+    "db:test:rls": "supabase db query -f supabase/scripts/verify_rls_policies.sql"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
