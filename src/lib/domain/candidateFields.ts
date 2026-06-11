@@ -1,4 +1,5 @@
 import type { NmmCandidateInsert, NmmCandidateUpdate } from '@/types/database.types'
+import { canonicalPartnerAvatarUrl } from '@/lib/team/partnerAvatarFix'
 import { parseNote, formatSimpleNote } from '@/lib/utils/noteParser'
 
 export type CandidateWarmth = 'sicak' | 'ilik' | 'soguk'
@@ -12,6 +13,7 @@ export interface ResolvedCandidateFields {
 
 /** Minimal row shape — RPC/partial selects may omit typed columns until migration 023. */
 export type CandidateRow = {
+  id?: string
   note: string | null
   note_tr?: string | null
   note_en?: string | null
@@ -34,7 +36,7 @@ export function resolveCandidateFields(row: CandidateRow): ResolvedCandidateFiel
     return {
       noteTr: row.note_tr?.trim() ?? '',
       noteEn: row.note_en?.trim() ?? '',
-      avatarUrl: row.avatar_url?.trim() || null,
+      avatarUrl: canonicalPartnerAvatarUrl(row.id ?? '', row.avatar_url?.trim() || null),
       warmth: normalizeWarmth(row.warmth),
     }
   }

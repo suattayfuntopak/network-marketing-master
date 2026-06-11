@@ -6,7 +6,7 @@ import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 import { enrichLeaderCandidates } from '@/lib/team/enrichLeaderCandidates'
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
-import { swapSeldaEzgiDisplayAvatars } from '@/lib/team/partnerAvatarFix'
+import { canonicalPartnerAvatarUrl } from '@/lib/team/partnerAvatarFix'
 
 export interface TeamBundle {
   members: TeamMember[]
@@ -153,7 +153,10 @@ export async function fetchTeamBundle(
         : undefined
       const phone = candidateMatch?.phone ?? null
       const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
-      const resolvedAvatar = m.avatar_url ?? authAvatars[m.user_id] ?? (noteAvatar || null)
+      const resolvedAvatar = canonicalPartnerAvatarUrl(
+        m.user_id,
+        m.avatar_url ?? authAvatars[m.user_id] ?? (noteAvatar || null),
+      )
 
       // Propagate resolved avatar to the source member object for statistics views
       m.avatar_url = resolvedAvatar
@@ -216,9 +219,6 @@ export async function fetchTeamBundle(
           }
         })
     }
-
-    swapSeldaEzgiDisplayAvatars(registeredMemberRows)
-    swapSeldaEzgiDisplayAvatars(members)
 
     const ekipRows = [...registeredMemberRows, ...nonAppMembers].sort((a, b) => {
       if (a.role === 'leader') return -1
@@ -370,7 +370,10 @@ async function fetchTeamBundleLegacy(
       const matchedPipelineId = linkedId ?? fuzzyId
       const candidateMatch = matchedPipelineId ? candidates.find(c => c.id === matchedPipelineId) : undefined
       const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
-      const resolvedAvatar = m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
+      const resolvedAvatar = canonicalPartnerAvatarUrl(
+        m.user_id,
+        m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null),
+      )
 
       return {
         user_id: m.user_id,
@@ -408,8 +411,10 @@ async function fetchTeamBundleLegacy(
     const candidateMatch = matchedPipelineId ? candidates.find(c => c.id === matchedPipelineId) : undefined
     const phone = candidateMatch?.phone ?? null
     const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
-    const resolvedAvatar =
-      m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
+    const resolvedAvatar = canonicalPartnerAvatarUrl(
+      m.user_id,
+      m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null),
+    )
 
     return {
       user_id: m.user_id,
@@ -467,9 +472,6 @@ async function fetchTeamBundleLegacy(
         })
       }
     })
-
-  swapSeldaEzgiDisplayAvatars(registeredMemberRows)
-  swapSeldaEzgiDisplayAvatars(statsMembers)
 
   const ekipRows = [...registeredMemberRows, ...nonAppMembers].sort((a, b) => {
     if (a.role === 'leader') return -1
