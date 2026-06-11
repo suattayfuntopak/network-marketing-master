@@ -93,7 +93,11 @@ export function SignupForm() {
         </>
       )}
 
-      {inviteError && <p className={authErrorClass}>{inviteError}</p>}
+      {inviteError && (
+        <p className={authErrorClass} data-testid="signup-invite-error">
+          {inviteError}
+        </p>
+      )}
 
       <div>
         <label className={authLabelClass} htmlFor="fullName">
@@ -145,7 +149,9 @@ export function SignupForm() {
           disabled={submitBlocked}
         />
         {inviteReady && (
-          <p className={`mt-1.5 text-xs ${authMutedClass}`}>{t('auth.invitePasswordOnlyHint')}</p>
+          <p className={`mt-1.5 text-xs ${authMutedClass}`} data-testid="signup-invite-hint">
+            {t('auth.invitePasswordOnlyHint')}
+          </p>
         )}
       </div>
 

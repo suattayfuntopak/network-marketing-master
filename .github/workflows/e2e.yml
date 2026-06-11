@@ -107,6 +107,8 @@ jobs:
         env:
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+          PLAYWRIGHT_INVITE_REF: ${{ secrets.PLAYWRIGHT_INVITE_REF }}
+          PLAYWRIGHT_INVITE_ADAY: ${{ secrets.PLAYWRIGHT_INVITE_ADAY }}
 
       - name: E2E skipped (no credentials)
         if: steps.e2e_creds.outputs.skip == 'true'
@@ -165,6 +167,8 @@ jobs:
         env:
           PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+          PLAYWRIGHT_INVITE_REF: ${{ secrets.PLAYWRIGHT_INVITE_REF }}
+          PLAYWRIGHT_INVITE_ADAY: ${{ secrets.PLAYWRIGHT_INVITE_ADAY }}
 
       - name: Mobile E2E advisory notice
         if: failure()

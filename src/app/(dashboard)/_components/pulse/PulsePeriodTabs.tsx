@@ -49,16 +49,25 @@ export function PulsePeriodTabs({ period, onChange, comfortableTypography = fals
           type="button"
           role="tab"
           aria-selected={period === p}
+          data-testid={p === 'all' ? 'pulse-period-tab-all' : undefined}
           onClick={() => onChange(p)}
           className={clsx(
             'rounded-lg font-bold transition',
             btnCls,
+            p === 'all' && 'text-base sm:text-sm',
             period === p
               ? 'bg-[var(--bg-card)] text-[var(--text-1)] shadow-sm'
               : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
           )}
         >
-          <span className="sm:hidden tabular-nums">{PULSE_PERIOD_SHORT[p]}</span>
+          <span
+            className={clsx(
+              'sm:hidden tabular-nums leading-none',
+              p === 'all' ? 'text-lg font-black' : undefined,
+            )}
+          >
+            {PULSE_PERIOD_SHORT[p]}
+          </span>
           <span className="hidden sm:inline">{pulsePeriodLabel(t, p)}</span>
         </button>
       ))}
