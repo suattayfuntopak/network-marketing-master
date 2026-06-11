@@ -1,4 +1,4 @@
-/** Focus Team — Selda/Ezgi: storage dosya içeriği aday dosya adıyla ters eşleşmiş. */
+/** Focus Team — Selda/Ezgi profil fotoğrafları tek kaynak (kod + 090 migration). */
 
 export const SELDA_KIRATLI_USER_ID = 'eeb42bdd-6bc0-4839-b109-d28f3e55d884'
 export const EZGI_SAGAR_USER_ID = 'a71184ee-5b32-455a-88aa-c6aba538cdc0'
@@ -10,12 +10,9 @@ const STORAGE_BASE =
 const FILE_ON_SELDA_CANDIDATE = 'candidate_00fa3484-97b1-4683-b987-638df261b6e2_1779647713382.jpeg'
 const FILE_ON_EZGI_CANDIDATE = 'candidate_001a2b65-8820-4b2c-9c4a-67d1344b17c2_1779982222611.jpg'
 
-/**
- * Dosya adı Selda adayına ait olanda Ezgi'nin, Ezgi adayına ait olanda Selda'nın yüzü var.
- * Görüntüleme için sabit çapraz URL — DB + kod swap çift döngüsünü önler.
- */
-export const SELDA_DISPLAY_AVATAR_URL = `${STORAGE_BASE}${FILE_ON_EZGI_CANDIDATE}`
-export const EZGI_DISPLAY_AVATAR_URL = `${STORAGE_BASE}${FILE_ON_SELDA_CANDIDATE}`
+/** Her kişi kendi aday dosyasına bağlı — DB sapması olsa bile görüntüleme sabitlenir. */
+export const SELDA_DISPLAY_AVATAR_URL = `${STORAGE_BASE}${FILE_ON_SELDA_CANDIDATE}`
+export const EZGI_DISPLAY_AVATAR_URL = `${STORAGE_BASE}${FILE_ON_EZGI_CANDIDATE}`
 
 /** user_id veya candidate id için doğru profil fotoğrafı URL'si. */
 export function canonicalPartnerAvatarUrl(

@@ -4,6 +4,12 @@ import {
   buildCandidateContentFields,
   syncLegacyNoteColumn,
 } from './candidateFields'
+import {
+  SELDA_CANDIDATE_ID,
+  EZGI_CANDIDATE_ID,
+  SELDA_DISPLAY_AVATAR_URL,
+  EZGI_DISPLAY_AVATAR_URL,
+} from '@/lib/team/partnerAvatarFix'
 
 describe('resolveCandidateFields', () => {
   it('reads typed columns when present', () => {
@@ -38,6 +44,26 @@ describe('resolveCandidateFields', () => {
       avatarUrl: null,
       warmth: 'ilik',
     })
+  })
+})
+
+describe('resolveCandidateFields partner avatars', () => {
+  it('forces canonical URLs for Selda/Ezgi candidate rows', () => {
+    expect(
+      resolveCandidateFields({
+        id: SELDA_CANDIDATE_ID,
+        note: null,
+        avatar_url: 'https://wrong/selda.jpg',
+      }).avatarUrl,
+    ).toBe(SELDA_DISPLAY_AVATAR_URL)
+
+    expect(
+      resolveCandidateFields({
+        id: EZGI_CANDIDATE_ID,
+        note: null,
+        avatar_url: 'https://wrong/ezgi.jpg',
+      }).avatarUrl,
+    ).toBe(EZGI_DISPLAY_AVATAR_URL)
   })
 })
 

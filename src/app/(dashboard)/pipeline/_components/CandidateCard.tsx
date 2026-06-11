@@ -110,7 +110,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
 
   return (
     <>
-      <li className={clsx(
+      <li
+        data-testid={`pipeline-candidate-card-${candidate.id}`}
+        className={clsx(
         'relative rounded-2xl border border-[var(--border)] p-4 shadow-sm transition-colors',
         STAGE_CARD_BG[candidate.stage],
         (quickActionOpen || stageOpen || editOpen || confirmOpen) && Z.cardOverlay

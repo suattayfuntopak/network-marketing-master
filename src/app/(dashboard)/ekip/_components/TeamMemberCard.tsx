@@ -109,7 +109,10 @@ export function TeamMemberCard({
   )
 
   return (
-    <div className={clsx('overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4', getTeamMemberCardClasses(m, isInactive))}>
+    <div
+      data-testid={`team-member-card-${m.user_id}`}
+      className={clsx('overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4', getTeamMemberCardClasses(m, isInactive))}
+    >
       {/* Header: profil + davet */}
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         {m.pipeline_id ? (

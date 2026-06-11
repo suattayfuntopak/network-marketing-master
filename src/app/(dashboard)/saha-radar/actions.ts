@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
-import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
+import { fetchSahaRadarMemberRows } from '@/lib/team/fetchTeamBundle'
 import { generateMessage } from '@/lib/ai/generateMessage'
 
 // ─── Saha Radar Types & Action ────────────────────────────────────────────────
@@ -55,12 +55,14 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
 
   const teamAccess = hasTeamPageAccess(wsData?.license_type, isSuperAdmin(user))
 
-  const bundle = teamAccess ? await fetchTeamBundleAction(workspaceId) : null
+  const ekipRows = teamAccess
+    ? await fetchSahaRadarMemberRows(supabase, workspaceId)
+    : []
   const now = Date.now()
   const nowIso = new Date(now).toISOString()
   const sevenDaysIso = new Date(now + 7 * 86_400_000).toISOString()
 
-  const teamMemberUserIds = (bundle?.ekipRows ?? [])
+  const teamMemberUserIds = ekipRows
     .filter(m => m.user_id !== user.id)
     .map(m => m.user_id)
 
@@ -83,7 +85,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
     }
   }
 
-  const members: SahaRadarMember[] = (bundle?.ekipRows ?? [])
+  const members: SahaRadarMember[] = ekipRows
     .filter(m => m.user_id !== user.id)
     .map(m => {
       const days = m.last_activity_at
@@ -111,7 +113,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
   const ownerIds = [user.id, ...(teamAccess ? teamMemberUserIds : [])]
 
   const memberNameMap: Record<string, string> = {}
-  for (const m of bundle?.ekipRows ?? []) {
+  for (const m of ekipRows) {
     memberNameMap[m.user_id] = m.full_name ?? '—'
   }
 

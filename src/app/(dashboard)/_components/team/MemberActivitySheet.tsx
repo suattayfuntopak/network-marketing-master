@@ -14,6 +14,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { funnelMetricLabelKeys } from '@/lib/domain/metricLabels'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import {
   MEMBER_ACTIVITY_PERIODS,
@@ -164,9 +165,10 @@ export function MemberActivitySheet({
     (data?.calls ?? 0) + (data?.whatsapps ?? 0) + (data?.notes ?? 0) +
     (data?.stageChanges ?? 0) + (data?.aiActions ?? 0)
 
+  const memberFunnelLabels = funnelMetricLabelKeys('member')
   const metricLabels = {
-    calls: t('team.fieldMetricCalls'),
-    newLeads: t('team.fieldMetricMeetings'),
+    calls: t(memberFunnelLabels.arama),
+    newLeads: t(memberFunnelLabels.tanisma),
   }
 
   const metrics = [

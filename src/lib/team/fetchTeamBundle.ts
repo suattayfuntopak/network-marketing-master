@@ -483,3 +483,41 @@ async function fetchTeamBundleLegacy(
 
   return { members: statsMembers, ekipRows }
 }
+
+/** Saha Radarı — tam bundle yerine yalnızca üye satırları (RPC + avatar + pipeline link). */
+export async function fetchSahaRadarMemberRows(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string,
+): Promise<MemberRow[]> {
+  const rpcBundle = await fetchTeamWithDownlines(supabase, workspaceId)
+  if (!rpcBundle) return []
+
+  const { members, leaderOwnerId } = rpcBundle
+  const allUserIds = members.map(m => m.user_id)
+  const [authAvatars, pipelineLinks] = await Promise.all([
+    resolveAuthAvatars(supabase, workspaceId, allUserIds),
+    fetchPipelineLinks(supabase, workspaceId),
+  ])
+
+  return members.map(m => ({
+    user_id: m.user_id,
+    full_name: m.full_name,
+    role: m.user_id === leaderOwnerId ? 'leader' : 'member',
+    joined_at: m.joined_at,
+    candidate_count: m.candidate_count,
+    yeni_count: m.yeni_count,
+    sunum_count: m.sunum_count,
+    takip_count: m.takip_count,
+    katildi_count: m.katildi_count,
+    last_activity_at: m.last_activity_at,
+    onboarding_steps: m.onboarding_steps,
+    phone: null,
+    isAppUser: true as const,
+    avatar_url: canonicalPartnerAvatarUrl(
+      m.user_id,
+      m.avatar_url ?? authAvatars[m.user_id] ?? null,
+    ),
+    pipeline_id: pipelineLinks[m.user_id] ?? null,
+    pipeline_link_explicit: pipelineLinks[m.user_id] != null,
+  }))
+}

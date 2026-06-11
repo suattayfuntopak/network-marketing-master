@@ -187,7 +187,7 @@ export async function getTeamFieldActivityAction(
   return { totals, byUser }
 }
 
-const RANKING_BATCH_PERIODS: PulsePeriod[] = ['today', '7d', '30d', 'ytd']
+const RANKING_BATCH_PERIODS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
 
 type DailyActionRow = {
   user_id: string
@@ -299,7 +299,7 @@ async function computeTeamRankingMetrics(
 }
 
 export type TeamRankingMetricsBatchResult = Record<
-  'today' | '7d' | '30d' | 'ytd',
+  'today' | '7d' | '30d' | 'ytd' | 'all',
   TeamRankingMetricsResult
 >
 
@@ -313,6 +313,7 @@ export async function getTeamRankingMetricsBatchAction(
     '7d': emptyPeriod(),
     '30d': emptyPeriod(),
     ytd: emptyPeriod(),
+    all: emptyPeriod(),
   }
 
   const ctx = await assertWorkspaceMember(workspaceId)
@@ -333,7 +334,9 @@ export async function getTeamRankingMetricsBatchAction(
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
   if (uniqueIds.length === 0) return empty
 
-  const batchStartIso = earliestPeriodStartIso(RANKING_BATCH_PERIODS)
+  const batchStartIso = RANKING_BATCH_PERIODS.includes('all')
+    ? null
+    : earliestPeriodStartIso(RANKING_BATCH_PERIODS)
   let actionsQuery = supabase
     .from('nmm_daily_actions')
     .select('user_id, action_type, created_at')
@@ -342,16 +345,16 @@ export async function getTeamRankingMetricsBatchAction(
     actionsQuery = actionsQuery.gte('created_at', batchStartIso)
   }
 
-  const ytdRange = funnelRangeForPulsePeriod('ytd')
+  const funnelFetchRange = funnelRangeForPulsePeriod('all')
   const [actionsResult, funnelUserDays] = await Promise.all([
     actionsQuery,
     fetchFunnelActualsBatchUserDays(
       supabase,
       uniqueIds,
-      ytdRange.sinceIso,
-      ytdRange.untilIso,
-      ytdRange.startCalendarKey,
-      ytdRange.endCalendarKey,
+      funnelFetchRange.sinceIso,
+      funnelFetchRange.untilIso,
+      funnelFetchRange.startCalendarKey,
+      funnelFetchRange.endCalendarKey,
     ),
   ])
 
@@ -397,8 +400,7 @@ export async function getTeamRankingMetricsAction(
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
   if (uniqueIds.length === 0) return empty
 
-  const normalized = period === 'all' ? 'ytd' : period
-  return computeTeamRankingMetrics(supabase, normalized, uniqueIds)
+  return computeTeamRankingMetrics(supabase, period, uniqueIds)
 }
 
 export async function getMemberActivityDetailAction(

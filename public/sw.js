@@ -1,5 +1,5 @@
 /* NMM — hafif PWA: statik asset cache + deploy güncelleme */
-const CACHE = 'nmm-shell-v2'
+const CACHE = 'nmm-shell-v3'
 const PRECACHE = ['/pano', '/manifest.json']
 
 self.addEventListener('install', (event) => {
@@ -56,11 +56,5 @@ self.addEventListener('fetch', (event) => {
     return
   }
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() =>
-        caches.match('/pano').then((cached) => cached ?? Response.error()),
-      ),
-    )
-  }
+  /* Navigasyon SW'de yakalanmaz — Safari "Service Worker context closed" regresyonu. */
 })

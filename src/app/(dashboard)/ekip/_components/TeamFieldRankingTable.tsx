@@ -25,6 +25,7 @@ import {
 } from '@/lib/ui/funnelMetricVisuals'
 import { Z } from '@/lib/ui/zIndex'
 import type { TeamRankingMetricsResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { FUNNEL_METRIC_LABEL_KEYS_MEMBER } from '@/lib/domain/metricLabels'
 
 type DownlineRow = {
   user_id: string
@@ -66,13 +67,6 @@ const ACTIVITY_COLUMNS = [
   { id: 'active' as const, Icon: CalendarDays, labelKey: 'team.activityActiveDays' },
   { id: 'total' as const, Icon: Activity, labelKey: 'team.activityTotalActions' },
 ] as const
-
-const FUNNEL_LABEL_KEYS: Record<FunnelMetricKey, string> = {
-  arama: 'team.fieldMetricCalls',
-  tanisma: 'team.fieldMetricMeetings',
-  sunum: 'team.fieldMetricPresentations',
-  yeniUye: 'team.fieldMetricMembers',
-}
 
 function rowStickyBg(idx: number): string {
   if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
@@ -116,7 +110,7 @@ function MobileMetricGrid({
     ...FUNNEL_METRIC_ORDER.map(metric => {
       const { Icon } = FUNNEL_METRIC_VISUAL[metric]
       return {
-        label: t(FUNNEL_LABEL_KEYS[metric]),
+        label: t(FUNNEL_METRIC_LABEL_KEYS_MEMBER[metric]),
         value: row.funnel[metric],
         icon: <Icon className={clsx('h-4 w-4', FUNNEL_METRIC_VIVID_CLASS[metric])} strokeWidth={2.25} />,
       }
@@ -257,7 +251,7 @@ export function TeamFieldRankingTable({
                             strokeWidth={2.25}
                             aria-hidden
                           />
-                          <span className="sr-only">{t(FUNNEL_LABEL_KEYS[metric])}</span>
+                          <span className="sr-only">{t(FUNNEL_METRIC_LABEL_KEYS_MEMBER[metric])}</span>
                         </th>
                       )
                     })}

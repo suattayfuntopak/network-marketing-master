@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -23,6 +23,7 @@ function mapSummaryTabToPulse(tab: HubPeriodTab): PulsePeriod {
   if (tab === 'daily') return 'today'
   if (tab === 'weekly') return '7d'
   if (tab === 'monthly') return '30d'
+  if (tab === 'all') return 'all'
   return 'ytd'
 }
 
@@ -45,14 +46,6 @@ export function EkipSummaryTab({
 
   const periodTab = parseSummaryTab(searchParams.get('period'))
   const pulsePeriod = mapSummaryTabToPulse(periodTab)
-
-  useEffect(() => {
-    if (searchParams.get('period') !== 'all') return
-    const params = new URLSearchParams(searchParams.toString())
-    params.set('tab', 'summary')
-    params.set('period', 'yearly')
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false })
-  }, [pathname, router, searchParams])
 
   const setPeriodTab = useCallback(
     (next: HubPeriodTab) => {
@@ -80,7 +73,7 @@ export function EkipSummaryTab({
     placeholderData: keepPreviousData,
   })
 
-  const metrics = batch?.[pulsePeriod === 'all' ? 'ytd' : pulsePeriod]
+  const metrics = batch?.[pulsePeriod]
 
   const getMemberHref = useCallback(
     (row: { user_id: string }) => {

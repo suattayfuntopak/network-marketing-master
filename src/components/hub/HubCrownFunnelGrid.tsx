@@ -8,6 +8,7 @@ import {
   FunnelMetricLabel,
 } from '@/lib/ui/funnelMetricVisuals'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import { funnelMetricLabelKeys } from '@/lib/domain/metricLabels'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { crownSoftMap } from '@/components/ui/SquareButton'
 import { HUB_FUNNEL_PANO_COLOR } from '@/lib/ui/hubPanoMetricColors'
@@ -28,20 +29,6 @@ type HubCrownFunnelGridProps = {
   labelMode?: 'self' | 'member'
 }
 
-const METRIC_LABEL_KEYS_SELF: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
-  arama: 'dashboard.dailyTrackMetricCalls',
-  tanisma: 'dashboard.dailyTrackMetricMeetings',
-  sunum: 'dashboard.dailyTrackMetricPresentations',
-  yeniUye: 'dashboard.dailyTrackMetricMembers',
-}
-
-const METRIC_LABEL_KEYS_MEMBER: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
-  arama: 'team.fieldMetricCalls',
-  tanisma: 'team.fieldMetricMeetings',
-  sunum: 'team.fieldMetricPresentations',
-  yeniUye: 'team.fieldMetricMembers',
-}
-
 export function HubCrownFunnelGrid({
   actuals,
   targets,
@@ -54,7 +41,7 @@ export function HubCrownFunnelGrid({
   labelMode = 'self',
 }: HubCrownFunnelGridProps) {
   const { t } = useTranslation()
-  const metricLabelKeys = labelMode === 'member' ? METRIC_LABEL_KEYS_MEMBER : METRIC_LABEL_KEYS_SELF
+  const metricLabelKeys = funnelMetricLabelKeys(labelMode)
 
   if (loading) {
     return (
