@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { X, Layout, Sun, Moon, Monitor, Loader2, Save, Rocket } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { getWorkspaceNameAction, updateWorkspaceNameAction } from '@/app/(dashboard)/actions/workspace'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTheme } from 'next-themes'
 import { toast } from 'sonner'
@@ -17,7 +17,6 @@ interface SettingsModalProps {
 
 export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const { theme, setTheme } = useTheme()
   
   const [mounted] = useState(() => typeof window !== 'undefined')
@@ -36,14 +35,8 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     // Load workspace info
     async function loadWorkspace() {
       try {
-        const { data, error } = await supabase
-          .from('nmm_workspaces')
-          .select('name')
-          .eq('id', workspaceId)
-          .single()
-
-        if (error) throw error
-        if (data) setWorkspaceName(data.name)
+        const name = await getWorkspaceNameAction(workspaceId)
+        setWorkspaceName(name)
       } catch (err) {
         console.error('Workspace yüklenirken hata:', err)
       } finally {
@@ -59,7 +52,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
     }
 
     return () => document.removeEventListener('keydown', onKey)
-  }, [workspaceId, onClose, supabase])
+  }, [workspaceId, onClose])
 
   async function handleSaveWorkspace(e: React.FormEvent) {
     e.preventDefault()
@@ -71,12 +64,7 @@ export function SettingsModal({ workspaceId, onClose }: SettingsModalProps) {
 
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('nmm_workspaces')
-        .update({ name: workspaceName.trim() })
-        .eq('id', workspaceId)
-
-      if (error) throw error
+      await updateWorkspaceNameAction(workspaceId, workspaceName)
 
       queryClient.invalidateQueries({ queryKey: ['workspace'] })
       toast.success('Grup adı başarıyla güncellendi')

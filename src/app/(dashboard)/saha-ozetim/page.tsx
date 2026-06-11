@@ -11,7 +11,7 @@ import {
   getHubWeeklySelfAction,
   getHubYearlySelfAction,
   getHubAllTimeSelfAction,
-} from '@/app/(dashboard)/crown/actions'
+} from '@/app/(dashboard)/crown/hubSelfActions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
 type Props = { searchParams: Promise<{ tab?: string; offset?: string }> }

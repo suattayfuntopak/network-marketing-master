@@ -67,8 +67,14 @@ export function formatFollowUpDate(iso: string | null, lang: string): string {
   })
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function renderActivityText(a: any, lang: string, t: TFunc): string {
+type ActivityRow = {
+  action_type: string
+  note: string | null
+  note_tr?: string | null
+  note_en?: string | null
+}
+
+export function renderActivityText(a: ActivityRow, lang: string, t: TFunc): string {
   const warmthMap: Record<string, { tr: string; en: string }> = {
     sicak: { tr: 'Sıcak 🔥', en: 'Hot 🔥' },
     ilik: { tr: 'Ilık ☀️', en: 'Warm ☀️' },

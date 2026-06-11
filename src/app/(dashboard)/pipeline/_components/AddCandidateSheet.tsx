@@ -8,7 +8,7 @@ import type { CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { PHONE_RE, sanitizePhone } from '@/lib/utils/validation'
-import { createClient } from '@/lib/supabase/client'
+import { uploadAvatarAction } from '@/app/(dashboard)/actions/profile'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
@@ -87,21 +87,11 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
       let avatarUrl = ''
 
       if (photoFile) {
-        const supabase = createClient()
-        const ext = photoFile.name.split('.').pop() ?? 'jpg'
-        const cleanExt = ext.replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
-        const path = `avatars/candidate_${candidateId}_${Date.now()}.${cleanExt}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('nmm-avatars')
-          .upload(path, photoFile, { contentType: photoFile.type })
-
-        if (uploadError) throw uploadError
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('nmm-avatars')
-          .getPublicUrl(path)
-        
+        const fd = new FormData()
+        fd.set('file', photoFile)
+        fd.set('scope', 'candidate')
+        fd.set('candidateId', candidateId)
+        const { publicUrl } = await uploadAvatarAction(fd)
         avatarUrl = publicUrl
       }
 

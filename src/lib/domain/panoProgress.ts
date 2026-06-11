@@ -1,5 +1,5 @@
 import type { DailyProgress } from '@/app/(dashboard)/hedef/actions'
-import type { HubMonthlyInsights, HubWeeklySelfPayload } from '@/app/(dashboard)/crown/actions'
+import type { HubMonthlyInsights, HubWeeklySelfPayload } from '@/app/(dashboard)/crown/hubSelfActions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslation } from '@/providers/LanguageProvider'
-import type { HubMonthlyInsights } from '@/app/(dashboard)/crown/actions'
+import type { HubMonthlyInsights } from '@/app/(dashboard)/crown/hubSelfActions'
 
 type HubMonthProgressProps = {
   data: HubMonthlyInsights | undefined

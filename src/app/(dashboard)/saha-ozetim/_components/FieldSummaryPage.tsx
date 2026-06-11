@@ -26,7 +26,7 @@ import {
   getHubYearlySelfAction,
   getHubAllTimeSelfAction,
   type HubSelfFieldMetrics,
-} from '@/app/(dashboard)/crown/actions'
+} from '@/app/(dashboard)/crown/hubSelfActions'
 import { queryKeys } from '@/lib/query/keys'
 import {
   calendarDayRange,

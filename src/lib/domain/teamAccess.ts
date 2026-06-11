@@ -1,7 +1,7 @@
 /** Ekibim/saha-radar/ilk-30-gun — freemium modelde tüm planlar erişebilir; yalnızca AI butonları kilitli. */
 export function hasTeamPageAccess(
-  licenseType?: string | null, // eslint-disable-line @typescript-eslint/no-unused-vars
-  isSuperAdmin?: boolean // eslint-disable-line @typescript-eslint/no-unused-vars
+  _licenseType?: string | null,
+  _isSuperAdmin?: boolean
 ): boolean {
   return true
 }

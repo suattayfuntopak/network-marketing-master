@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, ChevronRight, Users, UserPlus, Rocket, PartyPopper, ArrowRight } from 'lucide-react'
 import { useAddCandidate } from '@/hooks/useCandidates'
-import { createClient } from '@/lib/supabase/client'
+import { joinWorkspaceByInviteAction } from '@/app/(dashboard)/ekip/actions'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
@@ -84,23 +84,14 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
     if (code === inviteCode) { toast.error('Zaten bu çalışma alanındasınız!'); setStep(4); return }
     setJoining(true)
     try {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok.')
-
-      const { error: rpcError } = await supabase.rpc('nmm_join_workspace', { p_invite_code: code })
-      if (rpcError) {
-        toast.error(rpcError.message?.includes('invalid_invite_code') ? 'Geçersiz davet kodu.' : 'Ekibe katılım sırasında bir hata oluştu.')
-        setJoining(false)
-        return
-      }
-
+      await joinWorkspaceByInviteAction(code)
       toast.success('Başarıyla ekibe katıldınız!')
       qc.invalidateQueries({ queryKey: ['workspace'] })
       qc.invalidateQueries({ queryKey: ['team'] })
       qc.invalidateQueries({ queryKey: ['candidates'] })
-    } catch {
-      toast.error('Katılım başarısız oldu.')
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : ''
+      toast.error(message.includes('invalid_invite_code') ? 'Geçersiz davet kodu.' : 'Ekibe katılım sırasında bir hata oluştu.')
     } finally {
       setJoining(false)
     }

@@ -251,3 +251,27 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
     email: user.email,
   }
 }
+
+/** Ayarlar modalı: çalışma alanı adını okur (RLS üyelikle sınırlar). */
+export async function getWorkspaceNameAction(workspaceId: string): Promise<string> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('nmm_workspaces')
+    .select('name')
+    .eq('id', workspaceId)
+    .single()
+  if (error) throw new Error(error.message)
+  return data.name
+}
+
+/** Ayarlar modalı: çalışma alanı adını günceller (RLS sahiplikle sınırlar). */
+export async function updateWorkspaceNameAction(workspaceId: string, name: string): Promise<void> {
+  const trimmed = name.trim()
+  if (!trimmed) throw new Error('Grup / Ekip adı boş olamaz.')
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('nmm_workspaces')
+    .update({ name: trimmed })
+    .eq('id', workspaceId)
+  if (error) throw new Error(error.message)
+}

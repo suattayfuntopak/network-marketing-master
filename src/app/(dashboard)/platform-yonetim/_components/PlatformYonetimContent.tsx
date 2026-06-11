@@ -3,20 +3,13 @@
 import { useState, useEffect, useTransition, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatformAdmin'
-import {
-  Crown, Users, ShieldCheck, Search,
-  Mail, Sparkles, UserPlus, BookOpen, MessageSquare, Film,
-  Plus, Loader2, CheckCircle2, Trash2, CreditCard, LayoutTemplate, Link2,
-} from 'lucide-react'
+import { Crown, CreditCard, LayoutTemplate, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
-import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { waHref } from '@/lib/utils/waLink'
 import {
   type PlatformWorkspaceItem
 } from '../actions'
@@ -32,12 +25,14 @@ import {
   type ModerationRequestItem
 } from '@/app/(dashboard)/actions/moderation'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
-import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { buildInviteLink } from '@/lib/domain/inviteLink'
 import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
+import { PlatformKpiCards } from './PlatformKpiCards'
+import { PlatformIndependentSection } from './PlatformIndependentSection'
+import { PlatformWorkspacesTable } from './PlatformWorkspacesTable'
+import { PlatformModerationDesk } from './PlatformModerationDesk'
 
 const WorkspaceLicenseModal = dynamic(
   () => import('./WorkspaceLicenseModal').then(m => ({ default: m.WorkspaceLicenseModal })),
@@ -55,23 +50,6 @@ const RejectModerationDialog = dynamic(
   () => import('./RejectModerationDialog').then(m => ({ default: m.RejectModerationDialog })),
   { loading: () => null },
 )
-
-const getAvatarColor = (name: string) => {
-  const colors = [
-    'from-red-500 to-rose-500',
-    'from-orange-500 to-amber-500',
-    'from-green-500 to-emerald-500',
-    'from-teal-500 to-cyan-500',
-    'from-blue-500 to-indigo-500',
-    'from-violet-500 to-purple-500',
-    'from-fuchsia-500 to-pink-500'
-  ]
-  let hash = 0
-  for (let i = 0; i < name.length; i++) {
-    hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  return colors[Math.abs(hash) % colors.length]
-}
 
 export function PlatformYonetimContent() {
   const { t, lang } = useTranslation()
@@ -113,7 +91,6 @@ export function PlatformYonetimContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedWorkspace, setSelectedWorkspace] = useState<PlatformWorkspaceItem | null>(null)
 
-  // Independent users — add as candidate state
   const [addingId, setAddingId] = useState<string | null>(null)
   const [addedIds, setAddedIds] = useState<Set<string>>(new Set())
   const [claimingId, setClaimingId] = useState<string | null>(null)
@@ -141,53 +118,37 @@ export function PlatformYonetimContent() {
     }
   }, [workspacesError, workspacesQueryError])
 
-  function handleOpenReview(req: ModerationRequestItem) {
-    setSelectedRequest(req)
-  }
-
+  function handleOpenReview(req: ModerationRequestItem) { setSelectedRequest(req) }
 
   function handleQuickApprove(req: ModerationRequestItem) {
     if (!confirm('Bu içeriği düzenleme yapmadan doğrudan onaylamak istediğinize emin misiniz?')) return
-
     startModerationTransition(async () => {
       try {
         const res = await approveRequestAction(req.id, req.contentType, req.data)
-        if (res.success) {
-          toast.success('İçerik hızlıca onaylandı!')
-          refreshPlatform()
-        }
+        if (res.success) { toast.success('İçerik hızlıca onaylandı!'); refreshPlatform() }
       } catch (err: unknown) {
         toast.error((err instanceof Error ? err.message : '') || 'Onaylama başarısız oldu.')
       }
     })
   }
 
-  function handleRejectRequest(req: ModerationRequestItem) {
-    setRejectRequest(req)
-  }
+  function handleRejectRequest(req: ModerationRequestItem) { setRejectRequest(req) }
 
   function confirmRejectRequest(reason: string) {
     if (!rejectRequest) return
     const req = rejectRequest
     setRejectRequest(null)
-
     startModerationTransition(async () => {
       try {
         const bilingual = await buildBilingualRejectReasonAction(reason, lang === 'en' ? 'en' : 'tr')
         const res = await rejectRequestAction(req.id, req.contentType, bilingual)
-        if (res.success) {
-          toast.success(t('moderationReview.rejectedToast'))
-          refreshPlatform()
-        }
+        if (res.success) { toast.success(t('moderationReview.rejectedToast')); refreshPlatform() }
       } catch (err: unknown) {
         toast.error((err instanceof Error ? err.message : '') || 'Reddetme işlemi başarısız oldu.')
       }
     })
   }
 
-
-
-  // Filter workspaces based on search query
   const filtered = workspaces.filter(w => {
     const q = searchQuery.toLowerCase()
     return (
@@ -199,18 +160,6 @@ export function PlatformYonetimContent() {
     )
   })
 
-  function buildInviteWaLink(code: string, name: string): string {
-    const msg = t('platformPage.inviteWaMessage', { name, link: buildInviteLink(code), code })
-    return `https://wa.me/?text=${encodeURIComponent(msg)}`
-  }
-
-  function buildPlatformWaLink(w: PlatformWorkspaceItem, code: string): string | null {
-    if (w.isIndependent) {
-      return buildInviteWaLink(code, w.ownerName)
-    }
-    return waHref(w.ownerPhone)
-  }
-
   async function handleAddAsCandidate(workspaceId: string, email: string, name: string) {
     setAddingId(workspaceId)
     try {
@@ -219,9 +168,7 @@ export function PlatformYonetimContent() {
       toast.success(t('platformPage.addedToPipeline', { name }))
     } catch (err: unknown) {
       toast.error((err instanceof Error ? err.message : '') || t('platformPage.operationFailed'))
-    } finally {
-      setAddingId(null)
-    }
+    } finally { setAddingId(null) }
   }
 
   async function handleClaimToTeam(workspaceId: string, name: string) {
@@ -232,28 +179,19 @@ export function PlatformYonetimContent() {
       refreshPlatform()
     } catch (err: unknown) {
       toast.error((err instanceof Error ? err.message : '') || t('platformPage.operationFailed'))
-    } finally {
-      setClaimingId(null)
-    }
+    } finally { setClaimingId(null) }
   }
 
   async function handleDeleteUser(ownerId: string, email: string) {
     if (!confirm(t('platformPage.confirmDeleteUser', { email }))) return
-    
     setDeletingUserId(ownerId)
     setDeleteCountdown(5)
-
     const timer = setInterval(() => {
       setDeleteCountdown(prev => {
-        if (prev <= 1) {
-          clearInterval(timer)
-          executeDeleteUser(ownerId)
-          return 0
-        }
+        if (prev <= 1) { clearInterval(timer); executeDeleteUser(ownerId); return 0 }
         return prev - 1
       })
     }, 1000)
-
     setDeleteTimerId(timer)
   }
 
@@ -279,7 +217,6 @@ export function PlatformYonetimContent() {
     }
   }
 
-  // Calculations for Admin KPIs
   const totalUsersCount = workspaces.length
   const independentCount = workspaces.filter(w => w.isIndependent).length
   const totalPaidCount = workspaces.filter(w => w.licenseType !== 'free').length
@@ -307,10 +244,8 @@ export function PlatformYonetimContent() {
     <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8 animate-in fade-in duration-300">
       <div className="w-full space-y-6">
 
-        {/* Çözülemeyen ödemeler — varsa en üstte uyarı */}
         <UnresolvedOrdersAlert />
 
-        {/* Header */}
         <header className="flex items-start justify-between gap-2 sm:gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md">
@@ -361,147 +296,25 @@ export function PlatformYonetimContent() {
           </div>
         </header>
 
-        {/* Platform KPIs */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {/* KPI 1 */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
-            <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block">
-              {t('platformPage.kpiTotalLeaders')}
-            </span>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-3xl font-black text-[var(--text-1)]">{totalUsersCount}</span>
-              <Users className="h-4.5 w-4.5 text-[var(--text-3)] ml-auto" />
-            </div>
-          </div>
+        <PlatformKpiCards
+          totalUsersCount={totalUsersCount}
+          independentCount={independentCount}
+          totalPaidCount={totalPaidCount}
+          pendingCount={pendingRequests.length}
+        />
 
-          {/* KPI 2 */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
-            <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-purple-600 dark:text-purple-300">
-              {t('platformPage.kpiIndependent')}
-            </span>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-3xl font-black text-purple-600 dark:text-purple-300">{independentCount}</span>
-              <Sparkles className="h-4.5 w-4.5 text-purple-600 dark:text-purple-300 ml-auto animate-pulse" />
-            </div>
-          </div>
-
-          {/* KPI 3 */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
-            <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-emerald-600 dark:text-emerald-300">
-              {t('platformPage.kpiPaid')}
-            </span>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-3xl font-black text-emerald-700 dark:text-emerald-300">{totalPaidCount}</span>
-              <ShieldCheck className="h-4.5 w-4.5 text-emerald-600 dark:text-emerald-300 ml-auto" />
-            </div>
-          </div>
-
-          {/* KPI 4 — onay bekleyen eğitim talepleri */}
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm">
-            <span className="text-[9px] font-bold text-[var(--text-3)] uppercase tracking-wider block text-amber-600 dark:text-amber-300">
-              {t('platformPage.kpiTrainingRequests')}
-            </span>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-3xl font-black text-amber-700 dark:text-amber-300">{pendingRequests.length}</span>
-              <BookOpen className="h-4.5 w-4.5 text-amber-600 dark:text-amber-300 ml-auto" />
-            </div>
-          </div>
-        </div>
-
-        {/* Bağımsız Üyeler — Independent Signups */}
         {independentMembers.length > 0 && (
-          <section className="rounded-2xl border border-purple-500/30 bg-purple-500/5 p-5 space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <Sparkles className="h-4 w-4 text-purple-600 dark:text-purple-400 shrink-0" />
-              <h2 className="text-base font-bold text-[var(--text-1)]">
-                {t('platformPage.independentSignupsTitle')}
-                <span className="ml-2 text-purple-600 dark:text-purple-400">({independentMembers.length})</span>
-              </h2>
-              <span className="text-[10px] text-[var(--text-3)] font-medium ml-auto hidden sm:block">
-                {t('platformPage.independentSignupsHint')}
-              </span>
-            </div>
-            <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-              {independentMembers.map(w => {
-                const isAdded = addedIds.has(w.workspaceId)
-                const detailHref = w.pipelineCandidateId ? `/pipeline/${w.pipelineCandidateId}` : null
-                return (
-                  <div
-                    key={w.workspaceId}
-                    onClick={detailHref ? () => router.push(detailHref) : undefined}
-                    className={`flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm ${detailHref ? 'cursor-pointer hover:bg-[var(--bg-subtle)]/75 transition-colors' : ''}`}
-                  >
-
-
-
-                    {w.avatarUrl ? (
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full overflow-hidden shadow">
-                        <Image src={w.avatarUrl} alt={w.ownerName} width={36} height={36} unoptimized className="h-full w-full object-cover" />
-                      </div>
-                    ) : (
-                      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-base font-black text-white shadow`}>
-                        {w.ownerName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold text-sm text-[var(--text-1)] truncate">{w.ownerName}</div>
-                      <div className="text-[10px] text-[var(--text-3)] truncate">{w.ownerEmail}</div>
-                    </div>
-                    <div className="flex gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                      {(() => {
-                        const waLink = buildPlatformWaLink(w, inviteCode)
-                        if (!waLink) return null
-                        return (
-                          <a
-                            href={waLink}
-                            target="_blank"
-                            rel="noreferrer"
-                            title={t('platformPage.shareInviteWhatsApp')}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg bg-whatsapp/10 text-[#25D366] transition hover:bg-whatsapp hover:text-white"
-                          >
-                            <WhatsAppIcon className="h-3.5 w-3.5" />
-                          </a>
-                        )
-                      })()}
-                      <button
-                        onClick={() => handleClaimToTeam(w.workspaceId, w.ownerName)}
-                        disabled={claimingId === w.workspaceId}
-                        title={t('platformPage.linkToTeamTitle')}
-                        className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 transition hover:bg-purple-600 hover:text-white disabled:opacity-50 dark:text-purple-300"
-                      >
-                        {claimingId === w.workspaceId ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : (
-                          <Link2 className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                      <button
-                        onClick={() => handleAddAsCandidate(w.workspaceId, w.ownerEmail, w.ownerName)}
-                        disabled={addingId === w.workspaceId || isAdded}
-                        title={t('platformPage.addToPipelineTitle')}
-                        className={`flex h-7 w-7 items-center justify-center rounded-lg transition ${
-                          isAdded
-                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 cursor-default'
-                            : 'bg-brand/10 text-brand dark:text-white dark:bg-white/10 hover:bg-brand hover:text-white disabled:opacity-50'
-                        }`}
-                      >
-                        {addingId === w.workspaceId ? (
-                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        ) : isAdded ? (
-                          <CheckCircle2 className="h-3.5 w-3.5" />
-                        ) : (
-                          <UserPlus className="h-3.5 w-3.5" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
+          <PlatformIndependentSection
+            inviteCode={inviteCode}
+            independentMembers={independentMembers}
+            addingId={addingId}
+            addedIds={addedIds}
+            claimingId={claimingId}
+            onAddAsCandidate={handleAddAsCandidate}
+            onClaimToTeam={handleClaimToTeam}
+          />
         )}
 
-        {/* Search bar */}
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
           <input
@@ -513,327 +326,25 @@ export function PlatformYonetimContent() {
           />
         </div>
 
-        {/* Workspaces Spreadsheet Grid */}
-        <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
-          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-            <Users className="h-4 w-4 text-brand" />
-            {t('platformPage.workspacesTableTitle')}
-          </h2>
-          <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)] md:overflow-x-visible">
-            <table className="w-full max-md:min-w-[920px] text-left border-collapse text-sm">
-              <colgroup>
-                <col className="md:w-[18%]" />
-                <col className="md:w-[14%]" />
-                <col className="md:w-[8%]" />
-                <col className="md:w-[6%]" />
-                <col className="md:w-[6%]" />
-                <col className="md:w-[14%]" />
-                <col className="md:w-[10%]" />
-                <col className="md:w-[10%]" />
-                <col className="md:w-[14%]" />
-              </colgroup>
-              <thead>
-                <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] text-xs font-bold select-none">
-                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thLeaderName')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thWorkspaceName')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thLicensePlan')}</th>
-                  <th className="px-1 py-2 font-semibold text-center align-middle">{t('platformPage.thCandidates')}</th>
-                  <th className="px-1 py-2 font-semibold text-center align-middle">{t('platformPage.thDownlines')}</th>
-                  <th className="px-2 py-2 font-semibold align-middle">{t('platformPage.thSponsor')}</th>
-                  <th className="px-2 py-2 font-semibold text-center align-middle">{t('platformPage.thExpiry')}</th>
-                  <th className="px-2 py-2 font-semibold text-center align-middle">{t('platformPage.thRegistration')}</th>
-                  <th className="px-2 py-2 font-semibold text-right align-middle">{t('platformPage.thActions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border)] text-[var(--text-1)]">
-                {workspacesLoading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <tr key={i}>
-                      <td colSpan={9} className="p-3">
-                        <Skeleton className="h-10 w-full rounded-lg" />
-                      </td>
-                    </tr>
-                  ))
-                ) : filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="p-8 text-center text-base text-[var(--text-3)] italic">
-                      {t('platformPage.noLeadersFound')}
-                    </td>
-                  </tr>
-                ) : (
-                  filtered.map(w => {
-                    const regDate = new Date(w.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-                    const isPaidUnlimited = w.licenseType !== 'free' && !w.licenseExpiresAt
-                    const expDate = isPaidUnlimited
-                      ? null
-                      : w.licenseExpiresAt
-                        ? new Date(w.licenseExpiresAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
-                        : '-'
+        <PlatformWorkspacesTable
+          inviteCode={inviteCode}
+          filtered={filtered}
+          workspacesLoading={workspacesLoading}
+          deletingUserId={deletingUserId}
+          deleteCountdown={deleteCountdown}
+          onOpenLicense={setSelectedWorkspace}
+          onDeleteUser={handleDeleteUser}
+          onCancelDelete={handleCancelDeleteUser}
+        />
 
-                    const isExpired = !isPaidUnlimited && w.licenseExpiresAt ? new Date(w.licenseExpiresAt) < new Date() : false
-                    const detailHref = w.pipelineCandidateId ? `/pipeline/${w.pipelineCandidateId}` : null
+        <PlatformModerationDesk
+          pendingRequests={pendingRequests}
+          moderationLoading={moderationLoading}
+          onOpenReview={handleOpenReview}
+          onQuickApprove={handleQuickApprove}
+          onRejectRequest={handleRejectRequest}
+        />
 
-                    return (
-                      <tr
-                        key={w.workspaceId}
-                        onClick={detailHref ? () => router.push(detailHref) : undefined}
-                        className={`hover:bg-[var(--bg-subtle)]/75 transition-colors ${detailHref ? 'cursor-pointer' : ''}`}
-                      >
-                        {/* 1. Leader */}
-                        <td className="px-2 py-2 align-middle whitespace-nowrap">
-                          <div className="flex items-center gap-2 min-w-0">
-                            {w.avatarUrl ? (
-                              <div className="h-7 w-7 shrink-0 rounded-full overflow-hidden border border-[var(--border)] shadow-sm">
-                                <Image src={w.avatarUrl} alt={w.ownerName} width={28} height={28} unoptimized className="h-full w-full object-cover" />
-                              </div>
-                            ) : (
-                              <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(w.ownerName)} text-[10px] font-black text-white shadow-sm`}>
-                                {w.ownerName.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                            <div className="min-w-0">
-                              <div className="font-bold text-[var(--text-1)] truncate">{w.ownerName}</div>
-                              <div className="text-xs text-[var(--text-3)] font-semibold flex items-center gap-1 min-w-0">
-                                <Mail className="h-3 w-3 shrink-0" />
-                                <span className="truncate">{w.ownerEmail}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-
-                        {/* 2. Workspace name */}
-                        <td className="px-2 py-2 align-middle font-medium whitespace-normal break-words">{w.workspaceName}</td>
-
-                        {/* 3. License type */}
-                        <td className="px-2 py-2 align-middle font-bold shrink-0">
-                          <span className={`rounded-full px-2.5 py-0.5 text-sm font-black uppercase tracking-wider ${
-                            w.licenseType === 'pro'
-                              ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                              : w.licenseType === 'plus'
-                                ? 'bg-purple-500/10 text-purple-600 dark:text-purple-400'
-                                : w.licenseType === 'basic'
-                                  ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
-                                  : 'bg-zinc-500/10 text-zinc-600 dark:text-zinc-400'
-                          }`}>
-                            {w.licenseType === 'pro'
-                              ? t('platformPage.planPro')
-                              : w.licenseType === 'plus'
-                                ? t('platformPage.planPlus')
-                                : w.licenseType === 'basic'
-                                  ? t('platformPage.planBasic')
-                                  : t('platformPage.planFree')}
-                          </span>
-                        </td>
-
-                        {/* 4. Candidates count */}
-                        <td className="px-1 py-2 text-center align-middle font-bold text-blue-600 dark:text-blue-300 tabular-nums whitespace-nowrap">{w.candidateCount}</td>
-
-                        {/* 5. Team count */}
-                        <td className="px-1 py-2 text-center align-middle font-bold text-brand tabular-nums whitespace-nowrap">{w.downlineCount}</td>
-
-                        {/* 6. Sponsor linkage */}
-                        <td className="px-2 py-2 align-middle font-semibold whitespace-normal break-words">
-                          {w.isIndependent ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 px-1.5 py-0.5 text-[9px] font-black text-purple-600 dark:text-purple-400">
-                              💎 {t('platformPage.independentDirect')}
-                            </span>
-                          ) : (
-                            <span className="block text-[var(--text-1)]">{w.sponsorName}</span>
-                          )}
-                        </td>
-
-                        {/* 7. Expiry */}
-                        <td className={`px-2 py-2 text-center align-middle tabular-nums font-semibold whitespace-nowrap ${isExpired ? 'text-red-500 font-bold' : ''}`}>
-                          {isPaidUnlimited ? (
-                            <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-black text-emerald-600 dark:text-emerald-400">
-                              ♾ {t('platformPage.unlimited')}
-                            </span>
-                          ) : (
-                            <>
-                              {expDate}
-                              {isExpired && (
-                                <span className="ml-1 text-[9px] font-black bg-red-500/10 text-red-500 px-1 py-0.5 rounded uppercase">
-                                  {t('platformPage.expired')}
-                                </span>
-                              )}
-                            </>
-                          )}
-                        </td>
-
-                        {/* 8. Registration Date */}
-                        <td className="px-2 py-2 text-center align-middle text-xs text-[var(--text-3)] font-semibold tabular-nums whitespace-nowrap">{regDate}</td>
-
-                        {/* 9. Actions */}
-                        <td className="px-2 py-2 align-middle whitespace-nowrap text-right">
-                          <div className="inline-flex gap-2.5" onClick={(e) => e.stopPropagation()}>
-                            {(() => {
-                              const waLink = buildPlatformWaLink(w, inviteCode)
-                              if (!waLink) return null
-                              return (
-                                <a
-                                  href={waLink}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  title={
-                                    w.isIndependent
-                                      ? t('platformPage.shareInviteWhatsApp')
-                                      : t('platformPage.openWhatsAppChat')
-                                  }
-                                  className="flex h-7 w-7 items-center justify-center rounded-lg bg-whatsapp/10 text-[#25D366] transition hover:bg-whatsapp hover:text-white"
-                                >
-                                  <WhatsAppIcon className="h-4 w-4" />
-                                </a>
-                              )
-                            })()}
-
-                            {/* License adjustment trigger */}
-                            <button
-                              onClick={() => setSelectedWorkspace(w)}
-                              title={t('platformPage.manageLicenseTitle')}
-                              className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand/10 text-brand transition hover:bg-brand hover:text-white"
-                            >
-                              <Plus className="h-4 w-4" />
-                            </button>
-                            {/* Delete User trigger */}
-                            {deletingUserId === w.ownerId ? (
-                              <button
-                                onClick={handleCancelDeleteUser}
-                                title={t('platformPage.cancelDeletion')}
-                                className="flex h-7 px-2 items-center justify-center rounded-lg bg-red-500 text-white font-bold text-sm hover:bg-red-600 transition min-w-[4rem]"
-                              >
-                                {t('platformPage.undoLabel')} ({deleteCountdown})
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleDeleteUser(w.ownerId, w.ownerEmail)}
-                                disabled={deletingUserId !== null}
-                                title={t('platformPage.deleteUserTitle')}
-                                className="flex h-7 w-7 items-center justify-center rounded-lg bg-red-500/10 text-red-500 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                            </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })
-                )}
-              </tbody>
-            </table>
-          </HorizontalScrollLock>
-        </section>
-
-        {/* İçerik/Video/İtiraz Onay Masası */}
-        <section className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <h2 className="min-w-0 text-sm font-bold text-[var(--text-1)] sm:text-base whitespace-nowrap">
-              {t('platformPage.moderationDeskTitle')}
-            </h2>
-            <span className="text-[10px] text-[var(--text-3)] font-semibold ml-auto hidden sm:block">
-              {t('platformPage.moderationDeskHint')}
-            </span>
-          </div>
-
-          {moderationLoading ? (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-44 rounded-2xl" />
-              ))}
-            </div>
-          ) : pendingRequests.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-card)] py-8 text-center text-sm text-[var(--text-3)] italic">
-              {t('platformPage.moderationDeskEmpty')}
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {pendingRequests.map(req => {
-                const dateStr = new Date(req.createdAt).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })
-                const isTraining = req.contentType === 'training'
-                const isVideo = req.contentType === 'video'
-                const rd = req.data as unknown as Record<string, Record<string, string> | string | string[] | number | undefined>
-                const title = isVideo
-                  ? (rd.titleTr ?? 'İsimsiz Video')
-                  : isTraining
-                    ? (rd.baslik ?? 'İsimsiz İçerik')
-                    : ((rd.soru as Record<string, string> | undefined)?.tr ?? rd.soru ?? 'İsimsiz İtiraz')
-                const category = isVideo
-                  ? (rd.categoryTr ?? 'Genel')
-                  : isTraining
-                    ? (rd.kategoriBaslik ?? 'Zihniyet')
-                    : ((rd.kategori as Record<string, string> | undefined)?.tr ?? rd.kategori ?? 'Genel')
-                const preview = isVideo
-                  ? (rd.descriptionTr ?? 'Açıklama bulunmuyor.')
-                  : isTraining
-                    ? (rd.ozet ?? 'Özet bulunmuyor.')
-                    : (rd.kisaCevap ?? 'Kısa cevap bulunmuyor.')
-
-                return (
-                  <div key={req.id} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm space-y-3 relative overflow-hidden flex flex-col justify-between">
-                    <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-amber-400 to-amber-500" />
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
-                          isVideo
-                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
-                            : isTraining
-                              ? 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400'
-                              : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
-                        }`}>
-                          {isVideo ? <Film className="h-2.5 w-2.5" /> : isTraining ? <BookOpen className="h-2.5 w-2.5" /> : <MessageSquare className="h-2.5 w-2.5" />}
-                          {isVideo ? t('moderationReview.typeVideo') : isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}
-                        </span>
-                        <span className="text-[9px] text-[var(--text-3)] font-bold">{dateStr}</span>
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-bold text-[var(--text-1)] line-clamp-1 flex items-center gap-1">
-                          <span className="text-base shrink-0">{String(rd.emoji ?? '')}</span>
-                          {String(title ?? '')}
-                        </h3>
-                        <p className="text-[10px] text-[var(--text-3)] font-semibold mt-0.5 truncate">Kategori: {String(category ?? '')}</p>
-                      </div>
-
-                      <p className="text-[11px] text-[var(--text-2)] line-clamp-2 leading-relaxed bg-[var(--bg-subtle)] p-2 rounded-lg border border-[var(--border)] font-medium">
-                        {String(preview ?? '')}
-                      </p>
-
-                      <div className="text-[10px] text-[var(--text-3)] font-semibold space-y-0.5 border-t border-[var(--border)] pt-2">
-                        <div className="truncate"><strong>Gönderen:</strong> {req.userName}</div>
-                        <div className="truncate"><strong>E-posta:</strong> {req.userEmail}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 pt-2 border-t border-[var(--border)]">
-                      <button
-                        onClick={() => handleOpenReview(req)}
-                        className="flex-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] hover:bg-[var(--border)] text-[var(--text-2)] py-2 text-[10px] font-bold transition active:scale-95 cursor-pointer"
-                      >
-                        İncele & Düzenle
-                      </button>
-                      <button
-                        onClick={() => handleQuickApprove(req)}
-                        className="flex-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white py-2 text-[10px] font-bold transition active:scale-95 cursor-pointer shadow-sm"
-                      >
-                        Hızlı Onayla
-                      </button>
-                      <button
-                        onClick={() => handleRejectRequest(req)}
-                        className="rounded-xl bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 p-2 text-[10px] font-bold transition active:scale-95 cursor-pointer flex items-center justify-center shrink-0"
-                        title="Reddet ve Sil"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </section>
 
         {selectedWorkspace && (
           <WorkspaceLicenseModal
@@ -856,20 +367,14 @@ export function PlatformYonetimContent() {
       {navConfirm === 'payment' && (
         <ConfirmDialog
           message={t('platformPage.confirmGoPayment')}
-          onConfirm={() => {
-            setNavConfirm(null)
-            router.push('/odeme')
-          }}
+          onConfirm={() => { setNavConfirm(null); router.push('/odeme') }}
           onCancel={() => setNavConfirm(null)}
         />
       )}
       {navConfirm === 'landing' && (
         <ConfirmDialog
           message={t('platformPage.confirmGoLanding')}
-          onConfirm={() => {
-            setNavConfirm(null)
-            router.push('/acilis')
-          }}
+          onConfirm={() => { setNavConfirm(null); router.push('/acilis') }}
           onCancel={() => setNavConfirm(null)}
         />
       )}

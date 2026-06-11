@@ -9,7 +9,7 @@ import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
-import { createClient } from '@/lib/supabase/client'
+import { uploadAvatarAction } from '@/app/(dashboard)/actions/profile'
 import { resolveCandidateFields, buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { toast } from 'sonner'
@@ -80,20 +80,11 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
         toast.info('Fotoğraf sıkıştırılıyor...')
         const compressedFile = await imageCompression(photoFile, compressionOptions)
 
-        const supabase = createClient()
-        const ext = 'jpg'
-        const path = `avatars/candidate_${candidate.id}_${Date.now()}.${ext}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('nmm-avatars')
-          .upload(path, compressedFile, { contentType: 'image/jpeg' })
-
-        if (uploadError) throw uploadError
-
-        const { data: { publicUrl } } = supabase.storage
-          .from('nmm-avatars')
-          .getPublicUrl(path)
-        
+        const uploadFd = new FormData()
+        uploadFd.set('file', new File([compressedFile], 'candidate.jpg', { type: 'image/jpeg' }))
+        uploadFd.set('scope', 'candidate')
+        uploadFd.set('candidateId', candidate.id)
+        const { publicUrl } = await uploadAvatarAction(uploadFd)
         avatarUrl = publicUrl
       }
 

@@ -21,26 +21,31 @@ const noSupabaseClientInTsx = {
 };
 
 /**
- * Phased migration — exact file allowlist (NOT wildcards). Her dosya server
- * action'a taşındıkça listeden silinir; yeni eklenen dosyalar bu istisnaya
- * otomatik girmez, dolayısıyla borç ölçülebilir ve azalan kalır.
+ * KALICI istisnalar — tarayıcıya özgü Supabase auth API'leri kullanan dosyalar.
+ * `signInWithPassword` (cookie/oturum istemcide yazılır), `onAuthStateChange`
+ * (yalnızca tarayıcıda var) ve URL hash'ten `setSession` (recovery token yalnız
+ * tarayıcıya ulaşır) server action'a taşınamaz. Veri okuma/yazma yapan tüm
+ * legacy dosyalar server action'a taşındı (2026-06-11) — yeni dosya EKLEME.
  */
 const supabaseClientTsxLegacy = {
   files: [
     "src/app/(auth)/giris/_components/LoginForm.tsx",
     "src/app/(auth)/sifre-guncelle/_components/PasswordResetGate.tsx",
-    "src/app/(dashboard)/pano/_components/OnboardingModal.tsx",
-    "src/app/(dashboard)/pipeline/_components/AddCandidateSheet.tsx",
-    "src/app/(dashboard)/pipeline/_components/EditCandidateSheet.tsx",
-    "src/app/(dashboard)/yazar/_components/YazarForm.tsx",
     "src/app/_components/landing/LandingPage.tsx",
-    "src/components/ui/NotificationsModal.tsx",
-    "src/components/ui/ProfileModal.tsx",
-    "src/components/ui/SettingsModal.tsx",
-    "src/app/(dashboard)/_components/UserMenu.tsx",
   ],
   rules: {
     "no-restricted-imports": "off",
+  },
+};
+
+/** `_` önekli parametre = bilinçli kullanılmayan (API yüzeyi korunur). */
+const underscoreArgsAllowed = {
+  files: ["src/**/*.{ts,tsx}"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+    ],
   },
 };
 
@@ -67,6 +72,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   noSupabaseClientInTsx,
   supabaseClientTsxLegacy,
+  underscoreArgsAllowed,
   noRawZIndex,
   // Override default ignores of eslint-config-next.
   globalIgnores([

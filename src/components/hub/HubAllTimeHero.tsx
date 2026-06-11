@@ -2,7 +2,7 @@
 
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
-import type { HubSelfFieldMetrics } from '@/app/(dashboard)/crown/actions'
+import type { HubSelfFieldMetrics } from '@/app/(dashboard)/crown/hubSelfActions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 
 type HubAllTimeHeroProps = {
