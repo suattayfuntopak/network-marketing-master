@@ -1,5 +1,6 @@
 -- Tek seferlik: nmm_candidates.email boş kayıtları, güvenli kaynaklardan doldurur.
--- Migration 080 sonrası davet kayıt (?ref&aday) için adayda e-posta gerekir.
+-- Prod'da migration 081_join_email_sync_and_backfill.sql aynı UPDATE'leri uygular.
+-- Bu dosya yalnızca manuel dry-run / tekrar çalıştırma referansıdır.
 --
 -- Kullanım (Supabase SQL Editor veya psql):
 --   1) Önce dry-run SELECT'leri çalıştırın, satır sayısını kontrol edin.

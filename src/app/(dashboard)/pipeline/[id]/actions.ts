@@ -99,7 +99,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   // oluşturulurken (ensureWorkspaceAction) otomatik olarak liderin ekibine bağlanır
   // (parent_id) → "dış kayıt"/çift sayım olmadan. Kod, link açılmazsa yedek olarak kalır.
   const inviteLink = buildInviteLink(inviteCode, candidateId)
-  const linkBlock = `\n\nKayıt linki: ${inviteLink}\n(Linkten kaydolunca adın ve e-postan hazır gelir; yalnızca şifreni belirleyip ekibime otomatik bağlanırsın.)`
+  const linkBlock = `\n\nKayıt linki: ${inviteLink}\n\nLinke tıklayarak bilgileri doldurulmuş kayıt sayfasına ulaşabilir, sadece şifrenizi oluşturarak hızlıca giriş yapabilirsiniz.`
 
   try {
     const model = genAI.getGenerativeModel({

@@ -135,6 +135,14 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 {parsed.warmth === 'soguk' && (
                   <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
                 )}
+                {!candidate.email?.trim() && (
+                  <span
+                    className="inline-flex shrink-0 items-center rounded-full border border-amber-200/60 bg-amber-50/90 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/40 dark:text-amber-400"
+                    title={t('team.inviteEmailMissingHint')}
+                  >
+                    ✉️
+                  </span>
+                )}
               </div>
               {candidate.phone && (
                 <p className="hidden text-xs text-[var(--text-2)] sm:block">{candidate.phone}</p>

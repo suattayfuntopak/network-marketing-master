@@ -1,11 +1,20 @@
 import { REGISTER_URL } from '@/lib/domain/constants'
 
+/** Kayıt sayfası kökü — kısa davet yolu `/d/{ref}/{token}` için. */
+export const REGISTER_ORIGIN = REGISTER_URL.replace(/\/kayit\/?$/i, '')
+
 /**
- * Sponsor davet linkini TEK kaynaktan üretir: `${REGISTER_URL}?ref=KOD[&aday=ID]`.
- * `ref` (workspace invite_code) → kişi linkten kaydolunca davet kodunu ELLE girmeden
- * otomatik bu ekibe bağlanır (ensureWorkspaceAction → nmm_join_workspace) ve boru
- * hattındaki "katıldı" adayıyla eşleşip NMM Ortağı olur. `aday` (candidate id) eşleşmeyi
- * netleştirir. Kod yoksa düz kayıt linki döner. (Eskiden 4+ yerde elle kuruluyordu.)
+ * Aday UUID'sinden 8 karakterlik kısa token (workspace içi çözümleme).
+ * Örn. `00fa3484-97b1-4683-b987-638df261b6e2` → `00fa3484`
+ */
+export function inviteShortToken(candidateId: string): string {
+  return candidateId.replace(/-/g, '').slice(0, 8).toLowerCase()
+}
+
+/**
+ * Sponsor davet linkini TEK kaynaktan üretir.
+ * - Kod + aday: kısa yol `${REGISTER_ORIGIN}/d/KOD/token` (WhatsApp dostu).
+ * - Yalnız kod: `${REGISTER_URL}?ref=KOD`
  */
 export function buildInviteLink(
   inviteCode: string | null | undefined,
@@ -13,7 +22,10 @@ export function buildInviteLink(
 ): string {
   const code = (inviteCode ?? '').trim()
   if (!code) return REGISTER_URL
-  const params = new URLSearchParams({ ref: code })
-  if (candidateId) params.set('aday', candidateId)
-  return `${REGISTER_URL}?${params.toString()}`
+  const upper = code.toUpperCase()
+  const id = (candidateId ?? '').trim()
+  if (id) {
+    return `${REGISTER_ORIGIN}/d/${encodeURIComponent(upper)}/${inviteShortToken(id)}`
+  }
+  return `${REGISTER_URL}?${new URLSearchParams({ ref: upper }).toString()}`
 }

@@ -20,6 +20,11 @@ test.describe('davet kayıt (public)', () => {
     await expect(inviteError).not.toBeEmpty()
   })
 
+  test('kısa /d/ yolu kayıt sayfasına yönlendirir', async ({ page }) => {
+    await page.goto('/d/ZZZZZZ/00000000')
+    await expect(page).toHaveURL(/\/kayit/, { timeout: 15_000 })
+  })
+
   test('/kayit davet parametresi olmadan düzenlenebilir ad ve e-posta alanları', async ({ page }) => {
     await page.goto('/kayit')
 

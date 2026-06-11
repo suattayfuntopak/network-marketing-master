@@ -1,6 +1,7 @@
 'use server'
 
 import { createAdminClient } from '@/lib/supabase/admin'
+import { inviteShortToken } from '@/lib/domain/inviteLink'
 
 export type InviteSignupPrefill = {
   fullName: string
@@ -46,6 +47,43 @@ export async function getInviteSignupPrefillAction(
     ref: code,
     aday: candidateId,
   }
+}
+
+/**
+ * Kısa davet token'ından (`/d/{ref}/{token}`) tam aday id çözümler.
+ * Token = UUID'nin ilk 8 hex karakteri; workspace + invite_code ile sınırlı.
+ */
+export async function resolveInviteCandidateFromShortToken(
+  ref: string,
+  token: string,
+): Promise<string | null> {
+  const code = ref.trim().toUpperCase()
+  const prefix = token.trim().toLowerCase().replace(/[^a-f0-9]/g, '').slice(0, 8)
+  if (!code || prefix.length < 8) return null
+
+  const admin = createAdminClient()
+
+  const { data: ws } = await admin
+    .from('nmm_workspaces')
+    .select('id')
+    .eq('invite_code', code)
+    .maybeSingle()
+
+  if (!ws?.id) return null
+
+  const { data: rows } = await admin
+    .from('nmm_candidates')
+    .select('id')
+    .eq('workspace_id', ws.id)
+    .ilike('id', `${prefix}%`)
+
+  if (!rows?.length) return null
+  if (rows.length === 1) return rows[0].id
+
+  const exact = rows.find(
+    r => inviteShortToken(r.id) === prefix,
+  )
+  return exact?.id ?? rows[0].id
 }
 
 /** Kayıt sırasında davet adayının lider kayıtlı adını doğrula. */
