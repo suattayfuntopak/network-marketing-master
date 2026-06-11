@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-12 — Seviye düzeltmesi + Crown Team gerçek video serisi ✅
+
+### Seviye: rozet geri, yalnız "SEVİYE" kelimesi gizli
+- Önceki turda yanlış anlaşılıp tüm seviye rozeti kaldırılmıştı. **`TrainingCard.tsx`** geri alındı — Temel/Orta/İleri renkli rozeti yine görünüyor (`SEVIYE_RENK` + `konu.seviye`).
+- **`EgitimContent.tsx`:** Seviye filtre satırındaki **yalnızca "SEVİYE" etiket kelimesi** (`<span>{t('trainingPage.fieldLevel')}</span>`) kaldırıldı; filtre butonları (Tümü / Başlangıç / Orta / İleri) ve tüm seviye mantığı (badge, öğrenme yolu sıralaması, AddTrainingModal) korundu.
+
+### Crown Team "Network Marketing Eğitim Serisi" videoları (Dr. Tuna AKGÜN)
+- 047'deki 6 placeholder (generic İngilizce) video, kullanıcının paylaştığı 6 gerçek seri videosuyla değiştirildi (sıra 4–9; ilk 3 sonradan eklenecek).
+- **`trainingVideos.ts` (`TRAINING_VIDEOS`):** kanonik liste güncellendi — lider nabız özeti (pulse) anahtarları artık gerçek videolar. TR + kalıcı EN başlık/açıklama/kategori.
+- **`093_crown_team_video_series.sql`:** DB kataloğu (`nmm_training_videos`) aynı `key`/sıra ile güncellendi (placeholder DELETE + gerçek videolar UPSERT). `is_approved` default true → herkese görünür.
+- Videolar: 4·Liste Çalışması, 5·Davet Sanatı, 6·Sunum, 7·Takip Sistemi, 8·İtiraz Yönetimi, 9·Sponsorluk ve Kopyalama. Süreler tahminîdir (oynatıcı gerçek uzunluğu kullanır); 5·Davet=25dk slayttan.
+- **ÖNEMLİ — canlıya alma:** Prod migration otomatik değil. Videoların canlıda görünmesi için **GitHub Actions → "DB migrate (prod)" (db-push.yml) → mode: apply, onay: PUSH** ile elle tetiklenmeli.
+
+### Dosyalar
+`src/app/(dashboard)/egitim/_components/TrainingCard.tsx`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/lib/domain/trainingVideos.ts`, `supabase/migrations/093_crown_team_video_series.sql`
+
 ## 2026-06-12 — Seviye kaldırma, mobil pano tarihi, video otomatik izleme takibi ✅
 
 ### Seviye rozeti kaldırıldı

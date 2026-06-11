@@ -342,11 +342,8 @@ export function EgitimContent({
         ))}
       </div>
 
-      {/* Seviye filtresi — kategoriden ayrı, ikincil bir satır */}
+      {/* Seviye filtresi — kategoriden ayrı, ikincil bir satır ("Seviye" etiketi gizli) */}
       <div className="mb-5 flex flex-wrap items-center gap-2">
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-          {t('trainingPage.fieldLevel')}
-        </span>
         {([
           { key: 'all', label: t('trainingPage.allLevels') },
           { key: 'beginner', label: t('trainingPage.levelBeginner') },

@@ -2,7 +2,7 @@
 
 import { Check, CheckCircle2, ChevronDown, Circle, Clock, Copy, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getTrainingCategoryStyles } from '../constants'
+import { SEVIYE_RENK, getTrainingCategoryStyles } from '../constants'
 import type { TrainingTopic } from '../types'
 
 type Props = {
@@ -63,6 +63,9 @@ export function TrainingCard({
                 <p className={`text-[10px] font-bold uppercase tracking-wider ${catTextColor}`}>
                   {kategoriBaslik}
                 </p>
+                <span className={`rounded-full px-2 py-0.2 text-[8px] font-black uppercase tracking-wider shrink-0 ${SEVIYE_RENK[konu.seviye]}`}>
+                  {konu.seviye}
+                </span>
               </div>
               <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
                 {baslik}
