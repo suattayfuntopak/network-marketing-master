@@ -100,9 +100,6 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
               <Flame className="h-4 w-4 text-orange-500" />
               {t('statsPage.tempTitle')}
             </h2>
-            <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-              {t('statsPage.tempSubtitle')}
-            </p>
           </div>
 
           {total === 0 ? (
@@ -172,9 +169,6 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
                 <BarChart2 className="h-4 w-4 text-[#4169E1]" />
                 {t('statsPage.velocityTitle')}
               </h2>
-              <p className="mt-1 text-sm text-[var(--text-3)] leading-relaxed">
-                {t('statsPage.velocitySubtitle')}
-              </p>
             </div>
             <span className="text-sm font-bold text-[#4169E1] bg-[#EEF2FF] dark:bg-[#0a0f2e] border border-blue-100/50 dark:border-blue-900/10 px-2 py-0.5 rounded-full">
               {total} {t('statsPage.velocityNew')}
@@ -195,8 +189,11 @@ export function StatsCharts({ total, funnelSteps, temperatureData, trendBars, ma
                       className={`w-full rounded-t-md transition-all duration-700 ease-out ${bar.count > 0 ? 'bg-[#4169E1]' : 'bg-[#EEF2FF] dark:bg-[#4169E1]/20'}`}
                       style={{ height: `${Math.max((bar.count / maxTrendCount) * 105, bar.count > 0 ? 10 : 2)}px` }}
                     />
+                    <span className="block w-full truncate text-center text-xs font-semibold text-[var(--text-3)] md:hidden">
+                      {bar.label}
+                    </span>
                     <span
-                      className="block h-10 text-[10px] font-semibold leading-none text-[var(--text-3)] sm:text-xs"
+                      className="hidden md:block h-8 text-[8px] font-medium leading-none text-[var(--text-3)]"
                       style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
                     >
                       {bar.label}

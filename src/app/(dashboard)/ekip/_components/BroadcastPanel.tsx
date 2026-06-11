@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from './EkipPanel'
 import { waHref } from '@/lib/utils/waLink'
+import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 
 interface BroadcastPanelProps {
   members: MemberRow[]
@@ -85,7 +86,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                 onClick={() => setBroadcastMode('doc')}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition ${
                   broadcastMode === 'doc'
-                    ? 'border-brand bg-brand text-white dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:shadow-sm dark:shadow-pink-500/15'
+                    ? `border-brand bg-brand text-white ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`
                     : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
                 }`}
               >
@@ -96,7 +97,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                 onClick={() => setBroadcastMode('motiv')}
                 className={`flex flex-1 items-center justify-center gap-2 rounded-xl border py-2.5 text-sm font-semibold transition ${
                   broadcastMode === 'motiv'
-                    ? 'border-brand bg-brand text-white dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:shadow-sm dark:shadow-pink-500/15'
+                    ? `border-brand bg-brand text-white ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`
                     : 'border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--bg)]'
                 }`}
               >

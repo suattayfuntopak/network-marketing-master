@@ -14,9 +14,12 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
-import { hubPeriodTabLabel } from '@/components/hub/HubSummaryTabBar'
-import type { HubPeriodTab } from '@/components/hub/HubSummaryTabBar'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
+import {
+  MEMBER_ACTIVITY_PERIODS,
+  MemberActivityPeriodTabs,
+  sheetPeriodToHubTab,
+} from '@/components/team/MemberActivityPeriodTabs'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import {
@@ -34,7 +37,6 @@ export type MemberActivityTarget = {
   pipelineHref?: string | null
 }
 
-const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd']
 const METRICS_GRID_MIN_H = 'min-h-[22rem]'
 
 interface Props {
@@ -51,17 +53,6 @@ interface Props {
   pipelineTakipCount?: number
   pipelineKatildiCount?: number
   onClose?: () => void
-}
-
-const SHEET_TO_HUB_TAB: Record<SheetActivityPeriod, HubPeriodTab> = {
-  today: 'daily',
-  '7d': 'weekly',
-  '30d': 'monthly',
-  ytd: 'yearly',
-}
-
-function sheetPeriodLabel(t: (key: string) => string, p: SheetActivityPeriod): string {
-  return hubPeriodTabLabel(t, SHEET_TO_HUB_TAB[p])
 }
 
 function MetricsGridSkeleton() {
@@ -97,7 +88,7 @@ export function MemberActivitySheet({
   useBodyScrollLock(!embedded)
 
   useEffect(() => {
-    for (const p of SHEET_PERIODS) {
+    for (const p of MEMBER_ACTIVITY_PERIODS) {
       void queryClient.prefetchQuery({
         queryKey: ['member-activity', workspaceId, member.userId, p],
         queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, p),
@@ -173,13 +164,18 @@ export function MemberActivitySheet({
     (data?.calls ?? 0) + (data?.whatsapps ?? 0) + (data?.notes ?? 0) +
     (data?.stageChanges ?? 0) + (data?.aiActions ?? 0)
 
+  const metricLabels = {
+    calls: t('team.fieldMetricCalls'),
+    newLeads: t('team.fieldMetricMeetings'),
+  }
+
   const metrics = [
-    { icon: Phone, label: t('pulse.calls'), value: data?.calls ?? 0, color: 'text-blue-600' },
+    { icon: Phone, label: metricLabels.calls, value: data?.calls ?? 0, color: 'text-blue-600' },
     { icon: WhatsAppIcon, label: 'WhatsApp', value: data?.whatsapps ?? 0, color: 'text-[#128C7E]', isWa: true },
     { icon: Pencil, label: t('team.activityNotes'), value: data?.notes ?? 0, color: 'text-[var(--text-2)]' },
     { icon: ArrowRight, label: t('team.activityStageChanges'), value: data?.stageChanges ?? 0, color: 'text-amber-600' },
     { icon: Bot, label: t('team.activityAi'), value: data?.aiActions ?? 0, color: 'text-indigo-600' },
-    { icon: UserPlus, label: t('team.activityNewLeads'), value: data?.newCandidates ?? 0, color: 'text-emerald-600' },
+    { icon: UserPlus, label: metricLabels.newLeads, value: data?.newCandidates ?? 0, color: 'text-emerald-600' },
     ...(embedded
       ? [
           { icon: ArrowRight, label: t('stages.takip'), value: pipelineTakipCount, color: 'text-amber-600' },
@@ -194,22 +190,7 @@ export function MemberActivitySheet({
 
   const panelBody = (
     <>
-        <div className="flex flex-wrap gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-0.5 mb-4">
-          {SHEET_PERIODS.map(p => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setPeriod(p)}
-              className={`flex-1 min-w-[4.5rem] rounded-lg py-1.5 text-xs transition ${
-                period === p
-                  ? 'bg-[var(--bg-card)] text-brand dark:text-white font-bold shadow-sm border border-[var(--border)]'
-                  : 'text-[var(--text-3)] dark:text-white/80 font-normal'
-              }`}
-            >
-              {sheetPeriodLabel(t, p)}
-            </button>
-          ))}
-        </div>
+        <MemberActivityPeriodTabs active={period} onChange={setPeriod} />
 
         {embedded && memberSelfGoal && (
           <div className="mb-4 rounded-xl border border-amber-500/25 bg-amber-50/40 dark:bg-amber-950/20 p-4">
@@ -334,8 +315,9 @@ export function MemberActivitySheet({
               actuals={data.funnel}
               targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
               hasGoal={false}
-              period="monthly"
+              period={sheetPeriodToHubTab(period)}
               hideNoGoalFooter={embedded}
+              labelMode="member"
             />
           </div>
         )}

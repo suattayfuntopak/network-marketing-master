@@ -86,7 +86,7 @@ export function FollowUpCard({
         </p>
       </div>
       <div
-        className="flex shrink-0 items-center gap-1.5"
+        className="ml-auto flex shrink-0 items-center gap-1.5"
         onClick={e => e.stopPropagation()}
       >
         <button
@@ -133,7 +133,7 @@ export function FollowUpCard({
               e.stopPropagation()
               onCallClick(f.id)
             }}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
             aria-label="Ara"
             title="Ara"
           >
@@ -198,23 +198,25 @@ export function SahaRadarMemberCard({
         </p>
         <p className="text-xs text-[var(--text-3)]">{daysBadge}</p>
       </div>
-      <div
-        className="flex items-center gap-1.5 shrink-0"
-        onClick={e => e.stopPropagation()}
-      >
-        <span
-          className={clsx(
-            'text-[10px] font-bold rounded-full px-2 py-0.5 hidden sm:inline',
+      <span
+        className={clsx(
+          'ml-auto hidden text-[10px] font-bold rounded-full px-2 py-0.5 sm:inline',
             m.activityLevel === 'active'
               ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
               : m.activityLevel === 'recent'
                 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
                 : 'bg-rose-100 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300',
-          )}
-        >
-          {t(labelKey)}
-        </span>
+        )}
+      >
+        {t(labelKey)}
+      </span>
+      <span className="sm:hidden">
         <ActivityDot level={m.activityLevel} />
+      </span>
+      <div
+        className="flex shrink-0 items-center gap-1.5 sm:ml-0"
+        onClick={e => e.stopPropagation()}
+      >
         <button
           type="button"
           onClick={() => onCoachAI(m)}
@@ -259,7 +261,7 @@ export function SahaRadarMemberCard({
           <a
             href={`tel:${m.phone}`}
             onClick={e => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
             aria-label="Ara"
             title="Ara"
           >

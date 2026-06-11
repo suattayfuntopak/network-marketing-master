@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
+import { fetchTeamBundle } from '@/lib/team/fetchTeamBundle'
 import { computeMemberGeneration } from '@/lib/team/memberGeneration'
 
 export type GenerationTreeNode = {
@@ -12,6 +13,8 @@ export type GenerationTreeNode = {
   generation: number
   isAppUser: boolean
   joinedAt: string | null
+  /** Uygulama kullanıcısı detayı — pipeline_id varsa /pipeline/[id] */
+  pipelineId: string | null
 }
 
 export async function getTeamGenerationTreeAction(workspaceId: string): Promise<GenerationTreeNode[]> {
@@ -21,12 +24,22 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
 
   // bundle / wsMembers / tree birbirinden bağımsız — ardışık değil tek paralel
   // dalgada çekilir (3 round-trip → 1). leader kontrolü sonrasında yapılır.
-  const [bundle, { data: wsMembers }, { data: treeRows }] = await Promise.all([
+  const [bundle, teamBundle, { data: wsMembers }, { data: treeRows }] = await Promise.all([
     fetchTeamWithDownlines(supabase, workspaceId),
+    fetchTeamBundle(supabase, workspaceId),
     supabase.from('nmm_workspace_members').select('user_id').eq('workspace_id', workspaceId),
     supabase.rpc('nmm_leader_downline_workspace_tree'),
   ])
   const members = bundle?.members ?? []
+  const ekipRows = teamBundle?.ekipRows ?? []
+  const pipelineByUser = new Map(
+    ekipRows
+      .filter(row => row.isAppUser !== false && row.pipeline_id)
+      .map(row => [row.user_id, row.pipeline_id as string]),
+  )
+  const avatarByUser = new Map(
+    ekipRows.filter(row => row.user_id).map(row => [row.user_id, row.avatar_url ?? null]),
+  )
   const leader = members.find(m => m.role === 'leader')
   if (!leader) return []
 
@@ -37,7 +50,7 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
     .map(m => ({
       id: m.user_id,
       name: m.full_name ?? '—',
-      avatarUrl: m.avatar_url ?? null,
+      avatarUrl: avatarByUser.get(m.user_id) ?? m.avatar_url ?? null,
       generation: computeMemberGeneration(
         m.user_id,
         leader.user_id,
@@ -47,6 +60,7 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
       ),
       isAppUser: true,
       joinedAt: m.joined_at,
+      pipelineId: pipelineByUser.get(m.user_id) ?? null,
     }))
     .sort((a, b) => a.generation - b.generation || a.name.localeCompare(b.name))
 }

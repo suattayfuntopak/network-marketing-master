@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { GitBranch } from 'lucide-react'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -17,6 +18,7 @@ type Props = {
 
 export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
   const { t } = useTranslation()
+  const router = useRouter()
 
   const { data: nodes = [], isLoading } = useQuery({
     queryKey: ['team-generation-tree', workspaceId],
@@ -62,7 +64,23 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
           {nodes.map(node => (
             <li
               key={node.id}
-              className="flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5"
+              role={node.generation > 0 && node.pipelineId ? 'button' : undefined}
+              tabIndex={node.generation > 0 && node.pipelineId ? 0 : undefined}
+              onClick={() => {
+                if (node.generation === 0 || !node.pipelineId) return
+                router.push(`/pipeline/${node.pipelineId}`)
+              }}
+              onKeyDown={e => {
+                if (e.key !== 'Enter' && e.key !== ' ') return
+                if (node.generation === 0 || !node.pipelineId) return
+                e.preventDefault()
+                router.push(`/pipeline/${node.pipelineId}`)
+              }}
+              className={`flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 ${
+                node.generation > 0 && node.pipelineId
+                  ? 'cursor-pointer transition hover:bg-[var(--bg-subtle)] active:scale-[0.99]'
+                  : ''
+              }`}
               style={{ marginInlineStart: `${node.generation * 12}px` }}
             >
               <PersonAvatar name={node.name} imageUrl={node.avatarUrl} size="sm" />

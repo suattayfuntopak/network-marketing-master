@@ -24,13 +24,22 @@ type HubCrownFunnelGridProps = {
   hideNoGoalFooter?: boolean
   /** Saha Özetim: hedef durum/uyarı satırını tamamen gizle */
   hideFooter?: boolean
+  /** Ekip üyesi aktivite özeti: 3. tekil soru kalıbı */
+  labelMode?: 'self' | 'member'
 }
 
-const METRIC_LABEL_KEYS: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
+const METRIC_LABEL_KEYS_SELF: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
   arama: 'dashboard.dailyTrackMetricCalls',
   tanisma: 'dashboard.dailyTrackMetricMeetings',
   sunum: 'dashboard.dailyTrackMetricPresentations',
   yeniUye: 'dashboard.dailyTrackMetricMembers',
+}
+
+const METRIC_LABEL_KEYS_MEMBER: Record<(typeof FUNNEL_METRIC_ORDER)[number], string> = {
+  arama: 'team.fieldMetricCalls',
+  tanisma: 'team.fieldMetricMeetings',
+  sunum: 'team.fieldMetricPresentations',
+  yeniUye: 'team.fieldMetricMembers',
 }
 
 export function HubCrownFunnelGrid({
@@ -42,8 +51,10 @@ export function HubCrownFunnelGrid({
   panoVariant = false,
   hideNoGoalFooter = false,
   hideFooter = false,
+  labelMode = 'self',
 }: HubCrownFunnelGridProps) {
   const { t } = useTranslation()
+  const metricLabelKeys = labelMode === 'member' ? METRIC_LABEL_KEYS_MEMBER : METRIC_LABEL_KEYS_SELF
 
   if (loading) {
     return (
@@ -79,7 +90,7 @@ export function HubCrownFunnelGrid({
               {panoVariant ? (
                 <FunnelMetricLabel
                   metric={metric}
-                  label={t(METRIC_LABEL_KEYS[metric])}
+                  label={t(metricLabelKeys[metric])}
                   iconClassName="h-[18px] w-[18px]"
                   vivid
                   className="min-w-0 text-xs font-semibold text-[var(--text-1)] sm:text-sm"
@@ -87,7 +98,7 @@ export function HubCrownFunnelGrid({
               ) : (
                 <FunnelMetricLabel
                   metric={metric}
-                  label={t(METRIC_LABEL_KEYS[metric])}
+                  label={t(metricLabelKeys[metric])}
                   iconClassName="h-[18px] w-[18px]"
                   vivid
                   className="min-w-0 text-xs font-semibold text-[var(--text-1)] sm:text-sm"

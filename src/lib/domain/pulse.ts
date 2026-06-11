@@ -17,13 +17,14 @@ export function normalizePulsePeriod(period: PulsePeriod): PulsePeriod {
   return period === 'all' ? 'ytd' : period
 }
 
-/** Aktivite sheet — sadeleştirilmiş dönem sekmeleri. */
-export type SheetActivityPeriod = 'today' | '7d' | '30d' | 'ytd'
+/** Aktivite sheet — Saha Özetim ile hizalı dönem sekmeleri (Tüm Zamanlar dahil). */
+export type SheetActivityPeriod = 'today' | '7d' | '30d' | 'ytd' | 'all'
 
 export function mapStatsPeriodToSheet(period: PulsePeriod): SheetActivityPeriod {
   if (period === 'today') return 'today'
   if (period === '7d') return '7d'
-  if (period === 'ytd' || period === 'all') return 'ytd'
+  if (period === 'ytd') return 'ytd'
+  if (period === 'all') return 'all'
   return '30d'
 }
 

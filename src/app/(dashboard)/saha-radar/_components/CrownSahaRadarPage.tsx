@@ -17,6 +17,7 @@ import { FollowUpCard, SahaRadarMemberCard } from './SahaRadarCards'
 import { SahaRadarAiMessageModal, type ActiveAiMessage } from './SahaRadarAiMessageModal'
 
 import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { useMarkContacted } from '@/hooks/useCandidates'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
@@ -48,7 +49,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
     queryKey: queryKeys.crownSahaRadar(ws?.workspaceId ?? ''),
     queryFn: () => getCrownSahaRadarAction(ws!.workspaceId),
     enabled: !!ws?.workspaceId,
-    staleTime: 0,
+    staleTime: QUERY_STALE.metrics,
     refetchInterval: 60_000,
   })
 
@@ -194,9 +195,8 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
           </div>
         ) : (
           <>
-            {/* TAB: Takipler */}
-            {innerTab === 'takipler' && (
-              <div className="space-y-4">
+            {/* TAB: Takipler — hidden ile DOM'da tutulur; sekme geçişi anlık */}
+            <div className={innerTab === 'takipler' ? 'space-y-4' : 'hidden'}>
                 {/* Filtre: sadece benim (yalnızca ekip erişimi olan + başkasına ait takip varsa) */}
                 {canFilter && (
                   <div className="flex gap-2">
@@ -298,12 +298,10 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                   </span>
                   <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
                 </Link>
-              </div>
-            )}
+            </div>
 
             {/* TAB: Aktivite */}
-            {innerTab === 'aktivite' && (
-              <div className="space-y-4">
+            <div className={innerTab === 'aktivite' ? 'space-y-4' : 'hidden'}>
                 {(data?.members.length ?? 0) === 0 ? (
                   <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-6 text-center space-y-3">
                     <p className="text-sm text-[var(--text-3)]">{t('crown.emptyTeam')}</p>
@@ -359,8 +357,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                   </span>
                   <ChevronRight className="h-4 w-4 text-[var(--text-3)]" />
                 </Link>
-              </div>
-            )}
+            </div>
           </>
         )}
       </HubPageShell>

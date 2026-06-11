@@ -362,7 +362,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
 
   const prefetchMemberActivity = useCallback((userId: string) => {
-    const periods: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd']
+    const periods: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd', 'all']
     for (const p of periods) {
       void queryClient.prefetchQuery({
         queryKey: ['member-activity', ws.workspaceId, userId, p],

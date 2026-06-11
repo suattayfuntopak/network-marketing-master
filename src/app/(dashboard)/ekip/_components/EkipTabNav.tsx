@@ -14,6 +14,11 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import {
+  PANO_INDIGO_GRADIENT_ACTIVE,
+  PANO_TEAL_GRADIENT_ACTIVE,
+  PRO_CTA_GRADIENT_ACTIVE_DARK,
+} from '@/lib/ui/brandGradients'
 
 export const EKIP_TAB_IDS = ['members', 'summary', 'training', 'tree'] as const
 export type EkipTabId = (typeof EKIP_TAB_IDS)[number]
@@ -23,15 +28,6 @@ const LEGACY_TAB_MAP: Record<string, EkipTabId> = {
   invite: 'members',
   tools: 'members',
 }
-
-const PRO_TAB_ACTIVE_DARK =
-  'dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:text-white dark:shadow-md dark:shadow-pink-500/15'
-
-/** Pano launcher crown renkleri — Saha Özetim (teal), İstatistikler (indigo) */
-const TRAINING_TAB_ACTIVE =
-  'bg-gradient-to-br from-[#90E894] to-[#009688] text-white shadow-md'
-const TREE_TAB_ACTIVE =
-  'bg-gradient-to-br from-[#9D81FF] to-[#5D44C9] text-white shadow-md'
 
 const TABS: readonly {
   id: EkipTabId
@@ -43,11 +39,11 @@ const TABS: readonly {
     id: 'members',
     labelKey: 'team.tabMembers',
     icon: Users,
-    activeClass: `bg-brand text-white shadow-md ${PRO_TAB_ACTIVE_DARK}`,
+    activeClass: `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`,
   },
   { id: 'summary', labelKey: 'team.tabSummary', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
-  { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: TRAINING_TAB_ACTIVE },
-  { id: 'tree', labelKey: 'team.tabTree', icon: GitBranch, activeClass: TREE_TAB_ACTIVE },
+  { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: PANO_TEAL_GRADIENT_ACTIVE },
+  { id: 'tree', labelKey: 'team.tabTree', icon: GitBranch, activeClass: PANO_INDIGO_GRADIENT_ACTIVE },
 ]
 
 export function isEkipTabId(value: string | null): value is EkipTabId {

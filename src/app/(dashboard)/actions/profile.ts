@@ -46,9 +46,19 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ publicUr
   if (file.size > MAX_AVATAR_BYTES) throw new Error("Fotoğraf 2MB'den büyük olamaz.")
   if (!file.type.startsWith('image/')) throw new Error('Lütfen geçerli bir resim dosyası seçin.')
 
-  const scope = formData.get('scope') === 'candidate'
-    ? `candidate_${String(formData.get('candidateId') ?? '').replace(/[^a-zA-Z0-9-]/g, '')}`
+  const isCandidateScope = formData.get('scope') === 'candidate'
+  const rawCandidateId = String(formData.get('candidateId') ?? '').trim()
+  if (isCandidateScope) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawCandidateId)) {
+      throw new Error('Geçersiz aday kimliği.')
+    }
+  }
+  const scope = isCandidateScope
+    ? `candidate_${rawCandidateId.replace(/[^a-zA-Z0-9-]/g, '')}`
     : user.id
+  if (isCandidateScope && !scope.includes(rawCandidateId.replace(/[^a-zA-Z0-9-]/g, ''))) {
+    throw new Error('Avatar yolu aday kimliği ile eşleşmiyor.')
+  }
   const ext = (file.name.split('.').pop() ?? 'jpg').replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
   const path = `avatars/${scope}_${Date.now()}.${ext}`
 

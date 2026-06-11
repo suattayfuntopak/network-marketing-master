@@ -6,6 +6,7 @@ import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
 import { enrichLeaderCandidates } from '@/lib/team/enrichLeaderCandidates'
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
+import { swapSeldaEzgiDisplayAvatars } from '@/lib/team/partnerAvatarFix'
 
 export interface TeamBundle {
   members: TeamMember[]
@@ -215,6 +216,9 @@ export async function fetchTeamBundle(
           }
         })
     }
+
+    swapSeldaEzgiDisplayAvatars(registeredMemberRows)
+    swapSeldaEzgiDisplayAvatars(members)
 
     const ekipRows = [...registeredMemberRows, ...nonAppMembers].sort((a, b) => {
       if (a.role === 'leader') return -1
@@ -463,6 +467,9 @@ async function fetchTeamBundleLegacy(
         })
       }
     })
+
+  swapSeldaEzgiDisplayAvatars(registeredMemberRows)
+  swapSeldaEzgiDisplayAvatars(statsMembers)
 
   const ekipRows = [...registeredMemberRows, ...nonAppMembers].sort((a, b) => {
     if (a.role === 'leader') return -1
