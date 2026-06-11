@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-11 — Moderasyon: in-app bildirim + telemetri ham-anahtar bug FIX ✅
+
+### Ham-anahtar bug'ı KÖK NEDEN bulundu & çözüldü
+- Platform sayfasındaki monitör kartı `platformPage.hubPrefetchTitle` gibi **ham anahtarlar** gösteriyordu (kullanıcının iki kez çarptığı sorun).
+- **Kök neden:** `platform.ts`'te `platformPage` namespace'i satır 78'de KAPANIYOR, `moderationReview` 79'da açılıyor. `hubPrefetch*` anahtarları yanlışlıkla **moderationReview** içindeydi; kart ise `t('platformPage.hubPrefetch*')` çağırıyordu → undefined → ham anahtar. (Vitest ile runtime doğrulandı: `tr.platformPage.hubPrefetchTitle === undefined`.)
+- **Fix:** 10 hubPrefetch anahtarı (TR+EN) `moderationReview`'dan `platformPage`'e taşındı. Runtime doğrulaması: artık her iki dilde `platformPage.hubPrefetchTitle` çözülüyor, moderationReview'da yok.
+
+### Moderasyon akışı — eksik parça: onay/red'de IN-APP bildirim
+Kullanıcının tasarımı: üye içerik/video/itiraz ekler → kibar mesaj (SympatheticPopup ✓) + moderasyona düşer (✓); süper admin panelde görür/düzeltir/onaylar/reddeder (✓, `approveRequestAction` editedData alır); **sonuç → kişiye e-posta VE NMM içi bildirim**.
+- **Eksikti:** onay/red yalnızca **e-posta** gönderiyordu, in-app bildirim YOKtu.
+- **Eklendi:** `notifyModerationOutcome()` helper → onay ve redde gönderene `nmm_notifications` kaydı (TR+EN başlık/açıklama, redde gerekçe dâhil, type 'info'). 4 dalın hepsine bağlandı (onay/red × video/training-objection); eksik select'lere `user_id` eklendi.
+- Süper admin'e submit'te e-posta uyarısı zaten vardı + panelde görünüyor (değişmedi).
+
+### Doğrulama
+tsc + lint + unit (183/183) + build yeşil. i18n runtime kontrolü geçti.
+
+### Dosyalar
+`lib/translations/sections/platform.ts` (anahtar taşıma), `actions/moderation.ts` (in-app bildirim)
+
 ## 2026-06-11 — Onaylanan öneriler: #1 içerik editörü + #2 AI koç entegrasyonu + #5 E2E (+ #4 zaten vardı) ✅
 
 Kullanıcı 1-2-4-5 önerilerini onayladı (3 = Frankfurt taşıma hariç).
