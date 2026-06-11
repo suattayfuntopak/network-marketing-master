@@ -10,6 +10,7 @@ import { isSuperAdmin } from '@/lib/domain/auth'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { MemberRow } from '@/lib/team/types'
+import { canonicalPartnerAvatarUrl } from '@/lib/team/partnerAvatarFix'
 
 export type CoachingHistoryItem = {
   id: string
@@ -266,7 +267,9 @@ export async function resolveTeamAvatarsAction(
 
   const result: Record<string, string> = {}
   for (const [userId, url] of Object.entries(avatarMap as Record<string, unknown>)) {
-    if (typeof url === 'string' && url.trim()) result[userId] = url
+    if (typeof url !== 'string' || !url.trim()) continue
+    const resolved = canonicalPartnerAvatarUrl(userId, url.trim())
+    if (resolved) result[userId] = resolved
   }
   return result
 }

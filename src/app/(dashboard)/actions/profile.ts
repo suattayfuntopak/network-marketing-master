@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
+import { buildAvatarStoragePath } from '@/lib/utils/avatarStoragePath'
 
 const AVATAR_BUCKET = 'nmm-avatars'
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024
@@ -48,19 +49,12 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ publicUr
 
   const isCandidateScope = formData.get('scope') === 'candidate'
   const rawCandidateId = String(formData.get('candidateId') ?? '').trim()
-  if (isCandidateScope) {
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(rawCandidateId)) {
-      throw new Error('Geçersiz aday kimliği.')
-    }
-  }
-  const scope = isCandidateScope
-    ? `candidate_${rawCandidateId.replace(/[^a-zA-Z0-9-]/g, '')}`
-    : user.id
-  if (isCandidateScope && !scope.includes(rawCandidateId.replace(/[^a-zA-Z0-9-]/g, ''))) {
-    throw new Error('Avatar yolu aday kimliği ile eşleşmiyor.')
-  }
-  const ext = (file.name.split('.').pop() ?? 'jpg').replace(/[^a-zA-Z0-9]/g, '') || 'jpg'
-  const path = `avatars/${scope}_${Date.now()}.${ext}`
+  const path = buildAvatarStoragePath({
+    scope: isCandidateScope ? 'candidate' : 'user',
+    userId: user.id,
+    candidateId: isCandidateScope ? rawCandidateId : undefined,
+    fileName: file.name,
+  })
 
   const supabase = await createClient()
   const { error } = await supabase.storage
