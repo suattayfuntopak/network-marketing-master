@@ -15,7 +15,13 @@ import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { StatsKpiCards } from './StatsKpiCards'
-import { StatsCharts } from './StatsCharts'
+const StatsCharts = dynamic(
+  () => import('./StatsCharts').then(m => m.StatsCharts),
+  {
+    ssr: false,
+    loading: () => <div className="h-72 w-full animate-pulse rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border)]" />,
+  }
+)
 import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'

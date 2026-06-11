@@ -20,7 +20,7 @@ test.describe('public critical routes', () => {
 })
 
 // Auth korumalı ana sayfalar — kimlik yoksa /giris'e yönlenir, o yüzden skip.
-const AUTH_ROUTES = ['/pano', '/hedefim', '/ekip', '/crown', '/canli-egitim', '/egitim'] as const
+const AUTH_ROUTES = ['/pano', '/hedefim', '/ekip', '/istatistikler', '/saha-ozetim', '/crown', '/canli-egitim', '/egitim'] as const
 
 test.describe('authenticated core routes', () => {
   for (const path of AUTH_ROUTES) {

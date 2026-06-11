@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-11 — İstatistik Grafiklerinde Ertelenmiş Yükleme (next/dynamic) & E2E Smoke Rota Güncellemeleri ✅
+
+### İstatistik Grafikleri Performans İyileştirmesi
+- **`IstatistiklerContent.tsx`:** `StatsCharts` bileşeni `next/dynamic` kullanılarak `ssr: false` seçeneğiyle dinamik olarak yüklenecek şekilde güncellendi. Grafik yüklenirken boşluk kalmaması için kart iskeleti (pulse) eklendi. Bu sayede ağır grafik kütüphaneleri (Recharts vb.) ilk sayfa derlemesinden çıkarılarak yükleme hızı (Time to Interactive) düşürüldü.
+
+### E2E Smoke Test Rota Eşleşmesi
+- **`critical-routes-smoke.spec.ts`:** `/istatistikler` ve `/saha-ozetim` rotaları E2E smoke testlerindeki `AUTH_ROUTES` listesine eklenerek, kritik rotaların sunucu durum doğrulama kapsamına alındı.
+
+### Dosyalar
+`src/app/(dashboard)/istatistikler/_components/IstatistiklerContent.tsx`, `e2e/critical-routes-smoke.spec.ts`
+
 ## 2026-06-11 — Veritabanı Rol Düzeltme Migrasyonu & Yükleme İskeletleri (Skeleton Uyumlamaları) ✅
 
 ### Veritabanı Seviyesinde Rol Düzeltmesi (Migration 084)
