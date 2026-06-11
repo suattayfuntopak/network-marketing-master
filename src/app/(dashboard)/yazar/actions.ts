@@ -1,6 +1,7 @@
 'use server'
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
+import { createClient } from '@/lib/supabase/server'
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
@@ -333,4 +334,27 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
     console.error('Translation error:', err)
     return { error: 'Çeviri başarısız oldu.' }
   }
+}
+
+export type CandidateRecentAction = {
+  action_type: string
+  note: string | null
+  note_tr: string | null
+  note_en: string | null
+  created_at: string
+}
+
+/** YazarForm bağlam doldurma: adayın son 10 aktivitesi (RLS workspace ile sınırlar). */
+export async function getCandidateRecentActionsAction(
+  candidateId: string,
+): Promise<CandidateRecentAction[]> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from('nmm_daily_actions')
+    .select('action_type, note, note_tr, note_en, created_at')
+    .eq('candidate_id', candidateId)
+    .order('created_at', { ascending: false })
+    .limit(10)
+  if (error) throw new Error(error.message)
+  return data ?? []
 }

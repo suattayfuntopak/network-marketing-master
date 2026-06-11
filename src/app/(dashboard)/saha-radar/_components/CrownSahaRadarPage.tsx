@@ -1,23 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import {
-  Activity,
-  Bot,
-  ChevronRight,
-  Clock,
-  Copy,
-  Filter,
-  Lock,
-  Phone,
-  Sparkles,
-  Users,
-  X,
-} from 'lucide-react'
+import { Activity, ChevronRight, Clock, Filter, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -26,286 +12,18 @@ import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
 import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import type { SahaRadarMember, SahaRadarFollowUp } from '@/app/(dashboard)/saha-radar/actions'
-import { PersonAvatar } from '@/components/ui/PersonAvatar'
-import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { FollowUpCard, SahaRadarMemberCard } from './SahaRadarCards'
+import { SahaRadarAiMessageModal, type ActiveAiMessage } from './SahaRadarAiMessageModal'
 
 import { queryKeys } from '@/lib/query/keys'
-import { waHref } from '@/lib/utils/waLink'
 import { useMarkContacted } from '@/hooks/useCandidates'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
 import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
 import { toast } from 'sonner'
-import { Z } from '@/lib/ui/zIndex'
 
 type InnerTab = 'aktivite' | 'takipler'
-type ActiveAiMessage = {
-  message: string
-  candidateName: string
-  phone: string | null
-  candidateId: string
-  isCoaching?: boolean
-}
-
-function ActivityDot({ level }: { level: 'active' | 'recent' | 'silent' }) {
-  return (
-    <span
-      className={clsx(
-        'inline-block h-2.5 w-2.5 rounded-full shrink-0',
-        level === 'active'
-          ? 'bg-emerald-500'
-          : level === 'recent'
-            ? 'bg-amber-400'
-            : 'bg-rose-500',
-      )}
-    />
-  )
-}
-
-function FollowUpCard({
-  f,
-  t,
-  lang,
-  onAIClick,
-  onWaClick,
-  onCallClick,
-  generatingId,
-  hasAiFieldAccess,
-}: {
-  f: SahaRadarFollowUp
-  t: ReturnType<typeof useTranslation>['t']
-  lang: 'tr' | 'en'
-  onAIClick: (f: SahaRadarFollowUp) => void
-  onWaClick: (id: string) => void
-  onCallClick: (id: string) => void
-  generatingId: string | null
-  hasAiFieldAccess: boolean
-}) {
-  const router = useRouter()
-  const wa = f.phone ? waHref(f.phone) : null
-  const dueDate = new Date(f.dueAt)
-  const dateStr = dueDate.toLocaleDateString(lang === 'en' ? 'en-GB' : 'tr-TR', {
-    day: 'numeric',
-    month: 'short',
-    weekday: 'short',
-  })
-
-  return (
-    <li
-      className={clsx(
-        'flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition active:scale-[0.99]',
-        f.isOverdue
-          ? 'border-rose-500/30 bg-rose-50/30 dark:bg-rose-950/15'
-          : 'border-[var(--border)] bg-[var(--bg-card)]',
-      )}
-      onClick={() => router.push(`/pipeline/${f.id}`)}
-    >
-      <Clock
-        className={clsx(
-          'h-4 w-4 shrink-0',
-          f.isOverdue ? 'text-rose-500' : 'text-amber-500',
-        )}
-      />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-[var(--text-1)]">
-          {f.candidateName}
-        </p>
-        <p className="text-xs text-[var(--text-3)]">
-          {!f.isMine && <>{f.ownerName} · </>}
-          {dateStr}
-          {f.isOverdue && (
-            <span className="ml-1 font-bold text-rose-500">
-              {t('crown.sahaRadarOverdue')}
-            </span>
-          )}
-        </p>
-      </div>
-      <div
-        className="flex shrink-0 items-center gap-1.5"
-        onClick={e => e.stopPropagation()}
-      >
-        <button
-          type="button"
-          onClick={() => onAIClick(f)}
-          disabled={generatingId === f.id}
-          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
-          aria-label="AI Mesaj Üret"
-          title="AI Mesaj Üret"
-        >
-          {generatingId === f.id ? (
-            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-          ) : (
-            <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
-          )}
-          {!hasAiFieldAccess && (
-            <Lock
-              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]"
-              strokeWidth={2.5}
-              aria-hidden
-            />
-          )}
-        </button>
-        {wa && (
-          <a
-            href={wa}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={e => {
-              e.stopPropagation()
-              onWaClick(f.id)
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
-            aria-label="WhatsApp"
-            title="WhatsApp"
-          >
-            <WhatsAppIcon className="h-3.5 w-3.5" />
-          </a>
-        )}
-        {f.phone && (
-          <a
-            href={`tel:${f.phone}`}
-            onClick={e => {
-              e.stopPropagation()
-              onCallClick(f.id)
-            }}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
-            aria-label="Ara"
-            title="Ara"
-          >
-            <Phone className="h-3.5 w-3.5" strokeWidth={1.75} />
-          </a>
-        )}
-      </div>
-    </li>
-  )
-}
-
-function MemberCard({
-  m,
-  t,
-  onCoachAI,
-  coachingId,
-  hasAiFieldAccess,
-}: {
-  m: SahaRadarMember
-  t: ReturnType<typeof useTranslation>['t']
-  onCoachAI: (m: SahaRadarMember) => void
-  coachingId: string | null
-  hasAiFieldAccess: boolean
-}) {
-  const router = useRouter()
-  const labelKey =
-    m.activityLevel === 'active'
-      ? 'crown.sahaRadarActive'
-      : m.activityLevel === 'recent'
-        ? 'crown.sahaRadarRecent'
-        : 'crown.sahaRadarSilent'
-  const daysBadge =
-    m.daysSinceActivity === null
-      ? t('crown.sahaRadarNeverActive')
-      : m.daysSinceActivity === 0
-        ? t('crown.sahaRadarToday')
-        : t('crown.sahaRadarDaysAgo', { count: m.daysSinceActivity })
-  const wa = m.phone ? waHref(m.phone) : null
-
-  return (
-    <li
-      className={clsx(
-        'flex items-center gap-3 rounded-2xl border px-4 py-3 cursor-pointer transition active:scale-[0.99]',
-        m.activityLevel === 'silent'
-          ? 'border-rose-500/25 bg-rose-50/30 dark:bg-rose-950/15'
-          : 'border-[var(--border)] bg-[var(--bg-card)]',
-      )}
-      data-testid="saha-radar-member-card"
-      data-pipeline-id={m.pipelineId ?? ''}
-      onClick={() => {
-        if (m.pipelineId) {
-          router.push(`/pipeline/${m.pipelineId}`)
-          return
-        }
-        toast.info(t('crown.sahaRadarNoPipelineMatch'))
-      }}
-    >
-      <PersonAvatar name={m.fullName} imageUrl={m.avatarUrl} size="sm" />
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-[var(--text-1)]">
-          {m.fullName}
-        </p>
-        <p className="text-xs text-[var(--text-3)]">{daysBadge}</p>
-      </div>
-      <div
-        className="flex items-center gap-1.5 shrink-0"
-        onClick={e => e.stopPropagation()}
-      >
-        <span
-          className={clsx(
-            'text-[10px] font-bold rounded-full px-2 py-0.5 hidden sm:inline',
-            m.activityLevel === 'active'
-              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'
-              : m.activityLevel === 'recent'
-                ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300'
-                : 'bg-rose-100 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300',
-          )}
-        >
-          {t(labelKey)}
-        </span>
-        <ActivityDot level={m.activityLevel} />
-        <button
-          type="button"
-          onClick={() => onCoachAI(m)}
-          disabled={coachingId === m.userId}
-          className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:shadow-md disabled:opacity-50 active:scale-95"
-          aria-label="Koçluk Mesajı Üret"
-          title="Koçluk Mesajı Üret"
-        >
-          {coachingId === m.userId ? (
-            <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-          ) : (
-            <Bot className="h-3.5 w-3.5" strokeWidth={1.75} />
-          )}
-          {m.lastCoachedAt && (
-            <span
-              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-emerald-500 ring-1 ring-white dark:ring-[var(--bg-card)]"
-              aria-label="Son 3 gün içinde koçluk yapıldı"
-            />
-          )}
-          {!hasAiFieldAccess && !m.lastCoachedAt && (
-            <Lock
-              className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]"
-              strokeWidth={2.5}
-              aria-hidden
-            />
-          )}
-        </button>
-        {wa && (
-          <a
-            href={wa}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
-            aria-label="WhatsApp"
-            title="WhatsApp"
-          >
-            <WhatsAppIcon className="h-3.5 w-3.5" />
-          </a>
-        )}
-        {m.phone && (
-          <a
-            href={`tel:${m.phone}`}
-            onClick={e => e.stopPropagation()}
-            className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
-            aria-label="Ara"
-            title="Ara"
-          >
-            <Phone className="h-3.5 w-3.5" strokeWidth={1.75} />
-          </a>
-        )}
-      </div>
-    </li>
-  )
-}
 
 export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
@@ -620,7 +338,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                     </div>
                     <ul className="space-y-2">
                       {(data?.members ?? []).map(m => (
-                        <MemberCard
+                        <SahaRadarMemberCard
                           key={m.userId}
                           m={m}
                           t={t}
@@ -648,80 +366,13 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
       </HubPageShell>
 
       {/* AI mesaj modalı */}
-      {activeAiMessage &&
-        createPortal(
-          <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
-            <div
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-              onClick={() => setActiveAiMessage(null)}
-            />
-            <div className="relative w-full max-w-md rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950/20 text-brand">
-                    <Sparkles className="h-4 w-4 fill-current animate-pulse" />
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-[var(--text-1)]">
-                      {activeAiMessage.isCoaching ? 'Koçluk Mesajı' : 'Yapay Zeka Mesajı'}
-                    </h2>
-                    <p className="text-[11px] text-[var(--text-3)] font-medium mt-0.5">
-                      {activeAiMessage.candidateName} için üretildi
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveAiMessage(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[var(--border)] transition-colors active:scale-90"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="relative mb-5">
-                <textarea
-                  value={activeAiMessage.message}
-                  readOnly
-                  rows={6}
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-sm text-[var(--text-1)] leading-relaxed outline-none resize-none"
-                />
-              </div>
-              <div className="flex justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard.writeText(activeAiMessage.message)
-                    toast.success('Mesaj kopyalandı!')
-                  }}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] transition hover:bg-brand-subtle hover:text-brand active:scale-95"
-                  title="Kopyala"
-                >
-                  <Copy className="h-4 w-4" />
-                </button>
-                {activeAiMessage.phone &&
-                  waHref(activeAiMessage.phone, activeAiMessage.message) && (
-                    <a
-                      href={waHref(activeAiMessage.phone, activeAiMessage.message)!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => {
-                        markContacted.mutate({
-                          id: activeAiMessage.candidateId,
-                          actionType: 'whatsapp',
-                        })
-                        setActiveAiMessage(null)
-                      }}
-                      className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:opacity-90 active:scale-95 shadow-[0_4px_12px_rgba(37,211,102,0.2)]"
-                      title="WhatsApp ile Gönder"
-                    >
-                      <WhatsAppIcon className="h-4.5 w-4.5" />
-                    </a>
-                  )}
-              </div>
-            </div>
-          </div>,
-          document.body,
-        )}
+      {activeAiMessage && (
+        <SahaRadarAiMessageModal
+          activeAiMessage={activeAiMessage}
+          onClose={() => setActiveAiMessage(null)}
+          onWaSend={id => markContacted.mutate({ id, actionType: 'whatsapp' })}
+        />
+      )}
     </>
   )
 }

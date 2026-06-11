@@ -12,7 +12,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
 import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
-import { createClient } from '@/lib/supabase/client'
+import { useWorkspace } from '@/hooks/useWorkspace'
 import type { NotificationType } from '@/types/database.types'
 
 interface NotificationsModalProps {
@@ -110,7 +110,8 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const { lang, t } = useTranslation()
   const router = useRouter()
   const [mounted] = useState(() => typeof window !== 'undefined')
-  const [userEmail, setUserEmail]       = useState('')
+  const { data: ws } = useWorkspace()
+  const userEmail = ws?.email ?? ''
   const [selected, setSelected]         = useState<UiNotification | null>(null)
 
   useBodyScrollLock()
@@ -141,13 +142,6 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   }))
 
   const unreadCount = dbUnreadCount
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setUserEmail(user.email ?? '')
-    })
-  }, [])
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

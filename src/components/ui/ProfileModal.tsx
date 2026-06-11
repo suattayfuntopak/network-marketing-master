@@ -4,7 +4,12 @@ import { useState, useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import { X, User, Mail, Lock, Loader2, Camera } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import {
+  getProfileAction,
+  uploadAvatarAction,
+  setUserAvatarAction,
+  updateProfileAction,
+} from '@/app/(dashboard)/actions/profile'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
@@ -17,7 +22,6 @@ interface ProfileModalProps {
 
 export function ProfileModal({ onClose }: ProfileModalProps) {
   const queryClient = useQueryClient()
-  const supabase = createClient()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [mounted] = useState(() => typeof window !== 'undefined')
@@ -44,22 +48,12 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
     async function loadProfile() {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          setUserId(user.id)
-          setEmail(user.email ?? '')
-          const existingAvatar = (user.user_metadata?.avatar_url as string | undefined) ?? null
-          setAvatarUrl(existingAvatar)
-          setAvatarPreview(existingAvatar)
-
-          const { data: member } = await supabase
-            .from('nmm_workspace_members')
-            .select('full_name')
-            .eq('user_id', user.id)
-            .maybeSingle()
-
-          if (member?.full_name) setFullName(member.full_name)
-        }
+        const profile = await getProfileAction()
+        setUserId(profile.userId)
+        setEmail(profile.email)
+        setAvatarUrl(profile.avatarUrl)
+        setAvatarPreview(profile.avatarUrl)
+        if (profile.fullName) setFullName(profile.fullName)
       } catch (err) {
         console.error('Profil yüklenirken hata:', err)
       } finally {
@@ -69,7 +63,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
     loadProfile()
     return () => document.removeEventListener('keydown', onKey)
-  }, [onClose, supabase])
+  }, [onClose])
 
   async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -102,25 +96,14 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
       toast.info('Fotoğraf sıkıştırılıyor...')
       const compressedFile = await imageCompression(file, compressionOptions)
-      
-      const ext = 'jpg'
-      const path = `avatars/${userId}_${Date.now()}.${ext}` // Cache busting için Date.now eklendi
 
-      const { error: uploadError } = await supabase.storage
-        .from('nmm-avatars')
-        .upload(path, compressedFile, { upsert: true, contentType: 'image/jpeg' })
-
-      if (uploadError) throw uploadError
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('nmm-avatars')
-        .getPublicUrl(path)
+      const fd = new FormData()
+      fd.set('file', new File([compressedFile], 'avatar.jpg', { type: 'image/jpeg' }))
+      fd.set('scope', 'user')
+      const { publicUrl } = await uploadAvatarAction(fd)
 
       // Save to auth metadata
-      const { error: metaError } = await supabase.auth.updateUser({
-        data: { avatar_url: publicUrl },
-      })
-      if (metaError) throw metaError
+      await setUserAvatarAction(publicUrl)
 
       const { syncMemberAvatarAction } = await import('@/app/(dashboard)/ekip/actions')
       await syncMemberAvatarAction(publicUrl)
@@ -151,27 +134,16 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
 
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum bulunamadı.')
+      const { emailChangeRequested } = await updateProfileAction({
+        fullName,
+        email,
+        password: password || undefined,
+      })
 
-      if (fullName.trim()) {
-        const { error: memberError } = await supabase
-          .from('nmm_workspace_members')
-          .update({ full_name: fullName.trim() })
-          .eq('user_id', user.id)
-        if (memberError) throw memberError
-        await supabase.auth.updateUser({ data: { full_name: fullName.trim() } })
-      }
-
-      if (email !== user.email) {
-        const { error: emailError } = await supabase.auth.updateUser({ email })
-        if (emailError) throw emailError
+      if (emailChangeRequested) {
         toast.info('E-posta güncellemesi için doğrulama e-postası gönderildi.')
       }
-
       if (password) {
-        const { error: passwordError } = await supabase.auth.updateUser({ password })
-        if (passwordError) throw passwordError
         toast.success('Şifre başarıyla güncellendi.')
         setPassword('')
         setPasswordConfirm('')

@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     viewTransition: true,
+    // Avatar/aday fotoğrafı yüklemeleri artık server action üzerinden gider
+    // (uploadAvatarAction) — UI 2MB sınırı + FormData payı için 3mb.
+    serverActions: {
+      bodySizeLimit: '3mb',
+    },
     // lucide-react 120+ dosyada import ediliyor — barrel import yerine
     // ikon-başına otomatik tree-shake; client bundle'ını küçültür (daha hızlı
     // JS indir/parse → sayfa/sekme geçişleri "pat pat").

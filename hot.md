@@ -1,5 +1,33 @@
 # Hot Log
 
+## 2026-06-11 — Faz Ε+Ζ tamam: Supabase client TSX migrasyonu (11→3) + kalan god component'ler ✅
+
+Council Triad faz planının kalanı kapatıldı. lint 0 + tsc 0 + unit 183/183 + build 47/47 yeşil.
+
+### 1) Faz Ζ — ESLint allowlist 11 → 3 dosya (veri erişimi tamamen server action'da)
+- **`actions/profile.ts` (yeni):** `getProfileAction`, `uploadAvatarAction` (FormData ile nmm-avatars yükleme — kullanıcı + aday fotoğrafı tek action), `setUserAvatarAction`, `updateProfileAction` (ad/e-posta/şifre).
+- **`actions/workspace.ts` (+2):** `getWorkspaceNameAction`, `updateWorkspaceNameAction`.
+- **`yazar/actions.ts` (+1):** `getCandidateRecentActionsAction` (adayın son 10 aktivitesi).
+- **Migre edilen 8 dosya:** ProfileModal, SettingsModal, NotificationsModal (email → `useWorkspace`), UserMenu (client signOut silindi; `logoutAction` artık `scope:'global'`), OnboardingModal (RPC → mevcut `joinWorkspaceByInviteAction`), AddCandidateSheet + EditCandidateSheet (storage upload → `uploadAvatarAction`), YazarForm (sorgu → action).
+- **Kalıcı 3 istisna (tarayıcıya özgü auth):** LoginForm (`signInWithPassword` cookie istemcide), PasswordResetGate (URL hash'ten `setSession` + `onAuthStateChange`), LandingPage (`onAuthStateChange`). eslint.config yorumunda belgelendi — yeni dosya eklenmez.
+- **next.config:** `experimental.serverActions.bodySizeLimit: '3mb'` (UI 2MB fotoğraf sınırı + FormData payı).
+
+### 2) Faz Δ kalanı — son iki god component bölündü
+- **CrownSahaRadarPage 727 → 378 satır:** `SahaRadarCards.tsx` (ActivityDot + FollowUpCard + SahaRadarMemberCard) ve `SahaRadarAiMessageModal.tsx` ayrı dosyalara çıkarıldı.
+- **YazarForm 644 → 495 satır:** `yazarFormLabels.ts` (MESSAGE_TYPES/TONES + TR-EN etiket haritaları — component içindeki duplike haritalar silindi) ve `MessageHistorySection.tsx` (geçmiş paneli kendi state'iyle).
+
+### 3) Faz Ε kalanı — lint/tip temizliği
+- `renderActivityText(a: any)` → tipli `ActivityRow` (eslint-disable silindi).
+- eslint.config: `argsIgnorePattern: '^_'` — `_` önekli parametreler bilinçli-kullanılmayan sayılır (teamAccess uyarıları kapandı).
+- **Build düzeltmesi:** `crown/actions.ts`'teki `export { … } from './hubSelfActions'` re-export'u Next 16'da 'use server' dosyasında YASAK — kaldırıldı (tüketicisi yoktu). `hubSelfActions.ts`'te yanlışlıkla export edilen `EMPTY_FIELD_METRICS` ve `resolveWorkspaceId` private yapıldı ('use server' yalnız async fonksiyon export edebilir).
+
+### Dosyalar
+`actions/profile.ts` (yeni), `actions/workspace.ts`, `yazar/actions.ts`, `_shared-actions.ts`, `next.config.ts`, `eslint.config.mjs`,
+`ProfileModal.tsx`, `SettingsModal.tsx`, `NotificationsModal.tsx`, `UserMenu.tsx`, `OnboardingModal.tsx`,
+`AddCandidateSheet.tsx`, `EditCandidateSheet.tsx`, `YazarForm.tsx`, `yazarFormLabels.ts` (yeni), `MessageHistorySection.tsx` (yeni),
+`CrownSahaRadarPage.tsx`, `SahaRadarCards.tsx` (yeni), `SahaRadarAiMessageModal.tsx` (yeni),
+`crown/actions.ts`, `crown/hubSelfActions.ts`, `candidateDetailUtils.ts`, `TeamMemberCard.tsx`
+
 ## 2026-06-11 — Council Triad refaktör: god file split, god component split, lint düzeltmeleri ✅
 
 Kapsamlı kod kalitesi oturumu. Mimari borçların önceliklileri kapatıldı.

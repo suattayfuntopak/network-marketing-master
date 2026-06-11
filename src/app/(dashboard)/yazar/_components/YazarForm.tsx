@@ -1,8 +1,8 @@
 'use client'
 
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
-import { Copy, Loader2, Bot, X, ChevronDown, ChevronUp, Clock, Lock } from 'lucide-react'
-import { generateMessageAction, translateTextAction } from '../actions'
+import { Copy, Loader2, Bot, X, ChevronDown, Lock } from 'lucide-react'
+import { generateMessageAction, translateTextAction, getCandidateRecentActionsAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
@@ -10,7 +10,6 @@ import { getStageLabel } from '@/lib/domain/stages'
 
 import { waHref } from '@/lib/utils/waLink'
 import { readUserScopedJSON, writeUserScopedJSON } from '@/lib/ui/userScopedStorage'
-import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
@@ -23,35 +22,8 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { displayDailyActionNote, isLeaderUserNote, getWhatsAppActivityDisplay } from '@/lib/domain/dailyActionNote'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
-
-const MESSAGE_TYPES = [
-  { value: 'genel', label: 'Genel' },
-  { value: 'ilk_temas', label: 'İlk Temas' },
-  { value: 'bag_kurma', label: 'Bağ Kurma' },
-  { value: 'deger_paylasimi', label: 'Değer Paylaşımı' },
-  { value: 'davet', label: 'Davet' },
-  { value: 'sunum', label: 'Sunum' },
-  { value: 'takip', label: 'Takip' },
-  { value: 'itiraz_yonetimi', label: 'İtiraz Yönetimi' },
-  { value: 'karar_asamasi', label: 'Karar Aşaması' },
-  { value: 'hayir_sonrasi', label: 'Hayır Sonrası' },
-  { value: 'yeniden_bag', label: 'Yeniden Bağ' },
-  { value: 'dogum_gunu', label: 'Doğum Günü' },
-  { value: 'evlilik_yildonumu', label: 'Evlilik Yıldönümü' },
-  { value: 'tesekkur', label: 'Teşekkür' },
-  { value: 'yeni_uye_karsilama', label: 'Yeni Üye Karşılama' },
-]
-
-const TONES = [
-  { value: 'samimi', label: 'Samimi' },
-  { value: 'profesyonel', label: 'Profesyonel' },
-  { value: 'merakli', label: 'Meraklı' },
-  { value: 'empatik', label: 'Empatik' },
-  { value: 'kendinden_emin', label: 'Kendinden Emin' },
-  { value: 'esprili', label: 'Esprili' },
-  { value: 'net', label: 'Net' },
-  { value: 'motive_edici', label: 'Motive Edici' },
-]
+import { MESSAGE_TYPES, TONES, getMessageTypeLabel, getToneLabel } from './yazarFormLabels'
+import { MessageHistorySection, type HistoryEntry } from './MessageHistorySection'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
 
@@ -59,13 +31,6 @@ const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg
 // userScopedStorage helper'ı) → aynı tarayıcıda kullanıcı değişince sızmaz.
 const HISTORY_BASE = 'nmm_message_history'
 const MAX_HISTORY = 5
-
-interface HistoryEntry {
-  message: string
-  candidateName: string
-  messageType: string
-  timestamp: number
-}
 
 function loadHistory(userId: string | undefined | null): HistoryEntry[] {
   return readUserScopedJSON<HistoryEntry[]>(HISTORY_BASE, userId, [])
@@ -86,68 +51,6 @@ interface Props {
 export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 'ilik' }: Props) {
   const { t, lang } = useTranslation()
 
-  const getMessageTypeLabel = (val: string) => {
-    const trMap: Record<string, string> = {
-      genel: 'Genel',
-      ilk_temas: 'İlk Temas',
-      bag_kurma: 'Bağ Kurma',
-      deger_paylasimi: 'Değer Paylaşımı',
-      davet: 'Davet',
-      sunum: 'Sunum',
-      takip: 'Takip',
-      itiraz_yonetimi: 'İtiraz Yönetimi',
-      karar_asamasi: 'Karar Aşaması',
-      hayir_sonrasi: 'Hayır Sonrası',
-      yeniden_bag: 'Yeniden Bağ',
-      dogum_gunu: 'Doğum Günü',
-      evlilik_yildonumu: 'Evlilik Yıldönümü',
-      tesekkur: 'Teşekkür',
-      yeni_uye_karsilama: 'Yeni Üye Karşılama'
-    }
-    const enMap: Record<string, string> = {
-      genel: 'General',
-      ilk_temas: 'First Contact',
-      bag_kurma: 'Connecting',
-      deger_paylasimi: 'Sharing Value',
-      davet: 'Invite',
-      sunum: 'Presentation',
-      takip: 'Follow-up',
-      itiraz_yonetimi: 'Objection Handling',
-      karar_asamasi: 'Decision Phase',
-      hayir_sonrasi: 'Post-Rejection',
-      yeniden_bag: 'Reconnecting',
-      dogum_gunu: 'Birthday',
-      evlilik_yildonumu: 'Wedding Anniversary',
-      tesekkur: 'Thank You',
-      yeni_uye_karsilama: 'New Member Welcome'
-    }
-    return lang === 'en' ? enMap[val] || val : trMap[val] || val
-  }
-
-  const getToneLabel = (val: string) => {
-    const trMap: Record<string, string> = {
-      samimi: 'Samimi',
-      profesyonel: 'Profesyonel',
-      merakli: 'Meraklı',
-      empatik: 'Empatik',
-      kendinden_emin: 'Kendinden Emin',
-      esprili: 'Esprili',
-      net: 'Net',
-      motive_edici: 'Motive Edici'
-    }
-    const enMap: Record<string, string> = {
-      samimi: 'Warm',
-      profesyonel: 'Professional',
-      merakli: 'Curious',
-      empatik: 'Empathetic',
-      kendinden_emin: 'Confident',
-      esprili: 'Humorous',
-      net: 'Direct',
-      motive_edici: 'Motivating'
-    }
-    return lang === 'en' ? enMap[val] || val : trMap[val] || val
-  }
-
   const cleanInitialNote = initialNote ? initialNote.split('|||')[0].trim() : '' // URL param: plain TR text
   const [state, action, isPending] = useActionState(generateMessageAction, {})
   const [query, setQuery] = useState(initialName)
@@ -163,7 +66,6 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     return 'ilik'
   })
   const [history, setHistory] = useState<HistoryEntry[]>([])
-  const [historyOpen, setHistoryOpen] = useState(false)
 
   // Real-time automatic translation state
   const [displayedMessage, setDisplayedMessage] = useState('')
@@ -205,15 +107,9 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     }
     const warmthText = warmthMap[parsed.warmth || 'ilik']
 
-    const supabase = createClient()
-    supabase
-      .from('nmm_daily_actions')
-      .select('action_type, note, note_tr, note_en, created_at')
-      .eq('candidate_id', c.id)
-      .order('created_at', { ascending: false })
-      .limit(10)
-      .then(({ data }) => {
-        const rawActions = data ?? []
+    getCandidateRecentActionsAction(c.id)
+      .catch(() => [])
+      .then(rawActions => {
         // Leader notes (non-system notes)
         const leaderNotes = rawActions.filter(a => isLeaderUserNote(a))
         // Activities
@@ -362,12 +258,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     }
   }
 
-  function handleCopyHistory(msg: string) {
-    navigator.clipboard.writeText(msg)
-    toast.success('Mesaj kopyalandı!')
-  }
-
-  const waLink = selected?.phone 
+  const waLink = selected?.phone
     ? waHref(selected.phone, displayedMessage) 
     : `https://api.whatsapp.com/send?text=${encodeURIComponent(displayedMessage)}`
 
@@ -395,7 +286,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               >
                 {MESSAGE_TYPES.map(t => (
                   <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {getMessageTypeLabel(t.value)}
+                    {getMessageTypeLabel(t.value, lang)}
                   </option>
                 ))}
               </select>
@@ -416,7 +307,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
               >
                 {TONES.map(t => (
                   <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {getToneLabel(t.value)}
+                    {getToneLabel(t.value, lang)}
                   </option>
                 ))}
               </select>
@@ -596,47 +487,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
       )}
 
       {/* Mesaj Geçmişi */}
-      {history.length > 0 && (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
-          <button
-            onClick={() => setHistoryOpen(v => !v)}
-            className="flex w-full items-center justify-between px-4 py-3"
-          >
-            <span className="flex items-center gap-2 text-sm font-semibold text-[var(--text-2)]">
-              <Clock className="h-4 w-4" />
-              {t('coachUi.recentMessages')} ({history.length})
-            </span>
-            {historyOpen ? <ChevronUp className="h-4 w-4 text-[var(--text-3)]" /> : <ChevronDown className="h-4 w-4 text-[var(--text-3)]" />}
-          </button>
-          {historyOpen && (
-            <ul className="divide-y divide-[var(--border)] border-t border-[var(--border)]">
-              {history.map((entry, i) => (
-                <li key={i} className="p-4">
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-semibold text-[var(--text-1)]">{entry.candidateName}</span>
-                      <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[10px] font-medium text-[#0F6E56]">
-                        {getMessageTypeLabel(entry.messageType)}
-                      </span>
-                    </div>
-                    <button
-                      onClick={() => handleCopyHistory(entry.message)}
-                      className="flex items-center gap-1 rounded-lg bg-[var(--bg-subtle)] px-2 py-1 text-[10px] font-semibold text-[var(--text-2)] transition hover:bg-[var(--border)]"
-                    >
-                      <Copy className="h-2.5 w-2.5" />
-                      {t('coachUi.copy')}
-                    </button>
-                  </div>
-                  <p className="line-clamp-2 text-xs leading-relaxed text-[var(--text-3)]">{entry.message}</p>
-                  <p className="mt-1 text-[10px] text-[var(--text-3)]">
-                    {new Date(entry.timestamp).toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      <MessageHistorySection history={history} />
       {UpgradePrompt}
     </div>
   )

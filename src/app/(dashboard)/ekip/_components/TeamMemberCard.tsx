@@ -15,6 +15,7 @@ import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
+import type { UpgradeFeature } from '@/components/ui/UpgradePrompt'
 
 export type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity'
 
@@ -41,7 +42,7 @@ type Props = {
   onLinkToPipeline: () => void
   onInviteMember: () => void
   onSetOnboardingCoachData: (data: { memberName: string; stepId: string; phone?: string | null } | null) => void
-  onOpenUpgrade: (reason: string) => void
+  onOpenUpgrade: (feature?: UpgradeFeature) => void
 }
 
 export function TeamMemberCard({

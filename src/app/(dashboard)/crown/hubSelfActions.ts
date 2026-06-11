@@ -24,7 +24,7 @@ export type HubSelfFieldMetrics = {
 
 export type HubPipelineStageCounts = Partial<Record<CandidateStage, number>>
 
-export const EMPTY_FIELD_METRICS: HubSelfFieldMetrics = {
+const EMPTY_FIELD_METRICS: HubSelfFieldMetrics = {
   calls: 0,
   whatsapps: 0,
   notes: 0,
@@ -103,7 +103,7 @@ export type HubMonthlyInsights = {
 
 // cache(): tek render içinde birden çok hub action çağrıldığında workspace lookup
 // 4 kez değil 1 kez yapılır.
-export const resolveWorkspaceId = cache(async (): Promise<string | null> => {
+const resolveWorkspaceId = cache(async (): Promise<string | null> => {
   const supabase = await createClient()
   const { user } = await getAuthUser()
   if (!user) return null

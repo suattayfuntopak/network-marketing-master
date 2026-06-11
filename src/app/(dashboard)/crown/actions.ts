@@ -24,7 +24,6 @@ import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 
-export { getCrownWorkspaceIdAction } from './hubSelfActions'
 
 const ONBOARDING_TOTAL = ONBOARDING_STEPS.length
 

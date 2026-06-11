@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/client'
 import { LogOut, User, Settings, Bell, ChevronDown, Sparkles } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { logoutAction } from '../_shared-actions'
@@ -47,9 +46,8 @@ export function UserMenu() {
     setLogoutConfirmOpen(false)
     setOpen(false)
     try {
+      // logoutAction scope:'global' — tüm cihazlardaki oturumları sunucuda kapatır.
       await logoutAction()
-      const supabase = createClient()
-      await supabase.auth.signOut({ scope: 'global' })
       // Paylaşılan tarayıcı hijyeni: önceki kullanıcının cihaz-yerel izini sil
       // (tümü Supabase'de kalıcı; sonraki girişte yeniden yüklenir).
       clearNmmLocalStorage()
