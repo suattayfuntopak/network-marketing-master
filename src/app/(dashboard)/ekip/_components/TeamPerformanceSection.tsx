@@ -43,7 +43,7 @@ export interface TeamPerformanceSectionProps {
 
 type FieldCardTab = 'aiInvite' | 'nmmInvite'
 
-const MEMBER_CARD_TABS: MemberCardTab[] = ['onboarding', 'call', 'whatsapp', 'activity']
+const MEMBER_CARD_TABS: MemberCardTab[] = ['activity', 'onboarding', 'whatsapp', 'call']
 const FIELD_CARD_TABS: FieldCardTab[] = ['aiInvite', 'nmmInvite']
 
 const TEAM_TAB_STORAGE_KEY = 'nmm_team_perf_tabs'

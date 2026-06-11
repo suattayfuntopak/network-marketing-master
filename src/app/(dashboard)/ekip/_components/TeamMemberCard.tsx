@@ -4,6 +4,7 @@ import { type ComponentType } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
+import { toast } from 'sonner'
 import { Crown, Check, Rocket, Bot, Phone, BarChart3, UserPlus, Target } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -60,7 +61,9 @@ export function TeamMemberCard({
   const onboardingDone = m.onboarding_steps?.length ?? 0
   const onboardingPct = Math.min(100, Math.round((onboardingDone / ONBOARDING_STEP_COUNT) * 100))
   const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
-  const waQuick = waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
+  const waDirect = waHref(m.phone)
+  const waQuick = waDirect
+    ?? waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
 
   const memberTabs: {
     id: MemberCardTab
@@ -72,8 +75,8 @@ export function TeamMemberCard({
   }[] = [
     { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
     { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
+    { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: m.role === 'member', wa: true },
     { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref, className: 'sm:hidden' },
-    { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, className: 'sm:hidden', wa: true },
   ]
   const visibleTabs = memberTabs.filter(tab => tab.show)
 
@@ -152,7 +155,19 @@ export function TeamMemberCard({
                 aria-selected={activeTab === id}
                 aria-label={label}
                 title={label}
-                onClick={e => { e.stopPropagation(); if (id === 'activity') onPrefetchActivity(); onSelectTab(id) }}
+                onClick={e => {
+                  e.stopPropagation()
+                  if (id === 'whatsapp') {
+                    if (waDirect) {
+                      window.open(waDirect, '_blank', 'noopener,noreferrer')
+                    } else {
+                      toast.error(t('team.noPhone'))
+                    }
+                    return
+                  }
+                  if (id === 'activity') onPrefetchActivity()
+                  onSelectTab(id)
+                }}
                 onPointerEnter={() => { if (id === 'activity') onPrefetchActivity() }}
                 className={clsx(
                   'flex h-10 flex-1 items-center justify-center rounded-lg transition-all cursor-pointer',
