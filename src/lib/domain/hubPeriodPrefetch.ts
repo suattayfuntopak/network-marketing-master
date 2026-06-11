@@ -1,13 +1,12 @@
 /** Saha Özetim dönem sekmeleri — sunucu prefetch + istemci paylaşımlı. */
 
-export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly'] as const
+export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly', 'all'] as const
 export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
 
 /** Dönem şeridi swipe/ok ile komşu günler/haftalar için önbellek offset'leri. */
 export const HUB_PERIOD_NEIGHBOR_OFFSETS = [-1, 0, 1] as const
 
 export function parseSummaryTab(raw: string | null): HubPeriodTab {
-  if (raw === 'all') return 'yearly'
   if (raw && (HUB_PERIOD_TABS as readonly string[]).includes(raw)) {
     return raw as HubPeriodTab
   }

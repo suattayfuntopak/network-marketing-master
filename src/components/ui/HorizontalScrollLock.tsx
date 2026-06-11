@@ -20,7 +20,7 @@ export function HorizontalScrollLock({
     <div
       {...props}
       className={clsx(
-        'horizontal-scroll-lock no-swipe overflow-x-auto overscroll-x-contain touch-pan-x scrollbar-none',
+        'horizontal-scroll-lock no-swipe overflow-x-auto overscroll-x-contain scrollbar-none',
         className,
       )}
       data-no-swipe="true"

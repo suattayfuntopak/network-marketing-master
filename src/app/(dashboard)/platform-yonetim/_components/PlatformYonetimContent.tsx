@@ -18,7 +18,6 @@ import {
   claimIndependentSignupToTeamAction,
   deleteUserAction,
 } from '../admin-actions'
-import { HubPrefetchMonitorCard } from './HubPrefetchMonitorCard'
 import {
   approveRequestAction,
   buildBilingualRejectReasonAction,
@@ -346,7 +345,6 @@ export function PlatformYonetimContent() {
           onRejectRequest={handleRejectRequest}
         />
 
-        <HubPrefetchMonitorCard />
 
         {selectedWorkspace && (
           <WorkspaceLicenseModal

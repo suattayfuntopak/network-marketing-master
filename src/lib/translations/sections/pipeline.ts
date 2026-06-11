@@ -23,7 +23,7 @@ export const pipelineSection = {
       aiMentorAnalysis: "YZ Mentör Analizi",
       analyzing: "Analiz ediliyor...",
       analyzeSummarize: "Analiz Et & Özetle ✨",
-      claudeReviewing: "Yapay Zeka Koçu tüm notları inceliyor...",
+      claudeReviewing: "Yapay Zeka Koçum tüm notları inceliyor...",
       reAnalyze: "Yeniden Analiz Et 🔄",
       letAiAnalyze: "Notların özetini çıkarmak ve dinamik aksiyon planı üretmek için YZ analizi başlatın.",
       showLess: "Kapat",
@@ -48,7 +48,7 @@ export const pipelineSection = {
     presentationMaterialsPage: {
       title: 'Sunum Materyalleri',
       subtitle: 'Aday detayından WhatsApp ile göndereceğiniz link ve mesaj şablonları. En fazla {max} materyal ekleyebilirsiniz.',
-      backToPipeline: 'Boru Hattına Dön',
+      backToPipeline: 'Listeme Dön',
       templateHintTitle: 'WhatsApp mesajı nasıl çalışır?',
       templateHintSimple: 'Mesajınızı normal Türkçe yazın. Aşağıdaki üç bilgi gönderirken adayın adı, link ve sizin adınızla otomatik doldurulur:',
       templateHintFooter: 'Mesaj kutusundaki renkli butonlara basarak bu alanları ekleyebilirsiniz. Teknik bilgi gerekmez.',

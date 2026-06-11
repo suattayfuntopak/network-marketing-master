@@ -135,20 +135,31 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 {parsed.warmth === 'soguk' && (
                   <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
                 )}
+                {!candidate.email?.trim() && (
+                  <span
+                    className="inline-flex shrink-0 items-center rounded-full border border-amber-200/60 bg-amber-50/90 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/40 dark:text-amber-400"
+                    title={t('team.inviteEmailMissingHint')}
+                  >
+                    ✉️
+                  </span>
+                )}
               </div>
               {candidate.phone && (
-                <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
+                <p className="hidden text-xs text-[var(--text-2)] sm:block">{candidate.phone}</p>
               )}
               {(parsed.noteTr || parsed.noteEn) && (
-                <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">
+                <p className="mt-1 hidden line-clamp-2 break-words text-xs text-[var(--text-2)] sm:block">
                   {lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr}
                 </p>
               )}
             </div>
           </Link>
 
-          {/* Eylemler: YZ | WhatsApp */}
-          <div className="flex shrink-0 items-center gap-1.5" onClick={e => e.stopPropagation()}>
+          {/* Eylemler: mobil YZ | WA | Ara — masaüstü YZ solda, WA sağda (ara yok) */}
+          <div
+            className="flex w-[7.25rem] shrink-0 items-center justify-between gap-1.5 sm:w-20"
+            onClick={e => e.stopPropagation()}
+          >
             <button
               onClick={handleAIMessage}
               disabled={generating}
@@ -182,7 +193,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <a
                 href={`tel:${candidate.phone}`}
                 onClick={() => markContacted.mutate({ id: candidate.id, actionType: 'call' })}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
                 aria-label={t('pipeline.call')}
                 title={t('pipeline.call')}
               >
@@ -356,7 +367,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               }
               return null
             })()}
-            <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at, t)}</span>
+            <span className="hidden text-xs text-[var(--text-3)] sm:inline">{daysSince(candidate.last_contact_at, t)}</span>
           </div>
         </div>
       </li>

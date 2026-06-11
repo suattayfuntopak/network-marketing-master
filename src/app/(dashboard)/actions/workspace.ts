@@ -204,10 +204,12 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   // GÖRÜNMEZ ve istatistiklerde çift sayılmaz. Hatalı/eski kod sessizce temizlenir.
   let claimedUpline = false
   const pendingCode = (user.user_metadata?.pending_invite_code as string | undefined)?.trim()
+  const pendingCandidateId = (user.user_metadata?.pending_candidate_id as string | undefined)?.trim() || null
   if (pendingCode) {
     try {
       const { error: joinErr } = await supabase.rpc('nmm_join_workspace', {
         p_invite_code: pendingCode.toUpperCase(),
+        p_candidate_id: pendingCandidateId,
       })
       if (joinErr) console.error('[ensureWorkspaceAction] auto-join failed:', joinErr.message)
       else claimedUpline = true

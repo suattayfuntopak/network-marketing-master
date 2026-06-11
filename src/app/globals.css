@@ -195,11 +195,13 @@ body {
   }
 }
 
-/* Yatay kaydırma alanları — pan-x, sayfa swipe ile çakışmaz (no-swipe + data-no-swipe ile kullanın) */
+/* Yatay kaydırma alanları — pan-x (tablo yatay scroll) + pan-y (parmak tablonun/
+   kutunun ÜZERİNDEYKEN de sayfa dikey kayabilsin). Sayfa swipe-nav'ı no-swipe +
+   data-no-swipe ile zaten kapalı; yön çakışması yok. */
 @utility horizontal-scroll-lock {
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  touch-action: pan-x;
+  touch-action: pan-x pan-y;
 }
 
 /* Bottom sheet slide-up animation */

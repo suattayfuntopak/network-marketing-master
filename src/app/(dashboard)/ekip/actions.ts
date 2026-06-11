@@ -370,7 +370,7 @@ export async function addTeamMemberAsCandidateAction(
       owner_id: user.id,
       full_name: trimmedName,
       stage: 'katildi',
-      note_tr: 'Ekibimden boru hattına eklendi',
+      note_tr: 'Ekibimden listeye eklendi',
       note_en: 'Added from my team to pipeline',
       warmth: 'ilik',
       ...(resolvedPhone ? { phone: resolvedPhone } : {}),
@@ -427,7 +427,22 @@ export async function joinWorkspaceByInviteAction(
   const { data, error } = await supabase.rpc('nmm_join_workspace', {
     p_invite_code: inviteCode.trim().toUpperCase(),
   })
-  if (error) throw new Error(error.message)
+  if (error) {
+    // Ham Postgres hatasını kullanıcıya GÖSTERME (uzun İngilizce mesaj); sunucuya logla,
+    // bilinen durumları temiz/Türkçe mesaja çevir, gerisini nazik bir mesajla kapat.
+    console.error('[joinWorkspaceByInviteAction] RPC error:', error.message)
+    const m = error.message || ''
+    if (m.includes('invalid_invite_code')) {
+      throw new Error('Geçersiz davet kodu. Lütfen kodu kontrol edip tekrar deneyin.')
+    }
+    if (m.includes('cannot_join_own_workspace')) {
+      throw new Error('Bu senin kendi davet kodun — kendi ekibine katılamazsın.')
+    }
+    if (m.includes('not_authenticated')) {
+      throw new Error('Oturum bulunamadı. Lütfen yeniden giriş yap.')
+    }
+    throw new Error('Ekibe katılırken bir sorun oluştu. Lütfen birazdan tekrar dene.')
+  }
 
   if (data && typeof data === 'object' && 'workspace_name' in data) {
     return { workspace_name: String((data as { workspace_name?: string }).workspace_name ?? '') }

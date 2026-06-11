@@ -3,7 +3,7 @@
 import { UserPlus, Copy, Check } from 'lucide-react'
 import { SpoilerCode } from './SpoilerCode'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { REGISTER_URL } from '@/lib/domain/constants'
+import { buildInviteLink } from '@/lib/domain/inviteLink'
 
 interface InviteTeammateSectionProps {
   inviteCode: string
@@ -40,7 +40,7 @@ export function InviteTeammateSection({
           </button>
           <a
             href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-              t('team.waInviteGroup', { code: inviteCode, link: REGISTER_URL })
+              t('team.waInviteGroup', { code: inviteCode, link: buildInviteLink(inviteCode) })
             )}`}
             target="_blank"
             rel="noopener noreferrer"

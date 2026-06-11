@@ -94,6 +94,22 @@ export async function addCustomContent(
   })
 }
 
+/** Updates an existing custom item's payload (owner-only; RLS "own ..." policy). */
+export async function updateCustomContent(
+  table: CustomTable,
+  itemKey: string | number,
+  item: CustomItem
+): Promise<void> {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+  await supabase
+    .from(table)
+    .update({ data: item as unknown as Json })
+    .eq('user_id', user.id)
+    .eq('item_key', String(itemKey))
+}
+
 export async function deleteCustomContent(
   table: CustomTable,
   itemKey: string | number

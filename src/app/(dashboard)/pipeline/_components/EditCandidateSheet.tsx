@@ -92,9 +92,12 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
       const rawNoteInput = (fd.get('note') as string).trim()
       const warmth = (fd.get('warmth') as 'sicak' | 'ilik' | 'soguk') || 'ilik'
 
+      const rawEmail = (fd.get('email') as string).trim()
+
       await update.mutateAsync({
         id: candidate.id,
         full_name: (fd.get('fullName') as string).trim(),
+        email: rawEmail || null,
         phone: phone || null,
         stage: fd.get('stage') as CandidateStage,
         ...buildCandidateContentFields({
@@ -218,6 +221,19 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
           <div>
             <label className={labelClass} htmlFor="edit-fullName">Ad Soyad *</label>
             <input id="edit-fullName" name="fullName" required defaultValue={candidate.full_name} className={inputClass} />
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="edit-email">E-posta</label>
+            <input
+              id="edit-email"
+              name="email"
+              type="email"
+              defaultValue={candidate.email ?? ''}
+              placeholder="ornek@email.com"
+              className={inputClass}
+              autoComplete="email"
+            />
+            <p className="mt-1 text-[11px] text-[var(--text-3)]">NMM davet linkinde kayıt formu bu adresle doldurulur.</p>
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-phone">Telefon</label>

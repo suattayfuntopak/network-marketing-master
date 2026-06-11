@@ -138,7 +138,10 @@ BEGIN
     RAISE EXCEPTION 'cannot_join_own_workspace';
   END IF;
 
-  SELECT full_name, phone INTO v_user_fullname, v_user_phone
+  -- NOT: nmm_workspace_members'ta `phone` kolonu YOKTUR; eskiden buradaki
+  -- `SELECT full_name, phone` bu migration'ın UYGULANMASINI kırıyordu. Telefon
+  -- adaylardan/metadata'dan alınır (bkz. 079). full_name yeterli.
+  SELECT full_name INTO v_user_fullname
   FROM nmm_workspace_members
   WHERE user_id = v_user_id
   ORDER BY joined_at DESC NULLS LAST

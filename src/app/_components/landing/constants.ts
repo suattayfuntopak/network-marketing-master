@@ -57,7 +57,7 @@ export const TESTIMONIALS = [
     title: { en: 'Independent Master', tr: 'Bağımsız Master' },
     text: {
       en: 'Candidate tracking used to get lost in notebooks. Now, thanks to the Pipeline, I see who is at which stage (new, presentation, follow-up) in one glance. Nobody is forgotten.',
-      tr: 'Aday takibi eskiden defterlerde kayboluyordu. Şimdi Boru Hattı sayesinde hangi adayın hangi aşamada (yeni, sunum, takip) olduğunu tek bakışta görüyorum. Kimseyi unutmuyorum.'
+      tr: 'Aday takibi eskiden defterlerde kayboluyordu. Şimdi Aday Listesi sayesinde hangi adayın hangi aşamada (yeni, sunum, takip) olduğunu tek bakışta görüyorum. Kimseyi unutmuyorum.'
     },
     bg: 'bg-amber-500/10',
     color: 'text-amber-400'
@@ -101,7 +101,7 @@ export const TESTIMONIALS = [
     title: { en: 'Field Director', tr: 'Saha Direktörü' },
     text: {
       en: 'Swiping between tabs on my smartphone is extremely practical. I manage my entire candidate pipeline and calendar with one hand while on the move.',
-      tr: 'Akıllı telefonlarda sağa sola kaydırarak sekmeler arasında gezinebilmek çok pratik. Sahada koştururken tüm aday boru hattımı ve takvimimi tek elle pürüzsüzce yönetiyorum.'
+      tr: 'Akıllı telefonlarda sağa sola kaydırarak sekmeler arasında gezinebilmek çok pratik. Sahada koştururken tüm aday listemi ve takvimimi tek elle pürüzsüzce yönetiyorum.'
     },
     bg: 'bg-rose-500/10',
     color: 'text-rose-400'

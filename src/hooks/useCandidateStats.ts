@@ -3,7 +3,6 @@
 import { useMemo } from 'react'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
 import type { PulsePeriod } from '@/lib/domain/pulse'
-import { normalizePulsePeriod } from '@/lib/domain/pulse'
 import type { CandidateStage } from '@/types/database.types'
 
 /** Aday listesinden dönem metrikleri — İstatistikler sayfası; Akademi vb. için de kullanılabilir. */
@@ -16,8 +15,8 @@ export function filterCandidatesByPeriod<T extends CandidateStatsRow>(
   candidates: T[],
   period: PulsePeriod,
 ): T[] {
-  const p = normalizePulsePeriod(period)
-  if (p === 'all') return candidates
+  const p = period
+  if (p === 'all') return candidates // tüm zamanlar — filtre yok
 
   const now = new Date()
   let cutoff: Date

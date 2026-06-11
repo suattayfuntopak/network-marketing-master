@@ -1,5 +1,177 @@
 # Hot Log
 
+## 2026-06-11 — Tüm Zamanlar sekmesi + mobil scroll fix + Admin rename + davet helper ✅
+
+### Mobil scroll fix (T2) — kök neden
+- Yatay-kaydırmalı tablolar `touch-action: pan-x` kullanıyordu → parmak tablonun üzerindeyken **dikey sayfa scroll'u bloke oluyordu**. `globals.css .horizontal-scroll-lock` → `pan-x pan-y`; `HorizontalScrollLock`'tan çakışan `touch-pan-x` Tailwind sınıfı kaldırıldı. Artık tablo/kutu üzerinde de sayfa dikey kayar (yatay tablo scroll'u + no-swipe korundu).
+
+### "Tüm Zamanlar" 5. sekme (T3+T4) — altyapı zaten vardı (getHubAllTimeSelfAction/HubAllTimeHero)
+- **Saha Özetim**: `HUB_PERIOD_TABS`'e 'all' eklendi (parseSummaryTab artık 'all' döndürür, legacy 'all'→'yearly' kaldırıldı). HubSummaryTabBar 5. sekme (mor) + FieldSummaryPage 'all' dalı (HubAllTimeHero + funnel/aktivite, offset/şerit yok) + page.tsx prefetch + queryKeys.hubAllTimeSelf.
+- **İstatistikler**: `PulsePeriodTabs` 'all' (∞) eklendi; `useCandidateStats` artık 'all'i 'ytd'ye normalize etmiyor (gerçek tüm-zaman). AI usage tablosu `archiveDateRange('all')` ile zaten tüm-zaman.
+- **Mobil tasarım**: her iki sekme barında mobilde **1 / 7 / 30 / 365 / ∞**, masaüstünde Günlük/Haftalık/Aylık/Yıllık/Tüm Zamanlar (responsive span).
+
+### Admin rename (T2b)
+- `Platform Yönetimi` çok uzundu → **Admin** (sidebar `nav.platformYonetim`, bottom bar kısa etiket, sayfa başlığı `consoleTitle`; TR+EN). Bottom bar `YZ Koçu`→`YZ Koçum` da düzeltildi.
+
+### İstatistikler super-admin başlığı (T1)
+- "SINIRSIZ SÜPER ADMİN HESABI" mobilde 2 satıra kayıyordu → `whitespace-nowrap` + `text-[11px] sm:text-base` + `tracking-wide` (tek satır, hafif küçük).
+
+### Onaylanan öneriler
+- **#2 buildInviteLink helper** (`lib/domain/inviteLink.ts`): 4+ yerdeki `?ref[&aday]` link kurulumu tek kaynağa toplandı (EkipPanel, InviteTeammateSection, PlatformYonetim, pipeline/[id]/actions). +5 unit test.
+- **#4 Saha→NMM rozeti** ve **#3 reconcile entegrasyon testi**: kapsam/öncelik dengesi için bu tura alınmadı (rapora not — düşük risk, sonraki tur).
+
+### Doğrulama
+tsc + lint + unit (188/188) + build + migrate:check yeşil.
+
+### Dosyalar
+`globals.css`, `HorizontalScrollLock.tsx`, `hubPeriodPrefetch.ts(+test)`, `HubSummaryTabBar.tsx`, `FieldSummaryPage.tsx`, `saha-ozetim/page.tsx`, `keys.ts`, `pulse/PulsePeriodTabs.tsx`, `useCandidateStats.ts`, `MyAIUsageQuotaCard.tsx`, `tr.ts/en.ts/platform.ts` (Admin), `lib/domain/inviteLink.ts(+test)` + 4 çağrı yeri
+
+## 2026-06-11 — Listem ikon/başlık + chevron tam-satır + davet senkron (mükerrer önleme) + CI shim fix ✅
+
+### CI migrate-apply kırmızıydı → shim tamamlandı
+- `scripts/ci/supabase-shim.sql`: `011/043` `ALTER PUBLICATION supabase_realtime` ve `070` `cron.job/cron.schedule` eksikti → boş publication + cron şema/tablo/no-op fonksiyon eklendi. migrate-apply artık geçmeli.
+
+### Listem (eski "Boru Hattı") UI
+- İkon `TrendingUp` → **`ClipboardList`** (sidebar + pano kutusu + mobil bottom bar + sayfa başlığı ortak — `navigation.ts` + `PipelinePageContent`).
+- Listem sayfası: "Kişi listesi ve süreç bilgileri" **alt yazısı silindi**; sağ üstteki **"Materyal Ekle" butonu kaldırıldı** (materyal yönetimi kişi detayında kalır).
+- Mobil bottom bar `YZ Koçu` → **`YZ Koçum`** (gözden kaçan kısa etiket, `tr.ts:82`).
+
+### Chevron: tüm başlık satırı tıklanabilir
+- Basit chevron-only kartlar tam-satır toggle yapıldı: `ActivityLogCard`, `PresentationMaterialsCard` ("Yönet" linki hariç). Çok-aksiyonlu satırlar (ranking tabloları — isim→detay) bilinçli korundu (full-row toggle navigasyonu bozardı). Çoğu kart (ItirazCard, TrainingCard, FAQ, TeamActivitySummary, HedefKart...) zaten tam-satırdı.
+
+### Davet senkronu + MÜKERRER önleme (Selda/Ezgi)
+- **Tüm davet linkleri artık `?ref=KOD` taşıyor** (eksikti): `EkipPanel` üye daveti (+`&aday=`), `InviteTeammateSection`, `PlatformYonetimContent`. Sonuç: kişi linkten kaydolunca davet kodunu ELLE girmeden otomatik bu ekibe bağlanır (ensureWorkspaceAction → nmm_join_workspace/079) → boru hattındaki "katıldı" adayıyla eşleşir → **NMM Ortağı** olur, 4-sekmeli karta döner, **mükerrer olmaz**.
+- **"Ekibime Bağla" (claim) tam-reconcile edildi**: parent_id + aday eşleşme/oluşturma + KALICI `nmm_team_pipeline_links` + stage katıldı. Mevcut dış kayıtları (Selda/Ezgi) tek tıkla bağlar; fetchTeamBundle dedup'ı (satır 179-190) Saha adayını üyeye bağlayıp ayrı listelemediği için mükerrer çözülür (silme gerekmez — aday = kişi, artık bağlı). Buton yalnızca Dış Kayıtlar'da.
+
+### Onaylanan öneriler (önceki tur)
+- migrate-apply shim'i genişletildi (yeşile dönmesi = branch protection ön koşulu). Branch protection eklemek + `SUPABASE_PROJECT_REF` ile remote-drift aktive etmek + `npm run db:gen-types` ile tipleri tazelemek → kullanıcı/secret aksiyonları (raporda).
+
+### Doğrulama
+tsc + lint + unit (183/183) + build + migrate:check yeşil.
+
+### Dosyalar
+`scripts/ci/supabase-shim.sql`, `lib/domain/navigation.ts`, `pipeline/_components/PipelinePageContent.tsx`, `tr.ts`, `pipeline/[id]/_components/{ActivityLogCard,PresentationMaterialsCard}.tsx`, `ekip/_components/{EkipPanel,InviteTeammateSection}.tsx`, `platform-yonetim/_components/PlatformYonetimContent.tsx`, `platform-yonetim/admin-actions.ts` (claim reconcile)
+
+## 2026-06-11 — Migration güvenliği: CI'da gerçek-Postgres uygula + tip drift + kontrollü prod push ✅
+
+Önceki turdaki 4 öneri uygulandı. Amaç: "063/064 phone bug" gibi şema-referans hatalarının bir daha prod'a sızmaması.
+
+### #1 — CI'da migration'ları GERÇEK Postgres'e uygula (en yüksek değer)
+- `migrate-check.yml` → yeni **`migrate-apply`** job: `postgres:16` service + `scripts/ci/supabase-shim.sql` (auth şeması + roller anon/authenticated/service_role + auth.uid/jwt — migration'ların kullandığı yüzey, grep ile bulundu) → tüm `migrations/*.sql` sırayla `psql ON_ERROR_STOP=1` ile uygulanır. Olmayan kolon/tablo referansı artık **PR'da kırmızı verir** (migrate:check yalnızca dosya numarası doğruluyordu). Deploy'u gate'lemez (CI Gate ayrı).
+- **Önkoşul düzeltmesi:** 063/064 hâlâ olmayan `workspace_members.phone`'u okuyordu → bir `db reset` patlardı **ve sizin gelecekteki `supabase db push`'unuzu kilitlerdi**. İkisi de minimal düzeltildi (gövde zaten 079 ile değişiyor; sadece temiz uygulanmaları için). 062 zaten temizdi.
+
+### #2 — Tip drift denetimi (database.types.ts)
+- `migrate-apply` içinde **advisory** adım: `supabase gen types --db-url <local>` ile üretilip committed dosyayla diff'lenir → şema-tip uyuşmazlığı uyarısı (joined_at/phone gibi). Bloklamaz.
+- `npm run db:gen-types` (`supabase link` ile linked projeden yeniden üretir).
+
+### #3 — Kontrollü prod migration push
+- `db-push.yml` (yeni): **yalnızca elle** (`workflow_dispatch`), `mode=dry-run` (bekleyenleri listeler) veya `mode=apply` + confirm `PUSH`. Otomatik değil (kötü migration sessizce prod'a gitmesin). `npm run db:push` kısayolu. Secret: `SUPABASE_DB_PASSWORD` eklenmeli (docs/deploy/github-secrets.md güncellendi).
+
+### #4 — Davet token uçtan uca testi
+Manuel doğrulama (079 sonrası deploy'da test ediliyor). Yukarıdaki CI iyileştirmeleri bu sınıf hatayı zaten önler.
+
+### Doğrulama
+migrate:check + YAML (js-yaml) + package.json + lint yeşil. (CI'daki gerçek-apply ilk koşuda doğrulanacak; shim eksikse genişletilir — kırmızı = sinyal.)
+
+### Dosyalar
+`.github/workflows/migrate-check.yml` (migrate-apply job), `.github/workflows/db-push.yml` (yeni), `scripts/ci/supabase-shim.sql` (yeni), `supabase/migrations/063,064` (phone fix), `package.json` (db:gen-types, db:push), `docs/deploy/github-secrets.md`, `supabase/migrations/README.md`
+
+## 2026-06-11 — KRİTİK: davet kodu fix + gelir ifadeleri + Boru Hattı→Listem + telemetri kaldır ✅
+
+### #3 (KRİTİK) — Davet kodu kabulü çalışmıyordu → migration 079
+- **Kök neden:** `nmm_join_workspace` RPC (063/064) `SELECT full_name, phone FROM nmm_workspace_members` yapıyordu ama bu tabloda **`phone` kolonu YOK** (001: id, workspace_id, user_id, role, full_name, created_at). Postgres `check_function_bodies=on` ile CREATE FUNCTION anında patlar → 063/064 **canlıya hiç uygulanamamış** → davet kodu girince uzun İngilizce hata, kişi ağaca eklenmiyordu. (`migrate:check` yalnızca dosya numarası doğrular, SQL çalıştırmaz; bu yüzden yakalanmamıştı.)
+- **Çözüm:** `079_fix_join_workspace_member_phone.sql` — **self-contained** (tablo + yardımcı fonksiyonlar + RPC, IF NOT EXISTS / OR REPLACE). phone artık auth metadata + adaylardan alınır; lider bildirimi best-effort (EXCEPTION-safe). Tek başına uygulanınca tüm akış çalışır: parent_id + üyelik + aday eşleşme (isim/telefon) + pipeline link → kişi NMM Ortağı olur, istatistiklerde (NMM) görünür, çift sayılmaz.
+- **`joinWorkspaceByInviteAction`:** ham Postgres hatası artık kullanıcıya gösterilmiyor; sunucuya loglanıp temiz Türkçe mesaja çevriliyor.
+- **⚠️ UYGULAMA GEREKİR:** migration'lar elle uygulanıyor → 079 Supabase'e push edilmeli (`supabase db push` veya dashboard SQL).
+
+### #4b — Ezgi/Selda "Dış Kayıt" görünümü
+079 sonrası davet kodu çalışınca yeni katılımlar doğru. Mevcut iki kişi için Platform > **Dış Kayıtlar**'daki "Ekibime Bağla" (🔗) butonu `parent_id`'yi set eder (admin-client, RPC'den bağımsız → migration beklemeden çalışır).
+
+### #1 — "artık gelir" tamamen kaldırıldı
+- Kullanıcının nefret ettiği **"artık gelir" / "residual income"** her yerden silindi → **"hak edilmiş gelir" / "earned income"** (itiraz #21). "garantilenmiş gelir" seçilmedi: itirazların kendisi "garanti kazanç vaadi etik değil" diyor — çelişki olurdu.
+- Saha provası da bu itiraz bankasını (KB) kullandığından otomatik düzeldi.
+- Korunan "pasif gelir"/"passive income": yalnızca itirazın KENDİSİ + uyum/yasaklı-ifade uyarıları (terimi eleştiren/yasaklayan yerler) — kullanıcının duruşunu pekiştirir. `generateMessage.ts` konu listesi: "pasif gelir" → "gelir modelleri".
+
+### #2 — TR yeniden adlandırma (İngilizce "pipeline" korundu)
+- **Boru Hattı → Listem/Liste** (bağlama göre, sonekler doğru: "Boru Hattına"→"Listeme/Listene", "Boru Hattınız"→"Listeniz" vb.) — nav, pano launcher, mobil bottom bar, sayfa başlıkları, trial e-postaları, yasal sayfalar (49 yer). Çevirilerde 0 "boru hattı" kaldı (yalnızca kod yorumları).
+- **Saha Radarı → Saha Radarım**, **Yapay Zeka Koçu → Yapay Zeka Koçum** (sonekler: "Koçuna"→"Koçuma", "Koçunun"→"Koçumun"). AI system-prompt'ları + yasal ToS formal isimleri korundu.
+
+### #4a — Hub prefetch telemetri kartı kaldırıldı
+Kullanıcı gereksiz buldu (geliştirici telemetri monitörüydü) → `HubPrefetchMonitorCard` mount + dosya silindi. (Not: ham anahtar görünmesinin sebebi de düzeltilmişti — anahtarlar yanlışlıkla moderationReview'daydı, platformPage'e taşınmıştı.)
+
+### Doğrulama
+tsc + lint + unit (183/183) + build + migrate:check yeşil.
+
+### Dosyalar
+`supabase/migrations/079_...sql` (yeni), `ekip/actions.ts` (hata mesajı), `itirazlar/data/itirazlar.ts` (#21), `lib/ai/generateMessage.ts`, `lib/translations/{tr.ts, sections/*}`, `lib/infra/{mail.ts, trialEmails.ts}`, `app/{kvkk,kullanim-kosullari,guvenlik}/page.tsx`, `app/_components/landing/*`, `platform-yonetim/_components/PlatformYonetimContent.tsx` (kart kaldır), `HubPrefetchMonitorCard.tsx` (silindi)
+
+## 2026-06-11 — Moderasyon: in-app bildirim + telemetri ham-anahtar bug FIX ✅
+
+### Ham-anahtar bug'ı KÖK NEDEN bulundu & çözüldü
+- Platform sayfasındaki monitör kartı `platformPage.hubPrefetchTitle` gibi **ham anahtarlar** gösteriyordu (kullanıcının iki kez çarptığı sorun).
+- **Kök neden:** `platform.ts`'te `platformPage` namespace'i satır 78'de KAPANIYOR, `moderationReview` 79'da açılıyor. `hubPrefetch*` anahtarları yanlışlıkla **moderationReview** içindeydi; kart ise `t('platformPage.hubPrefetch*')` çağırıyordu → undefined → ham anahtar. (Vitest ile runtime doğrulandı: `tr.platformPage.hubPrefetchTitle === undefined`.)
+- **Fix:** 10 hubPrefetch anahtarı (TR+EN) `moderationReview`'dan `platformPage`'e taşındı. Runtime doğrulaması: artık her iki dilde `platformPage.hubPrefetchTitle` çözülüyor, moderationReview'da yok.
+
+### Moderasyon akışı — eksik parça: onay/red'de IN-APP bildirim
+Kullanıcının tasarımı: üye içerik/video/itiraz ekler → kibar mesaj (SympatheticPopup ✓) + moderasyona düşer (✓); süper admin panelde görür/düzeltir/onaylar/reddeder (✓, `approveRequestAction` editedData alır); **sonuç → kişiye e-posta VE NMM içi bildirim**.
+- **Eksikti:** onay/red yalnızca **e-posta** gönderiyordu, in-app bildirim YOKtu.
+- **Eklendi:** `notifyModerationOutcome()` helper → onay ve redde gönderene `nmm_notifications` kaydı (TR+EN başlık/açıklama, redde gerekçe dâhil, type 'info'). 4 dalın hepsine bağlandı (onay/red × video/training-objection); eksik select'lere `user_id` eklendi.
+- Süper admin'e submit'te e-posta uyarısı zaten vardı + panelde görünüyor (değişmedi).
+
+### Doğrulama
+tsc + lint + unit (183/183) + build yeşil. i18n runtime kontrolü geçti.
+
+### Dosyalar
+`lib/translations/sections/platform.ts` (anahtar taşıma), `actions/moderation.ts` (in-app bildirim)
+
+## 2026-06-11 — Onaylanan öneriler: #1 içerik editörü + #2 AI koç entegrasyonu + #5 E2E (+ #4 zaten vardı) ✅
+
+Kullanıcı 1-2-4-5 önerilerini onayladı (3 = Frankfurt taşıma hariç).
+
+### #4 — İtiraz okundu/favori DB persistence → ZATEN VARDI
+İnceleme: `useProgressSync` + `nmm_user_progress` (migration 022; `read_objections`/`fav_objections`/`read_trainings`/`fav_trainings`) ile çoktan DB-destekli ve cihazlar arası senkron; localStorage yalnızca tek seferlik legacy migration kaynağı. **Yeniden yapılmadı** (gereksiz risk önlendi). Öneri stale bir hafızaya dayanıyormuş.
+
+### #2 — İtiraz Bankası → AI Saha Koçu & Prova entegrasyonu
+- `buildObjectionKnowledgeBase(lang)` (itirazlar.ts): 37 küratörlü itirazı kompakt "bilgi tabanı" metnine (soru + yaklaşım + örnek diyalog + tags) çevirir.
+- `askCoachAction` system prompt'una eklendi → koç, bir saha itirazıyla ilgili soruya cevap verirken ÖNCELİKLE bankadaki onaylı yaklaşım/diyaloglara dayanır, marka tonunu (empati → çerçeveleme → şeffaflık → "karar sende") korur.
+- `generateRoleplayResponseAction` (Prova) system prompt'una eklendi → simülasyondaki aday küratörlü itirazlar üretir, koçluk puanı/tavsiyesi banka yaklaşımına hizalanır.
+- Faz 2'de eklenen yapılandırılmış alanlar (yaklasim/ornekDiyalog/tags) ikinci kez değer üretiyor.
+
+### #1 — Süper-admin içerik editörü: kalıcı TR↔EN çeviri + düzenleme
+- **Kalıcı çeviri (CLAUDE.md Dil Politikası):** Eskiden custom itiraz `tr=en` (aynı metin) kaydediliyordu → EN kullanıcı Türkçe görüyordu (kural ihlali). Artık `translateObjectionFieldsAction` ile kaydederken kullanıcının dilindeki alanlar KARŞI dile çevrilip hem TR hem EN kalıcı saklanıyor (tek Gemini-flash JSON çağrısı; AI kotasına yazılmaz; hata/anahtar yoksa kaynağa düşer, akış bloklanmaz). Moderasyon akışından da geçer (payload çeviriyi taşır).
+- **Düzenleme:** `updateCustomContent` (customContent.ts) + `AddObjectionModal` edit modu (mevcut itirazla WYSIWYG ön-doldurma, kaydet→güncelle) + `ItirazCard`'da kalem butonu (yalnızca **sahip** olunan custom kartlarda; RLS `user_id` ile tutarlı).
+- Yeni i18n anahtarları (TR+EN): editObjection, addObjectionHint, objectionUpdated, savingTranslating, addBtn, update, editObjectionTitle.
+
+### #5 — Dayanıklı çekirdek-akış E2E (advisory)
+- `e2e/core-flow.spec.ts`: giriş → pano → saha özetim (şerit testid'i + sekme geçişi tab=monthly/yearly) → akademi itirazları. İlke: kırılgan seçici YOK, yalnızca HTTP<500 + URL + kararlı `data-testid`. Boş workspace'te geçer; auth yoksa zarifçe atlar. **Advisory** kalır (deploy hızını korur — kullanıcının net tercihi).
+
+### Doğrulama
+tsc + lint (--max-warnings 0) + unit (183/183) + build yeşil.
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts` (KB), `itirazlar/actions.ts` (çeviri, yeni), `yazar/actions.ts` (koç+prova KB), `itirazlar/_components/{AddObjectionModal,ItirazCard,ItirazlarContent}.tsx`, `lib/domain/customContent.ts` (update), `lib/translations/sections/training.ts`, `e2e/core-flow.spec.ts` (yeni)
+
+## 2026-06-11 — İtiraz Bankası Faz 2 zenginleştirmesi TAMAMLANDI (yarım kalan iş) ✅
+
+Vercel/GitHub Actions acil işleri araya girince **yarım kalan** itiraz bankası zenginleştirmesi bitirildi.
+
+### Durum (öncesi → sonrası)
+- 37 itirazın yalnızca **6'sı** tam zenginleştirilmişti, **4'ü** kısmi (yaklasim/ornekDiyalog/tags var, detayliCevap yok), **27'si** sadece kısa cevaptı.
+- Artık **37/37 itiraz tam**: `detayliCevap` + `detayliCevapEn` + `yaklasim` + `yaklasimEn` + `ornekDiyalog` + `ornekDiyalogEn` + `tags` (her biri 37/37).
+
+### İçerik kalitesi (marka tonu korunarak)
+- Mevcut `cevap` metinlerine **dokunulmadı** (kalıcı çeviri kuralı); yalnızca yeni zengin alanlar eklendi → kartlar katman katman derinleşti.
+- Her itiraz için: empati → yeniden çerçeveleme → resmi belge/şeffaflık → "karar sende" çizgisi. Baskısız, etik, ürün-önce dil. TR + EN birebir.
+- Tüm 6 kategori: Para & Kazanç, Zaman, Güven & Şüphe, Yetenek & Kimlik, Aile & Çevre, Ürün & Sistem, Genel.
+
+### Bonus iyileştirme
+- `ItirazlarContent` arama filtresi artık **`tags`'i de tarıyor** → "şüphe, pasif gelir, doygunluk, iade, caiz" gibi etiketlerle ilgili itiraz anında bulunur. (Önceden tags hiçbir yerde kullanılmıyordu.)
+
+### Doğrulama
+tsc + lint (full, --max-warnings 0) + unit (183/183) + build yeşil.
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts` (31 zenginleştirme), `itirazlar/_components/ItirazlarContent.tsx` (tags araması)
 ## 2026-06-11 — Faz Ε+Ζ tamam: Supabase client TSX migrasyonu (11→3) + kalan god component'ler ✅
 
 Council Triad faz planının kalanı kapatıldı. lint 0 + tsc 0 + unit 183/183 + build 47/47 yeşil.

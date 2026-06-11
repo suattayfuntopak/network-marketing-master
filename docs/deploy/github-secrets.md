@@ -139,6 +139,14 @@ Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'
 
 ---
 
+## Migration doğrulama & uygulama (CI)
+
+- **`migrate-apply` job** (`.github/workflows/migrate-check.yml`): her migration değişikliğinde tüm `supabase/migrations/*.sql` GERÇEK bir Postgres'e (`scripts/ci/supabase-shim.sql` ile auth şeması + roller hazırlanır) sırayla uygulanır. `063/064`'teki "column phone does not exist" gibi şema-referans hataları artık prod'a sızmadan burada kırmızı verir. Secret gerektirmez.
+- **`DB migrate (prod)` workflow** (`.github/workflows/db-push.yml`): bekleyen migration'ları PROD'a uygular — **yalnızca elle** (`workflow_dispatch`), `mode=apply` + confirm `PUSH` ile. Gerekli secret'lar:
+  - `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (zaten var)
+  - **`SUPABASE_DB_PASSWORD`** — Supabase → Project Settings → Database → Connection string şifresi; `supabase db push` için gerekir.
+  - Kullanım: önce `mode=dry-run` (bekleyenleri listeler), sonra `mode=apply` + `confirm=PUSH`.
+
 ## Yerel `.env.local`
 
-Geliştirme ve `npm run dev` için Supabase + Gemini zorunlu. E2E koşacaksanız `PLAYWRIGHT_TEST_*` ekleyin. CI-only secret’ları (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`) yalnızca yerelde migration drift kontrolü yapacaksanız ekleyin.
+Geliştirme ve `npm run dev` için Supabase + Gemini zorunlu. E2E koşacaksanız `PLAYWRIGHT_TEST_*` ekleyin. CI-only secret’ları (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`) yalnızca yerelde migration drift kontrolü yapacaksanız ekleyin. Types yeniden üretmek: `npm run db:gen-types` (`supabase link` gerekir).

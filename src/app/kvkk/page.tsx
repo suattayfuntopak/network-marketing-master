@@ -26,7 +26,7 @@ export default function KVKKPage() {
           text: 'Platformu kullanımınız kapsamında yalnızca hizmet sunumu için zorunlu olan şu veriler işlenmektedir:',
           bullets: [
             'Kimlik ve İletişim Bilgileri: Adınız, soyadınız, e-posta adresiniz, telefon numaranız.',
-            'Kullanım ve İşlem Verileri: Eklediğiniz aday listeleri, boru hattı (pipeline) geçiş hareketleri, günlük YZ Mesaj Yazarı ve YZ Koçu sorgularınız.',
+            'Kullanım ve İşlem Verileri: Eklediğiniz aday listeleri (pipeline) geçiş hareketleri, günlük YZ Mesaj Yazarı ve YZ Koçu sorgularınız.',
             'Cihaz ve Bağlantı Verileri: Giriş yaptığınız IP adresleri, tarayıcı türleri ve oturum doğrulama kayıtları.',
           ],
         },
@@ -36,7 +36,7 @@ export default function KVKKPage() {
           text: 'Kişisel verileriniz, KVKK 5. maddesi uyarınca "Bir sözleşmenin kurulması veya ifasıyla doğrudan doğruya ilgili olması" ve "Veri sorumlusunun meşru menfaati" hukuki sebeplerine dayalı olarak şu amaçlarla işlenir:',
           bullets: [
             'Çalışma alanınızın (Workspace) oluşturulması ve oturum doğrulaması yapılması.',
-            'Aday takip boru hattı (pipeline) ve ekip koordinasyonu araçlarının çalıştırılması.',
+            'Aday takip listesi (pipeline) ve ekip koordinasyonu araçlarının çalıştırılması.',
             'YZ Koçu ve Saha Provası simülasyonları gibi yapay zeka entegrasyonlarının kişiselleştirilmiş olarak sunulması.',
             'Platformun güvenliğinin sağlanması ve yasal uyum denetim raporlarının üretilmesi.',
           ],
@@ -62,7 +62,7 @@ export default function KVKKPage() {
         {
           id: 'p6',
           title: '6. Ekip Performans İzleme ve Sponsor Görünürlüğü',
-          text: 'Pro plan kapsamında doğrudan sponsorunuz (lideriniz), "Ekip Performans İzleme Tablosu" üzerinde ekip gelişiminizi yalnızca özet düzeyde görüntüleyebilir: eğitim, itiraz ve video içeriklerindeki tamamlama yüzdeleriniz, Doğru Başlangıç (DQSG) ilerlemeniz ve aday boru hattınızdaki aşama dağılımınız. Bu veriler yalnızca bireysel koçluk ve ekip gelişimi amacıyla işlenir; aday notlarınız veya mesaj içerikleriniz sponsorunuzla paylaşılmaz.',
+          text: 'Pro plan kapsamında doğrudan sponsorunuz (lideriniz), "Ekip Performans İzleme Tablosu" üzerinde ekip gelişiminizi yalnızca özet düzeyde görüntüleyebilir: eğitim, itiraz ve video içeriklerindeki tamamlama yüzdeleriniz, Doğru Başlangıç (DQSG) ilerlemeniz ve aday listenizdeki aşama dağılımınız. Bu veriler yalnızca bireysel koçluk ve ekip gelişimi amacıyla işlenir; aday notlarınız veya mesaj içerikleriniz sponsorunuzla paylaşılmaz.',
           bullets: [
             'İlerleme verileri sponsorunuza yalnızca özet düzeyde (yüzde ve sayaç) sunulur; ham içerik paylaşılmaz.',
             'İstediğiniz zaman hesap ayarlarınızdan veya destek kanalından verilerinize ilişkin bilgi talep edebilirsiniz.',

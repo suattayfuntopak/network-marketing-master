@@ -65,10 +65,18 @@ export function PresentationMaterialsCard({ c, workspaceId, isSuperAdmin, sender
   return (
     <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 text-sm">
       <div className="flex items-center justify-between gap-3">
-        <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
-          <Presentation className="h-3.5 w-3.5 text-brand" />
-          {t('pipeline.presentationMaterials')}
-        </p>
+        {/* Başlık alanı (boş alan dâhil) tıklanınca aç/kapa — "Yönet" linki hariç. */}
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+          className="flex min-w-0 flex-1 items-center gap-1.5 text-left"
+        >
+          <p className="flex items-center gap-1.5 text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
+            <Presentation className="h-3.5 w-3.5 text-brand" />
+            {t('pipeline.presentationMaterials')}
+          </p>
+        </button>
         <div className="flex shrink-0 items-center gap-2">
           <Link
             href="/pipeline/sunum-materyalleri"

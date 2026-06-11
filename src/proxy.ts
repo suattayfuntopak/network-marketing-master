@@ -107,6 +107,7 @@ export async function proxy(request: NextRequest) {
   const isCronRoute = pathname.startsWith('/api/cron/')
   const isPublic =
     pathname === '/' ||
+    pathname.startsWith('/d/') ||
     isShopierWebhook ||
     isCronRoute ||
     PUBLIC_PATHS.some(p => p !== '/api/payment/shopier' && pathname.startsWith(p))

@@ -25,7 +25,7 @@ export const pagesSection = {
       nearestFollowUp: "En yakın takip: {date} ({count} aday)",
       monthSummary: "Bu ay: {total} takip, {overdue} gecikmiş",
       followUpUpdated: "Takip tarihi güncellendi",
-      viewInPipeline: "Boru Hattı'nda gör",
+      viewInPipeline: "Listede gör",
       viewDailySummary: "Saha Özetim'e git",
       followUpCompleted: "Takip tamamlandı",
       bulkDeferOneDay: "Hepsini yarına ertele",

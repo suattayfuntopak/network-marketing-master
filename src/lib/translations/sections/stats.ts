@@ -18,10 +18,10 @@ export const statsSection = {
 
       fieldFunnelTitle: 'Saha Huni Gerçekleşenleri',
       fieldFunnelSubtitle:
-        'Arama, yeni aday, sunum ve katılım — yalnızca boru hattındaki kayıtlardan otomatik sayılır. Elle girilen sayılar bu tabloda yer almaz.',
-      fieldFunnelCta: 'Boru hattına git',
+        'Arama, yeni aday, sunum ve katılım — yalnızca listedeki kayıtlardan otomatik sayılır. Elle girilen sayılar bu tabloda yer almaz.',
+      fieldFunnelCta: 'Listeye git',
       fieldFunnelEmpty:
-        'Bu dönemde boru hattı kaydı yok. Önce aday ekle, ardından aday kartından arama ve aşama değişikliği kaydet.',
+        'Bu dönemde liste kaydı yok. Önce aday ekle, ardından aday kartından arama ve aşama değişikliği kaydet.',
 
       funnelTotalLeads: 'Yeni Aday',
       funnelContacted: 'İletişim Kurulan',
@@ -35,7 +35,7 @@ export const statsSection = {
       funnelDropSuffix: 'kişi önceki aşamada kaldı',
 
       tempTitle: 'Süreç Sıcaklık Dağılımı',
-      tempSubtitle: 'Adayların süreçteki aktifliklerine göre boru hattı sıcaklıkları.',
+      tempSubtitle: 'Adayların süreçteki aktifliklerine göre liste sıcaklıkları.',
       tempEmpty: 'Analiz edilecek aday yok',
       tempHot: 'Sıcak (Arama/Sunum)',
       tempWarm: 'Ilık (Yeni/İletişim)',

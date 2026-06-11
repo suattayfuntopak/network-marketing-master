@@ -22,6 +22,42 @@ interface ContentSubmissionResult {
 }
 
 /**
+ * Moderasyon sonucu (onay/red) için gönderene UYGULAMA İÇİ bildirim oluşturur —
+ * e-postaya ek olarak. Kullanıcının tasarladığı akış: sonuç ne olursa olsun
+ * kişiye hem e-posta hem NMM içi bildirim gider. admin-client RLS'i baypas eder.
+ */
+async function notifyModerationOutcome(
+  admin: ReturnType<typeof createAdminClient>,
+  userId: string | null | undefined,
+  approved: boolean,
+  contentType: ModerationContentType,
+  title: string,
+  reason?: string,
+): Promise<void> {
+  if (!userId) return
+  const kindTr = contentType === 'video' ? 'video' : contentType === 'training' ? 'eğitim içeriği' : 'itiraz'
+  const kindEn = contentType === 'video' ? 'video' : contentType === 'training' ? 'training content' : 'objection'
+  const reasonTr = reason ? rejectReasonForEmail(reason, 'tr') : ''
+  const reasonEn = reason ? rejectReasonForEmail(reason, 'en') : ''
+  try {
+    await admin.from('nmm_notifications').insert({
+      user_id: userId,
+      title_tr: approved ? 'İçerik talebin onaylandı ✅' : 'İçerik talebin onaylanmadı',
+      title_en: approved ? 'Your submission was approved ✅' : 'Your submission was not approved',
+      description_tr: approved
+        ? `"${title}" (${kindTr}) onaylandı ve yayına alındı. Teşekkürler!`
+        : `"${title}" (${kindTr}) bu kez yayınlanmadı.${reasonTr ? ` Gerekçe: ${reasonTr}` : ''}`,
+      description_en: approved
+        ? `"${title}" (${kindEn}) was approved and published. Thank you!`
+        : `"${title}" (${kindEn}) was not published this time.${reasonEn ? ` Reason: ${reasonEn}` : ''}`,
+      type: 'info',
+    })
+  } catch (err) {
+    console.error('[notifyModerationOutcome]', err)
+  }
+}
+
+/**
  * Submits a custom training or objection.
  * If Super Admin submits, it is approved immediately.
  * If a regular user submits, it goes to moderation, triggers an alert email to Super Admin,
@@ -215,7 +251,7 @@ export async function approveRequestAction(
     const edited = editedData as Record<string, unknown>
     const { data: row, error: fetchErr } = await admin
       .from('nmm_training_videos')
-      .select('user_email, user_name, key')
+      .select('user_email, user_name, key, user_id')
       .eq('id', id)
       .single()
 
@@ -261,6 +297,7 @@ export async function approveRequestAction(
         console.error('[Resend Approval Notification Error]', err)
       })
     }
+    await notifyModerationOutcome(admin, row.user_id, true, 'video', title)
 
     return { success: true }
   }
@@ -309,6 +346,7 @@ export async function approveRequestAction(
       console.error('[Resend Approval Notification Error]', err)
     })
   }
+  await notifyModerationOutcome(admin, row.user_id, true, contentType, title)
 
   return { success: true }
 }
@@ -345,7 +383,7 @@ export async function rejectRequestAction(
   if (contentType === 'video') {
     const { data: row } = await admin
       .from('nmm_training_videos')
-      .select('user_email, user_name, title_tr')
+      .select('user_email, user_name, title_tr, user_id')
       .eq('id', id)
       .single()
 
@@ -366,6 +404,7 @@ export async function rejectRequestAction(
         console.error('[Resend Rejection Email Error]', err)
       })
     }
+    await notifyModerationOutcome(admin, row?.user_id, false, 'video', row?.title_tr ?? 'İsimsiz Video', reason)
 
     return { success: true }
   }
@@ -374,7 +413,7 @@ export async function rejectRequestAction(
 
   const { data: row } = await admin
     .from(table)
-    .select('user_email, user_name, data')
+    .select('user_email, user_name, data, user_id')
     .eq('id', id)
     .single()
 
@@ -383,7 +422,7 @@ export async function rejectRequestAction(
     throw new Error('İçerik reddedilirken silinemedi: ' + error.message)
   }
 
-  if (row && row.user_email) {
+  if (row) {
     const rowData = row.data as Record<string, Json | undefined>
     const title = contentType === 'training'
       ? ((rowData?.baslik as string | undefined) ?? 'İsimsiz İçerik')
@@ -391,16 +430,19 @@ export async function rejectRequestAction(
 
     const userLang: 'tr' | 'en' = 'tr'
 
-    sendModerationRejectedEmail(
-      row.user_email,
-      row.user_name ?? 'NMM Üyesi',
-      contentType,
-      title,
-      rejectReasonForEmail(reason, userLang),
-      userLang
-    ).catch(err => {
-      console.error('[Resend Rejection Email Error]', err)
-    })
+    if (row.user_email) {
+      sendModerationRejectedEmail(
+        row.user_email,
+        row.user_name ?? 'NMM Üyesi',
+        contentType,
+        title,
+        rejectReasonForEmail(reason, userLang),
+        userLang
+      ).catch(err => {
+        console.error('[Resend Rejection Email Error]', err)
+      })
+    }
+    await notifyModerationOutcome(admin, row.user_id, false, contentType, title, reason)
   }
 
   return { success: true }

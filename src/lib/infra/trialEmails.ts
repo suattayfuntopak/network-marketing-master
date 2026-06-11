@@ -53,7 +53,7 @@ function statsParagraph(stats: TrialUserStats | undefined, lang: 'tr' | 'en'): s
     s += '. Keep your momentum going — pick up right where you left off.'
     return emailParagraph(s)
   }
-  let s = `Boru hattınızda ${emailHighlight(`${candidateCount} aday`)} var`
+  let s = `Listenizde ${emailHighlight(`${candidateCount} aday`)} var`
   if (activeCount > 0) s += `, ${activeCount} tanesi aktif takipte`
   if (upcomingFollowUps > 0) s += `, ${upcomingFollowUps} planlı hatırlatmanız hazır`
   s += '. Bu emeği boşa harcamayın — kaldığınız yerden devam edin.'
@@ -116,7 +116,7 @@ function contentFor(
                     '<strong>Set a follow-up reminder</strong> on your calendar so no one slips away',
                   ]
                 : [
-                    'Henüz eklemediyseniz <strong>ilk 5 adayınızı</strong> boru hattına ekleyin',
+                    'Henüz eklemediyseniz <strong>ilk 5 adayınızı</strong> listenize ekleyin',
                     'Bir sonraki gerçek görüşmeden önce <strong>bir YZ saha provası</strong> yapın',
                     'Kimse kaybolmasın diye takviminize <strong>bir takip hatırlatması</strong> koyun',
                   ]
@@ -147,7 +147,7 @@ function contentFor(
             emailParagraph(
               lang === 'en'
                 ? `Your ${emailHighlight('14-day free trial')} on Network Marketing Master ends in ${emailHighlight('3 days')}. You still have full Basic features — pipeline, AI coach, and roleplay.`
-                : `${emailHighlight('14 günlük ücretsiz denemeniz')} Network Marketing Master'da ${emailHighlight('3 gün')} içinde sona erecek. Basic özelliklerin tamamı hâlâ açık — boru hattı, YZ koçu ve saha provası.`
+                : `${emailHighlight('14 günlük ücretsiz denemeniz')} Network Marketing Master'da ${emailHighlight('3 gün')} içinde sona erecek. Basic özelliklerin tamamı hâlâ açık — liste, YZ koçu ve saha provası.`
             ),
             planBox(lang),
             emailCta(paymentCtaUrl(kind, utm), cta),
@@ -171,7 +171,7 @@ function contentFor(
             emailParagraph(
               lang === 'en'
                 ? `Tomorrow your free Basic trial ends. Your ${emailHighlight('AI access will be locked')} — but pipeline, calendar, team, training, and all your NMM data stay fully open. Pick the plan that fits you to keep AI running.`
-                : `Yarın ücretsiz Basic denemeniz bitecek. ${emailHighlight('Yapay zeka erişimi kilitlenecek')} — ancak boru hattı, takvim, ekip, eğitimler ve tüm verileriniz açık kalmaya devam ediyor. Yapay zekayı aktif tutmak için bugün planınızı seçin.`
+                : `Yarın ücretsiz Basic denemeniz bitecek. ${emailHighlight('Yapay zeka erişimi kilitlenecek')} — ancak liste, takvim, ekip, eğitimler ve tüm verileriniz açık kalmaya devam ediyor. Yapay zekayı aktif tutmak için bugün planınızı seçin.`
             ),
             planBox(lang),
             emailCta(paymentCtaUrl(kind, utm), cta),
@@ -207,7 +207,7 @@ function contentFor(
                     '🔒 <strong>AI Coach, roleplay & field AI tools</strong> — locked on free plan',
                   ]
                 : [
-                    '✅ <strong>Boru hattı ve aday notları</strong> — tamamen açık',
+                    '✅ <strong>Liste ve aday notları</strong> — tamamen açık',
                     '✅ <strong>Takvim ve takip hatırlatmaları</strong> — tamamen açık',
                     '✅ <strong>Ekibim sayfası</strong> — tamamen açık',
                     '✅ <strong>Eğitim kütüphanesi</strong> — tamamen açık',
@@ -243,7 +243,7 @@ function contentFor(
             emailParagraph(
               lang === 'en'
                 ? `It's been ${emailHighlight('15 days')} since your trial ended. The tools to run your network marketing business systematically are still here — pipeline tracking, AI coaching, and team visibility on Plus/Pro.`
-                : `Deneme sürenizin bitmesinin üzerinden ${emailHighlight('15 gün')} geçti. Network marketing işinizi sistematik yönetmek için ihtiyaç duyduğunuz araçlar burada — boru hattı, YZ koçluğu ve Plus/Pro ile ekip görünürlüğü.`
+                : `Deneme sürenizin bitmesinin üzerinden ${emailHighlight('15 gün')} geçti. Network marketing işinizi sistematik yönetmek için ihtiyaç duyduğunuz araçlar burada — liste, YZ koçluğu ve Plus/Pro ile ekip görünürlüğü.`
             ),
             emailBulletList(
               lang === 'en'

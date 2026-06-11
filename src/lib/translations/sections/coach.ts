@@ -2,7 +2,7 @@ export const coachSection = {
   tr: {
     coachUi: {
       // page.tsx
-      pageTitle: 'Yapay Zeka Koçu',
+      pageTitle: 'Yapay Zeka Koçum',
       pageSubtitle: 'Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap',
 
       // YzKocuContainer.tsx
@@ -13,7 +13,7 @@ export const coachSection = {
 
       // KoclukForm.tsx
       answerCopied: 'Cevap kopyalandı!',
-      askYourCoachTitle: 'Yapay Zeka Koçuna Sor',
+      askYourCoachTitle: 'Yapay Zeka Koçuma Sor',
       premiumEngineBadge: 'Premium AI motoru',
       askYourCoachDesc: 'Network marketing ve liderlikle ilgili merak ettiğin her şeyi sor.',
       unlimited: 'Sınırsız',
@@ -23,7 +23,7 @@ export const coachSection = {
       thinking: 'Koç Düşünüyor...',
       dailyLimitReached: 'Günlük Limite Ulaştınız',
       askCoach: 'Koç’a Sor',
-      coachAnswer: 'Yapay Zeka Koçunun Yanıtı',
+      coachAnswer: 'Yapay Zeka Koçumun Yanıtı',
       copied: 'Kopyalandı',
       copyAnswer: 'Cevabı Kopyala',
       shareWhatsApp: 'WhatsApp ile Paylaş',

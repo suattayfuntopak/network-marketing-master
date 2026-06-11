@@ -34,3 +34,15 @@ Komşu offset'ler dönem şeridi swipe/ok ile anında geçiş içindir — yeni 
 ## Ekip detay linki
 
 Ekip üyesi detayı = liderin pipeline adayı (`pipeline_id` / `findLeaderCandidateForMember`). Saha Radarı aktivite kartları `/pipeline/[pipelineId]` kullanır; eşleşme yoksa `/ekip/[userId]` yedek.
+
+## Görsel: metrik kutuları (`panoVariant`)
+
+Saha Özetim taç hunisi ve saha aktivitesi kartları pano launcher ile aynı renk ailesini kullanır; tam opak `crownSolidMap` yerine **`crownSoftMap`** (`SquareButton.tsx` — gradient uçları `/25`, ~%25 opaklık) uygulanır.
+
+| Bileşen | Dosya | Not |
+|---------|-------|-----|
+| Taç hunisi (4 KPI) | `HubCrownFunnelGrid.tsx` | `panoVariant` → `crownSoftMap` + normal metin rengi; progress bar %55 opak |
+| Saha aktivitesi | `HubSelfActivityGrid.tsx` | Aynı `panoVariant` / `crownSoftMap` |
+| Pano launcher | `SquareButton` `variant="crown"` | Canlı `crownSolidMap` — değişmedi |
+
+Yeni metrik satırı eklerken: pano ile uyum için `panoVariant` + `crownSoftMap`; tam renkli CTA kutusu için `crownSolidMap`. İstatistikler sekmeleri `PulsePeriodTabs` — ayrı bileşen, hub sekme boyutlarıyla hizalı ∞ (`all`) tipografisi.

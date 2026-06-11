@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useEffect, useState, useTransition } from 'react'
 import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -8,6 +8,7 @@ import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
+import { translateObjectionFieldsAction } from '../actions'
 import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { CustomItiraz } from '../types'
@@ -16,10 +17,13 @@ type Props = {
   open: boolean
   onClose: () => void
   onAdd: (objection: CustomItiraz) => void
+  /** Edit modu: dolu gelirse form bu itirazla doldurulur ve kaydet → güncelle olur. */
+  editing?: CustomItiraz | null
+  onUpdate?: (objection: CustomItiraz) => void
 }
 
-export function AddObjectionModal({ open, onClose, onAdd }: Props) {
-  const { t } = useTranslation()
+export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpdate }: Props) {
+  const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
   const [isPending, startTransition] = useTransition()
 
@@ -35,6 +39,36 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
   const [showSympathetic, setShowSympathetic] = useState(false)
 
   useBodyScrollLock(open || showSympathetic)
+
+  const isEdit = !!editing
+
+  // Form açıldığında: edit modunda mevcut itirazla doldur (kullanıcının diline göre
+  // WYSIWYG); ekleme modunda temiz başla.
+  useEffect(() => {
+    if (!open) return
+    /* eslint-disable react-hooks/set-state-in-effect */
+    if (editing) {
+      const en = lang === 'en'
+      setNewSoru(en ? editing.soru.en : editing.soru.tr)
+      setNewKategori(en ? editing.kategori.en : editing.kategori.tr)
+      setNewKisaCevap((en ? editing.kisaCevapEn ?? editing.kisaCevap : editing.kisaCevap) ?? '')
+      setNewDetayliCevap((en ? editing.detayliCevapEn ?? editing.detayliCevap : editing.detayliCevap) ?? '')
+      setNewYaklasim((en ? editing.yaklasimEn ?? editing.yaklasim : editing.yaklasim) ?? '')
+      setNewOrnekDiyalog((en ? editing.ornekDiyalogEn ?? editing.ornekDiyalog : editing.ornekDiyalog) ?? '')
+      setNewEmoji(editing.emoji || '🛡️')
+      setNewTags((editing.tags ?? []).join(', '))
+    } else {
+      setNewSoru('')
+      setNewKategori('Genel')
+      setNewKisaCevap('')
+      setNewDetayliCevap('')
+      setNewYaklasim('')
+      setNewOrnekDiyalog('')
+      setNewEmoji('🛡️')
+      setNewTags('')
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [open, editing, lang])
 
   if (!open && !showSympathetic) return null
 
@@ -52,32 +86,59 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
     e.preventDefault()
     if (!newSoru.trim()) return
 
-    const itemKey = Date.now()
-    const newObj: CustomItiraz = {
-      id: itemKey,
-      kategori: { tr: newKategori, en: newKategori },
-      soru: { tr: newSoru, en: newSoru },
-      emoji: newEmoji || '🛡️',
-      kisaCevap: newKisaCevap,
-      detayliCevap: newDetayliCevap,
-      yaklasim: newYaklasim,
-      ornekDiyalog: newOrnekDiyalog,
-      tags: newTags.split(',').map(tag => tag.trim()).filter(Boolean),
-    }
+    const sourceLang: 'tr' | 'en' = lang === 'en' ? 'en' : 'tr'
+    const tags = newTags.split(',').map(tag => tag.trim()).filter(Boolean)
 
     startTransition(async () => {
       try {
+        // Kalıcı çeviri: kullanıcının dilindeki alanları karşı dile çevir (CLAUDE.md).
+        const src = {
+          kategori: newKategori,
+          soru: newSoru,
+          kisaCevap: newKisaCevap,
+          detayliCevap: newDetayliCevap,
+          yaklasim: newYaklasim,
+          ornekDiyalog: newOrnekDiyalog,
+        }
+        const other = await translateObjectionFieldsAction(src, sourceLang)
+        const tr = sourceLang === 'en' ? other : src
+        const en = sourceLang === 'en' ? src : other
+
+        const itemKey = editing ? editing.id : Date.now()
+        const obj: CustomItiraz = {
+          id: itemKey,
+          kategori: { tr: tr.kategori, en: en.kategori },
+          soru: { tr: tr.soru, en: en.soru },
+          emoji: newEmoji || '🛡️',
+          kisaCevap: tr.kisaCevap,
+          kisaCevapEn: en.kisaCevap,
+          detayliCevap: tr.detayliCevap,
+          detayliCevapEn: en.detayliCevap,
+          yaklasim: tr.yaklasim,
+          yaklasimEn: en.yaklasim,
+          ornekDiyalog: tr.ornekDiyalog,
+          ornekDiyalogEn: en.ornekDiyalog,
+          tags,
+        }
+
+        if (isEdit) {
+          onUpdate?.(obj)
+          toast.success(t('objectionsPage.objectionUpdated'))
+          onClose()
+          return
+        }
+
         const res = await submitModeratedRequestAction(
           'objection',
           ws?.workspaceId ?? null,
           String(itemKey),
-          newObj as unknown as Record<string, Json>
+          obj as unknown as Record<string, Json>
         )
 
         resetForm()
 
         if (res.isApproved) {
-          onAdd(newObj)
+          onAdd(obj)
           toast.success(t('objectionsPage.objectionAdded'))
           onClose()
         } else {
@@ -98,9 +159,9 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
           <div className="relative w-full max-w-xl md:max-w-2xl rounded-3xl bg-[var(--bg-card)] border border-[var(--border)] p-6 md:p-7 shadow-2xl overflow-y-auto my-auto max-h-[85vh] md:max-h-[90vh] animate-in zoom-in-95 duration-200 space-y-4 md:space-y-5">
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
-                <h2 className="text-lg md:text-xl font-bold text-[var(--text-1)]">{t('objectionsPage.addObjection')}</h2>
+                <h2 className="text-lg md:text-xl font-bold text-[var(--text-1)]">{isEdit ? t('objectionsPage.editObjection') : t('objectionsPage.addObjection')}</h2>
                 <p className="text-[11px] md:text-sm text-[var(--text-3)] font-medium mt-0.5">
-                  Sahada duyduğun yeni itirazları kısa ve detaylı cevaplarıyla birlikte bankaya ekleyebilirsin.
+                  {t('objectionsPage.addObjectionHint')}
                 </p>
               </div>
               <button
@@ -236,10 +297,10 @@ export function AddObjectionModal({ open, onClose, onAdd }: Props) {
                   {isPending ? (
                     <>
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                      <span>İncelemeye Gönderiliyor...</span>
+                      <span>{t('objectionsPage.savingTranslating')}</span>
                     </>
                   ) : (
-                    <span>+ Ekle</span>
+                    <span>{isEdit ? t('objectionsPage.update') : t('objectionsPage.addBtn')}</span>
                   )}
                 </button>
               </div>

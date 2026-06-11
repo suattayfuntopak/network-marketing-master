@@ -20,14 +20,24 @@ export const HUB_PERIOD_TAB_LABEL_KEYS: Record<HubPeriodTab, string> = {
   weekly: 'dashboard.summaryTabWeekly',
   monthly: 'dashboard.summaryTabMonthly',
   yearly: 'dashboard.summaryTabYearly',
+  all: 'dashboard.summaryTabAllTime',
 }
 
-/** Pano launcher ilk 4 kutu — Hedefim, Saha Özetim, Saha Radarı, Boru Hattı */
+/** Mobilde sığması için kısa etiket: 1 / 7 / 30 / 365 / ∞ */
+const HUB_PERIOD_TAB_SHORT: Record<HubPeriodTab, string> = {
+  daily: '1',
+  weekly: '7',
+  monthly: '30',
+  yearly: '365',
+  all: '∞',
+}
+
 const HUB_TAB_PANO_COLORS: Record<HubPeriodTab, ButtonColor> = {
   daily: 'indigo',
   weekly: 'teal',
   monthly: 'coral',
   yearly: 'amber',
+  all: 'purple',
 }
 
 export function hubPeriodTabLabel(
@@ -65,13 +75,22 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
             data-testid={`hub-summary-tab-${tab}`}
             onClick={() => onChange(tab)}
             className={clsx(
-              'min-w-[4.5rem] flex-1 shrink-0 rounded-lg px-2 py-2 text-center text-[11px] font-bold transition sm:min-w-0 sm:px-3 sm:text-xs',
+              'min-w-0 flex-1 shrink-0 rounded-lg px-1.5 py-2 text-center font-bold transition sm:px-3',
+              tab === 'all' ? 'text-base sm:text-sm' : 'text-xs',
               isActive
                 ? clsx(crownSolidMap[panoColor], 'text-white shadow-sm border border-white/20')
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
             )}
           >
-            {t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}
+            <span
+              className={clsx(
+                'sm:hidden tabular-nums leading-none',
+                tab === 'all' ? 'text-lg font-black' : 'text-sm',
+              )}
+            >
+              {HUB_PERIOD_TAB_SHORT[tab]}
+            </span>
+            <span className="hidden sm:inline">{t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}</span>
           </button>
         )
       })}

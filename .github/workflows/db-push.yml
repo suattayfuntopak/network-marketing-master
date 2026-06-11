@@ -1,0 +1,80 @@
+name: DB migrate (prod)
+
+# Bekleyen migration'ları PROD Supabase'e uygular — YALNIZCA elle, onaylı tetikleme.
+# Otomatik DEĞİL: kötü bir migration'ın deploy ile sessizce prod'a gitmesini önlemek için
+# (kullanıcı tercihi: kontrollü). Çalıştırmadan önce migrate-apply (gerçek Postgres)
+# job'ının yeşil olduğundan emin olun.
+#
+# Gerekli secret'lar: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
+# (bkz. docs/deploy/github-secrets.md).
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'dry-run (yalnızca göster) veya apply (gerçekten uygula)'
+        required: true
+        default: 'dry-run'
+        type: choice
+        options:
+          - dry-run
+          - apply
+      confirm:
+        description: 'apply için "PUSH" yazın (dry-run için boş bırakabilirsiniz)'
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  db-push:
+    name: supabase db push (${{ inputs.mode }})
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Onay kontrolü (apply)
+        if: inputs.mode == 'apply' && inputs.confirm != 'PUSH'
+        run: |
+          echo "::error::apply modu için confirm alanına 'PUSH' yazmalısınız. İptal edildi."
+          exit 1
+
+      - name: Secret kontrolü
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$REF" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN / SUPABASE_PROJECT_REF tanımlı değil. docs/deploy/github-secrets.md"
+            exit 1
+          fi
+
+      - name: Link
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+
+      - name: Bekleyen migration'lar (dry-run)
+        if: inputs.mode == 'dry-run'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "▶ Bekleyen migration'lar (uygulanmadan listelenir):"
+          supabase db push --dry-run
+
+      - name: Migration'ları uygula (apply)
+        if: inputs.mode == 'apply' && inputs.confirm == 'PUSH'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "▶ Migration'lar PROD'a uygulanıyor..."
+          supabase db push
+          echo "✅ Tamamlandı."

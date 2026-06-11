@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
+import { formatEmailDate, formatEmailDateTime } from '@/lib/utils/emailDateTime'
 import {
   NMM_APP_URL,
   NMM_REPLY_TO,
@@ -60,14 +61,14 @@ export async function sendWelcomeEmail(email: string, name: string, lang: 'tr' |
         ),
         emailParagraph('Deneme süresince Basic ile neler yapabilirsiniz:'),
         emailPlanBox([
-          '🎯 <strong>Boru hattı & adaylar</strong> — her adayı aşamalar boyunca takip edin',
+          '🎯 <strong>Liste & adaylar</strong> — her adayı aşamalar boyunca takip edin',
           '🤖 <strong>YZ saha provası</strong> — gerçek görüşmeden önce itiraz provası yapın',
           '📅 <strong>Takvim & hatırlatmalar</strong> — hiçbir takibi kaçırmayın',
           '🛡️ <strong>Uyum denetimi</strong> — paylaşımlarını YZ ile mevzuata uygun tut',
           '📊 <strong>İstatistik & hedef yol haritası</strong> — günlük hedeflerinizi ve ilerlemenizi görün',
         ]),
         emailParagraph(
-          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre sonunda NMM çalışmaya devam eder — boru hattı, takvim, ekip ve eğitimler tamamen açık kalır. ${emailHighlight('Yalnızca yapay zeka araçları')} ücretsiz planda kilitlenir. İstediğiniz zaman plan seçerek AI'ı yeniden açabilirsiniz.`
+          `Denemeniz ${emailHighlight('14 gün')} sürer. Süre sonunda NMM çalışmaya devam eder — liste, takvim, ekip ve eğitimler tamamen açık kalır. ${emailHighlight('Yalnızca yapay zeka araçları')} ücretsiz planda kilitlenir. İstediğiniz zaman plan seçerek AI'ı yeniden açabilirsiniz.`
         ),
         emailCta(`${NMM_APP_URL}/odeme`, 'Planları gör ve yükselt'),
         emailParagraph(
@@ -117,11 +118,7 @@ export async function sendPaymentSuccessEmail(
     ? `Payment Confirmed! Your ${planLabel} is active 💎`
     : `Ödemeniz Alındı! ${planLabel} lisansınız aktifleşti 💎`
 
-  const dateFormatted = new Date(expiresAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const dateFormatted = formatEmailDate(expiresAt, lang)
 
   const receipt = lang === 'en'
     ? emailPlanBox([
@@ -193,9 +190,7 @@ export async function sendLicenseExpiryEmail(
       ? 'Plus Lider'
       : 'Basic Partner'
 
-  const dateFormatted = new Date(expiresAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  })
+  const dateFormatted = formatEmailDate(expiresAt, lang)
 
   const subject = lang === 'en'
     ? `Your license expires in ${daysRemaining} day${daysRemaining > 1 ? 's' : ''}! ⏳`
@@ -220,7 +215,7 @@ export async function sendLicenseExpiryEmail(
         emailParagraph(
           `Merhaba ${name}, ${emailHighlight(planLabel)} lisansınız ${emailHighlight(daysLabel)} içinde sona eriyor (${dateFormatted}).`
         ),
-        emailParagraph('YZ kredileri, boru hattı ve ekip araçları için kesintisiz erişim için yenileyin.'),
+        emailParagraph('YZ kredileri, liste ve ekip araçları için kesintisiz erişim için yenileyin.'),
         emailCta(`${NMM_APP_URL}/odeme`, 'Hemen yenile →'),
       ].join('')
 
@@ -259,7 +254,7 @@ export async function sendAdminNewUserEmail(
     emailPlanBox([
       `<strong>İsim:</strong> ${newUserName}`,
       `<strong>E-posta:</strong> ${newUserEmail}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Detaylar için Platform Yönetimi sayfasını kullanabilirsiniz.'),
   ].join('')
@@ -308,7 +303,7 @@ export async function sendUnresolvedOrderAlertEmail(params: {
       `<strong>Not (note):</strong> ${params.note ?? '—'}`,
       `<strong>Ürün ID:</strong> ${params.productId ?? '—'}`,
       `<strong>Neden:</strong> ${params.reason}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Müşteriyi Platform Yönetimi sayfasından bulup lisansını el ile tanımlayabilirsiniz.'),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Platform Yönetimini Aç'),
@@ -357,7 +352,7 @@ export async function sendModerationAlertEmail(
       `<strong>Gönderen:</strong> ${userName} (${userEmail})`,
       `<strong>Başlık:</strong> ${contentTitle}`,
       `<strong>Tür:</strong> ${typeLabel}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Talebi incelemek, düzenlemek veya onaylamak için Platform Yönetimi paneline gidebilirsiniz.'),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Moderasyon Panelini Aç'),
@@ -557,7 +552,7 @@ export async function sendBankTransferNotifyEmail(
         workspaceName ? `<strong>Çalışma alanı:</strong> ${workspaceName}` : '',
         `<strong>Mevcut plan:</strong> ${currentPlan}`,
         intendedPlan ? `<strong>Talep edilen plan:</strong> ${intendedPlan}` : '',
-        `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+        `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
       ].filter(Boolean),
     ),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Lisansı Aktive Et'),
@@ -616,10 +611,10 @@ export async function sendOverdueDigestEmail(
         ].join('')
       : [
           emailHeading('Gecikmiş takipler'),
-          emailParagraph(`Merhaba ${name}, boru hattınızda aşağıdaki adaylar için planlanan takipler geçti:`),
+          emailParagraph(`Merhaba ${name}, listenizde aşağıdaki adaylar için planlanan takipler geçti:`),
           `<ul style="padding-left:20px;margin:12px 0;">${rows}</ul>`,
-          emailParagraph('Yeni tarih belirlemek ve hızınızı korumak için boru hattınızı açın.'),
-          emailCta(`${NMM_APP_URL}/pipeline`, 'Boru Hattını Aç'),
+          emailParagraph('Yeni tarih belirlemek ve hızınızı korumak için listenizi açın.'),
+          emailCta(`${NMM_APP_URL}/pipeline`, 'Listeyi Aç'),
         ].join('')
 
   try {

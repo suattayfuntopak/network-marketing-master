@@ -26,7 +26,7 @@ test.describe('Legacy ilgilen redirects', () => {
     // HubSummaryTabBar sekmeleri ARIA `role="tab"` ile render edilir (a8aa0de).
     // Açık `role="tab"` örtük button rolünü ezdiği için getByRole('button') ASLA
     // eşleşmez — bu yüzden CI'da timeout'a düşüyordu. Doğru role ile sorgula.
-    await expect(page.getByRole('tab', { name: /Günlük|Daily/i }).first()).toBeVisible({
+    await expect(page.getByTestId('hub-summary-tab-daily')).toBeVisible({
       timeout: 20_000,
     })
   })

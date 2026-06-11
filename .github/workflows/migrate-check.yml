@@ -5,6 +5,8 @@ on:
     paths:
       - 'supabase/migrations/**'
       - 'scripts/check-migrations.mjs'
+      - 'scripts/ci/supabase-shim.sql'
+      - 'src/types/database.types.ts'
       - 'package.json'
       - '.github/workflows/migrate-check.yml'
   push:
@@ -12,6 +14,7 @@ on:
     paths:
       - 'supabase/migrations/**'
       - 'scripts/check-migrations.mjs'
+      - 'scripts/ci/supabase-shim.sql'
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
@@ -25,6 +28,62 @@ jobs:
         with:
           node-version: '22'
       - run: npm run migrate:check
+
+  # Tüm migration'ları GERÇEK bir Postgres'e sırayla uygular → 063/064'teki
+  # "column phone does not exist" gibi şema-referans hataları artık prod'a
+  # SIZMADAN, CI'da yakalanır. (migrate:check yalnızca dosya numarası doğruluyordu.)
+  # Bu workflow deploy'u gate'lemez (CI Gate ayrı); kırmızı = migration bozuk demek.
+  migrate-apply:
+    name: Migration apply (gerçek Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: nmm_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: nmm_ci
+      DB_URL: postgresql://postgres:postgres@localhost:5432/nmm_ci
+    steps:
+      - uses: actions/checkout@v6
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: psql kur
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Supabase shim (auth şeması + roller)
+        run: psql -v ON_ERROR_STOP=1 -f scripts/ci/supabase-shim.sql
+      - name: Tüm migration'ları sırayla uygula
+        run: |
+          set -euo pipefail
+          for f in $(ls supabase/migrations/*.sql | sort); do
+            echo "▶ $(basename "$f")"
+            psql -v ON_ERROR_STOP=1 -f "$f"
+          done
+          echo "✅ Tüm migration'lar temiz uygulandı."
+      - name: Tip drift (database.types.ts) — ADVISORY
+        continue-on-error: true
+        run: |
+          if ! supabase gen types typescript --db-url "$DB_URL" --schema public > /tmp/gen-types.ts 2>/tmp/gen-err.txt; then
+            echo "::warning::supabase gen types çalıştırılamadı (advisory) — atlandı."
+            cat /tmp/gen-err.txt || true
+            exit 0
+          fi
+          if diff <(grep -vE '^\s*//|^\s*\*|^\s*/\*' src/types/database.types.ts) <(grep -vE '^\s*//|^\s*\*|^\s*/\*' /tmp/gen-types.ts) >/dev/null 2>&1; then
+            echo "✅ database.types.ts migration şemasıyla uyumlu."
+          else
+            echo "::warning::database.types.ts migration şemasıyla DRİFT halinde olabilir. 'npm run db:gen-types' ile yeniden üretip gözden geçirin."
+          fi
 
   migrate-check-remote:
     runs-on: ubuntu-latest

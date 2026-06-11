@@ -12,6 +12,7 @@ import { HubMonthHero } from '@/components/hub/HubMonthHero'
 import { HubYearHero } from '@/components/hub/HubYearHero'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import { HubSelfActivityGrid } from '@/components/hub/HubSelfActivityGrid'
+import { HubAllTimeHero } from '@/components/hub/HubAllTimeHero'
 import {
   HubSummaryTabBar,
   hubPeriodTabLabel,
@@ -23,6 +24,7 @@ import {
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
   getHubYearlySelfAction,
+  getHubAllTimeSelfAction,
   type HubSelfFieldMetrics,
 } from '@/app/(dashboard)/crown/hubSelfActions'
 import { queryKeys } from '@/lib/query/keys'
@@ -60,6 +62,7 @@ function hubQueryFor(
   if (tab === 'daily') return { key: queryKeys.hubDailySelf(o), fn: () => getHubDailySelfAction(o) }
   if (tab === 'weekly') return { key: queryKeys.hubWeeklySelf(o), fn: () => getHubWeeklySelfAction(o) }
   if (tab === 'monthly') return { key: queryKeys.hubMonthlySelf(o), fn: () => getHubMonthlySelfAction(o) }
+  if (tab === 'all') return { key: queryKeys.hubAllTimeSelf(), fn: () => getHubAllTimeSelfAction() }
   return { key: queryKeys.hubYearlySelf(o), fn: () => getHubYearlySelfAction(o) }
 }
 
@@ -118,6 +121,14 @@ function FieldSummaryInner() {
     staleTime: 60_000,
     placeholderData: hubCachedPlaceholder(queryKeys.hubYearlySelf(offset)),
     enabled: tab === 'yearly',
+  })
+
+  const { data: allTimeSelf, isLoading: allTimeLoading } = useQuery({
+    queryKey: queryKeys.hubAllTimeSelf(),
+    queryFn: () => getHubAllTimeSelfAction(),
+    staleTime: 60_000,
+    placeholderData: hubCachedPlaceholder(queryKeys.hubAllTimeSelf()),
+    enabled: tab === 'all',
   })
 
   const dailyActuals = dailySelf?.dailyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
@@ -236,6 +247,32 @@ function FieldSummaryInner() {
             loading={loading}
             panoVariant
           />
+        </>
+      )
+    }
+
+    if (tab === 'all') {
+      const loading = allTimeLoading && !allTimeSelf
+      const metrics = allTimeSelf?.fieldMetrics ?? EMPTY_METRICS
+      // Tüm Zamanlar — dönem şeridi/offset yok (tek, sabit aralık).
+      return (
+        <>
+          <HubAllTimeHero
+            activeDays={metrics.activeDays}
+            fieldMetrics={allTimeSelf?.fieldMetrics}
+            allTimeActuals={allTimeSelf?.allTimeActuals}
+            joinedAt={allTimeSelf?.joinedAt ?? null}
+            loading={loading}
+          />
+          <HubCrownFunnelGrid
+            actuals={allTimeSelf?.allTimeActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+            targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
+            hasGoal={false}
+            period="yearly"
+            loading={loading}
+            panoVariant
+          />
+          <HubSelfActivityGrid metrics={metrics} loading={loading} panoVariant />
         </>
       )
     }
