@@ -3,7 +3,7 @@
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { weeklyAccent } from '@/components/hub/hubWeeklyAccent'
-import type { HubWeeklySelfPayload } from '@/app/(dashboard)/crown/actions'
+import type { HubWeeklySelfPayload } from '@/app/(dashboard)/crown/hubSelfActions'
 
 type HubWeeklySelfBarProps = {
   data: HubWeeklySelfPayload | undefined

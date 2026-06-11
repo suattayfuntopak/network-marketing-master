@@ -199,7 +199,7 @@ async function handleOsbNotification(res: string, hash: string) {
     console.info(`[Shopier OSB] Already processed for workspace ${parsed.workspaceId}`)
     return new NextResponse('already-processed', { status: 200, headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
   }
-  console.log(`[Shopier OSB] License updated for workspace ${parsed.workspaceId}`)
+  console.info(`[Shopier OSB] License updated for workspace ${parsed.workspaceId}`)
   return new NextResponse('success', {
     status: 200,
     headers: { 'Content-Type': 'text/plain; charset=utf-8' },
@@ -305,7 +305,7 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
     return NextResponse.json({ received: true, applied: false, duplicate: true })
   }
 
-  console.log(
+  console.info(
     `[Shopier order.created] License updated for workspace ${workspaceId} (${resolved.plan}) until ${newExpiry.toISOString()}`
   )
   return NextResponse.json({ received: true, applied: true })
@@ -348,7 +348,7 @@ async function handleRefundWebhook(payload: unknown, event: string) {
       .from('nmm_shopier_processed_orders')
       .update({ status: 'refunded', refunded_at: new Date().toISOString() })
       .eq('order_id', o.order_id)
-    console.log('[Shopier refund] license revoked', { orderId: o.order_id, workspaceId: o.workspace_id })
+    console.info('[Shopier refund] license revoked', { orderId: o.order_id, workspaceId: o.workspace_id })
   }
   return NextResponse.json({ received: true, refunded: true, count: orders.length })
 }
@@ -417,7 +417,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true, message: 'Already processed', duplicate: true })
     }
 
-    console.log(
+    console.info(
       `[Shopier Webhook] Success! Workspace ${parsed.workspaceId} until ${newExpiry.toISOString()}`
     )
     return NextResponse.json({ success: true, message: 'License updated successfully' })

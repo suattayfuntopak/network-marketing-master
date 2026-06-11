@@ -5,8 +5,8 @@ import { useMemo } from 'react'
 import {
   getHubWeeklySelfAction,
   getHubMonthlyInsightsAction,
-  getCrownSahaRadarAction,
-} from '@/app/(dashboard)/crown/actions'
+} from '@/app/(dashboard)/crown/hubSelfActions'
+import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { queryKeys } from '@/lib/query/keys'
 

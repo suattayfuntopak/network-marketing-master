@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Landmark, Copy, Check, Mail, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -154,8 +155,7 @@ export function BankTransferCard({ variant = 'dashboard', onNotify }: BankTransf
             {/* QR — yalnızca masaüstü: telefon bankacılığıyla ekranı taramak için */}
             <div className="hidden lg:flex flex-col items-center gap-1 shrink-0">
               <div className="rounded-lg bg-white p-1.5 ring-1 ring-slate-200">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/iban-qr.svg" alt="IBAN QR" className="h-[76px] w-[76px]" />
+                <Image src="/iban-qr.svg" alt="IBAN QR" width={76} height={76} />
               </div>
               <span className={`text-[9px] font-semibold ${tk.muted}`}>
                 {t('paymentPage.bankQrCaption')}

@@ -5,7 +5,7 @@ import { Sparkles, Pencil, ArrowRight, CalendarDays, Activity, MessageCircle } f
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
-import type { HubSelfFieldMetrics } from '@/app/(dashboard)/crown/actions'
+import type { HubSelfFieldMetrics } from '@/app/(dashboard)/crown/hubSelfActions'
 import { crownSolidMap } from '@/components/ui/SquareButton'
 import { HUB_ACTIVITY_PANO_COLOR } from '@/lib/ui/hubPanoMetricColors'
 

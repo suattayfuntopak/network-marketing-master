@@ -1,5 +1,41 @@
 # Hot Log
 
+## 2026-06-11 — Council Triad refaktör: god file split, god component split, lint düzeltmeleri ✅
+
+Kapsamlı kod kalitesi oturumu. Mimari borçların önceliklileri kapatıldı.
+
+### 1) `crown/actions.ts` tanrı dosyası üçe bölündü (1117 → ~230 satır)
+- **`src/app/(dashboard)/crown/hubSelfActions.ts`** (yeni, ~380 satır): tüm Hub öz-metrik aksiyonları — `getHubWeeklySelfAction`, `getHubDailySelfAction`, `getHubMonthlySelfAction`, `getHubYearlySelfAction`, `getHubAllTimeSelfAction`, `getHubMonthlyInsightsAction`, `resolveWorkspaceId`, `getCrownWorkspaceIdAction`.
+- **`src/app/(dashboard)/saha-radar/actions.ts`** (genişletildi): `getCrownSahaRadarAction` ve ilgili tipler taşındı (`SahaRadarActivityLevel`, `SahaRadarMember`, `SahaRadarFollowUp`, `CrownSahaRadarPayload`).
+- **`src/app/(dashboard)/crown/actions.ts`** (kırpıldı): yalnızca ekip aksiyonları kaldı (`getCrownTeamPageAction`, `getCrownVideoPageAction`, `getCrownEntriesPageAction`, `getCrownFirst30PageAction`, `getCrownTeamPeriodPulseAction` vb.).
+- 12+ import yolu güncellendi (`usePanoHubBadges`, `prefetchRouteMetrics`, `FieldSummaryPage`, `CrownSahaRadarPage` + 8 hub bileşeni).
+
+### 2) `PlatformYonetimContent.tsx` tanrı bileşeni dörde bölündü (889 → ~290 satır)
+- **`PlatformKpiCards.tsx`** (yeni): 4 KPI metrik kartı — props: 4 sayı.
+- **`PlatformIndependentSection.tsx`** (yeni): bağımsız üye ızgarası — avatarlar, WhatsApp/bağla/boru hattı butonları.
+- **`PlatformWorkspacesTable.tsx`** (yeni): ana workspace tablosu — yatay kaydırmaya karşı korumalı, tüm satır aksiyonları.
+- **`PlatformModerationDesk.tsx`** (yeni): içerik moderasyon masası — eğitim/video/itiraz inceleme kartları.
+- Üst bileşen yalnızca state ve handler'larını tutar; JSX `<Component props={...} />` çağrılarına indirgendi.
+
+### 3) `TeamPerformanceSection.tsx` tanrı bileşeni bölündü (853 → 538 satır)
+- **`TeamMemberCard.tsx`** (yeni, ~250 satır): VirtualizedMemberList'in 329 satırlık `renderItem` lambda'sı özel bileşene taşındı — sekme çubuğu (onboarding/arama/WhatsApp/aktivite), onboarding adımları, AI koçluk butonu, MasterAccess guard, üye aktivite sayfası.
+- `MemberCardTab` tipi artık `TeamMemberCard.tsx`'ten dışa aktarılıyor, üst bileşen import ediyor.
+
+### 4) Küçük düzeltmeler (Faz A)
+- **`src/lib/domain/teamAccess.ts`**: `licenseType` ve `isSuperAdmin` dead param'larına `// eslint-disable-line` yerine `_` öneki — 14+ çağıran kırılmaz.
+- **`src/app/api/payment/shopier/route.ts`**: 4 `console.log` → `console.info` (kritik ödeme akışı logları korundu).
+- **`src/components/payment/BankTransferCard.tsx`**: `<img>` → `<Image>` (next/image).
+
+### Dosyalar
+`crown/actions.ts` (kırpıldı), `crown/hubSelfActions.ts` (yeni), `saha-radar/actions.ts` (genişletildi),
+`usePanoHubBadges.ts`, `prefetchRouteMetrics.ts`, `FieldSummaryPage.tsx`, `CrownSahaRadarPage.tsx`,
+`saha-ozetim/page.tsx`, `panoProgress.ts`, `HubWeeklySelfBar.tsx`, `HubYearHero.tsx`, `HubMonthProgress.tsx`,
+`HubSelfActivityGrid.tsx`, `HubAllTimeHero.tsx`, `useNotifications.ts`,
+`PlatformYonetimContent.tsx` (kırpıldı), `PlatformKpiCards.tsx` (yeni), `PlatformIndependentSection.tsx` (yeni),
+`PlatformWorkspacesTable.tsx` (yeni), `PlatformModerationDesk.tsx` (yeni),
+`TeamPerformanceSection.tsx` (kırpıldı), `TeamMemberCard.tsx` (yeni),
+`teamAccess.ts`, `shopier/route.ts`, `BankTransferCard.tsx`
+
 ## 2026-06-10 — Şerit 3-buton + Saha Özetim "pat pat" hız + davet senkronizasyonu + telemetri monitörü ✅
 
 Tek oturumda 4 iş; build + tsc + lint + unit (183/183) yeşil.

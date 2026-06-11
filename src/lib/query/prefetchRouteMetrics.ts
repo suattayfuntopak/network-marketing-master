@@ -2,16 +2,18 @@ import type { QueryClient } from '@tanstack/react-query'
 import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import {
-  getCrownSahaRadarAction,
   getCrownTeamMonthlyPulseAction,
   getCrownTeamWeeklyPulseAction,
   getCrownEntriesPageAction,
+} from '@/app/(dashboard)/crown/actions'
+import {
   getHubYearlySelfAction,
   getHubDailySelfAction,
   getHubMonthlyInsightsAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
-} from '@/app/(dashboard)/crown/actions'
+} from '@/app/(dashboard)/crown/hubSelfActions'
+import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
 import {
   getTeamFieldActivityAction,
