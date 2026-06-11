@@ -62,11 +62,18 @@ export function TeamMemberCard({
   const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
   const waQuick = waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
 
-  const memberTabs: { id: MemberCardTab; Icon: ComponentType<{ className?: string }>; label: string; show: boolean; wa?: boolean }[] = [
-    { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
+  const memberTabs: {
+    id: MemberCardTab
+    Icon: ComponentType<{ className?: string }>
+    label: string
+    show: boolean
+    className?: string
+    wa?: boolean
+  }[] = [
     { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
-    { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref },
-    { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, wa: true },
+    { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
+    { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref, className: 'sm:hidden' },
+    { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: !!waQuick, className: 'sm:hidden', wa: true },
   ]
   const visibleTabs = memberTabs.filter(tab => tab.show)
 
@@ -137,7 +144,7 @@ export function TeamMemberCard({
       {m.isAppUser !== false && (
         <div className="border-t border-dashed border-[var(--border)] pt-4 space-y-4">
           <div className="flex items-center gap-1 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-1" role="tablist" aria-label={t('team.memberDetailTabs')}>
-            {visibleTabs.map(({ id, Icon, label, wa }) => (
+            {visibleTabs.map(({ id, Icon, label, className, wa }) => (
               <button
                 key={id}
                 type="button"
@@ -151,7 +158,8 @@ export function TeamMemberCard({
                   'flex h-10 flex-1 items-center justify-center rounded-lg transition-all cursor-pointer',
                   activeTab === id
                     ? 'bg-[var(--bg-card)] text-brand dark:text-indigo-300 shadow-sm border border-[var(--border)]'
-                    : 'text-[var(--text-3)] hover:text-[var(--text-2)]'
+                    : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
+                  className
                 )}
               >
                 {wa ? <WhatsAppIcon className="h-5 w-5 fill-current" /> : <Icon className="h-5 w-5" />}

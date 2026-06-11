@@ -32,7 +32,7 @@ export function MyAIUsageQuotaCard({ usage, dailyLimit }: Props) {
       {usage?.isSuperAdmin ? (
         <div className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-purple-500/5 to-transparent p-4">
           <span className="text-2xl">👑</span>
-          <h3 className="whitespace-nowrap text-[11px] sm:text-base font-black text-amber-600 dark:text-amber-300 uppercase tracking-wide">
+          <h3 className="whitespace-nowrap text-[13px] sm:text-lg font-black text-amber-600 dark:text-amber-300 uppercase tracking-wide">
             {t('statsPage.quotaSuperTitle')}
           </h3>
         </div>

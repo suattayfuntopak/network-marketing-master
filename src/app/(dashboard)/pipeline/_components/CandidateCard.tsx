@@ -115,9 +115,9 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
         STAGE_CARD_BG[candidate.stage],
         (quickActionOpen || stageOpen || editOpen || confirmOpen) && Z.cardOverlay
       )}>
-        <div className="flex items-start gap-3">
+        <div className="flex items-center gap-3">
           {/* Avatar + Bilgi → detay sayfasına link */}
-          <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-start gap-3 min-w-0">
+          <Link href={`/pipeline/${candidate.id}`} className="flex flex-1 items-center gap-3 min-w-0">
             <PersonAvatar
               name={candidate.full_name}
               imageUrl={parsed.avatarUrl}
@@ -127,20 +127,18 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <div className="flex items-center gap-1.5 min-w-0">
                 <p className="truncate text-sm font-semibold text-[var(--text-1)]">{candidate.full_name}</p>
                 {parsed.warmth === 'sicak' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">🔥 {t('pipelinePage.warmthHot')}</span>
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-red-50 dark:bg-red-950/30 px-1.5 py-0.5 text-[9px] font-bold text-red-600 dark:text-red-400 border border-red-200/50 dark:border-red-900/30 animate-pulse">
+                    🔥<span className="hidden sm:inline"> {t('pipelinePage.warmthHot')}</span>
+                  </span>
                 )}
                 {parsed.warmth === 'ilik' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">☀️ {t('pipelinePage.warmthWarm')}</span>
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 text-[9px] font-bold text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/30">
+                    ☀️<span className="hidden sm:inline"> {t('pipelinePage.warmthWarm')}</span>
+                  </span>
                 )}
                 {parsed.warmth === 'soguk' && (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">❄️ {t('pipelinePage.warmthCold')}</span>
-                )}
-                {!candidate.email?.trim() && (
-                  <span
-                    className="inline-flex shrink-0 items-center rounded-full border border-amber-200/60 bg-amber-50/90 px-1.5 py-0.5 text-[9px] font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/40 dark:text-amber-400"
-                    title={t('team.inviteEmailMissingHint')}
-                  >
-                    ✉️
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 dark:text-blue-400 border border-blue-200/50 dark:border-blue-900/30">
+                    ❄️<span className="hidden sm:inline"> {t('pipelinePage.warmthCold')}</span>
                   </span>
                 )}
               </div>

@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-11 — Performans Optimizasyonları, Rol Düzeltmeleri, Tab Sıralaması & Aday Kartı Tasarım Güncellemeleri ✅
+
+### Hız Optimizasyonları
+- **Hedefim Sayfası:** `/hedefim/page.tsx` rotası Client Component'ten Server Component'e dönüştürüldü ve sunucu tarafında prefetch (`getGoalDashboardAction`) eklendi. HydrationBoundary kullanımıyla sayfa yüklenme gecikmesi ve 2-3 saniyelik boş iskelet pulse yüklenmesi engellendi.
+- **Saha Özetim Sayfası:** `/saha-ozetim/page.tsx` üzerinde workspace bilgisi ve aktif dönem verisi ardışık yerine paralel (`Promise.all` ile) prefetch edilerek sunucu yanıt süresi iyileştirildi.
+
+### Rol Eşleşme Hata Düzeltmesi
+- **Ekibim & İstatistikler Listesi:** `fetchTeamBundle.ts` dosyasında, alt ekip çalışma alanlarının sahiplerinin (Elif Sinem Topak, Selda Kıratlı, Ezgi Şagar) rolleri, kendi sistemlerindeki `leader` yerine sponsor perspektifinden `member` olarak düzeltildi. Bu sayede `EkipPanel` filtreleme mantığına takılarak listeden kaybolmaları sorunu çözüldü, tüm istatistik kutuları ve Ekibim sayfalarında doğru şekilde gösterilmeleri sağlandı.
+
+### Ekibim Sayfa Düzenlemeleri & Modül Temizliği
+- **Tab Sıralaması (TeamMemberCard.tsx):** Üye kartlarının altındaki butonlar Aktivite, Doğru Başlangıç Rehberi (DDBR), (mobil temada) Telefon ve WhatsApp olacak şekilde yeniden sıralandı. Telefon ve WhatsApp butonları masaüstü görünümünde gizlendi (`sm:hidden`).
+- **Davet Modülü Temizliği:** Davet kodlu davet sistemi yerine tamamen referans linki sistemine geçilmesi nedeniyle, Ekip sayfası altındaki "Ekip Arkadaşını Davet Et" (`InviteTeammateSection`) ve "Davet Kodu Gir" (`JoinByInviteSection`) bölümleri kaldırıldı, sadece "Ekibe Gönder" (BroadcastPanel) kartı bırakıldı.
+
+### Tasarım & Tipografi İyileştirmeleri
+- **Süper Admin Yazısı:** İstatistikler sayfasındaki "SINIRSIZ SÜPER ADMİN HESABI" metninin boyutu 2 punto büyütüldü (`text-[13px] sm:text-lg`).
+- **Listem Aday Kartları (CandidateCard.tsx):**
+  - E-posta eksik uyarı zarfı (`✉️`) kaldırıldı.
+  - Sıcaklık durumlarının yazısı mobilde gizlenerek sadece ikonları (`🔥`, `☀️`, `❄️`) bırakıldı.
+  - Kart içindeki kişi ismi ve sağdaki butonlar dikeyde (dikey eksende) ortalandı (`items-center` entegre edildi).
+
+### Dosyalar
+`src/app/(dashboard)/hedefim/page.tsx`, `src/app/(dashboard)/saha-ozetim/page.tsx`, `src/lib/team/fetchTeamBundle.ts`, `src/app/(dashboard)/ekip/_components/TeamMemberCard.tsx`, `src/app/(dashboard)/ekip/_components/TeamPerformanceSection.tsx`, `src/app/(dashboard)/ekip/_components/EkipPanel.tsx`, `src/app/(dashboard)/istatistikler/_components/MyAIUsageQuotaCard.tsx`, `src/app/(dashboard)/pipeline/_components/CandidateCard.tsx`
+
 ## 2026-06-11 — Aday Kazanım İvmesi Grafik Ayarları & Profil Resimleri Senkronizasyonu ✅
 
 ### Aday Kazanım İvmesi Grafik Güncellemesi (IstatistiklerContent.tsx)

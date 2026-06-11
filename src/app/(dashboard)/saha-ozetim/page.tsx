@@ -12,7 +12,6 @@ import {
   getHubYearlySelfAction,
   getHubAllTimeSelfAction,
 } from '@/app/(dashboard)/crown/hubSelfActions'
-import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
 type Props = { searchParams: Promise<{ tab?: string; offset?: string }> }
 
@@ -28,25 +27,28 @@ export default async function SahaOzetimPage({ searchParams }: Props) {
   const offset = Number.parseInt(offsetRaw ?? '0', 10) || 0
 
   const queryClient = getQueryClient()
-  await queryClient.prefetchQuery({
-    queryKey: queryKeys.workspace(),
-    queryFn: fetchWorkspaceAction,
-  })
+  const active: { key: readonly unknown[]; fn: () => Promise<unknown> } =
+    activeTab === 'daily'
+      ? { key: queryKeys.hubDailySelf(offset), fn: () => getHubDailySelfAction(offset) }
+      : activeTab === 'weekly'
+        ? { key: queryKeys.hubWeeklySelf(offset), fn: () => getHubWeeklySelfAction(offset) }
+        : activeTab === 'monthly'
+          ? { key: queryKeys.hubMonthlySelf(offset), fn: () => getHubMonthlySelfAction(offset) }
+          : activeTab === 'all'
+            ? { key: queryKeys.hubAllTimeSelf(), fn: () => getHubAllTimeSelfAction() }
+            : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
 
-  const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
-  if (ws?.workspaceId) {
-    const active: { key: readonly unknown[]; fn: () => Promise<unknown> } =
-      activeTab === 'daily'
-        ? { key: queryKeys.hubDailySelf(offset), fn: () => getHubDailySelfAction(offset) }
-        : activeTab === 'weekly'
-          ? { key: queryKeys.hubWeeklySelf(offset), fn: () => getHubWeeklySelfAction(offset) }
-          : activeTab === 'monthly'
-            ? { key: queryKeys.hubMonthlySelf(offset), fn: () => getHubMonthlySelfAction(offset) }
-            : activeTab === 'all'
-              ? { key: queryKeys.hubAllTimeSelf(), fn: () => getHubAllTimeSelfAction() }
-              : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
-    await queryClient.prefetchQuery({ queryKey: active.key, queryFn: active.fn, staleTime: 60_000 })
-  }
+  await Promise.all([
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.workspace(),
+      queryFn: fetchWorkspaceAction,
+    }),
+    queryClient.prefetchQuery({
+      queryKey: active.key,
+      queryFn: active.fn,
+      staleTime: 60_000,
+    }),
+  ])
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

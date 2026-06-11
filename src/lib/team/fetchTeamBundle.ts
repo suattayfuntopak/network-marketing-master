@@ -128,13 +128,16 @@ export async function fetchTeamBundle(
 ): Promise<TeamBundle> {
   const rpcBundle = await fetchTeamWithDownlines(supabase, workspaceId)
   if (rpcBundle) {
+    const { leaderOwnerId } = rpcBundle
     const members = rpcBundle.members
+    members.forEach(m => {
+      m.role = m.user_id === leaderOwnerId ? 'leader' : 'member'
+    })
     const allUserIds = members.map(m => m.user_id)
     const authAvatars = await resolveAuthAvatars(supabase, workspaceId, allUserIds)
     const candidates = await enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates)
     const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
     const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
-    const { leaderOwnerId } = rpcBundle
     const ownWs = { owner_id: leaderOwnerId }
 
     const registeredMemberRows: MemberRow[] = members.map(m => {

@@ -13,8 +13,6 @@ import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 import { VirtualizedMemberList } from './VirtualizedMemberList'
 import { TeamMemberCard, type MemberCardTab } from './TeamMemberCard'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
-import { InviteTeammateSection } from './InviteTeammateSection'
-import { JoinByInviteSection } from './JoinByInviteSection'
 import { BroadcastPanel } from './BroadcastPanel'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { addTeamMemberAsCandidateAction } from '../actions'
@@ -41,14 +39,6 @@ export interface TeamPerformanceSectionProps {
   teamPulseUnlocked: boolean
   teamPageUnlocked: boolean
   memberGoalsMap?: Record<string, MemberGoalRow>
-  inviteCode: string
-  hasUpline: boolean
-  copied: boolean
-  onCopyInviteCode: () => void
-  inviteCodeInput: string
-  joining: boolean
-  onInviteCodeChange: (value: string) => void
-  onJoinSubmit: (e: React.FormEvent) => void
 }
 
 type FieldCardTab = 'aiInvite' | 'nmmInvite'
@@ -186,8 +176,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberSearch, onMemberSearchChange,
     teamPulseUnlocked, teamPageUnlocked,
     memberGoalsMap = {},
-    inviteCode, hasUpline, copied, onCopyInviteCode,
-    inviteCodeInput, joining, onInviteCodeChange, onJoinSubmit,
   } = props
   const router = useRouter()
   const pathname = usePathname()
@@ -212,7 +200,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     return () => clearTimeout(timer)
   }, [localSearch, memberSearch, onMemberSearchChange])
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const hasTeamTools = isLeader || !hasUpline
+  const hasTeamTools = isLeader && teamPageUnlocked
 
   const searchQ = memberSearch.trim()
   const hasMemberSearch = searchQ.length > 0
@@ -575,25 +563,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             </button>
             {toolsOpen ? (
               <div className="space-y-6 border-t border-[var(--border)] px-4 pb-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                {isLeader ? (
-                  <InviteTeammateSection
-                    inviteCode={inviteCode}
-                    copied={copied}
-                    onCopy={onCopyInviteCode}
-                    t={t}
-                  />
-                ) : null}
-
-                {!hasUpline ? (
-                  <JoinByInviteSection
-                    inviteCodeInput={inviteCodeInput}
-                    joining={joining}
-                    onInviteCodeChange={onInviteCodeChange}
-                    onSubmit={onJoinSubmit}
-                    t={t}
-                  />
-                ) : null}
-
                 {isLeader && teamPageUnlocked ? (
                   <BroadcastPanel members={visibleMembers} t={t} />
                 ) : null}

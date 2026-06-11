@@ -11,7 +11,6 @@ import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
 import type { EkipTabId } from './EkipTabNav'
 import {
-  joinWorkspaceByInviteAction,
   removeTeamMemberAction,
   toggleOnboardingStepAction,
 } from '../actions'
@@ -20,7 +19,6 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
-import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
@@ -58,9 +56,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     : false
   const hasMasterAccess = (licenseType === 'plus' || licenseType === 'pro') && !isLicenseExpired
 
-  const [copied, setCopied] = useState(false)
-  const [inviteCodeInput, setInviteCodeInput] = useState('')
-  const [joining, setJoining] = useState(false)
   const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
@@ -168,36 +163,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
 
   const isLeader = ws.role === 'leader'
 
-  function handleCopyInviteCode() {
-    if (!ws?.inviteCode) return
-    navigator.clipboard.writeText(ws.inviteCode)
-    setCopied(true)
-    toast.success(t('team.inviteCopied'))
-    setTimeout(() => setCopied(false), 2000)
-  }
 
-  async function handleJoinWorkspace(e: React.FormEvent) {
-    e.preventDefault()
-    if (joining) return
-    const code = inviteCodeInput.trim().toUpperCase()
-    if (!code) { toast.error('Lütfen bir davet kodu girin!'); return }
-    if (code === ws?.inviteCode) { toast.error(t('team.alreadyInTeam')); return }
-    setJoining(true)
-    try {
-      const result = await joinWorkspaceByInviteAction(code)
-      toast.success(t('team.joinSuccess', { name: result.workspace_name ?? '' }))
-      setInviteCodeInput('')
-      queryClient.invalidateQueries({ queryKey: ['workspace'] })
-      queryClient.invalidateQueries({ queryKey: ['team'] })
-      invalidateHubMetrics(queryClient, ws?.workspaceId)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error(err)
-      toast.error(message || t('team.joinError'))
-    } finally {
-      setJoining(false)
-    }
-  }
 
   async function handleRemoveMemberConfirmed() {
     if (!memberToRemove) return
@@ -236,14 +202,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           teamPulseUnlocked={teamPulseUnlocked}
           teamPageUnlocked={teamPageUnlocked}
           memberGoalsMap={memberGoalsMap}
-          inviteCode={ws.inviteCode}
-          hasUpline={ws.hasUpline}
-          copied={copied}
-          onCopyInviteCode={handleCopyInviteCode}
-          inviteCodeInput={inviteCodeInput}
-          joining={joining}
-          onInviteCodeChange={setInviteCodeInput}
-          onJoinSubmit={handleJoinWorkspace}
         />
       )}
 
