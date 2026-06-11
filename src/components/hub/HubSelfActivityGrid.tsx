@@ -6,7 +6,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { HubSelfFieldMetrics } from '@/app/(dashboard)/crown/actions'
-import { crownSolidMap } from '@/components/ui/SquareButton'
+import { crownSoftMap } from '@/components/ui/SquareButton'
 import { HUB_ACTIVITY_PANO_COLOR } from '@/lib/ui/hubPanoMetricColors'
 
 type HubSelfActivityGridProps = {
@@ -97,38 +97,21 @@ export function HubSelfActivityGrid({ metrics, loading, panoVariant = false }: H
               className={clsx(
                 'flex flex-col rounded-xl px-3 py-2.5',
                 panoVariant
-                  ? clsx(crownSolidMap[panoColor], 'border border-white/20 text-white shadow-md')
+                  ? clsx(crownSoftMap[panoColor], 'border border-[var(--border)] bg-[var(--bg-card)]')
                   : 'border border-[var(--border)] bg-[var(--bg-card)]',
               )}
             >
               <div className="mb-1 flex items-center gap-1.5">
                 {isWa ? (
-                  <WhatsAppIcon
-                    className={clsx('h-4 w-4 shrink-0', panoVariant ? 'text-white' : color)}
-                  />
+                  <WhatsAppIcon className={clsx('h-4 w-4 shrink-0', color)} />
                 ) : (
-                  <Icon
-                    className={clsx('h-4 w-4 shrink-0', panoVariant ? 'text-white' : color)}
-                    strokeWidth={2.25}
-                  />
+                  <Icon className={clsx('h-4 w-4 shrink-0', color)} strokeWidth={2.25} />
                 )}
-                <span
-                  className={clsx(
-                    'text-[10px] font-bold uppercase tracking-wide',
-                    panoVariant ? 'text-white/80' : 'text-[var(--text-3)]',
-                  )}
-                >
+                <span className="text-[10px] font-bold uppercase tracking-wide text-[var(--text-3)]">
                   {label}
                 </span>
               </div>
-              <p
-                className={clsx(
-                  'text-xl font-black tabular-nums',
-                  panoVariant ? 'text-white' : 'text-[var(--text-1)]',
-                )}
-              >
-                {value}
-              </p>
+              <p className="text-xl font-black tabular-nums text-[var(--text-1)]">{value}</p>
             </div>
           )
         })}

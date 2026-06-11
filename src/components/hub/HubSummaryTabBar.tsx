@@ -75,13 +75,21 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
             data-testid={`hub-summary-tab-${tab}`}
             onClick={() => onChange(tab)}
             className={clsx(
-              'min-w-0 flex-1 shrink-0 rounded-lg px-1.5 py-2 text-center text-xs font-bold transition sm:px-3',
+              'min-w-0 flex-1 shrink-0 rounded-lg px-1.5 py-2 text-center font-bold transition sm:px-3',
+              tab === 'all' ? 'text-base sm:text-sm' : 'text-xs',
               isActive
                 ? clsx(crownSolidMap[panoColor], 'text-white shadow-sm border border-white/20')
                 : 'text-[var(--text-3)] hover:text-[var(--text-2)]',
             )}
           >
-            <span className="sm:hidden tabular-nums text-sm">{HUB_PERIOD_TAB_SHORT[tab]}</span>
+            <span
+              className={clsx(
+                'sm:hidden tabular-nums leading-none',
+                tab === 'all' ? 'text-lg font-black' : 'text-sm',
+              )}
+            >
+              {HUB_PERIOD_TAB_SHORT[tab]}
+            </span>
             <span className="hidden sm:inline">{t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}</span>
           </button>
         )

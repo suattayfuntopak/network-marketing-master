@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, type ComponentType } from 'react'
+import { useState, useEffect, useCallback, useMemo, type ComponentType } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { clsx } from 'clsx'
@@ -31,6 +31,8 @@ import { addTeamMemberAsCandidateAction } from '../actions'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { queryKeys } from '@/lib/query/keys'
 import { toast } from 'sonner'
+import { memberMatchesSearch } from '@/lib/team/memberSearch'
+
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
   lang: string
@@ -195,6 +197,26 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const [toolsOpen, setToolsOpen] = useState(true)
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const hasTeamTools = isLeader || !hasUpline
+
+  const searchQ = memberSearch.trim()
+  const hasMemberSearch = searchQ.length > 0
+  const searchMatchCount = useMemo(
+    () =>
+      hasMemberSearch
+        ? visibleMembers.filter(m => memberMatchesSearch(m, searchQ)).length
+        : visibleMembers.length,
+    [visibleMembers, hasMemberSearch, searchQ],
+  )
+
+  useEffect(() => {
+    if (!hasMemberSearch) return
+    const first = visibleMembers.find(m => memberMatchesSearch(m, searchQ))
+    if (!first) return
+    document.getElementById(`ekip-member-${first.user_id}`)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }, [hasMemberSearch, searchQ, visibleMembers])
 
   async function handleLinkMemberToPipeline(member: MemberRow) {
     if (!member.full_name || linkingMemberId) return
@@ -426,6 +448,9 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               placeholder={t('team.searchMembers')}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-4 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
             />
+            {hasMemberSearch && searchMatchCount === 0 && (
+              <p className="mt-2 text-center text-xs text-[var(--text-3)]">{t('common.searchNoResults')}</p>
+            )}
           </div>
         )}
 
@@ -444,12 +469,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
             const waQuick = waHref(m.phone, t('team.activityWaCheckIn', { name: (m.full_name ?? '').split(' ')[0] || t('common.member') }))
 
+            const matchesSearch = memberMatchesSearch(m, searchQ)
+
             return (
               <div
                 key={m.user_id}
+                id={`ekip-member-${m.user_id}`}
                 className={clsx(
                   'overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4',
-                  getTeamMemberCardClasses(m, isInactive)
+                  getTeamMemberCardClasses(m, isInactive),
+                  hasMemberSearch && !matchesSearch && 'opacity-35',
                 )}
               >
                 {/* Kart üst: profil + sağda davet */}

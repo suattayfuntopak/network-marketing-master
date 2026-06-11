@@ -62,6 +62,22 @@ export const crownSolidMap: Record<ButtonColor, string> = {
   chick:  'bg-gradient-to-br from-[#FFD966] to-[#FF9900] text-white hover:brightness-105',
 }
 
+/** Saha Özetim metrik kutuları — %25 opak gradient (yumuşak renk). */
+export const crownSoftMap: Record<ButtonColor, string> = {
+  purple: 'bg-gradient-to-br from-[#54C1F0]/25 to-[#0095DD]/25',
+  teal:   'bg-gradient-to-br from-[#90E894]/25 to-[#009688]/25',
+  amber:  'bg-gradient-to-br from-[#FFD54B]/25 to-[#FF9A00]/25',
+  pink:   'bg-gradient-to-br from-[#FF6F91]/25 to-[#E04070]/25',
+  blue:   'bg-gradient-to-br from-[#448AFF]/25 to-[#2962FF]/25',
+  coral:  'bg-gradient-to-br from-[#FF9D7A]/25 to-[#FF5722]/25',
+  rose:   'bg-gradient-to-br from-[#FF5252]/25 to-[#D81B60]/25',
+  indigo: 'bg-gradient-to-br from-[#9D81FF]/25 to-[#5D44C9]/25',
+  cyan:   'bg-gradient-to-br from-[#448AFF]/25 to-[#2962FF]/25',
+  yellow: 'bg-gradient-to-br from-[#FFD54B]/25 to-[#FF9A00]/25',
+  peach:  'bg-gradient-to-br from-[#FFD4A8]/25 to-[#FFAB5C]/25',
+  chick:  'bg-gradient-to-br from-[#FFD966]/25 to-[#FF9900]/25',
+}
+
 const crownClass = (
   color: ButtonColor,
   opts?: { compact?: boolean; prominent?: boolean; fill?: boolean; className?: string },

@@ -98,6 +98,7 @@ const PANO_COLOR_BY_HREF = Object.fromEntries(
 
 /** Sidebar aktif vurgusu — pano kutusu rengi; platform yönetimi amber (başlık taç ikonu). */
 export function getPanoLauncherColor(href: string): ButtonColor | undefined {
+  if (href === '/pano') return 'purple'
   if (href === NAV_ADMIN.href) return 'amber'
   return PANO_COLOR_BY_HREF[href]
 }

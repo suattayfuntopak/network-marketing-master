@@ -70,7 +70,7 @@ export function TrainingCard({
               <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
                 {baslik}
               </p>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 hidden items-center gap-2 md:flex">
                 <div className="flex items-center gap-1 text-[11px] text-[var(--text-3)]">
                   <Clock className="h-3 w-3 shrink-0" />
                   <span>{konu.sure}</span>

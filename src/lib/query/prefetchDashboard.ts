@@ -3,8 +3,7 @@ import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { fetchAIUsageAction } from '@/app/(dashboard)/actions/aiUsage'
 import { fetchCandidatesAction } from '@/app/(dashboard)/actions/candidates'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
-import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
-import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
+import { prefetchPlatformAdminQueries } from '@/lib/query/prefetchPlatformAdmin'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import { queryKeys } from './keys'
@@ -60,18 +59,7 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   ]
 
   if (ws.isSuperAdmin) {
-    background.push(
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.platformWorkspaces(),
-        queryFn: getPlatformWorkspacesAction,
-        staleTime: QUERY_STALE.usage,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.platformModeration(),
-        queryFn: getPendingRequestsAction,
-        staleTime: QUERY_STALE.metrics,
-      }),
-    )
+    background.push(prefetchPlatformAdminQueries(queryClient))
   }
 
   void Promise.all(background)

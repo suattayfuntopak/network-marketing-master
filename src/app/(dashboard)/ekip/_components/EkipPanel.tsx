@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
@@ -116,17 +116,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     ? downlineMembers.slice(0, 50)
     : downlineMembers
 
-  const filteredVisibleMembers = useMemo(() => {
-    const q = memberSearch.trim().toLowerCase()
-    if (!q) return visibleMembers
-    return visibleMembers.filter(m => {
-      const name = (m.full_name ?? '').toLowerCase()
-      const phone = (m.phone ?? '').replace(/\D/g, '')
-      const qPhone = q.replace(/\D/g, '')
-      return name.includes(q) || (qPhone.length >= 3 && phone.includes(qPhone))
-    })
-  }, [visibleMembers, memberSearch])
-
   const teamPulseUnlocked = hasTeamPulseAccess(licenseType, ws?.isSuperAdmin)
   const teamPageUnlocked = hasTeamPageAccess(licenseType, ws?.isSuperAdmin)
 
@@ -234,7 +223,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           lang={lang}
           ws={ws}
           members={members}
-          visibleMembers={filteredVisibleMembers}
+          visibleMembers={visibleMembers}
           isLeader={isLeader}
           isSolo={members.length <= 1}
           isPlusCapReached={isPlusCapReached}

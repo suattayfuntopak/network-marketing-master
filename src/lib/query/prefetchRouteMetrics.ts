@@ -17,6 +17,7 @@ import {
   getTeamFieldActivityAction,
   getTeamRankingMetricsBatchAction,
 } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { fetchAIUsageAction } from '@/app/(dashboard)/actions/aiUsage'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import {
@@ -25,6 +26,7 @@ import {
 } from '@/app/(dashboard)/egitim/akademiProgressActions'
 import { getVideoCatalogAction } from '@/app/(dashboard)/egitim/videoActions'
 import { recordHubPrefetchEventAction } from '@/app/(dashboard)/platform-yonetim/hubPrefetchActions'
+import { prefetchPlatformAdminQueries } from '@/lib/query/prefetchPlatformAdmin'
 import {
   hubPeriodOffsetsForPrefetch,
   readStoredHubActiveTab,
@@ -305,11 +307,7 @@ export function prefetchRouteMetrics(
   }
 
   if (href === '/pano') {
-    void queryClient.prefetchQuery({
-      queryKey: ['pano-field-insights', workspaceId],
-      queryFn: () => getMyPanoInsightsAction(workspaceId),
-      staleTime: QUERY_STALE.metrics,
-    })
+    void prefetchPanoMetrics(queryClient, workspaceId)
   }
 
   const teamRoutes = new Set([
@@ -358,6 +356,21 @@ export function prefetchRouteMetrics(
 
   if (href === '/egitim') {
     void prefetchAkademiProgressBundle(queryClient, workspaceId)
+  }
+
+  if (href === '/platform-yonetim' && wsSlice.isSuperAdmin) {
+    void prefetchPlatformAdminQueries(queryClient)
+  }
+
+  if (href === '/istatistikler') {
+    void queryClient.prefetchQuery({
+      queryKey: queryKeys.dailyAiUsage(),
+      queryFn: fetchAIUsageAction,
+      staleTime: QUERY_STALE.usage,
+    })
+    if (hasTeamPageAccess(wsSlice.licenseType, wsSlice.isSuperAdmin)) {
+      void prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice)
+    }
   }
 
   if (href === '/saha-radar') {

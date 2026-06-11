@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { authCardClass, authCardSubtitleClass, authCardTitleClass } from '@/app/(auth)/_components/authUi'
 import { SignupForm } from './_components/SignupForm'
@@ -11,7 +12,9 @@ export default function KayitPage() {
     <div className={authCardClass}>
       <h2 className={authCardTitleClass}>{t('auth.registerTitle')}</h2>
       <p className={authCardSubtitleClass}>{t('auth.welcome')}</p>
-      <SignupForm />
+      <Suspense fallback={<p className="text-sm text-[var(--text-3)]">{t('common.loading')}</p>}>
+        <SignupForm />
+      </Suspense>
     </div>
   )
 }

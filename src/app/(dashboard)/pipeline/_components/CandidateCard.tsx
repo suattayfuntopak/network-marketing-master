@@ -137,18 +137,21 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
                 )}
               </div>
               {candidate.phone && (
-                <p className="text-xs text-[var(--text-2)]">{candidate.phone}</p>
+                <p className="hidden text-xs text-[var(--text-2)] sm:block">{candidate.phone}</p>
               )}
               {(parsed.noteTr || parsed.noteEn) && (
-                <p className="mt-1 line-clamp-2 break-words text-xs text-[var(--text-2)]">
+                <p className="mt-1 hidden line-clamp-2 break-words text-xs text-[var(--text-2)] sm:block">
                   {lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr}
                 </p>
               )}
             </div>
           </Link>
 
-          {/* Eylemler: YZ | WhatsApp */}
-          <div className="flex shrink-0 items-center gap-1.5" onClick={e => e.stopPropagation()}>
+          {/* Eylemler: mobil YZ | WA | Ara — masaüstü YZ solda, WA sağda (ara yok) */}
+          <div
+            className="flex w-[7.25rem] shrink-0 items-center justify-between gap-1.5 sm:w-20"
+            onClick={e => e.stopPropagation()}
+          >
             <button
               onClick={handleAIMessage}
               disabled={generating}
@@ -182,7 +185,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               <a
                 href={`tel:${candidate.phone}`}
                 onClick={() => markContacted.mutate({ id: candidate.id, actionType: 'call' })}
-                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md"
+                className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
                 aria-label={t('pipeline.call')}
                 title={t('pipeline.call')}
               >
@@ -356,7 +359,7 @@ export function CandidateCard({ candidate, workspaceId }: CandidateCardProps) {
               }
               return null
             })()}
-            <span className="text-xs text-[var(--text-3)]">{daysSince(candidate.last_contact_at, t)}</span>
+            <span className="hidden text-xs text-[var(--text-3)] sm:inline">{daysSince(candidate.last_contact_at, t)}</span>
           </div>
         </div>
       </li>

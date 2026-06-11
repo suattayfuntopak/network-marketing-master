@@ -1,6 +1,7 @@
 'use client'
 
 import { useActionState, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { signupAction } from '../actions'
@@ -30,21 +31,22 @@ export function SignupForm() {
     {},
   )
 
+  const searchParams = useSearchParams()
+  const ref = searchParams.get('ref')?.trim() ?? ''
+  const aday = searchParams.get('aday')?.trim() ?? ''
+  const hasInviteParams = Boolean(ref && aday)
+
   const [invite, setInvite] = useState<InviteSignupPrefill | null>(null)
-  const [inviteLoading, setInviteLoading] = useState(false)
+  const [inviteLoading, setInviteLoading] = useState(hasInviteParams)
   const [inviteError, setInviteError] = useState<string | null>(null)
-  const [hasInviteParams, setHasInviteParams] = useState(false)
 
   useEffect(() => {
-    const sp = new URLSearchParams(window.location.search)
-    const ref = sp.get('ref')?.trim()
-    const aday = sp.get('aday')?.trim()
     if (!ref || !aday) return
 
-    setHasInviteParams(true)
-    setInviteLoading(true)
+    let cancelled = false
     getInviteSignupPrefillAction(ref, aday)
       .then(prefill => {
+        if (cancelled) return
         if (!prefill) {
           setInviteError(t('auth.invitePrefillInvalid'))
           return
@@ -55,9 +57,17 @@ export function SignupForm() {
         }
         setInvite(prefill)
       })
-      .catch(() => setInviteError(t('auth.invitePrefillInvalid')))
-      .finally(() => setInviteLoading(false))
-  }, [t])
+      .catch(() => {
+        if (!cancelled) setInviteError(t('auth.invitePrefillInvalid'))
+      })
+      .finally(() => {
+        if (!cancelled) setInviteLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [ref, aday, t])
 
   useEffect(() => {
     if (state.success && state.shouldRedirect) {
