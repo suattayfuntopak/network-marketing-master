@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
 import { Search, ChevronDown, X } from 'lucide-react'
@@ -40,120 +40,13 @@ export interface TeamPerformanceSectionProps {
   memberGoalsMap?: Record<string, MemberGoalRow>
 }
 
-type FieldCardTab = 'aiInvite' | 'nmmInvite'
-
-const MEMBER_CARD_TABS: MemberCardTab[] = ['activity', 'onboarding', 'whatsapp', 'call']
-const FIELD_CARD_TABS: FieldCardTab[] = ['aiInvite', 'nmmInvite']
-
-const TEAM_TAB_STORAGE_KEY = 'nmm_team_perf_tabs'
-
-function isMemberCardTab(value: string | null): value is MemberCardTab {
-  return !!value && MEMBER_CARD_TABS.includes(value as MemberCardTab)
-}
-
-function isFieldCardTab(value: string | null): value is FieldCardTab {
-  return !!value && FIELD_CARD_TABS.includes(value as FieldCardTab)
-}
-
-function loadTeamTabState(): {
-  member: Record<string, MemberCardTab | undefined>
-  field: Record<string, FieldCardTab | undefined>
-} {
-  if (typeof window === 'undefined') return { member: {}, field: {} }
-  try {
-    const raw = sessionStorage.getItem(TEAM_TAB_STORAGE_KEY)
-    if (!raw) return { member: {}, field: {} }
-    const parsed = JSON.parse(raw) as {
-      member?: Record<string, MemberCardTab | undefined>
-      field?: Record<string, FieldCardTab | undefined>
-    }
-    return {
-      member: parsed.member ?? {},
-      field: parsed.field ?? {},
-    }
-  } catch {
-    return { member: {}, field: {} }
-  }
-}
-
+// Üye kartlarının açık sekmesini ölçüm anahtarı olarak serileştirir (virtualize remeasure).
+// Not: Sekme durumu KALICI DEĞİLDİR — sayfaya her girişte tüm sekmeler kapalı başlar.
 function serializeMemberTabs(member: Record<string, MemberCardTab | undefined>): string {
   return Object.entries(member)
     .filter((entry): entry is [string, MemberCardTab] => entry[1] != null)
     .map(([id, tab]) => `${id}:${tab}`)
     .join(',')
-}
-
-function serializeFieldTabs(field: Record<string, FieldCardTab | undefined>): string {
-  return Object.entries(field)
-    .filter((entry): entry is [string, FieldCardTab] => entry[1] != null)
-    .map(([id, tab]) => `${id}:${tab}`)
-    .join(',')
-}
-
-const PERF_HASH_PREFIX = '#perf='
-const PERF_URL_QUERY_MAX = 120
-
-function buildPerfCompact(memberSerialized: string, fieldSerialized: string): string {
-  return `m:${memberSerialized};f:${fieldSerialized}`
-}
-
-function parsePerfCompact(raw: string): {
-  member: Record<string, MemberCardTab>
-  field: Record<string, FieldCardTab>
-} {
-  const memberRaw = raw.match(/(?:^|;)m:([^;]*)/)?.[1] ?? ''
-  const fieldRaw = raw.match(/(?:^|;)f:([^;]*)/)?.[1] ?? ''
-  return {
-    member: parseMemberTabs(memberRaw || null),
-    field: parseFieldTabs(fieldRaw || null),
-  }
-}
-
-function readPerfFromHash(): ReturnType<typeof parsePerfCompact> | null {
-  if (typeof window === 'undefined') return null
-  const hash = window.location.hash
-  if (!hash.startsWith(PERF_HASH_PREFIX)) return null
-  try {
-    return parsePerfCompact(decodeURIComponent(hash.slice(PERF_HASH_PREFIX.length)))
-  } catch {
-    return null
-  }
-}
-
-function parseMemberTabs(raw: string | null): Record<string, MemberCardTab> {
-  if (!raw) return {}
-  const out: Record<string, MemberCardTab> = {}
-  for (const part of raw.split(',')) {
-    const sep = part.indexOf(':')
-    if (sep <= 0) continue
-    const id = part.slice(0, sep)
-    const tab = part.slice(sep + 1)
-    if (isMemberCardTab(tab)) out[id] = tab
-  }
-  return out
-}
-
-function sanitizeMemberTabs(
-  member: Record<string, MemberCardTab | undefined>,
-): Record<string, MemberCardTab | undefined> {
-  const out: Record<string, MemberCardTab | undefined> = {}
-  for (const [id, tab] of Object.entries(member)) {
-    if (tab && isMemberCardTab(tab)) out[id] = tab
-  }
-  return out
-}
-
-function parseFieldTabs(raw: string | null): Record<string, FieldCardTab> {
-  if (!raw) return {}
-  const out: Record<string, FieldCardTab> = {}
-  for (const part of raw.split(',')) {
-    const sep = part.indexOf(':')
-    if (sep <= 0) continue
-    const id = part.slice(0, sep)
-    const tab = part.slice(sep + 1)
-    if (isFieldCardTab(tab)) out[id] = tab
-  }
-  return out
 }
 
 function getSearchScore(fullName: string | null, query: string): number {
@@ -177,8 +70,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     memberGoalsMap = {},
   } = props
   const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
   const [toolsOpen, setToolsOpen] = useState(true)
@@ -248,114 +139,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     }
   }
   const [now] = useState(() => Date.now())
+  // Sekme durumu efemeraldir: sayfaya her girişte tüm üye kartı sekmeleri kapalı başlar.
+  // Kullanıcı tıklayarak açar; kalıcılık (sessionStorage/URL) bilinçli olarak yoktur.
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
-  const [fieldCardTab, setFieldCardTab] = useState<Record<string, FieldCardTab | undefined>>({})
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
-  const [tabsHydrated, setTabsHydrated] = useState(false)
-
-  const syncPerfTabsToUrl = useCallback((
-    member: Record<string, MemberCardTab | undefined>,
-    field: Record<string, FieldCardTab | undefined>,
-  ) => {
-    const params = new URLSearchParams(searchParams.toString())
-    const memberSerialized = serializeMemberTabs(member)
-    const fieldSerialized = serializeFieldTabs(field)
-    const compact = buildPerfCompact(memberSerialized, fieldSerialized)
-
-    params.delete('perfMember')
-    params.delete('perfMemberTab')
-    params.delete('perfField')
-    params.delete('perfFieldTab')
-
-    if (compact.length > PERF_URL_QUERY_MAX) {
-      params.delete('perfMemberTabs')
-      params.delete('perfFieldTabs')
-      const qs = params.toString()
-      const base = qs ? `${pathname}?${qs}` : pathname
-      router.replace(`${base}${PERF_HASH_PREFIX}${encodeURIComponent(compact)}`, { scroll: false })
-      return
-    }
-
-    if (memberSerialized) params.set('perfMemberTabs', memberSerialized)
-    else params.delete('perfMemberTabs')
-
-    if (fieldSerialized) params.set('perfFieldTabs', fieldSerialized)
-    else params.delete('perfFieldTabs')
-
-    const qs = params.toString()
-    if (typeof window !== 'undefined' && window.location.hash.startsWith(PERF_HASH_PREFIX)) {
-      window.history.replaceState(null, '', qs ? `${pathname}?${qs}` : pathname)
-    }
-    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [router, searchParams, pathname])
-
-  useEffect(() => {
-    const stored = loadTeamTabState()
-    const member: Record<string, MemberCardTab | undefined> = { ...stored.member }
-    const field: Record<string, FieldCardTab | undefined> = { ...stored.field }
-
-    const fromHash = readPerfFromHash()
-    if (fromHash) {
-      Object.assign(member, fromHash.member)
-      Object.assign(field, fromHash.field)
-    } else {
-      Object.assign(member, parseMemberTabs(searchParams.get('perfMemberTabs')))
-      Object.assign(field, parseFieldTabs(searchParams.get('perfFieldTabs')))
-    }
-
-    const urlMemberId = searchParams.get('perfMember')
-    const urlMemberTab = searchParams.get('perfMemberTab')
-    if (urlMemberId && isMemberCardTab(urlMemberTab)) {
-      member[urlMemberId] = urlMemberTab
-    }
-
-    const urlFieldId = searchParams.get('perfField')
-    const urlFieldTab = searchParams.get('perfFieldTab')
-    if (urlFieldId && isFieldCardTab(urlFieldTab)) {
-      field[urlFieldId] = urlFieldTab
-    }
-
-    /* eslint-disable-next-line react-hooks/set-state-in-effect */
-    setMemberCardTab(sanitizeMemberTabs(member))
-    setFieldCardTab(field)
-    setTabsHydrated(true)
-  }, [searchParams])
-
-  useEffect(() => {
-    if (!tabsHydrated) return
-
-    const applyHashPerf = () => {
-      const fromHash = readPerfFromHash()
-      if (!fromHash) return
-      setMemberCardTab(prev => ({ ...prev, ...fromHash.member }))
-      setFieldCardTab(prev => ({ ...prev, ...fromHash.field }))
-    }
-
-    window.addEventListener('hashchange', applyHashPerf)
-    window.addEventListener('popstate', applyHashPerf)
-    return () => {
-      window.removeEventListener('hashchange', applyHashPerf)
-      window.removeEventListener('popstate', applyHashPerf)
-    }
-  }, [tabsHydrated])
-
-  useEffect(() => {
-    if (!tabsHydrated) return
-    sessionStorage.setItem(
-      TEAM_TAB_STORAGE_KEY,
-      JSON.stringify({ member: memberCardTab, field: fieldCardTab }),
-    )
-  }, [memberCardTab, fieldCardTab, tabsHydrated])
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
-    setMemberCardTab(prev => {
-      const next = {
-        ...prev,
-        [userId]: prev[userId] === tab ? undefined : tab,
-      }
-      syncPerfTabsToUrl(next, fieldCardTab)
-      return next
-    })
+    setMemberCardTab(prev => ({
+      ...prev,
+      [userId]: prev[userId] === tab ? undefined : tab,
+    }))
   }
 
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]

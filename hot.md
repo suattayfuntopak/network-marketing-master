@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-12 — Ekip üye kartları: sekmeler başlangıçta kapalı ✅
+
+### Sorun
+Ekip (Ekibim Plus) üye listesinde her kişinin aktivite/sekme durumu `sessionStorage` + URL (`perfMemberTabs`, `#perf=`) ile kalıcı tutuluyordu; sayfaya her girişte daha önce açılan sekmeler tekrar açık geliyordu — kullanıcı bunu "varsayılan açık" olarak deneyimliyordu.
+
+### Çözüm
+- **`TeamPerformanceSection.tsx`:** Sekme kalıcılığı (sessionStorage yazma/okuma, URL/hash senkronu, `perfMember*` parse) tamamen kaldırıldı. `memberCardTab` artık efemeral local state — sayfaya her girişte **tüm üye kartı sekmeleri kapalı** başlar; kullanıcı tıklayarak açar.
+- Ölü kod temizlendi: `loadTeamTabState`, `serializeFieldTabs`, `parseMemberTabs/parseFieldTabs`, `sanitizeMemberTabs`, `buildPerfCompact/parsePerfCompact`, `readPerfFromHash`, `syncPerfTabsToUrl`, `fieldCardTab` state, `tabsHydrated`, `usePathname/useSearchParams` importları. `serializeMemberTabs` yalnızca virtualize remeasure anahtarı için korundu.
+
+### Dosyalar
+`src/app/(dashboard)/ekip/_components/TeamPerformanceSection.tsx`
+
 ## 2026-06-12 — Developer & UX Improvements (Phase 2) ✅
 
 ### UX Optimistic Updates
