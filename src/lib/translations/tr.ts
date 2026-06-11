@@ -135,6 +135,9 @@ export const tr = {
     resetPassword: "Şifremi Unuttum",
     backToLogin: "Giriş Sayfasına Dön",
     errorOccured: "Bir hata oluştu, lütfen bilgilerinizi kontrol edin.",
+    invitePasswordOnlyHint: "Ad ve e-posta sponsorunuzun kaydından geldi — yalnızca şifrenizi belirleyin.",
+    invitePrefillInvalid: "Davet bağlantısı geçersiz veya süresi dolmuş. Liderinizden yeni link isteyin.",
+    invitePrefillNoEmail: "Bu aday için e-posta kayıtlı değil. Lideriniz Listem'de e-postayı ekledikten sonra tekrar deneyin.",
   },
   hedef: {
     title: "Hedefini Belirle",
@@ -484,7 +487,7 @@ export const tr = {
     backToTeam: "Ekibime Dön",
     memberNotFound: "Üye bulunamadı",
     unnamedMember: "İsimsiz Üye",
-    inviteWaMessage: "Merhaba {name},\n\nSahadaki çalışmalarımızı daha profesyonel bir boyuta taşımak ve işimizi dijital olarak da takip edebilmek için 'Network Marketing Master' uygulamasına davetlisiniz!\n\nBu uygulama sayesinde sistemli ve disiplinli bir çalışma ile harika bir sinerji ve başarı yakalayabileceğimize inanıyorum. Kayıt linki ve detaylar aşağıdadır:\n\nKayıt Linki: {link}\nDavet Kodu: {code}\n\nKayıt olduktan sonra yukarıdaki davet kodunu 'Ekibim' sayfasındaki 'Davet Kodunu Gir' kutusuna girmeniz yeterli!\n\nMüsait olduğunuzda bir göz atıp bana haber verirseniz ilk adımları birlikte planlayabiliriz.\n\nGörüşmek dileğiyle!",
+    inviteWaMessage: "Merhaba {name},\n\nSahadaki çalışmalarımızı daha profesyonel bir boyuta taşımak ve işimizi dijital olarak takip edebilmek için Network Marketing Master uygulamasına davetlisiniz!\n\nKayıt linki: {link}\n\nLinkten kaydolunca adın ve e-postan hazır gelir; yalnızca şifreni belirleyip ekibime otomatik bağlanırsın.\n\nMüsait olduğunuzda bir göz atıp bana haber verirseniz ilk adımları birlikte planlayabiliriz.\n\nGörüşmek dileğiyle!",
     memberDetailBack: "Ekibe Dön",
     memberDetailTitle: "Üye Detayı",
     memberDetailJoinedDate: "Katılım: {date}",

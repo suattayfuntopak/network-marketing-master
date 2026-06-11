@@ -99,7 +99,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   // oluşturulurken (ensureWorkspaceAction) otomatik olarak liderin ekibine bağlanır
   // (parent_id) → "dış kayıt"/çift sayım olmadan. Kod, link açılmazsa yedek olarak kalır.
   const inviteLink = buildInviteLink(inviteCode, candidateId)
-  const linkBlock = `\n\nKayıt linki: ${inviteLink}\n(Linkten kaydolunca ekibime otomatik bağlanırsın. Kod istenirse: ${inviteCode})`
+  const linkBlock = `\n\nKayıt linki: ${inviteLink}\n(Linkten kaydolunca adın ve e-postan hazır gelir; yalnızca şifreni belirleyip ekibime otomatik bağlanırsın.)`
 
   try {
     const model = genAI.getGenerativeModel({
@@ -110,7 +110,7 @@ Kurallar:
 2. Baskıcı/suçlayıcı olma; merak ve güven duygusu uyandır.
 3. Vurgu: Sadece uygulamaya kayıt değil — senin sponsorluğun altında, aynı sistemle saha disiplinini birlikte kurmak. Gerçek hayatta zaten ekibinde olabilir ama NMM'de sana bağlı değildir; bunu nazikçe ima et.
 4. NMM'in pratik faydasını 1 cümlede belirt (aday takibi, YZ koçu, saha provası).
-5. Mesajın SONUNA sana verilen davet linkini ve kodu AYNEN, değiştirmeden ekle.
+5. Mesajın SONUNA sana verilen davet linkini AYNEN, değiştirmeden ekle (davet kodu yazma — link yeterli).
 6. 2-3 emoji, kısa (en fazla ~90 kelime), akıcı Türkçe. SADECE mesaj metnini döndür.`
     })
     const result = await model.generateContent({
@@ -119,7 +119,7 @@ Kurallar:
     })
     let message = result.response.text().trim()
     if (!message) throw new Error('Boş yanıt döndü.')
-    if (inviteCode && !message.includes(inviteCode)) message += linkBlock
+    if (inviteLink && !message.includes(inviteLink)) message += linkBlock
 
     await logAIGeneration({
       workspaceId: quota.workspaceId,

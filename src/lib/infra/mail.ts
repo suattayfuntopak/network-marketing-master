@@ -1,5 +1,6 @@
 import { Resend } from 'resend'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
+import { formatEmailDate, formatEmailDateTime } from '@/lib/utils/emailDateTime'
 import {
   NMM_APP_URL,
   NMM_REPLY_TO,
@@ -117,11 +118,7 @@ export async function sendPaymentSuccessEmail(
     ? `Payment Confirmed! Your ${planLabel} is active 💎`
     : `Ödemeniz Alındı! ${planLabel} lisansınız aktifleşti 💎`
 
-  const dateFormatted = new Date(expiresAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
+  const dateFormatted = formatEmailDate(expiresAt, lang)
 
   const receipt = lang === 'en'
     ? emailPlanBox([
@@ -193,9 +190,7 @@ export async function sendLicenseExpiryEmail(
       ? 'Plus Lider'
       : 'Basic Partner'
 
-  const dateFormatted = new Date(expiresAt).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-    year: 'numeric', month: 'long', day: 'numeric',
-  })
+  const dateFormatted = formatEmailDate(expiresAt, lang)
 
   const subject = lang === 'en'
     ? `Your license expires in ${daysRemaining} day${daysRemaining > 1 ? 's' : ''}! ⏳`
@@ -259,7 +254,7 @@ export async function sendAdminNewUserEmail(
     emailPlanBox([
       `<strong>İsim:</strong> ${newUserName}`,
       `<strong>E-posta:</strong> ${newUserEmail}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Detaylar için Platform Yönetimi sayfasını kullanabilirsiniz.'),
   ].join('')
@@ -308,7 +303,7 @@ export async function sendUnresolvedOrderAlertEmail(params: {
       `<strong>Not (note):</strong> ${params.note ?? '—'}`,
       `<strong>Ürün ID:</strong> ${params.productId ?? '—'}`,
       `<strong>Neden:</strong> ${params.reason}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Müşteriyi Platform Yönetimi sayfasından bulup lisansını el ile tanımlayabilirsiniz.'),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Platform Yönetimini Aç'),
@@ -357,7 +352,7 @@ export async function sendModerationAlertEmail(
       `<strong>Gönderen:</strong> ${userName} (${userEmail})`,
       `<strong>Başlık:</strong> ${contentTitle}`,
       `<strong>Tür:</strong> ${typeLabel}`,
-      `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+      `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
     ]),
     emailParagraph('Talebi incelemek, düzenlemek veya onaylamak için Platform Yönetimi paneline gidebilirsiniz.'),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Moderasyon Panelini Aç'),
@@ -557,7 +552,7 @@ export async function sendBankTransferNotifyEmail(
         workspaceName ? `<strong>Çalışma alanı:</strong> ${workspaceName}` : '',
         `<strong>Mevcut plan:</strong> ${currentPlan}`,
         intendedPlan ? `<strong>Talep edilen plan:</strong> ${intendedPlan}` : '',
-        `<strong>Zaman:</strong> ${new Date().toLocaleString('tr-TR')}`,
+        `<strong>Zaman:</strong> ${formatEmailDateTime(new Date(), 'tr')}`,
       ].filter(Boolean),
     ),
     emailCta(`${NMM_APP_URL}/platform-yonetim`, 'Lisansı Aktive Et'),

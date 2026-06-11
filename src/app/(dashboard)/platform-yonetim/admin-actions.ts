@@ -1,5 +1,6 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin } from '@/lib/domain/auth'
@@ -169,13 +170,21 @@ export async function claimIndependentSignupToTeamAction(
   //    hattındaki "katıldı" adayıyla eşleştir/oluştur + KALICI member↔aday bağı kur
   //    + stage katıldı. Böylece kişi Listem'de, detay sayfası açık, NMM Ortağı olur
   //    ve MÜKERRER kayıt oluşmaz (mevcut Saha adayı bu üyeye bağlanır, ayrıca listelenmez).
-  const targetMember = await admin
+  const { data: targetMember } = await admin
     .from('nmm_workspace_members')
     .select('full_name')
     .eq('user_id', target.owner_id)
-    .limit(1)
+    .eq('workspace_id', targetWorkspaceId)
     .maybeSingle()
-  const targetName = (targetMember.data?.full_name ?? '').trim()
+
+  let targetName = (targetMember?.full_name ?? '').trim()
+  let targetPhone: string | null = null
+
+  if (!targetName) {
+    const { data: authUser } = await admin.auth.admin.getUserById(target.owner_id)
+    targetName = (authUser?.user?.user_metadata?.full_name as string | undefined)?.trim() ?? ''
+    targetPhone = (authUser?.user?.user_metadata?.phone as string | undefined)?.trim() || null
+  }
 
   if (targetName) {
     const { data: leaderCands } = await admin
@@ -185,7 +194,7 @@ export async function claimIndependentSignupToTeamAction(
       .eq('owner_id', user.id)
 
     const pool = leaderCands ?? []
-    let candidateId = findLeaderCandidateForMember(pool, user.id, targetName)
+    let candidateId = findLeaderCandidateForMember(pool, user.id, targetName, targetPhone)
 
     if (candidateId) {
       const matched = pool.find(c => c.id === candidateId)
@@ -218,6 +227,7 @@ export async function claimIndependentSignupToTeamAction(
     }
   }
 
+  revalidatePath('/platform-yonetim')
   return { success: true }
 }
 

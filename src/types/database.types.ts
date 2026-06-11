@@ -111,6 +111,7 @@ export interface Database {
           workspace_id: string
           owner_id: string
           full_name: string
+          email: string | null
           phone: string | null
           stage: CandidateStage
           last_contact_at: string | null
@@ -128,6 +129,7 @@ export interface Database {
           workspace_id: string
           owner_id: string
           full_name: string
+          email?: string | null
           phone?: string | null
           stage?: CandidateStage
           last_contact_at?: string | null
@@ -145,6 +147,7 @@ export interface Database {
           workspace_id?: string
           owner_id?: string
           full_name?: string
+          email?: string | null
           phone?: string | null
           stage?: CandidateStage
           last_contact_at?: string | null
@@ -1022,7 +1025,7 @@ export interface Database {
     Views: { [_ in never]: never }
     Functions: {
       nmm_join_workspace: {
-        Args: { p_invite_code: string }
+        Args: { p_invite_code: string; p_candidate_id?: string | null }
         Returns: Json
       }
       nmm_remove_member: {

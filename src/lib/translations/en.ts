@@ -135,6 +135,9 @@ export const en = {
     resetPassword: "Forgot Password",
     backToLogin: "Back to Login",
     errorOccured: "An error occurred, please verify your credentials.",
+    invitePasswordOnlyHint: "Name and email come from your sponsor's record — set your password only.",
+    invitePrefillInvalid: "This invite link is invalid or expired. Ask your sponsor for a new link.",
+    invitePrefillNoEmail: "No email is saved for this contact. Ask your sponsor to add it in their pipeline first.",
   },
   hedef: {
     title: "Set Your Goal",
@@ -485,7 +488,7 @@ export const en = {
     backToTeam: "Back to My Team",
     memberNotFound: "Member not found",
     unnamedMember: "Unnamed Member",
-    inviteWaMessage: "Hello {name},\n\nYou're invited to join Network Marketing Master — so we can take our field work to a more professional level and track our business digitally!\n\nI believe this app will help us build great synergy and success through a structured, disciplined approach. Registration link and details are below:\n\nRegistration link: {link}\nInvite code: {code}\n\nAfter signing up, just enter the invite code above in the \"Enter invite code\" box on the My Team page!\n\nWhen you have a moment, take a look and let me know — we can plan the first steps together.\n\nLooking forward to connecting!",
+    inviteWaMessage: "Hello {name},\n\nYou're invited to Network Marketing Master — so we can track our field work professionally and digitally!\n\nRegistration link: {link}\n\nFrom the link, your name and email are pre-filled; set your password and you'll join my team automatically.\n\nWhen you have a moment, take a look and let me know — we can plan the first steps together.\n\nLooking forward to connecting!",
     memberDetailBack: "Back to Team",
     memberDetailTitle: "Member Detail",
     memberDetailJoinedDate: "Joined: {date}",

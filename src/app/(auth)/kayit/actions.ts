@@ -5,6 +5,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendWelcomeEmail, sendAdminNewUserEmail } from '@/lib/infra/mail'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
+import { resolveInviteSignupName } from '@/lib/domain/inviteSignup'
+import { ensureWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 
 interface FormState {
   error?: string
@@ -29,8 +31,17 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   const inviteCode = (formData.get('ref') as string | null)?.trim().toUpperCase() ?? ''
   const inviteCandidateId = (formData.get('aday') as string | null)?.trim() ?? ''
 
-  if (!email || !password || !fullName) {
-    return { error: 'Tüm alanları doldurmak zorunlu.' }
+  if (!email || !password) {
+    return { error: 'E-posta ve şifre zorunlu.' }
+  }
+
+  const resolvedName =
+    inviteCode && inviteCandidateId
+      ? await resolveInviteSignupName(inviteCode, inviteCandidateId, fullName)
+      : fullName.trim()
+
+  if (!resolvedName) {
+    return { error: 'Ad soyad zorunlu.' }
   }
 
   const supabase = await createClient()
@@ -39,7 +50,7 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     password,
     options: {
       data: {
-        full_name: fullName,
+        full_name: resolvedName,
         ...(inviteCode ? { pending_invite_code: inviteCode } : {}),
         ...(inviteCandidateId ? { pending_candidate_id: inviteCandidateId } : {}),
       },
@@ -62,14 +73,14 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
     after(async () => {
       // 1) Kullanıcıya hoş geldin e-postası (kritik — önce ve bağımsız)
       try {
-        await sendWelcomeEmail(email, fullName, 'tr')
+        await sendWelcomeEmail(email, resolvedName, 'tr')
       } catch (err) {
         console.error('[signupAction] Welcome email failed:', err)
       }
 
       // 2) Admin'e bilgilendirme e-postası
       try {
-        await sendAdminNewUserEmail(SUPER_ADMIN_EMAIL, email, fullName)
+        await sendAdminNewUserEmail(SUPER_ADMIN_EMAIL, email, resolvedName)
       } catch (err) {
         console.error('[signupAction] Admin notification email failed:', err)
       }
@@ -84,8 +95,8 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
             user_id: adminUser.id,
             title_tr: 'Yeni Platform Kaydı 🚀',
             title_en: 'New Platform Signup 🚀',
-            description_tr: `${fullName} (${email}) platforma yeni bağımsız üye olarak kaydoldu!`,
-            description_en: `${fullName} (${email}) signed up as a new independent member!`,
+            description_tr: `${resolvedName} (${email}) platforma yeni bağımsız üye olarak kaydoldu!`,
+            description_en: `${resolvedName} (${email}) signed up as a new independent member!`,
             type: 'user',
           })
         }
@@ -101,9 +112,14 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   }
 
   if (data.session) {
+    try {
+      await ensureWorkspaceAction()
+    } catch (wsErr) {
+      console.error('[signupAction] ensureWorkspace after signup:', wsErr)
+    }
     return {
-      success: 'Hesabınız başarıyla oluşturuldu! Giriş yapılıyor, yönlendiriliyorsunuz...',
-      shouldRedirect: true
+      success: 'Hesabınız başarıyla oluşturuldu! Panoya yönlendiriliyorsunuz...',
+      shouldRedirect: true,
     }
   }
 
