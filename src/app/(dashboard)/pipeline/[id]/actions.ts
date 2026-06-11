@@ -2,7 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
-import { REGISTER_URL } from '@/lib/domain/constants'
+import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -98,9 +98,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   // Link sponsor kodunu + aday id'sini taşır: kişi linkten kaydolunca workspace'i
   // oluşturulurken (ensureWorkspaceAction) otomatik olarak liderin ekibine bağlanır
   // (parent_id) → "dış kayıt"/çift sayım olmadan. Kod, link açılmazsa yedek olarak kalır.
-  const inviteLink = inviteCode
-    ? `${REGISTER_URL}?ref=${encodeURIComponent(inviteCode)}&aday=${encodeURIComponent(candidateId)}`
-    : REGISTER_URL
+  const inviteLink = buildInviteLink(inviteCode, candidateId)
   const linkBlock = `\n\nKayıt linki: ${inviteLink}\n(Linkten kaydolunca ekibime otomatik bağlanırsın. Kod istenirse: ${inviteCode})`
 
   try {

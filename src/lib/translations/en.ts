@@ -83,7 +83,7 @@ export const en = {
     sahaProvasi: "Rehearsal",
     uyum: "Compliance",
     istatistikler: "Stats",
-    platformYonetim: "Platform",
+    platformYonetim: "Admin",
   },
   nav: {
     pano: "Dashboard",
@@ -105,7 +105,7 @@ export const en = {
     todayFocus: "Personal follow-up",
     uyum: "Compliance Center",
     istatistikler: "Statistics",
-    platformYonetim: "Platform Admin",
+    platformYonetim: "Admin",
   },
   stages: {
     yeni: "New Prospect",

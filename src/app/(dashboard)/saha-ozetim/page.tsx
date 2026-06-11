@@ -10,6 +10,7 @@ import {
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
   getHubYearlySelfAction,
+  getHubAllTimeSelfAction,
 } from '@/app/(dashboard)/crown/actions'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 
@@ -41,7 +42,9 @@ export default async function SahaOzetimPage({ searchParams }: Props) {
           ? { key: queryKeys.hubWeeklySelf(offset), fn: () => getHubWeeklySelfAction(offset) }
           : activeTab === 'monthly'
             ? { key: queryKeys.hubMonthlySelf(offset), fn: () => getHubMonthlySelfAction(offset) }
-            : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
+            : activeTab === 'all'
+              ? { key: queryKeys.hubAllTimeSelf(), fn: () => getHubAllTimeSelfAction() }
+              : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
     await queryClient.prefetchQuery({ queryKey: active.key, queryFn: active.fn, staleTime: 60_000 })
   }
 

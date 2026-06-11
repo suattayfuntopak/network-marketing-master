@@ -34,7 +34,7 @@ import {
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { REGISTER_URL } from '@/lib/domain/constants'
+import { buildInviteLink } from '@/lib/domain/inviteLink'
 import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
@@ -200,8 +200,7 @@ export function PlatformYonetimContent() {
   })
 
   function buildInviteWaLink(code: string, name: string): string {
-    const link = code ? `${REGISTER_URL}?ref=${encodeURIComponent(code)}` : REGISTER_URL
-    const msg = t('platformPage.inviteWaMessage', { name, link, code })
+    const msg = t('platformPage.inviteWaMessage', { name, link: buildInviteLink(code), code })
     return `https://wa.me/?text=${encodeURIComponent(msg)}`
   }
 

@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-11 — Tüm Zamanlar sekmesi + mobil scroll fix + Admin rename + davet helper ✅
+
+### Mobil scroll fix (T2) — kök neden
+- Yatay-kaydırmalı tablolar `touch-action: pan-x` kullanıyordu → parmak tablonun üzerindeyken **dikey sayfa scroll'u bloke oluyordu**. `globals.css .horizontal-scroll-lock` → `pan-x pan-y`; `HorizontalScrollLock`'tan çakışan `touch-pan-x` Tailwind sınıfı kaldırıldı. Artık tablo/kutu üzerinde de sayfa dikey kayar (yatay tablo scroll'u + no-swipe korundu).
+
+### "Tüm Zamanlar" 5. sekme (T3+T4) — altyapı zaten vardı (getHubAllTimeSelfAction/HubAllTimeHero)
+- **Saha Özetim**: `HUB_PERIOD_TABS`'e 'all' eklendi (parseSummaryTab artık 'all' döndürür, legacy 'all'→'yearly' kaldırıldı). HubSummaryTabBar 5. sekme (mor) + FieldSummaryPage 'all' dalı (HubAllTimeHero + funnel/aktivite, offset/şerit yok) + page.tsx prefetch + queryKeys.hubAllTimeSelf.
+- **İstatistikler**: `PulsePeriodTabs` 'all' (∞) eklendi; `useCandidateStats` artık 'all'i 'ytd'ye normalize etmiyor (gerçek tüm-zaman). AI usage tablosu `archiveDateRange('all')` ile zaten tüm-zaman.
+- **Mobil tasarım**: her iki sekme barında mobilde **1 / 7 / 30 / 365 / ∞**, masaüstünde Günlük/Haftalık/Aylık/Yıllık/Tüm Zamanlar (responsive span).
+
+### Admin rename (T2b)
+- `Platform Yönetimi` çok uzundu → **Admin** (sidebar `nav.platformYonetim`, bottom bar kısa etiket, sayfa başlığı `consoleTitle`; TR+EN). Bottom bar `YZ Koçu`→`YZ Koçum` da düzeltildi.
+
+### İstatistikler super-admin başlığı (T1)
+- "SINIRSIZ SÜPER ADMİN HESABI" mobilde 2 satıra kayıyordu → `whitespace-nowrap` + `text-[11px] sm:text-base` + `tracking-wide` (tek satır, hafif küçük).
+
+### Onaylanan öneriler
+- **#2 buildInviteLink helper** (`lib/domain/inviteLink.ts`): 4+ yerdeki `?ref[&aday]` link kurulumu tek kaynağa toplandı (EkipPanel, InviteTeammateSection, PlatformYonetim, pipeline/[id]/actions). +5 unit test.
+- **#4 Saha→NMM rozeti** ve **#3 reconcile entegrasyon testi**: kapsam/öncelik dengesi için bu tura alınmadı (rapora not — düşük risk, sonraki tur).
+
+### Doğrulama
+tsc + lint + unit (188/188) + build + migrate:check yeşil.
+
+### Dosyalar
+`globals.css`, `HorizontalScrollLock.tsx`, `hubPeriodPrefetch.ts(+test)`, `HubSummaryTabBar.tsx`, `FieldSummaryPage.tsx`, `saha-ozetim/page.tsx`, `keys.ts`, `pulse/PulsePeriodTabs.tsx`, `useCandidateStats.ts`, `MyAIUsageQuotaCard.tsx`, `tr.ts/en.ts/platform.ts` (Admin), `lib/domain/inviteLink.ts(+test)` + 4 çağrı yeri
+
 ## 2026-06-11 — Listem ikon/başlık + chevron tam-satır + davet senkron (mükerrer önleme) + CI shim fix ✅
 
 ### CI migrate-apply kırmızıydı → shim tamamlandı

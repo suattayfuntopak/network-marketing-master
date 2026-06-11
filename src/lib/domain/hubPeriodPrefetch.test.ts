@@ -11,7 +11,8 @@ describe('hubPeriodPrefetch', () => {
   it('parseSummaryTab defaults to daily', () => {
     expect(parseSummaryTab(null)).toBe('daily')
     expect(parseSummaryTab('weekly')).toBe('weekly')
-    expect(parseSummaryTab('all')).toBe('yearly')
+    expect(parseSummaryTab('all')).toBe('all') // Tüm Zamanlar artık gerçek bir sekme
+    expect(parseSummaryTab('bilinmeyen')).toBe('daily')
   })
 
   it('hubPeriodOffsetsForPrefetch without active tab only prefetches offset 0', () => {

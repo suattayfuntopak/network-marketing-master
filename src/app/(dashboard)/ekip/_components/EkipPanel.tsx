@@ -17,7 +17,7 @@ import {
 } from '../actions'
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { REGISTER_URL } from '@/lib/domain/constants'
+import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
 import { queryKeys } from '@/lib/query/keys'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
@@ -71,12 +71,8 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
 
   const handleInviteMember = (member: MemberRow) => {
     const code = ws?.inviteCode || ''
-    // Link sponsor kodunu (+ varsa aday id'sini) taşır → kişi linkten kaydolunca
-    // davet kodunu ELLE girmeden otomatik bu ekibe bağlanır (ensureWorkspaceAction →
-    // nmm_join_workspace), boru hattındaki "katıldı" adayıyla eşleşir, NMM Ortağı olur.
-    const link = code
-      ? `${REGISTER_URL}?ref=${encodeURIComponent(code)}${member.pipeline_id ? `&aday=${encodeURIComponent(member.pipeline_id)}` : ''}`
-      : REGISTER_URL
+    // Link sponsor kodunu (+ varsa aday id'sini) taşır → otomatik ekip bağlaması (bkz. buildInviteLink).
+    const link = buildInviteLink(code, member.pipeline_id)
     const message = t('team.inviteWaMessage', {
       name: member.full_name ?? t('common.member'),
       link,

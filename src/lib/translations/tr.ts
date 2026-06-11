@@ -83,7 +83,7 @@ export const tr = {
     sahaProvasi: "Saha Provası",
     uyum: "Uyum Merkezi",
     istatistikler: "İstatistikler",
-    platformYonetim: "Yönetim",
+    platformYonetim: "Admin",
   },
   nav: {
     pano: "Pano",
@@ -105,7 +105,7 @@ export const tr = {
     todayFocus: "Kişisel takip",
     uyum: "Uyum Merkezi",
     istatistikler: "İstatistikler",
-    platformYonetim: "Platform Yönetimi",
+    platformYonetim: "Admin",
   },
   stages: {
     yeni: "Yeni Aday",
