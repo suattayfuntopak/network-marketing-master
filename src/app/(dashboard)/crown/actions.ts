@@ -20,7 +20,7 @@ import { periodStartIso, type PulsePeriod } from '@/lib/domain/pulse'
 
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
-import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
+import { VIDEO_COMPLETE_PERCENT, type VideoProgressSummary } from '@/lib/domain/videoProgress'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import type { TeamFieldActivityResult } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 
@@ -125,7 +125,7 @@ export async function getCrownVideoPageAction(workspaceId: string): Promise<Crow
   let lastCompletedAt = ''
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= 90
+    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
     const at = p?.completed_at ?? p?.started_at ?? ''
     if (done && at >= lastCompletedAt) {
       lastCompletedAt = at
@@ -135,7 +135,7 @@ export async function getCrownVideoPageAction(workspaceId: string): Promise<Crow
   let nextVideo: CrownVideoHighlight | null = null
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= 90
+    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
     if (!done) {
       nextVideo = { key: v.key, titleTr: v.titleTr, titleEn: v.titleEn }
       break

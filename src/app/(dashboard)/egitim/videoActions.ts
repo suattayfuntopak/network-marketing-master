@@ -8,6 +8,7 @@ import { sendModerationAlertEmail } from '@/lib/infra/mail'
 import { type TrainingVideoDef } from '@/lib/domain/trainingVideos'
 import {
   summarizeVideoProgress,
+  VIDEO_COMPLETE_PERCENT,
   type VideoProgressRow,
   type VideoProgressSummary,
 } from '@/lib/domain/videoProgress'
@@ -145,93 +146,42 @@ export async function getVideoCatalogAction(workspaceId: string): Promise<VideoC
   return { videos, progressByKey, summary }
 }
 
-export async function markVideoStartedAction(
+/**
+ * Otomatik izleme raporu (YouTube IFrame API).
+ * - `watch_percent` MONOTONİKtir: yalnızca en uzun seyredilen yüzde kayıtlı kalır;
+ *   yeni bir izleme bu süreyi geçince metrik güncellenir.
+ * - Video ancak SONUNA kadar izlenince (`ended` veya eşik) "completed" sayılır.
+ */
+export async function reportVideoWatchAction(
   workspaceId: string,
-  videoKey: string
+  videoKey: string,
+  watchPercent: number,
+  ended = false,
 ): Promise<void> {
   const { supabase, user } = await assertMember(workspaceId)
   const video = await fetchVideoByKey(supabase, videoKey)
   if (!video) throw new Error('Geçersiz video.')
   const durationSec = video.duration_min * 60
+  const now = new Date().toISOString()
 
   const { data: existing } = await supabase
     .from('nmm_video_progress')
-    .select('status')
+    .select('status, watch_percent, started_at, completed_at')
     .eq('user_id', user.id)
     .eq('video_key', videoKey)
     .maybeSingle()
 
-  if (existing?.status === 'completed') return
+  const wasCompleted = existing?.status === 'completed'
+  const priorPct = existing?.watch_percent ?? 0
+  const incoming = Math.max(0, Math.min(100, Math.round(watchPercent)))
+  // En uzun seyredilen süre korunur (monotonik artış).
+  const nextPct = Math.max(priorPct, ended ? 100 : incoming)
+  const completed = wasCompleted || ended || nextPct >= VIDEO_COMPLETE_PERCENT
+  const finalPct = completed ? 100 : nextPct
+  const positionSec = Math.round((durationSec * finalPct) / 100)
 
-  await supabase.from('nmm_video_progress').upsert(
-    {
-      user_id: user.id,
-      video_key: videoKey,
-      workspace_id: workspaceId,
-      status: 'started',
-      duration_sec: durationSec,
-      started_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id,video_key' }
-  )
-}
-
-export async function markVideoCompletedAction(
-  workspaceId: string,
-  videoKey: string
-): Promise<void> {
-  const { supabase, user } = await assertMember(workspaceId)
-  const video = await fetchVideoByKey(supabase, videoKey)
-  if (!video) throw new Error('Geçersiz video.')
-  const durationSec = video.duration_min * 60
-  const now = new Date().toISOString()
-
-  const { data: priorRows } = await supabase
-    .from('nmm_video_progress')
-    .select('video_key, status')
-    .eq('user_id', user.id)
-
-  const completedBefore =
-    (priorRows ?? []).filter(
-      r => r.status === 'completed' && r.video_key !== videoKey
-    ).length
-
-  await supabase.from('nmm_video_progress').upsert(
-    {
-      user_id: user.id,
-      video_key: videoKey,
-      workspace_id: workspaceId,
-      status: 'completed',
-      watch_percent: 100,
-      position_sec: durationSec,
-      duration_sec: durationSec,
-      completed_at: now,
-      updated_at: now,
-    },
-    { onConflict: 'user_id,video_key' }
-  )
-
-  const total = await countVideos(supabase)
-  if (total > 0 && completedBefore === total - 1) {
-    await maybeNotifyAllVideosComplete(supabase, user.id, total)
-  }
-}
-
-export async function updateVideoWatchPercentAction(
-  workspaceId: string,
-  videoKey: string,
-  watchPercent: number
-): Promise<void> {
-  const pct = Math.max(0, Math.min(100, Math.round(watchPercent)))
-
-  const { supabase, user } = await assertMember(workspaceId)
-  const video = await fetchVideoByKey(supabase, videoKey)
-  if (!video) throw new Error('Geçersiz video.')
-  const durationSec = video.duration_min * 60
-  const positionSec = Math.round((durationSec * pct) / 100)
-  const now = new Date().toISOString()
-  const completed = pct >= 90
+  // Hiç ilerleme yoksa (0% ve tamam değil) gereksiz satır açma.
+  if (!existing && finalPct <= 0 && !completed) return
 
   await supabase.from('nmm_video_progress').upsert(
     {
@@ -239,14 +189,21 @@ export async function updateVideoWatchPercentAction(
       video_key: videoKey,
       workspace_id: workspaceId,
       status: completed ? 'completed' : 'started',
-      watch_percent: pct,
+      watch_percent: finalPct,
       position_sec: positionSec,
       duration_sec: durationSec,
-      completed_at: completed ? now : null,
+      started_at: existing?.started_at ?? now,
+      completed_at: completed ? (existing?.completed_at ?? now) : null,
       updated_at: now,
     },
     { onConflict: 'user_id,video_key' }
   )
+
+  // Yeni tamamlanma → tüm videolar bittiyse lidere bildir.
+  if (completed && !wasCompleted) {
+    const total = await countVideos(supabase)
+    if (total > 0) await maybeNotifyAllVideosComplete(supabase, user.id, total)
+  }
 }
 
 async function maybeNotifyAllVideosComplete(

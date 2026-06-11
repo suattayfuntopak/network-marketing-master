@@ -1,4 +1,5 @@
 import type { VideoCatalogPayload } from '@/app/(dashboard)/egitim/videoActions'
+import { VIDEO_COMPLETE_PERCENT } from '@/lib/domain/videoProgress'
 
 export type VideoContinueHighlight = {
   key: string
@@ -19,7 +20,7 @@ export function deriveVideoContinueFromCatalog(
 
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= 90
+    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
     const at = p?.completed_at ?? p?.started_at ?? ''
     if (done && at >= lastCompletedAt) {
       lastCompletedAt = at
@@ -30,7 +31,7 @@ export function deriveVideoContinueFromCatalog(
   let nextVideo: VideoContinueHighlight | null = null
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= 90
+    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
     if (!done) {
       nextVideo = { key: v.key, titleTr: v.titleTr, titleEn: v.titleEn }
       break

@@ -1,5 +1,12 @@
 import { CANONICAL_VIDEO_COUNT } from '@/lib/domain/trainingVideos'
 
+/**
+ * Bir video yalnızca SONUNA kadar izlenince "tamamlandı" sayılır.
+ * Otomatik takip (YouTube IFrame API) ENDED olayında %100 yazar; bu eşik,
+ * oynatıcı sonu tam %100'e ulaşmadan bitirdiğinde de tamam kabul etmek içindir.
+ */
+export const VIDEO_COMPLETE_PERCENT = 98
+
 export type VideoProgressRow = {
   video_key: string
   status: 'started' | 'completed'
@@ -34,7 +41,7 @@ export function summarizeVideoProgress(
       continue
     }
     const done =
-      row.status === 'completed' || row.watch_percent >= 90
+      row.status === 'completed' || row.watch_percent >= VIDEO_COMPLETE_PERCENT
     if (done) completed++
     else startedIncomplete++
   }

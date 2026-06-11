@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-12 — Seviye kaldırma, mobil pano tarihi, video otomatik izleme takibi ✅
+
+### Seviye rozeti kaldırıldı
+- **`TrainingCard.tsx`:** İçerik/itiraz kartlarındaki Temel/Orta/İleri seviye rozeti UI'dan kaldırıldı; `SEVIYE_RENK` importu temizlendi. Veri modeli (`konu.seviye`) korundu.
+
+### Mobilde pano tarihi sağa yaslandı
+- **`PanoContent.tsx`:** Selamlama + tarih artık mobilde de tek satırda (`flex-row justify-between`); tarih sağa yaslı ve `shrink-0`. Masaüstü davranışı aynı.
+
+### Video eğitimler: otomatik izleme takibi
+- **`TrainingVideoCard.tsx`:** "İzlemeye başladım" / "Tamamladım" butonları ve manuel yüzde sürgüsü kaldırıldı. Artık kartı eşit ikiye bölen **Video** + **İlgili Konu** butonları var. Video açıldığında **YouTube IFrame API** ile gerçek izleme yüzdesi 1sn aralıkla örneklenir; oynatıcı duraklat/kapat/bitiş anlarında rapor edilir. Kartta ilerleme çubuğu + "İzlendi · tamamlanmadı / Tamamlandı" göstergesi.
+- **`videoActions.ts`:** Üç eski aksiyon (`markVideoStarted/Completed`, `updateVideoWatchPercent`) tek `reportVideoWatchAction(ws, key, pct, ended)` ile değiştirildi. `watch_percent` **monotonik**: yalnızca en uzun seyredilen yüzde kayıtlı kalır (`max(prior, incoming)`); yeni izleme bu süreyi geçince güncellenir. Video yalnızca **sonuna kadar** (ENDED veya eşik) izlenince `completed`. Tüm-videolar-bitti bildirimi korundu.
+- **Eşik 90→98:** `VIDEO_COMPLETE_PERCENT` sabiti `videoProgress.ts`'e eklendi; `summarizeVideoProgress`, `videoContinue.ts`, `crown/actions.ts` bu sabiti kullanıyor — kart ve liderlik metrikleri "sonuna kadar bitmedi" semantiğinde tutarlı.
+- **`sections/videoTraining.ts`:** `watchVideoBtn`, `watchedLabel`, `notFinished`, `finishedLabel` (tr+en) eklendi.
+
+### Dosyalar
+`src/app/(dashboard)/egitim/_components/TrainingCard.tsx`, `src/app/(dashboard)/egitim/_components/TrainingVideoCard.tsx`, `src/app/(dashboard)/egitim/videoActions.ts`, `src/app/(dashboard)/pano/_components/PanoContent.tsx`, `src/lib/domain/videoProgress.ts`, `src/lib/domain/videoContinue.ts`, `src/app/(dashboard)/crown/actions.ts`, `src/lib/translations/sections/videoTraining.ts`
+
 ## 2026-06-12 — Ekip üye kartları: sekmeler başlangıçta kapalı ✅
 
 ### Sorun
