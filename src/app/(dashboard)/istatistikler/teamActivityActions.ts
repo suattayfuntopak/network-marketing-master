@@ -15,6 +15,9 @@ import {
   funnelRangeForPulsePeriod,
 } from '@/lib/domain/funnelActuals'
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
+import { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
+
+export { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
 
 export type TeamMemberFieldActivity = {
   userId: string
@@ -187,8 +190,6 @@ export async function getTeamFieldActivityAction(
   return { totals, byUser }
 }
 
-const RANKING_BATCH_PERIODS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
-
 type DailyActionRow = {
   user_id: string
   action_type: string
@@ -334,9 +335,9 @@ export async function getTeamRankingMetricsBatchAction(
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]
   if (uniqueIds.length === 0) return empty
 
-  const batchStartIso = RANKING_BATCH_PERIODS.includes('all')
+  const batchStartIso = TEAM_RANKING_BATCH_PERIODS.includes('all')
     ? null
-    : earliestPeriodStartIso(RANKING_BATCH_PERIODS)
+    : earliestPeriodStartIso(TEAM_RANKING_BATCH_PERIODS)
   let actionsQuery = supabase
     .from('nmm_daily_actions')
     .select('user_id, action_type, created_at')
@@ -359,7 +360,7 @@ export async function getTeamRankingMetricsBatchAction(
   ])
 
   const actions = (actionsResult.data ?? []) as DailyActionRow[]
-  const entries = RANKING_BATCH_PERIODS.map(period => {
+  const entries = TEAM_RANKING_BATCH_PERIODS.map(period => {
     const range = funnelRangeForPulsePeriod(period)
     const funnelByUser: Record<string, FunnelCounts> = {}
     for (const uid of uniqueIds) {

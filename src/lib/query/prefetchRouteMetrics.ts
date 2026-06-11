@@ -256,7 +256,11 @@ export async function prefetchEkipTrainingMetrics(
   })
 }
 
-/** Ekibim saha özeti — tek batch ranking sorgusu. */
+/**
+ * Ekibim saha özeti — tek batch ranking sorgusu.
+ * `getTeamRankingMetricsBatchAction` tüm `TEAM_RANKING_BATCH_PERIODS` dönemlerini
+ * (today, 7d, 30d, ytd, all) tek seferde yükler; hover prefetch aynı batch'i kullanır.
+ */
 export async function prefetchEkipRankingMetrics(
   queryClient: QueryClient,
   workspaceId: string,

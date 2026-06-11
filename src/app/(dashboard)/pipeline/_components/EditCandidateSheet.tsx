@@ -84,6 +84,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
         uploadFd.set('file', new File([compressedFile], 'candidate.jpg', { type: 'image/jpeg' }))
         uploadFd.set('scope', 'candidate')
         uploadFd.set('candidateId', candidate.id)
+        if (parsed.avatarUrl) uploadFd.set('oldAvatarUrl', parsed.avatarUrl)
         const { publicUrl } = await uploadAvatarAction(uploadFd)
         avatarUrl = publicUrl
       }

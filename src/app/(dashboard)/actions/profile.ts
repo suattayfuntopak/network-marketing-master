@@ -2,9 +2,9 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
+import { isSuperAdmin } from '@/lib/domain/auth'
+import { AVATAR_BUCKET, removeAvatarObjectByPublicUrl } from '@/lib/infra/avatarStorage'
 import { buildAvatarStoragePath } from '@/lib/utils/avatarStoragePath'
-
-const AVATAR_BUCKET = 'nmm-avatars'
 const MAX_AVATAR_BYTES = 2 * 1024 * 1024
 
 export type ProfileInfo = {
@@ -35,7 +35,7 @@ export async function getProfileAction(): Promise<ProfileInfo> {
 
 /**
  * Avatar/aday fotoğrafı yükler (nmm-avatars bucket).
- * FormData: `file` (zorunlu) + `scope` ('user' | 'candidate') + `candidateId`.
+ * FormData: `file` (zorunlu) + `scope` ('user' | 'candidate') + `candidateId` + opsiyonel `oldAvatarUrl`.
  * Not: server action body limiti next.config'te 3mb'ye yükseltildi (UI 2MB sınırı + FormData payı).
  */
 export async function uploadAvatarAction(formData: FormData): Promise<{ publicUrl: string }> {
@@ -49,6 +49,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ publicUr
 
   const isCandidateScope = formData.get('scope') === 'candidate'
   const rawCandidateId = String(formData.get('candidateId') ?? '').trim()
+  const oldAvatarUrl = String(formData.get('oldAvatarUrl') ?? '').trim() || null
   const path = buildAvatarStoragePath({
     scope: isCandidateScope ? 'candidate' : 'user',
     userId: user.id,
@@ -63,6 +64,31 @@ export async function uploadAvatarAction(formData: FormData): Promise<{ publicUr
   if (error) throw new Error(error.message)
 
   const { data: { publicUrl } } = supabase.storage.from(AVATAR_BUCKET).getPublicUrl(path)
+
+  if (isCandidateScope) {
+    if (!rawCandidateId) throw new Error('Aday kimliği gerekli.')
+    const { data: row, error: fetchErr } = await supabase
+      .from('nmm_candidates')
+      .select('id, owner_id, avatar_url')
+      .eq('id', rawCandidateId)
+      .single()
+    if (fetchErr || !row) throw new Error('Aday bulunamadı.')
+    if (row.owner_id !== user.id && !isSuperAdmin(user)) throw new Error('Yetkisiz işlem.')
+
+    const { error: updErr } = await supabase
+      .from('nmm_candidates')
+      .update({ avatar_url: publicUrl, updated_at: new Date().toISOString() })
+      .eq('id', rawCandidateId)
+    if (updErr) throw new Error(updErr.message)
+
+    const priorUrl = oldAvatarUrl ?? row.avatar_url
+    if (priorUrl && priorUrl !== publicUrl) {
+      await removeAvatarObjectByPublicUrl(supabase, priorUrl)
+    }
+  } else if (oldAvatarUrl && oldAvatarUrl !== publicUrl) {
+    await removeAvatarObjectByPublicUrl(supabase, oldAvatarUrl)
+  }
+
   return { publicUrl }
 }
 

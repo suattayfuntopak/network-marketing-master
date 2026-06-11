@@ -102,6 +102,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
       const fd = new FormData()
       fd.set('file', new File([compressedFile], 'avatar.jpg', { type: 'image/jpeg' }))
       fd.set('scope', 'user')
+      if (avatarUrl) fd.set('oldAvatarUrl', avatarUrl)
       const { publicUrl } = await uploadAvatarAction(fd)
 
       // Save to auth metadata

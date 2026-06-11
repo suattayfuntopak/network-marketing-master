@@ -368,6 +368,24 @@ export interface Database {
         }
         Relationships: []
       }
+      nmm_partner_avatar_overrides: {
+        Row: {
+          entity_id: string
+          display_url: string
+          updated_at: string
+        }
+        Insert: {
+          entity_id: string
+          display_url: string
+          updated_at?: string
+        }
+        Update: {
+          entity_id?: string
+          display_url?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nmm_presentation_materials: {
         Row: {
           id: string
@@ -1039,6 +1057,26 @@ export interface Database {
       nmm_resolve_team_avatars: {
         Args: { p_workspace_id: string; p_user_ids: string[] }
         Returns: Json
+      }
+      nmm_partner_avatar_url: {
+        Args: { p_entity_id: string }
+        Returns: string
+      }
+      nmm_saha_radar_follow_ups: {
+        Args: {
+          p_workspace_id: string
+          p_owner_ids: string[]
+          p_horizon_days?: number
+          p_limit?: number
+        }
+        Returns: {
+          id: string
+          full_name: string
+          phone: string | null
+          owner_id: string
+          next_follow_up_at: string
+          stage: string
+        }[]
       }
       nmm_fetch_team_with_downlines: {
         Args: { p_workspace_id: string }

@@ -60,7 +60,6 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
     : []
   const now = Date.now()
   const nowIso = new Date(now).toISOString()
-  const sevenDaysIso = new Date(now + 7 * 86_400_000).toISOString()
 
   const teamMemberUserIds = ekipRows
     .filter(m => m.user_id !== user.id)
@@ -117,16 +116,15 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
     memberNameMap[m.user_id] = m.full_name ?? '—'
   }
 
-  const { data: candidates } = await supabase
-    .from('nmm_candidates')
-    .select('id, full_name, phone, owner_id, next_follow_up_at, stage')
-    .in('owner_id', ownerIds)
-    .not('next_follow_up_at', 'is', null)
-    .lte('next_follow_up_at', sevenDaysIso)
-    .order('next_follow_up_at', { ascending: true })
-    .limit(60)
+  const { data: followUpRows, error: followUpErr } = await supabase.rpc('nmm_saha_radar_follow_ups', {
+    p_workspace_id: workspaceId,
+    p_owner_ids: ownerIds,
+    p_horizon_days: 7,
+    p_limit: 60,
+  })
+  if (followUpErr) throw new Error(followUpErr.message)
 
-  const followUps: SahaRadarFollowUp[] = (candidates ?? []).map(c => ({
+  const followUps: SahaRadarFollowUp[] = (followUpRows ?? []).map(c => ({
     id: c.id,
     candidateName: c.full_name,
     ownerUserId: c.owner_id,
