@@ -6,6 +6,7 @@ import { assertSuperAdmin } from '@/lib/domain/auth'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import type { User } from '@supabase/supabase-js'
 import { normalizeLicenseType } from '@/lib/domain/aiUsage'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
@@ -70,7 +71,7 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     admin.rpc('nmm_count_candidates_per_workspace'),
     admin
       .from('nmm_candidates')
-      .select('id, owner_id, full_name, phone')
+      .select('id, owner_id, full_name, phone, avatar_url, note, note_tr, note_en')
       .eq('owner_id', user.id),
     // Avatarlar eskiden workspaces sonucundan türeyen ownerIds'e bağlı AYRI bir
     // 2. dalgaydı; tüm üye avatarlarını burada paralelde çekip bağımlılığı kaldırıyoruz.
@@ -124,10 +125,13 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   })
 
   const { data: adminCandidates } = adminCandidatesResult
-
+ 
   const phoneByCandidateId = new Map<string, string>()
+  const avatarByCandidateId = new Map<string, string>()
   adminCandidates?.forEach(c => {
     if (c.phone) phoneByCandidateId.set(c.id, c.phone)
+    const noteAvatar = resolveCandidateFields(c).avatarUrl ?? c.avatar_url ?? null
+    if (noteAvatar) avatarByCandidateId.set(c.id, noteAvatar)
   })
 
   const seenOwners = new Set<string>()
@@ -142,9 +146,13 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     const ownerUser = w.owner_id ? userMap.get(w.owner_id) : null
     const ownerEmail = ownerUser?.email ?? 'Bilinmiyor'
     const ownerName = (ownerUser?.user_metadata?.full_name as string | undefined) ?? ownerUser?.email?.split('@')[0] ?? 'İsimsiz Üye'
+    const pipelineCandidateId = findLeaderCandidateForMember(adminCandidates ?? [], user.id, ownerName)
+    const candidateAvatar = pipelineCandidateId ? avatarByCandidateId.get(pipelineCandidateId) ?? null : null
+
     const avatarUrl =
       (ownerUser?.user_metadata?.avatar_url as string | undefined) ??
-      (w.owner_id ? avatarByOwnerId.get(w.owner_id) ?? null : null)
+      (w.owner_id ? avatarByOwnerId.get(w.owner_id) ?? null : null) ??
+      candidateAvatar
 
     let sponsorName: string | null = null
     let sponsorEmail: string | null = null
@@ -162,7 +170,6 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
     const candidateCount = candidateCountMap.get(w.id) ?? 0
     const downlineCount = parentCountMap.get(w.id) ?? 0
 
-    const pipelineCandidateId = findLeaderCandidateForMember(adminCandidates ?? [], user.id, ownerName)
     const ownerPhone =
       (pipelineCandidateId ? phoneByCandidateId.get(pipelineCandidateId) : null) ??
       ownerUser?.phone ??

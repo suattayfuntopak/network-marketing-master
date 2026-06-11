@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-11 — Aday Kazanım İvmesi Grafik Ayarları & Profil Resimleri Senkronizasyonu ✅
+
+### Aday Kazanım İvmesi Grafik Güncellemesi (IstatistiklerContent.tsx)
+- **Aylık Görünüm:** Son 30 günü kapsayacak şekilde (örneğin 11 Mayıs - 11 Haziran) İstanbul Saati (UTC+3) ile uyumlu, her güne ait ayrı günlük çubuk grafikler (31 adet günlük çubuk) üretildi.
+- **Yıllık Görünüm:** Bulunulan yılın Ocak ayından geçerli aya kadar (örneğin Ocak - Haziran) her ay için birer adet çubuk grafik gösterilmesi sağlandı. Temmuz ayına geçildiğinde Temmuz ayı da otomatik olarak ilk günden itibaren eklenecektir.
+- Linter `react-hooks/purity` kurallarına uymak amacıyla render esnasında çağrılan `Date.now()` gibi saf olmayan fonksiyonlar kaldırıldı; bunun yerine mount esnasında sabitlenen bir `now` state'i tanımlanarak tüm hesaplamalar bunun üzerinden yapıldı.
+
+### Profil Resimleri Senkronizasyonu (Migration 083)
+- WhatsApp davetiyle dış kayıt olarak eklenen ve profil resimleri "Ekibim" sayfasında göründüğü halde İstatistikler ve Admin listesinde görünmeyen Selda Kıratlı ve Ezgi Şagar'ın profil resimleri senkronize edildi.
+- **SQL Migrasyonu (`083_update_selda_ezgi_avatars.sql`):** Veritabanı seviyesinde `nmm_workspace_members` tablosundaki `avatar_url` sütunları ve `auth.users` altındaki `raw_user_meta_data` içindeki avatar URL'leri, ilgili aday kartlarındaki profil resimleriyle güncellendi.
+- **fetchTeamBundle.ts:** RPC ve legacy veri çekme yollarında, eğer kullanıcının kendi profil resmi null ise sponsorun boru hattındaki eşleşen aday kartının profil resmine (`avatar_url`) geri dönme fallback mantığı eklendi. Bu sayede İstatistikler sayfasındaki performans ve YZ tabloları artık resimleri doğru şekilde gösteriyor.
+- **platform-yonetim/actions.ts:** Admin sayfasındaki "Kullanıcı ve Lisans Listesi" için `getPlatformWorkspacesAction` fonksiyonunda aday kartlarındaki profil resimleri sorguya dahil edilip fallback olarak atandı.
+
+### Dosyalar
+`supabase/migrations/083_update_selda_ezgi_avatars.sql`, `src/lib/team/fetchTeamBundle.ts`, `src/app/(dashboard)/platform-yonetim/actions.ts`, `src/app/(dashboard)/istatistikler/_components/IstatistiklerContent.tsx`
+
 ## 2026-06-11 — Saha Özetim UI, Arama Debounce, Mükerrer Aday Kontrolü & parent_id FK Güncellemesi ✅
 
 ### Veritabanı Şeması & parent_id Dönüşümü (Migration 082)

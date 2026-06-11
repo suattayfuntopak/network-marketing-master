@@ -151,6 +151,9 @@ export async function fetchTeamBundle(
       const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
       const resolvedAvatar = m.avatar_url ?? authAvatars[m.user_id] ?? (noteAvatar || null)
 
+      // Propagate resolved avatar to the source member object for statistics views
+      m.avatar_url = resolvedAvatar
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -353,6 +356,15 @@ async function fetchTeamBundleLegacy(
         else todayMessage++
       })
 
+      const linkedId = pipelineLinks[m.user_id] ?? null
+      const fuzzyId = !linkedId && !matchBlocks.has(m.user_id) && ownWs.owner_id
+        ? findLeaderCandidateForMember(candidates, ownWs.owner_id, m.full_name)
+        : null
+      const matchedPipelineId = linkedId ?? fuzzyId
+      const candidateMatch = matchedPipelineId ? candidates.find(c => c.id === matchedPipelineId) : undefined
+      const noteAvatar = candidateMatch ? resolveCandidateFields(candidateMatch).avatarUrl ?? '' : ''
+      const resolvedAvatar = m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? (noteAvatar || null)
+
       return {
         user_id: m.user_id,
         full_name: m.full_name,
@@ -370,7 +382,7 @@ async function fetchTeamBundleLegacy(
         today_roleplay: todayRoleplay,
         today_compliance: todayCompliance,
         today_message: todayMessage,
-        avatar_url: m.avatar_url ?? avatarByUser[m.user_id] ?? authAvatars[m.user_id] ?? null,
+        avatar_url: resolvedAvatar,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
