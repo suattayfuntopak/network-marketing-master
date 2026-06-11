@@ -101,13 +101,15 @@ export function ItirazlarContent({
       const detay = i.detayliCevap ?? ''
       const yakl = i.yaklasim ?? ''
       const diyalog = i.ornekDiyalog ?? ''
+      const etiketler = (i.tags ?? []).join(' ')
       return (
         soru.toLowerCase().includes(q) ||
         cevap.toLowerCase().includes(q) ||
         kisa.toLowerCase().includes(q) ||
         detay.toLowerCase().includes(q) ||
         yakl.toLowerCase().includes(q) ||
-        diyalog.toLowerCase().includes(q)
+        diyalog.toLowerCase().includes(q) ||
+        etiketler.toLowerCase().includes(q)
       )
     })
   }, [search, aktifKategori, favs, lang, KATEGORILER, tumItirazlar])

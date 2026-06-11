@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-11 — İtiraz Bankası Faz 2 zenginleştirmesi TAMAMLANDI (yarım kalan iş) ✅
+
+Vercel/GitHub Actions acil işleri araya girince **yarım kalan** itiraz bankası zenginleştirmesi bitirildi.
+
+### Durum (öncesi → sonrası)
+- 37 itirazın yalnızca **6'sı** tam zenginleştirilmişti, **4'ü** kısmi (yaklasim/ornekDiyalog/tags var, detayliCevap yok), **27'si** sadece kısa cevaptı.
+- Artık **37/37 itiraz tam**: `detayliCevap` + `detayliCevapEn` + `yaklasim` + `yaklasimEn` + `ornekDiyalog` + `ornekDiyalogEn` + `tags` (her biri 37/37).
+
+### İçerik kalitesi (marka tonu korunarak)
+- Mevcut `cevap` metinlerine **dokunulmadı** (kalıcı çeviri kuralı); yalnızca yeni zengin alanlar eklendi → kartlar katman katman derinleşti.
+- Her itiraz için: empati → yeniden çerçeveleme → resmi belge/şeffaflık → "karar sende" çizgisi. Baskısız, etik, ürün-önce dil. TR + EN birebir.
+- Tüm 6 kategori: Para & Kazanç, Zaman, Güven & Şüphe, Yetenek & Kimlik, Aile & Çevre, Ürün & Sistem, Genel.
+
+### Bonus iyileştirme
+- `ItirazlarContent` arama filtresi artık **`tags`'i de tarıyor** → "şüphe, pasif gelir, doygunluk, iade, caiz" gibi etiketlerle ilgili itiraz anında bulunur. (Önceden tags hiçbir yerde kullanılmıyordu.)
+
+### Doğrulama
+tsc + lint (full, --max-warnings 0) + unit (183/183) + build yeşil.
+
+### Dosyalar
+`itirazlar/data/itirazlar.ts` (31 zenginleştirme), `itirazlar/_components/ItirazlarContent.tsx` (tags araması)
+
 ## 2026-06-10 — Şerit 3-buton + Saha Özetim "pat pat" hız + davet senkronizasyonu + telemetri monitörü ✅
 
 Tek oturumda 4 iş; build + tsc + lint + unit (183/183) yeşil.
