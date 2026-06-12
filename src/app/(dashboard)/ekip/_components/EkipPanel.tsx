@@ -4,16 +4,12 @@ import dynamic from 'next/dynamic'
 import { useCallback, useEffect, useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
 import type { EkipTabId } from './EkipTabNav'
-import {
-  removeTeamMemberAction,
-  toggleOnboardingStepAction,
-} from '../actions'
+import { toggleOnboardingStepAction } from '../actions'
 import { waHref } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
@@ -56,7 +52,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     : false
   const hasMasterAccess = (licenseType === 'plus' || licenseType === 'pro') && !isLicenseExpired
 
-  const [memberToRemove, setMemberToRemove] = useState<{ id: string; name: string } | null>(null)
   const [onboardingCoachData, setOnboardingCoachData] = useState<{
     memberName: string
     stepId: string
@@ -129,7 +124,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     staleTime: 30_000,
   })
 
-  const handleMemberRemoveCancel = useCallback(() => setMemberToRemove(null), [])
 
   if (wsLoading) {
     return (
@@ -164,22 +158,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   const isLeader = ws.role === 'leader'
 
 
-
-  async function handleRemoveMemberConfirmed() {
-    if (!memberToRemove) return
-    const memberId = memberToRemove.id
-    const memberName = memberToRemove.name
-    setMemberToRemove(null)
-    try {
-      await removeTeamMemberAction(memberId, memberName)
-      toast.success(t('team.removeSuccess', { name: memberName }))
-      queryInvalidator.invalidateTeam(queryClient, ws?.workspaceId)
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err)
-      console.error(err)
-      toast.error(message || t('team.removeError'))
-    }
-  }
 
   return (
     <div className="space-y-7">
@@ -226,14 +204,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
 
       {activeTab === 'tree' && (
         <TeamGenerationTree workspaceId={ws.workspaceId} teamPageUnlocked={teamPageUnlocked} />
-      )}
-
-      {memberToRemove && (
-        <ConfirmDeleteModal
-          message={t('team.removeMemberMsg', { name: memberToRemove.name })}
-          onConfirm={handleRemoveMemberConfirmed}
-          onCancel={handleMemberRemoveCancel}
-        />
       )}
 
       {onboardingCoachData && (

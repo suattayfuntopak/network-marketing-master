@@ -15,6 +15,7 @@ on:
       - 'supabase/migrations/**'
       - 'scripts/check-migrations.mjs'
       - 'scripts/ci/supabase-shim.sql'
+      - '.github/workflows/migrate-check.yml'
   schedule:
     - cron: '0 6 * * 1'
   workflow_dispatch:
@@ -112,3 +113,38 @@ jobs:
           fi
           supabase link --project-ref "$SUPABASE_PROJECT_REF"
           npm run migrate:check:remote
+
+  # Otomatik prod uygulaması — YALNIZCA gerçek-Postgres doğrulaması (migrate-apply)
+  # ve numara kontrolü (migrate-check) YEŞİL olursa çalışır. Bozuk bir migration
+  # bu gate'e takılır ve prod'a UYGULANMAZ. Elle db-push.yml (dry-run/apply) yedek
+  # olarak durur. Yalnız main'e push'ta (ve elle tetiklemede) tetiklenir.
+  migrate-deploy:
+    name: Migration apply (PROD — otomatik, gated)
+    needs: [migrate-check, migrate-apply]
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/main') ||
+      github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Secret kontrolü
+        env:
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$REF" ]; then
+            echo "::error::SUPABASE_ACCESS_TOKEN / SUPABASE_PROJECT_REF tanımlı değil. docs/deploy/github-secrets.md"
+            exit 1
+          fi
+      - name: Link + bekleyen migration'ları uygula
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
+          echo "▶ Bekleyen migration'lar prod'a uygulanıyor (doğrulama yeşil)..."
+          supabase db push
+          echo "✅ Tamamlandı (yeni migration yoksa no-op)."

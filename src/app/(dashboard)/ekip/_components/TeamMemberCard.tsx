@@ -135,20 +135,20 @@ export function TeamMemberCard({
         ) : null}
       </div>
 
-      {isLeader && m.isAppUser !== false && m.role === 'member' ? (
+      {/* Yalnız Listem'de OLMAYAN (pipeline_id yok) ekip üyesinde: Listeye Ekle + Ekipten Çıkar.
+          Listem'de + ekipte olan üyede hiçbiri görünmez. */}
+      {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id ? (
         <div className="flex gap-2">
-          {!m.pipeline_id ? (
-            <button
-              type="button"
-              disabled={linkingMemberId === m.user_id}
-              onClick={e => { e.stopPropagation(); onLinkToPipeline() }}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-3 py-2.5 text-xs font-bold text-brand transition hover:bg-brand/10 disabled:opacity-50"
-              aria-label={t('team.linkToPipeline')}
-            >
-              <UserPlus className="h-4 w-4 shrink-0" />
-              <span className="hidden sm:inline">{t('team.linkToPipeline')}</span>
-            </button>
-          ) : null}
+          <button
+            type="button"
+            disabled={linkingMemberId === m.user_id}
+            onClick={e => { e.stopPropagation(); onLinkToPipeline() }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-3 py-2.5 text-xs font-bold text-brand transition hover:bg-brand/10 disabled:opacity-50"
+            aria-label={t('team.linkToPipeline')}
+          >
+            <UserPlus className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{t('team.linkToPipeline')}</span>
+          </button>
           <button
             type="button"
             onClick={e => { e.stopPropagation(); onRemoveFromTeam() }}

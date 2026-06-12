@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-13 — Otomatik migration + dead-code temizliği + dokümantasyon ✅
+
+### Migration artık otomatik (güvenli/gated)
+- **`migrate-check.yml`:** Yeni `migrate-deploy` job'ı — gerçek-Postgres doğrulaması (`migrate-apply`) + numara kontrolü (`migrate-check`) **YEŞİL olursa** main'e push'ta prod'a `supabase db push` yapar. Bozuk migration gate'e takılır, prod'a GİDEMEZ. Elle `db-push.yml` (dry-run/apply) yedek kalır. Workflow dosyası push paths'e eklendi → bu push 096'yı otomatik uygular. Artık migration için elle adım yok.
+
+### Suggestion #1 — ölü legacy üye-çıkarma yolu kaldırıldı
+- **`EkipPanel.tsx`:** `memberToRemove` hiçbir yerde set edilmiyordu → `nmm_remove_member` (legacy) yolu ÖLÜYDÜ. State + handler + ConfirmDeleteModal bloğu + import kaldırıldı. **`ekip/actions.ts`:** kullanılmayan `removeTeamMemberAction` silindi. i18n `team.removeSuccess/removeError/removeMemberMsg` (tr+en) silindi. (RPC DB'de duruyor, UI'dan çağrılmıyor — docs'ta legacy notu.)
+
+### Suggestion #3 — `docs/team-membership.md` [YENİ]
+İki temsil modeli (downline `parent_id` ↔ pipeline candidate), claim/unclaim/pipeline-delete simetrisi, "neden tamamen sil yok", ve **mahremiyet değişmezleri** (#2 invariant burada) tek belgede.
+
+### Suggestion #4 — otomatik checker ertelendi (gerekçeli)
+Kodun dinamik anahtar erişimi (`t(row.labelKey)`, `funnelMetricLabelKeys`) naif checker'ı yanlış-pozitife düşürür; güvenli sürüm ayrı bir iş. Asıl değer (ölü anahtar temizliği) bu oturumda elle+doğrulamalı yapıldı.
+
+### Item 4 — `docs/performance.md` [YENİ] kalıcı oyun kitabı
+Darboğaz modeli (Supabase round-trip ~320ms), ölçüm yöntemi, etki-sıralı kaldıraçlar, "hızlı" tanımı, çalışma döngüsü ve öncelikli backlog. Config kolay kazançları zaten tükenmiş; bundan sonrası ÖLÇÜMLE (sonraki tur).
+
+### "Ekipten Çıkar" buton yerleşimi düzeltildi
+- **`TeamMemberCard.tsx`:** Buton artık YALNIZCA kişi Listem'de değilken (`pipeline_id` yok) "Listeye Ekle"nin sağında görünüyor. Listem'de + ekipte olan üyelerde gösterilmiyor (önceki tur tüm üyelerde gösteriyordu).
+
+### Dosyalar
+`.github/workflows/migrate-check.yml`, `ekip/_components/EkipPanel.tsx`, `ekip/_components/TeamMemberCard.tsx`, `ekip/actions.ts`, `lib/translations/{tr,en}.ts`, `docs/team-membership.md` [yeni], `docs/performance.md` [yeni]
+
 ## 2026-06-13 — Mahremiyet (Saha Radarı + Takvim) + "Ekipten Çıkar" ✅
 
 ### 1) Saha Radarım: yalnız liderin kendi takipleri

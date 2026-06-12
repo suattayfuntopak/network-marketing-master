@@ -453,21 +453,6 @@ export async function joinWorkspaceByInviteAction(
   return {}
 }
 
-export async function removeTeamMemberAction(
-  memberId: string,
-  memberName: string
-): Promise<void> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Oturum bulunamadı.')
-
-  const { error } = await supabase.rpc('nmm_remove_member', {
-    p_member_id: memberId,
-    p_member_name: memberName,
-  })
-  if (error) throw new Error(error.message)
-}
-
 /**
  * "Ekipten Çıkar" — downline app-user üyenin bağını koparır (parent_id=NULL).
  * Kişi yeniden bağımsız "dış kayıt" olur; bağlı pipeline adayı + linki silinir.
