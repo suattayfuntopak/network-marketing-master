@@ -1,6 +1,7 @@
 'use client'
 
 import { type ComponentType } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
@@ -15,8 +16,12 @@ import { waHref } from '@/lib/utils/waLink'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
-import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import type { UpgradeFeature } from '@/components/ui/UpgradePrompt'
+
+const MemberActivitySheet = dynamic(
+  () => import('@/app/(dashboard)/_components/team/MemberActivitySheet').then(m => ({ default: m.MemberActivitySheet })),
+  { loading: () => null },
+)
 
 export type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity'
 

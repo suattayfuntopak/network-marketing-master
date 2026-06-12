@@ -12,6 +12,40 @@ import {
   getHubYearlySelfAction,
   getHubAllTimeSelfAction,
 } from '@/app/(dashboard)/crown/hubSelfActions'
+import { Skeleton } from '@/components/ui/Skeleton'
+
+function SahaOzetimSkeleton() {
+  return (
+    <div className="w-full space-y-6 px-4 pb-28 pt-6 md:pb-8 animate-pulse">
+      {/* Header section skeleton */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-10 w-10 rounded-xl" />
+          <div className="space-y-2">
+            <Skeleton className="h-6 w-48 rounded" />
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-10 w-28 rounded-xl" />
+          <Skeleton className="h-10 w-28 rounded-xl" />
+        </div>
+      </div>
+
+      {/* Main KPI grids skeleton */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="aspect-square rounded-[14px]" />
+        ))}
+      </div>
+
+      {/* Secondary section (charts/metrics) skeleton */}
+      <div className="space-y-3">
+        <Skeleton className="h-16 w-full rounded-2xl" />
+        <Skeleton className="h-40 w-full rounded-2xl" />
+      </div>
+    </div>
+  )
+}
 
 type Props = { searchParams: Promise<{ tab?: string; offset?: string }> }
 
@@ -50,11 +84,7 @@ export default async function SahaOzetimPage({ searchParams }: Props) {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <Suspense
-        fallback={
-          <div className="px-4 py-8 text-sm text-[var(--text-3)]">…</div>
-        }
-      >
+      <Suspense fallback={<SahaOzetimSkeleton />}>
         <FieldSummaryPage />
       </Suspense>
     </HydrationBoundary>

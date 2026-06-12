@@ -3,7 +3,6 @@ export const pagesSection = {
     pagesUi: {
       // search/page.tsx
       objectionsAndAnswers: "İtirazlar ve Cevaplar",
-      readAnswer: "Cevabı oku ➔",
 
       // takvim/page.tsx
       calendarTitle: "Takvim",
@@ -36,13 +35,8 @@ export const pagesSection = {
       bulkDeferNone: "Takip ertelenemedi — sayfayı yenileyip tekrar deneyin",
 
       // saha-provasi/page.tsx
-      fieldRehearsalTitle: "Saha Provası",
-      fieldRehearsalSubtitle: "İtiraz karşılama, davet ve kapanış senaryolarını dinamik olarak deneyimle",
 
       // bugun/ilgilen/page.tsx
-      todayPrioritiesTitle: "Bugün İlgilen",
-      todayPrioritiesSubtitle: "Bugün sen ve ekibin ne durumdasınız, neler yapmalısınız; hızlıca göz at, aksiyona geç!",
-      ilgilenHubSubtitle: "Yol haritanız, günlük huni ve özet sekmeleri — pano ile aynı organizasyon.",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Hiç aranmadı",
@@ -75,7 +69,6 @@ export const pagesSection = {
     pagesUi: {
       // search/page.tsx
       objectionsAndAnswers: "Objections & Answers",
-      readAnswer: "Read Answer ➔",
 
       // takvim/page.tsx
       calendarTitle: "Calendar",
@@ -108,13 +101,8 @@ export const pagesSection = {
       bulkDeferNone: "Could not defer — refresh and try again",
 
       // saha-provasi/page.tsx
-      fieldRehearsalTitle: "Field Rehearsal",
-      fieldRehearsalSubtitle: "Practice objection handling, invitations, and closing scenarios dynamically",
 
       // bugun/ilgilen/page.tsx
-      todayPrioritiesTitle: "Today's Priorities",
-      todayPrioritiesSubtitle: "See where you and your team stand today and what to do — glance quickly and take action!",
-      ilgilenHubSubtitle: "Your roadmap, daily funnel, and summary tabs — aligned with the home hub.",
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
       neverContacted: "Never contacted",

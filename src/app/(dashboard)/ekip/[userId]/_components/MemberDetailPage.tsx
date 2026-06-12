@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Bot, ChevronDown, ChevronUp, Copy, Lock, Phone, Sparkles, X } from 'lucide-react'
@@ -26,8 +27,12 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
-import { MemberActivitySheet } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+
+const MemberActivitySheet = dynamic(
+  () => import('@/app/(dashboard)/_components/team/MemberActivitySheet').then(m => ({ default: m.MemberActivitySheet })),
+  { loading: () => null },
+)
 
 type ActivityLevel = 'active' | 'recent' | 'silent'
 

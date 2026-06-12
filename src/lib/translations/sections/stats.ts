@@ -3,18 +3,12 @@ export const statsSection = {
     statsPage: {
       title: 'İstatistikler',
       subtitle: 'Aday, süreç ve yapay zeka kullanım istatistikleri',
-      period7d: 'Son 7 Gün',
       period30d: 'Son 30 Gün',
-      periodAll: 'Tüm Zamanlar',
 
       kpiTotalLeads: 'TOPLAM ADAY',
-      kpiTotalLeadsDesc: 'Filtreye uyan aday sayısı',
       kpiActiveLeads: 'AKTİF SÜREÇ',
-      kpiActiveLeadsDesc: 'İlişkisi canlı adaylar',
       kpiConversionRate: 'DÖNÜŞÜM ORANI',
-      kpiBecameMember: 'distribütör oldu',
       kpiPresentationRate: 'SUNUM ORANI',
-      kpiPresentationRateDesc: 'Yapılan fırsat sunumu',
 
       fieldFunnelTitle: 'Saha Huni Gerçekleşenleri',
       fieldFunnelSubtitle:
@@ -30,19 +24,16 @@ export const statsSection = {
       funnelFollowUp: 'Takip Edilen',
       funnelJoinedPartner: 'İş Ortağı (Katıldı)',
       funnelTitle: 'Aday Dönüşüm Hunisi',
-      funnelSubtitle: 'Aday listendeki kişilerin aşama aşama organizasyonuna katılım sürecini gör.',
       funnelEmpty: 'Bu periyotta veri bulunamadı',
       funnelDropSuffix: 'kişi önceki aşamada kaldı',
 
       tempTitle: 'Süreç Sıcaklık Dağılımı',
-      tempSubtitle: 'Adayların süreçteki aktifliklerine göre liste sıcaklıkları.',
       tempEmpty: 'Analiz edilecek aday yok',
       tempHot: 'Sıcak (Arama/Sunum)',
       tempWarm: 'Ilık (Yeni/İletişim)',
       tempCold: 'Soğuk (İlgilenmedi)',
 
       velocityTitle: 'Aday Kazanım İvmesi',
-      velocitySubtitle: 'Seçilen periyotta organizasyonuna yeni katılan adayların trendi.',
       velocityNew: 'yeni',
       velocityEmpty: 'Kayıt trendi verisi yok',
 
@@ -70,21 +61,8 @@ export const statsSection = {
       typeNmm: 'NMM',
       typeField: 'Saha',
       typeExternal: 'Dış Kayıt',
-      dqsgFootnote: 'DİSTRİBÜTÖR DOĞRU BAŞLANGIÇ REHBERİ',
 
       aiAdminTitle: 'Ekip & Dış Kaynak Yapay Zeka Kullanım & Limit Kontrol Tablosu',
-      aiAdminSubtitle: 'NMM uygulama ortakları (💎) & katıldı aşamasındaki saha distribütörleri (🤝) ve dış kayıtları (🌐) birlikte gösteren yapay zeka kullanım ve limit verilerini içeren tablo.',
-      aiModelMixTitle: 'Model kullanımı (Flash / Pro)',
-      aiModelFlash: 'Flash',
-      aiModelPro: 'Pro',
-      aiModelUnknown: 'Etiketsiz (eski kayıt)',
-      productFunnelTitle: 'Dönüşüm hunisi',
-      productFunnelPricing: 'Fiyat bölümü görüntüleme',
-      productFunnelUpgradeCta: 'Upgrade CTA tıklama',
-      productFunnelOdemeLink: 'Ödeme Basic deep link',
-      aiColMessage: 'YZ Mesajı (Kullanılan / Limit)',
-      aiColCoach: 'YZ Koçu (Kullanılan / Limit)',
-      aiColCompliance: 'Uyum Denetimi (Kullanılan / Limit)',
       unlimited: 'Sınırsız',
       licensePlanSuperAdmin: 'PRO - SINIRSIZ',
 
@@ -95,9 +73,7 @@ export const statsSection = {
       licensePlanPro: 'Pro',
 
       quotaTitle: 'Yapay Zeka Günlük Kullanım Kotası',
-      quotaSubtitle: 'Tüm YZ işlemleri (mesaj, koç, prova, uyum) tek günlük havuzdan düşer',
       quotaSuperTitle: 'SINIRSIZ SÜPER ADMİN HESABI',
-      quotaSuperDesc: 'Network Marketing Master geliştirici hesabınız için tüm yapay zeka limitleri ve kullanım kotaları kaldırılmıştır. Keyifli testler dileriz!',
       quotaUnified: 'Günlük YZ Kotası',
       quotaUnifiedHint: 'Mesaj yazarı, koç, saha provası ve uyum denetimi aynı kotayı kullanır.',
       quotaUsed: 'kullanılan',
@@ -123,18 +99,12 @@ export const statsSection = {
     statsPage: {
       title: 'Statistics',
       subtitle: 'Candidate, pipeline and AI usage insights',
-      period7d: 'Last 7 Days',
       period30d: 'Last 30 Days',
-      periodAll: 'All Time',
 
       kpiTotalLeads: 'TOTAL LEADS',
-      kpiTotalLeadsDesc: 'Candidates in period',
       kpiActiveLeads: 'ACTIVE LEADS',
-      kpiActiveLeadsDesc: 'Moving candidates',
       kpiConversionRate: 'CONVERSION RATE',
-      kpiBecameMember: 'became member',
       kpiPresentationRate: 'PRESENTATION RATE',
-      kpiPresentationRateDesc: 'Completed pitches',
 
       fieldFunnelTitle: 'Field Funnel Actuals',
       fieldFunnelSubtitle:
@@ -150,19 +120,16 @@ export const statsSection = {
       funnelFollowUp: 'Follow-up',
       funnelJoinedPartner: 'Joined Partner',
       funnelTitle: 'Candidate Conversion Funnel',
-      funnelSubtitle: 'Cumulative waterfall representing step-by-step conversion of your contact list.',
       funnelEmpty: 'No candidates found in this period',
       funnelDropSuffix: 'prospects remained in the previous step',
 
       tempTitle: 'Pipeline Temperature',
-      tempSubtitle: 'Warmth levels calculated based on their active process stages.',
       tempEmpty: 'No candidates to analyze',
       tempHot: 'Hot Market',
       tempWarm: 'Warm Market',
       tempCold: 'Cold/Lost',
 
       velocityTitle: 'Acquisition Velocity',
-      velocitySubtitle: 'Growth trend representing new candidate creations.',
       velocityNew: 'new',
       velocityEmpty: 'No recent trend data',
 
@@ -190,21 +157,8 @@ export const statsSection = {
       typeNmm: 'NMM',
       typeField: 'Field',
       typeExternal: 'External',
-      dqsgFootnote: 'DISTRIBUTOR QUICK START GUIDE',
 
       aiAdminTitle: 'Team & External AI Usage & Quota Control Table',
-      aiAdminSubtitle: 'A combined table of AI usage and quota data for NMM app partners (💎), field distributors at the joined stage (🤝) and external signups (🌐).',
-      aiModelMixTitle: 'Model usage (Flash / Pro)',
-      aiModelFlash: 'Flash',
-      aiModelPro: 'Pro',
-      aiModelUnknown: 'Untagged (legacy)',
-      productFunnelTitle: 'Conversion funnel',
-      productFunnelPricing: 'Pricing section views',
-      productFunnelUpgradeCta: 'Upgrade CTA clicks',
-      productFunnelOdemeLink: 'Payment Basic deep link',
-      aiColMessage: 'AI Message (Used / Limit)',
-      aiColCoach: 'AI Coach (Used / Limit)',
-      aiColCompliance: 'Compliance (Used / Limit)',
       unlimited: 'Unlimited',
       licensePlanSuperAdmin: 'PRO - UNLIMITED',
 
@@ -215,9 +169,7 @@ export const statsSection = {
       licensePlanPro: 'Pro',
 
       quotaTitle: 'AI Daily Usage Quotas',
-      quotaSubtitle: 'All AI actions (messages, coach, rehearsal, compliance) share one daily pool',
       quotaSuperTitle: 'UNLIMITED DEVELOPER ACCOUNT',
-      quotaSuperDesc: 'All artificial intelligence action limits and usage quotas are fully bypassed for your account. Happy testing!',
       quotaUnified: 'Daily AI Quota',
       quotaUnifiedHint: 'Copywriter, coach, field rehearsal and compliance audit use the same pool.',
       quotaUsed: 'used',

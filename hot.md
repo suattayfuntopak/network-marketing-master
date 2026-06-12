@@ -1,5 +1,54 @@
 # Hot Log
 
+## 2026-06-12 — Project-Wide Optimization and Visual Standardizations ✅
+
+### 1. Semantic Color Mappings in styling
+- **`globals.css`**: Defined new theme variables (`--color-theme-training` and `--color-theme-objections`) mapped to semantic dark/light values, registering them in Tailwind `@theme` configuration.
+- **`akademiTabTheme.ts`**: Cleaned up legacy static hex class values and conditional dark-mode overrides in favor of cleaner utility classes (e.g. `bg-theme-training` and `bg-theme-objections`).
+
+### 2. Layout Shift & Skeleton Loader Alignments
+- **`egitim/page.tsx`**: Replaced generic text fallback (`Loading…`) with a structured skeleton component (`EgitimSkeleton`) designed to replicate the card-based layout structure of the Academy route.
+- **`saha-ozetim/page.tsx`**: Replaced simple ellipsis loading state (`…`) with a balanced metric-grid skeleton (`SahaOzetimSkeleton`) matching the Field Summary page.
+
+### 3. Performance Lazy-Loading Optimizations
+- **`EkipPanel.tsx`**: Shifted `YZOnboardingKocuModal` to a dynamically loaded import to reduce initial bundle weights.
+- **`TeamMemberCard.tsx` & `MemberDetailPage.tsx`**: Converted `MemberActivitySheet` to dynamic imports, loading drawer components asynchronously on user interaction.
+
+### Files
+`src/app/globals.css`, `src/lib/ui/akademiTabTheme.ts`, `src/app/(dashboard)/egitim/page.tsx`, `src/app/(dashboard)/saha-ozetim/page.tsx`, `src/app/(dashboard)/ekip/_components/EkipPanel.tsx`, `src/app/(dashboard)/ekip/_components/TeamMemberCard.tsx`, `src/app/(dashboard)/ekip/[userId]/_components/MemberDetailPage.tsx`
+
+## 2026-06-12 — Genel öneri turu: pageHelp, prefetch DRY, i18n, AGENTS ✅
+
+### Yapılanlar
+1. **pageHelp** — Saha Özetim Aylık vs İstatistikler Son 30 Gün ayrımı; istatistikler saha huni adımı eklendi.
+2. **hubTabShortLabel** — `pulsePeriodLabels.ts`; HubSummaryTabBar tek kaynak.
+3. **prefetchMemberActivity** — `lib/query/prefetchMemberActivity.ts`; sheet + ekip kart hover DRY; `QUERY_STALE.memberActivity` / `funnelBundle`.
+4. **i18n** — Doğrulanmış ölü anahtarlar: dashboard crownMock×4, crown subtitle×4+hubPipeline×2, pulse period×4 (TR+EN).
+5. **AGENTS.md + hub-metrics.md** — huni/dönem checklist ve Aylık≠30g tablosu.
+
+### Doğrulama
+`pulsePeriodLabels.test.ts` 5/5 · `pageHelp.test.ts` 12/12 · lint temiz.
+
+### Dosyalar
+`pageHelp.ts`, `pulsePeriodLabels.ts`, `prefetchMemberActivity.ts`, `staleTimes.ts`, `HubSummaryTabBar.tsx`, `MemberActivitySheet.tsx`, `TeamPerformanceSection.tsx`, `StatsFieldFunnelSection.tsx`, `AGENTS.md`, `docs/hub-metrics.md`, `tr.ts`, `en.ts`, `crown.ts`, `pulse.ts`
+
+## 2026-06-12 — Dönem etiketleri merkezi modül + ekip sheet + eğitim i18n ✅
+
+Önceki raporun 5 önerisinden 4'ü kodlandı; prefetch zaten vardı.
+
+### Yapılanlar
+1. **`pulsePeriodLabels.ts`** — `pulsePeriodLabel`, `hubPeriodTabLabel`, `sheetActivityPeriodLabel`, kısa kodlar tek kaynak.
+2. **`pulsePeriodLabels.test.ts`** — rolling30 + sheet 30g etiket testleri (4 case).
+3. **MemberActivityPeriodTabs** — masaüstü `30d` → "Son 30 Gün"; hub eşlemesi `pulsePeriodToHubGridPeriod` üzerinden.
+4. **Prefetch** — `MemberActivitySheet` mount'ta 5 dönem prefetch zaten mevcut; değişiklik gerekmedi.
+5. **training.ts** — kaldırılmış `fieldType` / `typeLectureNote` / `typeGuide` i18n artıkları temizlendi.
+
+### Doğrulama
+`pulsePeriodLabels.test.ts` 4/4 · `hubFunnelTargets.test.ts` 7/7 · lint temiz.
+
+### Dosyalar
+`pulsePeriodLabels.ts`, `pulsePeriodLabels.test.ts`, `PulsePeriodTabs.tsx`, `MemberActivityPeriodTabs.tsx`, `HubSummaryTabBar.tsx`, `StatsFieldFunnelSection.tsx`, `training.ts`
+
 ## 2026-06-12 — Huni UX cilası: 30g etiket, internal actuals, ekip footer ✅
 
 Önceki analizin 3 küçük önerisi uygulandı.

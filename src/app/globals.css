@@ -81,6 +81,13 @@
   --fallback-border-active: rgba(107, 33, 168, 0.25);
   --fallback-bullet-bg:     #FAF5FF;
   --fallback-bullet-text:   #6B21A8;
+
+  /* Theme Active colors */
+  --color-theme-training: #3730A3;
+  --color-theme-training-hover: #28227d;
+  --color-theme-objections: #16A34A;
+  --color-theme-objections-hover: #15803d;
+  --color-theme-objections-text-dark: #ffffff;
 }
 
 .dark {
@@ -164,6 +171,13 @@
   --fallback-border-active: rgba(216, 180, 254, 0.25);
   --fallback-bullet-bg:     #1a0030;
   --fallback-bullet-text:   #d8b4fe;
+
+  /* Theme Active colors */
+  --color-theme-training: #2962FF;
+  --color-theme-training-hover: #1e4ed8;
+  --color-theme-objections: #fda4af;
+  --color-theme-objections-hover: #fbacbe;
+  --color-theme-objections-text-dark: #3d0a1a;
 }
 
 /* Brand purple on dark backgrounds — readable white text without touching light mode */
@@ -272,6 +286,13 @@
   --color-fallback-border-active: var(--fallback-border-active);
   --color-fallback-bullet-bg:     var(--fallback-bullet-bg);
   --color-fallback-bullet-text:   var(--fallback-bullet-text);
+
+  /* Theme active states */
+  --color-theme-training:             var(--color-theme-training);
+  --color-theme-training-hover:       var(--color-theme-training-hover);
+  --color-theme-objections:           var(--color-theme-objections);
+  --color-theme-objections-hover:     var(--color-theme-objections-hover);
+  --color-theme-objections-text-dark: var(--color-theme-objections-text-dark);
 
   /* Scale all font sizes up by another 1px globally for improved readability */
   --font-size-xs: 0.875rem;     /* 13px -> 14px */

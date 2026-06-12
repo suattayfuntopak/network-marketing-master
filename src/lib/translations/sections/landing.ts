@@ -47,7 +47,6 @@ export const landingSection = {
       pricingYearlyBadge: '25% İndirim',
       priceMonth: 'ay',
       yearlyBillingDisclaimer: 'Fiyatlar aylık gösterilir (%25 indirimli). Yıllık planlar, gösterilen aylık tutar × 12 olacak şekilde tek seferde tahsil edilir.',
-      yearlyMonthsFree: '{months} ay bedava!',
       planBasicTag: 'BİREYSEL ORTAK',
       planBasicName: 'Basic Plan',
       planBasicDesc: 'Kişisel aday hunisi + 14 gün YZ denemesi; deneme sonrası sayfalar açık, YZ kilitli.',
@@ -85,7 +84,6 @@ export const landingSection = {
       footerKvkk: 'KVKK ve Gizlilik Politikası',
       footerTerms: 'Kullanım Koşulları',
       footerSecurity: 'Güvenlik Bildirgesi',
-      footerContact: 'İletişim',
       legalPage: {
         backToHome: 'Giriş Sayfası',
         kvkkBadge: 'KVKK UYUMLU GÜVENLİ VERİ',
@@ -143,7 +141,6 @@ export const landingSection = {
       pricingYearlyBadge: '25% Off',
       priceMonth: 'month',
       yearlyBillingDisclaimer: 'Prices shown per month (25% off). Yearly plans are billed once as 12 × the displayed monthly rate.',
-      yearlyMonthsFree: '{months} months free!',
       planBasicTag: 'SOLO BUILDER',
       planBasicName: 'Basic Plan',
       planBasicDesc: 'Personal pipeline + 14-day AI trial; pages stay open after trial, AI locked.',
@@ -181,7 +178,6 @@ export const landingSection = {
       footerKvkk: 'PDPL & Privacy Policy',
       footerTerms: 'Terms of Service',
       footerSecurity: 'Security Statement',
-      footerContact: 'Contact Us',
       legalPage: {
         backToHome: 'Back to Home',
         kvkkBadge: 'PDPL COMPLIANT',

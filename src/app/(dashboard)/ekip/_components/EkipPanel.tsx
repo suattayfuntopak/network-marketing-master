@@ -7,7 +7,6 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { TeamPerformanceSection } from './TeamPerformanceSection'
-import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
 import type { EkipTabId } from './EkipTabNav'
 import { toggleOnboardingStepAction } from '../actions'
 import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
@@ -23,6 +22,11 @@ import {
   prefetchEkipRankingMetrics,
   prefetchEkipTrainingMetrics,
 } from '@/lib/query/prefetchRouteMetrics'
+
+const YZOnboardingKocuModal = dynamic(
+  () => import('./YZOnboardingKocuModal').then(m => ({ default: m.YZOnboardingKocuModal })),
+  { loading: () => null },
+)
 
 const EkipSummaryTab = dynamic(
   () => import('./EkipSummaryTab').then(m => ({ default: m.EkipSummaryTab })),

@@ -13,8 +13,8 @@ export const AKADEMI_TAB_THEME: Record<
   }
 > = {
   training: {
-    activeTabClass: 'bg-[#3730A3] dark:bg-gradient-to-br dark:from-[#448AFF] dark:to-[#2962FF] text-white shadow-sm',
-    addButtonClass: 'bg-[#3730A3] hover:bg-[#28227d] dark:bg-[#2962FF] dark:hover:bg-[#1e4ed8] text-white',
+    activeTabClass: 'bg-theme-training text-white shadow-sm',
+    addButtonClass: 'bg-theme-training hover:bg-theme-training-hover text-white',
     navButtonClass:
       'border-[#2962FF]/35 bg-[#448AFF]/10 text-[#2962FF] hover:bg-[#448AFF]/20 dark:border-[#448AFF]/40 dark:bg-[#448AFF]/15 dark:text-[#93c5fd]',
     textClass: 'text-[#2962FF] dark:text-[#93c5fd]',
@@ -29,8 +29,8 @@ export const AKADEMI_TAB_THEME: Record<
     progressBarClass: 'bg-rose-500',
   },
   objections: {
-    activeTabClass: 'bg-[#16A34A] text-white dark:bg-none dark:bg-[#fda4af] dark:text-[#3d0a1a] shadow-sm',
-    addButtonClass: 'bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white',
+    activeTabClass: 'bg-theme-objections text-theme-objections-text-dark shadow-sm',
+    addButtonClass: 'bg-theme-objections hover:bg-theme-objections-hover text-theme-objections-text-dark',
     navButtonClass:
       'border-[#16A34A]/35 bg-[#22C55E]/10 text-[#16A34A] hover:bg-[#22C55E]/20 dark:border-[#fda4af]/40 dark:bg-[#fda4af]/15 dark:text-[#fda4af]',
     textClass: 'text-[#16A34A] dark:text-[#fda4af]',

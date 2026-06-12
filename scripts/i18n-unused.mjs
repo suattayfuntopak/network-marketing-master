@@ -65,7 +65,10 @@ const haystack = collectSrc(join(ROOT, 'src'), []).join('\n')
 // Dinamik anahtar erişimi: `t(`ns.sub${...}`)` veya `t('ns.sub' + ...)` → bu
 // statik önekle BAŞLAYAN tüm anahtarları "kullanılıyor" say (yanlış-pozitif azalt).
 const dynamicPrefixes = new Set()
-for (const m of haystack.matchAll(/[`'"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)\$\{/g)) {
+// Template literal interpolasyonu: `prefix${...}` — önek nokta İLE biter
+// (`stages.${}`) ya da nokta OLMADAN (`shellUi.planBlurb_${}`). Backtick'ten
+// `${`e kadarki tüm statik kısmı önek say (sonek-interpolasyonu da kapsanır).
+for (const m of haystack.matchAll(/`([a-zA-Z0-9_.]+)\$\{/g)) {
   dynamicPrefixes.add(m[1])
 }
 for (const m of haystack.matchAll(/['"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)['"]\s*\+/g)) {
