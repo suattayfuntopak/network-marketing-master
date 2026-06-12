@@ -1,5 +1,4 @@
 import type { AkademiTab } from '@/lib/domain/akademiTab'
-import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 
 /** Vaktin Varsa sekmeleri + Eğitim İlerlemem alt navigasyon. Video sekmesi: video
  *  butonu rengi (light brand / dark pembe-gül). İtiraz: itiraz kartı bordo aksanı. */
@@ -22,20 +21,20 @@ export const AKADEMI_TAB_THEME: Record<
     progressBarClass: 'bg-[#2962FF]',
   },
   videos: {
-    activeTabClass: `bg-[#16A34A] dark:bg-brand text-white shadow-sm ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`,
-    addButtonClass: 'bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:hover:from-pink-700 dark:hover:to-rose-600 text-white',
+    activeTabClass: `bg-gradient-to-br from-pink-600 to-rose-500 text-white shadow-sm shadow-pink-500/15`,
+    addButtonClass: 'bg-gradient-to-br from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 text-white',
     navButtonClass:
-      'border-[#16A34A]/35 bg-[#22C55E]/10 text-[#16A34A] hover:bg-[#22C55E]/20 dark:border-rose-500/40 dark:bg-rose-500/15 dark:text-rose-400',
-    textClass: 'text-[#16A34A] dark:text-rose-400',
-    progressBarClass: 'bg-[#16A34A] dark:bg-rose-500',
+      'border-rose-500/35 bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:border-rose-500/40 dark:bg-rose-500/15 dark:text-rose-400',
+    textClass: 'text-rose-600 dark:text-rose-400',
+    progressBarClass: 'bg-rose-500',
   },
   objections: {
-    activeTabClass: 'bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] text-white dark:bg-none dark:bg-[#fda4af] dark:text-[#3d0a1a] shadow-sm',
-    addButtonClass: 'bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] hover:opacity-95 dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white',
+    activeTabClass: 'bg-[#16A34A] text-white dark:bg-none dark:bg-[#fda4af] dark:text-[#3d0a1a] shadow-sm',
+    addButtonClass: 'bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white',
     navButtonClass:
-      'border-[#B91C5C]/35 bg-[#B91C5C]/10 text-[#B91C5C] hover:bg-[#B91C5C]/20 dark:border-[#fda4af]/40 dark:bg-[#fda4af]/15 dark:text-[#fda4af]',
-    textClass: 'text-[#9B1D47] dark:text-[#fda4af]',
-    progressBarClass: 'bg-[#9B1D47] dark:bg-[#fda4af]',
+      'border-[#16A34A]/35 bg-[#22C55E]/10 text-[#16A34A] hover:bg-[#22C55E]/20 dark:border-[#fda4af]/40 dark:bg-[#fda4af]/15 dark:text-[#fda4af]',
+    textClass: 'text-[#16A34A] dark:text-[#fda4af]',
+    progressBarClass: 'bg-[#16A34A] dark:bg-[#fda4af]',
   },
 }
 

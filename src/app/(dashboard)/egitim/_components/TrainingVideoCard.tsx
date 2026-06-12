@@ -13,7 +13,6 @@ import {
   type TrainingVideoDef,
 } from '@/lib/domain/trainingVideos'
 import { VIDEO_COMPLETE_PERCENT, type VideoProgressRow } from '@/lib/domain/videoProgress'
-import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 import { WhatsAppShareButton } from '@/components/ui/WhatsAppShareButton'
 import { reportVideoWatchAction } from '@/app/(dashboard)/egitim/videoActions'
 
@@ -202,7 +201,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
         </div>
 
         <div className="flex flex-1 flex-col p-4 pr-4">
-          <p className="pr-14 text-xs font-bold uppercase tracking-wider text-[#16A34A] dark:text-[var(--text-1)]">
+          <p className="pr-14 text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
             {lang === 'en' ? video.categoryEn : video.categoryTr}
           </p>
           <h3 className="mt-1 line-clamp-2 pr-14 text-base font-bold text-[var(--text-1)]">
@@ -217,7 +216,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             <button
               type="button"
               onClick={() => setShowEmbed(true)}
-              className={`${actionBtn} bg-[#16A34A] hover:bg-[#15803d] text-white ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`}
+              className={`${actionBtn} bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 text-white shadow-sm shadow-pink-500/15 transition active:scale-95 cursor-pointer`}
             >
               <Play className="h-4 w-4" />
               {t('videoTraining.watchVideoBtn')}
@@ -225,7 +224,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             {hasRelated ? (
               <Link
                 href={relatedHref}
-                className={`${actionBtn} border border-[var(--border)] text-[#16A34A] dark:text-[var(--text-1)] hover:border-[#16A34A]/40 dark:hover:border-[var(--border)]`}
+                className={`${actionBtn} border border-[var(--border)] text-rose-600 dark:text-rose-400 hover:border-rose-500/40 dark:hover:border-rose-400/40`}
               >
                 {t('videoTraining.relatedTopic')}
               </Link>
@@ -258,7 +257,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
                 <div
-                  className={`h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : 'bg-[#16A34A] dark:bg-brand'}`}
+                  className={`h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : 'bg-rose-500 dark:bg-rose-500'}`}
                   style={{ width: `${displayPct}%` }}
                 />
               </div>

@@ -167,7 +167,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
               <button
                 type="button"
                 onClick={onClose}
-                className="flex items-center gap-1 text-[11px] md:text-sm font-bold text-[var(--text-3)] hover:text-[#9B1D47] dark:hover:text-[#fda4af] transition cursor-pointer"
+                className="flex items-center gap-1 text-[11px] md:text-sm font-bold text-[var(--text-3)] hover:text-[#16A34A] dark:hover:text-[#fda4af] transition cursor-pointer"
               >
                 <X className="h-4 w-4" />
                 <span>Formu Kapat</span>
@@ -184,7 +184,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                     value={newSoru}
                     onChange={e => setNewSoru(e.target.value)}
                     placeholder="Örn. Bu iş uzun vadede yorucu gelmiyor mu?"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
                 <div className="space-y-1">
@@ -192,7 +192,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                   <select
                     value={newKategori}
                     onChange={e => setNewKategori(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="Para & Kazanç">Para & Kazanç</option>
                     <option value="Zaman & Yoğunluk">Zaman & Yoğunluk</option>
@@ -212,7 +212,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                   value={newKisaCevap}
                   onChange={e => setNewKisaCevap(e.target.value)}
                   placeholder="Kısa ve hızlı saha cevabı..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
@@ -223,7 +223,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                   value={newDetayliCevap}
                   onChange={e => setNewDetayliCevap(e.target.value)}
                   placeholder="Detaylı cevap metni..."
-                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                  className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition resize-none"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                     value={newYaklasim}
                     onChange={e => setNewYaklasim(e.target.value)}
                     placeholder="Bu itirazı nasıl ele almak gerektiğini yaz..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
                 <div className="space-y-1">
@@ -245,7 +245,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                     value={newOrnekDiyalog}
                     onChange={e => setNewOrnekDiyalog(e.target.value)}
                     placeholder="Kısa örnek konuşma..."
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition resize-none"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-3 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition resize-none"
                   />
                 </div>
               </div>
@@ -256,7 +256,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                   <select
                     value={newEmoji}
                     onChange={e => setNewEmoji(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition"
                   >
                     <option value="🛡️">🛡️ Kalkan</option>
                     <option value="⚖️">⚖️ Terazi</option>
@@ -275,7 +275,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                     value={newTags}
                     onChange={e => setNewTags(e.target.value)}
                     placeholder="örn. güven, fiyat, zamanlama"
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition"
+                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition"
                   />
                 </div>
               </div>
@@ -292,7 +292,7 @@ export function AddObjectionModal({ open, onClose, onAdd, editing = null, onUpda
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-5 py-2 md:py-2.5 text-sm md:text-base font-bold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  className="rounded-xl bg-[#16A34A] hover:bg-[#15803d] text-white px-5 py-2 md:py-2.5 text-sm md:text-base font-bold shadow-sm transition active:scale-95 cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {isPending ? (
                     <>

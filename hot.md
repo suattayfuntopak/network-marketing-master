@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-13 — Academy Tab Color Sync & Card Action Footer Refactoring ✅
+
+### Academy Tab & Layout Color Synchronization
+- **`akademiTabTheme.ts`**: Synchronized colors for light mode:
+  - Video Eğitimler (`videos`): Shifted light mode active tab, add button, and progress indicators to a pink/rose gradient theme, aligning it with the dark mode rose styling. Removed unused `PRO_CTA_GRADIENT_ACTIVE_DARK_SM` import.
+  - İtiraz Bankası (`objections`): Shifted light mode active tab, add button, sub-navigation tabs, text class, and progress bar to flat green (`#16A34A`), inheriting the green palette previously used by the videos tab in light mode. Dark mode remains rose (`#fda4af`) and untouched.
+- **`VideolarContent.tsx` & `VideoEditModal.tsx`**: Updated back arrow links, headers, film icons, and save buttons to use pink/rose styling instead of green `#16A34A` in light mode.
+- **`TrainingVideoCard.tsx`**: Changed video card category headers, play buttons, related topic links, and watch progress bars to use the pink/rose theme in light mode. Removed unused `PRO_CTA_GRADIENT_ACTIVE_DARK_SM` import.
+
+### Content Library Card Action Footer Refactoring
+- **`TrainingCard.tsx`**: Refactored the action footer to be right-aligned, icon-only (removed text labels for both mobile and desktop), and sorted left-to-right exactly as: Pencil (Edit/Düzenle) -> Trash2 (Delete/Sil) -> Copy/Check (Copy/Kopyala) -> WhatsApp share button. Standardized all button sizes to `h-9 w-9`.
+- **`ItirazCard.tsx`**: Fixed a missing closing `</div>` tag inside the expanded conditional section that was causing a parsing warning.
+
+### Dosyalar
+`src/lib/ui/akademiTabTheme.ts`, `src/app/(dashboard)/egitim/_components/VideolarContent.tsx`, `src/app/(dashboard)/egitim/_components/VideoEditModal.tsx`, `src/app/(dashboard)/egitim/_components/TrainingVideoCard.tsx`, `src/app/(dashboard)/egitim/_components/TrainingCard.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazCard.tsx`
+
 ## 2026-06-13 — Funnel Icon Harmonization, Member Activity Cleanup & Academy Color Sync ✅
 
 ### Dashboard & Sheet Funnel Icon Harmonization

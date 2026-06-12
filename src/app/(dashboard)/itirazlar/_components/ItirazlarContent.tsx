@@ -187,8 +187,8 @@ export function ItirazlarContent({
         <header className="mb-6">
           <div className="flex items-center justify-between gap-3 mb-1">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF1F3] dark:bg-[#3d0a1a]">
-                <MessageCircleQuestion className="h-5 w-5 text-[#9B1D47] dark:text-[#fda4af]" strokeWidth={1.75} />
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFDF5] dark:bg-[#3d0a1a]">
+                <MessageCircleQuestion className="h-5 w-5 text-[#16A34A] dark:text-[#fda4af]" strokeWidth={1.75} />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
@@ -196,26 +196,26 @@ export function ItirazlarContent({
             </div>
             <button
               onClick={() => { setEditingObjection(null); setFormOpen(true) }}
-              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] hover:opacity-95 dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{t('objectionsPage.addObjection')}</span>
             </button>
           </div>
-          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#FFE4EA] dark:border-[#3d0a1a] bg-[#FFF1F3] dark:bg-[#3d0a1a]/60 px-4 py-3">
+          <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#D1FAE5] dark:border-[#3d0a1a] bg-[#ECFDF5] dark:bg-[#3d0a1a]/60 px-4 py-3">
             <span className="text-3xl">🛡️</span>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold leading-relaxed text-[#9B1D47] dark:text-[#fda4af]">
+              <p className="text-sm font-semibold leading-relaxed text-[#16A34A] dark:text-[#fda4af]">
                 {t('objectionsPage.subtitle')}
               </p>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
               {favCount > 0 ? (
-                <span className="rounded-full bg-[#9B1D47] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
+                <span className="rounded-full bg-[#16A34A] px-2.5 py-1 text-[10px] font-bold text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]">
                   {favCount} {t('objectionsPage.fav')}
                 </span>
               ) : (
-                <span className="rounded-full bg-[#9B1D47]/10 px-2.5 py-1 text-[10px] font-bold text-[#9B1D47] dark:text-[#fda4af]">
+                <span className="rounded-full bg-[#16A34A]/10 px-2.5 py-1 text-[10px] font-bold text-[#16A34A] dark:text-[#fda4af]">
                   {tumItirazlar.length} {t('objectionsPage.objections')}
                 </span>
               )}
@@ -234,7 +234,7 @@ export function ItirazlarContent({
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => { setEditingObjection(null); setFormOpen(true) }}
-            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] hover:opacity-95 dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{t('objectionsPage.addObjection')}</span>
@@ -249,7 +249,7 @@ export function ItirazlarContent({
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t('objectionsPage.searchPlaceholder')}
-          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#9B1D47] dark:focus:border-[#fda4af] transition-all"
+          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#16A34A] dark:focus:border-[#fda4af] transition-all"
         />
         {search && (
           <button
@@ -268,14 +268,14 @@ export function ItirazlarContent({
             onClick={() => setAktifKategori(idx)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
               aktifKategori === idx
-                ? 'bg-[#9B1D47] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
-                : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#9B1D47] dark:hover:border-[#fda4af]'
+                ? 'bg-[#16A34A] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
+                : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#16A34A] dark:hover:border-[#fda4af]'
             }`}
           >
             {(k === 'Favoriler' || k === 'Favorites') && <Star className="h-3 w-3" />}
             {k}
             {(k === 'Favoriler' || k === 'Favorites') && favCount > 0 && (
-              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === idx ? 'bg-white/20' : 'bg-[#9B1D47]/10 text-[#9B1D47] dark:text-[#fda4af]'}`}>
+              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === idx ? 'bg-white/20' : 'bg-[#16A34A]/10 text-[#16A34A] dark:text-[#fda4af]'}`}>
                 {favCount}
               </span>
             )}
@@ -367,8 +367,8 @@ export function ItirazlarContent({
                   }}
                   className={`h-9 w-9 rounded-xl text-base font-semibold transition-all ${
                     page === p
-                      ? 'bg-[#9B1D47] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
-                      : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#9B1D47] dark:hover:border-[#fda4af]'
+                      ? 'bg-[#16A34A] text-white dark:bg-[#fda4af] dark:text-[#3d0a1a]'
+                      : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#16A34A] dark:hover:border-[#fda4af]'
                   }`}
                 >
                   {p}

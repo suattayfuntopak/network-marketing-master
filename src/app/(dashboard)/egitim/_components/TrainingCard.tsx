@@ -130,76 +130,60 @@ export function TrainingCard({
               ))}
             </ul>
 
-            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] pt-3">
-              {/* Left Group: Copy & WhatsApp */}
-              <div className="flex flex-wrap items-center gap-2">
+            <div className="mt-4 flex items-center justify-end gap-2 border-t border-[var(--border)] pt-3">
+              {onEdit && (
                 <button
-                  onClick={onCopy}
-                  className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-semibold transition-all ${
-                    copied
-                      ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
-                      : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3]'
-                  }`}
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    onEdit()
+                  }}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3] transition-all cursor-pointer active:scale-95"
+                  title={t('trainingPage.editContent') || 'Düzenle'}
                 >
-                  {copied ? (
-                    <>
-                      <Check className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t('trainingPage.copied')}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" /> <span className="hidden sm:inline">{t('trainingPage.copyContent')}</span>
-                    </>
-                  )}
+                  <Pencil className="h-4 w-4" />
                 </button>
+              )}
 
-                <a
-                  href={whatsappShareUrl(t('trainingPage.waShare', { title: baslik, body: maddeler.join('\n') }))}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={e => e.stopPropagation()}
-                  title={t('trainingPage.sendViaWhatsApp')}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 px-3 py-1.5 text-sm font-semibold text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a]"
+              {onDelete && (
+                <button
+                  type="button"
+                  onClick={e => {
+                    e.stopPropagation()
+                    onDelete()
+                  }}
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 transition-all cursor-pointer active:scale-95"
+                  title={t('trainingPage.deleteContent') || 'Sil'}
                 >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z" />
-                  </svg>
-                  <span className="hidden sm:inline">{t('trainingPage.sendViaWhatsApp')}</span>
-                </a>
-              </div>
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              )}
 
-              {/* Right Group: Edit & Delete (ml-auto forces it to the right) */}
-              <div className="flex flex-wrap items-center gap-2 ml-auto">
-                {onEdit && (
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation()
-                      onEdit()
-                    }}
-                    className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3] px-3 py-1.5 text-sm font-semibold transition-all"
-                    title={t('trainingPage.editContent') || 'Düzenle'}
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t('trainingPage.editContent') || 'Düzenle'}</span>
-                  </button>
-                )}
+              <button
+                onClick={onCopy}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl transition-all cursor-pointer active:scale-95 ${
+                  copied
+                    ? 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]'
+                    : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:bg-[#EEF2FF] hover:text-[#3730A3]'
+                }`}
+                title={copied ? t('trainingPage.copied') : t('trainingPage.copyContent')}
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+              </button>
 
-                {onDelete && (
-                  <button
-                    type="button"
-                    onClick={e => {
-                      e.stopPropagation()
-                      onDelete()
-                    }}
-                    className="flex items-center gap-1.5 rounded-xl bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-950/40 px-3 py-1.5 text-sm font-semibold transition-all"
-                    title={t('trainingPage.deleteContent') || 'Sil'}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                    <span className="hidden sm:inline">{t('trainingPage.deleteContent') || 'Sil'}</span>
-                  </button>
-                )}
-              </div>
+              <a
+                href={whatsappShareUrl(t('trainingPage.waShare', { title: baslik, body: maddeler.join('\n') }))}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={e => e.stopPropagation()}
+                title={t('trainingPage.sendViaWhatsApp')}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#E7FBF0] dark:bg-[#0d2e1a]/50 text-[#1a9e4f] dark:text-[#4ade80] transition-all hover:bg-[#d4f7e4] dark:hover:bg-[#0d2e1a] cursor-pointer active:scale-95"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.554 4.118 1.523 5.845L0 24l6.335-1.508A11.927 11.927 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.807 9.807 0 01-5.031-1.386l-.361-.214-3.761.896.953-3.651-.235-.374A9.778 9.778 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z" />
+                </svg>
+              </a>
             </div>
           </div>
         )}

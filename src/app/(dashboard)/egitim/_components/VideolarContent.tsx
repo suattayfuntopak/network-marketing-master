@@ -87,23 +87,23 @@ export function VideolarContent({
         {!embedded && (
         <Link
           href="/egitim"
-          className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#16A34A] dark:text-[var(--text-1)] hover:underline"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-rose-600 dark:text-[var(--text-1)] hover:underline"
         >
-          <ArrowLeft className="h-4 w-4 text-[#16A34A] dark:text-[var(--text-1)]" />
+          <ArrowLeft className="h-4 w-4 text-rose-600 dark:text-[var(--text-1)]" />
           {t('videoTraining.backToTraining')}
         </Link>
         )}
         {!embedded && (
         <div className="flex items-center justify-between gap-3">
           <h1 className="flex items-center gap-2 text-xl font-bold text-[var(--text-1)]">
-            <Film className="h-5 w-5 text-[#16A34A] dark:text-[var(--text-1)]" />
+            <Film className="h-5 w-5 text-rose-600 dark:text-[var(--text-1)]" />
             {t('videoTraining.pageTitle')}
           </h1>
           {isAdmin && (
             <button
               type="button"
               onClick={() => { setEditing(null); setModalOpen(true) }}
-              className="flex items-center gap-1.5 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:hover:from-pink-700 dark:hover:to-rose-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 px-3.5 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95 cursor-pointer"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{t('videoTraining.addVideoShort')}</span>

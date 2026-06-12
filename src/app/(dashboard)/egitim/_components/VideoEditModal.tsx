@@ -87,7 +87,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
       <div className="w-full max-w-lg max-h-[88vh] overflow-y-auto rounded-2xl bg-[var(--bg-card)] shadow-2xl border border-[var(--border)]">
         <div className="flex items-center justify-between border-b border-[var(--border)] px-5 py-3">
           <h2 className="flex items-center gap-2 text-base font-bold text-[var(--text-1)]">
-            <Film className="h-4 w-4 text-[#16A34A] dark:text-[var(--text-1)]" />
+            <Film className="h-4 w-4 text-rose-600 dark:text-[var(--text-1)]" />
             {editing ? t('videoTraining.editVideo') : t('videoTraining.addVideo')}
           </h2>
           <button
@@ -192,7 +192,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
             type="button"
             onClick={submit}
             disabled={saving}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:hover:from-pink-700 dark:hover:to-rose-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95 disabled:opacity-60 cursor-pointer"
           >
             {saving && <Loader2 className="h-4 w-4 animate-spin" />}
             {editing ? t('videoTraining.save') : t('videoTraining.add')}
