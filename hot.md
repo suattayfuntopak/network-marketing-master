@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-13 — Vaktin Varsa / İçerik Kütüphanesi & İtiraz Bankası dark tema renk uyumu ✅
+
+### İçerik Kütüphanesi (Dark Tema Renk Düzenlemeleri)
+- **Kategori & Seviye Butonları:** Dark temada aktif kategori ve seviye filtre butonlarının arka plan rengi İçerik Kütüphanesi sekme rengindeki neon/kraliyet mavi (`#2962FF`) ile eşitlendi, yazıları beyaz yapıldı. Pasif kategori butonlarındaki rakam baloncuklarının rengi dark modda `#448AFF` mavi olarak değiştirildi.
+- **Öğrenme Yolu:** "ÖĞRENME YOLUNDA SIRADAKİ" başlık rengi dark modda `#448AFF` maviye, "Devam et" butonu rengi ise `#2962FF` maviye güncellendi.
+- **Zihniyet & Temel Grubu:** Bu kategori grubuna ait kart başlığı, hover kenarlıkları, aktif kenarlıkları ve chevron açıldığındaki madde numaralarının (`bulletStyle`) dark mod rengi İçerik Kütüphanesi'nin mavi rengi (`#2962FF` / `#448AFF`) ile uyumlu hale getirildi.
+- **Sayfa Numaraları:** Arama/liste altındaki aktif sayfalama numarası dark modda `#2962FF` mavi ve beyaz yazı oldu, hover kenarlığı da mavi yapıldı.
+- **Favori Yıldızı:** Seçili durumdaki favori yıldızının dark moddaki rengi neon mavi (`#2962FF`/10 arka plan ve `#448AFF` metin/ikon rengi) olarak revize edildi, light moddaki amber rengi korundu.
+- **İçerik Kütüphanesi Sekmesi (Light Mod):** Light mod aktif sekme arka plan rengi `#3730A3` indigo olarak güncellendi, dark moddaki mavi gradyan arka plan korundu.
+
+### İtiraz Bankası
+- **İtiraz Bankası Sekmesi (Dark Mod):** Dark mod aktif sekme rengi, İtiraz Bankası "Tümü" kategori butonunun rengi ile uyumlu olması için `#fda4af` pembe/rose olarak güncellendi, yazı rengi `#3d0a1a` yapıldı, light mod sekme rengine dokunulmadı.
+
+### Dosyalar
+`src/lib/ui/akademiTabTheme.ts`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/app/(dashboard)/egitim/constants.ts`, `src/app/(dashboard)/egitim/_components/TrainingCard.tsx`
+
 ## 2026-06-13 — Sayfa yardımı konumlandırma + Vaktin Varsa içerik/itiraz kart iyileştirmeleri ✅
 
 ### Sayfa Yardımı (?) UX/Konumlandırma

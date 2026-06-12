@@ -11,7 +11,7 @@ export const PAGE_SIZE = 10
 
 export function getTrainingCategoryStyles(kategoriId: string) {
   const catTextColor =
-    kategoriId === 'zihniyet' ? 'text-[#3730A3] dark:text-[#a5b4fc]' :
+    kategoriId === 'zihniyet' ? 'text-[#3730A3] dark:text-[#448AFF]' :
     kategoriId === 'iletisim' || kategoriId === 'iletisim-&-yaklasim' ? 'text-[#0F6E56] dark:text-[#4ade80]' :
     kategoriId === 'davet' || kategoriId === 'davet-pratigi' ? 'text-[#0369A1] dark:text-[#38bdf8]' :
     kategoriId === 'sunum' || kategoriId === 'sunum-&-kapanis' ? 'text-[#9A3412] dark:text-[#fb923c]' :
@@ -21,7 +21,7 @@ export function getTrainingCategoryStyles(kategoriId: string) {
     'text-[#6B21A8] dark:text-[#d8b4fe]'
 
   const catBorderColorHover =
-    kategoriId === 'zihniyet' ? 'hover:border-[#3730A3]/30 dark:hover:border-[#a5b4fc]/30' :
+    kategoriId === 'zihniyet' ? 'hover:border-[#3730A3]/30 dark:hover:border-[#448AFF]/30' :
     kategoriId === 'iletisim' || kategoriId === 'iletisim-&-yaklasim' ? 'hover:border-[#0F6E56]/30 dark:hover:border-[#4ade80]/30' :
     kategoriId === 'davet' || kategoriId === 'davet-pratigi' ? 'hover:border-[#0369A1]/30 dark:hover:border-[#38bdf8]/30' :
     kategoriId === 'sunum' || kategoriId === 'sunum-&-kapanis' ? 'hover:border-[#9A3412]/30 dark:hover:border-[#fb923c]/30' :
@@ -31,7 +31,7 @@ export function getTrainingCategoryStyles(kategoriId: string) {
     'hover:border-[#6B21A8]/30 dark:hover:border-[#d8b4fe]/30'
 
   const catBorderColorActive =
-    kategoriId === 'zihniyet' ? 'border-[#3730A3]/25 dark:border-[#a5b4fc]/25 shadow-[#3730A3]/5' :
+    kategoriId === 'zihniyet' ? 'border-[#3730A3]/25 dark:border-[#2962FF]/25 shadow-[#3730A3]/5' :
     kategoriId === 'iletisim' || kategoriId === 'iletisim-&-yaklasim' ? 'border-[#0F6E56]/25 dark:border-[#4ade80]/25 shadow-[#0F6E56]/5' :
     kategoriId === 'davet' || kategoriId === 'davet-pratigi' ? 'border-[#0369A1]/25 dark:border-[#38bdf8]/25 shadow-[#0369A1]/5' :
     kategoriId === 'sunum' || kategoriId === 'sunum-&-kapanis' ? 'border-[#9A3412]/25 dark:border-[#fb923c]/25 shadow-[#9A3412]/5' :
@@ -41,7 +41,7 @@ export function getTrainingCategoryStyles(kategoriId: string) {
     'border-[#6B21A8]/25 dark:border-[#d8b4fe]/25 shadow-[#6B21A8]/5'
 
   const bulletStyle =
-    kategoriId === 'zihniyet' ? 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc]' :
+    kategoriId === 'zihniyet' ? 'bg-[#EEF2FF] dark:bg-[#2962FF]/10 text-[#3730A3] dark:text-[#448AFF]' :
     kategoriId === 'iletisim' || kategoriId === 'iletisim-&-yaklasim' ? 'bg-[#E1F5EE] dark:bg-[#0d3d2e] text-[#0F6E56] dark:text-[#4ade80]' :
     kategoriId === 'davet' || kategoriId === 'davet-pratigi' ? 'bg-[#F0F9FF] dark:bg-[#0c1a2e] text-[#0369A1] dark:text-[#38bdf8]' :
     kategoriId === 'sunum' || kategoriId === 'sunum-&-kapanis' ? 'bg-[#FFF7ED] dark:bg-[#2a1500] text-[#9A3412] dark:text-[#fb923c]' :

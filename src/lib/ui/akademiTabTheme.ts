@@ -14,7 +14,7 @@ export const AKADEMI_TAB_THEME: Record<
   }
 > = {
   training: {
-    activeTabClass: 'bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white shadow-sm',
+    activeTabClass: 'bg-[#3730A3] dark:bg-gradient-to-br dark:from-[#448AFF] dark:to-[#2962FF] text-white shadow-sm',
     addButtonClass: 'bg-[#2962FF] hover:bg-[#1e4ed8] text-white',
     navButtonClass:
       'border-[#2962FF]/35 bg-[#448AFF]/10 text-[#2962FF] hover:bg-[#448AFF]/20 dark:border-[#448AFF]/40 dark:bg-[#448AFF]/15 dark:text-[#93c5fd]',
@@ -30,7 +30,7 @@ export const AKADEMI_TAB_THEME: Record<
     progressBarClass: 'bg-[#EA580C]',
   },
   objections: {
-    activeTabClass: 'bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] text-white shadow-sm',
+    activeTabClass: 'bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] text-white dark:bg-none dark:bg-[#fda4af] dark:text-[#3d0a1a] shadow-sm',
     addButtonClass: 'bg-[#16A34A] hover:bg-[#15803d] text-white',
     navButtonClass:
       'border-[#16A34A]/35 bg-[#22C55E]/10 text-[#16A34A] hover:bg-[#22C55E]/20 dark:border-[#22C55E]/40 dark:bg-[#22C55E]/15 dark:text-[#86efac]',

@@ -64,7 +64,14 @@ export function EgitimContent({
   }
 
   function handleUpdateTraining(updated: TrainingTopic) {
-    setCustomTrainings(prev => prev.map(c => c.id === updated.id ? updated : c))
+    setCustomTrainings(prev => {
+      const exists = prev.some(c => c.id === updated.id)
+      if (exists) {
+        return prev.map(c => c.id === updated.id ? updated : c)
+      } else {
+        return [updated, ...prev]
+      }
+    })
     setEditingTraining(null)
   }
 
@@ -100,7 +107,24 @@ export function EgitimContent({
   }, [KATEGORILER_DATA])
 
   const allTopicsMerged = useMemo(() => {
-    return [...ALL_TOPICS, ...customTrainings]
+    const mergedMap = new Map<string, TrainingTopic>()
+
+    ALL_TOPICS.forEach(topic => {
+      mergedMap.set(topic.id, topic)
+    })
+
+    customTrainings.forEach(topic => {
+      if (topic.isDeleted) {
+        mergedMap.delete(topic.id)
+      } else {
+        mergedMap.set(topic.id, {
+          ...topic,
+          isCustom: true
+        })
+      }
+    })
+
+    return Array.from(mergedMap.values())
   }, [ALL_TOPICS, customTrainings])
 
   const KATEGORILER = useMemo(() => {
@@ -319,7 +343,7 @@ export function EgitimContent({
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t('trainingPage.searchPlaceholder')}
-          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition-all"
+          className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] py-3 pl-10 pr-10 text-base text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-[#3730A3] dark:focus:border-[#2962FF] transition-all"
         />
         {search && (
           <button
@@ -338,14 +362,14 @@ export function EgitimContent({
             onClick={() => setAktifKategori(idx)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
               aktifKategori === idx
-                ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
-                : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#a5b4fc]'
+                ? 'bg-[#3730A3] text-white dark:bg-[#2962FF] dark:text-white'
+                : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#2962FF]'
             }`}
           >
             {(k === 'Favoriler' || k === 'Favorites') && <Star className="h-3 w-3" />}
             {k}
             {(k === 'Favoriler' || k === 'Favorites') && favCount > 0 && (
-              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === idx ? 'bg-white/20' : 'bg-[#3730A3]/10 text-[#3730A3] dark:text-[#a5b4fc]'}`}>
+              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === idx ? 'bg-white/20' : 'bg-[#3730A3]/10 text-[#3730A3] dark:bg-[#2962FF]/10 dark:text-[#448AFF]'}`}>
                 {favCount}
               </span>
             )}
@@ -366,7 +390,7 @@ export function EgitimContent({
             onClick={() => setAktifSeviye(key)}
             className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition-all ${
               aktifSeviye === key
-                ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
+                ? 'bg-[#3730A3] text-white dark:bg-[#2962FF] dark:text-white'
                 : 'bg-[var(--bg-subtle)] text-[var(--text-2)] hover:text-[var(--text-1)]'
             }`}
           >
@@ -379,16 +403,16 @@ export function EgitimContent({
       {!search && nextTopic && (
         <button
           onClick={goToNextTopic}
-          className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-gradient-to-r from-[#EEF2FF] to-[#F5F3FF] dark:from-[#1e1b4b]/70 dark:to-[#2a1b4b]/50 px-4 py-3 text-left transition hover:border-[#3730A3] dark:hover:border-[#a5b4fc] active:scale-[0.99]"
+          className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-gradient-to-r from-[#EEF2FF] to-[#F5F3FF] dark:from-[#1e1b4b]/70 dark:to-[#2a1b4b]/50 px-4 py-3 text-left transition hover:border-[#3730A3] dark:hover:border-[#2962FF] active:scale-[0.99]"
         >
           <span className="text-2xl shrink-0">📚</span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3730A3] dark:text-[#a5b4fc]">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3730A3] dark:text-[#448AFF]">
               {t('trainingPage.learningPathNext')}
             </p>
             <p className="truncate text-sm font-bold text-[var(--text-1)]">{nextTopic.baslik}</p>
           </div>
-          <span className="shrink-0 rounded-xl bg-[#3730A3] px-3 py-1.5 text-xs font-bold text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]">
+          <span className="shrink-0 rounded-xl bg-[#3730A3] px-3 py-1.5 text-xs font-bold text-white dark:bg-[#2962FF] dark:text-white">
             {t('trainingPage.learningPathContinue')}
           </span>
         </button>
@@ -444,17 +468,26 @@ export function EgitimContent({
                   )
                 }
                 onDelete={
-                  konu.isCustom
+                  !konu.isCustom ||
+                  (konu as unknown as { userId?: string }).userId === ws?.userId ||
+                  ws?.isSuperAdmin
                     ? () =>
                         deleteWithUndo(konu.baslik, () => {
-                          setCustomTrainings(prev => prev.filter(item => item.id !== konu.id))
-                          deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
+                          if (konu.isCustom) {
+                            setCustomTrainings(prev => prev.filter(item => item.id !== konu.id))
+                            deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
+                          } else {
+                            const deletedItem = { ...konu, isCustom: true, isDeleted: true }
+                            setCustomTrainings(prev => [deletedItem as TrainingTopic, ...prev])
+                            addCustomContent('nmm_custom_trainings', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: string | number }).catch(() => {})
+                          }
                         })
                     : undefined
                 }
                 onEdit={
-                  konu.isCustom &&
-                  (konu as unknown as { userId?: string }).userId === ws?.userId
+                  !konu.isCustom ||
+                  (konu as unknown as { userId?: string }).userId === ws?.userId ||
+                  ws?.isSuperAdmin
                     ? () => handleEditTraining(konu)
                     : undefined
                 }
@@ -470,8 +503,8 @@ export function EgitimContent({
                   onClick={() => { setPage(p); setAcikId(null); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                   className={`h-9 w-9 rounded-xl text-base font-semibold transition-all ${
                     page === p
-                      ? 'bg-[#3730A3] text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b]'
-                      : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#a5b4fc]'
+                      ? 'bg-[#3730A3] text-white dark:bg-[#2962FF] dark:text-white'
+                      : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#2962FF]'
                   }`}
                 >
                   {p}

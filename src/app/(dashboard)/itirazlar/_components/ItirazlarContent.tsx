@@ -57,7 +57,26 @@ export function ItirazlarContent({
     return () => { cancelled = true }
   }, [ws?.workspaceId])
 
-  const tumItirazlar = useMemo(() => [...ITIRAZLAR, ...customItirazlar], [customItirazlar])
+  const tumItirazlar = useMemo(() => {
+    const mergedMap = new Map<number, CustomItiraz>()
+
+    ITIRAZLAR.forEach(itiraz => {
+      mergedMap.set(itiraz.id, itiraz as CustomItiraz)
+    })
+
+    customItirazlar.forEach(itiraz => {
+      if (itiraz.isDeleted) {
+        mergedMap.delete(itiraz.id)
+      } else {
+        mergedMap.set(itiraz.id, {
+          ...itiraz,
+          isCustom: true
+        })
+      }
+    })
+
+    return Array.from(mergedMap.values())
+  }, [customItirazlar])
 
   const KATEGORILER = useMemo(() => {
     const base = lang === 'en' ? ['All', 'Favorites'] : ['Tümü', 'Favoriler']
@@ -87,8 +106,20 @@ export function ItirazlarContent({
   }
 
   function handleUpdateObjection(updatedObj: CustomItiraz) {
-    setCustomItirazlar(prev => prev.map(c => (c.id === updatedObj.id ? updatedObj : c)))
-    updateCustomContent('nmm_custom_objections', updatedObj.id, updatedObj as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+    const isCustom = customItirazlar.some(c => c.id === updatedObj.id)
+    setCustomItirazlar(prev => {
+      const exists = prev.some(c => c.id === updatedObj.id)
+      if (exists) {
+        return prev.map(c => (c.id === updatedObj.id ? updatedObj : c))
+      } else {
+        return [updatedObj, ...prev]
+      }
+    })
+    if (isCustom) {
+      updateCustomContent('nmm_custom_objections', updatedObj.id, updatedObj as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+    } else {
+      addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, updatedObj as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+    }
     setEditingObjection(null)
   }
 
@@ -280,7 +311,6 @@ export function ItirazlarContent({
                 isFav={favs.has(itiraz.id)}
                 isRead={read.has(itiraz.id)}
                 copied={copiedId === itiraz.id}
-                isCustom={customIds.has(itiraz.id)}
                 onToggle={() => setAcikId(prev => (prev === itiraz.id ? null : itiraz.id))}
                 onToggleFav={e => {
                   e.stopPropagation()
@@ -292,19 +322,31 @@ export function ItirazlarContent({
                 }}
                 onCopy={(value, e) => copyCevap(value, itiraz.id, e)}
                 onEdit={
-                  customIds.has(itiraz.id) &&
-                  (itiraz as unknown as { userId?: string }).userId === ws?.userId
+                  !customIds.has(itiraz.id) ||
+                  (itiraz as unknown as { userId?: string }).userId === ws?.userId ||
+                  ws?.isSuperAdmin
                     ? () => {
                         setEditingObjection(itiraz as CustomItiraz)
                         setFormOpen(true)
                       }
                     : undefined
                 }
-                onDelete={() =>
-                  deleteWithUndo(itiraz.soru[lang] ?? itiraz.soru.tr, () => {
-                    setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
-                    deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
-                  })
+                onDelete={
+                  !customIds.has(itiraz.id) ||
+                  (itiraz as unknown as { userId?: string }).userId === ws?.userId ||
+                  ws?.isSuperAdmin
+                    ? () =>
+                        deleteWithUndo(itiraz.soru[lang] ?? itiraz.soru.tr, () => {
+                          if (customIds.has(itiraz.id)) {
+                            setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
+                            deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
+                          } else {
+                            const deletedItem = { ...itiraz, isCustom: true, isDeleted: true }
+                            setCustomItirazlar(prev => [deletedItem as CustomItiraz, ...prev])
+                            addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+                          }
+                        })
+                    : undefined
                 }
               />
             ))}

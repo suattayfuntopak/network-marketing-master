@@ -13,6 +13,8 @@ export interface Itiraz {
   ornekDiyalog?: string
   ornekDiyalogEn?: string
   tags?: string[]
+  isCustom?: boolean
+  isDeleted?: boolean
 }
 
 export type CustomItiraz = Itiraz

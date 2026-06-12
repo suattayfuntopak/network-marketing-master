@@ -14,5 +14,6 @@ export interface TrainingTopic {
   kategoriBaslikEn?: string
   kategoriRenk: string
   isCustom?: boolean
+  isDeleted?: boolean
   tags?: string[]
 }

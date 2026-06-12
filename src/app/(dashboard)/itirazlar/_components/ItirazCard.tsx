@@ -27,12 +27,11 @@ type Props = {
   isFav: boolean
   isRead: boolean
   copied: boolean
-  isCustom: boolean
   onToggle: () => void
   onToggleFav: (e: React.MouseEvent) => void
   onToggleRead: (e: React.MouseEvent) => void
   onCopy: (value: string, e: React.MouseEvent) => void
-  onDelete: () => void
+  onDelete?: () => void
   onEdit?: () => void
 }
 
@@ -42,7 +41,6 @@ export function ItirazCard({
   isFav,
   isRead,
   copied,
-  isCustom,
   onToggle,
   onToggleFav,
   onToggleRead,
@@ -204,7 +202,7 @@ export function ItirazCard({
 
               {/* Right Group: Edit & Delete (ml-auto forces it to the right) */}
               <div className="flex flex-wrap items-center gap-2 ml-auto">
-                {isCustom && onEdit && (
+                {onEdit && (
                   <button
                     type="button"
                     onClick={e => {
@@ -219,7 +217,7 @@ export function ItirazCard({
                   </button>
                 )}
 
-                {isCustom && onDelete && (
+                {onDelete && (
                   <button
                     type="button"
                     onClick={e => {

@@ -11,7 +11,7 @@ import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderati
 import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { TrainingTopic } from '../types'
-import { updateCustomContent } from '@/lib/domain/customContent'
+import { updateCustomContent, addCustomContent } from '@/lib/domain/customContent'
 import { useEffect } from 'react'
 
 type Props = {
@@ -88,7 +88,11 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
     startTransition(async () => {
       try {
         if (editing && onUpdate) {
-          await updateCustomContent('nmm_custom_trainings', itemKey, newObj as unknown as Record<string, unknown> & { id: string | number })
+          if (editing.isCustom) {
+            await updateCustomContent('nmm_custom_trainings', itemKey, newObj as unknown as Record<string, unknown> & { id: string | number })
+          } else {
+            await addCustomContent('nmm_custom_trainings', ws?.workspaceId ?? null, newObj as unknown as Record<string, unknown> & { id: string | number })
+          }
           onUpdate(newObj)
           toast.success(t('trainingPage.contentUpdated') || 'İçerik güncellendi!')
           onClose()

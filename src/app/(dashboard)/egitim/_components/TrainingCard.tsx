@@ -108,8 +108,8 @@ export function TrainingCard({
               title={isFav ? t('training.removeFromFavorites') : t('training.addToFavorites')}
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
                 isFav
-                  ? 'bg-amber-500/10 text-amber-500 hover:scale-105'
-                  : 'text-[var(--text-3)] hover:text-amber-500 hover:scale-105'
+                  ? 'bg-amber-500/10 text-amber-500 dark:bg-[#2962FF]/10 dark:text-[#448AFF] hover:scale-105'
+                  : 'text-[var(--text-3)] hover:text-amber-500 dark:hover:text-[#448AFF] hover:scale-105'
               }`}
             >
               <Star className={`h-4 w-4 ${isFav ? 'fill-current' : ''}`} />
@@ -170,7 +170,7 @@ export function TrainingCard({
 
               {/* Right Group: Edit & Delete (ml-auto forces it to the right) */}
               <div className="flex flex-wrap items-center gap-2 ml-auto">
-                {konu.isCustom && onEdit && (
+                {onEdit && (
                   <button
                     type="button"
                     onClick={e => {
@@ -185,7 +185,7 @@ export function TrainingCard({
                   </button>
                 )}
 
-                {konu.isCustom && onDelete && (
+                {onDelete && (
                   <button
                     type="button"
                     onClick={e => {
