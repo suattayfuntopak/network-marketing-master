@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-13 — Genel Öneriler: Timezone ESLint Guard, Konvansiyon Belgeleme, WA Helper, Ölü i18n Temizliği ✅
+
+İki önceki + son oturumun "genel öneriler" listesi cerrah titizliğinde hayata geçirildi.
+
+### 1. Timezone gün-anahtarı ESLint kuralı (regresyon kalkanı)
+- **`eslint.config.mjs`**: `noRawZIndex` bloğu `noRestrictedSyntax` olarak yeniden adlandırıldı ve TEK `no-restricted-syntax` bloğunda toplandı (flat config'te aynı kural iki blokta tanımlanırsa sonuncusu öncekini EZER — z-index kuralının sessizce kapanmasını önlemek için kritik).
+- Yeni seçici: `CallExpression[callee.object.property.name='created_at'][callee.property.name='slice']` → `created_at.slice(0,10)` (UTC günü, 00:00–03:00 yanlış güne düşer) artık hata; mesaj `istanbulDayKey()`'e yönlendirir. Probe ile her iki seçicinin de (z-index + created_at) ateşlediği doğrulandı.
+
+### 2. Konvansiyon belgeleme (AGENTS.md)
+- **Migrations**: Veri-onarım migration'ları idempotent olmalı → `RAISE EXCEPTION` yerine `RAISE NOTICE '...'; RETURN;`. CI migrate-apply toleransına gerek kalmaz.
+- **Zaman dilimi & gün anahtarları** (yeni bölüm): Sunucu tarafı gün anahtarı için her zaman `lib/utils/calendarDates` İstanbul yardımcıları; `created_at.slice(0,10)` yasak (ESLint), `setHours(0,0,0,0)`/`toISOString().slice(0,10)` metrik gruplamasında kullanma.
+- **Sayfa yardımı (PageHelp)** (yeni bölüm): Yeni dashboard sayfası → `src/lib/domain/pageHelp.ts`'e girdi ekle.
+
+### 3. Merkezi WhatsApp paylaşım yardımcısı
+- **`src/lib/utils/waLink.ts`**: `whatsappShareUrl(text)` eklendi — dağınık `wa.me/?text=` / `api.whatsapp.com/send?text=` kullanımlarını tek yerde toplar.
+- 5 çağrı yeri refactor edildi: `WhatsAppShareButton.tsx`, `TrainingCard.tsx`, `ItirazCard.tsx`, `PlatformWorkspacesTable.tsx`, `PlatformIndependentSection.tsx`.
+
+### 4. Ölü i18n namespace temizliği
+- **`tr.ts` + `en.ts`**: `calendar.*` ve `achievements.*` blokları kaldırıldı (0 kullanım — kaldırılmış özelliklerden artık). `objections.*` ve `training.*` korundu (aktif). i18n parite testi (14/14) yeşil.
+
+### Doğrulama
+`tsc --noEmit` temiz · `vitest translations` 14/14 · `eslint --max-warnings 0` temiz · `npm run build` başarılı.
+
+### Dosyalar
+`eslint.config.mjs`, `AGENTS.md`, `src/lib/utils/waLink.ts`, `src/components/ui/WhatsAppShareButton.tsx`, `src/app/(dashboard)/egitim/_components/TrainingCard.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazCard.tsx`, `src/app/(dashboard)/platform-yonetim/_components/PlatformWorkspacesTable.tsx`, `src/app/(dashboard)/platform-yonetim/_components/PlatformIndependentSection.tsx`, `src/lib/translations/tr.ts`, `src/lib/translations/en.ts`
+
 ## 2026-06-13 — Content Library Level Filters, Category Sync & Next Topic Box Removal ✅
 
 ### Content Library Filter & Popup Form Updates

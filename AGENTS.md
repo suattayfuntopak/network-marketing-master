@@ -22,6 +22,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - User-visible copy: `useTranslation()` → `t('section.key', { vars })`.
 - Avoid `lang === 'en' ? ... : ...` in components; add keys to `src/lib/translations/tr.ts` and `en.ts`.
 
+### Sayfa yardımı (PageHelp)
+- Yeni bir dashboard sayfası eklerken `src/lib/domain/pageHelp.ts`'e o sayfanın `PageHelp` girdisini ekle (başlık + kısa açıklama maddeleri). Yardım balonu içeriği sayfalarla birlikte büyür — boş bırakma.
+
 ## Architecture conventions (NMM)
 
 ### Supabase client in components
@@ -43,6 +46,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Migrations
 - One number = one migration; never edit an already-applied migration — add the next number. See `supabase/migrations/README.md`.
 - After schema changes, update `src/types/database.types.ts`.
+- **Veri-onarım migration'ları idempotent olmalı:** beklenen durum zaten sağlanmışsa `RAISE EXCEPTION` ile patlatma — `RAISE NOTICE '...'; RETURN;` ile sessizce çık. Böylece CI'da migrate-apply'ın hata-toleransına gerek kalmaz, migration ikinci kez çalışınca güvenle no-op olur.
+
+### Zaman dilimi & gün anahtarları
+- Uygulama saat dilimi İstanbul (UTC+3). Sunucu tarafında metrik/gün anahtarı üretirken **her zaman** `src/lib/utils/calendarDates` yardımcılarını kullan: `todayCalendarKey()`, `istanbulDayKey(iso)`, `istanbulDayStartIso(key)`.
+- `created_at.slice(0,10)` (UTC günü) **yasak** — gece 00:00–03:00 arası yanlış güne düşürür; ESLint `no-restricted-syntax` ile engellenir.
+- Sunucu-yerel `setHours(0,0,0,0)` / `toISOString().slice(0,10)` ile gün anahtarı üretme; istemci bileşenlerinde kullanıcı-yerel zaman istendiğinde sorun yok ama metrik gruplaması için İstanbul yardımcılarını tercih et.
 
 ### Hub metrics (Saha Özetim)
 - Dönem prefetch, offset maliyeti ve placeholder stratejisi: `docs/hub-metrics.md`.
