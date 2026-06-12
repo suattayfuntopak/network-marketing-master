@@ -1,5 +1,26 @@
 # Hot Log
 
+## 2026-06-13 — TanStack Query Optimistic Updates, Soft Delete (097) & Semantic Category CSS ✅
+
+### TanStack Query Optimistic Updates
+- **`useProgressSync.ts`**: Wrapped the `handleUpdate` progress synchronization handler with optimistic React Query updates for the `selfUserProgress` cache keys. Included query cancel-prevention, cache state snapshots, optimistic cache mutation, background cache invalidation, and automatic cache rollback (for both query cache and scoped local states/localStorage) on failure.
+
+### Database Soft Delete (Migration 097)
+- **`097_custom_content_soft_delete.sql` [NEW]**: Created SQL migration to add `is_deleted` BOOLEAN column (default `false`) to both `nmm_custom_trainings` and `nmm_custom_objections` tables, updating the SELECT RLS policies to restrict queries to `is_deleted = false`.
+- **`database.types.ts`**: Updated TS schemas for both custom content tables to include the new `is_deleted` field.
+- **`customContent.ts`**: Refactored `loadCustomContent` to filter for `is_deleted: false` and updated `deleteCustomContent` to soft-delete items via an `update` operation rather than a hard delete.
+- **`moderation.ts`**: Updated `getPendingRequestsAction` to ignore soft-deleted requests.
+
+### Semantic CSS Variables for Categories
+- **`globals.css`**: Centralized all category styling (iletisim, davet, sunum, ekip, strateji, uyum, and fallback) out of raw JS/TS files as semantic CSS variables under `:root` and `.dark` selectors, mapped in Tailwind's `@theme` configuration.
+- **`constants.ts`**: Refactored category styling helper `getTrainingCategoryStyles` to consume these semantic Tailwind classes.
+
+### i18n Unused Keys pre-commit Hook
+- **`.git/hooks/pre-commit`**: Created an automated pre-commit hook executing `npm run i18n:unused` to check for unused translation keys during git commits.
+
+### Dosyalar
+`src/hooks/useProgressSync.ts`, `supabase/migrations/097_custom_content_soft_delete.sql`, `src/types/database.types.ts`, `src/lib/domain/customContent.ts`, `src/app/(dashboard)/actions/moderation.ts`, `src/app/globals.css`, `src/app/(dashboard)/egitim/constants.ts`, `.git/hooks/pre-commit`
+
 ## 2026-06-13 — Vaktin Varsa / İçerik Kütüphanesi & İtiraz Bankası dark tema renk uyumu ✅
 
 ### İçerik Kütüphanesi (Dark Tema Renk Düzenlemeleri)

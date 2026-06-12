@@ -41,6 +41,7 @@ export async function loadCustomContent(
   const { data: rows } = await supabase
     .from(table)
     .select('item_key, data, created_at, is_approved, user_id')
+    .eq('is_deleted', false)
     .or(`is_approved.eq.true,user_id.eq.${user.id}`)
     .order('created_at', { ascending: false })
 
@@ -91,6 +92,7 @@ export async function addCustomContent(
     workspace_id: workspaceId,
     item_key: String(item.id),
     data: item as unknown as Json,
+    is_deleted: false,
   })
 }
 
@@ -117,5 +119,9 @@ export async function deleteCustomContent(
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
-  await supabase.from(table).delete().eq('user_id', user.id).eq('item_key', String(itemKey))
+  await supabase
+    .from(table)
+    .update({ is_deleted: true })
+    .eq('user_id', user.id)
+    .eq('item_key', String(itemKey))
 }

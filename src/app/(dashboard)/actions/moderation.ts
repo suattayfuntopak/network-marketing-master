@@ -160,11 +160,13 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
       .from('nmm_custom_trainings')
       .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
       .eq('is_approved', false)
+      .eq('is_deleted', false)
       .order('created_at', { ascending: false }),
     admin
       .from('nmm_custom_objections')
       .select('id, user_id, workspace_id, item_key, data, created_at, is_approved, user_email, user_name')
       .eq('is_approved', false)
+      .eq('is_deleted', false)
       .order('created_at', { ascending: false }),
     admin
       .from('nmm_training_videos')

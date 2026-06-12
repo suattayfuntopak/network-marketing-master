@@ -25,6 +25,62 @@
   --warmth-cold-bg:     #f0f9ff;
   --warmth-cold-text:   #0284c7;
   --warmth-cold-border: rgba(186, 230, 253, 0.5);
+
+  /* Zihniyet & Temel Category Colors */
+  --zihniyet-text:          #3730A3;
+  --zihniyet-border-hover:  rgba(55, 48, 163, 0.3);
+  --zihniyet-border-active: rgba(55, 48, 163, 0.25);
+  --zihniyet-bullet-bg:     #EEF2FF;
+  --zihniyet-bullet-text:   #3730A3;
+
+  /* Category Colors - Iletisim */
+  --iletisim-text:          #0F6E56;
+  --iletisim-border-hover:  rgba(15, 110, 86, 0.3);
+  --iletisim-border-active: rgba(15, 110, 86, 0.25);
+  --iletisim-bullet-bg:     #E1F5EE;
+  --iletisim-bullet-text:   #0F6E56;
+
+  /* Category Colors - Davet */
+  --davet-text:          #0369A1;
+  --davet-border-hover:  rgba(3, 105, 161, 0.3);
+  --davet-border-active: rgba(3, 105, 161, 0.25);
+  --davet-bullet-bg:     #F0F9FF;
+  --davet-bullet-text:   #0369A1;
+
+  /* Category Colors - Sunum */
+  --sunum-text:          #9A3412;
+  --sunum-border-hover:  rgba(154, 52, 18, 0.3);
+  --sunum-border-active: rgba(154, 52, 18, 0.25);
+  --sunum-bullet-bg:     #FFF7ED;
+  --sunum-bullet-text:   #9A3412;
+
+  /* Category Colors - Ekip */
+  --ekip-text:          #854F0B;
+  --ekip-border-hover:  rgba(133, 79, 11, 0.3);
+  --ekip-border-active: rgba(133, 79, 11, 0.25);
+  --ekip-bullet-bg:     #FAEEDA;
+  --ekip-bullet-text:   #854F0B;
+
+  /* Category Colors - Strateji */
+  --strateji-text:          #72243E;
+  --strateji-border-hover:  rgba(114, 36, 62, 0.3);
+  --strateji-border-active: rgba(114, 36, 62, 0.25);
+  --strateji-bullet-bg:     #FBEAF0;
+  --strateji-bullet-text:   #72243E;
+
+  /* Category Colors - Uyum */
+  --uyum-text:          #166534;
+  --uyum-border-hover:  rgba(22, 101, 52, 0.3);
+  --uyum-border-active: rgba(22, 101, 52, 0.25);
+  --uyum-bullet-bg:     #F0FDF4;
+  --uyum-bullet-text:   #166534;
+
+  /* Category Colors - Fallback */
+  --fallback-text:          #6B21A8;
+  --fallback-border-hover:  rgba(107, 33, 168, 0.3);
+  --fallback-border-active: rgba(107, 33, 168, 0.25);
+  --fallback-bullet-bg:     #FAF5FF;
+  --fallback-bullet-text:   #6B21A8;
 }
 
 .dark {
@@ -52,6 +108,62 @@
   --warmth-cold-bg:     rgba(30, 58, 138, 0.3);
   --warmth-cold-text:   #60a5fa;
   --warmth-cold-border: rgba(30, 58, 138, 0.3);
+
+  /* Zihniyet & Temel Category Colors */
+  --zihniyet-text:          #448AFF;
+  --zihniyet-border-hover:  rgba(68, 138, 255, 0.3);
+  --zihniyet-border-active: rgba(41, 98, 255, 0.25);
+  --zihniyet-bullet-bg:     rgba(41, 98, 255, 0.1);
+  --zihniyet-bullet-text:   #448AFF;
+
+  /* Category Colors - Iletisim */
+  --iletisim-text:          #4ade80;
+  --iletisim-border-hover:  rgba(74, 222, 128, 0.3);
+  --iletisim-border-active: rgba(74, 222, 128, 0.25);
+  --iletisim-bullet-bg:     #0d3d2e;
+  --iletisim-bullet-text:   #4ade80;
+
+  /* Category Colors - Davet */
+  --davet-text:          #38bdf8;
+  --davet-border-hover:  rgba(56, 189, 248, 0.3);
+  --davet-border-active: rgba(56, 189, 248, 0.25);
+  --davet-bullet-bg:     #0c1a2e;
+  --davet-bullet-text:   #38bdf8;
+
+  /* Category Colors - Sunum */
+  --sunum-text:          #fb923c;
+  --sunum-border-hover:  rgba(251, 146, 60, 0.3);
+  --sunum-border-active: rgba(251, 146, 60, 0.25);
+  --sunum-bullet-bg:     #2a1500;
+  --sunum-bullet-text:   #fb923c;
+
+  /* Category Colors - Ekip */
+  --ekip-text:          #fbbf24;
+  --ekip-border-hover:  rgba(251, 191, 36, 0.3);
+  --ekip-border-active: rgba(251, 191, 36, 0.25);
+  --ekip-bullet-bg:     #3a2200;
+  --ekip-bullet-text:   #fbbf24;
+
+  /* Category Colors - Strateji */
+  --strateji-text:          #f9a8d4;
+  --strateji-border-hover:  rgba(249, 168, 212, 0.3);
+  --strateji-border-active: rgba(249, 168, 212, 0.25);
+  --strateji-bullet-bg:     #3d0f1f;
+  --strateji-bullet-text:   #f9a8d4;
+
+  /* Category Colors - Uyum */
+  --uyum-text:          #86efac;
+  --uyum-border-hover:  rgba(134, 239, 172, 0.3);
+  --uyum-border-active: rgba(134, 239, 172, 0.25);
+  --uyum-bullet-bg:     #052e16;
+  --uyum-bullet-text:   #86efac;
+
+  /* Category Colors - Fallback */
+  --fallback-text:          #d8b4fe;
+  --fallback-border-hover:  rgba(216, 180, 254, 0.3);
+  --fallback-border-active: rgba(216, 180, 254, 0.25);
+  --fallback-bullet-bg:     #1a0030;
+  --fallback-bullet-text:   #d8b4fe;
 }
 
 /* Brand purple on dark backgrounds — readable white text without touching light mode */
@@ -110,6 +222,56 @@
   --color-warmth-cold-bg:     var(--warmth-cold-bg);
   --color-warmth-cold-text:   var(--warmth-cold-text);
   --color-warmth-cold-border: var(--warmth-cold-border);
+
+  /* Zihniyet Category Theme Mapping */
+  --color-zihniyet-text:          var(--zihniyet-text);
+  --color-zihniyet-border-hover:  var(--zihniyet-border-hover);
+  --color-zihniyet-border-active: var(--zihniyet-border-active);
+  --color-zihniyet-bullet-bg:     var(--zihniyet-bullet-bg);
+  --color-zihniyet-bullet-text:   var(--zihniyet-bullet-text);
+
+  /* Other Categories Theme Mapping */
+  --color-iletisim-text:          var(--iletisim-text);
+  --color-iletisim-border-hover:  var(--iletisim-border-hover);
+  --color-iletisim-border-active: var(--iletisim-border-active);
+  --color-iletisim-bullet-bg:     var(--iletisim-bullet-bg);
+  --color-iletisim-bullet-text:   var(--iletisim-bullet-text);
+
+  --color-davet-text:          var(--davet-text);
+  --color-davet-border-hover:  var(--davet-border-hover);
+  --color-davet-border-active: var(--davet-border-active);
+  --color-davet-bullet-bg:     var(--davet-bullet-bg);
+  --color-davet-bullet-text:   var(--davet-bullet-text);
+
+  --color-sunum-text:          var(--sunum-text);
+  --color-sunum-border-hover:  var(--sunum-border-hover);
+  --color-sunum-border-active: var(--sunum-border-active);
+  --color-sunum-bullet-bg:     var(--sunum-bullet-bg);
+  --color-sunum-bullet-text:   var(--sunum-bullet-text);
+
+  --color-ekip-text:          var(--ekip-text);
+  --color-ekip-border-hover:  var(--ekip-border-hover);
+  --color-ekip-border-active: var(--ekip-border-active);
+  --color-ekip-bullet-bg:     var(--ekip-bullet-bg);
+  --color-ekip-bullet-text:   var(--ekip-bullet-text);
+
+  --color-strateji-text:          var(--strateji-text);
+  --color-strateji-border-hover:  var(--strateji-border-hover);
+  --color-strateji-border-active: var(--strateji-border-active);
+  --color-strateji-bullet-bg:     var(--strateji-bullet-bg);
+  --color-strateji-bullet-text:   var(--strateji-bullet-text);
+
+  --color-uyum-text:          var(--uyum-text);
+  --color-uyum-border-hover:  var(--uyum-border-hover);
+  --color-uyum-border-active: var(--uyum-border-active);
+  --color-uyum-bullet-bg:     var(--uyum-bullet-bg);
+  --color-uyum-bullet-text:   var(--uyum-bullet-text);
+
+  --color-fallback-text:          var(--fallback-text);
+  --color-fallback-border-hover:  var(--fallback-border-hover);
+  --color-fallback-border-active: var(--fallback-border-active);
+  --color-fallback-bullet-bg:     var(--fallback-bullet-bg);
+  --color-fallback-bullet-text:   var(--fallback-bullet-text);
 
   /* Scale all font sizes up by another 1px globally for improved readability */
   --font-size-xs: 0.875rem;     /* 13px -> 14px */

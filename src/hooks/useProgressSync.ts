@@ -147,6 +147,7 @@ export function useProgressSync() {
     id: string | number,
     add: boolean,
   ) => {
+    // 1. Update local states
     if (type === 'readTraining' || type === 'favTraining') {
       const cur = type === 'readTraining' ? readTrainings : favTrainings
       const next = new Set(cur)
@@ -166,12 +167,67 @@ export function useProgressSync() {
     }
 
     if (ws?.workspaceId) {
+      const queryKey = queryKeys.selfUserProgress()
+
+      // Cancel any outgoing refetches so they don't overwrite our optimistic update
+      void queryClient.cancelQueries({ queryKey })
+
+      // Snapshot the previous value
+      const previousProgress = queryClient.getQueryData<FullUserProgressSnapshot | null>(queryKey)
+
+      // Optimistically update the query cache
+      queryClient.setQueryData<FullUserProgressSnapshot | null>(queryKey, (old) => {
+        if (!old) {
+          return {
+            readTrainings: type === 'readTraining' ? (add ? [id as string] : []) : [],
+            favTrainings: type === 'favTraining' ? (add ? [id as string] : []) : [],
+            readObjections: type === 'readObjection' ? (add ? [id as number] : []) : [],
+            favObjections: type === 'favObjection' ? (add ? [id as number] : []) : [],
+          }
+        }
+        const updated = { ...old }
+        if (type === 'readTraining') {
+          updated.readTrainings = add
+            ? Array.from(new Set([...old.readTrainings, id as string]))
+            : old.readTrainings.filter(x => x !== id)
+        } else if (type === 'favTraining') {
+          updated.favTrainings = add
+            ? Array.from(new Set([...old.favTrainings, id as string]))
+            : old.favTrainings.filter(x => x !== id)
+        } else if (type === 'readObjection') {
+          updated.readObjections = add
+            ? Array.from(new Set([...old.readObjections, id as number]))
+            : old.readObjections.filter(x => x !== id)
+        } else if (type === 'favObjection') {
+          updated.favObjections = add
+            ? Array.from(new Set([...old.favObjections, id as number]))
+            : old.favObjections.filter(x => x !== id)
+        }
+        return updated
+      })
+
       recordProgressChangeAction(ws.workspaceId, type, id, add)
         .then(() => {
-          void queryClient.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
+          void queryClient.invalidateQueries({ queryKey })
         })
         .catch(err => {
           console.error('Progress sync failed:', err)
+          // Rollback to the previous value in case of error
+          if (previousProgress) {
+            queryClient.setQueryData(queryKey, previousProgress)
+            // Rollback local states
+            if (type === 'readTraining' || type === 'favTraining') {
+              const prevSet = new Set(previousProgress[type === 'readTraining' ? 'readTrainings' : 'favTrainings'])
+              if (type === 'readTraining') setReadTrainings(prevSet)
+              else setFavTrainings(prevSet)
+              if (userId) saveLocalSet(scopedKey(BASE[type], userId), prevSet)
+            } else {
+              const prevSet = new Set(previousProgress[type === 'readObjection' ? 'readObjections' : 'favObjections'])
+              if (type === 'readObjection') setReadObjections(prevSet)
+              else setFavObjections(prevSet)
+              if (userId) saveLocalSet(scopedKey(BASE[type], userId), prevSet)
+            }
+          }
         })
     }
   }

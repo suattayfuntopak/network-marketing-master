@@ -433,6 +433,7 @@ export interface Database {
           is_approved: boolean
           user_email: string | null
           user_name: string | null
+          is_deleted: boolean
         }
         Insert: {
           id?: string
@@ -444,6 +445,7 @@ export interface Database {
           is_approved?: boolean
           user_email?: string | null
           user_name?: string | null
+          is_deleted?: boolean
         }
         Update: {
           id?: string
@@ -455,6 +457,7 @@ export interface Database {
           is_approved?: boolean
           user_email?: string | null
           user_name?: string | null
+          is_deleted?: boolean
         }
         Relationships: []
       }
@@ -571,6 +574,7 @@ export interface Database {
           is_approved: boolean
           user_email: string | null
           user_name: string | null
+          is_deleted: boolean
         }
         Insert: {
           id?: string
@@ -582,6 +586,7 @@ export interface Database {
           is_approved?: boolean
           user_email?: string | null
           user_name?: string | null
+          is_deleted?: boolean
         }
         Update: {
           id?: string
@@ -593,6 +598,7 @@ export interface Database {
           is_approved?: boolean
           user_email?: string | null
           user_name?: string | null
+          is_deleted?: boolean
         }
         Relationships: []
       }
