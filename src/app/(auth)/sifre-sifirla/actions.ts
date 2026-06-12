@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPasswordResetEmail } from '@/lib/infra/mail'
+import { NMM_APP_URL } from '@/lib/infra/emailTemplate'
 import { headers } from 'next/headers'
 
 interface FormState {
@@ -15,10 +16,14 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
 
   if (!email) return { error: 'E-posta adresi zorunlu.' }
 
+  // GÜVENLİK: kurtarma (recovery) bağlantısının origin'i isteğin Host/Origin
+  // başlığından TÜRETİLMEZ — saldırgan Host header'ı zehirleyip sıfırlama linkini
+  // kendi alanına yönlendirebilir (token hırsızlığı). Prod origin'i güvenilir sabite
+  // (NMM_APP_URL) pinliyoruz; yalnızca yerel geliştirmede (localhost) host'tan türetilir.
   const headersList = await headers()
   const host = headersList.get('host') ?? ''
-  const protocol = host.includes('localhost') ? 'http' : 'https'
-  const origin = headersList.get('origin') || `${protocol}://${host}`
+  const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1')
+  const origin = isLocal ? `http://${host}` : NMM_APP_URL
   const redirectTo = `${origin}/auth/callback?next=/sifre-guncelle`
 
   const admin = createAdminClient()
