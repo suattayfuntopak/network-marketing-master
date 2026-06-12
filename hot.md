@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-13 — 5 Önerinin Uygulanması: i18n Büyük Budama + Baseline Ölçüm + pulse-my ✅
+
+Önceki raporun 5 önerisinin hepsi onaylandı, hayata geçirildi. (Bu oturum paralel ajanlarla aynı dosyalarda çakıştı; değişiklikler oto-commit'lere karıştı, bu girdi NET olarak benim işimi belgeler.)
+
+### #2 — i18n ölü-anahtar büyük budama (asıl iş)
+- **`i18n-unused.mjs` dedektörü iki kez akıllandırıldı:** (a) `.replace('nav.','navMobile.')` önek-remap algısı (`navBarLabelKey` → `navMobile.*` yanlış-pozitifleri çözüldü), (b) genelleştirilmiş template-önek regex'i `` `prefix${ `` (sonek-interpolasyonu `shellUi.planBlurb_${plan}` dahil). Bu iki düzeltme, körlemesine silmenin tehlikesini kanıtladı — bulk silmeden önce şart.
+- **Çift-kapılı güvenli silme:** tam-anahtar referansı YOK **ve** leaf adı da kaynakta YOK olan anahtarlar silindi. ~325 ölü anahtar `tr.ts`/`en.ts` + 12 section dosyasından kaldırıldı (parite 14/14 korundu). Sözlük ~1658 → ~1300.
+- **Canlı namespace içindeki dağınık ölü anahtarlar** temizlendi (pulse/crown/team/stats/dashboard...) — namespace'lerin kendisi canlı olduğu için bulk-namespace silme YAPILMADI.
+
+### #1 — Perf baseline ÖLÇÜLDÜ
+- `perf-baseline.mjs` prod sunucuya karşı çalıştırıldı: public rotalar (statik prerender) p50 **6–14ms** — kabuk/render hızlı. Bulgu: "vasat" gecikme tamamen **auth'lu dinamik veri round-trip'inde** (Supabase origin), frontend'de değil. Bölge taşımanın getirisini doğrular.
+
+### #3 — pulse-my ölü invalidation'ları kaldırıldı
+- `['pulse-my']` invalidation'ları (`VideolarContent.tsx`, `invalidator.ts`) üreten hiçbir query olmadan no-op'tu → silindi. (Paralel ajanın merkezi-queryKeys refactor'üyle hizalı.)
+
+### #4 — Skeleton tutarlılığı: BOŞLUK YOK
+- Tüm `(dashboard)/**/{page,loading}.tsx` zaten `Skeleton` kullanıyor (pipeline geçen tur düzeltilmişti). Denetim temiz.
+
+### #5 — `type:module`
+- Eklendi + build doğrulandı; ancak paralel ajan iki kez geri aldı (package.json üzerinde aktif çalışıyor) → çekişmeye girmemek için bırakıldı.
+
+### Doğrulama
+`tsc` temiz · `vitest translations` 14/14 · `npm run build` başarılı · `perf-baseline` gerçek ölçümle çalıştı.
+
 ## 2026-06-12 — Genel Öneriler: GPU Animasyon, Çeviri Sync & Arama İndeksleri ✅
 
 ### Yapılanlar (4/4)
