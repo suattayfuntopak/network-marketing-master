@@ -2,7 +2,6 @@ export const trainingSection = {
   tr: {
     akademi: {
       title: 'Vaktin Varsa',
-      subtitle: 'İçerik kütüphanesi, video eğitimler ve itiraz bankası tek yerde',
       tabContentBank: 'İçerik Kütüphanesi',
       tabContentBankShort: 'Kütüphane',
       tabVideos: 'Video Eğitimler',
@@ -27,7 +26,6 @@ export const trainingSection = {
       copyContent: 'İçeriği Kopyala',
       sendViaWhatsApp: 'WhatsApp İle Gönder',
       waShare: 'Selam! 📚 Bu içeriği faydalı buldum, senin de işine yarayacağını düşündüm — paylaşmak istedim:\n\n{title}\n\n{body}',
-      waShareTitle: 'Bir kişiye WhatsApp ile gönder',
       addContentDesc: 'NM Master kütüphanesine kendi script, ders notu ya da rehberini ekleyebilirsin',
       closeForm: 'Formu Kapat',
       fieldTitle: 'Başlık',
@@ -80,7 +78,6 @@ export const trainingSection = {
       subtitle: 'Sahada en sık karşılaştığın itirazlara verilecek harika cevaplar',
       addObjection: 'İtiraz Ekle',
       objections: 'itiraz',
-      categories: 'kategori',
       fav: 'favori',
       searchPlaceholder: 'İtiraz veya cevap içinde ara...',
       resultsFound: 'sonuç bulundu',
@@ -98,7 +95,6 @@ export const trainingSection = {
       copyAnswer: 'Cevabı Kopyala',
       sendViaWhatsApp: 'WhatsApp İle Gönder',
       waShare: 'Selam! 💬 Şu soru ve cevabı işine yarayabilir diye paylaşıyorum, faydalı olur umarım:\n\n{question}\n\n{answer}',
-      waShareTitle: 'Bir kişiye WhatsApp ile gönder',
       copyShortAnswer: 'Kısa Cevap',
       copyDetailedAnswer: 'Detaylı Cevap',
       copyExampleDialog: 'Örnek Diyalog',
@@ -111,7 +107,6 @@ export const trainingSection = {
   en: {
     akademi: {
       title: 'When You Have Time',
-      subtitle: 'Content library, video training, and objection bank in one place',
       tabContentBank: 'Content Library',
       tabContentBankShort: 'Library',
       tabVideos: 'Video Training',
@@ -136,7 +131,6 @@ export const trainingSection = {
       copyContent: 'Copy Content',
       sendViaWhatsApp: 'Send via WhatsApp',
       waShare: 'Hi! 📚 I found this content useful and thought it would help you too — wanted to share it:\n\n{title}\n\n{body}',
-      waShareTitle: 'Send to someone on WhatsApp',
       addContentDesc: 'You can add your own script, lecture notes or guides to the NM Master library',
       closeForm: 'Close Form',
       fieldTitle: 'Title',
@@ -189,7 +183,6 @@ export const trainingSection = {
       subtitle: 'Great answers to the most common objections you face in the field',
       addObjection: 'Add Objection',
       objections: 'objections',
-      categories: 'categories',
       fav: 'fav',
       searchPlaceholder: 'Search objections or answers...',
       resultsFound: 'results found',
@@ -207,7 +200,6 @@ export const trainingSection = {
       copyAnswer: 'Copy Answer',
       sendViaWhatsApp: 'Send via WhatsApp',
       waShare: 'Hi! 💬 Sharing this question and answer in case it helps you — hope it is useful:\n\n{question}\n\n{answer}',
-      waShareTitle: 'Send to someone on WhatsApp',
       copyShortAnswer: 'Short Answer',
       copyDetailedAnswer: 'Detailed Answer',
       copyExampleDialog: 'Example Dialog',

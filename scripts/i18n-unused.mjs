@@ -11,7 +11,8 @@
  * Anahtarları okumak için TS'i Node ile sıyırarak yükler (Node 22+).
  *
  * Doğrulanmış statik namespace'ler (dinamik `t('ns.' + …)` yok — grep ile audit):
- * pulse.*, statsPage.teamSubtitle*, crown.detail|entries|lastEntry|loading|totalTeam
+ * aiWriter.*, objections.*, coachUi.pageSubtitle|unlimited|coachingCopied|daysInactive|generating
+ * waShare anahtarları kullanılıyor; waShareTitle ölü (sendViaWhatsApp title kullanılıyor).
  * Silmeden önce her anahtar için `t('anahtar')` araması yapın; @i18n-keep ile whitelist mümkün.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs'

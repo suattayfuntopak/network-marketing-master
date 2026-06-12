@@ -20,6 +20,12 @@ export default async function IstatistiklerPage() {
   })
 
   if (ws?.workspaceId) {
+    await queryClient.ensureQueryData({
+      queryKey: queryKeys.statsFunnelBundle('30d'),
+      queryFn: () => getStatsFunnelBundleAction('30d'),
+      staleTime: QUERY_STALE.funnelBundle,
+    })
+
     void Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.candidates(ws.workspaceId),
@@ -30,11 +36,6 @@ export default async function IstatistiklerPage() {
         queryKey: queryKeys.team(ws.workspaceId),
         queryFn: () => fetchTeamBundleAction(ws.workspaceId),
         staleTime: QUERY_STALE.data,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: ['stats-funnel-bundle', '30d'],
-        queryFn: () => getStatsFunnelBundleAction('30d'),
-        staleTime: QUERY_STALE.metrics,
       }),
     ])
 

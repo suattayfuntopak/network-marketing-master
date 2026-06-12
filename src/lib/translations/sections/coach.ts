@@ -3,7 +3,6 @@ export const coachSection = {
     coachUi: {
       // page.tsx
       pageTitle: 'Yapay Zeka Koçum',
-      pageSubtitle: 'Yapay zekayla mesajlar üret, koçluk al ve interaktif provanı yap',
 
       // YzKocuContainer.tsx
       tabMessage: 'YZ Mesajı',
@@ -15,7 +14,6 @@ export const coachSection = {
       answerCopied: 'Cevap kopyalandı!',
       askYourCoachTitle: 'Yapay Zeka Koçuma Sor',
       premiumEngineBadge: 'Premium AI motoru',
-      unlimited: 'Sınırsız',
       yourQuestion: 'Sorunuz',
       questionPlaceholder: 'Örn: Takip aşamasında adayların sürece sadık kalmasını nasıl sağlayabilirim?',
       thinking: 'Koç Düşünüyor...',
@@ -57,11 +55,6 @@ export const coachSection = {
       translatingMessage: 'Mesaj çevriliyor...',
       recentMessages: 'Son Mesajlar',
 
-      // YZEkipKocuSheet.tsx
-      coachingCopied: 'Koçluk mesajı kopyalandı!',
-      daysInactive: 'gündür inaktif',
-      generating: 'Analiz Ediliyor...',
-
       // NmmInviteSheet.tsx — saha ortağına kişiye özel NMM daveti
       inviteTitle: 'NMM Daveti',
       inviteSubtitle: '{name} için kişiye özel davet metni',
@@ -76,7 +69,6 @@ export const coachSection = {
     coachUi: {
       // page.tsx
       pageTitle: 'AI Coach',
-      pageSubtitle: 'Generate AI messages, get leadership coaching, and practice simulations',
 
       // YzKocuContainer.tsx
       tabMessage: 'AI Message',
@@ -88,7 +80,6 @@ export const coachSection = {
       answerCopied: 'Answer copied!',
       askYourCoachTitle: 'Ask Your AI Coach',
       premiumEngineBadge: 'Premium AI engine',
-      unlimited: 'Unlimited',
       yourQuestion: 'Your Question',
       questionPlaceholder: 'e.g. How can I increase candidate retention in the follow-up stage?',
       thinking: 'Thinking...',
@@ -130,10 +121,6 @@ export const coachSection = {
       translatingMessage: 'Translating message...',
       recentMessages: 'Recent Messages',
 
-      // YZEkipKocuSheet.tsx
-      coachingCopied: 'Coaching message copied!',
-      daysInactive: 'days inactive',
-      generating: 'Generating...',
       inviteTitle: 'NMM Invite',
       inviteSubtitle: 'Personalized invite message for {name}',
       inviteGenerating: 'Drafting invite message...',

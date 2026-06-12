@@ -38,6 +38,18 @@ export const queryKeys = {
     ['team-ranking-metrics-batch', workspaceId, [...memberIds].sort().join(',')] as const,
   teamProgressMap: (workspaceId: string, memberIds: string[]) =>
     ['team-progress-map', workspaceId, [...memberIds].sort().join(',')] as const,
+  /** İstatistikler saha huni bundle — dönem bazlı */
+  statsFunnelBundle: (period: string) => ['stats-funnel-bundle', period] as const,
+  /** Ekip aktivite sheet detay sorgusu */
+  memberActivity: (workspaceId: string, userId: string, period: string) =>
+    ['member-activity', workspaceId, userId, period] as const,
+  /** Lider tarafından üye hedefi (sheet düzenleme) */
+  memberGoal: (workspaceId: string, userId: string) =>
+    ['member-goal', workspaceId, userId] as const,
+  /** Üyenin kendi hedef kartı (gömülü sheet) */
+  memberUserGoal: (userId: string) => ['member-user-goal', userId] as const,
+  /** Ekip paneli hedef haritası */
+  memberGoalsMap: (workspaceId: string) => ['member-goals', workspaceId] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,

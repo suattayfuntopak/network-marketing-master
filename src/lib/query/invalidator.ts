@@ -54,9 +54,6 @@ export const queryInvalidator = {
     qc.invalidateQueries({ queryKey: ['team-ranking-metrics'] })
     qc.invalidateQueries({ queryKey: ['team-ranking-metrics-batch'] })
     qc.invalidateQueries({ queryKey: ['team-progress-map'] })
-    
-    // Academy pulse logs
-    qc.invalidateQueries({ queryKey: ['pulse-my'] })
   },
 
   /**

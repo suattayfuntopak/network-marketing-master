@@ -21,6 +21,7 @@ import {
   sheetPeriodToHubTab,
 } from '@/components/team/MemberActivityPeriodTabs'
 import { prefetchMemberActivity } from '@/lib/query/prefetchMemberActivity'
+import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
@@ -92,21 +93,21 @@ export function MemberActivitySheet({
   }, [workspaceId, member.userId, queryClient])
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ['member-activity', workspaceId, member.userId, period],
+    queryKey: queryKeys.memberActivity(workspaceId, member.userId, period),
     queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, period),
     staleTime: QUERY_STALE.memberActivity,
     placeholderData: keepPreviousData,
   })
 
   const { data: goalMap, refetch: refetchGoal } = useQuery({
-    queryKey: ['member-goal', workspaceId, member.userId],
+    queryKey: queryKeys.memberGoal(workspaceId, member.userId),
     queryFn: () => getMemberGoalsMapAction(workspaceId, [member.userId]),
     staleTime: QUERY_STALE.memberGoal,
     enabled: !embedded && canEditGoal,
   })
 
   const { data: memberSelfGoal } = useQuery({
-    queryKey: ['member-user-goal', member.userId],
+    queryKey: queryKeys.memberUserGoal(member.userId),
     queryFn: () => fetchMemberUserGoalAction(member.userId),
     staleTime: QUERY_STALE.memberGoal,
     enabled: embedded,

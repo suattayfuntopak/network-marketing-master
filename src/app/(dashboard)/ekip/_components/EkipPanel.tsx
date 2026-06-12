@@ -22,6 +22,7 @@ import {
   prefetchEkipRankingMetrics,
   prefetchEkipTrainingMetrics,
 } from '@/lib/query/prefetchRouteMetrics'
+import { queryKeys } from '@/lib/query/keys'
 
 const YZOnboardingKocuModal = dynamic(
   () => import('./YZOnboardingKocuModal').then(m => ({ default: m.YZOnboardingKocuModal })),
@@ -114,7 +115,9 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   const teamPageUnlocked = hasTeamPageAccess(licenseType, ws?.isSuperAdmin)
 
   const { data: memberGoalsMap = {} } = useQuery({
-    queryKey: ['member-goals', ws?.workspaceId],
+    queryKey: ws?.workspaceId
+      ? queryKeys.memberGoalsMap(ws.workspaceId)
+      : (['member-goals', 'none'] as const),
     queryFn: () =>
       getMemberGoalsMapAction(
         ws!.workspaceId,

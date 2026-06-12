@@ -65,7 +65,6 @@ export function VideolarContent({
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: queryKeys.videoCatalog(ws?.workspaceId ?? '') })
-    qc.invalidateQueries({ queryKey: ['pulse-my', ws?.workspaceId] })
   }
 
   async function handleConfirmDelete() {

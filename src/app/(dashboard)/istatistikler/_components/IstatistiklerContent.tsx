@@ -188,7 +188,8 @@ export function IstatistiklerContent() {
     const matchedId = leaderOwnerId
       ? findLeaderCandidateForMember(candidates, leaderOwnerId, row.full_name)
       : null
-    return matchedId ? `/pipeline/${matchedId}` : null
+    if (matchedId) return `/pipeline/${matchedId}`
+    return `/ekip/${row.user_id}`
   }
 
   const { metrics, temperatureData, funnelSteps } = useCandidateStats(
