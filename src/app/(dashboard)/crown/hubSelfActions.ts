@@ -3,8 +3,19 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
-import { getDailyProgressAction } from '@/app/(dashboard)/hedef/actions'
+import {
+  getDailyProgressAction,
+  getGoalFunnelContextAction,
+  type GoalFunnelContextPayload,
+} from '@/app/(dashboard)/hedef/actions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
+import {
+  funnelTargetsForCalendarDay,
+  funnelTargetsForCalendarMonth,
+  funnelTargetsForCalendarWeek,
+  funnelTargetsForCalendarYear,
+  type GoalFunnelContext,
+} from '@/lib/domain/hubFunnelTargets'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, toCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
@@ -283,11 +294,20 @@ async function funnelActualsSince(
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
+function toHubFunnelContext(payload: GoalFunnelContextPayload): GoalFunnelContext | null {
+  if (!payload.hasGoal || !payload.goal) return null
+  return {
+    startAt: new Date(payload.goal.startAt),
+    targetMonths: payload.goal.targetMonths,
+    roadmap: payload.roadmap,
+  }
+}
+
 // ─── Hub Self Actions ─────────────────────────────────────────────────────────
 
 export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfPayload> {
-  const [progress, { user }, workspaceId] = await Promise.all([
-    getDailyProgressAction(),
+  const [goalCtx, { user }, workspaceId] = await Promise.all([
+    getGoalFunnelContextAction(),
     getAuthUser(),
     resolveWorkspaceId(),
   ])
@@ -316,7 +336,8 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
     pipelineStageCountsForUser(user.id, workspaceId),
   ])
 
-  if (!progress.hasGoal) {
+  const hubCtx = toHubFunnelContext(goalCtx)
+  if (!hubCtx) {
     return {
       hasGoal: false,
       weeklyTargets: EMPTY_FUNNEL,
@@ -330,12 +351,11 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
     }
   }
 
-  const weeklyTargets: FunnelCounts = {
-    arama: progress.targets.arama * 7,
-    tanisma: progress.targets.tanisma * 7,
-    sunum: progress.targets.sunum * 7,
-    yeniUye: progress.targets.yeniUye * 7,
-  }
+  const weeklyTargets = funnelTargetsForCalendarWeek(
+    hubCtx,
+    range.startDate,
+    range.endDate,
+  )
   const pctOverall =
     weeklyTargets.arama > 0
       ? Math.min(999, Math.round((weeklyActuals.arama / weeklyTargets.arama) * 100))
@@ -355,8 +375,8 @@ export async function getHubWeeklySelfAction(offset = 0): Promise<HubWeeklySelfP
 }
 
 export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPayload> {
-  const [progress, { user }, workspaceId] = await Promise.all([
-    getDailyProgressAction(),
+  const [goalCtx, { user }, workspaceId] = await Promise.all([
+    getGoalFunnelContextAction(),
     getAuthUser(),
     resolveWorkspaceId(),
   ])
@@ -387,7 +407,8 @@ export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPay
 
   const dayActive = loginInfo.weekActive[0] ?? false
 
-  if (!progress.hasGoal) {
+  const hubCtx = toHubFunnelContext(goalCtx)
+  if (!hubCtx) {
     return {
       hasGoal: false,
       dailyTargets: EMPTY_FUNNEL,
@@ -402,7 +423,7 @@ export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPay
 
   return {
     hasGoal: true,
-    dailyTargets: progress.targets,
+    dailyTargets: funnelTargetsForCalendarDay(hubCtx, range.date),
     dailyActuals,
     dayActive,
     calendarKey: range.calendarKey,
@@ -413,8 +434,8 @@ export async function getHubDailySelfAction(offset = 0): Promise<HubDailySelfPay
 }
 
 export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySelfPayload> {
-  const [progress, { user }, workspaceId] = await Promise.all([
-    getDailyProgressAction(),
+  const [goalCtx, { user }, workspaceId] = await Promise.all([
+    getGoalFunnelContextAction(),
     getAuthUser(),
     resolveWorkspaceId(),
   ])
@@ -450,7 +471,8 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
     pipelineStageCountsForUser(user.id, workspaceId),
   ])
 
-  if (!progress.hasGoal) {
+  const hubCtx = toHubFunnelContext(goalCtx)
+  if (!hubCtx) {
     return {
       hasGoal: false,
       monthlyTargets: EMPTY_FUNNEL,
@@ -464,12 +486,7 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
     }
   }
 
-  const monthlyTargets: FunnelCounts = {
-    arama: progress.targets.arama * daysInMonth,
-    tanisma: progress.targets.tanisma * daysInMonth,
-    sunum: progress.targets.sunum * daysInMonth,
-    yeniUye: progress.targets.yeniUye * daysInMonth,
-  }
+  const monthlyTargets = funnelTargetsForCalendarMonth(hubCtx, range.startDate)
 
   return {
     hasGoal: true,
@@ -485,8 +502,8 @@ export async function getHubMonthlySelfAction(offset = 0): Promise<HubMonthlySel
 }
 
 export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfPayload> {
-  const [progress, { user }, workspaceId] = await Promise.all([
-    getDailyProgressAction(),
+  const [goalCtx, { user }, workspaceId] = await Promise.all([
+    getGoalFunnelContextAction(),
     getAuthUser(),
     resolveWorkspaceId(),
   ])
@@ -522,7 +539,8 @@ export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfP
     selfFieldMetricsSince(user.id, workspaceId, since, until),
   ])
 
-  if (!progress.hasGoal) {
+  const hubCtx = toHubFunnelContext(goalCtx)
+  if (!hubCtx) {
     return {
       hasGoal: false,
       yearlyTargets: EMPTY_FUNNEL,
@@ -538,13 +556,7 @@ export async function getHubYearlySelfAction(offset = 0): Promise<HubYearlySelfP
     }
   }
 
-  const days = range.totalDaysInYear
-  const yearlyTargets: FunnelCounts = {
-    arama: progress.targets.arama * days,
-    tanisma: progress.targets.tanisma * days,
-    sunum: progress.targets.sunum * days,
-    yeniUye: progress.targets.yeniUye * days,
-  }
+  const yearlyTargets = funnelTargetsForCalendarYear(hubCtx, range.year)
 
   return {
     hasGoal: true,

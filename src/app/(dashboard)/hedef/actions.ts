@@ -10,6 +10,7 @@ import {
   type RoadmapStage,
   type FunnelCounts,
 } from '@/lib/domain/roadmap'
+import { stageForRoadmapMonth } from '@/lib/domain/hubFunnelTargets'
 import { fetchFunnelActualsForToday } from '@/lib/domain/funnelActuals'
 
 export interface UserGoal {
@@ -136,6 +137,44 @@ export interface DailyProgress {
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
+export interface GoalFunnelContextPayload {
+  hasGoal: boolean
+  goal: UserGoal | null
+  roadmap: RoadmapStage[]
+  teamSize: number
+}
+
+/** Hedef + yol haritası — Saha Özetim dönem hedefleri için tek kaynak. */
+export async function getGoalFunnelContextAction(): Promise<GoalFunnelContextPayload> {
+  return getGoalFunnelContextCached()
+}
+
+const getGoalFunnelContextCached = cache(async (): Promise<GoalFunnelContextPayload> => {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  const empty: GoalFunnelContextPayload = {
+    hasGoal: false,
+    goal: null,
+    roadmap: [],
+    teamSize: 0,
+  }
+  if (!user) return empty
+
+  const [goal, workspaceId] = await Promise.all([
+    fetchUserGoalAction(),
+    ownWorkspaceId(supabase, user.id),
+  ])
+  const teamSize = workspaceId ? await directTeamCount(supabase) : 0
+  if (!goal) return { ...empty, teamSize }
+
+  return {
+    hasGoal: true,
+    goal,
+    roadmap: computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize),
+    teamSize,
+  }
+})
+
 /** Bugünün huni hedefleri (hedeften türetilmiş) + gerçekleşenleri (mevcut veriden). */
 /**
  * Server action sarmalayıcısı — gerçek iş `cache()`'li impl'de. Tek bir render
@@ -162,29 +201,23 @@ const getDailyProgressCached = cache(async (): Promise<DailyProgress> => {
   }
   if (!user) return empty
 
-  // goal / workspaceId / actuals birbirinden bağımsız — ardışık değil paralel
-  // çekilir (uzak DB'ye ~3 round-trip yerine 1 dalga). teamSize workspace'in
-  // varlığına bağlı olduğu için sonraki dalgada kalır.
-  const [goal, workspaceId, actuals] = await Promise.all([
-    fetchUserGoalAction(),
-    ownWorkspaceId(supabase, user.id),
+  const [ctx, actuals] = await Promise.all([
+    getGoalFunnelContextCached(),
     fetchFunnelActualsForToday(supabase, user.id),
   ])
-  const teamSize = workspaceId ? await directTeamCount(supabase) : 0
 
-  if (!goal) return { ...empty, teamSize, actuals }
+  if (!ctx.hasGoal || !ctx.goal) return { ...empty, teamSize: ctx.teamSize, actuals }
 
-  const roadmap = computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize)
-  const monthIndex = currentMonthIndex(new Date(goal.startAt), goal.targetMonths)
-  const stage = roadmap[monthIndex - 1] ?? roadmap[roadmap.length - 1] ?? null
+  const monthIndex = currentMonthIndex(new Date(ctx.goal.startAt), ctx.goal.targetMonths)
+  const stage = stageForRoadmapMonth(ctx.roadmap, monthIndex) ?? null
   const targets = dailyTargetsForMonth(stage ?? undefined)
 
   return {
     hasGoal: true,
     monthIndex,
-    totalMonths: goal.targetMonths,
-    teamSize,
-    targetTeamSize: goal.targetPeople,
+    totalMonths: ctx.goal.targetMonths,
+    teamSize: ctx.teamSize,
+    targetTeamSize: ctx.goal.targetPeople,
     targets,
     actuals,
     stage,

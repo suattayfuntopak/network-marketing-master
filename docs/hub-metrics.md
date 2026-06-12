@@ -2,10 +2,24 @@
 
 Saha Özetim (`/saha-ozetim`) dönem metrikleri — prefetch, cache ve flicker stratejisi.
 
+## Huni hedefleri (Hedefim ↔ Saha Özetim)
+
+Tek kaynak: `src/lib/domain/hubFunnelTargets.ts` + `getGoalFunnelContextAction()` (`hedef/actions.ts`).
+
+| Dönem | Hedef formülü | Hedefim ile uyum |
+|-------|---------------|------------------|
+| Günlük | `ceil(stage.monthly / 26)` — seçilen günün yol haritası kademesi | Bugünkü Odağım ile aynı (bugün) |
+| Haftalık | `ceil(stage.monthly × günSayısı / 26)` — hafta ay sınırını geçerse kademe bölünür | 26 iş günü modeli |
+| Aylık | `stage.monthly` — takvim ayının yol haritası kademesi | Ay ay döküm satırı ile birebir |
+| Yıllık | O takvim yılına düşen tüm kademelerin `monthly` toplamı | Yol haritası toplamı |
+
+Geçmiş dönemlerde hedef, **o dönemin** yol haritası ayına göre hesaplanır (bugünkü kademe değil).
+
 ## Modüller
 
 | Dosya | Rol |
 |-------|-----|
+| `src/lib/domain/hubFunnelTargets.ts` | Dönem huni hedef türetme (günlük/haftalık/aylık/yıllık) |
 | `src/lib/domain/hubPeriodPrefetch.ts` | Sekme tipleri, `parseSummaryTab`, komşu offset seçici, `sessionStorage` son sekme |
 | `src/lib/query/prefetchRouteMetrics.ts` | `prefetchHubMetrics` — SSR, hover ve maliyet kontrolü |
 | `src/app/(dashboard)/saha-ozetim/page.tsx` | Sunucu tarafı workspace + hub prefetch + `HydrationBoundary` |
