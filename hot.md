@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-13 — UX Hız Turu + Mobil PageHelp + WA Helper Migrasyonu + PageHelp Coverage ✅
+
+Kullanıcı talebi: mobilde sayfa yardımını kaldır; sayfalar/sekmeler/metrikler "pat pat" geçsin. + önceki turun genel önerilerinin uygulanması. (Kod değişiklikleri paralel bir otomatik commit ile `e591ea3`'e dahil oldu; bu girdi onları belgeler.)
+
+### 1. Mobil PageHelp kaldırıldı
+- **`PageHelp.tsx`**: (?) butonu `hidden sm:flex` → mobilde tarihin yanında artık görünmüyor (8 sayfada birden), masaüstünde aynı.
+
+### 2. Performans — "pat pat geçen" metrikler
+- **`StatsFieldFunnelSection.tsx`** + **`StatsSuperAdminSections.tsx`**: period-keyed metrik sorgularına `placeholderData: keepPreviousData` → dönem değişiminde sayılar sıfıra düşmüyor, eski değerler kalırken arkada tazeleniyor.
+- **`QueryProvider.tsx`**: persist cache köklerine `stats-funnel-actuals` eklendi (saf sayısal huni, PII yok, KVKK-güvenli) → İstatistikler huni kutuları tekrar ziyarette localStorage'tan ANINDA dolu gelir.
+- Mevcut altyapı doğrulandı: view transitions açık (80–120ms), nav hover + `router.prefetch` + route metrik prefetch, `optimizePackageImports`, `staleTimes.dynamic`.
+
+### 3. Merkezi WhatsApp helper migrasyonu tamamlandı
+- Kalan 8 ham `api.whatsapp.com/send?text=` kullanımı `whatsappShareUrl()`'a taşındı: `UyumContent`, `KoclukForm`, `YZOnboardingKocuModal`, `YazarForm`, `EkipPanel`, `BroadcastPanel` (×2), `InviteTeammateSection`.
+- **`eslint.config.mjs`**: ham WhatsApp paylaşım URL'i (TemplateElement + Literal) artık yasak; `waLink.ts` muaf. Probe ile doğrulandı.
+
+### 4. PageHelp coverage testi + 2 gerçek bug
+- **`pageHelp.test.ts`** (yeni): her `NAV_ROUTES` + admin rotası için generic-olmayan TR/EN yardım girdisi zorunlu (12/12).
+- Test 2 boşluk yakaladı: `/ekip` rotası yanlışlıkla `/ekibim` ile eşleşiyordu (generic'e düşüyordu) → düzeltildi; `/canli-egitim` yardımı hiç yoktu → eklendi.
+
+### Doğrulama
+`tsc --noEmit` temiz · `eslint --max-warnings 0` temiz · `vitest pageHelp` 12/12 · `vitest translations` 14/14 · `npm run build` başarılı · ESLint probe'ları (WA + created_at + z-index) ateşliyor.
+
 ## 2026-06-12 — Deletion Confirmation with 5s Undo & Snappy Page Transitions ✅
 
 ### 1. Deletion Confirmation Dialogs & 5s Undo Countdown
