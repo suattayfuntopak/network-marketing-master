@@ -11,6 +11,7 @@ import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
 import { getTeamFieldActivityAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import type { MemberRow } from '@/lib/team/types'
 import { canonicalPartnerAvatarUrl } from '@/lib/team/partnerAvatarFix'
+import { todayCalendarKey, fromCalendarKey, toCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
 
 export type CoachingHistoryItem = {
   id: string
@@ -96,12 +97,14 @@ export async function getMemberDetailAction(
   }))
 
   const countByDate: Record<string, number> = {}
+  const todayDate = fromCalendarKey(todayCalendarKey()) // İstanbul bugünü
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(now.getTime() - i * 86_400_000)
-    countByDate[d.toISOString().slice(0, 10)] = 0
+    const d = new Date(todayDate)
+    d.setDate(d.getDate() - i)
+    countByDate[toCalendarKey(d)] = 0
   }
   for (const r of actRows.data ?? []) {
-    const key = r.created_at.slice(0, 10)
+    const key = istanbulDayKey(r.created_at)
     if (key in countByDate) countByDate[key]++
   }
   const dailyActivity = Object.entries(countByDate).map(([date, count]) => ({ date, count }))

@@ -5,6 +5,7 @@ import { getAuthUser } from '@/lib/supabase/authUser'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { periodStartIso, parseLearningProgress, type PulsePeriod, type SheetActivityPeriod } from '@/lib/domain/pulse'
+import { istanbulDayKey } from '@/lib/utils/calendarDates'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import {
   fetchFunnelActualsForPeriod,
@@ -155,7 +156,7 @@ export async function getTeamFieldActivityAction(
     if (!bucket) continue
     if (act.action_type === 'call') bucket.calls++
     else if (act.action_type === 'whatsapp') bucket.whatsapps++
-    activeDaySets[act.user_id]?.add(act.created_at.slice(0, 10))
+    activeDaySets[act.user_id]?.add(istanbulDayKey(act.created_at))
   }
 
   for (const uid of uniqueIds) {
@@ -237,7 +238,7 @@ function aggregateRankingFromActions(
     if (startIso && act.created_at < startIso) continue
     const bucket = byUser[act.user_id]
     if (!bucket) continue
-    activeDaySets[act.user_id]?.add(act.created_at.slice(0, 10))
+    activeDaySets[act.user_id]?.add(istanbulDayKey(act.created_at))
     bucket.totalActions++
     switch (act.action_type) {
       case 'whatsapp':
@@ -491,7 +492,7 @@ export async function getMemberActivityDetailAction(
   const detail: MemberActivityDetail = { ...empty }
 
   for (const act of actions ?? []) {
-    activeDays.add(act.created_at.slice(0, 10))
+    activeDays.add(istanbulDayKey(act.created_at))
     switch (act.action_type) {
       case 'call':
         detail.calls++

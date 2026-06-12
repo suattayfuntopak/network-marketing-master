@@ -2,29 +2,21 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Target, ChevronDown, Pencil, Rocket, Check } from 'lucide-react'
+import { Target, ChevronDown, Pencil, Rocket } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { calendarMonthOffsetForRoadmapMonth, type FunnelCounts } from '@/lib/domain/roadmap'
 import {
-  FUNNEL_METRIC_ORDER,
   FUNNEL_METRIC_VIVID_CLASS,
   FUNNEL_METRIC_VISUAL,
   FunnelMetricCount,
-  FunnelMetricLabel,
 } from '@/lib/ui/funnelMetricVisuals'
+import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 
 const MONTH_OPTIONS = [3, 6, 9, 12, 18, 24, 36]
 
-const GOAL_ROW_LABELS: Record<keyof FunnelCounts, string> = {
-  arama: 'hedef.dailyRowCalls',
-  tanisma: 'hedef.dailyRowMeetings',
-  sunum: 'hedef.dailyRowPresentations',
-  yeniUye: 'hedef.dailyRowMembers',
-}
-
-const GOAL_ROWS = FUNNEL_METRIC_ORDER.map(key => ({ key, labelKey: GOAL_ROW_LABELS[key] }))
+const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export function HedefKart() {
   const { t } = useTranslation()
@@ -143,37 +135,16 @@ export function HedefKart() {
         <h2 className="text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
           {t('hedef.todayTitle')}
         </h2>
-        {GOAL_ROWS.map(row => {
-          const target = p?.targets[row.key] ?? 0
-          const actual = p?.actuals[row.key] ?? 0
-          const pct = target > 0 ? Math.min(100, Math.round((actual / target) * 100)) : actual > 0 ? 100 : 0
-          const done = target > 0 && actual >= target
-          const { barColor } = FUNNEL_METRIC_VISUAL[row.key]
-
-          return (
-            <div key={row.key} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 md:p-4">
-              <div className="mb-2 flex items-start justify-between gap-2">
-                <FunnelMetricLabel
-                  metric={row.key}
-                  label={t(row.labelKey)}
-                  iconClassName="h-[18px] w-[18px]"
-                  vivid
-                  className="text-sm font-semibold leading-snug text-[var(--text-1)] md:text-base md:font-medium"
-                />
-                <span className={clsx('shrink-0 text-sm font-semibold tabular-nums', done ? 'text-emerald-600 dark:text-emerald-400' : 'text-[var(--text-2)]')}>
-                  {done ? <Check className="mr-0.5 inline h-3.5 w-3.5" /> : null}
-                  {actual} / {target}
-                </span>
-              </div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
-                <div
-                  className="h-full rounded-full transition-all"
-                  style={{ width: `${pct}%`, backgroundColor: barColor }}
-                />
-              </div>
-            </div>
-          )
-        })}
+        {/* Saha Özetim ile birebir aynı 4 kutu (format + renk); etiketler gelecek zaman (plan). */}
+        <HubCrownFunnelGrid
+          actuals={p?.actuals ?? EMPTY_FUNNEL}
+          targets={p?.targets ?? EMPTY_FUNNEL}
+          hasGoal={!!goal}
+          period="daily"
+          panoVariant
+          hideFooter
+          labelMode="plan"
+        />
       </section>
 
       {roadmap.length > 0 ? (

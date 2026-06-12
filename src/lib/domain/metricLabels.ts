@@ -16,10 +16,18 @@ export const FUNNEL_METRIC_LABEL_KEYS_MEMBER: Record<FunnelMetricKey, string> = 
   yeniUye: 'team.fieldMetricMembers',
 }
 
+/** Hedefim — bugünkü plan (1. tekil, gelecek zaman) — hedef.dailyRow* */
+export const FUNNEL_METRIC_LABEL_KEYS_PLAN: Record<FunnelMetricKey, string> = {
+  arama: 'hedef.dailyRowCalls',
+  tanisma: 'hedef.dailyRowMeetings',
+  sunum: 'hedef.dailyRowPresentations',
+  yeniUye: 'hedef.dailyRowMembers',
+}
+
 export function funnelMetricLabelKeys(
-  mode: 'self' | 'member',
+  mode: 'self' | 'member' | 'plan',
 ): Record<FunnelMetricKey, string> {
-  return mode === 'member'
-    ? FUNNEL_METRIC_LABEL_KEYS_MEMBER
-    : FUNNEL_METRIC_LABEL_KEYS_SELF
+  if (mode === 'member') return FUNNEL_METRIC_LABEL_KEYS_MEMBER
+  if (mode === 'plan') return FUNNEL_METRIC_LABEL_KEYS_PLAN
+  return FUNNEL_METRIC_LABEL_KEYS_SELF
 }

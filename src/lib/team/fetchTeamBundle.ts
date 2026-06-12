@@ -7,6 +7,7 @@ import { enrichLeaderCandidates } from '@/lib/team/enrichLeaderCandidates'
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
 import { canonicalPartnerAvatarUrl } from '@/lib/team/partnerAvatarFix'
+import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
 
 export interface TeamBundle {
   members: TeamMember[]
@@ -248,8 +249,8 @@ async function fetchTeamBundleLegacy(
 
   if (wsErr || !ownWs) throw new Error(wsErr?.message || 'Workspace not found')
 
-  const todayStart = new Date()
-  todayStart.setHours(0, 0, 0, 0)
+  // İstanbul (UTC+3) gün başlangıcı — "bugünkü" aksiyonlar 00:00 TR'de döner.
+  const todayStartIso = istanbulDayStartIso(todayCalendarKey())
 
   const { data: membersRaw, error } = await supabase
     .from('nmm_workspace_members')
@@ -332,7 +333,7 @@ async function fetchTeamBundleLegacy(
       .select('user_id, note')
       .in('user_id', finalAllUserIds)
       .eq('action_type', 'ai_generate')
-      .gte('created_at', todayStart.toISOString()),
+      .gte('created_at', todayStartIso),
   ])
 
   const candidates = candidatesRaw ?? []

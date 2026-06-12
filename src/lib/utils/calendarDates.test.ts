@@ -5,6 +5,7 @@ import {
   keysForDaysAfter,
   followUpToIsoFromKey,
   istanbulDayStartIso,
+  istanbulDayKey,
 } from './calendarDates'
 
 describe('calendarDates', () => {
@@ -38,5 +39,16 @@ describe('calendarDates', () => {
     // 12:00 yerel saat — round-trip ile aynı takvim gününe çözülmeli.
     const iso = followUpToIsoFromKey('2026-05-31')
     expect(toCalendarKey(new Date(iso))).toBe('2026-05-31')
+  })
+
+  it('istanbulDayKey gece yarısı–03:00 penceresini DOĞRU güne yazar (UTC değil)', () => {
+    // 01:00 İstanbul 12 Haz = 22:00 UTC 11 Haz. UTC slice yanlış '06-11' verirdi;
+    // İstanbul günü doğru '06-12' olmalı (gece yarısı rollover regresyonu).
+    expect(istanbulDayKey('2026-06-11T22:00:00.000Z')).toBe('2026-06-12')
+    expect(istanbulDayKey('2026-06-11T23:30:00.000Z')).toBe('2026-06-12')
+    // 21:00 UTC = 00:00 İstanbul ertesi gün (tam gün başı).
+    expect(istanbulDayKey('2026-06-11T21:00:00.000Z')).toBe('2026-06-12')
+    // 20:59 UTC = 23:59 İstanbul aynı gün.
+    expect(istanbulDayKey('2026-06-11T20:59:00.000Z')).toBe('2026-06-11')
   })
 })

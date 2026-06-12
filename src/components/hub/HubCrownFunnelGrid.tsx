@@ -25,8 +25,8 @@ type HubCrownFunnelGridProps = {
   hideNoGoalFooter?: boolean
   /** Saha Özetim: hedef durum/uyarı satırını tamamen gizle */
   hideFooter?: boolean
-  /** Ekip üyesi aktivite özeti: 3. tekil soru kalıbı */
-  labelMode?: 'self' | 'member'
+  /** Ekip üyesi aktivite özeti: 3. tekil soru kalıbı; Hedefim: 'plan' (gelecek zaman) */
+  labelMode?: 'self' | 'member' | 'plan'
 }
 
 export function HubCrownFunnelGrid({

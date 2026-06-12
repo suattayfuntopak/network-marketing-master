@@ -4,6 +4,13 @@ import {
   videoDropoffCount,
   type VideoProgressSummary,
 } from '@/lib/domain/videoProgress'
+import {
+  todayCalendarKey,
+  fromCalendarKey,
+  toCalendarKey,
+  istanbulDayStartIso,
+  istanbulDayKey,
+} from '@/lib/utils/calendarDates'
 
 /** Canonical content counts (F1 — static library sizes). */
 export const CANONICAL_TRAINING_COUNT = 30
@@ -48,44 +55,30 @@ export type LearningProgressSummary = {
 
 export function periodStartIso(period: PulsePeriod): string | null {
   if (period === 'all') return null
-  const d = new Date()
-  if (period === 'today') {
-    d.setHours(0, 0, 0, 0)
-    return d.toISOString()
-  }
-  if (period === 'ytd') {
-    d.setMonth(0, 1)
-    d.setHours(0, 0, 0, 0)
-    return d.toISOString()
-  }
+  const today = todayCalendarKey() // İstanbul (UTC+3) bugünü
+  if (period === 'today') return istanbulDayStartIso(today)
+  if (period === 'ytd') return istanbulDayStartIso(`${today.slice(0, 4)}-01-01`)
   const days = period === '7d' ? 7 : 30
-  d.setDate(d.getDate() - days)
-  d.setHours(0, 0, 0, 0)
-  return d.toISOString()
+  const start = fromCalendarKey(today)
+  start.setDate(start.getDate() - days)
+  return istanbulDayStartIso(toCalendarKey(start))
 }
 
 const LEARNING_STREAK_EVENT_TYPES = ['training_read', 'objection_read'] as const
 
-/** Ardışık takvim günü serisi (bugün dahil; bugün yoksa dünden başlar). */
+/** Ardışık takvim günü serisi (İstanbul; bugün dahil; bugün yoksa dünden başlar).
+ *  Verilen `dayKeys` İstanbul gün anahtarı (istanbulDayKey) olmalı. */
 export function computeConsecutiveDayStreak(dayKeys: Iterable<string>): number {
   const set = dayKeys instanceof Set ? dayKeys : new Set(dayKeys)
   if (set.size === 0) return 0
 
-  const toKey = (date: Date) => {
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
-  }
-
-  const cursor = new Date()
-  cursor.setHours(0, 0, 0, 0)
-  if (!set.has(toKey(cursor))) {
+  const cursor = fromCalendarKey(todayCalendarKey())
+  if (!set.has(toCalendarKey(cursor))) {
     cursor.setDate(cursor.getDate() - 1)
   }
 
   let streak = 0
-  while (set.has(toKey(cursor))) {
+  while (set.has(toCalendarKey(cursor))) {
     streak++
     cursor.setDate(cursor.getDate() - 1)
   }
@@ -100,24 +93,16 @@ export function computeFieldStreak(
   const dayKeys = new Set<string>()
   for (const a of actions) {
     if (fieldTypes.has(a.action_type)) {
-      dayKeys.add(a.created_at.slice(0, 10))
+      dayKeys.add(istanbulDayKey(a.created_at))
     }
   }
 
-  const toKey = (date: Date) => {
-    const y = date.getFullYear()
-    const m = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    return `${y}-${m}-${day}`
-  }
-
-  const cursor = new Date()
-  cursor.setHours(0, 0, 0, 0)
+  const cursor = fromCalendarKey(todayCalendarKey())
   let activeDays = 0
   for (let i = 0; i < windowDays; i++) {
     const d = new Date(cursor)
     d.setDate(d.getDate() - i)
-    if (dayKeys.has(toKey(d))) activeDays++
+    if (dayKeys.has(toCalendarKey(d))) activeDays++
   }
   return activeDays
 }
@@ -130,7 +115,7 @@ export function computeLearningStreak(
     if (!LEARNING_STREAK_EVENT_TYPES.includes(e.event_type as (typeof LEARNING_STREAK_EVENT_TYPES)[number])) {
       continue
     }
-    dayKeys.add(e.created_at.slice(0, 10))
+    dayKeys.add(istanbulDayKey(e.created_at))
   }
   return computeConsecutiveDayStreak(dayKeys)
 }

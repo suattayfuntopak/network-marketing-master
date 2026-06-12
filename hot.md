@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-13 — Migration CI onarımı + İstanbul saati + Hedefim formatı + i18n araç ✅
+
+### Migration CI kalıcı onarıldı (auto-apply artık çalışır)
+- **Kök neden:** Veri-onarım migration'ları (085/087 — Selda/Ezgi/Focus Team) boş CI DB'sinde beklenen prod verisini bulamayıp `RAISE EXCEPTION` atıyordu → `migrate-apply` kırmızı (#24, #31+ hep kırmızı) → gated `migrate-deploy` hiç çalışmadı, 096 uygulanmadı.
+- **Çözüm (`migrate-check.yml`):** Apply döngüsü hata sınıflandırması yapıyor — `does not exist`/syntax gibi GERÇEK şema hataları job'ı kırmızı yapar (gate); veri-önkoşul RAISE'leri tolere edilir (DO bloğu atomik, yalnız veriye dokunur). Artık migrate-apply yeşil → migrate-deploy 096'yı bu push'ta otomatik uygular.
+
+### İstanbul (UTC+3) saat tutarlılığı — sistemik düzeltme + test
+- **Bug:** `created_at.slice(0,10)` (UTC günü) + `setHours(0,0,0,0)` (sunucu-yerel) ~15 yerde → metrikler gece 00:00 yerine **03:00 İstanbul'da** dönüyordu.
+- **`calendarDates.ts`:** `istanbulDayKey(iso)` eklendi (+ Intl formatter cache). **`pulse.ts`:** `periodStartIso` + 3 streak fonksiyonu İstanbul. **checkQuota** (usage_date), **fetchTeamBundle** (todayStart), **hubSelfActions** (weekActive + activeDays), **myPulseActions** (saha streak), **teamActivityActions**, **crown/actions**, **ekip/actions** (countByDate) — hepsi İstanbul gün anahtarına geçti.
+- **Test:** `calendarDates.test.ts` — gece yarısı–03:00 rollover regresyonu kilitlendi.
+
+### Hedefim "Bugünkü Odağım" → Saha Özetim formatı
+- **`HedefKart.tsx`:** 4 uzun satır yerine artık birebir **`HubCrownFunnelGrid`** (Saha Özetim'in 4 renkli kutusu) kullanılıyor → format + renk tutarlı. Yeni `labelMode='plan'` (gelecek zaman etiketleri: "Kaç Kişiyle Konuşacağım?").
+
+### #4 i18n kullanılmayan-anahtar dedektörü (advisory)
+- **`scripts/i18n-unused.mjs` + `npm run i18n:unused`:** Sözlükteki tam yolu kaynakta hiç geçmeyen anahtarları raporlar (dinamik önek baskılama ile). CI gate DEĞİL — dinamik erişim (`t(\`ns.${x}\`)`) yüzünden kesin tespit mümkün değil; elle-inceleme aracı.
+
+### #5 Perf
+- Mevcut kazanımlar doğrulandı: nav zaten hover-prefetch'li (Sidebar/BottomNav), config (optimizePackageImports/staleTimes/viewTransition) ve StatsCharts dynamic import yapılmış. Güvenli yeni kazanım: `istanbulDayKey` döngülerde çağrıldığı için Intl formatter cache'lendi. Kalan kaldıraçlar ölçüm-gerektiren (bkz. `docs/performance.md`).
+
+### Dosyalar
+`.github/workflows/migrate-check.yml`, `lib/utils/calendarDates.ts(+test)`, `lib/domain/pulse.ts`, `lib/ai/checkQuota.ts`, `lib/team/fetchTeamBundle.ts`, `crown/hubSelfActions.ts`, `crown/actions.ts`, `pano/myPulseActions.ts`, `ekip/actions.ts`, `istatistikler/teamActivityActions.ts`, `pano/_components/HedefKart.tsx`, `components/hub/HubCrownFunnelGrid.tsx`, `lib/domain/metricLabels.ts`, `scripts/i18n-unused.mjs`, `package.json`
+
 ## 2026-06-13 — Otomatik migration + dead-code temizliği + dokümantasyon ✅
 
 ### Migration artık otomatik (güvenli/gated)

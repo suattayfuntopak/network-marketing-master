@@ -7,6 +7,7 @@ import {
   periodStartIso,
   type FieldEngagementSummary,
 } from '@/lib/domain/pulse'
+import { todayCalendarKey, fromCalendarKey, toCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
 
 const FIELD_ACTION_TYPES = new Set(['call', 'whatsapp', 'stage_change', 'note', 'ai_generate'])
 
@@ -36,13 +37,6 @@ export type MyPanoInsights = {
   fieldStreak: number
 }
 
-function toDayKey(date: Date): string {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${day}`
-}
-
 export async function getFieldStreakDetailAction(workspaceId: string): Promise<FieldStreakDetail> {
   const empty: FieldStreakDetail = { activeDays: 0, days: [] }
 
@@ -63,15 +57,14 @@ export async function getFieldStreakDetailAction(workspaceId: string): Promise<F
   const fieldRows = (rows ?? []).filter(r => FIELD_ACTION_TYPES.has(r.action_type))
 
   const days: FieldStreakDayRow[] = []
-  const cursor = new Date()
-  cursor.setHours(0, 0, 0, 0)
+  const cursor = fromCalendarKey(todayCalendarKey()) // İstanbul bugünü
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(cursor)
     d.setDate(d.getDate() - i)
-    const dayKey = toDayKey(d)
+    const dayKey = toCalendarKey(d)
     const actions: FieldStreakActionRow[] = fieldRows
-      .filter(r => r.created_at.slice(0, 10) === dayKey)
+      .filter(r => istanbulDayKey(r.created_at) === dayKey)
       .map(r => {
         const candidate = r.nmm_candidates as { full_name: string } | null
         return {

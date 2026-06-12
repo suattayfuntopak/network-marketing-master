@@ -163,7 +163,8 @@ export async function logAIGeneration(params: {
       ...(params.aiModel ? { ai_model: params.aiModel } : {}),
     })
 
-    const usageDate = new Date().toISOString().slice(0, 10)
+    // İstanbul günü — kota penceresi (dayStartIso) ile tutarlı olmalı.
+    const usageDate = todayCalendarKey()
     await supabase.rpc('nmm_increment_ai_usage_daily', {
       p_user_id: params.userId,
       p_workspace_id: params.workspaceId,

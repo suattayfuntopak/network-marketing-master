@@ -7,7 +7,7 @@ import { getDailyProgressAction } from '@/app/(dashboard)/hedef/actions'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
-import { todayCalendarKey, toCalendarKey } from '@/lib/utils/calendarDates'
+import { todayCalendarKey, toCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
 import { fetchFunnelActualsForPeriod, funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
 import { calendarDayRange, rollingWeekRange, monthRange, yearRange } from '@/lib/utils/hubPeriodRange'
 
@@ -144,7 +144,7 @@ async function loginDaysInWindow(
 
   const daySet = new Set<string>()
   for (const row of data ?? []) {
-    daySet.add(row.created_at.slice(0, 10))
+    daySet.add(istanbulDayKey(row.created_at))
   }
 
   const weekActive: boolean[] = []
@@ -153,8 +153,8 @@ async function loginDaysInWindow(
   const end = new Date(windowEnd)
   end.setHours(0, 0, 0, 0)
   while (cursor <= end) {
-    const key = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, '0')}-${String(cursor.getDate()).padStart(2, '0')}`
-    weekActive.push(daySet.has(key))
+    // Hücre anahtarı da İstanbul gününde okunmalı (veri ile tutarlı).
+    weekActive.push(daySet.has(istanbulDayKey(cursor.toISOString())))
     cursor.setDate(cursor.getDate() + 1)
   }
 
@@ -174,7 +174,7 @@ async function loginDaysInRange(userId: string, since: string, until?: string): 
 
   const daySet = new Set<string>()
   for (const row of data ?? []) {
-    daySet.add(row.created_at.slice(0, 10))
+    daySet.add(istanbulDayKey(row.created_at))
   }
   return daySet.size
 }
@@ -213,7 +213,7 @@ async function selfFieldMetricsSince(
   const metrics: HubSelfFieldMetrics = { ...EMPTY_FIELD_METRICS }
 
   for (const act of actions ?? []) {
-    activeDays.add(act.created_at.slice(0, 10))
+    activeDays.add(istanbulDayKey(act.created_at))
     switch (act.action_type) {
       case 'call':
         metrics.calls++

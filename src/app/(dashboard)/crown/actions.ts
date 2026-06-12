@@ -17,6 +17,7 @@ import {
 import { getMemberGoalsMapAction } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import { periodStartIso, type PulsePeriod } from '@/lib/domain/pulse'
+import { istanbulDayKey } from '@/lib/utils/calendarDates'
 
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
@@ -226,7 +227,7 @@ export async function getCrownEntriesPageAction(workspaceId: string): Promise<Cr
   for (const act of actions ?? []) {
     const bucket = byUser[act.user_id]
     if (!bucket) continue
-    const day = act.created_at.slice(0, 10)
+    const day = istanbulDayKey(act.created_at)
     bucket.days.add(day)
     if (!bucket.last || act.created_at > bucket.last) bucket.last = act.created_at
     if (act.action_type === 'call') bucket.calls++
