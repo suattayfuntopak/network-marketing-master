@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query'
-import { queryKeys } from './keys'
+import { queryKeyRoots, queryKeys } from './keys'
 
 export const queryInvalidator = {
   /**
@@ -28,9 +28,9 @@ export const queryInvalidator = {
     }
     
     // Changing candidates also impacts hub metrics & funnel actuals
-    qc.invalidateQueries({ queryKey: ['hub'] })
-    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
-    qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.hub] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.statsFunnelBundle] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.panoFieldInsights] })
     qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
   },
@@ -63,9 +63,9 @@ export const queryInvalidator = {
   invalidateGoals: (qc: QueryClient) => {
     qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
-    qc.invalidateQueries({ queryKey: ['hub'] })
-    qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
-    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.hub] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.panoFieldInsights] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.statsFunnelBundle] })
   },
 
   /**
@@ -93,9 +93,9 @@ export const queryInvalidator = {
    * Hub metrics refreshed (refresh pull-down or day transitions).
    */
   invalidateHub: (qc: QueryClient, workspaceId?: string | null) => {
-    qc.invalidateQueries({ queryKey: ['hub'] })
-    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
-    qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.hub] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.statsFunnelBundle] })
+    qc.invalidateQueries({ queryKey: [queryKeyRoots.panoFieldInsights] })
     qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
     if (workspaceId) {

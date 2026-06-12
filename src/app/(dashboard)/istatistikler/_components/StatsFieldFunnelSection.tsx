@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react'
 import Link from 'next/link'
-import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Activity, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
@@ -11,7 +11,7 @@ import { pulsePeriodToHubGridPeriod } from '@/lib/domain/hubPeriodPrefetch'
 import { PULSE_PERIOD_OPTIONS } from '@/lib/domain/pulsePeriodLabels'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
-import { getStatsFunnelBundleAction } from '../actions'
+import { getStatsFunnelBundleAction, type StatsFunnelBundle } from '../actions'
 
 type Props = {
   period: PulsePeriod
@@ -35,8 +35,9 @@ export function StatsFieldFunnelSection({ period }: Props) {
     queryKey: queryKeys.statsFunnelBundle(period),
     queryFn: () => getStatsFunnelBundleAction(period),
     staleTime: QUERY_STALE.funnelBundle,
-    // Period değişiminde eski sayılar ekranda kalır (sıfıra düşmez) → "pat" geçer.
-    placeholderData: keepPreviousData,
+    // SSR hydrate + dönem geçişi: önce dehydrate cache, yoksa önceki dönem verisi.
+    placeholderData: (prev) =>
+      queryClient.getQueryData<StatsFunnelBundle>(queryKeys.statsFunnelBundle(period)) ?? prev,
   })
 
   const funnel = bundle?.actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }

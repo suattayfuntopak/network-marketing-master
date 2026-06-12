@@ -117,7 +117,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
   const { data: memberGoalsMap = {} } = useQuery({
     queryKey: ws?.workspaceId
       ? queryKeys.memberGoalsMap(ws.workspaceId)
-      : (['member-goals', 'none'] as const),
+      : queryKeys.memberGoalsMapDisabled(),
     queryFn: () =>
       getMemberGoalsMapAction(
         ws!.workspaceId,

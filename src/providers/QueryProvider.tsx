@@ -1,6 +1,7 @@
 'use client'
 
 import { QueryClient } from '@tanstack/react-query'
+import { queryKeyRoots } from '@/lib/query/keys'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import { useState } from 'react'
@@ -13,12 +14,12 @@ import { useState } from 'react'
  * Etki: Saha Özeti vb. metrik kutuları tekrar ziyarette localStorage'tan ANINDA
  * görünür, arkada sessizce tazelenir (stale-while-revalidate).
  */
-const PERSISTED_KEY_ROOTS = new Set([
-  'hub',
-  'pano-field-insights',
+const PERSISTED_KEY_ROOTS = new Set<string>([
+  queryKeyRoots.hub,
+  queryKeyRoots.panoFieldInsights,
   // Saf sayısal huni (arama/tanışma/sunum/yeni üye) — PII yok, İstatistikler
   // sayfası tekrar ziyarette anında dolu görünür.
-  'stats-funnel-bundle',
+  queryKeyRoots.statsFunnelBundle,
 ])
 
 const noopStorage = {

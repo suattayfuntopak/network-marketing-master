@@ -23,7 +23,7 @@ type Props = {
 }
 
 export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdate }: Props) {
-  const { t } = useTranslation()
+  const { t, lang } = useTranslation()
   const { data: ws } = useWorkspace()
   const [isPending, startTransition] = useTransition()
 
@@ -40,13 +40,17 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
   useBodyScrollLock(open || showSympathetic)
 
   useEffect(() => {
+    if (!open) return
     /* eslint-disable react-hooks/set-state-in-effect */
     if (editing) {
-      setNewBaslik(editing.baslik)
-      setNewOzet(editing.ozet)
-      setNewKategori(editing.kategoriBaslik || 'Zihniyet')
+      const en = lang === 'en'
+      setNewBaslik((en ? editing.baslikEn ?? editing.baslik : editing.baslik) ?? '')
+      setNewOzet((en ? editing.ozetEn ?? editing.ozet : editing.ozet) ?? '')
+      setNewKategori(
+        (en ? editing.kategoriBaslikEn ?? editing.kategoriBaslik : editing.kategoriBaslik) ?? 'Zihniyet',
+      )
       setNewSeviye(editing.seviye)
-      setNewIcerik(editing.maddeler.join('\n'))
+      setNewIcerik((en ? editing.maddelerEn ?? editing.maddeler : editing.maddeler).join('\n'))
       setNewEmoji(editing.emoji || '📖')
       setNewTags((editing.tags ?? []).join(', '))
     } else {
@@ -59,7 +63,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
       setNewTags('')
     }
     /* eslint-enable react-hooks/set-state-in-effect */
-  }, [open, editing])
+  }, [open, editing, lang])
 
   if (!open && !showSympathetic) return null
 

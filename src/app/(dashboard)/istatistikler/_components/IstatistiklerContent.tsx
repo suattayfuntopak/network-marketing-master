@@ -3,7 +3,6 @@
 import { useState, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
-import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { BarChart3 } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -177,18 +176,16 @@ export function IstatistiklerContent() {
     [sahaOrtaklari]
   )
 
-  // Person detail page = candidate detail (/pipeline/[id]). Saha rows ARE candidates;
-  // NMM members are matched to the leader's own candidate by name.
-  const leaderOwnerId = useMemo(
-    () => sortedMembers.find(m => m.role === 'leader')?.user_id ?? null,
-    [sortedMembers]
-  )
-  const getMemberHref = (row: { user_id: string; full_name: string | null; isAppUser?: boolean }): string | null => {
+  const pipelineByUserId = useMemo(() => {
+    const map = new Map<string, string | null>()
+    for (const m of sortedMembers) map.set(m.user_id, m.pipeline_id ?? null)
+    return map
+  }, [sortedMembers])
+
+  const getMemberHref = (row: { user_id: string; isAppUser?: boolean }): string | null => {
     if (row.isAppUser === false) return `/pipeline/${row.user_id}`
-    const matchedId = leaderOwnerId
-      ? findLeaderCandidateForMember(candidates, leaderOwnerId, row.full_name)
-      : null
-    if (matchedId) return `/pipeline/${matchedId}`
+    const pipelineId = pipelineByUserId.get(row.user_id)
+    if (pipelineId) return `/pipeline/${pipelineId}`
     return `/ekip/${row.user_id}`
   }
 

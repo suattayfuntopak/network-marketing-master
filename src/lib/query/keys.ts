@@ -1,3 +1,12 @@
+/** Persist / prefix invalidation kökleri — parametresiz eşleşme (tüm dönemler/workspace'ler). */
+export const queryKeyRoots = {
+  hub: 'hub',
+  panoFieldInsights: 'pano-field-insights',
+  statsFunnelBundle: 'stats-funnel-bundle',
+  team: 'team',
+  memberGoals: 'member-goals',
+} as const
+
 export const queryKeys = {
   workspace: () => ['workspace'] as const,
   candidates: (workspaceId: string) => ['candidates', workspaceId] as const,
@@ -7,6 +16,7 @@ export const queryKeys = {
   team: (workspaceId: string) => ['team', workspaceId] as const,
   /** @deprecated use team() — invalidation uyumu için alias */
   members: (workspaceId: string) => ['team', workspaceId] as const,
+  teamDisabled: () => [queryKeyRoots.team, 'none'] as const,
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   /** Hedef → Yol Haritası — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
@@ -39,7 +49,7 @@ export const queryKeys = {
   teamProgressMap: (workspaceId: string, memberIds: string[]) =>
     ['team-progress-map', workspaceId, [...memberIds].sort().join(',')] as const,
   /** İstatistikler saha huni bundle — dönem bazlı */
-  statsFunnelBundle: (period: string) => ['stats-funnel-bundle', period] as const,
+  statsFunnelBundle: (period: string) => [queryKeyRoots.statsFunnelBundle, period] as const,
   /** Ekip aktivite sheet detay sorgusu */
   memberActivity: (workspaceId: string, userId: string, period: string) =>
     ['member-activity', workspaceId, userId, period] as const,
@@ -49,7 +59,8 @@ export const queryKeys = {
   /** Üyenin kendi hedef kartı (gömülü sheet) */
   memberUserGoal: (userId: string) => ['member-user-goal', userId] as const,
   /** Ekip paneli hedef haritası */
-  memberGoalsMap: (workspaceId: string) => ['member-goals', workspaceId] as const,
+  memberGoalsMap: (workspaceId: string) => [queryKeyRoots.memberGoals, workspaceId] as const,
+  memberGoalsMapDisabled: () => [queryKeyRoots.memberGoals, 'none'] as const,
   notifications: () => ['notifications'] as const,
   notificationPreferences: () => ['notification-preferences'] as const,
   userSettings: (userId: string) => ['user-settings', userId] as const,

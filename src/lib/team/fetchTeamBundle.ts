@@ -231,6 +231,13 @@ export async function fetchTeamBundle(
       return b.candidate_count - a.candidate_count
     })
 
+    const pipelineByUser = new Map(
+      registeredMemberRows.map(r => [r.user_id, r.pipeline_id ?? null]),
+    )
+    for (const m of members) {
+      m.pipeline_id = pipelineByUser.get(m.user_id) ?? null
+    }
+
     return { members, ekipRows }
   }
 
@@ -351,6 +358,8 @@ async function fetchTeamBundleLegacy(
   })
 
   const authAvatars = await resolveAuthAvatars(supabase, workspaceId, finalAllUserIds)
+  const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
+  const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
 
   const statsMembers: TeamMember[] = finalUniqueMembers
     .map(m => {
@@ -396,12 +405,10 @@ async function fetchTeamBundleLegacy(
         today_compliance: todayCompliance,
         today_message: todayMessage,
         avatar_url: resolvedAvatar,
+        pipeline_id: matchedPipelineId,
       }
     })
     .sort((a, b) => b.candidate_count - a.candidate_count)
-
-  const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
-  const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
 
   const registeredMemberRows: MemberRow[] = finalUniqueMembers.map(m => {
     const mc = candidates.filter(c => c.owner_id === m.user_id)

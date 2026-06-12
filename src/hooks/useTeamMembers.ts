@@ -22,13 +22,15 @@ export interface TeamMember {
   today_compliance?: number
   today_message?: number
   avatar_url?: string | null
+  /** Candidate id for /pipeline/[id] — AGENTS: app user detayı için user_id değil */
+  pipeline_id?: string | null
 }
 
 const TEAM_STALE = 2 * 60 * 1000
 
 function teamQueryOptions(workspaceId: string | undefined) {
   return {
-    queryKey: workspaceId ? queryKeys.team(workspaceId) : (['team', 'none'] as const),
+    queryKey: workspaceId ? queryKeys.team(workspaceId) : queryKeys.teamDisabled(),
     queryFn: () => fetchTeamBundleAction(workspaceId!),
     enabled: !!workspaceId,
     staleTime: TEAM_STALE,
