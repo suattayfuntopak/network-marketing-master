@@ -6,11 +6,15 @@ import type { PulsePeriod } from '@/lib/domain/pulse'
 
 export const PULSE_PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
 
-/** Dönem etiketleri — Saha Özetim sekmeleriyle aynı (Günlük/Haftalık/Aylık/Yıllık/Tüm Zamanlar). */
-export function pulsePeriodLabel(t: (key: string) => string, p: PulsePeriod): string {
+/** Dönem etiketleri — varsayılan Saha Özetim ile hizalı; İstatistikler'de 30g kayan pencere. */
+export function pulsePeriodLabel(
+  t: (key: string) => string,
+  p: PulsePeriod,
+  opts?: { rolling30?: boolean },
+): string {
   if (p === 'today') return t('dashboard.summaryTabDaily')
   if (p === '7d') return t('dashboard.summaryTabWeekly')
-  if (p === '30d') return t('dashboard.summaryTabMonthly')
+  if (p === '30d') return opts?.rolling30 ? t('statsPage.period30d') : t('dashboard.summaryTabMonthly')
   if (p === 'all') return t('dashboard.summaryTabAllTime')
   return t('dashboard.summaryTabYearly')
 }
@@ -68,7 +72,9 @@ export function PulsePeriodTabs({ period, onChange, comfortableTypography = fals
           >
             {PULSE_PERIOD_SHORT[p]}
           </span>
-          <span className="hidden sm:inline">{pulsePeriodLabel(t, p)}</span>
+          <span className="hidden sm:inline">
+            {pulsePeriodLabel(t, p, { rolling30: comfortableTypography })}
+          </span>
         </button>
       ))}
     </div>

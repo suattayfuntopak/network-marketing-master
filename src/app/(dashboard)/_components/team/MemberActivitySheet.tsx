@@ -314,6 +314,7 @@ export function MemberActivitySheet({
               targets={data.funnelTargets}
               hasGoal={data.hasMemberGoal}
               period={sheetPeriodToHubTab(period)}
+              targetFooterKey={period === '30d' ? 'crown.hubRolling30Target' : undefined}
               hideNoGoalFooter={embedded}
               labelMode="member"
             />
