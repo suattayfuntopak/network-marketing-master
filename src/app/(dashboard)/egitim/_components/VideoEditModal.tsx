@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
-import { RelatedTopicPicker, resolveTopicLabel } from './RelatedTopicPicker'
+import { RelatedTopicPicker, useRelatedTopicOptions } from './RelatedTopicPicker'
 import {
   createTrainingVideoAction,
   updateTrainingVideoAction,
@@ -43,8 +43,9 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
   const [saving, setSaving] = useState(false)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [showSympathetic, setShowSympathetic] = useState(false)
-  const { lang, t } = useTranslation()
+  const { t } = useTranslation()
   const { data: ws } = useWorkspace()
+  const { resolveLabel } = useRelatedTopicOptions()
   useBodyScrollLock(true)
 
   const set = <K extends keyof VideoInput>(k: K, v: VideoInput[K]) =>
@@ -160,7 +161,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
                   className={`${inputCls} flex flex-1 items-center justify-between gap-1 text-left`}
                 >
                   <span className={`line-clamp-1 ${form.relatedTrainingId ? 'text-[var(--text-1)]' : 'text-[var(--text-3)]'}`}>
-                    {resolveTopicLabel(form.relatedTrainingId ?? null, lang) ?? t('videoTraining.selectPlaceholder')}
+                    {resolveLabel(form.relatedTrainingId ?? null) ?? t('videoTraining.selectPlaceholder')}
                   </span>
                   <ChevronDown className="h-3.5 w-3.5 shrink-0 text-[var(--text-3)]" />
                 </button>

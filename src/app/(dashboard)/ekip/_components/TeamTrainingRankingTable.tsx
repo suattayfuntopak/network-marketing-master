@@ -1,9 +1,10 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { BookOpen, ChevronDown, PlayCircle, Shield, Trophy } from 'lucide-react'
+import { BookOpen, ChevronDown, PlayCircle, Shield, Trophy, User } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { personAccent } from '@/lib/ui/personAccent'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Z } from '@/lib/ui/zIndex'
@@ -31,34 +32,13 @@ type TrainingRow = {
   avg: number
 }
 
-function medalForRank(rank: number): string | null {
-  if (rank === 0) return '🥇'
-  if (rank === 1) return '🥈'
-  if (rank === 2) return '🥉'
-  return null
-}
-
-function rowStickyBg(idx: number): string {
-  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
-  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
-  return 'bg-[var(--bg-card)]'
-}
-
-function rowBg(idx: number): string {
-  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
-  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
-  return ''
+/** Eşit muamele: herkese aynı (adam) ikon, kişiye özel renk (sıralama vurgusu yok). */
+function PersonIcon({ userId }: { userId: string }) {
+  return <User className={clsx('h-4 w-4 shrink-0', personAccent(userId).icon)} strokeWidth={2.5} aria-hidden />
 }
 
 function PctCell({ value }: { value: number }) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <span className="font-bold tabular-nums">%{value}</span>
-      <div className="h-1 w-10 overflow-hidden rounded-full bg-[var(--bg-subtle)]">
-        <div className="h-full rounded-full bg-brand" style={{ width: `${Math.min(100, value)}%` }} />
-      </div>
-    </div>
-  )
+  return <span className="font-bold tabular-nums">%{value}</span>
 }
 
 function MobileTrainingMetricGrid({
@@ -142,16 +122,14 @@ export function TeamTrainingRankingTable({
       </div>
 
       <ul className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] md:hidden">
-        {rows.map((row, idx) => {
+        {rows.map((row) => {
           const open = expandedId === row.userId
           return (
-            <li key={row.userId} className={rowBg(idx)}>
+            <li key={row.userId}>
               <div className="flex items-center gap-2 p-3">
-                <p className="min-w-0 flex-1 truncate text-sm font-semibold text-[var(--text-1)]">
-                  <span className="mr-1.5 tabular-nums text-[var(--text-3)]">
-                    {medalForRank(idx) ?? idx + 1}
-                  </span>
-                  {row.name}
+                <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm font-semibold text-[var(--text-1)]">
+                  <PersonIcon userId={row.userId} />
+                  <span className="truncate">{row.name}</span>
                 </p>
                 <span className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand">
                   %{row.avg}
@@ -200,21 +178,17 @@ export function TeamTrainingRankingTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border)]">
-            {rows.map((row, idx) => {
-              const stickyBg = rowStickyBg(idx)
+            {rows.map((row) => {
               return (
-                <tr key={row.userId} className={rowBg(idx)}>
+                <tr key={row.userId}>
                   <td
                     className={clsx(
-                      'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
+                      'sticky left-0 bg-[var(--bg-card)] p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
                       Z.cardControlsUpper,
-                      stickyBg,
                     )}
                   >
                     <span className="inline-flex items-center gap-1.5">
-                      <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
-                        {medalForRank(idx) ?? idx + 1}
-                      </span>
+                      <PersonIcon userId={row.userId} />
                       <span className="truncate font-medium text-[var(--text-1)]">{row.name}</span>
                     </span>
                   </td>

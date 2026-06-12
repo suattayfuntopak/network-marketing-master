@@ -12,6 +12,7 @@ import { Zap, Bell, Search, X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { QuickAddModal } from '@/components/ui/QuickAddModal'
+import { PageHelp } from '@/components/ui/PageHelp'
 import { useNotifications } from '@/hooks/useNotifications'
 
 export const TRFlag = () => (
@@ -197,7 +198,10 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
         {/* Sağ Taraf Buton Grubu */}
         <div className="flex items-center gap-1 sm:gap-2">
-          
+
+          {/* Sayfa yardımı (?) — mevcut butonların en soluna; her sayfanın anlatımı */}
+          <PageHelp />
+
           {/* Mobil Arama (Mercek) Butonu */}
           <button
             type="button"

@@ -11,8 +11,10 @@ import {
   Pencil,
   Sparkles,
   Trophy,
+  User,
 } from 'lucide-react'
 import { clsx } from 'clsx'
+import { personAccent } from '@/lib/ui/personAccent'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
@@ -52,11 +54,9 @@ type RankingRow = {
   totalActions: number
 }
 
-function medalForRank(rank: number): string | null {
-  if (rank === 0) return '🥇'
-  if (rank === 1) return '🥈'
-  if (rank === 2) return '🥉'
-  return null
+/** Eşit muamele: herkese aynı (adam) ikon, kişiye özel renk (sıralama vurgusu yok). */
+function PersonIcon({ userId }: { userId: string }) {
+  return <User className={clsx('h-4 w-4 shrink-0', personAccent(userId).icon)} strokeWidth={2.5} aria-hidden />
 }
 
 const ACTIVITY_COLUMNS = [
@@ -67,18 +67,6 @@ const ACTIVITY_COLUMNS = [
   { id: 'active' as const, Icon: CalendarDays, labelKey: 'team.activityActiveDays' },
   { id: 'total' as const, Icon: Activity, labelKey: 'team.activityTotalActions' },
 ] as const
-
-function rowStickyBg(idx: number): string {
-  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
-  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
-  return 'bg-[var(--bg-card)]'
-}
-
-function rowBg(idx: number): string {
-  if (idx === 0) return 'bg-amber-50 dark:bg-amber-950'
-  if (idx === 2) return 'bg-sky-50 dark:bg-sky-950'
-  return ''
-}
 
 function metricValue(row: RankingRow, colId: (typeof ACTIVITY_COLUMNS)[number]['id']) {
   if (colId === 'whatsapp') return row.whatsapps
@@ -199,21 +187,19 @@ export function TeamFieldRankingTable({
           <>
             {/* Mobil: isim + chevron → genişleyen metrik grid */}
             <ul className="divide-y divide-[var(--border)] rounded-xl border border-[var(--border)] md:hidden">
-              {rows.map((row, idx) => {
+              {rows.map((row) => {
                 const open = expandedId === row.userId
                 return (
-                  <li key={row.userId} className={rowBg(idx)}>
+                  <li key={row.userId}>
                     <div className="flex items-center gap-2 p-3">
                       <button
                         type="button"
                         onClick={() => row.href && router.push(row.href)}
                         disabled={!row.href}
-                        className="min-w-0 flex-1 truncate text-left text-sm font-semibold text-[var(--text-1)] disabled:cursor-default"
+                        className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-left text-sm font-semibold text-[var(--text-1)] disabled:cursor-default"
                       >
-                        <span className="mr-1.5 tabular-nums text-[var(--text-3)]">
-                          {medalForRank(idx) ?? idx + 1}
-                        </span>
-                        {row.name}
+                        <PersonIcon userId={row.userId} />
+                        <span className="truncate">{row.name}</span>
                       </button>
                       <span className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand">
                         {row.totalActions}
@@ -268,15 +254,13 @@ export function TeamFieldRankingTable({
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--border)]">
-                  {rows.map((row, idx) => {
-                    const stickyBg = rowStickyBg(idx)
+                  {rows.map((row) => {
                     return (
-                      <tr key={row.userId} className={rowBg(idx)}>
+                      <tr key={row.userId}>
                         <td
                           className={clsx(
-                            'sticky left-0 p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
+                            'sticky left-0 bg-[var(--bg-card)] p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
                             Z.cardControlsUpper,
-                            stickyBg,
                           )}
                         >
                           <button
@@ -285,9 +269,7 @@ export function TeamFieldRankingTable({
                             disabled={!row.href}
                             className="flex w-full min-w-0 items-center gap-1.5 text-left disabled:cursor-default"
                           >
-                            <span className="w-6 shrink-0 tabular-nums text-[var(--text-3)]">
-                              {medalForRank(idx) ?? idx + 1}
-                            </span>
+                            <PersonIcon userId={row.userId} />
                             <span className="min-w-0 flex-1 truncate font-medium text-[var(--text-1)]">
                               {row.name}
                             </span>

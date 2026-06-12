@@ -115,11 +115,6 @@ export function VideolarContent({
         {!embedded && (
         <p className="text-base text-[var(--text-3)]">{t('videoTraining.pageSubtitle')}</p>
         )}
-        {data && data.summary.startedIncomplete > 0 && (
-          <p className="text-sm text-amber-700 dark:text-amber-300">
-            {t('videoTraining.dropoffHint', { count: data.summary.startedIncomplete })}
-          </p>
-        )}
         {data && (
           <p className="text-sm font-bold text-[var(--text-2)]">
             {data.summary.completed} / {data.summary.total} · {data.summary.pct}%
@@ -144,7 +139,7 @@ export function VideolarContent({
                   progress={data!.progressByKey[video.key]}
                   onProgressChange={invalidate}
                   isAdmin={isAdmin}
-                  onEdit={() => { setEditing(video); setModalOpen(true) }}
+                  onEdit={() => setEditing(video)}
                   onDelete={() => setDeletingVideo(video)}
                 />
               </li>
@@ -173,10 +168,10 @@ export function VideolarContent({
         </>
       )}
 
-      {modalOpen && (
+      {(modalOpen || editing) && (
         <VideoEditModal
           editing={editing}
-          onClose={() => setModalOpen(false)}
+          onClose={() => { setModalOpen(false); setEditing(null) }}
           onSaved={invalidate}
         />
       )}

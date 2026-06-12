@@ -1,5 +1,33 @@
 # Hot Log
 
+## 2026-06-13 — Ekibim/Vaktin Varsa/Eğitim UX paketi + sayfa yardımı ✅
+
+### Ekibim
+- **Listeden çıkarılan üyeler en alta** (`TeamPerformanceSection`): pipeline_id'siz app-user üyeler stabil sıralamayla listenin sonuna.
+- **Madalya → eşit renkli adam ikonu** (`lib/ui/personAccent.ts` [YENİ] + `TeamFieldRankingTable` + `TeamTrainingRankingTable`): 🥇🥈🥉/sayı yerine herkese aynı `User` ikonu, kişiye özel stabil renk (dark+light). Rank-vurgulu satır renkleri kaldırıldı.
+- **Eğitim İlerlemesi sıralamasında ilerleme barları kaldırıldı** (sadece %).
+- **DBR Takip Tablosu**: her satır kişiye özel pastel renk (`EkipTrainingTab`).
+
+### Vaktin Varsa / Eğitim
+- **Tab renkleri** (`akademiTabTheme`): Video sekmesi = video butonu rengi (light brand / dark pembe-gül); İtiraz sekmesi = itiraz bordo aksanı. (İçerik Kütüphanesi dark koyulaştırma ertelendi — bkz. rapor.)
+- **Mobilde içerik/itiraz "Kopyala"/"WhatsApp İle Gönder" yazısız (ikon)** — masaüstü dokunulmadı.
+- **WhatsApp ile öner/gönder** (`components/ui/WhatsAppShareButton.tsx` [YENİ]): video kartı sağ üst (herkese açık, edit/sil solunda), içerik & itiraz satır başlığında — `wa.me/?text=` ile hazır, kibar/profesyonel mesaj (kişi alıcıyı kendi seçer). TR+EN şablonlar.
+- **Video düzenle DUP bug düzeltildi** (`VideolarContent`): edit, `addFormOpen` üzerinden açıldığı için `editing` sıfırlanıp create moduna düşüyordu → ikinci kutu. Artık edit ayrı state.
+- **"X video yarım kaldı" ipucu kaldırıldı.**
+- **İlgili Konu otomatik senkron** (`RelatedTopicPicker` `useRelatedTopicOptions` hook): süper admin eklenen özel içerik/itirazlar video "İlgili Konu" seçicisinde otomatik görünür (statik + DB birleşik). VideoEditModal da bu hook'la etiket çözüyor.
+- **İçerik/itiraz sil = 5sn geri-sayım undo** (`deleteWithUndo`): native `confirm()` yerine app standardı undo animasyonu.
+
+### Global
+- **Sayfa yardımı (?)** (`components/ui/PageHelp.tsx` + `lib/domain/pageHelp.ts` [YENİ]): Header sağ grubun en solunda rotaya duyarlı (?) butonu → mobil+masaüstü büyük UX popup, o sayfanın EN SADE anlatımı (TR+EN, 11 sayfa + genel fallback).
+- **Masaüstü işaret-parmağı imleci** (`globals.css`): tıklanabilir öğelerde `cursor:pointer` (yalnız fare; hover/pointer media query).
+
+### Ertelenenler (rapor)
+- 6C: İçerik Kütüphanesi dark "Tümü" koyulaştırma (muğlak/okunabilirlik riski).
+- İçerik (TrainingCard) düzenle ikonu + statik içerik edit/sil (kod kaynaklı; override sistemi gerekir). Özel içerik sil + özel itiraz edit/sil çalışıyor.
+
+### Dosyalar
+`lib/ui/personAccent.ts`, `components/ui/WhatsAppShareButton.tsx`, `components/ui/PageHelp.tsx`, `lib/domain/pageHelp.ts` (hepsi yeni) + TeamFieldRankingTable, TeamTrainingRankingTable, EkipTrainingTab, TeamPerformanceSection, akademiTabTheme, TrainingCard, ItirazCard, TrainingVideoCard, VideolarContent, VideoEditModal, RelatedTopicPicker, EgitimContent, ItirazlarContent, Header, globals.css, metricLabels, HubCrownFunnelGrid, HedefKart, translations(videoTraining/training)
+
 ## 2026-06-13 — Migration CI onarımı + İstanbul saati + Hedefim formatı + i18n araç ✅
 
 ### Migration CI kalıcı onarıldı (auto-apply artık çalışır)

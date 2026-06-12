@@ -11,6 +11,7 @@ import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamTrainingRankingTable } from './TeamTrainingRankingTable'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
+import { personAccent } from '@/lib/ui/personAccent'
 
 type Props = {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -65,9 +66,12 @@ export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocke
             <h3 className="mb-4 text-sm font-bold text-[var(--text-1)]">
               {t('team.onboardingTrackerTitle')}
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {ranked.map(({ member: m, done, pct }) => (
-                <li key={m.user_id}>
+                <li
+                  key={m.user_id}
+                  className={clsx('rounded-xl border border-[var(--border)] p-3', personAccent(m.user_id).bg)}
+                >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
                     <p className="truncate text-sm font-medium text-[var(--text-1)]">
                       {m.full_name ?? '—'}

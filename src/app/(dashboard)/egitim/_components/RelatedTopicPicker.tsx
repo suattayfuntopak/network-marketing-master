@@ -1,11 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { X, Search, Check, BookOpen, MessageCircleQuestion } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useWorkspace } from '@/hooks/useWorkspace'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { ITIRAZLAR } from '@/app/(dashboard)/itirazlar/data/itirazlar'
+import { loadCustomContent } from '@/lib/domain/customContent'
 
 export type TopicOption = {
   value: string
@@ -15,36 +17,96 @@ export type TopicOption = {
   kind: 'content' | 'objection'
 }
 
-/** İçerik (training) + itiraz başlıklarını tek listede toplar (deep link → Akademi sekmeleri). */
-export function getRelatedTopicOptions(lang: 'tr' | 'en'): TopicOption[] {
+type CustomTrainingItem = {
+  id: string | number
+  baslik?: string
+  baslikEn?: string
+  emoji?: string
+  kategoriBaslik?: string
+  kategoriBaslikEn?: string
+}
+type CustomObjectionItem = {
+  id: string | number
+  soru?: { tr?: string; en?: string }
+  emoji?: string
+  kategori?: { tr?: string; en?: string }
+}
+
+/** İçerik (training) + itiraz başlıklarını tek listede toplar (statik + özel/DB içerik). */
+export function getRelatedTopicOptions(
+  lang: 'tr' | 'en',
+  customContent: CustomTrainingItem[] = [],
+  customObjections: CustomObjectionItem[] = [],
+): TopicOption[] {
   const out: TopicOption[] = []
+  const seen = new Set<string>()
+  const push = (o: TopicOption) => {
+    const key = `${o.kind}_${o.value}`
+    if (seen.has(key)) return
+    seen.add(key)
+    out.push(o)
+  }
   for (const cat of getTrainingData(lang)) {
     for (const konu of cat.konular) {
-      out.push({
-        value: konu.id,
-        label: konu.baslik,
-        emoji: konu.emoji,
-        group: `${lang === 'en' ? 'Content' : 'İçerik'} · ${cat.baslik}`,
-        kind: 'content',
-      })
+      push({ value: konu.id, label: konu.baslik, emoji: konu.emoji, group: `${lang === 'en' ? 'Content' : 'İçerik'} · ${cat.baslik}`, kind: 'content' })
     }
   }
+  for (const k of customContent) {
+    const cat = (lang === 'en' && k.kategoriBaslikEn ? k.kategoriBaslikEn : k.kategoriBaslik) ?? (lang === 'en' ? 'Custom' : 'Özel')
+    push({
+      value: String(k.id),
+      label: (lang === 'en' && k.baslikEn ? k.baslikEn : k.baslik) ?? String(k.id),
+      emoji: k.emoji ?? '📄',
+      group: `${lang === 'en' ? 'Content' : 'İçerik'} · ${cat}`,
+      kind: 'content',
+    })
+  }
   for (const it of ITIRAZLAR) {
-    out.push({
+    push({ value: String(it.id), label: it.soru[lang], emoji: it.emoji, group: `${lang === 'en' ? 'Objection' : 'İtiraz'} · ${it.kategori[lang]}`, kind: 'objection' })
+  }
+  for (const it of customObjections) {
+    push({
       value: String(it.id),
-      label: it.soru[lang],
-      emoji: it.emoji,
-      group: `${lang === 'en' ? 'Objection' : 'İtiraz'} · ${it.kategori[lang]}`,
+      label: it.soru?.[lang] ?? String(it.id),
+      emoji: it.emoji ?? '💬',
+      group: `${lang === 'en' ? 'Objection' : 'İtiraz'} · ${it.kategori?.[lang] ?? (lang === 'en' ? 'Custom' : 'Özel')}`,
       kind: 'objection',
     })
   }
   return out
 }
 
-/** Kayıtlı id'yi insan-okur başlığa çevirir (kart/alan gösterimi için). */
-export function resolveTopicLabel(value: string | null | undefined, lang: 'tr' | 'en'): string | null {
-  if (!value) return null
-  return getRelatedTopicOptions(lang).find(o => o.value === value)?.label ?? value
+/**
+ * Statik + ÖZEL (DB/yerel) içerik & itirazları birleştiren hook. Süper admin yeni
+ * içerik/itiraz eklediğinde video "İlgili Konu" seçicisinde otomatik görünür.
+ */
+export function useRelatedTopicOptions() {
+  const { lang } = useTranslation()
+  const { data: ws } = useWorkspace()
+  const [customContent, setCustomContent] = useState<CustomTrainingItem[]>([])
+  const [customObjections, setCustomObjections] = useState<CustomObjectionItem[]>([])
+
+  useEffect(() => {
+    let alive = true
+    const wsId = ws?.workspaceId ?? null
+    loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', wsId)
+      .then(items => { if (alive) setCustomContent(items as CustomTrainingItem[]) })
+      .catch(() => {})
+    loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', wsId)
+      .then(items => { if (alive) setCustomObjections(items as CustomObjectionItem[]) })
+      .catch(() => {})
+    return () => { alive = false }
+  }, [ws?.workspaceId])
+
+  const options = useMemo(
+    () => getRelatedTopicOptions(lang, customContent, customObjections),
+    [lang, customContent, customObjections],
+  )
+  const resolveLabel = useCallback(
+    (value: string | null | undefined) => (value ? options.find(o => o.value === value)?.label ?? value : null),
+    [options],
+  )
+  return { options, resolveLabel }
 }
 
 function groupLabel(group: string): string {
@@ -63,11 +125,11 @@ export function RelatedTopicPicker({
   onSelect: (value: string | null) => void
   onClose: () => void
 }) {
-  const { lang, t } = useTranslation()
+  const { t } = useTranslation()
   const [q, setQ] = useState('')
   const [tab, setTab] = useState<Tab>('content')
   const [draft, setDraft] = useState<string | null>(current)
-  const options = useMemo(() => getRelatedTopicOptions(lang), [lang])
+  const { options, resolveLabel } = useRelatedTopicOptions()
 
   const groups = useMemo(() => {
     const s = q.trim().toLowerCase()
@@ -205,7 +267,7 @@ export function RelatedTopicPicker({
           <p className="text-sm text-[var(--text-2)]">
             {draft
               ? t('videoTraining.selectedTopic', {
-                  label: resolveTopicLabel(draft, lang) ?? draft,
+                  label: resolveLabel(draft) ?? draft,
                 })
               : t('videoTraining.noTopicSelected')}
           </p>

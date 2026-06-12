@@ -99,7 +99,13 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const hasMemberSearch = searchQ.length > 0
 
   const searchedMembers = useMemo(() => {
-    if (!hasMemberSearch) return visibleMembers
+    // Listeden çıkarılmış (pipeline_id yok) app-user üyeler en alta — liderle hem
+    // listede hem ekipte olanlar üstte kalır (stabil sıralama).
+    const removedWeight = (m: MemberRow) =>
+      m.role !== 'leader' && m.isAppUser !== false && !m.pipeline_id ? 1 : 0
+    if (!hasMemberSearch) {
+      return [...visibleMembers].sort((a, b) => removedWeight(a) - removedWeight(b))
+    }
     const matches = visibleMembers.filter(m => memberMatchesSearch(m, searchQ))
     return [...matches].sort((a, b) => {
       const scoreA = getSearchScore(a.full_name, searchQ)

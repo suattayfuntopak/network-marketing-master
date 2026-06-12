@@ -7,6 +7,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
+import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
@@ -299,12 +300,12 @@ export function ItirazlarContent({
                       }
                     : undefined
                 }
-                onDelete={() => {
-                  if (!confirm(t('objectionsPage.confirmDelete'))) return
-                  setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
-                  deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
-                  toast.success(t('objectionsPage.objectionDeleted'))
-                }}
+                onDelete={() =>
+                  deleteWithUndo(itiraz.soru[lang] ?? itiraz.soru.tr, () => {
+                    setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
+                    deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
+                  })
+                }
               />
             ))}
           </ul>

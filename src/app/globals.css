@@ -251,3 +251,17 @@ body {
 .animate-slide-up {
   animation: slide-up 0.28s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
+
+/* Masaüstü (fare) — tıklanabilir öğelerde işaret-parmağı imleci. Mobil/dokunmada
+   uygulanmaz (hover/pointer media query). Devre dışı butonlar hariç. */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled),
+  a[href],
+  [role="button"]:not([aria-disabled="true"]),
+  [role="tab"],
+  summary,
+  label[for],
+  select:not(:disabled) {
+    cursor: pointer;
+  }
+}

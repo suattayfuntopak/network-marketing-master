@@ -6,7 +6,7 @@ import { BookOpen, Search, X, Plus, Star, CheckCircle2, Film } from 'lucide-reac
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
-import { toast } from 'sonner'
+import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
@@ -434,14 +434,11 @@ export function EgitimContent({
                 }
                 onDelete={
                   konu.isCustom
-                    ? () => {
-                        if (confirm(t('trainingPage.confirmDelete'))) {
-                          const updated = customTrainings.filter(item => item.id !== konu.id)
-                          setCustomTrainings(updated)
+                    ? () =>
+                        deleteWithUndo(konu.baslik, () => {
+                          setCustomTrainings(prev => prev.filter(item => item.id !== konu.id))
                           deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
-                          toast.success(t('trainingPage.contentDeleted'))
-                        }
-                      }
+                        })
                     : undefined
                 }
               />

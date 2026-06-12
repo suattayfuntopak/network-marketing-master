@@ -14,6 +14,7 @@ import {
 } from '@/lib/domain/trainingVideos'
 import { VIDEO_COMPLETE_PERCENT, type VideoProgressRow } from '@/lib/domain/videoProgress'
 import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
+import { WhatsAppShareButton } from '@/components/ui/WhatsAppShareButton'
 import { reportVideoWatchAction } from '@/app/(dashboard)/egitim/videoActions'
 
 type Props = {
@@ -166,28 +167,39 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
   return (
     <>
       <article className="relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
-        {isAdmin && (
-          <div className={`absolute right-2.5 top-2.5 ${Z.cardControls} flex items-center gap-1`}>
-            <button
-              type="button"
-              onClick={onEdit}
-              title="Düzenle"
-              aria-label="Videoyu düzenle"
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] transition"
-            >
-              <Pencil className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              onClick={onDelete}
-              title="Sil"
-              aria-label="Videoyu sil"
-              className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm hover:bg-red-500/10 hover:text-red-500 transition"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
+        <div className={`absolute right-2.5 top-2.5 ${Z.cardControls} flex items-center gap-1`}>
+          {/* Herkese açık: bu videoyu bir kişiye WhatsApp ile öner (en solda) */}
+          <WhatsAppShareButton
+            text={t('videoTraining.waRecommend', {
+              title: localizedVideoTitle(video, lang),
+              url: `https://youtu.be/${cleanId}`,
+            })}
+            title={t('videoTraining.waShareTitle')}
+            className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm transition hover:bg-[#E7FBF0] hover:text-[#1a9e4f] dark:hover:bg-[#0d2e1a]/40 dark:hover:text-[#4ade80]"
+          />
+          {isAdmin && (
+            <>
+              <button
+                type="button"
+                onClick={onEdit}
+                title="Düzenle"
+                aria-label="Videoyu düzenle"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] transition"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+              </button>
+              <button
+                type="button"
+                onClick={onDelete}
+                title="Sil"
+                aria-label="Videoyu sil"
+                className="flex h-7 w-7 items-center justify-center rounded-lg bg-[var(--bg-card)]/90 text-[var(--text-3)] shadow-sm hover:bg-red-500/10 hover:text-red-500 transition"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </>
+          )}
+        </div>
 
         <div className="flex flex-1 flex-col p-4 pr-4">
           <p className="pr-14 text-xs font-bold uppercase tracking-wider text-brand-readable">

@@ -1,6 +1,8 @@
 import type { AkademiTab } from '@/lib/domain/akademiTab'
+import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 
-/** Vaktin Varsa sekmeleri + Eğitim İlerlemem alt navigasyon — mavi / turuncu / yeşil. */
+/** Vaktin Varsa sekmeleri + Eğitim İlerlemem alt navigasyon. Video sekmesi: video
+ *  butonu rengi (light brand / dark pembe-gül). İtiraz: itiraz kartı bordo aksanı. */
 export const AKADEMI_TAB_THEME: Record<
   AkademiTab,
   {
@@ -20,7 +22,7 @@ export const AKADEMI_TAB_THEME: Record<
     progressBarClass: 'bg-[#2962FF]',
   },
   videos: {
-    activeTabClass: 'bg-gradient-to-br from-[#FB923C] to-[#EA580C] text-white shadow-sm',
+    activeTabClass: `bg-brand text-white shadow-sm ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`,
     addButtonClass: 'bg-[#EA580C] hover:bg-[#c2410c] text-white',
     navButtonClass:
       'border-[#EA580C]/35 bg-[#FB923C]/10 text-[#EA580C] hover:bg-[#FB923C]/20 dark:border-[#FB923C]/40 dark:bg-[#FB923C]/15 dark:text-[#fdba74]',
@@ -28,7 +30,7 @@ export const AKADEMI_TAB_THEME: Record<
     progressBarClass: 'bg-[#EA580C]',
   },
   objections: {
-    activeTabClass: 'bg-gradient-to-br from-[#22C55E] to-[#16A34A] text-white shadow-sm',
+    activeTabClass: 'bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] text-white shadow-sm',
     addButtonClass: 'bg-[#16A34A] hover:bg-[#15803d] text-white',
     navButtonClass:
       'border-[#16A34A]/35 bg-[#22C55E]/10 text-[#16A34A] hover:bg-[#22C55E]/20 dark:border-[#22C55E]/40 dark:bg-[#22C55E]/15 dark:text-[#86efac]',
