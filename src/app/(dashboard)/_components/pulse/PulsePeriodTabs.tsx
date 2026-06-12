@@ -3,30 +3,13 @@
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { PulsePeriod } from '@/lib/domain/pulse'
+import {
+  PULSE_PERIOD_OPTIONS,
+  PULSE_PERIOD_SHORT,
+  pulsePeriodLabel,
+} from '@/lib/domain/pulsePeriodLabels'
 
-export const PULSE_PERIOD_OPTIONS: PulsePeriod[] = ['today', '7d', '30d', 'ytd', 'all']
-
-/** Dönem etiketleri — varsayılan Saha Özetim ile hizalı; İstatistikler'de 30g kayan pencere. */
-export function pulsePeriodLabel(
-  t: (key: string) => string,
-  p: PulsePeriod,
-  opts?: { rolling30?: boolean },
-): string {
-  if (p === 'today') return t('dashboard.summaryTabDaily')
-  if (p === '7d') return t('dashboard.summaryTabWeekly')
-  if (p === '30d') return opts?.rolling30 ? t('statsPage.period30d') : t('dashboard.summaryTabMonthly')
-  if (p === 'all') return t('dashboard.summaryTabAllTime')
-  return t('dashboard.summaryTabYearly')
-}
-
-/** Mobilde sığması için kısa etiket: 1 / 7 / 30 / 365 / ∞ */
-const PULSE_PERIOD_SHORT: Record<PulsePeriod, string> = {
-  today: '1',
-  '7d': '7',
-  '30d': '30',
-  ytd: '365',
-  all: '∞',
-}
+export { PULSE_PERIOD_OPTIONS, pulsePeriodLabel } from '@/lib/domain/pulsePeriodLabels'
 
 type Props = {
   period: PulsePeriod

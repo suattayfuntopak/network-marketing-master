@@ -2,42 +2,19 @@
 
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
-import {
-  hubPeriodTabLabel,
-  type HubPeriodTab,
-} from '@/components/hub/HubSummaryTabBar'
 import type { SheetActivityPeriod } from '@/lib/domain/pulse'
+import {
+  PULSE_PERIOD_OPTIONS,
+  PULSE_PERIOD_SHORT,
+  sheetActivityPeriodLabel,
+} from '@/lib/domain/pulsePeriodLabels'
 
-const SHEET_PERIODS: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd', 'all']
+export {
+  sheetActivityPeriodLabel,
+  sheetPeriodToHubTab,
+} from '@/lib/domain/pulsePeriodLabels'
 
-const SHEET_TO_HUB_TAB: Record<SheetActivityPeriod, HubPeriodTab> = {
-  today: 'daily',
-  '7d': 'weekly',
-  '30d': 'monthly',
-  ytd: 'yearly',
-  all: 'all',
-}
-
-const SHEET_PERIOD_SHORT: Record<SheetActivityPeriod, string> = {
-  today: '1',
-  '7d': '7',
-  '30d': '30',
-  ytd: '365',
-  all: '∞',
-}
-
-export function sheetPeriodToHubTab(period: SheetActivityPeriod): HubPeriodTab {
-  return SHEET_TO_HUB_TAB[period]
-}
-
-export function sheetActivityPeriodLabel(
-  t: (key: string) => string,
-  period: SheetActivityPeriod,
-): string {
-  return hubPeriodTabLabel(t, SHEET_TO_HUB_TAB[period])
-}
-
-export const MEMBER_ACTIVITY_PERIODS = SHEET_PERIODS
+export const MEMBER_ACTIVITY_PERIODS = PULSE_PERIOD_OPTIONS
 
 type Props = {
   active: SheetActivityPeriod
@@ -56,7 +33,7 @@ export function MemberActivityPeriodTabs({ active, onChange }: Props) {
       data-no-swipe="true"
       onTouchStart={e => e.stopPropagation()}
     >
-      {SHEET_PERIODS.map(period => {
+      {MEMBER_ACTIVITY_PERIODS.map(period => {
         const isActive = active === period
         return (
           <button
@@ -79,7 +56,7 @@ export function MemberActivityPeriodTabs({ active, onChange }: Props) {
                 period === 'all' ? 'text-lg font-black' : 'text-sm',
               )}
             >
-              {SHEET_PERIOD_SHORT[period]}
+              {PULSE_PERIOD_SHORT[period]}
             </span>
             <span className="hidden sm:inline">{sheetActivityPeriodLabel(t, period)}</span>
           </button>

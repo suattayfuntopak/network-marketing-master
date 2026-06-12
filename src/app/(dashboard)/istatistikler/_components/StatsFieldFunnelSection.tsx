@@ -8,7 +8,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { pulsePeriodToHubGridPeriod } from '@/lib/domain/hubPeriodPrefetch'
-import { PULSE_PERIOD_OPTIONS } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
+import { PULSE_PERIOD_OPTIONS } from '@/lib/domain/pulsePeriodLabels'
 import { getStatsFunnelBundleAction } from '../actions'
 
 type Props = {

@@ -8,20 +8,16 @@ import {
   type HubPeriodTab,
   parseSummaryTab,
 } from '@/lib/domain/hubPeriodPrefetch'
+import {
+  HUB_PERIOD_TAB_LABEL_KEYS,
+  hubPeriodTabLabel,
+} from '@/lib/domain/pulsePeriodLabels'
 
-export { HUB_PERIOD_TABS, parseSummaryTab }
+export { HUB_PERIOD_TABS, parseSummaryTab, HUB_PERIOD_TAB_LABEL_KEYS, hubPeriodTabLabel }
 export type { HubPeriodTab }
 
 /** @deprecated Use HubPeriodTab — kept for field summary imports */
 export type HubSummaryTab = HubPeriodTab
-
-export const HUB_PERIOD_TAB_LABEL_KEYS: Record<HubPeriodTab, string> = {
-  daily: 'dashboard.summaryTabDaily',
-  weekly: 'dashboard.summaryTabWeekly',
-  monthly: 'dashboard.summaryTabMonthly',
-  yearly: 'dashboard.summaryTabYearly',
-  all: 'dashboard.summaryTabAllTime',
-}
 
 /** Mobilde sığması için kısa etiket: 1 / 7 / 30 / 365 / ∞ */
 const HUB_PERIOD_TAB_SHORT: Record<HubPeriodTab, string> = {
@@ -38,13 +34,6 @@ const HUB_TAB_PANO_COLORS: Record<HubPeriodTab, ButtonColor> = {
   monthly: 'coral',
   yearly: 'amber',
   all: 'purple',
-}
-
-export function hubPeriodTabLabel(
-  t: (key: string) => string,
-  tab: HubPeriodTab,
-): string {
-  return t(HUB_PERIOD_TAB_LABEL_KEYS[tab])
 }
 
 type HubSummaryTabBarProps = {
