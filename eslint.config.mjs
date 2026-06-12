@@ -49,7 +49,9 @@ const underscoreArgsAllowed = {
   },
 };
 
-const noRawZIndex = {
+// Tek `no-restricted-syntax` bloğu — flat config'te aynı kural birden çok blokta
+// tanımlanırsa sonuncusu öncekini EZER, bu yüzden tüm seçiciler burada toplanır.
+const noRestrictedSyntax = {
   files: ["src/**/*.{ts,tsx}"],
   ignores: ["src/lib/ui/zIndex.ts"],
   rules: {
@@ -63,6 +65,12 @@ const noRawZIndex = {
         selector: "Literal[value=/\\bz-(?!\\[)\\d+\\b/]",
         message: "Use Z.* from @/lib/ui/zIndex instead of raw z-NN.",
       },
+      {
+        // `created_at.slice(0,10)` UTC gününü verir → gece 00:00–03:00 yanlış güne
+        // düşer. Gün anahtarı için istanbulDayKey() (lib/utils/calendarDates) kullan.
+        selector: "CallExpression[callee.object.property.name='created_at'][callee.property.name='slice']",
+        message: "created_at.slice(0,10) UTC günü verir; İstanbul günü için istanbulDayKey() (lib/utils/calendarDates) kullan.",
+      },
     ],
   },
 };
@@ -73,7 +81,7 @@ const eslintConfig = defineConfig([
   noSupabaseClientInTsx,
   supabaseClientTsxLegacy,
   underscoreArgsAllowed,
-  noRawZIndex,
+  noRestrictedSyntax,
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

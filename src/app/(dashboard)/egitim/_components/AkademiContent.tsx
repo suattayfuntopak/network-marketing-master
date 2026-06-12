@@ -14,6 +14,7 @@ import { akademiAccent } from './akademiTheme'
 import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 export function AkademiContent() {
   const { t } = useTranslation()
@@ -95,7 +96,10 @@ export function AkademiContent() {
               </span>
             </h1>
           </div>
-          {addButton}
+          <div className="flex items-center gap-2 shrink-0">
+            <PageHelp />
+            {addButton}
+          </div>
         </div>
 
         <div

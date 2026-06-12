@@ -11,14 +11,18 @@ import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderati
 import type { Json } from '@/types/database.types'
 import { SympatheticPopup } from '@/components/ui/SympatheticPopup'
 import type { TrainingTopic } from '../types'
+import { updateCustomContent } from '@/lib/domain/customContent'
+import { useEffect } from 'react'
 
 type Props = {
   open: boolean
   onClose: () => void
   onAdd: (topic: TrainingTopic) => void
+  editing?: TrainingTopic | null
+  onUpdate?: (topic: TrainingTopic) => void
 }
 
-export function AddTrainingModal({ open, onClose, onAdd }: Props) {
+export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdate }: Props) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const [isPending, startTransition] = useTransition()
@@ -36,51 +40,79 @@ export function AddTrainingModal({ open, onClose, onAdd }: Props) {
 
   useBodyScrollLock(open || showSympathetic)
 
+  useEffect(() => {
+    if (editing) {
+      setNewBaslik(editing.baslik)
+      setNewOzet(editing.ozet)
+      setNewKategori(editing.kategoriBaslik || 'Zihniyet')
+      setNewSeviye(editing.seviye)
+      setNewIcerik(editing.maddeler.join('\n'))
+      setNewEmoji(editing.emoji || '📖')
+      setNewTags((editing.tags ?? []).join(', '))
+    } else {
+      setNewBaslik('')
+      setNewOzet('')
+      setNewKategori('Zihniyet')
+      setNewTur('Ders Notu')
+      setNewSeviye('Başlangıç')
+      setNewIcerik('')
+      setNewEmoji('📖')
+      setNewTags('')
+    }
+  }, [open, editing])
+
   if (!open && !showSympathetic) return null
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!newBaslik.trim() || !newIcerik.trim()) return
 
-    const itemKey = `custom_${Date.now()}`
+    const itemKey = editing ? editing.id : `custom_${Date.now()}`
     const newObj: TrainingTopic = {
       id: itemKey,
       baslik: newBaslik,
       emoji: newEmoji || '📖',
-      sure: '5 dk',
+      sure: editing ? editing.sure : '5 dk',
       seviye: newSeviye,
       ozet: newOzet || newIcerik.slice(0, 100) + '...',
       maddeler: newIcerik.split('\n').map(l => l.trim()).filter(Boolean),
       kategoriId: newKategori.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'),
       kategoriBaslik: newKategori,
-      kategoriRenk: 'bg-purple-100 text-purple-700',
+      kategoriRenk: editing ? editing.kategoriRenk : 'bg-purple-100 text-purple-700',
       tags: newTags.split(',').map(tag => tag.trim()).filter(Boolean),
       isCustom: true,
     }
 
     startTransition(async () => {
       try {
-        const res = await submitModeratedRequestAction(
-          'training',
-          ws?.workspaceId ?? null,
-          itemKey,
-          newObj as unknown as Record<string, Json>
-        )
-
-        setNewBaslik('')
-        setNewOzet('')
-        setNewIcerik('')
-        setNewTags('')
-        setNewEmoji('📖')
-
-        if (res.isApproved) {
-          onAdd(newObj)
-          toast.success(t('trainingPage.contentAdded'))
+        if (editing && onUpdate) {
+          await updateCustomContent('nmm_custom_trainings', itemKey, newObj as any)
+          onUpdate(newObj)
+          toast.success(t('trainingPage.contentUpdated') || 'İçerik güncellendi!')
           onClose()
         } else {
-          // Regular user submitted successfully, closed and show sympathetic modal
-          onClose()
-          setShowSympathetic(true)
+          const res = await submitModeratedRequestAction(
+            'training',
+            ws?.workspaceId ?? null,
+            itemKey,
+            newObj as unknown as Record<string, Json>
+          )
+
+          setNewBaslik('')
+          setNewOzet('')
+          setNewIcerik('')
+          setNewTags('')
+          setNewEmoji('📖')
+
+          if (res.isApproved) {
+            onAdd(newObj)
+            toast.success(t('trainingPage.contentAdded'))
+            onClose()
+          } else {
+            // Regular user submitted successfully, closed and show sympathetic modal
+            onClose()
+            setShowSympathetic(true)
+          }
         }
       } catch (err: unknown) {
         toast.error((err instanceof Error ? err.message : '') || 'Hata oluştu.')

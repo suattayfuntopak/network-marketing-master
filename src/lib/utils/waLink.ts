@@ -15,3 +15,11 @@ export function waHref(phone: string | null | undefined, text?: string): string 
   const base = `https://wa.me/${number}`
   return text ? `${base}?text=${encodeURIComponent(text)}` : base
 }
+
+/**
+ * Alıcı belirtmeden WhatsApp paylaşımı — kullanıcı kişiyi WhatsApp'ta kendi seçer.
+ * Dağınık `wa.me/?text=` / `api.whatsapp.com/send?text=` kullanımlarını tek yerde toplar.
+ */
+export function whatsappShareUrl(text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`
+}

@@ -6,6 +6,7 @@ import { ArrowLeft, RefreshCw, type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 type HubPageShellProps = {
   title: string
@@ -113,17 +114,20 @@ export function HubPageShell({
               ) : null}
             </div>
           </div>
-          {showRefresh ? (
-            <button
-              type="button"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] disabled:opacity-60"
-            >
-              <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-              {t('crown.refresh')}
-            </button>
-          ) : null}
+          <div className="flex items-center gap-2">
+            <PageHelp />
+            {showRefresh ? (
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-xs font-semibold text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] disabled:opacity-60"
+              >
+                <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+                {t('crown.refresh')}
+              </button>
+            ) : null}
+          </div>
         </header>
         {children}
       </div>

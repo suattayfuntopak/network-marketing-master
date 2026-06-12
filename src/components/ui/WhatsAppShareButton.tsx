@@ -1,6 +1,7 @@
 'use client'
 
 import { WhatsAppIcon } from './WhatsAppIcon'
+import { whatsappShareUrl } from '@/lib/utils/waLink'
 
 /**
  * "Bir kişiye gönder" WhatsApp paylaşım butonu. Telefon vermez → wa.me/?text=...
@@ -18,7 +19,7 @@ export function WhatsAppShareButton({
 }) {
   return (
     <a
-      href={`https://wa.me/?text=${encodeURIComponent(text)}`}
+      href={whatsappShareUrl(text)}
       target="_blank"
       rel="noopener noreferrer"
       onClick={e => e.stopPropagation()}

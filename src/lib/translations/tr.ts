@@ -565,14 +565,6 @@ export const tr = {
   loading: {
     page: "Sayfa yükleniyor...",
   },
-  calendar: {
-    title: "Takvim",
-    subtitle: "Yaklaşan aday takipleri ve randevularınızı takip edin",
-    noEvents: "Bu tarihte planlanmış bir temas veya görev bulunmuyor.",
-    taskTitle: "Görev / Temas",
-    taskCompleted: "Görev Tamamlandı",
-    taskPending: "Beklemede",
-  },
   objections: {
     title: "İtirazlara Cevaplar",
     subtitle: "Adaylarınızın en sık dile getirdiği itirazlara karşı profesyonel cevap rehberleri",
@@ -609,12 +601,4 @@ export const tr = {
     addToFavorites: "Favorilere Ekle",
     removeFromFavorites: "Favorilerden Çıkar",
   },
-  achievements: {
-    title: "Kazanımlar",
-    subtitle: "Ağ pazarlaması yolculuğunuzdaki başarılarınızı ve hedeflerinizi izleyin",
-    targetProgress: "Hedef İlerlemesi",
-    completedTasks: "Tamamlanan Görevler",
-    successRate: "Başarı Oranı",
-    badges: "Rozetleriniz",
-  }
 };

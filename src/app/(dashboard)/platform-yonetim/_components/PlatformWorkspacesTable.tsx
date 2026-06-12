@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Users, Mail, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { waHref } from '@/lib/utils/waLink'
+import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { REGISTER_URL } from '@/lib/domain/constants'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -54,7 +54,7 @@ export function PlatformWorkspacesTable({
   function buildWaLink(w: PlatformWorkspaceItem): string | null {
     if (w.isIndependent) {
       const msg = t('platformPage.inviteWaMessage', { name: w.ownerName, link: REGISTER_URL, code: inviteCode })
-      return `https://wa.me/?text=${encodeURIComponent(msg)}`
+      return whatsappShareUrl(msg)
     }
     return waHref(w.ownerPhone)
   }

@@ -8,6 +8,7 @@ import { parseYazarTab, type YazarTab } from '@/lib/domain/yazarTab'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useFeatureAccess } from '@/hooks/useFeatureAccess'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 const YAZAR_TAB_LABEL_KEYS: Record<YazarTab, string> = {
   yazar: 'coachUi.tabMessage',
@@ -37,15 +38,18 @@ export default function YazarPage({ searchParams }: PageProps) {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <div className="w-full space-y-6">
-        <header className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
-            <Bot className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+        <header className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
+              <Bot className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-[var(--text-1)]">
+                {pageTitle}
+              </h1>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-[var(--text-1)]">
-              {pageTitle}
-            </h1>
-          </div>
+          <PageHelp />
         </header>
         {hasAiCoachAccess ? (
           <YzKocuContainer initialName={name ?? ''} initialNote={note ?? ''} initialWarmth={warmth ?? 'ilik'} />

@@ -13,6 +13,7 @@ import { CandidateCard } from './CandidateCard'
 import { AddCandidateSheet } from './AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { clsx } from 'clsx'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 const STAGE_PARAM_FILTERS: CandidateFilter[] = [
   'yeni',
@@ -97,6 +98,7 @@ export function PipelinePageContent() {
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <PageHelp />
           <button
             onClick={() => setSheetOpen(true)}
             className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] dark:bg-[#5D44C9] dark:hover:bg-[#4a38b0] active:scale-95 shadow-md"

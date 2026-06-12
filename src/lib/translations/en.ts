@@ -565,14 +565,6 @@ export const en = {
   loading: {
     page: "Loading page...",
   },
-  calendar: {
-    title: "Calendar",
-    subtitle: "Track your upcoming follow-ups and business appointments",
-    noEvents: "No contact logs or tasks scheduled for this day.",
-    taskTitle: "Task / Contact",
-    taskCompleted: "Completed",
-    taskPending: "Pending",
-  },
   objections: {
     title: "Objection Handling",
     subtitle: "Professional scripts and strategies to handle the most common prospect objections",
@@ -609,12 +601,4 @@ export const en = {
     addToFavorites: "Add to Favorites",
     removeFromFavorites: "Remove from Favorites",
   },
-  achievements: {
-    title: "Achievements",
-    subtitle: "Monitor your network marketing targets, badges, and professional progress",
-    targetProgress: "Goal Progress",
-    completedTasks: "Completed Tasks",
-    successRate: "Success Ratio",
-    badges: "Your Badges",
-  }
 };

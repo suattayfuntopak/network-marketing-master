@@ -9,6 +9,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { formatPanoDateLine } from '@/lib/utils/calendarLocale'
 import { AccountStatusAlert } from './AccountStatusAlert'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 export function PanoContent() {
   const { t, lang } = useTranslation()
@@ -50,9 +51,12 @@ export function PanoContent() {
               {greetingIcon} {greeting} {firstName}
             </h1>
           )}
-          <p className="shrink-0 text-right text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">
-            {todayLine}
-          </p>
+          <div className="flex items-center gap-2 shrink-0">
+            <PageHelp />
+            <p className="shrink-0 text-right text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">
+              {todayLine}
+            </p>
+          </div>
         </div>
       </header>
 

@@ -26,6 +26,7 @@ import {
 } from '@/app/(dashboard)/actions/moderation'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { PageHelp } from '@/components/ui/PageHelp'
 import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
@@ -260,7 +261,8 @@ export function PlatformYonetimContent() {
               </h1>
             </div>
           </div>
-          <div className="flex shrink-0 flex-row gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 flex-row gap-1.5 sm:gap-2 items-center">
+            <PageHelp />
             <button
               type="button"
               onClick={() => setNavConfirm('payment')}

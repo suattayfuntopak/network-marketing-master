@@ -53,9 +53,20 @@ export function EgitimContent({
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   const [customTrainings, setCustomTrainings] = useState<TrainingTopic[]>([])
+  const [editingTraining, setEditingTraining] = useState<TrainingTopic | null>(null)
   const [internalFormOpen, setInternalFormOpen] = useState(false)
   const formOpen = addFormOpenProp ?? internalFormOpen
   const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
+
+  function handleEditTraining(topic: TrainingTopic) {
+    setEditingTraining(topic)
+    setFormOpen(true)
+  }
+
+  function handleUpdateTraining(updated: TrainingTopic) {
+    setCustomTrainings(prev => prev.map(c => c.id === updated.id ? updated : c))
+    setEditingTraining(null)
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -441,6 +452,12 @@ export function EgitimContent({
                         })
                     : undefined
                 }
+                onEdit={
+                  konu.isCustom &&
+                  (konu as unknown as { userId?: string }).userId === ws?.userId
+                    ? () => handleEditTraining(konu)
+                    : undefined
+                }
               />
             ))}
           </ul>
@@ -467,8 +484,13 @@ export function EgitimContent({
 
       <AddTrainingModal
         open={formOpen}
-        onClose={() => setFormOpen(false)}
+        onClose={() => {
+          setFormOpen(false)
+          setEditingTraining(null)
+        }}
         onAdd={handleAddTraining}
+        editing={editingTraining}
+        onUpdate={handleUpdateTraining}
       />
     </>
   )

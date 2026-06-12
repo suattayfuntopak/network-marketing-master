@@ -34,11 +34,11 @@ export function PageHelp() {
 
       {open && (
         <div
-          className={`fixed inset-0 ${Z.confirm} flex items-end justify-center bg-black/55 p-0 backdrop-blur-sm sm:items-center sm:p-4`}
+          className={`fixed inset-0 ${Z.confirm} flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm`}
           onClick={() => setOpen(false)}
         >
           <div
-            className="flex max-h-[90vh] w-full flex-col overflow-hidden rounded-t-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-slide-up sm:max-w-lg sm:rounded-2xl"
+            className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-5 py-4">
@@ -58,7 +58,7 @@ export function PageHelp() {
               </button>
             </div>
 
-            <div className="space-y-4 overflow-y-auto px-5 py-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
+            <div className="space-y-4 overflow-y-auto px-5 py-4 pb-5">
               <p className="text-sm leading-relaxed text-[var(--text-2)]">{help.intro}</p>
               <ul className="space-y-2.5">
                 {help.steps.map((s, i) => (

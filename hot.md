@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-13 — Sayfa yardımı konumlandırma + Vaktin Varsa içerik/itiraz kart iyileştirmeleri ✅
+
+### Sayfa Yardımı (?) UX/Konumlandırma
+- **Pop-up Hizalama ve Stil:** `PageHelp.tsx` popup'ı hem mobil hem de masaüstü temalarda ekranın tam ortasına (yatay ve dikey olarak) yerleştirildi. `rounded-2xl` ve `animate-in fade-in zoom-in-95` animasyonları ile premium bir görünüm sağlandı, kesilme sorunları tamamen çözüldü.
+- **Sayfa-İçi Başlıklara Taşıma:** Global `Header.tsx`'ten buton kaldırıldı ve 11 kritik sayfanın kendi iç sağ üst köşelerine / başlıklarına rotaya duyarlı şekilde eklendi:
+  - `HubPageShell.tsx` (Hedefim, Saha Özetim, Saha Radarı, Ekibim)
+  - `AkademiContent.tsx` (Vaktin Varsa)
+  - `PanoContent.tsx` (Pano)
+  - `PipelinePageContent.tsx` (Listem)
+  - `IstatistiklerContent.tsx` (İstatistikler)
+  - `PlatformYonetimContent.tsx` (Platform Yönetimi)
+  - `yazar/page.tsx` (YZ Koçu)
+  - `takvim/page.tsx` (Takvim)
+
+### Vaktin Varsa / İçerik Kütüphanesi & İtiraz Bankası
+- **Row Header Temizliği:** `TrainingCard.tsx` ve `ItirazCard.tsx` satır başlıklarının en sağındaki WhatsApp paylaşım butonu ve Delete/Edit butonları kaldırıldı.
+- **Expanded İçi Buton Düzenlemesi:** Kartlar açıldığında alt kısımda Copy (Kopyala) ve WhatsApp butonları sola yaslı olarak bırakılırken, Düzenle (Edit) ve Sil (Delete) aksiyon butonları sağ aşağıya yaslı (`ml-auto` ile sağa yaslı) olarak yerleştirildi.
+- **Responsive Düzenle/Sil:** Düzenle ve Sil butonları masaüstünde yazılı ve ikonlu (`Düzenle` / `Sil` metniyle), mobilde ise sadece ikonlu olacak şekilde responsive yapıldı.
+- **WhatsApp Paylaşım Metni:** Kart içindeki WhatsApp paylaşım linkine tıklandığında, kaldırılan sağ üstteki buton gibi hem başlığı/soruyu hem de maddeleri/cevabı içeren tam yapılandırılmış mesajın (`waShare`) paylaşılması sağlandı.
+- **İçerik Kütüphanesi Düzenleme Flow'u:** `AddTrainingModal.tsx` edit modunu ve custom veri güncellemesini (`updateCustomContent`) destekleyecek şekilde güncellendi. `EgitimContent.tsx`'e `editingTraining` state'i ve edit callback'i (`onEdit`) eklenerek custom eğitim içeriklerinin de düzenlenebilmesi sağlandı.
+
+### Dosyalar
+`src/components/ui/PageHelp.tsx`, `src/app/(dashboard)/_components/Header.tsx`, `src/components/hub/HubPageShell.tsx`, `src/app/(dashboard)/egitim/_components/AkademiContent.tsx`, `src/app/(dashboard)/pano/_components/PanoContent.tsx`, `src/app/(dashboard)/pipeline/_components/PipelinePageContent.tsx`, `src/app/(dashboard)/istatistikler/_components/IstatistiklerContent.tsx`, `src/app/(dashboard)/platform-yonetim/_components/PlatformYonetimContent.tsx`, `src/app/(dashboard)/yazar/page.tsx`, `src/app/(dashboard)/takvim/page.tsx`, `src/app/(dashboard)/egitim/_components/TrainingCard.tsx`, `src/app/(dashboard)/egitim/_components/AddTrainingModal.tsx`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazCard.tsx`
+
 ## 2026-06-13 — Ekibim/Vaktin Varsa/Eğitim UX paketi + sayfa yardımı ✅
 
 ### Ekibim

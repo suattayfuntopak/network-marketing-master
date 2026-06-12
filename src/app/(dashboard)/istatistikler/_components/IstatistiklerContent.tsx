@@ -34,6 +34,7 @@ import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriod
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
+import { PageHelp } from '@/components/ui/PageHelp'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -243,7 +244,10 @@ export function IstatistiklerContent() {
           </div>
 
           {/* Period Filter — Bugün / Son 7 Gün / Son 30 Gün / Bu Yıl / Tüm Zamanlar */}
-          <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            <PageHelp />
+            <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
+          </div>
         </header>
 
         <div className="space-y-6">
