@@ -71,6 +71,11 @@ for (const m of haystack.matchAll(/[`'"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)\$\
 for (const m of haystack.matchAll(/['"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)['"]\s*\+/g)) {
   dynamicPrefixes.add(m[1])
 }
+// `.replace('nav.', 'navMobile.')` gibi önek-yeniden-eşleme: hedef öneki dinamik
+// say (örn. navBarLabelKey). Aksi halde navMobile.* anahtarları yanlış-pozitif olur.
+for (const m of haystack.matchAll(/\.replace\(\s*['"][a-zA-Z0-9_.]+['"]\s*,\s*['"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)['"]/g)) {
+  dynamicPrefixes.add(m[1])
+}
 
 // @i18n-keep yorum satırı desteği ile whitelisting
 const whitelist = new Set()

@@ -1,5 +1,39 @@
 # Hot Log
 
+## 2026-06-13 — Öneri Turu: i18n Ölü-Anahtar Temizliği + Baseline Script + Pipeline Skeleton ✅
+
+Önceki raporun "sıradaki tur" önerilerini hayata geçirdim (region kararı hariç — o senin infra çağrın).
+
+### 1. i18n ölü-anahtar temizliği + dedektör doğruluğu (#3)
+- **`i18n-unused.mjs`**: `.replace('nav.', 'navMobile.')` gibi önek-yeniden-eşlemeyi algılayan yeni dinamik-prefix kuralı eklendi. `navBarLabelKey` bunu yapıyordu; eksikti → `navMobile.*` anahtarları **yanlış-pozitif** raporlanıyordu. Artık doğru.
+- **`tr.ts` + `en.ts`**: 0-referans doğrulanmış 13 ölü anahtar kaldırıldı (parite korundu, blok-kapsamlı): `nav.{itirazlar,egitim,kazanimlar,sahaProvasi,groupSecondary,groupExpert,todayFocus,uyum}` + `navMobile.{todayFocus,egitim,itirazlar,sahaProvasi,uyum}` — kaldırılmış/redirect olmuş rotaların artıkları.
+- **Canlı `navMobile.{pano,pipeline,takvim,ekip,vaktinVarsa,yazar,istatistikler,platformYonetim}` KORUNDU** (`.replace` ile kullanılıyor — silmek alt navı kırardı). Dedektör çıktısı 447→426'ya düştü, navMobile yanlış-pozitifleri tamamen gitti.
+
+### 2. Perf baseline ölçüm scripti (#1)
+- **`scripts/perf-baseline.mjs`** + `npm run perf:baseline`: ana rotalar için TTFB (p50/p95) ölçer. `NMM_COOKIE` env'i ile auth'lu rotalar da ölçülür. ~320ms round-trip kökünü **sayısallaştırır** → bölge taşıma kararına veri sağlar. Sunucu yokken zarif başarısız olur.
+
+### 3. Pipeline streaming fallback (#4)
+- **`pipeline/page.tsx`**: çıplak spinner fallback'i yapılandırılmış `Skeleton` iskeletine yükseltildi (ekip sayfasıyla tutarlı, AGENTS.md "Skeleton tercih et" konvansiyonu) → geçişte "pat" hissi. (Hem pipeline hem ekip zaten `<Suspense>` ile stream ediyordu; ekip RSC prefetch + HydrationBoundary kullanıyor.)
+
+### Doğrulama
+`tsc --noEmit` temiz · `eslint --max-warnings 0` (dokunulan) temiz · `vitest translations` 14/14 · `npm run build` başarılı · `perf-baseline.mjs` syntax + smoke OK.
+
+### Dosyalar
+`scripts/i18n-unused.mjs`, `scripts/perf-baseline.mjs`, `package.json`, `src/lib/translations/tr.ts`, `src/lib/translations/en.ts`, `src/app/(dashboard)/pipeline/page.tsx`
+
+## 2026-06-12 — İstatistikler huni entegrasyonu + cache düzeltmesi ✅
+
+`StatsFieldFunnelSection` önceki turda yazılmış ama sayfaya bağlanmamıştı; cache/invalidation eski `stats-funnel-actuals` anahtarındaydı.
+
+### Yapılanlar
+- **IstatistiklerContent** — Saha huni KPI altına eklendi
+- **invalidator + QueryProvider** — `stats-funnel-bundle`; hedef değişince invalidate
+- **SSR + istemci prefetch** — varsayılan 30d + 5 dönem mount
+- **30g footer** — `hubRolling30Target` (kayan pencere, takvim ayı değil)
+
+### Dosyalar
+`IstatistiklerContent.tsx`, `StatsFieldFunnelSection.tsx`, `istatistikler/page.tsx`, `invalidator.ts`, `QueryProvider.tsx`, `HubCrownFunnelGrid.tsx`, `crown.ts`
+
 ## 2026-06-12 — Finalized Page Headers Standardization & generic toastActions ✅
 
 ### 1. Reusable toastWithAction Helper Refactoring

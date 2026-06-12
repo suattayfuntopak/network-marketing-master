@@ -14,6 +14,7 @@
     "migrate:check": "node scripts/check-migrations.mjs",
     "migrate:check:remote": "node scripts/check-migrations.mjs --remote",
     "i18n:unused": "node --experimental-strip-types scripts/i18n-unused.mjs",
+    "perf:baseline": "node scripts/perf-baseline.mjs",
     "db:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
     "db:push": "supabase db push",
     "db:smoke:focus-team": "supabase db query -f supabase/scripts/verify_focus_team_identity.sql",

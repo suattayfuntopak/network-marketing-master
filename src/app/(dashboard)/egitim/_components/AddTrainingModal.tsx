@@ -30,7 +30,6 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
   const [newBaslik, setNewBaslik] = useState('')
   const [newOzet, setNewOzet] = useState('')
   const [newKategori, setNewKategori] = useState('Zihniyet')
-  const [newTur, setNewTur] = useState('Ders Notu')
   const [newSeviye, setNewSeviye] = useState('Temel')
   const [newIcerik, setNewIcerik] = useState('')
   const [newEmoji, setNewEmoji] = useState('📖')
@@ -54,7 +53,6 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
       setNewBaslik('')
       setNewOzet('')
       setNewKategori('Zihniyet')
-      setNewTur('Ders Notu')
       setNewSeviye('Temel')
       setNewIcerik('')
       setNewEmoji('📖')
@@ -180,7 +178,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">
                     {t('trainingPage.fieldCategory')}
@@ -198,20 +196,6 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
                     <option value="Strateji & Plan">{t('trainingPage.catStrategy')}</option>
                     <option value="Yasal Uyum">{t('trainingPage.catCompliance')}</option>
                     <option value="Genel">{t('trainingPage.catGeneral') || 'Genel'}</option>
-                  </select>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] md:text-sm font-bold text-[var(--text-2)] uppercase tracking-wider">
-                    {t('trainingPage.fieldType')}
-                  </label>
-                  <select
-                    value={newTur}
-                    onChange={e => setNewTur(e.target.value)}
-                    className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
-                  >
-                    <option value="Ders Notu">{t('trainingPage.typeLectureNote')}</option>
-                    <option value="Script">Script</option>
-                    <option value="Rehber">{t('trainingPage.typeGuide')}</option>
                   </select>
                 </div>
                 <div className="space-y-1">
