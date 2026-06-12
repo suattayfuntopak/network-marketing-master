@@ -9,12 +9,13 @@
 4. **StatsFieldFunnelSection** — dehydrate cache öncelikli `placeholderData`.
 5. **AddTrainingModal** — EN modda `*En` alanlarıyla düzenleme.
 6. **i18n:unused** — `--no-warnings=MODULE_TYPELESS_PACKAGE_JSON` (099 migration önceki commit'te).
+7. **prefetchRouteMetrics** — `/itirazlar` rotası hover/focus aşamasına `prefetchAkademiProgressBundle` çağrısı dahil edilerek favori/okundu durumlarının anında yüklenmesi sağlandı.
 
 ### Doğrulama
 `tsc` · `pulsePeriodLabels` 6/6 · `i18n:unused` 1250/1250 · commit `975bc6d`
 
 ### Dosyalar
-`keys.ts`, `invalidator.ts`, `QueryProvider.tsx`, `useTeamMembers.ts`, `fetchTeamBundle.ts`, `IstatistiklerContent.tsx`, `StatsFieldFunnelSection.tsx`, `EkipPanel.tsx`, `AddTrainingModal.tsx`, `package.json`
+`keys.ts`, `invalidator.ts`, `QueryProvider.tsx`, `useTeamMembers.ts`, `fetchTeamBundle.ts`, `IstatistiklerContent.tsx`, `StatsFieldFunnelSection.tsx`, `EkipPanel.tsx`, `AddTrainingModal.tsx`, `package.json`, `prefetchRouteMetrics.ts`
 
 ## 2026-06-13 — 5 Önerinin Uygulanması: i18n Büyük Budama + Baseline Ölçüm + pulse-my ✅
 

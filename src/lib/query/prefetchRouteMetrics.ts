@@ -360,7 +360,7 @@ export function prefetchRouteMetrics(
     void prefetchAkademiProgressBundle(queryClient, workspaceId)
   }
 
-  if (href === '/egitim') {
+  if (href === '/egitim' || href === '/itirazlar') {
     void prefetchAkademiProgressBundle(queryClient, workspaceId)
   }
 
