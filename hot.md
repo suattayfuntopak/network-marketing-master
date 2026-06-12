@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-12 — Huni UX cilası: 30g etiket, internal actuals, ekip footer ✅
+
+Önceki analizin 3 küçük önerisi uygulandı.
+
+### Yapılanlar
+1. **PulsePeriodTabs** — İstatistikler'de `30d` sekmesi artık "Son 30 Gün" (`statsPage.period30d`); Saha Özetim'de "Aylık" korunuyor (`rolling30` opt).
+2. **istatistikler/actions** — `getStatsFunnelActualsAction` public export kaldırıldı; `loadStatsFunnelActuals` modül-içi helper.
+3. **MemberActivitySheet** — `30d` huni footer'ı `crown.hubRolling30Target` ile İstatistikler ile hizalı.
+
+### Doğrulama
+`hubFunnelTargets.test.ts` 7/7 · lint temiz.
+
+### Dosyalar
+`PulsePeriodTabs.tsx`, `istatistikler/actions.ts`, `MemberActivitySheet.tsx`
+
+## 2026-06-12 — Removed Dysfunctional Type Field from AddTrainingModal ✅
+
+### 1. Form Field Cleanups
+- **`AddTrainingModal.tsx`**: Removed the unused "Tür/Type" dropdown select from the custom training popup form.
+- **Aesthetics & Layout**: Changed the grid wrapper size from `md:grid-cols-3` to `md:grid-cols-2` so that the remaining fields ("Kategori/Category" and "Seviye/Level") span the row perfectly and look modern and well-proportioned.
+
+### Files
+`src/app/(dashboard)/egitim/_components/AddTrainingModal.tsx`
+
 ## 2026-06-13 — Öneri Turu: i18n Ölü-Anahtar Temizliği + Baseline Script + Pipeline Skeleton ✅
 
 Önceki raporun "sıradaki tur" önerilerini hayata geçirdim (region kararı hariç — o senin infra çağrın).
