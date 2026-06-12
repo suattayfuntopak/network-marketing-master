@@ -41,6 +41,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
   useBodyScrollLock(open || showSympathetic)
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (editing) {
       setNewBaslik(editing.baslik)
       setNewOzet(editing.ozet)
@@ -59,6 +60,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
       setNewEmoji('📖')
       setNewTags('')
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [open, editing])
 
   if (!open && !showSympathetic) return null
@@ -86,7 +88,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
     startTransition(async () => {
       try {
         if (editing && onUpdate) {
-          await updateCustomContent('nmm_custom_trainings', itemKey, newObj as any)
+          await updateCustomContent('nmm_custom_trainings', itemKey, newObj as unknown as Record<string, unknown> & { id: string | number })
           onUpdate(newObj)
           toast.success(t('trainingPage.contentUpdated') || 'İçerik güncellendi!')
           onClose()

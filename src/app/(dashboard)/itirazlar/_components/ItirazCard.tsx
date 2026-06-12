@@ -2,7 +2,6 @@
 
 import { Check, CheckCircle2, ChevronDown, Circle, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { WhatsAppShareButton } from '@/components/ui/WhatsAppShareButton'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import type { Itiraz } from '../types'
 
