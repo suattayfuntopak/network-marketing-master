@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-13 — Tab and Button Color Synchronization, dynamic() Modals & RLS Indexing ✅
+
+### Tab & Button Color Theme Alignment
+- **`akademiTabTheme.ts`**: Synchronized active tabs and add buttons for light and dark modes:
+  - İçerik Kütüphanesi (`training`): Light mode button changed to `#3730A3` to match the tab color.
+  - Video Eğitimler (`videos`): Light mode active tab color, progress bar, and metrics changed to green `#16A34A`. Dark mode add button changed to the pink/rose gradient.
+  - İtiraz Bankası (`objections`): Light mode add button, progress, and metrics changed to red/burgundy gradient/color to match the tab. Dark mode add button changed to rose `#fda4af` with text color `#3d0a1a` to match the active tab.
+- **`TrainingVideoCard.tsx` / `VideolarContent.tsx` / `VideoEditModal.tsx`**: Updated Video Eğitimler page subcomponents (play buttons, progress bars, back links, icons, and save buttons) to green `#16A34A` in light mode.
+- **`ItirazlarContent.tsx` / `EgitimContent.tsx`**: Updated add buttons to respect light/dark tab color configurations.
+
+### Performance: lazy loading of Modals (dynamic() Import)
+- **`EgitimContent.tsx` & `ItirazlarContent.tsx`**: Lazy-loaded `AddTrainingModal` and `AddObjectionModal` using Next.js `dynamic()` imports to minimize first-page client-side bundle footprint.
+
+### Database Indexing (Migration 098)
+- **`098_custom_content_indexes.sql` [NEW]**: Added composite performance indexes on `nmm_custom_trainings` and `nmm_custom_objections` for `is_approved`, `user_id` where `is_deleted = false` to optimize Supabase RLS lookups.
+
+### i18n Checker Whitelist Annotation
+- **`i18n-unused.mjs`**: Added `@i18n-keep <key>` code-comment annotation support to whitelist dynamic keys.
+
+### Dosyalar
+`src/lib/ui/akademiTabTheme.ts`, `src/app/(dashboard)/egitim/_components/TrainingVideoCard.tsx`, `src/app/(dashboard)/egitim/_components/VideolarContent.tsx`, `src/app/(dashboard)/egitim/_components/VideoEditModal.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazlarContent.tsx`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `supabase/migrations/098_custom_content_indexes.sql`, `scripts/i18n-unused.mjs`
+
 ## 2026-06-13 — TanStack Query Optimistic Updates, Soft Delete (097) & Semantic Category CSS ✅
 
 ### TanStack Query Optimistic Updates

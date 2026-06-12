@@ -202,7 +202,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
         </div>
 
         <div className="flex flex-1 flex-col p-4 pr-4">
-          <p className="pr-14 text-xs font-bold uppercase tracking-wider text-brand-readable">
+          <p className="pr-14 text-xs font-bold uppercase tracking-wider text-[#16A34A] dark:text-[var(--text-1)]">
             {lang === 'en' ? video.categoryEn : video.categoryTr}
           </p>
           <h3 className="mt-1 line-clamp-2 pr-14 text-base font-bold text-[var(--text-1)]">
@@ -217,7 +217,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             <button
               type="button"
               onClick={() => setShowEmbed(true)}
-              className={`${actionBtn} bg-brand text-white hover:opacity-95 ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`}
+              className={`${actionBtn} bg-[#16A34A] hover:bg-[#15803d] text-white ${PRO_CTA_GRADIENT_ACTIVE_DARK_SM}`}
             >
               <Play className="h-4 w-4" />
               {t('videoTraining.watchVideoBtn')}
@@ -225,7 +225,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
             {hasRelated ? (
               <Link
                 href={relatedHref}
-                className={`${actionBtn} border border-[var(--border)] text-brand-readable hover:border-brand/40 dark:hover:border-[var(--border)]`}
+                className={`${actionBtn} border border-[var(--border)] text-[#16A34A] dark:text-[var(--text-1)] hover:border-[#16A34A]/40 dark:hover:border-[var(--border)]`}
               >
                 {t('videoTraining.relatedTopic')}
               </Link>
@@ -258,7 +258,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
               </div>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-[var(--bg-subtle)]">
                 <div
-                  className={`h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : 'bg-brand'}`}
+                  className={`h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : 'bg-[#16A34A] dark:bg-brand'}`}
                   style={{ width: `${displayPct}%` }}
                 />
               </div>

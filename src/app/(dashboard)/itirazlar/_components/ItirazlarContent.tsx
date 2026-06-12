@@ -12,7 +12,10 @@ import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
 import { ItirazCard } from './ItirazCard'
-import { AddObjectionModal } from './AddObjectionModal'
+import dynamic from 'next/dynamic'
+const AddObjectionModal = dynamic(() => import('./AddObjectionModal').then(mod => mod.AddObjectionModal), {
+  ssr: false,
+})
 
 export function ItirazlarContent({
   embedded = false,
@@ -193,7 +196,7 @@ export function ItirazlarContent({
             </div>
             <button
               onClick={() => { setEditingObjection(null); setFormOpen(true) }}
-              className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] hover:bg-[#801438] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+              className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] hover:opacity-95 dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
             >
               <Plus className="h-3.5 w-3.5" />
               <span>{t('objectionsPage.addObjection')}</span>
@@ -231,7 +234,7 @@ export function ItirazlarContent({
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => { setEditingObjection(null); setFormOpen(true) }}
-            className="flex items-center gap-1.5 rounded-xl bg-[#9B1D47] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#801438] active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-[#B91C5C] to-[#9B1D47] hover:opacity-95 dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{t('objectionsPage.addObjection')}</span>

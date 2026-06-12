@@ -13,7 +13,10 @@ import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/
 import { PAGE_SIZE } from '../constants'
 import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
-import { AddTrainingModal } from './AddTrainingModal'
+import dynamic from 'next/dynamic'
+const AddTrainingModal = dynamic(() => import('./AddTrainingModal').then(mod => mod.AddTrainingModal), {
+  ssr: false,
+})
 
 type SeviyeKey = 'all' | 'beginner' | 'intermediate' | 'advanced'
 
@@ -273,7 +276,7 @@ export function EgitimContent({
               </Link>
               <button
                 onClick={() => setFormOpen(true)}
-                className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] dark:bg-[#2962FF] dark:hover:bg-[#1e4ed8] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
               >
                 <Plus className="h-3.5 w-3.5" />
                 <span>{t('trainingPage.addContent')}</span>
@@ -328,7 +331,7 @@ export function EgitimContent({
         <div className="mb-4 flex justify-end">
           <button
             onClick={() => setFormOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-[#28227d] active:scale-95"
+            className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] dark:bg-[#2962FF] dark:hover:bg-[#1e4ed8] px-3.5 py-2 text-sm font-bold text-white shadow-sm transition active:scale-95"
           >
             <Plus className="h-3.5 w-3.5" />
             <span>{t('trainingPage.addContent')}</span>

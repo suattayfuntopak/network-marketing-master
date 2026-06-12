@@ -71,12 +71,19 @@ for (const m of haystack.matchAll(/[`'"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)\$\
 for (const m of haystack.matchAll(/['"]([a-zA-Z0-9_]+(?:\.[a-zA-Z0-9_]+)*\.)['"]\s*\+/g)) {
   dynamicPrefixes.add(m[1])
 }
+
+// @i18n-keep yorum satırı desteği ile whitelisting
+const whitelist = new Set()
+for (const m of haystack.matchAll(/@i18n-keep\s+([a-zA-Z0-9_.-]+)/g)) {
+  whitelist.add(m[1])
+}
+
 const usedByDynamic = (k) => {
   for (const p of dynamicPrefixes) if (k.startsWith(p)) return true
   return false
 }
 
-const unused = allKeys.filter(k => !haystack.includes(k) && !usedByDynamic(k)).sort()
+const unused = allKeys.filter(k => !haystack.includes(k) && !usedByDynamic(k) && !whitelist.has(k)).sort()
 
 if (unused.length === 0) {
   console.log(`✅ i18n: ${allKeys.length} anahtarın hepsi kaynakta referanslı.`)
