@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-12 — Genel öneri turu 5: queryKeyRoots, pipeline_id, legacy fix ✅
+
+### Yapılanlar (hub mobil ipucu yok — önerilmez)
+1. **queryKeyRoots** — `invalidator.ts` + `QueryProvider` tek kaynak; `teamDisabled` / `memberGoalsMapDisabled` sentinel.
+2. **TeamMember.pipeline_id** — bundle → istatistikler; `getMemberHref` `/pipeline/[id]` (isim eşleşmesi kaldırıldı).
+3. **fetchTeamBundle legacy TDZ** — `pipelineLinks` statsMembers öncesi yükleniyor + `pipeline_id` alanı.
+4. **StatsFieldFunnelSection** — dehydrate cache öncelikli `placeholderData`.
+5. **AddTrainingModal** — EN modda `*En` alanlarıyla düzenleme.
+6. **i18n:unused** — `--no-warnings=MODULE_TYPELESS_PACKAGE_JSON` (099 migration önceki commit'te).
+
+### Doğrulama
+`tsc` · `pulsePeriodLabels` 6/6 · `i18n:unused` 1250/1250 · commit `975bc6d`
+
+### Dosyalar
+`keys.ts`, `invalidator.ts`, `QueryProvider.tsx`, `useTeamMembers.ts`, `fetchTeamBundle.ts`, `IstatistiklerContent.tsx`, `StatsFieldFunnelSection.tsx`, `EkipPanel.tsx`, `AddTrainingModal.tsx`, `package.json`
+
 ## 2026-06-13 — 5 Önerinin Uygulanması: i18n Büyük Budama + Baseline Ölçüm + pulse-my ✅
 
 Önceki raporun 5 önerisinin hepsi onaylandı, hayata geçirildi. (Bu oturum paralel ajanlarla aynı dosyalarda çakıştı; değişiklikler oto-commit'lere karıştı, bu girdi NET olarak benim işimi belgeler.)
