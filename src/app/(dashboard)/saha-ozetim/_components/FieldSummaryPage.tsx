@@ -31,10 +31,14 @@ import { queryKeys } from '@/lib/query/keys'
 import {
   calendarDayRange,
   rollingWeekRange,
+  monthRange,
   yearRange,
 } from '@/lib/utils/hubPeriodRange'
 import { HubPeriodProvider, useHubPeriodNavigation } from '@/components/hub/useHubPeriodNavigation'
 import { writeStoredHubActiveTab } from '@/lib/domain/hubPeriodPrefetch'
+import { useUserGoal } from '@/hooks/useUserGoal'
+import { HubGoalProgressBanner } from '@/components/hub/HubGoalProgressBanner'
+import { currentMonthIndex } from '@/lib/domain/roadmap'
 
 const EMPTY_METRICS: HubSelfFieldMetrics = {
   calls: 0,
@@ -70,6 +74,8 @@ function FieldSummaryInner() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const { tab, offset, setTab, goToCurrentPeriod } = useHubPeriodNavigation()
+  const { goal, roadmap, progress } = useUserGoal()
+  const teamSize = progress?.teamSize ?? 0
 
   useEffect(() => {
     writeStoredHubActiveTab(tab)
@@ -190,6 +196,15 @@ function FieldSummaryInner() {
 
     if (tab === 'monthly') {
       const loading = monthlyLoading && !monthlySelf
+
+      let monthlyTargetTeamSize = 0
+      if (goal && roadmap.length > 0) {
+        const startAt = new Date(goal.startAt)
+        const monthIdx = currentMonthIndex(startAt, goal.targetMonths, monthRange(offset).startDate)
+        const stage = roadmap.find(s => s.month === monthIdx) ?? roadmap[roadmap.length - 1]
+        monthlyTargetTeamSize = stage ? stage.teamSize : goal.targetPeople
+      }
+
       return (
         <>
           <HubPeriodNavigator mode="month" accentClass={ACCENT.monthly} />
@@ -198,6 +213,14 @@ function FieldSummaryInner() {
             monthPct={monthlySelf?.monthPct ?? 0}
             loading={loading}
           />
+          {goal && !loading && (
+            <HubGoalProgressBanner
+              current={teamSize}
+              target={monthlyTargetTeamSize}
+              overall={goal.targetPeople}
+              period="monthly"
+            />
+          )}
           <HubCrownFunnelGrid
             actuals={monthlySelf?.monthlyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
             targets={monthlySelf?.monthlyTargets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
@@ -218,6 +241,28 @@ function FieldSummaryInner() {
 
     if (tab === 'yearly') {
       const loading = yearlyLoading && !yearlySelf
+
+      let yearlyTargetTeamSize = 0
+      const activeYear = yearlySelf?.year ?? yearRangeData.year
+      if (goal && roadmap.length > 0) {
+        const startAt = new Date(goal.startAt)
+        const stagesInYear = roadmap.filter(stage => {
+          const calMonth = new Date(startAt.getFullYear(), startAt.getMonth() + (stage.month - 1), 1)
+          return calMonth.getFullYear() === activeYear
+        })
+        if (stagesInYear.length > 0) {
+          const lastStageInYear = stagesInYear.reduce((prev, curr) => curr.month > prev.month ? curr : prev)
+          yearlyTargetTeamSize = lastStageInYear.teamSize
+        } else {
+          const firstStageMonth = new Date(startAt.getFullYear(), startAt.getMonth(), 1)
+          if (activeYear < firstStageMonth.getFullYear()) {
+            yearlyTargetTeamSize = roadmap[0]?.teamSize ?? 0
+          } else {
+            yearlyTargetTeamSize = goal.targetPeople
+          }
+        }
+      }
+
       return (
         <>
           <HubPeriodNavigator mode="year" accentClass={ACCENT.yearly} />
@@ -230,6 +275,14 @@ function FieldSummaryInner() {
             isCurrentYear={yearlySelf?.isCurrentYear ?? offset === 0}
             loading={loading}
           />
+          {goal && !loading && (
+            <HubGoalProgressBanner
+              current={teamSize}
+              target={yearlyTargetTeamSize}
+              overall={goal.targetPeople}
+              period="yearly"
+            />
+          )}
           <HubCrownFunnelGrid
             actuals={yearlySelf?.yearlyActuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
             targets={yearlySelf?.yearlyTargets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}

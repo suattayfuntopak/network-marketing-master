@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-12 — Saha Özetim Ekip Büyüklüğü İlerlemesi Banner Entegrasyonu ✅
+
+### Yapılanlar
+1. **HubGoalProgressBanner.tsx** — Dönemlik kümülatif ekip büyüklüğü hedefini gösteren ilerleme çubuğu ve glassmorphic tasarıma sahip yeni React bileşeni oluşturuldu.
+2. **FieldSummaryPage.tsx** — `useUserGoal` hook'u entegre edilerek seçili sekme (Aylık/Yıllık) ve offset değerlerine göre yol haritasındaki kümülatif ekip hedefleri hesaplandı ve banner olarak yerleştirildi.
+3. **i18n** — `tr.ts` ve `en.ts` dosyalarına `hubGoalProgressTitle`, `hubGoalProgressSubtitleYearly` ve `hubGoalProgressSubtitleMonthly` çeviri anahtarları eklendi.
+
+### Doğrulama
+`tsc --noEmit` temiz · `npm run build` başarılı.
+
+### Dosyalar
+`src/components/hub/HubGoalProgressBanner.tsx`, `src/app/(dashboard)/saha-ozetim/_components/FieldSummaryPage.tsx`, `src/lib/translations/sections/crown.ts`
+
 ## 2026-06-12 — Genel öneri turu 5: queryKeyRoots, pipeline_id, legacy fix ✅
 
 ### Yapılanlar (hub mobil ipucu yok — önerilmez)
