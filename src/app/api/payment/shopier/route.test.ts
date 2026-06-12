@@ -149,6 +149,26 @@ describe('POST /api/payment/shopier', () => {
     expect(h.wsUpdates.length).toBe(0) // lisans İKİNCİ kez uzatılmadı
   })
 
+  // ── fail-closed: imza doğrulanamıyorsa lisans verme ──
+  it('fails closed (500) on order.created when no secret and verify is on', async () => {
+    delete process.env.SHOPIER_WEBHOOK_SECRET
+    process.env.SHOPIER_WEBHOOK_VERIFY = 'true' // bypass kapalı → secret zorunlu
+    const body = { id: '12345678', note: `${WS}_basic_monthly_1700`, lineItems: [{ productId: 'PROD_B_M' }] }
+    const res = await POST(jsonRequest(body) as unknown as NextRequest)
+    expect(res.status).toBe(500)
+    expect(h.wsUpdates.length).toBe(0) // imzasız lisans verilmedi
+  })
+
+  it('rejects the verify=false bypass in production', async () => {
+    process.env.SHOPIER_WEBHOOK_VERIFY = 'false'
+    process.env.VERCEL_ENV = 'production'
+    const body = { id: '12345678', note: `${WS}_basic_monthly_1700`, lineItems: [{ productId: 'PROD_B_M' }] }
+    const res = await POST(jsonRequest(body) as unknown as NextRequest)
+    expect(res.status).toBe(500)
+    expect(h.wsUpdates.length).toBe(0)
+    delete process.env.VERCEL_ENV
+  })
+
   // ── refund.updated → lisansı düşür ──
   it('revokes license on refund.updated matching a processed order', async () => {
     h.ordersForRefund = [{ order_id: '87654321', workspace_id: WS }]
