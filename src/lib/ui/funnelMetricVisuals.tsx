@@ -1,4 +1,4 @@
-import { Handshake, Phone, Presentation, UserPlus, type LucideIcon } from 'lucide-react'
+import { Phone, Presentation, UserPlus, Users, type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 
@@ -9,17 +9,17 @@ export const FUNNEL_METRIC_VISUAL: Record<
   { Icon: LucideIcon; color: string; barColor: string }
 > = {
   arama: { Icon: Phone, color: '#534AB7', barColor: '#534AB7' },
-  tanisma: { Icon: Handshake, color: '#0F6E56', barColor: '#0F6E56' },
+  tanisma: { Icon: UserPlus, color: '#059669', barColor: '#059669' },
   sunum: { Icon: Presentation, color: '#854F0B', barColor: '#854F0B' },
-  yeniUye: { Icon: UserPlus, color: '#72243E', barColor: '#72243E' },
+  yeniUye: { Icon: Users, color: '#72243E', barColor: '#72243E' },
 }
 
 export const FUNNEL_METRIC_ORDER: FunnelMetricKey[] = ['arama', 'tanisma', 'sunum', 'yeniUye']
 
 /** Hedefim sayfası — dark temada da okunur pastel/vivid ikon renkleri */
 export const FUNNEL_METRIC_VIVID_CLASS: Record<FunnelMetricKey, string> = {
-  arama: 'text-emerald-600 dark:text-emerald-400',
-  tanisma: 'text-sky-500 dark:text-sky-300',
+  arama: 'text-indigo-600 dark:text-indigo-400',
+  tanisma: 'text-emerald-600 dark:text-emerald-400',
   sunum: 'text-violet-500 dark:text-violet-300',
   yeniUye: 'text-amber-500 dark:text-amber-400',
 }

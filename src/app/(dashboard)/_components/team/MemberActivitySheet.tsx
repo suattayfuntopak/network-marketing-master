@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
-  X, Phone, Bot, Pencil, ArrowRight, UserPlus, CalendarDays,
-  Loader2, Target, Trash2, Activity, Users,
+  X, Phone, Bot, Pencil, ArrowRight, CalendarDays,
+  Loader2, Target, Trash2, Activity,
 } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -52,7 +52,6 @@ interface Props {
   memberIsLeader?: boolean
   /** Boru hattı aşama sayıları (Takipte / Katıldı) — gömülü aktivite sekmesi */
   pipelineTakipCount?: number
-  pipelineKatildiCount?: number
   onClose?: () => void
 }
 
@@ -75,7 +74,6 @@ export function MemberActivitySheet({
   embedded = false,
   memberIsLeader = false,
   pipelineTakipCount = 0,
-  pipelineKatildiCount = 0,
   onClose,
 }: Props) {
   const { t } = useTranslation()
@@ -177,11 +175,9 @@ export function MemberActivitySheet({
     { icon: Pencil, label: t('team.activityNotes'), value: data?.notes ?? 0, color: 'text-[var(--text-2)]' },
     { icon: ArrowRight, label: t('team.activityStageChanges'), value: data?.stageChanges ?? 0, color: 'text-amber-600' },
     { icon: Bot, label: t('team.activityAi'), value: data?.aiActions ?? 0, color: 'text-indigo-600' },
-    { icon: UserPlus, label: metricLabels.newLeads, value: data?.newCandidates ?? 0, color: 'text-emerald-600' },
     ...(embedded
       ? [
           { icon: ArrowRight, label: t('stages.takip'), value: pipelineTakipCount, color: 'text-amber-600' },
-          { icon: Users, label: t('stages.katildi'), value: pipelineKatildiCount, color: 'text-[#854F0B] dark:text-[#fcd34d]' },
         ]
       : []),
     { icon: CalendarDays, label: t('team.activityActiveDays'), value: data?.activeDays ?? 0, color: 'text-[var(--text-2)]' },

@@ -376,7 +376,6 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       teamPulseUnlocked={hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)}
                       memberIsLeader={m.role === 'leader'}
                       pipelineTakipCount={m.takip_count ?? 0}
-                      pipelineKatildiCount={m.katildi_count ?? 0}
                     />
                   </div>
                 </div>

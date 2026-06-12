@@ -343,7 +343,6 @@ export function TeamMemberCard({
                   teamPulseUnlocked={teamPulseUnlocked}
                   memberIsLeader={m.role === 'leader'}
                   pipelineTakipCount={m.takip_count ?? 0}
-                  pipelineKatildiCount={m.katildi_count ?? 0}
                 />
               ) : null}
             </div>

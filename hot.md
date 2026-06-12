@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-13 — Funnel Icon Harmonization, Member Activity Cleanup & Academy Color Sync ✅
+
+### Dashboard & Sheet Funnel Icon Harmonization
+- **`funnelMetricVisuals.tsx`**: Swapped the icons for `tanisma` (Kaç Kişi Ekledim?) and `yeniUye` (Ekibime Kaç Kişi Katıldı?):
+  - `tanisma` now uses `UserPlus` and has its base color set to green `#059669` and its vivid class mapped to `text-emerald-600 dark:text-emerald-400`.
+  - `yeniUye` now uses `Users` (the "Katıldı" icon) and retains its theme colors (`#72243E` / `text-amber-500 dark:text-amber-400`).
+  - `arama` was updated to `text-indigo-600 dark:text-indigo-400` under `FUNNEL_METRIC_VIVID_CLASS` to match its visual color and avoid duplicating colors.
+
+### Member Activity Sheet Cleanup
+- **`MemberActivitySheet.tsx`**: Removed the redundant "KAÇ KİŞİ EKLEDİ?" and "KATILDI" metric grid boxes since they are already displayed in the main 4 funnel boxes at the top of the sheet. Removed the unused `pipelineKatildiCount` parameter and imports (`UserPlus`, `Users`).
+- **`TeamMemberCard.tsx` & `MemberDetailPage.tsx`**: Removed passing the now-unused `pipelineKatildiCount` prop to `<MemberActivitySheet />`.
+
+### Academy Tab & Add Button Color Synchronization
+- **`akademiTabTheme.ts`**: Synchronized colors for the `videos` tab in both light and dark modes:
+  - Changed the light mode "Video Ekle" button (`addButtonClass`) to match the tab color green `#16A34A` (hover `#15803d`).
+  - Updated the dark mode sub-navigation tabs (`navButtonClass`), text class, and progress bar class to use rose/pink styling (`rose-500` / `rose-400`) instead of orange.
+
+### Dosyalar
+`src/lib/ui/funnelMetricVisuals.tsx`, `src/app/(dashboard)/_components/team/MemberActivitySheet.tsx`, `src/app/(dashboard)/ekip/_components/TeamMemberCard.tsx`, `src/app/(dashboard)/ekip/[userId]/_components/MemberDetailPage.tsx`, `src/lib/ui/akademiTabTheme.ts`
+
 ## 2026-06-13 — Tab and Button Color Synchronization, dynamic() Modals & RLS Indexing ✅
 
 ### Tab & Button Color Theme Alignment
