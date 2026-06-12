@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-13 — /cso güvenlik denetimi: 3 bulgu kapandı ✅
+
+gstack `/cso` (read-only güvenlik denetimi) tüm uygulamada çalıştırıldı: gizli anahtar arkeolojisi, tedarik zinciri, CI/CD, webhook, RLS, admin-client server action'ları, OWASP, AI çıktısı. **Tek HIGH + iki MEDIUM bulgu; hepsi düzeltildi.**
+
+### 🔴 HIGH — Shopier `order.created` webhook fail-open (`src/app/api/payment/shopier/route.ts`)
+- **Kök neden:** İmza kapısı `if (secret && VERIFY !== 'false')` idi. `SHOPIER_WEBHOOK_SECRET` tanımsızsa blok atlanıyor, fail-closed dal yalnız refund'u kapsıyordu → order.created **imzasız** işlenip sahte JSON ile bedava lisans verilebilirdi. Legacy `api_pay4` yolu fail-closed iken asimetri.
+- **Çözüm:** Non-refund event'lerde secret yoksa **500 (fail-closed)**. `SHOPIER_WEBHOOK_VERIFY=false` artık yalnız prod-dışı kaçış kapısı — `VERCEL_ENV`/`NODE_ENV` production'da zorla 500. İade davranışı (`no-secret → refunded:false`) korundu. **2 regresyon testi** eklendi.
+
+### 🟡 MEDIUM — Şifre sıfırlama Host-header zehirlemesi (`src/app/(auth)/sifre-sifirla/actions.ts`)
+- Recovery linkinin `redirectTo` origin'i `Host`/`Origin` başlığından türetiliyordu → saldırgan Host'u zehirleyip linki kendi alanına çekebilirdi (token hırsızlığı). Origin artık güvenilir sabit **`NMM_APP_URL`'e pinli**; yalnız `localhost`/`127.0.0.1`'de host'tan türetiliyor. (Bu, geçmişteki "dinamik origin fallback"in yerini güvenli biçimde alır — origin header'a hiç bağlı kalmadığımız için "origin eksik" senaryosu da çözülür.)
+
+### 🟡 MEDIUM — CI üçüncü-taraf action SHA-pin (`migrate-check.yml` ×3, `db-push.yml` ×1)
+- `supabase/setup-cli@v1` (taşınabilir tag) → `@ab058987…e30bd1 # v1.7.1` (sabit SHA). Tag yeniden işaretlenirse zararlı kod riski kapandı. First-party `actions/*` pinleri opsiyonel hardening olarak bırakıldı.
+
+### Temiz çıkanlar
+Git history'de sızdırılmış anahtar yok, `.env` track edilmemiş, RLS doğru (`is_approved OR user_id=auth.uid()`), admin-client yolları kimliği daima session'dan türetiyor ya da `assertSuperAdmin`, `eval`/`dangerouslySetInnerHTML` yok, SSRF yok, cron'lar `cronAuthError` korumalı.
+
+### Doğrulama
+`vitest` shopier 8/8 · `tsc` temiz · `eslint` temiz · `i18n:unused` 1250/1250 · commit'ler `6ee7be9`, `c6c4a95` · rapor `.gstack/security-reports/2026-06-13-015959.json`
+
 ## 2026-06-12 — Genel öneri turu 5: queryKeyRoots, pipeline_id, legacy fix ✅
 
 ### Yapılanlar (hub mobil ipucu yok — önerilmez)
