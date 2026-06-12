@@ -101,14 +101,14 @@ export function MemberActivitySheet({
   const { data: goalMap, refetch: refetchGoal } = useQuery({
     queryKey: ['member-goal', workspaceId, member.userId],
     queryFn: () => getMemberGoalsMapAction(workspaceId, [member.userId]),
-    staleTime: 30_000,
+    staleTime: QUERY_STALE.memberGoal,
     enabled: !embedded && canEditGoal,
   })
 
   const { data: memberSelfGoal } = useQuery({
     queryKey: ['member-user-goal', member.userId],
     queryFn: () => fetchMemberUserGoalAction(member.userId),
-    staleTime: 30_000,
+    staleTime: QUERY_STALE.memberGoal,
     enabled: embedded,
   })
 

@@ -14,4 +14,6 @@ export const QUERY_STALE = {
   memberActivity: 15_000,
   /** İstatistikler saha huni bundle */
   funnelBundle: 30_000,
+  /** Üye hedefi sorguları (MemberActivitySheet) */
+  memberGoal: 30_000,
 } as const

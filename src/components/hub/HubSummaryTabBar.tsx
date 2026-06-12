@@ -10,6 +10,7 @@ import {
 } from '@/lib/domain/hubPeriodPrefetch'
 import {
   HUB_PERIOD_TAB_LABEL_KEYS,
+  hubPeriodTabHint,
   hubPeriodTabLabel,
   hubTabShortLabel,
 } from '@/lib/domain/pulsePeriodLabels'
@@ -55,6 +56,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
             aria-selected={isActive}
             data-testid={`hub-summary-tab-${tab}`}
             onClick={() => onChange(tab)}
+            title={hubPeriodTabHint(t, tab)}
             className={clsx(
               'min-w-0 flex-1 shrink-0 rounded-lg px-1.5 py-2 text-center font-bold transition sm:px-3',
               tab === 'all' ? 'text-base sm:text-sm' : 'text-xs',

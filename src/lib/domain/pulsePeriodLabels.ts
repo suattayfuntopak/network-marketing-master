@@ -52,6 +52,12 @@ export function hubPeriodTabLabel(t: (key: string) => string, tab: HubPeriodTab)
   return t(HUB_PERIOD_TAB_LABEL_KEYS[tab])
 }
 
+/** Masaüstü sekme ipucu — Aylık takvim ayı vs İstatistikler kayan 30 gün ayrımı. */
+export function hubPeriodTabHint(t: (key: string) => string, tab: HubPeriodTab): string | undefined {
+  if (tab === 'monthly') return t('dashboard.summaryTabMonthlyHint')
+  return undefined
+}
+
 export function sheetPeriodToHubTab(period: SheetActivityPeriod): HubPeriodTab {
   return pulsePeriodToHubGridPeriod(period)
 }

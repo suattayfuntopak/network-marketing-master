@@ -38,7 +38,6 @@ export const statsSection = {
       velocityEmpty: 'Kayıt trendi verisi yok',
 
       teamTitle: 'Ekip Performans İzleme Tablosu',
-      teamSubtitle: 'NMM uygulama ortakları (💎) ve katıldı aşamasındaki saha distribütörlerini (🤝) birlikte gösteren huni dağılım tablosu.',
       teamEmpty: 'Henüz ekibe kayıtlı üye bulunmamaktadır.',
       teamLockedTitle: 'Plus veya Pro plan gerekli',
       teamLockedDesc: 'Ekip üyelerinizin aday hunisi, içerik, video ve Doğru Başlangıç gelişimini “Ekip Performans İzleme Tablosu”nda görmek için planınızı yükseltin.',
@@ -63,7 +62,6 @@ export const statsSection = {
       typeExternal: 'Dış Kayıt',
 
       aiAdminTitle: 'Ekip & Dış Kaynak Yapay Zeka Kullanım & Limit Kontrol Tablosu',
-      unlimited: 'Sınırsız',
       licensePlanSuperAdmin: 'PRO - SINIRSIZ',
 
       colLicense: 'Lisans',
@@ -91,8 +89,6 @@ export const statsSection = {
       kpiTotalCalls: 'Toplam arama',
       kpiTotalWhatsApp: 'Toplam WhatsApp',
       activeDaysSuffix: 'g',
-      teamSubtitleVideoHint:
-        'Huni Sonuçları — NMM ortakları ve saha distribütörlerinin huni dağılımı; video sütununda tamamlanan içerik oranı gösterilir.',
     },
   },
   en: {
@@ -134,7 +130,6 @@ export const statsSection = {
       velocityEmpty: 'No recent trend data',
 
       teamTitle: 'Team Performance Tracking Table',
-      teamSubtitle: 'Detailed excel-style summary including NMM app partners (💎) and field distributors at katildi stage (🤝).',
       teamEmpty: 'No team members registered',
       teamLockedTitle: 'Plus or Pro plan required',
       teamLockedDesc: 'Upgrade your plan to see your team members’ candidate pipeline, content, video and Onboarding progress in the “Team Performance Tracking Table”.',
@@ -159,7 +154,6 @@ export const statsSection = {
       typeExternal: 'External',
 
       aiAdminTitle: 'Team & External AI Usage & Quota Control Table',
-      unlimited: 'Unlimited',
       licensePlanSuperAdmin: 'PRO - UNLIMITED',
 
       colLicense: 'License',
@@ -187,8 +181,6 @@ export const statsSection = {
       kpiTotalCalls: 'Total calls',
       kpiTotalWhatsApp: 'Total WhatsApp',
       activeDaysSuffix: 'd',
-      teamSubtitleVideoHint:
-        'Funnel Results — pipeline breakdown for NMM partners and field distributors; video column shows completed content ratio.',
     },
   },
 } as const

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import {
+  hubPeriodTabHint,
   hubPeriodTabLabel,
   hubTabShortLabel,
   pulsePeriodLabel,
@@ -36,5 +37,10 @@ describe('pulsePeriodLabels', () => {
     expect(hubTabShortLabel('daily')).toBe('1')
     expect(hubTabShortLabel('monthly')).toBe('30')
     expect(hubTabShortLabel('all')).toBe('∞')
+  })
+
+  it('hubPeriodTabHint explains monthly calendar month only', () => {
+    expect(hubPeriodTabHint(t, 'monthly')).toBe('dashboard.summaryTabMonthlyHint')
+    expect(hubPeriodTabHint(t, 'weekly')).toBeUndefined()
   })
 })

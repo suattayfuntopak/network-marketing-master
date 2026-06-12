@@ -9,6 +9,10 @@
  *
  * Çalıştır: `npm run i18n:unused`  (yalnız rapor; CI'yi kırmaz.)
  * Anahtarları okumak için TS'i Node ile sıyırarak yükler (Node 22+).
+ *
+ * Doğrulanmış statik namespace'ler (dinamik `t('ns.' + …)` yok — grep ile audit):
+ * pulse.*, statsPage.teamSubtitle*, crown.detail|entries|lastEntry|loading|totalTeam
+ * Silmeden önce her anahtar için `t('anahtar')` araması yapın; @i18n-keep ile whitelist mümkün.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, extname } from 'node:path'

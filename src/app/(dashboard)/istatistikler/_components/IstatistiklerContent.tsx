@@ -28,8 +28,6 @@ import { TeamPerformanceTable } from './TeamPerformanceTable'
 import { MyAIUsageQuotaCard } from './MyAIUsageQuotaCard'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
-import { mapStatsPeriodToSheet } from '@/lib/domain/pulse'
-import { MemberActivitySheet, type MemberActivityTarget } from '@/app/(dashboard)/_components/team/MemberActivitySheet'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import type { MemberRow } from '@/lib/team/types'
@@ -68,11 +66,8 @@ export function IstatistiklerContent() {
   const { dailyLimit } = teamLimits
   const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
-  const canEditMemberGoal = ws?.role === 'leader' && !teamStatsLocked
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')
-  const [activityMember, setActivityMember] = useState<MemberActivityTarget | null>(null)
-
 
   const licenseLabel = useCallback(
     (licenseType: string) => {
@@ -234,6 +229,7 @@ export function IstatistiklerContent() {
         {/* Header */}
         <DashboardPageHeader
           title={t('statsPage.title')}
+          subtitle={t('statsPage.subtitle')}
           icon={<BarChart3 className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2} />}
           iconContainerClassName="bg-[#EEF2FF] dark:bg-[#1e1b4b]"
           actions={<PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />}
@@ -279,17 +275,6 @@ export function IstatistiklerContent() {
 
         </div>
       </div>
-
-      {activityMember && ws && (
-        <MemberActivitySheet
-          workspaceId={ws.workspaceId}
-          member={activityMember}
-          initialPeriod={mapStatsPeriodToSheet(period)}
-          teamPulseUnlocked={teamPulseUnlocked}
-          canEditGoal={canEditMemberGoal}
-          onClose={() => setActivityMember(null)}
-        />
-      )}
     </main>
   )
 }
