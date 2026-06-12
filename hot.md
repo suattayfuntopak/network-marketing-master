@@ -1,5 +1,49 @@
 # Hot Log
 
+## 2026-06-12 — Genel Öneriler: GPU Animasyon, Çeviri Sync & Arama İndeksleri ✅
+
+### Yapılanlar (4/4)
+1. **deleteWithUndo.tsx** — Geri-al (undo) dairesel sayaç animasyonu GPU optimizasyonu (`will-change` + `translateZ(0)`).
+2. **AddTrainingModal.tsx** — Dil değişiminde modal içi özel içerik alanlarının (`useState`) otomatik senkronizasyonu (`useEffect` lang bağımlılığı).
+3. **099_custom_content_search_indexes.sql** — Özel eğitim ve itirazlar için composite (approved/user_id + created_at) ve JSONB GIN (`data`) arama indeksleri.
+4. **invalidator.ts / VideolarContent.tsx** — Kullanılmayan `pulse-my` önbellek invalidation kodlarının temizliği.
+
+### Doğrulama
+`npm run lint` başarılı · `npm run test` 252/252 yeşil · `npm run migrate:check` yeşil.
+
+### Dosyalar
+`src/lib/ui/deleteWithUndo.tsx`, `src/app/(dashboard)/egitim/_components/AddTrainingModal.tsx`, `src/lib/query/invalidator.ts`, `src/app/(dashboard)/egitim/_components/VideolarContent.tsx`, `supabase/migrations/099_custom_content_search_indexes.sql`
+
+
+## 2026-06-12 — Genel öneri turu 4: queryKeys, SSR huni, i18n sıfır borç ✅
+
+### Yapılanlar (4/5 — #4 mobil hub ipucu atlandı)
+1. **queryKeys** — `statsFunnelBundle`, `memberActivity`, `memberGoal`, `memberUserGoal`, `memberGoalsMap`; tüketiciler merkezi anahtar.
+2. **İstatistikler SSR** — `ensureQueryData` ile huni bundle blocking hydrate (`30d`).
+3. **Ekip tablosu navigasyon** — pipeline eşleşmezse `/ekip/{userId}` fallback.
+4. **i18n temizlik** — `aiWriter`, `objections`, `coachUi` ölü anahtarlar; `training` `waShareTitle`/`categories`; `common`/`pipeline` ölüler. **1250/1250 referanslı.**
+
+### Doğrulama
+`pulsePeriodLabels.test.ts` 6/6 · `i18n:unused` ✅ sıfır aday.
+
+### Dosyalar
+`keys.ts`, `prefetchMemberActivity.ts`, `invalidator.ts`, `istatistikler/page.tsx`, `StatsFieldFunnelSection.tsx`, `IstatistiklerContent.tsx`, `MemberActivitySheet.tsx`, `EkipPanel.tsx`, `VideolarContent.tsx`, `tr.ts`, `en.ts`, `coach.ts`, `training.ts`, `i18n-unused.mjs`
+
+## 2026-06-12 — Genel öneri turu 3: i18n, ölü kod, hub ipucu ✅
+
+### Yapılanlar (5/5)
+1. **pulse.ts** — Yalnızca kaynakta referanslı 22 anahtar kaldı (~30 ölü silindi).
+2. **IstatistiklerContent** — Kullanılmayan `MemberActivitySheet` + state kaldırıldı; `statsPage.subtitle` header'a bağlandı.
+3. **QUERY_STALE.memberGoal** — MemberActivitySheet hedef sorguları merkezi staleTime.
+4. **Hub Aylık ipucu** — `hubPeriodTabHint` + `dashboard.summaryTabMonthlyHint` (masaüstü `title`).
+5. **i18n-unused.mjs** — Statik namespace audit notu; stats/crown/team ölü anahtarları temizlendi.
+
+### Doğrulama
+`pulsePeriodLabels.test.ts` 6/6 · `i18n:unused` ~85 → 40 aday.
+
+### Dosyalar
+`pulse.ts`, `stats.ts`, `crown.ts`, `tr.ts`, `en.ts`, `IstatistiklerContent.tsx`, `MemberActivitySheet.tsx`, `staleTimes.ts`, `pulsePeriodLabels.ts`, `HubSummaryTabBar.tsx`, `i18n-unused.mjs`
+
 ## 2026-06-12 — Project-Wide Optimization and Visual Standardizations ✅
 
 ### 1. Semantic Color Mappings in styling
