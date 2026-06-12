@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-13 — Vaktin Varsa mobil başlık + silme akışı incelemesi ✅
+
+### Vaktin Varsa mobil sekme başlığı
+- **`AkademiContent.tsx`:** Sayfa başlığı (h1) mobilde artık aktif sekmenin KISA etiketini gösteriyor: "Vaktin Varsa / Kütüphane", "Vaktin Varsa / Videolar", "Vaktin Varsa / İtirazlar". Masaüstü tam etiketle (İçerik Kütüphanesi / Video Eğitimler / İtiraz Bankası) aynen korundu — yalnız `sm:hidden` / `hidden sm:inline` span'leri eklendi.
+
+### Silme akışı incelemesi (KOD DEĞİŞMEDİ — karar bekliyor)
+- Kullanıcının "dış kayıt → Ekibime Bağla → pipeline'dan sil" senaryosu incelendi. Bulgular ve öneri sonuç raporunda. Özet: `claimIndependentSignupToTeamAction` iki ayrı temsil üretiyor (workspace.parent_id downline + pipeline candidate/link); pipeline silme yalnız candidate'i siler (link CASCADE ile düşer) ama parent_id'ye dokunmaz → kişi Ekibim/admin/istatistiklerde kalır. Çözüm önerisi: ayrı "Ekipten Çıkar" (parent_id=null) aksiyonu. Karar kullanıcıda.
+
+### Dosyalar
+`src/app/(dashboard)/egitim/_components/AkademiContent.tsx`
+
 ## 2026-06-12 — Arka plan iyileştirmeleri (gerçek süre + trend refactor + temizlik) ✅
 
 UI/buton eklemeden, yalnız arka planı güçlendiren öneriler uygulandı.

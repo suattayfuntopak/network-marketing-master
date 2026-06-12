@@ -80,10 +80,19 @@ export function AkademiContent() {
               <BookOpen className="h-5 w-5" strokeWidth={1.75} />
             </div>
             <h1 className="text-2xl font-bold text-[var(--text-1)]">
-              {formatTabbedPageTitle(
-                t('akademi.title'),
-                t(AKADEMI_TABS.find(row => row.key === tab)?.labelKey ?? 'akademi.tabContentBank'),
-              )}
+              {/* Mobilde kısa sekme etiketi (Vaktin Varsa / Kütüphane); masaüstü tam etiket, dokunulmadı */}
+              <span className="sm:hidden">
+                {formatTabbedPageTitle(
+                  t('akademi.title'),
+                  t(AKADEMI_TABS.find(row => row.key === tab)?.labelKeyMobile ?? 'akademi.tabContentBankShort'),
+                )}
+              </span>
+              <span className="hidden sm:inline">
+                {formatTabbedPageTitle(
+                  t('akademi.title'),
+                  t(AKADEMI_TABS.find(row => row.key === tab)?.labelKey ?? 'akademi.tabContentBank'),
+                )}
+              </span>
             </h1>
           </div>
           {addButton}
