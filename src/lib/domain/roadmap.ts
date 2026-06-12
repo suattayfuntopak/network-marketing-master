@@ -10,7 +10,10 @@
 
 /** Ekip her ay ~%30 hızlanır (aylık yeni-üye geometrik büyüme oranı). */
 export const DEFAULT_GROWTH_RATE = 1.3
-/** Aylık hedefleri günlüğe bölerken kullanılan iş günü sayısı. */
+/**
+ * Aylık hedefleri günlüğe ve kısa dönemlere bölerken kullanılan iş günü sayısı.
+ * Tek kaynak: `hubFunnelTargets.prorateMonthlyTargets` ve `dailyTargetsForMonth` buradan okur.
+ */
 export const WORKING_DAYS_PER_MONTH = 26
 /** Generic huni: 1 yeni üye için ortalama aktivite (1 üye ← 3 sunum ← 9 tanışma ← 18 arama). */
 export const FUNNEL = { sunumPerUye: 3, tanismaPerUye: 9, aramaPerUye: 18 } as const

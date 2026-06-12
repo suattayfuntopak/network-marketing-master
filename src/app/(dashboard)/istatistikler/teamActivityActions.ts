@@ -17,6 +17,11 @@ import {
 } from '@/lib/domain/funnelActuals'
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 import { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
+import {
+  funnelTargetsForPulsePeriod,
+  goalPayloadToFunnelContext,
+} from '@/lib/domain/hubFunnelTargets'
+import { getMemberGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
 
 export type TeamMemberFieldActivity = {
   userId: string
@@ -45,6 +50,9 @@ export type MemberActivityDetail = {
   activeDays: number
   /** Huni gerçekleşenleri — boru hattı tek kaynak (elle sayım yok). */
   funnel: FunnelCounts
+  /** Dönem huni hedefleri — üye/lider hedefinden (yol haritası ile hizalı). */
+  funnelTargets: FunnelCounts
+  hasMemberGoal: boolean
   /** Pro nabız — yalnızca sponsor Pro ise dolu */
   trainingPct?: number
   objectionPct?: number
@@ -408,6 +416,7 @@ export async function getMemberActivityDetailAction(
   memberUserId: string,
   period: SheetActivityPeriod
 ): Promise<MemberActivityDetail> {
+  const emptyFunnel: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
   const empty: MemberActivityDetail = {
     calls: 0,
     whatsapps: 0,
@@ -416,7 +425,9 @@ export async function getMemberActivityDetailAction(
     aiActions: 0,
     newCandidates: 0,
     activeDays: 0,
-    funnel: { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 },
+    funnel: emptyFunnel,
+    funnelTargets: emptyFunnel,
+    hasMemberGoal: false,
   }
 
   const ctx = await assertWorkspaceMember(workspaceId)
@@ -458,7 +469,7 @@ export async function getMemberActivityDetailAction(
 
   const funnelRange = funnelRangeForSheetPeriod(period)
 
-  const [actionsResult, candidatesResult, funnel, pulseBundle] = await Promise.all([
+  const [actionsResult, candidatesResult, funnel, goalCtx, pulseBundle] = await Promise.all([
     actionsQuery,
     candidatesQuery,
     fetchFunnelActualsForPeriod(
@@ -469,6 +480,7 @@ export async function getMemberActivityDetailAction(
       funnelRange.startCalendarKey,
       funnelRange.endCalendarKey,
     ),
+    getMemberGoalFunnelContextAction(workspaceId, memberUserId),
     pulseEnabled
       ? Promise.all([
           supabase
@@ -514,6 +526,12 @@ export async function getMemberActivityDetailAction(
   detail.activeDays = activeDays.size
   detail.newCandidates = newCandidates?.length ?? 0
   detail.funnel = funnel
+
+  if (goalCtx.hasGoal && goalCtx.goal) {
+    const funnelCtx = goalPayloadToFunnelContext(goalCtx.goal, goalCtx.roadmap)
+    detail.funnelTargets = funnelTargetsForPulsePeriod(funnelCtx, period)
+    detail.hasMemberGoal = true
+  }
 
   if (pulseBundle) {
     const [{ data: progressRow }, { data: onboardingRows }, videoMap] = pulseBundle

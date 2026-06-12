@@ -15,6 +15,8 @@ Tek kaynak: `src/lib/domain/hubFunnelTargets.ts` + `getGoalFunnelContextAction()
 
 Geçmiş dönemlerde hedef, **o dönemin** yol haritası ayına göre hesaplanır (bugünkü kademe değil).
 
+**Diğer yüzeyler:** `funnelTargetsForPulsePeriod` — İstatistikler (`getStatsFunnelBundleAction`) ve ekip aktivite sheet (`getMemberActivityDetailAction` → `funnelTargets` / `hasMemberGoal`). Üye hedefi: önce `nmm_user_goals`, yoksa lider ataması `nmm_member_goals` (`created_at` = başlangıç).
+
 ## Modüller
 
 | Dosya | Rol |

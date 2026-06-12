@@ -6,7 +6,8 @@ import { Activity, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import type { PulsePeriod } from '@/lib/domain/pulse'
-import { getStatsFunnelActualsAction } from '../actions'
+import { pulsePeriodToHubGridPeriod } from '@/lib/domain/hubPeriodPrefetch'
+import { getStatsFunnelBundleAction } from '../actions'
 
 type Props = {
   period: PulsePeriod
@@ -15,16 +16,19 @@ type Props = {
 export function StatsFieldFunnelSection({ period }: Props) {
   const { t } = useTranslation()
 
-  const { data: actuals, isLoading } = useQuery({
-    queryKey: ['stats-funnel-actuals', period],
-    queryFn: () => getStatsFunnelActualsAction(period),
+  const { data: bundle, isLoading } = useQuery({
+    queryKey: ['stats-funnel-bundle', period],
+    queryFn: () => getStatsFunnelBundleAction(period),
     staleTime: 30_000,
     // Period değişiminde eski sayılar ekranda kalır (sıfıra düşmez) → "pat" geçer.
     placeholderData: keepPreviousData,
   })
 
-  const funnel = actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+  const funnel = bundle?.actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+  const targets = bundle?.targets ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+  const hasGoal = bundle?.hasGoal ?? false
   const hasActivity = funnel.arama + funnel.tanisma + funnel.sunum + funnel.yeniUye > 0
+  const showGrid = isLoading || hasActivity || hasGoal
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4">
@@ -47,16 +51,16 @@ export function StatsFieldFunnelSection({ period }: Props) {
         </Link>
       </div>
 
-      {!isLoading && !hasActivity ? (
+      {!showGrid ? (
         <p className="rounded-xl border border-dashed border-[var(--border)] bg-[var(--bg-subtle)]/40 px-4 py-6 text-center text-sm text-[var(--text-3)]">
           {t('statsPage.fieldFunnelEmpty')}
         </p>
       ) : (
         <HubCrownFunnelGrid
           actuals={funnel}
-          targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-          hasGoal={false}
-          period="monthly"
+          targets={targets}
+          hasGoal={hasGoal}
+          period={pulsePeriodToHubGridPeriod(period)}
           loading={isLoading}
         />
       )}

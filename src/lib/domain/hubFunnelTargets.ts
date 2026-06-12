@@ -4,6 +4,9 @@ import {
   type FunnelCounts,
   type RoadmapStage,
 } from '@/lib/domain/roadmap'
+import { funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
+import type { PulsePeriod } from '@/lib/domain/pulse'
+import { fromCalendarKey } from '@/lib/utils/calendarDates'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -113,4 +116,49 @@ export function funnelTargetsForCalendarYear(ctx: GoalFunnelContext, year: numbe
     }
   }
   return total
+}
+
+/** İstanbul hizalı takvim aralığı — yol haritası ay sınırında günler ayrı oranlanır. */
+export function funnelTargetsForDateRange(
+  ctx: GoalFunnelContext,
+  startDate: Date,
+  endDate: Date,
+): FunnelCounts {
+  return funnelTargetsForCalendarWeek(ctx, startDate, endDate)
+}
+
+/**
+ * İstatistikler / ekip aktivite sheet — PulsePeriod hedefleri (gerçekleşen penceresi ile aynı).
+ * Günlük = bugünün kademesi; 7g/30g = kayan pencerede günlük oran toplamı; ytd = takvim yılı; all = hedef yok.
+ */
+export function funnelTargetsForPulsePeriod(
+  ctx: GoalFunnelContext,
+  period: PulsePeriod,
+): FunnelCounts {
+  if (period === 'all') return { ...EMPTY_FUNNEL }
+
+  const range = funnelRangeForPulsePeriod(period)
+  const end = fromCalendarKey(range.endCalendarKey)
+
+  if (period === 'today') {
+    return funnelTargetsForCalendarDay(ctx, end)
+  }
+  if (period === 'ytd') {
+    return funnelTargetsForCalendarYear(ctx, end.getFullYear())
+  }
+
+  const start = fromCalendarKey(range.startCalendarKey)
+  return funnelTargetsForDateRange(ctx, start, end)
+}
+
+/** Kullanıcı hedefi + yol haritası → Saha huni hedef hesapları için bağlam. */
+export function goalPayloadToFunnelContext(
+  goal: { targetMonths: number; startAt: string },
+  roadmap: RoadmapStage[],
+): GoalFunnelContext {
+  return {
+    startAt: new Date(goal.startAt),
+    targetMonths: goal.targetMonths,
+    roadmap,
+  }
 }

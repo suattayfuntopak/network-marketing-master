@@ -150,6 +150,8 @@ export const en = {
     calculating: "Calculating...",
     goalSummary: "Goal: {people} people · {months} mo",
     myGoalStatement: "🎯 Reach a team of at least {people} people in {months} months!",
+    monthlyFocusLine:
+      "This month’s target: {arama} calls · {tanisma} contacts · {sunum} presentations · {yeniUye} new members",
     monthProgress: "Month {current}/{total} · team {team}/{target}",
     todayTitle: "Today's Focus",
     dailyRowCalls: "How many people will I talk to?",

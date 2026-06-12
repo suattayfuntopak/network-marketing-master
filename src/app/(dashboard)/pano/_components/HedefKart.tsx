@@ -131,6 +131,17 @@ export function HedefKart() {
         </button>
       </section>
 
+      {p?.stage ? (
+        <p className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/50 px-3 py-2.5 text-xs font-medium leading-relaxed text-[var(--text-2)] sm:text-sm">
+          {t('hedef.monthlyFocusLine', {
+            arama: p.stage.monthly.arama,
+            tanisma: p.stage.monthly.tanisma,
+            sunum: p.stage.monthly.sunum,
+            yeniUye: p.stage.monthly.yeniUye,
+          })}
+        </p>
+      ) : null}
+
       <section className="space-y-3">
         <h2 className="text-sm font-semibold uppercase tracking-widest text-[var(--text-3)]">
           {t('hedef.todayTitle')}

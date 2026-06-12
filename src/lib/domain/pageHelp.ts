@@ -39,8 +39,9 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'Burada hedefini belirler ve bugün ne yapman gerektiğini görürsün.',
       steps: [
         { t: 'Hedefini gir', d: 'Kaç kişilik bir ekip istediğini ve kaç ayda ulaşmak istediğini yaz, sistem sana yol haritası çıkarsın.' },
-        { t: 'Bugünkü odağım', d: 'Renkli 4 kutu bugün kaç kişiyle konuşman, kaç kişi eklemen, kaç sunum yapman gerektiğini gösterir.' },
-        { t: 'Ay ay plan', d: 'Aşağıdaki listede her ay için hedeflerini görebilirsin.' },
+        { t: 'Bu ay özeti', d: 'Hedef cümlesinin altındaki satır, içinde bulunduğun yol haritası ayının aylık hedefini (arama, tanışma, sunum, yeni üye) gösterir.' },
+        { t: 'Bugünkü odağım', d: 'Renkli 4 kutu bugünkü tempo hedefini gösterir — aylık hedefin 26 iş gününe bölünmüş halidir; Saha Özetim Günlük sekmesiyle aynı mantıktır.' },
+        { t: 'Ay ay plan', d: 'Aşağıdaki listede her ay için hedeflerini görebilirsin; bir satıra dokunarak o ayın Saha Özetim özetine gidebilirsin.' },
       ],
     },
     en: {
@@ -48,8 +49,9 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'Set your goal here and see what to do today.',
       steps: [
         { t: 'Enter your goal', d: 'Write how big a team you want and in how many months; the system builds a roadmap for you.' },
-        { t: 'Today’s focus', d: 'The 4 colored boxes show how many people to talk to, add, and present to today.' },
-        { t: 'Month-by-month', d: 'See your targets for each month in the list below.' },
+        { t: 'This month', d: 'The line under your goal statement shows this roadmap month’s targets (calls, contacts, presentations, new members).' },
+        { t: 'Today’s focus', d: 'The 4 colored boxes are today’s pace — monthly targets spread over 26 working days; same logic as Field Summary → Daily.' },
+        { t: 'Month-by-month', d: 'See each month’s targets below; tap a row to open that month in Field Summary.' },
       ],
     },
   },
@@ -60,7 +62,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'Kendi sahadaki performansını günlük/haftalık/aylık görürsün.',
       steps: [
         { t: 'Dönem seç', d: 'Üstteki Günlük / Haftalık / Aylık / Yıllık / Tüm Zamanlar sekmeleriyle istediğin dönemi seç.' },
-        { t: '4 renkli kutu', d: 'Kaç kişiyle konuştun, kaç kişi ekledin, kaç sunum yaptın, kaç kişi katıldı — hepsi burada.' },
+        { t: '4 renkli kutu', d: 'Gerçekleşenler boru hattından otomatik sayılır; hedef çizgisi Hedefim yol haritasıyla aynıdır (günlük = tempo, aylık = o ayın satırı).' },
         { t: 'Saha aktivitesi', d: 'Aşağıda WhatsApp, not, arama gibi aksiyon sayılarını görebilirsin.' },
       ],
     },
@@ -69,7 +71,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'See your own field performance daily/weekly/monthly.',
       steps: [
         { t: 'Pick a period', d: 'Use the Daily / Weekly / Monthly / Yearly / All-time tabs at the top.' },
-        { t: '4 colored boxes', d: 'How many you talked to, added, presented to, and who joined — all here.' },
+        { t: '4 colored boxes', d: 'Actuals come from your pipeline automatically; targets match My Goal’s roadmap (daily = pace, monthly = that month’s row).' },
         { t: 'Field activity', d: 'Below, see action counts like WhatsApp, notes, calls.' },
       ],
     },

@@ -12,10 +12,38 @@ import {
   fetchFunnelActualsForPeriod,
   funnelRangeForPulsePeriod,
 } from '@/lib/domain/funnelActuals'
+import {
+  funnelTargetsForPulsePeriod,
+  goalPayloadToFunnelContext,
+} from '@/lib/domain/hubFunnelTargets'
+import { getGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { GEMINI_FLASH, GEMINI_PRO } from '@/lib/ai/models'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+
+export type StatsFunnelBundle = {
+  actuals: FunnelCounts
+  targets: FunnelCounts
+  hasGoal: boolean
+}
+
+/** Gerçekleşen + yol haritası hedefi — tek round-trip. */
+export async function getStatsFunnelBundleAction(period: PulsePeriod): Promise<StatsFunnelBundle> {
+  const [ctx, actuals] = await Promise.all([
+    getGoalFunnelContextAction(),
+    getStatsFunnelActualsAction(period),
+  ])
+  if (!ctx.hasGoal || !ctx.goal) {
+    return { actuals, targets: EMPTY_FUNNEL, hasGoal: false }
+  }
+  const funnelCtx = goalPayloadToFunnelContext(ctx.goal, ctx.roadmap)
+  return {
+    actuals,
+    targets: funnelTargetsForPulsePeriod(funnelCtx, period),
+    hasGoal: true,
+  }
+}
 
 /** Oturum açmış kullanıcının seçili dönem huni gerçekleşenleri — boru hattı tek kaynak. */
 export async function getStatsFunnelActualsAction(period: PulsePeriod): Promise<FunnelCounts> {

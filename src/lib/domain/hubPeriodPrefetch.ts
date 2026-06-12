@@ -1,7 +1,21 @@
+import type { PulsePeriod } from '@/lib/domain/pulse'
+
 /** Saha Özetim dönem sekmeleri — sunucu prefetch + istemci paylaşımlı. */
 
 export const HUB_PERIOD_TABS = ['daily', 'weekly', 'monthly', 'yearly', 'all'] as const
 export type HubPeriodTab = (typeof HUB_PERIOD_TABS)[number]
+
+/** İstatistikler / ekip sheet PulsePeriod → HubCrownFunnelGrid period etiketi. */
+export function pulsePeriodToHubGridPeriod(period: PulsePeriod): HubPeriodTab {
+  const map: Record<PulsePeriod, HubPeriodTab> = {
+    today: 'daily',
+    '7d': 'weekly',
+    '30d': 'monthly',
+    ytd: 'yearly',
+    all: 'all',
+  }
+  return map[period]
+}
 
 /** Dönem şeridi swipe/ok ile komşu günler/haftalar için önbellek offset'leri. */
 export const HUB_PERIOD_NEIGHBOR_OFFSETS = [-1, 0, 1] as const

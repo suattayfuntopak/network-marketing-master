@@ -150,6 +150,8 @@ export const tr = {
     calculating: "Hesaplanıyor...",
     goalSummary: "Hedefin: {people} kişi · {months} ay",
     myGoalStatement: "🎯 {months} ayda en az {people} kişilik bir ekibe ulaşmak!",
+    monthlyFocusLine:
+      "Bu ay hedefin: {arama} arama · {tanisma} tanışma · {sunum} sunum · {yeniUye} yeni üye",
     monthProgress: "{current}/{total}. ay · ekip {team}/{target}",
     todayTitle: "Bugünkü Odağım",
     dailyRowCalls: "Kaç Kişiyle Konuşacağım?",

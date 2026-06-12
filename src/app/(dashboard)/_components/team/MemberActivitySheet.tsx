@@ -311,8 +311,8 @@ export function MemberActivitySheet({
             </div>
             <HubCrownFunnelGrid
               actuals={data.funnel}
-              targets={{ arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }}
-              hasGoal={false}
+              targets={data.funnelTargets}
+              hasGoal={data.hasMemberGoal}
               period={sheetPeriodToHubTab(period)}
               hideNoGoalFooter={embedded}
               labelMode="member"

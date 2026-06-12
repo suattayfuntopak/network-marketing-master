@@ -124,6 +124,83 @@ async function directTeamCount(
   return data?.length ?? 0
 }
 
+/** Üyenin doğrudan downline workspace sayısı (yol haritası currentTeam). */
+async function memberDirectTeamCount(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  memberUserId: string,
+): Promise<number> {
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('id')
+    .eq('owner_id', memberUserId)
+    .maybeSingle()
+  if (!ws) return 0
+
+  const { count } = await supabase
+    .from('nmm_workspaces')
+    .select('id', { count: 'exact', head: true })
+    .or(`parent_id.eq.${ws.id},parent_id.eq.${memberUserId}`)
+
+  return count ?? 0
+}
+
+/**
+ * Downline üyenin huni hedefleri — önce kendi hedefi (nmm_user_goals), yoksa lider ataması (nmm_member_goals).
+ */
+export async function getMemberGoalFunnelContextAction(
+  workspaceId: string,
+  memberUserId: string,
+): Promise<GoalFunnelContextPayload> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  const empty: GoalFunnelContextPayload = {
+    hasGoal: false,
+    goal: null,
+    roadmap: [],
+    teamSize: 0,
+  }
+  if (!user || !memberUserId) return empty
+
+  const [userGoalRes, memberGoalRes, teamSize] = await Promise.all([
+    supabase
+      .from('nmm_user_goals')
+      .select('target_people, target_months, start_at')
+      .eq('user_id', memberUserId)
+      .maybeSingle(),
+    supabase
+      .from('nmm_member_goals')
+      .select('target_people, target_months, created_at')
+      .eq('workspace_id', workspaceId)
+      .eq('member_user_id', memberUserId)
+      .maybeSingle(),
+    memberDirectTeamCount(supabase, memberUserId),
+  ])
+
+  const row = userGoalRes.data
+  const goal: UserGoal | null = row
+    ? {
+        targetPeople: row.target_people,
+        targetMonths: row.target_months,
+        startAt: row.start_at,
+      }
+    : memberGoalRes.data
+      ? {
+          targetPeople: memberGoalRes.data.target_people,
+          targetMonths: memberGoalRes.data.target_months,
+          startAt: memberGoalRes.data.created_at,
+        }
+      : null
+
+  if (!goal) return { ...empty, teamSize }
+
+  return {
+    hasGoal: true,
+    goal,
+    roadmap: computeRoadmap(goal.targetPeople, goal.targetMonths, teamSize),
+    teamSize,
+  }
+}
+
 export interface DailyProgress {
   hasGoal: boolean
   monthIndex: number

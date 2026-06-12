@@ -18,7 +18,7 @@ export const statsSection = {
 
       fieldFunnelTitle: 'Saha Huni Gerçekleşenleri',
       fieldFunnelSubtitle:
-        'Arama, yeni aday, sunum ve katılım — yalnızca listedeki kayıtlardan otomatik sayılır. Elle girilen sayılar bu tabloda yer almaz.',
+        'Arama, yeni aday, sunum ve katılım — listedeki kayıtlardan otomatik sayılır. Hedefin varsa yol haritasıyla aynı dönem hedefi kutularda gösterilir.',
       fieldFunnelCta: 'Listeye git',
       fieldFunnelEmpty:
         'Bu dönemde liste kaydı yok. Önce aday ekle, ardından aday kartından arama ve aşama değişikliği kaydet.',
@@ -138,7 +138,7 @@ export const statsSection = {
 
       fieldFunnelTitle: 'Field Funnel Actuals',
       fieldFunnelSubtitle:
-        'Calls, new prospects, presentations, and joins — counted automatically from pipeline actions only. Manual counters are not included.',
+        'Calls, new prospects, presentations, and joins — counted from your pipeline. When you have a goal, period targets match your roadmap.',
       fieldFunnelCta: 'Go to Pipeline',
       fieldFunnelEmpty:
         'No pipeline activity in this period. Add a prospect first, then log calls and stage changes from the candidate card.',

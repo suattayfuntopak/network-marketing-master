@@ -5,6 +5,7 @@ import {
   funnelTargetsForCalendarMonth,
   funnelTargetsForCalendarWeek,
   funnelTargetsForCalendarYear,
+  funnelTargetsForPulsePeriod,
   prorateMonthlyTargets,
   type GoalFunnelContext,
 } from '@/lib/domain/hubFunnelTargets'
@@ -83,5 +84,22 @@ describe('hubFunnelTargets', () => {
       )
     expect(year2026).toEqual(expected)
     expect(year2026.arama).toBeGreaterThan(18)
+  })
+
+  it('pulse 7g = kayan 7 günlük pencere hedefi (günlük×7 değil)', () => {
+    const ctx = ctxFor300x18()
+    const weekly = funnelTargetsForPulsePeriod(ctx, '7d')
+    const monthly = { arama: 18, tanisma: 9, sunum: 3, yeniUye: 1 }
+    expect(weekly).toEqual(prorateMonthlyTargets(monthly, 7))
+  })
+
+  it('pulse all = hedef yok', () => {
+    const ctx = ctxFor300x18()
+    expect(funnelTargetsForPulsePeriod(ctx, 'all')).toEqual({
+      arama: 0,
+      tanisma: 0,
+      sunum: 0,
+      yeniUye: 0,
+    })
   })
 })
