@@ -5,7 +5,7 @@ import { Send, FileText, MessageSquare, Users, CheckSquare, Square } from 'lucid
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from './EkipPanel'
-import { waHref } from '@/lib/utils/waLink'
+import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { PRO_CTA_GRADIENT_ACTIVE_DARK_SM } from '@/lib/ui/brandGradients'
 
 interface BroadcastPanelProps {
@@ -34,7 +34,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
   function handleGroupBroadcast() {
     const text = composeBroadcastMessage()
     if (!text) { toast.error(t('team.broadcastEmpty')); return }
-    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank')
+    window.open(whatsappShareUrl(text), '_blank')
   }
 
   function toggleMember(id: string) {
@@ -234,7 +234,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                         </span>
                         {selected && (
                           <a
-                            href={waHref(m.phone, broadcastPreviewText || '') || `https://api.whatsapp.com/send?text=${encodeURIComponent(broadcastPreviewText || '')}`}
+                            href={waHref(m.phone, broadcastPreviewText || '') || whatsappShareUrl(broadcastPreviewText || '')}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={e => { if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')) } }}

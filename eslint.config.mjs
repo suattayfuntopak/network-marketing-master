@@ -53,7 +53,9 @@ const underscoreArgsAllowed = {
 // tanımlanırsa sonuncusu öncekini EZER, bu yüzden tüm seçiciler burada toplanır.
 const noRestrictedSyntax = {
   files: ["src/**/*.{ts,tsx}"],
-  ignores: ["src/lib/ui/zIndex.ts"],
+  // zIndex.ts ham z-[ değerlerini TANIMLAR; waLink.ts wa.me/?text= helper'ını
+  // BARINDIRIR — ikisi de kendi kuralından muaf.
+  ignores: ["src/lib/ui/zIndex.ts", "src/lib/utils/waLink.ts"],
   rules: {
     "no-restricted-syntax": [
       "error",
@@ -70,6 +72,15 @@ const noRestrictedSyntax = {
         // düşer. Gün anahtarı için istanbulDayKey() (lib/utils/calendarDates) kullan.
         selector: "CallExpression[callee.object.property.name='created_at'][callee.property.name='slice']",
         message: "created_at.slice(0,10) UTC günü verir; İstanbul günü için istanbulDayKey() (lib/utils/calendarDates) kullan.",
+      },
+      {
+        // Ham WhatsApp paylaşım URL'i (alıcısız) — `whatsappShareUrl()` kullan.
+        selector: "TemplateElement[value.raw=/(?:api\\.whatsapp\\.com\\/send|wa\\.me\\/\\?text=)/]",
+        message: "Ham WhatsApp paylaşım URL'i kurma; whatsappShareUrl() (lib/utils/waLink) kullan.",
+      },
+      {
+        selector: "Literal[value=/(?:api\\.whatsapp\\.com\\/send\\?text=|wa\\.me\\/\\?text=)/]",
+        message: "Ham WhatsApp paylaşım URL'i kurma; whatsappShareUrl() (lib/utils/waLink) kullan.",
       },
     ],
   },

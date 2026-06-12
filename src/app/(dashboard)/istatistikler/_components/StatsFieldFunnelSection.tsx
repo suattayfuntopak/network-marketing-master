@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { Activity, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
@@ -19,6 +19,8 @@ export function StatsFieldFunnelSection({ period }: Props) {
     queryKey: ['stats-funnel-actuals', period],
     queryFn: () => getStatsFunnelActualsAction(period),
     staleTime: 30_000,
+    // Period değişiminde eski sayılar ekranda kalır (sıfıra düşmez) → "pat" geçer.
+    placeholderData: keepPreviousData,
   })
 
   const funnel = actuals ?? { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }

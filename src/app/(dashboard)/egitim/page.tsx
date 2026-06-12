@@ -14,7 +14,7 @@ export default async function EgitimPage() {
   })
 
   if (ws?.workspaceId) {
-    await prefetchAkademiProgressBundle(queryClient, ws.workspaceId)
+    void prefetchAkademiProgressBundle(queryClient, ws.workspaceId)
   }
 
   return (

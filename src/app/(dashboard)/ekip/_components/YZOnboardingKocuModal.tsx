@@ -11,7 +11,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { generateOnboardingGuidanceAction } from '../actions'
-import { waHref } from '@/lib/utils/waLink'
+import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
@@ -102,7 +102,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
     if (href) {
       window.open(href, '_blank')
     } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+      window.open(whatsappShareUrl(message), '_blank')
     }
   }
 

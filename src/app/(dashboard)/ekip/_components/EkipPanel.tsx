@@ -10,7 +10,7 @@ import { TeamPerformanceSection } from './TeamPerformanceSection'
 import { YZOnboardingKocuModal } from './YZOnboardingKocuModal'
 import type { EkipTabId } from './EkipTabNav'
 import { toggleOnboardingStepAction } from '../actions'
-import { waHref } from '@/lib/utils/waLink'
+import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { useEkipPanelRows } from '@/hooks/useTeamMembers'
@@ -73,7 +73,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     if (href) {
       window.open(href, '_blank')
     } else {
-      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`, '_blank')
+      window.open(whatsappShareUrl(message), '_blank')
     }
   }
 

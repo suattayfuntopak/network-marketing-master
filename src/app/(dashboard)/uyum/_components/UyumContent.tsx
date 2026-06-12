@@ -19,6 +19,7 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useAILimits } from '@/hooks/useAILimits'
 import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
+import { whatsappShareUrl } from '@/lib/utils/waLink'
 
 const APPROVED_CLAIMS = {
   tr: [
@@ -413,7 +414,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                           {copiedImproved ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                         </button>
                         <a
-                          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(auditResult.improved_text!)}`}
+                          href={whatsappShareUrl(auditResult.improved_text!)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white transition active:scale-95 hover:scale-105 hover:shadow-md cursor-pointer"

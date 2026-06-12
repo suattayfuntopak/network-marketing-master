@@ -6,7 +6,7 @@ import { HedefPage } from './_components/HedefPage'
 
 export default async function HedefimRoutePage() {
   const queryClient = getQueryClient()
-  await queryClient.prefetchQuery({
+  void queryClient.prefetchQuery({
     queryKey: queryKeys.goalDashboard(),
     queryFn: getGoalDashboardAction,
     staleTime: 60_000,

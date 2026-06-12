@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { Crown, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -101,6 +101,8 @@ export function StatsSuperAdminSections({
     queryFn: () => getAiUsageByPeriodAction(appUserIds, toArchivePeriod(period)),
     enabled: appUserIds.length > 0,
     staleTime: 60_000,
+    // Period değişiminde tablo boşalmaz; eski değerler görünmeye devam eder.
+    placeholderData: keepPreviousData,
   })
 
   const rows = useMemo((): AiRow[] => {

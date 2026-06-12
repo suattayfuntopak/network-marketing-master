@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-12 — Deletion Confirmation with 5s Undo & Snappy Page Transitions ✅
+
+### 1. Deletion Confirmation Dialogs & 5s Undo Countdown
+- **Video Eğitimler (`VideolarContent.tsx`)**: Refactored to trigger a `ConfirmDialog` first. Upon confirmation, the 5-second undo toast countdown (`deleteWithUndo`) is initiated, executing `deleteTrainingVideoAction` if not cancelled. Title display is localized according to the current language.
+- **İçerik Kütüphanesi (`EgitimContent.tsx`)**: Introduced `deletingTopic` state. Triggering `onDelete` on `TrainingCard` now sets this state to display a danger-themed `ConfirmDialog` instead of running `deleteWithUndo` immediately. Upon confirm, `deleteWithUndo` runs.
+- **İtiraz Bankası (`ItirazlarContent.tsx`)**: Introduced `deletingObjection` state. `onDelete` now sets this state to display `ConfirmDialog`. Upon confirm, the 5-second `deleteWithUndo` toast is triggered with the localized objection question.
+
+### 2. Snappy transitions ("pat pat" geçişler)
+- Removed blocking `await` statements from route-level prefetching within the Server Component page files to make page transitions snappy and instant. Prefetches now run as non-blocking `void` calls, allowing immediate client hydration.
+- Affected pages:
+  - `src/app/(dashboard)/egitim/page.tsx`
+  - `src/app/(dashboard)/pano/page.tsx`
+  - `src/app/(dashboard)/istatistikler/page.tsx`
+  - `src/app/(dashboard)/platform-yonetim/page.tsx`
+  - `src/app/(dashboard)/canli-egitim/page.tsx`
+  - `src/app/(dashboard)/hedefim/page.tsx`
+  - `src/app/(dashboard)/saha-radar/page.tsx`
+  - `src/app/(dashboard)/saha-ozetim/page.tsx` (only workspace prefetch remains blocking, metric prefetch is non-blocking)
+
+### Files
+`src/app/(dashboard)/egitim/_components/VideolarContent.tsx`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazlarContent.tsx`, `src/app/(dashboard)/egitim/page.tsx`, `src/app/(dashboard)/pano/page.tsx`, `src/app/(dashboard)/istatistikler/page.tsx`, `src/app/(dashboard)/platform-yonetim/page.tsx`, `src/app/(dashboard)/canli-egitim/page.tsx`, `src/app/(dashboard)/hedefim/page.tsx`, `src/app/(dashboard)/saha-radar/page.tsx`, `src/app/(dashboard)/saha-ozetim/page.tsx`
+
 ## 2026-06-13 — Genel Öneriler: Timezone ESLint Guard, Konvansiyon Belgeleme, WA Helper, Ölü i18n Temizliği ✅
 
 İki önceki + son oturumun "genel öneriler" listesi cerrah titizliğinde hayata geçirildi.

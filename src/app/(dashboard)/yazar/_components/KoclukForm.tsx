@@ -13,6 +13,7 @@ import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useAILimits } from '@/hooks/useAILimits'
 import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
+import { whatsappShareUrl } from '@/lib/utils/waLink'
 
 export function KoclukForm() {
   const { t, lang } = useTranslation()
@@ -200,7 +201,7 @@ export function KoclukForm() {
 
               {/* WhatsApp Share Button */}
               <a
-                href={`https://api.whatsapp.com/send?text=${encodeURIComponent(displayedAnswer)}`}
+                href={whatsappShareUrl(displayedAnswer)}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={t('coachUi.shareWhatsApp')}

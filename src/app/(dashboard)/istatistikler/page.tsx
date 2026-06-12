@@ -19,7 +19,7 @@ export default async function IstatistiklerPage() {
   })
 
   if (ws?.workspaceId) {
-    await Promise.all([
+    void Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.candidates(ws.workspaceId),
         queryFn: () => fetchCandidatesAction(ws.workspaceId),
@@ -38,7 +38,7 @@ export default async function IstatistiklerPage() {
       )
       const memberIds = downlineActivityMemberIds(team?.ekipRows ?? [])
       if (memberIds.length > 0) {
-        await queryClient.prefetchQuery({
+        void queryClient.prefetchQuery({
           queryKey: queryKeys.teamProgressMap(ws.workspaceId, memberIds),
           queryFn: () => getTeamProgressMapAction(ws.workspaceId, memberIds),
           staleTime: QUERY_STALE.metrics,

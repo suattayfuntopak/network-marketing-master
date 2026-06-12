@@ -8,7 +8,7 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { getStageLabel } from '@/lib/domain/stages'
 
-import { waHref } from '@/lib/utils/waLink'
+import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { readUserScopedJSON, writeUserScopedJSON } from '@/lib/ui/userScopedStorage'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
@@ -260,7 +260,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
 
   const waLink = selected?.phone
     ? waHref(selected.phone, displayedMessage) 
-    : `https://api.whatsapp.com/send?text=${encodeURIComponent(displayedMessage)}`
+    : whatsappShareUrl(displayedMessage)
 
   return (
     <div className="space-y-5">

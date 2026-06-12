@@ -21,7 +21,7 @@ export default async function SahaRadarPage() {
   )
 
   if (ws?.workspaceId && hasTeamPageAccess(ws.licenseType, ws.isSuperAdmin)) {
-    await queryClient.prefetchQuery({
+    void queryClient.prefetchQuery({
       queryKey: queryKeys.crownSahaRadar(ws.workspaceId),
       queryFn: () => getCrownSahaRadarAction(ws.workspaceId),
       staleTime: QUERY_STALE.metrics,

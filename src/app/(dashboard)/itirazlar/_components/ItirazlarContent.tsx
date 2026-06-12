@@ -8,6 +8,7 @@ import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
@@ -43,6 +44,7 @@ export function ItirazlarContent({
   const [page, setPage] = useState(1)
   const [customItirazlar, setCustomItirazlar] = useState<CustomItiraz[]>([])
   const [editingObjection, setEditingObjection] = useState<CustomItiraz | null>(null)
+  const [deletingObjection, setDeletingObjection] = useState<CustomItiraz | null>(null)
   const [internalFormOpen, setInternalFormOpen] = useState(false)
   const formOpen = addFormOpenProp ?? internalFormOpen
   const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
@@ -180,6 +182,22 @@ export function ItirazlarContent({
     favCount === 0
 
   const customIds = useMemo(() => new Set(customItirazlar.map(c => c.id)), [customItirazlar])
+
+  function handleConfirmDeleteObjection() {
+    if (!deletingObjection) return
+    const itiraz = deletingObjection
+    setDeletingObjection(null)
+    deleteWithUndo(itiraz.soru[lang] ?? itiraz.soru.tr, () => {
+      if (customIds.has(itiraz.id)) {
+        setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
+        deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
+      } else {
+        const deletedItem = { ...itiraz, isCustom: true, isDeleted: true }
+        setCustomItirazlar(prev => [deletedItem as CustomItiraz, ...prev])
+        addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: number }).catch(() => {})
+      }
+    })
+  }
 
   const body = (
     <>
@@ -338,17 +356,7 @@ export function ItirazlarContent({
                   !customIds.has(itiraz.id) ||
                   (itiraz as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
-                    ? () =>
-                        deleteWithUndo(itiraz.soru[lang] ?? itiraz.soru.tr, () => {
-                          if (customIds.has(itiraz.id)) {
-                            setCustomItirazlar(prev => prev.filter(c => c.id !== itiraz.id))
-                            deleteCustomContent('nmm_custom_objections', itiraz.id).catch(() => {})
-                          } else {
-                            const deletedItem = { ...itiraz, isCustom: true, isDeleted: true }
-                            setCustomItirazlar(prev => [deletedItem as CustomItiraz, ...prev])
-                            addCustomContent('nmm_custom_objections', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: number }).catch(() => {})
-                          }
-                        })
+                    ? () => setDeletingObjection(itiraz)
                     : undefined
                 }
               />
@@ -389,6 +397,15 @@ export function ItirazlarContent({
         editing={editingObjection}
         onUpdate={handleUpdateObjection}
       />
+
+      {deletingObjection && (
+        <ConfirmDialog
+          message={t('objectionsPage.confirmDelete')}
+          variant="danger"
+          onConfirm={handleConfirmDeleteObjection}
+          onCancel={() => setDeletingObjection(null)}
+        />
+      )}
     </>
   )
 

@@ -13,7 +13,13 @@ import { useState } from 'react'
  * Etki: Saha Özeti vb. metrik kutuları tekrar ziyarette localStorage'tan ANINDA
  * görünür, arkada sessizce tazelenir (stale-while-revalidate).
  */
-const PERSISTED_KEY_ROOTS = new Set(['hub', 'pano-field-insights'])
+const PERSISTED_KEY_ROOTS = new Set([
+  'hub',
+  'pano-field-insights',
+  // Saf sayısal huni (arama/tanışma/sunum/yeni üye) — PII yok, İstatistikler
+  // sayfası tekrar ziyarette anında dolu görünür.
+  'stats-funnel-actuals',
+])
 
 const noopStorage = {
   getItem: () => null,

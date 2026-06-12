@@ -117,7 +117,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
     },
   },
   {
-    match: '/ekibim',
+    match: '/ekip',
     tr: {
       title: 'Ekibim',
       intro: 'Ekip üyelerini ve onların gelişimini buradan takip edersin.',
@@ -155,6 +155,27 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
         { t: 'Tabs', d: 'Switch between Content Library, Video Training and Objection Bank using the top tabs.' },
         { t: 'Share', d: 'Use the WhatsApp icon on any content/video/objection to send it to someone with a ready, kind message.' },
         { t: 'Favorite & read', d: 'Star to favorite, use the circle to mark as read.' },
+      ],
+    },
+  },
+  {
+    match: '/canli-egitim',
+    tr: {
+      title: 'Canlı Eğitim',
+      intro: 'Crown Team video serisi ve canlı eğitim içeriklerini buradan izlersin.',
+      steps: [
+        { t: 'Video serisi', d: 'Sıralı eğitim videolarını baştan sona izleyerek ilerleyebilirsin.' },
+        { t: 'İzleme takibi', d: 'İzlediğin videolar otomatik işaretlenir; kaldığın yerden devam edebilirsin.' },
+        { t: 'Ekiple paylaş', d: 'Faydalı bir bölümü ekip üyelerine önererek onların da izlemesini sağlayabilirsin.' },
+      ],
+    },
+    en: {
+      title: 'Live Training',
+      intro: 'Watch the Crown Team video series and live training content here.',
+      steps: [
+        { t: 'Video series', d: 'Progress through the ordered training videos from start to finish.' },
+        { t: 'Watch tracking', d: 'Videos you watch are marked automatically; resume where you left off.' },
+        { t: 'Share with team', d: 'Recommend a useful section to your team members so they watch it too.' },
       ],
     },
   },

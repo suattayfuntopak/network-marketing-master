@@ -16,7 +16,7 @@ export default async function PanoPage() {
 
   const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
   if (ws?.workspaceId) {
-    await prefetchPanoMetrics(queryClient, ws.workspaceId)
+    void prefetchPanoMetrics(queryClient, ws.workspaceId)
   }
 
   return (

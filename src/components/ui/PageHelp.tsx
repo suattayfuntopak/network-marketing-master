@@ -27,7 +27,7 @@ export function PageHelp() {
         onClick={() => setOpen(true)}
         title={helpLabel}
         aria-label={helpLabel}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
+        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] sm:flex"
       >
         <HelpCircle className="h-4.5 w-4.5" strokeWidth={1.75} />
       </button>

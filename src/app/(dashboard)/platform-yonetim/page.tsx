@@ -17,7 +17,7 @@ export default async function PlatformYonetimPage() {
   })
 
   if ((ws as WorkspaceContext | null)?.isSuperAdmin) {
-    await prefetchPlatformAdminQueries(queryClient)
+    void prefetchPlatformAdminQueries(queryClient)
   }
 
   return (

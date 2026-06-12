@@ -38,17 +38,15 @@ export default async function SahaOzetimPage({ searchParams }: Props) {
             ? { key: queryKeys.hubAllTimeSelf(), fn: () => getHubAllTimeSelfAction() }
             : { key: queryKeys.hubYearlySelf(offset), fn: () => getHubYearlySelfAction(offset) }
 
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.workspace(),
-      queryFn: fetchWorkspaceAction,
-    }),
-    queryClient.prefetchQuery({
-      queryKey: active.key,
-      queryFn: active.fn,
-      staleTime: 60_000,
-    }),
-  ])
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.workspace(),
+    queryFn: fetchWorkspaceAction,
+  })
+  void queryClient.prefetchQuery({
+    queryKey: active.key,
+    queryFn: active.fn,
+    staleTime: 60_000,
+  })
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>

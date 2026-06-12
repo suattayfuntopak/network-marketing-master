@@ -17,6 +17,7 @@ import { TrainingVideoCard } from './TrainingVideoCard'
 import { VideoEditModal } from './VideoEditModal'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 
 const PAGE_SIZE = 9
 
@@ -29,7 +30,7 @@ export function VideolarContent({
   addFormOpen?: boolean
   onAddFormOpenChange?: (open: boolean) => void
 }) {
-  const { t } = useTranslation()
+  const { lang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const isAdmin = !!ws?.isSuperAdmin
@@ -71,13 +72,18 @@ export function VideolarContent({
     if (!deletingVideo) return
     const video = deletingVideo
     setDeletingVideo(null)
-    try {
-      await deleteTrainingVideoAction(video.id)
-      toast.success(t('videoTraining.videoDeleted'))
-      invalidate()
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t('videoTraining.deleteFailed'))
-    }
+    deleteWithUndo(
+      lang === 'en' ? (video.titleEn || video.titleTr) : video.titleTr,
+      async () => {
+        try {
+          await deleteTrainingVideoAction(video.id)
+          toast.success(t('videoTraining.videoDeleted'))
+          invalidate()
+        } catch (err) {
+          toast.error(err instanceof Error ? err.message : t('videoTraining.deleteFailed'))
+        }
+      }
+    )
   }
 
   if (!ws?.workspaceId) return null
@@ -176,7 +182,7 @@ export function VideolarContent({
 
       {deletingVideo && (
         <ConfirmDialog
-          message={t('videoTraining.confirmDelete', { title: deletingVideo.titleTr })}
+          message={t('videoTraining.confirmDelete', { title: lang === 'en' ? (deletingVideo.titleEn || deletingVideo.titleTr) : deletingVideo.titleTr })}
           variant="danger"
           onConfirm={handleConfirmDelete}
           onCancel={() => setDeletingVideo(null)}

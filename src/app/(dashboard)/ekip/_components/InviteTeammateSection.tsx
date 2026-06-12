@@ -4,6 +4,7 @@ import { UserPlus, Copy, Check } from 'lucide-react'
 import { SpoilerCode } from './SpoilerCode'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
+import { whatsappShareUrl } from '@/lib/utils/waLink'
 
 interface InviteTeammateSectionProps {
   inviteCode: string
@@ -39,9 +40,9 @@ export function InviteTeammateSection({
             {copied ? <Check className="h-5 w-5" /> : <Copy className="h-5 w-5" />}
           </button>
           <a
-            href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+            href={whatsappShareUrl(
               t('team.waInviteGroup', { code: inviteCode, link: buildInviteLink(inviteCode) })
-            )}`}
+            )}
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white hover:bg-[#20ba56] transition active:scale-95 shadow-sm cursor-pointer"

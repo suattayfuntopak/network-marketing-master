@@ -7,6 +7,7 @@ import { getTrainingData } from '@/lib/domain/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
@@ -58,9 +59,26 @@ export function EgitimContent({
 
   const [customTrainings, setCustomTrainings] = useState<TrainingTopic[]>([])
   const [editingTraining, setEditingTraining] = useState<TrainingTopic | null>(null)
+  const [deletingTopic, setDeletingTopic] = useState<TrainingTopic | null>(null)
   const [internalFormOpen, setInternalFormOpen] = useState(false)
   const formOpen = addFormOpenProp ?? internalFormOpen
   const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
+
+  function handleConfirmDeleteTopic() {
+    if (!deletingTopic) return
+    const konu = deletingTopic
+    setDeletingTopic(null)
+    deleteWithUndo(konu.baslik, () => {
+      if (konu.isCustom) {
+        setCustomTrainings(prev => prev.filter(item => item.id !== konu.id))
+        deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
+      } else {
+        const deletedItem = { ...konu, isCustom: true, isDeleted: true }
+        setCustomTrainings(prev => [deletedItem as TrainingTopic, ...prev])
+        addCustomContent('nmm_custom_trainings', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: string | number }).catch(() => {})
+      }
+    })
+  }
 
   function handleEditTraining(topic: TrainingTopic) {
     setEditingTraining(topic)
@@ -440,17 +458,7 @@ export function EgitimContent({
                   !konu.isCustom ||
                   (konu as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
-                    ? () =>
-                        deleteWithUndo(konu.baslik, () => {
-                          if (konu.isCustom) {
-                            setCustomTrainings(prev => prev.filter(item => item.id !== konu.id))
-                            deleteCustomContent('nmm_custom_trainings', konu.id).catch(() => {})
-                          } else {
-                            const deletedItem = { ...konu, isCustom: true, isDeleted: true }
-                            setCustomTrainings(prev => [deletedItem as TrainingTopic, ...prev])
-                            addCustomContent('nmm_custom_trainings', ws?.workspaceId ?? null, deletedItem as unknown as Record<string, unknown> & { id: string | number }).catch(() => {})
-                          }
-                        })
+                    ? () => setDeletingTopic(konu)
                     : undefined
                 }
                 onEdit={
@@ -494,6 +502,15 @@ export function EgitimContent({
         editing={editingTraining}
         onUpdate={handleUpdateTraining}
       />
+
+      {deletingTopic && (
+        <ConfirmDialog
+          message={t('trainingPage.confirmDelete')}
+          variant="danger"
+          onConfirm={handleConfirmDeleteTopic}
+          onCancel={() => setDeletingTopic(null)}
+        />
+      )}
     </>
   )
 
