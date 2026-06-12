@@ -8,6 +8,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
@@ -258,33 +259,30 @@ export function EgitimContent({
   const body = (
     <>
       {!embedded && (
-        <header className="mb-6">
-          <div className="flex items-center justify-between gap-3 mb-1">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
-                <BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('training.title')}</h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <Link
-                href="/egitim/videolar"
-                className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-brand/10 hover:border-brand/40 dark:hover:bg-brand dark:hover:border-brand"
-              >
-                <Film className="h-3.5 w-3.5 text-brand-readable" />
-                <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
-              </Link>
-              <button
-                onClick={() => setFormOpen(true)}
-                className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] dark:bg-[#2962FF] dark:hover:bg-[#1e4ed8] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                <span>{t('trainingPage.addContent')}</span>
-              </button>
-            </div>
-          </div>
+        <div className="mb-6">
+          <DashboardPageHeader
+            title={t('training.title')}
+            icon={<BookOpen className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />}
+            iconContainerClassName="bg-[#EEF2FF] dark:bg-[#1e1b4b]"
+            actions={
+              <>
+                <Link
+                  href="/egitim/videolar"
+                  className="flex items-center gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2 text-sm font-bold text-brand-readable transition hover:bg-brand/10 hover:border-brand/40 dark:hover:bg-brand dark:hover:border-brand"
+                >
+                  <Film className="h-3.5 w-3.5 text-brand-readable" />
+                  <span className="hidden sm:inline">{t('videoTraining.openTraining')}</span>
+                </Link>
+                <button
+                  onClick={() => setFormOpen(true)}
+                  className="flex items-center gap-1.5 rounded-xl bg-[#3730A3] hover:bg-[#28227d] dark:bg-[#2962FF] dark:hover:bg-[#1e4ed8] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  <span>{t('trainingPage.addContent')}</span>
+                </button>
+              </>
+            }
+          />
 
           <div className="mt-4 flex items-center gap-2.5 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-[#EEF2FF] dark:bg-[#1e1b4b]/70 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
             <span className="text-3xl">📖</span>
@@ -326,7 +324,7 @@ export function EgitimContent({
               </div>
             </div>
           )}
-        </header>
+        </div>
       )}
 
       {embedded && !onAddFormOpenChange && (

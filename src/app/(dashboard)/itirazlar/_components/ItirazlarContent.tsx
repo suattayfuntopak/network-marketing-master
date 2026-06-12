@@ -9,6 +9,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { loadCustomContent, addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
 import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
@@ -202,24 +203,21 @@ export function ItirazlarContent({
   const body = (
     <>
       {!embedded && (
-        <header className="mb-6">
-          <div className="flex items-center justify-between gap-3 mb-1">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#ECFDF5] dark:bg-[#3d0a1a]">
-                <MessageCircleQuestion className="h-5 w-5 text-[#16A34A] dark:text-[#fda4af]" strokeWidth={1.75} />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-[var(--text-1)]">{t('objectionsPage.title')}</h1>
-              </div>
-            </div>
-            <button
-              onClick={() => { setEditingObjection(null); setFormOpen(true) }}
-              className="flex items-center gap-1.5 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
-            >
-              <Plus className="h-3.5 w-3.5" />
-              <span>{t('objectionsPage.addObjection')}</span>
-            </button>
-          </div>
+        <div className="mb-6">
+          <DashboardPageHeader
+            title={t('objectionsPage.title')}
+            icon={<MessageCircleQuestion className="h-5 w-5 text-[#16A34A] dark:text-[#fda4af]" strokeWidth={1.75} />}
+            iconContainerClassName="bg-[#ECFDF5] dark:bg-[#3d0a1a]"
+            actions={
+              <button
+                onClick={() => { setEditingObjection(null); setFormOpen(true) }}
+                className="flex items-center gap-1.5 rounded-xl bg-[#16A34A] hover:bg-[#15803d] dark:bg-none dark:bg-[#fda4af] dark:hover:bg-[#fbacbe] dark:text-[#3d0a1a] text-white px-3.5 py-2 text-sm font-bold shadow-sm transition active:scale-95 cursor-pointer shrink-0"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                <span>{t('objectionsPage.addObjection')}</span>
+              </button>
+            }
+          />
           <div className="mt-4 flex items-center gap-2 rounded-2xl border border-[#D1FAE5] dark:border-[#3d0a1a] bg-[#ECFDF5] dark:bg-[#3d0a1a]/60 px-4 py-3">
             <span className="text-3xl">🛡️</span>
             <div className="flex-1 min-w-0">
@@ -245,7 +243,7 @@ export function ItirazlarContent({
               )}
             </div>
           </div>
-        </header>
+        </div>
       )}
 
       {embedded && !onAddFormOpenChange && (

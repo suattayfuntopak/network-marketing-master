@@ -34,7 +34,7 @@ import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriod
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -231,24 +231,12 @@ export function IstatistiklerContent() {
       <div className="w-full space-y-6">
         
         {/* Header */}
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF2FF] dark:bg-[#1e1b4b]">
-              <BarChart3 className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2} />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-[var(--text-1)]">
-                {t('statsPage.title')}
-              </h1>
-            </div>
-          </div>
-
-          {/* Period Filter — Bugün / Son 7 Gün / Son 30 Gün / Bu Yıl / Tüm Zamanlar */}
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            <PageHelp />
-            <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
-          </div>
-        </header>
+        <DashboardPageHeader
+          title={t('statsPage.title')}
+          icon={<BarChart3 className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2} />}
+          iconContainerClassName="bg-[#EEF2FF] dark:bg-[#1e1b4b]"
+          actions={<PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />}
+        />
 
         <div className="space-y-6">
           {/* KPI Cards */}

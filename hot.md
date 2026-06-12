@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-12 — Finalized Page Headers Standardization & generic toastActions ✅
+
+### 1. Reusable toastWithAction Helper Refactoring
+- **`deleteWithUndo.tsx`**: Successfully refactored `deleteWithUndo` to export the new generic helper `toastWithAction`. Modified it so that standard undo toasts leverage a central, animated 5s countdown timer.
+
+### 2. Page Header Consolidation
+- **`EgitimContent.tsx`**: Refactored the header block using `<DashboardPageHeader>`, passing the open-videos link and create-topic button inside the actions slot.
+- **`ItirazlarContent.tsx`**: Refactored the header block using `<DashboardPageHeader>`, passing the add-objection button inside the actions slot.
+
+### Files
+`src/lib/ui/deleteWithUndo.tsx`, `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/app/(dashboard)/itirazlar/_components/ItirazlarContent.tsx`
+
+## 2026-06-12 — Huni hedefleri genel öneriler (5 madde) ✅
+
+Önceki hizalama raporundaki 5 genel öneri hayata geçirildi — Hedefim, Saha Özetim, İstatistikler ve ekip sheet aynı yol haritası mantığını paylaşıyor.
+
+### Yapılanlar
+1. **HedefKart** — `monthlyFocusLine`: içinde bulunulan ayın 18·9·3·1 özet satırı
+2. **PageHelp** — `/hedefim` ve `/saha-ozetim`: günlük tempo vs aylık yol haritası açıklaması
+3. **İstatistikler** — `getStatsFunnelBundleAction` + `funnelTargetsForPulsePeriod`; huni kutularında hedef çizgisi
+4. **Ekip aktivite sheet** — `getMemberGoalFunnelContextAction`; üye/lider hedefi + dönem `funnelTargets`
+5. **WORKING_DAYS_PER_MONTH** — `roadmap.ts` tek kaynak yorumu; `hubFunnelTargets` pulse dönem API
+
+### Dosyalar
+`hubFunnelTargets.ts`, `hubFunnelTargets.test.ts`, `hubPeriodPrefetch.ts`, `hedef/actions.ts`, `istatistikler/actions.ts`, `StatsFieldFunnelSection.tsx`, `teamActivityActions.ts`, `MemberActivitySheet.tsx`, `HedefKart.tsx`, `pageHelp.ts`, `roadmap.ts`, `tr.ts`, `en.ts`, `stats.ts`, `docs/hub-metrics.md`
+
 ## 2026-06-13 — Timezone Niyet Annotation'ları + Öneri Turu Kapanışı ✅
 
 Önceki raporun önerilerini denetledim; cerrah titizliğinde yalnızca **güvenli + değerli** olanı uyguladım, riskli/biten olanları gerekçeyle eledim.

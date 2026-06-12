@@ -1,15 +1,16 @@
 'use client'
 
+import React from 'react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-function DeleteToast({
-  name,
-  onUndo,
-}: {
-  name: string
+interface ActionToastProps {
+  message: React.ReactNode
+  actionLabel: React.ReactNode
   onUndo: () => void
-}) {
+}
+
+function ActionToast({ message, actionLabel, onUndo }: ActionToastProps) {
   const { t } = useTranslation()
   const r = 14
   const circ = 2 * Math.PI * r
@@ -30,14 +31,13 @@ function DeleteToast({
           />
         </svg>
         <span className="text-[9px] font-bold text-red-500">
-          {t('common.deleteLabel')}
+          {actionLabel}
         </span>
       </div>
 
-      <p className="flex-1 min-w-0 truncate text-sm font-medium text-[var(--text-1)]">
-        <span className="font-semibold">{name}</span>{' '}
-        {t('common.deleting')}
-      </p>
+      <div className="flex-1 min-w-0 truncate text-sm font-medium text-[var(--text-1)]">
+        {message}
+      </div>
 
       <button
         onClick={onUndo}
@@ -49,20 +49,28 @@ function DeleteToast({
   )
 }
 
-export function deleteWithUndo(
-  name: string,
-  deleteFn: () => void,
-) {
+export function toastWithAction({
+  message,
+  actionLabel,
+  actionFn,
+  duration = 5000,
+}: {
+  message: React.ReactNode
+  actionLabel: React.ReactNode
+  actionFn: () => void
+  duration?: number
+}) {
   let cancelled = false
 
   const timer = setTimeout(() => {
-    if (!cancelled) deleteFn()
-  }, 5000)
+    if (!cancelled) actionFn()
+  }, duration)
 
   const toastId: string | number = toast.custom(
     () => (
-      <DeleteToast
-        name={name}
+      <ActionToast
+        message={message}
+        actionLabel={actionLabel}
         onUndo={() => {
           cancelled = true
           clearTimeout(timer)
@@ -70,7 +78,33 @@ export function deleteWithUndo(
         }}
       />
     ),
-    { duration: 5200 }
+    { duration: duration + 200 }
   )
 }
 
+function DeleteToastMessage({ name }: { name: string }) {
+  const { t } = useTranslation()
+  return (
+    <>
+      <span className="font-semibold">{name}</span>{' '}
+      {t('common.deleting')}
+    </>
+  )
+}
+
+function DeleteToastLabel() {
+  const { t } = useTranslation()
+  return <>{t('common.deleteLabel')}</>
+}
+
+export function deleteWithUndo(
+  name: string,
+  deleteFn: () => void,
+) {
+  toastWithAction({
+    message: <DeleteToastMessage name={name} />,
+    actionLabel: <DeleteToastLabel />,
+    actionFn: deleteFn,
+    duration: 5000,
+  })
+}
