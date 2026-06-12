@@ -21,7 +21,7 @@ export function HubWeekLoginStrip({ weekActive, loading, weekEnd }: HubWeekLogin
         ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
     const end = weekEnd ? new Date(weekEnd) : new Date()
-    end.setHours(0, 0, 0, 0)
+    end.setHours(0, 0, 0, 0) // istemci: kullanıcı-yerel gün (kasıtlı)
     return weekActive.map((_, i) => {
       const d = new Date(end)
       d.setDate(d.getDate() - (6 - i))

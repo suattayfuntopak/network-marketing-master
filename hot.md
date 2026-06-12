@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-13 — Timezone Niyet Annotation'ları + Öneri Turu Kapanışı ✅
+
+Önceki raporun önerilerini denetledim; cerrah titizliğinde yalnızca **güvenli + değerli** olanı uyguladım, riskli/biten olanları gerekçeyle eledim.
+
+### Uygulanan: gün-anahtarı niyet annotation'ları (3 turluk timezone-guard kapağı)
+Kalan `setHours(0,0,0,0)` / `toISOString().slice` noktalarına, niyeti belirsiz olan yerlere kısa açıklama eklendi → gelecekte yanlış "fix"/regresyonu önler (ESLint `created_at.slice` yasağını tamamlar):
+- **Sunucu/domain (döngü sınırı, gün anahtarı DEĞİL):** `hubSelfActions.ts` (gerçek anahtar `istanbulDayKey`), `hubFunnelTargets.ts` (ay-bazlı sayım), `hubPeriodRange.ts` (`startOfDay` görüntüleme sınırı).
+- **Cron (sunucu-yerel gün penceresi, kasıtlı):** `license-reminder/route.ts`, `cronTrialRecipients.ts`.
+- **İstemci (kullanıcı-yerel, kasıtlı):** `PanoWeeklyLite.tsx`, `HubWeekLoginStrip.tsx`, `useCandidateStats.ts`.
+
+### Elenen öneriler (gerekçeyle)
+- **persist cache genişletme → İPTAL (KVKK):** `field-streak-detail` iç içe `FieldStreakActionRow` içinde `note` + `candidate_name` taşıyor (PII); `ai-usage-by-period` başka kullanıcıların UUID'li verisi; `independent-ai-usage` isim/e-posta. Hiçbiri güvenle PII-free değil → localStorage'a yazılmaz. (`stats-funnel-actuals` zaten önceki turda eklendi.)
+- **keepPreviousData yayma → ZATEN TAMAM:** tab/period-keyed sorgu taraması temiz (önceki turda yapıldı).
+- **`type:module` / i18n:unused→CI → DESCOPE:** `type:module` marjinal + riskli; i18n:unused yerel `.git/hooks/pre-commit`'te (versiyonlanmıyor, takım geneli değiştirilemez).
+- **Doğrulandı, boşluk yok:** masaüstü `Sidebar` zaten hover + mount prefetch yapıyor; `archiveDateRange` ve `hub-prefetch-rollup` zaten UTC-kasıtlı dokümante.
+
+### Doğrulama
+`tsc --noEmit` temiz · `eslint --max-warnings 0` (dokunulan 8 dosya) temiz.
+
+### Dosyalar
+`src/app/(dashboard)/crown/hubSelfActions.ts`, `src/lib/domain/hubFunnelTargets.ts`, `src/lib/utils/hubPeriodRange.ts`, `src/app/api/cron/license-reminder/route.ts`, `src/lib/infra/cronTrialRecipients.ts`, `src/app/(dashboard)/pano/_components/PanoWeeklyLite.tsx`, `src/components/hub/HubWeekLoginStrip.tsx`, `src/hooks/useCandidateStats.ts`
+
 ## 2026-06-12 — Unified DashboardPageHeader Component Integration ✅
 
 ### 1. Unified Reusable Header Component

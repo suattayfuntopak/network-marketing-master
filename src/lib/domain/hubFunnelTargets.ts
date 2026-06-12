@@ -75,6 +75,7 @@ export function funnelTargetsForCalendarWeek(
   endDate: Date,
 ): FunnelCounts {
   const daysByMonth = new Map<number, number>()
+  // setHours: yerel gün döngüsü; ay-bazlı sayım (gün anahtarı değil) → TZ etkisiz.
   const cursor = new Date(startDate)
   cursor.setHours(0, 0, 0, 0)
   const end = new Date(endDate)

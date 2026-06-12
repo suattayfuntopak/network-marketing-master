@@ -14,7 +14,7 @@ function buildWeekBars(candidates: NmmCandidate[], lang: 'tr' | 'en') {
       : ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
 
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0) // istemci: kullanıcı-yerel "bugün" (kasıtlı)
 
   return Array.from({ length: 7 }, (_, i) => {
     const d = new Date(today)

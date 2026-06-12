@@ -40,6 +40,7 @@ export async function fetchFreeTrialRecipients(
   supabase: AdminClient,
   offsetDays: number
 ): Promise<TrialEmailRecipient[]> {
+  // Cron: sunucu-yerel gün penceresi (kasıtlı; metrik gün anahtarı değil).
   const target = new Date()
   target.setDate(target.getDate() + offsetDays)
   target.setHours(0, 0, 0, 0)

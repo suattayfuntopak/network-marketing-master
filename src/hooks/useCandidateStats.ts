@@ -26,7 +26,7 @@ export function filterCandidatesByPeriod<T extends CandidateStatsRow>(
     cutoff = new Date()
     if (period === '7d') cutoff.setDate(now.getDate() - 7)
     else if (period === '30d') cutoff.setDate(now.getDate() - 30)
-    cutoff.setHours(0, 0, 0, 0)
+    cutoff.setHours(0, 0, 0, 0) // istemci: kullanıcı-yerel kesim (kasıtlı)
   }
 
   return candidates.filter(c => new Date(c.created_at) >= cutoff)

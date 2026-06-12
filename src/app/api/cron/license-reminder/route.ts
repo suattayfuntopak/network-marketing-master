@@ -17,6 +17,7 @@ export async function GET(request: NextRequest) {
   const results: { email: string; days: number; sent: boolean; skipped?: boolean }[] = []
 
   for (const daysRemaining of [7, 3, 1]) {
+    // Cron: sunucu-yerel gün penceresi (kasıtlı; metrik gün anahtarı değil).
     const targetStart = new Date(now)
     targetStart.setDate(targetStart.getDate() + daysRemaining)
     targetStart.setHours(0, 0, 0, 0)

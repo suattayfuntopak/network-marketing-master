@@ -53,6 +53,7 @@ function endOfDay(d: Date): Date {
   return x
 }
 
+// Görüntüleme Date sınırı (metrik gün anahtarı değil); yerel gün başı kasıtlı.
 function startOfDay(d: Date): Date {
   const x = new Date(d)
   x.setHours(0, 0, 0, 0)

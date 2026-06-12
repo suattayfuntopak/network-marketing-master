@@ -159,6 +159,7 @@ async function loginDaysInWindow(
   }
 
   const weekActive: boolean[] = []
+  // setHours: yalnızca döngü sınırı; gerçek gün anahtarı aşağıda istanbulDayKey ile.
   const cursor = new Date(windowStart)
   cursor.setHours(0, 0, 0, 0)
   const end = new Date(windowEnd)
