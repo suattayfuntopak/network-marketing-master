@@ -34,7 +34,7 @@ export function usePanoHubBadges() {
     staleTime: 60_000,
   })
 
-  // Badge: bugün/geçmiş takip sayısı (kendi + ekip)
+  // Badge: bugün/geçmiş takip sayısı (yalnızca liderin kendi boru hattı)
   const sahaRadarBadgeCount = useMemo(() => {
     if (!sahaRadar.data) return null
     const count = sahaRadar.data.followUps.filter(f => f.isOverdue).length

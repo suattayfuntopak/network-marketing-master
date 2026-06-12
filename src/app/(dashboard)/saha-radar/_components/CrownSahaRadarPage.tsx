@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { Activity, ChevronRight, Clock, Filter, Users } from 'lucide-react'
+import { Activity, ChevronRight, Clock, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -35,15 +35,6 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [coachingId, setCoachingId] = useState<string | null>(null)
   const [activeAiMessage, setActiveAiMessage] = useState<ActiveAiMessage | null>(null)
-  const [showMineOnly, setShowMineOnly] = useState(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem('nmm_radar_filter') === 'mine'
-  })
-
-  function toggleMineOnly(val: boolean) {
-    setShowMineOnly(val)
-    localStorage.setItem('nmm_radar_filter', val ? 'mine' : 'all')
-  }
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.crownSahaRadar(ws?.workspaceId ?? ''),
@@ -116,11 +107,8 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
     }
   }
 
-  const allOverdue = data?.followUps.filter(f => f.isOverdue) ?? []
-  const allUpcoming = data?.followUps.filter(f => !f.isOverdue) ?? []
-  const canFilter = data?.hasTeamAccess && (data?.followUps ?? []).some(f => !f.isMine)
-  const overdue = showMineOnly ? allOverdue.filter(f => f.isMine) : allOverdue
-  const upcoming = showMineOnly ? allUpcoming.filter(f => f.isMine) : allUpcoming
+  const overdue = data?.followUps.filter(f => f.isOverdue) ?? []
+  const upcoming = data?.followUps.filter(f => !f.isOverdue) ?? []
   const activeMembers = data?.members.filter(m => m.activityLevel === 'active').length ?? 0
   const silentMembers = data?.members.filter(m => m.activityLevel === 'silent').length ?? 0
 
@@ -197,36 +185,6 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
           <>
             {/* TAB: Takipler — hidden ile DOM'da tutulur; sekme geçişi anlık */}
             <div className={innerTab === 'takipler' ? 'space-y-4' : 'hidden'}>
-                {/* Filtre: sadece benim (yalnızca ekip erişimi olan + başkasına ait takip varsa) */}
-                {canFilter && (
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => toggleMineOnly(false)}
-                      className={clsx(
-                        'rounded-full px-3 py-1 text-xs font-semibold transition',
-                        !showMineOnly
-                          ? 'bg-orange-600 text-white shadow-sm'
-                          : 'border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
-                      )}
-                    >
-                      <Filter className="mr-1 inline h-3 w-3" />
-                      {t('crown.sahaRadarFilterAll')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => toggleMineOnly(true)}
-                      className={clsx(
-                        'rounded-full px-3 py-1 text-xs font-semibold transition',
-                        showMineOnly
-                          ? 'bg-orange-600 text-white shadow-sm'
-                          : 'border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]',
-                      )}
-                    >
-                      {t('crown.sahaRadarFilterMine')}
-                    </button>
-                  </div>
-                )}
                 {overdue.length === 0 && upcoming.length === 0 ? (
                   <HubSectionCard>
                     <p className="text-center text-sm text-[var(--text-3)]">

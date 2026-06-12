@@ -76,7 +76,6 @@ export function FollowUpCard({
           {f.candidateName}
         </p>
         <p className="text-xs text-[var(--text-3)]">
-          {!f.isMine && <>{f.ownerName} · </>}
           {dateStr}
           {f.isOverdue && (
             <span className="ml-1 font-bold text-rose-500">

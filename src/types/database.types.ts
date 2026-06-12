@@ -1050,6 +1050,10 @@ export interface Database {
         Args: { p_member_id: string; p_member_name: string }
         Returns: Json
       }
+      nmm_unclaim_member: {
+        Args: { p_member_user_id: string }
+        Returns: Json
+      }
       nmm_sync_member_avatar: {
         Args: { p_avatar_url: string }
         Returns: undefined

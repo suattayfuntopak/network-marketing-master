@@ -388,6 +388,8 @@ export const tr = {
     joinATeamDesc: "Size gönderilen NMM davet kodunu aşağıya girerek liderinizin ekibine katılın. Mevcut tüm aday verileriniz otomatik olarak bu ekibe aktarılacaktır.",
     joinBtn: "Katıl",
     removeFromTeam: "Ekipten Çıkar",
+    removeFromTeamConfirm: "{name} ekibinden çıkarılsın mı? Kişi bağımsız (dış kayıt) olarak listelenecek ve liste kaydı kaldırılacak. Dilersen tekrar ekibine bağlayabilirsin.",
+    removeFromTeamSuccess: "{name} ekipten çıkarıldı — artık dış kayıt.",
     performancePanel: "Lider ve Ekip Performans Paneli",
     statLeader: "Lider",
     statNmmPartner: "NMM Ortağı",

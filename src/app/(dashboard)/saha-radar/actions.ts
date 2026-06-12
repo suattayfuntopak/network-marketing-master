@@ -26,11 +26,8 @@ export type SahaRadarMember = {
 export type SahaRadarFollowUp = {
   id: string
   candidateName: string
-  ownerUserId: string
-  ownerName: string
   dueAt: string
   isOverdue: boolean
-  isMine: boolean
   phone: string | null
   stage: string
 }
@@ -38,13 +35,11 @@ export type SahaRadarFollowUp = {
 export type CrownSahaRadarPayload = {
   members: SahaRadarMember[]
   followUps: SahaRadarFollowUp[]
-  myUserId: string
-  hasTeamAccess: boolean
 }
 
 export async function getCrownSahaRadarAction(workspaceId: string): Promise<CrownSahaRadarPayload> {
   const { user } = await getAuthUser()
-  if (!user) return { members: [], followUps: [], myUserId: '', hasTeamAccess: false }
+  if (!user) return { members: [], followUps: [] }
 
   const supabase = await createClient()
   const { data: wsData } = await supabase
@@ -109,16 +104,11 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
       return order[a.activityLevel] - order[b.activityLevel]
     })
 
-  const ownerIds = [user.id, ...(teamAccess ? teamMemberUserIds : [])]
-
-  const memberNameMap: Record<string, string> = {}
-  for (const m of ekipRows) {
-    memberNameMap[m.user_id] = m.full_name ?? '—'
-  }
-
+  // Takipler YALNIZCA liderin kendi boru hattındaki adaylar — ekip üyelerinin
+  // kendi takipleri burada görünmez (mahremiyet). Her ekip kendi NMM'inde takip eder.
   const { data: followUpRows, error: followUpErr } = await supabase.rpc('nmm_saha_radar_follow_ups', {
     p_workspace_id: workspaceId,
-    p_owner_ids: ownerIds,
+    p_owner_ids: [user.id],
     p_horizon_days: 7,
     p_limit: 60,
   })
@@ -127,16 +117,13 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
   const followUps: SahaRadarFollowUp[] = (followUpRows ?? []).map(c => ({
     id: c.id,
     candidateName: c.full_name,
-    ownerUserId: c.owner_id,
-    ownerName: memberNameMap[c.owner_id] ?? '—',
     dueAt: c.next_follow_up_at!,
     isOverdue: c.next_follow_up_at! < nowIso,
-    isMine: c.owner_id === user.id,
     phone: c.phone ?? null,
     stage: c.stage,
   }))
 
-  return { members, followUps, myUserId: user.id, hasTeamAccess: teamAccess }
+  return { members, followUps }
 }
 
 // ─── Coaching AI Action ───────────────────────────────────────────────────────

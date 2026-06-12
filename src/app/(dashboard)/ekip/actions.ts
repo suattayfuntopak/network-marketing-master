@@ -468,6 +468,22 @@ export async function removeTeamMemberAction(
   if (error) throw new Error(error.message)
 }
 
+/**
+ * "Ekipten Çıkar" — downline app-user üyenin bağını koparır (parent_id=NULL).
+ * Kişi yeniden bağımsız "dış kayıt" olur; bağlı pipeline adayı + linki silinir.
+ * "Ekibime Bağla" ile geri alınabilir. Yetki kontrolü RPC içinde (kendi downline'ı).
+ */
+export async function unclaimMemberFromTeamAction(memberUserId: string): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const { error } = await supabase.rpc('nmm_unclaim_member', {
+    p_member_user_id: memberUserId,
+  })
+  if (error) throw new Error(error.message)
+}
+
 export async function syncMemberAvatarAction(avatarUrl: string): Promise<void> {
   const supabase = await createClient()
   const { error } = await supabase.rpc('nmm_sync_member_avatar', { p_avatar_url: avatarUrl })

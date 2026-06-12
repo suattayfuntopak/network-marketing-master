@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-13 — Mahremiyet (Saha Radarı + Takvim) + "Ekipten Çıkar" ✅
+
+### 1) Saha Radarım: yalnız liderin kendi takipleri
+- **`saha-radar/actions.ts`:** Takipler artık YALNIZCA liderin kendi boru hattındaki adaylar (`p_owner_ids = [user.id]`). Ekip üyelerinin kendi takipleri görünmez (mahremiyet). `SahaRadarFollowUp`'tan `isMine/ownerName/ownerUserId`, payload'dan `myUserId/hasTeamAccess` kaldırıldı.
+- **`CrownSahaRadarPage.tsx`:** "Tüm takipler / Sadece benim" filtre butonları + `showMineOnly`/`canFilter`/localStorage(`nmm_radar_filter`) tamamen kaldırıldı. **`SahaRadarCards.tsx`:** ownerName satırı kaldırıldı. i18n `sahaRadarFilterAll/Mine` silindi. `usePanoHubBadges` rozet yorumu güncellendi. Kırıntı bırakılmadı.
+
+### 2) Takvim: Ekip Takvimi kaldırıldı
+- **`TakvimClient.tsx`:** Alt taraftaki Ekip Takvimi tablosu + `showTeamCalendar` + `['takvim-team']` invalidation kaldırıldı. **`TakvimTeamCalendar.tsx` silindi.** **`takvim/actions.ts`:** `fetchTeamCalendarSummaryAction` + `TeamCalendarMemberSummary` + yalnız ona ait yardımcılar (`monthPrefix`, `summarizeMemberMonth`) ve artık kullanılmayan importlar kaldırıldı. i18n `teamCalendar*` silindi.
+
+### 3) "Ekipten Çıkar" (downline app-user → dış kayıt)
+- **`096_unclaim_member.sql` [YENİ]:** `nmm_unclaim_member(p_member_user_id)` SECURITY DEFINER RPC — `claimIndependentSignupToTeamAction`'ın simetrik tersi: hedef workspace `parent_id=NULL` (→ bağımsız/dış kayıt) + bağlı pipeline adayı silinir (CASCADE link de düşer). Çağıran yalnız kendi downline'ını çıkarabilir.
+- **`ekip/actions.ts`:** `unclaimMemberFromTeamAction`. **`database.types.ts`:** RPC tipi eklendi.
+- **`TeamMemberCard.tsx`:** "Listeye Ekle" yanına **"Ekipten Çıkar"** (kırmızı, `UserMinus`). Masaüstü metinli, **mobilde her iki buton da yazısız (sadece ikon)**.
+- **`TeamPerformanceSection.tsx`:** ConfirmDialog (danger) + `handleRemoveFromTeam` → `invalidateCandidates` (huni/Hedefim) + `invalidateTeam` (Ekibim/istatistik). Tersine çalışır (tekrar "Ekibime Bağla"). i18n `team.removeFromTeamConfirm/Success` (tr+en).
+
+### Migration: 096 db push (dry-run→apply/PUSH) ile uygulanmalı.
+
+### Dosyalar
+`saha-radar/actions.ts`, `saha-radar/_components/CrownSahaRadarPage.tsx`, `saha-radar/_components/SahaRadarCards.tsx`, `hooks/usePanoHubBadges.ts`, `takvim/_components/TakvimClient.tsx`, `takvim/actions.ts` (+ TakvimTeamCalendar.tsx silindi), `ekip/actions.ts`, `ekip/_components/TeamMemberCard.tsx`, `ekip/_components/TeamPerformanceSection.tsx`, `types/database.types.ts`, `supabase/migrations/096_unclaim_member.sql`, `lib/translations/*`
+
 ## 2026-06-13 — Vaktin Varsa mobil başlık + silme akışı incelemesi ✅
 
 ### Vaktin Varsa mobil sekme başlığı

@@ -388,6 +388,8 @@ export const en = {
     joinATeamDesc: "Enter the NMM invite code you received to join your leader's team. All your current candidate data will be automatically transferred.",
     joinBtn: "Join",
     removeFromTeam: "Remove from Team",
+    removeFromTeamConfirm: "Remove {name} from your team? They will be listed as an independent (external) signup and their pipeline record will be removed. You can re-link them to your team anytime.",
+    removeFromTeamSuccess: "{name} removed from team — now an external signup.",
     performancePanel: "Leader & Team Performance Panel",
     statLeader: "Leader",
     statNmmPartner: "NMM Partner",

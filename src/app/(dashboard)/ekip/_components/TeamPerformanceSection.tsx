@@ -15,7 +15,8 @@ import { TeamMemberCard, type MemberCardTab } from './TeamMemberCard'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { BroadcastPanel } from './BroadcastPanel'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { addTeamMemberAsCandidateAction } from '../actions'
+import { addTeamMemberAsCandidateAction, unclaimMemberFromTeamAction } from '../actions'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { queryInvalidator } from '@/lib/query/invalidator'
 import { toast } from 'sonner'
 import { memberMatchesSearch } from '@/lib/team/memberSearch'
@@ -72,6 +73,8 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const router = useRouter()
   const queryClient = useQueryClient()
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null)
+  const [confirmRemove, setConfirmRemove] = useState<MemberRow | null>(null)
   const [toolsOpen, setToolsOpen] = useState(true)
   const [localSearch, setLocalSearch] = useState(memberSearch)
   const [prevSearch, setPrevSearch] = useState(memberSearch)
@@ -138,6 +141,24 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
       setLinkingMemberId(null)
     }
   }
+
+  async function handleRemoveFromTeam(member: MemberRow) {
+    if (removingMemberId) return
+    setRemovingMemberId(member.user_id)
+    try {
+      await unclaimMemberFromTeamAction(member.user_id)
+      // Aday silindi + bağ koptu → huni/Hedefim ve ekip metrikleri yenilenir.
+      queryInvalidator.invalidateCandidates(queryClient, ws.workspaceId)
+      queryInvalidator.invalidateTeam(queryClient, ws.workspaceId)
+      toast.success(t('team.removeFromTeamSuccess', { name: member.full_name ?? t('common.member') }))
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : t('common.error'))
+    } finally {
+      setRemovingMemberId(null)
+      setConfirmRemove(null)
+    }
+  }
+
   const [now] = useState(() => Date.now())
   // Sekme durumu efemeraldir: sayfaya her girişte tüm üye kartı sekmeleri kapalı başlar.
   // Kullanıcı tıklayarak açar; kalıcılık (sessionStorage/URL) bilinçli olarak yoktur.
@@ -293,6 +314,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               onSetOnboardingWeek={week => setOnboardingWeekByMember(prev => ({ ...prev, [m.user_id]: week }))}
               onToggleOnboardingStep={(stepId, isDone) => { onMemberSearchChange(''); void toggleOnboardingStep(m.user_id, stepId, isDone) }}
               onLinkToPipeline={() => { onMemberSearchChange(''); void handleLinkMemberToPipeline(m) }}
+              onRemoveFromTeam={() => { onMemberSearchChange(''); setConfirmRemove(m) }}
               onInviteMember={() => { onMemberSearchChange(''); handleInviteMember(m) }}
               onSetOnboardingCoachData={setOnboardingCoachData}
               onOpenUpgrade={openUpgrade}
@@ -364,6 +386,14 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
         ) : null}
       </section>
       {UpgradePrompt}
+      {confirmRemove && (
+        <ConfirmDialog
+          message={t('team.removeFromTeamConfirm', { name: confirmRemove.full_name ?? t('common.member') })}
+          variant="danger"
+          onConfirm={() => { void handleRemoveFromTeam(confirmRemove) }}
+          onCancel={() => setConfirmRemove(null)}
+        />
+      )}
       </>
   )
 }

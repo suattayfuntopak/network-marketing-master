@@ -1,20 +1,11 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { isSuperAdmin } from '@/lib/domain/auth'
 import {
-  buildCalendarByDate,
   CALENDAR_TERMINAL_STAGES,
   FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
 } from '@/lib/domain/calendarFollowUp'
 import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/utils/calendarDates'
-import type { NmmCandidate } from '@/types/database.types'
-
-export type TeamCalendarMemberSummary = {
-  userId: string
-  fullName: string
-  days: { dateKey: string; count: number }[]
-}
 
 async function assertWorkspaceOwner(workspaceId: string) {
   const supabase = await createClient()
@@ -23,13 +14,13 @@ async function assertWorkspaceOwner(workspaceId: string) {
 
   const { data: ws } = await supabase
     .from('nmm_workspaces')
-    .select('owner_id, license_type')
+    .select('owner_id')
     .eq('id', workspaceId)
     .single()
 
   if (!ws || ws.owner_id !== user.id) throw new Error('Yetkisiz işlem.')
 
-  return { supabase, user, ws }
+  return { supabase, user }
 }
 
 async function logFollowUpChange(
@@ -173,85 +164,4 @@ export async function bulkDeferOverdueFollowUpsAction(
   await supabase.from('nmm_daily_actions').insert(logRows)
 
   return { updated: eligible.length }
-}
-
-function monthPrefix(year: number, month: number): string {
-  return `${year}-${String(month + 1).padStart(2, '0')}-`
-}
-
-function summarizeMemberMonth(
-  candidates: NmmCandidate[],
-  prefix: string,
-): { dateKey: string; count: number }[] {
-  const byDate = buildCalendarByDate(candidates)
-  return Object.entries(byDate)
-    .filter(([key]) => key.startsWith(prefix))
-    .map(([dateKey, list]) => ({ dateKey, count: list.length }))
-    .sort((a, b) => a.dateKey.localeCompare(b.dateKey))
-}
-
-export async function fetchTeamCalendarSummaryAction(
-  workspaceId: string,
-  year: number,
-  month: number,
-): Promise<TeamCalendarMemberSummary[]> {
-  const { supabase, user, ws } = await assertWorkspaceOwner(workspaceId)
-
-  if (ws.license_type !== 'pro' && !isSuperAdmin(user)) {
-    return []
-  }
-
-  // Downline keşfi kolon-kısıtlı definer rpc ile (055): workspace SELECT politikası
-  // own+member'a daraldı; davet kodu/lisans sızdırmadan id+owner_id alınır (auth.uid() kapsamı).
-  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
-
-  if (!downlineWs?.length) return []
-
-  const ownerIds = downlineWs.map(w => w.owner_id).filter(Boolean) as string[]
-
-  const { data: members } = await supabase
-    .from('nmm_workspace_members')
-    .select('user_id, full_name')
-    .in('user_id', ownerIds)
-
-  const nameByUser: Record<string, string> = {}
-  members?.forEach(m => { nameByUser[m.user_id] = m.full_name ?? 'Ekip üyesi' })
-
-  const prefix = monthPrefix(year, month)
-  const downlineWsIds = downlineWs.map(w => w.id)
-
-  const { data: allCandidates } = await supabase
-    .from('nmm_candidates')
-    .select('*')
-    .in('workspace_id', downlineWsIds)
-
-  const candidatesByOwner = new Map<string, NmmCandidate[]>()
-  for (const row of allCandidates ?? []) {
-    const c = row as NmmCandidate
-    if (!c.owner_id) continue
-    const list = candidatesByOwner.get(c.owner_id) ?? []
-    list.push(c)
-    candidatesByOwner.set(c.owner_id, list)
-  }
-
-  const summaries: TeamCalendarMemberSummary[] = []
-
-  for (const dl of downlineWs) {
-    if (!dl.owner_id) continue
-
-    const memberCandidates = (candidatesByOwner.get(dl.owner_id) ?? []).filter(
-      c => c.workspace_id === dl.id,
-    )
-
-    const days = summarizeMemberMonth(memberCandidates, prefix)
-    if (!days.length) continue
-
-    summaries.push({
-      userId: dl.owner_id,
-      fullName: nameByUser[dl.owner_id] ?? 'Ekip üyesi',
-      days,
-    })
-  }
-
-  return summaries.sort((a, b) => a.fullName.localeCompare(b.fullName, 'tr'))
 }

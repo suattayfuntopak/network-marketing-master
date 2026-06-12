@@ -34,9 +34,6 @@ export const pagesSection = {
       bulkDeferConfirm: "Evet, ertele",
       bulkDeferSuccess: "{count} takip ertelendi",
       bulkDeferNone: "Takip ertelenemedi — sayfayı yenileyip tekrar deneyin",
-      teamCalendarTitle: "Ekip Takvimi",
-      teamCalendarSubtitle: "Alt ekip liderlerinin planlı takip yoğunluğu (salt okunur)",
-      teamCalendarEmpty: "Bu ay planlı takip yok",
 
       // saha-provasi/page.tsx
       fieldRehearsalTitle: "Saha Provası",
@@ -109,9 +106,6 @@ export const pagesSection = {
       bulkDeferConfirm: "Yes, defer",
       bulkDeferSuccess: "{count} follow-ups deferred",
       bulkDeferNone: "Could not defer — refresh and try again",
-      teamCalendarTitle: "Team Calendar",
-      teamCalendarSubtitle: "Downline leaders' scheduled follow-up load (read-only)",
-      teamCalendarEmpty: "No scheduled follow-ups this month",
 
       // saha-provasi/page.tsx
       fieldRehearsalTitle: "Field Rehearsal",

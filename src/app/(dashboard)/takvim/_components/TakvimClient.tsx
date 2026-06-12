@@ -35,7 +35,6 @@ import {
   deferFollowUpAction,
 } from '../actions'
 import { TakvimCandidateRow } from './TakvimCandidateRow'
-import { TakvimTeamCalendar } from './TakvimTeamCalendar'
 import { TakvimConfirmModal } from './TakvimConfirmModal'
 
 export function TakvimClient() {
@@ -119,11 +118,9 @@ export function TakvimClient() {
   const isViewingTodayMonth =
     view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth()
   const showBackToToday = selected !== todayKey || !isViewingTodayMonth
-  const showTeamCalendar = ws?.licenseType === 'pro' || ws?.isSuperAdmin
 
   const invalidateCalendar = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: ['candidates', ws?.workspaceId] })
-    queryClient.invalidateQueries({ queryKey: ['takvim-team', ws?.workspaceId] })
   }, [queryClient, ws?.workspaceId])
 
   const showPipelineToast = useCallback((candidateId: string) => {
@@ -455,18 +452,6 @@ export function TakvimClient() {
           </div>
         )
       })()}
-
-      {showTeamCalendar && (
-        <TakvimTeamCalendar
-          workspaceId={ws.workspaceId}
-          year={view.getFullYear()}
-          month={view.getMonth()}
-          lang={lang}
-          title={t('pagesUi.teamCalendarTitle')}
-          subtitle={t('pagesUi.teamCalendarSubtitle')}
-          emptyLabel={t('pagesUi.teamCalendarEmpty')}
-        />
-      )}
     </div>
   )
 }

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import { toast } from 'sonner'
-import { Crown, Check, Rocket, Bot, Phone, BarChart3, UserPlus, Target } from 'lucide-react'
+import { Crown, Check, Rocket, Bot, Phone, BarChart3, UserPlus, UserMinus, Target } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
@@ -41,6 +41,7 @@ type Props = {
   onSetOnboardingWeek: (week: 1 | 2 | 3 | 4) => void
   onToggleOnboardingStep: (stepId: string, isDone: boolean) => void
   onLinkToPipeline: () => void
+  onRemoveFromTeam: () => void
   onInviteMember: () => void
   onSetOnboardingCoachData: (data: { memberName: string; stepId: string; phone?: string | null } | null) => void
   onOpenUpgrade: (feature?: UpgradeFeature) => void
@@ -50,7 +51,7 @@ export function TeamMemberCard({
   m, ws, now, isLeader, hasMasterAccess, linkingMemberId,
   activeTab, onboardingWeek, memberGoalsMap, teamPulseUnlocked,
   lang, t, hasAiFieldAccess, onSelectTab, onPrefetchActivity,
-  onSetOnboardingWeek, onToggleOnboardingStep, onLinkToPipeline,
+  onSetOnboardingWeek, onToggleOnboardingStep, onLinkToPipeline, onRemoveFromTeam,
   onInviteMember, onSetOnboardingCoachData, onOpenUpgrade,
 }: Props) {
   const router = useRouter()
@@ -134,16 +135,30 @@ export function TeamMemberCard({
         ) : null}
       </div>
 
-      {isLeader && m.isAppUser !== false && m.role === 'member' && !m.pipeline_id ? (
-        <button
-          type="button"
-          disabled={linkingMemberId === m.user_id}
-          onClick={e => { e.stopPropagation(); onLinkToPipeline() }}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-4 py-2.5 text-xs font-bold text-brand transition hover:bg-brand/10 disabled:opacity-50 sm:w-auto"
-        >
-          <UserPlus className="h-4 w-4 shrink-0" />
-          <span>{t('team.linkToPipeline')}</span>
-        </button>
+      {isLeader && m.isAppUser !== false && m.role === 'member' ? (
+        <div className="flex gap-2">
+          {!m.pipeline_id ? (
+            <button
+              type="button"
+              disabled={linkingMemberId === m.user_id}
+              onClick={e => { e.stopPropagation(); onLinkToPipeline() }}
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-brand/25 bg-brand/5 px-3 py-2.5 text-xs font-bold text-brand transition hover:bg-brand/10 disabled:opacity-50"
+              aria-label={t('team.linkToPipeline')}
+            >
+              <UserPlus className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">{t('team.linkToPipeline')}</span>
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={e => { e.stopPropagation(); onRemoveFromTeam() }}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-rose-300/40 bg-rose-50 px-3 py-2.5 text-xs font-bold text-rose-600 transition hover:bg-rose-100 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40"
+            aria-label={t('team.removeFromTeam')}
+          >
+            <UserMinus className="h-4 w-4 shrink-0" />
+            <span className="hidden sm:inline">{t('team.removeFromTeam')}</span>
+          </button>
+        </div>
       ) : null}
 
       {/* NMM kullanıcıları: ikon sekmeleri + içerik */}
