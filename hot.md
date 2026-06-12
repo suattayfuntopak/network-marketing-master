@@ -1,5 +1,32 @@
 # Hot Log
 
+## 2026-06-12 — Unified DashboardPageHeader Component Integration ✅
+
+### 1. Unified Reusable Header Component
+- **`DashboardPageHeader.tsx` [NEW]**: Implemented a flexible, responsive header component encapsulating page title, subtitle, icon, custom wrapper styling, right-aligned action slots, optional dateline, and built-in `<PageHelp />` popups.
+
+### 2. Page Header Refactoring
+- **`takvim/page.tsx`**: Standardized the calendar header by replacing legacy elements with the `<DashboardPageHeader>` component.
+- **`yazar/page.tsx`**: Standardized the AI Coach header.
+- **`PlatformYonetimContent.tsx`**: Refactored the platform console header to wrap title tags and mount action tabs and buttons cleanly into the header component's actions slot.
+
+### Files
+`src/components/ui/DashboardPageHeader.tsx`, `src/app/(dashboard)/takvim/page.tsx`, `src/app/(dashboard)/yazar/page.tsx`, `src/app/(dashboard)/platform-yonetim/_components/PlatformYonetimContent.tsx`
+
+## 2026-06-12 — Hedefim ↔ Saha Özetim huni hedef hizalaması ✅
+
+Kullanıcı talebi: Hedefim yol haritası ile Saha Özetim dönem hedeflerinin senkron olması (×7/×30/×365 kaldırıldı).
+
+### Yapılanlar
+- **`hubFunnelTargets.ts`** (yeni): Günlük `ceil(m/26)`, haftalık `ceil(m×gün/26)`, aylık `stage.monthly`, yıllık kademe toplamı; geçmiş dönem = o dönemin yol haritası ayı.
+- **`getGoalFunnelContextAction()`**: Hedef + roadmap tek cache kaynağı (`hedef/actions.ts`).
+- **`hubSelfActions.ts`**: Tüm sekmeler yeni hedef motorunu kullanıyor.
+- **`hubFunnelTargets.test.ts`**: 5 senaryo (300/18 ay, 1. ay 18·9·3, haftalık 5·3·1·1).
+- **`docs/hub-metrics.md`**: Huni hedef tablosu eklendi.
+
+### Doğrulama
+`vitest hubFunnelTargets + roadmap` 19/19 · `tsc --noEmit` temiz.
+
 ## 2026-06-13 — UX Hız Turu + Mobil PageHelp + WA Helper Migrasyonu + PageHelp Coverage ✅
 
 Kullanıcı talebi: mobilde sayfa yardımını kaldır; sayfalar/sekmeler/metrikler "pat pat" geçsin. + önceki turun genel önerilerinin uygulanması. (Kod değişiklikleri paralel bir otomatik commit ile `e591ea3`'e dahil oldu; bu girdi onları belgeler.)

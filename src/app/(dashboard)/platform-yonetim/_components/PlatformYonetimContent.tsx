@@ -26,7 +26,7 @@ import {
 } from '@/app/(dashboard)/actions/moderation'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
 import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
@@ -247,56 +247,54 @@ export function PlatformYonetimContent() {
 
         <UnresolvedOrdersAlert />
 
-        <header className="flex items-start justify-between gap-2 sm:gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md">
-              <Crown className="h-5 w-5 text-white" strokeWidth={2.25} />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-[var(--text-1)] flex flex-wrap items-center gap-2">
-                <span className="truncate">{t('platformPage.consoleTitle')}</span>
-                <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 shrink-0">
-                  {t('platformPage.superAdmin')}
-                </span>
-              </h1>
-            </div>
-          </div>
-          <div className="flex shrink-0 flex-row gap-1.5 sm:gap-2 items-center">
-            <PageHelp />
-            <button
-              type="button"
-              onClick={() => setNavConfirm('payment')}
-              aria-label={t('platformPage.openPaymentPage')}
-              title={t('platformPage.openPaymentPage')}
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-300/80 bg-emerald-50 text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 md:hidden"
-            >
-              <CreditCard className="h-4.5 w-4.5" strokeWidth={2} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setNavConfirm('landing')}
-              aria-label={t('platformPage.openLandingPage')}
-              title={t('platformPage.openLandingPage')}
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-300/80 bg-violet-50 text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 md:hidden"
-            >
-              <LayoutTemplate className="h-4.5 w-4.5" strokeWidth={2} />
-            </button>
-            <button
-              type="button"
-              onClick={() => setNavConfirm('payment')}
-              className="hidden rounded-lg border border-emerald-300/80 bg-emerald-50 px-3 py-2 text-[11px] font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 whitespace-nowrap md:inline-flex"
-            >
-              {t('platformPage.openPaymentPage')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setNavConfirm('landing')}
-              className="hidden rounded-lg border border-violet-300/80 bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 whitespace-nowrap md:inline-flex"
-            >
-              {t('platformPage.openLandingPage')}
-            </button>
-          </div>
-        </header>
+        <DashboardPageHeader
+          title={
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="truncate">{t('platformPage.consoleTitle')}</span>
+              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 shrink-0">
+                {t('platformPage.superAdmin')}
+              </span>
+            </span>
+          }
+          icon={<Crown className="h-5 w-5 text-white" strokeWidth={2.25} />}
+          iconContainerClassName="bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md"
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => setNavConfirm('payment')}
+                aria-label={t('platformPage.openPaymentPage')}
+                title={t('platformPage.openPaymentPage')}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-300/80 bg-emerald-50 text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 md:hidden"
+              >
+                <CreditCard className="h-4.5 w-4.5" strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setNavConfirm('landing')}
+                aria-label={t('platformPage.openLandingPage')}
+                title={t('platformPage.openLandingPage')}
+                className="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-300/80 bg-violet-50 text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 md:hidden"
+              >
+                <LayoutTemplate className="h-4.5 w-4.5" strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                onClick={() => setNavConfirm('payment')}
+                className="hidden rounded-lg border border-emerald-300/80 bg-emerald-50 px-3 py-2 text-[11px] font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-100 active:scale-[0.98] dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-100 dark:hover:bg-emerald-950/60 whitespace-nowrap md:inline-flex"
+              >
+                {t('platformPage.openPaymentPage')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setNavConfirm('landing')}
+                className="hidden rounded-lg border border-violet-300/80 bg-violet-50 px-3 py-2 text-[11px] font-bold text-violet-900 shadow-sm transition hover:bg-violet-100 active:scale-[0.98] dark:border-violet-700/60 dark:bg-violet-950/40 dark:text-violet-100 dark:hover:bg-violet-950/60 whitespace-nowrap md:inline-flex"
+              >
+                {t('platformPage.openLandingPage')}
+              </button>
+            </>
+          }
+        />
 
         <PlatformKpiCards
           totalUsersCount={totalUsersCount}
