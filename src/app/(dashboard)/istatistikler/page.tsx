@@ -8,6 +8,7 @@ import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { downlineActivityMemberIds } from '@/lib/query/prefetchRouteMetrics'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import { getStatsFunnelBundleAction } from './actions'
 import { IstatistiklerContent } from './_components/IstatistiklerContent'
 
 export default async function IstatistiklerPage() {
@@ -29,6 +30,11 @@ export default async function IstatistiklerPage() {
         queryKey: queryKeys.team(ws.workspaceId),
         queryFn: () => fetchTeamBundleAction(ws.workspaceId),
         staleTime: QUERY_STALE.data,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: ['stats-funnel-bundle', '30d'],
+        queryFn: () => getStatsFunnelBundleAction('30d'),
+        staleTime: QUERY_STALE.metrics,
       }),
     ])
 

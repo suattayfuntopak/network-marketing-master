@@ -29,7 +29,7 @@ export const queryInvalidator = {
     
     // Changing candidates also impacts hub metrics & funnel actuals
     qc.invalidateQueries({ queryKey: ['hub'] })
-    qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
+    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
     qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
     qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
@@ -68,6 +68,7 @@ export const queryInvalidator = {
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })
     qc.invalidateQueries({ queryKey: ['hub'] })
     qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
+    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
   },
 
   /**
@@ -96,7 +97,7 @@ export const queryInvalidator = {
    */
   invalidateHub: (qc: QueryClient, workspaceId?: string | null) => {
     qc.invalidateQueries({ queryKey: ['hub'] })
-    qc.invalidateQueries({ queryKey: ['stats-funnel-actuals'] })
+    qc.invalidateQueries({ queryKey: ['stats-funnel-bundle'] })
     qc.invalidateQueries({ queryKey: ['pano-field-insights'] })
     qc.invalidateQueries({ queryKey: queryKeys.goalDashboard() })
     qc.invalidateQueries({ queryKey: queryKeys.selfUserProgress() })

@@ -16,6 +16,7 @@ import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildCandidateTrendBars } from '@/lib/domain/trendBuckets'
 import { StatsKpiCards } from './StatsKpiCards'
+import { StatsFieldFunnelSection } from './StatsFieldFunnelSection'
 const StatsCharts = dynamic(
   () => import('./StatsCharts').then(m => m.StatsCharts),
   {
@@ -241,6 +242,8 @@ export function IstatistiklerContent() {
         <div className="space-y-6">
           {/* KPI Cards */}
           <StatsKpiCards metrics={metrics} />
+
+          <StatsFieldFunnelSection period={period} />
 
           {/* Huni & Grafik Bölümü */}
           <StatsCharts

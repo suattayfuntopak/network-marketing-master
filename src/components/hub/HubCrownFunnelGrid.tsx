@@ -27,6 +27,8 @@ type HubCrownFunnelGridProps = {
   hideFooter?: boolean
   /** Ekip üyesi aktivite özeti: 3. tekil soru kalıbı; Hedefim: 'plan' (gelecek zaman) */
   labelMode?: 'self' | 'member' | 'plan'
+  /** Dönem etiketi özel (örn. İstatistikler 30g kayan pencere) */
+  targetFooterKey?: string
 }
 
 export function HubCrownFunnelGrid({
@@ -39,6 +41,7 @@ export function HubCrownFunnelGrid({
   hideNoGoalFooter = false,
   hideFooter = false,
   labelMode = 'self',
+  targetFooterKey,
 }: HubCrownFunnelGridProps) {
   const { t } = useTranslation()
   const metricLabelKeys = funnelMetricLabelKeys(labelMode)
@@ -118,13 +121,15 @@ export function HubCrownFunnelGrid({
             </div>
             {hideFooter ? null : hasGoal ? (
               <p className="mt-1.5 text-[10px] font-medium text-[var(--text-3)]">
-                {period === 'daily'
-                  ? t('crown.hubDailyTarget')
-                  : period === 'weekly'
-                    ? t('crown.hubWeeklyTarget')
-                    : period === 'monthly'
-                      ? t('crown.hubMonthlyTarget')
-                      : t('crown.hubYearlyTarget')}
+                {targetFooterKey
+                  ? t(targetFooterKey)
+                  : period === 'daily'
+                    ? t('crown.hubDailyTarget')
+                    : period === 'weekly'
+                      ? t('crown.hubWeeklyTarget')
+                      : period === 'monthly'
+                        ? t('crown.hubMonthlyTarget')
+                        : t('crown.hubYearlyTarget')}
               </p>
             ) : hideNoGoalFooter ? null : (
               <p className="mt-1.5 text-[10px] font-medium text-[var(--text-3)]">

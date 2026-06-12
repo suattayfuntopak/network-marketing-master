@@ -18,7 +18,7 @@ const PERSISTED_KEY_ROOTS = new Set([
   'pano-field-insights',
   // Saf sayısal huni (arama/tanışma/sunum/yeni üye) — PII yok, İstatistikler
   // sayfası tekrar ziyarette anında dolu görünür.
-  'stats-funnel-actuals',
+  'stats-funnel-bundle',
 ])
 
 const noopStorage = {

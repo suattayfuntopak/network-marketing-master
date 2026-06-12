@@ -1,12 +1,14 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Activity, ExternalLink } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { pulsePeriodToHubGridPeriod } from '@/lib/domain/hubPeriodPrefetch'
+import { PULSE_PERIOD_OPTIONS } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import { getStatsFunnelBundleAction } from '../actions'
 
 type Props = {
@@ -15,6 +17,17 @@ type Props = {
 
 export function StatsFieldFunnelSection({ period }: Props) {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    for (const p of PULSE_PERIOD_OPTIONS) {
+      void queryClient.prefetchQuery({
+        queryKey: ['stats-funnel-bundle', p],
+        queryFn: () => getStatsFunnelBundleAction(p),
+        staleTime: 30_000,
+      })
+    }
+  }, [queryClient])
 
   const { data: bundle, isLoading } = useQuery({
     queryKey: ['stats-funnel-bundle', period],
@@ -61,6 +74,7 @@ export function StatsFieldFunnelSection({ period }: Props) {
           targets={targets}
           hasGoal={hasGoal}
           period={pulsePeriodToHubGridPeriod(period)}
+          targetFooterKey={period === '30d' ? 'crown.hubRolling30Target' : undefined}
           loading={isLoading}
         />
       )}
