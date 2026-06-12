@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-13 — Content Library Level Filters, Category Sync & Next Topic Box Removal ✅
+
+### Content Library Filter & Popup Form Updates
+- **`EgitimContent.tsx`**:
+  - Removed the "ÖĞRENME YOLUNDA SIRADAKİ" (Next Topic) box and its associated `nextTopic` and `goToNextTopic` declarations.
+  - Added "Temel" (Basic) level filter button immediately to the right of "Tüm Seviyeler".
+  - Configured `SeviyeKey` and `SEVIYE_GRUPLARI` mapping to separate `basic` level ('Temel', 'Basic') from `beginner` level ('Başlangıç').
+- **`AddTrainingModal.tsx`**:
+  - Set default levels state (`newSeviye`) to `'Temel'`.
+  - Added `Temel` (Basic) option as the first item in the Seviye dropdown select.
+  - Added `Genel` (General) option as the last item in the Kategori dropdown select.
+- **`training.ts`**: Added Turkish/English translation keys for `levelBasic` and `catGeneral` in the training section dictionary.
+
+### Dosyalar
+`src/app/(dashboard)/egitim/_components/EgitimContent.tsx`, `src/app/(dashboard)/egitim/_components/AddTrainingModal.tsx`, `src/lib/translations/sections/training.ts`
+
 ## 2026-06-13 — Academy Tab Color Sync & Card Action Footer Refactoring ✅
 
 ### Academy Tab & Layout Color Synchronization

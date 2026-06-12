@@ -18,11 +18,12 @@ const AddTrainingModal = dynamic(() => import('./AddTrainingModal').then(mod => 
   ssr: false,
 })
 
-type SeviyeKey = 'all' | 'beginner' | 'intermediate' | 'advanced'
+type SeviyeKey = 'all' | 'basic' | 'beginner' | 'intermediate' | 'advanced'
 
 /** Seviye etiketleri TR/EN + custom içerik için çoklu değer eşlemesi. */
 const SEVIYE_GRUPLARI: Record<Exclude<SeviyeKey, 'all'>, string[]> = {
-  beginner: ['Temel', 'Basic', 'Başlangıç'],
+  basic: ['Temel', 'Basic'],
+  beginner: ['Başlangıç', 'Beginner'],
   intermediate: ['Orta', 'Medium', 'Intermediate'],
   advanced: ['İleri', 'Advanced'],
 }
@@ -161,24 +162,7 @@ export function EgitimContent({
     })
   }, [search, aktifKategori, aktifSeviye, favs, allTopicsMerged, KATEGORILER])
 
-  // Öğrenme yolu: okunmamış konular arasında seviye sırasına göre (Başlangıç →
-  // Orta → İleri) ilk konu. Kullanıcıya "sıradaki adım"ı önerir.
-  const nextTopic = useMemo(() => {
-    const rank = (s: string) =>
-      SEVIYE_GRUPLARI.beginner.includes(s) ? 0
-        : SEVIYE_GRUPLARI.intermediate.includes(s) ? 1 : 2
-    const unread = allTopicsMerged.filter(k => !read.has(k.id))
-    if (unread.length === 0) return null
-    return [...unread].sort((a, b) => rank(a.seviye) - rank(b.seviye))[0]
-  }, [allTopicsMerged, read])
 
-  function goToNextTopic() {
-    if (!nextTopic) return
-    setSearch('')
-    setAktifKategori(0)
-    setAktifSeviye('all')
-    setPendingOpenId(nextTopic.id)
-  }
 
   function handleAddTraining(topic: TrainingTopic) {
     const updated = [topic, ...customTrainings]
@@ -384,6 +368,7 @@ export function EgitimContent({
       <div className="mb-5 flex flex-wrap items-center gap-2">
         {([
           { key: 'all', label: t('trainingPage.allLevels') },
+          { key: 'basic', label: t('trainingPage.levelBasic') },
           { key: 'beginner', label: t('trainingPage.levelBeginner') },
           { key: 'intermediate', label: t('trainingPage.levelIntermediate') },
           { key: 'advanced', label: t('trainingPage.levelAdvanced') },
@@ -401,25 +386,6 @@ export function EgitimContent({
           </button>
         ))}
       </div>
-
-      {/* Öğrenme yolu — sıradaki okunmamış konuyu öner (arama yokken) */}
-      {!search && nextTopic && (
-        <button
-          onClick={goToNextTopic}
-          className="mb-5 flex w-full items-center gap-3 rounded-2xl border border-[#E0E7FF] dark:border-[#312e81]/40 bg-gradient-to-r from-[#EEF2FF] to-[#F5F3FF] dark:from-[#1e1b4b]/70 dark:to-[#2a1b4b]/50 px-4 py-3 text-left transition hover:border-[#3730A3] dark:hover:border-[#2962FF] active:scale-[0.99]"
-        >
-          <span className="text-2xl shrink-0">📚</span>
-          <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold uppercase tracking-wide text-[#3730A3] dark:text-[#448AFF]">
-              {t('trainingPage.learningPathNext')}
-            </p>
-            <p className="truncate text-sm font-bold text-[var(--text-1)]">{nextTopic.baslik}</p>
-          </div>
-          <span className="shrink-0 rounded-xl bg-[#3730A3] px-3 py-1.5 text-xs font-bold text-white dark:bg-[#2962FF] dark:text-white">
-            {t('trainingPage.learningPathContinue')}
-          </span>
-        </button>
-      )}
 
       {search && (
         <p className="mb-3 text-sm text-[var(--text-3)]">

@@ -31,7 +31,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
   const [newOzet, setNewOzet] = useState('')
   const [newKategori, setNewKategori] = useState('Zihniyet')
   const [newTur, setNewTur] = useState('Ders Notu')
-  const [newSeviye, setNewSeviye] = useState('Başlangıç')
+  const [newSeviye, setNewSeviye] = useState('Temel')
   const [newIcerik, setNewIcerik] = useState('')
   const [newEmoji, setNewEmoji] = useState('📖')
   const [newTags, setNewTags] = useState('')
@@ -55,7 +55,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
       setNewOzet('')
       setNewKategori('Zihniyet')
       setNewTur('Ders Notu')
-      setNewSeviye('Başlangıç')
+      setNewSeviye('Temel')
       setNewIcerik('')
       setNewEmoji('📖')
       setNewTags('')
@@ -197,6 +197,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
                     <option value="Ekip & Liderlik">{t('trainingPage.catTeam')}</option>
                     <option value="Strateji & Plan">{t('trainingPage.catStrategy')}</option>
                     <option value="Yasal Uyum">{t('trainingPage.catCompliance')}</option>
+                    <option value="Genel">{t('trainingPage.catGeneral') || 'Genel'}</option>
                   </select>
                 </div>
                 <div className="space-y-1">
@@ -222,6 +223,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
                     onChange={e => setNewSeviye(e.target.value)}
                     className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-3.5 py-2 text-sm md:text-base text-[var(--text-1)] outline-none focus:border-[#3730A3] dark:focus:border-[#a5b4fc] transition"
                   >
+                    <option value="Temel">{t('trainingPage.levelBasic')}</option>
                     <option value="Başlangıç">{t('trainingPage.levelBeginner')}</option>
                     <option value="Orta">{t('trainingPage.levelIntermediate')}</option>
                     <option value="İleri">{t('trainingPage.levelAdvanced')}</option>
