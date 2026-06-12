@@ -13,6 +13,7 @@ import {
   type VideoProgressSummary,
 } from '@/lib/domain/videoProgress'
 import { extractYoutubeId } from '@/lib/utils/youtubeId'
+import { fetchYoutubeDurationMin } from '@/lib/infra/youtubeMeta'
 
 export type VideoProgressMap = Record<string, VideoProgressRow>
 
@@ -323,6 +324,9 @@ export async function createTrainingVideoAction(
   const userEmail = user.email ?? ''
   const userName = (user.user_metadata?.full_name as string) ?? user.email?.split('@')[0] ?? 'NMM Üyesi'
   const key = `vid-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`
+  // Gerçek süreyi YouTube'dan çek; başarısızsa elle girilen değere düş.
+  const realDuration = await fetchYoutubeDurationMin(youtubeId)
+  const durationMin = realDuration ?? Math.max(1, Math.round(input.durationMin || 10))
 
   const { error } = await admin.from('nmm_training_videos').insert({
     key,
@@ -331,7 +335,7 @@ export async function createTrainingVideoAction(
     title_en: (input.titleEn || input.titleTr).trim(),
     description_tr: input.descriptionTr.trim(),
     description_en: input.descriptionEn.trim(),
-    duration_min: Math.max(1, Math.round(input.durationMin || 10)),
+    duration_min: durationMin,
     category_tr: input.categoryTr.trim(),
     category_en: input.categoryEn.trim(),
     related_training_id: input.relatedTrainingId || null,
@@ -359,6 +363,9 @@ export async function updateTrainingVideoAction(id: string, input: VideoInput): 
   if (!youtubeId) throw new Error('Geçerli bir YouTube video bağlantısı/ID girin.')
   if (!input.titleTr.trim()) throw new Error('Başlık (TR) gerekli.')
 
+  const realDuration = await fetchYoutubeDurationMin(youtubeId)
+  const durationMin = realDuration ?? Math.max(1, Math.round(input.durationMin || 10))
+
   const { error } = await admin
     .from('nmm_training_videos')
     .update({
@@ -367,7 +374,7 @@ export async function updateTrainingVideoAction(id: string, input: VideoInput): 
       title_en: (input.titleEn || input.titleTr).trim(),
       description_tr: input.descriptionTr.trim(),
       description_en: input.descriptionEn.trim(),
-      duration_min: Math.max(1, Math.round(input.durationMin || 10)),
+      duration_min: durationMin,
       category_tr: input.categoryTr.trim(),
       category_en: input.categoryEn.trim(),
       related_training_id: input.relatedTrainingId || null,

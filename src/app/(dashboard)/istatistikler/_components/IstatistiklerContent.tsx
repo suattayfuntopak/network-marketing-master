@@ -14,6 +14,7 @@ import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { buildCandidateTrendBars } from '@/lib/domain/trendBuckets'
 import { StatsKpiCards } from './StatsKpiCards'
 const StatsCharts = dynamic(
   () => import('./StatsCharts').then(m => m.StatsCharts),
@@ -199,161 +200,11 @@ export function IstatistiklerContent() {
     t,
   )
 
-  // 5. Kayıt Trendi Barları (MiniTrend benzeri)
-  const trendBars = useMemo(() => {
-    const ISTANBUL_OFFSET = 3 * 60 * 60 * 1000
-    const monthsTr = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
-
-    // Get Istanbul current date components (UTC+3) using pure now state
-    const todayIst = new Date(now + ISTANBUL_OFFSET)
-    const todayYear = todayIst.getUTCFullYear()
-    const todayMonth = todayIst.getUTCMonth()
-    const todayDate = todayIst.getUTCDate()
-
-    if (period === '30d') {
-      // Monthly: Trailing 30 days (1 month ago date-wise in UTC+3 to today)
-      // e.g. 11 May to 11 June
-      const startDate = new Date(Date.UTC(todayYear, todayMonth - 1, todayDate))
-      const endDate = new Date(Date.UTC(todayYear, todayMonth, todayDate))
-
-      const dates: Date[] = []
-      const curr = new Date(startDate)
-      while (curr <= endDate) {
-        dates.push(new Date(curr))
-        curr.setUTCDate(curr.getUTCDate() + 1)
-      }
-
-      return dates.map(date => {
-        const count = candidates.filter(c => {
-          const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
-          return (
-            cDate.getUTCFullYear() === date.getUTCFullYear() &&
-            cDate.getUTCMonth() === date.getUTCMonth() &&
-            cDate.getUTCDate() === date.getUTCDate()
-          )
-        }).length
-
-        return {
-          label: `${date.getUTCDate()} ${monthsTr[date.getUTCMonth()]}`,
-          count,
-        }
-      })
-    }
-
-    if (period === 'ytd') {
-      // Yearly: From January of current year up to current month of current year (UTC+3)
-      const monthlyBars = []
-      for (let m = 0; m <= todayMonth; m++) {
-        const count = candidates.filter(c => {
-          const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
-          return cDate.getUTCFullYear() === todayYear && cDate.getUTCMonth() === m
-        }).length
-
-        monthlyBars.push({
-          label: monthsTr[m],
-          count,
-        })
-      }
-      return monthlyBars
-    }
-
-    if (period === 'all') {
-      // Tüm Zamanlar: ilk adaydan bugüne TAKVİM ayı bazlı kovalar — her bar
-      // ayrı bir ay (etiketler benzersiz ve okunur). Çok uzun aralıkta yıllık.
-      if (candidates.length === 0) return []
-      const earliest = candidates.reduce(
-        (m, c) => Math.min(m, new Date(c.created_at).getTime()),
-        now,
-      )
-      const eIst = new Date(earliest + ISTANBUL_OFFSET)
-      const startY = eIst.getUTCFullYear()
-      const startM = eIst.getUTCMonth()
-      const monthsSpan = (todayYear - startY) * 12 + (todayMonth - startM) + 1
-
-      if (monthsSpan <= 18) {
-        return Array.from({ length: monthsSpan }, (_, i) => {
-          const y = startY + Math.floor((startM + i) / 12)
-          const m = (startM + i) % 12
-          const count = candidates.filter(c => {
-            const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
-            return cDate.getUTCFullYear() === y && cDate.getUTCMonth() === m
-          }).length
-          return { label: `${monthsTr[m]} ${String(y).slice(2)}`, count }
-        })
-      }
-
-      // 18 aydan uzun geçmiş → yıllık kovalar
-      return Array.from({ length: todayYear - startY + 1 }, (_, i) => {
-        const y = startY + i
-        const count = candidates.filter(c => {
-          const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
-          return cDate.getUTCFullYear() === y
-        }).length
-        return { label: String(y), count }
-      })
-    }
-
-    // Default legacy/bucket logic for other periods, aligned with Istanbul Time
-    const BUCKETS = 7
-    const dayMs = 86_400_000
-
-    let start: number
-    if (period === 'today') {
-      const d = new Date(now + ISTANBUL_OFFSET)
-      const startOfDayIst = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0))
-      start = startOfDayIst.getTime() - ISTANBUL_OFFSET
-    } else if (period === '7d') {
-      const dates7d: Date[] = []
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date(Date.UTC(todayYear, todayMonth, todayDate))
-        d.setUTCDate(d.getUTCDate() - i)
-        dates7d.push(d)
-      }
-      return dates7d.map(date => {
-        const count = candidates.filter(c => {
-          const cDate = new Date(new Date(c.created_at).getTime() + ISTANBUL_OFFSET)
-          return (
-            cDate.getUTCFullYear() === date.getUTCFullYear() &&
-            cDate.getUTCMonth() === date.getUTCMonth() &&
-            cDate.getUTCDate() === date.getUTCDate()
-          )
-        }).length
-
-        const days = ['Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt', 'Paz']
-        const dayIdx = (date.getUTCDay() + 6) % 7
-        return {
-          label: days[dayIdx],
-          count,
-        }
-      })
-    } else {
-      // all: earliest candidate date in Istanbul to now
-      start = candidates.length
-        ? candidates.reduce((m, c) => Math.min(m, new Date(c.created_at).getTime()), now)
-        : now - 6 * dayMs
-    }
-
-    const span = Math.max(now - start, 3_600_000)
-    const step = span / BUCKETS
-
-    return Array.from({ length: BUCKETS }, (_, idx) => {
-      const bStart = start + idx * step
-      const bEnd = idx === BUCKETS - 1 ? now + 1 : start + (idx + 1) * step
-      const count = candidates.filter(c => {
-        const t = new Date(c.created_at).getTime()
-        return t >= bStart && t < bEnd
-      }).length
-
-      const dRef = new Date(bStart + ISTANBUL_OFFSET)
-      let label: string
-      if (period === 'today') {
-        label = dRef.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' })
-      } else {
-        label = dRef.toLocaleDateString(undefined, { month: 'short', year: '2-digit', timeZone: 'UTC' })
-      }
-      return { label, count }
-    })
-  }, [candidates, period, now])
+  // 5. Kayıt Trendi Barları (MiniTrend benzeri) — saf mantık lib/domain/trendBuckets'ta
+  const trendBars = useMemo(
+    () => buildCandidateTrendBars(candidates, period, now),
+    [candidates, period, now],
+  )
 
   const maxTrendCount = Math.max(...trendBars.map(b => b.count), 1)
 

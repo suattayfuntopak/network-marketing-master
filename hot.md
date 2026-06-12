@@ -1,5 +1,35 @@
 # Hot Log
 
+## 2026-06-12 — Arka plan iyileştirmeleri (gerçek süre + trend refactor + temizlik) ✅
+
+UI/buton eklemeden, yalnız arka planı güçlendiren öneriler uygulandı.
+
+### Gerçek video süreleri
+- 9 videonun süresi YouTube'dan çekilen GERÇEK değerlerle düzeltildi (tahminler bazıları çok yanlıştı: Takip 18→28, İtiraz 22→38, Sponsorluk 16→33 dk).
+- **`trainingVideos.ts`** + **`095_video_real_durations.sql`** (UPDATE).
+
+### Öneri #1 — Otomatik süre çekme (arka plan)
+- **`lib/infra/youtubeMeta.ts` [YENİ]:** `fetchYoutubeDurationMin` — watch sayfasından `lengthSeconds` okur, Data API anahtarı gerektirmez, best-effort (başarısızsa null).
+- **`videoActions.ts`:** `createTrainingVideoAction` + `updateTrainingVideoAction` artık gerçek süreyi otomatik çekip yazar; başarısızsa elle girilen değere düşer. (UI değişmez — yalnız arka plan.)
+
+### Öneri #2 — Trend bucketing saf fonksiyon + testler
+- **`lib/domain/trendBuckets.ts` [YENİ]:** İstatistiklerdeki ~150 satırlık dönem→kova mantığı saf `buildCandidateTrendBars(candidates, period, now)` fonksiyonuna taşındı.
+- **`trendBuckets.test.ts` [YENİ]:** 8 birim testi — "aynı ay" regresyonu, yıllık fallback, ytd/7d/today/30d doğrulaması.
+- **`IstatistiklerContent.tsx`:** useMemo artık tek satır fonksiyon çağrısı.
+
+### Öneri #5 — Kullanılmayan i18n anahtar temizliği
+- `videoTraining.started/completed/watchProgress` (0 kullanım) tr+en'den silindi. `trainingPage.fieldLevel` KORUNDU (AddTrainingModal hâlâ kullanıyor).
+
+### Uygulanmayanlar
+- **#3 (TS↔DB tek kaynak):** pulse hesabını derinden etkileyen büyük refactor — aceleye gelmesin diye ertelendi.
+- **#4 (bekleyen-migration rozeti):** UI eklerdi; kullanıcı isteği gereği yapılmadı.
+
+### Migration notu (kullanıcıya)
+093/094 Supabase SQL editöründen elle uygulandı — sorun değil (migration'lar idempotent). Doğru yol GitHub Actions "DB migrate (prod)" (db-push.yml). 095 de aynı şekilde uygulanmalı. Detay raporda.
+
+### Dosyalar
+`src/lib/domain/trainingVideos.ts`, `supabase/migrations/095_video_real_durations.sql`, `src/lib/infra/youtubeMeta.ts`, `src/app/(dashboard)/egitim/videoActions.ts`, `src/lib/domain/trendBuckets.ts`, `src/lib/domain/trendBuckets.test.ts`, `src/app/(dashboard)/istatistikler/_components/IstatistiklerContent.tsx`, `src/lib/translations/sections/videoTraining.ts`
+
 ## 2026-06-12 — Serinin ilk 3 videosu, dark video buton rengi, Tüm Zamanlar grafiği ✅
 
 ### Crown Team serisinin ilk 3 videosu (1–3)
