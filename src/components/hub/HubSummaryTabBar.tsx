@@ -11,6 +11,7 @@ import {
 import {
   HUB_PERIOD_TAB_LABEL_KEYS,
   hubPeriodTabLabel,
+  hubTabShortLabel,
 } from '@/lib/domain/pulsePeriodLabels'
 
 export { HUB_PERIOD_TABS, parseSummaryTab, HUB_PERIOD_TAB_LABEL_KEYS, hubPeriodTabLabel }
@@ -18,15 +19,6 @@ export type { HubPeriodTab }
 
 /** @deprecated Use HubPeriodTab — kept for field summary imports */
 export type HubSummaryTab = HubPeriodTab
-
-/** Mobilde sığması için kısa etiket: 1 / 7 / 30 / 365 / ∞ */
-const HUB_PERIOD_TAB_SHORT: Record<HubPeriodTab, string> = {
-  daily: '1',
-  weekly: '7',
-  monthly: '30',
-  yearly: '365',
-  all: '∞',
-}
 
 const HUB_TAB_PANO_COLORS: Record<HubPeriodTab, ButtonColor> = {
   daily: 'indigo',
@@ -77,7 +69,7 @@ export function HubSummaryTabBar({ active, onChange }: HubSummaryTabBarProps) {
                 tab === 'all' ? 'text-lg font-black' : 'text-sm',
               )}
             >
-              {HUB_PERIOD_TAB_SHORT[tab]}
+              {hubTabShortLabel(tab)}
             </span>
             <span className="hidden sm:inline">{t(HUB_PERIOD_TAB_LABEL_KEYS[tab])}</span>
           </button>

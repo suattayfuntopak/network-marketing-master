@@ -23,6 +23,19 @@ export const PULSE_PERIOD_SHORT: Record<PulsePeriod, string> = {
   all: '∞',
 }
 
+const HUB_TAB_TO_PULSE: Record<HubPeriodTab, PulsePeriod> = {
+  daily: 'today',
+  weekly: '7d',
+  monthly: '30d',
+  yearly: 'ytd',
+  all: 'all',
+}
+
+/** Hub sekme kısa kodu — pulse ile aynı görsel (1/7/30/365/∞). */
+export function hubTabShortLabel(tab: HubPeriodTab): string {
+  return PULSE_PERIOD_SHORT[HUB_TAB_TO_PULSE[tab]]
+}
+
 export type PulsePeriodLabelOpts = { rolling30?: boolean }
 
 /** Pulse dönem etiketi — varsayılan hub takvimi; `rolling30` ile kayan 30 gün (İstatistikler / ekip sheet). */

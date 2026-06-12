@@ -8,8 +8,7 @@ import { Search, ChevronDown, X } from 'lucide-react'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
-import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
-import type { SheetActivityPeriod } from '@/lib/domain/pulse'
+import { prefetchMemberActivity } from '@/lib/query/prefetchMemberActivity'
 import { VirtualizedMemberList } from './VirtualizedMemberList'
 import { TeamMemberCard, type MemberCardTab } from './TeamMemberCard'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
@@ -180,16 +179,10 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
 
   const getMemberTab = (userId: string): MemberCardTab | undefined => memberCardTab[userId]
 
-  const prefetchMemberActivity = useCallback((userId: string) => {
-    const periods: SheetActivityPeriod[] = ['today', '7d', '30d', 'ytd', 'all']
-    for (const p of periods) {
-      void queryClient.prefetchQuery({
-        queryKey: ['member-activity', ws.workspaceId, userId, p],
-        queryFn: () => getMemberActivityDetailAction(ws.workspaceId, userId, p),
-        staleTime: 15_000,
-      })
-    }
-  }, [queryClient, ws.workspaceId])
+  const prefetchMemberActivityForCard = useCallback(
+    (userId: string) => prefetchMemberActivity(queryClient, ws.workspaceId, userId),
+    [queryClient, ws.workspaceId],
+  )
 
   const getOnboardingWeek = (userId: string): 1 | 2 | 3 | 4 => onboardingWeekByMember[userId] ?? 1
 
@@ -316,7 +309,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               t={t}
               hasAiFieldAccess={hasAiFieldAccess}
               onSelectTab={tab => { onMemberSearchChange(''); selectMemberTab(m.user_id, tab) }}
-              onPrefetchActivity={() => prefetchMemberActivity(m.user_id)}
+              onPrefetchActivity={() => prefetchMemberActivityForCard(m.user_id)}
               onSetOnboardingWeek={week => setOnboardingWeekByMember(prev => ({ ...prev, [m.user_id]: week }))}
               onToggleOnboardingStep={(stepId, isDone) => { onMemberSearchChange(''); void toggleOnboardingStep(m.user_id, stepId, isDone) }}
               onLinkToPipeline={() => { onMemberSearchChange(''); void handleLinkMemberToPipeline(m) }}

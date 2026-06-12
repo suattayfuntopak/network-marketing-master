@@ -17,10 +17,11 @@ import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pu
 import { funnelMetricLabelKeys } from '@/lib/domain/metricLabels'
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import {
-  MEMBER_ACTIVITY_PERIODS,
   MemberActivityPeriodTabs,
   sheetPeriodToHubTab,
 } from '@/components/team/MemberActivityPeriodTabs'
+import { prefetchMemberActivity } from '@/lib/query/prefetchMemberActivity'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { fetchMemberUserGoalAction } from '@/app/(dashboard)/hedef/actions'
 import { getMemberActivityDetailAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import {
@@ -87,19 +88,13 @@ export function MemberActivitySheet({
   useBodyScrollLock(!embedded)
 
   useEffect(() => {
-    for (const p of MEMBER_ACTIVITY_PERIODS) {
-      void queryClient.prefetchQuery({
-        queryKey: ['member-activity', workspaceId, member.userId, p],
-        queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, p),
-        staleTime: 15_000,
-      })
-    }
+    prefetchMemberActivity(queryClient, workspaceId, member.userId)
   }, [workspaceId, member.userId, queryClient])
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ['member-activity', workspaceId, member.userId, period],
     queryFn: () => getMemberActivityDetailAction(workspaceId, member.userId, period),
-    staleTime: 15_000,
+    staleTime: QUERY_STALE.memberActivity,
     placeholderData: keepPreviousData,
   })
 

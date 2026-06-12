@@ -17,12 +17,23 @@ Geçmiş dönemlerde hedef, **o dönemin** yol haritası ayına göre hesaplanı
 
 **Diğer yüzeyler:** `funnelTargetsForPulsePeriod` — İstatistikler (`getStatsFunnelBundleAction`) ve ekip aktivite sheet (`getMemberActivityDetailAction` → `funnelTargets` / `hasMemberGoal`). Üye hedefi: önce `nmm_user_goals`, yoksa lider ataması `nmm_member_goals` (`created_at` = başlangıç).
 
+## Dönem etiketleri (Aylık ≠ Son 30 Gün)
+
+| Yüzey | `30d` / `monthly` anlamı |
+|-------|--------------------------|
+| Saha Özetim **Aylık** | Takvim ayının yol haritası kademesi (`stage.monthly`) |
+| İstatistikler / ekip sheet **Son 30 Gün** | Kayan 30 günlük pencere (`funnelTargetsForPulsePeriod`) |
+
+Etiketler ve kısa kodlar: `src/lib/domain/pulsePeriodLabels.ts`.
+
 ## Modüller
 
 | Dosya | Rol |
 |-------|-----|
 | `src/lib/domain/hubFunnelTargets.ts` | Dönem huni hedef türetme (günlük/haftalık/aylık/yıllık) |
+| `src/lib/domain/pulsePeriodLabels.ts` | Sekme etiketleri, kısa kodlar (1/7/30/365/∞), rolling30 ayrımı |
 | `src/lib/domain/hubPeriodPrefetch.ts` | Sekme tipleri, `parseSummaryTab`, komşu offset seçici, `sessionStorage` son sekme |
+| `src/lib/query/prefetchMemberActivity.ts` | Ekip aktivite sheet — 5 dönem prefetch |
 | `src/lib/query/prefetchRouteMetrics.ts` | `prefetchHubMetrics` — SSR, hover ve maliyet kontrolü |
 | `src/app/(dashboard)/saha-ozetim/page.tsx` | Sunucu tarafı workspace + hub prefetch + `HydrationBoundary` |
 | `FieldSummaryPage.tsx` | İstemci sorguları; `placeholderData` önbellekten |

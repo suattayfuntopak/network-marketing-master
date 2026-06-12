@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   hubPeriodTabLabel,
+  hubTabShortLabel,
   pulsePeriodLabel,
   sheetActivityPeriodLabel,
 } from './pulsePeriodLabels'
@@ -29,5 +30,11 @@ describe('pulsePeriodLabels', () => {
   it('sheetActivityPeriodLabel uses rolling 30d label', () => {
     expect(sheetActivityPeriodLabel(t, '30d')).toBe('statsPage.period30d')
     expect(sheetActivityPeriodLabel(t, '7d')).toBe('dashboard.summaryTabWeekly')
+  })
+
+  it('hubTabShortLabel matches pulse short codes', () => {
+    expect(hubTabShortLabel('daily')).toBe('1')
+    expect(hubTabShortLabel('monthly')).toBe('30')
+    expect(hubTabShortLabel('all')).toBe('∞')
   })
 })

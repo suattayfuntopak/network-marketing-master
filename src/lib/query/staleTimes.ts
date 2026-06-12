@@ -10,4 +10,8 @@ export const QUERY_STALE = {
   usage: 90_000,
   /** Akademi okundu/favori — çoklu cihazda pencere odağında tazelenir */
   progress: 60_000,
+  /** Ekip aktivite sheet sorguları */
+  memberActivity: 15_000,
+  /** İstatistikler saha huni bundle */
+  funnelBundle: 30_000,
 } as const

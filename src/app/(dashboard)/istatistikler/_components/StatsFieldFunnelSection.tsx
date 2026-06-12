@@ -9,6 +9,7 @@ import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { pulsePeriodToHubGridPeriod } from '@/lib/domain/hubPeriodPrefetch'
 import { PULSE_PERIOD_OPTIONS } from '@/lib/domain/pulsePeriodLabels'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { getStatsFunnelBundleAction } from '../actions'
 
 type Props = {
@@ -24,7 +25,7 @@ export function StatsFieldFunnelSection({ period }: Props) {
       void queryClient.prefetchQuery({
         queryKey: ['stats-funnel-bundle', p],
         queryFn: () => getStatsFunnelBundleAction(p),
-        staleTime: 30_000,
+        staleTime: QUERY_STALE.funnelBundle,
       })
     }
   }, [queryClient])
@@ -32,7 +33,7 @@ export function StatsFieldFunnelSection({ period }: Props) {
   const { data: bundle, isLoading } = useQuery({
     queryKey: ['stats-funnel-bundle', period],
     queryFn: () => getStatsFunnelBundleAction(period),
-    staleTime: 30_000,
+    staleTime: QUERY_STALE.funnelBundle,
     // Period değişiminde eski sayılar ekranda kalır (sıfıra düşmez) → "pat" geçer.
     placeholderData: keepPreviousData,
   })

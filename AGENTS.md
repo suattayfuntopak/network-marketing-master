@@ -56,6 +56,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Hub metrics (Saha Özetim)
 - Dönem prefetch, offset maliyeti ve placeholder stratejisi: `docs/hub-metrics.md`.
 - Paylaşımlı sekme/offset mantığı: `src/lib/domain/hubPeriodPrefetch.ts` — yeni hub sorgusu eklerken komşu prefetch regresyonuna dikkat.
+- **Huni hedef & dönem etiketleri** (yeni sekme/sorgu eklerken): hedef türetme `hubFunnelTargets.ts` + `getGoalFunnelContextAction()`; dönem eşlemesi/prefetch `hubPeriodPrefetch.ts`; sekme etiketleri `pulsePeriodLabels.ts` (hub **Aylık** = takvim ayı, stats/ekip **Son 30 Gün** = kayan pencere).
+- Ekip aktivite önbelleği: `prefetchMemberActivity()` (`lib/query/prefetchMemberActivity.ts`) — kart hover ve sheet mount’ta 5 dönem; `QUERY_STALE.memberActivity`.
 
 ### Ekip üyesi → detay sayfası
 - Uygulama kullanıcısı (`isAppUser`) için detay **her zaman** `MemberRow.pipeline_id` → `/pipeline/[id]`.
