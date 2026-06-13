@@ -24,3 +24,16 @@
 3. **Ownership check:** Super admin admin amaçlı herhangi bir adaya erişebilir — bu bypass korunur.
 4. **Workspace & team:** Super admin'in kendi workspace'i, adayları ve ekip üyeleri tam anlamıyla gerçektir; diğer liderlerle aynı şekilde Supabase'de saklanır. Hiçbir zaman "sahte/test verisi" olarak değerlendirilmez.
 5. **Yeni özellik eklerken:** Super admin için ayrı bir "test/bypass" koşulu ekleme. Onun için çalışan şey, diğer kullanıcılar için de çalışmalıdır. Fark sadece sınırsız kotada ve Platform Yönetimi erişimindedir.
+
+## Health Stack
+
+`/health` panosu bu araçları çalıştırır (bu bölüm tanımlıysa otomatik-tespit atlanır):
+
+- typecheck: `npx tsc --noEmit`
+- lint: `npm run lint` (eslint --max-warnings 0)
+- test: `npm test` (vitest run)
+- deadcode: `npm run knip` (config: `knip.json` — Next.js App Router entry'leri + generated `database.types.ts` ignore)
+- i18n: `npm run i18n:unused` (proje-özel bütünlük kontrolü)
+- migrate: `npm run migrate:check` (migration numara doğrulaması)
+
+knip durumu (2026-06-13): **0 ulaşılamayan dosya** (29 ölü dosya temizlendi — rota birleştirme/tasarım artıkları), 26 unused export + 3 type + 3 duplicate export KALDI. Bu export'lar bilinçli tutuluyor: `fetchCandidatesPageAction` (Load More UI sonra), `bypassAILimits`/`describeShopierSignatureScheme` (güvenlik/teşhis API), `navigation.ts` config export'ları. Export kırpma yapılmadı — per-item karar gerektirir, yanlış-pozitif riski var.

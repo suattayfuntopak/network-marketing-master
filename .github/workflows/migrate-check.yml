@@ -57,7 +57,7 @@ jobs:
       DB_URL: postgresql://postgres:postgres@localhost:5432/nmm_ci
     steps:
       - uses: actions/checkout@v6
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: latest
       - name: psql kur
@@ -115,7 +115,7 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: '22'
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: latest
       - name: Remote migration drift
@@ -144,7 +144,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: latest
       - name: Secret kontrolü
