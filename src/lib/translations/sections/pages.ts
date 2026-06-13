@@ -39,23 +39,7 @@ export const pagesSection = {
       // bugun/ilgilen/page.tsx
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
-      neverContacted: "Hiç aranmadı",
-      oneDayAgo: "1 gün önce",
-      daysAgo: "{days} gün önce",
-      couldNotGenerateMessage: "Mesaj oluşturulamadı.",
-      noPendingFollowUps: "Bugün için bekleyen eylem yok",
-      greatJob: "Harika iş çıkardın!",
-      prioritiesLabel: "kişi öncelikli",
-      moreWaiting: "daha bekliyor",
-      generateAiMessage: "AI Mesaj Üret",
-      generateAndCopyAiMessage: "AI Mesaj Üret ve Kopyala",
       unlockAiBasic: "Basic planla AI'ı aç",
-      call: "Ara",
-      aiMessage: "Yapay Zeka Mesajı",
-      generatedFor: "{name} için üretildi",
-      messageCopied: "Mesaj kopyalandı!",
-      copy: "Kopyala",
-      sendViaWhatsApp: "WhatsApp ile Gönder",
 
       // ekip/_components/BroadcastPanel.tsx
       broadcastDocHeader: "📄 *Doküman / Link*",
@@ -105,23 +89,7 @@ export const pagesSection = {
       // bugun/ilgilen/page.tsx
 
       // bugun/ilgilen/_components/IlgilenContent.tsx
-      neverContacted: "Never contacted",
-      oneDayAgo: "1 day ago",
-      daysAgo: "{days} days ago",
-      couldNotGenerateMessage: "Could not generate message.",
-      noPendingFollowUps: "No pending follow-ups today",
-      greatJob: "Great job!",
-      prioritiesLabel: "priorities",
-      moreWaiting: "more waiting",
-      generateAiMessage: "Generate AI Message",
-      generateAndCopyAiMessage: "Generate and Copy AI Message",
       unlockAiBasic: "Unlock AI with Basic plan",
-      call: "Call",
-      aiMessage: "AI Message",
-      generatedFor: "Generated for {name}",
-      messageCopied: "Message copied!",
-      copy: "Copy",
-      sendViaWhatsApp: "Send via WhatsApp",
 
       // ekip/_components/BroadcastPanel.tsx
       broadcastDocHeader: "📄 *Document / Link*",
