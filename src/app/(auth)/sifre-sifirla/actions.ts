@@ -39,9 +39,22 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
     options: { redirectTo },
   })
 
+  // GÜVENLİK (kullanıcı sayımı / enumeration): generateLink var olmayan kullanıcıda
+  // "User not found" hatası döndürür. Bu hatayı kullanıcıya YANSITMA — aksi halde
+  // saldırgan "var olan e-posta → başarı, olmayan → hata" farkından kayıtlı adresleri
+  // tek tek sınayabilir. generateLink başarısızsa (user-not-found dahil) enumeration-
+  // güvenli resetPasswordForEmail'e düşeriz: Supabase var/yok ayırt etmeden sessizce
+  // başarı döner ve hiçbir durumda kullanıcıya farklı bir sinyal sızmaz.
   if (linkError || !data?.properties?.action_link) {
     console.error('[resetPasswordAction] generateLink:', linkError?.message)
-    return { error: 'Bir hata oluştu. Lütfen tekrar dene.' }
+    const supabase = await createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+    if (error) {
+      // Buraya düşmek bir altyapı hatasıdır (var-olmayan kullanıcı değil); yine de
+      // enumeration sinyali vermemek için generic başarı döneriz, gerçek hata log'da.
+      console.error('[resetPasswordAction] fallback resetPasswordForEmail:', error.message)
+    }
+    return { success: 'E-postanı kontrol et! Sıfırlama bağlantısı gönderildi.' }
   }
 
   const sent = await sendPasswordResetEmail(email, data.properties.action_link, 'tr')
