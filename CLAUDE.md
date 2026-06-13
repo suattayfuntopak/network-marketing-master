@@ -36,4 +36,4 @@
 - i18n: `npm run i18n:unused` (proje-özel bütünlük kontrolü)
 - migrate: `npm run migrate:check` (migration numara doğrulaması)
 
-knip baseline (2026-06-13): 31 ulaşılamayan dosya + 26 unused export. Çoğu kablolanmamış "haftalık hub" özellik kümesi ve birkaç yetim bileşen — silme ayrı bir karar (bazıları bilinçli ileri-özellik olabilir).
+knip durumu (2026-06-13): **0 ulaşılamayan dosya** (29 ölü dosya temizlendi — rota birleştirme/tasarım artıkları), 26 unused export + 3 type + 3 duplicate export KALDI. Bu export'lar bilinçli tutuluyor: `fetchCandidatesPageAction` (Load More UI sonra), `bypassAILimits`/`describeShopierSignatureScheme` (güvenlik/teşhis API), `navigation.ts` config export'ları. Export kırpma yapılmadı — per-item karar gerektirir, yanlış-pozitif riski var.

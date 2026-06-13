@@ -1,7 +1,8 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": [
-    "src/types/database.types.ts"
+    "src/types/database.types.ts",
+    "public/**"
   ],
   "ignoreExportsUsedInFile": true,
   "ignoreDependencies": ["server-only"],
@@ -15,5 +16,9 @@
       "src/app/**/*[aA]ctions.ts",
       "src/app/**/_shared-actions.ts"
     ]
+  },
+  "playwright": {
+    "config": ["playwright.config.ts"],
+    "entry": ["e2e/**/*.{test,spec}.ts", "e2e/**/*.setup.ts"]
   }
 }
