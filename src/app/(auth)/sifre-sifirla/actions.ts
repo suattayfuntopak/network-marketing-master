@@ -22,7 +22,13 @@ export async function resetPasswordAction(_prev: FormState, formData: FormData):
   // (NMM_APP_URL) pinliyoruz; yalnızca yerel geliştirmede (localhost) host'tan türetilir.
   const headersList = await headers()
   const host = headersList.get('host') ?? ''
-  const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1')
+  // Tam-host eşleşmesi: `localhost.evil.com` gibi alt-alan adı hilesi `startsWith`'i
+  // geçemesin (aksi halde Host-header zehirlemesi geri gelir).
+  const isLocal =
+    host === 'localhost' ||
+    host.startsWith('localhost:') ||
+    host === '127.0.0.1' ||
+    host.startsWith('127.0.0.1:')
   const origin = isLocal ? `http://${host}` : NMM_APP_URL
   const redirectTo = `${origin}/auth/callback?next=/sifre-guncelle`
 
