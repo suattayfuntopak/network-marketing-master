@@ -14,6 +14,7 @@
     "migrate:check": "node scripts/check-migrations.mjs",
     "migrate:check:remote": "node scripts/check-migrations.mjs --remote",
     "i18n:unused": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/i18n-unused.mjs",
+    "knip": "knip --no-progress",
     "perf:baseline": "node scripts/perf-baseline.mjs",
     "db:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
     "db:push": "supabase db push",
@@ -47,6 +48,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
+    "knip": "^6.16.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.7"
