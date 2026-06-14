@@ -4,6 +4,8 @@ import { QueryProvider } from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
 import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -63,6 +65,11 @@ export default function RootLayout({
             <Toaster richColors position="top-center" />
           </ThemeProvider>
         </LanguageProvider>
+        {/* Vercel Real-User Monitoring — cookieless (KVKK/GDPR uyumlu). SpeedInsights:
+            Web Vitals + p75 TTFB rota bazında (perf regresyon takibi, docs/performance.md
+            §3). Analytics: sayfa görüntüleme. Yalnızca Vercel'de veri gönderir, görsel yok. */}
+        <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );

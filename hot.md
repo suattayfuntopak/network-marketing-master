@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-14 — Perf turu (4. parti): kalıcı RUM ölçümü kuruldu (Vercel Speed Insights + Analytics) ✅
+
+Önceki raporun 4 genel önerisinden **kod tarafında yapılabilen** uygulandı.
+
+### Yapıldı — #4 İzleme/ölçüm (Vercel RUM)
+`@vercel/speed-insights` + `@vercel/analytics` kuruldu; `src/app/layout.tsx`'e `<SpeedInsights/>` + `<Analytics/>` eklendi.
+- **Cookieless / KVKK-uyumlu**, görsel çıktı yok, yalnızca Vercel'de veri gönderir.
+- **SpeedInsights:** Web Vitals (LCP/CLS/INP) + p75 TTFB rota bazında → prod'da otomatik toplanır. "pat pat" hedefi artık sürekli ölçülüyor; regresyon Vercel dashboard'da görünür.
+- **Analytics:** sayfa görüntüleme (p75 yorumu için trafik paydası).
+- `docs/performance.md` §3 "Alan ölçümü KURULU" işaretlendi.
+
+### Yapılamayan (kod-dışı, sizde/altyapıda)
+- **#1 baseline doldurma:** prod oturum cookie'nizi gerektirir (`.perf-cookie` + `npm run perf:baseline` hazır — tek komut).
+- **#3 Frankfurt taşıma:** Supabase Pro/slot gerektirir (bloke); runbook `docs/supabase-region-migration.md` hazır.
+- **#2 kalıplar:** zaten uygulanmıştı (ESLint kuralı + docs §8).
+
+### Not
+`npm audit` 2 moderate (postcss, Next transitive) — **önceden vardı**, @vercel paketlerinden değil; Next'i düşüreceği için dokunulmadı.
+
+### Doğrulama
+`tsc` ✓ · `eslint --max-warnings 0` ✓ · `vitest` 254/254 ✓ · `npm run build` ✓ (47/47).
+
 ## 2026-06-14 — Perf turu (3. parti): kalan 4 öneri uygulandı ✅
 
 Önceki raporun 4 genel önerisi de kullanıcı tarafından onaylandı; "tertemiz" uygulandı.

@@ -18,8 +18,10 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
 - Hub metrikleri dönem prefetch + offset stratejisi (`docs/hub-metrics.md`).
 
 ## 3. Ölçüm (önce bunu yap — tahminle değiştirme)
-1. **Alan (gerçek kullanıcı):** Vercel Analytics / Speed Insights — p75 TTFB,
-   route bazında. Mobil + masaüstü ayrı bak.
+1. **Alan (gerçek kullanıcı) — KURULU (2026-06-14):** Vercel Speed Insights + Analytics
+   `src/app/layout.tsx`'e eklendi (`<SpeedInsights/>` + `<Analytics/>`, cookieless/KVKK).
+   Web Vitals + p75 TTFB rota bazında otomatik toplanır → Vercel dashboard. Mobil +
+   masaüstü ayrı bak. Ayda bir p75'leri aşağıdaki §3 tablosuna işle (regresyon erken yakalanır).
 2. **Lab:** Chrome DevTools Performance + Lighthouse (mobil throttling) ana rotalarda:
    `/pano`, `/pipeline`, `/ekibim`, `/istatistikler`, `/saha-ozetim`.
 3. **Geçiş hissi:** sekme/route geçişinde ilk boya + veri gelene kadar geçen süre.
@@ -123,6 +125,13 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
   runbook: `docs/supabase-region-migration.md` (slot açılınca). (4) Realtime: `useNotifications`
   effect bağımlılıklarından `lang/t/router` çıkarıldı (ref pattern) → dil değişiminde
   websocket kanalı artık yeniden kurulmuyor (gereksiz churn giderildi). tsc/eslint/254 test/build ✓.
+
+- **2026-06-14 (4. parti) — kalıcı RUM ölçümü kuruldu.** Vercel Speed Insights +
+  Analytics (`@vercel/speed-insights`, `@vercel/analytics`) root layout'a eklendi —
+  cookieless (KVKK), görsel yok, yalnız Vercel'de veri gönderir. Web Vitals (LCP/CLS/INP)
+  + p75 TTFB rota bazında prod'da otomatik toplanır → "pat pat" hedefi artık sürekli
+  ölçülür, regresyon dashboard'da görünür. (Önerilen #1 "baseline doldur" ve #3 "Frankfurt
+  taşıma" kullanıcı aksiyonu/Pro slot gerektirir — kod tarafında yapılamaz; runbook hazır.)
 
 > Not: Config seviyesindeki kolay kazançlar tükendi. Bundan sonraki her değişiklik
 > **ölçümle** yapılmalı; tahminle perf değiştirmek regresyon riskidir.
