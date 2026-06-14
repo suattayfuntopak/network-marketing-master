@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-14 — Perf turu (2. parti): getUser kapsamı tamamlandı + ESLint ile kalıcılaştırıldı ✅
+
+Kullanıcı, önceki turun önerilerinden #1 (Supabase bölge taşıma) HARİÇ hepsini onayladı (Free plan slot kısıtı → Pro'ya geçilemiyor, ikinci proje açılamıyor). Onaylanan #2/#3/#4/#5 "tertemiz" uygulandı.
+
+### #3+#4 — Kalan TÜM ham `supabase.auth.getUser()` dönüştürüldü (bu turda 25 site)
+Her ham `getUser()` = ~230ms Supabase auth ağ turu. `getClaims` ise asimetrik JWT'yi yerel doğrular (~0ms).
+- **Server (`getAuthUser`):** `checkQuota` (HER AI üretiminde — hot), `userLang`, `admin-actions` ×4, `moderation` ×3, `profile`, `ekip/actions` ×5, `memberGoalsActions` ×2, `odeme`, `workspace` (ensure), `lib/infra/productEvents`, `lib/domain/shopierPaymentSession` ×2.
+- **Client (yeni `getClientUserId`):** `useCandidates` ×4, `useNotifications` ×3, `lib/domain/customContent` ×4. Yeni yardımcı: `src/lib/supabase/authUserClient.ts` (getClaims, tarayıcı→auth turunu eler).
+
+### #2 — ESLint kuralı (kalıcılaştırma)
+`eslint.config.mjs` `no-restricted-syntax`'e selector eklendi: ham `supabase.auth.getUser()` artık **derlemede hata**. Mesaj server→`getAuthUser`, client→`getClientUserId` yönlendiriyor. Kalıp regresyonu artık imkânsız.
+
+### #5 — Ölçüm kalıcılaştırma
+`docs/performance.md` §3'e `npm run perf:baseline` reçetesi + p75 TTFB **baseline kayıt tablosu** şablonu eklendi (prod+cookie ile bir kez doldurulacak). §7 backlog + §8 ölçülen-kazanç defteri güncellendi.
+
+### Test altyapısı
+`server-only` paketi vitest'te çözülmüyordu → `src/test/serverOnlyStub.ts` + `vitest.config.ts` alias ile no-op. `checkQuota.test.ts` artık `getAuthUser`'ı mock'luyor (gerçek `cache()` test izolasyonunu bozmasın diye).
+
+### Doğrulama
+`tsc --noEmit` ✓ · `eslint --max-warnings 0` ✓ (yeni kural aktif, ihlal yok) · `vitest` 254/254 ✓ · `npm run build` ✓ (47/47 statik) · kalan ham `auth.getUser()` çağrısı **0**.
+
+### Kalan en büyük kaldıraç
+Supabase origin coğrafi uzaklığı (~320ms/sorgu) — bölge taşıma Free-plan slot kısıtıyla ertelendi (kullanıcı kararı). Kod tavanı düşürmez; round-trip sayısı/auth turları minimumda.
+
 ## 2026-06-14 — Perf turu: hot-path auth round-trip kırpma (getUser→getClaims) ✅
 
 Uçtan uca performans incelemesi (landing→giriş→pano→sekme geçişleri→metrik dolması). Önceki turlarda config/SSR/prefetch kazançları tükendiği için (bkz. `docs/performance.md`, hafıza `project_perf_round_trips`) bu tur **kalan ham `supabase.auth.getUser()` ağ turlarını** hedefledi.

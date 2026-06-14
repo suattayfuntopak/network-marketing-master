@@ -105,7 +105,7 @@ export async function updateProfileAction(input: {
   password?: string
 }): Promise<{ emailChangeRequested: boolean }> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const fullName = input.fullName?.trim()

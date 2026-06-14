@@ -3,6 +3,7 @@
 // block previously duplicated across 7+ action files.
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { getEffectiveLicenseType, getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { isSuperAdmin } from '@/lib/domain/auth'
 import { istanbulDayStartIso, todayCalendarKey } from '@/lib/utils/calendarDates'
@@ -41,7 +42,7 @@ export async function checkAIQuota(
   const lang = opts.lang ?? 'tr'
   const supabase = await createClient()
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) {
     return {
       ok: false,

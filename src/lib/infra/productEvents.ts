@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import type { ProductEventName } from '@/lib/domain/productEvents'
 
 export async function insertProductEvent(params: {
@@ -8,9 +9,7 @@ export async function insertProductEvent(params: {
 }): Promise<void> {
   try {
     const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
+    const { user } = await getAuthUser()
 
     await supabase.from('nmm_product_events').insert({
       event_name: params.eventName,

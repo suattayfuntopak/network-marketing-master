@@ -91,7 +91,7 @@ export async function ensureWorkspaceAction(): Promise<WorkspaceContext> {
   if (existing) return existing
 
   const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) throw new Error('Oturum bulunamadı.')
 
   // Provizyon (workspace + üyelik oluşturma) bootstrap işlemidir ve service-role

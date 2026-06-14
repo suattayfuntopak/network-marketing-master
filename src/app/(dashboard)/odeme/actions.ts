@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { createShopierPaymentSession } from '@/lib/domain/shopierPaymentSession'
 import { sendBankTransferNotifyEmail } from '@/lib/infra/mail'
 
@@ -29,9 +30,7 @@ export async function notifyBankTransferAction(
   intendedPlan?: 'basic' | 'plus' | 'pro',
 ): Promise<boolean> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user?.email) return false
 
   const name =

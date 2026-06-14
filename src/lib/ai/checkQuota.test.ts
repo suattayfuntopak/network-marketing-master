@@ -3,10 +3,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 // Mock the Supabase server client and auth helper before importing the unit.
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/lib/domain/auth', () => ({ isSuperAdmin: vi.fn() }))
+// checkAIQuota artık kimliği getAuthUser() (getClaims, yerel doğrulama) ile alır;
+// ham supabase.auth.getUser() yerine bunu mock'la.
+vi.mock('@/lib/supabase/authUser', () => ({ getAuthUser: vi.fn() }))
 
 import { checkAIQuota } from './checkQuota'
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
+import { getAuthUser } from '@/lib/supabase/authUser'
 
 interface MockWorkspace {
   license_type: string | null
@@ -38,14 +42,15 @@ function makeClient(state: MockState) {
     return builder
   }
 
-  return {
-    auth: { getUser: async () => ({ data: { user: state.user } }) },
-    from,
-  }
+  return { from }
 }
 
 function setup(state: MockState, superAdmin = false) {
   ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(makeClient(state))
+  ;(getAuthUser as unknown as ReturnType<typeof vi.fn>).mockResolvedValue({
+    user: state.user,
+    error: null,
+  })
   ;(isSuperAdmin as unknown as ReturnType<typeof vi.fn>).mockReturnValue(superAdmin)
 }
 

@@ -26,6 +26,23 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
    gstack `/benchmark` (browse daemon) ile tekrarlanabilir ölçüm — regresyon yakalar.
 4. **Round-trip sayımı:** Network panelinde her rota için Supabase isteği adedi.
    Hedef: rota başına **tek seferde paralel** + tekrar ziyarette **0** (cache).
+5. **TTFB baseline (tekrarlanabilir, kalıcı):** `npm run perf:baseline`
+   (`scripts/perf-baseline.mjs`). Public rotalar doğrudan; auth'lu rotalar için
+   `NMM_COOKIE` ver (DevTools → Application → Cookies → `sb-*`). Prod'a karşı
+   `BASE_URL=https://<app> NMM_COOKIE="..." npm run perf:baseline`. Çıktıdaki p75
+   TTFB'yi aşağıdaki tabloya işle → bir sonraki tur regresyonu yakalar.
+
+### Baseline kayıt tablosu (her perf turunda güncelle)
+| Tarih | Rota | Ortam | p50 TTFB | p75 TTFB | Not |
+|-------|------|-------|----------|----------|-----|
+| _doldur_ | /pano | prod+cookie | | | bölge taşıma öncesi referans |
+| _doldur_ | /istatistikler | prod+cookie | | | |
+| _doldur_ | /saha-ozetim | prod+cookie | | | |
+| _doldur_ | /ekip | prod+cookie | | | |
+| _doldur_ | /pipeline | prod+cookie | | | |
+
+> Bu tabloyu prod'a karşı bir kez doldurmak, "tahminle değiştirme" kuralını
+> uygulanabilir kılar: her tur öncesi/sonrası aynı satırı ölç, kazancı §8'e yaz.
 
 ## 4. Kaldıraçlar (etki sırasına göre)
 1. **[En büyük] Supabase bölge taşıma.** Origin'i kullanıcıların bölgesine taşı
@@ -52,8 +69,11 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
 4. Sonucu bu belgeye "ölçülen kazanç" olarak not et.
 
 ## 7. Sıradaki tur backlog (öncelikli)
-- [ ] Baseline ölçüm tablosu (ana 5 rota, mobil+masaüstü, p75 TTFB + LH).
-- [ ] Bölge taşıma fizibilitesi (en büyük kaldıraç) — karar notu.
+- [x] Baseline ölçüm ALTYAPISI (2026-06-14): `npm run perf:baseline` + §3 kayıt
+      tablosu hazır. KALAN: tabloyu prod'a karşı bir kez doldur (kullanıcı cookie'si gerekir).
+- [~] Bölge taşıma fizibilitesi: **karar verildi — ERTELENDİ.** Kullanıcı Supabase
+      Free planında, 2 proje slotu da dolu; Pro'ya geçemiyor → yeni Frankfurt projesi
+      açılamıyor. En büyük kaldıraç bu kısıt kalkana dek kilitli; kod turları devam.
 - [x] `prefetchRouteMetrics` kapsam denetimi (2026-06-14): nav linkleri `onMouseEnter`/
       `onPointerEnter` ile data prefetch + `DashboardShell` mount'ta tüm rotalar için
       `router.prefetch`. Kapsam tam; yeni rota eklerken aynı kalıbı uygula.
@@ -77,6 +97,17 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
   (`useCandidates`, `useNotifications` — tarayıcı tarafı, ayrı konu) + düşük-trafik admin
   mutasyonları (`moderation`, `ekip/actions`, `admin-actions`, `profile`, `userLang`,
   `odeme`) — istenirse aynı kalıpla dönüştürülebilir.
+- **2026-06-14 (2. parti) — getUser kapsamı TAMAMLANDI + ESLint ile kalıcılaştırıldı.**
+  Kalan tüm ham `supabase.auth.getUser()` çağrıları dönüştürüldü (toplam bu turda 25 site):
+  server tarafı (`checkQuota` [HER AI üretiminde — hot], `userLang`, `admin-actions` ×4,
+  `moderation` ×3, `profile`, `ekip/actions` ×5, `memberGoalsActions` ×2, `odeme`,
+  `workspace` ensure, `productEvents`, `shopierPaymentSession` ×2) → `getAuthUser()`;
+  **client** (`useCandidates` ×4, `useNotifications` ×3, `customContent` ×4) → yeni
+  `getClientUserId()` (`lib/supabase/authUserClient.ts`, getClaims yerel doğrulama,
+  tarayıcı→auth turu eler). **ESLint kuralı eklendi** (`eslint.config.mjs`
+  `no-restricted-syntax`): ham `supabase.auth.getUser()` artık derlemede hata →
+  kalıp regresyonu imkânsız. `server-only` testte no-op alias'landı
+  (`src/test/serverOnlyStub.ts` + vitest.config). tsc/eslint/254 test/build ✓.
 
 > Not: Config seviyesindeki kolay kazançlar tükendi. Bundan sonraki her değişiklik
 > **ölçümle** yapılmalı; tahminle perf değiştirmek regresyon riskidir.

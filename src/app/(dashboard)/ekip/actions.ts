@@ -228,7 +228,7 @@ export async function resolveTeamAvatarsAction(
   if (!userIds.length) return {}
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return {}
 
   const { data: ownWs } = await supabase
@@ -283,7 +283,7 @@ export async function toggleOnboardingStepAction(
   markDone: boolean
 ): Promise<void> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   if (markDone) {
@@ -314,7 +314,7 @@ export async function addTeamMemberAsCandidateAction(
   options?: AddTeamMemberAsCandidateOptions,
 ): Promise<{ candidateId: string; created: boolean }> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const trimmedName = memberName.trim()
@@ -427,7 +427,7 @@ export async function joinWorkspaceByInviteAction(
   inviteCode: string
 ): Promise<{ workspace_name?: string }> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const { data, error } = await supabase.rpc('nmm_join_workspace', {
@@ -463,7 +463,7 @@ export async function joinWorkspaceByInviteAction(
  */
 export async function unclaimMemberFromTeamAction(memberUserId: string): Promise<void> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const { error } = await supabase.rpc('nmm_unclaim_member', {

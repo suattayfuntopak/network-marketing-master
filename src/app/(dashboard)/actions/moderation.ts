@@ -1,6 +1,5 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
@@ -69,8 +68,7 @@ export async function submitModeratedRequestAction(
   itemKey: string,
   data: Record<string, Json>
 ): Promise<ContentSubmissionResult> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum kapalı: İçerik eklemek için lütfen giriş yapın.')
 
   const userEmail = user.email ?? ''
@@ -243,8 +241,7 @@ export async function approveRequestAction(
   contentType: ModerationContentType,
   editedData: Json
 ): Promise<{ success: boolean }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
@@ -376,8 +373,7 @@ export async function rejectRequestAction(
   contentType: ModerationContentType,
   reason?: string
 ): Promise<{ success: boolean }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()

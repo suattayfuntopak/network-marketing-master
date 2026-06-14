@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
+import { getClientUserId } from '@/lib/supabase/authUserClient'
 import { fetchCandidatesAction, fetchCandidateDetailAction } from '@/app/(dashboard)/actions/candidates'
 import { getLang } from '@/lib/utils/getLang'
 import { queryKeys } from '@/lib/query/keys'
@@ -69,15 +70,15 @@ export function useAddCandidate(workspaceId: string) {
   return useMutation({
     mutationFn: async (payload: Omit<NmmCandidateInsert, 'workspace_id' | 'owner_id'>) => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
+      const userId = await getClientUserId()
+      if (!userId) throw new Error('Oturum yok')
 
       const { data, error } = await supabase
         .from('nmm_candidates')
         .insert({
           ...payload,
           workspace_id: workspaceId,
-          owner_id: user.id,
+          owner_id: userId,
         })
         .select('id')
         .single()
@@ -86,7 +87,7 @@ export function useAddCandidate(workspaceId: string) {
       if (data) {
         await supabase.from('nmm_daily_actions').insert({
           workspace_id: workspaceId,
-          user_id: user.id,
+          user_id: userId,
           candidate_id: data.id,
           action_type: 'note' as const,
           note: 'system_note:candidate_created',
@@ -125,15 +126,15 @@ export function useUpdateCandidate(workspaceId: string) {
       if (error) throw new Error(error.message)
 
       if (currentCandidate) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
+        const userId = await getClientUserId()
+        if (userId) {
           const inserts: NmmDailyActionInsert[] = []
 
           // Stage change
           if (patch.stage && patch.stage !== currentCandidate.stage) {
             inserts.push({
               workspace_id: workspaceId,
-              user_id: user.id,
+              user_id: userId,
               candidate_id: id,
               action_type: 'stage_change' as const,
               note: patch.stage,
@@ -147,7 +148,7 @@ export function useUpdateCandidate(workspaceId: string) {
             if (currentWarmth !== newWarmth) {
               inserts.push({
                 workspace_id: workspaceId,
-                user_id: user.id,
+                user_id: userId,
                 candidate_id: id,
                 action_type: 'note' as const,
                 note: `system_note:warmth_change:${currentWarmth}->${newWarmth}`,
@@ -161,7 +162,7 @@ export function useUpdateCandidate(workspaceId: string) {
             const newDate = patch.next_follow_up_at || 'none'
             inserts.push({
               workspace_id: workspaceId,
-              user_id: user.id,
+              user_id: userId,
               candidate_id: id,
               action_type: 'note' as const,
               note: `system_note:follow_up_change:${oldDate}->${newDate}`,
@@ -173,7 +174,7 @@ export function useUpdateCandidate(workspaceId: string) {
               (patch.phone !== undefined && patch.phone !== currentCandidate.phone)) {
             inserts.push({
               workspace_id: workspaceId,
-              user_id: user.id,
+              user_id: userId,
               candidate_id: id,
               action_type: 'note' as const,
               note: 'system_note:profile_update',
@@ -238,8 +239,8 @@ export function useMarkContacted(workspaceId: string) {
   return useMutation({
     mutationFn: async ({ id, actionType }: { id: string; actionType: ActionType }) => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
+      const userId = await getClientUserId()
+      if (!userId) throw new Error('Oturum yok')
       await Promise.all([
         supabase
           .from('nmm_candidates')
@@ -247,7 +248,7 @@ export function useMarkContacted(workspaceId: string) {
           .eq('id', id),
         supabase.from('nmm_daily_actions').insert({
           workspace_id: workspaceId,
-          user_id: user.id,
+          user_id: userId,
           candidate_id: id,
           action_type: actionType,
         }),
@@ -414,12 +415,12 @@ export function useAddCandidateNote(workspaceId: string) {
       noteEn?: string
     }) => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
+      const userId = await getClientUserId()
+      if (!userId) throw new Error('Oturum yok')
 
       const { error } = await supabase.from('nmm_daily_actions').insert({
         workspace_id: workspaceId,
-        user_id: user.id,
+        user_id: userId,
         candidate_id: candidateId,
         action_type: 'note' as const,
         ...buildDailyActionNoteFields({ noteTr, noteEn }),

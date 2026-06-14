@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin } from '@/lib/domain/auth'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
@@ -19,8 +18,7 @@ export async function adminExtendLicenseAction(
   days: number,
   unlimited: boolean = false
 ): Promise<{ success: boolean; expiresAt: string | null }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
 
   assertSuperAdmin(user)
 
@@ -77,8 +75,7 @@ export async function addIndependentAsCandidateAction(
   targetEmail: string,
   targetName: string
 ): Promise<{ success: boolean }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
 
   assertSuperAdmin(user)
 
@@ -125,8 +122,7 @@ export async function addIndependentAsCandidateAction(
 export async function claimIndependentSignupToTeamAction(
   targetWorkspaceId: string,
 ): Promise<{ success: boolean }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
 
   assertSuperAdmin(user)
 
@@ -299,8 +295,7 @@ export async function claimIndependentSignupToTeamAction(
 }
 
 export async function deleteUserAction(ownerId: string): Promise<{ success: boolean }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
 
   assertSuperAdmin(user)
 

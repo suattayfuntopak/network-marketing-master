@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
+import { getClientUserId } from '@/lib/supabase/authUserClient'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
 import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
@@ -30,13 +31,13 @@ export interface NotificationItem {
 
 async function fetchNotifications(): Promise<NotificationItem[]> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return []
+  const userId = await getClientUserId()
+  if (!userId) return []
 
   const { data, error } = await supabase
     .from('nmm_notifications')
     .select('*')
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(50)
 
@@ -67,18 +68,18 @@ export function useNotifications(options?: { enabled?: boolean }) {
     if (!enabled) return
     let channel: RealtimeChannel | null = null
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+    getClientUserId().then((userId) => {
+      if (!userId) return
 
       channel = supabase
-        .channel(`nmm_notifications_realtime:${user.id}`)
+        .channel(`nmm_notifications_realtime:${userId}`)
         .on(
           'postgres_changes',
           {
             event: 'INSERT',
             schema: 'public',
             table: 'nmm_notifications',
-            filter: `user_id=eq.${user.id}`,
+            filter: `user_id=eq.${userId}`,
           },
           (payload: RealtimePostgresInsertPayload<NotificationItem>) => {
             const newNotif = payload.new
@@ -157,13 +158,13 @@ export function useNotifications(options?: { enabled?: boolean }) {
   // Mutation: Mark all notifications as read
   const markAllReadMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      const userId = await getClientUserId()
+      if (!userId) return
 
       await supabase
         .from('nmm_notifications')
         .update({ read: true })
-        .eq('user_id', user.id)
+        .eq('user_id', userId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })

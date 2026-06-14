@@ -82,6 +82,15 @@ const noRestrictedSyntax = {
         selector: "Literal[value=/(?:api\\.whatsapp\\.com\\/send\\?text=|wa\\.me\\/\\?text=)/]",
         message: "Ham WhatsApp paylaşım URL'i kurma; whatsappShareUrl() (lib/utils/waLink) kullan.",
       },
+      {
+        // `supabase.auth.getUser()` HER çağrıda Supabase auth sunucusuna ~230ms
+        // ağ gidiş-dönüşü yapar. getClaims tabanlı yardımcılar asimetrik JWT'yi
+        // YEREL doğrular (~0ms) ve cache()'ler. Server: getAuthUser()
+        // (lib/supabase/authUser); Client/hook: getClientUserId()
+        // (lib/supabase/authUserClient). Bkz. docs/performance.md §8.
+        selector: "CallExpression[callee.object.property.name='auth'][callee.property.name='getUser']",
+        message: "Ham supabase.auth.getUser() (~230ms auth round-trip) yasak. Server'da getAuthUser() (lib/supabase/authUser), client'ta getClientUserId() (lib/supabase/authUserClient) kullan.",
+      },
     ],
   },
 };

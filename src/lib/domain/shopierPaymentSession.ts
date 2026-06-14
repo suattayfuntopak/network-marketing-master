@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { getShopierAmount, type BillingPeriod, type PlanId } from '@/lib/domain/pricing'
 import {
   buildShopierCheckoutForm,
@@ -34,7 +35,7 @@ export async function createShopierPaymentSession(
   }
 
   const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) {
     throw new Error('Oturum bulunamadı. Lütfen tekrar giriş yapın.')
   }
@@ -104,7 +105,7 @@ export async function createShopierStorefrontRedirect(
   }
 
   const supabase = await createClient()
-  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  const { user, error: userError } = await getAuthUser()
   if (userError || !user) {
     throw new Error('Oturum bulunamadı. Lütfen tekrar giriş yapın.')
   }

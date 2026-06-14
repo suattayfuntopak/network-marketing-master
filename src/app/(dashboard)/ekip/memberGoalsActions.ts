@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
@@ -13,9 +14,7 @@ export type MemberGoalRow = {
 
 async function assertLeader(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
   const { data: ws } = await supabase
@@ -49,9 +48,7 @@ export async function getMemberGoalsMapAction(
   memberUserIds: string[]
 ): Promise<Record<string, MemberGoalRow>> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user || memberUserIds.length === 0) return {}
 
   const uniqueIds = [...new Set(memberUserIds.filter(Boolean))]

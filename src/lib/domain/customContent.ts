@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
+import { getClientUserId } from '@/lib/supabase/authUserClient'
 import type { Json } from '@/types/database.types'
 
 /**
@@ -35,14 +36,14 @@ export async function loadCustomContent(
   workspaceId: string | null
 ): Promise<CustomItem[]> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return readLocal(localKey)
+  const userId = await getClientUserId()
+  if (!userId) return readLocal(localKey)
 
   const { data: rows } = await supabase
     .from(table)
     .select('item_key, data, created_at, is_approved, user_id')
     .eq('is_deleted', false)
-    .or(`is_approved.eq.true,user_id.eq.${user.id}`)
+    .or(`is_approved.eq.true,user_id.eq.${userId}`)
     .order('created_at', { ascending: false })
 
   const dbItems = (rows ?? []).map(r => ({
@@ -58,7 +59,7 @@ export async function loadCustomContent(
   if (toMigrate.length > 0) {
     await supabase.from(table).insert(
       toMigrate.map(it => ({
-        user_id: user.id,
+        user_id: userId,
         workspace_id: workspaceId,
         item_key: String(it.id),
         data: it as unknown as Json,
@@ -73,7 +74,7 @@ export async function loadCustomContent(
   const migratedItems = toMigrate.map(it => ({
     ...it,
     isApproved: true,
-    userId: user.id,
+    userId: userId,
   }))
 
   return [...migratedItems, ...dbItems]
@@ -85,10 +86,10 @@ export async function addCustomContent(
   item: CustomItem
 ): Promise<void> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const userId = await getClientUserId()
+  if (!userId) return
   await supabase.from(table).insert({
-    user_id: user.id,
+    user_id: userId,
     workspace_id: workspaceId,
     item_key: String(item.id),
     data: item as unknown as Json,
@@ -103,12 +104,12 @@ export async function updateCustomContent(
   item: CustomItem
 ): Promise<void> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const userId = await getClientUserId()
+  if (!userId) return
   await supabase
     .from(table)
     .update({ data: item as unknown as Json })
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('item_key', String(itemKey))
 }
 
@@ -117,11 +118,11 @@ export async function deleteCustomContent(
   itemKey: string | number
 ): Promise<void> {
   const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
+  const userId = await getClientUserId()
+  if (!userId) return
   await supabase
     .from(table)
     .update({ is_deleted: true })
-    .eq('user_id', user.id)
+    .eq('user_id', userId)
     .eq('item_key', String(itemKey))
 }

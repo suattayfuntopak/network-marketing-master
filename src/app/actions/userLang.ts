@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 
 /**
  * Kullanıcının seçtiği arayüz dilini user_metadata'ya kalıcılaştırır.
@@ -12,7 +13,7 @@ import { createClient } from '@/lib/supabase/server'
 export async function persistUserLangAction(lang: 'tr' | 'en'): Promise<void> {
   if (lang !== 'tr' && lang !== 'en') return
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return
   if (user.user_metadata?.lang === lang) return
   await supabase.auth.updateUser({ data: { lang } })
