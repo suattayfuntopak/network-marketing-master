@@ -55,3 +55,6 @@ next-env.d.ts
 
 # gstack (Garry Tan skill paketi) yerel çıktıları — güvenlik raporları yerel kalır
 .gstack/
+
+# perf:baseline oturum cookie'si (scripts/perf-baseline.mjs okur) — asla commit'leme
+.perf-cookie

@@ -10,9 +10,20 @@ import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
-import { NotificationsModal } from '@/components/ui/NotificationsModal'
-import { QuickAddModal } from '@/components/ui/QuickAddModal'
 import { useNotifications } from '@/hooks/useNotifications'
+import dynamic from 'next/dynamic'
+
+// Tıklamayla açılan modallar — ilk boyada gerekmez. next/dynamic (ssr:false)
+// ile JS yalnızca ilk açılışta yüklenir; Header her dashboard sayfasının ilk
+// bundle'ında olduğundan bu, kabuk JS'ini küçültür → "pat pat" geçiş.
+const NotificationsModal = dynamic(
+  () => import('@/components/ui/NotificationsModal').then(m => m.NotificationsModal),
+  { ssr: false },
+)
+const QuickAddModal = dynamic(
+  () => import('@/components/ui/QuickAddModal').then(m => m.QuickAddModal),
+  { ssr: false },
+)
 
 export const TRFlag = () => (
   <svg viewBox="0 0 1200 800" className="w-5 h-3.5 rounded-[2px] shadow-sm shrink-0">

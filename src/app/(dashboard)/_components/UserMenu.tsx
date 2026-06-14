@@ -6,10 +6,22 @@ import Image from 'next/image'
 import { LogOut, User, Settings, Bell, ChevronDown, Sparkles } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { logoutAction } from '../_shared-actions'
-import { ProfileModal } from '@/components/ui/ProfileModal'
-import { NotificationsModal } from '@/components/ui/NotificationsModal'
-import { SettingsModal } from '@/components/ui/SettingsModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
+import dynamic from 'next/dynamic'
+
+// Tıklamayla açılan modallar — next/dynamic (ssr:false) ile ilk açılışta yüklenir.
+const ProfileModal = dynamic(
+  () => import('@/components/ui/ProfileModal').then(m => m.ProfileModal),
+  { ssr: false },
+)
+const NotificationsModal = dynamic(
+  () => import('@/components/ui/NotificationsModal').then(m => m.NotificationsModal),
+  { ssr: false },
+)
+const SettingsModal = dynamic(
+  () => import('@/components/ui/SettingsModal').then(m => m.SettingsModal),
+  { ssr: false },
+)
 import { clearNmmLocalStorage } from '@/lib/ui/userScopedStorage'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'

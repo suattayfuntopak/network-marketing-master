@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { RealtimeChannel, RealtimePostgresInsertPayload } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
@@ -56,6 +56,20 @@ export function useNotifications(options?: { enabled?: boolean }) {
   const router = useRouter()
   const enabled = options?.enabled !== false
 
+  // Realtime kanalını dil/çeviri/router değişiminde YENİDEN kurmamak için bunları
+  // ref'te tut. Aksi halde her dil değişiminde websocket kanalı yıkılıp yeniden
+  // abone oluyordu (gereksiz bağlantı churn'ü). Callback güncel değerleri ref'ten okur.
+  const langRef = useRef(lang)
+  const tRef = useRef(t)
+  const routerRef = useRef(router)
+  // Ref'leri render sonrası güncelle (render sırasında ref yazımı react-hooks/refs
+  // ihlali). Realtime callback async tetiklendiği için bir kare gecikme önemsiz.
+  useEffect(() => {
+    langRef.current = lang
+    tRef.current = t
+    routerRef.current = router
+  })
+
   const query = useQuery({
     queryKey: queryKeys.notifications(),
     queryFn: fetchNotifications,
@@ -84,6 +98,11 @@ export function useNotifications(options?: { enabled?: boolean }) {
           (payload: RealtimePostgresInsertPayload<NotificationItem>) => {
             const newNotif = payload.new
             if (!newNotif) return
+
+            // Güncel dil/çeviri/router — ref'ten (effect bunlara bağlı değil).
+            const lang = langRef.current
+            const t = tRef.current
+            const router = routerRef.current
 
             // 1. Invalidate query to refresh UI lists and badge count instantly
             queryClient.invalidateQueries({ queryKey: queryKeys.notifications() })
@@ -153,7 +172,7 @@ export function useNotifications(options?: { enabled?: boolean }) {
         supabase.removeChannel(channel)
       }
     }
-  }, [queryClient, supabase, lang, router, t, enabled])
+  }, [queryClient, supabase, enabled])
 
   // Mutation: Mark all notifications as read
   const markAllReadMutation = useMutation({

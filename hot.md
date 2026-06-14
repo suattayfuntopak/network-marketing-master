@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-14 — Perf turu (3. parti): kalan 4 öneri uygulandı ✅
+
+Önceki raporun 4 genel önerisi de kullanıcı tarafından onaylandı; "tertemiz" uygulandı.
+
+### #1 — Baseline ölçüm turnkey (`scripts/perf-baseline.mjs`)
+Cookie'yi `.perf-cookie` dosyasından (gitignored) da okur (env şart değil); p75 eklendi; `docs/performance.md` §3 tablosuna **yapıştırılabilir markdown satırları** üretir. Kullanım: `BASE_URL=https://<app> npm run perf:baseline` (cookie dosyada). KALAN: kullanıcı prod'a karşı bir kez çalıştırıp tabloyu doldurur (cookie onun oturumundan).
+
+### #2 — Modal code-split (`next/dynamic`)
+Header (`NotificationsModal`, `QuickAddModal`) + UserMenu (`ProfileModal`, `NotificationsModal`, `SettingsModal`) statik import → `dynamic(ssr:false)`. Modallar zaten tıklamayla koşullu render ediliyordu → **sıfır UX regresyonu**; Header her dashboard sayfasının ilk bundle'ında olduğundan kabuk JS küçüldü, modal JS ilk açılışta yüklenir.
+
+### #3 — Frankfurt taşıma runbook (`docs/supabase-region-migration.md`)
+En büyük kaldıraç (origin ~320ms→~40-60ms) Free-plan slot kısıtıyla ertelendi; slot/Pro açılınca uygulanacak adım-adım runbook yazıldı (dump/restore, storage, avatar domain rewrite, auth+asimetrik anahtar, Vercel env, Shopier etkilenmez, doğrulama, rollback).
+
+### #4 — Realtime kanal churn'ü giderildi (`useNotifications`)
+Effect bağımlılıkları `[queryClient, supabase, lang, router, t, enabled]` idi → her **dil değişiminde** Supabase realtime websocket kanalı yıkılıp yeniden kuruluyordu. `lang/t/router` ref'e alındı (ref güncellemesi render sonrası useEffect'te — `react-hooks/refs` uyumlu); effect artık `[queryClient, supabase, enabled]`. Kanal bir kez kurulur, callback güncel değerleri ref'ten okur.
+
+### Doğrulama
+`tsc` ✓ · `eslint --max-warnings 0` ✓ · `vitest` 254/254 ✓ · `npm run build` ✓ (47/47).
+
 ## 2026-06-14 — Perf turu (2. parti): getUser kapsamı tamamlandı + ESLint ile kalıcılaştırıldı ✅
 
 Kullanıcı, önceki turun önerilerinden #1 (Supabase bölge taşıma) HARİÇ hepsini onayladı (Free plan slot kısıtı → Pro'ya geçilemiyor, ikinci proje açılamıyor). Onaylanan #2/#3/#4/#5 "tertemiz" uygulandı.

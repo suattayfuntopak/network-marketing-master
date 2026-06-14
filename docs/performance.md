@@ -69,11 +69,14 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
 4. Sonucu bu belgeye "ölçülen kazanç" olarak not et.
 
 ## 7. Sıradaki tur backlog (öncelikli)
-- [x] Baseline ölçüm ALTYAPISI (2026-06-14): `npm run perf:baseline` + §3 kayıt
-      tablosu hazır. KALAN: tabloyu prod'a karşı bir kez doldur (kullanıcı cookie'si gerekir).
+- [x] Baseline ölçüm ALTYAPISI (2026-06-14): `npm run perf:baseline` turnkey —
+      `.perf-cookie` dosyasından cookie okur, p75 + §3'e yapıştırılabilir markdown
+      satırları üretir. KALAN (kullanıcı aksiyonu): prod'a karşı bir kez çalıştır,
+      §3 tablosunu doldur (cookie kullanıcının oturumundan gelir).
 - [~] Bölge taşıma fizibilitesi: **karar verildi — ERTELENDİ.** Kullanıcı Supabase
       Free planında, 2 proje slotu da dolu; Pro'ya geçemiyor → yeni Frankfurt projesi
       açılamıyor. En büyük kaldıraç bu kısıt kalkana dek kilitli; kod turları devam.
+      Slot açılınca uygulanacak adım-adım runbook: **`docs/supabase-region-migration.md`**.
 - [x] `prefetchRouteMetrics` kapsam denetimi (2026-06-14): nav linkleri `onMouseEnter`/
       `onPointerEnter` ile data prefetch + `DashboardShell` mount'ta tüm rotalar için
       `router.prefetch`. Kapsam tam; yeni rota eklerken aynı kalıbı uygula.
@@ -81,8 +84,13 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
       (`FieldSummaryPage`, `EkipSummaryTab`, `StatsFieldFunnelSection`, `MemberActivitySheet`,
       `useCandidates`/`useTeamMembers`/`useAIUsage`) `placeholderData: keepPreviousData`
       kullanıyor → dönem/sekme geçişi "boş→dolu" değil "eski→yeni". Yeni metrik sorgusunda zorunlu.
-- [ ] En ağır 3 client bileşeni için `next/dynamic` bölme (kısmen var: İstatistikler/Platform/
-      İtirazlar/Ekip/Eğitim içerikleri zaten `next/dynamic`).
+- [x] Click-tetikli modallar `next/dynamic` (2026-06-14): Header (`NotificationsModal`,
+      `QuickAddModal`) + UserMenu (`ProfileModal`, `NotificationsModal`, `SettingsModal`)
+      statik import'tan `dynamic(ssr:false)`'a. Header her sayfada → kabuk JS küçüldü,
+      modal JS ilk açılışta yüklenir (zaten koşullu render → sıfır UX regresyonu).
+      `AddObjectionModal`/`AddTrainingModal` + sayfa içerikleri (İstatistikler/Platform/
+      İtirazlar/Ekip/Eğitim) zaten bölünmüştü. **KALIP:** yeni modal/ağır client bileşeni
+      `next/dynamic(ssr:false)` ile, koşullu (`{open && <X/>}`) render et.
 
 ## 8. Ölçülen kazanç defteri
 - **2026-06-14 — Hot-path auth round-trip kırpma.** Ham `supabase.auth.getUser()`
@@ -108,6 +116,13 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
   `no-restricted-syntax`): ham `supabase.auth.getUser()` artık derlemede hata →
   kalıp regresyonu imkânsız. `server-only` testte no-op alias'landı
   (`src/test/serverOnlyStub.ts` + vitest.config). tsc/eslint/254 test/build ✓.
+
+- **2026-06-14 (3. parti) — kalan 4 öneri uygulandı.** (1) Baseline `perf:baseline`
+  turnkey: `.perf-cookie` + p75 + markdown çıktı (§3). (2) Modal code-split: Header +
+  UserMenu modalları `next/dynamic(ssr:false)` → kabuk JS küçüldü. (3) Frankfurt taşıma
+  runbook: `docs/supabase-region-migration.md` (slot açılınca). (4) Realtime: `useNotifications`
+  effect bağımlılıklarından `lang/t/router` çıkarıldı (ref pattern) → dil değişiminde
+  websocket kanalı artık yeniden kurulmuyor (gereksiz churn giderildi). tsc/eslint/254 test/build ✓.
 
 > Not: Config seviyesindeki kolay kazançlar tükendi. Bundan sonraki her değişiklik
 > **ölçümle** yapılmalı; tahminle perf değiştirmek regresyon riskidir.
