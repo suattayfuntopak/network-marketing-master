@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import {
   MAX_PRESENTATION_MATERIALS,
   normalizePresentationUrl,
@@ -28,9 +29,7 @@ function mapDbError(error: { code?: string; message?: string }): string {
 
 async function requireWorkspaceAccess(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
   const { data: membership } = await supabase

@@ -54,9 +54,29 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
 ## 7. Sıradaki tur backlog (öncelikli)
 - [ ] Baseline ölçüm tablosu (ana 5 rota, mobil+masaüstü, p75 TTFB + LH).
 - [ ] Bölge taşıma fizibilitesi (en büyük kaldıraç) — karar notu.
-- [ ] `prefetchRouteMetrics` kapsam denetimi: hangi rotalar hover-prefetch'siz?
-- [ ] Sekme geçişlerinde `keepPreviousData` + skeleton tutarlılığı denetimi.
-- [ ] En ağır 3 client bileşeni için `next/dynamic` bölme.
+- [x] `prefetchRouteMetrics` kapsam denetimi (2026-06-14): nav linkleri `onMouseEnter`/
+      `onPointerEnter` ile data prefetch + `DashboardShell` mount'ta tüm rotalar için
+      `router.prefetch`. Kapsam tam; yeni rota eklerken aynı kalıbı uygula.
+- [x] Sekme geçişlerinde `keepPreviousData` denetimi (2026-06-14): ana metrik sayfaları
+      (`FieldSummaryPage`, `EkipSummaryTab`, `StatsFieldFunnelSection`, `MemberActivitySheet`,
+      `useCandidates`/`useTeamMembers`/`useAIUsage`) `placeholderData: keepPreviousData`
+      kullanıyor → dönem/sekme geçişi "boş→dolu" değil "eski→yeni". Yeni metrik sorgusunda zorunlu.
+- [ ] En ağır 3 client bileşeni için `next/dynamic` bölme (kısmen var: İstatistikler/Platform/
+      İtirazlar/Ekip/Eğitim içerikleri zaten `next/dynamic`).
+
+## 8. Ölçülen kazanç defteri
+- **2026-06-14 — Hot-path auth round-trip kırpma.** Ham `supabase.auth.getUser()`
+  (~230ms ağ turu) → cached `getAuthUser()` (getClaims yerel doğrulama ~0ms + `cache()`
+  dedup). 13 çağrı / 7 dosya: `istatistikler/actions.ts` (×6, `loadStatsFunnelActuals`
+  hot + 5 admin okuma), `pipeline/[id]/actions.ts` (×3 çeviri), `pipeline/sunum-
+  materyalleri` (×1), `actions/notificationPreferences` (×2), `pulse/learningEvents`,
+  `egitim/videoActions` (assertAdmin), `takvim/actions` (assertWorkspaceOwner). Regresyonsuz
+  (simetrik anahtara düşerse davranış aynı). **KALIP (kalıcı):** her yeni server action
+  kimlik için `getAuthUser()` çağırır; ham `supabase.auth.getUser()` server tarafında
+  yasak sayılır (kritik/hot yollarda mutlak). Kalan ham getUser'lar: client hook'lar
+  (`useCandidates`, `useNotifications` — tarayıcı tarafı, ayrı konu) + düşük-trafik admin
+  mutasyonları (`moderation`, `ekip/actions`, `admin-actions`, `profile`, `userLang`,
+  `odeme`) — istenirse aynı kalıpla dönüştürülebilir.
 
 > Not: Config seviyesindeki kolay kazançlar tükendi. Bundan sonraki her değişiklik
 > **ölçümle** yapılmalı; tahminle perf değiştirmek regresyon riskidir.

@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import {
   CALENDAR_TERMINAL_STAGES,
   FOLLOW_UP_CALENDAR_SUPPRESSED_ISO,
@@ -9,7 +10,7 @@ import { fromCalendarKey, followUpToIsoFromKey, toCalendarKey } from '@/lib/util
 
 async function assertWorkspaceOwner(workspaceId: string) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const { data: ws } = await supabase

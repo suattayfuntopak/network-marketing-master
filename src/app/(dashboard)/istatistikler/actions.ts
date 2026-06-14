@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient, type AdminClient } from '@/lib/supabase/admin'
 import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
 import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
@@ -30,9 +31,7 @@ export type StatsFunnelBundle = {
 
 async function loadStatsFunnelActuals(period: PulsePeriod): Promise<FunnelCounts> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return EMPTY_FUNNEL
 
   const range = funnelRangeForPulsePeriod(period)
@@ -102,9 +101,7 @@ export async function getIndependentSignupAIUsageAction(): Promise<
 
 async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]> {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
@@ -216,10 +213,7 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 export async function getMemberLicenseProfilesAction(
   userIds: string[]
 ): Promise<Record<string, MemberLicenseProfile>> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   if (userIds.length === 0) return {}
@@ -366,10 +360,7 @@ export async function getAiUsageByPeriodAction(
   userIds: string[],
   period: AIUsageArchivePeriod
 ): Promise<AiUsageByPeriod> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
   if (userIds.length === 0) return {}
 
@@ -398,10 +389,7 @@ export type AiModelMix = {
 
 /** Süper admin: seçili dönemde Flash vs Pro çağrı sayıları. */
 export async function getAiModelMixAction(period: AIUsageArchivePeriod): Promise<AiModelMix> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()
@@ -443,10 +431,7 @@ export type ProductFunnelCounts = {
 export async function getProductFunnelStatsAction(
   period: AIUsageArchivePeriod,
 ): Promise<ProductFunnelCounts> {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
 
   const admin = createAdminClient()

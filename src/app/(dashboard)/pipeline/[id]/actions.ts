@@ -2,6 +2,7 @@
 
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
@@ -202,8 +203,7 @@ export async function translateNoteAction(text: string): Promise<string> {
   if (!process.env.GEMINI_API_KEY) return text
   if (!text?.trim()) return text ?? ''
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   try {
@@ -229,8 +229,7 @@ export async function translateEnToTrAction(text: string): Promise<string> {
   if (!process.env.GEMINI_API_KEY) return text
   if (!text?.trim()) return text ?? ''
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   try {
@@ -261,7 +260,7 @@ export async function persistLeaderNoteTranslationAction(
   noteEn: string,
 ): Promise<void> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum bulunamadı.')
 
   const { data: action } = await supabase

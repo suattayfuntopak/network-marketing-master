@@ -302,10 +302,7 @@ export type VideoInput = {
 }
 
 async function assertAdmin() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   assertSuperAdmin(user)
   return createAdminClient()
 }

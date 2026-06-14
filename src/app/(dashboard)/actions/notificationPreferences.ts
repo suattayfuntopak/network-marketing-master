@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 
 export type NotificationPreferences = {
   email: boolean
@@ -12,7 +13,7 @@ export type NotificationPreferences = {
 /** Sunucuda satır yoksa `null` — istemci localStorage ile devam eder. */
 export async function getNotificationPreferencesAction(): Promise<NotificationPreferences | null> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return null
 
   const { data, error } = await supabase
@@ -35,7 +36,7 @@ export async function updateNotificationPreferencesAction(
   prefs: NotificationPreferences,
 ): Promise<{ ok: true } | { ok: false; error: string }> {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) return { ok: false, error: 'Oturum bulunamadı.' }
 
   const { error } = await supabase

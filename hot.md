@@ -1,5 +1,30 @@
 # Hot Log
 
+## 2026-06-14 — Perf turu: hot-path auth round-trip kırpma (getUser→getClaims) ✅
+
+Uçtan uca performans incelemesi (landing→giriş→pano→sekme geçişleri→metrik dolması). Önceki turlarda config/SSR/prefetch kazançları tükendiği için (bkz. `docs/performance.md`, hafıza `project_perf_round_trips`) bu tur **kalan ham `supabase.auth.getUser()` ağ turlarını** hedefledi.
+
+### Kök bulgu
+`supabase.auth.getUser()` her çağrıda Supabase auth sunucusuna **~230ms ağ gidiş-dönüşü** yapar. `getAuthUser()` (`src/lib/supabase/authUser.ts`) ise `getClaims()` ile asimetrik JWT'yi **yerel** doğrular (~0ms) + React `cache()` ile aynı istekte dedupe eder. Simetrik anahtara düşse bile davranış birebir aynı → **regresyonsuz, her durumda ya kazanç ya nötr**. Bu kalıp `authUser.ts` docstring'inde zaten "hot-path action'lar bunu çağırmalı" diye kilitli; bu tur kapsamı tamamlandı.
+
+### Dönüştürülen 13 çağrı / 7 dosya
+- **`istatistikler/actions.ts`** (6): `loadStatsFunnelActuals` (HOT — stats funnel bundle prefetch+localStorage persist) + 5 süper-admin okuma aksiyonu (bağımsız kayıt YZ, lisans profilleri, YZ kullanım/model mix, ürün hunisi).
+- **`pipeline/[id]/actions.ts`** (3): not çeviri (TR↔EN) + kalıcı lider notu çevirisi — aday detayında kullanıcı bekleyen etkileşimler.
+- **`pipeline/sunum-materyalleri/actions.ts`** (1): `requireWorkspaceAccess` — aday detayı sunum materyalleri okuma/yazma.
+- **`actions/notificationPreferences.ts`** (2): tercih oku + güncelle.
+- **`pulse/learningEvents.ts`** (1), **`egitim/videoActions.ts`** (1: `assertAdmin`), **`takvim/actions.ts`** (1: `assertWorkspaceOwner`).
+
+Kritik yol (`fetchWorkspaceAction`, `fetchCandidatesAction`, hub/goal/team aksiyonları) zaten `getAuthUser` kullanıyordu — dokunulmadı.
+
+### Etki
+İstatistikler ilk yüklemede stats funnel ~230ms hızlanır; not çeviri/takvim/bildirim/sunum etkileşimleri her birinde ~230ms auth turu eler. Kümülatif: metrik-yoğun sayfa ve etkileşimlerde "pat pat" hissine kalıcı katkı. (Asimetrik anahtar aktifken; bkz. hafıza.)
+
+### Doğrulama
+`tsc --noEmit` temiz · `eslint --max-warnings 0` temiz · `vitest` 254/254 · `npm run build` ✓ (env ile; worktree'de .env yokken prerender env-hatası verir, koddan bağımsız).
+
+### Kalan en büyük kaldıraç (kod değil)
+Supabase origin coğrafi uzaklığı (~320ms/sorgu) hâlâ tavan. Frankfurt taşıma Free-plan slot kısıtıyla bloke. Kod turları round-trip **sayısını** düşürür, **mesafesini** değil — kalıcı çözüm bölge taşıma/read-replica.
+
 ## 2026-06-13 — /cso güvenlik denetimi: 3 bulgu kapandı ✅
 
 gstack `/cso` (read-only güvenlik denetimi) tüm uygulamada çalıştırıldı: gizli anahtar arkeolojisi, tedarik zinciri, CI/CD, webhook, RLS, admin-client server action'ları, OWASP, AI çıktısı. **Tek HIGH + iki MEDIUM bulgu; hepsi düzeltildi.**

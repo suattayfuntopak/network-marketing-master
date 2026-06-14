@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { getAuthUser } from '@/lib/supabase/authUser'
 import type { ProgressChangeType } from '@/lib/domain/learningEvents'
 
 type ProgressRow = {
@@ -12,9 +13,7 @@ type ProgressRow = {
 
 async function assertMember(workspaceId: string) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
   const { data: membership } = await supabase
