@@ -24,6 +24,8 @@ export const queryKeys = {
   activityStreak: () => ['activity-streak'] as const,
   /** Başarılar & rozetler (Hedefim tanınma kartı) */
   achievements: () => ['achievements'] as const,
+  /** Müşteri listesi + sipariş özeti */
+  customers: () => ['customers'] as const,
   /** Günlük Özet hub — haftalık/aylık ile aynı veri modeli */
   hubDailySelf: (offset = 0) => ['hub', 'daily-self', offset] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,

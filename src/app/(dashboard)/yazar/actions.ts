@@ -14,6 +14,7 @@ import {
 } from '@/lib/domain/aiInputLimit'
 import { buildObjectionKnowledgeBase } from '@/app/(dashboard)/itirazlar/data/itirazlar'
 import { generateLocalFallbackMessage, generateLocalCoachAnswer } from '@/lib/domain/aiFallback'
+import { parseRoleplayDifficulty, roleplayDifficultyInstruction } from '@/lib/domain/roleplayDifficulty'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -89,7 +90,8 @@ export async function generateRoleplayResponseAction(
   scenarioId: string,
   messageHistory: { role: string; text: string; score?: number; strengths?: string[]; improvements?: string }[],
   userReply: string,
-  lang: string
+  lang: string,
+  difficulty: string = 'orta'
 ): Promise<RoleplayResponseState> {
   const l = toLang(lang)
   if (!process.env.GEMINI_API_KEY) {
@@ -125,6 +127,8 @@ GÖREVİN:
    - 0 ile 100 arasında bir liderlik puanı belirle ve JSON'daki "yzk_score" alanına yerleştir.
    - En fazla 2 adet çok net ve pozitif güçlü yönünü belirtip JSON'daki "yzk_strengths" dizisine yerleştir.
    - Distribütörün bir sonraki sefere daha iyi yapması için en fazla 1 adet motivasyonel ve eyleme dökülebilir tavsiye yazıp JSON'daki "yzk_improvements" alanına yerleştir.
+
+${roleplayDifficultyInstruction(parseRoleplayDifficulty(difficulty), l)}
 
 DİL POLİTİKASI:
 Eğer dil (language) parametresi 'en' ise, tüm JSON içeriğini (candidate_reply, yzk_strengths, yzk_improvements) tamamen İngilizce yaz. Eğer 'tr' ise tamamen Türkçe yaz.

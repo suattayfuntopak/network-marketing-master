@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ClipboardList, Bot, Users,
   CalendarDays, BookOpen, Target,
   GraduationCap, History, Crown, Ellipsis, Activity,
-  BarChart3,
+  BarChart3, ShoppingBag,
   type LucideIcon,
 } from 'lucide-react'
 import type { ButtonColor } from '@/components/ui/SquareButton'
@@ -44,6 +44,9 @@ function panoToNavItem({ href, translationKey, icon, calendarPeriod }: PanoLaunc
 export const NAV_SIDEBAR_MODULES: readonly NavItem[] = [
   { href: '/pano', translationKey: 'nav.pano', icon: LayoutDashboard },
   ...PANO_ORGANIZATION_ITEMS.map(panoToNavItem),
+  // Müşterilerim — perakende/sipariş tarafı. Pano 5×2 launcher'ına dokunmadan
+  // yalnız sidebar + (kaydırılabilir) alt nav'da görünür.
+  { href: '/musteriler', translationKey: 'nav.musteriler', icon: ShoppingBag },
 ]
 
 /** @deprecated NAV_SIDEBAR_MODULES kullanın */

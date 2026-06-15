@@ -247,6 +247,27 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
     },
   },
   {
+    match: '/musteriler',
+    tr: {
+      title: 'Müşterilerim',
+      intro: 'Ürün sattığın müşterileri ve siparişlerini burada takip edersin (adaylardan ayrı).',
+      steps: [
+        { t: 'Müşteri ekle', d: '“Müşteri Ekle” ile ad, telefon ve not girerek yeni bir müşteri oluştur.' },
+        { t: 'Sipariş ekle', d: 'Bir müşterinin kartındaki “Sipariş Ekle” ile tutarı gir; toplam ciro ve son sipariş otomatik güncellenir.' },
+        { t: 'Özet', d: 'Üstteki kutular toplam ciroyu, müşteri ve sipariş sayını gösterir.' },
+      ],
+    },
+    en: {
+      title: 'My Customers',
+      intro: 'Track customers you sell products to and their orders here (separate from prospects).',
+      steps: [
+        { t: 'Add customer', d: 'Use “Add Customer” to create a new customer with name, phone and a note.' },
+        { t: 'Add order', d: 'Use “Add Order” on a customer card to log an amount; revenue and last order update automatically.' },
+        { t: 'Summary', d: 'The top boxes show total revenue, customer and order counts.' },
+      ],
+    },
+  },
+  {
     match: '/platform-yonetim',
     tr: {
       title: 'Platform Yönetimi',

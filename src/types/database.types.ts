@@ -25,6 +25,72 @@ export type NotificationType = 'bell' | 'alert' | 'info' | 'user' | 'calendar' |
 export interface Database {
   public: {
     Tables: {
+      nmm_customers: {
+        Row: {
+          id: string
+          workspace_id: string
+          owner_id: string
+          full_name: string
+          phone: string | null
+          note: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          owner_id: string
+          full_name: string
+          phone?: string | null
+          note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          owner_id?: string
+          full_name?: string
+          phone?: string | null
+          note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      nmm_orders: {
+        Row: {
+          id: string
+          workspace_id: string
+          customer_id: string
+          owner_id: string
+          amount: number
+          note: string | null
+          ordered_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          customer_id: string
+          owner_id: string
+          amount?: number
+          note?: string | null
+          ordered_at?: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          customer_id?: string
+          owner_id?: string
+          amount?: number
+          note?: string | null
+          ordered_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       nmm_workspaces: {
         Row: {
           id: string

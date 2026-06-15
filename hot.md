@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-15 — Domain düzeltme + Müşteri/Sipariş takibi + Saha Provası 2.0 ✅
+
+### 🔧 Domain düzeltmesi
+`APP_URL` `nmmaster.com` (sahip olunmayan) → **`https://nmm.suattayfuntopak.com`** (kanonik, e-posta/shopier/REGISTER_URL ile aynı). Yalnız AchievementsCard paylaşım linkinde kullanılıyordu.
+
+### 🟢 Müşteri & Sipariş Takibi (Dalga 3 — NM gelirinin diğer yarısı)
+- **Migration `100_customers_orders.sql`**: `nmm_customers` + `nmm_orders` + RLS (`nmm_candidates` kalıbı: workspace üyeliği; super admin ayrı bypass yok) + indexler + updated_at trigger. **Canlıya db push gerektirir** (otonom dokunulmadı).
+- `database.types.ts` elle güncellendi (iki tablo). **`customerStats.ts`** saf birleştirici + 5 test (müşteri bazında sipariş toplama, ciro, son-siparişe göre sıralama).
+- `musteriler/actions.ts` (list/add müşteri, add sipariş, sil) + `useCustomers` + **`/musteriler`** sayfası (özet kartları, müşteri ekle, kart başına sipariş ekle/sil). PageHelp girdisi eklendi.
+- Nav: yalnız sidebar + (kaydırılabilir) alt nav'a eklendi — **Pano 5×2 launcher korundu** (decoupled).
+
+### 🟢 Saha Provası 2.0 (Dalga 3 — "kimsede yok" derinleştirme)
+- **`roleplayDifficulty.ts`** saf + 4 test: Kolay/Orta/Zor → AI aday personasının sertliği + zor'da daha katı puanlama. `generateRoleplayResponseAction`'a `difficulty` parametresi (varsayılan orta) → sistem prompt'una enjekte.
+- ProvaForm: senaryo ekranında **zorluk seçici**, sohbet başlığında **oturum skor ortalaması** (Ø skor · tur).
+- Sesli prova bilinçli ertelendi (speech API + QA odaklı oturum).
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1176/1176 · `vitest` 286/286 (+9) · `migrate:check` 100 ✓.
+
 ## 2026-06-15 — Dalga 2 kalanı + Dalga 3 başlangıcı: Başarılar & Tanınma ✅
 
 Dalga 2'nin "paylaşılabilir başarı kartları" ile Dalga 3'ün "gamification & tanınma" pilarını tek tutarlı **tanınma katmanı** olarak kurdum (recognition = network marketing'in para birimi; "çift taraflı ödül"ün billing'e dokunmayan, güvenli hali). **Migration yok.**

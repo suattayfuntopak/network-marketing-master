@@ -16,6 +16,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
+import type { RoleplayDifficulty } from '@/lib/domain/roleplayDifficulty'
 
 interface Scenario {
   id: string
@@ -260,6 +261,7 @@ interface Message {
 export function ProvaForm() {
   const { t, lang } = useTranslation()
   const [activeScenario, setActiveScenario] = useState<Scenario | null>(null)
+  const [difficulty, setDifficulty] = useState<RoleplayDifficulty>('orta')
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isPending, setIsPending] = useState(false)
@@ -268,6 +270,13 @@ export function ProvaForm() {
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { isSuperAdmin, aiUsed, dailyLimit } = useAILimits()
   const isProEngine = ws?.effectiveLicenseType === 'pro'
+
+  const evaluatedScores = messages
+    .filter(m => m.role === 'yzk' && typeof m.score === 'number')
+    .map(m => m.score as number)
+  const sessionAvg = evaluatedScores.length
+    ? Math.round(evaluatedScores.reduce((a, b) => a + b, 0) / evaluatedScores.length)
+    : null
 
   const chatEndRef = useRef<HTMLDivElement>(null)
 
@@ -330,7 +339,8 @@ export function ProvaForm() {
         activeScenario.id,
         history,
         userMessage,
-        lang
+        lang,
+        difficulty
       )
 
       if (result.error) {
@@ -385,6 +395,11 @@ export function ProvaForm() {
           </button>
           
           <div className="flex items-center gap-2">
+            {sessionAvg !== null && (
+              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-black text-amber-600 dark:text-amber-400">
+                {t('coachUi.sessionAvg', { score: sessionAvg, count: evaluatedScores.length })}
+              </span>
+            )}
             {isProEngine && (
               <span className="rounded-full bg-[#3730A3] px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
                 {t('coachUi.premiumEngineBadge')}
@@ -536,6 +551,33 @@ export function ProvaForm() {
             {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
           </p>
         )}
+
+        {/* Zorluk seviyesi — aday personasının sertliği */}
+        <div className="mt-4 flex flex-col items-center gap-1.5">
+          <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-3)]">
+            {t('coachUi.difficultyLabel')}
+          </span>
+          <div className="inline-flex rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] p-1">
+            {([
+              ['kolay', t('coachUi.difficultyEasy')],
+              ['orta', t('coachUi.difficultyMedium')],
+              ['zor', t('coachUi.difficultyHard')],
+            ] as const).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setDifficulty(key)}
+                className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
+                  difficulty === key
+                    ? 'bg-[#D97706] text-white shadow-sm'
+                    : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* 10 Scenario Cards Grid */}
