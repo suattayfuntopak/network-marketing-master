@@ -90,6 +90,9 @@ export const tr = {
     resetPassword: "Şifremi Unuttum",
     invitePasswordOnlyHint: "Ad ve e-posta sponsorunuzun kaydından geldi — yalnızca şifrenizi belirleyin.",
     invitePrefillInvalid: "Davet bağlantısı geçersiz veya süresi dolmuş. Liderinizden yeni link isteyin.",
+    inviteSponsorWelcome: "{sponsor} seni {team} ekibine davet etti 👋",
+    inviteTeamWelcome: "{team} ekibine davet edildin 👋",
+    inviteSponsorSubtitle: "Hesabını oluştur, doğru başlangıcı birlikte yapalım.",
   },
   hedef: {
     title: "Hedefini Belirle",

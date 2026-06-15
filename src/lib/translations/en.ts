@@ -90,6 +90,9 @@ export const en = {
     resetPassword: "Forgot Password",
     invitePasswordOnlyHint: "Name and email come from your sponsor's record — set your password only.",
     invitePrefillInvalid: "This invite link is invalid or expired. Ask your sponsor for a new link.",
+    inviteSponsorWelcome: "{sponsor} invited you to {team} 👋",
+    inviteTeamWelcome: "You're invited to {team} 👋",
+    inviteSponsorSubtitle: "Create your account — let's start strong together.",
   },
   hedef: {
     title: "Set Your Goal",

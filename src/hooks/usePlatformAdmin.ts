@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { getPlatformWorkspacesAction } from '@/app/(dashboard)/platform-yonetim/actions'
+import { getPlatformWorkspacesAction, getViralKpiAction } from '@/app/(dashboard)/platform-yonetim/actions'
 import { getPendingRequestsAction } from '@/app/(dashboard)/actions/moderation'
 
 export function usePlatformWorkspaces(enabled: boolean) {
@@ -19,5 +19,14 @@ export function usePlatformModeration(enabled: boolean) {
     queryFn: getPendingRequestsAction,
     enabled,
     staleTime: 60_000,
+  })
+}
+
+export function usePlatformViralKpi(enabled: boolean) {
+  return useQuery({
+    queryKey: ['platform-viral-kpi'],
+    queryFn: getViralKpiAction,
+    enabled,
+    staleTime: 120_000,
   })
 }

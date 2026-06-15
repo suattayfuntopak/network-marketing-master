@@ -5,7 +5,16 @@ import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { signupAction } from '../actions'
-import { getInviteSignupPrefillAction, type InviteSignupPrefill } from '@/lib/domain/inviteSignup'
+import {
+  getInviteSignupPrefillAction,
+  getInviteSponsorAction,
+  type InviteSignupPrefill,
+  type InviteSponsor,
+} from '@/lib/domain/inviteSignup'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
+import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import {
   authErrorClass,
   authInputClass,
@@ -39,6 +48,26 @@ export function SignupForm() {
   const [invite, setInvite] = useState<InviteSignupPrefill | null>(null)
   const [inviteLoading, setInviteLoading] = useState(hasInviteParams)
   const [inviteError, setInviteError] = useState<string | null>(null)
+  const [sponsor, setSponsor] = useState<InviteSponsor | null>(null)
+
+  // Kişisel davet karşılaması — sponsor adı/yüzü/ekibi (yalnız ref yeter).
+  useEffect(() => {
+    if (!ref) return
+    let cancelled = false
+    void logProductEventAction(
+      PRODUCT_EVENTS.inviteLandingView,
+      { code: ref },
+      getAnalyticsSessionId(),
+    )
+    getInviteSponsorAction(ref)
+      .then(s => {
+        if (!cancelled && s) setSponsor(s)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [ref])
 
   useEffect(() => {
     if (!ref || !aday) return
@@ -81,10 +110,37 @@ export function SignupForm() {
   const submitBlocked = inviteLoading || (hasInviteParams && !!inviteError)
 
   return (
-    <form action={action} className="space-y-5">
-      {inviteReady && (
-        <>
-          <input type="hidden" name="ref" value={invite.ref} />
+    <>
+      {sponsor && (
+        <div
+          className="mb-5 flex items-center gap-3 rounded-2xl border border-brand/30 bg-brand-subtle/30 p-3.5"
+          data-testid="signup-sponsor-welcome"
+        >
+          <PersonAvatar
+            name={sponsor.sponsorName || sponsor.teamName || '?'}
+            imageUrl={sponsor.avatarUrl}
+            size="lg"
+          />
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-[var(--text-1)]">
+              {sponsor.sponsorName
+                ? t('auth.inviteSponsorWelcome', {
+                    sponsor: sponsor.sponsorName,
+                    team: sponsor.teamName,
+                  })
+                : t('auth.inviteTeamWelcome', { team: sponsor.teamName })}
+            </p>
+            <p className="mt-0.5 text-xs text-[var(--text-3)]">
+              {t('auth.inviteSponsorSubtitle')}
+            </p>
+          </div>
+        </div>
+      )}
+
+      <form action={action} className="space-y-5">
+        {inviteReady && (
+          <>
+            <input type="hidden" name="ref" value={invite.ref} />
           <input type="hidden" name="aday" value={invite.aday} />
           {nameReadOnly && <input type="hidden" name="fullName" value={invite.fullName} />}
           {emailReadOnly && <input type="hidden" name="email" value={invite.email} />}
@@ -169,6 +225,7 @@ export function SignupForm() {
           {t('auth.loginTitle')}
         </Link>
       </div>
-    </form>
+      </form>
+    </>
   )
 }

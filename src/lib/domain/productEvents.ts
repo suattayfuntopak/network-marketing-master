@@ -8,6 +8,8 @@ export const PRODUCT_EVENTS = {
   // (Şema değişmez; nmm_product_events serbest event_name kabul eder.)
   /** Kullanıcı bir davet linki paylaştı (WhatsApp vb.) → K-faktör payı. */
   inviteSent: 'invite_sent',
+  /** Davet linki açıldı, sponsor karşılaması görüntülendi → huni: gönderildi→görüntülendi→kayıt. */
+  inviteLandingView: 'invite_landing_view',
   /** Davet koduyla kayıt tamamlandı → davet→kayıt dönüşümü, ekip-içi yayılma. */
   inviteAccepted: 'invite_accepted',
   /** Kullanıcı o gün uygulamayı açtı (gün başına 1) → D1/D7/D30 retention, DAU/MAU, streak. */

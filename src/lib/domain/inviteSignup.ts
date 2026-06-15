@@ -49,6 +49,47 @@ export async function getInviteSignupPrefillAction(
   }
 }
 
+export type InviteSponsor = {
+  /** Sponsor (workspace sahibi) adı — yoksa boş. */
+  sponsorName: string
+  /** Ekip/workspace adı (örn. "Focus Team"). */
+  teamName: string
+  avatarUrl: string | null
+}
+
+/**
+ * Davet kodundan sponsor kimliğini çözer (kişisel davet karşılaması için).
+ * Public kayıt akışı → admin client (RLS bypass). Yalnız kod gerekir; aday opsiyonel.
+ * Davet eden kişi bu kişiyi bizzat davet ettiği için ad/ekip görünür (beklenen bağlam).
+ */
+export async function getInviteSponsorAction(ref: string): Promise<InviteSponsor | null> {
+  const code = ref.trim().toUpperCase()
+  if (!code) return null
+
+  const admin = createAdminClient()
+
+  const { data: ws } = await admin
+    .from('nmm_workspaces')
+    .select('owner_id, name')
+    .eq('invite_code', code)
+    .maybeSingle()
+
+  if (!ws) return null
+
+  let sponsorName = ''
+  let avatarUrl: string | null = null
+
+  if (ws.owner_id) {
+    const { data: userRes } = await admin.auth.admin.getUserById(ws.owner_id)
+    const meta = (userRes?.user?.user_metadata ?? {}) as Record<string, unknown>
+    sponsorName = typeof meta.full_name === 'string' ? meta.full_name.trim() : ''
+    avatarUrl =
+      typeof meta.avatar_url === 'string' && meta.avatar_url.trim() ? meta.avatar_url.trim() : null
+  }
+
+  return { sponsorName, teamName: (ws.name ?? '').trim(), avatarUrl }
+}
+
 /**
  * Kısa davet token'ından (`/d/{ref}/{token}`) tam aday id çözümler.
  * Token = UUID'nin ilk 8 hex karakteri; workspace + invite_code ile sınırlı.

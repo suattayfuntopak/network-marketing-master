@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 2: Kişisel davet karşılaması + K-faktör paneli ✅
+
+Viralite döngüsünün ilk yapı taşları. **Migration yok**; Dalga 0 olayları (`invite_sent/accepted/daily_active`) artık hem dönüşümü artırıyor hem görünür oluyor.
+
+### 🟢 Kişisel davet karşılaması (K-faktör payı ↑)
+- **`getInviteSponsorAction(ref)`** (`inviteSignup.ts`): davet kodundan sponsor adı + ekip adı (`nmm_workspaces.name`) + avatar (owner `user_metadata`) çözer (admin client, public akış).
+- **SignupForm**: ref varsa kayıt formunun üstünde **sponsor karşılama kartı** (`PersonAvatar` + "{sponsor} seni {team} ekibine davet etti 👋"). Jenerik kayıt → kişisel, sıcak landing.
+- Yeni olay **`invite_landing_view`** → davet hunisi: gönderildi → görüntülendi → kayıt.
+
+### 🟢 K-faktör paneli (Süper Admin — döngüyü ölç)
+- **`viralKpi.ts`** (saf agregatör + 7 birim testi): `aggregateViralKpi(rows, todayKey)` → K-faktör (kabul/ayrı davet eden), dönüşüm %, gönderildi/görüntülendi/kayıt, aktif kullanıcı + DAU.
+- **`getViralKpiAction`** (`platform-yonetim/actions.ts`, `assertSuperAdmin` + admin client): son 30 gün `nmm_product_events` agregasyonu (RLS yalnız insert'e açık → service role ile okunur).
+- **`PlatformViralKpi.tsx`** + `usePlatformViralKpi` → platform panosunda KPI kartları (KpiCards'ın hemen altında). Dalga 0'ın 6 KPI'sı nihayet görünür.
+
+### i18n
+14 anahtar (auth ×3 + platformPage ×11) — TR jargon + EN parite; `%` yerleşimi locale-doğru (`viralPercentValue`).
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1143/1143 · `vitest` 270/270 (+7 viralKpi) · migration eklenmedi.
+
 ## 2026-06-15 — Dalga 1: Streak (seri) + Akşam Kapanışı ✅
 
 Viralite/vazgeçilemezlik yol haritasının 2. dalgası — günlük alışkanlık çekirdeği. **Migration yok**; Dalga 0'da yazılmaya başlayan `daily_active` olayları artık seriye dönüşüyor.

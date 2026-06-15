@@ -7,6 +7,9 @@ import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import type { User } from '@supabase/supabase-js'
 import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { aggregateViralKpi, type ViralKpi, type ViralEventRow } from '@/lib/domain/viralKpi'
+import { todayCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
@@ -196,4 +199,43 @@ export async function getPlatformWorkspacesAction(): Promise<PlatformWorkspaceIt
   }
 
   return result
+}
+
+const VIRAL_KPI_WINDOW_DAYS = 30
+
+/**
+ * Viralite KPI paneli (Süper Admin) — Dalga 0 ölçüm olaylarını okunur metriklere çevirir.
+ * product_events RLS yalnız insert'e açık; agregasyon admin client (service role) ile.
+ * Son 30 gün; hesaplama saf `aggregateViralKpi`'de (test edilebilir).
+ */
+export async function getViralKpiAction(): Promise<ViralKpi> {
+  const { user } = await getAuthUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const windowStartIso = new Date(
+    Date.now() - VIRAL_KPI_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString()
+
+  const { data } = await admin
+    .from('nmm_product_events')
+    .select('event_name, user_id, metadata, created_at')
+    .gte('created_at', windowStartIso)
+    .in('event_name', [
+      PRODUCT_EVENTS.inviteSent,
+      PRODUCT_EVENTS.inviteLandingView,
+      PRODUCT_EVENTS.inviteAccepted,
+      PRODUCT_EVENTS.dailyActive,
+    ])
+    .limit(20000)
+
+  const rows: ViralEventRow[] = (data ?? []).map(r => {
+    const meta = r.metadata as Record<string, unknown> | null
+    const day = typeof meta?.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(meta.day)
+      ? meta.day
+      : istanbulDayKey(r.created_at)
+    return { eventName: r.event_name, userId: r.user_id, day }
+  })
+
+  return aggregateViralKpi(rows, todayCalendarKey(), VIRAL_KPI_WINDOW_DAYS)
 }

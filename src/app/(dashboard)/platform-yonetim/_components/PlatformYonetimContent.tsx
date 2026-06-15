@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { usePlatformWorkspaces, usePlatformModeration } from '@/hooks/usePlatformAdmin'
+import { usePlatformWorkspaces, usePlatformModeration, usePlatformViralKpi } from '@/hooks/usePlatformAdmin'
 import { Crown, CreditCard, LayoutTemplate, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
@@ -31,6 +31,7 @@ import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
 import { PlatformKpiCards } from './PlatformKpiCards'
+import { PlatformViralKpi } from './PlatformViralKpi'
 import { PlatformIndependentSection } from './PlatformIndependentSection'
 import { PlatformWorkspacesTable } from './PlatformWorkspacesTable'
 import { PlatformModerationDesk } from './PlatformModerationDesk'
@@ -72,6 +73,8 @@ export function PlatformYonetimContent() {
     data: pendingRequests = [],
     isLoading: moderationLoading,
   } = usePlatformModeration(isSuperAdmin)
+
+  const { data: viralKpi, isLoading: viralKpiLoading } = usePlatformViralKpi(isSuperAdmin)
 
   useEffect(() => {
     if (!isSuperAdmin) return
@@ -302,6 +305,8 @@ export function PlatformYonetimContent() {
           totalPaidCount={totalPaidCount}
           pendingCount={pendingRequests.length}
         />
+
+        <PlatformViralKpi kpi={viralKpi} isLoading={viralKpiLoading} />
 
         {independentMembers.length > 0 && (
           <PlatformIndependentSection
