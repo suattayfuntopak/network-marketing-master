@@ -2,7 +2,7 @@ import {
   LayoutDashboard, ClipboardList, Bot, Users,
   CalendarDays, BookOpen, Target,
   GraduationCap, History, Crown, Ellipsis, Activity,
-  BarChart3, ShoppingBag,
+  BarChart3, ShoppingBag, Megaphone,
   type LucideIcon,
 } from 'lucide-react'
 import type { ButtonColor } from '@/components/ui/SquareButton'
@@ -47,6 +47,7 @@ export const NAV_SIDEBAR_MODULES: readonly NavItem[] = [
   // Müşterilerim — perakende/sipariş tarafı. Pano 5×2 launcher'ına dokunmadan
   // yalnız sidebar + (kaydırılabilir) alt nav'da görünür.
   { href: '/musteriler', translationKey: 'nav.musteriler', icon: ShoppingBag },
+  { href: '/duyurular', translationKey: 'nav.duyurular', icon: Megaphone },
 ]
 
 /** @deprecated NAV_SIDEBAR_MODULES kullanın */

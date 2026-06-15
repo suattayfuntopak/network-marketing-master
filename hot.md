@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 4: Downline Ağaç Analitiği + Ekip İletişim Hub'ı ✅
+
+### 🟢 Downline Ağaç Analitiği (migration yok)
+- **`downlineAnalytics.ts`** saf + 6 test: `computeDownlineAnalytics(nodes)` → toplam üye, jenerasyon derinliği, jenerasyon dağılımı, en kalabalık kat, son-30-gün katılan. Mevcut `getTeamGenerationTreeAction` verisinden.
+- **`TeamGenerationTree`**'ye 4 metrikli özet kart (aynı `nodes` query'sinden; ekstra round-trip yok). 6 i18n anahtarı.
+
+### 🟢 Ekip İletişim Hub'ı — `/duyurular` (migration 101)
+- **Migration `101_team_announcements.sql`**: `nmm_team_announcements` + basit RLS (`author_id = auth.uid()`). **Canlıya db push** (merge ile otomatik).
+- Okuma cross-workspace (downline → üst hat) olduğundan **server action'da admin client + dual parent_id çözümü** ile (recursive RLS yok); yalnız kendi + doğrudan üst hat duyuruları döner.
+- **`teamAnnouncements.ts`** saf + 3 test (isMine işaretleme + sıralama). `duyurular/actions` (get/add/delete) + `useTeamAnnouncements` + `/duyurular` sayfası (yaz/sil, lider rozeti) + PageHelp.
+- Nav: sidebar + alt nav'a eklendi (Megaphone) — **Pano launcher korundu**. `database.types.ts` elle güncel.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1220/1220 · `vitest` 301/301 (+9) · `migrate:check` 101 ✓.
+(Lint, `TeamGenerationTree`'de koşullu `useMemo`'yu yakaladı → hook guard üstüne taşındı.)
+
 ## 2026-06-15 — Dalga 4: Sosyal Satış Stüdyosu ✅
 
 İçerik virali (Döngü 3) + soğuk pazar büyütme. **Migration yok** — sadece AI üretim. AI Koçum (`/yazar`) içinde **yeni "İçerik Stüdyosu" sekmesi** (5. sekme; Pano launcher'a dokunulmadı).

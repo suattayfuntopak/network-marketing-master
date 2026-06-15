@@ -25,6 +25,33 @@ export type NotificationType = 'bell' | 'alert' | 'info' | 'user' | 'calendar' |
 export interface Database {
   public: {
     Tables: {
+      nmm_team_announcements: {
+        Row: {
+          id: string
+          workspace_id: string
+          author_id: string
+          title: string
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          workspace_id: string
+          author_id: string
+          title: string
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          workspace_id?: string
+          author_id?: string
+          title?: string
+          body?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
       nmm_customers: {
         Row: {
           id: string

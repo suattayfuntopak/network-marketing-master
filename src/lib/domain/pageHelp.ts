@@ -268,6 +268,27 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
     },
   },
   {
+    match: '/duyurular',
+    tr: {
+      title: 'Duyurular',
+      intro: 'Ekibine tek mesajla ulaş; liderinin duyurularını da burada gör.',
+      steps: [
+        { t: 'Duyuru yaz', d: '“Duyuru Yaz” ile başlık + mesaj gir, yayınla — alt ekibin görür.' },
+        { t: 'Liderinden gelenler', d: 'Üst hattının (liderinin) duyuruları da bu listede görünür.' },
+        { t: 'Sil', d: 'Yalnızca kendi yazdığın duyuruları silebilirsin.' },
+      ],
+    },
+    en: {
+      title: 'Announcements',
+      intro: 'Reach your team with one message; also see your leader’s announcements here.',
+      steps: [
+        { t: 'Write', d: 'Use “Write Announcement” to add a title + message and publish — your downline sees it.' },
+        { t: 'From your leader', d: 'Your upline (leader) announcements also appear in this list.' },
+        { t: 'Delete', d: 'You can only delete announcements you wrote.' },
+      ],
+    },
+  },
+  {
     match: '/platform-yonetim',
     tr: {
       title: 'Platform Yönetimi',
