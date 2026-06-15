@@ -14,6 +14,7 @@ const YAZAR_TAB_LABEL_KEYS: Record<YazarTab, string> = {
   yazar: 'coachUi.tabMessage',
   kocluk: 'coachUi.tabCoaching',
   prova: 'coachUi.tabProva',
+  studyo: 'coachUi.tabStudyo',
   uyum: 'coachUi.tabCompliance',
 }
 

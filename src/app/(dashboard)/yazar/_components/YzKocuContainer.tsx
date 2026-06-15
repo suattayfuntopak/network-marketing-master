@@ -3,11 +3,12 @@
 
 import { useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { MessageSquare, HelpCircle, Target, Shield } from 'lucide-react'
+import { MessageSquare, HelpCircle, Target, Shield, PenLine } from 'lucide-react'
 import { clsx } from 'clsx'
 import { YazarForm } from './YazarForm'
 import { KoclukForm } from './KoclukForm'
 import { ProvaForm } from './ProvaForm'
+import { StudyoForm } from './StudyoForm'
 import { UyumContent } from '@/app/(dashboard)/uyum/_components/UyumContent'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { parseYazarTab, type YazarTab } from '@/lib/domain/yazarTab'
@@ -22,6 +23,7 @@ const TABS: readonly { key: YazarTab; icon: typeof MessageSquare; labelKey: stri
   { key: 'yazar', icon: MessageSquare, labelKey: 'coachUi.tabMessage', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { key: 'kocluk', icon: HelpCircle, labelKey: 'coachUi.tabCoaching', activeClass: 'bg-[#3730A3] text-white shadow-md' },
   { key: 'prova', icon: Target, labelKey: 'coachUi.tabProva', activeClass: 'bg-amber-600 text-white shadow-md' },
+  { key: 'studyo', icon: PenLine, labelKey: 'coachUi.tabStudyo', activeClass: 'bg-fuchsia-600 text-white shadow-md' },
   { key: 'uyum', icon: Shield, labelKey: 'coachUi.tabCompliance', activeClass: 'bg-[#C03E1F] text-white shadow-md' },
 ]
 
@@ -79,6 +81,7 @@ export function YzKocuContainer({ initialName, initialNote, initialWarmth }: YzK
         {v.has('yazar')  && <div className={activeTab !== 'yazar'   ? 'hidden' : ''}><YazarForm initialName={initialName} initialNote={initialNote} initialWarmth={initialWarmth} /></div>}
         {v.has('kocluk') && <div className={activeTab !== 'kocluk'  ? 'hidden' : ''}><KoclukForm /></div>}
         {v.has('prova')  && <div className={activeTab !== 'prova'   ? 'hidden' : ''}><ProvaForm /></div>}
+        {v.has('studyo') && <div className={activeTab !== 'studyo'  ? 'hidden' : ''}><StudyoForm /></div>}
         {v.has('uyum')   && <div className={activeTab !== 'uyum'    ? 'hidden' : ''}><UyumContent embedded /></div>}
       </div>
     </div>

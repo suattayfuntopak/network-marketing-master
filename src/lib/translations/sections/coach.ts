@@ -8,6 +8,7 @@ export const coachSection = {
       tabMessage: 'YZ Mesajı',
       tabCoaching: 'Koçluk Al',
       tabProva: 'Saha Provası',
+      tabStudyo: 'İçerik Stüdyosu',
       tabCompliance: 'Uyum Denetimi',
 
       // KoclukForm.tsx
@@ -79,6 +80,7 @@ export const coachSection = {
       tabMessage: 'AI Message',
       tabCoaching: 'Get Coaching',
       tabProva: 'Field Rehearsal',
+      tabStudyo: 'Content Studio',
       tabCompliance: 'Compliance Check',
 
       // KoclukForm.tsx

@@ -22,6 +22,12 @@ export const PRODUCT_EVENTS = {
   // ── Dalga 2/3: Tanınma & paylaşım ──
   /** Kazanılan bir başarı/rozet WhatsApp'ta paylaşıldı → içerik virali (Döngü 3). */
   achievementShared: 'achievement_shared',
+
+  // ── Dalga 4: Sosyal Satış Stüdyosu ──
+  /** AI sosyal içerik üretildi. */
+  socialContentGenerated: 'social_content_generated',
+  /** Üretilen sosyal içerik paylaşıldı/kopyalandı → içerik virali. */
+  socialContentShared: 'social_content_shared',
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]

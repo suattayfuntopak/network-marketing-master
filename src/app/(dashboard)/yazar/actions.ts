@@ -15,6 +15,7 @@ import {
 import { buildObjectionKnowledgeBase } from '@/app/(dashboard)/itirazlar/data/itirazlar'
 import { generateLocalFallbackMessage, generateLocalCoachAnswer } from '@/lib/domain/aiFallback'
 import { parseRoleplayDifficulty, roleplayDifficultyInstruction } from '@/lib/domain/roleplayDifficulty'
+import { buildSocialContentUserPrompt, parseSocialGoal, parseSocialPlatform } from '@/lib/domain/socialContent'
 
 function toLang(lang: string): 'tr' | 'en' {
   return lang === 'en' ? 'en' : 'tr'
@@ -303,6 +304,79 @@ ${buildObjectionKnowledgeBase(l)}`;
     console.error('Yapay Zeka Koçu Hatası, yerel koç yanıtına geçiliyor:', err)
     const answer = generateLocalCoachAnswer(question, l)
     return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
+  }
+}
+
+export interface SocialContentState {
+  content?: string
+  error?: string
+  remaining?: number
+}
+
+export async function generateSocialContentAction(input: {
+  goal: string
+  platform: string
+  tone: string
+  topic: string
+  lang: string
+}): Promise<SocialContentState> {
+  const l = toLang(input.lang)
+
+  const topicErr = rejectIfAIInputTooLong(input.topic ?? '', l)
+  if (topicErr) return { error: topicErr }
+
+  if (!process.env.GEMINI_API_KEY) {
+    return { error: l === 'en' ? 'AI is unavailable right now.' : 'Yapay zeka şu an kullanılamıyor.' }
+  }
+
+  const quota = await checkAIQuota('message', { lang: l })
+  if (!quota.ok) return { error: quota.message, remaining: 0 }
+
+  const userPrompt = buildSocialContentUserPrompt({
+    goal: parseSocialGoal(input.goal),
+    platform: parseSocialPlatform(input.platform),
+    tone: input.tone,
+    topic: clampAIUserInput(input.topic ?? ''),
+    lang: l,
+  })
+
+  const contentModel = resolveGeminiModel('deep_coach', quota.licenseType)
+
+  const systemPrompt = `Sen bir Network Marketing sosyal medya içerik uzmanısın. Distribütörün sosyal hesaplarında paylaşacağı, spam'siz, özgün ve etkili içerikler üretirsin.
+
+GÖREVİN: Verilen platform, amaç, ton ve konuya göre 3 FARKLI içerik varyantı yaz. Her varyant:
+- Platforma uygun uzunluk ve biçimde olsun (Instagram: akıcı caption + 3-5 ilgili hashtag; WhatsApp Durumu: çok kısa, emojili; Facebook: biraz daha uzun, sohbet başlatan).
+- Doğal, samimi ve değer veren bir dille yazılsın; satış baskısı ve klişe olmasın.
+- Yumuşak bir eylem çağrısı (CTA) içersin (DM at, yorum yaz gibi) — agresif olmasın.
+
+UYUM / ETİK (ZORUNLU): Sağlık iddiası (hastalık iyileştirme vb.) ve gelir garantisi/abartısı YAPMA. "Kesin kazanç", "garanti sonuç", "mucize" gibi ifadeler kullanma; yasal ve dürüst kal.
+
+ÇIKTI BİÇİMİ: Varyantları "1)", "2)", "3)" diye numaralandır, aralarına boş satır koy. Başka açıklama ekleme.
+
+DİL POLİTİKASI: language 'en' ise tamamen İngilizce, 'tr' ise tamamen Türkçe yaz.`
+
+  try {
+    const model = genAI.getGenerativeModel({ model: contentModel, systemInstruction: systemPrompt })
+    const result = await model.generateContent({
+      contents: [{ role: 'user', parts: [{ text: `${userPrompt}\n\nlanguage: ${l}` }] }],
+      generationConfig: { maxOutputTokens: 8192, temperature: 0.85 },
+    })
+    const content = result.response.text().trim()
+    if (!content) {
+      return { error: l === 'en' ? 'Empty response, please try again.' : 'Boş yanıt geldi, tekrar dener misin?' }
+    }
+
+    await logAIGeneration({
+      workspaceId: quota.workspaceId,
+      userId: quota.user.id,
+      note: 'message',
+      aiModel: contentModel,
+    })
+
+    return { content, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
+  } catch (err) {
+    console.error('generateSocialContentAction error:', err)
+    return { error: l === 'en' ? 'Something went wrong. Please try again.' : 'Bir şeyler ters gitti. Tekrar dener misin?' }
   }
 }
 

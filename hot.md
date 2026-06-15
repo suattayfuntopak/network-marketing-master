@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 4: Sosyal Satış Stüdyosu ✅
+
+İçerik virali (Döngü 3) + soğuk pazar büyütme. **Migration yok** — sadece AI üretim. AI Koçum (`/yazar`) içinde **yeni "İçerik Stüdyosu" sekmesi** (5. sekme; Pano launcher'a dokunulmadı).
+
+### 🟢 Sosyal Satış Stüdyosu
+- **`socialContent.ts`** saf domain + 6 test: amaç (ürün/fırsat/hikaye/etkileşim) × platform (Instagram/WhatsApp Durumu/Facebook) × ton → `buildSocialContentUserPrompt` (TR/EN), `parseSocialGoal/Platform`.
+- **`generateSocialContentAction`** (`yazar/actions.ts`): quota gate + `deep_coach` model + **uyum-bilinçli** sistem prompt (sağlık/gelir abartısı yasak), 3 varyant üretir. `logAIGeneration` ile kotaya işlenir.
+- **`StudyoForm`** + `YzKocuContainer`'a `studyo` sekmesi (`yazarTab.ts` genişletildi): amaç/platform/ton/konu seçimi → üret → kopyala / WhatsApp paylaş.
+- Yeni olaylar: `social_content_generated`, `social_content_shared` (içerik hunisi).
+- ⏳ İçerik takvimi (planlı gönderiler — depolama/migration ister) bir sonraki adıma.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1201/1201 · `vitest` 292/292 (+6) · migration eklenmedi.
+
 ## 2026-06-15 — Domain düzeltme + Müşteri/Sipariş takibi + Saha Provası 2.0 ✅
 
 ### 🔧 Domain düzeltmesi
