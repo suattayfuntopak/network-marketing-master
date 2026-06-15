@@ -7,6 +7,8 @@ import { sendWelcomeEmail, sendAdminNewUserEmail } from '@/lib/infra/mail'
 import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 import { resolveInviteSignupName } from '@/lib/domain/inviteSignup'
 import { ensureWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
+import { insertProductEvent } from '@/lib/infra/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 
 interface FormState {
   error?: string
@@ -71,6 +73,14 @@ export async function signupAction(_prev: FormState, formData: FormData): Promis
   if (data.user) {
     const newUserId = data.user.id
     after(async () => {
+      // 0) Dalga 0 — davet→kayıt dönüşümü / ekip-içi yayılma KPI'sı.
+      if (inviteCode) {
+        await insertProductEvent({
+          eventName: PRODUCT_EVENTS.inviteAccepted,
+          metadata: { code: inviteCode, withCandidate: !!inviteCandidateId },
+        })
+      }
+
       // 1) Kullanıcıya hoş geldin e-postası (kritik — önce ve bağımsız)
       try {
         await sendWelcomeEmail(email, resolvedName, 'tr')

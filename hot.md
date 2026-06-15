@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-15 — "Uygulama benim olsaydı" Dalga 0 + Sabah Brief'i ✅
+
+Viralite & vazgeçilemezlik yol haritasının ilk dalgası. **Migration yok, yeni server action yok** — `nmm_product_events` zaten serbest `event_name` kabul ediyor; Sabah Brief'i tamamen önbellekteki veriyi (candidates + goal) yeniden kullanıyor.
+
+### 🟢 Dalga 0 — KPI ölçüm zemini
+- **`PRODUCT_EVENTS`'e 5 olay** (`src/lib/domain/productEvents.ts`): `invite_sent`, `invite_accepted`, `daily_active`, `morning_brief_view`, `morning_brief_action_click`. Bunlar K-faktör, davet→kayıt dönüşümü, D1/D7/D30 retention, DAU/MAU ve streak'in tek kaynağı.
+- **`daily_active` beacon** (`src/hooks/useDailyActiveBeacon.ts`): günde bir kez, İstanbul gün-anahtarı + localStorage guard ile; `DashboardShell`'de tek merkezden tetiklenir (sayfa geçişleri çoğaltmaz).
+- **`invite_sent`** EkipPanel davet-paylaş handler'ına, **`invite_accepted`** `kayit/actions.ts` `after()` bloğuna (davet kodu varsa) bağlandı.
+
+### 🟢 Sabah Brief'i — Pano günlük çapası
+- **`MorningBrief.tsx`** (`src/app/(dashboard)/pano/_components/`): tek kart, üç satır — **bugünün takipleri** (candidates cache → `buildDailyPriorities`), **sessizleşen ekip üyesi** (yalnız ekip erişimi olanda, bloklamadan; saha-radar cache'ini ısıtır), **günün temposu** (goal `progress` → kalan arama/sunum; hedef yoksa "hedef belirle" CTA'sı). Pano header'ı ile launcher grid arasına yerleşti.
+- "Ne yapacağım?" sürtünmesini sıfırlar → her gün açılma sebebi. Her satır `morning_brief_action_click` ile ölçülür.
+
+### i18n
+`dashboard.*` altına 8 anahtar (TR network jargonu + EN), parite tam.
+
+### Doğrulama
+`tsc --noEmit` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1124/1124 · `vitest` 254/254 · `migrate:check` geçti (migration eklenmedi).
+
 ## 2026-06-13 — /cso güvenlik denetimi: 3 bulgu kapandı ✅
 
 gstack `/cso` (read-only güvenlik denetimi) tüm uygulamada çalıştırıldı: gizli anahtar arkeolojisi, tedarik zinciri, CI/CD, webhook, RLS, admin-client server action'ları, OWASP, AI çıktısı. **Tek HIGH + iki MEDIUM bulgu; hepsi düzeltildi.**

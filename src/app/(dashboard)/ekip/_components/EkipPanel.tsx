@@ -23,6 +23,8 @@ import {
   prefetchEkipTrainingMetrics,
 } from '@/lib/query/prefetchRouteMetrics'
 import { queryKeys } from '@/lib/query/keys'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 
 const YZOnboardingKocuModal = dynamic(
   () => import('./YZOnboardingKocuModal').then(m => ({ default: m.YZOnboardingKocuModal })),
@@ -80,6 +82,12 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     } else {
       window.open(whatsappShareUrl(message), '_blank')
     }
+
+    // Dalga 0 — K-faktör payı: davet linki paylaşıldı.
+    void logProductEventAction(PRODUCT_EVENTS.inviteSent, {
+      source: 'ekip',
+      withCandidate: !!member.pipeline_id,
+    })
   }
 
   const toggleOnboardingStep = useCallback(async (userId: string, stepId: string, isStepDone: boolean) => {

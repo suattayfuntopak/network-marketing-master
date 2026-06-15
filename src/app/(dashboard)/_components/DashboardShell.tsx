@@ -13,6 +13,7 @@ import { AccountAccessGuard } from './AccountAccessGuard'
 import { AppVersionGuard } from '@/components/AppVersionGuard'
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 import { useMobileChromeVisibility } from '@/lib/ui/useMobileChromeVisibility'
+import { useDailyActiveBeacon } from '@/hooks/useDailyActiveBeacon'
 export function setNavDir(dir: 'forward' | 'back') {
   document.documentElement.dataset.navDir = dir
   setTimeout(() => { delete document.documentElement.dataset.navDir }, 500)
@@ -33,6 +34,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
+
+  // Dalga 0 — günde bir kez `daily_active` (retention/DAU/streak KPI zemini).
+  useDailyActiveBeacon(!!ws?.workspaceId)
 
   const routes = useMemo(
     () => isSuperAdmin ? [...NAV_ROUTES, '/platform-yonetim'] : NAV_ROUTES,

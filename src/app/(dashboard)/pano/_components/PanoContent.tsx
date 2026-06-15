@@ -5,6 +5,7 @@ import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
 import { WelcomeCard } from './WelcomeCard'
 import { PanoLauncherGrid } from './PanoLauncherGrid'
+import { MorningBrief } from './MorningBrief'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { formatPanoDateLine } from '@/lib/utils/calendarLocale'
 import { AccountStatusAlert } from './AccountStatusAlert'
@@ -59,6 +60,8 @@ export function PanoContent() {
           </div>
         </div>
       </header>
+
+      <MorningBrief />
 
       <div className="min-h-0 flex-1 md:flex md:flex-col">
         <PanoLauncherGrid />
