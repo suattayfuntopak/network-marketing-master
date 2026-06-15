@@ -18,6 +18,10 @@ export const PRODUCT_EVENTS = {
   morningBriefView: 'morning_brief_view',
   /** Sabah Brief'i içindeki bir aksiyon satırına dokunuldu. */
   morningBriefActionClick: 'morning_brief_action_click',
+
+  // ── Dalga 2/3: Tanınma & paylaşım ──
+  /** Kazanılan bir başarı/rozet WhatsApp'ta paylaşıldı → içerik virali (Döngü 3). */
+  achievementShared: 'achievement_shared',
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]

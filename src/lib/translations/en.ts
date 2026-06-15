@@ -165,6 +165,17 @@ export const en = {
     briefTomorrowNone: "No follow-ups planned tomorrow 🌙",
     briefTempoEvening: "Today: {arama} calls · {sunum} presentations",
   },
+  achievements: {
+    title: "My Achievements",
+    earnedOf: "{earned}/{total} badges",
+    streakLabel: "{count}-Day Streak",
+    candidatesLabel: "{count} Prospects",
+    teamLabel: "{count} Team Members",
+    nextHint: "Next: {badge}",
+    share: "Share",
+    shareMessage: "🎉 I earned the \"{badge}\" badge! Growing my business and team with Network Marketing Master 🚀 {url}",
+    empty: "Add a prospect or log today's activity to earn your first badge.",
+  },
   pipeline: {
     addCandidate: "Add Candidate",
     searchCandidate: "Search leads...",

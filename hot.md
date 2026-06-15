@@ -1,5 +1,25 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 2 kalanı + Dalga 3 başlangıcı: Başarılar & Tanınma ✅
+
+Dalga 2'nin "paylaşılabilir başarı kartları" ile Dalga 3'ün "gamification & tanınma" pilarını tek tutarlı **tanınma katmanı** olarak kurdum (recognition = network marketing'in para birimi; "çift taraflı ödül"ün billing'e dokunmayan, güvenli hali). **Migration yok.**
+
+### 🟢 Başarılar & Rozetler (gamification & tanınma)
+- **`achievements.ts`** (saf domain + 7 birim testi): `computeAchievements({streak, candidateCount, teamSize})` → 9 rozet (3 grup × 3 eşik: seri/aday/ekip), kazanılmış + `topEarned` (paylaşım) + `next` (en yakın kilit). Mevcut metriklerden türer, yeni tablo yok.
+- **`getAchievementsAction`** (`_shared-actions/achievements.ts`): daily_active'ten streak + aday sayımı + downline rpc → `computeAchievements`. **`useAchievements`** hook + `queryKeys.achievements`.
+- **`AchievementsCard`** Hedefim'de: rozet ızgarası (kazanılan vurgulu / kilitli ilerlemeli), "sıradaki" ipucu.
+
+### 🟢 Paylaşılabilir başarı kartı (içerik virali — Döngü 3)
+- Kazanılan en yüksek rozet için **WhatsApp'ta paylaş** butonu → "🎉 X rozetini kazandım! … {APP_URL}". Yeni olay **`achievement_shared`**.
+
+### ⏳ Bilinçli ertelendi (cerrah titizliği — ayrı oturum hak ediyor)
+- **Saha Provası 2.0** (persona + skor + sesli): AI prompt/persona tasarımı + görsel QA gerektirir.
+- **Müşteri & sipariş takibi**: yeni tablo + migration + RLS + CRUD UI — kendi odaklı oturumunu hak eder.
+- **Çift taraflı kredi/trial ödülü**: billing-hassas; ürün/fiyat kararı gerektirir (tanınma versiyonu bu dalgada teslim edildi).
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1152/1152 · `vitest` 277/277 (+7 achievements) · migration eklenmedi.
+
 ## 2026-06-15 — Dalga 2: Kişisel davet karşılaması + K-faktör paneli ✅
 
 Viralite döngüsünün ilk yapı taşları. **Migration yok**; Dalga 0 olayları (`invite_sent/accepted/daily_active`) artık hem dönüşümü artırıyor hem görünür oluyor.

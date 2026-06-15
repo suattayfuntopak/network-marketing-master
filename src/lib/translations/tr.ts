@@ -165,6 +165,17 @@ export const tr = {
     briefTomorrowNone: "Yarın planlı takip yok 🌙",
     briefTempoEvening: "Bugün {arama} arama · {sunum} sunum yaptın",
   },
+  achievements: {
+    title: "Başarılarım",
+    earnedOf: "{earned}/{total} rozet",
+    streakLabel: "{count} Günlük Seri",
+    candidatesLabel: "{count} Aday",
+    teamLabel: "{count} Ekip Üyesi",
+    nextHint: "Sıradaki: {badge}",
+    share: "Paylaş",
+    shareMessage: "🎉 \"{badge}\" rozetini kazandım! Network Marketing Master ile işimi ve ekibimi büyütüyorum 🚀 {url}",
+    empty: "İlk rozetin için bir aday ekle ya da bugünkü aktiviteni gir.",
+  },
   pipeline: {
     addCandidate: "Aday Ekle",
     searchCandidate: "Adaylarda ara...",
