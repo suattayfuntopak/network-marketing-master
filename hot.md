@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 1: Streak (seri) + Akşam Kapanışı ✅
+
+Viralite/vazgeçilemezlik yol haritasının 2. dalgası — günlük alışkanlık çekirdeği. **Migration yok**; Dalga 0'da yazılmaya başlayan `daily_active` olayları artık seriye dönüşüyor.
+
+### 🟢 Streak (ardışık aktif-gün serisi)
+- **`activityStreak.ts`** (saf domain + 9 birim testi): `computeActivityStreak(dayKeys, todayKey)` — bugünden (henüz işlenmemişse dünden) geriye kesintisiz sayar; boşlukta kırılır. Önceki gün anahtarı `fromCalendarKey/toCalendarKey` ile (TZ-uyumlu, `slice(0,10)` yok).
+- **`getActivityStreakAction`** (`_shared-actions/streak.ts`): `nmm_product_events`'ten `daily_active` günlerini okur (metadata.day → fallback `istanbulDayKey(created_at)`), 400 satır limit. **`useActivityStreak`** hook'u + `prefetchPanoMetrics`'te ısıtılır → çip anında hazır.
+- Sabah Brief'i başlığında **🔥 {n} günlük seri** çipi (n≥1).
+
+### 🟢 Akşam Kapanışı (zaman-duyarlı Brief)
+- Saat 18:00+ → Brief "Günün Kapanışı"na (🌙) döner: takip satırı **yarının** takiplerini gösterir (candidates → `calendarFollowUpKey === yarınKey`, → /takvim), tempo satırı **bugün yapılanları** (actuals) gösterir. Sabah mantığı değişmez.
+- `morning_brief_view` olayına `phase: morning|evening` metadata eklendi.
+
+### i18n
+`dashboard.*` altına 5 anahtar (briefStreak, briefEveningTitle, briefTomorrowFollowups, briefTomorrowNone, briefTempoEvening) — TR jargon + EN parite.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1129/1129 · `vitest` 263/263 (+9 streak) · migration eklenmedi.
+
 ## 2026-06-15 — "Uygulama benim olsaydı" Dalga 0 + Sabah Brief'i ✅
 
 Viralite & vazgeçilemezlik yol haritasının ilk dalgası. **Migration yok, yeni server action yok** — `nmm_product_events` zaten serbest `event_name` kabul ediyor; Sabah Brief'i tamamen önbellekteki veriyi (candidates + goal) yeniden kullanıyor.

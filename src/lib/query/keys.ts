@@ -20,6 +20,8 @@ export const queryKeys = {
   dailyAiUsage: () => ['daily-ai-usage'] as const,
   /** Hedef → Yol Haritası — tek konsolide sorgu (prefetch'lenir) */
   goalDashboard: () => ['goal-dashboard'] as const,
+  /** Ardışık aktif-gün serisi (Sabah Brief'i streak çipi) */
+  activityStreak: () => ['activity-streak'] as const,
   /** Günlük Özet hub — haftalık/aylık ile aynı veri modeli */
   hubDailySelf: (offset = 0) => ['hub', 'daily-self', offset] as const,
   videoCatalog: (workspaceId: string) => ['video-catalog', workspaceId] as const,

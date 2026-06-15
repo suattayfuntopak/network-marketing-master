@@ -156,6 +156,11 @@ export const tr = {
     briefTempo: "Bugünün temposu: {arama} arama · {sunum} sunum",
     briefTempoDone: "Bugünün temposunu yakaladın 👏",
     briefSetGoal: "Hedefini belirle, günlük tempon hazır olsun",
+    briefStreak: "{count} günlük seri 🔥",
+    briefEveningTitle: "Günün Kapanışı",
+    briefTomorrowFollowups: "Yarın {count} takip seni bekliyor",
+    briefTomorrowNone: "Yarın planlı takip yok 🌙",
+    briefTempoEvening: "Bugün {arama} arama · {sunum} sunum yaptın",
   },
   pipeline: {
     addCandidate: "Aday Ekle",

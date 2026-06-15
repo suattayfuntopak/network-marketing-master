@@ -3,13 +3,16 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Bell, CalendarCheck2, Target, UserMinus, ChevronRight } from 'lucide-react'
+import { Bell, CalendarCheck2, CalendarClock, Target, UserMinus, ChevronRight, Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { useFeatureAccess } from '@/hooks/useFeatureAccess'
+import { useActivityStreak } from '@/hooks/useActivityStreak'
 import { buildDailyPriorities } from '@/lib/domain/dailyPriorities'
+import { calendarFollowUpKey } from '@/lib/domain/calendarFollowUp'
+import { todayCalendarKey, keysForDaysAfter } from '@/lib/utils/calendarDates'
 import { queryKeys } from '@/lib/query/keys'
 import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
@@ -18,13 +21,16 @@ import { Skeleton } from '@/components/ui/Skeleton'
 
 type BriefRow = 'followups' | 'team' | 'tempo'
 
+/** Akşam (18:00+) → "Günün Kapanışı": yarının takipleri + bugünün yaptıkları. */
+const EVENING_HOUR = 18
+
 /**
  * Sabah Brief'i — Pano'nun günlük çapası. "Ne yapacağım?" sürtünmesini sıfırlar:
- * bugünün takipleri + sessizleşen ekip üyesi + günün temposu, tek kart.
+ * bugünün takipleri + sessizleşen ekip üyesi + günün temposu, tek kart. Akşam
+ * "Günün Kapanışı"na döner (yarını hazırlar). Üstte ardışık-gün serisi (streak) çipi.
  *
- * Veri tamamen önbellekten gelir (candidates + goal Pano'da prefetch'lidir);
- * ekip-sessizliği yalnız ekip erişimi olan kullanıcıda, bloklamadan yüklenir
- * (saha-radar cache'ini de ısıtır). Yeni server action / migration yok.
+ * Veri tamamen önbellekten gelir (candidates + goal + streak Pano'da prefetch'lidir);
+ * ekip-sessizliği yalnız ekip erişimi olan kullanıcıda, bloklamadan yüklenir.
  */
 export function MorningBrief() {
   const { t } = useTranslation()
@@ -34,6 +40,9 @@ export function MorningBrief() {
   const { candidates, isLoading: cLoading } = useCandidates(workspaceId)
   const { progress } = useUserGoal()
   const { hasTeamFullAccess } = useFeatureAccess()
+  const { data: streak } = useActivityStreak()
+
+  const isEvening = new Date().getHours() >= EVENING_HOUR
 
   const radar = useQuery({
     queryKey: workspaceId ? queryKeys.crownSahaRadar(workspaceId) : ['crown', 'saha-radar', 'none'],
@@ -44,6 +53,12 @@ export function MorningBrief() {
 
   const due = useMemo(() => buildDailyPriorities(candidates).all, [candidates])
   const dueNames = due.slice(0, 3).map(c => c.full_name).filter(Boolean).join(', ')
+
+  const tomorrowKey = useMemo(() => keysForDaysAfter(todayCalendarKey(), 1)[0], [])
+  const tomorrowCount = useMemo(
+    () => candidates.filter(c => calendarFollowUpKey(c) === tomorrowKey).length,
+    [candidates, tomorrowKey],
+  )
 
   const silent = useMemo(
     () =>
@@ -57,14 +72,20 @@ export function MorningBrief() {
   const hasGoal = progress?.hasGoal ?? false
   const aramaLeft = Math.max(0, (progress?.targets.arama ?? 0) - (progress?.actuals.arama ?? 0))
   const sunumLeft = Math.max(0, (progress?.targets.sunum ?? 0) - (progress?.actuals.sunum ?? 0))
+  const aramaDone = progress?.actuals.arama ?? 0
+  const sunumDone = progress?.actuals.sunum ?? 0
   const tempoDone = hasGoal && aramaLeft === 0 && sunumLeft === 0
+
+  const streakCount = streak?.current ?? 0
 
   const viewLogged = useRef(false)
   useEffect(() => {
     if (viewLogged.current || !workspaceId) return
     viewLogged.current = true
-    void logProductEventAction(PRODUCT_EVENTS.morningBriefView)
-  }, [workspaceId])
+    void logProductEventAction(PRODUCT_EVENTS.morningBriefView, {
+      phase: isEvening ? 'evening' : 'morning',
+    })
+  }, [workspaceId, isEvening])
 
   if (!workspaceId) return null
 
@@ -79,22 +100,40 @@ export function MorningBrief() {
 
   return (
     <div className="shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
-      <div className="flex items-center gap-1.5 pb-0.5 pt-0.5">
-        <span className="text-base">☀️</span>
-        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-3)]">
-          {t('dashboard.briefTitle')}
-        </span>
+      <div className="flex items-center justify-between gap-2 pb-0.5 pt-0.5">
+        <div className="flex items-center gap-1.5">
+          <span className="text-base">{isEvening ? '🌙' : '☀️'}</span>
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-3)]">
+            {isEvening ? t('dashboard.briefEveningTitle') : t('dashboard.briefTitle')}
+          </span>
+        </div>
+        {streakCount >= 1 && (
+          <span className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
+            <Flame className="h-3.5 w-3.5" />
+            {t('dashboard.briefStreak', { count: streakCount })}
+          </span>
+        )}
       </div>
 
       <div className="divide-y divide-[var(--border)]">
-        {/* Takipler */}
-        <button type="button" className={rowClass} onClick={() => go('followups', '/saha-radar')}>
+        {/* Takipler — sabah: bugün; akşam: yarın */}
+        <button
+          type="button"
+          className={rowClass}
+          onClick={() => go('followups', isEvening ? '/takvim' : '/saha-radar')}
+        >
           <span className={`${iconWrap} bg-amber-500/10 text-amber-500`}>
-            <Bell className="h-4 w-4" />
+            {isEvening ? <CalendarClock className="h-4 w-4" /> : <Bell className="h-4 w-4" />}
           </span>
           <span className="min-w-0 flex-1">
             {cLoading ? (
               <Skeleton className="h-4 w-40" />
+            ) : isEvening ? (
+              <span className="block text-sm font-medium text-[var(--text-2)]">
+                {tomorrowCount > 0
+                  ? t('dashboard.briefTomorrowFollowups', { count: tomorrowCount })
+                  : t('dashboard.briefTomorrowNone')}
+              </span>
             ) : due.length > 0 ? (
               <>
                 <span className="block text-sm font-semibold text-[var(--text-1)]">
@@ -136,7 +175,7 @@ export function MorningBrief() {
           </button>
         )}
 
-        {/* Günün temposu */}
+        {/* Günün temposu — sabah: kalan hedef; akşam: bugün yapılanlar */}
         <button type="button" className={rowClass} onClick={() => go('tempo', '/hedefim')}>
           <span className={`${iconWrap} bg-indigo-500/10 text-indigo-500`}>
             {hasGoal && tempoDone ? (
@@ -153,6 +192,10 @@ export function MorningBrief() {
             ) : tempoDone ? (
               <span className="block text-sm font-semibold text-[var(--text-1)]">
                 {t('dashboard.briefTempoDone')}
+              </span>
+            ) : isEvening ? (
+              <span className="block text-sm font-semibold text-[var(--text-1)]">
+                {t('dashboard.briefTempoEvening', { arama: aramaDone, sunum: sunumDone })}
               </span>
             ) : (
               <span className="block text-sm font-semibold text-[var(--text-1)]">

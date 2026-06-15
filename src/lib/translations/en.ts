@@ -156,6 +156,11 @@ export const en = {
     briefTempo: "Today's pace: {arama} calls · {sunum} presentations",
     briefTempoDone: "You've hit today's pace 👏",
     briefSetGoal: "Set your goal to unlock your daily pace",
+    briefStreak: "{count}-day streak 🔥",
+    briefEveningTitle: "Day's Wrap-up",
+    briefTomorrowFollowups: "{count} follow-ups waiting tomorrow",
+    briefTomorrowNone: "No follow-ups planned tomorrow 🌙",
+    briefTempoEvening: "Today: {arama} calls · {sunum} presentations",
   },
   pipeline: {
     addCandidate: "Add Candidate",

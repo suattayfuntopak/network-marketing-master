@@ -21,6 +21,7 @@ import {
 } from '@/app/(dashboard)/istatistikler/teamActivityActions'
 import { fetchAIUsageAction } from '@/app/(dashboard)/actions/aiUsage'
 import { getMyPanoInsightsAction } from '@/app/(dashboard)/pano/myPulseActions'
+import { getActivityStreakAction } from '@/app/(dashboard)/_shared-actions/streak'
 import { getTeamProgressMapAction } from '@/app/(dashboard)/pulse/actions'
 import {
   getAkademiCustomCountsAction,
@@ -220,6 +221,12 @@ export async function prefetchPanoMetrics(queryClient: QueryClient, workspaceId:
     queryClient.prefetchQuery({
       queryKey: ['pano-field-insights', workspaceId],
       queryFn: () => getMyPanoInsightsAction(workspaceId),
+      staleTime: QUERY_STALE.metrics,
+    }),
+    // Sabah Brief'i streak çipi — anında görünsün diye Pano'da ısıtılır.
+    queryClient.prefetchQuery({
+      queryKey: queryKeys.activityStreak(),
+      queryFn: getActivityStreakAction,
       staleTime: QUERY_STALE.metrics,
     }),
   ])
