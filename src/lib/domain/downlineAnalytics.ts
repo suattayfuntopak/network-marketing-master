@@ -1,5 +1,7 @@
 /** Downline (ekip ağacı) yapısal analizi — SAF, mevcut jenerasyon ağacından türer. */
 
+import { istanbulDayKey } from '@/lib/utils/calendarDates'
+
 export interface DownlineAnalyticsNode {
   /** 0 = lider; 1+ = downline jenerasyonu. */
   generation: number
@@ -61,4 +63,41 @@ export function computeDownlineAnalytics(
     biggestGeneration,
     joinedLast30,
   }
+}
+
+export interface JoinCohort {
+  /** YYYY-MM (İstanbul). */
+  month: string
+  count: number
+}
+
+/**
+ * Son `months` ayın katılım kohortları (İstanbul ayına göre), eskiden yeniye.
+ * Boş aylar 0 olarak dahildir → trend çubuğu için kesintisiz seri. Tam "retention"
+ * (hâlâ aktif %) için aktivite verisi gerekir (daily_active birikiyor); bu kohort
+ * boyutu/büyüme trendini gösterir.
+ */
+export function monthlyJoinCohorts(
+  nodes: DownlineAnalyticsNode[],
+  nowMs: number = Date.now(),
+  months: number = 6,
+): JoinCohort[] {
+  const counts = new Map<string, number>()
+  for (const n of nodes) {
+    if (n.generation < 1 || !n.joinedAt) continue
+    const t = new Date(n.joinedAt).getTime()
+    if (!Number.isFinite(t)) continue
+    const month = istanbulDayKey(n.joinedAt).substring(0, 7)
+    counts.set(month, (counts.get(month) ?? 0) + 1)
+  }
+
+  // Son `months` ayın anahtarlarını üret (now dahil, geriye doğru).
+  const result: JoinCohort[] = []
+  const base = new Date(nowMs)
+  for (let i = months - 1; i >= 0; i--) {
+    const d = new Date(base.getFullYear(), base.getMonth() - i, 15, 12)
+    const month = istanbulDayKey(d.toISOString()).substring(0, 7)
+    result.push({ month, count: counts.get(month) ?? 0 })
+  }
+  return result
 }

@@ -15,6 +15,15 @@ import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 import type { SocialGoal, SocialPlatform } from '@/lib/domain/socialContent'
+import { CalendarPlus, CalendarClock, Check, Trash2 } from 'lucide-react'
+import { queryKeys } from '@/lib/query/keys'
+import { useContentPlans } from '@/hooks/useContentPlans'
+import {
+  addContentPlanAction,
+  toggleContentPlanPostedAction,
+  deleteContentPlanAction,
+} from '../contentPlanActions'
+import { keysForDaysAfter, todayCalendarKey } from '@/lib/utils/calendarDates'
 
 const GOALS: { key: SocialGoal; icon: typeof ShoppingBag; labelKey: string }[] = [
   { key: 'urun', icon: ShoppingBag, labelKey: 'studyo.goalUrun' },
@@ -50,6 +59,43 @@ export function StudyoForm() {
   const [topic, setTopic] = useState('')
   const [result, setResult] = useState('')
   const [isPending, setIsPending] = useState(false)
+  const [planDate, setPlanDate] = useState(() => keysForDaysAfter(todayCalendarKey(), 1)[0])
+  const [savingPlan, setSavingPlan] = useState(false)
+
+  const { data: plans = [] } = useContentPlans()
+  const invalidatePlans = () => qc.invalidateQueries({ queryKey: queryKeys.contentPlans() })
+
+  async function saveToCalendar() {
+    if (!result || savingPlan) return
+    setSavingPlan(true)
+    try {
+      await addContentPlanAction({ platform, scheduledFor: planDate, body: result })
+      toast.success(t('studyo.planSaved'))
+      await invalidatePlans()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSavingPlan(false)
+    }
+  }
+
+  async function togglePosted(id: string, isPosted: boolean) {
+    try {
+      await toggleContentPlanPostedAction(id, isPosted)
+      await invalidatePlans()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  async function removePlan(id: string) {
+    try {
+      await deleteContentPlanAction(id)
+      await invalidatePlans()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : String(err))
+    }
+  }
 
   async function generate() {
     if (!hasAiCoachAccess) { openUpgrade('ai_coach'); return }
@@ -174,6 +220,49 @@ export function StudyoForm() {
             </div>
           </div>
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--text-1)]">{result}</p>
+
+          {/* Takvime kaydet */}
+          <div className="mt-3 flex items-center gap-2 border-t border-[var(--border)] pt-3">
+            <input
+              type="date"
+              value={planDate}
+              min={todayCalendarKey()}
+              onChange={e => setPlanDate(e.target.value)}
+              className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-brand"
+            />
+            <button type="button" onClick={saveToCalendar} disabled={savingPlan}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[#0F6E56] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50">
+              <CalendarPlus className="h-3.5 w-3.5" /> {t('studyo.saveToCalendar')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Planlarım — içerik takvimi */}
+      {plans.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-[var(--text-3)]">
+            <CalendarClock className="h-3.5 w-3.5" /> {t('studyo.plansTitle')}
+          </div>
+          {plans.map(p => (
+            <div key={p.id} className={`rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm ${p.is_posted ? 'opacity-60' : ''}`}>
+              <div className="flex items-center justify-between gap-2 pb-1">
+                <span className="text-xs font-bold text-[var(--text-2)]">
+                  {p.scheduled_for} · {p.platform}
+                </span>
+                <div className="flex gap-1.5">
+                  <button type="button" onClick={() => togglePosted(p.id, !p.is_posted)}
+                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition ${p.is_posted ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-[var(--text-1)]'}`}>
+                    <Check className="h-3 w-3" /> {p.is_posted ? t('studyo.posted') : t('studyo.markPosted')}
+                  </button>
+                  <button type="button" onClick={() => removePlan(p.id)} className="rounded-lg p-1 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+              <p className="line-clamp-3 whitespace-pre-wrap text-xs leading-relaxed text-[var(--text-2)]">{p.body}</p>
+            </div>
+          ))}
         </div>
       )}
 

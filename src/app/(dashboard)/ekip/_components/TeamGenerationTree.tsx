@@ -11,7 +11,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { getTeamGenerationTreeAction } from '../treeActions'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
-import { computeDownlineAnalytics } from '@/lib/domain/downlineAnalytics'
+import { computeDownlineAnalytics, monthlyJoinCohorts } from '@/lib/domain/downlineAnalytics'
 
 type Props = {
   workspaceId: string
@@ -30,6 +30,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
   })
 
   const analytics = useMemo(() => computeDownlineAnalytics(nodes), [nodes])
+  const cohorts = useMemo(() => monthlyJoinCohorts(nodes), [nodes])
 
   if (isLoading) {
     return (
@@ -78,6 +79,30 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
               )
             })}
           </div>
+
+          {/* Katılım trendi — son 6 ay kohort boyutu */}
+          {cohorts.some(c => c.count > 0) && (
+            <div className="mt-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
+                {t('team.analyticsCohortTitle')}
+              </div>
+              <div className="flex items-end justify-between gap-1.5">
+                {(() => {
+                  const max = Math.max(1, ...cohorts.map(c => c.count))
+                  return cohorts.map(c => (
+                    <div key={c.month} className="flex flex-1 flex-col items-center gap-1">
+                      <span className="text-[10px] font-bold text-[var(--text-2)]">{c.count}</span>
+                      <div
+                        className="w-full rounded-t bg-[#72243E]/70 dark:bg-pink-400/60"
+                        style={{ height: `${8 + Math.round((c.count / max) * 36)}px` }}
+                      />
+                      <span className="text-[9px] text-[var(--text-3)]">{c.month.slice(5)}</span>
+                    </div>
+                  ))
+                })()}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

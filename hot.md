@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-15 — Dalga 4 kalanı: İçerik Takvimi + Katılım Kohortu ✅
+
+### 🟢 İçerik Takvimi (Sosyal Stüdyo içinde — migration 102)
+- **Migration `102_content_plans.sql`**: `nmm_content_plans` + RLS (workspace üyeliği). **Canlıda db push** (merge ile otomatik).
+- **`contentPlans.ts`** saf + 3 test (`sortContentPlans`: planlanan önce/yakın tarih üstte, paylaşılan sona). `contentPlanActions` (get/add/togglePosted/delete) + `useContentPlans`.
+- Stüdyo'da: üretilen içeriğe **"Takvime Kaydet"** (tarih seç) + **"Planlarım"** listesi (paylaştım işaretle/sil). Yeni rota/nav YOK — Stüdyo sekmesi içinde kohezyon. `database.types.ts` elle güncel.
+
+### 🟢 Katılım Kohortu (Downline analitiği — migration yok)
+- **`monthlyJoinCohorts`** (`downlineAnalytics.ts`) saf + 3 test: son 6 ay katılım kohort boyutu (İstanbul ayı, boş aylar 0). TeamGenerationTree analitik kartına **mini-bar trend**. Tam retention-% aktivite birikimi ister (daily_active topluyor).
+
+### Bilinçli yapılmadı (açıklandı, kod yok)
+- **Markalı mini-akademi**: zaten `nmm_custom_trainings/objections` (022/037/097) ile var — kullanıcı kendi eğitim/itirazını ekler, moderasyon + paylaşılan kütüphane. Ekip-scope ayrı ürün kararı.
+- **WhatsApp derin entegrasyon**: Meta Business API (dış kimlik/onay/altyapı) gerektirir — kod-şimdi işi değil.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1226/1226 · `vitest` 307/307 (+6) · `migrate:check` 102 ✓.
+
 ## 2026-06-15 — Dalga 4: Downline Ağaç Analitiği + Ekip İletişim Hub'ı ✅
 
 ### 🟢 Downline Ağaç Analitiği (migration yok)
