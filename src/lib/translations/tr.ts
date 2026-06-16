@@ -45,6 +45,8 @@ export const tr = {
   navMobile: {
     pano: "Pano",
     pipeline: "Listem",
+    sahaRadar: "Radar",
+    more: "Diğer",
     takvim: "Takvim",
     ekip: "Ekibim",
     vaktinVarsa: "Vaktin Varsa",

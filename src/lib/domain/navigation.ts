@@ -63,6 +63,18 @@ export const NAV_MODULE_ITEMS: readonly NavItem[] = PANO_ORGANIZATION_ITEMS.map(
 
 export const NAV_PRIMARY: readonly NavItem[] = NAV_SIDEBAR_MODULES
 
+/**
+ * Mobil alt bar — birincil (her zaman görünür) 5 modül; gerisi "Diğer" çekmecesinde.
+ * Masaüstü sidebar tüm listeyi gösterir (dikey alan bol). Sıra: bu dizinin sırası.
+ */
+export const NAV_MOBILE_PRIMARY_HREFS: readonly string[] = [
+  '/pano',
+  '/pipeline',
+  '/ekip',
+  '/hedefim',
+  '/saha-radar',
+]
+
 export const NAV_MORE_ITEMS: readonly NavItem[] = []
 
 export const NAV_ADMIN: NavItem = {

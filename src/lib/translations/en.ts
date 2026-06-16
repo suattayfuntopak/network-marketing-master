@@ -45,6 +45,8 @@ export const en = {
   navMobile: {
     pano: "Dashboard",
     pipeline: "Pipeline",
+    sahaRadar: "Radar",
+    more: "More",
     takvim: "Calendar",
     ekip: "Team",
     vaktinVarsa: "When You Have Time",

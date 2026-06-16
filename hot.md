@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-16 — Nav #1: mobil alt bar "Diğer" çekmecesi ✅
+
+Kalabalıklaşan mobil alt bar sadeleştirildi (masaüstü sidebar tüm listeyi taşır, dokunulmadı).
+- **`NAV_MOBILE_PRIMARY_HREFS`** (navigation.ts): birincil 5 — Pano · Listem · Ekibim · Hedefim · Saha Radarım.
+- **BottomNav** yeniden yazıldı: 5 birincil (flex-1, eşit, kaydırmasız) + **"Diğer"** (Ellipsis). Gerisi (Saha Özetim, Takvim, İstatistikler, Müşterilerim, Duyurular, Eğitim, YZ Koçum, Vaktin Varsa, +Admin) alttan açılan **sheet**'te (backdrop + grid-cols-4 + grab handle). "Diğer" düğmesi, aktif rota gizli modüllerden biriyse vurgulanır. Rota değişince/backdrop'ta kapanır.
+- Kısa etiket: "Saha Radarım" → **"Radar"** (`navMobile.sahaRadar`), düğme **"Diğer"** (`navMobile.more`); uzun etiketler `truncate`.
+- Sadece mobil (`md:hidden`); masaüstü değişmedi.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1241/1241 · `vitest` 308/308 · migration yok.
+
 ## 2026-06-16 — "Kodu Gir" (join-by-code) + paylaşım analitiği ✅
 
 ### 🟢 Kodu Gir — güvenli join-by-code (kör restore değil)
