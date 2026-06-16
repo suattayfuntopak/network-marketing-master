@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-16 — "Kodu Gir" (join-by-code) + paylaşım analitiği ✅
+
+### 🟢 Kodu Gir — güvenli join-by-code (kör restore değil)
+- **Backend zaten denetlenmiş:** signup'taki otomatik bağlamanın aynısı olan `nmm_join_workspace` RPC (SECURITY DEFINER: auth, geçerli kod, kendi-kodu-değil, parent_id set, aday eşleştirme). Yeni linkleme mantığı yazılmadı, bu audit'li RPC kullanıldı.
+- **`joinTeamByCodeAction`** (`ekip/actions.ts`) iki app-katmanı guard ekler: (1) **re-parenting/poaching** — yalnız ÜST HATSIZ kullanıcı katılabilir; (2) **döngü** — sponsor, katılanın alt ekibindeyse reddedilir. Hata kodları kullanıcı-dostu mesaja map'lenir.
+- **UI:** silinmiş `JoinByInviteSection` geri getirildi; Ekibim araç kutusunda **yalnız `!hasUpline`** kullanıcıya, Davet Kodu Gönder ile Ekibe Gönder arasında. Başarıda toast + workspace/team cache invalidation.
+- i18n: joinATeam/Desc/joinBtn/pasteInvitePlaceholder + joinSuccess (tr+en).
+
+### 🟢 Genel öneri: satış hunisi olayı
+"Planları Gör" (hesap modalı) tıklamasına `see_plans_click` olayı (phase: trial|ended) → hangi girişin /odeme'ye döndüğü ölçülür.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1239/1239 · `vitest` 308/308 · migration yok (mevcut RPC).
+
 ## 2026-06-16 — 5 maddelik UX/akış turu ✅
 
 1. **K-faktör paneli anlaşılır isimlendi:** "Viralite & Büyüme" → **"Büyüme & Yayılma"** / "Growth & Reach"; "K-FAKTÖRÜ" → **"DAVET ETKİSİ"** / "INVITE IMPACT" + açıklayıcı ipucu (1 üzeri = kendi kendine büyüme).

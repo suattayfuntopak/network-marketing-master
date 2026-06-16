@@ -6,6 +6,8 @@ import { AlertTriangle, Sparkles, Rocket, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getAccountLifecycle } from '@/lib/domain/accountLifecycle'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 
@@ -150,7 +152,10 @@ export function AccountStatusAlert() {
               </button>
               <Link
                 href={paymentHref}
-                onClick={() => setOpen(false)}
+                onClick={() => {
+                  void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: isTrial ? 'trial' : 'ended' })
+                  setOpen(false)
+                }}
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
               >
                 <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

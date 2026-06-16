@@ -34,6 +34,8 @@ export const PRODUCT_EVENTS = {
   announcementShared: 'announcement_shared',
   /** Ekibe doküman/materyal gönderildi (target: grup|tekli, source: material|manual). */
   broadcastSent: 'broadcast_sent',
+  /** Hesap-durumu modalındaki "Planları Gör" tıklandı (phase: trial|ended) → satış hunisi. */
+  seePlansClick: 'see_plans_click',
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]

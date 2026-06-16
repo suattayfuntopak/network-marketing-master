@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
@@ -13,8 +13,9 @@ import { TeamMemberCard, type MemberCardTab } from './TeamMemberCard'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { BroadcastPanel } from './BroadcastPanel'
 import { InviteTeammateSection } from './InviteTeammateSection'
+import { JoinByInviteSection } from './JoinByInviteSection'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
-import { addTeamMemberAsCandidateAction, unclaimMemberFromTeamAction } from '../actions'
+import { addTeamMemberAsCandidateAction, unclaimMemberFromTeamAction, joinTeamByCodeAction } from '../actions'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { queryInvalidator } from '@/lib/query/invalidator'
 import { toast } from 'sonner'
@@ -84,6 +85,28 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }, [ws])
+
+  const [inviteCodeInput, setInviteCodeInput] = useState('')
+  const [joining, setJoining] = useState(false)
+
+  const handleJoinSubmit = useCallback(async (e: FormEvent) => {
+    e.preventDefault()
+    if (!inviteCodeInput.trim() || joining) return
+    setJoining(true)
+    try {
+      const res = await joinTeamByCodeAction(inviteCodeInput)
+      if (res.ok) {
+        toast.success(t('team.joinSuccess'))
+        setInviteCodeInput('')
+        queryClient.invalidateQueries({ queryKey: ['workspace'] })
+        if (ws?.workspaceId) queryInvalidator.invalidateTeam(queryClient, ws.workspaceId)
+      } else {
+        toast.error(res.error)
+      }
+    } finally {
+      setJoining(false)
+    }
+  }, [inviteCodeInput, joining, queryClient, ws, t])
   const [prevSearch, setPrevSearch] = useState(memberSearch)
 
   if (memberSearch !== prevSearch) {
@@ -372,6 +395,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               onCopy={handleCopyCode}
               t={t}
             />
+            {/* Kodu Gir — yalnız ÜST HATSIZ (bağımsız) kullanıcıya; bir lidere bağlanmak için */}
+            {!ws?.hasUpline && (
+              <JoinByInviteSection
+                inviteCodeInput={inviteCodeInput}
+                joining={joining}
+                onInviteCodeChange={setInviteCodeInput}
+                onSubmit={handleJoinSubmit}
+                t={t}
+              />
+            )}
             {/* Ekibe Gönder — yalnız ücretli ekip erişiminde */}
             {teamPageUnlocked && <BroadcastPanel members={visibleMembers} t={t} />}
           </div>

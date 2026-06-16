@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
@@ -575,4 +576,64 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
         : 'Rehberlik mesajı üretilemedi: ' + msg,
     }
   }
+}
+
+/**
+ * Davet koduyla bir liderin ekibine katılım ("Kodu Gir"). Backend bağlama, signup
+ * akışıyla birebir aynı denetlenmiş `nmm_join_workspace` RPC'sidir (auth, geçerli kod,
+ * kendi-kodu-değil, parent_id set, aday eşleştirme). App katmanında iki ek güvenlik:
+ *  1) Re-parenting/poaching: yalnız ÜST HATSIZ (bağımsız) kullanıcı katılabilir.
+ *  2) Döngü: sponsor, katılanın alt ekibinde ise reddedilir.
+ */
+export async function joinTeamByCodeAction(
+  rawCode: string,
+): Promise<{ ok: true } | { ok: false; error: string }> {
+  const code = (rawCode ?? '').trim().toUpperCase()
+  if (!code) return { ok: false, error: 'Davet kodu boş.' }
+
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user) return { ok: false, error: 'Oturum bulunamadı.' }
+
+  const admin = createAdminClient()
+
+  const { data: myWs } = await admin
+    .from('nmm_workspaces')
+    .select('id, parent_id, invite_code')
+    .eq('owner_id', user.id)
+    .maybeSingle()
+  if (!myWs) return { ok: false, error: 'Çalışma alanın bulunamadı.' }
+
+  // (1) Yalnız bağımsız kullanıcı koda katılabilir — mevcut bağ değiştirilemez (poaching koruması).
+  if (myWs.parent_id) return { ok: false, error: 'Zaten bir lidere bağlısın; bağlantı değiştirilemez.' }
+  if ((myWs.invite_code ?? '').toUpperCase() === code) {
+    return { ok: false, error: 'Kendi davet kodunu giremezsin.' }
+  }
+
+  const { data: sponsor } = await admin
+    .from('nmm_workspaces')
+    .select('id, owner_id')
+    .eq('invite_code', code)
+    .maybeSingle()
+  if (!sponsor) return { ok: false, error: 'Geçersiz davet kodu.' }
+  if (sponsor.id === myWs.id) return { ok: false, error: 'Kendi davet kodunu giremezsin.' }
+
+  // (2) Döngü koruması: sponsor workspace'i benim alt ekibimde mi? (definer rpc → auth.uid() downline workspace'leri)
+  const { data: downline } = await supabase.rpc('nmm_leader_downline_workspaces')
+  const cycle = (downline ?? []).some(w => w.id === sponsor.id || w.owner_id === sponsor.owner_id)
+  if (cycle) return { ok: false, error: 'Bu kişi senin alt ekibinde; döngü oluşturulamaz.' }
+
+  const { error } = await supabase.rpc('nmm_join_workspace', {
+    p_invite_code: code,
+    p_candidate_id: null,
+  })
+  if (error) {
+    const map: Record<string, string> = {
+      invalid_invite_code: 'Geçersiz davet kodu.',
+      cannot_join_own_workspace: 'Kendi davet kodunu giremezsin.',
+      not_authenticated: 'Oturum bulunamadı.',
+    }
+    return { ok: false, error: map[error.message] ?? 'Bağlanma başarısız oldu.' }
+  }
+  return { ok: true }
 }
