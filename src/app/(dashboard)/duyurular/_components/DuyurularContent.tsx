@@ -8,8 +8,10 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
+import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTeamAnnouncements } from '@/hooks/useTeamAnnouncements'
 import { queryKeys } from '@/lib/query/keys'
+import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { addTeamAnnouncementAction, deleteTeamAnnouncementAction } from '../actions'
 import type { AnnotatedAnnouncement } from '@/lib/domain/teamAnnouncements'
 
@@ -59,6 +61,10 @@ export function DuyurularContent() {
     return a.author_name || t('duyurular.leader')
   }
 
+  function shareOnWhatsapp(a: AnnotatedAnnouncement) {
+    window.open(whatsappShareUrl(`*${a.title}*\n\n${a.body}`), '_blank')
+  }
+
   return (
     <HubPageShell
       title={t('duyurular.title')}
@@ -104,11 +110,16 @@ export function DuyurularContent() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <span className="truncate text-sm font-bold text-[var(--text-1)]">{a.title}</span>
-                    {a.isMine && (
-                      <button type="button" onClick={() => remove(a)} className="shrink-0 rounded-lg p-1 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
-                        <Trash2 className="h-3.5 w-3.5" />
+                    <div className="flex shrink-0 items-center gap-1">
+                      <button type="button" onClick={() => shareOnWhatsapp(a)} className="rounded-lg p-1 text-[var(--text-3)] transition hover:text-[#25D366]" aria-label={t('duyurular.share')}>
+                        <WhatsAppIcon className="h-3.5 w-3.5" />
                       </button>
-                    )}
+                      {a.isMine && (
+                        <button type="button" onClick={() => remove(a)} className="rounded-lg p-1 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-3)]">
                     <span className={a.isMine ? 'font-bold text-brand' : 'font-semibold'}>{authorLabel(a)}</span>

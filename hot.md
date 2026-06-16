@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-15 — Masaüstü Brief floating + Ekip iletişim konsolidasyonu (Madde 4) ✅
+
+### 🖥️ Masaüstü Brief taşma düzeltmesi (mobil dokunulmadı)
+Açılan Brief gövdesi masaüstünde grid'le çakışıyordu. Çözüm: gövde **yalnız masaüstünde** akıştan çıkıp floating dropdown olur (`md:absolute md:top-full md:mt-2`, gölge, `Z.dropdown`); kart `relative`. Mobilde inline (değişmedi). Grid layout'a dokunulmadı → çakışma yok, başlık altında şık boşluk.
+
+### 🔗 Ekip iletişim konsolidasyonu (Madde 4 — onaylı)
+- **BroadcastPanel doküman-odaklı oldu:** "Ekibe Mesaj" (motiv) sekmesi **kaldırıldı** (Duyurular + WhatsApp-paylaş onun yerine geçti). İçerik-türü seçici gitti.
+- **Kayıtlı materyal quick-pick:** mevcut `usePresentationMaterials` (Sunum Materyalleri) BroadcastPanel'e bağlandı — kayıtlı materyale tek tıkla link+başlık dolar, ekibe/seçili üyeye gönder. Yeni tablo yok (mevcut altyapı yeniden kullanıldı).
+- **Duyurular'a WhatsApp-paylaş:** her duyuruya WhatsApp ikonu → başlık+gövde tek tıkla paylaşılır.
+- i18n temizliği: 5 ölü anahtar silindi (broadcastTypeDoc/Motiv, broadcastMsgLabel/Placeholder, pagesUi.contentType), 2 eklendi (broadcastSavedMaterials, duyurular.share). Parite tam.
+
+### Bilinçli yapılmadı
+- **#1 Nav "Daha Fazla" menüsü:** gerçek-cihaz mobil QA gerektiriyor; en çok kullanılan bileşeni kör değiştirmek "borç/hantallık katma" talimatına aykırı olurdu → QA'lı ayrı adıma bırakıldı.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1223/1223 · `vitest` 307/307.
+
 ## 2026-06-15 — Perf (#6): Brief saha-radar sorgusu açılınca tetiklenir ✅
 
 7 genel öneri değerlendirildi. **#6** uygulandı: Sabah Brief'i varsayılan kapalı olduğundan, ekip-sessizliği (saha-radar) sorgusu artık yalnız kart **açıkken** çalışır (`enabled: … && open`) → çoğu Pano açılışında bir client round-trip tasarrufu; açınca yüklenir + cache ısıtır. **#3 (CI tip-drift) zaten mevcut** (`migrate-check.yml` advisory: gen-types + diff). Kalan öneriler (#1 nav-More, #4 proaktif AI, #5 onboarding) gerçek-cihaz QA / veri birikimi / ürün kararı gerektirdiğinden körlemesine yapılmadı — raporda planlandı.

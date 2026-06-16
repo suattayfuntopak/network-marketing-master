@@ -43,7 +43,6 @@ export const pagesSection = {
 
       // ekip/_components/BroadcastPanel.tsx
       broadcastDocHeader: "📄 *Doküman / Link*",
-      contentType: "İçerik Türü",
       recipients: "Alıcılar",
       selectRecipients: "Kişileri seçin",
       noOtherMembers: "Henüz başka ekip üyeniz yok.",
@@ -93,7 +92,6 @@ export const pagesSection = {
 
       // ekip/_components/BroadcastPanel.tsx
       broadcastDocHeader: "📄 *Document / Link*",
-      contentType: "Content Type",
       recipients: "Recipients",
       selectRecipients: "Select recipients",
       noOtherMembers: "No other team members yet.",

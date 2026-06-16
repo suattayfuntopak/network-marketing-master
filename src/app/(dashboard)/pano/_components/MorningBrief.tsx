@@ -18,6 +18,7 @@ import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Z } from '@/lib/ui/zIndex'
 
 type BriefRow = 'followups' | 'team' | 'tempo'
 
@@ -104,7 +105,7 @@ export function MorningBrief() {
   const iconWrap = 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg'
 
   return (
-    <div className="shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
+    <div className="relative shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -131,7 +132,9 @@ export function MorningBrief() {
       </button>
 
       {open && (
-      <div className="divide-y divide-[var(--border)]">
+      <div
+        className={`divide-y divide-[var(--border)] md:absolute md:inset-x-0 md:top-full md:mt-2 md:rounded-2xl md:border md:border-[var(--border)] md:bg-[var(--bg-card)] md:px-4 md:shadow-xl ${Z.dropdown}`}
+      >
         {/* Takipler — sabah: bugün; akşam: yarın */}
         <button
           type="button"
