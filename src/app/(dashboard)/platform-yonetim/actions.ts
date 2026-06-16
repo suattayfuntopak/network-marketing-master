@@ -226,6 +226,10 @@ export async function getViralKpiAction(): Promise<ViralKpi> {
       PRODUCT_EVENTS.inviteLandingView,
       PRODUCT_EVENTS.inviteAccepted,
       PRODUCT_EVENTS.dailyActive,
+      PRODUCT_EVENTS.achievementShared,
+      PRODUCT_EVENTS.socialContentShared,
+      PRODUCT_EVENTS.announcementShared,
+      PRODUCT_EVENTS.broadcastSent,
     ])
     .limit(20000)
 

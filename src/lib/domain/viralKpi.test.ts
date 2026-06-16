@@ -82,4 +82,26 @@ describe('aggregateViralKpi', () => {
   it('windowDays parametresi yansıtılır', () => {
     expect(aggregateViralKpi([], TODAY, 7).windowDays).toBe(7)
   })
+
+  it('paylaşım kırılımını sayar (her tür tek olay, çift sayma yok)', () => {
+    const rows = [
+      row(PRODUCT_EVENTS.inviteSent, 'u1'),
+      row(PRODUCT_EVENTS.achievementShared, 'u1'),
+      row(PRODUCT_EVENTS.achievementShared, 'u2'),
+      row(PRODUCT_EVENTS.socialContentShared, null),
+      row(PRODUCT_EVENTS.announcementShared, 'u1'),
+      row(PRODUCT_EVENTS.broadcastSent, 'u1'),
+    ]
+    const k = aggregateViralKpi(rows, TODAY)
+    expect(k.shares).toMatchObject({
+      invite: 1,
+      achievement: 2,
+      social: 1,
+      announcement: 1,
+      broadcast: 1,
+      total: 6,
+    })
+    // invite paylaşımı = invitesSent (aynı olay, çift sayılmaz)
+    expect(k.shares.invite).toBe(k.invitesSent)
+  })
 })

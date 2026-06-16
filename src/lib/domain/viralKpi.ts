@@ -8,6 +8,21 @@ export interface ViralEventRow {
   day: string
 }
 
+/** WhatsApp paylaşımı tür kırılımı (her tür tek olay → çift sayma yok). */
+export interface ViralShares {
+  /** invite_sent — davet linki. */
+  invite: number
+  /** achievement_shared — başarı/rozet kartı. */
+  achievement: number
+  /** social_content_shared — Sosyal Stüdyo içeriği. */
+  social: number
+  /** announcement_shared — ekip duyurusu. */
+  announcement: number
+  /** broadcast_sent — ekibe doküman/materyal. */
+  broadcast: number
+  total: number
+}
+
 export interface ViralKpi {
   /** Pencere boyu (gün). */
   windowDays: number
@@ -27,6 +42,8 @@ export interface ViralKpi {
   activeUsers: number
   /** Bugün aktif ayrı kullanıcı (DAU). */
   dau: number
+  /** WhatsApp paylaşımı tür kırılımı. */
+  shares: ViralShares
 }
 
 function round2(n: number): number {
@@ -45,6 +62,10 @@ export function aggregateViralKpi(
   let invitesSent = 0
   let landingViews = 0
   let accepted = 0
+  let achievementShares = 0
+  let socialShares = 0
+  let announcementShares = 0
+  let broadcastShares = 0
   const inviters = new Set<string>()
   const activeUserSet = new Set<string>()
   const dauSet = new Set<string>()
@@ -61,6 +82,18 @@ export function aggregateViralKpi(
       case PRODUCT_EVENTS.inviteAccepted:
         accepted++
         break
+      case PRODUCT_EVENTS.achievementShared:
+        achievementShares++
+        break
+      case PRODUCT_EVENTS.socialContentShared:
+        socialShares++
+        break
+      case PRODUCT_EVENTS.announcementShared:
+        announcementShares++
+        break
+      case PRODUCT_EVENTS.broadcastSent:
+        broadcastShares++
+        break
       case PRODUCT_EVENTS.dailyActive:
         if (r.userId) {
           activeUserSet.add(r.userId)
@@ -71,6 +104,14 @@ export function aggregateViralKpi(
   }
 
   const distinctInviters = inviters.size
+  const shares: ViralShares = {
+    invite: invitesSent,
+    achievement: achievementShares,
+    social: socialShares,
+    announcement: announcementShares,
+    broadcast: broadcastShares,
+    total: invitesSent + achievementShares + socialShares + announcementShares + broadcastShares,
+  }
   return {
     windowDays,
     invitesSent,
@@ -81,5 +122,6 @@ export function aggregateViralKpi(
     kFactor: distinctInviters > 0 ? round2(accepted / distinctInviters) : 0,
     activeUsers: activeUserSet.size,
     dau: dauSet.size,
+    shares,
   }
 }

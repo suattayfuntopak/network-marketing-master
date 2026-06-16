@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-15 — K-faktör paneli: Paylaşım Kaynakları kırılımı ✅
+
+Önceki turun #1 önerisi (do-now). **Migration yok** — yalnız mevcut olayları okuyup gösterir.
+- **`viralKpi.ts`**: `ViralShares` (invite/achievement/social/announcement/broadcast + total); `aggregateViralKpi` 4 paylaşım olayını da sayar (+1 test). invite paylaşımı = invitesSent (çift sayma yok).
+- **`getViralKpiAction`**: `.in()` filtresine 4 paylaşım olayı eklendi (30 gün penceresi).
+- **`PlatformViralKpi`**: KPI kartlarının altında **"Paylaşım Kaynakları"** satırı (tür başına + toplam) — hangi kanalın viralite ürettiği görünür.
+- i18n: 6 anahtar (tr+en), parite tam.
+
+#2 (materyal taşıma) ve #3 (nav-More) kendi önerimde sıralı/QA-bağımlı → bilinçli yapılmadı.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1230/1230 · `vitest` 308/308 (+1).
+
 ## 2026-06-15 — Genel öneri uygulaması: materyal-ekle linki + paylaşım analitiği ✅
 
 Önceki turun "genel öneriler"i, çift-saymadan ve mevcut altyapıyla:

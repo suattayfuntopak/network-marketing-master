@@ -117,6 +117,31 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
           </div>
         </div>
       )}
+
+      {/* Paylaşım kaynakları — WhatsApp paylaşımı tür kırılımı (her tür tek olay) */}
+      {!isLoading && kpi && kpi.shares.total > 0 && (
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+          <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
+            {t('platformPage.viralSharesTitle')} · {kpi.shares.total}
+          </div>
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+            {([
+              ['platformPage.viralShareInvite', kpi.shares.invite],
+              ['platformPage.viralShareSocial', kpi.shares.social],
+              ['platformPage.viralShareAchievement', kpi.shares.achievement],
+              ['platformPage.viralShareAnnouncement', kpi.shares.announcement],
+              ['platformPage.viralShareBroadcast', kpi.shares.broadcast],
+            ] as const).map(([key, val]) => (
+              <div key={key} className="rounded-xl bg-[var(--bg-subtle)] p-2 text-center">
+                <div className="text-lg font-black text-[var(--text-1)]">{val}</div>
+                <div className="text-[9px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
+                  {t(key)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   )
 }
