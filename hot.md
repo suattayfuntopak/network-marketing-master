@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-15 — Perf (#6): Brief saha-radar sorgusu açılınca tetiklenir ✅
+
+7 genel öneri değerlendirildi. **#6** uygulandı: Sabah Brief'i varsayılan kapalı olduğundan, ekip-sessizliği (saha-radar) sorgusu artık yalnız kart **açıkken** çalışır (`enabled: … && open`) → çoğu Pano açılışında bir client round-trip tasarrufu; açınca yüklenir + cache ısıtır. **#3 (CI tip-drift) zaten mevcut** (`migrate-check.yml` advisory: gen-types + diff). Kalan öneriler (#1 nav-More, #4 proaktif AI, #5 onboarding) gerçek-cihaz QA / veri birikimi / ürün kararı gerektirdiğinden körlemesine yapılmadı — raporda planlandı.
+
+`tsc`/`eslint`/`vitest 307` temiz.
+
 ## 2026-06-15 — UX düzeltmeleri: kısa gün adı (mobil) + Brief katlanır + nav sırası ✅
 
 1. **Mobil kısa gün adı:** `formatPanoDateLine(date, lang, weekday='long'|'short')`. PanoContent mobilde `short` (Pzt/Mon), masaüstünde `long` (responsive span) → uzun gün adı Welcome'ı alt satıra itmiyor. Masaüstü değişmedi.

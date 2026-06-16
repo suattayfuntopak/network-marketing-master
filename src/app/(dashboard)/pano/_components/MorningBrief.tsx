@@ -47,10 +47,12 @@ export function MorningBrief() {
 
   const isEvening = new Date().getHours() >= EVENING_HOUR
 
+  // Perf (#6): ekip-sessizliği yalnız kart açıkken çekilir — varsayılan kapalı
+  // Brief'te gereksiz round-trip olmaz; açınca yüklenir ve saha-radar cache'ini ısıtır.
   const radar = useQuery({
     queryKey: workspaceId ? queryKeys.crownSahaRadar(workspaceId) : ['crown', 'saha-radar', 'none'],
     queryFn: () => getCrownSahaRadarAction(workspaceId as string),
-    enabled: !!workspaceId && hasTeamFullAccess,
+    enabled: !!workspaceId && hasTeamFullAccess && open,
     staleTime: 5 * 60_000,
   })
 
