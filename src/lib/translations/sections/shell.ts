@@ -53,6 +53,7 @@ export const shellSection = {
       upgradeTrialEndedDesc:
         'Liste, takvim ve ekibin açık kalır. Basic ile günlük {limit} yapay zeka mesajına hemen devam edebilirsin.',
       upgradeTrialEndedCta: 'Basic ile devam et',
+      seePlansCta: 'Planları Gör',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
         'Davet kodunuzla yeni üyeler ekleyebilirsiniz. Detaylı performans takibi ve ekip nabzı Plus veya Pro planda açılır.',
@@ -133,6 +134,7 @@ export const shellSection = {
       upgradeTrialEndedDesc:
         'Pipeline, calendar, and your team stay open. Continue with Basic for {limit} daily AI messages right away.',
       upgradeTrialEndedCta: 'Continue with Basic',
+      seePlansCta: 'See Plans',
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:
         'Invite new members with your code. Detailed performance tracking and Team Pulse unlock on Plus or Pro.',

@@ -2,9 +2,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { clsx } from 'clsx'
 import { useQueryClient } from '@tanstack/react-query'
-import { Search, ChevronDown, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import type { MemberRow } from '@/lib/team/types'
 import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
@@ -13,6 +12,7 @@ import { VirtualizedMemberList } from './VirtualizedMemberList'
 import { TeamMemberCard, type MemberCardTab } from './TeamMemberCard'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { BroadcastPanel } from './BroadcastPanel'
+import { InviteTeammateSection } from './InviteTeammateSection'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { addTeamMemberAsCandidateAction, unclaimMemberFromTeamAction } from '../actions'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
@@ -74,8 +74,16 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const [linkingMemberId, setLinkingMemberId] = useState<string | null>(null)
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null)
   const [confirmRemove, setConfirmRemove] = useState<MemberRow | null>(null)
-  const [toolsOpen, setToolsOpen] = useState(true)
+  const [copied, setCopied] = useState(false)
   const [localSearch, setLocalSearch] = useState(memberSearch)
+
+  const handleCopyCode = useCallback(() => {
+    const code = ws?.inviteCode ?? ''
+    if (!code) return
+    void navigator.clipboard?.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [ws])
   const [prevSearch, setPrevSearch] = useState(memberSearch)
 
   if (memberSearch !== prevSearch) {
@@ -92,7 +100,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
     return () => clearTimeout(timer)
   }, [localSearch, memberSearch, onMemberSearchChange])
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const hasTeamTools = isLeader && teamPageUnlocked
 
   const searchQ = memberSearch.trim()
   const hasMemberSearch = searchQ.length > 0
@@ -356,33 +363,19 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           </p>
         )}
 
-        {hasTeamTools ? (
-          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] pt-2">
-            <button
-              type="button"
-              onClick={() => setToolsOpen(v => !v)}
-              aria-expanded={toolsOpen}
-              className="flex w-full items-center justify-between gap-2 px-4 py-3 cursor-pointer"
-            >
-              <span className="text-sm font-bold text-[var(--text-1)]">
-                {t('team.toolsCollapsibleTitle')}
-              </span>
-              <ChevronDown
-                className={clsx(
-                  'h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform',
-                  toolsOpen && 'rotate-180',
-                )}
-              />
-            </button>
-            {toolsOpen ? (
-              <div className="space-y-6 border-t border-[var(--border)] px-4 pb-4 pt-4 animate-in fade-in slide-in-from-top-1 duration-200">
-                {isLeader && teamPageUnlocked ? (
-                  <BroadcastPanel members={visibleMembers} t={t} />
-                ) : null}
-              </div>
-            ) : null}
+        {isLeader && (
+          <div className="space-y-6 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4">
+            {/* Davet Kodu Gönder — herkese açık (ücretsiz dahil); kodu/linki paylaş */}
+            <InviteTeammateSection
+              inviteCode={ws?.inviteCode ?? ''}
+              copied={copied}
+              onCopy={handleCopyCode}
+              t={t}
+            />
+            {/* Ekibe Gönder — yalnız ücretli ekip erişiminde */}
+            {teamPageUnlocked && <BroadcastPanel members={visibleMembers} t={t} />}
           </div>
-        ) : null}
+        )}
       </section>
       {UpgradePrompt}
       {confirmRemove && (

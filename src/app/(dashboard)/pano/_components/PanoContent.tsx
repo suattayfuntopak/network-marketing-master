@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { OnboardingModal } from './OnboardingModal'
@@ -16,6 +18,8 @@ export function PanoContent() {
   const { t, lang } = useTranslation()
   const { data: ws, isLoading: wsLoading } = useWorkspace()
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
+  // Brief açık/kapalı — Pano sahibi tutar ki masaüstünde grid'i aşağı itebilsin.
+  const [briefOpen, setBriefOpen] = useState(false)
 
   const hour = new Date().getHours()
   const greeting = hour < 5
@@ -35,7 +39,7 @@ export function PanoContent() {
   const todayLineLong = formatPanoDateLine(new Date(), lang, 'long')
 
   return (
-    <div className="flex min-h-0 w-full flex-1 flex-col gap-1 md:gap-2 md:overflow-hidden">
+    <div className="flex min-h-0 w-full flex-1 flex-col gap-1 md:gap-2 md:overflow-y-auto">
       {!cLoading && ws && (
         <OnboardingModal
           workspaceId={ws.workspaceId}
@@ -64,9 +68,11 @@ export function PanoContent() {
         </div>
       </header>
 
-      <MorningBrief />
+      <MorningBrief open={briefOpen} onToggle={() => setBriefOpen(o => !o)} />
 
-      <div className="min-h-0 flex-1 md:flex md:flex-col">
+      {/* Brief açıkken masaüstünde grid flex-none olur → brief'in altına itilir (çakışmaz);
+          kapalıyken flex-1 ile alanı doldurur (mevcut görünüm). Mobil hep flex-1 (doğal akış). */}
+      <div className={clsx('min-h-0 flex-1 md:flex md:flex-col', briefOpen && 'md:flex-none')}>
         <PanoLauncherGrid />
       </div>
 

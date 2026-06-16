@@ -1,5 +1,16 @@
 # Hot Log
 
+## 2026-06-16 — 5 maddelik UX/akış turu ✅
+
+1. **K-faktör paneli anlaşılır isimlendi:** "Viralite & Büyüme" → **"Büyüme & Yayılma"** / "Growth & Reach"; "K-FAKTÖRÜ" → **"DAVET ETKİSİ"** / "INVITE IMPACT" + açıklayıcı ipucu (1 üzeri = kendi kendine büyüme).
+2. **Masaüstü Brief push-down:** floating dropdown kaldırıldı; açılış PanoContent'e taşındı (controlled). Brief açıkken grid masaüstünde `md:flex-none` ile **brief'in altına itiliyor** (çakışma yok), PanoContent `md:overflow-y-auto` ile gerekirse kayar; kapanınca grid eski yerine. Mobil değişmedi.
+3. **Ekibim temizliği + Davet Kodu Gönder geri geldi:** "Ekibim Araçları (Davet Kodu vd)" collapsible + tekrar eden "Ekibe Gönder" h2 kaldırıldı. Silinmiş **`InviteTeammateSection` + `SpoilerCode`** geri getirildi (kod paylaş; ücretsiz dahil `isLeader`). "Kodu Gir" (`JoinByInviteSection`) **bilinçli geri getirilmedi** (backend join-action ister → raporda görüş).
+4. **Plan barı oturumda bir kez:** AccountStatusAlert sessionStorage bayrağı — ilk sayfa girişinde görünür, sonra o oturumda görünmez; çıkışta (UserMenu) bayrak temizlenir → yeni girişte tekrar.
+5. **Modal CTA:** "Basic ile devam et" → **"Planları Gör"**; `/odeme?...&period=yearly` → **`/odeme`** (aylık tutarlar varsayılan; yıllık sekme %25 indirimli).
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1234/1234 · `vitest` 308/308.
+
 ## 2026-06-15 — K-faktör paneli: Paylaşım Kaynakları kırılımı ✅
 
 Önceki turun #1 önerisi (do-now). **Migration yok** — yalnız mevcut olayları okuyup gösterir.

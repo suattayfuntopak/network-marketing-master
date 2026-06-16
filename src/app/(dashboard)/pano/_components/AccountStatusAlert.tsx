@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { AlertTriangle, Sparkles, Rocket, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -19,11 +19,18 @@ function formatDateTime(date: Date, lang: 'tr' | 'en') {
   })
 }
 
+/** Oturum-yerel: banner her oturumda yalnız ilk sayfa girişinde görünür (çıkışta temizlenir). */
+export const ACCOUNT_ALERT_SEEN_KEY = 'nmm_account_alert_seen'
+
 export function AccountStatusAlert() {
   const { data: ws } = useWorkspace()
   const { t, lang } = useTranslation()
   const [open, setOpen] = useState(false)
   const [now] = useState(() => Date.now())
+  // İlk render'da oku (flaş yok): bayrak set'liyse bu oturumda bir daha gösterme.
+  const [sessionSeen] = useState(
+    () => typeof window !== 'undefined' && window.sessionStorage.getItem(ACCOUNT_ALERT_SEEN_KEY) === '1',
+  )
 
   useBodyScrollLock(open)
 
@@ -36,15 +43,22 @@ export function AccountStatusAlert() {
     })
   }, [ws])
 
-  if (!lifecycle || lifecycle.phase === 'paid') return null
+  // Banner görünür hale geldiyse bu oturum için "görüldü" işaretle.
+  useEffect(() => {
+    if (lifecycle && lifecycle.phase !== 'paid' && typeof window !== 'undefined') {
+      try { window.sessionStorage.setItem(ACCOUNT_ALERT_SEEN_KEY, '1') } catch { /* gizli sekme */ }
+    }
+  }, [lifecycle])
+
+  if (!lifecycle || lifecycle.phase === 'paid' || sessionSeen) return null
 
   const registered = formatDateTime(lifecycle.registeredAt, lang)
   const trialEnd = formatDateTime(lifecycle.trialEndsAt, lang)
 
   const isTrial = lifecycle.phase === 'trial'
   const daysLeft = Math.max(0, Math.ceil((lifecycle.trialEndsAt.getTime() - now) / 86_400_000))
-  const trialEnded = lifecycle.phase === 'free'
-  const paymentHref = trialEnded ? '/odeme?plan=basic&period=yearly' : '/odeme'
+  // Planları Gör → /odeme (parametresiz = aylık varsayılan; kullanıcı yıllık sekmeden %25 indirimi görür)
+  const paymentHref = '/odeme'
   const bannerTitle = isTrial
     ? daysLeft <= 1
       ? t('shellUi.accountAlertTrialTitleLast')
@@ -140,7 +154,7 @@ export function AccountStatusAlert() {
                 className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
               >
                 <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {trialEnded ? t('shellUi.upgradeTrialEndedCta') : t('shellUi.upgradeBannerCta')}
+                {t('shellUi.seePlansCta')}
               </Link>
             </div>
           </div>

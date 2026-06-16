@@ -64,11 +64,6 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
 
   return (
     <section>
-      <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-[var(--text-3)] flex items-center gap-2">
-        <Send className="h-5 w-5" />
-        {t('team.broadcastTitle')}
-      </h2>
-
       <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
         {/* Üst başlık bantı */}
         <div className="flex items-start gap-3 border-b border-[var(--border)] bg-gradient-to-r from-brand/8 to-whatsapp/8 p-4">

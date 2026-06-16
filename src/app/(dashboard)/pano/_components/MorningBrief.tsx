@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Bell, CalendarCheck2, CalendarClock, Target, UserMinus, ChevronRight, ChevronDown, Flame } from 'lucide-react'
@@ -18,7 +18,6 @@ import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { Z } from '@/lib/ui/zIndex'
 
 type BriefRow = 'followups' | 'team' | 'tempo'
 
@@ -33,7 +32,7 @@ const EVENING_HOUR = 18
  * Veri tamamen önbellekten gelir (candidates + goal + streak Pano'da prefetch'lidir);
  * ekip-sessizliği yalnız ekip erişimi olan kullanıcıda, bloklamadan yüklenir.
  */
-export function MorningBrief() {
+export function MorningBrief({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   const { t } = useTranslation()
   const router = useRouter()
   const { data: ws } = useWorkspace()
@@ -42,9 +41,6 @@ export function MorningBrief() {
   const { progress } = useUserGoal()
   const { hasTeamFullAccess } = useFeatureAccess()
   const { data: streak } = useActivityStreak()
-
-  // Varsayılan kapalı; sayfadan çıkıp dönünce yine kapalı (kalıcı değil).
-  const [open, setOpen] = useState(false)
 
   const isEvening = new Date().getHours() >= EVENING_HOUR
 
@@ -105,10 +101,10 @@ export function MorningBrief() {
   const iconWrap = 'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg'
 
   return (
-    <div className="relative shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
+    <div className="shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
       <button
         type="button"
-        onClick={() => setOpen(o => !o)}
+        onClick={onToggle}
         aria-expanded={open}
         className="flex w-full items-center justify-between gap-2 pb-0.5 pt-0.5"
       >
@@ -132,9 +128,7 @@ export function MorningBrief() {
       </button>
 
       {open && (
-      <div
-        className={`divide-y divide-[var(--border)] md:absolute md:inset-x-0 md:top-full md:mt-2 md:rounded-2xl md:border md:border-[var(--border)] md:bg-[var(--bg-card)] md:px-4 md:shadow-xl ${Z.dropdown}`}
-      >
+      <div className="divide-y divide-[var(--border)]">
         {/* Takipler — sabah: bugün; akşam: yarın */}
         <button
           type="button"

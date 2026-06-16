@@ -11,6 +11,7 @@ import { NotificationsModal } from '@/components/ui/NotificationsModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { clearNmmLocalStorage } from '@/lib/ui/userScopedStorage'
+import { ACCOUNT_ALERT_SEEN_KEY } from '@/app/(dashboard)/pano/_components/AccountStatusAlert'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 
@@ -51,6 +52,8 @@ export function UserMenu() {
       // Paylaşılan tarayıcı hijyeni: önceki kullanıcının cihaz-yerel izini sil
       // (tümü Supabase'de kalıcı; sonraki girişte yeniden yüklenir).
       clearNmmLocalStorage()
+      // Oturum-yerel banner bayrağını temizle → yeni girişte plan barı tekrar görünsün.
+      try { window.sessionStorage.removeItem(ACCOUNT_ALERT_SEEN_KEY) } catch { /* yok */ }
     } catch (err) {
       console.error('[logout]', err)
     }
