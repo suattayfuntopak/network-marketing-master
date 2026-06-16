@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-15 — UX düzeltmeleri: kısa gün adı (mobil) + Brief katlanır + nav sırası ✅
+
+1. **Mobil kısa gün adı:** `formatPanoDateLine(date, lang, weekday='long'|'short')`. PanoContent mobilde `short` (Pzt/Mon), masaüstünde `long` (responsive span) → uzun gün adı Welcome'ı alt satıra itmiyor. Masaüstü değişmedi.
+2. **Sabah Brief'i / Gün Kapanışı:** Başlıklar netleşti — sabah **"Gün Başlangıcı"** (☀️), akşam (18:00+) **"Gün Kapanışı"** (🌙). Kart artık **varsayılan kapalı**; grid üstünde yalnız başlık + streak çipi + chevron. Tıkla → aşağı açılır; sayfadan çıkıp dönünce yine kapalı (kalıcı değil).
+3. **Nav sırası:** İstatistikler sidebar + alt-bar'da **Admin'den hemen önceye** alındı (launcher 5×2 dokunulmadı; `NAV_SIDEBAR_MODULES` decoupled).
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1226/1226 · `vitest` 307/307.
+
 ## 2026-06-15 — Dalga 4 kalanı: İçerik Takvimi + Katılım Kohortu ✅
 
 ### 🟢 İçerik Takvimi (Sosyal Stüdyo içinde — migration 102)

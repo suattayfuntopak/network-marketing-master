@@ -30,7 +30,9 @@ export function PanoContent() {
 
   const greetingIcon = hour < 5 ? '🌙' : hour < 12 ? '🌅' : hour < 14 ? '☀️' : hour < 19 ? '🌤️' : '🌙'
   const firstName = ws?.fullName?.split(' ')[0] ?? ''
-  const todayLine = formatPanoDateLine(new Date(), lang)
+  // Mobilde kısa gün adı (Pzt/Mon) → uzun gün adı (Pazartesi) Welcome'ı alt satıra itmesin.
+  const todayLineShort = formatPanoDateLine(new Date(), lang, 'short')
+  const todayLineLong = formatPanoDateLine(new Date(), lang, 'long')
 
   return (
     <div className="flex min-h-0 w-full flex-1 flex-col gap-1 md:gap-2 md:overflow-hidden">
@@ -55,7 +57,8 @@ export function PanoContent() {
           <div className="flex items-center gap-2 shrink-0">
             <PageHelp />
             <p className="shrink-0 text-right text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">
-              {todayLine}
+              <span className="md:hidden">{todayLineShort}</span>
+              <span className="hidden md:inline">{todayLineLong}</span>
             </p>
           </div>
         </div>

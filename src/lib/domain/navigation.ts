@@ -40,14 +40,22 @@ function panoToNavItem({ href, translationKey, icon, calendarPeriod }: PanoLaunc
   return { href, translationKey, icon, calendarPeriod }
 }
 
-/** Alt nav / sidebar — pano hub + kutularla aynı sıra. */
+/**
+ * Alt nav / sidebar. Pano 5×2 launcher'ına (PANO_ORGANIZATION_ITEMS) dokunulmaz;
+ * yalnız nav sırası ayarlanır. İstatistikler nav'da en sona alınır → ekibe eklenen
+ * Admin (NAV_ADMIN, bileşende append edilir) hariç son sırada görünür.
+ */
+const PANO_NAV_ITEMS = PANO_ORGANIZATION_ITEMS.map(panoToNavItem)
+const STATS_HREF = '/istatistikler'
+
 export const NAV_SIDEBAR_MODULES: readonly NavItem[] = [
   { href: '/pano', translationKey: 'nav.pano', icon: LayoutDashboard },
-  ...PANO_ORGANIZATION_ITEMS.map(panoToNavItem),
-  // Müşterilerim — perakende/sipariş tarafı. Pano 5×2 launcher'ına dokunmadan
-  // yalnız sidebar + (kaydırılabilir) alt nav'da görünür.
+  ...PANO_NAV_ITEMS.filter(i => i.href !== STATS_HREF),
+  // Müşterilerim / Duyurular — launcher'a dokunmadan yalnız sidebar + (kaydırılabilir) alt nav.
   { href: '/musteriler', translationKey: 'nav.musteriler', icon: ShoppingBag },
   { href: '/duyurular', translationKey: 'nav.duyurular', icon: Megaphone },
+  // İstatistikler — Admin'den hemen önce (kullanıcı talebi).
+  ...PANO_NAV_ITEMS.filter(i => i.href === STATS_HREF),
 ]
 
 /** @deprecated NAV_SIDEBAR_MODULES kullanın */

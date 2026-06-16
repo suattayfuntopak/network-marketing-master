@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
-import { Bell, CalendarCheck2, CalendarClock, Target, UserMinus, ChevronRight, Flame } from 'lucide-react'
+import { Bell, CalendarCheck2, CalendarClock, Target, UserMinus, ChevronRight, ChevronDown, Flame } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -41,6 +41,9 @@ export function MorningBrief() {
   const { progress } = useUserGoal()
   const { hasTeamFullAccess } = useFeatureAccess()
   const { data: streak } = useActivityStreak()
+
+  // Varsayılan kapalı; sayfadan çıkıp dönünce yine kapalı (kalıcı değil).
+  const [open, setOpen] = useState(false)
 
   const isEvening = new Date().getHours() >= EVENING_HOUR
 
@@ -100,21 +103,32 @@ export function MorningBrief() {
 
   return (
     <div className="shrink-0 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-2.5 shadow-sm">
-      <div className="flex items-center justify-between gap-2 pb-0.5 pt-0.5">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        aria-expanded={open}
+        className="flex w-full items-center justify-between gap-2 pb-0.5 pt-0.5"
+      >
         <div className="flex items-center gap-1.5">
           <span className="text-base">{isEvening ? '🌙' : '☀️'}</span>
           <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-3)]">
             {isEvening ? t('dashboard.briefEveningTitle') : t('dashboard.briefTitle')}
           </span>
         </div>
-        {streakCount >= 1 && (
-          <span className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
-            <Flame className="h-3.5 w-3.5" />
-            {t('dashboard.briefStreak', { count: streakCount })}
-          </span>
-        )}
-      </div>
+        <div className="flex items-center gap-2">
+          {streakCount >= 1 && (
+            <span className="flex items-center gap-1 rounded-full bg-orange-500/10 px-2 py-0.5 text-[11px] font-bold text-orange-500">
+              <Flame className="h-3.5 w-3.5" />
+              {t('dashboard.briefStreak', { count: streakCount })}
+            </span>
+          )}
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </div>
+      </button>
 
+      {open && (
       <div className="divide-y divide-[var(--border)]">
         {/* Takipler — sabah: bugün; akşam: yarın */}
         <button
@@ -206,6 +220,7 @@ export function MorningBrief() {
           <ChevronRight className="h-4 w-4 shrink-0 text-[var(--text-3)]" />
         </button>
       </div>
+      )}
     </div>
   )
 }

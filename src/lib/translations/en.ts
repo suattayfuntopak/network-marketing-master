@@ -187,7 +187,7 @@ export const en = {
     crownMockFirst30Days: "First 30 Days",
     crownMockSahaRadar: "Field Radar",
     panoActionPlan: "My Goal",
-    briefTitle: "Today's Brief",
+    briefTitle: "Day Start",
     briefFollowupsDue: "{count} follow-ups due today",
     briefFollowupsNone: "No follow-ups due today 🎉",
     briefTeamSilent: "{name} has been quiet for {days} days",
