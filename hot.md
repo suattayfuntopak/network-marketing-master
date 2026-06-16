@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-15 — Genel öneri uygulaması: materyal-ekle linki + paylaşım analitiği ✅
+
+Önceki turun "genel öneriler"i, çift-saymadan ve mevcut altyapıyla:
+- **Materyal keşfedilebilirliği:** BroadcastPanel'de kayıtlı materyal yokken `/pipeline/sunum-materyalleri`'ne **"Materyal ekle →"** linki (tek satır, yüksek değer).
+- **Paylaşım analitiği (non-redundant):** WhatsApp paylaşımı 5 noktada; 3'ü zaten olay üretiyor (invite_sent/achievement_shared/social_content_shared). Eksik **iki** noktaya olay eklendi: `announcement_shared` (Duyurular) + `broadcast_sent` (Broadcast; metadata target=grup|tekli, source=material|manual). Genel `shared_via_whatsapp` **bilerek eklenmedi** → çift sayma/ölü veri yok.
+- **#3 (nav disiplini):** ilke — bu turda da uyuldu, yeni top-level rota yok.
+
+### Doğrulama
+`tsc` temiz · `eslint --max-warnings 0` temiz · `i18n:unused` 1224/1224 · `vitest` 307/307.
+
 ## 2026-06-15 — Masaüstü Brief floating + Ekip iletişim konsolidasyonu (Madde 4) ✅
 
 ### 🖥️ Masaüstü Brief taşma düzeltmesi (mobil dokunulmadı)

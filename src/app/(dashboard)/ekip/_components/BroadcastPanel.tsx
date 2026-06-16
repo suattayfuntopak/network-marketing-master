@@ -1,13 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { Send, FileText, Users, CheckSquare, Square } from 'lucide-react'
+import Link from 'next/link'
+import { Send, FileText, Users, CheckSquare, Square, Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from './EkipPanel'
 import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { usePresentationMaterials } from '@/hooks/usePresentationMaterials'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 
 interface BroadcastPanelProps {
   members: MemberRow[]
@@ -29,9 +32,14 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
     return [header, linkLine, noteLine].filter(Boolean).join('\n\n')
   }
 
+  function broadcastSource(): 'material' | 'manual' {
+    return broadcastLink && materials.some(m => m.url === broadcastLink) ? 'material' : 'manual'
+  }
+
   function handleGroupBroadcast() {
     const text = composeBroadcastMessage()
     if (!text) { toast.error(t('team.broadcastEmpty')); return }
+    void logProductEventAction(PRODUCT_EVENTS.broadcastSent, { target: 'grup', source: broadcastSource() })
     window.open(whatsappShareUrl(text), '_blank')
   }
 
@@ -98,6 +106,17 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Materyal yoksa: kayıtlı materyal eklemeye yönlendir (keşfedilebilirlik) */}
+          {materials.length === 0 && (
+            <Link
+              href="/pipeline/sunum-materyalleri"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand transition hover:underline"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              {t('team.broadcastAddMaterial')}
+            </Link>
           )}
 
           {/* Doküman / link + not */}
@@ -215,7 +234,10 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
                             href={waHref(m.phone, broadcastPreviewText || '') || whatsappShareUrl(broadcastPreviewText || '')}
                             target="_blank"
                             rel="noopener noreferrer"
-                            onClick={e => { if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')) } }}
+                            onClick={e => {
+                              if (!broadcastPreviewText) { e.preventDefault(); toast.error(t('team.broadcastEmpty')); return }
+                              void logProductEventAction(PRODUCT_EVENTS.broadcastSent, { target: 'tekli', source: broadcastSource() })
+                            }}
                             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-whatsapp text-white transition hover:bg-[#1fb85a] active:scale-95"
                             title={`WhatsApp: ${m.full_name ?? ''}`}
                           >

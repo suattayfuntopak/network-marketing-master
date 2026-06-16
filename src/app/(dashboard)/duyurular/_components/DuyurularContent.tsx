@@ -12,6 +12,8 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useTeamAnnouncements } from '@/hooks/useTeamAnnouncements'
 import { queryKeys } from '@/lib/query/keys'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { addTeamAnnouncementAction, deleteTeamAnnouncementAction } from '../actions'
 import type { AnnotatedAnnouncement } from '@/lib/domain/teamAnnouncements'
 
@@ -62,6 +64,7 @@ export function DuyurularContent() {
   }
 
   function shareOnWhatsapp(a: AnnotatedAnnouncement) {
+    void logProductEventAction(PRODUCT_EVENTS.announcementShared, { mine: a.isMine })
     window.open(whatsappShareUrl(`*${a.title}*\n\n${a.body}`), '_blank')
   }
 

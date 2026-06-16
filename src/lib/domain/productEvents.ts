@@ -28,6 +28,12 @@ export const PRODUCT_EVENTS = {
   socialContentGenerated: 'social_content_generated',
   /** Üretilen sosyal içerik paylaşıldı/kopyalandı → içerik virali. */
   socialContentShared: 'social_content_shared',
+
+  // ── Ekip iletişim paylaşımı (mevcut domain olaylarıyla çift saymaz) ──
+  /** Ekip duyurusu WhatsApp'ta paylaşıldı. */
+  announcementShared: 'announcement_shared',
+  /** Ekibe doküman/materyal gönderildi (target: grup|tekli, source: material|manual). */
+  broadcastSent: 'broadcast_sent',
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]

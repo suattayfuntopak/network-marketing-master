@@ -318,6 +318,7 @@ export const tr = {
     broadcastTitle: "Ekibe Gönder",
     broadcastSubtitle: "Doküman, link veya kayıtlı materyalini tüm ekibine ya da seçtiğin üyelere WhatsApp ile gönder.",
     broadcastSavedMaterials: "Kayıtlı Materyaller",
+    broadcastAddMaterial: "Materyal ekle →",
     broadcastLinkLabel: "Link veya Doküman URL'i",
     broadcastLinkPlaceholder: "https://drive.google.com/... veya herhangi bir link",
     broadcastNoteLabel: "Ek Not (isteğe bağlı)",

@@ -318,6 +318,7 @@ export const en = {
     broadcastTitle: "Send to Team",
     broadcastSubtitle: "Send a document, link, or saved material to your whole team or selected members via WhatsApp.",
     broadcastSavedMaterials: "Saved Materials",
+    broadcastAddMaterial: "Add material →",
     broadcastLinkLabel: "Link or Document URL",
     broadcastLinkPlaceholder: "https://drive.google.com/... or any link",
     broadcastNoteLabel: "Additional Note (optional)",
