@@ -3,6 +3,10 @@
 -- Idempotent: policy zaten yoksa DROP no-op; yeniden CREATE güvenli değil — önce DROP.
 
 DROP POLICY IF EXISTS "nmm_candidate_owner_all" ON nmm_candidates;
+DROP POLICY IF EXISTS "nmm_candidate_owner_select" ON nmm_candidates;
+DROP POLICY IF EXISTS "nmm_candidate_owner_insert" ON nmm_candidates;
+DROP POLICY IF EXISTS "nmm_candidate_owner_update" ON nmm_candidates;
+DROP POLICY IF EXISTS "nmm_candidate_owner_delete" ON nmm_candidates;
 
 CREATE POLICY "nmm_candidate_owner_select" ON nmm_candidates
   FOR SELECT
