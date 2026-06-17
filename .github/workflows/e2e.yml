@@ -121,6 +121,7 @@ jobs:
           name: playwright-report-chromium
           path: playwright-report/
           retention-days: 7
+          if-no-files-found: ignore
 
   playwright-mobile:
     name: E2E (mobile-chrome)
@@ -182,3 +183,4 @@ jobs:
           name: playwright-report-mobile
           path: playwright-report/
           retention-days: 7
+          if-no-files-found: ignore

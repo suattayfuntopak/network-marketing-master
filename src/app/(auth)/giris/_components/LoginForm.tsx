@@ -17,7 +17,6 @@ import {
 
 interface FormState {
   error?: string
-  shouldRedirect?: boolean
 }
 
 export function LoginForm() {
@@ -28,12 +27,6 @@ export function LoginForm() {
   useEffect(() => {
     router.prefetch('/pano')
   }, [router])
-
-  useEffect(() => {
-    if (state.shouldRedirect) {
-      window.location.assign('/pano')
-    }
-  }, [state.shouldRedirect])
 
   return (
     <form action={action} className="space-y-5">

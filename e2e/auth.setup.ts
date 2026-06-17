@@ -24,8 +24,10 @@ setup('authenticate test user', async ({ page }) => {
     await page.goto('/giris')
     await page.locator('#email').fill(email)
     await page.locator('#password').fill(password)
-    await page.getByRole('button', { name: /giriş|sign in|log in/i }).click()
-    await page.waitForURL(/\/pano/, { timeout: 30_000 })
+    await Promise.all([
+      page.waitForURL(/\/pano/, { timeout: 45_000 }),
+      page.getByRole('button', { name: /giriş|sign in|log in/i }).click(),
+    ])
     fs.mkdirSync(path.dirname(authFile), { recursive: true })
     await page.context().storageState({ path: authFile })
   } catch (err) {

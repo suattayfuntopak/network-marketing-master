@@ -1,6 +1,7 @@
 'use server'
 
 import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ensureWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { NMM_LANG_COOKIE, isUiLang, type UiLang } from '@/lib/utils/langCookie'
@@ -9,7 +10,6 @@ import { en } from '@/lib/translations/en'
 
 interface FormState {
   error?: string
-  shouldRedirect?: boolean
 }
 
 async function loginLang(): Promise<UiLang> {
@@ -54,5 +54,5 @@ export async function loginAction(_prev: FormState, formData: FormData): Promise
     console.error('[loginAction] ensureWorkspace after login:', workspaceError)
   }
 
-  return { shouldRedirect: true }
+  redirect('/pano')
 }
