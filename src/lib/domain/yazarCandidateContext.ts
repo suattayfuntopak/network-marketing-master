@@ -2,9 +2,18 @@ import { getStageLabel } from '@/lib/domain/stages'
 import { displayDailyActionNote, isLeaderUserNote } from '@/lib/domain/dailyActionNote'
 import { renderActivityText } from '@/app/(dashboard)/pipeline/[id]/_components/candidateDetailUtils'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import type { NmmCandidate, NmmDailyAction } from '@/types/database.types'
+import type { NmmCandidate } from '@/types/database.types'
 
 type TFunc = (k: string, v?: Record<string, string | number>) => string
+
+/** getCandidateRecentActionsAction ile uyumlu minimal aktivite satırı. */
+export type YazarContextAction = {
+  action_type: string
+  note: string | null
+  note_tr?: string | null
+  note_en?: string | null
+  created_at: string
+}
 
 const WARMTH_KEYS: Record<string, { tr: string; en: string }> = {
   sicak: { tr: 'Sıcak (Hot) 🔥', en: 'Hot 🔥' },
@@ -19,7 +28,7 @@ function warmthLabel(warmth: string, lang: 'tr' | 'en'): string {
 /** Yazar formu bağlam metni — renderActivityText ile aktivite satırları. */
 export function formatCandidateContextForYazar(
   c: NmmCandidate,
-  rawActions: NmmDailyAction[],
+  rawActions: YazarContextAction[],
   lang: 'tr' | 'en',
   t: TFunc,
 ): string {

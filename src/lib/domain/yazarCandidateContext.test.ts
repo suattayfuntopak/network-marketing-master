@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { formatCandidateContextForYazar } from '@/lib/domain/yazarCandidateContext'
-import type { NmmCandidate, NmmDailyAction } from '@/types/database.types'
+import type { YazarContextAction } from '@/lib/domain/yazarCandidateContext'
 
 const t = (k: string) => k
 
@@ -44,7 +44,7 @@ describe('formatCandidateContextForYazar', () => {
         note: null,
         created_at: '2026-06-01T10:00:00Z',
       },
-    ] as NmmDailyAction[]
+    ] as YazarContextAction[]
     const text = formatCandidateContextForYazar(baseCandidate, actions, 'tr', t)
     expect(text).toContain('pipeline.activityCall')
     expect(text).toContain('Son Aktiviteler')
