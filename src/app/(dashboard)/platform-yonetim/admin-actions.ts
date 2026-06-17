@@ -8,6 +8,7 @@ import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
 import { sendWelcomeEmail } from '@/lib/infra/mail'
+import { todayCalendarKey } from '@/lib/utils/calendarDates'
 
 /**
  * Securely upgrades or extends a workspace's license.
@@ -252,7 +253,7 @@ export async function claimIndependentSignupToTeamAction(
         await admin.from('nmm_email_sent_log').insert({
           workspace_id: targetWorkspaceId,
           kind: 'welcome',
-          sent_date: new Date().toISOString().slice(0, 10),
+          sent_date: todayCalendarKey(),
         })
       } catch (emailErr) {
         console.error('[claimIndependentSignupToTeamAction] Welcome email failed:', emailErr)

@@ -2,6 +2,7 @@
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
+import { requireAuthUserId } from '@/lib/supabase/requireAuth'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -26,6 +27,8 @@ export async function translateObjectionFieldsAction(
   fields: ObjectionFields,
   sourceLang: 'tr' | 'en',
 ): Promise<ObjectionFields> {
+  await requireAuthUserId()
+
   const targetLang = sourceLang === 'en' ? 'tr' : 'en'
   const targetName = targetLang === 'en' ? 'English' : 'Turkish'
 

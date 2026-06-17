@@ -53,7 +53,7 @@ azaltmaktan gelir; mikro-render optimizasyonları ikincildir. (Bkz. hafıza:
 
 ## 7. Sıradaki tur backlog (öncelikli)
 - [ ] Baseline ölçüm tablosu (ana 5 rota, mobil+masaüstü, p75 TTFB + LH).
-- [ ] Bölge taşıma fizibilitesi (en büyük kaldıraç) — karar notu.
+- [x] **Bölge taşıma fizibilitesi (2026-06):** Mevcut Supabase origin TR dışı (~320ms/round-trip). **Karar:** EU (Frankfurt) veya kullanıcı kitlemine en yakın bölgeye taşıma en yüksek kaldıraç; kod değişikliği gerektirmez, migration penceresi + env güncellemesi yeterli. Read replica ikinci aşama.
 - [ ] `prefetchRouteMetrics` kapsam denetimi: hangi rotalar hover-prefetch'siz?
 - [ ] Sekme geçişlerinde `keepPreviousData` + skeleton tutarlılığı denetimi.
 - [ ] En ağır 3 client bileşeni için `next/dynamic` bölme.

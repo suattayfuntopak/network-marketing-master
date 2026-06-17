@@ -252,7 +252,7 @@ export async function getCrownEntriesPageAction(workspaceId: string): Promise<Cr
       userId: m.user_id,
       fullName: m.full_name ?? '—',
       entryDays: b?.days.size ?? 0,
-      lastEntry: b?.last ? b.last.slice(0, 10) : m.last_activity_at?.slice(0, 10) ?? null,
+      lastEntry: b?.last ? istanbulDayKey(b.last) : m.last_activity_at ? istanbulDayKey(m.last_activity_at) : null,
       calls: b?.calls ?? 0,
       newCandidates: b?.newCand ?? 0,
       presentations: b?.sunum ?? 0,

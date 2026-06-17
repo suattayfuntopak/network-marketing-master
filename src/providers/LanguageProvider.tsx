@@ -17,6 +17,12 @@ import { pulseSection } from '@/lib/translations/sections/pulse'
 import { videoTrainingSection } from '@/lib/translations/sections/videoTraining'
 import { crownSection } from '@/lib/translations/sections/crown'
 import { persistUserLangAction } from '@/app/actions/userLang'
+import {
+  NMM_LANG_STORAGE_KEY,
+  isUiLang,
+  readLangCookie,
+  writeLangCookie,
+} from '@/lib/utils/langCookie'
 
 type LangType = 'tr' | 'en'
 
@@ -99,21 +105,23 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   /* eslint-disable react-hooks/set-state-in-effect */
   React.useEffect(() => {
-    const saved = localStorage.getItem('nmm_lang') as LangType | null
-    if (saved === 'tr' || saved === 'en') {
-      setLangState(saved)
-    } else {
-      const detected = navigator.language.slice(0, 2) === 'en' ? 'en' : 'tr'
-      if (detected !== 'tr') {
-        setLangState(detected)
-      }
-    }
+    const saved = localStorage.getItem(NMM_LANG_STORAGE_KEY)
+    const cookieLang = readLangCookie(document.cookie)
+    const detected = navigator.language.slice(0, 2) === 'en' ? 'en' : 'tr'
+    const resolved = isUiLang(saved) ? saved : (cookieLang ?? detected)
+
+    setLangState(prev => (prev === resolved ? prev : resolved))
+
+    localStorage.setItem(NMM_LANG_STORAGE_KEY, resolved)
+    writeLangCookie(resolved)
+    document.documentElement.lang = resolved
   }, [])
   /* eslint-enable react-hooks/set-state-in-effect */
 
   function setLang(newLang: LangType) {
     setLangState(newLang)
-    localStorage.setItem('nmm_lang', newLang)
+    localStorage.setItem(NMM_LANG_STORAGE_KEY, newLang)
+    writeLangCookie(newLang)
     document.documentElement.lang = newLang
     // Sunucu tarafına kalıcılaştır (cron/e-posta dili için). Oturum yoksa no-op.
     persistUserLangAction(newLang).catch(() => {})

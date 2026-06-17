@@ -2,18 +2,28 @@
 
 import { keepPreviousData, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
-import { fetchCandidatesAction, fetchCandidateDetailAction } from '@/app/(dashboard)/actions/candidates'
-import { getLang } from '@/lib/utils/getLang'
+import {
+  addCandidateAction,
+  addCandidateNoteAction,
+  deleteCandidateAction,
+  deleteCandidateActivityAction,
+  fetchAllCandidatesAction,
+  fetchCandidateActivityHistoryAction,
+  fetchCandidateDetailAction,
+  fetchCandidateNotesAction,
+  fetchLeaderNotesCountAction,
+  markCandidateContactedAction,
+  updateCandidateAction,
+} from '@/app/(dashboard)/actions/candidates'
 import { queryKeys } from '@/lib/query/keys'
+import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { ACTIVE_STAGES, HOT_STAGES } from '@/lib/domain/stages'
-import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, NmmDailyActionInsert, ActionType } from '@/types/database.types'
+import type { NmmCandidate, NmmCandidateInsert, NmmCandidateUpdate, NmmDailyAction, ActionType } from '@/types/database.types'
 
-import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
 import { logPresentationWhatsAppAction } from '@/app/(dashboard)/pulse/learningEvents'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { queryInvalidator } from '@/lib/query/invalidator'
+import { useTranslation } from '@/providers/LanguageProvider'
 
 function invalidateCandidateQueries(qc: ReturnType<typeof useQueryClient>, workspaceId: string, candidateId?: string) {
   queryInvalidator.invalidateCandidates(qc, workspaceId, candidateId)
@@ -24,9 +34,9 @@ export type CandidateFilter = 'tumü' | 'aktif' | 'sicak' | 'takip_zamani' | 'ka
 export function useCandidates(workspaceId: string | undefined, filter: CandidateFilter = 'tumü') {
   const query = useQuery({
     queryKey: workspaceId ? queryKeys.candidates(workspaceId) : ['candidates', 'none'],
-    queryFn: () => fetchCandidatesAction(workspaceId!),
+    queryFn: () => fetchAllCandidatesAction(workspaceId!),
     enabled: !!workspaceId,
-    staleTime: 2 * 60 * 1000,
+    staleTime: QUERY_STALE.data,
     placeholderData: keepPreviousData,
   })
 
@@ -54,7 +64,7 @@ export function useCandidateDetail(workspaceId: string | undefined, candidateId:
         : ['candidate', 'none'],
     queryFn: () => fetchCandidateDetailAction(workspaceId!, candidateId),
     enabled: !!workspaceId && !!candidateId,
-    staleTime: 60_000,
+    staleTime: QUERY_STALE.progress,
     placeholderData: keepPreviousData,
     initialData: () => {
       if (!workspaceId) return undefined
@@ -66,126 +76,25 @@ export function useCandidateDetail(workspaceId: string | undefined, candidateId:
 
 export function useAddCandidate(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
-    mutationFn: async (payload: Omit<NmmCandidateInsert, 'workspace_id' | 'owner_id'>) => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
-
-      const { data, error } = await supabase
-        .from('nmm_candidates')
-        .insert({
-          ...payload,
-          workspace_id: workspaceId,
-          owner_id: user.id,
-        })
-        .select('id')
-        .single()
-      if (error) throw new Error(error.message)
-
-      if (data) {
-        await supabase.from('nmm_daily_actions').insert({
-          workspace_id: workspaceId,
-          user_id: user.id,
-          candidate_id: data.id,
-          action_type: 'note' as const,
-          note: 'system_note:candidate_created',
-        })
-      }
-    },
+    mutationFn: async (payload: Omit<NmmCandidateInsert, 'workspace_id' | 'owner_id'>) =>
+      addCandidateAction(workspaceId, payload),
     onSuccess: () => {
       invalidateCandidateQueries(qc, workspaceId)
-      toast.success(getLang() === 'en' ? 'Candidate added' : 'Aday eklendi')
+      toast.success(t('pipelinePage.toastCandidateAdded'))
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to add: ${e.message}` : `Eklenemedi: ${e.message}`),
+    onError: (e: Error) =>
+      toast.error(t('pipelinePage.toastAddFailed', { message: e.message })),
   })
 }
 
 export function useUpdateCandidate(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
-    mutationFn: async ({ id, ...patch }: NmmCandidateUpdate & { id: string }) => {
-      const supabase = createClient()
-
-      // Aktivite "öncesi" değerini stale cache'den DEĞİL, güncellemeden hemen önce
-      // DB'den taze oku. Aksi halde iki sekme aynı adayı güncellerken yanlış
-      // stage_change ("iletisim→davetli" yerine gerçek "sunum→davetli") loglanır.
-      const { data: currentCandidate } = await supabase
-        .from('nmm_candidates')
-        .select('*')
-        .eq('id', id)
-        .single()
-
-      const { error } = await supabase
-        .from('nmm_candidates')
-        .update(patch)
-        .eq('id', id)
-        .select('id')
-        .single()
-      if (error) throw new Error(error.message)
-
-      if (currentCandidate) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (user) {
-          const inserts: NmmDailyActionInsert[] = []
-
-          // Stage change
-          if (patch.stage && patch.stage !== currentCandidate.stage) {
-            inserts.push({
-              workspace_id: workspaceId,
-              user_id: user.id,
-              candidate_id: id,
-              action_type: 'stage_change' as const,
-              note: patch.stage,
-            })
-          }
-
-          // Warmth change (typed column or legacy note fallback)
-          if (patch.warmth !== undefined && patch.warmth !== currentCandidate.warmth) {
-            const currentWarmth = resolveCandidateFields(currentCandidate).warmth
-            const newWarmth = patch.warmth
-            if (currentWarmth !== newWarmth) {
-              inserts.push({
-                workspace_id: workspaceId,
-                user_id: user.id,
-                candidate_id: id,
-                action_type: 'note' as const,
-                note: `system_note:warmth_change:${currentWarmth}->${newWarmth}`,
-              })
-            }
-          }
-
-          // Follow-up date change
-          if (patch.next_follow_up_at !== undefined && patch.next_follow_up_at !== currentCandidate.next_follow_up_at) {
-            const oldDate = currentCandidate.next_follow_up_at || 'none'
-            const newDate = patch.next_follow_up_at || 'none'
-            inserts.push({
-              workspace_id: workspaceId,
-              user_id: user.id,
-              candidate_id: id,
-              action_type: 'note' as const,
-              note: `system_note:follow_up_change:${oldDate}->${newDate}`,
-            })
-          }
-
-          // Profile change
-          if ((patch.full_name && patch.full_name !== currentCandidate.full_name) ||
-              (patch.phone !== undefined && patch.phone !== currentCandidate.phone)) {
-            inserts.push({
-              workspace_id: workspaceId,
-              user_id: user.id,
-              candidate_id: id,
-              action_type: 'note' as const,
-              note: 'system_note:profile_update',
-            })
-          }
-
-          if (inserts.length > 0) {
-            await supabase.from('nmm_daily_actions').insert(inserts)
-          }
-        }
-      }
-    },
+    mutationFn: async ({ id, ...patch }: NmmCandidateUpdate & { id: string }) =>
+      updateCandidateAction(workspaceId, id, patch),
     // Optimistic: yeni değer (ör. takip tarihi) anında görünsün, refetch'i bekleme.
     onMutate: async ({ id, ...patch }) => {
       const detailKey = queryKeys.candidateDetail(workspaceId, id)
@@ -207,52 +116,36 @@ export function useUpdateCandidate(workspaceId: string) {
     onSuccess: (_, vars) => {
       invalidateCandidateQueries(qc, workspaceId, vars.id)
       invalidateTeamAndAIUsage(qc, workspaceId)
-      toast.success(getLang() === 'en' ? 'Updated' : 'Güncellendi')
+      toast.success(t('pipelinePage.toastCandidateUpdated'))
     },
     onError: (e: Error, _vars, ctx) => {
       if (ctx?.prevDetail !== undefined) qc.setQueryData(ctx.detailKey, ctx.prevDetail)
       if (ctx?.prevList !== undefined) qc.setQueryData(ctx.listKey, ctx.prevList)
-      toast.error(getLang() === 'en' ? `Failed to update: ${e.message}` : `Güncellenemedi: ${e.message}`)
+      toast.error(t('pipelinePage.toastUpdateFailed', { message: e.message }))
     },
   })
 }
 
 export function useDeleteCandidate(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
-    mutationFn: async (id: string) => {
-      const supabase = createClient()
-      const { error } = await supabase.from('nmm_candidates').delete().eq('id', id)
-      if (error) throw new Error(error.message)
-    },
+    mutationFn: async (id: string) => deleteCandidateAction(workspaceId, id),
     onSuccess: () => {
       invalidateCandidateQueries(qc, workspaceId)
-      toast.success(getLang() === 'en' ? 'Candidate deleted' : 'Aday silindi')
+      toast.success(t('pipelinePage.toastCandidateDeleted'))
     },
-    onError: (e: Error) => toast.error(getLang() === 'en' ? `Failed to delete: ${e.message}` : `Silinemedi: ${e.message}`),
+    onError: (e: Error) =>
+      toast.error(t('pipelinePage.toastDeleteFailed', { message: e.message })),
   })
 }
 
 export function useMarkContacted(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
-    mutationFn: async ({ id, actionType }: { id: string; actionType: ActionType }) => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
-      await Promise.all([
-        supabase
-          .from('nmm_candidates')
-          .update({ last_contact_at: new Date().toISOString() })
-          .eq('id', id),
-        supabase.from('nmm_daily_actions').insert({
-          workspace_id: workspaceId,
-          user_id: user.id,
-          candidate_id: id,
-          action_type: actionType,
-        }),
-      ])
-    },
+    mutationFn: async ({ id, actionType }: { id: string; actionType: ActionType }) =>
+      markCandidateContactedAction(workspaceId, id, actionType),
     onMutate: async ({ id, actionType }) => {
       const detailKey = queryKeys.candidateDetail(workspaceId, id)
       const listKey = queryKeys.candidates(workspaceId)
@@ -299,28 +192,24 @@ export function useMarkContacted(workspaceId: string) {
     },
     onSuccess: (_data, vars) => {
       invalidateCandidateQueries(qc, workspaceId, vars.id)
-      const lang = getLang()
       toast.success(
         vars.actionType === 'call'
-          ? lang === 'en'
-            ? 'Call logged'
-            : 'Arama kaydedildi'
-          : lang === 'en'
-            ? 'WhatsApp logged'
-            : 'WhatsApp kaydedildi',
+          ? t('pipelinePage.toastCallLogged')
+          : t('pipelinePage.toastWhatsAppLogged'),
       )
     },
     onError: (e: Error, vars, ctx) => {
       if (ctx?.prevDetail !== undefined) qc.setQueryData(ctx.detailKey, ctx.prevDetail)
       if (ctx?.prevList !== undefined) qc.setQueryData(ctx.listKey, ctx.prevList)
       if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
-      toast.error(getLang() === 'en' ? `Contact recording error: ${e.message}` : `Kayıt hatası: ${e.message}`)
+      toast.error(t('pipelinePage.toastContactFailed', { message: e.message }))
     },
   })
 }
 
 export function useLogPresentationWhatsApp(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
     mutationFn: async ({
       candidateId,
@@ -336,28 +225,14 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
       invalidateTeamAndAIUsage(qc, workspaceId)
     },
     onError: (e: Error) =>
-      toast.error(
-        getLang() === 'en'
-          ? `Could not log activity: ${e.message}`
-          : `Aktivite kaydedilemedi: ${e.message}`
-      ),
+      toast.error(t('pipelinePage.toastActivityLogFailed', { message: e.message })),
   })
 }
 
 export function useActivityHistory(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
     queryKey: ['activity', candidateId],
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('nmm_daily_actions')
-        .select('*')
-        .eq('candidate_id', candidateId)
-        .order('created_at', { ascending: false })
-        .limit(50)
-      if (error) throw new Error(error.message)
-      return data ?? []
-    },
+    queryFn: () => fetchCandidateActivityHistoryAction(candidateId),
     enabled: !!candidateId && queryEnabled,
   })
 }
@@ -365,17 +240,7 @@ export function useActivityHistory(candidateId: string, queryEnabled = true) {
 export function useCandidateNotes(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
     queryKey: ['candidate-notes', candidateId],
-    queryFn: async () => {
-      const supabase = createClient()
-      const { data, error } = await supabase
-        .from('nmm_daily_actions')
-        .select('*')
-        .eq('candidate_id', candidateId)
-        .eq('action_type', 'note')
-        .order('created_at', { ascending: false })
-      if (error) throw new Error(error.message)
-      return data ?? []
-    },
+    queryFn: () => fetchCandidateNotesAction(candidateId),
     enabled: !!candidateId && queryEnabled,
   })
 }
@@ -384,25 +249,15 @@ export function useCandidateNotes(candidateId: string, queryEnabled = true) {
 export function useLeaderNotesCount(candidateId: string, queryEnabled = true) {
   return useQuery<number>({
     queryKey: ['candidate-notes-count', candidateId],
-    queryFn: async () => {
-      const supabase = createClient()
-      const { count, error } = await supabase
-        .from('nmm_daily_actions')
-        .select('*', { count: 'exact', head: true })
-        .eq('candidate_id', candidateId)
-        .eq('action_type', 'note')
-        .not('note', 'like', 'system_note:%')
-        .or('note_tr.not.is.null,note_en.not.is.null')
-      if (error) throw new Error(error.message)
-      return count ?? 0
-    },
+    queryFn: () => fetchLeaderNotesCountAction(candidateId),
     enabled: !!candidateId && queryEnabled,
-    staleTime: 60_000,
+    staleTime: QUERY_STALE.progress,
   })
 }
 
 export function useAddCandidateNote(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
     mutationFn: async ({
       candidateId,
@@ -412,20 +267,7 @@ export function useAddCandidateNote(workspaceId: string) {
       candidateId: string
       noteTr: string
       noteEn?: string
-    }) => {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Oturum yok')
-
-      const { error } = await supabase.from('nmm_daily_actions').insert({
-        workspace_id: workspaceId,
-        user_id: user.id,
-        candidate_id: candidateId,
-        action_type: 'note' as const,
-        ...buildDailyActionNoteFields({ noteTr, noteEn }),
-      })
-      if (error) throw new Error(error.message)
-    },
+    }) => addCandidateNoteAction(workspaceId, { candidateId, noteTr, noteEn }),
     onMutate: async ({ candidateId, noteTr, noteEn }) => {
       const notesKey = ['candidate-notes', candidateId]
       const activityKey = ['activity', candidateId]
@@ -461,27 +303,22 @@ export function useAddCandidateNote(workspaceId: string) {
     },
     onSuccess: (_, { candidateId }) => {
       invalidateCandidateQueries(qc, workspaceId, candidateId)
-      toast.success(getLang() === 'en' ? 'Note saved' : 'Not kaydedildi')
+      toast.success(t('pipelinePage.toastNoteSaved'))
     },
     onError: (e: Error, _vars, ctx) => {
       if (ctx?.prevNotes !== undefined) qc.setQueryData(ctx.notesKey, ctx.prevNotes)
       if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
-      toast.error(getLang() === 'en' ? `Failed to save note: ${e.message}` : `Not kaydedilemedi: ${e.message}`)
+      toast.error(t('pipelinePage.toastNoteFailed', { message: e.message }))
     },
   })
 }
 
 export function useDeleteActivity(workspaceId: string) {
   const qc = useQueryClient()
+  const { t } = useTranslation()
   return useMutation({
-    mutationFn: async ({ activityId }: { activityId: string; candidateId: string }) => {
-      const supabase = createClient()
-      const { error } = await supabase
-        .from('nmm_daily_actions')
-        .delete()
-        .eq('id', activityId)
-      if (error) throw new Error(error.message)
-    },
+    mutationFn: async ({ activityId, candidateId }: { activityId: string; candidateId: string }) =>
+      deleteCandidateActivityAction(workspaceId, { activityId, candidateId }),
     onMutate: async ({ activityId, candidateId }) => {
       const notesKey = ['candidate-notes', candidateId]
       const activityKey = ['activity', candidateId]
@@ -508,7 +345,7 @@ export function useDeleteActivity(workspaceId: string) {
     onError: (e: Error, _vars, ctx) => {
       if (ctx?.prevNotes !== undefined) qc.setQueryData(ctx.notesKey, ctx.prevNotes)
       if (ctx?.prevActivity !== undefined) qc.setQueryData(ctx.activityKey, ctx.prevActivity)
-      toast.error(getLang() === 'en' ? `Failed to delete activity: ${e.message}` : `Aktivite silinemedi: ${e.message}`)
+      toast.error(t('pipelinePage.toastActivityFailed', { message: e.message }))
     },
   })
 }

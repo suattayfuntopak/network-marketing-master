@@ -1,19 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { cronAuthError } from '@/lib/infra/cronAuth'
+import { yesterdayCalendarKey } from '@/lib/utils/calendarDates'
 
-/** UTC dün — hub prefetch günlük rollup. */
-function yesterdayUtcDateKey(): string {
-  const d = new Date()
-  d.setUTCDate(d.getUTCDate() - 1)
-  return d.toISOString().slice(0, 10)
+/** İstanbul takviminde dün — hub prefetch günlük rollup. */
+function yesterdayHubDayKey(): string {
+  return yesterdayCalendarKey()
 }
 
 export async function GET(request: NextRequest) {
   const authError = cronAuthError(request)
   if (authError) return authError
 
-  const day = yesterdayUtcDateKey()
+  const day = yesterdayHubDayKey()
   const supabase = createAdminClient()
   const { data, error } = await supabase.rpc('nmm_rollup_hub_prefetch_daily', { p_day: day })
 

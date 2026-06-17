@@ -9,9 +9,11 @@ import { useSearchParams } from 'next/navigation'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { loadCustomContent, addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
+import { useCustomContent } from '@/hooks/useCustomContent'
+import { addCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
 import { PAGE_SIZE } from '../constants'
 import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
@@ -98,18 +100,18 @@ export function EgitimContent({
     setEditingTraining(null)
   }
 
+  const { data: customRaw } = useCustomContent(
+    'nmm_custom_trainings',
+    'nmm_custom_training_v1',
+    ws?.workspaceId,
+  )
+
   useEffect(() => {
-    let cancelled = false
-    loadCustomContent('nmm_custom_trainings', 'nmm_custom_training_v1', ws?.workspaceId ?? null)
-      .then(items => {
-        if (!cancelled) {
-          const approved = items.filter(it => (it as Record<string, unknown>).isApproved)
-          setCustomTrainings(approved as unknown as TrainingTopic[])
-        }
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
-  }, [ws?.workspaceId])
+    if (!customRaw) return
+    const approved = customRaw.filter(it => (it as Record<string, unknown>).isApproved)
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- TanStack query → yerel optimistic state senkronu */
+    setCustomTrainings(approved as unknown as TrainingTopic[])
+  }, [customRaw])
 
   const KATEGORILER_DATA = getTrainingData(lang)
 
@@ -358,7 +360,7 @@ export function EgitimContent({
         )}
       </div>
 
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
+      <HorizontalScrollLock className="mb-5 flex gap-2 pb-1 scrollbar-hide">
         {KATEGORILER.map((k, idx) => (
           <button
             key={k}
@@ -378,7 +380,7 @@ export function EgitimContent({
             )}
           </button>
         ))}
-      </div>
+      </HorizontalScrollLock>
 
       {/* Seviye filtresi — kategoriden ayrı, ikincil bir satır ("Seviye" etiketi gizli) */}
       <div className="mb-5 flex flex-wrap items-center gap-2">

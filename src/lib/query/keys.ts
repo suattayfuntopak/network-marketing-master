@@ -76,4 +76,6 @@ export const queryKeys = {
   userSettings: (userId: string) => ['user-settings', userId] as const,
   platformWorkspaces: () => ['platform-workspaces'] as const,
   platformModeration: () => ['platform-moderation'] as const,
+  customContent: (table: string, workspaceId: string) =>
+    ['custom-content', table, workspaceId] as const,
 }

@@ -132,6 +132,10 @@ export const tr = {
     inviteSponsorWelcome: "{sponsor} seni {team} ekibine davet etti 👋",
     inviteTeamWelcome: "{team} ekibine davet edildin 👋",
     inviteSponsorSubtitle: "Hesabını oluştur, doğru başlangıcı birlikte yapalım.",
+    loginErrorRequired: "E-posta ve şifre zorunlu.",
+    loginErrorInvalid: "E-posta veya şifre hatalı.",
+    loginErrorUnconfirmed: "Devam etmek için e-posta adresini doğrula.",
+    loginErrorGeneric: "Giriş yapılamadı. Lütfen tekrar dene.",
   },
   hedef: {
     title: "Hedefini Belirle",

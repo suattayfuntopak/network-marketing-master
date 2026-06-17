@@ -19,6 +19,7 @@ import {
 import { getGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { GEMINI_FLASH, GEMINI_PRO } from '@/lib/ai/models'
+import { fromCalendarKey, toCalendarKey, todayCalendarKey } from '@/lib/utils/calendarDates'
 
 const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
@@ -273,18 +274,21 @@ function archiveDateRange(period: AIUsageArchivePeriod): {
   fromDate: string | null
   toDate: string
 } {
-  const now = new Date()
-  const toDate = now.toISOString().slice(0, 10)
-  const dayMs = 24 * 60 * 60 * 1000
+  const toDate = todayCalendarKey()
+  const today = fromCalendarKey(toDate)
   let fromDate: string | null = null
   if (period === 'today') {
     fromDate = toDate
   } else if (period === '7d') {
-    fromDate = new Date(now.getTime() - 6 * dayMs).toISOString().slice(0, 10)
+    const start = new Date(today)
+    start.setDate(start.getDate() - 6)
+    fromDate = toCalendarKey(start)
   } else if (period === '30d') {
-    fromDate = new Date(now.getTime() - 29 * dayMs).toISOString().slice(0, 10)
+    const start = new Date(today)
+    start.setDate(start.getDate() - 29)
+    fromDate = toCalendarKey(start)
   } else if (period === 'ytd') {
-    fromDate = new Date(Date.UTC(now.getUTCFullYear(), 0, 1)).toISOString().slice(0, 10)
+    fromDate = `${today.getFullYear()}-01-01`
   }
   return { fromDate, toDate }
 }

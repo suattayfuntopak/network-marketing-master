@@ -8,6 +8,7 @@ import {
   prefetchEkipTrainingMetrics,
 } from '@/lib/query/prefetchRouteMetrics'
 import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { clsx } from 'clsx'
 import {
   Users, BarChart3, GraduationCap, GitBranch,
@@ -88,12 +89,10 @@ export function EkipTabNav({ activeTab }: Props) {
   }
 
   return (
-    <nav
-      className="no-swipe mb-6 flex w-full overflow-x-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 shadow-sm scrollbar-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+    <HorizontalScrollLock
+      className="mb-6 flex w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-1.5 shadow-sm scrollbar-none"
       role="tablist"
       aria-label={t('team.title')}
-      data-no-swipe="true"
-      onTouchStart={e => e.stopPropagation()}
     >
       {TABS.map(({ id, labelKey, icon: Icon, activeClass }) => {
         const isActive = activeTab === id
@@ -130,6 +129,6 @@ export function EkipTabNav({ activeTab }: Props) {
           </button>
         )
       })}
-    </nav>
+    </HorizontalScrollLock>
   )
 }

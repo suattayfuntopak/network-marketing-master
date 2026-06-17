@@ -22,16 +22,14 @@ const noSupabaseClientInTsx = {
 
 /**
  * KALICI istisnalar — tarayıcıya özgü Supabase auth API'leri kullanan dosyalar.
- * `signInWithPassword` (cookie/oturum istemcide yazılır), `onAuthStateChange`
- * (yalnızca tarayıcıda var) ve URL hash'ten `setSession` (recovery token yalnız
- * tarayıcıya ulaşır) server action'a taşınamaz. Veri okuma/yazma yapan tüm
- * legacy dosyalar server action'a taşındı (2026-06-11) — yeni dosya EKLEME.
+ * URL hash'ten `setSession` ve recovery auth state dinleme yalnız tarayıcıya
+ * ulaşır; bu yüzden şifre sıfırlama kapısı geçici istisna. Veri okuma/yazma
+ * yapan diğer legacy dosyalar server action'a taşındı (2026-06-13) — yeni dosya
+ * EKLEME.
  */
 const supabaseClientTsxLegacy = {
   files: [
-    "src/app/(auth)/giris/_components/LoginForm.tsx",
     "src/app/(auth)/sifre-guncelle/_components/PasswordResetGate.tsx",
-    "src/app/_components/landing/LandingPage.tsx",
   ],
   rules: {
     "no-restricted-imports": "off",
@@ -100,6 +98,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Local assistant/worktree state — proje kaynak kodu değil.
+    ".claude/**",
+    ".cursor/**",
+    "playwright-report/**",
+    "test-results/**",
     // Geçici geliştirici scriptleri — lint kapsamı dışında
     "scratch/**",
   ]),

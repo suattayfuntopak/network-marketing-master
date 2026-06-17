@@ -1,5 +1,14 @@
-import { createClient } from '@/lib/supabase/client'
-import type { Json } from '@/types/database.types'
+'use client'
+
+import {
+  addCustomContentAction,
+  deleteCustomContentAction,
+  fetchCustomContentAction,
+  migrateLocalCustomContentAction,
+  updateCustomContentAction,
+  type CustomContentItem,
+  type CustomContentTable,
+} from '@/app/(dashboard)/actions/customContent'
 
 /**
  * DB-backed persistence for user-created custom trainings/objections (Y-12).
@@ -8,20 +17,22 @@ import type { Json } from '@/types/database.types'
  * only as a one-time migration source.
  */
 
-type CustomTable = 'nmm_custom_trainings' | 'nmm_custom_objections'
-
-interface CustomItem {
-  id: string | number
-  [key: string]: unknown
-}
-
-function readLocal(localKey: string): CustomItem[] {
+function readLocal(localKey: string): CustomContentItem[] {
   if (typeof window === 'undefined') return []
   try {
     const raw = localStorage.getItem(localKey)
-    return raw ? (JSON.parse(raw) as CustomItem[]) : []
+    return raw ? (JSON.parse(raw) as CustomContentItem[]) : []
   } catch {
     return []
+  }
+}
+
+function clearLocal(localKey: string) {
+  if (typeof window === 'undefined') return
+  try {
+    localStorage.removeItem(localKey)
+  } catch {
+    // ignore
   }
 }
 
@@ -30,98 +41,54 @@ function readLocal(localKey: string): CustomItem[] {
  * items into the DB (no data loss), then clears the local key.
  */
 export async function loadCustomContent(
-  table: CustomTable,
+  table: CustomContentTable,
   localKey: string,
   workspaceId: string | null
-): Promise<CustomItem[]> {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return readLocal(localKey)
-
-  const { data: rows } = await supabase
-    .from(table)
-    .select('item_key, data, created_at, is_approved, user_id')
-    .eq('is_deleted', false)
-    .or(`is_approved.eq.true,user_id.eq.${user.id}`)
-    .order('created_at', { ascending: false })
-
-  const dbItems = (rows ?? []).map(r => ({
-    ...(r.data as CustomItem),
-    isApproved: (r as { is_approved: boolean }).is_approved,
-    userId: (r as { user_id: string }).user_id,
-  }))
-  const dbKeys = new Set((rows ?? []).map(r => String(r.item_key)))
+): Promise<CustomContentItem[]> {
+  const localItems = readLocal(localKey)
+  const { items: dbItems, currentUserId } = await fetchCustomContentAction(table)
 
   // One-time migration of localStorage-only items.
-  const localItems = readLocal(localKey)
+  if (!currentUserId) {
+    return localItems.length > 0 ? localItems : dbItems
+  }
+
+  const dbKeys = new Set(dbItems.map(item => String(item.id)))
   const toMigrate = localItems.filter(it => !dbKeys.has(String(it.id)))
   if (toMigrate.length > 0) {
-    await supabase.from(table).insert(
-      toMigrate.map(it => ({
-        user_id: user.id,
-        workspace_id: workspaceId,
-        item_key: String(it.id),
-        data: it as unknown as Json,
-        is_approved: true, // Migrated ones are immediately approved for the owner
-      }))
-    )
+    await migrateLocalCustomContentAction(table, workspaceId, toMigrate)
   }
-  if (typeof window !== 'undefined' && localItems.length > 0) {
-    try { localStorage.removeItem(localKey) } catch { /* ignore */ }
-  }
+  if (localItems.length > 0) clearLocal(localKey)
 
   const migratedItems = toMigrate.map(it => ({
     ...it,
     isApproved: true,
-    userId: user.id,
+    userId: currentUserId,
   }))
 
   return [...migratedItems, ...dbItems]
 }
 
 export async function addCustomContent(
-  table: CustomTable,
+  table: CustomContentTable,
   workspaceId: string | null,
-  item: CustomItem
+  item: CustomContentItem
 ): Promise<void> {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  await supabase.from(table).insert({
-    user_id: user.id,
-    workspace_id: workspaceId,
-    item_key: String(item.id),
-    data: item as unknown as Json,
-    is_deleted: false,
-  })
+  await addCustomContentAction(table, workspaceId, item)
 }
 
 /** Updates an existing custom item's payload (owner-only; RLS "own ..." policy). */
 export async function updateCustomContent(
-  table: CustomTable,
+  table: CustomContentTable,
   itemKey: string | number,
-  item: CustomItem
+  item: CustomContentItem
 ): Promise<void> {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  await supabase
-    .from(table)
-    .update({ data: item as unknown as Json })
-    .eq('user_id', user.id)
-    .eq('item_key', String(itemKey))
+  await updateCustomContentAction(table, itemKey, item)
 }
 
 export async function deleteCustomContent(
-  table: CustomTable,
+  table: CustomContentTable,
   itemKey: string | number
 ): Promise<void> {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return
-  await supabase
-    .from(table)
-    .update({ is_deleted: true })
-    .eq('user_id', user.id)
-    .eq('item_key', String(itemKey))
+  await deleteCustomContentAction(table, itemKey)
 }

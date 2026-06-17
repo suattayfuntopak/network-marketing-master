@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       !(ws.license_expires_at && new Date(ws.license_expires_at) < now),
   )
   if (activeWs.length === 0) {
-    return NextResponse.json({ ok: true, todayKey, processed: 0, sent: 0, results })
+    return NextResponse.json({ ok: true, todayKey, processed: 0, sent: 0 })
   }
 
   // O-9: aday ve mevcut bildirimleri tek batch sorguyla çek, N+1'i kaldır.
@@ -104,6 +104,5 @@ export async function GET(request: NextRequest) {
     todayKey,
     processed: results.length,
     sent: results.filter(r => r.sent).length,
-    results,
   })
 }

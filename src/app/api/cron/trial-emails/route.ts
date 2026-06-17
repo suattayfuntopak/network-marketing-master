@@ -50,5 +50,13 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, processed: results.length, results })
+  const sent = results.filter(r => r.sent).length
+  const skipped = results.filter(r => r.skipped).length
+  const byKind = JOBS.map(job => ({
+    kind: job.kind,
+    sent: results.filter(r => r.kind === job.kind && r.sent).length,
+    skipped: results.filter(r => r.kind === job.kind && r.skipped).length,
+  }))
+
+  return NextResponse.json({ ok: true, processed: results.length, sent, skipped, byKind })
 }

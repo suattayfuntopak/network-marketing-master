@@ -5,6 +5,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import type { CandidateFilter } from '@/hooks/useCandidates'
 import { STAGE_COLOR } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 
 const STAGE_FILTERS: CandidateFilter[] = [
   'tumü',
@@ -35,7 +36,7 @@ export function StageFilter({ active, onChange, counts }: StageFilterProps) {
   }
 
   return (
-    <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
+    <HorizontalScrollLock className="flex gap-2 pb-1 scrollbar-hide">
       {STAGE_FILTERS.map((key) => {
         const isStage = key !== 'tumü'
         const stageChip = isStage ? STAGE_COLOR[key as CandidateStage] : null
@@ -72,6 +73,6 @@ export function StageFilter({ active, onChange, counts }: StageFilterProps) {
         </button>
         )
       })}
-    </div>
+    </HorizontalScrollLock>
   )
 }

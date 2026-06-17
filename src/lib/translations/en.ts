@@ -132,6 +132,10 @@ export const en = {
     inviteSponsorWelcome: "{sponsor} invited you to {team} 👋",
     inviteTeamWelcome: "You're invited to {team} 👋",
     inviteSponsorSubtitle: "Create your account — let's start strong together.",
+    loginErrorRequired: "Email and password are required.",
+    loginErrorInvalid: "Invalid email or password.",
+    loginErrorUnconfirmed: "Please verify your email address to continue.",
+    loginErrorGeneric: "Could not sign in. Please try again.",
   },
   hedef: {
     title: "Set Your Goal",

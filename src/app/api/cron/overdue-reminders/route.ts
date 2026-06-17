@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       !(ws.license_expires_at && new Date(ws.license_expires_at) < now),
   )
   if (activeWs.length === 0) {
-    return NextResponse.json({ ok: true, processed: 0, sent: 0, results })
+    return NextResponse.json({ ok: true, processed: 0, sent: 0 })
   }
 
   const wsIds = activeWs.map(ws => ws.id)
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
     .order('next_follow_up_at', { ascending: true })
 
   if (!overdueCandidates || overdueCandidates.length === 0) {
-    return NextResponse.json({ ok: true, processed: 0, sent: 0, results })
+    return NextResponse.json({ ok: true, processed: 0, sent: 0 })
   }
 
   // Bugün zaten gönderilmiş overdue bildirimlerini çek
@@ -159,6 +159,5 @@ export async function GET(request: NextRequest) {
     ok: true,
     processed: results.length,
     sent: results.filter(r => r.sent).length,
-    results,
   })
 }

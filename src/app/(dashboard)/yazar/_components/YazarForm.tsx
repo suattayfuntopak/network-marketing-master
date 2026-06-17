@@ -1,12 +1,12 @@
 'use client'
 
 import { useActionState, useState, useRef, useEffect, useCallback } from 'react'
-import { Copy, Loader2, Bot, X, ChevronDown, Lock } from 'lucide-react'
+import { Copy, Loader2, Bot, Lock } from 'lucide-react'
 import { generateMessageAction, translateTextAction, getCandidateRecentActionsAction } from '../actions'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
-import { getStageLabel } from '@/lib/domain/stages'
+import { formatCandidateContextForYazar } from '@/lib/domain/yazarCandidateContext'
 
 import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { readUserScopedJSON, writeUserScopedJSON } from '@/lib/ui/userScopedStorage'
@@ -16,14 +16,13 @@ import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useAILimits } from '@/hooks/useAILimits'
 import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
-import { Z } from '@/lib/ui/zIndex'
-import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
-import { displayDailyActionNote, isLeaderUserNote, getWhatsAppActivityDisplay } from '@/lib/domain/dailyActionNote'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
-import { MESSAGE_TYPES, TONES, getMessageTypeLabel, getToneLabel } from './yazarFormLabels'
+import type { NmmCandidate } from '@/types/database.types'
 import { MessageHistorySection, type HistoryEntry } from './MessageHistorySection'
+import { CandidateSearchCombobox } from './CandidateSearchCombobox'
+import { YazarTypeToneFields } from './YazarTypeToneFields'
 
 const inputClass = 'w-full rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 text-sm text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]'
 
@@ -96,60 +95,14 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     setDropdownOpen(false)
 
     const parsed = resolveCandidateFields(c)
-    const parsedNote = lang === 'en' ? (parsed.noteEn || parsed.noteTr) : parsed.noteTr
     setWarmth(parsed.warmth || 'ilik')
-    const stageName = getStageLabel(c.stage, lang) || c.stage
-
-    const warmthMap: Record<string, string> = {
-      sicak: lang === 'en' ? 'Hot 🔥' : 'Sıcak (Hot) 🔥',
-      ilik: lang === 'en' ? 'Warm ☀️' : 'Ilık (Warm) ☀️',
-      soguk: lang === 'en' ? 'Cold ❄️' : 'Soğuk (Cold) ❄️'
-    }
-    const warmthText = warmthMap[parsed.warmth || 'ilik']
 
     getCandidateRecentActionsAction(c.id)
       .catch(() => [])
       .then(rawActions => {
-        // Leader notes (non-system notes)
-        const leaderNotes = rawActions.filter(a => isLeaderUserNote(a))
-        // Activities
-        const activities = rawActions.slice(0, 5)
-
-        const notesText = leaderNotes.length > 0
-          ? (lang === 'en' ? '\n\nLeader Notes:\n' : '\n\nLider Notları:\n') +
-            leaderNotes
-              .map(n => `- ${displayDailyActionNote(n, lang === 'en' ? 'en' : 'tr')}`)
-              .join('\n')
-          : ''
-
-        const activityLines = activities.map(a => {
-          const dateStr = new Date(a.created_at).toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', { day: 'numeric', month: 'short' })
-          const actionText = a.action_type === 'call' ? (lang === 'en' ? 'Phone Call' : 'Telefon Araması')
-            : a.action_type === 'whatsapp'
-              ? getWhatsAppActivityDisplay(a, lang === 'en' ? 'en' : 'tr')
-                ?? (lang === 'en' ? 'WhatsApp · Message sent' : 'WhatsApp · Mesaj gönderildi')
-            : a.action_type === 'ai_generate' ? (lang === 'en' ? 'AI Message Generated' : 'YZ Mesajı Üretildi')
-            : a.action_type === 'stage_change' ? (lang === 'en' ? `Stage changed: ${getStageLabel(a.note as CandidateStage, lang) || a.note}` : `Aşama değişti: ${getStageLabel(a.note as CandidateStage, lang) || a.note}`)
-            : a.note?.startsWith('system_note:candidate_created') ? (lang === 'en' ? 'Candidate profile created' : 'Aday profili oluşturuldu')
-            : a.note?.startsWith('system_note:profile_update') ? (lang === 'en' ? 'Profile updated' : 'Profil güncellendi')
-            : a.note?.startsWith('system_note:warmth_change:') ? (lang === 'en' ? 'Relationship level updated' : 'Sıcaklık derecesi güncellendi')
-            : a.note?.startsWith('system_note:follow_up_change:') ? (lang === 'en' ? 'Follow-up date updated' : 'Takip tarihi güncellendi')
-            : a.note?.startsWith('system_note:follow_up_cleared:') ? (lang === 'en' ? 'Follow-up reminder cleared' : 'Takip hatırlatması kapatıldı')
-            : a.note?.startsWith('system_note:') ? (lang === 'en' ? 'System activity recorded' : 'Sistem aktivitesi kaydedildi')
-            : a.note || (lang === 'en' ? 'Note Added' : 'Not Eklendi')
-          return `- ${dateStr}: ${actionText}`
-        }).join('\n')
-
-        const activitiesText = activities.length > 0
-          ? (lang === 'en' ? '\n\nRecent Activities:\n' : '\n\nSon Aktiviteler:\n') + activityLines
-          : ''
-
-        const infoText = lang === 'en'
-          ? `Candidate: ${c.full_name}\nRelationship: ${warmthText}\nStage: ${stageName}${parsedNote ? `\nNotes: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
-          : `Aday: ${c.full_name}\nİlişki Derecesi: ${warmthText}\nAşama: ${stageName}${parsedNote ? `\nNotlar: ${parsedNote}` : ''}${notesText}${activitiesText}\n\n`
-        setContext(infoText)
+        setContext(formatCandidateContextForYazar(c, rawActions, lang, t))
       })
-  }, [lang])
+  }, [lang, t])
 
 
   // Kullanıcı belli olunca userId-izole history'yi yükle.
@@ -271,119 +224,31 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         <input type="hidden" name="stage" value={selected?.stage ?? ''} />
         <input type="hidden" name="name" value={selected?.full_name ?? query} />
 
-        {/* Mesaj Türü + Ton Dropdown'ları */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="messageTypeSelect">
-              {t('coachUi.messageType')}
-            </label>
-            <div className="relative">
-              <select
-                id="messageTypeSelect"
-                value={messageType}
-                onChange={e => setMessageType(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
-              >
-                {MESSAGE_TYPES.map(t => (
-                  <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {getMessageTypeLabel(t.value, lang)}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
-            </div>
-          </div>
+        <YazarTypeToneFields
+          messageType={messageType}
+          tone={tone}
+          lang={lang}
+          messageTypeLabel={t('coachUi.messageType')}
+          toneLabel={t('coachUi.tone')}
+          onMessageTypeChange={setMessageType}
+          onToneChange={setTone}
+        />
 
-          <div>
-            <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]" htmlFor="toneSelect">
-              {t('coachUi.tone')}
-            </label>
-            <div className="relative">
-              <select
-                id="toneSelect"
-                value={tone}
-                onChange={e => setTone(e.target.value)}
-                className="w-full appearance-none rounded-xl border border-[var(--border)] bg-[var(--bg-card)] pl-4 pr-10 py-3 text-sm text-[var(--text-1)] outline-none transition focus:border-[#0F6E56] focus:ring-2 focus:ring-[#E1F5EE]"
-              >
-                {TONES.map(t => (
-                  <option key={t.value} value={t.value} className="bg-[var(--bg-card)] text-[var(--text-1)]">
-                    {getToneLabel(t.value, lang)}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3.5 top-1/2 h-4.5 w-4.5 -translate-y-1/2 text-[var(--text-3)] pointer-events-none" />
-            </div>
-          </div>
-        </div>
-
-        {/* Kişi — inline combobox */}
-        <div ref={containerRef} className="relative">
-          <label className="mb-1.5 block text-sm font-semibold text-[var(--text-1)]">
-            {t('coachUi.candidate')}
-          </label>
-
-          {selected ? (
-            <div className="flex items-center justify-between rounded-xl border border-[#0F6E56] bg-[var(--bg-card)] px-4 py-3 ring-2 ring-[#E1F5EE]">
-              <div>
-                <p className="text-sm font-semibold text-[var(--text-1)]">{selected.full_name}</p>
-                <p className="text-xs text-[var(--text-3)]">{getStageLabel(selected.stage, lang)}</p>
-              </div>
-              <button
-                type="button"
-                onClick={clearSelection}
-                className="ml-3 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--bg-subtle)] text-[var(--text-3)] transition hover:text-[var(--text-1)]"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ) : (
-            <input
-              type="text"
-              value={query}
-              onChange={e => {
-                setQuery(e.target.value)
-                setDropdownOpen(true)
-              }}
-              onFocus={() => { if (query) setDropdownOpen(true) }}
-              placeholder={t('coachUi.candidatePlaceholder')}
-              autoComplete="off"
-              className={inputClass}
-            />
-          )}
-
-          {dropdownOpen && !selected && query.length > 0 && (
-            <div
-              className={`absolute left-0 right-0 top-full ${Z.dropdown} mt-1 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-xl`}
-              style={{ maxHeight: '240px', overflowY: 'auto' }}
-            >
-              {filtered.length === 0 ? (
-                <p className="py-6 text-center text-sm text-[var(--text-3)]">
-                  {t('coachUi.noCandidates')}
-                </p>
-              ) : (
-                filtered.map(c => (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onMouseDown={() => selectCandidate(c)}
-                    className="flex w-full items-center gap-3 border-b border-[var(--border)] px-4 py-3 text-left transition hover:bg-[var(--bg-subtle)] last:border-b-0"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-subtle text-xs font-bold text-brand">
-                      {c.full_name.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-[var(--text-1)]">{c.full_name}</p>
-                      {c.phone && <p className="text-xs text-[var(--text-3)]">{c.phone}</p>}
-                    </div>
-                    <span className="shrink-0 rounded-full bg-brand-subtle px-2 py-0.5 text-[10px] font-semibold text-brand">
-                      {getStageLabel(c.stage as CandidateStage, lang)}
-                    </span>
-                  </button>
-                ))
-              )}
-            </div>
-          )}
-        </div>
+        <CandidateSearchCombobox
+          query={query}
+          selected={selected}
+          dropdownOpen={dropdownOpen}
+          filtered={filtered}
+          lang={lang}
+          containerRef={containerRef}
+          label={t('coachUi.candidate')}
+          placeholder={t('coachUi.candidatePlaceholder')}
+          noCandidatesLabel={t('coachUi.noCandidates')}
+          onQueryChange={setQuery}
+          onDropdownOpen={setDropdownOpen}
+          onSelect={selectCandidate}
+          onClear={clearSelection}
+        />
 
         {/* Ek bilgi */}
         <div>

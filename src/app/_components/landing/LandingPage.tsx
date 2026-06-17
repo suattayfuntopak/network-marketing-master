@@ -1,10 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import { createClient } from '@/lib/supabase/client'
-import { useTranslation } from '@/providers/LanguageProvider'
+import { useEffect } from 'react'
 import { LandingHeader } from './LandingHeader'
 import { LandingHero } from './LandingHero'
 import { LandingFeatures } from './LandingFeatures'
@@ -15,14 +11,7 @@ import { LandingFaq } from './LandingFaq'
 import { LandingFooter } from './LandingFooter'
 
 export function LandingPage() {
-  const router = useRouter()
-  const { t } = useTranslation()
-  const [checkingSession, setCheckingSession] = useState(true)
-
   useEffect(() => {
-    let active = true
-    let subscription: { unsubscribe: () => void } | undefined
-
     // Şifre sıfırlama linki ana sayfaya düşerse hash/query korunarak yönlendir
     const hash = window.location.hash
     const search = window.location.search
@@ -33,75 +22,12 @@ export function LandingPage() {
       search.includes('token_hash=') ||
       search.includes('token=')
     ) {
-      router.replace(`/sifre-guncelle${search}${hash}`)
-      return
+      window.location.replace(`/sifre-guncelle${search}${hash}`)
     }
-
-    try {
-      const supabase = createClient()
-      
-      // 1. Initial active session check
-      supabase.auth.getSession()
-        .then((res) => {
-          const session = res?.data?.session
-          const onLandingPreview = window.location.pathname.startsWith('/acilis')
-          if (session && !onLandingPreview) {
-            router.push('/pano')
-          } else {
-            if (active) setCheckingSession(false)
-          }
-        })
-        .catch(() => {
-          if (active) setCheckingSession(false)
-        })
-
-      // 2. Auth state change listener
-      const authStateChangeResult = supabase.auth.onAuthStateChange((event, session) => {
-        if (event === 'PASSWORD_RECOVERY') {
-          router.replace('/sifre-guncelle')
-          return
-        }
-        if (session && !window.location.pathname.startsWith('/acilis')) {
-          router.push('/pano')
-        } else {
-          if (active) setCheckingSession(false)
-        }
-      })
-      subscription = authStateChangeResult?.data?.subscription
-    } catch {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (active) setCheckingSession(false)
-    }
-
-    return () => {
-      active = false
-      if (subscription) {
-        subscription.unsubscribe()
-      }
-    }
-  }, [router])
-
-  if (checkingSession) {
-    return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-white dark:bg-[#0A0B10] text-[var(--text-1)]">
-        <div className="relative flex items-center justify-center">
-          {/* Glowing pulse ring */}
-          <div className="absolute h-16 w-16 animate-ping rounded-full bg-brand/20" />
-          <div className="absolute h-12 w-12 animate-pulse rounded-full bg-brand/40" />
-          <div className="relative flex h-8 w-8 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)]">
-            <Image src="/logo.png" alt="NMM Logo" width={32} height={32} className="h-full w-full rounded-full object-cover" />
-          </div>
-        </div>
-        <p className="mt-4 text-xs font-bold uppercase tracking-widest text-[var(--text-3)] animate-pulse">
-          {t('landingPage.verifyingSession')}
-        </p>
-      </div>
-    )
-  }
+  }, [])
 
   return (
     <div className="relative min-h-screen bg-white text-slate-900 dark:bg-[#0A0B10] dark:text-[#E2E8F0] selection:bg-brand selection:text-white overflow-x-clip font-sans">
-      
       {/* ── BACKGROUND NEON ORBS ── */}
       <div className="absolute top-[10%] left-[-10%] h-[400px] w-[400px] rounded-full dark:bg-brand/10 blur-[130px] pointer-events-none" />
       <div className="absolute top-[40%] right-[-10%] h-[500px] w-[500px] rounded-full dark:bg-blue-600/5 blur-[150px] pointer-events-none" />
@@ -115,7 +41,6 @@ export function LandingPage() {
       <LandingPricing />
       <LandingTestimonials />
       <LandingFooter />
-
     </div>
   )
 }

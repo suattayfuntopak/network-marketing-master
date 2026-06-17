@@ -6,10 +6,12 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useProgressSync } from '@/hooks/useProgressSync'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { loadCustomContent, addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
+import { useCustomContent } from '@/hooks/useCustomContent'
+import { addCustomContent, updateCustomContent, deleteCustomContent } from '@/lib/domain/customContent'
 import { deleteWithUndo } from '@/lib/ui/deleteWithUndo'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
+import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
@@ -50,18 +52,18 @@ export function ItirazlarContent({
   const formOpen = addFormOpenProp ?? internalFormOpen
   const setFormOpen = onAddFormOpenChange ?? setInternalFormOpen
 
+  const { data: customRaw } = useCustomContent(
+    'nmm_custom_objections',
+    'nmm_custom_objections_v1',
+    ws?.workspaceId,
+  )
+
   useEffect(() => {
-    let cancelled = false
-    loadCustomContent('nmm_custom_objections', 'nmm_custom_objections_v1', ws?.workspaceId ?? null)
-      .then(items => {
-        if (!cancelled) {
-          const approved = items.filter(it => (it as Record<string, unknown>).isApproved)
-          setCustomItirazlar(approved as unknown as CustomItiraz[])
-        }
-      })
-      .catch(() => {})
-    return () => { cancelled = true }
-  }, [ws?.workspaceId])
+    if (!customRaw) return
+    const approved = customRaw.filter(it => (it as Record<string, unknown>).isApproved)
+    /* eslint-disable-next-line react-hooks/set-state-in-effect -- TanStack query → yerel optimistic state senkronu */
+    setCustomItirazlar(approved as unknown as CustomItiraz[])
+  }, [customRaw])
 
   const tumItirazlar = useMemo(() => {
     const mergedMap = new Map<number, CustomItiraz>()
@@ -277,7 +279,7 @@ export function ItirazlarContent({
         )}
       </div>
 
-      <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide no-swipe" data-no-swipe="true">
+      <HorizontalScrollLock className="mb-5 flex gap-2 pb-1 scrollbar-hide">
         {KATEGORILER.map((k, idx) => (
           <button
             key={k}
@@ -297,7 +299,7 @@ export function ItirazlarContent({
             )}
           </button>
         ))}
-      </div>
+      </HorizontalScrollLock>
 
       {search && (
         <p className="mb-3 text-sm text-[var(--text-3)]">

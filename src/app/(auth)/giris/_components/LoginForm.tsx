@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { createClient } from '@/lib/supabase/client'
+import { loginAction } from '../actions'
 import {
   authErrorClass,
   authInputClass,
@@ -15,53 +15,28 @@ import {
   authPrimaryBtnClass,
 } from '@/app/(auth)/_components/authUi'
 
+interface FormState {
+  error?: string
+  shouldRedirect?: boolean
+}
+
 export function LoginForm() {
   const { t } = useTranslation()
   const router = useRouter()
-  const [error, setError] = useState<string>()
-  const [pending, setPending] = useState(false)
+  const [state, action, pending] = useActionState<FormState, FormData>(loginAction, {})
 
   useEffect(() => {
     router.prefetch('/pano')
   }, [router])
 
-  // Zaten oturum açıksa (ör. yarım kalmış giriş) doğrudan panoya gönder
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        router.replace('/pano')
-      }
-    })
-  }, [router])
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    if (pending) return
-
-    const form = e.currentTarget
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value.trim()
-    const password = (form.elements.namedItem('password') as HTMLInputElement).value
-
-    setPending(true)
-    setError(undefined)
-
-    const supabase = createClient()
-    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
-
-    if (signInError) {
-      setError('E-posta veya şifre hatalı.')
-      setPending(false)
-      return
+    if (state.shouldRedirect) {
+      window.location.assign('/pano')
     }
-
-    await supabase.auth.getSession()
-    router.refresh()
-    router.replace('/pano')
-  }
+  }, [state.shouldRedirect])
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form action={action} className="space-y-5">
       <div>
         <label className={authLabelClass} htmlFor="email">
           {t('auth.emailLabel')}
@@ -92,9 +67,9 @@ export function LoginForm() {
         />
       </div>
 
-      {error && (
+      {state.error && (
         <p className={authErrorClass}>
-          {error}
+          {state.error}
         </p>
       )}
 
