@@ -57,13 +57,6 @@ export async function notifyBankTransferAction(
   )
 }
 
-/** Deneme bitişi "Basic ile devam et" → Shopier dükkan linki (workspace note ile). */
-export async function getBasicShopierStorefrontUrlAction(): Promise<
-  { ok: true; url: string } | { ok: false; error: string }
-> {
-  return getShopierStorefrontUrlAction('basic', 'monthly')
-}
-
 /** Oturumlu kullanıcı → Shopier ürün linki (plan/period). */
 export async function getShopierStorefrontUrlAction(
   plan: 'basic' | 'plus' | 'pro',

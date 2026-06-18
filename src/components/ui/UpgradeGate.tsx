@@ -3,18 +3,15 @@
 import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import Link from 'next/link'
-import { Sparkles, ArrowRight, Lock, Users, X, Loader2 } from 'lucide-react'
-import { toast } from 'sonner'
+import { Sparkles, ArrowRight, Lock, Users, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { ODEME_BASIC_DEEP_LINK } from '@/lib/domain/paymentRoutes'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
-import { getBasicShopierStorefrontUrlAction } from '@/app/(dashboard)/odeme/actions'
 
 export type UpgradeFeature = GatedFeature | 'team'
 
@@ -59,7 +56,6 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
   const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const [mounted] = useState(() => typeof window !== 'undefined')
-  const [basicCheckoutPending, setBasicCheckoutPending] = useState(false)
   useBodyScrollLock(open)
   if (!open || !mounted) return null
 
@@ -69,26 +65,6 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
     ws.licenseType === 'free' &&
     !ws.isTrialActive
   const plansHref = '/odeme'
-  const paymentHref = trialEnded ? ODEME_BASIC_DEEP_LINK : plansHref
-
-  const handleBasicShopierCheckout = () => {
-    if (basicCheckoutPending) return
-    setBasicCheckoutPending(true)
-    void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
-      trialEnded: true,
-      feature: resolveFeature(feature),
-      cta: 'basic_shopier',
-    })
-    void getBasicShopierStorefrontUrlAction().then(res => {
-      setBasicCheckoutPending(false)
-      if (res.ok) {
-        onClose()
-        window.location.assign(res.url)
-        return
-      }
-      toast.error(res.error)
-    })
-  }
 
   return createPortal(
     <div
@@ -145,23 +121,29 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
 
         <div className="mt-4 flex flex-col gap-2">
           {trialEnded ? (
-            <button
-              type="button"
-              disabled={basicCheckoutPending}
-              onClick={handleBasicShopierCheckout}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition disabled:opacity-70"
-            >
-              {basicCheckoutPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
+              >
+                {t('shellUi.accountAlertClose')}
+              </button>
+              <Link
+                href={plansHref}
+                onClick={() => {
+                  void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: 'ended', source: 'upgrade_gate' })
+                  onClose()
+                }}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+              >
                 <Sparkles className="h-4 w-4" />
-              )}
-              {t('shellUi.upgradeTrialEndedCta')}
-              <ArrowRight className="h-4 w-4" />
-            </button>
+                {t('shellUi.seePlansCta')}
+              </Link>
+            </div>
           ) : (
             <Link
-              href={paymentHref}
+              href={plansHref}
               onClick={() => {
                 void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
                   trialEnded: false,
@@ -175,19 +157,6 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
               <Sparkles className="h-4 w-4" />
               {t('shellUi.upgradeBannerCta')}
               <ArrowRight className="h-4 w-4" />
-            </Link>
-          )}
-          {trialEnded && (
-            <Link
-              href={plansHref}
-              onClick={() => {
-                void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: 'ended', source: 'upgrade_gate' })
-                onClose()
-              }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-card)] transition"
-            >
-              <Sparkles className="h-4 w-4 text-brand" />
-              {t('shellUi.seePlansCta')}
             </Link>
           )}
         </div>

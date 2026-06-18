@@ -52,7 +52,6 @@ export const shellSection = {
       upgradeTrialEndedTitle: '14 günlük denemen bitti — YZ kilitlendi',
       upgradeTrialEndedDesc:
         'Liste, takvim ve ekibin açık kalır. Basic ile günlük {limit} yapay zeka mesajına hemen devam edebilirsin.',
-      upgradeTrialEndedCta: 'Basic ile devam et',
       seePlansCta: 'Planları Gör',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
@@ -133,7 +132,6 @@ export const shellSection = {
       upgradeTrialEndedTitle: 'Your 14-day trial ended — AI is locked',
       upgradeTrialEndedDesc:
         'Pipeline, calendar, and your team stay open. Continue with Basic for {limit} daily AI messages right away.',
-      upgradeTrialEndedCta: 'Continue with Basic',
       seePlansCta: 'See Plans',
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:
