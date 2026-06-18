@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
@@ -74,6 +74,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const [removingMemberId, setRemovingMemberId] = useState<string | null>(null)
   const [confirmRemove, setConfirmRemove] = useState<MemberRow | null>(null)
   const [localSearch, setLocalSearch] = useState(memberSearch)
+  const [prevSearch, setPrevSearch] = useState(memberSearch)
 
   if (memberSearch !== prevSearch) {
     setPrevSearch(memberSearch)
