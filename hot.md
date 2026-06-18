@@ -1,5 +1,131 @@
 # Hot Log
 
+## 2026-06-18 — Şifre güncelle/sıfırla i18n ✅
+
+### Özet
+`sifre-guncelle` ve `sifre-sifirla` sayfaları auth i18n pattern'ine taşındı; tema uyumlu authCard stilleri.
+
+### Değişen dosyalar
+- `sifre-guncelle/page.tsx`, `PasswordResetGate.tsx`
+- `sifre-sifirla/page.tsx`
+- `tr.ts`, `en.ts`
+
+### Doğrulama
+lint · test 320/320 · i18n 0 unused · build · commit push
+
+## 2026-06-18 — DB migrate dry-run düzeltmesi + auth i18n + .env.example ✅
+
+### Özet
+Migration 100 defter boşluğu için `supabase-db-push.mjs` + `repair-gaps` modu. Kayıt/şifre sıfırlama formları i18n errorKey pattern. Trial e-posta CTA uygulama içi redirect. `.env.example` eklendi.
+
+### Değişen dosyalar
+- `scripts/supabase-db-push.mjs`, `db-push.yml`, `migrate-check.yml`, `package.json`
+- `kayit/actions.ts`, `SignupForm.tsx`, `sifre-sifirla/*`, `tr.ts`, `en.ts`
+- `trialEmails.ts`, `.env.example`, `docs/deploy/github-secrets.md`
+
+### Prod aksiyon (elle, bir kez)
+GitHub → DB migrate (prod) → `repair-gaps` + confirm `PUSH` → sonra `dry-run` yeşil olmalı.
+
+### Doğrulama
+lint · test 320/320 · i18n 0 unused · build · commit push
+
+## 2026-06-18 — Öneri paketi: Shopier Plus/Pro, i18n, E2E özeti ✅
+
+### Özet
+Plus/Pro Shopier redirect rotaları (`/odeme/shopier/[plan]`). Login hataları i18n anahtarına taşındı; ölü `verifyingSession` silindi. E2E workflow'a haftalık özet job'ı eklendi. Trial e-posta UTM helper netleştirildi.
+
+### Değişen dosyalar
+- `odeme/shopier/[plan]/route.ts` — basic/plus/pro (+ yearly query)
+- `paymentRoutes.ts`, `shopierStorefront.ts`, `odeme/actions.ts`
+- `giris/actions.ts`, `LoginForm.tsx` — errorKey + LOGIN_ERROR_I18N
+- `landing.ts` — verifyingSession kaldırıldı
+- `trialEmails.ts`, `e2e.yml`, test dosyaları
+
+### Doğrulama
+lint · test 320/320 · i18n 0 unused · build · commit push
+
+## 2026-06-18 — Davet kodu kaldırma + Shopier cutover ✅
+
+### Özet
+Ekibim soloHint banner kaldırıldı. Shopier storefront SHOPIER_PRODUCTS ile otomatik açılır. Deneme e-posta/bildirim CTA'ları Shopier Basic'e yönlendirir. Eski davet kodu i18n anahtarları temizlendi.
+
+### Değişen dosyalar
+- `TeamPerformanceSection.tsx`, `EkipPanel.tsx` — soloHint bloğu kaldırıldı
+- `shopierStorefront.ts` — `isShopierStorefrontEnabled` products fallback; `buildBasicMonthlyStorefrontUrl`
+- `paymentRoutes.ts`, `odeme/shopier/basic/route.ts` — Shopier Basic redirect
+- `trialEmails.ts`, `trial-emails/route.ts`, `notificationRoutes.ts` — Shopier CTA
+- `tr.ts`, `en.ts`, `crown.ts` — davet kodu metinleri güncellendi/silindi
+
+### Doğrulama
+lint · test 314/314 · build · commit push
+
+## 2026-06-18 — Basic Shopier CTA + iş akışı netleştirme ✅
+
+### Özet
+Deneme bitişi popup: "Basic ile devam et" → Shopier (workspace note ile). E2E main push kaldırıldı (haftalık+manuel). Prod migration 001–103 tamam.
+
+### Değişen dosyalar
+- `UpgradeGate.tsx`, `odeme/actions.ts` — `getBasicShopierStorefrontUrlAction`
+- `e2e.yml` — schedule Pazartesi 06:00 + workflow_dispatch (main push yok)
+
+### Doğrulama
+lint · test 314/314 · build · commit push
+
+## 2026-06-17 — Billing sonrası tam kapanış ✅
+
+### Özet
+GitHub Actions kotası yenilendi; workflow'lar yeniden tetiklendi. Prod migration 103 elle uygulandı; defter senkronlandı.
+
+### Sonuçlar (eaa2bfb)
+- **CI Gate** ✅ lint + unit + build
+- **E2E (Playwright)** ✅ chromium + mobile (~5 dk)
+- **Deploy (production)** ✅ CI Gate sonrası tetiklendi
+- **Migration check** — migrate-deploy drift (MCP timestamp kaydı) düzeltildi, yeniden koştu
+
+### Prod
+- `103_candidate_rls_owner_scope` RLS policy'leri aktif
+- `schema_migrations` 100–103 temiz
+
+## 2026-06-17 — E2E login redirect düzeltmesi ✅
+
+### Özet
+`23bc29b` build'i düzeltti ama E2E hâlâ kırmızıydı (#242 ~5s anormal; #241 build TS).
+
+### Düzeltmeler
+- **loginAction:** `redirect('/pano')` — client `window.location.assign` kaldırıldı (Playwright auth.setup uyumu).
+- **auth.setup:** click + waitForURL paralel, 45s timeout.
+- **e2e.yml:** artifact upload `if-no-files-found: ignore`.
+
+### Doğrulama
+`npm run lint` · `npm test` 314/314 · `npm run build` · commit `c21b7cb` push main
+
+## 2026-06-17 — CI düzeltmeleri (build + migration + E2E) ✅
+
+### Özet
+`5eabc7b` sonrası patlayan workflow'lar giderildi.
+
+### Düzeltmeler
+- **Build TS:** `YazarContextAction` tipi — `formatCandidateContextForYazar` artık `CandidateRecentAction` ile uyumlu.
+- **useCustomContent:** `CustomContentTable` import'u actions'tan (re-export yoktu).
+- **Migration:** `100_candidate_rls_owner_scope.sql` → `103_...` (100_customers_orders çakışması).
+- **E2E:** main push'ta secret yoksa advisory skip (exit 1 kaldırıldı).
+
+### Doğrulama
+`npm run lint` · `npm test` 314/314 · `npm run build` · `migrate:check` · commit `23bc29b` push main
+
+## 2026-06-17 — Öncelikli Aksiyon Matrisi (dedektif raporu uygulaması) ✅
+
+### Özet
+20 maddelik aksiyon matrisi uygulandı: güvenlik (candidate RLS mig 100, translate auth, cron PII), mimari (server actions, pagination, requireAuth, customContent query), i18n (login + pipeline toast), UX (HorizontalScrollLock), test/CI, dokümantasyon.
+
+### Kritik
+- **Migration 100:** candidate RLS owner-scoped.
+- **Cron:** JSON yanıtlardan PII kaldırıldı.
+- **translateObjectionFieldsAction:** auth guard.
+
+### Doğrulama
+`npm run lint` · `npm test` 314/314 · commit `5eabc7b` · **migration 100 prod deploy gerekli**
+
 ## 2026-06-16 — Nav #1: mobil alt bar "Diğer" çekmecesi ✅
 
 Kalabalıklaşan mobil alt bar sadeleştirildi (masaüstü sidebar tüm listeyi taşır, dokunulmadı).
@@ -6803,3 +6929,17 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 
 ### fix: Next.js Dev Origin Geliştirici Sunucusu WebSocket Hata Engeli
 - Playwright test çalıştırıcısının `127.0.0.1` üzerinden yaptığı isteklerin Next.js dev server tarafından çapraz kökenli (cross-origin) WebSocket/HMR isteği olarak algılanıp engellenmesi çözüldü. [next.config.ts](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/next.config.ts) dosyasına `allowedDevOrigins: ['127.0.0.1']` eklendi.
+
+
+## 2026-06-18 — Council Triad 3. Tur: Kapsamlı Proje Analizi (yalnızca rapor, kod değişmedi)
+
+### docs: Council of High Intelligence — Triad (Torvalds + Feynman + Lao Tzu)
+- Üç bağımsız perspektifle (pragmatik mühendislik / ilk-prensipler doğruluk / sadeleştirme-ferahlık) tüm kod tabanı uçtan uca tarandı; her bulgu rapor sahibi tarafından `dosya:satır` kanıtıyla doğrulandı. Tam rapor: [docs/council-triad-2026-06-18.md](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/council-triad-2026-06-18.md).
+- **Genel hüküm:** Kod tabanı disiplinli — lint `--max-warnings 0` sıfır uyarı, 320 test geçiyor, `as any` 0, `console.log` 0, tr/en parite tam (474/474). Spaghetti yok.
+- **Bulgu dağılımı:** 1 kritik, 6 yüksek, 9 orta, 9 düşük + stratejik sadeleştirme fırsatları.
+- **K-1 (kritik):** `tsc --noEmit` kırık — `yazarCandidateContext.test.ts:23` tanımsız `NmmCandidate`; Vitest esbuild ile transpile ettiği için sessizce geçiyor. Çözüm: 1 satır import + `typecheck` script'i CI'a.
+- **Y-1 (yüksek):** `hubPeriodRange.ts:112-113` `monthRange` ham `toISOString()` kullanıyor (sunucu UTC) → İstanbul 00:00–03:00 aktiviteleri yanlış aya düşüyor. Komşu fonksiyonlar İstanbul helper kullanıyor; yalnızca `monthRange` kuraldışı.
+- **Diğer yüksekler:** `lib/domain`→`app` ters bağımlılık (Y-2), `assertWorkspaceMember` ölü licenseType fallback ×4 (Y-3), `noteEn` opsiyonel/çift-dil kuralı (Y-4), Shopier inline client (Y-5), coaching templates localStorage çift-kaynak (Y-6).
+- **Doğrulamada elenen iddialar:** Shopier webhook "yok" → GEÇERSİZ (`api/payment/shopier/route.ts` mevcut + testli); `yearRange` timezone → GEÇERSİZ; "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped).
+- **En yüksek kaldıraçlı 3 hamle:** (1) tsc yeşil + CI, (2) `monthRange` timezone fix, (3) ölü iskelet temizliği (nav alias + boş klasör + ThemeToggle + çift skeleton).
+- Önceliklendirme ve fazlama [docs/COUNCIL_STATUS.md](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/COUNCIL_STATUS.md)'de güncellendi. **Bu turda hiçbir uygulama kodu değiştirilmedi.**

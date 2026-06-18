@@ -1,4 +1,25 @@
-# Council durum özeti (2026-05-31)
+# Council durum özeti (2026-06-18)
+
+## 3. Tur — Triad (Torvalds + Feynman + Lao Tzu)
+
+Tam rapor: [council-triad-2026-06-18.md](council-triad-2026-06-18.md). **Analiz turu — kod değişmedi.**
+
+**Genel:** Kod tabanı disiplinli (lint sıfır uyarı, 320 test geçiyor, `as any` 0, çeviri paritesi tam). 1 kritik + 6 yüksek + 9 orta + 9 düşük bulgu.
+
+### Bu turun açık bulguları (önceliğe göre)
+
+| Faz | Kapsam | Bulgular | Durum |
+|---|---|---|---|
+| **A — Doğruluk** | tsc kırık (CI'a koy) + `monthRange` İstanbul timezone + AI kota check-then-act | K-1 (🔴), Y-1, O-1 | ⏳ açık |
+| **B — Güvenlik/hijyen** | Shopier inline client→`createAdminClient` + daily_actions derinlemesine-savunma + cron `select('*')` + cronAuth 401/500 | Y-5, O-2, O-6, D-8 | ⏳ açık |
+| **C — Mimari yön** | `lib/domain`→`app` ters bağımlılık + `assertWorkspaceMember` dedup + `EMPTY_FUNNEL`/hub action konsolidasyon + inline queryKey | Y-2, Y-3, O-5, O-9 | ⏳ açık |
+| **D — Çift-dil & veri** | `noteEn` zorunlu (CLAUDE.md §2) + customContent moderasyon/sessiz-hata + coaching localStorage çift-kaynak | Y-4, Y-6, O-4 | ⏳ açık |
+| **E — Sadeleştirme/ferahlık** | 5 nav alias + 3 boş klasör + ThemeToggle + çift skeleton + confirm/upgrade tekilleştir + `crownMock*` isim | D-1..D-7, O-3, O-7, O-8 | ⏳ açık |
+| **F — Stratejik (ölç→karar)** | 6 metrik yüzeyi konsolidasyonu, `trainingData` CMS | §5 | 🔭 önce ölç |
+
+**Doğrulamada elenen üye iddiaları:** Shopier webhook "yok" → GEÇERSİZ (mevcut+test); `yearRange` timezone → GEÇERSİZ (İstanbul helper kullanıyor); "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped → O-2).
+
+---
 
 ## 2. Tur — Triad (Torvalds + Aristoteles + Ada)
 
