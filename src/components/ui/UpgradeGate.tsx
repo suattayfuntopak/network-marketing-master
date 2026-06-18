@@ -189,7 +189,7 @@ interface BannerProps {
 function BannerGate() {
   const { t } = useTranslation()
   return (
-    <div className="rounded-2xl border border-indigo-500/25 bg-gradient-to-br from-[#EEEDFE]/80 to-[var(--bg-card)] p-4 sm:p-5">
+    <div className="rounded-2xl border border-indigo-500/25 bg-gradient-to-br from-[#EEEDFE]/80 to-[var(--bg-card)] p-4 sm:p-5 dark:border-[var(--border)] dark:from-brand/[0.08] dark:to-[var(--bg-card)]">
       <div className="flex items-start gap-3">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600">
           <Users className="h-5 w-5" strokeWidth={1.75} />

@@ -222,14 +222,14 @@ export function TakvimClient() {
       )}
 
       {overdueCount > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0]/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0]/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-[#3d0f1f] dark:bg-[#3d0f1f]/40">
           <button
             type="button"
             onClick={() => earliestOverdue && selectCalendarDate(earliestOverdue)}
             className="flex items-center gap-2 text-left"
           >
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#72243E]" />
-            <p className="text-sm font-semibold text-[#72243E]">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#72243E] dark:bg-[#f9a8d4]" />
+            <p className="text-sm font-semibold text-[#72243E] dark:text-[#f9a8d4]">
               {t('pagesUi.overdueFollowUps', { count: overdueCount })}
             </p>
           </button>
@@ -238,13 +238,13 @@ export function TakvimClient() {
               type="button"
               onClick={() => setBulkConfirmOpen(true)}
               disabled={isBusy}
-              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline disabled:opacity-50"
+              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline disabled:opacity-50 dark:text-[#f9a8d4]"
             >
               {t('pagesUi.bulkDeferOneDay')}
             </button>
             <Link
               href="/saha-ozetim?tab=daily"
-              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline"
+              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline dark:text-[#f9a8d4]"
             >
               {t('pagesUi.viewTodayPriorities')}
             </Link>
@@ -349,9 +349,9 @@ export function TakvimClient() {
         </p>
 
         {selected < todayKey && selectedCandidates.length > 0 && (
-          <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2">
-            <span className="h-2 w-2 rounded-full bg-[#72243E]" />
-            <p className="text-xs font-semibold text-[#72243E]">
+          <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2 dark:bg-[#3d0f1f]/40">
+            <span className="h-2 w-2 rounded-full bg-[#72243E] dark:bg-[#f9a8d4]" />
+            <p className="text-xs font-semibold text-[#72243E] dark:text-[#f9a8d4]">
               {t('pagesUi.followUpsMissed', { count: selectedCandidates.length })}
             </p>
           </div>

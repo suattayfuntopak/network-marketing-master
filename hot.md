@@ -1,5 +1,26 @@
 # Hot Log
 
+## 2026-06-19 — Dark-mode parlayan kutu düzeltmesi + 3 inceleme ✅
+
+### Özet (kod: 1 madde)
+**Dark-mode glow fix:** "Ekibinizi görüntülüyorsunuz" bannerı (`UpgradeGate` BannerGate) dark modda `from-[#EEEDFE]/80` sabit açık lavanta ile parlıyordu → `dark:from-brand/[0.08] dark:to-[var(--bg-card)] dark:border-[var(--border)]` ile diğer dark kartlarla uyumlu, hafif brand tonlu yapıldı (light mode değişmedi). Tarama: tek kalıcı açık-gradient glow kart buydu; named-color `-50` glow kart yok. Ayrıca crown-rose (`#FBEAF0`/`#72243E`) **notice/error kutuları** (6 adet: PipelinePageContent, AddCandidateSheet, YazarForm ×2, TakvimClient ×2) additive `dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]` aldı — light mode korundu, danger butonlarına dokunulmadı.
+
+**Bilinçli bırakılanlar:** crown-rose **danger butonları** (`bg-[#72243E] text-white` — dark'ta zaten çalışır), küçük ikon-chip'leri, takvim hücre overdue işaretleri. App genelinde `#FBEAF0`/`#72243E` 66 yerde sabit hex (semantic token kullanılmıyor) — kapsamlı token-migration ayrı oturum işi (kör sweep contrast regresyonu riski).
+
+### İncelemeler (kod değişmedi — sonraki oturum kararları)
+1. **Dış-kayıt downline AI kullanımı izleme:** super admin paneli `createAdminClient()` ile tüm workspace'leri görür ama AI kullanımı workspace-başı toplanmıyor. `nmm_daily_actions` zaten workspace_id ile yazılıyor → kişi-bazlı (isimsiz) downline AI metriği teknik olarak DERLENEBİLİR. Ortalama AI/kullanıcı → plan fiyatlama için uygun. Karar sonraki oturuma.
+2. **Moderasyon talebi akışı:** Gönderen/E-posta boş = legacy satır (user_email/user_name kolonları eklenmeden önce). Alert e-postası `info@suattayfuntopak.com`'a gidiyor (gmail değil!) + RESEND_API_KEY gerektirir. Super admin'e **in-app (zil) bildirimi YOK** — `notifyModerationOutcome` yalnız onay/red'de KULLANICIYA bildirir. Gerçek boşluk: yeni talepte super-admin in-app bildirimi.
+3. **Süper Admin metrikleri:** Büyüme & Yayılma = `aggregateViralKpi` (viralKpi.ts); Satış Hunisi = `getProductFunnelStatsAction` (istatistikler/actions.ts, `nmm_product_events`). Her metriğin tanımı rapora yazıldı.
+
+### Değişen dosyalar
+- `src/components/ui/UpgradeGate.tsx`
+- `src/app/(dashboard)/pipeline/_components/{PipelinePageContent,AddCandidateSheet}.tsx`
+- `src/app/(dashboard)/yazar/_components/YazarForm.tsx`
+- `src/app/(dashboard)/takvim/_components/TakvimClient.tsx`
+
+### Doğrulama
+tsc · lint (--max-warnings 0) · test 331/331 · i18n 1287 · next build ✓
+
 ## 2026-06-19 — UI cilası (6 madde) + build fix ✅
 
 ### Özet
