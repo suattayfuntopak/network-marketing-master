@@ -6969,3 +6969,16 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 ### feat(analytics): 6 metrik yüzeyi trafik ölçümü enstrümante edildi (Faz F)
 - Ürün-event altyapısına `surface_view` olayı eklendi; `useSurfaceViewBeacon` hook'u izlenen yüzeylere (pano/saha-ozetim/saha-radar/istatistikler/hedefim) her girişte olay gönderir; `DashboardShell`'e tek satır bağlandı (sayfa-başı churn yok).
 - **Kör kesme yok:** Bu, "tek performans kapısı" konsolidasyonunun ön-koşulu olan veriyi biriktirir. ~2-4 hafta sonra `surface_view` dağılımına bakıp konsolidasyon kararı veriyle alınacak.
+
+
+## 2026-06-18 — Sahip kararları: ölçüm döngüsü kapatıldı, CMS ertelendi
+
+### chore(analytics): surface_view analiz sorgusu — Faz F verisini görülebilir kıldı
+- "Uygulama senin olsaydı?" — sahip gözüyle: `surface_view` toplanıyordu ama platform admin Viralite KPI paneli bu olayı agregelemiyordu → veri pratikte ölüydü. Tek-seferlik karar için kalıcı dashboard gold-plating; doğru araç salt-okunur sorgu.
+- **`supabase/scripts/analyze_surface_view_traffic.sql`** (son 28 gün; yüzey başına views/unique_users/views_per_user/pct_of_total) + **`npm run db:analyze:surface-view`** kısayolu. Yorum rehberi script başında. Detay: [docs/council-triad-2026-06-18.md §11](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/council-triad-2026-06-18.md).
+
+### decision: trainingData CMS göçü bilinçli ertelendi (kod yok)
+- 2075 satır içerik için CMS = yeni tablolar + admin editör + veri göçü + çift-dil; çok günlük spekülatif özellik. Rapor "MVP için kabul edilebilir" diyor. Kod-as-içerik şu an daha basit/versiyonlu/tip-güvenli. **Tetik:** geliştirici-olmayan editör ihtiyacı VEYA içerik değişimi > ayda 1 VEYA çok-dilli editör akışı. Yoksa CMS net karmaşıklık gerilemesi.
+
+### decision: planlı cloud agent kurulmadı (gerekçeli)
+- Cloud agent prod Supabase kimliği olmadan çalışır (connector yok) + otonom prod politika-dışı → analiz sorgusunu çalıştıramaz, işlevsiz olurdu. **Kalıcı hatırlatıcı repo-içi not:** ~2026-07-09'da `npm run db:analyze:surface-view` çalıştır → çıktıya göre konsolidasyon planı (kod değil, öneri).

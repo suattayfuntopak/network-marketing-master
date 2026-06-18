@@ -323,3 +323,23 @@ Kullanıcı onayıyla, ilk turda bilinçli ertelenen iki kalem cerrah titizliği
 - **Neden kesme yok:** Bu, "tek performans kapısı" konsolidasyonunun **ön-koşulu** olan veriyi biriktirir. Birkaç hafta sonra göreli trafik görülünce (örn. saha-radar düşük → İstatistikler'e sekme) konsolidasyon **veriyle** kararlaştırılır. `morningBriefView` zaten ayrı izleniyor.
 - **Dosyalar:** `lib/domain/productEvents.ts` (`surfaceView`), `hooks/useSurfaceViewBeacon.ts` (yeni), `DashboardShell.tsx` (+1 satır).
 - **Sonraki adım (kod değil, karar):** ~2-4 hafta veri sonrası `surface_view` dağılımına bakıp konsolidasyon turu planla.
+
+---
+
+## 11. Sahip Kararları (2026-06-18 — "uygulama senin olsaydı?")
+
+Kalan iki ucu sahip gözüyle değerlendirdim. İlke: **gereksiz/erken iş yapma; ölçüm döngüsünü gerçekten kapat.**
+
+### Karar 1 — Faz F ölçüm döngüsü gerçekten kapatıldı (kod)
+`surface_view` toplanıyordu ama görülebilir değildi: platform admin'in Viralite KPI paneli yalnız belirli event listesini agregeliyor, `surface_view` orada yok. **Tek-seferlik konsolidasyon kararı için kalıcı admin dashboard'u eklemek gold-plating** olurdu ("sade" ihlali) — doğru araç salt-okunur bir analiz sorgusu:
+- **`supabase/scripts/analyze_surface_view_traffic.sql`** (son 28 gün; yüzey başına `views / unique_users / views_per_user / pct_of_total`).
+- **`npm run db:analyze:surface-view`** kısayolu (keşfedilebilirlik).
+- Yorum rehberi script başında: düşük pay + düşük unique_users → o yüzeyi başka birinin sekmesine indir; Pano'ya dokunma (ana iniş).
+
+### Karar 2 — `trainingData` CMS göçü: BİLİNÇLİ ERTELENDİ (kod yok)
+2075 satır TR içerik; CMS'e taşımak yeni tablolar + admin editör UI + veri göçü + çift-dil (CLAUDE.md §2) demek — çok günlük bir özellik, salt-kozmetik değil. Rapor zaten "MVP için kabul edilebilir" diyor. **Şimdi yapmak erken ve spekülatif:** kod-as-içerik şu an daha basit, versiyonlu ve tip-güvenli. Sahip kararı: bekle.
+- **Tetik koşulu (bunlardan biri olunca yap):** (a) geliştirici-olmayan birinin içerik düzenlemesi gerekiyor, VEYA (b) içerik değişim sıklığı ayda 1'i geçiyor, VEYA (c) içerik çok-dilli editör akışı gerektiriyor. Bu koşullar yokken CMS net bir gerileme (karmaşıklık) getirir.
+
+### Karar 3 — Planlı cloud agent OLUŞTURULMADI (gerekçeli)
+Faz F incelemesi için cloud `/schedule` routine'i değerlendirildi ve **kurulmadı**: cloud agent taze checkout + prod Supabase kimliği olmadan çalışır (bağlı connector'larda Supabase yok) ve otonom prod erişimi politika-dışı → analiz sorgusunu çalıştıramaz, yalnız "sen çalıştır" diyebilirdi (işlevsiz). **Kalıcı, dürüst hatırlatıcı bu repo-içi nottur:**
+- **~2026-07-09 (≈3 hafta sonra):** `npm run db:analyze:surface-view` çalıştır → çıktıyı paylaş → konsolidasyon planı (saha-radar muhtemel aday) önerilecek. Kod değişmez; öneri + onay sonrası ayrı tur.
