@@ -107,10 +107,12 @@ export function monthRange(offset: number): MonthRange {
   const isCurrent = offset === 0
   const dayOfMonth = isCurrent ? now.getDate() : daysInMonth
   const monthPct = isCurrent ? Math.round((dayOfMonth / daysInMonth) * 100) : 100
+  // İstanbul gün-başı/sonu — ham toISOString() sunucu UTC'sinde ayın ilk gününün
+  // 00:00–03:00 (İstanbul) aktivitelerini yanlış aya düşürürdü (komşu fonksiyonlarla aynı kalıp).
   return {
     offset,
-    sinceIso: startDate.toISOString(),
-    untilIso: endDate.toISOString(),
+    sinceIso: istanbulDayStartIso(toCalendarKey(startDate)),
+    untilIso: istanbulDayEndIso(toCalendarKey(endDate)),
     startDate,
     endDate,
     daysInMonth,

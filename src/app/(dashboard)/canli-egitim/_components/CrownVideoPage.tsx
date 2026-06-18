@@ -41,7 +41,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
 
   return (
     <HubPageShell
-      title={t('dashboard.crownMockLiveTraining')}
+      title={t('dashboard.crownLiveTraining')}
       icon={GraduationCap}
       iconClassName={videoProgressAccent.icon}
       backHref="/pano"

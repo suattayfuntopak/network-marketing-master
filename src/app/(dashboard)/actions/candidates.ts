@@ -5,6 +5,7 @@ import { requireAuthUserId } from '@/lib/supabase/requireAuth'
 import { CANDIDATE_DETAIL_SELECT, CANDIDATE_LIST_SELECT } from '@/lib/domain/candidateSelect'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildDailyActionNoteFields } from '@/lib/domain/dailyActionNote'
+import { translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
 import type {
   ActionType,
   NmmCandidate,
@@ -285,6 +286,10 @@ export async function fetchCandidateActivityHistoryAction(
   candidateId: string
 ): Promise<NmmDailyAction[]> {
   const supabase = await createClient()
+  // Auth gate; yetki sınırı RLS'te. `nmm_daily_actions` kasıtlı olarak workspace +
+  // downline scope'lu (`nmm_action_member_all`/`nmm_action_read_downlines`): bir aday
+  // detayını sahibi de, lideri de (downline → /pipeline/[id]) görür. Burada
+  // `.eq('user_id', ...)` filtresi lider notlarını ve liderin downline görünümünü kırardı.
   await requireAuthUserId()
 
   const { data, error } = await supabase
@@ -343,6 +348,11 @@ export async function addCandidateNoteAction(
   const userId = await requireAuthUserId()
   await getOwnedCandidate(supabase, workspaceId, input.candidateId, userId)
 
+  // CLAUDE.md §2: çift-dilli KALICI saklama garantisi. İstemci çeviriyi geçemezse
+  // (AI hatası → catch yolu) lazy/on-the-fly yerine yazım anında BURADA üretilir;
+  // translateNoteAction hata/anahtar yokken TR metnini döndürür (asla boş bırakmaz).
+  const noteEn = input.noteEn?.trim() ? input.noteEn : await translateNoteAction(input.noteTr)
+
   const { error } = await supabase.from('nmm_daily_actions').insert({
     workspace_id: workspaceId,
     user_id: userId,
@@ -350,7 +360,7 @@ export async function addCandidateNoteAction(
     action_type: 'note',
     ...buildDailyActionNoteFields({
       noteTr: input.noteTr,
-      noteEn: input.noteEn,
+      noteEn,
     }),
   })
 

@@ -7,12 +7,19 @@ import { NextRequest, NextResponse } from 'next/server'
  * gönderilirse `Bearer ${''} === 'Bearer '` eşleşip endpoint herkese açılırdı.
  * Bu yüzden secret'in varlığı ayrıca kontrol edilir.
  *
- * @returns Yetkisizse 401 yanıtı, yetkiliyse `null`.
+ * D-8: Secret eksikliği bir yapılandırma hatasıdır (500), yetkisiz istek değil (401) —
+ * Shopier webhook'uyla tutarlı dürüst sınıflandırma.
+ *
+ * @returns Secret yoksa 500, yetkisizse 401, yetkiliyse `null`.
  */
 export function cronAuthError(request: NextRequest): NextResponse | null {
   const secret = process.env.CRON_SECRET
+  if (!secret) {
+    console.error('[cronAuth] CRON_SECRET tanımsız — endpoint yapılandırılmamış.')
+    return NextResponse.json({ error: 'Server misconfiguration' }, { status: 500 })
+  }
   const authHeader = request.headers.get('authorization')
-  if (!secret || authHeader !== `Bearer ${secret}`) {
+  if (authHeader !== `Bearer ${secret}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   return null

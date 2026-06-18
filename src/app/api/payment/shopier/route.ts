@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendPaymentSuccessEmail, sendUnresolvedOrderAlertEmail } from '@/lib/infra/mail'
 import { verifyShopierSignature, parseShopierOrderId } from '@/lib/domain/shopierWebhook'
 import {
@@ -19,6 +19,7 @@ import {
   resolvePlanFromProductId,
 } from '@/lib/domain/shopierStorefront'
 import { isSuperAdmin } from '@/lib/domain/auth'
+import type { PlanId } from '@/lib/domain/pricing'
 
 /**
  * Çözülemeyen siparişi Platform Yönetimi'nde göstermek için DB'ye yazar
@@ -31,10 +32,7 @@ async function recordUnresolvedOrder(params: {
 }): Promise<void> {
   if (!params.orderId) return
   try {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    const supabase = createAdminClient()
     await supabase.from('nmm_shopier_processed_orders').upsert(
       {
         order_id: params.orderId,
@@ -51,17 +49,14 @@ async function recordUnresolvedOrder(params: {
 
 async function applyLicenseUpgrade(params: {
   workspaceId: string
-  newLicenseType: string
+  newLicenseType: PlanId
   daysToAdd: number
   totalAmount: string
   parentId: string | null
   /** Shopier sipariş id'si — idempotency (aynı sipariş tekrar gelirse atla). */
   orderId?: string | null
 }): Promise<Date | null> {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const supabase = createAdminClient()
 
   // Idempotency: aynı Shopier siparişi ikinci kez lisans uzatmasın.
   if (params.orderId) {
@@ -150,7 +145,7 @@ async function applyLicenseUpgrade(params: {
         sendPaymentSuccessEmail(
           authUser.user.email,
           leaderMember.full_name || authUser.user.user_metadata?.full_name || 'Değerli Ortak',
-          params.newLicenseType as 'basic' | 'plus' | 'pro',
+          params.newLicenseType,
           params.totalAmount,
           newExpiry.toISOString(),
           'tr'
@@ -337,10 +332,7 @@ async function handleOrderCreatedWebhook(request: NextRequest) {
  * doğru workspace bulunur (collectIdCandidates). Eşleşme yoksa non-PII özet loglanır.
  */
 async function handleRefundWebhook(payload: unknown, event: string) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  )
+  const supabase = createAdminClient()
   const candidates = collectIdCandidates(payload)
   if (candidates.length === 0) {
     console.warn('[Shopier refund] no id candidates', { event })

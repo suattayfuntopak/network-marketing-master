@@ -4,6 +4,7 @@ import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import {
+  EMPTY_FUNNEL,
   computeRoadmap,
   dailyTargetsForMonth,
   currentMonthIndex,
@@ -211,8 +212,6 @@ export interface DailyProgress {
   actuals: FunnelCounts
   stage: RoadmapStage | null
 }
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export interface GoalFunnelContextPayload {
   hasGoal: boolean

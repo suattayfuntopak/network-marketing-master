@@ -6,7 +6,7 @@ import { Target, ChevronDown, Pencil, Rocket } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useUserGoal } from '@/hooks/useUserGoal'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { calendarMonthOffsetForRoadmapMonth, type FunnelCounts } from '@/lib/domain/roadmap'
+import { EMPTY_FUNNEL, calendarMonthOffsetForRoadmapMonth } from '@/lib/domain/roadmap'
 import {
   FUNNEL_METRIC_VIVID_CLASS,
   FUNNEL_METRIC_VISUAL,
@@ -15,8 +15,6 @@ import {
 import { HubCrownFunnelGrid } from '@/components/hub/HubCrownFunnelGrid'
 
 const MONTH_OPTIONS = [3, 6, 9, 12, 18, 24, 36]
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export function HedefKart() {
   const { t } = useTranslation()

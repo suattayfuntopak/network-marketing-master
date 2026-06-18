@@ -56,13 +56,22 @@ export async function loadCustomContent(
   const dbKeys = new Set(dbItems.map(item => String(item.id)))
   const toMigrate = localItems.filter(it => !dbKeys.has(String(it.id)))
   if (toMigrate.length > 0) {
-    await migrateLocalCustomContentAction(table, workspaceId, toMigrate)
+    try {
+      await migrateLocalCustomContentAction(table, workspaceId, toMigrate)
+    } catch (err) {
+      // O-4: göç hatası TÜM içeriği kaybettirmesin — mevcut DB öğelerini döndür,
+      // localStorage'ı da silme (sonraki açılışta yeniden denenir).
+      console.error('[customContent] migration failed (non-fatal):', err)
+      return dbItems
+    }
   }
   if (localItems.length > 0) clearLocal(localKey)
 
+  // O-4: DB gerçeğiyle tutarlı — migrate edilen item moderasyon kuyruğuna girer
+  // (is_approved=false); sahibi yine görür, herkese yayınlanmaz.
   const migratedItems = toMigrate.map(it => ({
     ...it,
-    isApproved: true,
+    isApproved: false,
     userId: currentUserId,
   }))
 

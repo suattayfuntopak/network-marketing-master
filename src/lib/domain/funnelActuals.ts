@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
-import type { FunnelCounts } from '@/lib/domain/roadmap'
+import { EMPTY_FUNNEL, type FunnelCounts } from '@/lib/domain/roadmap'
 import type { PulsePeriod, SheetActivityPeriod } from '@/lib/domain/pulse'
 import {
   fromCalendarKey,
@@ -18,8 +18,6 @@ export type FunnelPeriodRange = {
 }
 
 const ISTANBUL = 'Europe/Istanbul'
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export function istanbulCalendarKeyFromIso(iso: string): string {
   return new Intl.DateTimeFormat('en-CA', {

@@ -1,6 +1,6 @@
 import { getStageLabel } from '@/lib/domain/stages'
 import { displayDailyActionNote, isLeaderUserNote } from '@/lib/domain/dailyActionNote'
-import { renderActivityText } from '@/app/(dashboard)/pipeline/[id]/_components/candidateDetailUtils'
+import { renderActivityText } from '@/lib/domain/activityText'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import type { NmmCandidate } from '@/types/database.types'
 

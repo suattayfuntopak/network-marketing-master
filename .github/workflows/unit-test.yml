@@ -35,6 +35,8 @@ jobs:
         run: npm ci
       - name: ESLint
         run: npm run lint
+      - name: TypeScript
+        run: npm run typecheck
 
   unit:
     name: Vitest

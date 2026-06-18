@@ -31,7 +31,7 @@ export function CrownFirst30Page({ asTab = false }: { asTab?: boolean }) {
 
   return (
     <HubPageShell
-      title={t('dashboard.crownMockFirst30Days')}
+      title={t('dashboard.crownFirst30Days')}
       subtitle={t('crown.first30Subtitle')}
       icon={CalendarDays}
       iconClassName="bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400"

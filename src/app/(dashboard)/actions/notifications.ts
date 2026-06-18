@@ -24,7 +24,8 @@ export async function fetchNotificationsAction(): Promise<NotificationItem[]> {
 
   const { data, error } = await supabase
     .from('nmm_notifications')
-    .select('*')
+    // O-6: NotificationItem alanlarını açıkça seç — '*' yerine tip-hizalı ve dar.
+    .select('id, user_id, title_tr, title_en, description_tr, description_en, type, read, created_at, candidate_id')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
     .limit(50)

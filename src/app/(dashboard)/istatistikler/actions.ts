@@ -4,10 +4,9 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient, type AdminClient } from '@/lib/supabase/admin'
 import { listAllAuthUsers } from '@/lib/supabase/listAllAuthUsers'
 import { assertSuperAdmin, isSuperAdmin, superAdminLicenseOverride } from '@/lib/domain/auth'
-import { getLimitsForLicense } from '@/lib/domain/aiUsage'
-import { normalizeLicenseType } from '@/lib/domain/aiUsage'
+import { getLimitsForLicense, normalizeLicenseType } from '@/lib/domain/aiUsage'
 import type { PulsePeriod } from '@/lib/domain/pulse'
-import type { FunnelCounts } from '@/lib/domain/roadmap'
+import { EMPTY_FUNNEL, type FunnelCounts } from '@/lib/domain/roadmap'
 import {
   fetchFunnelActualsForPeriod,
   funnelRangeForPulsePeriod,
@@ -20,8 +19,6 @@ import { getGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { GEMINI_FLASH, GEMINI_PRO } from '@/lib/ai/models'
 import { fromCalendarKey, toCalendarKey, todayCalendarKey } from '@/lib/utils/calendarDates'
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export type StatsFunnelBundle = {
   actuals: FunnelCounts

@@ -2,22 +2,23 @@
 
 ## 3. Tur — Triad (Torvalds + Feynman + Lao Tzu)
 
-Tam rapor: [council-triad-2026-06-18.md](council-triad-2026-06-18.md). **Analiz turu — kod değişmedi.**
+Tam rapor: [council-triad-2026-06-18.md](council-triad-2026-06-18.md). **Analiz + uygulama turu — A→F uygulandı (kullanıcı onayı).**
 
-**Genel:** Kod tabanı disiplinli (lint sıfır uyarı, 320 test geçiyor, `as any` 0, çeviri paritesi tam). 1 kritik + 6 yüksek + 9 orta + 9 düşük bulgu.
+**Genel:** Kod tabanı disiplinli (lint sıfır uyarı, 320 test geçiyor, `as any` 0, çeviri paritesi tam). 1 kritik + 6 yüksek + 9 orta + 9 düşük bulgu. **Uygulama doğrulaması:** build ✓ · lint ✓ · tsc ✓ · 320 test ✓ · i18n ✓ · net −190 satır.
 
-### Bu turun açık bulguları (önceliğe göre)
+### Bulgular ve durum
 
 | Faz | Kapsam | Bulgular | Durum |
 |---|---|---|---|
-| **A — Doğruluk** | tsc kırık (CI'a koy) + `monthRange` İstanbul timezone + AI kota check-then-act | K-1 (🔴), Y-1, O-1 | ⏳ açık |
-| **B — Güvenlik/hijyen** | Shopier inline client→`createAdminClient` + daily_actions derinlemesine-savunma + cron `select('*')` + cronAuth 401/500 | Y-5, O-2, O-6, D-8 | ⏳ açık |
-| **C — Mimari yön** | `lib/domain`→`app` ters bağımlılık + `assertWorkspaceMember` dedup + `EMPTY_FUNNEL`/hub action konsolidasyon + inline queryKey | Y-2, Y-3, O-5, O-9 | ⏳ açık |
-| **D — Çift-dil & veri** | `noteEn` zorunlu (CLAUDE.md §2) + customContent moderasyon/sessiz-hata + coaching localStorage çift-kaynak | Y-4, Y-6, O-4 | ⏳ açık |
-| **E — Sadeleştirme/ferahlık** | 5 nav alias + 3 boş klasör + ThemeToggle + çift skeleton + confirm/upgrade tekilleştir + `crownMock*` isim | D-1..D-7, O-3, O-7, O-8 | ⏳ açık |
-| **F — Stratejik (ölç→karar)** | 6 metrik yüzeyi konsolidasyonu, `trainingData` CMS | §5 | 🔭 önce ölç |
+| **A — Doğruluk** | tsc kırık + CI'a `typecheck` + `monthRange` İstanbul timezone | K-1 (🔴), Y-1 | ✅ uygulandı · O-1 (kota yarışı) ⏸️ ertelendi (DB risk) |
+| **B — Güvenlik/hijyen** | Shopier→typed `createAdminClient` (gizli tip hatası yakaladı) + cron `select('*')` + cronAuth 500/401 | Y-5, O-6, D-8 | ✅ uygulandı · O-2 belgelendi (RLS doğru sınır) |
+| **C — Mimari yön** | `lib/domain`→`app` ters bağımlılık + `assertWorkspaceMember` dedup + `EMPTY_FUNNEL` 7→1 + queryKey merkez | Y-2, Y-3, O-5, O-9 | ✅ uygulandı · hub 671-satır konsolidasyon ⏸️ ertelendi |
+| **D — Çift-dil & veri** | server-side `noteEn` garantisi + customContent moderasyon-sızıntısı + coaching localStorage (gizli global-key bug) | Y-4, Y-6, O-4 | ✅ uygulandı |
+| **E — Sadeleştirme** | 5 nav alias + 3 boş klasör + ThemeToggle + çift import + çift skeleton + `crownMock*`→`crown*` | D-1,D-2,D-3,D-4,D-6,O-3 | ✅ uygulandı |
+| **E — Ertelenenler** | confirm (tasarım kararı) · upgrade (mimari yanlış-okuma) · D-5 (geçersiz) · D-7 (geçerli desen) | O-7, O-8, D-5, D-7 | ⏸️ gerekçeli ertelendi |
+| **F — Stratejik (ölç→karar)** | 6 metrik yüzeyi konsolidasyonu, `trainingData` CMS | §5 | 🔭 önce ölç (kod değişmedi) |
 
-**Doğrulamada elenen üye iddiaları:** Shopier webhook "yok" → GEÇERSİZ (mevcut+test); `yearRange` timezone → GEÇERSİZ (İstanbul helper kullanıyor); "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped → O-2).
+**Doğrulamada elenen üye iddiaları:** Shopier webhook "yok" → GEÇERSİZ (mevcut+test); `yearRange` timezone → GEÇERSİZ; "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped). **Uygulama turunda:** O-8 (UpgradeGate çekirdek bileşen), D-5 (import kullanımda), O-2 (RLS doğru) — olduğu gibi uygulansa regresyon yaratacaktı.
 
 ---
 

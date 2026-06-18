@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { Zap, Bell, Search, X } from 'lucide-react'
@@ -219,7 +219,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
           {/* Tema Butonu */}
           <div className="shrink-0">
-            <ThemeToggle />
+            <ThemeCycleButton />
           </div>
 
           {/* Dil: aktif dilin bayrağı — tıklayınca diğer dile geç */}

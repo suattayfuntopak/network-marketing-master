@@ -6,6 +6,7 @@ import { StickyNote, ChevronUp, ChevronDown, Bot, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useCandidateNotes, useLeaderNotesCount, useAddCandidateNote } from '@/hooks/useCandidates'
+import { queryKeys } from '@/lib/query/keys'
 import { useDeferredCandidateSection } from '@/hooks/useDeferredCandidateSection'
 import {
   resolveDailyActionNote,
@@ -80,8 +81,8 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
           .then(async (translated: string) => {
             if (translated) {
               await persistLeaderNoteTranslationAction(n.id, translated)
-              queryClient.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
-              queryClient.invalidateQueries({ queryKey: ['activity', candidateId] })
+              queryClient.invalidateQueries({ queryKey: queryKeys.candidateNotes(candidateId) })
+              queryClient.invalidateQueries({ queryKey: queryKeys.candidateActivity(candidateId) })
             }
           })
           .catch(err => console.error('Lider notu otomatik çeviri hatası:', err))

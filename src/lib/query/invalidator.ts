@@ -17,14 +17,14 @@ export const queryInvalidator = {
     }
     
     // Invalidate activity logs and notes
-    qc.invalidateQueries({ queryKey: ['activity'] })
+    qc.invalidateQueries({ queryKey: queryKeys.candidateActivity() })
     if (candidateId) {
-      qc.invalidateQueries({ queryKey: ['activity', candidateId] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes', candidateId] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes-count', candidateId] })
+      qc.invalidateQueries({ queryKey: queryKeys.candidateActivity(candidateId) })
+      qc.invalidateQueries({ queryKey: queryKeys.candidateNotes(candidateId) })
+      qc.invalidateQueries({ queryKey: queryKeys.candidateNotesCount(candidateId) })
     } else {
-      qc.invalidateQueries({ queryKey: ['candidate-notes'] })
-      qc.invalidateQueries({ queryKey: ['candidate-notes-count'] })
+      qc.invalidateQueries({ queryKey: queryKeys.candidateNotes() })
+      qc.invalidateQueries({ queryKey: queryKeys.candidateNotesCount() })
     }
     
     // Changing candidates also impacts hub metrics & funnel actuals

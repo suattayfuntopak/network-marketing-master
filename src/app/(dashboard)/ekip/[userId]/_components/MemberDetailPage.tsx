@@ -36,13 +36,6 @@ const MemberActivitySheet = dynamic(
 
 type ActivityLevel = 'active' | 'recent' | 'silent'
 
-const TMPL_KEY = (level: ActivityLevel) => `nmm_tmpl_${level}`
-
-function readTemplate(level: ActivityLevel): string {
-  if (typeof window === 'undefined') return ''
-  return localStorage.getItem(TMPL_KEY(level)) ?? ''
-}
-
 function activityLevel(lastActivityAt: string | null): ActivityLevel {
   if (!lastActivityAt) return 'silent'
   const days = Math.floor((Date.now() - new Date(lastActivityAt).getTime()) / 86_400_000)
@@ -117,19 +110,21 @@ function TemplateEditor({
   workspaceId: string
   targetUserId: string
 }) {
-  const [active, setActive] = useState(readTemplate('active'))
-  const [recent, setRecent] = useState(readTemplate('recent'))
-  const [silent, setSilent] = useState(readTemplate('silent'))
+  // Y-6: DB tek kaynak. Eski global `nmm_tmpl_*` localStorage çift-kaynağı kaldırıldı
+  // (üye-bazlı değildi → şablonu olmayan üye, son görüntülenen üyenin şablonunu görürdü).
+  const [active, setActive] = useState('')
+  const [recent, setRecent] = useState('')
+  const [silent, setSilent] = useState('')
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
 
-  // Hydrate per-member templates from Supabase on mount
+  // Hydrate per-member templates from Supabase; üye değişince koşulsuz sıfırla/doldur.
   useEffect(() => {
     if (!workspaceId || !targetUserId) return
     getMemberCoachingTemplatesAction(workspaceId, targetUserId).then((tmpl: CoachingTemplates) => {
-      if (tmpl.active) { setActive(tmpl.active); localStorage.setItem(TMPL_KEY('active'), tmpl.active) }
-      if (tmpl.recent) { setRecent(tmpl.recent); localStorage.setItem(TMPL_KEY('recent'), tmpl.recent) }
-      if (tmpl.silent) { setSilent(tmpl.silent); localStorage.setItem(TMPL_KEY('silent'), tmpl.silent) }
+      setActive(tmpl.active ?? '')
+      setRecent(tmpl.recent ?? '')
+      setSilent(tmpl.silent ?? '')
     })
   }, [workspaceId, targetUserId])
 
@@ -137,9 +132,6 @@ function TemplateEditor({
     setSaving(true)
     try {
       await saveMemberCoachingTemplatesAction(workspaceId, targetUserId, { active, recent, silent })
-      localStorage.setItem(TMPL_KEY('active'), active)
-      localStorage.setItem(TMPL_KEY('recent'), recent)
-      localStorage.setItem(TMPL_KEY('silent'), silent)
       toast.success(t('team.memberDetailTemplateSaved'))
     } finally {
       setSaving(false)
@@ -223,7 +215,11 @@ export function MemberDetailPage({ userId }: { userId: string }) {
     if (!m) return
     const days = daysSinceActivity(m.last_activity_at)
     const level = activityLevel(m.last_activity_at)
-    const customContext = readTemplate(level) || undefined
+    // Y-6: koçluk şablonu DB tek kaynağından (localStorage kaldırıldı) — son kaydedilen şablon.
+    const tmpl = ws?.workspaceId
+      ? await getMemberCoachingTemplatesAction(ws.workspaceId, userId)
+      : null
+    const customContext = tmpl?.[level] || undefined
     setGenerating(true)
     try {
       const result = await generateCoachingMessageAction({

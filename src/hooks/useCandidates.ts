@@ -149,7 +149,7 @@ export function useMarkContacted(workspaceId: string) {
     onMutate: async ({ id, actionType }) => {
       const detailKey = queryKeys.candidateDetail(workspaceId, id)
       const listKey = queryKeys.candidates(workspaceId)
-      const activityKey = ['activity', id]
+      const activityKey = queryKeys.candidateActivity(id)
 
       await Promise.all([
         qc.cancelQueries({ queryKey: detailKey }),
@@ -231,7 +231,7 @@ export function useLogPresentationWhatsApp(workspaceId: string) {
 
 export function useActivityHistory(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
-    queryKey: ['activity', candidateId],
+    queryKey: queryKeys.candidateActivity(candidateId),
     queryFn: () => fetchCandidateActivityHistoryAction(candidateId),
     enabled: !!candidateId && queryEnabled,
   })
@@ -239,7 +239,7 @@ export function useActivityHistory(candidateId: string, queryEnabled = true) {
 
 export function useCandidateNotes(candidateId: string, queryEnabled = true) {
   return useQuery<NmmDailyAction[]>({
-    queryKey: ['candidate-notes', candidateId],
+    queryKey: queryKeys.candidateNotes(candidateId),
     queryFn: () => fetchCandidateNotesAction(candidateId),
     enabled: !!candidateId && queryEnabled,
   })
@@ -248,7 +248,7 @@ export function useCandidateNotes(candidateId: string, queryEnabled = true) {
 /** Kapalı kart rozeti — tam not listesi çekmeden lider notu sayısı. */
 export function useLeaderNotesCount(candidateId: string, queryEnabled = true) {
   return useQuery<number>({
-    queryKey: ['candidate-notes-count', candidateId],
+    queryKey: queryKeys.candidateNotesCount(candidateId),
     queryFn: () => fetchLeaderNotesCountAction(candidateId),
     enabled: !!candidateId && queryEnabled,
     staleTime: QUERY_STALE.progress,
@@ -269,8 +269,8 @@ export function useAddCandidateNote(workspaceId: string) {
       noteEn?: string
     }) => addCandidateNoteAction(workspaceId, { candidateId, noteTr, noteEn }),
     onMutate: async ({ candidateId, noteTr, noteEn }) => {
-      const notesKey = ['candidate-notes', candidateId]
-      const activityKey = ['activity', candidateId]
+      const notesKey = queryKeys.candidateNotes(candidateId)
+      const activityKey = queryKeys.candidateActivity(candidateId)
       await Promise.all([
         qc.cancelQueries({ queryKey: notesKey }),
         qc.cancelQueries({ queryKey: activityKey }),
@@ -320,8 +320,8 @@ export function useDeleteActivity(workspaceId: string) {
     mutationFn: async ({ activityId, candidateId }: { activityId: string; candidateId: string }) =>
       deleteCandidateActivityAction(workspaceId, { activityId, candidateId }),
     onMutate: async ({ activityId, candidateId }) => {
-      const notesKey = ['candidate-notes', candidateId]
-      const activityKey = ['activity', candidateId]
+      const notesKey = queryKeys.candidateNotes(candidateId)
+      const activityKey = queryKeys.candidateActivity(candidateId)
       await Promise.all([
         qc.cancelQueries({ queryKey: notesKey }),
         qc.cancelQueries({ queryKey: activityKey }),

@@ -8,7 +8,7 @@ import {
   getGoalFunnelContextAction,
   type GoalFunnelContextPayload,
 } from '@/app/(dashboard)/hedef/actions'
-import type { FunnelCounts } from '@/lib/domain/roadmap'
+import { EMPTY_FUNNEL, type FunnelCounts } from '@/lib/domain/roadmap'
 import {
   funnelTargetsForCalendarDay,
   funnelTargetsForCalendarMonth,
@@ -292,8 +292,6 @@ async function funnelActualsSince(
     endCalendarKey,
   )
 }
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 function toHubFunnelContext(payload: GoalFunnelContextPayload): GoalFunnelContext | null {
   if (!payload.hasGoal || !payload.goal) return null

@@ -1,4 +1,5 @@
 import {
+  EMPTY_FUNNEL,
   WORKING_DAYS_PER_MONTH,
   currentMonthIndex,
   type FunnelCounts,
@@ -7,8 +8,6 @@ import {
 import { funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { fromCalendarKey } from '@/lib/utils/calendarDates'
-
-const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
 
 export type GoalFunnelContext = {
   startAt: Date

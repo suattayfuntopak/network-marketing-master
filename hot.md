@@ -6943,3 +6943,15 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Doğrulamada elenen iddialar:** Shopier webhook "yok" → GEÇERSİZ (`api/payment/shopier/route.ts` mevcut + testli); `yearRange` timezone → GEÇERSİZ; "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped).
 - **En yüksek kaldıraçlı 3 hamle:** (1) tsc yeşil + CI, (2) `monthRange` timezone fix, (3) ölü iskelet temizliği (nav alias + boş klasör + ThemeToggle + çift skeleton).
 - Önceliklendirme ve fazlama [docs/COUNCIL_STATUS.md](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/COUNCIL_STATUS.md)'de güncellendi. **Bu turda hiçbir uygulama kodu değiştirilmedi.**
+
+
+## 2026-06-18 — Council Triad 3. Tur: Düzeltmelerin Uygulanması (Faz A→F)
+
+### refactor: Kullanıcı onayıyla A→F fazları cerrah titizliğiyle uygulandı
+- **Doğrulama:** `next build` ✓ · `eslint --max-warnings 0` ✓ · `tsc --noEmit` ✓ · 320/320 test ✓ · i18n paritesi (1277 anahtar) ✓. **Net −190 satır** (36 dosya). Tam döküm: [docs/council-triad-2026-06-18.md §9](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/council-triad-2026-06-18.md).
+- **Faz A (doğruluk):** `yazarCandidateContext.test.ts` tip importu + `package.json` `typecheck` script'i + CI gate'e `tsc --noEmit` adımı (K-1). `monthRange` ham `toISOString()` → İstanbul gün-anahtarı (Y-1; aylık hub metriği gece 00:00–03:00 kaymasını düzeltti).
+- **Faz B (güvenlik/hijyen):** Shopier route 3× inline `createClient` → typed `createAdminClient` (Y-5) — typed client gizli tip hatası yakaladı, `newLicenseType: PlanId` daraltıldı. Cron + notifications `select('*')` → açık alan listesi (O-6). `cronAuth` secret yokken 500 vs 401 (D-8).
+- **Faz C (mimari):** `renderActivityText` → `lib/domain/activityText.ts` (Y-2, `lib→app` runtime ihlali kalktı). `assertWorkspaceMember` ölü fallback ×4 → tek destructure (Y-3). `EMPTY_FUNNEL` 7 tanım → `roadmap.ts` kanonik (O-5). Aday `activity`/`notes`/`-count` keyleri `queryKeys` factory'sine (O-9).
+- **Faz D (çift-dil & veri):** `addCandidateNoteAction` `noteEn` boşsa server-side çeviri üretir — CLAUDE.md §2 garantisi (Y-4). Coaching templates global `localStorage` kaldırıldı, DB tek kaynak — şablonsuz üyenin başka üyenin şablonunu görmesi bug'ı düzeldi (Y-6). customContent göçü `is_approved: false` (moderasyon-atlama sızıntısı kapandı) + göç hatası `dbItems` döndürür (O-4).
+- **Faz E (sadeleştirme):** 5 ölü nav alias (D-1), 3 boş `_components` klasörü (D-2), `ThemeToggle` sarmalayıcı (D-3), çift import (D-4) silindi; `crownMock*`→`crown*` (D-6); saha-ozetim çift skeleton → paylaşılan `FieldSummarySkeleton`, `animate-pulse` ihlali kalktı (O-3).
+- **Bilinçli ertelenenler (gerekçeli):** O-1 (kota yarışı — canlı DB rezerve-pattern riski), hub 671-satır konsolidasyon (salt-kozmetik), O-7 (confirm — tasarım kararı), O-8 (upgrade — bulgu mimariyi yanlış okumuş; UpgradeGate çekirdek bileşen), D-5 (geçersiz — import kullanımda), D-7 (geçerli desen), Faz F (ölç→karar). Üye yanılgıları `dosya:satır` ile doğrulandı.

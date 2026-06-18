@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { formatCandidateContextForYazar } from '@/lib/domain/yazarCandidateContext'
 import type { YazarContextAction } from '@/lib/domain/yazarCandidateContext'
+import type { NmmCandidate } from '@/types/database.types'
 
 const t = (k: string) => k
 

@@ -42,7 +42,8 @@ export async function GET(request: NextRequest) {
 
   const { data: allCandidates } = await supabase
     .from('nmm_candidates')
-    .select('*')
+    // O-6: yalnız takip hesabı için gereken alanlar — gece tüm tabloyu (note vb.) çekme.
+    .select('id, owner_id, workspace_id, full_name, next_follow_up_at, last_contact_at, stage, created_at')
     .in('workspace_id', wsIds)
 
   const candidatesByWs = new Map<string, NmmCandidate[]>()

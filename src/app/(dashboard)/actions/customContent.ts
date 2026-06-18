@@ -85,7 +85,11 @@ export async function migrateLocalCustomContentAction(
       workspace_id: workspaceId,
       item_key: String(item.id),
       data: item as unknown as Json,
-      is_approved: true,
+      // O-4: addCustomContentAction ile tutarlı (DB default false). Eski `true`,
+      // kullanıcının özel localStorage içeriğini moderasyonu ATLAYARAK herkese
+      // yayınlıyordu. Sahibi `user_id` koşuluyla görmeye devam eder; paylaşım için
+      // moderasyondan geçer.
+      is_approved: false,
       is_deleted: false,
     }))
 

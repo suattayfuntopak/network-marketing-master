@@ -25,6 +25,9 @@ export interface FunnelCounts {
   yeniUye: number
 }
 
+/** Sıfır huni — kanonik tek kaynak (O-5/D-2: 7 dosyadaki yerel kopyalar buradan import eder). */
+export const EMPTY_FUNNEL: FunnelCounts = { arama: 0, tanisma: 0, sunum: 0, yeniUye: 0 }
+
 export interface RoadmapStage {
   /** 1..A */
   month: number

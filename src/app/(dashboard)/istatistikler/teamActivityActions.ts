@@ -82,9 +82,9 @@ async function assertWorkspaceMember(workspaceId: string) {
   const { user } = await getAuthUser()
   if (!user) throw new Error('Oturum gerekli.')
 
-  // license_type'ı üyelik sorgusuna JOIN et → üye yolundaki AYRI lisans
-  // round-trip'i silinir (çağıranların 'licenseType' in ctx fallback'i artık
-  // tetiklenmez). ekip + istatistikler team action'larından bir sıralı dalga kalkar.
+  // license_type'ı üyelik sorgusuna JOIN et → her zaman `licenseType` döndürülür.
+  // Y-3: çağıranlar artık doğrudan destructure eder; eski 'licenseType' in ctx
+  // fallback round-trip'i (ölü koddu) kaldırıldı.
   const { data: membership } = await supabase
     .from('nmm_workspace_members')
     .select('workspace_id, nmm_workspaces(license_type)')
@@ -119,18 +119,7 @@ export async function getTeamFieldActivityAction(
     byUser: {},
   }
 
-  const ctx = await assertWorkspaceMember(workspaceId)
-  const { supabase, user } = ctx
-  const licenseType =
-    'licenseType' in ctx && ctx.licenseType
-      ? ctx.licenseType
-      : (
-          await supabase
-            .from('nmm_workspaces')
-            .select('license_type')
-            .eq('id', workspaceId)
-            .single()
-        ).data?.license_type
+  const { supabase, user, licenseType } = await assertWorkspaceMember(workspaceId)
 
   if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
 
@@ -324,18 +313,7 @@ export async function getTeamRankingMetricsBatchAction(
     all: emptyPeriod(),
   }
 
-  const ctx = await assertWorkspaceMember(workspaceId)
-  const { supabase, user } = ctx
-  const licenseType =
-    'licenseType' in ctx && ctx.licenseType
-      ? ctx.licenseType
-      : (
-          await supabase
-            .from('nmm_workspaces')
-            .select('license_type')
-            .eq('id', workspaceId)
-            .single()
-        ).data?.license_type
+  const { supabase, user, licenseType } = await assertWorkspaceMember(workspaceId)
 
   if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
 
@@ -390,18 +368,7 @@ export async function getTeamRankingMetricsAction(
 ): Promise<TeamRankingMetricsResult> {
   const empty: TeamRankingMetricsResult = { byUser: {} }
 
-  const ctx = await assertWorkspaceMember(workspaceId)
-  const { supabase, user } = ctx
-  const licenseType =
-    'licenseType' in ctx && ctx.licenseType
-      ? ctx.licenseType
-      : (
-          await supabase
-            .from('nmm_workspaces')
-            .select('license_type')
-            .eq('id', workspaceId)
-            .single()
-        ).data?.license_type
+  const { supabase, user, licenseType } = await assertWorkspaceMember(workspaceId)
 
   if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
 
@@ -430,18 +397,7 @@ export async function getMemberActivityDetailAction(
     hasMemberGoal: false,
   }
 
-  const ctx = await assertWorkspaceMember(workspaceId)
-  const { supabase, user } = ctx
-  const licenseType =
-    'licenseType' in ctx && ctx.licenseType
-      ? ctx.licenseType
-      : (
-          await supabase
-            .from('nmm_workspaces')
-            .select('license_type')
-            .eq('id', workspaceId)
-            .single()
-        ).data?.license_type
+  const { supabase, user, licenseType } = await assertWorkspaceMember(workspaceId)
 
   if (!hasTeamPageAccess(licenseType, isSuperAdmin(user))) return empty
 

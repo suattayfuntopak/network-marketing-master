@@ -261,4 +261,46 @@ Cron sadece 5 alan kullanırken `nmm_candidates` için `select('*')` tüm sütun
 
 ---
 
-**Sonuç:** Proje sağlıklı ve premium eşiğinde. 1 kritik (tsc) + 1 doğruluk (timezone) bulgusu önce kapanmalı; gerisi teknik borç temizliği ve ferahlık için sadeleştirme. Bu fazlama tamamlandığında uygulama "tertemiz kod, tıkır tıkır çalışan, ferah ve premium" hedefine ulaşır. **Bu turda hiçbir kod değiştirilmedi.**
+**Sonuç:** Proje sağlıklı ve premium eşiğinde. 1 kritik (tsc) + 1 doğruluk (timezone) bulgusu önce kapanmalı; gerisi teknik borç temizliği ve ferahlık için sadeleştirme. Bu fazlama tamamlandığında uygulama "tertemiz kod, tıkır tıkır çalışan, ferah ve premium" hedefine ulaşır.
+
+---
+
+## 9. Uygulama Turu (2026-06-18 — kod değiştirildi)
+
+Yukarıdaki analizin ardından kullanıcı onayıyla A→F fazları cerrah titizliğiyle uygulandı. **Doğrulama:** `next build` ✓ · `eslint --max-warnings 0` ✓ · `tsc --noEmit` ✓ · 320/320 test ✓ · i18n paritesi (1277 anahtar) ✓. Net **−190 satır** (36 dosya).
+
+### Uygulananlar
+| ID | Faz | Ne yapıldı |
+|---|---|---|
+| K-1 | A | `yazarCandidateContext.test.ts` tip importu eklendi; `typecheck` script'i + CI gate'e (`unit-test.yml` lint job) `tsc --noEmit` adımı |
+| Y-1 | A | `monthRange` ham `toISOString()` → `istanbulDayStartIso/EndIso` (komşu fonksiyonlarla aynı kalıp) |
+| Y-5 | B | Shopier route 3× inline `createClient` → typed `createAdminClient`; **typed client gizli tip hatası yakaladı** → `newLicenseType: PlanId` daraltıldı, gereksiz cast silindi |
+| O-6 | B | `calendar-reminder` cron + `notifications` action: `select('*')` → açık alan listesi |
+| D-8 | B | `cronAuth`: secret yokken 500 (yapılandırma) vs yetkisiz 401 ayrıldı |
+| Y-2 | C | `renderActivityText` UI util'inden `lib/domain/activityText.ts`'e taşındı; `candidateDetailUtils` re-export; `lib/domain`→`app` runtime ihlali kalktı |
+| Y-3 | C | `assertWorkspaceMember` ölü `licenseType` fallback ×4 → tek destructure (−~40 satır) |
+| O-5 | C | `EMPTY_FUNNEL` 7 yerel tanım → `roadmap.ts` kanonik tek kaynak |
+| O-9 | C | Aday `activity`/`candidate-notes`/`-count` keyleri `queryKeys` factory'sine (3 dosyada drift kapandı) |
+| Y-4 | D | `addCandidateNoteAction` `noteEn` boşsa **server-side** çeviri üretir → CLAUDE.md §2 çift-dil garantisi (lazy/on-the-fly yerine yazım anında) |
+| Y-6 | D | Coaching templates global `localStorage` kaldırıldı, DB tek kaynak; **gizli bug:** üye-bazlı olmayan key yüzünden şablonsuz üye, son görüntülenen üyenin şablonunu görüyordu — düzeldi |
+| O-4 | D | customContent göçü `is_approved: true` → `false` (**moderasyon-atlama sızıntısı** kapandı); göç hatası artık `dbItems` döndürür (sessiz boşaltma yok) |
+| D-1 | E | navigation.ts 5 ölü `@deprecated` alias silindi (tüketicisiz) |
+| D-2 | E | 3 boş `_components/` klasörü silindi (redirect kabukları köprü olarak korundu) |
+| D-3 | E | `ThemeToggle` tek-satır sarmalayıcı silindi; `Header` doğrudan `ThemeCycleButton` |
+| D-4 | E | istatistikler/actions çift `aiUsage` importu birleştirildi |
+| D-6 | E | `crownMock*` çeviri anahtarları → `crown*` (yanıltıcı "Mock" kaldırıldı) |
+| O-3 | E | saha-ozetim çift skeleton → paylaşılan `FieldSummarySkeleton`; ad-hoc `animate-pulse` (AGENTS.md ihlali) kalktı |
+
+### Bilinçli ertelenenler (gerekçeli — cerrah titizliği)
+| ID | Neden ertelendi |
+|---|---|
+| **O-1** (AI kota yarışı) | Gerçek atomik fix, AI çağrısından önce slot rezerve eden yeni DB fonksiyonu + 7+ çağrı yerinde "rezerve/geri-al" semantiği gerektirir. **Canlı prod DB'sine** kör deploy edilemez (lockout riski; ödeyen/super-admin asla kilitlenmemeli). Sayaç zaten atomik, etki sınırlı (eşzamanlı sekmede limit+N, veri bozulması yok) → ayrı, DB-test edilmiş tura bırakıldı. |
+| **O-5 hub konsolidasyon** | `hubSelfActions` 671-satır 5-periyot birleştirmesi çalışan kodun salt-kozmetik yeniden yazımı; regresyon riski > fayda. `EMPTY_FUNNEL` dedup yapıldı. |
+| **O-7** (confirm tekilleştir) | İki danger görseli **kasıtlı farklı** (ConfirmDeleteModal bordo+Trash2 vs ConfirmDialog kırmızı+AlertTriangle). Birleştirmek 5 silme akışının görünümünü değiştirir → bir **tasarım kararı**, sessiz dayatılmamalı. |
+| **O-8** (upgrade tekilleştir) | **Bulgu mimariyi yanlış okumuş:** `UpgradeGate` ince sarmalayıcı değil, 273-satır 3-varyantlı **çekirdek** yükseltme bileşeni (Shopier checkout + plan grid); `UpgradePrompt` bunun üzerine kurulu. Gereksiz değil. |
+| **D-5** (kullanılmayan import) | **Geçersiz:** `superAdminLicenseOverride` `istatistikler/actions.ts:245`'te kullanılıyor. |
+| **D-7** (hedef/ klasörü) | `page.tsx` olmadığı için aslında rota değil; co-located actions klasörü geçerli Next deseni — 8-dosya import churn'üne değmez. |
+| **O-2** (daily_actions filtresi) | RLS workspace+downline scope'u kasıtlı; `.eq('user_id')` lider notlarını/downline görünümünü kırardı. Niyet yorumla belgelendi. |
+| **Faz F** (6 metrik yüzeyi, trainingData CMS) | Rota-trafiği verisi + sahip kararı gerektiren ürün/mimari kararlar; "ölç→karar" — kör kesme yok. |
+
+**Doğrulamanın elediği üye yanılgıları (uygulama turunda da):** O-8 (UpgradeGate çekirdek bileşen), D-5 (import kullanımda), O-2 (RLS doğru sınır) — konseyin önerileri olduğu gibi uygulansa regresyon yaratırdı; her biri `dosya:satır` ile doğrulanıp düzeltildi.

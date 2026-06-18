@@ -12,6 +12,15 @@ export const queryKeys = {
   candidates: (workspaceId: string) => ['candidates', workspaceId] as const,
   candidateDetail: (workspaceId: string, candidateId: string) =>
     ['candidate', workspaceId, candidateId] as const,
+  /** Aday aktivite günlüğü — id'siz kök prefix invalidation için kullanılır. */
+  candidateActivity: (candidateId?: string) =>
+    candidateId ? (['activity', candidateId] as const) : (['activity'] as const),
+  /** Aday lider notları — id'siz kök prefix invalidation için kullanılır. */
+  candidateNotes: (candidateId?: string) =>
+    candidateId ? (['candidate-notes', candidateId] as const) : (['candidate-notes'] as const),
+  /** Aday lider notu sayısı (kapalı kart rozeti) — id'siz kök prefix invalidation. */
+  candidateNotesCount: (candidateId?: string) =>
+    candidateId ? (['candidate-notes-count', candidateId] as const) : (['candidate-notes-count'] as const),
   /** Ekip paneli + istatistik ekip tablosu — tek bundle cache */
   team: (workspaceId: string) => ['team', workspaceId] as const,
   /** @deprecated use team() — invalidation uyumu için alias */
