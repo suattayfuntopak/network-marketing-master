@@ -1239,6 +1239,19 @@ export interface Database {
         }
         Returns: undefined
       }
+      nmm_insert_ai_action_if_under_limit: {
+        Args: {
+          p_user_id: string
+          p_workspace_id: string
+          p_candidate_id: string | null
+          p_note: string
+          p_note_tr: string | null
+          p_ai_model: string | null
+          p_day_start: string
+          p_limit: number
+        }
+        Returns: boolean
+      }
       nmm_rollup_hub_prefetch_daily: {
         Args: { p_day?: string }
         Returns: number

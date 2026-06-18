@@ -181,6 +181,7 @@ export async function generateCoachingMessageAction(input: {
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       noteTr: input.targetUserId ? `coaching:${input.targetUserId}:${preview}` : undefined,
       aiModel: GEMINI_FLASH,

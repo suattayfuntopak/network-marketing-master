@@ -52,6 +52,7 @@ export async function generateCoachMessage(
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: GEMINI_FLASH,
     })
@@ -124,6 +125,7 @@ Kurallar:
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: GEMINI_FLASH,
     })
@@ -182,6 +184,7 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: GEMINI_FLASH,
     })

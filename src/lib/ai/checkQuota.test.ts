@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/lib/domain/auth', () => ({ isSuperAdmin: vi.fn() }))
 
-import { checkAIQuota } from './checkQuota'
+import { checkAIQuota, logAIGeneration } from './checkQuota'
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
@@ -183,5 +183,76 @@ describe('checkAIQuota', () => {
       expect(res.used).toBe(10)
       expect(res.remaining).toBe(89)
     }
+  })
+})
+
+// ── logAIGeneration: O-1 atomik kota rezervasyonu ───────────────────────────
+
+type RpcResult = { data?: unknown; error?: { message: string } | null }
+
+function makeLogClient(rpcImpl: (name: string) => RpcResult) {
+  const inserts: unknown[] = []
+  const rpcCalls: string[] = []
+  const client = {
+    from: () => ({
+      insert: (row: unknown) => {
+        inserts.push(row)
+        return Promise.resolve({ error: null })
+      },
+    }),
+    rpc: async (name: string) => {
+      rpcCalls.push(name)
+      return rpcImpl(name)
+    },
+  }
+  return { client, inserts, rpcCalls }
+}
+
+const RESERVE = 'nmm_insert_ai_action_if_under_limit'
+const INCREMENT = 'nmm_increment_ai_usage_daily'
+
+describe('logAIGeneration (atomik kota rezervasyonu)', () => {
+  it('limitli akış: atomik RPC + başarılıysa sayaç artışı, düz insert yok', async () => {
+    const { client, inserts, rpcCalls } = makeLogClient(name =>
+      name === RESERVE ? { data: true, error: null } : { error: null },
+    )
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGeneration({ workspaceId: 'w1', userId: 'u1', note: 'message', dailyLimit: 20 })
+
+    expect(rpcCalls).toEqual([RESERVE, INCREMENT])
+    expect(inserts).toHaveLength(0) // atomik yol kullanıldı, düz insert yok
+  })
+
+  it('limit dolu (RPC false): sayaç artmaz, düz insert yok', async () => {
+    const { client, inserts, rpcCalls } = makeLogClient(() => ({ data: false, error: null }))
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGeneration({ workspaceId: 'w1', userId: 'u1', note: 'message', dailyLimit: 20 })
+
+    expect(rpcCalls).toEqual([RESERVE]) // increment çağrılmadı
+    expect(inserts).toHaveLength(0)
+  })
+
+  it('RPC hatası: fail-open düz insert + sayaç artışı', async () => {
+    const { client, inserts, rpcCalls } = makeLogClient(name =>
+      name === RESERVE ? { data: null, error: { message: 'function does not exist' } } : { error: null },
+    )
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGeneration({ workspaceId: 'w1', userId: 'u1', note: 'message', dailyLimit: 20 })
+
+    expect(rpcCalls).toEqual([RESERVE, INCREMENT])
+    expect(inserts).toHaveLength(1) // fallback düz insert
+  })
+
+  it('limitsiz (süper admin, dailyLimit null): düz insert, rezerve RPC yok', async () => {
+    const { client, inserts, rpcCalls } = makeLogClient(() => ({ error: null }))
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGeneration({ workspaceId: 'w1', userId: 'u1', note: 'message', dailyLimit: null })
+
+    expect(rpcCalls).toEqual([INCREMENT]) // yalnız analitik sayaç
+    expect(inserts).toHaveLength(1)
   })
 })

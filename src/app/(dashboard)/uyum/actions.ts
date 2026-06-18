@@ -142,6 +142,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'compliance',
       aiModel: GEMINI_FLASH,
     })

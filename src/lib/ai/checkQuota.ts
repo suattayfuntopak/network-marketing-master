@@ -149,12 +149,20 @@ export async function logAIGeneration(params: {
   noteTr?: string | null
   /** Gemini model id — süper admin maliyet paneli. */
   aiModel?: string | null
+  /**
+   * Günlük AI limiti — verilirse insert atomik+limit-farkında yapılır (O-1: yarış
+   * kapatma). `null`/undefined → limitsiz (süper admin) → düz insert. `checkAIQuota`
+   * sonucundan: `quota.isSuperAdmin ? null : quota.limit`.
+   */
+  dailyLimit?: number | null
 }): Promise<void> {
   if (!params.workspaceId) return
   const supabase = await createClient()
-  try {
-    await supabase.from('nmm_daily_actions').insert({
-      workspace_id: params.workspaceId,
+
+  // Süper admin / limitsiz akış — düz insert (mevcut davranış).
+  const plainInsert = () =>
+    supabase.from('nmm_daily_actions').insert({
+      workspace_id: params.workspaceId!,
       user_id: params.userId,
       candidate_id: params.candidateId ?? null,
       action_type: 'ai_generate' as const,
@@ -163,14 +171,45 @@ export async function logAIGeneration(params: {
       ...(params.aiModel ? { ai_model: params.aiModel } : {}),
     })
 
-    // İstanbul günü — kota penceresi (dayStartIso) ile tutarlı olmalı.
-    const usageDate = todayCalendarKey()
-    await supabase.rpc('nmm_increment_ai_usage_daily', {
-      p_user_id: params.userId,
-      p_workspace_id: params.workspaceId,
-      p_usage_date: usageDate,
-      p_kind: 'ai',
-    })
+  try {
+    let counted = true
+
+    if (typeof params.dailyLimit === 'number' && Number.isFinite(params.dailyLimit)) {
+      // Atomik limit-farkında insert: per-kullanıcı advisory-lock ile count+insert
+      // tek seri bölgede → eşzamanlı sekme/çift-tık sayımı limiti aşamaz.
+      const dayStartIso = istanbulDayStartIso(todayCalendarKey())
+      const { data, error } = await supabase.rpc('nmm_insert_ai_action_if_under_limit', {
+        p_user_id: params.userId,
+        p_workspace_id: params.workspaceId,
+        p_candidate_id: params.candidateId ?? null,
+        p_note: params.note,
+        p_note_tr: params.noteTr ?? null,
+        p_ai_model: params.aiModel ?? null,
+        p_day_start: dayStartIso,
+        p_limit: params.dailyLimit,
+      })
+      if (error) {
+        // Fail-open: RPC yoksa (migration uygulanmadan deploy) veya erişilemezse
+        // düz insert'e düş — kota asla ödeyen kullanıcıyı kilitlemez.
+        console.error('[logAIGeneration] atomic reserve failed, düz insert:', error)
+        await plainInsert()
+      } else {
+        // false → limit dolu (eşzamanlı yarışta diğer istek doldurdu): sayma.
+        counted = data === true
+      }
+    } else {
+      await plainInsert()
+    }
+
+    if (counted) {
+      // İstanbul günü — kota penceresi (dayStartIso) ile tutarlı olmalı.
+      await supabase.rpc('nmm_increment_ai_usage_daily', {
+        p_user_id: params.userId,
+        p_workspace_id: params.workspaceId,
+        p_usage_date: todayCalendarKey(),
+        p_kind: 'ai',
+      })
+    }
   } catch (err) {
     console.error('[logAIGeneration] insert failed:', err)
   }

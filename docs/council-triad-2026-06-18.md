@@ -304,3 +304,22 @@ Yukarıdaki analizin ardından kullanıcı onayıyla A→F fazları cerrah titiz
 | **Faz F** (6 metrik yüzeyi, trainingData CMS) | Rota-trafiği verisi + sahip kararı gerektiren ürün/mimari kararlar; "ölç→karar" — kör kesme yok. |
 
 **Doğrulamanın elediği üye yanılgıları (uygulama turunda da):** O-8 (UpgradeGate çekirdek bileşen), D-5 (import kullanımda), O-2 (RLS doğru sınır) — konseyin önerileri olduğu gibi uygulansa regresyon yaratırdı; her biri `dosya:satır` ile doğrulanıp düzeltildi.
+
+---
+
+## 10. Ertelenen Tur: O-1 + Faz F (2026-06-18)
+
+Kullanıcı onayıyla, ilk turda bilinçli ertelenen iki kalem cerrah titizliğiyle ele alındı. **Doğrulama:** `next build` ✓ · lint ✓ · `tsc --noEmit` ✓ · **324/324 test** (4 yeni) ✓ · `migrate:check` ✓.
+
+### O-1 — AI kota check-then-act yarışı (atomik rezervasyon, fail-open)
+**Tasarım:** Yeni DB fonksiyonu `nmm_insert_ai_action_if_under_limit` (migration **104**), per-kullanıcı `pg_advisory_xact_lock` ile `count + insert`'i tek seri bölgede yapar → eşzamanlı sekme/çift-tık günlük sayımı limiti aşamaz. `logAIGeneration` limit verildiğinde bu RPC'yi çağırır; **fail-open**: RPC yoksa (migration uygulanmadan deploy) veya hata verirse düz insert'e düşer — kota **asla** ödeyen kullanıcıyı/super-admin'i kilitlemez. Limit doluysa (RPC `false`) o eşzamanlı istek sayılmaz (analitik sayaç da artmaz).
+- **Neden reserve-before-AI değil:** checkAIQuota sonrası erken-return'ler (ownership/validation) rezervasyon sızdırırdı; insert AI başarısından sonra olduğu için sızıntı yok. Kimlik koruması: fonksiyon `p_user_id <> auth.uid()` ise `false` döner.
+- **Dosyalar:** `supabase/migrations/104_*.sql`, `database.types.ts` (Functions), `lib/ai/checkQuota.ts` (logAIGeneration + `dailyLimit` param), 11 AI action çağrısına `dailyLimit: quota.isSuperAdmin ? null : quota.limit`.
+- **Test:** `checkQuota.test.ts` +4 — atomik başarı (rezerve→sayaç), limit-dolu (sayaç yok), RPC-hatası (fail-open düz insert), limitsiz süper admin (düz insert).
+- **Deploy notu:** migration normal `db push` akışıyla uygulanır; kod fail-open olduğundan deploy sırası önemsiz.
+
+### Faz F — 6 metrik yüzeyi trafik ölçümü (additif enstrümantasyon)
+**Tasarım:** Mevcut ürün-event altyapısına (`PRODUCT_EVENTS` + `logProductEventAction`) `surface_view` olayı eklendi. `useSurfaceViewBeacon(pathname, enabled)` hook'u, izlenen yüzeylere (`/pano`, `/saha-ozetim`, `/saha-radar`, `/istatistikler`, `/hedefim`) her girişte olayı gönderir; `DashboardShell`'e **tek satır** bağlandı (sayfa-başı churn yok). `lastFired` ref'i ara rotadan dönüşü yeni görüntüleme sayar, salt re-render'ı saymaz.
+- **Neden kesme yok:** Bu, "tek performans kapısı" konsolidasyonunun **ön-koşulu** olan veriyi biriktirir. Birkaç hafta sonra göreli trafik görülünce (örn. saha-radar düşük → İstatistikler'e sekme) konsolidasyon **veriyle** kararlaştırılır. `morningBriefView` zaten ayrı izleniyor.
+- **Dosyalar:** `lib/domain/productEvents.ts` (`surfaceView`), `hooks/useSurfaceViewBeacon.ts` (yeni), `DashboardShell.tsx` (+1 satır).
+- **Sonraki adım (kod değil, karar):** ~2-4 hafta veri sonrası `surface_view` dağılımına bakıp konsolidasyon turu planla.

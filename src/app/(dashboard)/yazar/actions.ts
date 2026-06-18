@@ -66,6 +66,7 @@ export async function generateMessageAction(
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: GEMINI_FLASH,
     })
@@ -201,6 +202,7 @@ JSON yapısı şu şekilde olmalıdır:
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'roleplay',
       aiModel: coachModel,
     })
@@ -295,6 +297,7 @@ ${buildObjectionKnowledgeBase(l)}`;
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: coachModel,
     })
@@ -369,6 +372,7 @@ DİL POLİTİKASI: language 'en' ise tamamen İngilizce, 'tr' ise tamamen Türk�
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: contentModel,
     })

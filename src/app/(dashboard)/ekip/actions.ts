@@ -559,6 +559,7 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: coachModel,
     })

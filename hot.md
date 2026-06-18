@@ -6955,3 +6955,17 @@ Hardcode Türkçe metin içeren tüm bileşenler tespit edilerek `t()` fonksiyon
 - **Faz D (çift-dil & veri):** `addCandidateNoteAction` `noteEn` boşsa server-side çeviri üretir — CLAUDE.md §2 garantisi (Y-4). Coaching templates global `localStorage` kaldırıldı, DB tek kaynak — şablonsuz üyenin başka üyenin şablonunu görmesi bug'ı düzeldi (Y-6). customContent göçü `is_approved: false` (moderasyon-atlama sızıntısı kapandı) + göç hatası `dbItems` döndürür (O-4).
 - **Faz E (sadeleştirme):** 5 ölü nav alias (D-1), 3 boş `_components` klasörü (D-2), `ThemeToggle` sarmalayıcı (D-3), çift import (D-4) silindi; `crownMock*`→`crown*` (D-6); saha-ozetim çift skeleton → paylaşılan `FieldSummarySkeleton`, `animate-pulse` ihlali kalktı (O-3).
 - **Bilinçli ertelenenler (gerekçeli):** O-1 (kota yarışı — canlı DB rezerve-pattern riski), hub 671-satır konsolidasyon (salt-kozmetik), O-7 (confirm — tasarım kararı), O-8 (upgrade — bulgu mimariyi yanlış okumuş; UpgradeGate çekirdek bileşen), D-5 (geçersiz — import kullanımda), D-7 (geçerli desen), Faz F (ölç→karar). Üye yanılgıları `dosya:satır` ile doğrulandı.
+
+
+## 2026-06-18 — Council Triad 3. Tur: Ertelenen O-1 + Faz F uygulandı
+
+### feat(ai): AI kota check-then-act yarışı atomik rezervasyonla kapatıldı (O-1)
+- **Doğrulama:** build ✓ · lint ✓ · tsc ✓ · **324/324 test** (4 yeni) ✓ · migrate:check ✓. Detay: [docs/council-triad-2026-06-18.md §10](file:///Users/suattayfuntopak/STT/ai/my-projects/network-marketing-master/docs/council-triad-2026-06-18.md).
+- Yeni DB fonksiyonu `nmm_insert_ai_action_if_under_limit` (migration **104**): per-kullanıcı `pg_advisory_xact_lock` ile `count + insert` tek seri bölgede → eşzamanlı sekme/çift-tık günlük sayımı limiti aşamaz. Kimlik koruması (`p_user_id = auth.uid()`).
+- `logAIGeneration`'a `dailyLimit` parametresi; limitli akış RPC'yi çağırır, **fail-open**: RPC yoksa/hatalıysa düz insert'e düşer (kota asla ödeyen kullanıcıyı kilitlemez). Limit doluysa o eşzamanlı istek sayılmaz. 11 AI action çağrısı `dailyLimit: quota.isSuperAdmin ? null : quota.limit` geçiriyor.
+- `checkQuota.test.ts` +4 test: atomik başarı, limit-dolu, RPC-hata fail-open, limitsiz süper admin.
+- **Deploy:** migration normal db-push akışıyla uygulanır; kod fail-open olduğundan deploy sırası önemsiz.
+
+### feat(analytics): 6 metrik yüzeyi trafik ölçümü enstrümante edildi (Faz F)
+- Ürün-event altyapısına `surface_view` olayı eklendi; `useSurfaceViewBeacon` hook'u izlenen yüzeylere (pano/saha-ozetim/saha-radar/istatistikler/hedefim) her girişte olay gönderir; `DashboardShell`'e tek satır bağlandı (sayfa-başı churn yok).
+- **Kör kesme yok:** Bu, "tek performans kapısı" konsolidasyonunun ön-koşulu olan veriyi biriktirir. ~2-4 hafta sonra `surface_view` dağılımına bakıp konsolidasyon kararı veriyle alınacak.

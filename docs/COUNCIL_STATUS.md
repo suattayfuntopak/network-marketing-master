@@ -16,7 +16,17 @@ Tam rapor: [council-triad-2026-06-18.md](council-triad-2026-06-18.md). **Analiz 
 | **D — Çift-dil & veri** | server-side `noteEn` garantisi + customContent moderasyon-sızıntısı + coaching localStorage (gizli global-key bug) | Y-4, Y-6, O-4 | ✅ uygulandı |
 | **E — Sadeleştirme** | 5 nav alias + 3 boş klasör + ThemeToggle + çift import + çift skeleton + `crownMock*`→`crown*` | D-1,D-2,D-3,D-4,D-6,O-3 | ✅ uygulandı |
 | **E — Ertelenenler** | confirm (tasarım kararı) · upgrade (mimari yanlış-okuma) · D-5 (geçersiz) · D-7 (geçerli desen) | O-7, O-8, D-5, D-7 | ⏸️ gerekçeli ertelendi |
-| **F — Stratejik (ölç→karar)** | 6 metrik yüzeyi konsolidasyonu, `trainingData` CMS | §5 | 🔭 önce ölç (kod değişmedi) |
+| **F — Stratejik (ölç→karar)** | 6 metrik yüzeyi konsolidasyonu, `trainingData` CMS | §5 | 📊 ölçüm enstrümante edildi (aşağı) |
+
+### Ertelenen tur — O-1 + Faz F uygulandı (§10)
+
+| Kalem | Ne yapıldı | Durum |
+|---|---|---|
+| **O-1** kota yarışı | migration 104 `nmm_insert_ai_action_if_under_limit` (advisory-lock atomik insert) + `logAIGeneration` fail-open + 11 çağrı `dailyLimit` + 4 test | ✅ uygulandı (fail-open, lockout riski yok) |
+| **Faz F** trafik ölçümü | `surface_view` event + `useSurfaceViewBeacon` + DashboardShell tek satır (pano/saha-ozetim/saha-radar/istatistikler/hedefim) | 📊 enstrümante — ~2-4 hafta veri sonrası konsolidasyon kararı |
+| **trainingData CMS** | uzun vade, henüz dokunulmadı | 🔭 ertelendi |
+
+**Doğrulama:** build ✓ · lint ✓ · tsc ✓ · 324 test ✓ · migrate:check ✓.
 
 **Doğrulamada elenen üye iddiaları:** Shopier webhook "yok" → GEÇERSİZ (mevcut+test); `yearRange` timezone → GEÇERSİZ; "herhangi kullanıcı aktivite okur" → ABARTILI (RLS workspace-scoped). **Uygulama turunda:** O-8 (UpgradeGate çekirdek bileşen), D-5 (import kullanımda), O-2 (RLS doğru) — olduğu gibi uygulansa regresyon yaratacaktı.
 

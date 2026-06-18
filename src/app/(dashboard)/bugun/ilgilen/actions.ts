@@ -38,6 +38,7 @@ export async function generateQuickMessageAction(input: {
     await logAIGeneration({
       workspaceId: quota.workspaceId,
       userId: quota.user.id,
+      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
       note: 'message',
       aiModel: GEMINI_FLASH,
     })

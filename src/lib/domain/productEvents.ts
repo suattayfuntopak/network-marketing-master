@@ -36,6 +36,14 @@ export const PRODUCT_EVENTS = {
   broadcastSent: 'broadcast_sent',
   /** Hesap-durumu modalındaki "Planları Gör" tıklandı (phase: trial|ended) → satış hunisi. */
   seePlansClick: 'see_plans_click',
+
+  // ── Faz F: metrik/özet yüzeyi trafiği (konsolidasyon kararı için ölçüm) ──
+  /**
+   * Bir "performans/özet" yüzeyi görüntülendi (payload: surface). 6 yüzeyin
+   * (pano/saha-ozetim/saha-radar/istatistikler/hedefim) göreli trafiğini ölçer →
+   * "tek performans kapısı" konsolidasyonu veriyle kararlaştırılır (kör kesme yok).
+   */
+  surfaceView: 'surface_view',
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]
