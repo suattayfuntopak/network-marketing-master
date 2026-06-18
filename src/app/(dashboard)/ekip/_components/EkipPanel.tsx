@@ -184,7 +184,6 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           members={members}
           visibleMembers={visibleMembers}
           isLeader={isLeader}
-          isSolo={members.length <= 1}
           isPlusCapReached={isPlusCapReached}
           hasMasterAccess={hasMasterAccess}
           setOnboardingCoachData={setOnboardingCoachData}

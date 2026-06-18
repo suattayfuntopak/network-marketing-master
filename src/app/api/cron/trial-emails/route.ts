@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       }
 
       const stats = await fetchTrialUserStats(supabase, r.workspaceId)
-      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang, stats)
+      const sent = await sendTrialLifecycleEmail(r.email, r.name, job.kind, r.lang, stats, r.workspaceId)
 
       if (sent && shouldSendTrialPush(job.kind)) {
         const pushFresh = await claimEmailSend(supabase, r.workspaceId, `push_${job.kind}`, todayKey)

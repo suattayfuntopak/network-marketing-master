@@ -26,7 +26,6 @@ export interface TeamPerformanceSectionProps {
   members: MemberRow[]
   visibleMembers: MemberRow[]
   isLeader: boolean
-  isSolo: boolean
   isPlusCapReached: boolean
   hasMasterAccess: boolean
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
@@ -61,7 +60,7 @@ function getSearchScore(fullName: string | null, query: string): number {
 
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
-    t, lang, ws, members, visibleMembers, isLeader, isSolo, isPlusCapReached, hasMasterAccess,
+    t, lang, ws, members, visibleMembers, isLeader, isPlusCapReached, hasMasterAccess,
     setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange,
@@ -342,11 +341,6 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           </div>
         )}
 
-        {isSolo && isLeader && (
-          <p className="rounded-xl bg-[var(--bg-subtle)] px-5 py-4 text-center text-sm font-semibold text-[var(--text-2)] leading-relaxed border border-[var(--border)]">
-            {t('team.soloHint')}
-          </p>
-        )}
         {!isLeader && (
           <p className="rounded-xl bg-[var(--bg-subtle)] px-5 py-4 text-center text-sm font-semibold text-[var(--text-2)] leading-relaxed border border-[var(--border)]">
             {t('team.memberHint')}

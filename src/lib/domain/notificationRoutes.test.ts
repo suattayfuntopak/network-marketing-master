@@ -27,20 +27,20 @@ describe('notificationTargetHref', () => {
     expect(notificationTargetHref({ type: 'calendar', candidate_id: null })).toBe('/takvim')
   })
 
-  it('routes trial upgrade notifications to odeme basic deep link', () => {
+  it('routes trial upgrade notifications to Shopier basic checkout', () => {
     expect(
       notificationTargetHref({
         type: 'alert',
         candidate_id: null,
         title_tr: 'Deneme bitti — Basic ile devam et',
       }),
-    ).toBe('/odeme?plan=basic&period=monthly')
+    ).toBe('/odeme/shopier/basic')
     expect(
       notificationTargetHref({
         type: 'info',
         candidate_id: null,
         title_en: '3 days left on your trial',
       }),
-    ).toBe('/odeme?plan=basic&period=monthly')
+    ).toBe('/odeme/shopier/basic')
   })
 })

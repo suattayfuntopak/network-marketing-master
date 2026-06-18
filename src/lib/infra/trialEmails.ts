@@ -13,7 +13,8 @@ import {
 
 import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
-import { ODEME_BASIC_DEEP_LINK } from '@/lib/domain/paymentRoutes'
+import { ODEME_SHOPIER_BASIC_PATH } from '@/lib/domain/paymentRoutes'
+import { buildBasicMonthlyStorefrontUrl } from '@/lib/domain/shopierStorefront'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -26,15 +27,19 @@ export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ende
 
 const PAYMENT_URL = `${NMM_APP_URL}/odeme`
 
-function paymentUrlForTrialKind(kind: TrialEmailKind): string {
+function paymentUrlForTrialKind(kind: TrialEmailKind, workspaceId?: string): string {
   if (kind === 'trial_3d' || kind === 'trial_1d' || kind === 'trial_ended') {
-    return `${NMM_APP_URL}${ODEME_BASIC_DEEP_LINK}`
+    if (workspaceId) {
+      const shopier = buildBasicMonthlyStorefrontUrl(workspaceId)
+      if (shopier) return shopier
+    }
+    return `${NMM_APP_URL}${ODEME_SHOPIER_BASIC_PATH}`
   }
   return PAYMENT_URL
 }
 
-function paymentCtaUrl(kind: TrialEmailKind, utm: string): string {
-  const base = paymentUrlForTrialKind(kind)
+function paymentCtaUrl(kind: TrialEmailKind, utm: string, workspaceId?: string): string {
+  const base = paymentUrlForTrialKind(kind, workspaceId)
   return base.includes('?') ? `${base}&${utm}` : `${base}?${utm}`
 }
 
@@ -81,7 +86,8 @@ function contentFor(
   kind: TrialEmailKind,
   name: string,
   lang: 'tr' | 'en',
-  stats?: TrialUserStats
+  stats?: TrialUserStats,
+  workspaceId?: string
 ): { subject: string; html: string } {
   const hi = lang === 'en' ? `Hi ${name},` : `Merhaba ${name},`
   const cta =
@@ -150,7 +156,7 @@ function contentFor(
                 : `${emailHighlight('14 günlük ücretsiz denemeniz')} Network Marketing Master'da ${emailHighlight('3 gün')} içinde sona erecek. Basic özelliklerin tamamı hâlâ açık — liste, YZ koçu ve saha provası.`
             ),
             planBox(lang),
-            emailCta(paymentCtaUrl(kind, utm), cta),
+            emailCta(paymentCtaUrl(kind, utm, workspaceId), cta),
           ].join(''),
           lang
         ),
@@ -174,7 +180,7 @@ function contentFor(
                 : `Yarın ücretsiz Basic denemeniz bitecek. ${emailHighlight('Yapay zeka erişimi kilitlenecek')} — ancak liste, takvim, ekip, eğitimler ve tüm verileriniz açık kalmaya devam ediyor. Yapay zekayı aktif tutmak için bugün planınızı seçin.`
             ),
             planBox(lang),
-            emailCta(paymentCtaUrl(kind, utm), cta),
+            emailCta(paymentCtaUrl(kind, utm, workspaceId), cta),
           ].join(''),
           lang
         ),
@@ -220,7 +226,7 @@ function contentFor(
                 : 'AI\'ı yeniden açmak ve işinizi büyütmeye devam etmek için plan seçin:'
             ),
             planBox(lang),
-            emailCta(paymentCtaUrl(kind, utm), cta),
+            emailCta(paymentCtaUrl(kind, utm, workspaceId), cta),
           ].join(''),
           lang
         ),
@@ -277,14 +283,15 @@ export async function sendTrialLifecycleEmail(
   name: string,
   kind: TrialEmailKind,
   lang: 'tr' | 'en' = 'tr',
-  stats?: TrialUserStats
+  stats?: TrialUserStats,
+  workspaceId?: string
 ): Promise<boolean> {
   if (!process.env.RESEND_API_KEY) {
     console.warn('[Resend] Skipping trial email:', kind)
     return false
   }
 
-  const { subject, html } = contentFor(kind, name, lang, stats)
+  const { subject, html } = contentFor(kind, name, lang, stats, workspaceId)
 
   try {
     await getResend().emails.send({ from: FROM_EMAIL, to: [email], replyTo: NMM_REPLY_TO, subject, html })

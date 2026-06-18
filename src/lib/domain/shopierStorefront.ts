@@ -1,4 +1,5 @@
 import type { BillingPeriod, PlanId } from '@/lib/domain/pricing'
+import { buildShopierPlatformOrderId } from '@/lib/domain/shopierCheckout'
 
 /**
  * Shopier "dükkan yönlendirme" (storefront-redirect) modeli.
@@ -28,9 +29,11 @@ export interface ShopierStorefrontProduct {
   productId: string
 }
 
-/** SHOPIER_STOREFRONT_ENABLED=true iken yeni dükkan-yönlendirme akışı devrede. */
+/** SHOPIER_STOREFRONT_ENABLED=true veya SHOPIER_PRODUCTS doluysa dükkan yönlendirmesi. */
 export function isShopierStorefrontEnabled(): boolean {
-  return process.env.SHOPIER_STOREFRONT_ENABLED === 'true'
+  if (process.env.SHOPIER_STOREFRONT_ENABLED === 'false') return false
+  if (process.env.SHOPIER_STOREFRONT_ENABLED === 'true') return true
+  return Object.keys(loadShopierProductMap()).length > 0
 }
 
 export function productKey(plan: PlanId, period: BillingPeriod): ProductKey {
@@ -87,6 +90,14 @@ export function buildStorefrontRedirectUrl(productUrl: string, note: string): st
   url.searchParams.set('quantity', '1')
   url.searchParams.set('note', note)
   return url.toString()
+}
+
+/** Cron/e-posta için workspace'e özel Basic aylık Shopier linki; ürün yoksa null. */
+export function buildBasicMonthlyStorefrontUrl(workspaceId: string): string | null {
+  const product = getStorefrontProduct('basic', 'monthly')
+  if (!product) return null
+  const note = buildShopierPlatformOrderId(workspaceId, 'basic', 'monthly')
+  return buildStorefrontRedirectUrl(product.url, note)
 }
 
 export interface ResolvedStorefrontPlan {
