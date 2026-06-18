@@ -23,8 +23,9 @@ Tam rapor: [council-triad-2026-06-18.md](council-triad-2026-06-18.md). **Analiz 
 | Kalem | Ne yapıldı | Durum |
 |---|---|---|
 | **O-1** kota yarışı | migration 104 `nmm_insert_ai_action_if_under_limit` (advisory-lock atomik insert) + `logAIGeneration` fail-open + 11 çağrı `dailyLimit` + 4 test | ✅ uygulandı (fail-open, lockout riski yok) |
-| **Faz F** trafik ölçümü | `surface_view` event + `useSurfaceViewBeacon` + DashboardShell tek satır (pano/saha-ozetim/saha-radar/istatistikler/hedefim) | 📊 enstrümante — ~2-4 hafta veri sonrası konsolidasyon kararı |
-| **trainingData CMS** | uzun vade, henüz dokunulmadı | 🔭 ertelendi |
+| **Faz F** trafik ölçümü | `surface_view` event + `useSurfaceViewBeacon` + DashboardShell tek satır; **görülebilirlik:** `analyze_surface_view_traffic.sql` + `npm run db:analyze:surface-view` (§11) | 📊 enstrümante + sorgu hazır — ~2026-07-09 `npm run db:analyze:surface-view` → konsolidasyon önerisi |
+| **trainingData CMS** | 2075 satır; CMS çok günlük spekülatif özellik | ⏸️ bilinçli ertelendi (§11) — tetik: dev-olmayan editör / değişim > ayda 1 / çok-dilli editör |
+| **Planlı cloud agent** | cloud sandbox'ta prod Supabase erişimi yok → analiz çalıştıramaz | ❌ kurulmadı (gerekçeli) — repo-içi tarihli not hatırlatıcı |
 
 **Doğrulama:** build ✓ · lint ✓ · tsc ✓ · 324 test ✓ · migrate:check ✓.
 
