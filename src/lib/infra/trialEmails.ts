@@ -13,7 +13,12 @@ import {
 
 import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
-import { ODEME_SHOPIER_BASIC_PATH } from '@/lib/domain/paymentRoutes'
+import { ODEME_PLANS_PATH } from '@/lib/domain/paymentRoutes'
+import {
+  TRIAL_EMAIL_CTA,
+  trialLifecyclePaymentPath,
+  type TrialLifecycleKind,
+} from '@/lib/domain/trialLifecycle'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -22,25 +27,13 @@ function getResend(): Resend {
 }
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'NMM <onboarding@resend.dev>'
 
-export type TrialEmailKind = 'trial_mid' | 'trial_3d' | 'trial_1d' | 'trial_ended' | 'trial_15d'
+export type TrialEmailKind = TrialLifecycleKind
 
-const PAYMENT_URL = `${NMM_APP_URL}/odeme`
-
-/** Deneme CTA — uygulama içi redirect (UTM + workspace note sunucuda üretilir). */
-function paymentUrlForTrialKind(kind: TrialEmailKind): string {
-  if (kind === 'trial_3d' || kind === 'trial_1d' || kind === 'trial_ended') {
-    return `${NMM_APP_URL}${ODEME_SHOPIER_BASIC_PATH}`
-  }
-  return PAYMENT_URL
-}
-
-/** Shopier dış URL veya uygulama içi path'e UTM ekler (note alanına karışmaz). */
-function appendUtm(url: string, utm: string): string {
-  return url.includes('?') ? `${url}&${utm}` : `${url}?${utm}`
-}
+const PAYMENT_URL = `${NMM_APP_URL}${ODEME_PLANS_PATH}`
 
 function paymentCtaUrl(kind: TrialEmailKind, utm: string): string {
-  return appendUtm(paymentUrlForTrialKind(kind), utm)
+  const base = `${NMM_APP_URL}${trialLifecyclePaymentPath(kind)}`
+  return base.includes('?') ? `${base}&${utm}` : `${base}?${utm}`
 }
 
 /**
@@ -89,8 +82,7 @@ function contentFor(
   stats?: TrialUserStats,
 ): { subject: string; html: string } {
   const hi = lang === 'en' ? `Hi ${name},` : `Merhaba ${name},`
-  const cta =
-    lang === 'en' ? 'View plans & continue →' : 'Planları incele ve devam et →'
+  const cta = lang === 'en' ? TRIAL_EMAIL_CTA.en : TRIAL_EMAIL_CTA.tr
   const utm = `utm_source=nmm_email&utm_campaign=${kind}`
   const personal = statsParagraph(stats, lang)
 

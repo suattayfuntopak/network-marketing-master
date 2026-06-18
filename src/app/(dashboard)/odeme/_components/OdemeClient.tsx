@@ -47,6 +47,14 @@ export function OdemeClient() {
   useBodyScrollLock(loading)
 
   const basicDeepLinkLogged = useRef(false)
+  const odemeViewLogged = useRef(false)
+
+  useEffect(() => {
+    if (!odemeViewLogged.current) {
+      odemeViewLogged.current = true
+      void logProductEventAction(PRODUCT_EVENTS.odemePageView, {})
+    }
+  }, [])
 
   useEffect(() => {
     if (highlightBasic && basicPlanRef.current) {

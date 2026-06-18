@@ -1,9 +1,20 @@
-/** Ürün hunisi olay adları — SQL / raporlarda sabit string. */
+/** Ürün hunisi olay adları — SQL / raporlarda sabit string.
+ *
+ * Satış hunisi akışı:
+ *   pricing_section_view (landing)
+ *   → see_plans_click (source: account_alert | upgrade_gate | notification; phase: trial | ended)
+ *   → odeme_page_view
+ *   → odeme_basic_deep_link (legacy query deep link)
+ *   → upgrade_gate_cta_click (yalnız aktif deneme UpgradeGate)
+ */
 export const PRODUCT_EVENTS = {
   pricingSectionView: 'pricing_section_view',
-  /** UpgradeGate (aktif deneme) CTA — artık trialEnded akışında seePlansClick kullanılır. */
+  /** UpgradeGate (aktif deneme) CTA — trialEnded akışında seePlansClick kullanılır. */
   upgradeGateCtaClick: 'upgrade_gate_cta_click',
+  /** @deprecated Legacy ?plan=basic deep link; yeni huni odemePageView üzerinden ölçülür. */
   odemeBasicDeepLink: 'odeme_basic_deep_link',
+  /** /odeme sayfası görüntülendi → seePlans sonrası dönüşüm. */
+  odemePageView: 'odeme_page_view',
 
   // ── Dalga 0: Viralite & alışkanlık KPI ölçüm zemini ──
   // (Şema değişmez; nmm_product_events serbest event_name kabul eder.)
@@ -48,3 +59,10 @@ export const PRODUCT_EVENTS = {
 } as const
 
 export type ProductEventName = (typeof PRODUCT_EVENTS)[keyof typeof PRODUCT_EVENTS]
+
+export type SeePlansClickPhase = 'trial' | 'ended'
+export type SeePlansClickSource = 'account_alert' | 'upgrade_gate' | 'notification'
+export type SeePlansClickMetadata = {
+  phase: SeePlansClickPhase
+  source: SeePlansClickSource
+}

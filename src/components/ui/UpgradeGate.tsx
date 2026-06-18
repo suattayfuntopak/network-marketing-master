@@ -95,9 +95,16 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
           {trialEnded ? t('shellUi.upgradeTrialEndedTitle') : t(titleKey(feature))}
         </h2>
         <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[var(--text-2)]">
-          {trialEnded
-            ? t('shellUi.upgradeTrialEndedDesc')
-            : t(descKey(feature))}
+          {trialEnded ? (
+            <span className="block space-y-2">
+              <span className="block">{t('shellUi.accountModalLockedBody')}</span>
+              <span className="block rounded-lg border border-amber-500/25 bg-amber-500/8 px-3 py-2.5">
+                {t('shellUi.accountModalLockedFootnote')}
+              </span>
+            </span>
+          ) : (
+            t(descKey(feature))
+          )}
         </p>
 
         <div className="mt-4 grid grid-cols-3 gap-2 text-left">

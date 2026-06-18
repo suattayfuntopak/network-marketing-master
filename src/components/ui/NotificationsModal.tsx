@@ -10,7 +10,9 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
-import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { isTeamJoinNotification, isTrialUpgradeNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { trialNotificationPhase } from '@/lib/domain/trialLifecycle'
+import { logSeePlansClick } from '@/lib/domain/seePlansAnalytics'
 import { useNotificationPreferences } from '@/hooks/useNotificationPreferences'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import type { NotificationType } from '@/types/database.types'
@@ -439,6 +441,27 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
                       className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-brand transition-colors hover:border-brand/40 hover:bg-brand/12 active:scale-[0.98] dark:border-brand/35 dark:bg-brand/15 dark:hover:bg-brand/22"
                     >
                       {t('pagesUi.viewDailySummary')}
+                    </button>
+                  ) : isTrialUpgradeNotification(selected) ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        logSeePlansClick(
+                          trialNotificationPhase(selected.title_tr, selected.title_en),
+                          'notification',
+                        )
+                        router.push(notificationTargetHref({
+                          type: selected.type,
+                          candidate_id: selected.candidate_id,
+                          title_tr: selected.title_tr,
+                          title_en: selected.title_en,
+                        }))
+                        setSelected(null)
+                        onClose()
+                      }}
+                      className="inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-brand/25 bg-brand/[0.07] px-3 py-1.5 text-xs font-semibold leading-tight text-brand transition-colors hover:border-brand/40 hover:bg-brand/12 active:scale-[0.98] dark:border-brand/35 dark:bg-brand/15 dark:hover:bg-brand/22"
+                    >
+                      {t('shellUi.seePlansCta')}
                     </button>
                   ) : null}
                   <button

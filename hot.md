@@ -1,5 +1,56 @@
 # Hot Log
 
+## 2026-06-18 — Deneme hunisi tam paket (23 öneri) ✅
+
+### Özet
+trialLifecycle tek kaynak kopya; e-posta CTA `/odeme`; UpgradeModalFooter + seePlansAnalytics; bildirim tıklama analytics; Platform Yönetim satış hunisi kartı; odemePageView; i18n/metin tutarlılığı; legacy metrik etiketleri.
+
+### Değişen dosyalar
+- `src/lib/domain/trialLifecycle.ts` (+test), `seePlansAnalytics.ts` (+test)
+- `src/lib/infra/trialEmails.ts`, `trialPush.ts`
+- `src/lib/domain/paymentRoutes.ts` (+test), `notificationRoutes.ts`, `productEvents.ts`
+- `src/components/ui/UpgradeGate.tsx`, `UpgradeModalFooter.tsx`
+- `src/hooks/useNotifications.ts`, `NotificationsModal.tsx`
+- `src/app/(dashboard)/odeme/_components/OdemeClient.tsx`
+- `src/app/(dashboard)/platform-yonetim/` (PlatformProductFunnel, actions, content)
+- `src/app/(dashboard)/istatistikler/actions.ts`
+- `src/lib/translations/sections/shell.ts`, `platform.ts`
+- `src/lib/ai/checkQuota.ts`
+
+### Doğrulama
+tsc · test 331/331 · lint · i18n
+
+## 2026-06-18 — Deneme hunisi tutarlılık paketi (5 öneri) ✅
+
+### Özet
+UpgradeGate + AccountStatusAlert ortak `UpgradeModalFooter`; trialEnded metni nötr plan seçimi tonuna çekildi; Basic plan vurgusu kaldırıldı; trial push bildirim metinleri güncellendi; bildirim rotası `/odeme`; `seePlansClick` hunisi source kırılımı (`account_alert` | `upgrade_gate`).
+
+### Değişen dosyalar
+- `src/components/ui/UpgradeModalFooter.tsx` (yeni)
+- `src/components/ui/UpgradeGate.tsx`
+- `src/app/(dashboard)/pano/_components/AccountStatusAlert.tsx`
+- `src/lib/translations/sections/shell.ts`
+- `src/lib/infra/trialPush.ts`
+- `src/lib/domain/notificationRoutes.ts`, `notificationRoutes.test.ts`
+- `src/lib/domain/productEvents.ts`
+- `src/app/(dashboard)/istatistikler/actions.ts`
+
+### Doğrulama
+tsc · notificationRoutes.test 5/5 · lint
+
+## 2026-06-18 — Deneme bitişi UpgradeGate: Basic CTA kaldırıldı ✅
+
+### Özet
+Deneme süresi bitince YZ kilit modalından "Basic ile devam et" (Shopier doğrudan checkout) kaldırıldı. Butonlar üst banner modalı (`AccountStatusAlert`) ile hizalandı: **Planları Gör** (birincil) + **Kapat**. Kullanılmayan `getBasicShopierStorefrontUrlAction` ve `upgradeTrialEndedCta` i18n anahtarı temizlendi.
+
+### Değişen dosyalar
+- `src/components/ui/UpgradeGate.tsx`
+- `src/lib/translations/sections/shell.ts`
+- `src/app/(dashboard)/odeme/actions.ts`
+
+### Doğrulama
+tsc --noEmit · lint
+
 ## 2026-06-18 — Şifre güncelle/sıfırla i18n ✅
 
 ### Özet

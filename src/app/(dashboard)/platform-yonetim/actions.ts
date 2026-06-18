@@ -10,6 +10,12 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { aggregateViralKpi, type ViralKpi, type ViralEventRow } from '@/lib/domain/viralKpi'
 import { todayCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
+import {
+  getProductFunnelStatsAction,
+  type ProductFunnelCounts,
+} from '@/app/(dashboard)/istatistikler/actions'
+
+export type { ProductFunnelCounts }
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
@@ -242,4 +248,9 @@ export async function getViralKpiAction(): Promise<ViralKpi> {
   })
 
   return aggregateViralKpi(rows, todayCalendarKey(), VIRAL_KPI_WINDOW_DAYS)
+}
+
+/** Süper admin: son 30 gün satış hunisi (landing → plan CTA → ödeme). */
+export async function getPlatformProductFunnelAction() {
+  return getProductFunnelStatsAction('30d')
 }

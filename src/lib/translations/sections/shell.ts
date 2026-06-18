@@ -25,7 +25,7 @@ export const shellSection = {
       upgradeBannerCta: 'Planları Gör & Yükselt',
       upgradeMenuTrialTitle: 'Planı Yükselt',
       upgradeMenuExpiredTitle: 'Planı Yükselt',
-      upgradeMenuDesc: 'Basic, Plus veya Pro — daha yüksek günlük YZ kredileri',
+      upgradeMenuDesc: 'Basic, Plus veya Pro — yapay zeka ve ekip özelliklerini aç',
       teamGateTitle: 'Ekibim Plus veya Pro planlarda',
       teamGateDesc:
         'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Ücretsiz planda ekibinizi görebilir ve davet kodunuzla yeni üyeler ekleyebilirsiniz.',
@@ -50,8 +50,6 @@ export const shellSection = {
       planBlurb_plus: 'Günlük {limit} YZ + ekibim',
       planBlurb_pro: 'Günlük {limit} YZ + tam güç',
       upgradeTrialEndedTitle: '14 günlük denemen bitti — YZ kilitlendi',
-      upgradeTrialEndedDesc:
-        'Deneme süren bitti. Liste, takvim ve ekibin açık kalıyor. Yapay zeka ve gelişmiş ekip özelliklerini yeniden açmak için bir plan seç.',
       seePlansCta: 'Planları Gör',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
@@ -105,7 +103,7 @@ export const shellSection = {
       upgradeBannerCta: 'View Plans & Upgrade',
       upgradeMenuTrialTitle: 'Upgrade plan',
       upgradeMenuExpiredTitle: 'Upgrade plan',
-      upgradeMenuDesc: 'Basic, Plus, or Pro — higher daily AI credits',
+      upgradeMenuDesc: 'Basic, Plus, or Pro — unlock AI and team features',
       teamGateTitle: 'Team hub is on Plus or Pro',
       teamGateDesc:
         'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. On the free plan you can view your team and invite new members with your code.',
@@ -130,8 +128,6 @@ export const shellSection = {
       planBlurb_plus: 'Daily {limit} AI + team hub',
       planBlurb_pro: 'Daily {limit} AI + full power',
       upgradeTrialEndedTitle: 'Your 14-day trial ended — AI is locked',
-      upgradeTrialEndedDesc:
-        'Your trial has ended. Pipeline, calendar, and your team stay open. Choose a plan to unlock AI and advanced team features again.',
       seePlansCta: 'See Plans',
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:

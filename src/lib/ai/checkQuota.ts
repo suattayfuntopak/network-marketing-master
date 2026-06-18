@@ -96,8 +96,8 @@ export async function checkAIQuota(
       ok: false,
       reason: 'feature_unavailable',
       message: lang === 'en'
-        ? 'Your 14-day trial has ended. Upgrade to Basic, Plus, or Pro to use AI features again.'
-        : '14 günlük deneme süreniz bitti. Yapay zeka özelliklerini kullanmak için Basic, Plus veya Pro plana geçin.',
+        ? 'Choose a Basic, Plus, or Pro plan to unlock AI features again.'
+        : 'Yapay zeka özelliklerini yeniden açmak için Basic, Plus veya Pro plan seçin.',
       limit: 0,
     }
   }

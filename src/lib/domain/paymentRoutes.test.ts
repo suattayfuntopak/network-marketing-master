@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   odemeShopierPath,
+  ODEME_PLANS_PATH,
   ODEME_SHOPIER_BASIC_PATH,
   ODEME_SHOPIER_PLUS_MONTHLY_PATH,
   ODEME_SHOPIER_PRO_MONTHLY_PATH,
@@ -16,5 +17,11 @@ describe('odemeShopierPath', () => {
 
   it('appends period query for yearly', () => {
     expect(odemeShopierPath('plus', 'yearly')).toBe('/odeme/shopier/plus?period=yearly')
+  })
+})
+
+describe('ODEME_PLANS_PATH', () => {
+  it('is the default trial notification destination', () => {
+    expect(ODEME_PLANS_PATH).toBe('/odeme')
   })
 })

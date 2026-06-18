@@ -4,14 +4,15 @@ import Link from 'next/link'
 import { Sparkles } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
-import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import type { SeePlansClickPhase, SeePlansClickSource } from '@/lib/domain/productEvents'
+import { logSeePlansClick } from '@/lib/domain/seePlansAnalytics'
+import { ODEME_PLANS_PATH } from '@/lib/domain/paymentRoutes'
 
-export type SeePlansClickSource = 'upgrade_gate' | 'account_alert'
+export type { SeePlansClickSource }
 
 type UpgradeModalFooterProps = {
   onClose: () => void
-  phase: 'trial' | 'ended'
+  phase: SeePlansClickPhase
   source: SeePlansClickSource
   /** sheet: hesap modalı alt şeridi; compact: UpgradeGate gövdesi içi */
   layout?: 'sheet' | 'compact'
@@ -23,7 +24,7 @@ export function UpgradeModalFooter({
   phase,
   source,
   layout = 'compact',
-  plansHref = '/odeme',
+  plansHref = ODEME_PLANS_PATH,
 }: UpgradeModalFooterProps) {
   const { t } = useTranslation()
   const isSheet = layout === 'sheet'
@@ -49,7 +50,7 @@ export function UpgradeModalFooter({
       <Link
         href={plansHref}
         onClick={() => {
-          void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase, source })
+          logSeePlansClick(phase, source)
           onClose()
         }}
         className={clsx(

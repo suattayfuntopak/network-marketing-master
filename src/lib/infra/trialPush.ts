@@ -1,40 +1,19 @@
 import type { AdminClient } from '@/lib/supabase/admin'
-import type { TrialEmailKind } from '@/lib/infra/trialEmails'
+import type { TrialLifecycleKind } from '@/lib/domain/trialLifecycle'
+import { TRIAL_PUSH_COPY, isTrialPushKind } from '@/lib/domain/trialLifecycle'
 
-const PUSH_KINDS = new Set<TrialEmailKind>(['trial_3d', 'trial_1d', 'trial_ended'])
-
-export function shouldSendTrialPush(kind: TrialEmailKind): boolean {
-  return PUSH_KINDS.has(kind)
+export function shouldSendTrialPush(kind: TrialLifecycleKind): boolean {
+  return isTrialPushKind(kind)
 }
 
 export async function sendTrialLifecyclePush(
   supabase: AdminClient,
   userId: string,
-  kind: TrialEmailKind,
+  kind: TrialLifecycleKind,
 ): Promise<boolean> {
-  if (!shouldSendTrialPush(kind)) return false
+  if (!isTrialPushKind(kind)) return false
 
-  const copy =
-    kind === 'trial_ended'
-      ? {
-          title_tr: 'Deneme bitti — YZ kilitlendi',
-          title_en: 'Trial ended — AI locked',
-          description_tr: 'NMM açık kalıyor — plan seçerek YZ\'yi yeniden aç.',
-          description_en: 'NMM stays open — pick a plan to unlock AI again.',
-        }
-      : kind === 'trial_1d'
-        ? {
-            title_tr: 'Denemen yarın bitiyor',
-            title_en: 'Your trial ends tomorrow',
-            description_tr: 'Planları incele — YZ erişimini kesintisiz sürdür.',
-            description_en: 'View plans to keep AI access without interruption.',
-          }
-        : {
-            title_tr: 'Denemene 3 gün kaldı',
-            title_en: '3 days left on your trial',
-            description_tr: 'Basic, Plus veya Pro planlarını incele.',
-            description_en: 'Review Basic, Plus, or Pro plans.',
-          }
+  const copy = TRIAL_PUSH_COPY[kind]
 
   const { error } = await supabase.from('nmm_notifications').insert({
     user_id: userId,

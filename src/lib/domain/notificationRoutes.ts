@@ -1,6 +1,5 @@
 import type { NotificationType } from '@/types/database.types'
-
-const ODEME_PLANS_PATH = '/odeme' as const
+import { ODEME_PLANS_PATH } from '@/lib/domain/paymentRoutes'
 
 type NotificationRouteInput = {
   type: NotificationType

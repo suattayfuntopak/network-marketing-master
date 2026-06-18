@@ -13,7 +13,9 @@ import {
 } from '@/app/(dashboard)/actions/notifications'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
-import { isTeamJoinNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { isTeamJoinNotification, isTrialUpgradeNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { trialNotificationPhase } from '@/lib/domain/trialLifecycle'
+import { logSeePlansClick } from '@/lib/domain/seePlansAnalytics'
 import { queryKeys } from '@/lib/query/keys'
 import { invalidateHubMetrics } from '@/lib/query/invalidateHubMetrics'
 import { getHubDailySelfAction } from '@/app/(dashboard)/crown/hubSelfActions'
@@ -83,7 +85,19 @@ export function useNotifications(options?: { enabled?: boolean }) {
               ? t('pagesUi.viewInPipeline')
               : isTeamJoinNotification(newNotif)
                 ? t('pagesUi.viewDailySummary')
-                : t('shellUi.view')
+                : isTrialUpgradeNotification(newNotif)
+                  ? t('shellUi.seePlansCta')
+                  : t('shellUi.view')
+
+            const navigateFromToast = () => {
+              if (isTrialUpgradeNotification(newNotif)) {
+                logSeePlansClick(
+                  trialNotificationPhase(newNotif.title_tr, newNotif.title_en),
+                  'notification',
+                )
+              }
+              router.push(targetHref)
+            }
 
             const showToast = (desc: string) => {
               toast(title, {
@@ -91,9 +105,7 @@ export function useNotifications(options?: { enabled?: boolean }) {
                 duration: 6000,
                 action: {
                   label: actionLabel,
-                  onClick: () => {
-                    router.push(targetHref)
-                  },
+                  onClick: navigateFromToast,
                 },
               })
             }

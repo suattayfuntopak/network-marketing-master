@@ -438,11 +438,16 @@ export type ProductFunnelCounts = {
   pricingSectionView: number
   /** Aktif denemede UpgradeGate "Planları Gör & Yükselt" tıklaması */
   upgradeGateCtaClick: number
+  /** @deprecated Legacy ?plan=basic query deep link */
   odemeBasicDeepLink: number
-  /** Planları Gör tıklaması — metadata.source: account_alert | upgrade_gate */
+  odemePageView: number
+  /** Planları Gör — metadata.source: account_alert | upgrade_gate | notification */
   seePlansClick: number
   seePlansClickAccountAlert: number
   seePlansClickUpgradeGate: number
+  seePlansClickNotification: number
+  seePlansClickTrial: number
+  seePlansClickEnded: number
 }
 
 /** Süper admin: ürün hunisi olay sayıları (landing → plan CTA → ödeme). */
@@ -472,9 +477,13 @@ export async function getProductFunnelStatsAction(
       pricingSectionView: 0,
       upgradeGateCtaClick: 0,
       odemeBasicDeepLink: 0,
+      odemePageView: 0,
       seePlansClick: 0,
       seePlansClickAccountAlert: 0,
       seePlansClickUpgradeGate: 0,
+      seePlansClickNotification: 0,
+      seePlansClickTrial: 0,
+      seePlansClickEnded: 0,
     }
   }
 
@@ -482,19 +491,29 @@ export async function getProductFunnelStatsAction(
     pricingSectionView: 0,
     upgradeGateCtaClick: 0,
     odemeBasicDeepLink: 0,
+    odemePageView: 0,
     seePlansClick: 0,
     seePlansClickAccountAlert: 0,
     seePlansClickUpgradeGate: 0,
+    seePlansClickNotification: 0,
+    seePlansClickTrial: 0,
+    seePlansClickEnded: 0,
   }
   for (const row of data ?? []) {
+    const meta = row.metadata as Record<string, unknown> | null
     if (row.event_name === PRODUCT_EVENTS.pricingSectionView) counts.pricingSectionView++
     else if (row.event_name === PRODUCT_EVENTS.upgradeGateCtaClick) counts.upgradeGateCtaClick++
     else if (row.event_name === PRODUCT_EVENTS.odemeBasicDeepLink) counts.odemeBasicDeepLink++
+    else if (row.event_name === PRODUCT_EVENTS.odemePageView) counts.odemePageView++
     else if (row.event_name === PRODUCT_EVENTS.seePlansClick) {
       counts.seePlansClick++
-      const source = (row.metadata as Record<string, unknown> | null)?.source
+      const source = meta?.source
+      const phase = meta?.phase
       if (source === 'account_alert') counts.seePlansClickAccountAlert++
       else if (source === 'upgrade_gate') counts.seePlansClickUpgradeGate++
+      else if (source === 'notification') counts.seePlansClickNotification++
+      if (phase === 'trial') counts.seePlansClickTrial++
+      else if (phase === 'ended') counts.seePlansClickEnded++
     }
   }
   return counts
