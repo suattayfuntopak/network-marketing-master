@@ -1,10 +1,16 @@
+'use client'
+
+import { useTranslation } from '@/providers/LanguageProvider'
+import { authCardClass, authCardSubtitleClass, authCardTitleClass } from '@/app/(auth)/_components/authUi'
 import { PasswordResetGate } from './_components/PasswordResetGate'
 
 export default function SifreGuncelePage() {
+  const { t } = useTranslation()
+
   return (
-    <div className="rounded-3xl bg-white p-8 shadow-sm">
-      <h2 className="mb-1 text-xl font-bold text-gray-900">Yeni Şifre Belirle</h2>
-      <p className="mb-6 text-sm text-gray-500">En az 6 karakter gir.</p>
+    <div className={authCardClass}>
+      <h2 className={authCardTitleClass}>{t('auth.updatePasswordTitle')}</h2>
+      <p className={authCardSubtitleClass}>{t('auth.updatePasswordSubtitle')}</p>
       <PasswordResetGate />
     </div>
   )

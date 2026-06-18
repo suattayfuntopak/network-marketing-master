@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
+import { useTranslation } from '@/providers/LanguageProvider'
 import {
   authErrorClass,
   authInputClass,
@@ -12,6 +14,14 @@ import {
 } from '@/app/(auth)/_components/authUi'
 
 type Status = 'loading' | 'ready' | 'error'
+
+type FormErrorKey = 'updatePasswordErrorShort' | 'updatePasswordErrorFailed'
+
+// i18n:unused tarayıcısı literal anahtarları görsün diye.
+const FORM_ERROR_I18N: Record<FormErrorKey, string> = {
+  updatePasswordErrorShort: 'auth.updatePasswordErrorShort',
+  updatePasswordErrorFailed: 'auth.updatePasswordErrorFailed',
+}
 
 /** E-posta linkindeki token/code/hash → sunucu callback veya setSession. */
 function buildCallbackUrl(params: URLSearchParams): string | null {
@@ -30,10 +40,11 @@ function buildCallbackUrl(params: URLSearchParams): string | null {
 }
 
 export function PasswordResetGate() {
+  const { t } = useTranslation()
   const [status, setStatus] = useState<Status>('loading')
   const [password, setPassword] = useState('')
   const [saving, setSaving] = useState(false)
-  const [formError, setFormError] = useState('')
+  const [formErrorKey, setFormErrorKey] = useState<FormErrorKey | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -111,15 +122,15 @@ export function PasswordResetGate() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password.length < 6) {
-      setFormError('Şifre en az 6 karakter olmalı.')
+      setFormErrorKey('updatePasswordErrorShort')
       return
     }
     setSaving(true)
-    setFormError('')
+    setFormErrorKey(null)
     const supabase = createClient()
     const { error } = await supabase.auth.updateUser({ password })
     if (error) {
-      setFormError('Şifre güncellenemedi. Yeni sıfırlama bağlantısı iste.')
+      setFormErrorKey('updatePasswordErrorFailed')
       setSaving(false)
       return
     }
@@ -130,7 +141,7 @@ export function PasswordResetGate() {
     return (
       <div className="flex flex-col items-center gap-3 py-6">
         <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-        <p className={`text-xs ${authMutedClass}`}>Bağlantı doğrulanıyor…</p>
+        <p className={`text-xs ${authMutedClass}`}>{t('auth.updatePasswordVerifying')}</p>
       </div>
     )
   }
@@ -138,15 +149,13 @@ export function PasswordResetGate() {
   if (status === 'error') {
     return (
       <div className="space-y-4">
-        <p className={authErrorClass}>
-          Sıfırlama bağlantısı geçersiz veya süresi dolmuş. Lütfen yeni bir bağlantı iste.
-        </p>
-        <a
+        <p className={authErrorClass}>{t('auth.updatePasswordLinkInvalid')}</p>
+        <Link
           href="/sifre-sifirla"
           className={`block text-center text-sm ${authLinkSecondaryClass}`}
         >
-          Yeni bağlantı iste
-        </a>
+          {t('auth.updatePasswordRequestNewLink')}
+        </Link>
       </div>
     )
   }
@@ -155,7 +164,7 @@ export function PasswordResetGate() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className={authLabelClass} htmlFor="password">
-          Yeni Şifre
+          {t('auth.updatePasswordLabel')}
         </label>
         <input
           id="password"
@@ -163,15 +172,15 @@ export function PasswordResetGate() {
           required
           minLength={6}
           autoComplete="new-password"
-          placeholder="En az 6 karakter"
+          placeholder={t('auth.updatePasswordPlaceholder')}
           value={password}
           onChange={e => setPassword(e.target.value)}
           className={authInputClass}
         />
       </div>
 
-      {formError && (
-        <p className={authErrorClass}>{formError}</p>
+      {formErrorKey && (
+        <p className={authErrorClass}>{t(FORM_ERROR_I18N[formErrorKey])}</p>
       )}
 
       <button
@@ -179,7 +188,7 @@ export function PasswordResetGate() {
         disabled={saving}
         className={authPrimaryBtnClass}
       >
-        {saving ? 'Kaydediliyor...' : 'Şifremi Güncelle'}
+        {saving ? t('auth.updatePasswordSubmitPending') : t('auth.updatePasswordSubmit')}
       </button>
     </form>
   )

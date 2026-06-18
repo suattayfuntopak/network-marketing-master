@@ -1,26 +1,43 @@
+'use client'
+
+import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useTranslation } from '@/providers/LanguageProvider'
+import {
+  authCardClass,
+  authCardSubtitleClass,
+  authCardTitleClass,
+  authErrorClass,
+} from '@/app/(auth)/_components/authUi'
 import { ResetForm } from './_components/ResetForm'
 
-interface Props {
-  searchParams: Promise<{ error?: string }>
-}
-
-export default async function SifreSifirlaPage({ searchParams }: Props) {
-  const { error } = await searchParams
+function SifreSifirlaContent() {
+  const { t } = useTranslation()
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
 
   return (
-    <div className="rounded-3xl bg-white p-8 shadow-sm">
-      <h2 className="mb-1 text-xl font-bold text-gray-900">Şifreni Sıfırla</h2>
-      <p className="mb-6 text-sm text-gray-500">
-        E-postanı gir, sana sıfırlama bağlantısı gönderelim.
-      </p>
+    <div className={authCardClass}>
+      <h2 className={authCardTitleClass}>{t('auth.resetPageTitle')}</h2>
+      <p className={authCardSubtitleClass}>{t('auth.resetPageSubtitle')}</p>
       {error && (
-        <div className="mb-4 rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E]">
+        <div className={`mb-4 ${authErrorClass}`}>
           {error === 'link_gecersiz'
-            ? 'Bağlantı süresi dolmuş veya geçersiz. Yeni bir sıfırlama isteği gönder.'
+            ? t('auth.resetPageLinkInvalid')
             : decodeURIComponent(error)}
         </div>
       )}
       <ResetForm />
     </div>
+  )
+}
+
+export default function SifreSifirlaPage() {
+  const { t } = useTranslation()
+
+  return (
+    <Suspense fallback={<p className="text-sm text-[var(--text-3)]">{t('common.loading')}</p>}>
+      <SifreSifirlaContent />
+    </Suspense>
   )
 }
