@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 
 /**
- * Davet kayıt akışı (?ref=KOD&aday=UUID) — public kayıt sayfası.
- * Tam kayıt oluşturmaz; HTTP, form alanları ve davet hata/prefill durumları.
- * Opsiyonel: PLAYWRIGHT_INVITE_REF + PLAYWRIGHT_INVITE_ADAY (adayda e-posta kayıtlı).
+ * Pipeline NMM davet kaydı (?ref=WORKSPACE_INVITE_CODE&aday=CANDIDATE_UUID).
+ * Ekip davet kodu değil — aday kartından üretilen kişisel kayıt linki.
+ * Opsiyonel: PLAYWRIGHT_INVITE_REF + PLAYWRIGHT_INVITE_ADAY tanımlı değilse test atlanır.
  */
 
 test.describe('davet kayıt (public)', () => {

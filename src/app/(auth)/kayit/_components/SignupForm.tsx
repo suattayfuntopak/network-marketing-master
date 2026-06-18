@@ -4,7 +4,7 @@ import { useActionState, useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { signupAction } from '../actions'
+import { signupAction, type SignupErrorKey, type SignupSuccessKey } from '../actions'
 import {
   getInviteSignupPrefillAction,
   getInviteSponsorAction,
@@ -26,9 +26,26 @@ import {
 } from '@/app/(auth)/_components/authUi'
 
 interface FormState {
-  error?: string
-  success?: string
+  errorKey?: SignupErrorKey
+  successKey?: SignupSuccessKey
   shouldRedirect?: boolean
+}
+
+// i18n:unused tarayıcısı literal anahtarları görsün diye.
+const SIGNUP_ERROR_I18N: Record<SignupErrorKey, string> = {
+  signupErrorRequired: 'auth.signupErrorRequired',
+  signupErrorNameRequired: 'auth.signupErrorNameRequired',
+  signupErrorAlreadyRegistered: 'auth.signupErrorAlreadyRegistered',
+  signupErrorPasswordShort: 'auth.signupErrorPasswordShort',
+  signupErrorInvalidEmail: 'auth.signupErrorInvalidEmail',
+  signupErrorRateLimit: 'auth.signupErrorRateLimit',
+  signupErrorDisabled: 'auth.signupErrorDisabled',
+  signupErrorGeneric: 'auth.signupErrorGeneric',
+}
+
+const SIGNUP_SUCCESS_I18N: Record<SignupSuccessKey, string> = {
+  signupSuccessRedirect: 'auth.signupSuccessRedirect',
+  signupSuccessConfirm: 'auth.signupSuccessConfirm',
 }
 
 const readonlyInputClass = `${authInputClass} cursor-not-allowed bg-[var(--bg-subtle)]/80 text-[var(--text-2)]`
@@ -95,13 +112,13 @@ export function SignupForm() {
   }, [ref, aday, t])
 
   useEffect(() => {
-    if (state.success && state.shouldRedirect) {
+    if (state.successKey && state.shouldRedirect) {
       window.location.href = '/pano'
     }
-  }, [state.success, state.shouldRedirect])
+  }, [state.successKey, state.shouldRedirect])
 
-  if (state.success) {
-    return <div className={authSuccessClass}>{state.success}</div>
+  if (state.successKey) {
+    return <div className={authSuccessClass}>{t(SIGNUP_SUCCESS_I18N[state.successKey])}</div>
   }
 
   const inviteReady = !!invite
@@ -209,7 +226,9 @@ export function SignupForm() {
         )}
       </div>
 
-      {state.error && <p className={authErrorClass}>{state.error}</p>}
+      {state.errorKey && (
+        <p className={authErrorClass}>{t(SIGNUP_ERROR_I18N[state.errorKey])}</p>
+      )}
 
       <button
         type="submit"

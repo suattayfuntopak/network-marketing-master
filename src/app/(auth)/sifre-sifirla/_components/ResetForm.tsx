@@ -2,7 +2,8 @@
 
 import { useActionState } from 'react'
 import Link from 'next/link'
-import { resetPasswordAction } from '../actions'
+import { useTranslation } from '@/providers/LanguageProvider'
+import { resetPasswordAction, type ResetErrorKey, type ResetSuccessKey } from '../actions'
 import {
   authErrorClass,
   authInputClass,
@@ -14,24 +15,34 @@ import {
 } from '@/app/(auth)/_components/authUi'
 
 interface FormState {
-  error?: string
-  success?: string
+  errorKey?: ResetErrorKey
+  successKey?: ResetSuccessKey
+}
+
+const RESET_ERROR_I18N: Record<ResetErrorKey, string> = {
+  resetErrorEmailRequired: 'auth.resetErrorEmailRequired',
+  resetErrorGeneric: 'auth.resetErrorGeneric',
+}
+
+const RESET_SUCCESS_I18N: Record<ResetSuccessKey, string> = {
+  resetSuccess: 'auth.resetSuccess',
 }
 
 export function ResetForm() {
+  const { t } = useTranslation()
   const [state, action, pending] = useActionState<FormState, FormData>(
     resetPasswordAction,
-    {}
+    {},
   )
 
-  if (state.success) {
+  if (state.successKey) {
     return (
       <div className="space-y-4">
         <div className={authSuccessClass}>
-          {state.success}
+          {t(RESET_SUCCESS_I18N[state.successKey])}
         </div>
         <Link href="/giris" className={`block text-center text-sm ${authLinkSecondaryClass}`}>
-          Giriş sayfasına dön
+          {t('auth.resetBackToLogin')}
         </Link>
       </div>
     )
@@ -41,7 +52,7 @@ export function ResetForm() {
     <form action={action} className="space-y-4">
       <div>
         <label className={authLabelClass} htmlFor="email">
-          E-posta
+          {t('auth.emailLabel')}
         </label>
         <input
           id="email"
@@ -54,9 +65,9 @@ export function ResetForm() {
         />
       </div>
 
-      {state.error && (
+      {state.errorKey && (
         <p className={authErrorClass}>
-          {state.error}
+          {t(RESET_ERROR_I18N[state.errorKey])}
         </p>
       )}
 
@@ -65,12 +76,12 @@ export function ResetForm() {
         disabled={pending}
         className={authPrimaryBtnClass}
       >
-        {pending ? 'Gönderiliyor...' : 'Sıfırlama Bağlantısı Gönder'}
+        {pending ? t('auth.resetSubmitPending') : t('auth.resetSubmit')}
       </button>
 
       <p className={`text-center text-sm ${authMutedClass}`}>
         <Link href="/giris" className={authLinkSecondaryClass}>
-          Giriş sayfasına dön
+          {t('auth.resetBackToLogin')}
         </Link>
       </p>
     </form>

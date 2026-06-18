@@ -163,5 +163,5 @@ jobs:
         run: |
           supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
           echo "▶ Bekleyen migration'lar prod'a uygulanıyor (doğrulama yeşil)..."
-          supabase db push
+          node scripts/supabase-db-push.mjs apply
           echo "✅ Tamamlandı (yeni migration yoksa no-op)."

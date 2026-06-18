@@ -7,21 +7,24 @@ name: DB migrate (prod)
 #
 # Gerekli secret'lar: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
 # (bkz. docs/deploy/github-secrets.md).
+#
+# Defter boşluğu (ör. 100 eksik, 101–103 uygulanmış): önce repair-gaps, sonra dry-run.
 
 on:
   workflow_dispatch:
     inputs:
       mode:
-        description: 'dry-run (göster) / apply (uygula) / repair (defteri uygulanmış işaretle)'
+        description: 'dry-run / apply / repair-gaps (defter) / repair (tümü applied işaretle)'
         required: true
         default: 'dry-run'
         type: choice
         options:
           - dry-run
           - apply
+          - repair-gaps
           - repair
       confirm:
-        description: 'apply ve repair için "PUSH" yazın (dry-run için boş bırakın)'
+        description: 'apply, repair ve repair-gaps için "PUSH" yazın (dry-run için boş)'
         required: false
         default: ''
         type: string
@@ -35,12 +38,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
       - uses: supabase/setup-cli@ab058987d8d6c725971f6cf9d0b5c98467e30bd1 # v1.7.1
         with:
           version: latest
 
-      - name: Onay kontrolü (apply/repair)
-        if: (inputs.mode == 'apply' || inputs.mode == 'repair') && inputs.confirm != 'PUSH'
+      - name: Onay kontrolü (apply/repair/repair-gaps)
+        if: (inputs.mode == 'apply' || inputs.mode == 'repair' || inputs.mode == 'repair-gaps') && inputs.confirm != 'PUSH'
         run: |
           echo "::error::${{ inputs.mode }} modu için confirm alanına 'PUSH' yazmalısınız. İptal edildi."
           exit 1
@@ -61,29 +67,37 @@ jobs:
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: supabase link --project-ref "${{ secrets.SUPABASE_PROJECT_REF }}"
 
+      - name: Migration durumu (list)
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "▶ Remote migration listesi:"
+          supabase migration list --linked || true
+
       - name: Bekleyen migration'lar (dry-run)
         if: inputs.mode == 'dry-run'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          echo "▶ Bekleyen migration'lar (uygulanmadan listelenir):"
-          supabase db push --dry-run
+        run: node scripts/supabase-db-push.mjs dry-run
 
       - name: Migration'ları uygula (apply)
         if: inputs.mode == 'apply' && inputs.confirm == 'PUSH'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          echo "▶ Migration'lar PROD'a uygulanıyor..."
-          supabase db push
-          echo "✅ Tamamlandı."
+        run: node scripts/supabase-db-push.mjs apply
 
-      # Defter onarımı: tüm yerel migration'ları "applied" işaretler — SQL ÇALIŞTIRMAZ,
-      # yalnız schema_migrations defterini günceller. Elle SQL editöründen uygulanmış
-      # ama deftere yazılmamış migration'ları senkronlamak için tek seferlik.
-      - name: Defteri onar (repair)
+      - name: Defter boşluklarını onar (repair-gaps)
+        if: inputs.mode == 'repair-gaps' && inputs.confirm == 'PUSH'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: node scripts/supabase-db-push.mjs repair-gaps
+
+      # Defter onarımı: tüm yerel migration'ları "applied" işaretler — SQL ÇALIŞTIRMAZ.
+      - name: Defteri onar — tümü (repair)
         if: inputs.mode == 'repair' && inputs.confirm == 'PUSH'
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}

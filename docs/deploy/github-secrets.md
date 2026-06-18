@@ -145,11 +145,30 @@ Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'
 ## Migration doğrulama & uygulama (CI)
 
 - **`migrate-apply` job** (`.github/workflows/migrate-check.yml`): her migration değişikliğinde tüm `supabase/migrations/*.sql` GERÇEK bir Postgres'e (`scripts/ci/supabase-shim.sql` ile auth şeması + roller hazırlanır) sırayla uygulanır. `063/064`'teki "column phone does not exist" gibi şema-referans hataları artık prod'a sızmadan burada kırmızı verir. Secret gerektirmez.
-- **`DB migrate (prod)` workflow** (`.github/workflows/db-push.yml`): bekleyen migration'ları PROD'a uygular — **yalnızca elle** (`workflow_dispatch`), `mode=apply` + confirm `PUSH` ile. Gerekli secret'lar:
+- **`DB migrate (prod)` workflow** (`.github/workflows/db-push.yml`): bekleyen migration'ları PROD'a uygular — **yalnızca elle** (`workflow_dispatch`), onaylı. Gerekli secret'lar:
   - `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF` (zaten var)
-  - **`SUPABASE_DB_PASSWORD`** — Supabase → Project Settings → Database → Connection string şifresi; `supabase db push` için gerekir.
-  - Kullanım: önce `mode=dry-run` (bekleyenleri listeler), sonra `mode=apply` + `confirm=PUSH`.
+  - **`SUPABASE_DB_PASSWORD`** — Supabase → Project Settings → Database → Connection string şifresi
+  - **Modlar:**
+    - `dry-run` — bekleyenleri listeler (varsayılan, confirm gerekmez)
+    - `apply` + `confirm=PUSH` — migration SQL'lerini uygular (`--include-all` gerekirse otomatik)
+    - `repair-gaps` + `confirm=PUSH` — defter boşluğu (ör. 100 eksik, 101–103 uygulanmış); SQL çalıştırmaz, yalnız eksik numaraları "applied" işaretler
+    - `repair` + `confirm=PUSH` — tüm yerel numaraları applied işaretler (tek seferlik, dikkatli)
+  - **Dry-run kırmızı + "inserted before the last migration"** → önce `repair-gaps`, sonra tekrar `dry-run`. Yerel: `npm run db:repair-gaps` (`supabase link` gerekir).
+
+### `workflow_dispatch` ne demek?
+
+GitHub Actions'ta **elle tetikleme** modu. Otomatik koşmaz; siz **Actions → ilgili workflow → Run workflow** dersiniz.
+
+| Workflow | Ne zaman elle koşturmalısınız? |
+|----------|-------------------------------|
+| **DB migrate (prod)** | Yeni migration prod'a gidecekse: önce `dry-run`, gerekirse `repair-gaps`, sonra `apply` |
+| **E2E (Playwright)** | Auth/ödeme büyük değişiklik sonrası güven vermek için (Pazartesi cron zaten var) |
+| **Migration check** | Drift şüphesi; remote kontrol için |
+
+**E2E için yapmanız gereken bir şey yok** — Pazartesi 06:00 İstanbul'da otomatik koşar; isterseniz deploy öncesi manuel de tetikleyebilirsiniz.
 
 ## Yerel `.env.local`
 
-Geliştirme ve `npm run dev` için Supabase + Gemini zorunlu. E2E koşacaksanız `PLAYWRIGHT_TEST_*` ekleyin. CI-only secret’ları (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`) yalnızca yerelde migration drift kontrolü yapacaksanız ekleyin. Types yeniden üretmek: `npm run db:gen-types` (`supabase link` gerekir).
+Şablon: `.env.example` → `.env.local` olarak kopyalayın.
+
+Geliştirme ve `npm run dev` için Supabase + Gemini zorunlu. E2E koşacaksanız `PLAYWRIGHT_TEST_*` ekleyin. CI-only secret’ları (`SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_REF`) yalnızca yerelde migration drift kontrolü yapacaksanız ekleyin. Types yeniden üretmek: `npm run db:gen-types` (`supabase link` gerekir). Migration push: `npm run db:push:dry-run` / `npm run db:push`.
