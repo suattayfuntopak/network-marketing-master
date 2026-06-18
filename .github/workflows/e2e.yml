@@ -1,17 +1,16 @@
 name: E2E (Playwright)
 
+# ADVISORY — deploy'u bloklamaz (CI Gate ayrı). Maliyet: main push'ta KOŞMAZ.
+# Tetikleyiciler: PR, haftalık schedule (Pazartesi 06:00 İstanbul), workflow_dispatch.
 on:
   pull_request:
     paths-ignore:
       - '**.md'
       - 'docs/**'
       - 'hot.md'
-  push:
-    branches: [main]
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'hot.md'
+  schedule:
+    # Pazartesi 06:00 Europe/Istanbul (UTC+3) ≈ 03:00 UTC
+    - cron: '0 3 * * 1'
   workflow_dispatch:
 
 env:

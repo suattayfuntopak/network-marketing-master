@@ -56,9 +56,12 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 
 ### CI testi nasıl çalıştırılır?
 
-1. **Otomatik:** `main`’e push veya PR açıldığında `E2E (Playwright)` workflow’u tetiklenir.
-2. **Manuel:** GitHub → Actions → **E2E (Playwright)** → **Run workflow**.
-3. **Yerel:** `.env.local`’e `PLAYWRIGHT_TEST_EMAIL` / `PLAYWRIGHT_TEST_PASSWORD` ekleyip `npm run test:e2e`.
+1. **PR:** PR açıldığında `E2E (Playwright)` koşar (kod değişikliği varsa).
+2. **Haftalık:** Pazartesi 06:00 (İstanbul) otomatik schedule.
+3. **Manuel:** GitHub → Actions → **E2E (Playwright)** → **Run workflow** (büyük özellik / auth akışı değişikliği sonrası).
+4. **Yerel:** `.env.local`'e `PLAYWRIGHT_TEST_EMAIL` / `PLAYWRIGHT_TEST_PASSWORD` ekleyip `npm run test:e2e`.
+
+`main` push **E2E tetiklemez** — prod gate yalnızca **CI Gate** (lint + unit + build, ~2 dk). E2E advisory kalır; deploy'u bloklamaz.
 
 Migration drift için: Actions’ta **Migration check** workflow’unu veya yerelde `npm run migrate:check:remote` (token + ref gerekir).
 
