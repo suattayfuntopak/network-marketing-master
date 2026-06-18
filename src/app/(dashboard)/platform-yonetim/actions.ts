@@ -10,12 +10,7 @@ import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { aggregateViralKpi, type ViralKpi, type ViralEventRow } from '@/lib/domain/viralKpi'
 import { todayCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
-import {
-  getProductFunnelStatsAction,
-  type ProductFunnelCounts,
-} from '@/app/(dashboard)/istatistikler/actions'
-
-export type { ProductFunnelCounts }
+import { getProductFunnelStatsAction } from '@/app/(dashboard)/istatistikler/actions'
 
 export interface PlatformWorkspaceItem {
   workspaceId: string
