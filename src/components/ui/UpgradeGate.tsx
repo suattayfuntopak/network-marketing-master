@@ -8,6 +8,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useWorkspace } from '@/hooks/useWorkspace'
+import { ODEME_BASIC_DEEP_LINK } from '@/lib/domain/paymentRoutes'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
@@ -64,7 +65,9 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
     !ws.isSuperAdmin &&
     ws.licenseType === 'free' &&
     !ws.isTrialActive
-  const paymentHref = trialEnded ? '/odeme?plan=basic&period=yearly' : '/odeme'
+  const plansHref = '/odeme'
+  const basicHref = ODEME_BASIC_DEEP_LINK
+  const paymentHref = trialEnded ? basicHref : plansHref
 
   return createPortal(
     <div
@@ -119,21 +122,37 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
           ))}
         </div>
 
-        <Link
-          href={paymentHref}
-          onClick={() => {
-            void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
-              trialEnded,
-              feature: resolveFeature(feature),
-            })
-            onClose()
-          }}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
-        >
-          <Sparkles className="h-4 w-4" />
-          {trialEnded ? t('shellUi.upgradeTrialEndedCta') : t('shellUi.upgradeBannerCta')}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <div className="mt-4 flex flex-col gap-2">
+          <Link
+            href={paymentHref}
+            onClick={() => {
+              void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
+                trialEnded,
+                feature: resolveFeature(feature),
+                cta: trialEnded ? 'basic' : 'upgrade',
+              })
+              onClose()
+            }}
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
+          >
+            <Sparkles className="h-4 w-4" />
+            {trialEnded ? t('shellUi.upgradeTrialEndedCta') : t('shellUi.upgradeBannerCta')}
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+          {trialEnded && (
+            <Link
+              href={plansHref}
+              onClick={() => {
+                void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: 'ended', source: 'upgrade_gate' })
+                onClose()
+              }}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-card)] transition"
+            >
+              <Sparkles className="h-4 w-4 text-brand" />
+              {t('shellUi.seePlansCta')}
+            </Link>
+          )}
+        </div>
       </div>
     </div>,
     document.body,

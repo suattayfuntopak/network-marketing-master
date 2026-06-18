@@ -13,7 +13,7 @@ import {
 
 import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
-import { ODEME_BASIC_YEARLY_DEEP_LINK } from '@/lib/domain/paymentRoutes'
+import { ODEME_BASIC_DEEP_LINK } from '@/lib/domain/paymentRoutes'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -28,7 +28,7 @@ const PAYMENT_URL = `${NMM_APP_URL}/odeme`
 
 function paymentUrlForTrialKind(kind: TrialEmailKind): string {
   if (kind === 'trial_3d' || kind === 'trial_1d' || kind === 'trial_ended') {
-    return `${NMM_APP_URL}${ODEME_BASIC_YEARLY_DEEP_LINK}`
+    return `${NMM_APP_URL}${ODEME_BASIC_DEEP_LINK}`
   }
   return PAYMENT_URL
 }

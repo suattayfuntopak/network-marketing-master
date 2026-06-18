@@ -34,13 +34,13 @@ describe('notificationTargetHref', () => {
         candidate_id: null,
         title_tr: 'Deneme bitti — Basic ile devam et',
       }),
-    ).toBe('/odeme?plan=basic&period=yearly')
+    ).toBe('/odeme?plan=basic&period=monthly')
     expect(
       notificationTargetHref({
         type: 'info',
         candidate_id: null,
         title_en: '3 days left on your trial',
       }),
-    ).toBe('/odeme?plan=basic&period=yearly')
+    ).toBe('/odeme?plan=basic&period=monthly')
   })
 })
