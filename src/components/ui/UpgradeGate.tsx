@@ -12,6 +12,7 @@ import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
+import { UpgradeModalFooter } from '@/components/ui/UpgradeModalFooter'
 
 export type UpgradeFeature = GatedFeature | 'team'
 
@@ -95,7 +96,7 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
         </h2>
         <p className="mt-2 text-xs sm:text-sm leading-relaxed text-[var(--text-2)]">
           {trialEnded
-            ? t('shellUi.upgradeTrialEndedDesc', { limit: DAILY_AI_LIMITS.basic })
+            ? t('shellUi.upgradeTrialEndedDesc')
             : t(descKey(feature))}
         </p>
 
@@ -103,11 +104,7 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
           {(['basic', 'plus', 'pro'] as const).map(plan => (
             <div
               key={plan}
-              className={`rounded-xl border px-2.5 py-2.5 ${
-                trialEnded && plan === 'basic'
-                  ? 'border-brand/40 bg-brand/5 ring-1 ring-brand/25'
-                  : 'border-[var(--border)] bg-[var(--bg-subtle)]'
-              }`}
+              className="rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] px-2.5 py-2.5"
             >
               <p className="text-[10px] font-black uppercase tracking-wide text-[var(--text-3)]">
                 {t(`shellUi.planLabel_${plan}`)}
@@ -121,26 +118,11 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
 
         <div className="mt-4 flex flex-col gap-2">
           {trialEnded ? (
-            <div className="flex flex-col-reverse gap-2 sm:flex-row">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 rounded-xl border border-[var(--border)] px-3 py-2.5 text-sm font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
-              >
-                {t('shellUi.accountAlertClose')}
-              </button>
-              <Link
-                href={plansHref}
-                onClick={() => {
-                  void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: 'ended', source: 'upgrade_gate' })
-                  onClose()
-                }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
-              >
-                <Sparkles className="h-4 w-4" />
-                {t('shellUi.seePlansCta')}
-              </Link>
-            </div>
+            <UpgradeModalFooter
+              onClose={onClose}
+              phase="ended"
+              source="upgrade_gate"
+            />
           ) : (
             <Link
               href={plansHref}

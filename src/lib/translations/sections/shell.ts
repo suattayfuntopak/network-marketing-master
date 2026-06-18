@@ -51,7 +51,7 @@ export const shellSection = {
       planBlurb_pro: 'Günlük {limit} YZ + tam güç',
       upgradeTrialEndedTitle: '14 günlük denemen bitti — YZ kilitlendi',
       upgradeTrialEndedDesc:
-        'Liste, takvim ve ekibin açık kalır. Basic ile günlük {limit} yapay zeka mesajına hemen devam edebilirsin.',
+        'Deneme süren bitti. Liste, takvim ve ekibin açık kalıyor. Yapay zeka ve gelişmiş ekip özelliklerini yeniden açmak için bir plan seç.',
       seePlansCta: 'Planları Gör',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
@@ -131,7 +131,7 @@ export const shellSection = {
       planBlurb_pro: 'Daily {limit} AI + full power',
       upgradeTrialEndedTitle: 'Your 14-day trial ended — AI is locked',
       upgradeTrialEndedDesc:
-        'Pipeline, calendar, and your team stay open. Continue with Basic for {limit} daily AI messages right away.',
+        'Your trial has ended. Pipeline, calendar, and your team stay open. Choose a plan to unlock AI and advanced team features again.',
       seePlansCta: 'See Plans',
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:

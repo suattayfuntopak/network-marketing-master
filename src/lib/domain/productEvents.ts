@@ -1,6 +1,7 @@
 /** Ürün hunisi olay adları — SQL / raporlarda sabit string. */
 export const PRODUCT_EVENTS = {
   pricingSectionView: 'pricing_section_view',
+  /** UpgradeGate (aktif deneme) CTA — artık trialEnded akışında seePlansClick kullanılır. */
   upgradeGateCtaClick: 'upgrade_gate_cta_click',
   odemeBasicDeepLink: 'odeme_basic_deep_link',
 
@@ -34,7 +35,7 @@ export const PRODUCT_EVENTS = {
   announcementShared: 'announcement_shared',
   /** Ekibe doküman/materyal gönderildi (target: grup|tekli, source: material|manual). */
   broadcastSent: 'broadcast_sent',
-  /** Hesap-durumu modalındaki "Planları Gör" tıklandı (phase: trial|ended) → satış hunisi. */
+  /** Hesap-durumu / UpgradeGate modalındaki "Planları Gör" (phase + source metadata) → satış hunisi. */
   seePlansClick: 'see_plans_click',
 
   // ── Faz F: metrik/özet yüzeyi trafiği (konsolidasyon kararı için ölçüm) ──

@@ -1,15 +1,13 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { AlertTriangle, Sparkles, Rocket, X } from 'lucide-react'
+import { AlertTriangle, Rocket, X } from 'lucide-react'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getAccountLifecycle } from '@/lib/domain/accountLifecycle'
-import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
-import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { UpgradeModalFooter } from '@/components/ui/UpgradeModalFooter'
 
 function formatDateTime(date: Date, lang: 'tr' | 'en') {
   return date.toLocaleString(lang === 'en' ? 'en-GB' : 'tr-TR', {
@@ -59,8 +57,6 @@ export function AccountStatusAlert() {
 
   const isTrial = lifecycle.phase === 'trial'
   const daysLeft = Math.max(0, Math.ceil((lifecycle.trialEndsAt.getTime() - now) / 86_400_000))
-  // Planları Gör → /odeme (parametresiz = aylık varsayılan; kullanıcı yıllık sekmeden %25 indirimi görür)
-  const paymentHref = '/odeme'
   const bannerTitle = isTrial
     ? daysLeft <= 1
       ? t('shellUi.accountAlertTrialTitleLast')
@@ -142,26 +138,12 @@ export function AccountStatusAlert() {
               </p>
             </div>
 
-            <div className="flex shrink-0 flex-col-reverse gap-2 border-t border-[var(--border)] bg-[var(--bg-card)] px-4 py-3 sm:flex-row sm:px-5 sm:py-3.5 md:px-6 md:py-4">
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="flex-1 rounded-xl border border-[var(--border)] px-3 py-2 text-xs sm:text-sm md:text-base font-semibold text-[var(--text-2)] hover:bg-[var(--bg-subtle)] transition"
-              >
-                {t('shellUi.accountAlertClose')}
-              </button>
-              <Link
-                href={paymentHref}
-                onClick={() => {
-                  void logProductEventAction(PRODUCT_EVENTS.seePlansClick, { phase: isTrial ? 'trial' : 'ended' })
-                  setOpen(false)
-                }}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-3 py-2 text-xs sm:text-sm md:text-base font-bold text-white shadow-md hover:opacity-95 transition"
-              >
-                <Sparkles className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                {t('shellUi.seePlansCta')}
-              </Link>
-            </div>
+            <UpgradeModalFooter
+              layout="sheet"
+              onClose={() => setOpen(false)}
+              phase={isTrial ? 'trial' : 'ended'}
+              source="account_alert"
+            />
           </div>
         </div>
       )}

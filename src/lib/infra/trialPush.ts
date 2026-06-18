@@ -19,21 +19,21 @@ export async function sendTrialLifecyclePush(
       ? {
           title_tr: 'Deneme bitti — YZ kilitlendi',
           title_en: 'Trial ended — AI locked',
-          description_tr: 'NMM açık; Basic ile günlük YZ kotana devam et.',
-          description_en: 'NMM stays open — continue with Basic daily AI.',
+          description_tr: 'NMM açık kalıyor — plan seçerek YZ\'yi yeniden aç.',
+          description_en: 'NMM stays open — pick a plan to unlock AI again.',
         }
       : kind === 'trial_1d'
         ? {
             title_tr: 'Denemen yarın bitiyor',
             title_en: 'Your trial ends tomorrow',
-            description_tr: 'Basic planı incele — YZ erişimini kesintisiz sürdür.',
-            description_en: 'Review Basic to keep AI access without interruption.',
+            description_tr: 'Planları incele — YZ erişimini kesintisiz sürdür.',
+            description_en: 'View plans to keep AI access without interruption.',
           }
         : {
             title_tr: 'Denemene 3 gün kaldı',
             title_en: '3 days left on your trial',
-            description_tr: 'Planları gör; Basic ile günlük 20 YZ mesajı.',
-            description_en: 'View plans — Basic includes 20 daily AI messages.',
+            description_tr: 'Basic, Plus veya Pro planlarını incele.',
+            description_en: 'Review Basic, Plus, or Pro plans.',
           }
 
   const { error } = await supabase.from('nmm_notifications').insert({
