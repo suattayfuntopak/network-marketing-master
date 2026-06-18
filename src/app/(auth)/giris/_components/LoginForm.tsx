@@ -4,7 +4,7 @@ import { useActionState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { loginAction } from '../actions'
+import { loginAction, type LoginErrorKey } from '../actions'
 import {
   authErrorClass,
   authInputClass,
@@ -16,7 +16,15 @@ import {
 } from '@/app/(auth)/_components/authUi'
 
 interface FormState {
-  error?: string
+  errorKey?: LoginErrorKey
+}
+
+// i18n:unused tarayıcısı literal anahtarları görsün diye.
+const LOGIN_ERROR_I18N: Record<LoginErrorKey, string> = {
+  loginErrorRequired: 'auth.loginErrorRequired',
+  loginErrorInvalid: 'auth.loginErrorInvalid',
+  loginErrorUnconfirmed: 'auth.loginErrorUnconfirmed',
+  loginErrorGeneric: 'auth.loginErrorGeneric',
 }
 
 export function LoginForm() {
@@ -60,9 +68,9 @@ export function LoginForm() {
         />
       </div>
 
-      {state.error && (
+      {state.errorKey && (
         <p className={authErrorClass}>
-          {state.error}
+          {t(LOGIN_ERROR_I18N[state.errorKey])}
         </p>
       )}
 

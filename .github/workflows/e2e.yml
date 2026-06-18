@@ -183,3 +183,25 @@ jobs:
           path: playwright-report/
           retention-days: 7
           if-no-files-found: ignore
+
+  e2e-summary:
+    name: E2E özeti
+    needs: [lint, build, playwright-chromium, playwright-mobile]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Haftalık E2E sonuç özeti
+        run: |
+          {
+            echo "## E2E haftalık özeti"
+            echo ""
+            echo "| Job | Sonuç |"
+            echo "|-----|-------|"
+            echo "| Lint | ${{ needs.lint.result }} |"
+            echo "| Build | ${{ needs.build.result }} |"
+            echo "| Chromium | ${{ needs.playwright-chromium.result }} |"
+            echo "| Mobile (advisory) | ${{ needs.playwright-mobile.result }} |"
+            echo ""
+            echo "Tetikleyici: \`${{ github.event_name }}\` — billing kotası için Actions kullanımını izleyin."
+          } >> "$GITHUB_STEP_SUMMARY"

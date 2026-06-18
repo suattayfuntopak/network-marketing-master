@@ -16,8 +16,8 @@ import { buildShopierPlatformOrderId } from '@/lib/domain/shopierCheckout'
  * ucuz plana ödeyip pahalı plan kapamaz.
  *
  * AÇMAK İÇİN (cutover):
- *   SHOPIER_STOREFRONT_ENABLED=true
  *   SHOPIER_PRODUCTS={"basic_monthly":{"url":"https://www.shopier.com/...","productId":"123"}, ...}
+ *   (SHOPIER_STOREFRONT_ENABLED=true zorunlu değil — ürün haritası doluysa otomatik açılır.)
  */
 
 export type ProductKey = `${PlanId}_${BillingPeriod}`
@@ -92,12 +92,21 @@ export function buildStorefrontRedirectUrl(productUrl: string, note: string): st
   return url.toString()
 }
 
+/** Cron/e-posta için workspace'e özel Shopier linki; ürün yoksa null. */
+export function buildStorefrontUrl(
+  workspaceId: string,
+  plan: PlanId,
+  period: BillingPeriod,
+): string | null {
+  const product = getStorefrontProduct(plan, period)
+  if (!product) return null
+  const note = buildShopierPlatformOrderId(workspaceId, plan, period)
+  return buildStorefrontRedirectUrl(product.url, note)
+}
+
 /** Cron/e-posta için workspace'e özel Basic aylık Shopier linki; ürün yoksa null. */
 export function buildBasicMonthlyStorefrontUrl(workspaceId: string): string | null {
-  const product = getStorefrontProduct('basic', 'monthly')
-  if (!product) return null
-  const note = buildShopierPlatformOrderId(workspaceId, 'basic', 'monthly')
-  return buildStorefrontRedirectUrl(product.url, note)
+  return buildStorefrontUrl(workspaceId, 'basic', 'monthly')
 }
 
 export interface ResolvedStorefrontPlan {

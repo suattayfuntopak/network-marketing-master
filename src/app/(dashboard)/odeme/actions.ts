@@ -61,12 +61,20 @@ export async function notifyBankTransferAction(
 export async function getBasicShopierStorefrontUrlAction(): Promise<
   { ok: true; url: string } | { ok: false; error: string }
 > {
+  return getShopierStorefrontUrlAction('basic', 'monthly')
+}
+
+/** Oturumlu kullanıcı → Shopier ürün linki (plan/period). */
+export async function getShopierStorefrontUrlAction(
+  plan: 'basic' | 'plus' | 'pro',
+  period: 'monthly' | 'yearly' = 'monthly',
+): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   try {
-    const url = await createShopierStorefrontRedirect('basic', 'monthly')
+    const url = await createShopierStorefrontRedirect(plan, period)
     return { ok: true, url }
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Ödeme başlatılamadı'
-    console.error('[getBasicShopierStorefrontUrlAction]', message)
+    console.error('[getShopierStorefrontUrlAction]', plan, period, message)
     return { ok: false, error: message }
   }
 }

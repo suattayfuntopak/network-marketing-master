@@ -1,11 +1,13 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
   loadShopierProductMap,
   getStorefrontProduct,
   buildStorefrontRedirectUrl,
+  buildStorefrontUrl,
   resolvePlanFromProductId,
   extractWorkspaceIdFromNote,
   productKey,
+  isShopierStorefrontEnabled,
 } from './shopierStorefront'
 
 // Env anahtarları basic/plus/pro (= PlanId; DB license_type ile birebir).
@@ -106,5 +108,51 @@ describe('productKey', () => {
     expect(productKey('plus', 'monthly')).toBe('plus_monthly')
     expect(productKey('basic', 'yearly')).toBe('basic_yearly')
     expect(productKey('pro', 'monthly')).toBe('pro_monthly')
+  })
+})
+
+describe('buildStorefrontUrl', () => {
+  const env = process.env
+
+  beforeEach(() => {
+    process.env.SHOPIER_PRODUCTS = MAP_JSON
+  })
+
+  afterEach(() => {
+    process.env = { ...env }
+  })
+
+  it('builds workspace-specific redirect URL', () => {
+    const url = buildStorefrontUrl('0123456789abcdef', 'basic', 'monthly')
+    expect(url).toContain('47695583')
+    expect(url).toContain('note=0123456789abcdef_basic_monthly_')
+  })
+
+  it('returns null when product missing', () => {
+    expect(buildStorefrontUrl('0123456789abcdef', 'pro', 'yearly')).toBeNull()
+  })
+})
+
+describe('isShopierStorefrontEnabled', () => {
+  const env = process.env
+
+  beforeEach(() => {
+    process.env = { ...env }
+  })
+
+  afterEach(() => {
+    process.env = { ...env }
+  })
+
+  it('is true when SHOPIER_PRODUCTS has entries', () => {
+    process.env.SHOPIER_STOREFRONT_ENABLED = undefined
+    process.env.SHOPIER_PRODUCTS = MAP_JSON
+    expect(isShopierStorefrontEnabled()).toBe(true)
+  })
+
+  it('is false when explicitly disabled', () => {
+    process.env.SHOPIER_STOREFRONT_ENABLED = 'false'
+    process.env.SHOPIER_PRODUCTS = MAP_JSON
+    expect(isShopierStorefrontEnabled()).toBe(false)
   })
 })

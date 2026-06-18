@@ -14,7 +14,7 @@ import {
 import type { TrialUserStats } from '@/lib/infra/cronTrialRecipients'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import { ODEME_SHOPIER_BASIC_PATH } from '@/lib/domain/paymentRoutes'
-import { buildBasicMonthlyStorefrontUrl } from '@/lib/domain/shopierStorefront'
+import { buildStorefrontUrl } from '@/lib/domain/shopierStorefront'
 
 let _resend: Resend | null = null
 function getResend(): Resend {
@@ -30,7 +30,7 @@ const PAYMENT_URL = `${NMM_APP_URL}/odeme`
 function paymentUrlForTrialKind(kind: TrialEmailKind, workspaceId?: string): string {
   if (kind === 'trial_3d' || kind === 'trial_1d' || kind === 'trial_ended') {
     if (workspaceId) {
-      const shopier = buildBasicMonthlyStorefrontUrl(workspaceId)
+      const shopier = buildStorefrontUrl(workspaceId, 'basic', 'monthly')
       if (shopier) return shopier
     }
     return `${NMM_APP_URL}${ODEME_SHOPIER_BASIC_PATH}`
@@ -38,9 +38,13 @@ function paymentUrlForTrialKind(kind: TrialEmailKind, workspaceId?: string): str
   return PAYMENT_URL
 }
 
+/** Shopier dış URL veya uygulama içi path'e UTM ekler (note alanına karışmaz). */
+function appendUtm(url: string, utm: string): string {
+  return url.includes('?') ? `${url}&${utm}` : `${url}?${utm}`
+}
+
 function paymentCtaUrl(kind: TrialEmailKind, utm: string, workspaceId?: string): string {
-  const base = paymentUrlForTrialKind(kind, workspaceId)
-  return base.includes('?') ? `${base}&${utm}` : `${base}?${utm}`
+  return appendUtm(paymentUrlForTrialKind(kind, workspaceId), utm)
 }
 
 /**

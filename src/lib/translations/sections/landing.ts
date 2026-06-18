@@ -1,7 +1,6 @@
 export const landingSection = {
   tr: {
     landingPage: {
-      verifyingSession: 'Oturum Doğrulanıyor...',
       logIn: 'Giriş Yap',
       getStarted: 'Hemen Başla',
       heroBadge: 'YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ',
@@ -95,7 +94,6 @@ export const landingSection = {
   },
   en: {
     landingPage: {
-      verifyingSession: 'Verifying Session...',
       logIn: 'Log In',
       getStarted: 'Get Started',
       heroBadge: 'AI-POWERED NETWORK MARKETING OPERATING SYSTEM',
