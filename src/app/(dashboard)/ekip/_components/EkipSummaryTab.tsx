@@ -5,7 +5,6 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import type { MemberRow } from '@/lib/team/types'
-import { useTranslation } from '@/providers/LanguageProvider'
 import {
   HubSummaryTabBar,
   parseSummaryTab,
@@ -36,7 +35,6 @@ export function EkipSummaryTab({
   members: membersProp = [],
   membersLoading: membersLoadingProp = false,
 }: EkipSummaryTabProps = {}) {
-  const { t } = useTranslation()
   const { data: ws } = useWorkspace()
   const members = membersProp
   const membersLoading = membersLoadingProp
@@ -88,7 +86,6 @@ export function EkipSummaryTab({
     return (
       <div className="space-y-4">
         <TeamFreeUpgradeBanner />
-        <p className="text-sm text-[var(--text-2)]">{t('team.activityLockedHint')}</p>
       </div>
     )
   }

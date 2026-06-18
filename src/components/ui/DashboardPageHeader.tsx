@@ -12,6 +12,8 @@ interface DashboardPageHeaderProps {
   showHelp?: boolean
   className?: string
   dateLine?: string
+  /** Başlık + aksiyonları mobilde de tek satırda (sağ üst) tutar — alta sarmaz. */
+  rowOnMobile?: boolean
 }
 
 export function DashboardPageHeader({
@@ -23,9 +25,16 @@ export function DashboardPageHeader({
   showHelp = true,
   className = 'mb-6',
   dateLine,
+  rowOnMobile = false,
 }: DashboardPageHeaderProps) {
   return (
-    <header className={`flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between ${className}`}>
+    <header
+      className={`flex ${
+        rowOnMobile
+          ? 'flex-row items-center justify-between'
+          : 'flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'
+      } ${className}`}
+    >
       <div className="flex min-w-0 items-center gap-3">
         {icon && (
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconContainerClassName}`}>

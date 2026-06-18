@@ -229,7 +229,7 @@ export function TeamMemberCard({
                   <button
                     type="button"
                     onClick={e => { e.stopPropagation(); router.push('/odeme') }}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
+                    className="inline-flex items-center gap-1.5 rounded-xl brand-cta text-white px-5 py-2.5 text-xs font-bold shadow-md hover:shadow-indigo-500/10 active:scale-95 transition cursor-pointer border-0"
                   >
                     <span>{t('team.upgradeToMaster')}</span>
                   </button>

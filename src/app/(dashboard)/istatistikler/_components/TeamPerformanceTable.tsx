@@ -256,7 +256,7 @@ export function TeamPerformanceTable({
           </div>
           <Link
             href="/odeme"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
+            className="inline-flex items-center justify-center gap-2 rounded-xl brand-cta px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 transition"
           >
             <Sparkles className="h-4 w-4" />
             {t('statsPage.teamLockedCta')}

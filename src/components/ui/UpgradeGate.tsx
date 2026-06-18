@@ -141,7 +141,7 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
                 })
                 onClose()
               }}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl brand-cta px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
             >
               <Sparkles className="h-4 w-4" />
               {t('shellUi.upgradeBannerCta')}
@@ -199,7 +199,7 @@ function BannerGate() {
           <p className="mt-1 text-xs leading-relaxed text-[var(--text-2)]">{t('shellUi.teamFreeBannerDesc')}</p>
           <Link
             href="/odeme"
-            className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent px-4 py-2 text-xs font-bold text-white shadow-sm hover:opacity-95 transition"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-xl brand-cta px-4 py-2 text-xs font-bold text-white shadow-sm hover:opacity-95 transition"
           >
             <Sparkles className="h-3.5 w-3.5" />
             {t('shellUi.upgradeBannerCta')}

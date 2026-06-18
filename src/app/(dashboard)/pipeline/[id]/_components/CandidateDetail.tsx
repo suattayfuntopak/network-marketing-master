@@ -222,7 +222,9 @@ export function CandidateDetail({ candidateId }: Props) {
                 <Bot className="h-4 w-4" strokeWidth={1.75} />
                 {t('pipeline.aiMessage')}
                 {!hasAiFieldAccess && (
-                  <Lock className="absolute right-3 top-3 h-3 w-3 text-[var(--text-3)]" strokeWidth={2.5} aria-hidden />
+                  <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-amber-400 text-white shadow-sm ring-2 ring-[var(--bg-card)] dark:bg-amber-500">
+                    <Lock className="h-2.5 w-2.5" strokeWidth={3} aria-hidden />
+                  </span>
                 )}
               </button>
               {waLink ? (

@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { PageHelp } from '@/components/ui/PageHelp'
 import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { UserMenu } from './UserMenu'
 import { useWorkspace } from '@/hooks/useWorkspace'
@@ -62,6 +63,7 @@ export function Header({ visible = true }: { visible?: boolean }) {
   const { lang, setLang, t } = useTranslation()
   const { data: ws } = useWorkspace()
   const router = useRouter()
+  const pathname = usePathname()
   const searchInputRef = useRef<HTMLInputElement>(null)
   
   const [searchQuery, setSearchQuery] = useState('')
@@ -197,6 +199,12 @@ export function Header({ visible = true }: { visible?: boolean }) {
 
         {/* Sağ Taraf Buton Grubu */}
         <div className="flex items-center gap-1 sm:gap-2">
+
+          {/* Sayfa yardımı (?) — yalnızca mobil; masaüstünde sayfa başlığında durur.
+              Pano'da ve Süper Admin sayfasında (kendi başlık-içi yardımı var) gizli. */}
+          {pathname !== '/pano' && pathname !== '/platform-yonetim' && (
+            <PageHelp triggerClassName="flex sm:hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
+          )}
 
           {/* Mobil Arama (Mercek) Butonu */}
           <button

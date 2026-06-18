@@ -11,7 +11,12 @@ import { getPageHelp } from '@/lib/domain/pageHelp'
  * Sağ üst (?) yardım butonu — bulunulan sayfanın nasıl kullanılacağını EN SADE
  * dille, mobil + masaüstünde ekranı iyi kaplayan bir popup'ta anlatır.
  */
-export function PageHelp() {
+/**
+ * `triggerClassName` ile tetikleyici butonun görünürlük/stil sınıfları override
+ * edilebilir. Varsayılan: sayfa başlığındaki masaüstü (?) butonu (mobilde gizli).
+ * Header mobil kullanımı için `flex sm:hidden ...` geçilir.
+ */
+export function PageHelp({ triggerClassName }: { triggerClassName?: string } = {}) {
   const { lang } = useTranslation()
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
@@ -27,7 +32,10 @@ export function PageHelp() {
         onClick={() => setOpen(true)}
         title={helpLabel}
         aria-label={helpLabel}
-        className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] sm:flex"
+        className={
+          triggerClassName ??
+          'hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)] sm:flex'
+        }
       >
         <HelpCircle className="h-4.5 w-4.5" strokeWidth={1.75} />
       </button>

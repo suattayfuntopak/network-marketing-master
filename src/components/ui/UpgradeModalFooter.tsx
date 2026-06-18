@@ -54,7 +54,7 @@ export function UpgradeModalFooter({
           onClose()
         }}
         className={clsx(
-          'flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-brand to-brand-accent font-bold text-white shadow-md hover:opacity-95 transition',
+          'flex flex-1 items-center justify-center gap-1.5 rounded-xl brand-cta font-bold text-white shadow-md hover:opacity-95 transition',
           isSheet ? 'px-3 py-2 text-xs sm:text-sm md:text-base' : 'px-3 py-2.5 text-sm',
         )}
       >

@@ -27,6 +27,7 @@ import {
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
+import { PageHelp } from '@/components/ui/PageHelp'
 import {
   defaultRejectReason,
 } from '@/lib/domain/moderationDefaults'
@@ -253,18 +254,15 @@ export function PlatformYonetimContent() {
         <UnresolvedOrdersAlert />
 
         <DashboardPageHeader
-          title={
-            <span className="flex flex-wrap items-center gap-2">
-              <span className="truncate">{t('platformPage.consoleTitle')}</span>
-              <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 shrink-0">
-                {t('platformPage.superAdmin')}
-              </span>
-            </span>
-          }
+          title={t('platformPage.consoleTitle')}
+          rowOnMobile
           icon={<Crown className="h-5 w-5 text-white" strokeWidth={2.25} />}
           iconContainerClassName="bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md"
           actions={
             <>
+              {/* Mobil sayfa yardımı (?) — Ödeme/Landing butonlarının solunda; masaüstünde
+                  başlık-sonu PageHelp devreye girer (flex sm:hidden ile çakışma yok). */}
+              <PageHelp triggerClassName="flex sm:hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
               <button
                 type="button"
                 onClick={() => setNavConfirm('payment')}

@@ -1,5 +1,32 @@
 # Hot Log
 
+## 2026-06-19 — UI cilası (6 madde) + build fix ✅
+
+### Özet
+1. **CI build fix:** `platform-yonetim/actions.ts` `'use server'` dosyasından `export type { ProductFunnelCounts }` kaldırıldı — RSC manifest tip re-export'unu değer sanıp `next build`'i patlatıyordu (CI Gate #113/#114 kırmızıydı).
+2. **Dark-mode eflatun buton:** Soluk lavanta CTA'lar canlı indigo→menekşeye çekildi. Yeni `@utility brand-cta` (sabit `#534ab7→#7c3aed`, iki temada aynı) + `.dark .bg-brand { #534ab7 }` (yalnız dolu butonlar; `text-brand`/`border-brand`/opacity tint'leri etkilenmez). Light mode değişmedi.
+3. **YZ Mesajı kilit ikonu:** CandidateDetail'de metinle çakışan `absolute right-3 top-3` kilit → köşede amber rozet (`-right-1.5 -top-1.5`, ring ile ayrık); iki temada okunur.
+4. **Mobil sayfa yardımı (?):** PageHelp `triggerClassName` prop'u aldı; global Header'a mobil-only (`flex sm:hidden`) yardım butonu eklendi — Pano ve Süper Admin hariç tüm sayfalarda sağ üst, butonların solunda.
+5. **Saha Özeti kopyası:** `teamFreeBannerDesc` yeniden yazıldı (davet-kodu yerine "Katıldı → NMM'e Davet Et" akışı; "ekip nabzı" → "Saha Radarım"); kafa karıştıran `activityLockedHint` satırı + anahtarı kaldırıldı.
+6. **Ekip Üyeleri kartları:** NMM Ortağı / Saha Ortağı altına küçük italik açıklama (`statNmmPartnerHint` / `statFieldPartnerHint`).
+7. **Süper Admin başlığı:** mükerrer "SÜPER ADMİN" rozeti kaldırıldı; başlık "Admin" → "Süper Admin"; sidebar/bottom-bar `nav.platformYonetim` "Admin" → "Süper Admin"; Ödeme/Landing butonları mobilde başlık satırına (sağ üst, yardım ikonunun sağına) taşındı (`DashboardPageHeader.rowOnMobile`).
+
+### Değişen dosyalar
+- `src/app/globals.css` (brand-cta utility + dark bg-brand override)
+- `src/components/ui/PageHelp.tsx`, `DashboardPageHeader.tsx`, `UpgradeGate.tsx`, `UpgradeModalFooter.tsx`
+- `src/app/(dashboard)/_components/Header.tsx`
+- `src/app/(dashboard)/pipeline/[id]/_components/CandidateDetail.tsx`
+- `src/app/(dashboard)/ekip/_components/{EkipSummaryTab,TeamPerformanceSection,TeamMemberCard}.tsx`
+- `src/app/(dashboard)/{istatistikler,odeme,yazar,pipeline/sunum-materyalleri}/...` (brand-cta)
+- `src/app/(dashboard)/platform-yonetim/_components/PlatformYonetimContent.tsx`
+- `src/lib/translations/{tr,en}.ts`, `sections/{shell,platform}.ts`
+
+### Not (Madde 1 — bilgi, kod değişmedi)
+Dış alıcıların (üst liderler / başka firma distribütörleri) detaylı metrik & AI kullanımı: normal Ekibim/metrik akışı RLS + `nmm_leader_downline_workspaces` ile **yalnız kendi downline'ına** kapsanır → ağaç dışı alıcıların detayları görünmez. Süper Admin paneli `createAdminClient()` (service-role, RLS bypass) ile tüm workspace'leri listeler ama **yalnız kaba alanlar** (kimlik, lisans, aday/downline sayısı, sponsor); workspace-başı AI kullanımı/detaylı saha metriği YOK. "Görmeli miyim?" kararı sonraki oturuma bırakıldı.
+
+### Doğrulama
+tsc · lint (--max-warnings 0) · test 331/331 · i18n 1287 · next build ✓
+
 ## 2026-06-18 — Deneme hunisi tam paket (23 öneri) ✅
 
 ### Özet

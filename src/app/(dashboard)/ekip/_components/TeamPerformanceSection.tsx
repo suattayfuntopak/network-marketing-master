@@ -198,11 +198,17 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
               {t('team.statNmmPartner')}
             </p>
+            <p className="mt-1 text-[10px] italic leading-snug text-[#C9940A]/80">
+              {t('team.statNmmPartnerHint')}
+            </p>
           </div>
           <div className="rounded-2xl border border-[var(--border)] bg-[#FEECEC] dark:bg-red-950/25 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-red-600 dark:text-red-400">{fieldPartnerCount}</p>
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-red-700/80 dark:text-red-300/90">
               {t('team.statFieldPartner')}
+            </p>
+            <p className="mt-1 text-[10px] italic leading-snug text-red-700/70 dark:text-red-300/70">
+              {t('team.statFieldPartnerHint')}
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--border)] bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5 sm:p-6 shadow-sm">
@@ -240,11 +246,17 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#C9940A]">
               {t('team.statNmmPartner')}
             </p>
+            <p className="mt-1 text-[10px] italic leading-snug text-[#C9940A]/80">
+              {t('team.statNmmPartnerHint')}
+            </p>
           </div>
           <div className="rounded-2xl border border-[var(--border)] bg-[#FEECEC] dark:bg-red-950/25 p-5 sm:p-6 shadow-sm">
             <p className="text-3xl sm:text-4xl font-black text-red-600 dark:text-red-400">{fieldPartnerCount}</p>
             <p className="mt-1 text-xs sm:text-sm font-bold uppercase tracking-wider text-red-700/80 dark:text-red-300/90">
               {t('team.statFieldPartner')}
+            </p>
+            <p className="mt-1 text-[10px] italic leading-snug text-red-700/70 dark:text-red-300/70">
+              {t('team.statFieldPartnerHint')}
             </p>
           </div>
           <div className="rounded-2xl border border-[var(--border)] bg-[#EEF2FF] dark:bg-[#0a0f2e]/40 p-5 sm:p-6 shadow-sm">

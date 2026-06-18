@@ -188,6 +188,22 @@
   }
 }
 
+/* Dark mode: SOLID filled brand buttons (bg-brand + text-white) must stay a vivid
+   indigo — the same color as the light-mode CTA (image 2) — instead of the lightened
+   text-oriented --color-brand (#b4aff0), which washes out under white text.
+   `text-brand` / `border-brand` keep the lighter token, and opacity tints
+   (bg-brand/5, /10, /15…) are separate Tailwind classes, so they remain subtle. */
+.dark .bg-brand {
+  background-color: #534ab7;
+}
+
+/* Primary CTA gradient — fixed vivid indigo→violet in BOTH themes so dark mode
+   matches the light-mode button instead of fading to pale lavender via the lightened
+   dark brand tokens. Light mode is identical to the previous from-brand→to-brand-accent. */
+@utility brand-cta {
+  background-image: linear-gradient(to right, #534ab7, #7c3aed);
+}
+
 /* iOS notch / home indicator safe area */
 @utility pb-safe {
   padding-bottom: env(safe-area-inset-bottom);
