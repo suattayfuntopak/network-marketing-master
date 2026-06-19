@@ -44,20 +44,21 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
   const leader = members.find(m => m.role === 'leader')
   if (!leader) return []
 
+  const leaderUserId = leader.user_id
   const directIds = new Set((wsMembers ?? []).map(m => m.user_id))
   const tree = (treeRows ?? []) as { id: string; owner_id: string; parent_id: string | null }[]
   const wsById = new Map(tree.map(r => [r.id, r]))
 
   function resolveParentUserId(userId: string): string | null {
-    if (userId === leader.user_id) return null
+    if (userId === leaderUserId) return null
     const memberWs = tree.find(r => r.owner_id === userId)
     if (memberWs?.parent_id) {
-      if (memberWs.parent_id === workspaceId) return leader.user_id
+      if (memberWs.parent_id === workspaceId) return leaderUserId
       const parentWs = wsById.get(memberWs.parent_id)
       if (parentWs) return parentWs.owner_id
     }
-    if (directIds.has(userId)) return leader.user_id
-    return leader.user_id
+    if (directIds.has(userId)) return leaderUserId
+    return leaderUserId
   }
 
   return members
@@ -67,7 +68,7 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
       avatarUrl: avatarByUser.get(m.user_id) ?? m.avatar_url ?? null,
       generation: computeMemberGeneration(
         m.user_id,
-        leader.user_id,
+        leaderUserId,
         workspaceId,
         tree,
         directIds,
