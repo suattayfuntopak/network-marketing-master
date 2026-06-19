@@ -88,7 +88,7 @@ const TAB_HELP: TabHelpEntry[] = [
       steps: [
         { t: 'Kuşaklar', d: '1. nesil doğrudan ekibin; alt kuşaklar onların davet ettikleri.' },
         { t: 'Genişlet', d: 'Dallara dokunarak alt hattı aç/kapat.' },
-        { t: 'Üye detayı', d: 'Bir düğüme dokunarak o kişinin pipeline veya profil sayfasına git.' },
+        { t: 'Üye detayı', d: 'Bir kişiye tıklayarak o kişinin profil sayfasına git.' },
       ],
     },
     en: {
@@ -97,7 +97,7 @@ const TAB_HELP: TabHelpEntry[] = [
       steps: [
         { t: 'Generations', d: 'Gen 1 is your direct team; lower generations are their invites.' },
         { t: 'Expand', d: 'Tap branches to open or collapse downlines.' },
-        { t: 'Member detail', d: 'Tap a node to open their pipeline or profile page.' },
+        { t: 'Member detail', d: 'Tap a person to open their profile page.' },
       ],
     },
   },

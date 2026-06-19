@@ -13,8 +13,9 @@ export type GenerationTreeNode = {
   generation: number
   isAppUser: boolean
   joinedAt: string | null
-  /** Uygulama kullanıcısı detayı — pipeline_id varsa /pipeline/[id] */
   pipelineId: string | null
+  /** Üst sponsor (ağaç genişletme için). Lider = null. */
+  parentUserId: string | null
 }
 
 export async function getTeamGenerationTreeAction(workspaceId: string): Promise<GenerationTreeNode[]> {
@@ -45,6 +46,19 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
 
   const directIds = new Set((wsMembers ?? []).map(m => m.user_id))
   const tree = (treeRows ?? []) as { id: string; owner_id: string; parent_id: string | null }[]
+  const wsById = new Map(tree.map(r => [r.id, r]))
+
+  function resolveParentUserId(userId: string): string | null {
+    if (userId === leader.user_id) return null
+    const memberWs = tree.find(r => r.owner_id === userId)
+    if (memberWs?.parent_id) {
+      if (memberWs.parent_id === workspaceId) return leader.user_id
+      const parentWs = wsById.get(memberWs.parent_id)
+      if (parentWs) return parentWs.owner_id
+    }
+    if (directIds.has(userId)) return leader.user_id
+    return leader.user_id
+  }
 
   return members
     .map(m => ({
@@ -61,6 +75,7 @@ export async function getTeamGenerationTreeAction(workspaceId: string): Promise<
       isAppUser: true,
       joinedAt: m.joined_at,
       pipelineId: pipelineByUser.get(m.user_id) ?? null,
+      parentUserId: resolveParentUserId(m.user_id),
     }))
     .sort((a, b) => a.generation - b.generation || a.name.localeCompare(b.name))
 }

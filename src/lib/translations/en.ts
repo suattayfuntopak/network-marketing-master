@@ -335,6 +335,8 @@ export const en = {
     analyticsCohortTitle: "Join Trend (Last 6 Months)",
     treeTitle: "Generation tree",
     treeSubtitle: "Your NMM partners and their downlines appear here by generation.",
+    treeExpand: "Expand downline",
+    treeCollapse: "Collapse downline",
     treeEmpty: "No downline in your tree yet. Invite people from your pipeline once they reach the Joined stage.",
     treeInviteCta: "My Team → invite to NMM from member card →",
     treeYou: "You",

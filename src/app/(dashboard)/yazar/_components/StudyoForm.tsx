@@ -24,6 +24,12 @@ import {
   deleteContentPlanAction,
 } from '../contentPlanActions'
 import { keysForDaysAfter, todayCalendarKey } from '@/lib/utils/calendarDates'
+import {
+  EKIP_ACCENT_BTN_HOVER,
+  EKIP_ACCENT_FOCUS,
+  EKIP_ACCENT_PILL_ACTIVE,
+  EKIP_MODULE_ACCENT_CLASS,
+} from '@/lib/ui/brandGradients'
 
 const GOALS: { key: SocialGoal; icon: typeof ShoppingBag; labelKey: string }[] = [
   { key: 'urun', icon: ShoppingBag, labelKey: 'studyo.goalUrun' },
@@ -150,7 +156,7 @@ export function StudyoForm() {
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {GOALS.map(({ key, icon: Icon, labelKey }) => (
             <button key={key} type="button" onClick={() => setGoal(key)}
-              className={`${pillBase} flex items-center justify-center gap-1.5 ${goal === key ? 'border-[#0F6E56] bg-[#0F6E56]/10 text-[#0F6E56] dark:text-emerald-300' : 'border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'}`}>
+              className={`${pillBase} flex items-center justify-center gap-1.5 ${goal === key ? EKIP_ACCENT_PILL_ACTIVE : 'border-[var(--border)] text-[var(--text-2)] hover:bg-[var(--bg-subtle)]'}`}>
               <Icon className="h-3.5 w-3.5" /> {t(labelKey)}
             </button>
           ))}
@@ -192,13 +198,13 @@ export function StudyoForm() {
           maxLength={AI_USER_INPUT_MAX_CHARS}
           rows={2}
           placeholder={t('studyo.topicPlaceholder')}
-          className="w-full resize-none rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-base text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition focus:border-[#0F6E56]"
+          className={`w-full resize-none rounded-2xl border border-[var(--border)] bg-[var(--bg-subtle)] px-4 py-3 text-base text-[var(--text-1)] placeholder:text-[var(--text-3)] outline-none transition ${EKIP_ACCENT_FOCUS}`}
         />
       </div>
 
       {/* Üret */}
       <button type="button" onClick={generate} disabled={isPending}
-        className="relative flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0F6E56] px-4 py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#0c5a47] active:scale-[0.99] disabled:opacity-60"
+        className={`relative flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60 ${EKIP_MODULE_ACCENT_CLASS} ${EKIP_ACCENT_BTN_HOVER}`}
         title={!hasAiCoachAccess ? t('pagesUi.unlockAiBasic') : undefined}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {isPending ? t('studyo.generating') : t('studyo.generate')}
@@ -214,7 +220,7 @@ export function StudyoForm() {
               <button type="button" onClick={copyResult} className="inline-flex items-center gap-1 rounded-lg bg-[var(--bg-subtle)] px-2.5 py-1.5 text-xs font-bold text-[var(--text-2)] transition hover:text-[var(--text-1)]">
                 <Copy className="h-3.5 w-3.5" /> {t('studyo.copy')}
               </button>
-              <button type="button" onClick={shareResult} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-300">
+              <button type="button" onClick={shareResult} className="inline-flex items-center gap-1 rounded-lg bg-brand/10 px-2.5 py-1.5 text-xs font-bold text-brand dark:text-indigo-300">
                 <Send className="h-3.5 w-3.5" /> {t('studyo.share')}
               </button>
             </div>
@@ -231,7 +237,7 @@ export function StudyoForm() {
               className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-brand"
             />
             <button type="button" onClick={saveToCalendar} disabled={savingPlan}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-[#0F6E56] px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50">
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50 ${EKIP_MODULE_ACCENT_CLASS} ${EKIP_ACCENT_BTN_HOVER}`}>
               <CalendarPlus className="h-3.5 w-3.5" /> {t('studyo.saveToCalendar')}
             </button>
           </div>
@@ -252,7 +258,7 @@ export function StudyoForm() {
                 </span>
                 <div className="flex gap-1.5">
                   <button type="button" onClick={() => togglePosted(p.id, !p.is_posted)}
-                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition ${p.is_posted ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-[var(--text-1)]'}`}>
+                    className={`inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[11px] font-bold transition ${p.is_posted ? 'bg-brand/15 text-brand dark:text-indigo-300' : 'bg-[var(--bg-subtle)] text-[var(--text-3)] hover:text-[var(--text-1)]'}`}>
                     <Check className="h-3 w-3" /> {p.is_posted ? t('studyo.posted') : t('studyo.markPosted')}
                   </button>
                   <button type="button" onClick={() => removePlan(p.id)} className="rounded-lg p-1 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>

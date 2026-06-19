@@ -335,6 +335,8 @@ export const tr = {
     analyticsCohortTitle: "Katılım Trendi (Son 6 Ay)",
     treeTitle: "Nesil ağacı",
     treeSubtitle: "NMM ortaklarınız ve alt hatlarınız nesil nesil burada görünür.",
+    treeExpand: "Alt hattı aç",
+    treeCollapse: "Alt hattı kapat",
     treeEmpty: "Ağacınızda henüz alt hat yok. Listem'de katıldı aşamasındaki kişileri NMM'e davet edin.",
     treeInviteCta: "Ekibim → üye kartından NMM'e davet et →",
     treeYou: "Siz",

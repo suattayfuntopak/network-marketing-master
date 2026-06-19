@@ -12,6 +12,7 @@ import { StudyoForm } from './StudyoForm'
 import { UyumContent } from '@/app/(dashboard)/uyum/_components/UyumContent'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { parseYazarTab, type YazarTab } from '@/lib/domain/yazarTab'
+import { EKIP_ACCENT_BTN_HOVER, EKIP_MODULE_ACCENT_CLASS } from '@/lib/ui/brandGradients'
 
 interface YzKocuContainerProps {
   initialName: string
@@ -23,7 +24,7 @@ const TABS: readonly { key: YazarTab; icon: typeof MessageSquare; labelKey: stri
   { key: 'yazar', icon: MessageSquare, labelKey: 'coachUi.tabMessage', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { key: 'kocluk', icon: HelpCircle, labelKey: 'coachUi.tabCoaching', activeClass: 'bg-[#3730A3] text-white shadow-md' },
   { key: 'prova', icon: Target, labelKey: 'coachUi.tabProva', activeClass: 'bg-amber-600 text-white shadow-md' },
-  { key: 'studyo', icon: PenLine, labelKey: 'coachUi.tabStudyo', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
+  { key: 'studyo', icon: PenLine, labelKey: 'coachUi.tabStudyo', activeClass: `${EKIP_MODULE_ACCENT_CLASS} ${EKIP_ACCENT_BTN_HOVER}` },
   { key: 'uyum', icon: Shield, labelKey: 'coachUi.tabCompliance', activeClass: 'bg-[#C03E1F] text-white shadow-md' },
 ]
 

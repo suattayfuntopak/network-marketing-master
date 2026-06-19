@@ -5,6 +5,13 @@ export const PRO_CTA_GRADIENT_ACTIVE_DARK =
 /** Ekibim sidebar + sayfa başlık ikonu — Ekip Üyeleri sekmesi ile aynı marka gradyanı. */
 export const EKIP_MODULE_ACCENT_CLASS = `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`
 
+/** Ekibim modülü — seçili pill, odak halkası, solid CTA (İçerik Stüdyosu vb.). */
+export const EKIP_ACCENT_PILL_ACTIVE =
+  'border-brand bg-brand/10 text-brand dark:text-indigo-300'
+export const EKIP_ACCENT_FOCUS =
+  'focus:border-brand focus:ring-2 focus:ring-brand/20'
+export const EKIP_ACCENT_BTN_HOVER = 'hover:brightness-105'
+
 export const PRO_CTA_GRADIENT_ACTIVE_DARK_SM =
   'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:shadow-sm dark:shadow-pink-500/15'
 

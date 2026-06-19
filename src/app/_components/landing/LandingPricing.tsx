@@ -291,37 +291,6 @@ export function LandingPricing() {
 
       </div>
 
-      {/* Free tier comparison row */}
-      <div
-        data-testid="plan-free-row"
-        className="max-w-6xl mx-auto rounded-2xl border border-dashed border-slate-300 dark:border-white/10 bg-slate-50/60 dark:bg-white/[0.02] px-6 py-5"
-      >
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-bold text-slate-800 dark:text-zinc-200">
-              {t('landingPage.planFreeName')}
-            </p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-zinc-400 leading-relaxed">
-              {t('landingPage.planFreeDesc')}
-            </p>
-          </div>
-          <ul className="space-y-2 text-xs text-slate-600 dark:text-zinc-400 shrink-0">
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
-              <span>{t('landingPage.planFreeFeat1')}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
-              <span>{t('landingPage.planFreeFeat2')}</span>
-            </li>
-            <li className="flex items-center gap-2">
-              <CheckCircle2 className="h-3.5 w-3.5 text-slate-400 dark:text-zinc-500 shrink-0" />
-              <span>{t('landingPage.planFreeFeat3')}</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
       {BANK_TRANSFER_ENABLED && <BankTransferCard variant="landing" />}
     </section>
   )

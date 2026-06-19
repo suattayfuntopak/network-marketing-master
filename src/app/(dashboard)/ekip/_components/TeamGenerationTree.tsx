@@ -1,14 +1,14 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { GitBranch, Users, Layers, UserPlus, Crown } from 'lucide-react'
+import { ChevronDown, ChevronRight, GitBranch, Users, Layers, UserPlus, Crown } from 'lucide-react'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { getTeamGenerationTreeAction } from '../treeActions'
+import { getTeamGenerationTreeAction, type GenerationTreeNode } from '../treeActions'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { computeDownlineAnalytics, monthlyJoinCohorts } from '@/lib/domain/downlineAnalytics'
@@ -16,6 +16,119 @@ import { computeDownlineAnalytics, monthlyJoinCohorts } from '@/lib/domain/downl
 type Props = {
   workspaceId: string
   teamPageUnlocked: boolean
+}
+
+type TreeBranch = GenerationTreeNode & { children: TreeBranch[] }
+
+function buildTree(nodes: GenerationTreeNode[]): TreeBranch[] {
+  const byId = new Map(nodes.map(n => [n.id, { ...n, children: [] as TreeBranch[] }]))
+  const roots: TreeBranch[] = []
+
+  for (const node of byId.values()) {
+    if (node.parentUserId && byId.has(node.parentUserId)) {
+      byId.get(node.parentUserId)!.children.push(node)
+    } else if (node.generation === 0) {
+      roots.push(node)
+    } else {
+      const leader = [...byId.values()].find(n => n.generation === 0)
+      if (leader) leader.children.push(node)
+    }
+  }
+
+  const sortBranch = (a: TreeBranch, b: TreeBranch) =>
+    a.generation - b.generation || a.name.localeCompare(b.name)
+  const walk = (branch: TreeBranch) => {
+    branch.children.sort(sortBranch)
+    branch.children.forEach(walk)
+  }
+  roots.sort(sortBranch)
+  roots.forEach(walk)
+  return roots
+}
+
+function TreeNodeRow({
+  node,
+  depth,
+  expanded,
+  onToggle,
+  onOpenProfile,
+  t,
+}: {
+  node: TreeBranch
+  depth: number
+  expanded: Set<string>
+  onToggle: (id: string) => void
+  onOpenProfile: (id: string) => void
+  t: (key: string, vars?: Record<string, string | number>) => string
+}) {
+  const hasChildren = node.children.length > 0
+  const isOpen = expanded.has(node.id)
+  const isLeader = node.generation === 0
+
+  return (
+    <>
+      <li
+        className={`flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-2 py-2 sm:px-3 sm:py-2.5 ${
+          !isLeader ? 'cursor-pointer transition hover:bg-[var(--bg-subtle)] active:scale-[0.99]' : ''
+        }`}
+        style={{ marginInlineStart: `${depth * 16}px` }}
+      >
+        {hasChildren ? (
+          <button
+            type="button"
+            onClick={e => {
+              e.stopPropagation()
+              onToggle(node.id)
+            }}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[var(--text-3)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]"
+            aria-expanded={isOpen}
+            aria-label={isOpen ? t('team.treeCollapse') : t('team.treeExpand')}
+          >
+            {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          </button>
+        ) : (
+          <span className="inline-block h-8 w-8 shrink-0" aria-hidden />
+        )}
+
+        <button
+          type="button"
+          disabled={isLeader}
+          onClick={() => {
+            if (!isLeader) onOpenProfile(node.id)
+          }}
+          className="flex min-w-0 flex-1 items-center gap-3 text-left disabled:cursor-default"
+        >
+          <PersonAvatar name={node.name} imageUrl={node.avatarUrl} size="sm" />
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-[var(--text-1)]">{node.name}</p>
+            {node.generation > 0 && (
+              <p className="text-[10px] font-medium text-[var(--text-3)]">
+                {t('team.generationLabel', { n: node.generation })}
+              </p>
+            )}
+          </div>
+          {isLeader && (
+            <span className="shrink-0 rounded-full bg-brand-subtle px-2 py-0.5 text-[10px] font-bold text-brand">
+              {t('team.treeYou')}
+            </span>
+          )}
+        </button>
+      </li>
+
+      {hasChildren && isOpen &&
+        node.children.map(child => (
+          <TreeNodeRow
+            key={child.id}
+            node={child}
+            depth={depth + 1}
+            expanded={expanded}
+            onToggle={onToggle}
+            onOpenProfile={onOpenProfile}
+            t={t}
+          />
+        ))}
+    </>
+  )
 }
 
 export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
@@ -29,8 +142,23 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
     staleTime: QUERY_STALE.metrics,
   })
 
+  const leaderId = nodes.find(n => n.generation === 0)?.id ?? null
+  const [expandedOverride, setExpandedOverride] = useState<Set<string> | null>(null)
+  const expanded = expandedOverride ?? (leaderId ? new Set([leaderId]) : new Set<string>())
+
   const analytics = useMemo(() => computeDownlineAnalytics(nodes), [nodes])
   const cohorts = useMemo(() => monthlyJoinCohorts(nodes), [nodes])
+  const treeRoots = useMemo(() => buildTree(nodes), [nodes])
+
+  function toggleExpand(id: string) {
+    setExpandedOverride(prev => {
+      const base = prev ?? (leaderId ? new Set([leaderId]) : new Set<string>())
+      const next = new Set(base)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
 
   if (isLoading) {
     return (
@@ -80,7 +208,6 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
             })}
           </div>
 
-          {/* Katılım trendi — son 6 ay kohort boyutu */}
           {cohorts.some(c => c.count > 0) && (
             <div className="mt-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
               <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
@@ -124,43 +251,16 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
         </div>
       ) : (
         <ul className="space-y-2">
-          {nodes.map(node => (
-            <li
-              key={node.id}
-              role={node.generation > 0 && node.pipelineId ? 'button' : undefined}
-              tabIndex={node.generation > 0 && node.pipelineId ? 0 : undefined}
-              onClick={() => {
-                if (node.generation === 0 || !node.pipelineId) return
-                router.push(`/pipeline/${node.pipelineId}`)
-              }}
-              onKeyDown={e => {
-                if (e.key !== 'Enter' && e.key !== ' ') return
-                if (node.generation === 0 || !node.pipelineId) return
-                e.preventDefault()
-                router.push(`/pipeline/${node.pipelineId}`)
-              }}
-              className={`flex items-center gap-3 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-2.5 ${
-                node.generation > 0 && node.pipelineId
-                  ? 'cursor-pointer transition hover:bg-[var(--bg-subtle)] active:scale-[0.99]'
-                  : ''
-              }`}
-              style={{ marginInlineStart: `${node.generation * 12}px` }}
-            >
-              <PersonAvatar name={node.name} imageUrl={node.avatarUrl} size="sm" />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-[var(--text-1)]">{node.name}</p>
-                {node.generation > 0 && (
-                  <p className="text-[10px] font-medium text-[var(--text-3)]">
-                    {t('team.generationLabel', { n: node.generation })}
-                  </p>
-                )}
-              </div>
-              {node.generation === 0 && (
-                <span className="shrink-0 rounded-full bg-brand-subtle px-2 py-0.5 text-[10px] font-bold text-brand">
-                  {t('team.treeYou')}
-                </span>
-              )}
-            </li>
+          {treeRoots.map(root => (
+            <TreeNodeRow
+              key={root.id}
+              node={root}
+              depth={0}
+              expanded={expanded}
+              onToggle={toggleExpand}
+              onOpenProfile={id => router.push(`/ekip/${id}`)}
+              t={t}
+            />
           ))}
         </ul>
       )}
