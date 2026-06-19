@@ -11,7 +11,7 @@ import { useAIUsage } from '@/hooks/useAIUsage'
 import { useCandidateStats } from '@/hooks/useCandidateStats'
 import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { buildCandidateTrendBars } from '@/lib/domain/trendBuckets'
 import { StatsKpiCards } from './StatsKpiCards'
@@ -64,7 +64,10 @@ export function IstatistiklerContent() {
     ws?.workspaceCreatedAt
   )
   const { dailyLimit } = teamLimits
-  const teamStatsLocked = !hasTeamPageAccess(ws?.licenseType, ws?.isSuperAdmin)
+  const teamStatsLocked = !hasStatsAdvancedAccess(
+    ws?.effectiveLicenseType ?? ws?.licenseType,
+    ws?.isSuperAdmin,
+  )
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')

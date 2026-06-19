@@ -109,7 +109,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
         onClick={() => navigate(href)}
         onPointerEnter={() => prefetchRouteData(queryClient, href, ws?.workspaceId, ws)}
         className={clsx(
-          'flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-1 px-1 py-3 text-center text-[10px] font-bold transition-all duration-150',
+          'flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-0.5 px-0.5 py-2.5 text-center font-bold transition-all duration-150',
           active
             ? isCrown ? 'text-amber-500' : 'text-brand dark:text-[#FACC15]'
             : isCrown
@@ -125,7 +125,9 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
             strokeWidth={active || pending || isCrown ? 2.25 : 1.75}
           />
         </span>
-        <span className="max-w-full truncate">{barLabel(item)}</span>
+        <span className="line-clamp-2 max-w-full text-center text-[9px] font-bold leading-[1.15]">
+          {barLabel(item)}
+        </span>
       </button>
     )
   }
@@ -145,7 +147,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
           type="button"
           onClick={() => setMoreOpen(true)}
           className={clsx(
-            'flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-1 px-1 py-3 text-center text-[10px] font-bold transition-all duration-150',
+            'flex min-w-0 flex-1 cursor-pointer flex-col items-center gap-0.5 px-0.5 py-2.5 text-center text-[10px] font-bold transition-all duration-150',
             moreActive ? 'text-brand dark:text-[#FACC15]' : 'text-gray-400 hover:text-gray-600 dark:text-gray-500',
           )}
         >

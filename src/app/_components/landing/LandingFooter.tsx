@@ -109,14 +109,11 @@ export function LandingFooter() {
                 <li>
                   <a
                     href="mailto:info@suattayfuntopak.com"
-                    className="hover:text-brand dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5 group"
+                    className="hover:text-brand dark:hover:text-white transition-colors duration-200 flex items-center gap-1.5 group min-w-0"
                   >
                     <Mail className="h-3.5 w-3.5 text-brand dark:text-[#a09be8] group-hover:scale-110 transition-transform duration-200 shrink-0" />
-                    <span className="break-all md:break-normal text-[11px] sm:text-xs">info@suattayfuntopak.com</span>
+                    <span className="whitespace-nowrap text-[10px] sm:text-xs">info@suattayfuntopak.com</span>
                   </a>
-                </li>
-                <li className="text-[10px] text-slate-500 dark:text-zinc-500 italic">
-                  {isEn ? 'Typically replies within 24 hours' : 'Genellikle 24 saat içinde yanıtlanır'}
                 </li>
               </ul>
             </div>
