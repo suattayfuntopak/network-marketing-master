@@ -3,6 +3,7 @@
 import { CreditCard, Eye, Sparkles, ArrowRight, Link2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { ModuleInfo } from './ModuleInfo'
 import type { ProductFunnelCounts } from '@/app/(dashboard)/istatistikler/actions'
 
 type Props = {
@@ -46,11 +47,11 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
       <div className="flex items-center gap-2">
         <CreditCard className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
         <h2 className="text-sm font-bold text-[var(--text-1)]">{t('platformPage.funnelTitle')}</h2>
+        <ModuleInfo moduleKey="funnel" />
         <span className="rounded-full bg-[var(--bg-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-3)]">
           {t('platformPage.viralWindowHint', { days: 30 })}
         </span>
       </div>
-      <p className="text-[11px] leading-relaxed text-[var(--text-3)]">{t('platformPage.funnelHint')}</p>
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -86,7 +87,6 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
           <FunnelCard
             label={t('platformPage.funnelUpgradeGateLegacy')}
             value={funnel?.upgradeGateCtaClick ?? 0}
-            hint={t('platformPage.funnelUpgradeGateLegacyHint')}
             icon={ArrowRight}
           />
           <FunnelCard
@@ -102,7 +102,6 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
           <FunnelCard
             label={t('platformPage.funnelBasicDeepLinkLegacy')}
             value={funnel?.odemeBasicDeepLink ?? 0}
-            hint={t('platformPage.funnelBasicDeepLinkLegacyHint')}
             icon={Link2}
           />
         </div>

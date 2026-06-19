@@ -3,6 +3,7 @@
 import { BrainCircuit, Users, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { ModuleInfo } from './ModuleInfo'
 import type { AiUsageAnalytics, AiUsageGroupStat, AiTier, AiSegment } from '@/lib/domain/aiUsageAnalytics'
 
 type Props = {
@@ -60,6 +61,7 @@ export function PlatformAiUsageAnalytics({ analytics, isLoading }: Props) {
       <div className="flex flex-wrap items-center gap-2">
         <BrainCircuit className="h-4 w-4 text-fuchsia-600 dark:text-fuchsia-400" />
         <h2 className="text-sm font-bold text-[var(--text-1)]">{t('platformPage.aiUsageTitle')}</h2>
+        <ModuleInfo moduleKey="aiUsage" />
         <span className="rounded-full bg-[var(--bg-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-3)]">
           {t('platformPage.aiUsageWindowHint', { days: analytics?.windowDays ?? 30 })}
         </span>
@@ -67,8 +69,6 @@ export function PlatformAiUsageAnalytics({ analytics, isLoading }: Props) {
           {t('platformPage.aiUsageAnonymNote')}
         </span>
       </div>
-
-      <p className="text-[11px] leading-relaxed text-[var(--text-3)]">{t('platformPage.aiUsageExplain')}</p>
 
       {isLoading ? (
         <div className="space-y-3">

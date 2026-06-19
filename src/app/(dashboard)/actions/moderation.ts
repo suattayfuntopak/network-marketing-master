@@ -263,10 +263,15 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
     })
   })
 
+  // Süper admin kendi içerik/video/itiraz düzenlemelerini KENDİNE onaya göndermez —
+  // kendi gönderilerini masadan gizle (auto-approve edilmemiş eski/legacy satırlar dahil).
+  // Masada yalnız "başkalarının" talepleri kalır.
+  const pending = list.filter(r => r.userId !== user.id)
+
   // Gönderen onarımı: eski/seed satırlarda user_email/user_name boş olabilir ama
   // user_id durur — kimliği auth'tan çözüp doldur. Böylece "kim gönderdi" her zaman görünür.
   const unresolvedIds = Array.from(
-    new Set(list.filter(r => r.userId && (!r.userName || !r.userEmail)).map(r => r.userId as string)),
+    new Set(pending.filter(r => r.userId && (!r.userName || !r.userEmail)).map(r => r.userId as string)),
   )
   if (unresolvedIds.length > 0) {
     const resolved = new Map<string, { email: string | null; name: string | null }>()
@@ -286,7 +291,7 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
         }
       }),
     )
-    for (const r of list) {
+    for (const r of pending) {
       if (!r.userId) continue
       const u = resolved.get(r.userId)
       if (!u) continue
@@ -295,7 +300,7 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
     }
   }
 
-  return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return pending.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 }
 
 /**

@@ -1,5 +1,54 @@
 # Hot Log
 
+## 2026-06-19 — Süper Admin: kendi taleplerini gizle + modül-yardımı (?) + kopya temizliği ✅
+
+### 1) Süper admin kendi içeriklerini kendine onaya göndermez
+`getPendingRequestsAction` artık `userId === user.id` (süper admin'in kendi gönderileri)
+satırları masadan eler — auto-approve edilmemiş eski/legacy satırlar dahil. Masada
+yalnız BAŞKALARININ talepleri kalır. (Resimdeki "Suat Tayfun TOPAK" legacy satırı gider.)
+
+### 2) Modül-yardımı (?) — sayfa açıklamaları popup'a taşındı
+- Yeni `ModuleInfo` (?) butonu + `platformModuleHelp.ts` (TR/EN domain içeriği, i18n dict şişmez).
+  Büyüme & Yayılma, Satış Hunisi, AI Kullanım Analitiği başlıklarının yanında; her kutunun
+  ne işe yaradığını süper admin'e özel, detaylı anlatır.
+- Inline açıklamalar kaldırıldı (mobilde kalabalık yapıyordu): funnelHint cümlesi,
+  aiUsageExplain paragrafı, funnel kart legacy hint'leri, "PAYLAŞIM KAYNAKLARI · {sayı}"daki sayı.
+- Funnel etiketleri Türkçeleşti: LANDİNG FİYAT→FİYAT GÖRÜNTÜLENDİ, /ÖDEME GÖRÜNTÜ→ÖDEME
+  GÖRÜNTÜLENDİ, UPGRADE GATE→YÜKSELTME KAPISI, BASIC DEEP LINK→BASIC DERİN BAĞLANTI (ESKİ).
+
+### Değişen dosyalar (yalnız bu commit)
+- `src/app/(dashboard)/actions/moderation.ts`
+- `src/lib/domain/platformModuleHelp.ts` (yeni), `_components/ModuleInfo.tsx` (yeni)
+- `_components/{PlatformViralKpi,PlatformProductFunnel,PlatformAiUsageAnalytics}.tsx`
+- `src/lib/translations/sections/platform.ts`
+
+### Doğrulama
+tsc · lint · test 342/342 · next build ✓ (i18n'deki orphan paymentPage anahtarları paralel
+Cursor WIP'inden; bu commit'e dahil değil.)
+
+## 2026-06-19 — Plan limitleri (25/100/∞), fiyat güncelleme, kart metinleri ✅
+
+### Özet
+- **Alt ekip listesi:** `teamLimits.ts` — Basic/free **25**, Plus **100**, Pro **sınırsız**; Ekibim slice + limit banner (Basic→Plus, Plus→Pro).
+- **Fiyatlar:** Basic **499₺** (yıllık gösterim **374₺/ay**, tahsilat 4488₺); Plus **899₺** (674₺/ay); Pro **1699₺** (1274₺/ay, tahsilat 15288₺).
+- **Plan kartları:** Landing + /odeme TR/EN kullanıcı metinleri; Pro Diamond rozeti kaldırıldı; Basic 5 madde.
+- **Landing light hover:** Yıllık ödeme sekmesi hover + %25 rozeti light modda okunaklı.
+- **Upgrade metinleri:** teamGate, teamLimit, memberGoals Plus kontrolü.
+
+### Commit
+`b269ab5` — feat(billing): plan limitleri 25/100/∞, fiyatlar ve kart metinleri
+
+## 2026-06-19 — Mobil alt nav + footer e-posta + plan kartları (kod uyumlu) ✅
+
+### Özet
+- Bottom nav: Saha Özetim `line-clamp-2` ile tam görünür (truncate kaldırıldı).
+- Footer: e-posta tek satır (`whitespace-nowrap`); 24 saat yanıt metni silindi.
+- Landing + /odeme plan kartları kodla hizalandı (Saha Radarım Plus’a özel değil).
+- İstatistikler ekip tablosu kilidi `hasStatsAdvancedAccess` (Plus/Pro).
+
+### Commit
+`81174cf` — fix(ui): mobil nav etiketi, footer e-posta ve plan kartları
+
 ## 2026-06-19 — Build fix: PageHelp useSearchParams prerender bailout ✅
 
 ### Sorun
