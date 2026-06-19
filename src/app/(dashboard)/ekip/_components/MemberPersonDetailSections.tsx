@@ -323,7 +323,7 @@ export function MemberActionButtons({
   onCoaching: () => void
 }) {
   return (
-    <div className="flex w-full items-center gap-2">
+    <div className="flex items-center justify-start gap-2">
       <button
         type="button"
         onClick={onCoaching}
@@ -358,7 +358,7 @@ export function MemberActionButtons({
         <a
           href={`tel:${phone}`}
           onClick={e => e.stopPropagation()}
-          className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition hover:scale-105 hover:shadow-md md:hidden"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition hover:scale-105 hover:shadow-md md:hidden"
           aria-label={t('pipeline.call')}
           title={t('pipeline.call')}
         >
