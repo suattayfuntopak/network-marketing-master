@@ -24,6 +24,7 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS, type MemberRow } from '@/lib/team/types'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
+import { PANO_EKIP_ROSE_CTA } from '@/lib/ui/brandGradients'
 
 const MemberActivitySheet = dynamic(
   () => import('@/app/(dashboard)/_components/team/MemberActivitySheet').then(m => ({ default: m.MemberActivitySheet })),
@@ -340,14 +341,14 @@ export function MemberActionButtons({
                 'max-md:bg-gradient-to-br max-md:from-[#FF5252] max-md:to-[#D81B60] max-md:text-white max-md:shadow-md max-md:hover:brightness-105',
                 'md:bg-brand-subtle md:text-brand md:hover:scale-[1.02] md:hover:shadow-md',
               ]
-            : 'bg-brand-subtle px-3 text-brand hover:scale-[1.02] hover:shadow-md',
+            : [PANO_EKIP_ROSE_CTA, 'px-3'],
         )}
         title={t('team.memberDetailCoachCta')}
       >
         {generating ? (
           <div className={clsx(
             'h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-transparent',
-            cardTab ? 'max-md:border-white md:border-brand' : 'border-brand',
+            cardTab ? 'max-md:border-white md:border-brand' : 'border-white',
           )} />
         ) : (
           <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
@@ -355,7 +356,7 @@ export function MemberActionButtons({
         {t('team.memberDetailCoachCta')}
         {!hasAiFieldAccess && (
           <Lock
-            className={clsx('h-2.5 w-2.5 shrink-0', cardTab ? 'max-md:text-white/90 md:text-brand' : '')}
+            className={clsx('h-2.5 w-2.5 shrink-0', cardTab ? 'max-md:text-white/90 md:text-brand' : 'text-white/90')}
             strokeWidth={2.5}
           />
         )}

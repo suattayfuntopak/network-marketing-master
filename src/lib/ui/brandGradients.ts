@@ -6,6 +6,10 @@ export const PRO_CTA_GRADIENT_ACTIVE =
 export const PRO_CTA_GRADIENT_ACTIVE_DARK =
   'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:text-white dark:shadow-md dark:shadow-pink-500/15'
 
+/** Pano Ekibim launcher kutusu — crown rose gradyan (light + dark). */
+export const PANO_EKIP_ROSE_CTA =
+  'bg-gradient-to-br from-[#FF5252] to-[#D81B60] text-white shadow-md hover:brightness-105'
+
 /** Ekibim sidebar + sayfa başlık ikonu — Ekip Üyeleri sekmesi ile aynı marka gradyanı. */
 export const EKIP_MODULE_ACCENT_CLASS = `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`
 
