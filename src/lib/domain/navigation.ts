@@ -59,15 +59,21 @@ export const NAV_PRIMARY: readonly NavItem[] = NAV_SIDEBAR_MODULES
 
 /**
  * Mobil alt bar — birincil (her zaman görünür) 5 modül; gerisi "Diğer" çekmecesinde.
- * Masaüstü sidebar tüm listeyi gösterir (dikey alan bol). Sıra: bu dizinin sırası.
+ * Sıra: Pano → Hedefim → Listem → Ekibim → Saha Özetim → Diğer (Saha Radarı çekmecede).
  */
 export const NAV_MOBILE_PRIMARY_HREFS: readonly string[] = [
   '/pano',
+  '/hedefim',
   '/pipeline',
   '/ekip',
-  '/hedefim',
-  '/saha-radar',
+  '/saha-ozetim',
 ]
+
+/** Sidebar / başlık rengi — pano launcher dışı modüller. */
+const NAV_MODULE_EXTRA_COLORS: Record<string, ButtonColor> = {
+  '/musteriler': 'coral',
+  '/duyurular': 'rose',
+}
 
 export const NAV_ADMIN: NavItem = {
   href: '/platform-yonetim',
@@ -112,5 +118,5 @@ const PANO_COLOR_BY_HREF = Object.fromEntries(
 export function getPanoLauncherColor(href: string): ButtonColor | undefined {
   if (href === '/pano') return 'purple'
   if (href === NAV_ADMIN.href) return 'amber'
-  return PANO_COLOR_BY_HREF[href]
+  return PANO_COLOR_BY_HREF[href] ?? NAV_MODULE_EXTRA_COLORS[href]
 }

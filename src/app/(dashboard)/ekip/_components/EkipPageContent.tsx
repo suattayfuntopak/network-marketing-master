@@ -9,6 +9,9 @@ import { hubPeriodTabLabel, parseSummaryTab } from '@/components/hub/HubSummaryT
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useTranslation } from '@/providers/LanguageProvider'
 
+import { PageHelp } from '@/components/ui/PageHelp'
+import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
+
 export function EkipPageContent() {
   const { t } = useTranslation()
   const searchParams = useSearchParams()
@@ -34,12 +37,13 @@ export function EkipPageContent() {
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
       <header className="mb-4 flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FAEEDA]">
-          <Users className="h-5 w-5 text-[#854F0B]" strokeWidth={1.75} />
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${pageHeaderIconClass('/ekip')}`}>
+          <Users className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />
         </div>
-        <div>
+        <div className="min-w-0 flex-1">
           <h1 className="text-xl font-bold text-[var(--text-1)]">{pageTitle}</h1>
         </div>
+        <PageHelp />
       </header>
       <EkipTabNav activeTab={activeTab} />
       <EkipPanel activeTab={activeTab} />

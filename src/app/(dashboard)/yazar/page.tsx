@@ -9,6 +9,7 @@ import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useFeatureAccess } from '@/hooks/useFeatureAccess'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
+import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 const YAZAR_TAB_LABEL_KEYS: Record<YazarTab, string> = {
   yazar: 'coachUi.tabMessage',
@@ -41,8 +42,8 @@ export default function YazarPage({ searchParams }: PageProps) {
       <div className="w-full space-y-6">
         <DashboardPageHeader
           title={pageTitle}
-          icon={<Bot className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={1.75} />}
-          iconContainerClassName="bg-[#EEF2FF] dark:bg-[#1e1b4b]"
+          icon={<Bot className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />}
+          iconContainerClassName={pageHeaderIconClass('/yazar')}
           className=""
         />
         {hasAiCoachAccess ? (

@@ -14,6 +14,7 @@ import { AddCandidateSheet } from './AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { clsx } from 'clsx'
 import { PageHelp } from '@/components/ui/PageHelp'
+import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 const STAGE_PARAM_FILTERS: CandidateFilter[] = [
   'yeni',
@@ -91,8 +92,8 @@ export function PipelinePageContent() {
   return (
     <PageShell>
       <div className="mb-5 flex items-center gap-3 animate-in fade-in duration-300">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] dark:bg-[#0a1f4d]">
-          <ClipboardList className="h-5 w-5 text-[#1A56DB] dark:text-[#93c5fd]" strokeWidth={1.75} />
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${pageHeaderIconClass('/pipeline')}`}>
+          <ClipboardList className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />
         </div>
         <div className="flex-1">
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>

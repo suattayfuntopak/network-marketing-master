@@ -9,6 +9,312 @@ export type PageHelpContent = { title: string; intro: string; steps: PageHelpSte
 
 type Lang = 'tr' | 'en'
 
+type TabHelpEntry = { match: string; tab: string; tr: PageHelpContent; en: PageHelpContent }
+
+/** Sekmeli sayfalar — rota + sekme anahtarı (URL ?tab= veya bileşen contextKey). */
+const TAB_HELP: TabHelpEntry[] = [
+  {
+    match: '/ekip',
+    tab: 'members',
+    tr: {
+      title: 'Ekibim — Ekip Üyeleri',
+      intro: 'Doğrudan ekibindeki üyeleri listeler; davet, liste bağlantısı ve kart aksiyonları burada.',
+      steps: [
+        { t: 'Üye kartı', d: 'Bir üyeye dokunarak aktivite, eğitim ve hedef bilgilerine gidebilirsin.' },
+        { t: 'Listeye ekle', d: 'Üye henüz senin aday listende değilse tek tıkla pipeline\'a ekleyebilirsin.' },
+        { t: 'Davet', d: 'Davet kodun ve WhatsApp paylaşımı ile yeni üyeleri NMM\'e çağır.' },
+      ],
+    },
+    en: {
+      title: 'My Team — Members',
+      intro: 'Lists your direct team members; invites, pipeline links, and card actions live here.',
+      steps: [
+        { t: 'Member card', d: 'Tap a member to see activity, training, and goal info.' },
+        { t: 'Add to list', d: 'If they are not in your pipeline yet, add them in one tap.' },
+        { t: 'Invite', d: 'Share your invite code via WhatsApp to bring new members to NMM.' },
+      ],
+    },
+  },
+  {
+    match: '/ekip',
+    tab: 'summary',
+    tr: {
+      title: 'Ekibim — Saha Özeti',
+      intro: 'Ekibinin saha performansını dönem dönem görürsün (Günlük / Haftalık / Aylık).',
+      steps: [
+        { t: 'Dönem seç', d: 'Üstteki sekmelerle ekibinin o dönemdeki arama, tanışma, sunum ve yeni üye sayılarını karşılaştır.' },
+        { t: 'Sıralama', d: 'Tablo en aktif üyeleri üstte gösterir; zayıf kalanlara dokunarak destek planla.' },
+        { t: 'Detay', d: 'Bir satıra dokunarak üyenin kendi saha özetine gidebilirsin.' },
+      ],
+    },
+    en: {
+      title: 'My Team — Field Summary',
+      intro: 'See your team\'s field performance by period (Daily / Weekly / Monthly).',
+      steps: [
+        { t: 'Pick a period', d: 'Use the top tabs to compare calls, contacts, presentations, and new members.' },
+        { t: 'Ranking', d: 'The table highlights the most active members first.' },
+        { t: 'Drill down', d: 'Tap a row to open that member\'s own field summary.' },
+      ],
+    },
+  },
+  {
+    match: '/ekip',
+    tab: 'training',
+    tr: {
+      title: 'Ekibim — Eğitim İlerlemesi',
+      intro: 'Ekibinin eğitim ve video ilerlemesini takip edersin.',
+      steps: [
+        { t: 'İlerleme yüzdesi', d: 'Her üyenin tamamladığı eğitim ve video oranını gör.' },
+        { t: 'Destek', d: 'Geride kalan üyelere hatırlatma veya içerik paylaşımı planla.' },
+        { t: 'Detay', d: 'Üye kartından bireysel eğitim durumuna inebilirsin.' },
+      ],
+    },
+    en: {
+      title: 'My Team — Training Progress',
+      intro: 'Track your team\'s training and video completion.',
+      steps: [
+        { t: 'Progress %', d: 'See each member\'s completed training and video ratio.' },
+        { t: 'Support', d: 'Plan reminders or content shares for members who lag behind.' },
+        { t: 'Detail', d: 'Open a member card for individual training status.' },
+      ],
+    },
+  },
+  {
+    match: '/ekip',
+    tab: 'tree',
+    tr: {
+      title: 'Ekibim — Nesil Ağacı',
+      intro: 'Ekibinin nesil nesil (kuşak) yapısını görsel ağaç olarak görürsün.',
+      steps: [
+        { t: 'Kuşaklar', d: '1. nesil doğrudan ekibin; alt kuşaklar onların davet ettikleri.' },
+        { t: 'Genişlet', d: 'Dallara dokunarak alt hattı aç/kapat.' },
+        { t: 'Üye detayı', d: 'Bir düğüme dokunarak o kişinin pipeline veya profil sayfasına git.' },
+      ],
+    },
+    en: {
+      title: 'My Team — Generation Tree',
+      intro: 'See your team structure as a visual generation tree.',
+      steps: [
+        { t: 'Generations', d: 'Gen 1 is your direct team; lower generations are their invites.' },
+        { t: 'Expand', d: 'Tap branches to open or collapse downlines.' },
+        { t: 'Member detail', d: 'Tap a node to open their pipeline or profile page.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-ozetim',
+    tab: 'daily',
+    tr: {
+      title: 'Saha Özetim — Günlük',
+      intro: 'Bugünkü tempo hedefin ve gerçekleşenlerin (26 iş gününe bölünmüş aylık hedef).',
+      steps: [
+        { t: '4 kutu', d: 'Arama, tanışma, sunum, yeni üye — Hedefim ile aynı kaynak.' },
+        { t: 'Offset', d: 'Ok ile önceki/sonraki güne bakabilirsin.' },
+        { t: 'Aktivite', d: 'Alttaki satırlarda WhatsApp, not ve arama sayıları.' },
+      ],
+    },
+    en: {
+      title: 'Field Summary — Daily',
+      intro: 'Today\'s pace targets vs actuals (monthly goal spread over 26 working days).',
+      steps: [
+        { t: '4 boxes', d: 'Calls, contacts, presentations, new members — same source as My Goal.' },
+        { t: 'Offset', d: 'Use arrows to view previous/next days.' },
+        { t: 'Activity', d: 'See WhatsApp, notes, and call counts below.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-ozetim',
+    tab: 'weekly',
+    tr: {
+      title: 'Saha Özetim — Haftalık',
+      intro: 'Bu haftanın toplam saha performansı.',
+      steps: [
+        { t: 'Hafta seç', d: 'Ok ile önceki/sonraki haftaya geç.' },
+        { t: 'Hedef çizgisi', d: 'Yol haritası hedefleriyle karşılaştır.' },
+        { t: 'Trend', d: 'Haftalık tempo düşüyorsa Hedefim\'den ay planını gözden geçir.' },
+      ],
+    },
+    en: {
+      title: 'Field Summary — Weekly',
+      intro: 'This week\'s total field performance.',
+      steps: [
+        { t: 'Pick a week', d: 'Use arrows for previous/next week.' },
+        { t: 'Target line', d: 'Compare against your roadmap targets.' },
+        { t: 'Trend', d: 'If pace drops, review your month plan in My Goal.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-ozetim',
+    tab: 'monthly',
+    tr: {
+      title: 'Saha Özetim — Aylık',
+      intro: 'Takvim ayının yol haritası hedefi — İstatistikler\'deki kayan 30 günden farklıdır.',
+      steps: [
+        { t: 'Ay seç', d: 'Hedefim\'deki ilgili ay satırıyla eşleşir.' },
+        { t: '4 metrik', d: 'Ay boyunca biriken gerçekleşmeler.' },
+        { t: 'Hedefim bağlantısı', d: 'Ay satırına Hedefim\'den de dokunarak buraya gelebilirsin.' },
+      ],
+    },
+    en: {
+      title: 'Field Summary — Monthly',
+      intro: 'Calendar month roadmap row — not the rolling 30-day window on Statistics.',
+      steps: [
+        { t: 'Pick a month', d: 'Matches the corresponding row in My Goal.' },
+        { t: '4 metrics', d: 'Accumulated actuals for the month.' },
+        { t: 'My Goal link', d: 'You can also jump here from a month row in My Goal.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-ozetim',
+    tab: 'yearly',
+    tr: {
+      title: 'Saha Özetim — Yıllık',
+      intro: 'Yıl bazında toplam performans özeti.',
+      steps: [
+        { t: 'Yıl seç', d: 'Ok ile farklı yıllara bak.' },
+        { t: 'Büyük resim', d: 'Uzun vadeli ivmeni gör.' },
+      ],
+    },
+    en: {
+      title: 'Field Summary — Yearly',
+      intro: 'Year-level performance overview.',
+      steps: [
+        { t: 'Pick a year', d: 'Browse other years with arrows.' },
+        { t: 'Big picture', d: 'See your long-term momentum.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-ozetim',
+    tab: 'all',
+    tr: {
+      title: 'Saha Özetim — Tüm Zamanlar',
+      intro: 'NMM kullanımın başından beri biriken tüm saha metrikleri.',
+      steps: [
+        { t: 'Kümülatif', d: 'Tüm dönemlerin toplamı.' },
+        { t: 'Karşılaştırma', d: 'Günlük/aylık sekmelerle güncel tempoyu kıyasla.' },
+      ],
+    },
+    en: {
+      title: 'Field Summary — All Time',
+      intro: 'All field metrics since you started using NMM.',
+      steps: [
+        { t: 'Cumulative', d: 'Totals across every period.' },
+        { t: 'Compare', d: 'Contrast with daily/monthly tabs for current pace.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-radar',
+    tab: 'takipler',
+    tr: {
+      title: 'Saha Radarım — Takipler',
+      intro: 'Gecikmiş ve bu haftaki takiplerini listeler.',
+      steps: [
+        { t: 'Gecikmiş', d: 'Zamanı geçmiş takipler üstte vurgulanır.' },
+        { t: 'WhatsApp / ara', d: 'Kart üzerinden doğrudan iletişime geç.' },
+        { t: 'Listeye git', d: 'Kişinin pipeline kaydına tek tıkla geç.' },
+      ],
+    },
+    en: {
+      title: 'Field Radar — Follow-Ups',
+      intro: 'Lists overdue and this week\'s follow-ups.',
+      steps: [
+        { t: 'Overdue', d: 'Past-due follow-ups are highlighted at the top.' },
+        { t: 'WhatsApp / call', d: 'Reach out directly from the card.' },
+        { t: 'Go to list', d: 'Jump to the person\'s pipeline record.' },
+      ],
+    },
+  },
+  {
+    match: '/saha-radar',
+    tab: 'aktivite',
+    tr: {
+      title: 'Saha Radarım — Aktivite',
+      intro: 'Ekip üyelerinin son giriş ve aktivite nabzı.',
+      steps: [
+        { t: 'Aktif / sessiz', d: 'Kim bugün giriş yaptı, kim uzun süredir yok — bir bakışta gör.' },
+        { t: 'Destek', d: 'Sessiz üyelere kısa bir mesaj veya hatırlatma gönder.' },
+      ],
+    },
+    en: {
+      title: 'Field Radar — Activity',
+      intro: 'Team members\' recent login and activity pulse.',
+      steps: [
+        { t: 'Active / quiet', d: 'See who logged in today and who has been silent.' },
+        { t: 'Support', d: 'Send a quick nudge to quiet members.' },
+      ],
+    },
+  },
+  {
+    match: '/egitim',
+    tab: 'training',
+    tr: {
+      title: 'Vaktin Varsa — İçerik Kütüphanesi',
+      intro: 'Metin eğitim içeriklerini okur, favoriler ve okundu işaretlersin.',
+      steps: [
+        { t: 'Kategori', d: 'Konuya göre filtrele veya ara.' },
+        { t: 'Paylaş', d: 'WhatsApp ile adaya veya ekibe gönder.' },
+        { t: 'Katkı', d: 'Kendi içeriğini eklemek için + butonunu kullan.' },
+      ],
+    },
+    en: {
+      title: 'When You Have Time — Content Library',
+      intro: 'Read text training content; favorite and mark as read.',
+      steps: [
+        { t: 'Category', d: 'Filter or search by topic.' },
+        { t: 'Share', d: 'Send to a prospect or teammate via WhatsApp.' },
+        { t: 'Contribute', d: 'Use + to submit your own content.' },
+      ],
+    },
+  },
+  {
+    match: '/egitim',
+    tab: 'videos',
+    tr: {
+      title: 'Vaktin Varsa — Video Eğitimler',
+      intro: 'Video eğitim serisini izler ve ilerlemeni takip edersin.',
+      steps: [
+        { t: 'Sıra', d: 'Videoları sırayla izlemek ilerlemeyi hızlandırır.' },
+        { t: 'Paylaş', d: 'Faydalı videoyu WhatsApp ile paylaş.' },
+      ],
+    },
+    en: {
+      title: 'When You Have Time — Video Training',
+      intro: 'Watch the video training series and track progress.',
+      steps: [
+        { t: 'Order', d: 'Watching in order speeds up progress.' },
+        { t: 'Share', d: 'Share useful videos via WhatsApp.' },
+      ],
+    },
+  },
+  {
+    match: '/egitim',
+    tab: 'objections',
+    tr: {
+      title: 'Vaktin Varsa — İtiraz Bankası',
+      intro: 'Sık duyulan itirazlara hazır cevapları bulursun.',
+      steps: [
+        { t: 'Ara', d: 'Anahtar kelimeyle itiraz bul.' },
+        { t: 'Paylaş', d: 'Cevabı adayla WhatsApp\'tan paylaş.' },
+        { t: 'Katkı', d: 'Yeni itiraz/cevap ekleyebilirsin.' },
+      ],
+    },
+    en: {
+      title: 'When You Have Time — Objection Bank',
+      intro: 'Find ready answers to common objections.',
+      steps: [
+        { t: 'Search', d: 'Find objections by keyword.' },
+        { t: 'Share', d: 'Share the answer with a prospect on WhatsApp.' },
+        { t: 'Contribute', d: 'You can submit new objections/answers.' },
+      ],
+    },
+  },
+]
+
 // Rota öneki → içerik. En uzun eşleşen önek seçilir.
 const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
   {
@@ -332,7 +638,40 @@ const GENERIC: Record<Lang, PageHelpContent> = {
   },
 }
 
-export function getPageHelp(pathname: string, lang: Lang): PageHelpContent {
+export function resolvePageHelpContext(pathname: string, tab: string | null | undefined): string | undefined {
+  if (pathname.startsWith('/ekip')) {
+    if (tab === 'summary' || tab === 'training' || tab === 'tree') return tab
+    return 'members'
+  }
+  if (pathname.startsWith('/saha-ozetim')) {
+    const valid = ['daily', 'weekly', 'monthly', 'yearly', 'all'] as const
+    return valid.includes(tab as (typeof valid)[number]) ? tab! : 'daily'
+  }
+  if (pathname.startsWith('/egitim')) {
+    if (tab === 'videos' || tab === 'objections') return tab
+    return 'training'
+  }
+  if (pathname.startsWith('/saha-radar')) {
+    if (tab === 'aktivite') return 'aktivite'
+    return 'takipler'
+  }
+  return undefined
+}
+
+function findTabHelp(pathname: string, lang: Lang, tab?: string): PageHelpContent | null {
+  if (!tab) return null
+  for (const h of TAB_HELP) {
+    if (tab === h.tab && (pathname === h.match || pathname.startsWith(h.match + '/'))) {
+      return h[lang]
+    }
+  }
+  return null
+}
+
+export function getPageHelp(pathname: string, lang: Lang, tab?: string): PageHelpContent {
+  const tabContent = findTabHelp(pathname, lang, tab)
+  if (tabContent) return tabContent
+
   let best: (typeof HELP)[number] | null = null
   for (const h of HELP) {
     if (pathname === h.match || pathname.startsWith(h.match + '/') || pathname.startsWith(h.match)) {

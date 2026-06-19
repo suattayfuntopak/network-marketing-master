@@ -19,6 +19,7 @@ import {
 } from '@/components/hub/HubSummaryTabBar'
 import type { HubPeriodTab } from '@/lib/domain/hubPeriodPrefetch'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import {
   getHubDailySelfAction,
   getHubMonthlySelfAction,
@@ -332,7 +333,7 @@ function FieldSummaryInner() {
     <HubPageShell
       title={formatTabbedPageTitle(t('dashboard.panoFieldSummary'), hubPeriodTabLabel(t, tab))}
       customIcon={<History className="h-5 w-5" />}
-      iconClassName="bg-teal-50 text-teal-700 dark:bg-teal-950/30 dark:text-teal-400"
+      iconClassName={pageHeaderIconClass('/saha-ozetim')}
       backHref="/pano"
       showRefresh={false}
       onIconClick={goToCurrentPeriod}

@@ -10,11 +10,11 @@ import { parseAkademiTab, akademiHref, type AkademiTab } from '@/lib/domain/akad
 import { EgitimContent } from './EgitimContent'
 import { VideolarContent } from './VideolarContent'
 import { ItirazlarContent } from '@/app/(dashboard)/itirazlar/_components/ItirazlarContent'
-import { akademiAccent } from './akademiTheme'
 import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { PageHelp } from '@/components/ui/PageHelp'
+import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 export function AkademiContent() {
   const { t } = useTranslation()
@@ -77,8 +77,8 @@ export function AkademiContent() {
       <header className="mb-5">
         <div className="flex items-center justify-between gap-3">
           <div className="flex min-w-0 items-center gap-3">
-            <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', akademiAccent.icon)}>
-              <BookOpen className="h-5 w-5" strokeWidth={1.75} />
+            <div className={clsx('flex h-10 w-10 shrink-0 items-center justify-center rounded-xl', pageHeaderIconClass('/egitim'))}>
+              <BookOpen className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />
             </div>
             <h1 className="text-2xl font-bold text-[var(--text-1)]">
               {/* Mobilde kısa sekme etiketi (Vaktin Varsa / Kütüphane); masaüstü tam etiket, dokunulmadı */}

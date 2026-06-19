@@ -33,6 +33,7 @@ import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
+import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 const StatsSuperAdminSections = dynamic(
   () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
@@ -228,8 +229,8 @@ export function IstatistiklerContent() {
         <DashboardPageHeader
           title={t('statsPage.title')}
           subtitle={t('statsPage.subtitle')}
-          icon={<BarChart3 className="h-5 w-5 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2} />}
-          iconContainerClassName="bg-[#EEF2FF] dark:bg-[#1e1b4b]"
+          icon={<BarChart3 className={PAGE_HEADER_ICON_GLYPH} strokeWidth={2} />}
+          iconContainerClassName={pageHeaderIconClass('/istatistikler')}
           actions={<PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />}
         />
 

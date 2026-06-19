@@ -23,6 +23,8 @@ type HubPageShellProps = {
   showRefresh?: boolean
   /** Tab içinde kullanıldığında true — shell başlığı/back butonu gizlenir */
   asTab?: boolean
+  /** Sekme-özel yardım (ör. Saha Radarı iç sekmeleri — URL'de ?tab= yok) */
+  helpContext?: string
   /** Başlık ikonuna tıklanınca (ör. içinde bulunulan hafta/aya dön) */
   onIconClick?: () => void
   iconAriaLabel?: string
@@ -42,6 +44,7 @@ export function HubPageShell({
   asTab = false,
   onIconClick,
   iconAriaLabel,
+  helpContext,
 }: HubPageShellProps) {
   const { t } = useTranslation()
   const router = useRouter()
@@ -104,7 +107,7 @@ export function HubPageShell({
               )
             ) : Icon ? (
               <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconClassName}`}>
-                <Icon className="h-5 w-5" strokeWidth={1.75} />
+                <Icon className="h-5 w-5 shrink-0 text-white" strokeWidth={1.75} />
               </div>
             ) : null}
             <div className="min-w-0">
@@ -115,7 +118,7 @@ export function HubPageShell({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <PageHelp />
+            <PageHelp contextKey={helpContext} />
             {showRefresh ? (
               <button
                 type="button"

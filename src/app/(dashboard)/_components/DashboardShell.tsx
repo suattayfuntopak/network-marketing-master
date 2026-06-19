@@ -31,7 +31,14 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const queryClient = useQueryClient()
   const visible = useMobileChromeVisibility(pathname)
-  const touchStart = useRef<{ x: number; y: number } | null>(null)
+  const touchStart = useRef<{ x: number; y: number; t: number } | null>(null)
+  const navLockUntil = useRef(0)
+
+  const SWIPE_PREVIEW_DX = 36
+  const SWIPE_NAV_DX = 96
+  const SWIPE_DY_RATIO_PREVIEW = 1.6
+  const SWIPE_DY_RATIO_NAV = 2.75
+  const NAV_LOCK_MS = 500
 
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
@@ -70,7 +77,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
       }
       target = target.parentElement
     }
-    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now() }
     setPendingHref(null)
   }
 
@@ -78,7 +85,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (!touchStart.current) return
     const dx = e.touches[0].clientX - touchStart.current.x
     const dy = e.touches[0].clientY - touchStart.current.y
-    if (Math.abs(dx) < 30 || Math.abs(dx) < Math.abs(dy) * 1.5) {
+    if (Math.abs(dx) < SWIPE_PREVIEW_DX || Math.abs(dx) < Math.abs(dy) * SWIPE_DY_RATIO_PREVIEW) {
       setPendingHref(null)
       return
     }
@@ -92,16 +99,25 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     if (!touchStart.current) return
     const dx = e.changedTouches[0].clientX - touchStart.current.x
     const dy = e.changedTouches[0].clientY - touchStart.current.y
+    if (Date.now() < navLockUntil.current) {
+      touchStart.current = null
+      setPendingHref(null)
+      return
+    }
+    const elapsed = Date.now() - touchStart.current.t
     touchStart.current = null
     setPendingHref(null)
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return
+    if (elapsed < 80) return
+    if (Math.abs(dx) < SWIPE_NAV_DX || Math.abs(dx) < Math.abs(dy) * SWIPE_DY_RATIO_NAV) return
     const idx = getRouteIndex(pathname)
     if (idx === -1) return
     if (dx < 0 && idx < routes.length - 1) {
       setNavDir('forward')
+      navLockUntil.current = Date.now() + NAV_LOCK_MS
       router.push(routes[idx + 1])
     } else if (dx > 0 && idx > 0) {
       setNavDir('back')
+      navLockUntil.current = Date.now() + NAV_LOCK_MS
       router.push(routes[idx - 1])
     }
   }

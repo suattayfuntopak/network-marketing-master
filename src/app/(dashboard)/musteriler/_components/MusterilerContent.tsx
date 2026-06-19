@@ -5,6 +5,7 @@ import { ShoppingBag, Plus, Trash2, Phone, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useCustomers } from '@/hooks/useCustomers'
@@ -80,7 +81,7 @@ export function MusterilerContent() {
     <HubPageShell
       title={t('musteriler.title')}
       icon={ShoppingBag}
-      iconClassName="bg-gradient-to-br from-emerald-500 to-teal-400"
+      iconClassName={pageHeaderIconClass('/musteriler')}
       backHref="/pano"
       showRefresh={false}
     >

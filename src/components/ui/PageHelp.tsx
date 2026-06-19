@@ -1,27 +1,35 @@
 'use client'
 
 import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { HelpCircle, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
-import { getPageHelp } from '@/lib/domain/pageHelp'
+import { getPageHelp, resolvePageHelpContext } from '@/lib/domain/pageHelp'
 
 /**
- * Sağ üst (?) yardım butonu — bulunulan sayfanın nasıl kullanılacağını EN SADE
- * dille, mobil + masaüstünde ekranı iyi kaplayan bir popup'ta anlatır.
+ * Sağ üst (?) yardım butonu — bulunulan sayfa/sekmenin nasıl kullanılacağını anlatır.
+ * `contextKey`: URL ?tab= yoksa (ör. Saha Radarı iç sekmeleri) üst bileşenden geçilir.
  */
-/**
- * `triggerClassName` ile tetikleyici butonun görünürlük/stil sınıfları override
- * edilebilir. Varsayılan: sayfa başlığındaki masaüstü (?) butonu (mobilde gizli).
- * Header mobil kullanımı için `flex sm:hidden ...` geçilir.
- */
-export function PageHelp({ triggerClassName }: { triggerClassName?: string } = {}) {
+export function PageHelp({
+  triggerClassName,
+  contextKey,
+}: {
+  triggerClassName?: string
+  contextKey?: string
+} = {}) {
   const { lang } = useTranslation()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [open, setOpen] = useState(false)
   const l: 'tr' | 'en' = lang === 'en' ? 'en' : 'tr'
-  const help = getPageHelp(pathname ?? '/', l)
+  const tabFromUrl = searchParams.get('tab')
+  const tab =
+    contextKey ??
+    resolvePageHelpContext(pathname ?? '/', tabFromUrl) ??
+    tabFromUrl ??
+    undefined
+  const help = getPageHelp(pathname ?? '/', l, tab)
   const helpLabel = l === 'en' ? 'How to use this page' : 'Bu sayfa nasıl kullanılır?'
   const closeLabel = l === 'en' ? 'Close' : 'Kapat'
 

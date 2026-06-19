@@ -5,6 +5,7 @@ import { Megaphone, Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -72,7 +73,7 @@ export function DuyurularContent() {
     <HubPageShell
       title={t('duyurular.title')}
       icon={Megaphone}
-      iconClassName="bg-gradient-to-br from-rose-500 to-pink-500"
+      iconClassName={pageHeaderIconClass('/duyurular')}
       backHref="/pano"
       showRefresh={false}
     >

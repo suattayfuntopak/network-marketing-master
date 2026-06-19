@@ -5,7 +5,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { HedefKart } from '@/app/(dashboard)/pano/_components/HedefKart'
 import { AchievementsCard } from './AchievementsCard'
-import { hedefAccent } from './hedefTheme'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 
 export function HedefPage() {
   const { t } = useTranslation()
@@ -14,7 +14,7 @@ export function HedefPage() {
     <HubPageShell
       title={t('dashboard.panoActionPlan')}
       icon={Target}
-      iconClassName={hedefAccent.icon}
+      iconClassName={pageHeaderIconClass('/hedefim')}
       backHref="/pano"
       showRefresh={false}
     >

@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { Activity, ChevronRight, Clock, Users } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
@@ -26,15 +28,26 @@ import { toast } from 'sonner'
 
 type InnerTab = 'aktivite' | 'takipler'
 
+function resolveSahaRadarTab(raw: string | null): InnerTab {
+  return raw === 'aktivite' ? 'aktivite' : 'takipler'
+}
+
 export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
   const { t, lang } = useTranslation()
-  const { data: ws } = useWorkspace()
-  const markContacted = useMarkContacted(ws?.workspaceId ?? '')
-  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const [innerTab, setInnerTab] = useState<InnerTab>('takipler')
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const innerTab = resolveSahaRadarTab(searchParams.get('tab'))
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [coachingId, setCoachingId] = useState<string | null>(null)
   const [activeAiMessage, setActiveAiMessage] = useState<ActiveAiMessage | null>(null)
+
+  const { data: ws } = useWorkspace()
+  const markContacted = useMarkContacted(ws?.workspaceId ?? '')
+  const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
+
+  function selectInnerTab(next: InnerTab) {
+    router.replace(`/saha-radar?tab=${next}`, { scroll: false })
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.crownSahaRadar(ws?.workspaceId ?? ''),
@@ -121,7 +134,8 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
           innerTab === 'takipler' ? t('crown.sahaRadarTabFollowUps') : t('crown.sahaRadarTabActivity'),
         )}
         icon={Activity}
-        iconClassName="bg-orange-50 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400"
+        iconClassName={pageHeaderIconClass('/saha-radar')}
+        helpContext={innerTab}
         backHref="/pano"
         showRefresh={false}
         asTab={asTab}
@@ -135,7 +149,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
         >
           <button
             type="button"
-            onClick={() => setInnerTab('takipler')}
+            onClick={() => selectInnerTab('takipler')}
             className={clsx(
               'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition',
               innerTab === 'takipler'
@@ -162,7 +176,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
             type="button"
             role="tab"
             data-testid="saha-radar-tab-activity"
-            onClick={() => setInnerTab('aktivite')}
+            onClick={() => selectInnerTab('aktivite')}
             className={clsx(
               'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition',
               innerTab === 'aktivite'

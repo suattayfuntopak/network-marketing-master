@@ -200,9 +200,8 @@ export function Header({ visible = true }: { visible?: boolean }) {
         {/* Sağ Taraf Buton Grubu */}
         <div className="flex items-center gap-1 sm:gap-2">
 
-          {/* Sayfa yardımı (?) — yalnızca mobil; masaüstünde sayfa başlığında durur.
-              Pano'da ve Süper Admin sayfasında (kendi başlık-içi yardımı var) gizli. */}
-          {pathname !== '/pano' && pathname !== '/platform-yonetim' && (
+          {/* Sayfa yardımı (?) — mobil üst bar (Platform Yönetimi kendi başlığında) */}
+          {pathname !== '/platform-yonetim' && (
             <PageHelp triggerClassName="flex sm:hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
           )}
 

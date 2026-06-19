@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getPageHelp } from './pageHelp'
+import { getPageHelp, resolvePageHelpContext } from './pageHelp'
 import { NAV_ROUTES, NAV_ADMIN } from './navigation'
 
 /**
@@ -9,7 +9,7 @@ import { NAV_ROUTES, NAV_ADMIN } from './navigation'
  */
 const GENERIC_TITLES = { tr: 'Yardım', en: 'Help' } as const
 
-const ROUTES = [...NAV_ROUTES, NAV_ADMIN.href]
+const ROUTES = [...NAV_ROUTES, NAV_ADMIN.href, '/musteriler', '/duyurular']
 
 describe('pageHelp coverage', () => {
   for (const route of ROUTES) {
@@ -22,4 +22,16 @@ describe('pageHelp coverage', () => {
       expect(en.steps.length).toBeGreaterThan(0)
     })
   }
+
+  it('Ekibim sekmeleri farklı yardım metni döner', () => {
+    const members = getPageHelp('/ekip', 'tr', 'members')
+    const summary = getPageHelp('/ekip', 'tr', 'summary')
+    expect(members.title).not.toBe(summary.title)
+  })
+
+  it('resolvePageHelpContext varsayılan sekmeleri döner', () => {
+    expect(resolvePageHelpContext('/ekip', null)).toBe('members')
+    expect(resolvePageHelpContext('/saha-radar', null)).toBe('takipler')
+    expect(resolvePageHelpContext('/saha-radar', 'aktivite')).toBe('aktivite')
+  })
 })

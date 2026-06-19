@@ -14,6 +14,7 @@ import { akademiHref } from '@/lib/domain/akademiTab'
 import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import { videoProgressAccent } from './videoProgressTheme'
 
 export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
@@ -43,7 +44,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
     <HubPageShell
       title={t('dashboard.crownLiveTraining')}
       icon={GraduationCap}
-      iconClassName={videoProgressAccent.icon}
+      iconClassName={pageHeaderIconClass('/canli-egitim')}
       backHref="/pano"
       showRefresh={false}
       asTab={asTab}

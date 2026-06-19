@@ -82,10 +82,18 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
     router.push(targetHref)
   }
 
-  /** Alt bar için kısa etiket (uzun "Saha Radarım" → "Radar"). */
+  /** Alt bar için kısa etiket. */
   function barLabel(item: NavItem): string {
-    if (item.href === '/saha-radar') return t('navMobile.sahaRadar')
-    return t(navBarLabelKey(item.translationKey))
+    switch (item.href) {
+      case '/saha-radar':
+        return t('navMobile.sahaRadar')
+      case '/saha-ozetim':
+        return t('navMobile.sahaOzetim')
+      case '/hedefim':
+        return t('navMobile.hedefim')
+      default:
+        return t(navBarLabelKey(item.translationKey))
+    }
   }
 
   function renderNavButton(item: NavItem) {
@@ -184,7 +192,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
                     >
                       <NavItemIcon item={item} className="h-5 w-5" strokeWidth={active ? 2.25 : 1.75} />
                     </span>
-                    <span className="max-w-full truncate text-center text-[10px] font-semibold leading-tight text-[var(--text-2)]">
+                    <span className="line-clamp-2 max-w-full text-center text-[10px] font-semibold leading-tight text-[var(--text-2)]">
                       {barLabel(item)}
                     </span>
                   </button>
