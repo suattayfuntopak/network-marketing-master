@@ -1,5 +1,147 @@
 # Hot Log
 
+## 2026-06-19 — Açılış/yükleme/gezinme hızı: soğuk-start blokajlarını kaldır ⚡✅
+
+### Özet
+Dostlara/liderlere gönderim öncesi uçtan uca performans/UX taraması. Uygulamanın veri katmanı zaten olgun (optimistic update, `keepPreviousData`, per-tab `enabled`, hub komşu-prefetch, localStorage metrik kalıcılığı). Kalan gerçek darboğazlar **ilk paint'i gereksiz bloke eden server-side `await`'lerdi** — Türkiye→Supabase origin ~320ms/round-trip olduğu için her biri saniyelere mal oluyordu. Üç cerrahi düzeltme:
+
+1. **Dashboard layout kritik dalgası küçültüldü** (`prefetchDashboard.ts`) — EN BÜYÜK kazanç. Eskiden her soğuk dashboard açılışı `Promise.all([candidates, **team**, **aiUsage**])` ile bloke ediyordu. `fetchTeamBundle` = en ağır aksiyon (zincirleme RPC: downline workspaces → avatar çözümleme → aday zenginleştirme → pipeline link/match blokları — çok sayıda **sıralı** round-trip ≈ 1.5–3 sn). Oysa Pano (ilk sayfa) ve shell chrome (Header/Sidebar/BottomNav) team'e **dokunmuyor**; team/aiUsage'ı yalnızca İstatistikler & Ekip kullanıyor ve o sayfalar zaten kendi prefetch'lerinde ısıtıyor. → team + aiUsage arka plana (`void`) alındı; ilk paint artık yalnızca **workspace + candidates** (Pano içeriği) bekliyor.
+2. **İstatistikler sayfası** (`istatistikler/page.tsx`) — huni paketi `await ensureQueryData` → `void prefetchQuery`. Eskiden KPI kartları + aday istatistikleri (cache'te hazır) dahil TÜM sayfa, huni round-trip'i arkasında bekliyordu. `StatsFieldFunnelSection` zaten kendi `isLoading` ızgarasını gösteriyor → sayfa anında çizilir, huni akarak gelir (saha-ozetim/ekip modeliyle hizalı). Paket localStorage'da kalıcı → tekrar ziyarette anında.
+3. **Açılış sayfası kod-bölme** (`LandingPage.tsx`) — ekran-altı bölümler (`RoiCalculator`, `Pricing`, `Testimonials`, `Faq`, `Footer`) `next/dynamic` ile ayrı client chunk'lara bölündü. `ssr` varsayılan açık → HTML hâlâ sunucuda render, **CLS yok**; yalnızca hydration JS'i parçalanır → hero/özellikler daha erken etkileşime hazır.
+
+### Etki
+Soğuk Pano açılışından en ağır sorgu (team bundle) çıkarıldı; İstatistikler artık huni beklemeden çiziliyor; açılış sayfası ilk-yük JS'i daha hafif. Veri tazeliği korunuyor (client hook'lar skeleton/placeholder ile sessizce tazeliyor).
+
+### Doğrulama
+`tsc --noEmit` ✓ · `eslint` ✓ · `next build` ✓ · `vitest` 342/342 ✓
+
+### Değişen dosyalar
+- `src/lib/query/prefetchDashboard.ts`
+- `src/app/(dashboard)/istatistikler/page.tsx`
+- `src/app/_components/landing/LandingPage.tsx`
+
+## 2026-06-19 — Ekip kartı aktivite sekmesi masaüstü: rose tam genişlik, WA yok ✅
+
+### Özet
+Aktivite sekmesinde (card-tab) masaüstünde WhatsApp butonu kaldırıldı (üstte WA sekmesi var). Koçluk Mesajı pano rose, tüm genişlik — mobil ile aynı. Kişi Detayı (profile) dokunulmadı.
+
+### Değişen dosyalar
+- `MemberPersonDetailSections.tsx`
+
+## 2026-06-19 — Kişi Detayı Koçluk CTA pano rose (mobil + masaüstü) ✅
+
+### Özet
+Kişi Detayı profil kartında Koçluk Mesajı butonu pano Ekibim rose gradyanı (`PANO_EKIP_ROSE_CTA`); light/dark. Mobilde sıra: Koçluk · WhatsApp · Arama. Ekip kartı aktivite sekmesi (masaüstü) dokunulmadı.
+
+### Değişen dosyalar
+- `MemberPersonDetailSections.tsx`, `brandGradients.ts`
+
+## 2026-06-19 — Bu Hafta kaldırıldı; mobil aktivite CTA rose tam genişlik ✅
+
+### Özet
+1. **Bu Hafta** modülü (Arama / WhatsApp / Son Aktif) Kişi Detayı ve ekip kartı aktivite sekmesinden silindi; ilgili i18n anahtarları temizlendi.
+2. **Mobil aktivite sekmesi** — Koçluk Mesajı pano Ekibim rose gradyanı (`#FF5252→#D81B60`), beyaz yazı, tam genişlik; WA/arama gizli. Masaüstü kart sekmesinde Koçluk + WhatsApp korundu.
+
+### Değişen dosyalar
+- `MemberPersonDetailSections.tsx`, `tr.ts`, `en.ts`
+
+## 2026-06-19 — Mobil eylem butonları: üçlü sola yaslı ✅
+
+### Özet
+Koçluk · WhatsApp · Arama artık mobilde yan yana sola hizalı (`ml-auto` kaldırıldı); arama üçüncü sırada. Masaüstünde yalnız Koçluk + WhatsApp.
+
+### Değişen dosyalar
+- `MemberPersonDetailSections.tsx`
+
+## 2026-06-19 — Ekip kartı aktivite sekmesi = Kişi Detayı gövdesi ✅
+
+### Özet
+`MemberPersonDetailSections` ortak bileşeni: aktivite özeti, Bu Hafta, koçluk geçmişi, mesaj şablonları + koçluk/WA/arama butonları. Ekip Üyeleri kartı aktivite sekmesi artık Kişi Detayı ile aynı (profil başlığı kartta kalır).
+
+### Değişen dosyalar
+- `MemberPersonDetailSections.tsx` (yeni), `MemberDetailPage.tsx`, `TeamMemberCard.tsx`
+
+## 2026-06-19 — Kişi Detayı: buton sırası, masaüstü arama gizle, Aylık sekme ✅
+
+### Özet
+1. **Butonlar** — sıra: Koçluk Mesajı → WhatsApp; arama (`tel:`) yalnız mobilde, sağda (`md:hidden` + `ml-auto`).
+2. **Aktivite sekmesi** — Kişi Detayı masaüstünde 30g etiketi «Aylık»; ekip kartı/sheet varsayılan «Son 30 Gün» korundu. Mobil 1/7/30/365/∞ dokunulmadı.
+
+### Değişen dosyalar
+- `MemberDetailPage.tsx`, `MemberActivitySheet.tsx`, `MemberActivityPeriodTabs.tsx`
+
+## 2026-06-19 — Kişi Detayı: başlık, genişlik, şablon açıklaması ✅
+
+### Özet
+1. **Başlık** — «Üye Detayı» → «Kişi Detayı» (EN: Person Detail); PageHelp + sekme aria metni güncellendi.
+2. **Genişlik** — `max-w-lg` kaldırıldı; Ekibim ve diğer dashboard sayfalarıyla aynı tam genişlik.
+3. **Mesaj Şablonlarım** — açıklama metni (`memberDetailTemplateIntro`) panel içine eklendi.
+
+### Değişen dosyalar
+- `MemberDetailPage.tsx`, `tr.ts`, `en.ts`, `pageHelp.ts`
+
+## 2026-06-19 — İçerik Stüdyosu light mode pembe CTA ✅
+
+### Özet
+İçerik Stüdyosu sekmesi ve «İçerik Üret» / takvime kaydet butonları light mode'da mor (`bg-brand`) kalıyordu; dark'taki pembe→rose gradyanı artık her iki temada da (`STUDIO_MODULE_ACCENT_CLASS`).
+
+### Değişen dosyalar
+- `brandGradients.ts`, `YzKocuContainer.tsx`, `StudyoForm.tsx`
+
+## 2026-06-19 — treeActions Vercel typecheck düzeltmesi ✅
+
+### Özet
+Vercel build `treeActions.ts` satır 52'de `'leader' is possibly 'undefined'` hatası veriyordu. `leader.user_id` guard sonrası `leaderUserId` const'a alındı; iç closure artık strict TS'ten geçiyor.
+
+### Değişen dosyalar
+- `src/app/(dashboard)/ekip/treeActions.ts`
+
+## 2026-06-19 — Mobil PageHelp düzeltmesi + prod deploy gate kaldırıldı ✅
+
+### Özet
+1. **Mobil PageHelp** — Ekibim (`PAGE_HELP_HEADER_TRIGGER_CLASS`), DashboardPageHeader `rowOnMobile` varsayılan true → Takvim/YZ Koçum sağ üst.
+2. **Prod deploy** — `vercel.json` içinde `main: false` Vercel otomatik deploy'u engelliyordu; kaldırıldı. Push sonrası prod güncellenmeli.
+
+### Değişen dosyalar
+- `DashboardPageHeader.tsx`, `EkipPageContent.tsx`, `takvim/page.tsx`, `yazar/page.tsx`, `vercel.json`
+
+## 2026-06-19 — İçerik Stüdyosu Ekibim rengi, landing CTA, nesil ağacı ✅
+
+### Özet
+1. **İçerik Stüdyosu** — sekme, İçerik Üret, amaç pill’leri, takvime kaydet ve yeşil aksiyonlar → Ekibim sidebar rengi (`EKIP_MODULE_ACCENT_CLASS`).
+2. **Landing** — Free karşılaştırma satırı kaldırıldı; Basic CTA → «14 Günlük ÜCRETSİZ Denemeyi Başlat».
+3. **Ekip Ağacı** — chevron ile dal aç/kapa; kişi tıklayınca `/ekip/[userId]` profil; PageHelp metni güncellendi.
+
+### Değişen dosyalar
+- `StudyoForm.tsx`, `YzKocuContainer.tsx`, `brandGradients.ts`
+- `LandingPricing.tsx`, `landing.ts`
+- `TeamGenerationTree.tsx`, `treeActions.ts`, `pageHelp.ts`, `tr.ts`, `en.ts`
+
+### Doğrulama
+lint · test 342/342 · i18n:unused ✓
+
+## 2026-06-19 — UX oturumu: moderasyon deep link, PageHelp, landing Free satırı, i18n temizliği ✅
+
+### Özet
+1. **i18n** — `planProBadge`, `diamondPro`, boş `proFeature4/5` / `planProFeat4/5` silindi.
+2. **Moderasyon onay bildirimi** — Tıklayınca ilgili eğitim/itiraz/video sayfasına gider; chevron açık + hafif yeşil vurgu (tek seferlik, sekme değişince kaybolur).
+3. **PageHelp (?)** — Mobil pano hariç sayfa başlığında (en solda); masaüstü pano dahil tüm sayfalarda; global mobil header'dan kaldırıldı.
+4. **İçerik Stüdyosu** sekme rengi → `#0F6E56` (İçerik Üret butonu ile aynı).
+5. **Ekibim** masaüstü sidebar + başlık ikonu → Ekip Üyeleri sekmesi marka gradyanı.
+6. **Landing** — 3 plan kartının altına Ücretsiz karşılaştırma satırı.
+7. **trialEmails** — plan kutuları landing/payment metinleriyle senkron.
+
+### Değişen dosyalar
+- `moderationNotificationLink.ts`, `moderationHighlight.ts` (yeni)
+- `moderation.ts`, `notificationRoutes.ts`, `NotificationsModal.tsx`, `useNotifications.ts`, `mail.ts`
+- `EgitimContent`, `ItirazlarContent`, `VideolarContent`, `TrainingCard`, `ItirazCard`, `TrainingVideoCard`
+- `PageHelp.tsx`, `DashboardPageHeader.tsx`, `Header.tsx`, `PanoContent.tsx`, `HubPageShell.tsx`, `PipelinePageContent.tsx`, `AkademiContent.tsx`
+- `Sidebar.tsx`, `pageHeaderIcon.ts`, `brandGradients.ts`, `YzKocuContainer.tsx`
+- `LandingPricing.tsx`, `landing.ts`, `payment.ts`, `pages.ts`, `trialEmails.ts`
+
+### Doğrulama
+lint · test 342/342 · i18n:unused 0 orphan
+
 ## 2026-06-19 — Süper Admin: kendi taleplerini gizle + modül-yardımı (?) + kopya temizliği ✅
 
 ### 1) Süper admin kendi içeriklerini kendine onaya göndermez

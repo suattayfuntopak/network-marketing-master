@@ -1,14 +1,24 @@
 'use client'
 
 import { useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { LandingHeader } from './LandingHeader'
 import { LandingHero } from './LandingHero'
 import { LandingFeatures } from './LandingFeatures'
-import { LandingRoiCalculator } from './LandingRoiCalculator'
-import { LandingPricing } from './LandingPricing'
-import { LandingTestimonials } from './LandingTestimonials'
-import { LandingFaq } from './LandingFaq'
-import { LandingFooter } from './LandingFooter'
+
+// Ekranın altındaki bölümler ayrı client chunk'larına bölünür: HTML hâlâ
+// sunucuda render edilir (ssr varsayılan true → CLS yok), ama hydration JS'i
+// ayrı yüklenir → hero/özellikler daha erken etkileşime hazır olur (ilk izlenim
+// hızı). Bunlar dostlara/liderlere gönderilen açılış sayfasının ağırlığını azaltır.
+const LandingRoiCalculator = dynamic(() =>
+  import('./LandingRoiCalculator').then(m => m.LandingRoiCalculator))
+const LandingPricing = dynamic(() =>
+  import('./LandingPricing').then(m => m.LandingPricing))
+const LandingTestimonials = dynamic(() =>
+  import('./LandingTestimonials').then(m => m.LandingTestimonials))
+const LandingFaq = dynamic(() => import('./LandingFaq').then(m => m.LandingFaq))
+const LandingFooter = dynamic(() =>
+  import('./LandingFooter').then(m => m.LandingFooter))
 
 export function LandingPage() {
   useEffect(() => {

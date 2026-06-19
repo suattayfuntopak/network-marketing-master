@@ -29,13 +29,26 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
   const ws = queryClient.getQueryData<WorkspaceContext | null>(queryKeys.workspace())
   if (!ws?.workspaceId) return
 
-  // Shell + yaygın kullanılan kritik veri — tek paralel dalga.
-  await Promise.all([
-    queryClient.prefetchQuery({
-      queryKey: queryKeys.candidates(ws.workspaceId),
-      queryFn: () => fetchCandidatesAction(ws.workspaceId),
-      staleTime: QUERY_STALE.data,
-    }),
+  // İlk paint için GERÇEKTEN kritik tek veri: aday listesi (Pano içeriği —
+  // MorningBrief/WelcomeCard). Shell chrome (Header/Sidebar/BottomNav) yalnızca
+  // workspace + notifications kullanır; team/aiUsage'a DOKUNMAZ. Bu yüzden tek
+  // hafif sorgu await edilir, gerisi ilk paint'i bloke etmez.
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.candidates(ws.workspaceId),
+    queryFn: () => fetchCandidatesAction(ws.workspaceId),
+    staleTime: QUERY_STALE.data,
+  })
+
+  // Kritik olmayan veri — ısınması ilk paint'i bloke etmemeli. Hover/nav ile de
+  // ısınır; burada fire-and-forget bırakılır.
+  //
+  // team (fetchTeamBundle) = en AĞIR aksiyon: zincirleme RPC + downline/avatar/
+  // pipeline sorguları (Türkiye→origin ~320ms × birçok = saniyeler). Pano onu
+  // KULLANMAZ; yalnızca İstatistikler/Ekip kullanır ve o sayfalar kendi
+  // server prefetch'lerinde ısıtır. Bu yüzden soğuk Pano açılışını team bundle'a
+  // bloke etmek saf ölü ağırlıktı → arka plana alındı. aiUsage da aynı (yalnızca
+  // İstatistikler kotası + AI modal'ı kullanır).
+  const background: Promise<unknown>[] = [
     queryClient.prefetchQuery({
       queryKey: queryKeys.team(ws.workspaceId),
       queryFn: () => fetchTeamBundleAction(ws.workspaceId),
@@ -46,11 +59,6 @@ export async function prefetchDashboardQueries(queryClient: QueryClient): Promis
       queryFn: fetchAIUsageAction,
       staleTime: QUERY_STALE.usage,
     }),
-  ])
-
-  // Kritik olmayan veri — ısınması ilk paint'i bloke etmemeli. Hover/nav ile de
-  // ısınır; burada fire-and-forget bırakılır.
-  const background: Promise<unknown>[] = [
     queryClient.prefetchQuery({
       queryKey: queryKeys.videoCatalog(ws.workspaceId),
       queryFn: () => getVideoCatalogAction(ws.workspaceId),
