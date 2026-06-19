@@ -1,5 +1,42 @@
 # Hot Log
 
+## 2026-06-19 — Build fix: PageHelp useSearchParams prerender bailout ✅
+
+### Sorun
+Paralel (Cursor) sekme-bilinçli PageHelp refaktörü `useSearchParams()`'i bileşenin
+tepesinde çağırıyordu. PageHelp global Header'da → her dashboard sayfasında. Statik
+prerender'da Suspense yokken `useSearchParams() should be wrapped in a suspense
+boundary` ile **build patlıyordu** (CI Gate kırmızı, deploy durur). tsc/lint/test
+geçiyordu ama `next build` prerender adımında düşüyordu.
+
+### Çözüm
+`useSearchParams` (+ usePathname/tab çözümleme) yalnız **modal**'a taşındı; modal sadece
+butona basılınca (open) render olur → prerender'da hiç çalışmaz. Modal `<Suspense
+fallback={null}>` ile sarılı. (?) butonu searchParams kullanmadığı için SSR'de her zaman
+görünür (layout shift yok). `src/components/ui/PageHelp.tsx`.
+
+### Doğrulama
+tsc · lint · test 339/339 · i18n 1310 · **next build 49/49 statik sayfa ✓** (artık geçiyor)
+
+## 2026-06-18 — Sayfa yardımı (sekme-bilinçli) + nav/ikon renk uyumu + mobil sıra + swipe ✅
+
+### Özet
+- **PageHelp (?):** Tüm sayfalarda mobil üst bar + masaüstü başlık; Ekibim, Saha Özetim, Saha Radarı, Eğitim sekmeleri için ayrı TR/EN metinler (`pageHelp.ts` + `resolvePageHelpContext`). Saha Radarı sekmeleri URL `?tab=` ile senkron.
+- **İkon renkleri:** `pageHeaderIconClass()` — pano grid + sidebar ile aynı gradient; beyaz ikon (light temada Duyurular/Müşterilerim görünür). Müşterilerim = coral (Saha Radarı), Duyurular = rose; sidebar `NAV_MODULE_EXTRA_COLORS`.
+- **Mobil alt nav:** Pano → Hedefim → Listem → Ekibim → Saha Özetim → Diğer; Saha Radarı çekmecede; çekmece etiketleri `line-clamp-2` (Eğitim İlerlemem tam görünür).
+- **Swipe sertleştirme:** Daha yüksek eşik, min 80ms dokunma, swipe sonrası 500ms nav kilidi (`DashboardShell`).
+
+### Değişen dosyalar
+- `src/lib/ui/pageHeaderIcon.ts` (yeni)
+- `src/lib/domain/pageHelp.ts`, `pageHelp.test.ts`, `navigation.ts`
+- `src/components/ui/PageHelp.tsx`, `src/components/hub/HubPageShell.tsx`
+- `src/app/(dashboard)/_components/{Header,BottomNav,DashboardShell}.tsx`
+- Sayfa başlıkları: ekip, pipeline, takvim, hedefim, saha-ozetim, saha-radar, musteriler, duyurular, egitim, canli-egitim, istatistikler, yazar
+- `src/lib/translations/tr.ts`, `en.ts` (navMobile çift anahtar düzeltmesi)
+
+### Doğrulama
+`tsc`, `eslint`, vitest 339 passed.
+
 ## 2026-06-19 — Moderasyon gönderen onarımı (kim gönderdi her zaman görünür) ✅
 
 ### Sorun
