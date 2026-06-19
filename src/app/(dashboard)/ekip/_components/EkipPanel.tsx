@@ -17,6 +17,10 @@ import { queryInvalidator } from '@/lib/query/invalidator'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
 import type { MemberRow, OnboardingStep } from '@/lib/team/types'
 import { hasTeamPulseAccess, hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import {
+  downlineCapUpgradeTier,
+  getDownlineListCap,
+} from '@/lib/domain/teamLimits'
 import { getMemberGoalsMapAction } from '../memberGoalsActions'
 import {
   prefetchEkipRankingMetrics,
@@ -113,11 +117,15 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
 
   const downlineMembers = members.filter(m => m.role !== 'leader')
   const totalDownlineCount = downlineMembers.length
-  const isPlusCapReached = licenseType === 'plus' && totalDownlineCount > 50
+  const downlineListCap = getDownlineListCap(licenseType, ws?.isSuperAdmin)
+  const isDownlineCapReached =
+    downlineListCap !== null && totalDownlineCount > downlineListCap
+  const downlineCapUpgrade = downlineCapUpgradeTier(licenseType)
 
-  const visibleMembers = licenseType === 'plus'
-    ? downlineMembers.slice(0, 50)
-    : downlineMembers
+  const visibleMembers =
+    downlineListCap === null
+      ? downlineMembers
+      : downlineMembers.slice(0, downlineListCap)
 
   const teamPulseUnlocked = hasTeamPulseAccess(licenseType, ws?.isSuperAdmin)
   const teamPageUnlocked = hasTeamPageAccess(licenseType, ws?.isSuperAdmin)
@@ -184,7 +192,9 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
           members={members}
           visibleMembers={visibleMembers}
           isLeader={isLeader}
-          isPlusCapReached={isPlusCapReached}
+          isDownlineCapReached={isDownlineCapReached}
+          downlineListCap={downlineListCap}
+          downlineCapUpgrade={downlineCapUpgrade}
           hasMasterAccess={hasMasterAccess}
           setOnboardingCoachData={setOnboardingCoachData}
           toggleOnboardingStep={toggleOnboardingStep}

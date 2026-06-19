@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
-import { hasTeamPageAccess } from '@/lib/domain/teamAccess'
+import { hasDownlineOnboardingAccess } from '@/lib/domain/teamLimits'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
 export type MemberGoalRow = {
@@ -28,7 +28,7 @@ async function assertLeader(workspaceId: string) {
     throw new Error('Yalnızca ekip lideri hedef belirleyebilir.')
   }
 
-  if (!hasTeamPageAccess(ws.license_type, isSuperAdmin(user))) {
+  if (!hasDownlineOnboardingAccess(ws.license_type, isSuperAdmin(user))) {
     throw new Error('Ekip hedefi için Plus veya Pro plan gerekli.')
   }
 

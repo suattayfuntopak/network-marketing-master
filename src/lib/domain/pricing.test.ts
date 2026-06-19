@@ -8,22 +8,22 @@ import {
 
 describe('pricing', () => {
   it('uses updated monthly list prices', () => {
-    expect(getDisplayPrice('basic', 'monthly')).toBe(399)
+    expect(getDisplayPrice('basic', 'monthly')).toBe(499)
     expect(getDisplayPrice('plus', 'monthly')).toBe(899)
-    expect(getDisplayPrice('pro', 'monthly')).toBe(1499)
+    expect(getDisplayPrice('pro', 'monthly')).toBe(1699)
   })
 
   it('shows 25% discounted monthly rate for yearly UI', () => {
-    expect(getYearlyMonthlyDisplayPrice('basic')).toBe(299)
+    expect(getYearlyMonthlyDisplayPrice('basic')).toBe(374)
     expect(getYearlyMonthlyDisplayPrice('plus')).toBe(674)
-    expect(getYearlyMonthlyDisplayPrice('pro')).toBe(1124)
+    expect(getYearlyMonthlyDisplayPrice('pro')).toBe(1274)
   })
 
   it('charges 12× discounted monthly for yearly checkout', () => {
-    expect(getYearlyChargeAmount('basic')).toBe(3588)
+    expect(getYearlyChargeAmount('basic')).toBe(4488)
     expect(getYearlyChargeAmount('plus')).toBe(8088)
-    expect(getYearlyChargeAmount('pro')).toBe(13488)
-    expect(getShopierAmount('pro', 'yearly')).toBe('13488')
+    expect(getYearlyChargeAmount('pro')).toBe(15288)
+    expect(getShopierAmount('pro', 'yearly')).toBe('15288')
     expect(getShopierAmount('plus', 'monthly')).toBe('899')
   })
 })

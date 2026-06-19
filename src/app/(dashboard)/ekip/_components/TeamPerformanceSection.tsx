@@ -18,6 +18,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { queryInvalidator } from '@/lib/query/invalidator'
 import { toast } from 'sonner'
 import { memberMatchesSearch } from '@/lib/team/memberSearch'
+import type { DownlineCapTier } from '@/lib/domain/teamLimits'
 
 export interface TeamPerformanceSectionProps {
   t: (key: string, vars?: Record<string, string | number>) => string
@@ -26,7 +27,9 @@ export interface TeamPerformanceSectionProps {
   members: MemberRow[]
   visibleMembers: MemberRow[]
   isLeader: boolean
-  isPlusCapReached: boolean
+  isDownlineCapReached: boolean
+  downlineListCap: number | null
+  downlineCapUpgrade: DownlineCapTier
   hasMasterAccess: boolean
   setOnboardingCoachData: (value: { memberName: string; stepId: string; phone?: string | null } | null) => void
   toggleOnboardingStep: (userId: string, stepId: string, isStepDone: boolean) => Promise<void>
@@ -60,7 +63,7 @@ function getSearchScore(fullName: string | null, query: string): number {
 
 export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const {
-    t, lang, ws, members, visibleMembers, isLeader, isPlusCapReached, hasMasterAccess,
+    t, lang, ws, members, visibleMembers, isLeader, isDownlineCapReached, downlineListCap, downlineCapUpgrade, hasMasterAccess,
     setOnboardingCoachData,
     toggleOnboardingStep, handleInviteMember,
     memberSearch, onMemberSearchChange,
@@ -329,17 +332,19 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
           )}
         />
 
-        {isPlusCapReached && (
+        {isDownlineCapReached && downlineListCap != null && (
           <div className="rounded-3xl border border-pink-500/20 bg-gradient-to-r from-pink-500/5 to-rose-500/5 p-8 text-center space-y-4 shadow-lg my-6">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-pink-500/10 text-pink-400 text-xl">
               👑
             </div>
             <div className="max-w-md mx-auto space-y-2">
               <h4 className="text-base font-bold text-white">
-                {t('team.teamLimitReached')}
+                {t('team.teamLimitReached', { limit: downlineListCap })}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                {t('team.teamLimitDescPro')}
+                {downlineCapUpgrade === 'plus'
+                  ? t('team.teamLimitDescPlus', { limit: downlineListCap })
+                  : t('team.teamLimitDescBasic', { limit: downlineListCap })}
               </p>
             </div>
             <div className="pt-2">
@@ -347,7 +352,11 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
                 onClick={() => router.push('/odeme')}
                 className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 px-6 py-2.5 text-xs font-bold text-white hover:opacity-90 transition active:scale-95 cursor-pointer shadow-lg shadow-pink-500/15"
               >
-                <span>{t('team.upgradeToPro')}</span>
+                <span>
+                  {downlineCapUpgrade === 'plus'
+                    ? t('team.upgradeToPro')
+                    : t('team.upgradeToPlus')}
+                </span>
               </button>
             </div>
           </div>

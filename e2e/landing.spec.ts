@@ -18,5 +18,5 @@ test('landing pricing shows Basic as popular with unified AI limit', async ({ pa
   await page.locator('#ucretlendirme').scrollIntoViewIfNeeded()
   await expect(page.getByTestId('plan-basic-popular-badge')).toBeVisible()
   await expect(page.getByTestId('plan-basic-ai-limit')).toBeVisible()
-  await expect(page.getByTestId('plan-basic-price')).toContainText('399')
+  await expect(page.getByTestId('plan-basic-price')).toContainText('499')
 })

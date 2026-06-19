@@ -51,8 +51,8 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
                 billingPeriod === 'monthly'
-                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25`
-                  : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
+                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25 hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
               {t('landingPage.pricingMonthly')}
@@ -62,12 +62,12 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('yearly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
                 billingPeriod === 'yearly'
-                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25`
-                  : 'text-slate-500 dark:text-zinc-400 hover:text-zinc-200'
+                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25 hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
+                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
               <span>{t('landingPage.pricingYearly')}</span>
-              <span className="text-[9px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-800 dark:text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-500/20 animate-pulse">
+              <span className="text-[9px] bg-emerald-200 text-emerald-950 dark:bg-emerald-500/20 dark:text-emerald-300 font-extrabold px-2 py-0.5 rounded-full border border-emerald-400 dark:border-emerald-500/20">
                 {t('landingPage.pricingYearlyBadge')}
               </span>
             </button>
@@ -107,9 +107,11 @@ export function LandingPricing() {
               <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">
                 {t('landingPage.planBasicName')}
               </h3>
-              <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                {t('landingPage.planBasicDesc')}
-              </p>
+              {t('landingPage.planBasicDesc') ? (
+                <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1">
+                  {t('landingPage.planBasicDesc')}
+                </p>
+              ) : null}
             </div>
 
             {/* Price */}
@@ -151,6 +153,10 @@ export function LandingPricing() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span>{t('landingPage.planBasicFeat5')}</span>
               </li>
             </ul>
           </div>
@@ -201,19 +207,15 @@ export function LandingPricing() {
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planPlusFeat1')}</span>
+                <span>{t('landingPage.planPlusFeat1', { limit: DAILY_AI_LIMITS.plus })}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span>{t('landingPage.planPlusFeat2', { limit: DAILY_AI_LIMITS.plus })}</span>
+                <span>{t('landingPage.planPlusFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat3')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span>{t('landingPage.planPlusFeat4')}</span>
               </li>
             </ul>
           </div>
@@ -230,12 +232,6 @@ export function LandingPricing() {
 
         {/* Plan C: Pro Plan */}
         <div className="rounded-3xl border border-pink-500/30 bg-pink-50 dark:bg-gradient-to-b dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-500/60 transition duration-300 relative shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
-          <div className="absolute right-6 top-6 flex items-center gap-2">
-            <span className="text-[9px] font-black text-pink-900 dark:text-pink-400 bg-pink-100 dark:bg-pink-500/20 border border-pink-200 dark:border-pink-500/30 px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1">
-              👑 {t('landingPage.planProBadge')}
-            </span>
-          </div>
-
           <div className="space-y-6">
             <div className="space-y-1">
               <span className="text-[10px] font-extrabold text-pink-800 dark:text-pink-400 bg-pink-100 dark:bg-pink-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -270,25 +266,15 @@ export function LandingPricing() {
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
-                <span className="font-bold text-slate-900 dark:text-white">{t('landingPage.planProFeat1')}</span>
+                <span>{t('landingPage.planProFeat1', { limit: DAILY_AI_LIMITS.pro })}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
-                <span className="font-bold text-pink-700 dark:text-pink-300">
-                  {t('landingPage.planProFeat2', { limit: DAILY_AI_LIMITS.pro })}
-                </span>
+                <span>{t('landingPage.planProFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat3')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
-                <span>{t('landingPage.planProFeat4')}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
-                <span>{t('landingPage.planProFeat5')}</span>
               </li>
             </ul>
           </div>

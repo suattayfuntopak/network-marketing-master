@@ -26,9 +26,9 @@ export const shellSection = {
       upgradeMenuTrialTitle: 'Planı Yükselt',
       upgradeMenuExpiredTitle: 'Planı Yükselt',
       upgradeMenuDesc: 'Basic, Plus veya Pro — yapay zeka ve ekip özelliklerini aç',
-      teamGateTitle: 'Ekibim Plus veya Pro planlarda',
+      teamGateTitle: 'Alt ekip onboarding takibi Plus planda',
       teamGateDesc:
-        'Alt ekibinizi izlemek, doğru başlangıç adımlarını takip etmek ve ekip performansını görmek için Plus veya Pro planına geçmeniz gerekir. Ücretsiz planda ekibinizi görebilir ve davet kodunuzla yeni üyeler ekleyebilirsiniz.',
+        'Distribütör Doğru Başlangıç adımlarını alt ekip üyelerinde takip etmek Plus veya Pro planda açılır. Basic planda ekibinizi görüntüleyebilir ve davet gönderebilirsiniz (25 kişiye kadar).',
       featureGateTitle: 'Bu özellik planınızda yer almıyor',
       featureGateDesc: 'Devam etmek için planınızı yükseltin.',
       upgradeAiCoachTitle: 'Yapay Zeka Koçum planınızda açık değil',
@@ -104,9 +104,9 @@ export const shellSection = {
       upgradeMenuTrialTitle: 'Upgrade plan',
       upgradeMenuExpiredTitle: 'Upgrade plan',
       upgradeMenuDesc: 'Basic, Plus, or Pro — unlock AI and team features',
-      teamGateTitle: 'Team hub is on Plus or Pro',
+      teamGateTitle: 'Downline onboarding tracking is on Plus',
       teamGateDesc:
-        'Track your downline, onboarding steps, and team performance with a Plus or Pro plan. On the free plan you can view your team and invite new members with your code.',
+        'Track Quick Start steps for downline distributors on Plus or Pro. On Basic you can view your team and send invites (up to 25 members).',
       featureGateTitle: 'This feature is not on your plan',
       featureGateDesc: 'Upgrade your plan to continue.',
       upgradeAiCoachTitle: 'AI Coach is not on your plan',
