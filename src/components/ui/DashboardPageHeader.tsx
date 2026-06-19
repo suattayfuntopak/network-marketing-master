@@ -25,13 +25,13 @@ export function DashboardPageHeader({
   showHelp = true,
   className = 'mb-6',
   dateLine,
-  rowOnMobile = false,
+  rowOnMobile = true,
 }: DashboardPageHeaderProps) {
   return (
     <header
       className={`flex ${
         rowOnMobile
-          ? 'flex-row items-center justify-between'
+          ? 'flex-row items-start justify-between gap-3'
           : 'flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'
       } ${className}`}
     >

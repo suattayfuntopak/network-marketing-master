@@ -9,7 +9,7 @@ import { hubPeriodTabLabel, parseSummaryTab } from '@/components/hub/HubSummaryT
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { useTranslation } from '@/providers/LanguageProvider'
 
-import { PageHelp } from '@/components/ui/PageHelp'
+import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 export function EkipPageContent() {
@@ -36,14 +36,14 @@ export function EkipPageContent() {
 
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-      <header className="mb-4 flex items-center gap-3">
-        <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${pageHeaderIconClass('/ekip')}`}>
-          <Users className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />
+      <header className="mb-4 flex w-full items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${pageHeaderIconClass('/ekip')}`}>
+            <Users className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />
+          </div>
+          <h1 className="min-w-0 text-xl font-bold text-[var(--text-1)]">{pageTitle}</h1>
         </div>
-        <div className="min-w-0 flex-1">
-          <h1 className="text-xl font-bold text-[var(--text-1)]">{pageTitle}</h1>
-        </div>
-        <PageHelp />
+        <PageHelp triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />
       </header>
       <EkipTabNav activeTab={activeTab} />
       <EkipPanel activeTab={activeTab} />

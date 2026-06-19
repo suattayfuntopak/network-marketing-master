@@ -16,6 +16,7 @@ export default function TakvimPage() {
         subtitle={t('pagesUi.calendarSubtitle')}
         icon={<CalendarDays className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />}
         iconContainerClassName={pageHeaderIconClass('/takvim')}
+        rowOnMobile
       />
       <TakvimClient />
     </main>

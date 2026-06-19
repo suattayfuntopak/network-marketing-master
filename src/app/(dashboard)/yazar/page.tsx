@@ -45,6 +45,7 @@ export default function YazarPage({ searchParams }: PageProps) {
           icon={<Bot className={PAGE_HEADER_ICON_GLYPH} strokeWidth={1.75} />}
           iconContainerClassName={pageHeaderIconClass('/yazar')}
           className=""
+          rowOnMobile
         />
         {hasAiCoachAccess ? (
           <YzKocuContainer initialName={name ?? ''} initialNote={note ?? ''} initialWarmth={warmth ?? 'ilik'} />
