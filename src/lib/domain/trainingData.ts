@@ -706,7 +706,7 @@ const TR_KATEGORILER: Kategori[] = [
     id: 'strateji',
     baslik: 'Strateji & Büyüme',
     emoji: '📈',
-    renk: 'bg-[#FBEAF0] dark:bg-[#3d0f1f] text-[#72243E] dark:text-[#f9a8d4] border-[#F5D9E5] dark:border-[#3d0f1f80]',
+    renk: 'bg-crown-subtle text-crown border-crown-subtle',
     konular: [
       {
         id: 's1',
@@ -1733,7 +1733,7 @@ const EN_KATEGORILER: Kategori[] = [
     id: 'strateji',
     baslik: 'Strategy & Momentum',
     emoji: '📈',
-    renk: 'bg-[#FBEAF0] dark:bg-[#3d0f1f] text-[#72243E] dark:text-[#f9a8d4] border-[#F5D9E5] dark:border-[#3d0f1f80]',
+    renk: 'bg-crown-subtle text-crown border-crown-subtle',
     konular: [
       {
         id: 's1',

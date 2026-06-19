@@ -60,7 +60,7 @@ export function RejectModerationDialog({ defaultReason, onConfirm, onCancel }: P
           <button
             type="button"
             onClick={() => onConfirm(reason.trim() || defaultReason)}
-            className="flex-1 rounded-xl bg-[#72243E] py-3 text-sm font-semibold text-white transition hover:bg-[#5a1c31]"
+            className="flex-1 rounded-xl bg-crown-strong py-3 text-sm font-semibold text-white transition hover:bg-[#5a1c31]"
           >
             {t('platformPage.rejectRequestConfirm')}
           </button>

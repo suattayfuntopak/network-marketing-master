@@ -361,7 +361,7 @@ export async function sendModerationAlertEmail(
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
-      to: ['info@suattayfuntopak.com'],
+      to: [SUPER_ADMIN_EMAIL, 'info@suattayfuntopak.com'],
       replyTo: userEmail,
       subject,
       html: buildPremiumEmail(content, 'tr'),
@@ -561,7 +561,7 @@ export async function sendBankTransferNotifyEmail(
   try {
     await getResend().emails.send({
       from: FROM_EMAIL,
-      to: ['info@suattayfuntopak.com'],
+      to: [SUPER_ADMIN_EMAIL, 'info@suattayfuntopak.com'],
       replyTo: userEmail,
       subject,
       html: buildPremiumEmail(content, 'tr'),

@@ -164,7 +164,7 @@ export function UserMenu() {
               setLogoutConfirmOpen(true)
               setOpen(false)
             }}
-            className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-[#72243E] dark:text-[#e87fa3] transition hover:bg-[#FBEAF0] dark:hover:bg-[#3d0f1f] cursor-pointer"
+            className="flex w-full items-center gap-3 px-4 py-2 text-sm font-medium text-crown transition hover:bg-crown-subtle cursor-pointer"
           >
             <LogOut className="h-4 w-4" strokeWidth={1.75} />
             {t('shellUi.logout')}

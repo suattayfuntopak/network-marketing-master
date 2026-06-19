@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
+import { SUPER_ADMIN_EMAIL } from '@/lib/domain/constants'
 import type { Json } from '@/types/database.types'
 import { sendModerationAlertEmail, sendModerationApprovedEmail, sendModerationRejectedEmail } from '@/lib/infra/mail'
 import {
@@ -58,6 +59,36 @@ async function notifyModerationOutcome(
 }
 
 /**
+ * Yeni bir moderasyon talebi geldiğinde Süper Admin'e UYGULAMA İÇİ (zil) bildirim
+ * oluşturur — e-postaya ek olarak. E-posta gözden kaçabilir; zil her zaman görünür.
+ * Hataya dayanıklı: bildirim başarısız olsa bile talep gönderimi etkilenmez.
+ */
+export async function notifySuperAdminNewModerationRequest(
+  contentType: ModerationContentType,
+  title: string,
+  submitterName: string,
+): Promise<void> {
+  try {
+    const admin = createAdminClient()
+    const { data: usersPage } = await admin.auth.admin.listUsers({ page: 1, perPage: 200 })
+    const adminUser = usersPage?.users?.find(u => u.email === SUPER_ADMIN_EMAIL)
+    if (!adminUser?.id) return
+    const kindTr = contentType === 'video' ? 'video' : contentType === 'training' ? 'eğitim içeriği' : 'itiraz cevabı'
+    const kindEn = contentType === 'video' ? 'video' : contentType === 'training' ? 'training content' : 'objection reply'
+    await admin.from('nmm_notifications').insert({
+      user_id: adminUser.id,
+      title_tr: 'Yeni Onay Talebi 📝',
+      title_en: 'New Approval Request 📝',
+      description_tr: `${submitterName}, "${title}" (${kindTr}) ekleme talebinde bulundu. Onay Masası'nda inceleyebilirsin.`,
+      description_en: `${submitterName} requested to add "${title}" (${kindEn}). Review it on the Approval Desk.`,
+      type: 'info',
+    })
+  } catch (err) {
+    console.error('[notifySuperAdminNewModerationRequest]', err)
+  }
+}
+
+/**
  * Submits a custom training or objection.
  * If Super Admin submits, it is approved immediately.
  * If a regular user submits, it goes to moderation, triggers an alert email to Super Admin,
@@ -102,6 +133,7 @@ export async function submitModeratedRequestAction(
     sendModerationAlertEmail(userEmail, userName, contentType, title).catch(err => {
       console.error('[Resend Alert Error]', err)
     })
+    void notifySuperAdminNewModerationRequest(contentType, title, userName)
   }
 
   return { success: true, isApproved }

@@ -13,7 +13,7 @@ const colorMap: Record<ButtonColor, string> = {
   purple: 'bg-brand-subtle text-brand hover:bg-[#E3E1FD] dark:bg-[#2d2a5e] dark:text-[#a09be8] dark:hover:bg-[#383474]',
   teal:   'bg-[#E1F5EE] text-[#0F6E56] hover:bg-[#D2EFE4] dark:bg-[#0d3d2e] dark:text-[#4ade80] dark:hover:bg-[#144d3a]',
   amber:  'bg-[#FAEEDA] text-[#854F0B] hover:bg-[#F6E4C4] dark:bg-[#3a2200] dark:text-[#fbbf24] dark:hover:bg-[#4a2d00]',
-  pink:   'bg-[#FBEAF0] text-[#72243E] hover:bg-[#F5D9E5] dark:bg-[#3d0f1f] dark:text-[#f9a8d4] dark:hover:bg-[#4d1428]',
+  pink:   'bg-crown-subtle text-crown hover:bg-crown-subtle-hover',
   blue:   'bg-[#E8F0FE] text-[#1A56DB] hover:bg-[#D6E4FD] dark:bg-[#0a1f4d] dark:text-[#93c5fd] dark:hover:bg-[#0f2860]',
   coral:  'bg-[#FEF0EC] text-[#C03E1F] hover:bg-[#FDE3DA] dark:bg-[#3d1409] dark:text-[#fca87d] dark:hover:bg-[#4d1a0d]',
   rose:   'bg-[#FFF1F3] text-[#9B1D47] hover:bg-[#FFE4EA] dark:bg-[#3d0a1a] dark:text-[#fda4af] dark:hover:bg-[#4d1022]',

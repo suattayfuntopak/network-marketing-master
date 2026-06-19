@@ -104,7 +104,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
           </div>
         ) : error ? (
           <div className="space-y-4">
-            <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E] dark:bg-red-950/20 dark:text-red-300">
+            <p className="rounded-xl bg-crown-subtle px-4 py-2.5 text-sm text-crown">
               {error}
             </p>
             <button

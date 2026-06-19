@@ -200,7 +200,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
                 <button
                   type="button"
                   onClick={handleRemovePhoto}
-                  className="flex items-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] px-3 py-2 text-xs font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+                  className="flex items-center gap-1.5 rounded-xl border border-crown-subtle bg-crown-subtle px-3 py-2 text-xs font-semibold text-crown transition hover:bg-crown-subtle-hover"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Fotoğrafı Kaldır
@@ -241,10 +241,10 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <input
               id="edit-phone" name="phone" type="tel"
               defaultValue={candidate.phone ?? ''} placeholder="05xxxxxxxxx"
-              className={`${inputClass} ${phoneError ? 'border-[#72243E] focus:border-[#72243E] focus:ring-[#FBEAF0]' : ''}`}
+              className={`${inputClass} ${phoneError ? 'border-crown focus:border-crown focus:ring-crown-subtle' : ''}`}
               onChange={() => phoneError && setPhoneError('')}
             />
-            {phoneError && <p className="mt-1 text-xs text-[#72243E]">{phoneError}</p>}
+            {phoneError && <p className="mt-1 text-xs text-crown">{phoneError}</p>}
           </div>
           <div>
             <label className={labelClass} htmlFor="edit-stage">Aşama</label>
@@ -270,7 +270,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
             <button type="submit" disabled={update.isPending || uploadingPhoto} className="flex-1 rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
               {update.isPending || uploadingPhoto ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
-            <button type="button" onClick={handleDelete} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#FBEAF0] text-[#72243E] transition hover:bg-[#f5d4e0]">
+            <button type="button" onClick={handleDelete} className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-crown-subtle text-crown transition hover:bg-crown-subtle-hover">
               <Trash2 className="h-4 w-4" />
             </button>
           </div>

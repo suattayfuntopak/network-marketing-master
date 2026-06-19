@@ -44,8 +44,8 @@ export function TakvimConfirmModal({
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative w-full max-w-sm rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-6 shadow-2xl">
         <div className="mb-4 flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEAF0]">
-            <AlertTriangle className="h-7 w-7 text-[#72243E]" strokeWidth={1.75} />
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-crown-subtle">
+            <AlertTriangle className="h-7 w-7 text-crown" strokeWidth={1.75} />
           </div>
         </div>
         <h2 className="mb-2 text-center text-base font-bold text-[var(--text-1)]">{title}</h2>

@@ -18,7 +18,7 @@ export function CandidateDeleteCard({ onDelete }: Props) {
       <button
         type="button"
         onClick={onDelete}
-        className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] py-2.5 text-sm font-semibold text-[#72243E] transition hover:bg-[#f5d4e0]"
+        className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-xl border border-crown-subtle bg-crown-subtle py-2.5 text-sm font-semibold text-crown transition hover:bg-crown-subtle-hover"
         title={t('pipeline.deleteCandidate')}
       >
         <Trash2 className="h-4 w-4" />

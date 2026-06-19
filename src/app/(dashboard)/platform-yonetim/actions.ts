@@ -9,6 +9,7 @@ import { normalizeLicenseType } from '@/lib/domain/aiUsage'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { aggregateViralKpi, type ViralKpi, type ViralEventRow } from '@/lib/domain/viralKpi'
+import { aggregateAiUsage, type AiUsageAnalytics, type AiUsageWorkspaceInput } from '@/lib/domain/aiUsageAnalytics'
 import { todayCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
 import { getProductFunnelStatsAction } from '@/app/(dashboard)/istatistikler/actions'
 
@@ -248,4 +249,52 @@ export async function getViralKpiAction(): Promise<ViralKpi> {
 /** Süper admin: son 30 gün satış hunisi (landing → plan CTA → ödeme). */
 export async function getPlatformProductFunnelAction() {
   return getProductFunnelStatsAction('30d')
+}
+
+const AI_USAGE_WINDOW_DAYS = 30
+
+/**
+ * Süper admin: anonim AI Kullanım Analitiği (son 30 gün). Her workspace'in
+ * `ai_generate` üretim yoğunluğunu lisans kademesi + segment (kendi ekip / dış-kayıt)
+ * kırılımıyla ort/medyan/p90 olarak özetler. Kimlik/isim taşımaz — fiyatlama kararı için.
+ *
+ * Super admin'in kendi workspace'i hariç tutulur (sınırsız kullanım metriği bozar).
+ * RLS bypass admin client ile; ağır hesaplama saf `aggregateAiUsage`'de (test edilebilir).
+ */
+export async function getAiUsageAnalyticsAction(): Promise<AiUsageAnalytics> {
+  const { user } = await getAuthUser()
+  assertSuperAdmin(user)
+
+  const admin = createAdminClient()
+  const windowStartIso = new Date(
+    Date.now() - AI_USAGE_WINDOW_DAYS * 24 * 60 * 60 * 1000,
+  ).toISOString()
+
+  const [workspacesResult, actionsResult] = await Promise.all([
+    admin.from('nmm_workspaces').select('id, owner_id, parent_id, license_type'),
+    admin
+      .from('nmm_daily_actions')
+      .select('workspace_id')
+      .eq('action_type', 'ai_generate')
+      .gte('created_at', windowStartIso)
+      .limit(100000),
+  ])
+
+  const actionCountByWs = new Map<string, number>()
+  for (const row of actionsResult.data ?? []) {
+    if (!row.workspace_id) continue
+    actionCountByWs.set(row.workspace_id, (actionCountByWs.get(row.workspace_id) ?? 0) + 1)
+  }
+
+  const rows: AiUsageWorkspaceInput[] = []
+  for (const w of workspacesResult.data ?? []) {
+    if (!w.owner_id || w.owner_id === user.id) continue // super admin'in kendi ws'i hariç
+    rows.push({
+      tier: normalizeLicenseType(w.license_type),
+      isIndependent: !w.parent_id,
+      actionCount: actionCountByWs.get(w.id) ?? 0,
+    })
+  }
+
+  return aggregateAiUsage(rows, AI_USAGE_WINDOW_DAYS)
 }

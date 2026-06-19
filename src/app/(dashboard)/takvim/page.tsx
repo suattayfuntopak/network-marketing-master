@@ -13,8 +13,8 @@ export default function TakvimPage() {
       <DashboardPageHeader
         title={t('pagesUi.calendarTitle')}
         subtitle={t('pagesUi.calendarSubtitle')}
-        icon={<CalendarDays className="h-5 w-5 text-[#72243E]" strokeWidth={1.75} />}
-        iconContainerClassName="bg-[#FBEAF0] dark:bg-[#72243E]/20"
+        icon={<CalendarDays className="h-5 w-5 text-crown" strokeWidth={1.75} />}
+        iconContainerClassName="bg-crown-subtle"
       />
       <TakvimClient />
     </main>

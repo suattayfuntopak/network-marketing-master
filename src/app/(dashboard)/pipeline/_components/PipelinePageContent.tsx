@@ -228,6 +228,6 @@ function Spinner() {
 
 function ErrorMsg({ msg }: { msg: string }) {
   return (
-    <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]">{msg}</div>
+    <div className="rounded-xl bg-crown-subtle px-4 py-3 text-sm text-crown">{msg}</div>
   )
 }

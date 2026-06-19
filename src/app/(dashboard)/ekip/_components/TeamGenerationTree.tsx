@@ -45,7 +45,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
   const downline = nodes.filter(n => n.generation > 0)
 
   const analyticsStats = [
-    { icon: Users, label: t('team.analyticsTotalMembers'), value: analytics.totalMembers, color: 'text-[#72243E] dark:text-pink-300' },
+    { icon: Users, label: t('team.analyticsTotalMembers'), value: analytics.totalMembers, color: 'text-crown' },
     { icon: Layers, label: t('team.analyticsDepth'), value: analytics.depth, color: 'text-indigo-600 dark:text-indigo-300' },
     { icon: UserPlus, label: t('team.analyticsJoined30'), value: analytics.joinedLast30, color: 'text-emerald-600 dark:text-emerald-300' },
     {
@@ -93,7 +93,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
                     <div key={c.month} className="flex flex-1 flex-col items-center gap-1">
                       <span className="text-[10px] font-bold text-[var(--text-2)]">{c.count}</span>
                       <div
-                        className="w-full rounded-t bg-[#72243E]/70 dark:bg-pink-400/60"
+                        className="w-full rounded-t bg-crown/70"
                         style={{ height: `${8 + Math.round((c.count / max) * 36)}px` }}
                       />
                       <span className="text-[9px] text-[var(--text-3)]">{c.month.slice(5)}</span>
@@ -107,7 +107,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
       )}
 
       <div className="flex items-center gap-2 text-sm font-semibold text-[var(--text-1)]">
-        <GitBranch className="h-4 w-4 text-[#72243E]" />
+        <GitBranch className="h-4 w-4 text-crown" />
         {t('team.treeTitle')}
       </div>
       <p className="text-xs text-[var(--text-3)]">{t('team.treeSubtitle')}</p>

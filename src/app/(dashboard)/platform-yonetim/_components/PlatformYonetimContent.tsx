@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
-import { usePlatformWorkspaces, usePlatformModeration, usePlatformViralKpi, usePlatformProductFunnel } from '@/hooks/usePlatformAdmin'
+import { usePlatformWorkspaces, usePlatformModeration, usePlatformViralKpi, usePlatformProductFunnel, usePlatformAiUsage } from '@/hooks/usePlatformAdmin'
 import { Crown, CreditCard, LayoutTemplate, Search } from 'lucide-react'
 import { toast } from 'sonner'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
@@ -34,6 +34,7 @@ import {
 import { PlatformKpiCards } from './PlatformKpiCards'
 import { PlatformViralKpi } from './PlatformViralKpi'
 import { PlatformProductFunnel } from './PlatformProductFunnel'
+import { PlatformAiUsageAnalytics } from './PlatformAiUsageAnalytics'
 import { PlatformIndependentSection } from './PlatformIndependentSection'
 import { PlatformWorkspacesTable } from './PlatformWorkspacesTable'
 import { PlatformModerationDesk } from './PlatformModerationDesk'
@@ -78,6 +79,7 @@ export function PlatformYonetimContent() {
 
   const { data: viralKpi, isLoading: viralKpiLoading } = usePlatformViralKpi(isSuperAdmin)
   const { data: productFunnel, isLoading: productFunnelLoading } = usePlatformProductFunnel(isSuperAdmin)
+  const { data: aiUsage, isLoading: aiUsageLoading } = usePlatformAiUsage(isSuperAdmin)
 
   useEffect(() => {
     if (!isSuperAdmin) return
@@ -309,6 +311,8 @@ export function PlatformYonetimContent() {
         <PlatformViralKpi kpi={viralKpi} isLoading={viralKpiLoading} />
 
         <PlatformProductFunnel funnel={productFunnel} isLoading={productFunnelLoading} />
+
+        <PlatformAiUsageAnalytics analytics={aiUsage} isLoading={aiUsageLoading} />
 
         {independentMembers.length > 0 && (
           <PlatformIndependentSection

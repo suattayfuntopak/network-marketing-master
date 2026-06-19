@@ -103,6 +103,13 @@
   --color-brand-accent: #c4b5fd;
   --color-brand-subtle: #2d2a5e;
 
+  /* Crown rose — dark modda: yüzeyler koyu-gül, metin/accent açık-gül (okunur).
+     Dolu danger buton (crown-strong) koyu kalır (beyaz yazı için kontrast). */
+  --color-crown:              #f9a8d4; /* açık gül — metin/ikon/nokta/kenar */
+  --color-crown-subtle:       #3d0f1f; /* koyu gül yüzey */
+  --color-crown-subtle-hover: #4d1428; /* koyu gül hover */
+  --color-crown-strong:       #8a2d4a; /* dolu danger buton — koyu kalır, beyaz yazı okunur */
+
   /* Candidate Warmth Colors */
   --warmth-hot-bg:      rgba(69, 10, 10, 0.3);
   --warmth-hot-text:    #f87171;
@@ -223,9 +230,14 @@
   --color-brand-faint:  #EEF2FF; /* Indigo 50 — very soft background */
 
   /* ── Crown / NMM identity colors ────────────────── */
-  --color-crown:        #72243E; /* Crown dark rose — identity accent */
-  --color-crown-dark:   #9B1D47; /* Crown deep — borders, text */
-  --color-crown-subtle: #FBEAF0; /* Crown tint 50 — subtle backgrounds */
+  /* Tema-bilinçli: text-crown / bg-crown-subtle vb. dark modda otomatik koyu-gül
+     yüzey + açık-gül metne döner (.dark override'ları aşağıda). Sabit hex yerine
+     bu token'ları kullan — tek kaynak. */
+  --color-crown:              #72243E; /* Crown dark rose — text/ikon/nokta/kenar accent */
+  --color-crown-dark:         #9B1D47; /* Crown deep — (itiraz/rose ailesi, ayrı) */
+  --color-crown-subtle:       #FBEAF0; /* Crown tint 50 — subtle backgrounds */
+  --color-crown-subtle-hover: #F5D9E5; /* Crown subtle bg hover */
+  --color-crown-strong:       #72243E; /* Dolu danger buton zemini (beyaz yazı) */
 
   /* ── WhatsApp ─────────────────────────────────────  */
   --color-whatsapp:     #25D366; /* WhatsApp official green */

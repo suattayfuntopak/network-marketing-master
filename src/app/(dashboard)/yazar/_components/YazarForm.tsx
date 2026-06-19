@@ -269,7 +269,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
         </div>
 
         {state.error && (
-          <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]">{state.error}</p>
+          <p className="rounded-xl bg-crown-subtle px-4 py-2.5 text-sm text-crown">{state.error}</p>
         )}
 
         {!hasAiFieldAccess ? (
@@ -283,7 +283,7 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
             {t('pagesUi.unlockAiBasic')}
           </button>
         ) : limitReached ? (
-          <div className="rounded-xl bg-[#FBEAF0] px-4 py-3 text-sm text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]">
+          <div className="rounded-xl bg-crown-subtle px-4 py-3 text-sm text-crown">
             {t('coachUi.dailyLimitMessage', { limit: dailyLimit })}
           </div>
         ) : (

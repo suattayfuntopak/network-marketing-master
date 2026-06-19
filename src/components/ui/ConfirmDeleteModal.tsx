@@ -41,8 +41,8 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
       <div className="relative w-full max-w-xs rounded-2xl bg-[var(--bg-card)] p-6 shadow-2xl border border-[var(--border)] animate-in fade-in zoom-in-95 duration-200">
         {/* İkon */}
         <div className="mb-4 flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FBEAF0]">
-            <AlertTriangle className="h-7 w-7 text-[#72243E]" strokeWidth={1.75} />
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-crown-subtle">
+            <AlertTriangle className="h-7 w-7 text-crown" strokeWidth={1.75} />
           </div>
         </div>
 
@@ -64,7 +64,7 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
           </button>
           <button
             onClick={onConfirm}
-            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#72243E] py-3 text-sm font-semibold text-white transition hover:bg-[#5a1c31] active:scale-95"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-crown-strong py-3 text-sm font-semibold text-white transition hover:bg-[#5a1c31] active:scale-95"
           >
             <Trash2 className="h-4 w-4" />
             {t('common.confirmYes')}

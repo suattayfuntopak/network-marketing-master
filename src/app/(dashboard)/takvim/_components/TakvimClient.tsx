@@ -222,14 +222,14 @@ export function TakvimClient() {
       )}
 
       {overdueCount > 0 && (
-        <div className="flex flex-col gap-2 rounded-2xl border border-[#FBEAF0] bg-[#FBEAF0]/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between dark:border-[#3d0f1f] dark:bg-[#3d0f1f]/40">
+        <div className="flex flex-col gap-2 rounded-2xl border border-crown-subtle bg-crown-subtle/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
           <button
             type="button"
             onClick={() => earliestOverdue && selectCalendarDate(earliestOverdue)}
             className="flex items-center gap-2 text-left"
           >
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#72243E] dark:bg-[#f9a8d4]" />
-            <p className="text-sm font-semibold text-[#72243E] dark:text-[#f9a8d4]">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-crown" />
+            <p className="text-sm font-semibold text-crown">
               {t('pagesUi.overdueFollowUps', { count: overdueCount })}
             </p>
           </button>
@@ -238,13 +238,13 @@ export function TakvimClient() {
               type="button"
               onClick={() => setBulkConfirmOpen(true)}
               disabled={isBusy}
-              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline disabled:opacity-50 dark:text-[#f9a8d4]"
+              className="text-xs font-semibold text-crown underline-offset-2 hover:underline disabled:opacity-50"
             >
               {t('pagesUi.bulkDeferOneDay')}
             </button>
             <Link
               href="/saha-ozetim?tab=daily"
-              className="text-xs font-semibold text-[#72243E] underline-offset-2 hover:underline dark:text-[#f9a8d4]"
+              className="text-xs font-semibold text-crown underline-offset-2 hover:underline"
             >
               {t('pagesUi.viewTodayPriorities')}
             </Link>
@@ -325,7 +325,7 @@ export function TakvimClient() {
                 className={`relative flex flex-col items-center justify-center rounded-xl py-2 text-sm font-medium transition-colors
                   ${isSelected ? 'bg-brand text-white' :
                     isToday ? 'bg-brand-subtle text-brand' :
-                    isOverdue ? 'text-[#72243E]' :
+                    isOverdue ? 'text-crown' :
                     'text-[var(--text-1)] hover:bg-[var(--bg-subtle)]'}
                   ${isPast && !isOverdue ? 'opacity-40' : ''}`}
               >
@@ -333,7 +333,7 @@ export function TakvimClient() {
                 {hasDot && (
                   <span className={`mt-0.5 h-1 w-1 rounded-full ${
                     isSelected ? 'bg-white' :
-                    isOverdue ? 'bg-[#72243E]' :
+                    isOverdue ? 'bg-crown' :
                     'bg-brand dark:bg-white/90'
                   }`} />
                 )}
@@ -349,9 +349,9 @@ export function TakvimClient() {
         </p>
 
         {selected < todayKey && selectedCandidates.length > 0 && (
-          <div className="mb-3 flex items-center gap-2 rounded-xl bg-[#FBEAF0] px-3 py-2 dark:bg-[#3d0f1f]/40">
-            <span className="h-2 w-2 rounded-full bg-[#72243E] dark:bg-[#f9a8d4]" />
-            <p className="text-xs font-semibold text-[#72243E] dark:text-[#f9a8d4]">
+          <div className="mb-3 flex items-center gap-2 rounded-xl bg-crown-subtle px-3 py-2">
+            <span className="h-2 w-2 rounded-full bg-crown" />
+            <p className="text-xs font-semibold text-crown">
               {t('pagesUi.followUpsMissed', { count: selectedCandidates.length })}
             </p>
           </div>

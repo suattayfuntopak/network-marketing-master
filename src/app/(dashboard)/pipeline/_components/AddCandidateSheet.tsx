@@ -204,7 +204,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
                   type="button"
                   onClick={handleRemovePhoto}
                   disabled={uploadingPhoto}
-                  className="flex items-center gap-1.5 rounded-xl border border-[#FBEAF0] bg-[#FBEAF0] px-3 py-2 text-xs font-semibold text-[#72243E] transition hover:bg-[#f5d4e0] disabled:opacity-60"
+                  className="flex items-center gap-1.5 rounded-xl border border-crown-subtle bg-crown-subtle px-3 py-2 text-xs font-semibold text-crown transition hover:bg-crown-subtle-hover disabled:opacity-60"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                   Kaldır
@@ -239,10 +239,10 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             <label className={labelClass} htmlFor="phone">Telefon</label>
             <input
               id="phone" name="phone" type="tel" placeholder="05xxxxxxxxx"
-              className={`${inputClass} ${phoneError ? 'border-[#72243E] focus:border-[#72243E] focus:ring-[#FBEAF0]' : ''}`}
+              className={`${inputClass} ${phoneError ? 'border-crown focus:border-crown focus:ring-crown-subtle' : ''}`}
               onChange={() => phoneError && setPhoneError('')}
             />
-            {phoneError && <p className="mt-1 text-xs text-[#72243E]">{phoneError}</p>}
+            {phoneError && <p className="mt-1 text-xs text-crown">{phoneError}</p>}
           </div>
           <div>
             <label className={labelClass} htmlFor="stage">Aşama</label>
@@ -265,7 +265,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
             <textarea id="note" name="note" rows={2} maxLength={1000} placeholder="Kısa bir not..." className={`${inputClass} resize-none`} />
           </div>
           {add.isError && (
-            <p className="rounded-xl bg-[#FBEAF0] px-4 py-2.5 text-sm text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]">Kişi eklenemedi. Tekrar dene.</p>
+            <p className="rounded-xl bg-crown-subtle px-4 py-2.5 text-sm text-crown">Kişi eklenemedi. Tekrar dene.</p>
           )}
           <button type="submit" disabled={add.isPending || uploadingPhoto} className="w-full rounded-xl bg-brand py-3 text-sm font-semibold text-white transition hover:bg-[#453DA0] disabled:opacity-60">
             {add.isPending || uploadingPhoto ? (

@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-19 — Crown token-migration + AI Kullanım Analitiği + moderasyon bildirimi ✅
+
+### 1) Crown-rose token-migration (tema tek-kaynak)
+`#FBEAF0`/`#72243E` (+`#f9a8d4`/`#3d0f1f`/`#F5D9E5`/`#f5d4e0`) sabit hex'leri tema-bilinçli token'lara taşındı. globals.css:
+- `@theme`: `--color-crown` (text/accent), `--color-crown-subtle` (bg), **yeni** `--color-crown-subtle-hover`, `--color-crown-strong` (dolu danger buton).
+- `.dark`: crown=`#f9a8d4`, crown-subtle=`#3d0f1f`, crown-subtle-hover=`#4d1428`, crown-strong=`#8a2d4a`.
+- 16 dosyada hex→semantic (`bg-crown-subtle`, `text-crown`, `bg-crown-strong` …); ad-hoc `dark:` override'lar (pink-300/red-300/e87fa3/pink-400) kaldırılıp token'a birleştirildi. **Light mode bire bir korundu** (token light = eski hex). Danger butonlar `crown-strong` ile koyu kaldı (beyaz yazı kontrastı).
+- Bilinçli istisna: `authUi.ts` (rose-50 ailesi, glow değil), `funnelMetricVisuals.tsx` (grafik renk seti — kardeş hex'lerle tutarlı, ayrı vivid-class dark sistemi var).
+
+### 2) AI Kullanım Analitiği (Süper Admin paneli)
+Anonim, workspace-bazlı AI üretim yoğunluğu (son 30 gün) — lisans kademesi + segment (kendi ekip/dış-kayıt) kırılımıyla ort/medyan/p90 günlük + kişi-başı 30g toplam (maliyet vekili).
+- Saf+test: `lib/domain/aiUsageAnalytics.ts` (+`.test.ts`, 4 test). Günlük = ws 30g toplam ÷ 30; p90 nearest-rank.
+- Server action `getAiUsageAnalyticsAction` (`nmm_daily_actions` action_type=ai_generate; super admin kendi ws hariç; isIndependent=!parent_id).
+- Hook `usePlatformAiUsage` + `PlatformAiUsageAnalytics` bileşeni — **bağımsız TanStack query + kendi skeleton'u** → sayfa/diğer bölümleri bloklamaz. PlatformProductFunnel sonrası render. platform.ts (tr+en) + pageHelp girdisi.
+- **Yük denetimi:** uygulama zaten Suspense+skeleton+`void` prefetch ile non-blocking (istatistikler/saha-ozetim/ekip yalnız ws + birincil bundle await ediyor). Yeni modül bu kalıba uyuyor.
+
+### 3) Moderasyon bildirimleri
+- Alert e-postaları gmail'e de gidiyor: `sendModerationAlertEmail` + lisans-aktivasyon alert `to: [SUPER_ADMIN_EMAIL, 'info@…']` (eskiden yalnız info@).
+- **Yeni:** `notifySuperAdminNewModerationRequest` — yeni içerik/video/itiraz talebinde Süper Admin'e UYGULAMA İÇİ (zil) bildirim ekler (`nmm_notifications`); `submitModeratedRequestAction` (training/objection) + `videoActions.ts` (video) `!isApproved` dalında çağrılıyor. Hataya dayanıklı (`void`+try/catch).
+
+### Doğrulama
+tsc · lint (--max-warnings 0) · test 335/335 (61 dosya) · i18n 1307 · next build ✓
+
 ## 2026-06-19 — Dark-mode parlayan kutu düzeltmesi + 3 inceleme ✅
 
 ### Özet (kod: 1 madde)

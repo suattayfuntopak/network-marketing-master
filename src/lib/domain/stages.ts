@@ -40,8 +40,8 @@ const STAGE_THEME: Record<CandidateStage, { badge: string; card: string }> = {
     card: 'bg-[#FAEEDA] text-[#854F0B] dark:bg-[#3a2200]/40 dark:text-[#fbbf24]',
   },
   kararsiz: {
-    badge: 'bg-[#FBEAF0] text-[#72243E] dark:bg-[#3d0f1f] dark:text-[#f9a8d4]',
-    card: 'bg-[#FBEAF0] text-[#72243E] dark:bg-[#3d0f1f]/40 dark:text-[#f9a8d4]',
+    badge: 'bg-crown-subtle text-crown',
+    card: 'bg-crown-subtle text-crown',
   },
   katildi: {
     badge: 'bg-[#E1F5EE] text-[#0F6E56] dark:bg-[#0d3d2e] dark:text-[#4ade80]',

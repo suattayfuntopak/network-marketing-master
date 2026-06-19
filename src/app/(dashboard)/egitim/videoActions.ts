@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { assertSuperAdmin, isSuperAdmin } from '@/lib/domain/auth'
 import { sendModerationAlertEmail } from '@/lib/infra/mail'
+import { notifySuperAdminNewModerationRequest } from '@/app/(dashboard)/actions/moderation'
 import { type TrainingVideoDef } from '@/lib/domain/trainingVideos'
 import {
   summarizeVideoProgress,
@@ -352,6 +353,7 @@ export async function createTrainingVideoAction(
     sendModerationAlertEmail(userEmail, userName, 'video', input.titleTr.trim()).catch(err => {
       console.error('[Resend Alert Error]', err)
     })
+    void notifySuperAdminNewModerationRequest('video', input.titleTr.trim(), userName)
   }
 
   return { success: true, isApproved }

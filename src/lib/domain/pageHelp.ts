@@ -296,6 +296,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       steps: [
         { t: 'Dış Kayıtlar', d: 'Bağımsız kaydolmuş kişileri "Ekibime Bağla" ile kendi ekibine alabilirsin.' },
         { t: 'Lisans yönetimi', d: 'Kullanıcı listesinden lisans paketlerini ve sürelerini düzenleyebilirsin.' },
+        { t: 'AI Kullanım Analitiği', d: 'Lisans kademesi ve segment bazında anonim günlük AI üretimi (ort/medyan/p90) — maliyet ve fiyatlama kararına ışık tutar.' },
       ],
     },
     en: {
@@ -304,6 +305,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       steps: [
         { t: 'External signups', d: 'Use “Link to my team” to bring independent signups into your team.' },
         { t: 'License management', d: 'Edit license tiers and durations from the user list.' },
+        { t: 'AI Usage Analytics', d: 'Anonymous daily AI generation (avg/median/p90) by license tier and segment — informs cost and pricing decisions.' },
       ],
     },
   },
