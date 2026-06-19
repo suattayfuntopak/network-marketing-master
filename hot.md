@@ -1,5 +1,28 @@
 # Hot Log
 
+## 2026-06-19 — Moderasyon gönderen onarımı (kim gönderdi her zaman görünür) ✅
+
+### Sorun
+Onay Masası'nda eski bir talepte "Gönderen / E-posta" boştu. Sebep: `user_email`/
+`user_name` kolonları eklenmeden önce oluşmuş satır (NULL) — ama `user_id` duruyordu.
+
+### Çözüm
+`getPendingRequestsAction`: `user_email`/`user_name` boş olan satırlarda kimliği
+`admin.auth.admin.getUserById(user_id)` ile çözüp dolduruyor (bounded — yalnız boş
+olanlar için, full-list yok). Böylece eski satırlar + gelecekteki tüm talepler
+gönderen bilgisini gösterir. UI'da kalıcı `—` fallback (silinmiş kullanıcı/boş id).
+
+### Değişen dosyalar
+- `src/app/(dashboard)/actions/moderation.ts` (gönderen onarımı)
+- `src/app/(dashboard)/platform-yonetim/_components/{PlatformModerationDesk,ModerationReviewModal}.tsx` (— fallback)
+
+### Notlar (inceleme, kod değişmedi)
+- **GitHub Actions/Vercel "uyumsuzluğu" yok:** E2E yalnız PR + haftalık cron (Pzt 06:00 TR) + manuel; push'ta çalışmaz → eski görünmesi normal, tasarruf için doğru. Vercel her main push'unda bağımsız deploy ediyor, en son commit canlı. Manuel iş yok.
+- **DİKKAT:** Çalışma ağacında commit edilmemiş, henüz DERLENMEYEN ayrı bir WIP var (sayfa başlık-ikonu + sekme-bilinçli PageHelp refaktörü; ~20 dosya + `pageHeaderIcon.ts`). Hatalar: navMobile'da çift `ekip` anahtarı (tr/en), AkademiContent'te tanımsız `AKADEMI_TAB_THEME`/`AkademiTabLabel`, kullanılmayan `PAGE_HEADER_ICON_GLYPH`. Bu commit ona dokunmadı.
+
+### Doğrulama (yalnız bu commit'in dosyaları)
+moderasyon 3 dosyası izole; tsc hataları yalnız yukarıdaki WIP dosyalarında (bu commit'e dahil değil).
+
 ## 2026-06-19 — Crown token-migration + AI Kullanım Analitiği + moderasyon bildirimi ✅
 
 ### 1) Crown-rose token-migration (tema tek-kaynak)

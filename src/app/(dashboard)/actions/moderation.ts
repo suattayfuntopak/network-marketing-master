@@ -263,6 +263,38 @@ export async function getPendingRequestsAction(): Promise<ModerationRequestItem[
     })
   })
 
+  // Gönderen onarımı: eski/seed satırlarda user_email/user_name boş olabilir ama
+  // user_id durur — kimliği auth'tan çözüp doldur. Böylece "kim gönderdi" her zaman görünür.
+  const unresolvedIds = Array.from(
+    new Set(list.filter(r => r.userId && (!r.userName || !r.userEmail)).map(r => r.userId as string)),
+  )
+  if (unresolvedIds.length > 0) {
+    const resolved = new Map<string, { email: string | null; name: string | null }>()
+    await Promise.all(
+      unresolvedIds.map(async id => {
+        try {
+          const { data } = await admin.auth.admin.getUserById(id)
+          const u = data?.user
+          if (u) {
+            resolved.set(id, {
+              email: u.email ?? null,
+              name: (u.user_metadata?.full_name as string | undefined) ?? u.email?.split('@')[0] ?? null,
+            })
+          }
+        } catch (err) {
+          console.error('[getPendingRequestsAction] getUserById failed:', err)
+        }
+      }),
+    )
+    for (const r of list) {
+      if (!r.userId) continue
+      const u = resolved.get(r.userId)
+      if (!u) continue
+      if (!r.userEmail) r.userEmail = u.email
+      if (!r.userName) r.userName = u.name
+    }
+  }
+
   return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 }
 

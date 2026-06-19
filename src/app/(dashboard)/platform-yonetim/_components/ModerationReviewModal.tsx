@@ -161,7 +161,7 @@ export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
           </div>
 
           <div className="rounded-xl bg-[var(--bg-subtle)] p-3 text-sm leading-relaxed text-[var(--text-2)] font-semibold border border-[var(--border)] space-y-0.5">
-            <div><strong>{t('moderationReview.submitter')}</strong> {request.userName} ({request.userEmail})</div>
+            <div><strong>{t('moderationReview.submitter')}</strong> {request.userName || '—'} ({request.userEmail || '—'})</div>
             <div><strong>{t('moderationReview.type')}</strong> {isVideo ? t('moderationReview.typeVideo') : isTraining ? t('moderationReview.typeTraining') : t('moderationReview.typeObjection')}</div>
           </div>
 

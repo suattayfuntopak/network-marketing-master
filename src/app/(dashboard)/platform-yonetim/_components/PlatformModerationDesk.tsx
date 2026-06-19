@@ -100,8 +100,8 @@ export function PlatformModerationDesk({
                   </p>
 
                   <div className="text-[10px] text-[var(--text-3)] font-semibold space-y-0.5 border-t border-[var(--border)] pt-2">
-                    <div className="truncate"><strong>Gönderen:</strong> {req.userName}</div>
-                    <div className="truncate"><strong>E-posta:</strong> {req.userEmail}</div>
+                    <div className="truncate"><strong>Gönderen:</strong> {req.userName || '—'}</div>
+                    <div className="truncate"><strong>E-posta:</strong> {req.userEmail || '—'}</div>
                   </div>
                 </div>
 
