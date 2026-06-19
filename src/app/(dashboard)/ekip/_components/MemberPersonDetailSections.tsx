@@ -323,12 +323,12 @@ export function MemberActionButtons({
   generating: boolean
   hasAiFieldAccess: boolean
   onCoaching: () => void
-  /** Ekip kartı aktivite sekmesi — mobilde tam genişlik pano rose CTA */
+  /** Ekip kartı aktivite sekmesi — tam genişlik pano rose CTA, WA sekmesi ayrı */
   variant?: 'profile' | 'card-tab'
 }) {
   const cardTab = variant === 'card-tab'
   return (
-    <div className={clsx('flex items-center justify-start gap-2', cardTab && 'w-full md:w-auto')}>
+    <div className={clsx('flex items-center justify-start gap-2', cardTab && 'w-full')}>
       <button
         type="button"
         onClick={onCoaching}
@@ -336,11 +336,7 @@ export function MemberActionButtons({
         className={clsx(
           'relative flex h-10 items-center gap-2 rounded-xl text-xs font-semibold transition disabled:opacity-50 active:scale-95',
           cardTab
-            ? [
-                'w-full justify-center px-4 md:w-auto md:justify-start md:px-3',
-                'max-md:bg-gradient-to-br max-md:from-[#FF5252] max-md:to-[#D81B60] max-md:text-white max-md:shadow-md max-md:hover:brightness-105',
-                'md:bg-brand-subtle md:text-brand md:hover:scale-[1.02] md:hover:shadow-md',
-              ]
+            ? [PANO_EKIP_ROSE_CTA, 'w-full justify-center px-4']
             : [PANO_EKIP_ROSE_CTA, 'px-3'],
         )}
         title={t('team.memberDetailCoachCta')}
@@ -348,29 +344,23 @@ export function MemberActionButtons({
         {generating ? (
           <div className={clsx(
             'h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-transparent',
-            cardTab ? 'max-md:border-white md:border-brand' : 'border-white',
+            'border-white',
           )} />
         ) : (
           <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
         )}
         {t('team.memberDetailCoachCta')}
         {!hasAiFieldAccess && (
-          <Lock
-            className={clsx('h-2.5 w-2.5 shrink-0', cardTab ? 'max-md:text-white/90 md:text-brand' : 'text-white/90')}
-            strokeWidth={2.5}
-          />
+          <Lock className="h-2.5 w-2.5 shrink-0 text-white/90" strokeWidth={2.5} />
         )}
       </button>
-      {wa && (
+      {wa && !cardTab && (
         <a
           href={wa}
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
-          className={clsx(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md',
-            cardTab && 'hidden md:flex',
-          )}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md"
           aria-label="WhatsApp"
           title="WhatsApp"
         >
