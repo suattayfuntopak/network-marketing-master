@@ -6,6 +6,7 @@ import type { SheetActivityPeriod } from '@/lib/domain/pulse'
 import {
   PULSE_PERIOD_OPTIONS,
   PULSE_PERIOD_SHORT,
+  pulsePeriodLabel,
   sheetActivityPeriodLabel,
 } from '@/lib/domain/pulsePeriodLabels'
 
@@ -19,11 +20,18 @@ export const MEMBER_ACTIVITY_PERIODS = PULSE_PERIOD_OPTIONS
 type Props = {
   active: SheetActivityPeriod
   onChange: (period: SheetActivityPeriod) => void
+  /** false → masaüstü 30g «Aylık» (Kişi Detayı); varsayılan kayan «Son 30 Gün». Mobil kısa kodlara dokunulmaz. */
+  desktopRolling30?: boolean
 }
 
 /** Saha Özetim HubSummaryTabBar ile aynı boyut/ritim — masaüstü metin, mobil 1/7/30/365/∞ */
-export function MemberActivityPeriodTabs({ active, onChange }: Props) {
+export function MemberActivityPeriodTabs({ active, onChange, desktopRolling30 = true }: Props) {
   const { t } = useTranslation()
+
+  const desktopLabel = (period: SheetActivityPeriod) =>
+    desktopRolling30
+      ? sheetActivityPeriodLabel(t, period)
+      : pulsePeriodLabel(t, period)
 
   return (
     <div
@@ -58,7 +66,7 @@ export function MemberActivityPeriodTabs({ active, onChange }: Props) {
             >
               {PULSE_PERIOD_SHORT[period]}
             </span>
-            <span className="hidden sm:inline">{sheetActivityPeriodLabel(t, period)}</span>
+            <span className="hidden sm:inline">{desktopLabel(period)}</span>
           </button>
         )
       })}

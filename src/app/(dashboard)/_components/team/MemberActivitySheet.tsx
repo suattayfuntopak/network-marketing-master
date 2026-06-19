@@ -54,6 +54,8 @@ interface Props {
   memberIsLeader?: boolean
   /** Boru hattı aşama sayıları (Takipte / Katıldı) — gömülü aktivite sekmesi */
   pipelineTakipCount?: number
+  /** false → masaüstü 30g sekmesi «Aylık» (Kişi Detayı) */
+  desktopRolling30?: boolean
   onClose?: () => void
 }
 
@@ -76,6 +78,7 @@ export function MemberActivitySheet({
   embedded = false,
   memberIsLeader = false,
   pipelineTakipCount = 0,
+  desktopRolling30 = true,
   onClose,
 }: Props) {
   const { t } = useTranslation()
@@ -184,7 +187,7 @@ export function MemberActivitySheet({
 
   const panelBody = (
     <>
-        <MemberActivityPeriodTabs active={period} onChange={setPeriod} />
+        <MemberActivityPeriodTabs active={period} onChange={setPeriod} desktopRolling30={desktopRolling30} />
 
         {embedded && memberSelfGoal && (
           <div className="mb-4 rounded-xl border border-amber-500/25 bg-amber-50/40 dark:bg-amber-950/20 p-4">

@@ -318,30 +318,8 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                     </div>
                   </div>
 
-                  {/* Eylem butonları */}
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {wa && (
-                      <a
-                        href={wa}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md"
-                        aria-label="WhatsApp"
-                        title="WhatsApp"
-                      >
-                        <WhatsAppIcon className="h-4 w-4" />
-                      </a>
-                    )}
-                    {m.phone && (
-                      <a
-                        href={`tel:${m.phone}`}
-                        className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition hover:scale-105 hover:shadow-md"
-                        aria-label={t('pipeline.call')}
-                        title={t('pipeline.call')}
-                      >
-                        <Phone className="h-4 w-4" strokeWidth={1.75} />
-                      </a>
-                    )}
+                  {/* Eylem butonları — mobil: Koçluk · WA · (sağda) Ara; masaüstü: Koçluk · WA */}
+                  <div className="mt-4 flex w-full items-center gap-2">
                     <button
                       type="button"
                       onClick={handleCoachingAI}
@@ -359,6 +337,28 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                         <Lock className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
                       )}
                     </button>
+                    {wa && (
+                      <a
+                        href={wa}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md"
+                        aria-label="WhatsApp"
+                        title="WhatsApp"
+                      >
+                        <WhatsAppIcon className="h-4 w-4" />
+                      </a>
+                    )}
+                    {m.phone && (
+                      <a
+                        href={`tel:${m.phone}`}
+                        className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition hover:scale-105 hover:shadow-md md:hidden"
+                        aria-label={t('pipeline.call')}
+                        title={t('pipeline.call')}
+                      >
+                        <Phone className="h-4 w-4" strokeWidth={1.75} />
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -380,6 +380,7 @@ export function MemberDetailPage({ userId }: { userId: string }) {
                       teamPulseUnlocked={hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)}
                       memberIsLeader={m.role === 'leader'}
                       pipelineTakipCount={m.takip_count ?? 0}
+                      desktopRolling30={false}
                     />
                   </div>
                 </div>
