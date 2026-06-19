@@ -1,5 +1,31 @@
 # Hot Log
 
+## 2026-06-19 — /health taraması + dead-code temizliği 🧹✅
+
+### Özet
+`/health` (gstack) ile uçtan uca durum taraması: **tip güvenliği, lint, 342 test, i18n paritesi (1301 anahtar), migration defteri (104 dosya) tertemiz.** Tek aksiyon gereken yer dead-code ayağıydı. İki bulgu:
+
+1. **`npm run knip` script'i kırık görünüyordu** — aslında `knip` `package.json` devDeps'te (`^6.16.1`) ama bu makinenin `node_modules`'ü bayattı (binary yoktu). `npm install` ile senkronlandı; kod değişikliği gerekmedi (CI fresh checkout'ta zaten doğru kurar).
+2. **4 ölü dosya + cascade dead export'lar** — 2026-06-13 temizliğinden sonra birikmiş. knip + symbol-level grep + worktree + test taraması ile **her biri tek tek** doğrulandı (yanlış-pozitif yok).
+
+### Temizlenenler (hepsi 0 referans — main + worktree + test)
+- **Ölü dosyalar (4):** `egitim/_components/akademiTheme.ts`, `ekip/_components/SpoilerCode.tsx`, `hedefim/_components/hedefTheme.ts`, `lib/utils/getLang.ts`
+- **`brandGradients.ts`:** `PRO_CTA_GRADIENT_ACTIVE` un-export edildi (iç kullanımı sürüyor, dışa açık alias = `STUDIO_MODULE_ACCENT_CLASS` → duplicate-export uyarısı çözüldü); `EKIP_ACCENT_BTN_HOVER` + `PRO_CTA_GRADIENT_ACTIVE_DARK_SM` silindi.
+- **`pulse.ts`:** 6 ölü fonksiyon (`mapStatsPeriodToSheet`, `computeLearningStreak`, `countDistinctReadsInPeriod`, `emptyMyPulseSummary`, `computeAttentionFlags`, `computeConsecutiveDayStreak`) + 2 yetim tip (`PeriodLearningSummary`, `PulseAttentionFlag`) + `LEARNING_STREAK_EVENT_TYPES` + 4 yetim video import. **Korunan:** `SheetActivityPeriod` (14 ref), `FieldEngagementSummary` (4 ref), `periodStartIso`, `computeFieldStreak`, `parseLearningProgress`.
+- **`videoProgress.ts`:** `videoDropoffCount` (silinen `emptyMyPulseSummary`'nin tek tüketicisiydi). `summarizeVideoProgress` korundu (videoActions kullanıyor).
+
+### Sonuç (knip)
+Ölü dosya **4 → 0** · unused export **25 → 18** · duplicate export **2 → 1**. Kalan 18 export + 3 tip + 1 duplicate **bilinçli tutulanlar** (CLAUDE.md: `bypassAILimits`, `describeShopierSignatureScheme`, `navigation.ts` config, payment deep-link'ler) ya da pulse/brandGradients dışı kapsam (`HubSummaryTab`, `ProgressData`, `LeaderNoteAction` — sonraki tur).
+
+### Doğrulama
+`tsc --noEmit` ✓ · `eslint --max-warnings 0` ✓ · `next build` ✓ · `vitest` 342/342 ✓ · `i18n:unused` ✓ · `migrate:check` ✓
+
+### Değişen dosyalar
+- silindi: `akademiTheme.ts`, `SpoilerCode.tsx`, `hedefTheme.ts`, `getLang.ts`
+- `src/lib/ui/brandGradients.ts`, `src/lib/domain/pulse.ts`, `src/lib/domain/videoProgress.ts`
+
+---
+
 ## 2026-06-19 — Açılış/yükleme/gezinme hızı: soğuk-start blokajlarını kaldır ⚡✅
 
 ### Özet

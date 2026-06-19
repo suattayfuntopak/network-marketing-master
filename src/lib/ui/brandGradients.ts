@@ -1,5 +1,6 @@
-/** Pro plan CTA — landing pricing «Zirveye Ulaş» ile aynı pembe gradyan (light + dark). */
-export const PRO_CTA_GRADIENT_ACTIVE =
+/** Pro plan CTA — landing pricing «Zirveye Ulaş» ile aynı pembe gradyan (light + dark).
+ *  Dışa açık alias: STUDIO_MODULE_ACCENT_CLASS. */
+const PRO_CTA_GRADIENT_ACTIVE =
   'border-pink-600 bg-gradient-to-r from-pink-600 to-rose-500 text-white shadow-md shadow-pink-500/15'
 
 /** Pro plan CTA — landing pricing "Zirveye Ulaş" ile aynı pembe gradyan (dark tema). */
@@ -22,10 +23,6 @@ export const EKIP_ACCENT_PILL_ACTIVE =
   'border-brand bg-brand/10 text-brand dark:text-indigo-300'
 export const EKIP_ACCENT_FOCUS =
   'focus:border-brand focus:ring-2 focus:ring-brand/20'
-export const EKIP_ACCENT_BTN_HOVER = 'hover:brightness-105'
-
-export const PRO_CTA_GRADIENT_ACTIVE_DARK_SM =
-  'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:shadow-sm dark:shadow-pink-500/15'
 
 /** Pano Saha Özetim crown gradyanı */
 export const PANO_TEAL_GRADIENT_ACTIVE =

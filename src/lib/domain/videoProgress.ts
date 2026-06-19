@@ -54,8 +54,3 @@ export function summarizeVideoProgress(
     pct: total > 0 ? Math.min(100, Math.round((completed / total) * 100)) : 0,
   }
 }
-
-/** Drop-off = started but not completed (coaching signal). */
-export function videoDropoffCount(summary: VideoProgressSummary): number {
-  return summary.startedIncomplete
-}
