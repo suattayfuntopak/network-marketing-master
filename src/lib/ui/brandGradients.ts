@@ -1,9 +1,17 @@
+/** Pro plan CTA — landing pricing «Zirveye Ulaş» ile aynı pembe gradyan (light + dark). */
+export const PRO_CTA_GRADIENT_ACTIVE =
+  'border-pink-600 bg-gradient-to-r from-pink-600 to-rose-500 text-white shadow-md shadow-pink-500/15'
+
 /** Pro plan CTA — landing pricing "Zirveye Ulaş" ile aynı pembe gradyan (dark tema). */
 export const PRO_CTA_GRADIENT_ACTIVE_DARK =
   'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:text-white dark:shadow-md dark:shadow-pink-500/15'
 
 /** Ekibim sidebar + sayfa başlık ikonu — Ekip Üyeleri sekmesi ile aynı marka gradyanı. */
 export const EKIP_MODULE_ACCENT_CLASS = `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`
+
+/** İçerik Stüdyosu — sekme + solid CTA (İçerik Üret, takvime kaydet). */
+export const STUDIO_MODULE_ACCENT_CLASS = PRO_CTA_GRADIENT_ACTIVE
+export const STUDIO_ACCENT_BTN_HOVER = 'hover:from-pink-700 hover:to-rose-600'
 
 /** Ekibim modülü — seçili pill, odak halkası, solid CTA (İçerik Stüdyosu vb.). */
 export const EKIP_ACCENT_PILL_ACTIVE =

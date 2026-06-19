@@ -25,10 +25,10 @@ import {
 } from '../contentPlanActions'
 import { keysForDaysAfter, todayCalendarKey } from '@/lib/utils/calendarDates'
 import {
-  EKIP_ACCENT_BTN_HOVER,
   EKIP_ACCENT_FOCUS,
   EKIP_ACCENT_PILL_ACTIVE,
-  EKIP_MODULE_ACCENT_CLASS,
+  STUDIO_ACCENT_BTN_HOVER,
+  STUDIO_MODULE_ACCENT_CLASS,
 } from '@/lib/ui/brandGradients'
 
 const GOALS: { key: SocialGoal; icon: typeof ShoppingBag; labelKey: string }[] = [
@@ -204,7 +204,7 @@ export function StudyoForm() {
 
       {/* Üret */}
       <button type="button" onClick={generate} disabled={isPending}
-        className={`relative flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60 ${EKIP_MODULE_ACCENT_CLASS} ${EKIP_ACCENT_BTN_HOVER}`}
+        className={`relative flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60 ${STUDIO_MODULE_ACCENT_CLASS} ${STUDIO_ACCENT_BTN_HOVER}`}
         title={!hasAiCoachAccess ? t('pagesUi.unlockAiBasic') : undefined}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
         {isPending ? t('studyo.generating') : t('studyo.generate')}
@@ -237,7 +237,7 @@ export function StudyoForm() {
               className="rounded-lg border border-[var(--border)] bg-[var(--bg)] px-2.5 py-1.5 text-xs text-[var(--text-1)] outline-none focus:border-brand"
             />
             <button type="button" onClick={saveToCalendar} disabled={savingPlan}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50 ${EKIP_MODULE_ACCENT_CLASS} ${EKIP_ACCENT_BTN_HOVER}`}>
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold text-white disabled:opacity-50 ${STUDIO_MODULE_ACCENT_CLASS} ${STUDIO_ACCENT_BTN_HOVER}`}>
               <CalendarPlus className="h-3.5 w-3.5" /> {t('studyo.saveToCalendar')}
             </button>
           </div>
