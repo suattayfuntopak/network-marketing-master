@@ -258,13 +258,14 @@ export function PlatformYonetimContent() {
         <DashboardPageHeader
           title={t('platformPage.consoleTitle')}
           rowOnMobile
+          showHelp={false}
           icon={<Crown className="h-5 w-5 text-white" strokeWidth={2.25} />}
           iconContainerClassName="bg-gradient-to-br from-amber-500 to-yellow-400 shadow-md"
           actions={
             <>
-              {/* Mobil sayfa yardımı (?) — Ödeme/Landing butonlarının solunda; masaüstünde
-                  başlık-sonu PageHelp devreye girer (flex sm:hidden ile çakışma yok). */}
-              <PageHelp triggerClassName="flex sm:hidden h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
+              {/* Sayfa yardımı (?) — hem mobil hem masaüstünde Ödeme/Landing butonlarının
+                  SOLUNDA (en solda). showHelp={false} ile başlık-sonu varsayılan (?) kapalı. */}
+              <PageHelp triggerClassName="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
               <button
                 type="button"
                 onClick={() => setNavConfirm('payment')}
