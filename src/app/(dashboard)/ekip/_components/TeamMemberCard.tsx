@@ -18,8 +18,8 @@ import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import type { UpgradeFeature } from '@/components/ui/UpgradePrompt'
 
-const MemberActivitySheet = dynamic(
-  () => import('@/app/(dashboard)/_components/team/MemberActivitySheet').then(m => ({ default: m.MemberActivitySheet })),
+const MemberPersonDetailSections = dynamic(
+  () => import('./MemberPersonDetailSections').then(mod => ({ default: mod.MemberPersonDetailSections })),
   { loading: () => null },
 )
 
@@ -336,18 +336,12 @@ export function TeamMemberCard({
                   </a>
                 </div>
               ) : activeTab === 'activity' && isLeader ? (
-                <MemberActivitySheet
-                  embedded
+                <MemberPersonDetailSections
                   workspaceId={ws.workspaceId}
-                  member={{
-                    userId: m.user_id,
-                    fullName: m.full_name,
-                    phone: m.phone,
-                    pipelineHref: m.pipeline_id ? `/pipeline/${m.pipeline_id}` : null,
-                  }}
+                  userId={m.user_id}
+                  memberSeed={m}
                   teamPulseUnlocked={teamPulseUnlocked}
-                  memberIsLeader={m.role === 'leader'}
-                  pipelineTakipCount={m.takip_count ?? 0}
+                  showActionButtons
                 />
               ) : null}
             </div>
