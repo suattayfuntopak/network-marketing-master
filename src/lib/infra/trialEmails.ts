@@ -64,14 +64,14 @@ function planBox(lang: 'tr' | 'en') {
   const pr = DAILY_AI_LIMITS.pro
   return lang === 'en'
     ? emailPlanBox([
-        `<strong>Basic</strong> — ${b} daily AI messages, coach & roleplay`,
-        `<strong>Plus</strong> — Team hub + ${p} daily AI messages`,
-        `<strong>Pro</strong> — ${pr} daily AI messages for growing leaders`,
+        `<strong>Basic</strong> — Full pipeline, calendar & library; ${b} daily AI credits; up to 25 downline`,
+        `<strong>Plus</strong> — Everything in Basic + onboarding tracking; ${p} daily AI; up to 100 downline`,
+        `<strong>Pro</strong> — Everything in Plus + unlimited downline & statistics; ${pr} daily AI`,
       ])
     : emailPlanBox([
-        `<strong>Basic</strong> — Günlük ${b} YZ mesajı, koç ve saha provası`,
-        `<strong>Plus</strong> — Ekibim + günlük ${p} YZ mesajı`,
-        `<strong>Pro</strong> — Büyüyen liderler için günlük ${pr} YZ mesajı`,
+        `<strong>Basic</strong> — Tam liste, takvim ve kütüphane; günlük ${b} YZ; 25 kişiye kadar alt ekip`,
+        `<strong>Plus</strong> — Basic + doğru başlangıç takibi; günlük ${p} YZ; 100 kişiye kadar alt ekip`,
+        `<strong>Pro</strong> — Plus + sınırsız alt ekip ve istatistikler; günlük ${pr} YZ`,
       ])
 }
 

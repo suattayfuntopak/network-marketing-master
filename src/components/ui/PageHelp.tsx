@@ -15,6 +15,9 @@ import { getPageHelp, resolvePageHelpContext } from '@/lib/domain/pageHelp'
  * sarılır — böylece statik prerender sırasında CSR-bailout olmaz; (?) butonu her
  * zaman SSR'de görünür. (Aksi halde tüm dashboard sayfaları prerender'da patlıyordu.)
  */
+export const PAGE_HELP_HEADER_TRIGGER_CLASS =
+  'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]'
+
 export function PageHelp({
   triggerClassName,
   contextKey,

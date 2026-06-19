@@ -23,7 +23,7 @@ const TABS: readonly { key: YazarTab; icon: typeof MessageSquare; labelKey: stri
   { key: 'yazar', icon: MessageSquare, labelKey: 'coachUi.tabMessage', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { key: 'kocluk', icon: HelpCircle, labelKey: 'coachUi.tabCoaching', activeClass: 'bg-[#3730A3] text-white shadow-md' },
   { key: 'prova', icon: Target, labelKey: 'coachUi.tabProva', activeClass: 'bg-amber-600 text-white shadow-md' },
-  { key: 'studyo', icon: PenLine, labelKey: 'coachUi.tabStudyo', activeClass: 'bg-fuchsia-600 text-white shadow-md' },
+  { key: 'studyo', icon: PenLine, labelKey: 'coachUi.tabStudyo', activeClass: 'bg-[#0F6E56] text-white shadow-md' },
   { key: 'uyum', icon: Shield, labelKey: 'coachUi.tabCompliance', activeClass: 'bg-[#C03E1F] text-white shadow-md' },
 ]
 

@@ -2,6 +2,9 @@
 export const PRO_CTA_GRADIENT_ACTIVE_DARK =
   'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:text-white dark:shadow-md dark:shadow-pink-500/15'
 
+/** Ekibim sidebar + sayfa başlık ikonu — Ekip Üyeleri sekmesi ile aynı marka gradyanı. */
+export const EKIP_MODULE_ACCENT_CLASS = `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`
+
 export const PRO_CTA_GRADIENT_ACTIVE_DARK_SM =
   'dark:border-pink-600 dark:bg-gradient-to-r dark:from-pink-600 dark:to-rose-500 dark:shadow-sm dark:shadow-pink-500/15'
 

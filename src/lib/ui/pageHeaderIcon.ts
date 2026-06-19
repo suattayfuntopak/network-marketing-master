@@ -1,8 +1,10 @@
 import { getPanoLauncherColor } from '@/lib/domain/navigation'
 import { crownSolidMap } from '@/components/ui/SquareButton'
+import { EKIP_MODULE_ACCENT_CLASS } from '@/lib/ui/brandGradients'
 
 /** Sayfa başlık ikon kutusu — pano grid + sidebar ile aynı gradient. */
 export function pageHeaderIconClass(href: string): string {
+  if (href === '/ekip') return EKIP_MODULE_ACCENT_CLASS
   const color = getPanoLauncherColor(href)
   if (!color) return 'bg-[var(--bg-subtle)] text-[var(--text-2)]'
   return crownSolidMap[color]

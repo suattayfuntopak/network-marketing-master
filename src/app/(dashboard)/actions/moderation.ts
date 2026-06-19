@@ -12,6 +12,10 @@ import {
 } from '@/lib/domain/moderationDefaults'
 import { buildBilingualRejectReason } from '@/lib/domain/moderationRejectReason'
 import { enrichApprovedModerationData } from '@/lib/domain/moderationApproval'
+import {
+  embedNotificationActionLink,
+  moderationApprovedHref,
+} from '@/lib/domain/moderationNotificationLink'
 import { translateNoteAction } from '@/app/(dashboard)/pipeline/[id]/actions'
 import { extractYoutubeId } from '@/lib/utils/youtubeId'
 
@@ -33,6 +37,7 @@ async function notifyModerationOutcome(
   approved: boolean,
   contentType: ModerationContentType,
   title: string,
+  itemKey?: string,
   reason?: string,
 ): Promise<void> {
   if (!userId) return
@@ -40,17 +45,27 @@ async function notifyModerationOutcome(
   const kindEn = contentType === 'video' ? 'video' : contentType === 'training' ? 'training content' : 'objection'
   const reasonTr = reason ? rejectReasonForEmail(reason, 'tr') : ''
   const reasonEn = reason ? rejectReasonForEmail(reason, 'en') : ''
+  const humanTr = approved
+    ? `"${title}" (${kindTr}) onaylandı ve yayına alındı. Teşekkürler!`
+    : `"${title}" (${kindTr}) bu kez yayınlanmadı.${reasonTr ? ` Gerekçe: ${reasonTr}` : ''}`
+  const humanEn = approved
+    ? `"${title}" (${kindEn}) was approved and published. Thank you!`
+    : `"${title}" (${kindEn}) was not published this time.${reasonEn ? ` Reason: ${reasonEn}` : ''}`
+  const description_tr =
+    approved && itemKey
+      ? embedNotificationActionLink(moderationApprovedHref(contentType, itemKey), humanTr)
+      : humanTr
+  const description_en =
+    approved && itemKey
+      ? embedNotificationActionLink(moderationApprovedHref(contentType, itemKey), humanEn)
+      : humanEn
   try {
     await admin.from('nmm_notifications').insert({
       user_id: userId,
       title_tr: approved ? 'İçerik talebin onaylandı ✅' : 'İçerik talebin onaylanmadı',
       title_en: approved ? 'Your submission was approved ✅' : 'Your submission was not approved',
-      description_tr: approved
-        ? `"${title}" (${kindTr}) onaylandı ve yayına alındı. Teşekkürler!`
-        : `"${title}" (${kindTr}) bu kez yayınlanmadı.${reasonTr ? ` Gerekçe: ${reasonTr}` : ''}`,
-      description_en: approved
-        ? `"${title}" (${kindEn}) was approved and published. Thank you!`
-        : `"${title}" (${kindEn}) was not published this time.${reasonEn ? ` Reason: ${reasonEn}` : ''}`,
+      description_tr,
+      description_en,
       type: 'info',
     })
   } catch (err) {
@@ -368,7 +383,7 @@ export async function approveRequestAction(
         console.error('[Resend Approval Notification Error]', err)
       })
     }
-    await notifyModerationOutcome(admin, row.user_id, true, 'video', title)
+    await notifyModerationOutcome(admin, row.user_id, true, 'video', title, row.key)
 
     return { success: true }
   }
@@ -417,7 +432,7 @@ export async function approveRequestAction(
       console.error('[Resend Approval Notification Error]', err)
     })
   }
-  await notifyModerationOutcome(admin, row.user_id, true, contentType, title)
+  await notifyModerationOutcome(admin, row.user_id, true, contentType, title, row.item_key)
 
   return { success: true }
 }
@@ -475,7 +490,7 @@ export async function rejectRequestAction(
         console.error('[Resend Rejection Email Error]', err)
       })
     }
-    await notifyModerationOutcome(admin, row?.user_id, false, 'video', row?.title_tr ?? 'İsimsiz Video', reason)
+    await notifyModerationOutcome(admin, row?.user_id, false, 'video', row?.title_tr ?? 'İsimsiz Video', undefined, reason)
 
     return { success: true }
   }
@@ -513,7 +528,7 @@ export async function rejectRequestAction(
         console.error('[Resend Rejection Email Error]', err)
       })
     }
-    await notifyModerationOutcome(admin, row.user_id, false, contentType, title, reason)
+    await notifyModerationOutcome(admin, row.user_id, false, contentType, title, undefined, reason)
   }
 
   return { success: true }

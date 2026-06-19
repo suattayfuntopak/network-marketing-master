@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 
 interface DashboardPageHeaderProps {
   title: React.ReactNode
@@ -53,13 +53,13 @@ export function DashboardPageHeader({
         </div>
       </div>
       <div className="flex shrink-0 flex-row items-center gap-2">
+        {showHelp && <PageHelp triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />}
         {dateLine && (
           <p className="shrink-0 text-right text-xs font-medium tracking-wide text-[var(--text-3)] sm:text-sm">
             {dateLine}
           </p>
         )}
         {actions}
-        {showHelp && <PageHelp />}
       </div>
     </header>
   )

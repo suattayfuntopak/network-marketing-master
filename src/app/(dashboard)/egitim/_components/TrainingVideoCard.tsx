@@ -15,6 +15,7 @@ import {
 import { VIDEO_COMPLETE_PERCENT, type VideoProgressRow } from '@/lib/domain/videoProgress'
 import { WhatsAppShareButton } from '@/components/ui/WhatsAppShareButton'
 import { reportVideoWatchAction } from '@/app/(dashboard)/egitim/videoActions'
+import { MODERATION_HIGHLIGHT_CLASS } from '@/lib/ui/moderationHighlight'
 
 type Props = {
   video: TrainingVideoDef
@@ -22,6 +23,7 @@ type Props = {
   progress?: VideoProgressRow
   onProgressChange: () => void
   isAdmin?: boolean
+  highlighted?: boolean
   onEdit?: () => void
   onDelete?: () => void
 }
@@ -73,7 +75,7 @@ function loadYouTubeApi(): Promise<YTNamespace> {
   return ytApiPromise
 }
 
-export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, onEdit, onDelete }: Props) {
+export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, highlighted = false, onEdit, onDelete }: Props) {
   const { lang, t } = useTranslation()
   const [showEmbed, setShowEmbed] = useState(false)
   const [localPct, setLocalPct] = useState(0)
@@ -165,7 +167,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
 
   return (
     <>
-      <article className="relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
+      <article className={`relative flex h-full min-h-[240px] flex-col overflow-hidden rounded-2xl border bg-[var(--bg-card)] ${highlighted ? MODERATION_HIGHLIGHT_CLASS : 'border-[var(--border)]'}`}>
         <div className={`absolute right-2.5 top-2.5 ${Z.cardControls} flex items-center gap-1`}>
           {/* Herkese açık: bu videoyu bir kişiye WhatsApp ile öner (en solda) */}
           <WhatsAppShareButton

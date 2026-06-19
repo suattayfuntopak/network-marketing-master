@@ -4,11 +4,13 @@ import { Check, CheckCircle2, ChevronDown, Circle, Clock, Copy, Pencil, Star, Tr
 import { useTranslation } from '@/providers/LanguageProvider'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { SEVIYE_RENK, getTrainingCategoryStyles } from '../constants'
+import { MODERATION_HIGHLIGHT_CLASS } from '@/lib/ui/moderationHighlight'
 import type { TrainingTopic } from '../types'
 
 type Props = {
   konu: TrainingTopic
   acik: boolean
+  highlighted?: boolean
   isFav: boolean
   isRead: boolean
   copied: boolean
@@ -23,6 +25,7 @@ type Props = {
 export function TrainingCard({
   konu,
   acik,
+  highlighted = false,
   isFav,
   isRead,
   copied,
@@ -47,7 +50,9 @@ export function TrainingCard({
     <li id={`konu-${konu.id}`}>
       <div
         className={`rounded-2xl border transition-all duration-200 ${
-          acik
+          highlighted
+            ? MODERATION_HIGHLIGHT_CLASS
+            : acik
             ? `${catBorderColorActive} bg-[var(--bg-card)] shadow-md`
             : `border-[var(--border)] bg-[var(--bg-card)] ${catBorderColorHover} hover:shadow-sm`
         }`}

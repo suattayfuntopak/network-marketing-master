@@ -13,7 +13,7 @@ import { CandidateCard } from './CandidateCard'
 import { AddCandidateSheet } from './AddCandidateSheet'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { clsx } from 'clsx'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 const STAGE_PARAM_FILTERS: CandidateFilter[] = [
@@ -99,7 +99,7 @@ export function PipelinePageContent() {
           <h1 className="text-xl font-bold text-[var(--text-1)]">{t('nav.pipeline')}</h1>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <PageHelp />
+          <PageHelp triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />
           <button
             onClick={() => setSheetOpen(true)}
             className="flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#453DA0] dark:bg-[#5D44C9] dark:hover:bg-[#4a38b0] active:scale-95 shadow-md"

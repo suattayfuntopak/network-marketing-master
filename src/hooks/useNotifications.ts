@@ -13,7 +13,8 @@ import {
 } from '@/app/(dashboard)/actions/notifications'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { isNotificationSoundEnabled } from '@/lib/ui/notificationPrefsStorage'
-import { isTeamJoinNotification, isTrialUpgradeNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { isTeamJoinNotification, isTrialUpgradeNotification, isModerationApprovalNotification, notificationTargetHref } from '@/lib/domain/notificationRoutes'
+import { parseNotificationDescription } from '@/lib/domain/moderationNotificationLink'
 import { trialNotificationPhase } from '@/lib/domain/trialLifecycle'
 import { logSeePlansClick } from '@/lib/domain/seePlansAnalytics'
 import { queryKeys } from '@/lib/query/keys'
@@ -74,12 +75,15 @@ export function useNotifications(options?: { enabled?: boolean }) {
 
             // 3. Show stunning interactive toast notification
             const title = lang === 'en' ? newNotif.title_en : newNotif.title_tr
-            const description = lang === 'en' ? newNotif.description_en : newNotif.description_tr
+            const rawDescription = lang === 'en' ? newNotif.description_en : newNotif.description_tr
+            const description = parseNotificationDescription(rawDescription).text
             const targetHref = notificationTargetHref({
               type: newNotif.type,
               candidate_id: newNotif.candidate_id,
               title_tr: newNotif.title_tr,
               title_en: newNotif.title_en,
+              description_en: newNotif.description_en,
+              description_tr: newNotif.description_tr,
             })
             const actionLabel = newNotif.candidate_id
               ? t('pagesUi.viewInPipeline')
@@ -87,7 +91,9 @@ export function useNotifications(options?: { enabled?: boolean }) {
                 ? t('pagesUi.viewDailySummary')
                 : isTrialUpgradeNotification(newNotif)
                   ? t('shellUi.seePlansCta')
-                  : t('shellUi.view')
+                  : isModerationApprovalNotification(newNotif)
+                    ? t('pagesUi.viewApprovedContent')
+                    : t('shellUi.view')
 
             const navigateFromToast = () => {
               if (isTrialUpgradeNotification(newNotif)) {

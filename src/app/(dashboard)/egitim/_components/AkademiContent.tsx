@@ -13,7 +13,7 @@ import { ItirazlarContent } from '@/app/(dashboard)/itirazlar/_components/Itiraz
 import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
 export function AkademiContent() {
@@ -97,7 +97,7 @@ export function AkademiContent() {
             </h1>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <PageHelp />
+            <PageHelp triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />
             {addButton}
           </div>
         </div>

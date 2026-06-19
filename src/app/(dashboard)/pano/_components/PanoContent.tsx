@@ -59,7 +59,7 @@ export function PanoContent() {
             </h1>
           )}
           <div className="flex items-center gap-2 shrink-0">
-            <PageHelp />
+            <PageHelp triggerClassName="hidden sm:flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]" />
             <p className="shrink-0 text-right text-sm font-medium tracking-wide text-[var(--text-3)] md:text-[15px]">
               <span className="md:hidden">{todayLineShort}</span>
               <span className="hidden md:inline">{todayLineLong}</span>

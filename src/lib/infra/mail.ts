@@ -402,10 +402,10 @@ export async function sendModerationApprovedEmail(
 
   const directLink =
     contentType === 'training'
-      ? `${NMM_APP_URL}/egitim?id=${itemKey}`
+      ? `${NMM_APP_URL}/egitim?tab=training&id=${encodeURIComponent(itemKey)}&highlight=1`
       : contentType === 'video'
-        ? `${NMM_APP_URL}/egitim?tab=videos`
-        : `${NMM_APP_URL}/egitim?tab=objections&id=${itemKey}`
+        ? `${NMM_APP_URL}/egitim?tab=videos&highlight=${encodeURIComponent(itemKey)}`
+        : `${NMM_APP_URL}/egitim?tab=objections&id=${encodeURIComponent(itemKey)}&highlight=1`
 
   const content = lang === 'en'
     ? [

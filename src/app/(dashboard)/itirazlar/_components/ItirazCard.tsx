@@ -3,6 +3,7 @@
 import { Check, CheckCircle2, ChevronDown, Circle, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
+import { MODERATION_HIGHLIGHT_CLASS } from '@/lib/ui/moderationHighlight'
 import type { Itiraz } from '../types'
 
 function buildCopyValue(
@@ -24,6 +25,7 @@ function buildCopyValue(
 type Props = {
   itiraz: Itiraz
   acik: boolean
+  highlighted?: boolean
   isFav: boolean
   isRead: boolean
   copied: boolean
@@ -38,6 +40,7 @@ type Props = {
 export function ItirazCard({
   itiraz,
   acik,
+  highlighted = false,
   isFav,
   isRead,
   copied,
@@ -75,7 +78,9 @@ export function ItirazCard({
     <li id={`konu-${itiraz.id}`}>
       <div
         className={`rounded-2xl border transition-all duration-200 ${
-          acik
+          highlighted
+            ? MODERATION_HIGHLIGHT_CLASS
+            : acik
             ? 'border-[#16A34A]/30 dark:border-[#fda4af]/30 bg-[var(--bg-card)] shadow-md'
             : 'border-[var(--border)] bg-[var(--bg-card)] hover:border-[#16A34A]/30 dark:hover:border-[#fda4af]/30 hover:shadow-sm'
         }`}

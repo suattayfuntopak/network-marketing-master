@@ -6,7 +6,7 @@ import { ArrowLeft, RefreshCw, type LucideIcon } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { ReactNode } from 'react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import { PageHelp } from '@/components/ui/PageHelp'
+import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 
 type HubPageShellProps = {
   title: string
@@ -118,7 +118,7 @@ export function HubPageShell({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <PageHelp contextKey={helpContext} />
+            <PageHelp contextKey={helpContext} triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />
             {showRefresh ? (
               <button
                 type="button"

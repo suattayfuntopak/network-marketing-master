@@ -51,6 +51,7 @@ export function EgitimContent({
   const [page, setPage] = useState(1)
   const [acikId, setAcikId] = useState<string | null>(null)
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null)
+  const [flashId, setFlashId] = useState<string | null>(null)
 
   const {
     readTrainings: read,
@@ -200,6 +201,9 @@ export function EgitimContent({
         /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setPage(targetPage)
         setAcikId(topicId)
+        if (searchParams.get('highlight') === '1') {
+          setFlashId(topicId)
+        }
         setTimeout(() => {
           const el = document.getElementById(`konu-${topicId}`)
           el?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -441,6 +445,7 @@ export function EgitimContent({
                 key={konu.id}
                 konu={konu}
                 acik={acikId === konu.id}
+                highlighted={flashId === konu.id}
                 isFav={favs.has(konu.id)}
                 isRead={read.has(konu.id)}
                 copied={copiedId === konu.id}

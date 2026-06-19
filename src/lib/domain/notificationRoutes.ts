@@ -1,11 +1,17 @@
 import type { NotificationType } from '@/types/database.types'
 import { ODEME_PLANS_PATH } from '@/lib/domain/paymentRoutes'
+import {
+  isModerationApprovalNotification,
+  parseNotificationDescription,
+} from '@/lib/domain/moderationNotificationLink'
 
 type NotificationRouteInput = {
   type: NotificationType
   candidate_id?: string | null
   title_tr?: string | null
   title_en?: string | null
+  description_en?: string | null
+  description_tr?: string | null
 }
 
 /** Davet kabulü / yeni ortak bildirimi → günlük huni özeti. */
@@ -31,6 +37,11 @@ export function isTrialUpgradeNotification(n: Pick<NotificationRouteInput, 'titl
 
 /** Bildirim toast/modal tıklamasında gidilecek rota. */
 export function notificationTargetHref(n: NotificationRouteInput): string {
+  const embedded =
+    parseNotificationDescription(n.description_en ?? '').href ??
+    parseNotificationDescription(n.description_tr ?? '').href
+  if (embedded) return embedded
+
   if (n.candidate_id) return `/pipeline/${n.candidate_id}`
 
   if (isTeamJoinNotification(n)) return '/saha-ozetim?tab=daily'
@@ -48,3 +59,5 @@ export function notificationTargetHref(n: NotificationRouteInput): string {
 
   return routeByType[n.type] ?? '/pano'
 }
+
+export { isModerationApprovalNotification }

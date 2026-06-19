@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useMemo, useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowLeft, Film, Plus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -31,12 +32,14 @@ export function VideolarContent({
   onAddFormOpenChange?: (open: boolean) => void
 }) {
   const { lang, t } = useTranslation()
+  const searchParams = useSearchParams()
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const isAdmin = !!ws?.isSuperAdmin
   const [internalModalOpen, setInternalModalOpen] = useState(false)
   const modalOpen = addFormOpenProp ?? internalModalOpen
   const setModalOpen = onAddFormOpenChange ?? setInternalModalOpen
+  const [flashKey, setFlashKey] = useState<string | null>(null)
 
   const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
   useEffect(() => {
@@ -62,6 +65,19 @@ export function VideolarContent({
     const start = activePage * PAGE_SIZE
     return vids.slice(start, start + PAGE_SIZE)
   }, [data?.videos, activePage])
+
+  useEffect(() => {
+    const highlightKey = searchParams.get('highlight')
+    if (!highlightKey || !data?.videos?.length) return
+    const idx = data.videos.findIndex(v => v.key === highlightKey)
+    if (idx === -1) return
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setPage(Math.floor(idx / PAGE_SIZE))
+    setFlashKey(highlightKey)
+    setTimeout(() => {
+      document.getElementById(`video-${highlightKey}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }, 300)
+  }, [searchParams, data?.videos])
 
   const invalidate = () => {
     qc.invalidateQueries({ queryKey: queryKeys.videoCatalog(ws?.workspaceId ?? '') })
@@ -135,9 +151,10 @@ export function VideolarContent({
         <>
           <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {pageVideos.map(video => (
-              <li key={video.key} className="min-h-[240px]">
+              <li key={video.key} id={`video-${video.key}`} className="min-h-[240px]">
                 <TrainingVideoCard
                   video={video}
+                  highlighted={flashKey === video.key}
                   workspaceId={ws.workspaceId}
                   progress={data!.progressByKey[video.key]}
                   onProgressChange={invalidate}

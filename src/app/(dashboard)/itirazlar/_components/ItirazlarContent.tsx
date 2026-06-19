@@ -42,6 +42,7 @@ export function ItirazlarContent({
 
   const [search, setSearch] = useState('')
   const [acikId, setAcikId] = useState<number | null>(null)
+  const [flashId, setFlashId] = useState<number | null>(null)
   const [aktifKategori, setAktifKategori] = useState(0)
   const [copiedId, setCopiedId] = useState<number | null>(null)
   const [page, setPage] = useState(1)
@@ -171,6 +172,9 @@ export function ItirazlarContent({
     /* eslint-disable-next-line react-hooks/set-state-in-effect */
     setPage(Math.floor(idx / PAGE_SIZE) + 1)
     setAcikId(topicId)
+    if (searchParams.get('highlight') === '1') {
+      setFlashId(topicId)
+    }
     setTimeout(() => {
       document.getElementById(`konu-${topicId}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }, 300)
@@ -329,6 +333,7 @@ export function ItirazlarContent({
                 key={itiraz.id}
                 itiraz={itiraz}
                 acik={acikId === itiraz.id}
+                highlighted={flashId === itiraz.id}
                 isFav={favs.has(itiraz.id)}
                 isRead={read.has(itiraz.id)}
                 copied={copiedId === itiraz.id}
