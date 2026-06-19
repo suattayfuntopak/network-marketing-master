@@ -157,6 +157,9 @@ function TemplateEditor({
 
       {open && (
         <div className="space-y-3 px-4 pb-4">
+          <p className="text-xs leading-relaxed text-[var(--text-3)]">
+            {t('team.memberDetailTemplateIntro')}
+          </p>
           {(
             [
               { key: 'active' as ActivityLevel, label: t('team.memberDetailTemplateActive'), val: active, set: setActive },
@@ -247,8 +250,8 @@ export function MemberDetailPage({ userId }: { userId: string }) {
   return (
     <>
       {UpgradePrompt}
-      <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-        <div className="mx-auto w-full max-w-lg space-y-5">
+      <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
+        <div className="w-full max-w-full min-w-0 space-y-5">
 
           {/* Geri + Başlık */}
           <div className="flex items-center gap-3">
