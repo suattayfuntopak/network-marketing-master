@@ -314,6 +314,7 @@ export function MemberActionButtons({
   generating,
   hasAiFieldAccess,
   onCoaching,
+  variant = 'profile',
 }: {
   t: ReturnType<typeof useTranslation>['t']
   wa: string | null
@@ -321,24 +322,42 @@ export function MemberActionButtons({
   generating: boolean
   hasAiFieldAccess: boolean
   onCoaching: () => void
+  /** Ekip kartı aktivite sekmesi — mobilde tam genişlik pano rose CTA */
+  variant?: 'profile' | 'card-tab'
 }) {
+  const cardTab = variant === 'card-tab'
   return (
-    <div className="flex items-center justify-start gap-2">
+    <div className={clsx('flex items-center justify-start gap-2', cardTab && 'w-full md:w-auto')}>
       <button
         type="button"
         onClick={onCoaching}
         disabled={generating}
-        className="relative flex h-10 items-center gap-2 rounded-xl bg-brand-subtle px-3 text-brand text-xs font-semibold transition hover:scale-[1.02] hover:shadow-md disabled:opacity-50 active:scale-95"
+        className={clsx(
+          'relative flex h-10 items-center gap-2 rounded-xl text-xs font-semibold transition disabled:opacity-50 active:scale-95',
+          cardTab
+            ? [
+                'w-full justify-center px-4 md:w-auto md:justify-start md:px-3',
+                'max-md:bg-gradient-to-br max-md:from-[#FF5252] max-md:to-[#D81B60] max-md:text-white max-md:shadow-md max-md:hover:brightness-105',
+                'md:bg-brand-subtle md:text-brand md:hover:scale-[1.02] md:hover:shadow-md',
+              ]
+            : 'bg-brand-subtle px-3 text-brand hover:scale-[1.02] hover:shadow-md',
+        )}
         title={t('team.memberDetailCoachCta')}
       >
         {generating ? (
-          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
+          <div className={clsx(
+            'h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-transparent',
+            cardTab ? 'max-md:border-white md:border-brand' : 'border-brand',
+          )} />
         ) : (
           <Bot className="h-4 w-4 shrink-0" strokeWidth={1.75} />
         )}
         {t('team.memberDetailCoachCta')}
         {!hasAiFieldAccess && (
-          <Lock className="h-2.5 w-2.5 shrink-0" strokeWidth={2.5} />
+          <Lock
+            className={clsx('h-2.5 w-2.5 shrink-0', cardTab ? 'max-md:text-white/90 md:text-brand' : '')}
+            strokeWidth={2.5}
+          />
         )}
       </button>
       {wa && (
@@ -347,14 +366,17 @@ export function MemberActionButtons({
           target="_blank"
           rel="noopener noreferrer"
           onClick={e => e.stopPropagation()}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md"
+          className={clsx(
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-whatsapp text-white transition hover:scale-105 hover:shadow-md',
+            cardTab && 'hidden md:flex',
+          )}
           aria-label="WhatsApp"
           title="WhatsApp"
         >
           <WhatsAppIcon className="h-4 w-4" />
         </a>
       )}
-      {phone && (
+      {phone && !cardTab && (
         <a
           href={`tel:${phone}`}
           onClick={e => e.stopPropagation()}
@@ -398,12 +420,6 @@ export function MemberPersonDetailSections({
 
   const m = data?.member ?? memberSeed
   const wa = m.phone ? waHref(m.phone) : null
-  const days = daysSinceActivity(m.last_activity_at)
-  const lastActiveStr = days === null
-    ? t('crown.sahaRadarNeverActive')
-    : days === 0
-      ? t('crown.sahaRadarToday')
-      : t('crown.sahaRadarDaysAgo', { count: days })
   const completedSteps = (m.onboarding_steps ?? []).length
   const totalSteps = ONBOARDING_STEPS.length
   const displayName = data?.member?.full_name ?? memberSeed.full_name
@@ -420,6 +436,7 @@ export function MemberPersonDetailSections({
             generating={coaching.generating}
             hasAiFieldAccess={coaching.hasAiFieldAccess}
             onCoaching={coaching.handleCoachingAI}
+            variant="card-tab"
           />
         )}
 
@@ -453,32 +470,6 @@ export function MemberPersonDetailSections({
           </div>
         ) : data?.hasAccess ? (
           <>
-            <div className="space-y-2">
-              <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
-                {t('team.memberDetailWeekTitle')}
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
-                  <p className="text-xl font-bold text-[var(--text-1)]">{data.weeklyActivity.calls}</p>
-                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('team.memberDetailWeeklyCalls')}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
-                  <p className="text-xl font-bold text-[var(--text-1)]">{data.weeklyActivity.whatsapps}</p>
-                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('team.memberDetailWeeklyWA')}
-                  </p>
-                </div>
-                <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] px-3 py-3 text-center">
-                  <p className="text-sm font-bold text-[var(--text-1)] leading-tight">{lastActiveStr}</p>
-                  <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--text-3)]">
-                    {t('team.memberDetailLastActive')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {data.memberGoal && (
               <div className="space-y-2">
                 <p className="text-xs font-bold uppercase tracking-wide text-[var(--text-3)]">
