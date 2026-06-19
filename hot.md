@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-19 — Dead-code 2. tur: yetim tipler + gstack upgrade 🧹⬆️✅
+
+### Özet
+Önceki turun "sonraki tur" notuna bırakılan 3 yetim tip temizlendi + gstack 1.55.0.0 → 1.58.3.0 yükseltildi.
+
+### Temizlenen tipler (hepsi 0 tüketici — main + 3 worktree + test doğrulandı)
+- **`HubSummaryTab`** (`HubSummaryTabBar.tsx`) — `@deprecated` "kept for field summary imports" diyordu ama importeri kalmamıştı; stale.
+- **`ProgressData`** (`useProgressSync.ts`) — interface, hiç tüketilmiyordu.
+- **`LeaderNoteAction`** (`dailyActionNote.ts`) — `Pick<NmmDailyAction,...>`; silince `NmmDailyAction` import'u yetim kaldı, onu da import'tan düşürdüm (lint --max-warnings 0 yakaladı, düzeltildi).
+
+### knip son durum
+unused **files 0 · exports 18 · types 0 · duplicate 1**. Kalan 18 export + 1 duplicate **bilinçli tutulanlar** (CLAUDE.md whitelist + `navigation.ts` config). knip artık temiz sayılır.
+
+### gstack upgrade
+1.55.0.0 → **1.58.3.0**. Migration 1.58.0.0 çalıştı. Öne çıkanlar: GBrowser "Layer C" anti-detection (varsayılan açık), hermetik E2E ortamı (local eval = CI sinyali), `/diagram` skill'i + make-pdf mermaid/excalidraw + HTML/Word çıktı.
+
+### Doğrulama
+`tsc` ✓ · `eslint --max-warnings 0` ✓ · `next build` ✓ · `vitest` 342/342 ✓
+
+### Değişen dosyalar
+- `src/components/hub/HubSummaryTabBar.tsx`, `src/hooks/useProgressSync.ts`, `src/lib/domain/dailyActionNote.ts`
+
+---
+
 ## 2026-06-19 — /health taraması + dead-code temizliği 🧹✅
 
 ### Özet

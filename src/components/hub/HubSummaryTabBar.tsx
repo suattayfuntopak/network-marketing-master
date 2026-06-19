@@ -18,9 +18,6 @@ import {
 export { HUB_PERIOD_TABS, parseSummaryTab, HUB_PERIOD_TAB_LABEL_KEYS, hubPeriodTabLabel }
 export type { HubPeriodTab }
 
-/** @deprecated Use HubPeriodTab — kept for field summary imports */
-export type HubSummaryTab = HubPeriodTab
-
 const HUB_TAB_PANO_COLORS: Record<HubPeriodTab, ButtonColor> = {
   daily: 'indigo',
   weekly: 'teal',

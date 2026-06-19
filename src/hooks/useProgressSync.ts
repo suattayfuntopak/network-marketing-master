@@ -12,13 +12,6 @@ import { useWorkspace } from './useWorkspace'
 import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 
-export interface ProgressData {
-  readTrainings: string[]
-  favTrainings: string[]
-  readObjections: number[]
-  favObjections: number[]
-}
-
 const BASE = {
   readTraining: 'nmm_egitim_read',
   favTraining: 'nmm_egitim_favori',

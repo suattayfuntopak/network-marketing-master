@@ -1,4 +1,4 @@
-import type { NmmDailyAction, NmmDailyActionInsert } from '@/types/database.types'
+import type { NmmDailyActionInsert } from '@/types/database.types'
 import { formatSimpleNote, parseSimpleNote } from '@/lib/utils/noteParser'
 
 export interface ResolvedDailyActionNote {
@@ -89,11 +89,6 @@ export function mergeDailyActionNoteUpdate(
 export function parseBilingualText(raw: string | null): { tr: string; en: string } {
   return parseSimpleNote(raw)
 }
-
-export type LeaderNoteAction = Pick<
-  NmmDailyAction,
-  'id' | 'note' | 'note_tr' | 'note_en' | 'created_at' | 'action_type'
->
 
 /** WhatsApp sunum materyali gönderimi — aktivite geçmişi + YZ bağlamı. */
 export const WHATSAPP_PRESENTATION_NOTE = 'whatsapp:presentation'
