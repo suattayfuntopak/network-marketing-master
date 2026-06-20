@@ -12,6 +12,7 @@ import {
   getHubMonthlyInsightsAction,
   getHubMonthlySelfAction,
   getHubWeeklySelfAction,
+  getHubAllTimeSelfAction,
 } from '@/app/(dashboard)/crown/hubSelfActions'
 import { getCrownSahaRadarAction } from '@/app/(dashboard)/saha-radar/actions'
 import { getGoalDashboardAction } from '@/app/(dashboard)/hedef/actions'
@@ -147,6 +148,16 @@ export async function prefetchHubMetrics(
       queryClient.prefetchQuery({
         queryKey: queryKeys.hubYearlySelf(offset),
         queryFn: () => getHubYearlySelfAction(offset),
+        staleTime: QUERY_STALE.metrics,
+      }),
+    )
+  }
+  if (activeTab === 'all') {
+    hubSelfPrefetchCount += 1
+    tasks.push(
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.hubAllTimeSelf(),
+        queryFn: () => getHubAllTimeSelfAction(),
         staleTime: QUERY_STALE.metrics,
       }),
     )

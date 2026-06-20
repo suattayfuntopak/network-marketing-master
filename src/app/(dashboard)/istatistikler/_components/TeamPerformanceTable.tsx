@@ -49,9 +49,37 @@ function VideoPctCell({
   return <span className="font-bold tabular-nums">%{pct}</span>
 }
 
-function PctCell({ value, show }: { value: number; show: boolean }) {
+function PctCell({
+  value,
+  show,
+  pulseLocked = false,
+}: {
+  value: number
+  show: boolean
+  pulseLocked?: boolean
+}) {
+  const { t } = useTranslation()
   if (!show) return <span className="text-[var(--text-3)]">—</span>
+  if (pulseLocked) {
+    return (
+      <span className="inline-flex items-center gap-1 text-[var(--text-3)]" title={t('pulse.proGateTitle')}>
+        <Lock className="h-3 w-3" />
+        —
+      </span>
+    )
+  }
   return <span className="font-bold tabular-nums">%{value}</span>
+}
+
+function PulseColHeader({ label, pulseLocked }: { label: string; pulseLocked: boolean }) {
+  const { t } = useTranslation()
+  if (!pulseLocked) return <>{label}</>
+  return (
+    <span className="inline-flex items-center justify-center gap-1" title={t('pulse.proGateTitle')}>
+      <Lock className="h-3 w-3 shrink-0" />
+      {label}
+    </span>
+  )
 }
 
 /** Dark-theme readable accent text for colored table cells */
@@ -138,9 +166,15 @@ export function TeamPerformanceTable({
                 <th className={`p-3 font-semibold text-center align-middle bg-purple-50/20 dark:bg-purple-950/5 ${COL.purple} whitespace-nowrap`}>
                   {t('statsPage.colDqsg')}
                 </th>
-                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>{t('pulse.colTraining')}</th>
-                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>{t('pulse.colVideos')}</th>
-                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>{t('pulse.colObjections')}</th>
+                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>
+                  <PulseColHeader label={t('pulse.colTraining')} pulseLocked={teamPulseLocked} />
+                </th>
+                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>
+                  <PulseColHeader label={t('pulse.colVideos')} pulseLocked={teamPulseLocked} />
+                </th>
+                <th className={`p-3 font-semibold text-center align-middle bg-teal-50/20 dark:bg-teal-950/5 ${COL.teal} whitespace-nowrap`}>
+                  <PulseColHeader label={t('pulse.colObjections')} pulseLocked={teamPulseLocked} />
+                </th>
                 <th className="p-3 font-semibold text-right align-middle">{t('statsPage.colLastActive')}</th>
               </tr>
             </thead>
@@ -200,7 +234,11 @@ export function TeamPerformanceTable({
                     <td className={`p-3 text-center tabular-nums align-middle bg-emerald-50/10 dark:bg-emerald-950/5 ${COL.emerald} font-black`}>{isAppUser ? m.katildi_count : '—'}</td>
                     <td className={`p-3 text-center tabular-nums align-middle bg-purple-50/10 dark:bg-purple-950/5 ${COL.purple} font-black`}>{isAppUser ? `%${onboardingPct}` : '—'}</td>
                     <td className="p-3 text-center align-middle bg-teal-50/10 dark:bg-teal-950/5">
-                      <PctCell value={progressByUserId[m.user_id]?.trainingPct ?? 0} show={isAppUser} />
+                      <PctCell
+                        value={progressByUserId[m.user_id]?.trainingPct ?? 0}
+                        show={isAppUser}
+                        pulseLocked={teamPulseLocked}
+                      />
                     </td>
                     <td className="p-3 text-center align-middle bg-teal-50/10 dark:bg-teal-950/5">
                       <VideoPctCell
@@ -210,7 +248,11 @@ export function TeamPerformanceTable({
                       />
                     </td>
                     <td className="p-3 text-center align-middle bg-teal-50/10 dark:bg-teal-950/5">
-                      <PctCell value={progressByUserId[m.user_id]?.objectionPct ?? 0} show={isAppUser} />
+                      <PctCell
+                        value={progressByUserId[m.user_id]?.objectionPct ?? 0}
+                        show={isAppUser}
+                        pulseLocked={teamPulseLocked}
+                      />
                     </td>
                     <td className="p-3 text-right text-sm text-[var(--text-2)] font-medium truncate align-middle">
                       {lastActive ? lastActive.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) : '—'}
@@ -231,9 +273,15 @@ export function TeamPerformanceTable({
                   <td className={`p-3 text-center tabular-nums align-middle ${COL.amber}`}>{totals.takip}</td>
                   <td className={`p-3 text-center tabular-nums align-middle ${COL.emerald}`}>{totals.katildi}</td>
                   <td className="p-3 text-center text-[var(--text-3)] align-middle">—</td>
-                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>%{totals.trainingAvg}</td>
-                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>%{totals.videoAvg}</td>
-                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>%{totals.objectionAvg}</td>
+                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>
+                    <PctCell value={totals.trainingAvg} show pulseLocked={teamPulseLocked} />
+                  </td>
+                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>
+                    <PctCell value={totals.videoAvg} show pulseLocked={teamPulseLocked} />
+                  </td>
+                  <td className={`p-3 text-center tabular-nums align-middle ${COL.teal}`}>
+                    <PctCell value={totals.objectionAvg} show pulseLocked={teamPulseLocked} />
+                  </td>
                   <td className="p-3 text-right text-[var(--text-3)] align-middle">—</td>
                 </tr>
               )}

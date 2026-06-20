@@ -323,6 +323,7 @@ export const tr = {
     title: "Ekibim",
     tabMembers: "Ekip Üyeleri",
     tabSummary: "Saha Özeti",
+    fieldPulseTitle: "Ekip Saha Nabzı",
     tabTraining: "Eğitim İlerlemesi",
     tabTree: "Ekip Ağacı",
     trainingEmpty: "Henüz eğitim ilerlemesi gösterilecek ekip üyesi yok.",
