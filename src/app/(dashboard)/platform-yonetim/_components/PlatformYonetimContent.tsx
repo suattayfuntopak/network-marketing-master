@@ -317,28 +317,8 @@ export function PlatformYonetimContent() {
           pendingCount={pendingRequests.length}
         />
 
-        {/* Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol — istatistiklerden taşındı,
-            üst grid kutuları ile Büyüme & Yayılma arasında. */}
-        <StatsSuperAdminSections />
-
-        <PlatformViralKpi kpi={viralKpi} isLoading={viralKpiLoading} />
-
-        <PlatformProductFunnel funnel={productFunnel} isLoading={productFunnelLoading} />
-
-        <PlatformAiUsageAnalytics analytics={aiUsage} isLoading={aiUsageLoading} />
-
-        {independentMembers.length > 0 && (
-          <PlatformIndependentSection
-            inviteCode={inviteCode}
-            independentMembers={independentMembers}
-            addingId={addingId}
-            addedIds={addedIds}
-            claimingId={claimingId}
-            onAddAsCandidate={handleAddAsCandidate}
-            onClaimToTeam={handleClaimToTeam}
-          />
-        )}
-
+        {/* Kullanıcı ve Lisans Listesi — üst grid kutuları ile Ekip & Dış Kaynak YZ
+            tablosu arasına taşındı (arama kutusu tablonun filtresi, birlikte taşındı). */}
         <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--text-3)]" />
           <input
@@ -360,6 +340,28 @@ export function PlatformYonetimContent() {
           onDeleteUser={handleDeleteUser}
           onCancelDelete={handleCancelDeleteUser}
         />
+
+        {/* Dış Kayıtlar — Kullanıcı ve Lisans Listesi'nin hemen altında. */}
+        {independentMembers.length > 0 && (
+          <PlatformIndependentSection
+            inviteCode={inviteCode}
+            independentMembers={independentMembers}
+            addingId={addingId}
+            addedIds={addedIds}
+            claimingId={claimingId}
+            onAddAsCandidate={handleAddAsCandidate}
+            onClaimToTeam={handleClaimToTeam}
+          />
+        )}
+
+        {/* Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol — istatistiklerden taşındı. */}
+        <StatsSuperAdminSections />
+
+        <PlatformViralKpi kpi={viralKpi} isLoading={viralKpiLoading} />
+
+        <PlatformProductFunnel funnel={productFunnel} isLoading={productFunnelLoading} />
+
+        <PlatformAiUsageAnalytics analytics={aiUsage} isLoading={aiUsageLoading} />
 
         <PlatformModerationDesk
           pendingRequests={pendingRequests}
