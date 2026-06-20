@@ -269,7 +269,7 @@ export function ProvaForm() {
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { isSuperAdmin, aiUsed, dailyLimit } = useAILimits()
+  const { isSuperAdmin, aiUsed, dailyLimit, limitReached } = useAILimits()
   const isProEngine = ws?.effectiveLicenseType === 'pro'
 
   const evaluatedScores = messages
@@ -313,6 +313,7 @@ export function ProvaForm() {
   async function handleSend(e: React.FormEvent) {
     e.preventDefault()
     if (!hasAiCoachAccess) { openUpgrade('ai_coach'); return }
+    if (limitReached) { openUpgrade('ai_coach'); return }
     if (!inputValue.trim() || isPending || !activeScenario) return
 
     const userMessage = inputValue.trim()

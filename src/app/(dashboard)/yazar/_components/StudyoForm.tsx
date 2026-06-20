@@ -58,7 +58,7 @@ export function StudyoForm() {
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { isSuperAdmin, aiUsed, dailyLimit } = useAILimits()
+  const { isSuperAdmin, aiUsed, dailyLimit, limitReached } = useAILimits()
 
   const [goal, setGoal] = useState<SocialGoal>('urun')
   const [platform, setPlatform] = useState<SocialPlatform>('instagram')
@@ -106,6 +106,7 @@ export function StudyoForm() {
 
   async function generate() {
     if (!hasAiCoachAccess) { openUpgrade('ai_coach'); return }
+    if (limitReached) { openUpgrade('ai_coach'); return }
     if (isPending) return
     setIsPending(true)
     try {
