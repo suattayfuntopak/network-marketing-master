@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import { useQuery } from '@tanstack/react-query'
 import { BarChart3 } from 'lucide-react'
@@ -13,6 +13,7 @@ import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
 import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
+import { matchUnlinkedKatildiCandidates } from '@/lib/domain/sahaPartners'
 import { buildCandidateTrendBars } from '@/lib/domain/trendBuckets'
 import { StatsKpiCards } from './StatsKpiCards'
 import { StatsFieldFunnelSection } from './StatsFieldFunnelSection'
@@ -34,19 +35,6 @@ import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { DashboardPageHeader } from '@/components/ui/DashboardPageHeader'
 import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
-
-const StatsSuperAdminSections = dynamic(
-  () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
-  {
-    loading: () => (
-      <div className="space-y-4">
-        <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-        <div className="h-48 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
-      </div>
-    ),
-  }
-)
-
 
 type PerformanceRow = TeamMember & { isAppUser: boolean }
 
@@ -71,22 +59,6 @@ export function IstatistiklerContent() {
   const teamPulseUnlocked = hasTeamPulseAccess(ws?.licenseType, ws?.isSuperAdmin)
 
   const [period, setPeriod] = useState<PulsePeriod>('30d')
-
-  const licenseLabel = useCallback(
-    (licenseType: string) => {
-      switch (licenseType) {
-        case 'pro':
-          return t('statsPage.licensePlanPro')
-        case 'plus':
-          return t('statsPage.licensePlanPlus')
-        case 'basic':
-          return t('statsPage.licensePlanBasic')
-        default:
-          return t('statsPage.licensePlanFree')
-      }
-    },
-    [t]
-  )
 
   // Sort team members: Leader (Me) first, followed by downline members
   const sortedMembers = useMemo(() => {
@@ -124,27 +96,11 @@ export function IstatistiklerContent() {
     staleTime: QUERY_STALE.metrics,
   })
 
-  // Turkish-aware name normalizer — must match EkipPanel's cleanStr
-  const cleanStr = (s: string | null | undefined) => (s ?? '')
-    .toLowerCase()
-    .replace(/ı/g, 'i').replace(/ğ/g, 'g')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]/g, '')
-
   // Non-NMM "Saha Ortakları": katildi candidates not matched to any workspace member
-  const sahaOrtaklari = useMemo(() => {
-    return candidates
-      .filter(c => c.stage === 'katildi')
-      .filter(c => !sortedMembers.some(m => {
-        const mf = cleanStr(m.full_name)
-        const cf = cleanStr(c.full_name)
-        if (!mf || !cf) return false
-        if (mf.includes(cf) || cf.includes(mf)) return true
-        const mWords = (m.full_name ?? '').split(/\s+/).map((w: string) => cleanStr(w)).filter((w: string) => w.length >= 3)
-        return mWords.some((w: string) => cf.includes(w))
-      }))
-  }, [candidates, sortedMembers])
+  const sahaOrtaklari = useMemo(
+    () => matchUnlinkedKatildiCandidates(candidates, sortedMembers),
+    [candidates, sortedMembers]
+  )
 
   // Combined performance table rows: NMM members + Saha Ortakları
   const performanceRows = useMemo((): PerformanceRow[] => {
@@ -168,17 +124,6 @@ export function IstatistiklerContent() {
     }))
     return [...nmmRows, ...sahaRows]
   }, [sortedMembers, sahaOrtaklari])
-
-  // Saha satırları — Ekip & Dış Kaynak YZ tablosu için (kişi bazlı, YZ kullanımı yok).
-  const sahaRows = useMemo(
-    () =>
-      sahaOrtaklari.map(c => ({
-        id: c.id,
-        full_name: c.full_name,
-        avatar_url: resolveCandidateFields(c).avatarUrl,
-      })),
-    [sahaOrtaklari]
-  )
 
   const pipelineByUserId = useMemo(() => {
     const map = new Map<string, string | null>()
@@ -263,14 +208,7 @@ export function IstatistiklerContent() {
             videoByUserId={perfProgress?.videoByUserId}
           />
 
-          {usage?.isSuperAdmin && (
-            <StatsSuperAdminSections
-              sortedMembers={sortedMembers}
-              sahaRows={sahaRows}
-              getMemberHref={getMemberHref}
-              licenseLabel={licenseLabel}
-            />
-          )}
+          {/* Ekip & Dış Kaynak YZ Kullanım & Limit tablosu Platform Yönetimi'ne taşındı. */}
 
           {/* Yapay Zeka Günlük Kullanım Kotası */}
           <MyAIUsageQuotaCard usage={usage} dailyLimit={dailyLimit} />

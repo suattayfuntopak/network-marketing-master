@@ -55,6 +55,14 @@ const RejectModerationDialog = dynamic(
   () => import('./RejectModerationDialog').then(m => ({ default: m.RejectModerationDialog })),
   { loading: () => null },
 )
+const StatsSuperAdminSections = dynamic(
+  () => import('./StatsSuperAdminSections').then(m => ({ default: m.StatsSuperAdminSections })),
+  {
+    loading: () => (
+      <div className="h-64 animate-pulse rounded-2xl bg-[var(--bg-subtle)]" />
+    ),
+  },
+)
 
 export function PlatformYonetimContent() {
   const { t, lang } = useTranslation()
@@ -308,6 +316,10 @@ export function PlatformYonetimContent() {
           totalPaidCount={totalPaidCount}
           pendingCount={pendingRequests.length}
         />
+
+        {/* Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol — istatistiklerden taşındı,
+            üst grid kutuları ile Büyüme & Yayılma arasında. */}
+        <StatsSuperAdminSections />
 
         <PlatformViralKpi kpi={viralKpi} isLoading={viralKpiLoading} />
 

@@ -1,34 +1,27 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import Image from 'next/image'
 import { Crown, Sparkles } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
-import type { TeamMember } from '@/hooks/useTeamMembers'
+import { useWorkspace } from '@/hooks/useWorkspace'
+import { useTeamMembers, type TeamMember } from '@/hooks/useTeamMembers'
+import { useCandidates } from '@/hooks/useCandidates'
 import { getLimitsForLicense } from '@/lib/domain/aiUsage'
+import { matchUnlinkedKatildiCandidates } from '@/lib/domain/sahaPartners'
+import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import {
   getIndependentSignupAIUsageAction,
   getMemberLicenseProfilesAction,
   getAiUsageByPeriodAction,
   type AIUsageArchivePeriod,
-} from '../actions'
+} from '@/app/(dashboard)/istatistikler/actions'
 import { PulsePeriodTabs } from '@/app/(dashboard)/_components/pulse/PulsePeriodTabs'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { PulsePeriod } from '@/lib/domain/pulse'
-
-type PerformanceRow = TeamMember & { isAppUser: boolean }
-
-export type SahaRow = { id: string; full_name: string | null; avatar_url?: string | null }
-
-type StatsSuperAdminSectionsProps = {
-  sortedMembers: TeamMember[]
-  sahaRows: SahaRow[]
-  getMemberHref: (row: PerformanceRow) => string | null
-  licenseLabel: (licenseType: string) => string
-}
 
 type AiRowType = 'leader' | 'nmm' | 'external' | 'saha'
 
@@ -64,15 +57,63 @@ function toArchivePeriod(p: PulsePeriod): AIUsageArchivePeriod {
   return p as AIUsageArchivePeriod
 }
 
-export function StatsSuperAdminSections({
-  sortedMembers,
-  sahaRows,
-  getMemberHref,
-  licenseLabel,
-}: StatsSuperAdminSectionsProps) {
+export function StatsSuperAdminSections() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { data: ws } = useWorkspace()
+  const { data: members = [] } = useTeamMembers(ws?.workspaceId)
+  const { candidates = [] } = useCandidates(ws?.workspaceId)
   const [period, setPeriod] = useState<PulsePeriod>('today')
+
+  const licenseLabel = useCallback(
+    (licenseType: string) => {
+      switch (licenseType) {
+        case 'pro':
+          return t('statsPage.licensePlanPro')
+        case 'plus':
+          return t('statsPage.licensePlanPlus')
+        case 'basic':
+          return t('statsPage.licensePlanBasic')
+        default:
+          return t('statsPage.licensePlanFree')
+      }
+    },
+    [t]
+  )
+
+  // Leader önce, sonra downline — istatistik perf tablosuyla aynı sıralama.
+  const sortedMembers = useMemo(() => {
+    const leader = members.find(m => m.role === 'leader')
+    const downlines = members.filter(m => m.role === 'member')
+    return leader ? [leader, ...downlines] : members
+  }, [members])
+
+  // Saha Ortakları — workspace üyesiyle eşleşmeyen katildi adayları (YZ kullanımı yok).
+  const sahaRows = useMemo(
+    () =>
+      matchUnlinkedKatildiCandidates(candidates, sortedMembers).map(c => ({
+        id: c.id,
+        full_name: c.full_name,
+        avatar_url: resolveCandidateFields(c).avatarUrl,
+      })),
+    [candidates, sortedMembers]
+  )
+
+  const pipelineByUserId = useMemo(() => {
+    const map = new Map<string, string | null>()
+    for (const m of sortedMembers) map.set(m.user_id, m.pipeline_id ?? null)
+    return map
+  }, [sortedMembers])
+
+  const getMemberHref = useCallback(
+    (row: { user_id: string; isAppUser?: boolean }): string | null => {
+      if (row.isAppUser === false) return `/pipeline/${row.user_id}`
+      const pipelineId = pipelineByUserId.get(row.user_id)
+      if (pipelineId) return `/pipeline/${pipelineId}`
+      return `/ekip/${row.user_id}`
+    },
+    [pipelineByUserId]
+  )
 
   const memberUserIds = useMemo(() => sortedMembers.map(m => m.user_id), [sortedMembers])
 
