@@ -214,14 +214,25 @@ export function StatsSuperAdminSections() {
   }, [sortedMembers, sahaRows, independentUsage, memberLicenses, periodUsage, getMemberHref, licenseLabel, t])
 
   const totalAi = rows.reduce((acc, r) => acc + (r.aiUsed ?? 0), 0)
+  // Kotasız çeviri hacmi (translate_count) — Gemini maliyet görünürlüğü, kotadan ayrı.
+  const totalTranslate = useMemo(
+    () => Object.values(periodUsage).reduce((acc, u) => acc + (u.translate ?? 0), 0),
+    [periodUsage]
+  )
 
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-          <Sparkles className="h-4 w-4 text-brand animate-pulse" />
-          {t('statsPage.aiAdminTitle')}
-        </h2>
+        <div className="space-y-1">
+          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
+            <Sparkles className="h-4 w-4 text-brand animate-pulse" />
+            {t('statsPage.aiAdminTitle')}
+          </h2>
+          <p className="text-xs text-[var(--text-3)]">
+            {t('statsPage.translateCostLabel')}:{' '}
+            <span className="font-bold tabular-nums text-[var(--text-2)]">{totalTranslate}</span>
+          </p>
+        </div>
         <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
       </div>
 

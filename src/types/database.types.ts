@@ -737,6 +737,7 @@ export interface Database {
           message_count: number
           roleplay_count: number
           compliance_count: number
+          translate_count: number
           updated_at: string
         }
         Insert: {
@@ -747,6 +748,7 @@ export interface Database {
           message_count?: number
           roleplay_count?: number
           compliance_count?: number
+          translate_count?: number
           updated_at?: string
         }
         Update: {
@@ -757,6 +759,7 @@ export interface Database {
           message_count?: number
           roleplay_count?: number
           compliance_count?: number
+          translate_count?: number
           updated_at?: string
         }
         Relationships: [
@@ -1233,7 +1236,7 @@ export interface Database {
       nmm_increment_ai_usage_daily: {
         Args: {
           p_user_id: string
-          p_workspace_id: string
+          p_workspace_id: string | null
           p_usage_date: string
           p_kind: string
         }

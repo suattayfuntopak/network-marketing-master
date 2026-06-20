@@ -3,7 +3,7 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, logAITranslation } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
@@ -203,7 +203,9 @@ export async function translateNoteAction(text: string): Promise<string> {
       generationConfig: { maxOutputTokens: 8192, temperature: 0.3 },
     })
 
-    return result.response.text().trim() || text
+    const translated = result.response.text().trim() || text
+    await logAITranslation({ userId: user.id })
+    return translated
   } catch {
     return text
   }
@@ -230,7 +232,9 @@ export async function translateEnToTrAction(text: string): Promise<string> {
       generationConfig: { maxOutputTokens: 8192, temperature: 0.3 },
     })
 
-    return result.response.text().trim() || text
+    const translated = result.response.text().trim() || text
+    await logAITranslation({ userId: user.id })
+    return translated
   } catch {
     return text
   }

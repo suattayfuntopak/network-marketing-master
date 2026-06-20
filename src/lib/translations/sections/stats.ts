@@ -62,6 +62,7 @@ export const statsSection = {
       typeExternal: 'Dış Kayıt',
 
       aiAdminTitle: 'Ekip & Dış Kaynak Yapay Zeka Kullanım & Limit Kontrol Tablosu',
+      translateCostLabel: 'Dönem çeviri hacmi (kotasız)',
       licensePlanSuperAdmin: 'PRO - SINIRSIZ',
 
       colLicense: 'Lisans',
@@ -143,6 +144,7 @@ export const statsSection = {
       typeExternal: 'External',
 
       aiAdminTitle: 'Team & External AI Usage & Quota Control Table',
+      translateCostLabel: 'Period translation volume (no quota)',
       licensePlanSuperAdmin: 'PRO - UNLIMITED',
 
       colLicense: 'License',

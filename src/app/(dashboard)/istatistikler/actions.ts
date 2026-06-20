@@ -292,6 +292,8 @@ function archiveDateRange(period: AIUsageArchivePeriod): {
 
 type UsageAgg = {
   ai: number
+  /** Kotasız çeviri sayısı (translate_count) — maliyet görünürlüğü. */
+  translate: number
 }
 
 async function aggregateAiUsageFromRollup(
@@ -302,7 +304,7 @@ async function aggregateAiUsageFromRollup(
 ): Promise<boolean> {
   let q = admin
     .from('nmm_ai_usage_daily')
-    .select('user_id, usage_date, ai_count, message_count, roleplay_count, compliance_count')
+    .select('user_id, usage_date, ai_count, message_count, roleplay_count, compliance_count, translate_count')
 
   if (fromDate) {
     q = q.gte('usage_date', fromDate).lte('usage_date', toDate)
@@ -319,8 +321,9 @@ async function aggregateAiUsageFromRollup(
     const legacy =
       (row.message_count ?? 0) + (row.roleplay_count ?? 0) + (row.compliance_count ?? 0)
     const count = row.ai_count > 0 ? row.ai_count : legacy
-    const bucket = byUser.get(row.user_id) ?? { ai: 0 }
+    const bucket = byUser.get(row.user_id) ?? { ai: 0, translate: 0 }
     bucket.ai += count
+    bucket.translate += row.translate_count ?? 0
     byUser.set(row.user_id, bucket)
   })
   return true
@@ -350,13 +353,13 @@ async function aggregateAiUsageFromDailyActions(
   }
 
   actions?.forEach(act => {
-    const bucket = byUser.get(act.user_id) ?? { ai: 0 }
+    const bucket = byUser.get(act.user_id) ?? { ai: 0, translate: 0 }
     bucket.ai++
     byUser.set(act.user_id, bucket)
   })
 }
 
-export type AiUsageByPeriod = Record<string, { ai: number }>
+export type AiUsageByPeriod = Record<string, { ai: number; translate: number }>
 
 /**
  * Süper admin: verilen kullanıcıların seçili dönemdeki YZ kullanım sayıları
@@ -386,7 +389,7 @@ export async function getAiUsageByPeriodAction(
   const result: AiUsageByPeriod = {}
   for (const [uid, agg] of byUser) {
     if (!idSet.has(uid)) continue
-    result[uid] = { ai: agg.ai }
+    result[uid] = { ai: agg.ai, translate: agg.translate }
   }
   return result
 }

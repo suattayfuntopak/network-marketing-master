@@ -3,6 +3,7 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { requireAuthUserId } from '@/lib/supabase/requireAuth'
+import { logAITranslation } from '@/lib/ai/checkQuota'
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 
@@ -27,7 +28,7 @@ export async function translateObjectionFieldsAction(
   fields: ObjectionFields,
   sourceLang: 'tr' | 'en',
 ): Promise<ObjectionFields> {
-  await requireAuthUserId()
+  const userId = await requireAuthUserId()
 
   const targetLang = sourceLang === 'en' ? 'tr' : 'en'
   const targetName = targetLang === 'en' ? 'English' : 'Turkish'
@@ -74,6 +75,7 @@ Rules: keep the warm, non-pushy, ethical, "the decision is yours" brand tone. Pr
     })
 
     const parsed = JSON.parse(result.response.text().trim()) as Partial<ObjectionFields>
+    await logAITranslation({ userId })
     // Boş gelen alanlarda kaynağa düş (asla içeriği kaybetme).
     return {
       kategori: parsed.kategori?.trim() || fields.kategori,

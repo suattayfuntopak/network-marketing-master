@@ -166,6 +166,30 @@ export async function logAIGenerationFromQuota(
   })
 }
 
+/**
+ * Çeviri maliyet kaydı — kullanıcı kotasını TÜKETMEZ (`ai_count`/`nmm_daily_actions`'a
+ * yazmaz), yalnız süper-admin maliyet panosu için `translate_count` sayacını artırır
+ * (`p_kind='translate'`). CLAUDE.md Dil Politikası: TR|||EN kalıcı çeviri altyapısaldır,
+ * kotaya yazılmaz; fail-safe — sayaç hatası kayıt akışını bloklamaz. `workspaceId` opsiyonel
+ * (per-kullanıcı maliyet için `userId` yeterli; RPC null workspace'i tolere eder).
+ */
+export async function logAITranslation(params: {
+  userId: string
+  workspaceId?: string | null
+}): Promise<void> {
+  const supabase = await createClient()
+  try {
+    await supabase.rpc('nmm_increment_ai_usage_daily', {
+      p_user_id: params.userId,
+      p_workspace_id: params.workspaceId ?? null,
+      p_usage_date: todayCalendarKey(),
+      p_kind: 'translate',
+    })
+  } catch (err) {
+    console.error('[logAITranslation] increment failed:', err)
+  }
+}
+
 /** Logs a successful AI generation to `nmm_daily_actions`. No-op if workspace unknown. */
 export async function logAIGeneration(params: {
   workspaceId: string | null
