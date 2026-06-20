@@ -409,6 +409,10 @@ export function OdemeClient() {
                 <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                 <span>{t('paymentPage.plusFeature3')}</span>
               </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
+                <span>{t('paymentPage.plusFeature4')}</span>
+              </li>
             </ul>
           </div>
 
@@ -487,6 +491,10 @@ export function OdemeClient() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
                 <span>{t('paymentPage.proFeature3')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
+                <span>{t('paymentPage.proFeature4')}</span>
               </li>
             </ul>
           </div>

@@ -290,6 +290,16 @@ export function TeamPerformanceTable({
         </HorizontalScrollLock>
       )}
 
+      {!teamStatsLocked && teamPulseLocked && displayRows.length > 0 && (
+        <p className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-[var(--text-3)]">
+          <Lock className="h-3 w-3 shrink-0" aria-hidden />
+          <span>{t('statsPage.teamPulseProHint')}</span>
+          <Link href="/odeme" className="font-semibold text-brand hover:underline">
+            {t('statsPage.teamPulseProHintCta')}
+          </Link>
+        </p>
+      )}
+
       {teamStatsLocked && performanceRows.length > 0 && (
         <div
           className={`absolute inset-0 ${Z.cardOverlay} flex flex-col items-center justify-center gap-3 rounded-2xl border border-white/10 bg-gradient-to-br from-brand/25 via-[#7c3aed]/15 to-emerald-500/10 backdrop-blur-xl backdrop-saturate-150 px-6 py-8 text-center shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]`}

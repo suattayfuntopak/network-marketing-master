@@ -324,6 +324,7 @@ export const en = {
     tabMembers: "Team Members",
     tabSummary: "Field Summary",
     fieldPulseTitle: "Team Field Pulse",
+    trainingRankingTitle: "Team Training Pulse",
     tabTraining: "Training Progress",
     tabTree: "Team Tree",
     trainingEmpty: "No team members to show training progress for yet.",

@@ -47,3 +47,23 @@ export const TEAM_FREE_BANNER_COPY = {
       'When someone in your list reaches the “Joined” stage, use “Invite to NMM” on their card to add them as an NMM Partner. Downline Distributor Quick Start tracking is on Plus; the full performance table (learning columns) and Ekibim field summary unlock on Pro.',
   },
 } as const
+
+/** Ödeme sayfası ekip özellikleri — paymentPage.plusFeature2/3/4, proFeature2/3/4 ile senkron. */
+export const PLAN_PAYMENT_TEAM_FEATURES = {
+  tr: {
+    plusDownlineOnboarding: 'Alt ekip için Distribütör Doğru Başlangıç takibi',
+    plusStatsFunnel: 'Ekip Performans tablosu — aday hunisi ve DDBR sütunları',
+    plusMemberLimit: 'Alt ekip yönetimi ve NMM davet kodu gönderimi (100 kişiye kadar)',
+    proLearningColumns: 'Tam performans tablosu — eğitim, video ve itiraz sütunları',
+    proFieldSummary: 'Ekibim saha özeti (Ekip Saha Nabzı)',
+    proUnlimitedTeam: 'Sınırsız alt ekip yönetimi ve NMM davet kodu gönderimi',
+  },
+  en: {
+    plusDownlineOnboarding: 'Quick Start onboarding tracking for downline distributors',
+    plusStatsFunnel: 'Team performance table — pipeline funnel & Quick Start columns',
+    plusMemberLimit: 'Downline management & NMM invites (up to 100 members)',
+    proLearningColumns: 'Full performance table — training, video & objection columns',
+    proFieldSummary: 'Ekibim field summary (Team Field Pulse)',
+    proUnlimitedTeam: 'Unlimited downline management & NMM invite codes',
+  },
+} as const
