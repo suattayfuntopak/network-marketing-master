@@ -45,22 +45,33 @@ function argVal(flag) {
   return i !== -1 ? process.argv[i + 1] : null
 }
 
-/** Verilen aralıktaki (no-merge) commit konularını döndürür. */
-export function getSubjects({ range = '', extra = '' } = {}) {
-  return git(`log ${range} ${extra} --no-merges --pretty=format:%s`)
+/** Verilen aralıktaki (no-merge) commit'leri {hash, subject} olarak döndürür. */
+export function getCommits({ range = '', extra = '' } = {}) {
+  return git(`log ${range} ${extra} --no-merges --pretty=format:%h%x09%s`)
     .split('\n')
     .filter(Boolean)
+    .map((line) => {
+      const tab = line.indexOf('\t')
+      return tab === -1
+        ? { hash: '', subject: line }
+        : { hash: line.slice(0, tab), subject: line.slice(tab + 1) }
+    })
 }
 
-/** Konuları tip bazında gruplayıp tek bir markdown bölümü ("## label (date)\n...") üretir. */
-export function buildSection(subjects, label, date = new Date().toISOString().slice(0, 10)) {
+/**
+ * Commit'leri tip bazında gruplayıp tek bir markdown bölümü ("## label (date)\n...")
+ * üretir. Her madde sonuna kısa hash eklenir — GitHub release notu / CHANGELOG'da
+ * commit'e OTOMATİK linklenir (izlenebilirlik). PR no'su (#123) konuda varsa korunur.
+ */
+export function buildSection(commits, label, date = new Date().toISOString().slice(0, 10)) {
   const CONV = /^(\w+)(?:\([^)]*\))?(!)?:\s*(.+)$/
   const groups = new Map()
-  for (const subject of subjects) {
+  for (const { hash, subject } of commits) {
     const m = subject.match(CONV)
     const type = m && KNOWN.has(m[1]) ? m[1] : 'other'
+    const text = m ? m[3] : subject
     if (!groups.has(type)) groups.set(type, [])
-    groups.get(type).push(m ? m[3] : subject)
+    groups.get(type).push(hash ? `${text} (${hash})` : text)
   }
   let out = `## ${label} (${date})\n\n`
   for (const [type, heading] of SECTIONS) {
@@ -88,9 +99,9 @@ function resolveLog() {
 
 function main() {
   const { range, label, extra } = resolveLog()
-  const subjects = getSubjects({ range, extra })
-  writeFileSync('CHANGELOG.md', CHANGELOG_HEADER + buildSection(subjects, label))
-  console.log(`✅ CHANGELOG.md üretildi — ${subjects.length} commit (${label}).`)
+  const commits = getCommits({ range, extra })
+  writeFileSync('CHANGELOG.md', CHANGELOG_HEADER + buildSection(commits, label))
+  console.log(`✅ CHANGELOG.md üretildi — ${commits.length} commit (${label}).`)
 }
 
 // Yalnız doğrudan çalıştırıldığında üret (import edilince fonksiyonlar açıkta kalır).

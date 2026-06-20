@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-20 — changelog commit-link (1/4 öneri, azalan getiri kararı) 🔗✅
+
+"Hangilerini yapardın" — dürüst değerlendirme: 4 öneriden **yalnız 1'i** gerçek/temiz değer; diğer 3'ü atlandı (iş uydurmadan):
+
+- **#1 AiQuotaBadge'i YazarForm/KoclukForm'a uygula — ATLANDI.** O ikisi krediyi `formatCreditButtonLabel` ile **buton etiketine** gömüyor (standalone sayaç değil); AiQuotaBadge ayrı sayaç satırı — zorlamak tekrar/invazif olurdu. Desenler yerinde farklı, ikisi de paylaşılan helper kullanıyor.
+- **#2 shellcheck'i health/pre-commit'e ekle — ATLANDI.** CI zaten workflow değişiminde koşuyor; yerel health'e binary bağımlılığı eklemek yavaşlatır + tekrar. CI doğru gate.
+- **#3 ilk sürümü kes — ATLANDI (sahibin kararı).** Public versiyonlu release ürün/milestone kararı; altyapı hazır, tek komut (`npm run release` + `git push --follow-tags`).
+- **#4 changelog commit-link — YAPILDI.** `gen-changelog`: `getSubjects`→`getCommits` (`%h%x09%s`); her madde sonuna kısa hash (`(d62ae2c)`) — GitHub release notu/CHANGELOG'da commit'e OTOMATİK linklenir. PR no'su (#123) korunur. `release.mjs` de güncellendi.
+
+### Doğrulama
+eslint 0 · vitest 377/377 · changelog 376 commit (hash'li) · release.mjs guard sağlam.
+
+---
+
 ## 2026-06-20 — shellcheck + auto GitHub Release + AiQuotaBadge (3/4 öneri, karar) 🔍🚀♻️✅
 
 "Bu uygulama senin olsaydı hangilerini yapardın" — karar verip uyguladım:

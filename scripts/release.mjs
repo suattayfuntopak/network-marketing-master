@@ -12,7 +12,7 @@
  */
 import { execSync } from 'node:child_process'
 import { readFileSync, writeFileSync, existsSync } from 'node:fs'
-import { CHANGELOG_HEADER, git, getSubjects, buildSection } from './gen-changelog.mjs'
+import { CHANGELOG_HEADER, git, getCommits, buildSection } from './gen-changelog.mjs'
 
 function fail(msg) {
   console.error(`❌ ${msg}`)
@@ -48,7 +48,7 @@ try {
 } catch {
   /* ilk sürüm — tüm geçmiş */
 }
-const section = buildSection(getSubjects({ range }), tag)
+const section = buildSection(getCommits({ range }), tag)
 
 // 4. Prepend (geçmiş korunur).
 const existing = existsSync('CHANGELOG.md') ? readFileSync('CHANGELOG.md', 'utf8') : ''
