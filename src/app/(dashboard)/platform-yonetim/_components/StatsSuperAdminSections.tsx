@@ -34,6 +34,8 @@ type AiRow = {
   license: string | null
   href: string | null
   aiUsed: number | null
+  /** Kotasız çeviri sayısı — uygulama kullanıcısı için; saha satırında null. */
+  translateUsed: number | null
   unlimited: boolean
   dailyLimit: number | null
   loading?: boolean
@@ -175,6 +177,7 @@ export function StatsSuperAdminSections() {
             : licenseLabel(profile.licenseType),
         href: getMemberHref({ ...m, isAppUser: true }),
         aiUsed: periodUsage[m.user_id]?.ai ?? 0,
+        translateUsed: periodUsage[m.user_id]?.translate ?? 0,
         unlimited: isAdmin,
         dailyLimit: lim?.dailyLimit ?? null,
         loading,
@@ -192,6 +195,7 @@ export function StatsSuperAdminSections() {
         license: null,
         href: `/pipeline/${s.id}`,
         aiUsed: null,
+        translateUsed: null,
         unlimited: false,
         dailyLimit: null,
       })
@@ -206,6 +210,7 @@ export function StatsSuperAdminSections() {
         license: licenseLabel(r.licenseType),
         href: null,
         aiUsed: periodUsage[r.userId]?.ai ?? 0,
+        translateUsed: periodUsage[r.userId]?.translate ?? 0,
         unlimited: false,
         dailyLimit: r.dailyLimit,
       })
@@ -223,21 +228,15 @@ export function StatsSuperAdminSections() {
   return (
     <section className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 space-y-4 animate-in fade-in duration-200">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
-            <Sparkles className="h-4 w-4 text-brand animate-pulse" />
-            {t('statsPage.aiAdminTitle')}
-          </h2>
-          <p className="text-xs text-[var(--text-3)]">
-            {t('statsPage.translateCostLabel')}:{' '}
-            <span className="font-bold tabular-nums text-[var(--text-2)]">{totalTranslate}</span>
-          </p>
-        </div>
+        <h2 className="text-base font-bold text-[var(--text-1)] flex items-center gap-1.5">
+          <Sparkles className="h-4 w-4 text-brand animate-pulse" />
+          {t('statsPage.aiAdminTitle')}
+        </h2>
         <PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />
       </div>
 
       <HorizontalScrollLock className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] shadow-[0_1px_3px_rgba(0,0,0,0.01)]">
-        <table className="w-full text-left border-collapse text-sm min-w-[640px]">
+        <table className="w-full text-left border-collapse text-sm min-w-[720px]">
           <thead>
             <tr className="bg-[var(--bg-subtle)] border-b border-[var(--border)] text-[var(--text-2)] font-bold select-none">
               <th className="p-3 font-semibold">{t('statsPage.colPartnerName')}</th>
@@ -245,6 +244,9 @@ export function StatsSuperAdminSections() {
               <th className="p-3 font-semibold">{t('statsPage.colLicense')}</th>
               <th className="p-3 font-semibold text-center bg-brand/5 text-brand">
                 {t('statsPage.aiColUnified')}
+              </th>
+              <th className="p-3 font-semibold text-center" title={t('statsPage.translateCostLabel')}>
+                {t('statsPage.colTranslate')}
               </th>
             </tr>
           </thead>
@@ -292,6 +294,9 @@ export function StatsSuperAdminSections() {
                       usageCell(row.aiUsed, row.unlimited, row.dailyLimit)
                     )}
                   </td>
+                  <td className="p-3 text-center tabular-nums text-[var(--text-2)] font-semibold">
+                    {row.translateUsed === null ? '—' : row.translateUsed}
+                  </td>
                 </tr>
               )
             })}
@@ -301,6 +306,7 @@ export function StatsSuperAdminSections() {
                 <td className="p-3" />
                 <td className="p-3" />
                 <td className="p-3 text-center tabular-nums text-brand">{totalAi}</td>
+                <td className="p-3 text-center tabular-nums text-[var(--text-2)]">{totalTranslate}</td>
               </tr>
             )}
           </tbody>

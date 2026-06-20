@@ -13,6 +13,7 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '')
 export interface CoachState {
   message?: string
   error?: string
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function generateCoachMessage(
@@ -32,7 +33,7 @@ export async function generateCoachMessage(
   if (!name || !stage) return { error: 'Kişi bilgisi eksik.' }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message }
+  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
 
   // Ownership check: candidate must belong to caller's workspace
   if (candidateId && !quota.isSuperAdmin && quota.workspaceId) {
@@ -69,7 +70,7 @@ export async function generateNmmInviteMessage(candidateId: string): Promise<Coa
   if (!candidateId) return { error: 'Kişi bilgisi eksik.' }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message }
+  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
 
   const supabase = await createClient()
   const { data: cand } = await supabase
