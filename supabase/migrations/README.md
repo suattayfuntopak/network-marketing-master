@@ -27,6 +27,11 @@ Both are already applied in production. Renaming them now would cause Supabase t
 main'e push etmen yeterli — `migrate-check.yml` → `migrate-deploy` job'ı, doğrulama
 yeşilse prod'a kendisi uygular. Elle `db push` / Dashboard SQL **gerekmez**.
 
+**⚠️ Geri-uyumlu (expand/contract) yaz** (apply ile deploy paralel koşar): kolon/tablo
+ekleme serbest; **silme/yeniden adlandırma aynı turda YASAK** — önce additive migration +
+kullanan kod (expand), canlı doğrulandıktan sonra ayrı turda eski kolonu düşür (contract).
+`NOT NULL` için önce `DEFAULT`'lu ekle. (Detay: `AGENTS.md` → Migrations.)
+
 1. `npm run migrate:check` — numara çakışması / boşluk (CI: `migrate-check.yml`).
    - **`migrate-apply` job** tüm migration'ları gerçek bir Postgres'e uygular (CI) →
      şema-referans hataları (olmayan kolon/tablo) PR'da yakalanır. Kırmızıysa prod'a UYGULANMAZ.

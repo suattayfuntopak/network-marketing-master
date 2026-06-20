@@ -170,3 +170,46 @@ jobs:
           echo "▶ Bekleyen migration'lar prod'a uygulanıyor (doğrulama yeşil)..."
           node scripts/supabase-db-push.mjs apply
           echo "✅ Tamamlandı (yeni migration yoksa no-op)."
+
+  # Otomatik prod apply başarısız olursa SESSIZ kalmasın — bir GitHub Issue açar
+  # (prod-smoke alert deseniyle aynı). GitHub'ın native fail e-postası da gelir.
+  migrate-alert:
+    name: Prod migration failure alert
+    needs: [migrate-deploy]
+    if: failure() && needs.migrate-deploy.result == 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const sha = context.sha.slice(0, 7)
+            const runUrl = `${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
+            const title = `[migration] Otomatik prod migration apply BAŞARISIZ (${sha})`
+
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner, repo, state: 'open', labels: 'migration-failed', per_page: 5,
+            })
+            if (openIssues.length > 0) {
+              core.info(`Açık migration-failed issue zaten var: #${openIssues[0].number}`)
+              return
+            }
+
+            await github.rest.issues.create({
+              owner, repo, title,
+              labels: ['migration-failed'],
+              body: [
+                '`migrate-deploy` job\'ı bekleyen migration\'ları prod\'a uygularken BAŞARISIZ oldu.',
+                '',
+                `- Commit: \`${sha}\``,
+                `- Workflow: ${runUrl}`,
+                '',
+                'Olası nedenler: secret eksik (SUPABASE_*), defter (ledger) boşluğu → `DB migrate (prod)` → `repair-gaps`, veya migration SQL hatası.',
+                'Migration prod\'a UYGULANMADI; uygulama eski şemaya çarpabilir. İlgilen.',
+              ].join('\n'),
+            })
+            core.info('migration-failed issue oluşturuldu.')

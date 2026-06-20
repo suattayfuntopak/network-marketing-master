@@ -47,6 +47,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - One number = one migration; never edit an already-applied migration — add the next number. See `supabase/migrations/README.md`.
 - After schema changes, update `src/types/database.types.ts`.
 - **Prod'a uygulama OTOMATİKTİR — kullanıcıya "migration'ı sen uygula" DEME.** main'e push'ta `.github/workflows/migrate-check.yml` → `migrate-deploy` job'ı, doğrulama (numara + gerçek-Postgres `migrate-apply`) yeşilse bekleyen migration'ları prod'a kendisi uygular. `DB migrate (prod)` (`db-push.yml`) yalnızca elle yedek/onarım (repair-gaps/repair/acil apply).
+- **Geri-uyumlu (expand/contract) ZORUNLU:** migration apply ile uygulama deploy'u paralel koşar (mod'a göre sıra garanti değil). Bu yüzden her migration, hem ESKİ hem YENİ kod ile çalışmalı. **Kolon/tablo ekle** (additive) serbest — eski kod yeni kolonu görmez, sorun olmaz. **Kolon/tablo SİLME/yeniden adlandırma aynı turda YASAK** — önce additive migration + onu kullanan kod (expand), CANLI doğrulandıktan sonra AYRI bir turda eski kolonu düşür (contract). `NOT NULL` eklerken önce `DEFAULT`'lu ekle. Böylece deploy/migration yarışı zararsız kalır.
 - **Veri-onarım migration'ları idempotent olmalı:** beklenen durum zaten sağlanmışsa `RAISE EXCEPTION` ile patlatma — `RAISE NOTICE '...'; RETURN;` ile sessizce çık. Böylece CI'da migrate-apply'ın hata-toleransına gerek kalmaz, migration ikinci kez çalışınca güvenle no-op olur.
 
 ### Zaman dilimi & gün anahtarları

@@ -1,6 +1,182 @@
 # Hot Log
 
-## 2026-06-20 — Migration otomasyonu netleştirildi + 4 öneri + tablo sıralama 🤖🧹✅
+## 2026-06-20 — Migration/deploy güvenliği + YZ UX (4 öneri) 🛡️🤖✅
+
+Önceki turun 4 rapor önerisi de halledildi:
+
+**#1 Deploy ↔ migration sıralama kapısı.** `deploy.yml`'ye, Vercel hook'undan önce çalışan bir adım eklendi: bu commit migration `.sql` değiştirdiyse, "Migration check" (→ migrate-deploy, prod'a uygular) koşusunun bu SHA için BAŞARILI bittiğini bekler. Salt-okunur GitHub API; hata/timeout'ta **fail-open** (expand/contract güvenliği), yalnız Migration check AÇIKÇA başarısızsa deploy'u engeller. Böylece yeni kod uygulanmamış şemaya çarpmaz.
+
+**#2 Expand/contract zorunlu kuralı.** AGENTS.md + migrations README: migration apply ↔ deploy paralel koştuğu için her migration hem eski hem yeni kodla çalışmalı. Kolon ekleme serbest; **silme/yeniden adlandırma aynı turda yasak** (önce additive+kod, sonra ayrı turda contract). `NOT NULL` için önce DEFAULT'lu ekle.
+
+**#3 migrate-deploy başarısızlık bildirimi.** `migrate-check.yml`'ye `migrate-alert` job'ı: otomatik prod apply başarısız olursa `migration-failed` etiketli GitHub Issue açar (prod-smoke deseniyle aynı). Sessiz kalmaz.
+
+**#4 surfaceAiQuotaError son buton.** `generateOnboardingGuidanceAction` (ekip onboarding koçu) `quotaError` döndürüyor; `YZOnboardingKocuModal` limit/feature → upgrade prompt'a bağlandı (`useUpgradePrompt` eklendi). Artık tüm YZ üretim yüzeyleri tutarlı.
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377 · knip baseline · i18n 1320 · 3 workflow YAML geçerli · migrate:check 105.
+
+---
+
+## 2026-06-20 — Ekibim light pembe + Basic deneme teal koyulaştırma 🎨✅
+
+**Ekibim light:** Sidebar, başlık ikonu, Ekip Üyeleri sekmesi → `pink-600 → rose-500` (dark ile aynı).
+
+**Landing dark:** Basic deneme butonu teal koyulaştırıldı (`#6AB86E → #00796B`) — beyaz yazı okunurluğu.
+
+Push: `e5fad9e`.
+
+---
+
+## 2026-06-20 — Landing dark CTA + Ekibim light accent hizalaması 🎨✅
+
+**Landing dark:** Basic deneme → Takvim teal; Plus → Vaktin Varsa blue; Zirveye Ulaş → Aylık Ödeme pembe.
+
+**Ekibim light:** Sidebar, başlık ikonu, Ekip Üyeleri sekmesi → `from-brand to-brand-accent` (Aylık Ödeme ile aynı). Dark zaten pembe idi.
+
+Dosyalar: `landing/constants.ts`, `brandGradients.ts`, `EkipTabNav.tsx`.
+
+Doğrulama: lint 0 · build OK.
+
+Push: `b1c2063`.
+
+---
+
+## 2026-06-20 — Landing dark mode CTA makyajı 🎨✅
+
+**Dark only:** Hemen Ücretsiz Dene / header / billing toggler → pembe (eski Zirveye Ulaş). Turuncu → Basic «14 günlük deneme» butonu. Zirveye Ulaş → pano Hedefim indigo crown (`#9D81FF→#5D44C9`). Light moda dokunulmadı.
+
+Dosyalar: `landing/constants.ts`, `LandingPricing.tsx`.
+
+Doğrulama: lint 0 · build OK.
+
+Push: `43dc8ce`.
+
+---
+
+## 2026-06-20 — Vercel build: ProductFunnelCounts type re-export 🔧✅
+
+**Sorun:** `'use server'` dosyasından `export type { ProductFunnelCounts }` Next.js build'de tüm dashboard sayfalarında kırılıyordu.
+
+**Çözüm:** Type yalnızca `@/lib/domain/productFunnelStats`'ten import; actions.ts re-export kaldırıldı.
+
+Doğrulama: `npm run build` OK.
+
+Push: `6037165`.
+
+---
+
+## 2026-06-20 — Vercel deploy fix + huni dönüşüm oranları + CI plan-copy 🔧✅
+
+**Deploy:** `istatistikler/actions.ts` kullanılmayan `PRODUCT_EVENTS` import kaldırıldı (ESLint `--max-warnings 0`).
+
+**Platform hunisi:** Dönüşüm oranı satırı (plan CTA/fiyat, ödeme/plan CTA, Plus vs Pro sayaç).
+
+**CI:** Vitest job'a `plan-copy:check` eklendi.
+
+Doğrulama: lint 0 · vitest 377/377.
+
+Push: `0cee851`.
+
+---
+
+## 2026-06-20 — 5 plan-tier önerisi: huni, Plus deep link, health check 🔧✅
+
+**Platform hunisi:** `pro_upgrade_cta_click` kaynak kırılımı (gate / ekip / stats) + `odeme_plus_deep_link` kartı.
+
+**Plus gate:** `stats_advanced` / `team_full` → `/odeme?plan=plus` scroll + `upgradePlusCta` metni.
+
+**Domain:** `productFunnelStats.ts` — huni sayımı tek kaynak; `aggregateProductFunnelCounts` testleri.
+
+**Health:** `npm run plan-copy:check` + `npm run health` (typecheck, lint, test, knip, i18n, migrate, plan copy).
+
+**CI docs:** Expired-trial staging hesabı oluşturma adımları (`github-secrets.md`).
+
+Doğrulama: tsc 0 · vitest 376/376 · plan-copy OK.
+
+Push: `06fb71b`.
+
+---
+
+## 2026-06-20 — Pro hunisi, gate blurbs, Plus prefetch query, telemetry 🔧✅
+
+**UpgradeGate:** `team_pulse` → `/odeme?plan=pro` + Pro CTA metni; `PLAN_MODAL_BLURBS` senkron.
+
+**Telemetry:** `pro_upgrade_cta_click` (ekip banner, stats ipucu, upgrade gate).
+
+**Plus İstatistikler:** `getTeamProgressMapAction` query Plus’ta enabled (sütunlar kilitli kalır).
+
+**CI docs:** `PLAYWRIGHT_TRIAL_EXPIRED_*` github-secrets + e2e.yml.
+
+Doğrulama: tsc 0 · vitest 372/372 · i18n OK.
+
+Push: `47f7103`.
+
+---
+
+## 2026-06-20 — Plan matrisi genişlemesi: gate, CTA, PageHelp, landing, E2E 🔧✅
+
+**Matris:** `PLAN_GATE_COPY`, `PLAN_PAGE_HELP_PLAN_STEP` — shell/stats/UpgradeGate metinleri senkron test.
+
+**Plus→Pro CTA:** Ekibim saha/eğitim kilit → `/odeme?plan=pro` + Pro kart scroll.
+
+**Prefetch:** Plus kullanıcıda `getTeamProgressMapAction` arka plan ısıtması.
+
+**PageHelp:** Ekibim/İstatistikler/Saha Özetim plan katmanları adımı.
+
+**Landing:** Plus/Pro özellik maddeleri ödeme sayfası ile hizalı (4 madde).
+
+**E2E:** `expired-trial-ekip.spec.ts` + `PLAYWRIGHT_TRIAL_EXPIRED_*` env.
+
+Push: `f53d72f`.
+
+## 2026-06-20 — Plan UX tamamlama: eğitim başlığı, Plus ipucu, ödeme kartları 🔧✅
+
+**Eğitim sekmesi:** `team.trainingRankingTitle` → “Ekip Eğitim Nabzı”; `crown.ranking` kaldırıldı.
+
+**İstatistikler Plus:** Tablo altında Pro sütun ipucu + `/odeme` linki.
+
+**Ödeme sayfası:** Plus/Pro kart maddeleri `PLAN_PAYMENT_TEAM_FEATURES` ile banner/matris ile hizalı (4 madde).
+
+Doğrulama: tsc 0 · vitest 368/368 · i18n:unused 0.
+
+Push: `3ab1acd`.
+
+---
+
+## 2026-06-20 — Plan matrisi, banner netliği, Plus/Pro UX 🔧✅
+
+**Ekibim banner:** `planFeatureMatrix.TEAM_FREE_BANNER_COPY` tek kaynak; Plus = DDBR, Pro = eğitim sütunları + saha özeti.
+
+**Saha Özeti tablo:** `team.fieldPulseTitle` → “Ekip Saha Nabzı” (crown.ranking değil).
+
+**İstatistikler:** Plus’ta eğitim/video/itiraz sütunları Pro kilit ikonu + tooltip.
+
+**Prefetch:** `activeTab=all` → `getHubAllTimeSelfAction`.
+
+**E2E:** `critical-routes-smoke` tab rotaları + route error boundary kontrolü.
+
+Doğrulama: tsc 0 · vitest 367/367 · i18n:unused OK.
+
+Push: `3c6dbbf` + `0847819` (shell import → senkron test, CI i18n hook).
+
+---
+
+## 2026-06-20 — UX sprint: PageHelp, video devam, Tüm Zamanlar, Ekibim, metinler 🔧✅
+
+**PageHelp:** Portal + scroll lock (mobil sıkışma). Platform yardım → Super Admin.
+
+**Video devam:** Yarım kalan video önceliği; deep link autoplay/resume.
+
+**Tüm Zamanlar:** 1970 gün döngüsü kaldırıldı; workspace kayıt tarihi + geniş aralık optimizasyonu.
+
+**Ekibim:** fetchTeamBundle güvenli; onboarding_steps parse.
+
+**Metinler:** `teamFreeBannerDesc` (Distribütör DDBR Plus / EPİT Pro); İstatistikler kilit başlığı → Plus veya Pro.
+
+Doğrulama: tsc 0 · eslint 0 · vitest 363/363.
+
+---
+
 
 ### Migration otomasyonu — ZATEN OTOMATİK (yanlış anlaşılma giderildi)
 Kullanıcı haklıymış: migration'lar **otomatik uygulanıyor**. `migrate-check.yml` → **`migrate-deploy`** job'ı, main'e push'ta doğrulama (numara + gerçek-Postgres `migrate-apply`) yeşilse bekleyen migration'ları prod'a kendisi uyguluyor (2026-06-18'den beri). Önceki turlardaki "migration'ı sen uygula" tavsiyem **bu job'ı gözden kaçırdığım için yanlıştı**. Düzeltmeler:

@@ -40,6 +40,49 @@ jobs:
       github.event.workflow_run.event == 'push'
     runs-on: ubuntu-latest
     steps:
+      # Migration sıralama kapısı: bu commit migration DEĞİŞTİRDİYSE, uygulamayı
+      # deploy etmeden ÖNCE "Migration check" (→ migrate-deploy, prod'a uygular)
+      # koşusunun bu SHA için BAŞARILI bittiğini doğrula. Böylece yeni kod, henüz
+      # uygulanmamış şemaya çarpmaz. Salt-okunur; hata/zaman aşımında FAIL-OPEN
+      # (additive/expand-contract politikası güvenliği) — yalnız Migration check
+      # AÇIKÇA başarısızsa deploy'u engeller.
+      - name: Migration sıralama kapısı
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const sha = context.payload.workflow_run.head_sha
+            let touched = false
+            try {
+              const cmp = await github.rest.repos.getCommit({ owner, repo, ref: sha })
+              touched = (cmp.data.files || []).some(
+                f => f.filename.startsWith('supabase/migrations/') && f.filename.endsWith('.sql')
+              )
+            } catch (e) {
+              core.warning(`Commit dosyaları okunamadı (${e.message}) — gate fail-open, deploy devam.`)
+              return
+            }
+            if (!touched) { core.info('Migration .sql değişmedi — gate atlandı.'); return }
+            core.info('Migration değişti — "Migration check" başarısı bekleniyor (max ~4 dk)...')
+            const deadline = Date.now() + 4 * 60 * 1000
+            while (Date.now() < deadline) {
+              const { data } = await github.rest.actions.listWorkflowRunsForRepo({
+                owner, repo, head_sha: sha, per_page: 30,
+              })
+              const mc = data.workflow_runs.find(r => r.name === 'Migration check')
+              if (mc && mc.status === 'completed') {
+                if (mc.conclusion === 'success') {
+                  core.info('Migration check başarılı — migration uygulandı, deploy devam.')
+                  return
+                }
+                core.setFailed(`Migration check conclusion=${mc.conclusion} — migration prod'a uygulanmadı, deploy ENGELLENDİ. Düzelt ve yeniden deploy et.`)
+                return
+              }
+              await new Promise(r => setTimeout(r, 15000))
+            }
+            core.warning('Migration check zamanında bitmedi — gate fail-open (expand/contract güvenliği). Durumu Actions\'tan doğrula.')
+
       - name: Deploy hook (CI Gate yeşilse)
         id: hook
         env:
