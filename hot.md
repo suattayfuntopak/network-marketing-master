@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-20 — release script + deploy Telegram + limit görsel + actionlint (4 öneri) 🚀📲✅
+
+Önceki turun 4 önerisi:
+
+**#1 Release otomasyonu.** `scripts/release.mjs` + `npm run release [patch|minor|major]`: temiz-ağaç kontrolü → version bump → CHANGELOG'a yeni sürüm bölümünü PREPEND (önceki tag..HEAD, geçmiş korunur) → commit `chore(release): vX.Y.Z` → tag. Push YAPMAZ (güvenli), sonunda `git push --follow-tags` hatırlatır. `gen-changelog.mjs` `buildSection`/`getSubjects` export edecek şekilde refactor edildi (paylaşım).
+
+**#2 Deploy başarı Telegram'ı.** Başarılı prod deploy + smoke sonrası opsiyonel "✅ deploy edildi (SHA)" Telegram mesajı (secret-guarded). Önceki turdaki failure-alert'leri tamamlar.
+
+**#3 limitReached görsel.** ProvaForm + StudyoForm: kota dolunca, gösterilen YZ-kota sayacı kırmızı tıklanabilir "Günlük Limite Ulaştınız"a dönüşür (→ upgrade prompt). Mevcut `coachUi.dailyLimitReached` anahtarı; yeni i18n yok.
+
+**#4 actionlint CI.** `.github/workflows/actionlint.yml`: `.github/workflows/**` değişince (PR + main push) workflow YAML + GitHub ifadelerini (`secrets.`/`needs.`/`matrix.`) doğrular. Yerelde actionlint v1.7.0 indirilip tüm workflow'lar `-shellcheck=` ile temiz doğrulandı (CI yeşil garantili; shellcheck ayrı temizlik turuna bırakıldı).
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377 · i18n 1320 · actionlint exit 0 (yerel, 8 workflow) · knip temiz.
+
+---
+
 ## 2026-06-20 — Telegram alert + gate timeout + limitReached + changelog (4 öneri) 📲🧩✅
 
 Önceki turun 4 önerisi:

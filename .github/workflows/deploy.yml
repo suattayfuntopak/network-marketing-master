@@ -127,6 +127,22 @@ jobs:
             exit 1
           fi
 
+      # Başarılı deploy + smoke → opsiyonel Telegram "deploy edildi" bildirimi.
+      - name: Telegram deploy bildirimi (opsiyonel)
+        if: success() && steps.hook.outputs.hook_active == 'true'
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "TELEGRAM_BOT_TOKEN/CHAT_ID yok — Telegram bildirimi atlandı."; exit 0
+          fi
+          curl -fsS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=✅ NMM: Prod deploy edildi ve /pano sağlıklı (${SHA:0:7})." \
+            >/dev/null || echo "Telegram gönderimi başarısız (tolere edildi)."
+
   smoke-alert:
     name: Prod smoke failure alert
     needs: deploy

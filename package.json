@@ -17,6 +17,7 @@
     "i18n:unused": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/i18n-unused.mjs",
     "plan-copy:check": "node scripts/plan-copy-check.mjs",
     "changelog": "node scripts/gen-changelog.mjs",
+    "release": "node scripts/release.mjs",
     "health": "npm run typecheck && npm run lint && npm test && npm run knip && npm run i18n:unused && npm run migrate:check && npm run plan-copy:check",
     "knip": "knip --no-progress",
     "perf:baseline": "node scripts/perf-baseline.mjs",

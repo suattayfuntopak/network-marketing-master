@@ -1,10 +1,11 @@
 # Changelog
 
-_Otomatik üretildi (`npm run changelog`) — `hot.md` (TR insan-okur günlük) tamamlayıcısıdır. Elle düzenleme._
+_Otomatik üretildi (`npm run changelog` / `npm run release`) — `hot.md` (TR insan-okur günlük) tamamlayıcısıdır._
 
 ## ui-sadelestirme-oncesi → HEAD (2026-06-20)
 
 ### ✨ Yeni Özellikler
+- ProvaForm/StudyoForm limitReached pre-empt
 - onboarding koçu limit→upgrade tutarlılığı (surfaceAiQuotaError)
 - Plus deep link hunisi, platform funnel kırılımı ve health check
 - Pro CTA hunisi, modal blurbs ve Plus progress query
@@ -289,6 +290,7 @@ _Otomatik üretildi (`npm run changelog`) — `hot.md` (TR insan-okur günlük) 
 - align PageHelp to viewport center, move it to inner page headers, and align training/objection card actions to right-bottom
 
 ### Diğer
+- ci+tooling: Telegram alert köprüsü + gate timeout vars + changelog üretici
 - moderasyon deep link, PageHelp yerleşimi, landing Free satırı.
 - feat+fix: 5 maddelik UX/akış turu
 - fix(ux)+feat: masaüstü Brief floating + ekip iletişim konsolidasyonu
