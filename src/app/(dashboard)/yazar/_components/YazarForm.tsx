@@ -151,6 +151,13 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     }
   }, [state.message, selected, query, messageType, qc, lang, ws?.userId, ws?.workspaceId])
 
+  // Limit/feature dolduğunda tutarlı upgrade prompt (diğer üretim butonlarıyla aynı).
+  useEffect(() => {
+    if (state.quotaError === 'limit' || state.quotaError === 'feature') {
+      openUpgrade('ai_field')
+    }
+  }, [state.quotaError, openUpgrade])
+
   // Handle global language toggle auto-translation
   useEffect(() => {
     if (displayedMessage && lang !== generatedLang) {

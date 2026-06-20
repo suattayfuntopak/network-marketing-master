@@ -17,6 +17,8 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useUserSettings } from '@/hooks/useUserSettings'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useAILimits } from '@/hooks/useAILimits'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
@@ -138,6 +140,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
   const { data: ws } = useWorkspace()
   const { settings, patchSettings } = useUserSettings(ws?.userId)
   const qc = useQueryClient()
+  const { openUpgrade, UpgradePrompt } = useUpgradePrompt()
 
   const [auditResult, setAuditResult] = useState<ComplianceAuditState | null>(null)
   const checkedItems = settings.complianceChecklist
@@ -186,7 +189,12 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
     try {
       const res = await auditComplianceMessageAction(inputText, currentLang)
       if (res.error) {
-        toast.error(res.error)
+        surfaceAiQuotaError(res, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_coach',
+          fallbackMessage: t('compliancePage.unexpectedError'),
+        })
       } else {
         setAuditResult(res)
         invalidateTeamAndAIUsage(qc, ws?.workspaceId)
@@ -212,6 +220,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
 
   const body = (
       <div className="w-full space-y-6">
+        {UpgradePrompt}
         {!embedded && (
         <header className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FEF0EC] dark:bg-[#3d1409]">

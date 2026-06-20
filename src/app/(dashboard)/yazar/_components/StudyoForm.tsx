@@ -8,6 +8,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAILimits } from '@/hooks/useAILimits'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { generateSocialContentAction } from '../actions'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
@@ -110,7 +111,12 @@ export function StudyoForm() {
     try {
       const res = await generateSocialContentAction({ goal, platform, tone, topic, lang })
       if (res.error) {
-        toast.error(res.error)
+        surfaceAiQuotaError(res, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_coach',
+          fallbackMessage: t('coachUi.somethingWrong'),
+        })
       } else if (res.content) {
         setResult(res.content)
         invalidateTeamAndAIUsage(qc, ws?.workspaceId)

@@ -3,7 +3,7 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { generateMessage } from '@/lib/ai/generateMessage'
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, logAITranslation, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
@@ -27,6 +27,7 @@ export interface YazarFormState {
   message?: string
   error?: string
   remaining?: number
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function generateMessageAction(
@@ -51,7 +52,7 @@ export async function generateMessageAction(
   }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   try {
     const message = await generateMessage({
@@ -80,6 +81,7 @@ export interface RoleplayResponseState {
   yzk_improvements?: string
   remaining?: number
   error?: string
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function generateRoleplayResponseAction(
@@ -98,7 +100,7 @@ export async function generateRoleplayResponseAction(
   if (replyErr) return { error: replyErr }
 
   const quota = await checkAIQuota('roleplay', { lang: l })
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   const safeReply = clampAIUserInput(userReply)
 
@@ -216,6 +218,7 @@ export interface KoclukFormState {
   answer?: string
   error?: string
   remaining?: number
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function askCoachAction(
@@ -237,7 +240,7 @@ export async function askCoachAction(
   }
 
   const quota = await checkAIQuota('message', { lang: l })
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   const safeQuestion = clampAIUserInput(question)
   const coachModel = resolveGeminiModel('deep_coach', quota.licenseType)
@@ -296,6 +299,7 @@ export interface SocialContentState {
   content?: string
   error?: string
   remaining?: number
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function generateSocialContentAction(input: {
@@ -315,7 +319,7 @@ export async function generateSocialContentAction(input: {
   }
 
   const quota = await checkAIQuota('message', { lang: l })
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   const userPrompt = buildSocialContentUserPrompt({
     goal: parseSocialGoal(input.goal),
@@ -369,10 +373,13 @@ export async function translateTextAction(text: string, targetLang: 'tr' | 'en')
   const textErr = rejectIfAIInputTooLong(text, targetLang)
   if (textErr) return { error: textErr }
 
-  const quota = await checkAIQuota('message', { lang: targetLang })
-  if (!quota.ok) {
-    return { error: quota.message }
-  }
+  // Otomatik dil-takip çevirisi (YazarForm, dil değişince üretilmiş mesajı çevirir).
+  // CLAUDE.md Dil Politikası: çeviri altyapısaldır → kotayı TÜKETMEZ; yalnız maliyet
+  // sayacına (translate_count) yazılır. Kredisi biten kullanıcının dil değiştirmesi
+  // bloklanmamalı. Oturum yoksa sessizce kaynak metni korur.
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return {}
 
   const systemPrompt = `Sen profesyonel bir çevirmensin. Görevin, verilen metni anlamını ve tonunu koruyarak ${
     targetLang === 'en' ? 'İngilizceye' : 'Türkçeye'
@@ -404,6 +411,7 @@ Metnin dışına çıkma. Herhangi bir açıklama, giriş veya sonuç ekleme. Sa
 
     const translatedText = result.response.text().trim()
 
+    await logAITranslation({ userId: user.id })
     return { translatedText }
   } catch (err) {
     console.error('Translation error:', err)

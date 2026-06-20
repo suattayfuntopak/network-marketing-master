@@ -1,7 +1,7 @@
 'use server'
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { serverError } from '@/lib/utils/serverError'
 import { clampAIUserInput, rejectIfAIInputTooLong } from '@/lib/domain/aiInputLimit'
@@ -19,6 +19,7 @@ export interface ComplianceAuditState {
   improved_text?: string
   remaining?: number
   error?: string
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function auditComplianceMessageAction(
@@ -39,7 +40,7 @@ export async function auditComplianceMessageAction(
   const safeText = clampAIUserInput(textToAudit)
 
   const quota = await checkAIQuota('compliance', { lang: l })
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   const systemPrompt = `Sen bir Network Marketing ve Doğrudan Satış yasal mevzuat uyum denetleyicisisin (Compliance Officer).
 Görevin, kullanıcının girdiği pazarlama metnini, reklam ve tüketici koruma kanunlarına (FTC standartları, TKHK ve yasal mevzuatlar) göre analiz etmek.

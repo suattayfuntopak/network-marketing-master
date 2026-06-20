@@ -15,6 +15,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 import type { RoleplayDifficulty } from '@/lib/domain/roleplayDifficulty'
 
@@ -344,7 +345,12 @@ export function ProvaForm() {
       )
 
       if (result.error) {
-        toast.error(result.error)
+        surfaceAiQuotaError(result, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_coach',
+          fallbackMessage: t('coachUi.somethingWrong'),
+        })
         // Rollback user message on quota failure
         setMessages(messages)
       } else if (result.candidate_reply) {

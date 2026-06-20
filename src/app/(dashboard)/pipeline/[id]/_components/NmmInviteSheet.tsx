@@ -10,6 +10,7 @@ import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateNmmInviteMessage } from '../actions'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 
 interface Props {
   candidate: { id: string; full_name: string | null; phone: string | null }
@@ -38,8 +39,9 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
     let cancelled = false
     generateNmmInviteMessage(candidate.id).then((res) => {
       if (cancelled) return
-      if (res.error) setError(res.error)
-      else setMessage(res.message ?? '')
+      if (res.error) {
+        surfaceAiQuotaError(res, { openUpgrade, toastError: setError, feature: 'ai_field', fallbackMessage: res.error })
+      } else setMessage(res.message ?? '')
       setLoading(false)
     })
     return () => {
@@ -55,8 +57,9 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
     setLoading(true)
     setError(null)
     const res = await generateNmmInviteMessage(candidate.id)
-    if (res.error) setError(res.error)
-    else setMessage(res.message ?? '')
+    if (res.error) {
+      surfaceAiQuotaError(res, { openUpgrade, toastError: setError, feature: 'ai_field', fallbackMessage: res.error })
+    } else setMessage(res.message ?? '')
     setLoading(false)
   }, [candidate.id, hasAiFieldAccess, openUpgrade])
 
