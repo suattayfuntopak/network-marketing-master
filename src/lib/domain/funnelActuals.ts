@@ -39,6 +39,37 @@ export function calendarKeysBetween(startKey: string, endKey: string): string[] 
   return keys
 }
 
+/** 400+ günlük aralıklarda gün dizisi üretmek yerine harita üzerinden toplama. */
+export const WIDE_FUNNEL_RANGE_DAY_THRESHOLD = 400
+
+export function calendarDayCount(startKey: string, endKey: string): number {
+  const start = fromCalendarKey(startKey)
+  const end = fromCalendarKey(endKey)
+  return Math.floor((end.getTime() - start.getTime()) / 86_400_000) + 1
+}
+
+export function isWideFunnelRange(startKey: string, endKey: string): boolean {
+  return calendarDayCount(startKey, endKey) > WIDE_FUNNEL_RANGE_DAY_THRESHOLD
+}
+
+export function calendarKeyInRange(key: string, startKey: string, endKey: string): boolean {
+  return key >= startKey && key <= endKey
+}
+
+export function sumFunnelDaysInRange(
+  actionsByDay: Map<string, FunnelCounts>,
+  startCalendarKey: string,
+  endCalendarKey: string,
+): FunnelCounts {
+  let total = { ...EMPTY_FUNNEL }
+  for (const [key, bucket] of actionsByDay) {
+    if (calendarKeyInRange(key, startCalendarKey, endCalendarKey)) {
+      total = addFunnel(total, bucket)
+    }
+  }
+  return total
+}
+
 function stageNoteToFunnelDelta(note: string | null): Pick<FunnelCounts, 'sunum' | 'yeniUye'> {
   const n = (note ?? '').toLowerCase().trim()
   if (n === 'sunum' || n === 'sunum yapıldı') return { sunum: 1, yeniUye: 0 }
@@ -75,8 +106,14 @@ export async function fetchFunnelActualsForPeriod(
   startCalendarKey: string,
   endCalendarKey: string,
 ): Promise<FunnelCounts> {
-  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
-  const dayKeySet = new Set(dayKeys)
+  const wide = isWideFunnelRange(startCalendarKey, endCalendarKey)
+  const dayKeys = wide ? null : calendarKeysBetween(startCalendarKey, endCalendarKey)
+  const dayKeySet = wide ? null : new Set(dayKeys)
+
+  const inRange = (key: string) =>
+    wide
+      ? calendarKeyInRange(key, startCalendarKey, endCalendarKey)
+      : dayKeySet!.has(key)
 
   const [calls, stages, candidates] = await Promise.all([
     supabase
@@ -113,26 +150,28 @@ export async function fetchFunnelActualsForPeriod(
 
   for (const row of calls.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureDay(key).arama++
   }
 
   for (const row of candidates.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureDay(key).tanisma++
   }
 
   for (const row of stages.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     const delta = stageNoteToFunnelDelta(row.note)
     const bucket = ensureDay(key)
     bucket.sunum += delta.sunum
     bucket.yeniUye += delta.yeniUye
   }
 
-  return sumFunnelDays(dayKeys, actionsByDay)
+  return wide
+    ? sumFunnelDaysInRange(actionsByDay, startCalendarKey, endCalendarKey)
+    : sumFunnelDays(dayKeys!, actionsByDay)
 }
 
 
@@ -149,8 +188,13 @@ export async function fetchFunnelActualsBatchForPeriod(
   const result: Record<string, FunnelCounts> = {}
   if (uniqueIds.length === 0) return result
 
-  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
-  const dayKeySet = new Set(dayKeys)
+  const wide = isWideFunnelRange(startCalendarKey, endCalendarKey)
+  const dayKeys = wide ? null : calendarKeysBetween(startCalendarKey, endCalendarKey)
+  const dayKeySet = wide ? null : new Set(dayKeys)
+  const inRange = (key: string) =>
+    wide
+      ? calendarKeyInRange(key, startCalendarKey, endCalendarKey)
+      : dayKeySet!.has(key)
   const actionsByUserDay = new Map<string, Map<string, FunnelCounts>>()
 
   const ensureUserDay = (userId: string, dayKey: string): FunnelCounts => {
@@ -192,19 +236,19 @@ export async function fetchFunnelActualsBatchForPeriod(
 
   for (const row of calls.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureUserDay(row.user_id, key).arama++
   }
 
   for (const row of candidates.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureUserDay(row.owner_id, key).tanisma++
   }
 
   for (const row of stages.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     const delta = stageNoteToFunnelDelta(row.note)
     const bucket = ensureUserDay(row.user_id, key)
     bucket.sunum += delta.sunum
@@ -213,7 +257,9 @@ export async function fetchFunnelActualsBatchForPeriod(
 
   for (const uid of uniqueIds) {
     const userMap = actionsByUserDay.get(uid) ?? new Map<string, FunnelCounts>()
-    result[uid] = sumFunnelDays(dayKeys, userMap)
+    result[uid] = wide
+      ? sumFunnelDaysInRange(userMap, startCalendarKey, endCalendarKey)
+      : sumFunnelDays(dayKeys!, userMap)
   }
 
   return result
@@ -232,8 +278,14 @@ export async function fetchFunnelActualsBatchUserDays(
   const actionsByUserDay = new Map<string, Map<string, FunnelCounts>>()
   if (uniqueIds.length === 0) return actionsByUserDay
 
-  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
-  const dayKeySet = new Set(dayKeys)
+  const wide = isWideFunnelRange(startCalendarKey, endCalendarKey)
+  const dayKeySet = wide
+    ? null
+    : new Set(calendarKeysBetween(startCalendarKey, endCalendarKey))
+  const inRange = (key: string) =>
+    wide
+      ? calendarKeyInRange(key, startCalendarKey, endCalendarKey)
+      : dayKeySet!.has(key)
 
   const ensureUserDay = (userId: string, dayKey: string): FunnelCounts => {
     let userMap = actionsByUserDay.get(userId)
@@ -274,19 +326,19 @@ export async function fetchFunnelActualsBatchUserDays(
 
   for (const row of calls.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureUserDay(row.user_id, key).arama++
   }
 
   for (const row of candidates.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     ensureUserDay(row.owner_id, key).tanisma++
   }
 
   for (const row of stages.data ?? []) {
     const key = istanbulCalendarKeyFromIso(row.created_at)
-    if (!dayKeySet.has(key)) continue
+    if (!inRange(key)) continue
     const delta = stageNoteToFunnelDelta(row.note)
     const bucket = ensureUserDay(row.user_id, key)
     bucket.sunum += delta.sunum
@@ -301,8 +353,23 @@ export function funnelTotalsForUserInRange(
   startCalendarKey: string,
   endCalendarKey: string,
 ): FunnelCounts {
-  const dayKeys = calendarKeysBetween(startCalendarKey, endCalendarKey)
-  return sumFunnelDays(dayKeys, userDayMap ?? new Map())
+  const map = userDayMap ?? new Map()
+  if (isWideFunnelRange(startCalendarKey, endCalendarKey)) {
+    return sumFunnelDaysInRange(map, startCalendarKey, endCalendarKey)
+  }
+  return sumFunnelDays(calendarKeysBetween(startCalendarKey, endCalendarKey), map)
+}
+
+/** Workspace kayıt tarihinden bugüne — Tüm Zamanlar sekmesi için. */
+export function funnelRangeAllTimeSince(joinedAtIso: string | null | undefined): FunnelPeriodRange {
+  const end = todayCalendarKey()
+  const start = joinedAtIso ? istanbulCalendarKeyFromIso(joinedAtIso) : end
+  return {
+    sinceIso: istanbulDayStartIso(start),
+    untilIso: istanbulDayEndIso(end),
+    startCalendarKey: start,
+    endCalendarKey: end,
+  }
 }
 
 /** İstatistikler / ekip nabzı — PulsePeriod → İstanbul hizalı dönem penceresi. */

@@ -14,6 +14,7 @@ import {
   funnelTotalsForUserInRange,
   funnelRangeForSheetPeriod,
   funnelRangeForPulsePeriod,
+  funnelRangeAllTimeSince,
 } from '@/lib/domain/funnelActuals'
 import { getTeamVideoSummaryMapAction } from '@/app/(dashboard)/egitim/videoActions'
 import { TEAM_RANKING_BATCH_PERIODS } from '@/lib/domain/teamRankingBatch'
@@ -331,7 +332,11 @@ export async function getTeamRankingMetricsBatchAction(
     actionsQuery = actionsQuery.gte('created_at', batchStartIso)
   }
 
-  const funnelFetchRange = funnelRangeForPulsePeriod('all')
+  const funnelFetchRange = funnelRangeAllTimeSince(
+    (
+      await supabase.from('nmm_workspaces').select('created_at').eq('id', workspaceId).maybeSingle()
+    ).data?.created_at ?? null,
+  )
   const [actionsResult, funnelUserDays] = await Promise.all([
     actionsQuery,
     fetchFunnelActualsBatchUserDays(
@@ -346,7 +351,7 @@ export async function getTeamRankingMetricsBatchAction(
 
   const actions = (actionsResult.data ?? []) as DailyActionRow[]
   const entries = TEAM_RANKING_BATCH_PERIODS.map(period => {
-    const range = funnelRangeForPulsePeriod(period)
+    const range = period === 'all' ? funnelFetchRange : funnelRangeForPulsePeriod(period)
     const funnelByUser: Record<string, FunnelCounts> = {}
     for (const uid of uniqueIds) {
       funnelByUser[uid] = funnelTotalsForUserInRange(

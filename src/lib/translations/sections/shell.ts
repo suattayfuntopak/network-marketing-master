@@ -53,7 +53,7 @@ export const shellSection = {
       seePlansCta: 'Planları Gör',
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
-        'Listenizde “Katıldı” aşamasına gelen kişileri kartlarındaki “NMM’e Davet Et” ile ekibinize NMM Ortağı olarak katabilirsiniz. Alt ekipte Doğru Başlangıç takibi Plus’ta; ekip nabzı tabloları Pro’da açılır.',
+        'Listenizde “Katıldı” aşamasına gelen kişileri kartlarındaki “NMM’e Davet Et” ile ekibinize NMM Ortağı olarak katabilirsiniz. Ancak alt ekibinizdeki Distribütör Doğru Başlangıç takibi Plus planda; Ekip Performans İzleme Tablosu ise Pro planda açılır.',
       accountAlertTrialTitle: 'Ücretsiz Basic denemen {days} gün sonra bitiyor — planları gör',
       accountAlertTrialTitleLast: 'Ücretsiz Basic denemen bugün/yarın bitiyor — planları gör',
       accountAlertLockedTitle: 'AI kilitlendi — NMM kullanımın devam ediyor, plan seçerek AI\'ı aç',
@@ -131,7 +131,7 @@ export const shellSection = {
       seePlansCta: 'See Plans',
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:
-        'When someone in your list reaches the “Joined” stage, use “Invite to NMM” on their card to bring them onto your team as an NMM Partner. Downline Quick Start tracking is on Plus; team pulse tables unlock on Pro.',
+        'When someone in your list reaches the “Joined” stage, use “Invite to NMM” on their card to add them as an NMM Partner. Downline Distributor Quick Start tracking is on Plus; the Team Performance Tracking Table unlocks on Pro.',
       accountAlertTrialTitle: 'Your free Basic trial ends in {days} days — view plans',
       accountAlertTrialTitleLast: 'Your free Basic trial ends today/tomorrow — view plans',
       accountAlertLockedTitle: 'AI locked — NMM keeps running, pick a plan to re-enable AI',

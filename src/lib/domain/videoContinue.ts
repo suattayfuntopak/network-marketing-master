@@ -7,6 +7,13 @@ export type VideoContinueHighlight = {
   titleEn: string
 }
 
+function isVideoComplete(
+  progress: VideoCatalogPayload['progressByKey'][string] | undefined,
+): boolean {
+  if (!progress) return false
+  return progress.status === 'completed' || (progress.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
+}
+
 export function deriveVideoContinueFromCatalog(
   catalog: VideoCatalogPayload | undefined,
 ): { lastWatched: VideoContinueHighlight | null; nextVideo: VideoContinueHighlight | null } {
@@ -20,7 +27,7 @@ export function deriveVideoContinueFromCatalog(
 
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
+    const done = isVideoComplete(p)
     const at = p?.completed_at ?? p?.started_at ?? ''
     if (done && at >= lastCompletedAt) {
       lastCompletedAt = at
@@ -28,13 +35,29 @@ export function deriveVideoContinueFromCatalog(
     }
   }
 
-  let nextVideo: VideoContinueHighlight | null = null
+  // Yarım kalan video: en yüksek izleme yüzdesi, eşitlikte sıradaki (sortOrder).
+  let resumeVideo: (typeof sorted)[number] | null = null
+  let resumePct = 0
   for (const v of sorted) {
     const p = catalog.progressByKey[v.key]
-    const done = p?.status === 'completed' || (p?.watch_percent ?? 0) >= VIDEO_COMPLETE_PERCENT
-    if (!done) {
-      nextVideo = { key: v.key, titleTr: v.titleTr, titleEn: v.titleEn }
-      break
+    if (isVideoComplete(p)) continue
+    const pct = p?.watch_percent ?? 0
+    if (pct <= 0) continue
+    if (pct > resumePct || (pct === resumePct && v.sortOrder < (resumeVideo?.sortOrder ?? Infinity))) {
+      resumePct = pct
+      resumeVideo = v
+    }
+  }
+
+  let nextVideo: VideoContinueHighlight | null = null
+  if (resumeVideo) {
+    nextVideo = { key: resumeVideo.key, titleTr: resumeVideo.titleTr, titleEn: resumeVideo.titleEn }
+  } else {
+    for (const v of sorted) {
+      if (!isVideoComplete(catalog.progressByKey[v.key])) {
+        nextVideo = { key: v.key, titleTr: v.titleTr, titleEn: v.titleEn }
+        break
+      }
     }
   }
 

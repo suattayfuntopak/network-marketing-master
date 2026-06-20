@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database.types'
 import { resolveCandidateFields } from '@/lib/domain/candidateFields'
 import { findLeaderCandidateForMember } from '@/lib/team/matchCandidate'
-import { fetchTeamWithDownlines } from '@/lib/team/fetchTeamWithDownlines'
+import { fetchTeamWithDownlines, parseOnboardingSteps } from '@/lib/team/fetchTeamWithDownlines'
 import { enrichLeaderCandidates } from '@/lib/team/enrichLeaderCandidates'
 import type { TeamMember } from '@/hooks/useTeamMembers'
 import type { MemberRow } from '@/lib/team/types'
@@ -130,6 +130,18 @@ export async function fetchTeamBundle(
   supabase: SupabaseClient<Database>,
   workspaceId: string
 ): Promise<TeamBundle> {
+  try {
+    return await fetchTeamBundleInner(supabase, workspaceId)
+  } catch (err) {
+    console.error('[fetchTeamBundle] failed:', err)
+    return { members: [], ekipRows: [] }
+  }
+}
+
+async function fetchTeamBundleInner(
+  supabase: SupabaseClient<Database>,
+  workspaceId: string
+): Promise<TeamBundle> {
   const rpcBundle = await fetchTeamWithDownlines(supabase, workspaceId)
   if (rpcBundle) {
     const { leaderOwnerId } = rpcBundle
@@ -175,7 +187,7 @@ export async function fetchTeamBundle(
         takip_count: m.takip_count,
         katildi_count: m.katildi_count,
         last_activity_at: m.last_activity_at,
-        onboarding_steps: m.onboarding_steps,
+        onboarding_steps: parseOnboardingSteps(m.onboarding_steps),
         phone,
         isAppUser: true as const,
         avatar_url: resolvedAvatar,
@@ -254,7 +266,10 @@ async function fetchTeamBundleLegacy(
     .eq('id', workspaceId)
     .single()
 
-  if (wsErr || !ownWs) throw new Error(wsErr?.message || 'Workspace not found')
+  if (wsErr || !ownWs) {
+    console.warn('[fetchTeamBundle] legacy workspace:', wsErr?.message ?? 'not found')
+    return { members: [], ekipRows: [] }
+  }
 
   // İstanbul (UTC+3) gün başlangıcı — "bugünkü" aksiyonlar 00:00 TR'de döner.
   const todayStartIso = istanbulDayStartIso(todayCalendarKey())
@@ -264,7 +279,10 @@ async function fetchTeamBundleLegacy(
     .select('user_id, full_name, role, joined_at, avatar_url')
     .eq('workspace_id', workspaceId)
 
-  if (error) throw error
+  if (error) {
+    console.warn('[fetchTeamBundle] legacy members:', error.message)
+    return { members: [], ekipRows: [] }
+  }
   const membersList = membersRaw ?? []
 
   const uniqueMembersMap: Record<string, MemberMapEntry> = {}
@@ -538,7 +556,7 @@ export async function fetchSahaRadarMemberRows(
       takip_count: m.takip_count,
       katildi_count: m.katildi_count,
       last_activity_at: m.last_activity_at,
-      onboarding_steps: m.onboarding_steps,
+      onboarding_steps: parseOnboardingSteps(m.onboarding_steps),
       phone,
       isAppUser: true as const,
       avatar_url: canonicalPartnerAvatarUrl(

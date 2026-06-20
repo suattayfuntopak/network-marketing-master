@@ -14,3 +14,13 @@ export function akademiHref(tab: AkademiTab, id?: string | number | null): strin
   const q = params.toString()
   return q ? `/egitim?${q}` : '/egitim'
 }
+
+/** Eğitim ilerlemem → video sekmesi: ilgili videoyu vurgula ve otomatik aç/oynat. */
+export function akademiVideoContinueHref(videoKey: string): string {
+  const params = new URLSearchParams({
+    tab: 'videos',
+    highlight: videoKey,
+    autoplay: '1',
+  })
+  return `/egitim?${params.toString()}`
+}

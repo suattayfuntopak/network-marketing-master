@@ -64,7 +64,8 @@ export function TeamMemberCard({
   const lastActiveDate = m.last_activity_at ? new Date(m.last_activity_at) : null
   const daysInactive = lastActiveDate ? Math.floor((now - lastActiveDate.getTime()) / (1000 * 60 * 60 * 24)) : 999
   const isInactive = daysInactive >= 7 && !isCurrentUser
-  const onboardingDone = m.onboarding_steps?.length ?? 0
+  const onboardingSteps = Array.isArray(m.onboarding_steps) ? m.onboarding_steps : []
+  const onboardingDone = onboardingSteps.length
   const onboardingPct = Math.min(100, Math.round((onboardingDone / ONBOARDING_STEP_COUNT) * 100))
   const telHref = m.phone ? `tel:${m.phone.replace(/\s/g, '')}` : null
   const waDirect = waHref(m.phone)
@@ -265,7 +266,7 @@ export function TeamMemberCard({
                   </div>
                   <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
                     {ONBOARDING_STEPS.filter(s => s.week === onboardingWeek).map(step => {
-                      const isStepDone = m.onboarding_steps?.includes(step.id) ?? false
+                      const isStepDone = onboardingSteps.includes(step.id)
                       return (
                         <div
                           key={step.id}

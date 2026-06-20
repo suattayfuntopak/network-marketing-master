@@ -24,6 +24,7 @@ type Props = {
   onProgressChange: () => void
   isAdmin?: boolean
   highlighted?: boolean
+  autoOpenEmbed?: boolean
   onEdit?: () => void
   onDelete?: () => void
 }
@@ -35,6 +36,8 @@ const actionBtn =
 interface YTPlayer {
   getDuration?: () => number
   getCurrentTime?: () => number
+  seekTo?: (seconds: number, allowSeekAhead: boolean) => void
+  playVideo?: () => void
   destroy?: () => void
 }
 interface YTStateEvent {
@@ -44,7 +47,7 @@ interface YTPlayerOptions {
   videoId: string
   host?: string
   playerVars?: Record<string, number>
-  events?: { onStateChange?: (e: YTStateEvent) => void }
+  events?: { onReady?: () => void; onStateChange?: (e: YTStateEvent) => void }
 }
 interface YTNamespace {
   Player: new (el: HTMLElement, opts: YTPlayerOptions) => YTPlayer
@@ -75,7 +78,7 @@ function loadYouTubeApi(): Promise<YTNamespace> {
   return ytApiPromise
 }
 
-export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, highlighted = false, onEdit, onDelete }: Props) {
+export function TrainingVideoCard({ video, workspaceId, progress, onProgressChange, isAdmin, highlighted = false, autoOpenEmbed = false, onEdit, onDelete }: Props) {
   const { lang, t } = useTranslation()
   const [showEmbed, setShowEmbed] = useState(false)
   const [localPct, setLocalPct] = useState(0)
@@ -83,7 +86,14 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
 
   useBodyScrollLock(showEmbed)
 
+  useEffect(() => {
+    if (!autoOpenEmbed) return
+    /* eslint-disable-next-line react-hooks/set-state-in-effect */
+    setShowEmbed(true)
+  }, [autoOpenEmbed])
+
   const savedPct = progress?.watch_percent ?? 0
+  const resumeSec = progress?.position_sec ?? 0
   const isCompleted = progress?.status === 'completed' || savedPct >= VIDEO_COMPLETE_PERCENT
   const displayPct = isCompleted ? 100 : Math.max(localPct, savedPct)
   const hasRelated = !!video.relatedTrainingId
@@ -132,8 +142,16 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
         player = new YT.Player(playerHostRef.current, {
           videoId: cleanId,
           host: 'https://www.youtube-nocookie.com',
-          playerVars: { rel: 0, modestbranding: 1, playsinline: 1 },
+          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, autoplay: autoOpenEmbed ? 1 : 0 },
           events: {
+            onReady: () => {
+              if (resumeSec > 0) {
+                player?.seekTo?.(resumeSec, true)
+              }
+              if (autoOpenEmbed) {
+                player?.playVideo?.()
+              }
+            },
             onStateChange: e => {
               if (e.data === YT.PlayerState.PLAYING) {
                 if (!timer) timer = setInterval(sample, 1000)
@@ -163,7 +181,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
       }
     }
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [showEmbed, cleanId, video.key, workspaceId])
+  }, [showEmbed, cleanId, video.key, workspaceId, autoOpenEmbed, resumeSec])
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { funnelRangeForPulsePeriod, sumFunnelDays } from '@/lib/domain/funnelActuals'
+import { funnelRangeForPulsePeriod, sumFunnelDays, sumFunnelDaysInRange } from '@/lib/domain/funnelActuals'
 import type { FunnelCounts } from '@/lib/domain/roadmap'
 
 describe('sumFunnelDays', () => {
@@ -31,5 +31,16 @@ describe('funnelRangeForPulsePeriod', () => {
     const end = new Date(`${range.endCalendarKey}T12:00:00`)
     const diffDays = Math.round((end.getTime() - start.getTime()) / 86_400_000)
     expect(diffDays).toBe(6)
+  })
+})
+
+describe('wide funnel ranges', () => {
+  it('sumFunnelDaysInRange avoids materializing 1970→today keys', () => {
+    const actions = new Map<string, FunnelCounts>([
+      ['2026-06-01', { arama: 3, tanisma: 0, sunum: 0, yeniUye: 0 }],
+      ['2026-06-02', { arama: 1, tanisma: 0, sunum: 0, yeniUye: 0 }],
+    ])
+    const result = sumFunnelDaysInRange(actions, '2026-06-01', '2026-06-02')
+    expect(result.arama).toBe(4)
   })
 })

@@ -597,7 +597,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
   {
     match: '/platform-yonetim',
     tr: {
-      title: 'Platform Yönetimi',
+      title: 'Super Admin',
       intro: 'Tüm kullanıcıları, lisansları ve dış kayıtları yönetirsin.',
       steps: [
         { t: 'Dış Kayıtlar', d: 'Bağımsız kaydolmuş kişileri "Ekibime Bağla" ile kendi ekibine alabilirsin.' },
@@ -606,7 +606,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       ],
     },
     en: {
-      title: 'Platform Management',
+      title: 'Super Admin',
       intro: 'Manage all users, licenses and external signups.',
       steps: [
         { t: 'External signups', d: 'Use “Link to my team” to bring independent signups into your team.' },

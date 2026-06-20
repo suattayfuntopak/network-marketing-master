@@ -37,6 +37,8 @@ function parseOnboardingSteps(raw: unknown): string[] {
   return []
 }
 
+export { parseOnboardingSteps }
+
 function mapRpcMember(row: RpcMember): TeamMember {
   return {
     user_id: row.user_id,

@@ -1,10 +1,12 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { HelpCircle, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { getPageHelp, resolvePageHelpContext } from '@/lib/domain/pageHelp'
 
 /**
@@ -14,6 +16,9 @@ import { getPageHelp, resolvePageHelpContext } from '@/lib/domain/pageHelp'
  * `useSearchParams` yalnız MODAL içinde (butona basılınca) okunur ve Suspense ile
  * sarılır — böylece statik prerender sırasında CSR-bailout olmaz; (?) butonu her
  * zaman SSR'de görünür. (Aksi halde tüm dashboard sayfaları prerender'da patlıyordu.)
+ *
+ * Modal `document.body`'ye portal edilir — `main-content` view-transition kapsayıcısı
+ * mobilde fixed overlay'i üstte sıkıştırıyordu.
  */
 export const PAGE_HELP_HEADER_TRIGGER_CLASS =
   'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[var(--text-2)] transition hover:bg-[var(--bg-subtle)] hover:text-[var(--text-1)]'
@@ -65,6 +70,7 @@ function PageHelpModal({
 }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
+  const [mounted] = useState(() => typeof window !== 'undefined')
   const tabFromUrl = searchParams.get('tab')
   const tab =
     contextKey ??
@@ -74,21 +80,37 @@ function PageHelpModal({
   const help = getPageHelp(pathname ?? '/', l, tab)
   const closeLabel = l === 'en' ? 'Close' : 'Kapat'
 
-  return (
+  useBodyScrollLock(true)
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  if (!mounted) return null
+
+  return createPortal(
     <div
       className={`fixed inset-0 ${Z.confirm} flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm`}
       onClick={onClose}
+      data-chrome-scroll-ignore
     >
       <div
         className="flex max-h-[85vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-2xl animate-in fade-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="page-help-title"
       >
         <div className="flex items-center justify-between gap-3 border-b border-[var(--border)] px-5 py-4">
           <div className="flex min-w-0 items-center gap-2.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand">
               <HelpCircle className="h-5 w-5" />
             </div>
-            <h2 className="truncate text-lg font-bold text-[var(--text-1)]">{help.title}</h2>
+            <h2 id="page-help-title" className="truncate text-lg font-bold text-[var(--text-1)]">{help.title}</h2>
           </div>
           <button
             type="button"
@@ -117,6 +139,7 @@ function PageHelpModal({
           </ul>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

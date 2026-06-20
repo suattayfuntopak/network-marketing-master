@@ -19,7 +19,7 @@ import {
 import { STAGE_ORDER } from '@/lib/domain/stages'
 import type { CandidateStage } from '@/types/database.types'
 import { todayCalendarKey, toCalendarKey, istanbulDayKey } from '@/lib/utils/calendarDates'
-import { fetchFunnelActualsForPeriod, funnelRangeForPulsePeriod } from '@/lib/domain/funnelActuals'
+import { fetchFunnelActualsForPeriod, funnelRangeAllTimeSince } from '@/lib/domain/funnelActuals'
 import { calendarDayRange, rollingWeekRange, monthRange, yearRange } from '@/lib/utils/hubPeriodRange'
 
 export type HubSelfFieldMetrics = {
@@ -578,7 +578,6 @@ export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> 
     getAuthUser(),
     resolveWorkspaceId(),
   ])
-  const range = funnelRangeForPulsePeriod('all')
 
   if (!user || !workspaceId) {
     return {
@@ -590,7 +589,15 @@ export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> 
   }
 
   const supabase = await createClient()
-  const [allTimeActuals, fieldMetrics, wsData] = await Promise.all([
+  const wsData = await supabase
+    .from('nmm_workspaces')
+    .select('created_at')
+    .eq('id', workspaceId)
+    .maybeSingle()
+  const joinedAt = wsData.data?.created_at ?? null
+  const range = funnelRangeAllTimeSince(joinedAt)
+
+  const [allTimeActuals, fieldMetrics] = await Promise.all([
     funnelActualsSince(
       user.id,
       range.sinceIso,
@@ -599,14 +606,13 @@ export async function getHubAllTimeSelfAction(): Promise<HubAllTimeSelfPayload> 
       range.endCalendarKey,
     ),
     selfFieldMetricsSince(user.id, workspaceId, range.sinceIso, range.untilIso),
-    supabase.from('nmm_workspaces').select('created_at').eq('id', workspaceId).maybeSingle(),
   ])
 
   return {
     hasGoal: progress.hasGoal,
     allTimeActuals,
     fieldMetrics,
-    joinedAt: wsData.data?.created_at ?? null,
+    joinedAt,
   }
 }
 

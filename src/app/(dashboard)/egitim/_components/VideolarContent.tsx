@@ -40,6 +40,7 @@ export function VideolarContent({
   const modalOpen = addFormOpenProp ?? internalModalOpen
   const setModalOpen = onAddFormOpenChange ?? setInternalModalOpen
   const [flashKey, setFlashKey] = useState<string | null>(null)
+  const autoplayKey = searchParams.get('autoplay') === '1' ? searchParams.get('highlight') : null
 
   const [editing, setEditing] = useState<TrainingVideoAdmin | null>(null)
   useEffect(() => {
@@ -155,6 +156,7 @@ export function VideolarContent({
                 <TrainingVideoCard
                   video={video}
                   highlighted={flashKey === video.key}
+                  autoOpenEmbed={autoplayKey === video.key}
                   workspaceId={ws.workspaceId}
                   progress={data!.progressByKey[video.key]}
                   onProgressChange={invalidate}

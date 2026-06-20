@@ -10,7 +10,7 @@ import { useVideoCatalog } from '@/hooks/useVideoCatalog'
 import { deriveVideoContinueFromCatalog } from '@/lib/domain/videoContinue'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { HubSectionCard } from '@/components/hub/HubSectionCard'
-import { akademiHref } from '@/lib/domain/akademiTab'
+import { akademiHref, akademiVideoContinueHref } from '@/lib/domain/akademiTab'
 import { AkademiTabLabel } from '@/components/ui/AkademiTabLabel'
 import { AKADEMI_TAB_THEME, AKADEMI_TABS } from '@/lib/ui/akademiTabTheme'
 import { Skeleton } from '@/components/ui/Skeleton'
@@ -127,7 +127,7 @@ export function CrownVideoPage({ asTab = false }: { asTab?: boolean }) {
                 ) : null}
                 {nextVideo ? (
                   <Link
-                    href={akademiHref('videos')}
+                    href={akademiVideoContinueHref(nextVideo.key)}
                     className={clsx(
                       'flex items-center gap-3 rounded-xl border px-3 py-2.5 transition',
                       videoProgressAccent.border,
