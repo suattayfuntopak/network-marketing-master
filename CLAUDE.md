@@ -35,6 +35,7 @@
 - deadcode: `npm run knip` (config: `knip.json` — Next.js App Router entry'leri + generated `database.types.ts` ignore)
 - i18n: `npm run i18n:unused` (proje-özel bütünlük kontrolü)
 - migrate: `npm run migrate:check` (migration numara doğrulaması)
+- plan copy: `npm run plan-copy:check` (planFeatureMatrix ↔ i18n senkron testleri)
 
 knip durumu (2026-06-13): **0 ulaşılamayan dosya** (29 ölü dosya temizlendi — rota birleştirme/tasarım artıkları), 26 unused export + 3 type + 3 duplicate export KALDI. Bu export'lar bilinçli tutuluyor: `fetchCandidatesPageAction` (Load More UI sonra), `bypassAILimits`/`describeShopierSignatureScheme` (güvenlik/teşhis API), `navigation.ts` config export'ları. Export kırpma yapılmadı — per-item karar gerektirir, yanlış-pozitif riski var.
 

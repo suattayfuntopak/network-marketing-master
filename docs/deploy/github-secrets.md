@@ -50,6 +50,16 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 
 **`PLAYWRIGHT_TRIAL_EXPIRED_*` tanımlı değilse** expired-trial spec’leri atlanır (ana E2E yeşil kalır). Ekibim crash regresyonu için staging’de trial’ı bitmiş ayrı bir hesap önerilir.
 
+#### Expired-trial test hesabı oluşturma (staging)
+
+Ana E2E kullanıcısından (`PLAYWRIGHT_TEST_*`) **ayrı** bir hesap kullanın — deneme bitince `license_type = free` ve `is_trial_active = false` olmalı.
+
+1. Supabase Auth’ta yeni e-posta/şifre ile kullanıcı oluşturun (veya staging’de kayıt akışını tamamlayın).
+2. İlgili `nmm_workspace` satırında deneme süresini geçmiş bir tarihe ayarlayın (`trial_ends_at` < bugün, İstanbul günü).
+3. `license_type = 'free'`, aktif abonelik yok — uygulamada Ekibim/UpgradeGate “deneme bitti” akışı görünmeli.
+4. GitHub Actions’a `PLAYWRIGHT_TRIAL_EXPIRED_EMAIL` ve `PLAYWRIGHT_TRIAL_EXPIRED_PASSWORD` ekleyin.
+5. Yerelde doğrulama: `.env.local`’e aynı değişkenleri yazıp `npm run test:e2e -- e2e/expired-trial-ekip.spec.ts`.
+
 **`PLAYWRIGHT_TEST_*` yoksa E2E job bilinçli olarak atlanır** (workflow uyarısı + yeşil job). Build job yine lint + derleme çalıştırır. Auth’lu senaryoları CI’da koşturmak için aşağıdaki adımları uygulayın.
 
 #### E2E secret ekleme (adım adım)

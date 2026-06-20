@@ -13,6 +13,8 @@ export const PRODUCT_EVENTS = {
   upgradeGateCtaClick: 'upgrade_gate_cta_click',
   /** @deprecated Legacy ?plan=basic deep link; yeni huni odemePageView üzerinden ölçülür. */
   odemeBasicDeepLink: 'odeme_basic_deep_link',
+  /** /odeme?plan=plus deep link (stats_advanced / team_full gate). */
+  odemePlusDeepLink: 'odeme_plus_deep_link',
   /** /odeme sayfası görüntülendi → seePlans sonrası dönüşüm. */
   odemePageView: 'odeme_page_view',
 

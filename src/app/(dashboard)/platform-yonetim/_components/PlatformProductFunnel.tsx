@@ -55,7 +55,7 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
 
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
+          {Array.from({ length: 10 }).map((_, i) => (
             <Skeleton key={i} className="h-20 rounded-2xl" />
           ))}
         </div>
@@ -85,6 +85,18 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
             accent="text-emerald-700 dark:text-emerald-300"
           />
           <FunnelCard
+            label={t('platformPage.funnelProUpgradeCta')}
+            value={funnel?.proUpgradeCtaClick ?? 0}
+            hint={t('platformPage.funnelProUpgradeHint', {
+              gate: funnel?.proUpgradeCtaUpgradeGate ?? 0,
+              summary: funnel?.proUpgradeCtaEkipSummary ?? 0,
+              training: funnel?.proUpgradeCtaEkipTraining ?? 0,
+              stats: funnel?.proUpgradeCtaStatsHint ?? 0,
+            })}
+            icon={Sparkles}
+            accent="text-pink-700 dark:text-pink-300"
+          />
+          <FunnelCard
             label={t('platformPage.funnelUpgradeGateLegacy')}
             value={funnel?.upgradeGateCtaClick ?? 0}
             icon={ArrowRight}
@@ -98,6 +110,11 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
             label={t('platformPage.funnelSeePlansEnded')}
             value={funnel?.seePlansClickEnded ?? 0}
             icon={Sparkles}
+          />
+          <FunnelCard
+            label={t('platformPage.funnelPlusDeepLink')}
+            value={funnel?.odemePlusDeepLink ?? 0}
+            icon={Link2}
           />
           <FunnelCard
             label={t('platformPage.funnelBasicDeepLinkLegacy')}

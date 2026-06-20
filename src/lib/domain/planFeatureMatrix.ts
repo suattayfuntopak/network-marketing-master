@@ -84,6 +84,7 @@ export const PLAN_GATE_COPY = {
     teamProUpgradeDesc:
       'Ekip Saha Nabzı ve eğitim/video/itiraz nabzı Pro planda açılır. Plus planınız huni tablosu ve DDBR takibini zaten içerir.',
     teamProUpgradeCta: 'Pro planları gör',
+    upgradePlusCta: 'Plus planları gör',
   },
   en: {
     teamGateDesc:
@@ -98,6 +99,7 @@ export const PLAN_GATE_COPY = {
     teamProUpgradeDesc:
       'Team Field Pulse and training/video/objection pulse unlock on Pro. Your Plus plan already includes the funnel table and Quick Start tracking.',
     teamProUpgradeCta: 'View Pro plans',
+    upgradePlusCta: 'View Plus plans',
   },
 } as const
 
@@ -130,7 +132,7 @@ export const PLAN_MODAL_BLURBS = {
   },
 } as const
 
-export type UpgradePlansTarget = 'general' | 'pro'
+export type UpgradePlansTarget = 'general' | 'plus' | 'pro'
 
 export type ProUpgradeCtaSource =
   | 'upgrade_gate'
@@ -138,14 +140,17 @@ export type ProUpgradeCtaSource =
   | 'ekip_training'
   | 'stats_hint'
 
-/** Ödeme deep link — team_pulse gate Pro kartına gider; diğerleri genel planlar. */
+/** Ödeme deep link — feature’a göre Plus veya Pro kartına gider. */
 export function resolveUpgradePlansTarget(
   feature: GatedFeature | 'team_full',
 ): UpgradePlansTarget {
   if (feature === 'team_pulse') return 'pro'
+  if (feature === 'stats_advanced' || feature === 'team_full') return 'plus'
   return 'general'
 }
 
 export function upgradePlansHref(target: UpgradePlansTarget): string {
-  return target === 'pro' ? '/odeme?plan=pro' : '/odeme'
+  if (target === 'pro') return '/odeme?plan=pro'
+  if (target === 'plus') return '/odeme?plan=plus'
+  return '/odeme'
 }

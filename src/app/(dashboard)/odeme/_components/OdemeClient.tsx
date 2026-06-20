@@ -36,8 +36,10 @@ export function OdemeClient() {
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const searchParams = useSearchParams()
   const basicPlanRef = useRef<HTMLDivElement>(null)
+  const plusPlanRef = useRef<HTMLDivElement>(null)
   const proPlanRef = useRef<HTMLDivElement>(null)
   const highlightBasic = searchParams.get('plan') === 'basic'
+  const highlightPlus = searchParams.get('plan') === 'plus'
   const highlightPro = searchParams.get('plan') === 'pro'
   const highlightYearly = searchParams.get('period') === 'yearly'
 
@@ -49,6 +51,7 @@ export function OdemeClient() {
   useBodyScrollLock(loading)
 
   const basicDeepLinkLogged = useRef(false)
+  const plusDeepLinkLogged = useRef(false)
   const odemeViewLogged = useRef(false)
 
   useEffect(() => {
@@ -65,6 +68,9 @@ export function OdemeClient() {
     if (highlightPro && proPlanRef.current) {
       proPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
+    if (highlightPlus && plusPlanRef.current) {
+      plusPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
     if (highlightBasic && !basicDeepLinkLogged.current) {
       basicDeepLinkLogged.current = true
       void logProductEventAction(PRODUCT_EVENTS.odemeBasicDeepLink, {
@@ -72,7 +78,14 @@ export function OdemeClient() {
         period: highlightYearly ? 'yearly' : 'monthly',
       })
     }
-  }, [highlightBasic, highlightPro, highlightYearly])
+    if (highlightPlus && !plusDeepLinkLogged.current) {
+      plusDeepLinkLogged.current = true
+      void logProductEventAction(PRODUCT_EVENTS.odemePlusDeepLink, {
+        source: 'query',
+        period: highlightYearly ? 'yearly' : 'monthly',
+      })
+    }
+  }, [highlightBasic, highlightPlus, highlightPro, highlightYearly])
 
   const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)
@@ -363,7 +376,13 @@ export function OdemeClient() {
         </div>
 
         {/* Plus Plan */}
-        <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-8 flex flex-col justify-between relative hover:border-indigo-300/60 dark:hover:border-zinc-600/50 transition duration-300 shadow-sm">
+        <div
+          ref={plusPlanRef}
+          id="plan-plus"
+          className={`rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-8 flex flex-col justify-between relative hover:border-indigo-300/60 dark:hover:border-zinc-600/50 transition duration-300 shadow-sm ${
+            highlightPlus ? 'ring-2 ring-amber-500/35 shadow-lg shadow-amber-500/10' : ''
+          }`}
+        >
           {isPlusActive && (
             <div className="absolute right-6 top-6">
               <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">

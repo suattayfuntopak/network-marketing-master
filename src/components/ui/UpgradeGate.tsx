@@ -74,7 +74,11 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
   const plansTarget = resolveUpgradePlansTarget(resolvedFeature)
   const plansHref = upgradePlansHref(plansTarget)
   const ctaLabelKey =
-    plansTarget === 'pro' ? 'shellUi.teamProUpgradeCta' : 'shellUi.upgradeBannerCta'
+    plansTarget === 'pro'
+      ? 'shellUi.teamProUpgradeCta'
+      : plansTarget === 'plus'
+        ? 'shellUi.upgradePlusCta'
+        : 'shellUi.upgradeBannerCta'
 
   const logCtaClick = () => {
     if (plansTarget === 'pro') {

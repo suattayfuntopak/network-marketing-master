@@ -17,6 +17,11 @@ import {
 } from '@/lib/domain/hubFunnelTargets'
 import { getGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import {
+  aggregateProductFunnelCounts,
+  emptyProductFunnelCounts,
+  type ProductFunnelCounts,
+} from '@/lib/domain/productFunnelStats'
 import { GEMINI_FLASH, GEMINI_PRO } from '@/lib/ai/models'
 import { fromCalendarKey, toCalendarKey, todayCalendarKey } from '@/lib/utils/calendarDates'
 
@@ -437,21 +442,7 @@ export async function getAiModelMixAction(period: AIUsageArchivePeriod): Promise
   return mix
 }
 
-export type ProductFunnelCounts = {
-  pricingSectionView: number
-  /** Aktif denemede UpgradeGate "Planları Gör & Yükselt" tıklaması */
-  upgradeGateCtaClick: number
-  /** @deprecated Legacy ?plan=basic query deep link */
-  odemeBasicDeepLink: number
-  odemePageView: number
-  /** Planları Gör — metadata.source: account_alert | upgrade_gate | notification */
-  seePlansClick: number
-  seePlansClickAccountAlert: number
-  seePlansClickUpgradeGate: number
-  seePlansClickNotification: number
-  seePlansClickTrial: number
-  seePlansClickEnded: number
-}
+export type { ProductFunnelCounts }
 
 /** Süper admin: ürün hunisi olay sayıları (landing → plan CTA → ödeme). */
 export async function getProductFunnelStatsAction(
@@ -476,48 +467,13 @@ export async function getProductFunnelStatsAction(
   const { data, error } = await q
   if (error) {
     console.error('[getProductFunnelStatsAction]', error)
-    return {
-      pricingSectionView: 0,
-      upgradeGateCtaClick: 0,
-      odemeBasicDeepLink: 0,
-      odemePageView: 0,
-      seePlansClick: 0,
-      seePlansClickAccountAlert: 0,
-      seePlansClickUpgradeGate: 0,
-      seePlansClickNotification: 0,
-      seePlansClickTrial: 0,
-      seePlansClickEnded: 0,
-    }
+    return emptyProductFunnelCounts()
   }
 
-  const counts: ProductFunnelCounts = {
-    pricingSectionView: 0,
-    upgradeGateCtaClick: 0,
-    odemeBasicDeepLink: 0,
-    odemePageView: 0,
-    seePlansClick: 0,
-    seePlansClickAccountAlert: 0,
-    seePlansClickUpgradeGate: 0,
-    seePlansClickNotification: 0,
-    seePlansClickTrial: 0,
-    seePlansClickEnded: 0,
-  }
-  for (const row of data ?? []) {
-    const meta = row.metadata as Record<string, unknown> | null
-    if (row.event_name === PRODUCT_EVENTS.pricingSectionView) counts.pricingSectionView++
-    else if (row.event_name === PRODUCT_EVENTS.upgradeGateCtaClick) counts.upgradeGateCtaClick++
-    else if (row.event_name === PRODUCT_EVENTS.odemeBasicDeepLink) counts.odemeBasicDeepLink++
-    else if (row.event_name === PRODUCT_EVENTS.odemePageView) counts.odemePageView++
-    else if (row.event_name === PRODUCT_EVENTS.seePlansClick) {
-      counts.seePlansClick++
-      const source = meta?.source
-      const phase = meta?.phase
-      if (source === 'account_alert') counts.seePlansClickAccountAlert++
-      else if (source === 'upgrade_gate') counts.seePlansClickUpgradeGate++
-      else if (source === 'notification') counts.seePlansClickNotification++
-      if (phase === 'trial') counts.seePlansClickTrial++
-      else if (phase === 'ended') counts.seePlansClickEnded++
-    }
-  }
-  return counts
+  return aggregateProductFunnelCounts(
+    (data ?? []).map(row => ({
+      event_name: row.event_name,
+      metadata: row.metadata as Record<string, unknown> | null,
+    })),
+  )
 }

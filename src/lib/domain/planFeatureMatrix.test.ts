@@ -77,6 +77,7 @@ describe('planFeatureMatrix', () => {
       expect(shell.teamProUpgradeTitle).toBe(gate.teamProUpgradeTitle)
       expect(shell.teamProUpgradeDesc).toBe(gate.teamProUpgradeDesc)
       expect(shell.teamProUpgradeCta).toBe(gate.teamProUpgradeCta)
+      expect(shell.upgradePlusCta).toBe(gate.upgradePlusCta)
       expect(statsSection[lang].statsPage.teamLockedDesc).toBe(gate.statsTeamLockedDesc)
     }
   })
@@ -104,11 +105,13 @@ describe('planFeatureMatrix', () => {
     }
   })
 
-  it('resolveUpgradePlansTarget routes team_pulse to Pro checkout', () => {
+  it('resolveUpgradePlansTarget routes features to correct checkout deep links', () => {
     expect(resolveUpgradePlansTarget('team_pulse')).toBe('pro')
     expect(upgradePlansHref('pro')).toBe('/odeme?plan=pro')
-    expect(resolveUpgradePlansTarget('stats_advanced')).toBe('general')
-    expect(resolveUpgradePlansTarget('team_full')).toBe('general')
+    expect(resolveUpgradePlansTarget('stats_advanced')).toBe('plus')
+    expect(resolveUpgradePlansTarget('team_full')).toBe('plus')
+    expect(upgradePlansHref('plus')).toBe('/odeme?plan=plus')
+    expect(resolveUpgradePlansTarget('ai_coach')).toBe('general')
     expect(upgradePlansHref('general')).toBe('/odeme')
   })
 })

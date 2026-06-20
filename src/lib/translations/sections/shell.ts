@@ -58,6 +58,7 @@ export const shellSection = {
       teamProUpgradeDesc:
         'Ekip Saha Nabzı ve eğitim/video/itiraz nabzı Pro planda açılır. Plus planınız huni tablosu ve DDBR takibini zaten içerir.',
       teamProUpgradeCta: 'Pro planları gör',
+      upgradePlusCta: 'Plus planları gör',
       accountAlertTrialTitle: 'Ücretsiz Basic denemen {days} gün sonra bitiyor — planları gör',
       accountAlertTrialTitleLast: 'Ücretsiz Basic denemen bugün/yarın bitiyor — planları gör',
       accountAlertLockedTitle: 'AI kilitlendi — NMM kullanımın devam ediyor, plan seçerek AI\'ı aç',
@@ -140,6 +141,7 @@ export const shellSection = {
       teamProUpgradeDesc:
         'Team Field Pulse and training/video/objection pulse unlock on Pro. Your Plus plan already includes the funnel table and Quick Start tracking.',
       teamProUpgradeCta: 'View Pro plans',
+      upgradePlusCta: 'View Plus plans',
       accountAlertTrialTitle: 'Your free Basic trial ends in {days} days — view plans',
       accountAlertTrialTitleLast: 'Your free Basic trial ends today/tomorrow — view plans',
       accountAlertLockedTitle: 'AI locked — NMM keeps running, pick a plan to re-enable AI',
