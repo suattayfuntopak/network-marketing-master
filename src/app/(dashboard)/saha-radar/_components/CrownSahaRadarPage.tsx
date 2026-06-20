@@ -22,6 +22,7 @@ import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { useMarkContacted } from '@/hooks/useCandidates'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { generateQuickMessageAction } from '@/app/(dashboard)/bugun/ilgilen/actions'
 import { generateCoachingMessageAction } from '@/app/(dashboard)/saha-radar/actions'
 import { toast } from 'sonner'
@@ -70,7 +71,12 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
         note: '',
       })
       if (result.error || !result.message) {
-        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        surfaceAiQuotaError(result, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_field',
+          fallbackMessage: 'Mesaj oluşturulamadı.',
+        })
         return
       }
       setActiveAiMessage({
@@ -103,7 +109,12 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
         customContext,
       })
       if (result.error || !result.message) {
-        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        surfaceAiQuotaError(result, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_field',
+          fallbackMessage: 'Mesaj oluşturulamadı.',
+        })
         return
       }
       setActiveAiMessage({

@@ -16,6 +16,7 @@ import {
 } from '@/lib/domain/dailyActionNote'
 import { generateNotesSummary, translateNoteAction, persistLeaderNoteTranslationAction } from '../actions'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 
 interface Props {
   candidateId: string
@@ -57,7 +58,12 @@ export function LeaderNotesCard({ candidateId, workspaceId, candidateName }: Pro
       const rawNotes = leaderNotes.map(n => resolveDailyActionNote(n).noteTr)
       const res = await generateNotesSummary(rawNotes)
       if (res.error) {
-        toast.error(res.error)
+        surfaceAiQuotaError(res, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_field',
+          fallbackMessage: t('pipelinePage.couldNotGenerateSummary'),
+        })
       } else if (res.summary) {
         setAiSummary(res.summary)
       }

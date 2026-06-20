@@ -1,7 +1,7 @@
 'use server'
 
 import { generateMessage } from '@/lib/ai/generateMessage'
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { generateLocalFallbackMessage } from '@/lib/domain/aiFallback'
 
@@ -9,7 +9,7 @@ export async function generateQuickMessageAction(input: {
   name: string
   stage: string
   note?: string | null
-}): Promise<{ message?: string; error?: string }> {
+}): Promise<{ message?: string; error?: string; quotaError?: AiQuotaErrorCode }> {
   if (!input.name) return { error: 'Kişi adı eksik.' }
 
   if (!process.env.GEMINI_API_KEY) {
@@ -24,7 +24,7 @@ export async function generateQuickMessageAction(input: {
   }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message }
+  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
 
   try {
     const message = await generateMessage({

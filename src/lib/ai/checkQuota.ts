@@ -30,6 +30,15 @@ export interface QuotaCheckErr {
 
 export type QuotaCheckResult = QuotaCheckOk | QuotaCheckErr
 
+/** UI'ın limit/feature hatasını upgrade-prompt'a yönlendirmesi için stabil kod. */
+export type AiQuotaErrorCode = 'limit' | 'feature' | 'auth'
+
+export function quotaErrorCode(reason: QuotaCheckErr['reason']): AiQuotaErrorCode {
+  if (reason === 'limit_reached') return 'limit'
+  if (reason === 'feature_unavailable') return 'feature'
+  return 'auth'
+}
+
 interface CheckOpts {
   lang?: 'tr' | 'en'
 }

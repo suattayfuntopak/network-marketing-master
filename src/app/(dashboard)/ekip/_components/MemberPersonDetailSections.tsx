@@ -20,6 +20,7 @@ import { queryKeys } from '@/lib/query/keys'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { waHref } from '@/lib/utils/waLink'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEPS, type MemberRow } from '@/lib/team/types'
@@ -291,7 +292,12 @@ export function useMemberCoachingMessage({
         customContext,
       })
       if (result.error || !result.message) {
-        toast.error(result.error ?? 'Mesaj oluşturulamadı.')
+        surfaceAiQuotaError(result, {
+          openUpgrade,
+          toastError: (m) => toast.error(m),
+          feature: 'ai_field',
+          fallbackMessage: 'Mesaj oluşturulamadı.',
+        })
         return
       }
       setMemberPhone(phone ?? null)

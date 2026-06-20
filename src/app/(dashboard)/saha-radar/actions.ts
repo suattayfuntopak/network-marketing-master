@@ -128,7 +128,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
 
 // ─── Coaching AI Action ───────────────────────────────────────────────────────
 
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { clampAIUserInput } from '@/lib/domain/aiInputLimit'
 
@@ -138,14 +138,14 @@ export async function generateCoachingMessageAction(input: {
   daysSinceActivity: number | null
   targetUserId?: string
   customContext?: string
-}): Promise<{ message?: string; error?: string }> {
+}): Promise<{ message?: string; error?: string; quotaError?: AiQuotaErrorCode }> {
   if (!process.env.GEMINI_API_KEY) {
     return { error: 'GEMINI_API_KEY eksik.' }
   }
   if (!input.memberName) return { error: 'Üye adı eksik.' }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message }
+  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
 
   const { activityLevel, daysSinceActivity } = input
   const tone = activityLevel === 'silent' ? 'empatik' : 'motive_edici'

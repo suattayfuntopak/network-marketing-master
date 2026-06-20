@@ -3,7 +3,7 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
-import { checkAIQuota, logAIGenerationFromQuota, logAITranslation } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, logAITranslation, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
@@ -124,7 +124,7 @@ Kurallar:
   }
 }
 
-export async function generateNotesSummary(notes: string[]): Promise<{ summary?: string; error?: string }> {
+export async function generateNotesSummary(notes: string[]): Promise<{ summary?: string; error?: string; quotaError?: AiQuotaErrorCode }> {
   if (!process.env.GEMINI_API_KEY) {
     return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
   }
@@ -132,7 +132,7 @@ export async function generateNotesSummary(notes: string[]): Promise<{ summary?:
   if (!notes || notes.length === 0) return { error: 'Not bulunamadı.' }
 
   const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message }
+  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
 
   try {
     const model = genAI.getGenerativeModel({
