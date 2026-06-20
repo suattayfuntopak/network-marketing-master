@@ -25,7 +25,7 @@ export const PANO_INDIGO_GRADIENT_ACTIVE =
 
 /** Landing Aylık Ödeme + Ekibim sidebar / başlık / Ekip Üyeleri sekmesi. */
 export const EKIP_MODULE_ACCENT_CLASS =
-  'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md dark:from-pink-600 dark:to-rose-500 dark:shadow-pink-500/15'
+  'bg-gradient-to-r from-pink-600 to-rose-500 text-white shadow-md shadow-pink-500/15'
 
 /** İçerik Stüdyosu — sekme + solid CTA (İçerik Üret, takvime kaydet). */
 export const STUDIO_MODULE_ACCENT_CLASS = PRO_CTA_GRADIENT_ACTIVE

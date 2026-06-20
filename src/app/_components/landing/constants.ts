@@ -11,9 +11,9 @@ export const LANDING_PRIMARY_CTA_SHADOW =
 export const LANDING_PRIMARY_CTA_HOVER =
   'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-pink-500/25'
 
-/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: pano Takvim teal crown. */
+/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: Takvim teal (okunabilirlik için biraz koyu). */
 export const LANDING_BASIC_TRIAL_CTA =
-  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-br dark:from-[#90E894] dark:to-[#009688] dark:text-white dark:shadow-md dark:hover:brightness-105'
+  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-br dark:from-[#6AB86E] dark:to-[#00796B] dark:text-white dark:shadow-md dark:hover:opacity-95'
 
 /** Plus plan CTA — light: brand (değişmez); dark: pano Vaktin Varsa blue crown. */
 export const LANDING_PLUS_CTA =
