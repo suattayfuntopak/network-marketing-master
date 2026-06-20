@@ -128,7 +128,7 @@ export async function getCrownSahaRadarAction(workspaceId: string): Promise<Crow
 
 // ─── Coaching AI Action ───────────────────────────────────────────────────────
 
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { clampAIUserInput } from '@/lib/domain/aiInputLimit'
 
@@ -178,10 +178,7 @@ export async function generateCoachingMessageAction(input: {
     })
 
     const preview = message.slice(0, 120).replace(/\n/g, ' ')
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
+    await logAIGenerationFromQuota(quota, {
       note: 'message',
       noteTr: input.targetUserId ? `coaching:${input.targetUserId}:${preview}` : undefined,
       aiModel: GEMINI_FLASH,

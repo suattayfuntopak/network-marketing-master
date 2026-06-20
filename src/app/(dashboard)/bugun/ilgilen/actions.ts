@@ -1,7 +1,7 @@
 'use server'
 
 import { generateMessage } from '@/lib/ai/generateMessage'
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { generateLocalFallbackMessage } from '@/lib/domain/aiFallback'
 
@@ -35,13 +35,7 @@ export async function generateQuickMessageAction(input: {
       messageType: 'takip',
     })
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
 
     return { message }
   } catch (err: unknown) {

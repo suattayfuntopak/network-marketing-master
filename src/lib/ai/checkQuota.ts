@@ -139,6 +139,33 @@ export async function checkAIQuota(
   }
 }
 
+/**
+ * `checkAIQuota` sonucundan doğrudan kullanım kaydı atar — tekrarlayan
+ * `workspaceId/userId/dailyLimit` türetmesini tek yerde toplar. Kota kapısı
+ * (`checkAIQuota`) + kullanım kaydı ikilisini eşleştirmenin ergonomik yolu:
+ * `dailyLimit = isSuperAdmin ? null : limit` (atomik limit-farkında insert) buradan
+ * gelir, böylece çağıran sahalar bu kritik satırı yanlış yazamaz.
+ */
+export async function logAIGenerationFromQuota(
+  quota: QuotaCheckOk,
+  opts: {
+    note: AIActionType
+    candidateId?: string | null
+    noteTr?: string | null
+    aiModel?: string | null
+  },
+): Promise<void> {
+  await logAIGeneration({
+    workspaceId: quota.workspaceId,
+    userId: quota.user.id,
+    note: opts.note,
+    candidateId: opts.candidateId ?? null,
+    noteTr: opts.noteTr ?? null,
+    aiModel: opts.aiModel ?? null,
+    dailyLimit: quota.isSuperAdmin ? null : quota.limit,
+  })
+}
+
 /** Logs a successful AI generation to `nmm_daily_actions`. No-op if workspace unknown. */
 export async function logAIGeneration(params: {
   workspaceId: string | null

@@ -3,7 +3,7 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
 import { generateMessage } from '@/lib/ai/generateMessage'
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { serverError } from '@/lib/utils/serverError'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
@@ -63,13 +63,7 @@ export async function generateMessageAction(
       warmth,
     })
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
 
     return { message, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: unknown) {
@@ -199,13 +193,7 @@ JSON yapısı şu şekilde olmalıdır:
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'roleplay',
-      aiModel: coachModel,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'roleplay', aiModel: coachModel })
 
     return {
       candidate_reply: parsed.candidate_reply,
@@ -294,13 +282,7 @@ ${buildObjectionKnowledgeBase(l)}`;
 
     const answer = result.response.text().trim()
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: coachModel,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: coachModel })
 
     return { answer, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err: unknown) {
@@ -369,13 +351,7 @@ DİL POLİTİKASI: language 'en' ise tamamen İngilizce, 'tr' ise tamamen Türk�
       return { error: l === 'en' ? 'Empty response, please try again.' : 'Boş yanıt geldi, tekrar dener misin?' }
     }
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: contentModel,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: contentModel })
 
     return { content, remaining: quota.isSuperAdmin ? undefined : quota.remaining }
   } catch (err) {

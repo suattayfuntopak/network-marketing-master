@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
 import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
@@ -556,13 +556,7 @@ Sadece mesajın kendisini çıktı olarak ver. "İşte mesajınız:", başlıkla
 
     const generatedText = result.response.text()?.trim() || ''
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: coachModel,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: coachModel })
 
     return {
       message: generatedText,

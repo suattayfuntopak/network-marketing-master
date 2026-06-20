@@ -36,7 +36,8 @@ const TRANSLATION_ONLY_WHITELIST = new Set([
 
 const AI_CALL = /(?:\.generateContent\s*\(|(?<![A-Za-z])generateMessage\s*\()/
 const HAS_QUOTA_GATE = /checkAIQuota\s*\(/
-const HAS_USAGE_LOG = /logAIGeneration\s*\(/
+// logAIGeneration(...) veya ergonomik logAIGenerationFromQuota(quota, ...)
+const HAS_USAGE_LOG = /logAIGeneration(?:FromQuota)?\s*\(/
 
 function collectTsFiles(dir: string): string[] {
   const out: string[] = []

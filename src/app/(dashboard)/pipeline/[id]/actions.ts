@@ -3,7 +3,7 @@
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { mergeDailyActionNoteUpdate } from '@/lib/domain/dailyActionNote'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { GEMINI_FLASH } from '@/lib/ai/models'
@@ -49,13 +49,7 @@ export async function generateCoachMessage(
   try {
     const message = await generateMessage({ name, stage, note, messageType })
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
 
     return { message }
   } catch (err: unknown) {
@@ -122,13 +116,7 @@ Kurallar:
     if (!message) throw new Error('Boş yanıt döndü.')
     if (inviteLink && !message.includes(inviteLink)) message += linkBlock
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
     return { message }
   } catch (err: unknown) {
     console.error('NMM invite message error', err)
@@ -181,13 +169,7 @@ Yalnızca bu formatta yanıt dön, başka açıklama, giriş veya sonuç ekleme.
 
     const summary = result.response.text().trim()
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'message',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
 
     return { summary }
   } catch (err: unknown) {

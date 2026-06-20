@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('@/lib/supabase/server', () => ({ createClient: vi.fn() }))
 vi.mock('@/lib/domain/auth', () => ({ isSuperAdmin: vi.fn() }))
 
-import { checkAIQuota, logAIGeneration } from './checkQuota'
+import { checkAIQuota, logAIGeneration, logAIGenerationFromQuota, type QuotaCheckOk } from './checkQuota'
 import { createClient } from '@/lib/supabase/server'
 import { isSuperAdmin } from '@/lib/domain/auth'
 
@@ -254,5 +254,41 @@ describe('logAIGeneration (atomik kota rezervasyonu)', () => {
 
     expect(rpcCalls).toEqual([INCREMENT]) // yalnız analitik sayaç
     expect(inserts).toHaveLength(1)
+  })
+})
+
+function fakeQuota(over: Partial<QuotaCheckOk> = {}): QuotaCheckOk {
+  return {
+    ok: true,
+    user: { id: 'u1', email: 'a@b.c' },
+    isSuperAdmin: false,
+    workspaceId: 'w1',
+    licenseType: 'basic',
+    limit: 20,
+    used: 0,
+    remaining: 19,
+    ...over,
+  }
+}
+
+describe('logAIGenerationFromQuota (dailyLimit türetmesi)', () => {
+  it('normal kullanıcı: dailyLimit=limit → atomik rezerve RPC çağrılır', async () => {
+    const { client, rpcCalls } = makeLogClient(name =>
+      name === RESERVE ? { data: true, error: null } : { error: null },
+    )
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGenerationFromQuota(fakeQuota(), { note: 'message' })
+
+    expect(rpcCalls).toEqual([RESERVE, INCREMENT])
+  })
+
+  it('süper admin: dailyLimit=null → rezerve RPC yok, yalnız sayaç', async () => {
+    const { client, rpcCalls } = makeLogClient(() => ({ error: null }))
+    ;(createClient as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(client)
+
+    await logAIGenerationFromQuota(fakeQuota({ isSuperAdmin: true }), { note: 'message' })
+
+    expect(rpcCalls).toEqual([INCREMENT])
   })
 })

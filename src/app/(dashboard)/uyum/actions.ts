@@ -1,7 +1,7 @@
 'use server'
 
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
-import { checkAIQuota, logAIGeneration } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
 import { GEMINI_FLASH } from '@/lib/ai/models'
 import { serverError } from '@/lib/utils/serverError'
 import { clampAIUserInput, rejectIfAIInputTooLong } from '@/lib/domain/aiInputLimit'
@@ -139,13 +139,7 @@ category değeri yalnızca şunlardan biri olabilir: "Sağlık İddiası", "Geli
     const text = result.response.text().trim()
     const parsed = JSON.parse(text)
 
-    await logAIGeneration({
-      workspaceId: quota.workspaceId,
-      userId: quota.user.id,
-      dailyLimit: quota.isSuperAdmin ? null : quota.limit,
-      note: 'compliance',
-      aiModel: GEMINI_FLASH,
-    })
+    await logAIGenerationFromQuota(quota, { note: 'compliance', aiModel: GEMINI_FLASH })
 
     return {
       score: parsed.score,
