@@ -297,7 +297,7 @@ export const tr = {
     total: "Toplam",
     active: "Aktif",
     hot: "Sıcak",
-    aiMessage: "YZ Mesajı",
+    aiMessage: "Yapay Zeka Mesajı Üret",
     call: "Ara",
     noPhone: "Tel yok",
     noWhatsApp: "WA yok",

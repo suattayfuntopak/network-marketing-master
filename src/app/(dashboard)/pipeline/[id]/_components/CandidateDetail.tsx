@@ -206,8 +206,8 @@ export function CandidateDetail({ candidateId }: Props) {
               isTranslating={isTranslating}
             />
 
-            {/* Aksiyon butonları */}
-            <div className="grid grid-cols-3 gap-3">
+            {/* Aksiyon butonları — mobil: YZ | WA | Ara; masaüstü: YZ | WA (eşit genişlik) */}
+            <div className="grid grid-cols-3 gap-3 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => {
@@ -247,13 +247,13 @@ export function CandidateDetail({ candidateId }: Props) {
                 <a
                   href={`tel:${c.phone}`}
                   onClick={() => markContacted.mutate({ id: candidateId, actionType: 'call' })}
-                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center"
+                  className="flex items-center justify-center gap-1.5 rounded-2xl bg-[#E8F0FE] py-4 text-sm font-semibold text-[#1A56DB] transition hover:opacity-90 animate-all duration-200 active:scale-95 text-center sm:hidden"
                 >
                   <Phone className="h-4 w-4" strokeWidth={1.75} />
                   {t('pipeline.call')}
                 </a>
               ) : (
-                <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)]">
+                <div className="flex items-center justify-center rounded-2xl bg-[var(--bg-subtle)] py-4 text-xs font-medium text-[var(--text-3)] sm:hidden">
                   {t('pipeline.noPhone')}
                 </div>
               )}

@@ -297,7 +297,7 @@ export const en = {
     total: "Total",
     active: "Active",
     hot: "Hot",
-    aiMessage: "AI Message",
+    aiMessage: "Generate AI Message",
     call: "Call",
     noPhone: "No Phone",
     noWhatsApp: "No WhatsApp",
