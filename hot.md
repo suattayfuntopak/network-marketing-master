@@ -8,9 +8,9 @@
 
 **Fix (#1):** Aday prefetch'i await'ten çıkarıp **arka plana** aldım (team/aiUsage gibi). Layout artık yalnız `fetchWorkspaceAction`'ı bekliyor → shell hemen stream olur. PanoContent zaten `useCandidates` ile client'ta yüklüyor (loading durumu var) → ekstra UI yok, skeleton akar.
 
-**Bekleyen (#2, kullanıcı yapacak — ücretsiz):** Supabase asimetrik JWT signing key. Proje simetrik (HS256) ise `getClaims()` her istekte ~230ms ağ doğrulamasına düşüyor (proxy + action = ~460ms). Asimetrik'e geçince YEREL doğrulama → ~460ms kazanç.
+**#2 (asimetrik JWT) — GEREKSİZ ÇIKTI:** Supabase JWT Keys ekranı kontrol edildi → CURRENT KEY zaten **ECC (P-256) asimetrik** (5 ay önce HS256'dan döndürülmüş). `getClaims()` çoktan YEREL doğruluyor; auth round-trip yok. Yani warm 1,7s'nin kaynağı **auth değil, #1'di** (aday sayfalama SSR bloku) — Focus Team çok-adaylı → 50'şerli birkaç tur ~1s+ blok.
 
-Birlikte: warm 1,7s → hedef ~0,7-0,9s (bölge taşımadan). Doğrulama: tsc 0 · eslint 0 · vitest 377/377.
+**Sonuç:** Asıl lever #1'di ve gönderildi. Kalan SSR await'i yalnız `fetchWorkspaceAction` (getClaims yerel + 1 workspace sorgusu ~320ms Mumbai). Bunun da altı için tek kalan kaldıraç **bölge taşıma** (ertelendi). Deploy sonrası /pano yeniden ölçülecek (warm 1,7s → beklenen ~0,5-0,7s). Doğrulama: tsc 0 · eslint 0 · vitest 377/377.
 
 ---
 
