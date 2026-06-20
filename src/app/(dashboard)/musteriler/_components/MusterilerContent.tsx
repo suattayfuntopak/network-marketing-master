@@ -1,30 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { ShoppingBag, Plus, Trash2, Phone, X, Bot, Lock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { ShoppingBag, Plus, Trash2, Pencil, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { useCustomers } from '@/hooks/useCustomers'
 import { queryKeys } from '@/lib/query/keys'
-import { waHref } from '@/lib/utils/waLink'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { addCustomerAction, addOrderAction, deleteCustomerAction, generateCustomerOutreachAction } from '../actions'
 import type { CustomerWithStats } from '@/lib/domain/customerStats'
 import { CustomerAiMessageModal } from './CustomerAiMessageModal'
-
-function formatTry(amount: number, lang: string): string {
-  return `₺${amount.toLocaleString(lang === 'en' ? 'en-US' : 'tr-TR', { maximumFractionDigits: 2 })}`
-}
-
-const inputClass =
-  'w-full rounded-lg border border-[var(--border)] bg-[var(--bg)] px-3 py-2 text-sm text-[var(--text-1)] outline-none focus:border-brand'
+import { CustomerContactActions } from './CustomerContactActions'
+import { EditCustomerSheet } from './EditCustomerSheet'
+import { customerInputClass, formatTry } from './customerFormat'
 
 type AiModalState = {
   customerId: string
@@ -35,77 +30,9 @@ type AiModalState = {
   error: string | null
 }
 
-function CustomerContactActions({
-  c,
-  t,
-  generatingId,
-  hasAiFieldAccess,
-  onAiClick,
-}: {
-  c: CustomerWithStats
-  t: ReturnType<typeof useTranslation>['t']
-  generatingId: string | null
-  hasAiFieldAccess: boolean
-  onAiClick: () => void
-}) {
-  const waLink = c.phone ? waHref(c.phone) : null
-  const generating = generatingId === c.id
-
-  return (
-    <div className="mt-2 flex items-center gap-1.5">
-      {c.phone && (
-        <a
-          href={`tel:${c.phone}`}
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
-          aria-label={t('pipeline.call')}
-          title={t('pipeline.call')}
-        >
-          <Phone className="h-4 w-4" strokeWidth={1.75} />
-        </a>
-      )}
-      {waLink ? (
-        <a
-          href={waLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
-          aria-label="WhatsApp"
-          title="WhatsApp"
-        >
-          <WhatsAppIcon className="h-4 w-4" />
-        </a>
-      ) : (
-        <div
-          className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--bg-subtle)] text-[var(--text-3)]"
-          title={t('pipeline.noWhatsApp')}
-          aria-hidden
-        >
-          <WhatsAppIcon className="h-4 w-4 opacity-40" />
-        </div>
-      )}
-      <button
-        type="button"
-        onClick={onAiClick}
-        disabled={generating}
-        className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-brand-subtle text-brand transition-all hover:scale-105 hover:shadow-md disabled:opacity-50"
-        aria-label={t('musteriler.aiMessageCta')}
-        title={t('musteriler.aiMessageCta')}
-      >
-        {generating ? (
-          <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-brand border-t-transparent" />
-        ) : (
-          <Bot className="h-4 w-4" strokeWidth={1.75} />
-        )}
-        {!hasAiFieldAccess && (
-          <Lock className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 text-[var(--text-3)]" strokeWidth={2.5} aria-hidden />
-        )}
-      </button>
-    </div>
-  )
-}
-
 export function MusterilerContent() {
   const { t, lang } = useTranslation()
+  const router = useRouter()
   const qc = useQueryClient()
   const { data, isLoading } = useCustomers()
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
@@ -119,8 +46,9 @@ export function MusterilerContent() {
   const [orderAmount, setOrderAmount] = useState('')
   const [generatingId, setGeneratingId] = useState<string | null>(null)
   const [aiModal, setAiModal] = useState<AiModalState | null>(null)
+  const [editCustomerId, setEditCustomerId] = useState<string | null>(null)
 
-  useBodyScrollLock(!!aiModal)
+  useBodyScrollLock(!!aiModal || !!editCustomerId)
 
   const invalidate = () => qc.invalidateQueries({ queryKey: queryKeys.customers() })
 
@@ -155,7 +83,8 @@ export function MusterilerContent() {
     }
   }
 
-  async function removeCustomer(c: CustomerWithStats) {
+  async function removeCustomer(c: CustomerWithStats, e: React.MouseEvent) {
+    e.stopPropagation()
     if (!confirm(t('musteriler.deleteConfirm'))) return
     try {
       await deleteCustomerAction(c.id)
@@ -166,7 +95,8 @@ export function MusterilerContent() {
     }
   }
 
-  async function handleCustomerAi(c: CustomerWithStats) {
+  async function handleCustomerAi(c: CustomerWithStats, e?: React.MouseEvent) {
+    e?.stopPropagation()
     if (!hasAiFieldAccess) {
       openUpgrade('ai_field')
       return
@@ -239,9 +169,9 @@ export function MusterilerContent() {
         <div className="mt-4">
           {adding ? (
             <div className="space-y-2 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3">
-              <input className={inputClass} placeholder={t('musteriler.namePlaceholder')} value={name} onChange={e => setName(e.target.value)} autoFocus />
-              <input className={inputClass} placeholder={t('musteriler.phonePlaceholder')} value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" />
-              <input className={inputClass} placeholder={t('musteriler.notePlaceholder')} value={note} onChange={e => setNote(e.target.value)} maxLength={200} />
+              <input className={customerInputClass} placeholder={t('musteriler.namePlaceholder')} value={name} onChange={e => setName(e.target.value)} autoFocus />
+              <input className={customerInputClass} placeholder={t('musteriler.phonePlaceholder')} value={phone} onChange={e => setPhone(e.target.value)} inputMode="tel" />
+              <input className={customerInputClass} placeholder={t('musteriler.notePlaceholder')} value={note} onChange={e => setNote(e.target.value)} maxLength={200} />
               <div className="flex gap-2">
                 <button type="button" disabled={busy || !name.trim()} onClick={submitCustomer} className="flex-1 rounded-lg bg-brand px-3 py-2 text-sm font-bold text-white disabled:opacity-50">
                   {t('common.save')}
@@ -268,12 +198,25 @@ export function MusterilerContent() {
             </p>
           ) : (
             data.customers.map(c => (
-              <div key={c.id} className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+              <div
+                key={c.id}
+                role="link"
+                tabIndex={0}
+                onClick={() => router.push(`/musteriler/${c.id}`)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    router.push(`/musteriler/${c.id}`)
+                  }
+                }}
+                className="cursor-pointer rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm transition hover:border-brand/30 hover:shadow-md"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-sm font-bold text-[var(--text-1)]">{c.full_name}</div>
                     <CustomerContactActions
-                      c={c}
+                      phone={c.phone}
+                      customerId={c.id}
                       t={t}
                       generatingId={generatingId}
                       hasAiFieldAccess={hasAiFieldAccess}
@@ -290,11 +233,11 @@ export function MusterilerContent() {
                   </div>
                 </div>
 
-                <div className="mt-2 flex items-center gap-2">
+                <div className="mt-2 flex items-center gap-2" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()} role="presentation">
                   {orderFor === c.id ? (
                     <>
                       <input
-                        className={`${inputClass} flex-1`}
+                        className={`${customerInputClass} flex-1`}
                         placeholder={t('musteriler.amountPlaceholder')}
                         value={orderAmount}
                         onChange={e => setOrderAmount(e.target.value)}
@@ -313,7 +256,15 @@ export function MusterilerContent() {
                       <button type="button" onClick={() => { setOrderFor(c.id); setOrderAmount('') }} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
                         <Plus className="h-3.5 w-3.5" /> {t('musteriler.addOrderCta')}
                       </button>
-                      <button type="button" onClick={() => removeCustomer(c)} className="ml-auto rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
+                      <button
+                        type="button"
+                        onClick={() => setEditCustomerId(c.id)}
+                        className="ml-auto rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-brand"
+                        aria-label={t('musteriler.detailEditCta')}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button type="button" onClick={e => { void removeCustomer(c, e) }} className="rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </>
@@ -336,6 +287,15 @@ export function MusterilerContent() {
           onClose={() => setAiModal(null)}
         />
       )}
+
+      {editCustomerId && (
+        <EditCustomerSheet
+          customerId={editCustomerId}
+          onClose={() => setEditCustomerId(null)}
+          onSaved={() => { void invalidate() }}
+        />
+      )}
+
       {UpgradePrompt}
     </>
   )

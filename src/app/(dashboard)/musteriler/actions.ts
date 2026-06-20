@@ -3,6 +3,27 @@
 import { createClient } from '@/lib/supabase/server'
 import { getAuthUser } from '@/lib/supabase/authUser'
 import { buildCustomerStats, type CustomerListResult } from '@/lib/domain/customerStats'
+
+export interface CustomerOrderRow {
+  id: string
+  amount: number
+  note: string | null
+  ordered_at: string
+}
+
+export interface CustomerDetailResult {
+  customer: {
+    id: string
+    full_name: string
+    phone: string | null
+    note: string | null
+    created_at: string
+    orderCount: number
+    totalAmount: number
+    lastOrderAt: string | null
+  }
+  orders: CustomerOrderRow[]
+}
 import { checkAIQuota, logAIGenerationFromQuota, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { generateMessage } from '@/lib/ai/generateMessage'
 import { GEMINI_FLASH } from '@/lib/ai/models'
@@ -52,6 +73,129 @@ export async function getCustomersAction(): Promise<CustomerListResult> {
   }))
 
   return buildCustomerStats(custRes.data ?? [], orders)
+}
+
+/** Tek müşteri + sipariş geçmişi (detay / düzenle). */
+export async function getCustomerDetailAction(
+  customerId: string,
+): Promise<CustomerDetailResult | null> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user || !customerId) return null
+
+  const workspaceId = await ownWorkspaceId(supabase, user.id)
+  if (!workspaceId) return null
+
+  const [custRes, orderRes] = await Promise.all([
+    supabase
+      .from('nmm_customers')
+      .select('id, full_name, phone, note, created_at')
+      .eq('id', customerId)
+      .eq('workspace_id', workspaceId)
+      .eq('owner_id', user.id)
+      .maybeSingle(),
+    supabase
+      .from('nmm_orders')
+      .select('id, amount, note, ordered_at')
+      .eq('customer_id', customerId)
+      .eq('workspace_id', workspaceId)
+      .eq('owner_id', user.id)
+      .order('ordered_at', { ascending: false })
+      .limit(500),
+  ])
+
+  const customer = custRes.data
+  if (!customer) return null
+
+  const orders: CustomerOrderRow[] = (orderRes.data ?? []).map(o => ({
+    id: o.id,
+    amount: Number(o.amount) || 0,
+    note: o.note,
+    ordered_at: o.ordered_at,
+  }))
+
+  const stats = buildCustomerStats([customer], orders.map(o => ({
+    customer_id: customerId,
+    amount: o.amount,
+    ordered_at: o.ordered_at,
+  })))
+
+  const withStats = stats.customers[0]
+  if (!withStats) return null
+
+  return {
+    customer: withStats,
+    orders,
+  }
+}
+
+export async function updateCustomerAction(input: {
+  customerId: string
+  fullName: string
+  phone?: string
+  note?: string
+}): Promise<void> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const fullName = input.fullName.trim()
+  if (!fullName) throw new Error('İsim zorunlu.')
+  if (!input.customerId) throw new Error('Müşteri bulunamadı.')
+
+  const { error } = await supabase
+    .from('nmm_customers')
+    .update({
+      full_name: fullName,
+      phone: input.phone?.trim() || null,
+      note: input.note?.trim().slice(0, 200) || null,
+    })
+    .eq('id', input.customerId)
+    .eq('owner_id', user.id)
+  if (error) throw new Error(error.message)
+}
+
+export async function updateOrderAction(input: {
+  orderId: string
+  amount: number
+  orderedAt: string
+  note?: string
+}): Promise<void> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+
+  const amount = Number(input.amount)
+  if (!Number.isFinite(amount) || amount < 0) throw new Error('Geçersiz tutar.')
+  if (!input.orderId) throw new Error('Sipariş bulunamadı.')
+
+  const dayKey = input.orderedAt.trim().slice(0, 10)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey)) throw new Error('Geçersiz tarih.')
+
+  const { error } = await supabase
+    .from('nmm_orders')
+    .update({
+      amount,
+      ordered_at: `${dayKey}T12:00:00.000Z`,
+      note: input.note?.trim().slice(0, 200) || null,
+    })
+    .eq('id', input.orderId)
+    .eq('owner_id', user.id)
+  if (error) throw new Error(error.message)
+}
+
+export async function deleteOrderAction(orderId: string): Promise<void> {
+  const supabase = await createClient()
+  const { user } = await getAuthUser()
+  if (!user) throw new Error('Oturum bulunamadı.')
+  if (!orderId) return
+
+  const { error } = await supabase
+    .from('nmm_orders')
+    .delete()
+    .eq('id', orderId)
+    .eq('owner_id', user.id)
+  if (error) throw new Error(error.message)
 }
 
 export async function addCustomerAction(input: {

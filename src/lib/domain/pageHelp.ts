@@ -569,7 +569,8 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'Ürün sattığın müşterileri ve siparişlerini burada takip edersin (adaylardan ayrı).',
       steps: [
         { t: 'Müşteri ekle', d: '“Müşteri Ekle” ile ad, telefon ve not girerek yeni bir müşteri oluştur.' },
-        { t: 'Sipariş ekle', d: 'Bir müşterinin kartındaki “Sipariş Ekle” ile tutarı gir; toplam ciro ve son sipariş otomatik güncellenir.' },
+        { t: 'Detay sayfası', d: 'Bir müşteri kartına dokunarak profil, sipariş geçmişi ve iletişim butonlarını görebilirsin.' },
+        { t: 'Sipariş ekle / düzenle', d: 'Karttan veya detaydan sipariş ekle; kalem ikonu ile müşteri ve sipariş bilgilerini düzenle.' },
         { t: 'Özet', d: 'Üstteki kutular toplam ciroyu, müşteri ve sipariş sayını gösterir.' },
       ],
     },
@@ -578,7 +579,8 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
       intro: 'Track customers you sell products to and their orders here (separate from prospects).',
       steps: [
         { t: 'Add customer', d: 'Use “Add Customer” to create a new customer with name, phone and a note.' },
-        { t: 'Add order', d: 'Use “Add Order” on a customer card to log an amount; revenue and last order update automatically.' },
+        { t: 'Detail page', d: 'Tap a customer card to open their profile, order history, and contact buttons.' },
+        { t: 'Add / edit orders', d: 'Add orders from the card or detail page; use the pencil icon to edit customer and order info.' },
         { t: 'Summary', d: 'The top boxes show total revenue, customer and order counts.' },
       ],
     },
