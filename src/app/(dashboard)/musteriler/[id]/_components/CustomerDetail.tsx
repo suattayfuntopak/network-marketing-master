@@ -140,7 +140,7 @@ export function CustomerDetail({ customerId }: { customerId: string }) {
   if (isLoading) {
     return (
       <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-        <div className="mx-auto max-w-2xl space-y-4">
+        <div className="w-full space-y-4">
           <Skeleton className="h-10 w-40 rounded-xl" />
           <Skeleton className="h-36 rounded-2xl" />
           <Skeleton className="h-48 rounded-2xl" />
@@ -152,7 +152,7 @@ export function CustomerDetail({ customerId }: { customerId: string }) {
   if (!data) {
     return (
       <main className="min-h-screen w-full bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-        <div className="mx-auto max-w-2xl rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-8 text-center">
+        <div className="w-full rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-8 text-center">
           <p className="text-sm text-[var(--text-3)]">{t('musteriler.detailNotFound')}</p>
           <Link href="/musteriler" className="mt-4 inline-flex text-sm font-semibold text-brand">
             {t('musteriler.detailBack')}
@@ -167,7 +167,7 @@ export function CustomerDetail({ customerId }: { customerId: string }) {
   return (
     <>
       <main className="min-h-screen w-full overflow-x-hidden bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">
-        <div className="mx-auto w-full max-w-2xl space-y-5">
+        <div className="w-full space-y-5">
           <div className="flex items-center gap-3">
             <Link
               href="/musteriler"

@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { ShoppingBag, Plus, Trash2, Pencil, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { pageHeaderIconClass } from '@/lib/ui/pageHeaderIcon'
+import { Z } from '@/lib/ui/zIndex'
 import { HubPageShell } from '@/components/hub/HubPageShell'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useCustomers } from '@/hooks/useCustomers'
@@ -32,7 +33,6 @@ type AiModalState = {
 
 export function MusterilerContent() {
   const { t, lang } = useTranslation()
-  const router = useRouter()
   const qc = useQueryClient()
   const { data, isLoading } = useCustomers()
   const { hasAiFieldAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
@@ -198,79 +198,77 @@ export function MusterilerContent() {
             </p>
           ) : (
             data.customers.map(c => (
-              <div
+              <article
                 key={c.id}
-                role="link"
-                tabIndex={0}
-                onClick={() => router.push(`/musteriler/${c.id}`)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    router.push(`/musteriler/${c.id}`)
-                  }
-                }}
-                className="cursor-pointer rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm transition hover:border-brand/30 hover:shadow-md"
+                className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm transition hover:border-brand/30 hover:shadow-md"
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-bold text-[var(--text-1)]">{c.full_name}</div>
-                    <CustomerContactActions
-                      phone={c.phone}
-                      customerId={c.id}
-                      t={t}
-                      generatingId={generatingId}
-                      hasAiFieldAccess={hasAiFieldAccess}
-                      onAiClick={() => { void handleCustomerAi(c) }}
-                    />
-                  </div>
-                  <div className="shrink-0 text-right">
-                    <div className="text-sm font-black text-emerald-600 dark:text-emerald-400">{formatTry(c.totalAmount, lang)}</div>
-                    <div className="text-[10px] text-[var(--text-3)]">
-                      {c.orderCount > 0
-                        ? t('musteriler.orderCountLabel', { count: c.orderCount })
-                        : t('musteriler.noOrdersLabel')}
+                <Link
+                  href={`/musteriler/${c.id}`}
+                  className="absolute inset-0 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                  aria-label={c.full_name}
+                />
+                <div className={`relative ${Z.cardControls} pointer-events-none p-3`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-bold text-[var(--text-1)]">{c.full_name}</div>
+                      <CustomerContactActions
+                        phone={c.phone}
+                        customerId={c.id}
+                        t={t}
+                        generatingId={generatingId}
+                        hasAiFieldAccess={hasAiFieldAccess}
+                        onAiClick={() => { void handleCustomerAi(c) }}
+                      />
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="text-sm font-black text-emerald-600 dark:text-emerald-400">{formatTry(c.totalAmount, lang)}</div>
+                      <div className="text-[10px] text-[var(--text-3)]">
+                        {c.orderCount > 0
+                          ? t('musteriler.orderCountLabel', { count: c.orderCount })
+                          : t('musteriler.noOrdersLabel')}
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <div className="mt-2 flex items-center gap-2" onClick={e => e.stopPropagation()} onKeyDown={e => e.stopPropagation()} role="presentation">
-                  {orderFor === c.id ? (
-                    <>
-                      <input
-                        className={`${customerInputClass} flex-1`}
-                        placeholder={t('musteriler.amountPlaceholder')}
-                        value={orderAmount}
-                        onChange={e => setOrderAmount(e.target.value)}
-                        inputMode="decimal"
-                        autoFocus
-                      />
-                      <button type="button" disabled={busy} onClick={() => submitOrder(c.id)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">
-                        {t('common.add')}
-                      </button>
-                      <button type="button" onClick={() => { setOrderFor(null); setOrderAmount('') }} className="rounded-lg border border-[var(--border)] p-2 text-[var(--text-3)]">
-                        <X className="h-4 w-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button type="button" onClick={() => { setOrderFor(c.id); setOrderAmount('') }} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                        <Plus className="h-3.5 w-3.5" /> {t('musteriler.addOrderCta')}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setEditCustomerId(c.id)}
-                        className="ml-auto rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-brand"
-                        aria-label={t('musteriler.detailEditCta')}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button type="button" onClick={e => { void removeCustomer(c, e) }} className="rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </>
-                  )}
+                  <div className="mt-2 flex items-center gap-2 pointer-events-auto">
+                    {orderFor === c.id ? (
+                      <>
+                        <input
+                          className={`${customerInputClass} flex-1`}
+                          placeholder={t('musteriler.amountPlaceholder')}
+                          value={orderAmount}
+                          onChange={e => setOrderAmount(e.target.value)}
+                          inputMode="decimal"
+                          autoFocus
+                        />
+                        <button type="button" disabled={busy} onClick={() => submitOrder(c.id)} className="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">
+                          {t('common.add')}
+                        </button>
+                        <button type="button" onClick={() => { setOrderFor(null); setOrderAmount('') }} className="rounded-lg border border-[var(--border)] p-2 text-[var(--text-3)]">
+                          <X className="h-4 w-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => { setOrderFor(c.id); setOrderAmount('') }} className="inline-flex items-center gap-1 rounded-lg bg-emerald-500/10 px-2.5 py-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                          <Plus className="h-3.5 w-3.5" /> {t('musteriler.addOrderCta')}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditCustomerId(c.id)}
+                          className="ml-auto rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-brand"
+                          aria-label={t('musteriler.detailEditCta')}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button type="button" onClick={e => { void removeCustomer(c, e) }} className="rounded-lg p-1.5 text-[var(--text-3)] transition hover:text-rose-500" aria-label={t('common.delete')}>
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
+              </article>
             ))
           )}
         </div>

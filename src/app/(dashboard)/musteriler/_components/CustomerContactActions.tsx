@@ -31,10 +31,7 @@ export function CustomerContactActions({
 
   return (
     <div
-      className={`flex items-center gap-1.5 ${className}`}
-      onClick={e => e.stopPropagation()}
-      onKeyDown={e => e.stopPropagation()}
-      role="presentation"
+      className={`pointer-events-auto flex items-center gap-1.5 ${className}`}
     >
       {phone && (
         <a
