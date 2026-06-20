@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-20 — Perf: aday listesini SSR-bloke'den çıkar (dashboard TTFB) ⚡✅
+
+**Ölçüm (kullanıcı, DevTools Zaman):** prod /pano TTFB cold **2515ms**, warm **1704ms**. Yani hem cold start (~800ms) hem de warm'da bile ~1,7s sunucu beklemesi → SSR yolu Mumbai (ap-south-1) sorgularına takılıyor.
+
+**Kök (kod incelemesi):** `prefetchDashboardQueries` (layout, TÜM sayfaları sarar) SSR'da `fetchCandidatesAction`'ı **await** ediyordu. O da `fetchAllCandidatesAction` → 50'şerli `do...while` SAYFALAMA → çok-adaylı workspace'te seri turlar (Mumbai ~320ms/tur) ilk paint'i bekletiyordu.
+
+**Fix (#1):** Aday prefetch'i await'ten çıkarıp **arka plana** aldım (team/aiUsage gibi). Layout artık yalnız `fetchWorkspaceAction`'ı bekliyor → shell hemen stream olur. PanoContent zaten `useCandidates` ile client'ta yüklüyor (loading durumu var) → ekstra UI yok, skeleton akar.
+
+**Bekleyen (#2, kullanıcı yapacak — ücretsiz):** Supabase asimetrik JWT signing key. Proje simetrik (HS256) ise `getClaims()` her istekte ~230ms ağ doğrulamasına düşüyor (proxy + action = ~460ms). Asimetrik'e geçince YEREL doğrulama → ~460ms kazanç.
+
+Birlikte: warm 1,7s → hedef ~0,7-0,9s (bölge taşımadan). Doğrulama: tsc 0 · eslint 0 · vitest 377/377.
+
+---
+
 ## 2026-06-20 — Auth-rota perf ölçümünü tek-tık yap (perf-baseline turnkey) 🔑📊
 
 Kullanıcı bölge taşımayı (paralı Supabase gerekiyor) ertelemek isteyince #1'e (auth-rota gerçek ölçümü) geçtik. Ölçümü non-teknik kullanım için **tek-tık** yaptım:
