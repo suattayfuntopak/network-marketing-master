@@ -1,5 +1,29 @@
 # Hot Log
 
+## 2026-06-20 — YZ kota kapsamı denetimi + yapısal regresyon kapısı 🛡️✅
+
+### Soru
+Yeni eklenen YZ butonları (özellikle Kişi Detayları + Ekip Üyeleri aktivite **Koçluk Mesajı**) günlük kotaya dahil mi, yoksa "boşta" mı? Bundan sonra otomatiğe bağlanabilir mi?
+
+### Denetim sonucu — boşta üretim butonu YOK
+YZ'ye erişen tüm yollar tarandı (`generateMessage(` + `model.generateContent(`, `.ts`/`.tsx` + `api/` dahil). **Her kullanıcı-tetikli üretim** `checkAIQuota()` + `logAIGeneration()` ile ortak günlük havuza bağlı:
+- pipeline `generateCoachMessage` · `generateNmmInviteMessage` · `generateNotesSummary`
+- ekip `generateOnboardingGuidanceAction` · saha-radar `generateCoachingMessageAction` (= Koçluk Mesajı butonu, pipeline LeaderNotesCard + ekip MemberPersonDetailSections)
+- uyum `auditComplianceMessageAction` · bugun/ilgilen `generateQuickMessageAction`
+- yazar `generateMessageAction` · `generateRoleplayResponseAction` · `askCoachAction` · `generateSocialContentAction` · `translateTextAction`
+
+Basic kullanıcı bu butonların hepsinden 20 mesajlık ortak havuzdan düşer (mesaj/koç/prova/uyum aynı havuz — `DAILY_AI_LIMITS`).
+
+**Carve-out (bilinçli, kotasız):** kayıt-anı otomatik TR|||EN çevirileri (`translateNoteAction`, `translateEnToTrAction`, `translateObjectionFieldsAction`) — CLAUDE.md Dil Politikası gereği altyapısal, tıklanabilir tekrar butonu değil.
+
+### Yapısal garanti (yeni)
+`src/lib/ai/aiQuotaCoverage.test.ts` — fs taraması: YZ üreten her dosya `checkAIQuota` + `logAIGeneration` içermeli, yoksa /health test adımında patlar. Çeviri istisnaları açık `TRANSLATION_ONLY_WHITELIST`'te (gerekçeli). Negatif-test ile vacuous olmadığı doğrulandı. Kota bağlama artık unutulamaz.
+
+### Doğrulama
+tsc 0 · eslint --max-warnings 0 · vitest **351/351** (+9).
+
+---
+
 ## 2026-06-19 — Dead-code 2. tur: yetim tipler + gstack upgrade 🧹⬆️✅
 
 ### Özet
