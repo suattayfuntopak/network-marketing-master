@@ -6,14 +6,16 @@
  * origin'in uzak olması (~320ms/sorgu); bu script onu ÖLÇER → bölge taşıma
  * kararına veri sağlar. Frontend optimizasyonu bu sayıyı GİZLER, SİLMEZ.
  *
- * Kullanım (TEK-TIK auth'lu prod ölçümü):
+ * Kullanım (EN KOLAY auth'lu prod ölçümü — 4 adım):
  *   1) Tarayıcıda nmm.suattayfuntopak.com'a GİRİŞ yap.
- *   2) DevTools → Application → Cookies → `sb-...` çerezlerini "ad=değer; ad=değer"
- *      olarak `.perf-cookie` dosyasına YAPIŞTIR (proje kökünde; gitignore'lu, güvenli).
- *   3) Çalıştır:  BASE_URL=https://nmm.suattayfuntopak.com npm run perf:baseline
+ *   2) F12 (DevTools) → "Network" sekmesi → sayfayı yenile → en üstteki satıra tıkla →
+ *      "Request Headers" altındaki `cookie:` satırının DEĞERİNİ kopyala (tüm cookie, tek kopya).
+ *   3) Proje kökünde `.perf-cookie` dosyası oluştur, kopyaladığını içine yapıştır
+ *      (gitignore'lu — güvenli, asla commit'lenmez).
+ *   4) Çalıştır:  npm run perf:baseline:prod
  *
  * Cookie olmadan yalnız public rotalar ölçülür. Yerelde: `npm run build && npm run start`
- * sonra BASE_URL'siz çalıştır (varsayılan localhost:3000).
+ * sonra `npm run perf:baseline` (varsayılan localhost:3000).
  *
  * Ortam değişkenleri:
  *   BASE_URL   (varsayılan http://localhost:3000; prod için yukarıdaki URL)
