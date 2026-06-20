@@ -6,21 +6,35 @@
  * origin'in uzak olması (~320ms/sorgu); bu script onu ÖLÇER → bölge taşıma
  * kararına veri sağlar. Frontend optimizasyonu bu sayıyı GİZLER, SİLMEZ.
  *
- * Kullanım:
- *   # 1) Uygulamayı çalıştır:  npm run build && npm run start   (veya npm run dev)
- *   # 2) Public rotalar:        node scripts/perf-baseline.mjs
- *   # 3) Auth'lu rotalar da:    NMM_COOKIE="sb-...=...; ..." node scripts/perf-baseline.mjs
- *        (Cookie'yi tarayıcı DevTools → Application → Cookies'ten kopyala.)
+ * Kullanım (TEK-TIK auth'lu prod ölçümü):
+ *   1) Tarayıcıda nmm.suattayfuntopak.com'a GİRİŞ yap.
+ *   2) DevTools → Application → Cookies → `sb-...` çerezlerini "ad=değer; ad=değer"
+ *      olarak `.perf-cookie` dosyasına YAPIŞTIR (proje kökünde; gitignore'lu, güvenli).
+ *   3) Çalıştır:  BASE_URL=https://nmm.suattayfuntopak.com npm run perf:baseline
+ *
+ * Cookie olmadan yalnız public rotalar ölçülür. Yerelde: `npm run build && npm run start`
+ * sonra BASE_URL'siz çalıştır (varsayılan localhost:3000).
  *
  * Ortam değişkenleri:
- *   BASE_URL   (varsayılan http://localhost:3000)
- *   NMM_COOKIE (auth'lu rotalar için oturum cookie'si; yoksa atlanır)
+ *   BASE_URL   (varsayılan http://localhost:3000; prod için yukarıdaki URL)
+ *   NMM_COOKIE (cookie'yi env ile de verebilirsin; .perf-cookie dosyasına göre önceliklidir)
  *   SAMPLES    (rota başına örnek sayısı; varsayılan 8)
  */
+import { readFileSync, existsSync } from 'node:fs'
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:3000'
-const COOKIE = process.env.NMM_COOKIE ?? ''
 const SAMPLES = Number(process.env.SAMPLES ?? 8)
+
+// Cookie önceliği: env NMM_COOKIE > .perf-cookie dosyası (gitignored) > yok.
+function resolveCookie() {
+  if (process.env.NMM_COOKIE?.trim()) return process.env.NMM_COOKIE.trim()
+  if (existsSync('.perf-cookie')) {
+    const c = readFileSync('.perf-cookie', 'utf8').trim()
+    if (c) return c
+  }
+  return ''
+}
+const COOKIE = resolveCookie()
 
 const PUBLIC_ROUTES = ['/', '/giris', '/kayit']
 // Ana dashboard rotaları — yalnızca NMM_COOKIE verilince ölçülür.
@@ -72,7 +86,7 @@ async function main() {
   const routes = [...PUBLIC_ROUTES, ...(COOKIE ? AUTH_ROUTES : [])]
   console.log(`\n🏁 Perf baseline → ${BASE_URL}  (örnek/rota: ${SAMPLES})`)
   if (!COOKIE) {
-    console.log('   ℹ️  NMM_COOKIE yok → yalnız public rotalar. Authlu rotalar için cookie ver.\n')
+    console.log('   ℹ️  Cookie yok → yalnız public rotalar. Auth rotaları için `.perf-cookie` dosyası oluştur (bkz. dosya başı).\n')
   } else {
     console.log('')
   }

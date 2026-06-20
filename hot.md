@@ -1,5 +1,20 @@
 # Hot Log
 
+## 2026-06-20 — Auth-rota perf ölçümünü tek-tık yap (perf-baseline turnkey) 🔑📊
+
+Kullanıcı bölge taşımayı (paralı Supabase gerekiyor) ertelemek isteyince #1'e (auth-rota gerçek ölçümü) geçtik. Ölçümü non-teknik kullanım için **tek-tık** yaptım:
+- `perf-baseline.mjs`: cookie artık `.perf-cookie` dosyasından da okunuyor (env NMM_COOKIE > dosya > yok). Uzun cookie'yi komut satırına yapıştırmak yerine bir kez dosyaya.
+- `.perf-cookie` → `.gitignore` (oturum cookie'si hassas, asla commit'lenmez).
+- `npm run perf:baseline:prod` kısayolu (BASE_URL prod'a hazır).
+- Dosya başı reçete: prod'a gir → DevTools cookie → `.perf-cookie` → `npm run perf:baseline:prod`.
+
+Bölge kararı için dürüst yönlendirme rapora yazıldı (önce mevcut bölgeyi kontrol et + ölç, sonra gerekirse taşı — canlı app'te riskli, ölçmeden taşıma).
+
+### Doğrulama
+eslint 0 · perf-baseline prod public ile çalışıyor (no-cookie yolu sağlam).
+
+---
+
 ## 2026-06-20 — Perf taraması 2: buildIndependentSignupAIUsage paralel + tarama tamam ⚡✅
 
 Seri-await taramasını sürdürdüm (önerim doğrultusunda). Kalan tek temiz kazanç:

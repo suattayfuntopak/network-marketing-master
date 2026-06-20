@@ -21,6 +21,7 @@
     "health": "npm run typecheck && npm run lint && npm test && npm run knip && npm run i18n:unused && npm run migrate:check && npm run plan-copy:check",
     "knip": "knip --no-progress",
     "perf:baseline": "node scripts/perf-baseline.mjs",
+    "perf:baseline:prod": "BASE_URL=https://nmm.suattayfuntopak.com node scripts/perf-baseline.mjs",
     "db:gen-types": "supabase gen types typescript --linked --schema public > src/types/database.types.ts",
     "db:push": "node scripts/supabase-db-push.mjs apply",
     "db:push:dry-run": "node scripts/supabase-db-push.mjs dry-run",

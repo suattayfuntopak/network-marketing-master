@@ -37,6 +37,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# perf-baseline oturum cookie'si (hassas — asla commit'lenmez)
+.perf-cookie
+
 # vercel
 .vercel
 
