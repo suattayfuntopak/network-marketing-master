@@ -13,7 +13,7 @@ type Props = {
   t: TranslateFn
   generatingId: string | null
   hasAiFieldAccess: boolean
-  onAiClick: () => void
+  onAiClick: (e: React.MouseEvent) => void
   className?: string
 }
 
@@ -30,12 +30,11 @@ export function CustomerContactActions({
   const generating = generatingId === customerId
 
   return (
-    <div
-      className={`pointer-events-auto flex items-center gap-1.5 ${className}`}
-    >
+    <div className={`flex items-center gap-1.5 ${className}`}>
       {phone && (
         <a
           href={`tel:${phone}`}
+          onClick={e => e.stopPropagation()}
           className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#E8F0FE] text-[#1A56DB] transition-all hover:scale-105 hover:shadow-md sm:hidden"
           aria-label={t('pipeline.call')}
           title={t('pipeline.call')}
@@ -48,6 +47,7 @@ export function CustomerContactActions({
           href={waLink}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
           className="flex h-9 w-9 items-center justify-center rounded-xl bg-whatsapp text-white transition-all hover:scale-105 hover:shadow-md"
           aria-label="WhatsApp"
           title="WhatsApp"

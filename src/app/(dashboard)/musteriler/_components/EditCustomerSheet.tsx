@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -122,11 +123,11 @@ export function EditCustomerSheet({ customerId, onClose, onSaved }: Props) {
     }
   }
 
-  return (
-    <>
-      <div className={`fixed inset-0 ${Z.sheetBackdrop} bg-black/40 backdrop-blur-sm`} onClick={onClose} />
+  return createPortal(
+    <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div
-        className={`fixed inset-x-0 bottom-0 ${Z.sheet} max-h-[90dvh] overflow-y-auto rounded-t-3xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl sm:inset-x-auto sm:left-1/2 sm:top-1/2 sm:max-h-[85dvh] sm:w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl`}
+        className={`relative w-full max-w-lg max-h-[min(85dvh,calc(100dvh-2rem))] overflow-y-auto rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-5 shadow-2xl animate-in fade-in zoom-in-95 duration-200 ${Z.confirm}`}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-[var(--text-1)]">{t('musteriler.editTitle')}</h2>
@@ -243,6 +244,7 @@ export function EditCustomerSheet({ customerId, onClose, onSaved }: Props) {
           </div>
         )}
       </div>
-    </>
+    </div>,
+    document.body,
   )
 }
