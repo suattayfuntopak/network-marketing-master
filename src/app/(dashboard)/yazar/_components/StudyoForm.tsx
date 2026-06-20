@@ -151,9 +151,19 @@ export function StudyoForm() {
         <h2 className="text-base font-bold text-[var(--text-1)]">{t('studyo.title')}</h2>
         <p className="mt-1.5 text-sm text-[var(--text-3)]">{t('studyo.intro')}</p>
         {!isSuperAdmin && (
-          <p className="mt-2 text-sm font-bold text-[var(--text-3)]">
-            {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
-          </p>
+          limitReached ? (
+            <button
+              type="button"
+              onClick={() => openUpgrade('ai_coach')}
+              className="mt-2 text-sm font-bold text-[#C03E1F] underline underline-offset-2 cursor-pointer"
+            >
+              {t('coachUi.dailyLimitReached')}
+            </button>
+          ) : (
+            <p className="mt-2 text-sm font-bold text-[var(--text-3)]">
+              {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
+            </p>
+          )
         )}
       </div>
 

@@ -554,9 +554,19 @@ export function ProvaForm() {
           {t('coachUi.selectScenarioTitle')}
         </h2>
         {!isSuperAdmin && (
-          <p className="mt-2.5 text-sm font-bold text-[var(--text-3)]">
-            {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
-          </p>
+          limitReached ? (
+            <button
+              type="button"
+              onClick={() => openUpgrade('ai_coach')}
+              className="mt-2.5 text-sm font-bold text-[#C03E1F] underline underline-offset-2 cursor-pointer"
+            >
+              {t('coachUi.dailyLimitReached')}
+            </button>
+          ) : (
+            <p className="mt-2.5 text-sm font-bold text-[var(--text-3)]">
+              {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
+            </p>
+          )
         )}
 
         {/* Zorluk seviyesi — aday personasının sertliği */}
