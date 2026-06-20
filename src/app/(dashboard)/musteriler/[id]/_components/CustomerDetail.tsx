@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Pencil, Plus, Receipt, Trash2, X } from 'lucide-react'
+import { ArrowLeft, Pencil, Plus, Trash2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -289,24 +289,19 @@ export function CustomerDetail({ customerId }: { customerId: string }) {
                 {orders.map(order => (
                   <div
                     key={order.id}
-                    className="flex items-start gap-3 rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm"
+                    className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <Receipt className="h-5 w-5" />
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-base font-black text-emerald-600 dark:text-emerald-400">
+                        {formatTry(order.amount, lang)}
+                      </p>
+                      <p className="shrink-0 text-xs font-medium text-[var(--text-3)]">
+                        {formatCustomerDate(order.ordered_at, lang)}
+                      </p>
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-base font-black text-emerald-600 dark:text-emerald-400">
-                          {formatTry(order.amount, lang)}
-                        </p>
-                        <p className="shrink-0 text-xs font-medium text-[var(--text-3)]">
-                          {formatCustomerDate(order.ordered_at, lang)}
-                        </p>
-                      </div>
-                      {order.note && (
-                        <p className="mt-1 text-sm text-[var(--text-2)]">{order.note}</p>
-                      )}
-                    </div>
+                    {order.note && (
+                      <p className="mt-2 text-sm text-[var(--text-2)]">{order.note}</p>
+                    )}
                   </div>
                 ))}
               </div>
