@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-20 — Perf taraması 2: buildIndependentSignupAIUsage paralel + tarama tamam ⚡✅
+
+Seri-await taramasını sürdürdüm (önerim doğrultusunda). Kalan tek temiz kazanç:
+
+**`buildIndependentSignupAIUsage`** (taşınan "Ekip & Dış Kaynak YZ" tablosunun süper-admin yükleyicisi, istatistikler/actions.ts): 2 bağımsız sorgu çifti seri çalışıyordu →
+- `myMembership` (RLS) ‖ `workspaces` (admin) → `Promise.all`.
+- `listAllAuthUsers` (resilient, `.catch`→`[]` korundu) ‖ `memberRows` → `Promise.all`.
+~2 round-trip tasarrufu, sıfır davranış değişikliği.
+
+**Tarama sonucu — hot read path'ler artık paralel:**
+- `myPulseActions` (pano insights): zaten `Promise.all` ✓
+- `crown/hubSelfActions` (Saha Özetim, tüm dönemler): zaten yoğun `Promise.all` ✓ — 2 aday nokta bağımlı (koşullu fallback / range-türetme), dokunulmadı.
+- `candidates.ts`: read'ler tek-sorgu; mutasyonlar check→write bağımlı; `markCandidateContacted` zaten paralel — temiz kazanç yok.
+- `getStatsFunnelBundleAction`: zaten `Promise.all` ✓
+
+Yani veri-yükleme eşzamanlılığı iyi durumda; kolay paralelleştirme kazançları **tükendi** (fetchTeamBundle + buildIndependentSignupAIUsage alındı). Sıradaki büyük kaldıraç kodda değil: **bölge taşıma** (Supabase origin ~320ms) + auth-rota gerçek ölçümü (cookie).
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377.
+
+---
+
 ## 2026-06-20 — Perf: fetchTeamBundle seri→paralel (ekip yükü ~2× hızlandı) ⚡✅
 
 Önerim #1 (QA/perf dogfood) ile başladım. Bulgular:

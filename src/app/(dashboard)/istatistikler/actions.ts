@@ -111,22 +111,22 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const admin = createAdminClient()
 
-  const { data: myMembership } = await supabase
-    .from('nmm_workspace_members')
-    .select('workspace_id')
-    .eq('user_id', user!.id)
-    .eq('role', 'leader')
-    .maybeSingle()
+  // myMembership (RLS) + TÜM workspace'ler (admin) bağımsız → paralel. Workspace'lerden
+  // süper admin'in kendi workspace'i + doğrudan ekibi aşağıda elenir; gerisi "dış kayıt".
+  const [{ data: myMembership }, { data: workspaces, error: wsError }] = await Promise.all([
+    supabase
+      .from('nmm_workspace_members')
+      .select('workspace_id')
+      .eq('user_id', user!.id)
+      .eq('role', 'leader')
+      .maybeSingle(),
+    admin
+      .from('nmm_workspaces')
+      .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
+      .order('created_at', { ascending: true }),
+  ])
 
   const excludeWorkspaceId = myMembership?.workspace_id ?? null
-
-  // Platform Yönetim Masası ile aynı: TÜM workspace'leri çek, süper admin'in kendi workspace'i +
-  // kendi doğrudan ekibi aşağıda elenir. Geri kalan herkes "dış kayıt" (Yusuf gibi parent_id dolu /
-  // farklı lisanslı olsa bile listeye girer).
-  const { data: workspaces, error: wsError } = await admin
-    .from('nmm_workspaces')
-    .select('id, owner_id, license_type, license_expires_at, created_at, parent_id')
-    .order('created_at', { ascending: true })
 
   if (wsError || !workspaces) {
     console.error('[getIndependentSignupAIUsage]', wsError)
@@ -162,18 +162,18 @@ async function buildIndependentSignupAIUsage(): Promise<IndependentAIUsageRow[]>
 
   const filteredOwnerIds = independentOwners.map(o => o.userId)
 
-  let users: Awaited<ReturnType<typeof listAllAuthUsers>> = []
-  try {
-    users = await listAllAuthUsers(admin)
-  } catch (listErr) {
-    console.error('[getIndependentSignupAIUsage] listUsers', listErr)
-  }
+  // listUsers (resilient) + member satırları bağımsız → paralel.
+  const [users, { data: memberRows }] = await Promise.all([
+    listAllAuthUsers(admin).catch((listErr): Awaited<ReturnType<typeof listAllAuthUsers>> => {
+      console.error('[getIndependentSignupAIUsage] listUsers', listErr)
+      return []
+    }),
+    admin
+      .from('nmm_workspace_members')
+      .select('user_id, full_name, avatar_url')
+      .in('user_id', filteredOwnerIds),
+  ])
   const userMap = new Map(users.map(u => [u.id, u]))
-
-  const { data: memberRows } = await admin
-    .from('nmm_workspace_members')
-    .select('user_id, full_name, avatar_url')
-    .in('user_id', filteredOwnerIds)
 
   const memberByUser = new Map((memberRows ?? []).map(m => [m.user_id, m]))
 
