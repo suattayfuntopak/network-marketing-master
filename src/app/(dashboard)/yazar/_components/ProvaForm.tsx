@@ -16,6 +16,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
+import { AiQuotaBadge } from '@/components/ui/AiQuotaBadge'
 import { AI_USER_INPUT_MAX_CHARS } from '@/lib/domain/aiInputLimit'
 import type { RoleplayDifficulty } from '@/lib/domain/roleplayDifficulty'
 
@@ -269,7 +270,7 @@ export function ProvaForm() {
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { isSuperAdmin, aiUsed, dailyLimit, limitReached } = useAILimits()
+  const { limitReached } = useAILimits()
   const isProEngine = ws?.effectiveLicenseType === 'pro'
 
   const evaluatedScores = messages
@@ -553,21 +554,7 @@ export function ProvaForm() {
         <h2 className="text-base font-bold text-[var(--text-1)]">
           {t('coachUi.selectScenarioTitle')}
         </h2>
-        {!isSuperAdmin && (
-          limitReached ? (
-            <button
-              type="button"
-              onClick={() => openUpgrade('ai_coach')}
-              className="mt-2.5 text-sm font-bold text-[#C03E1F] underline underline-offset-2 cursor-pointer"
-            >
-              {t('coachUi.dailyLimitReached')}
-            </button>
-          ) : (
-            <p className="mt-2.5 text-sm font-bold text-[var(--text-3)]">
-              {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
-            </p>
-          )
-        )}
+        <AiQuotaBadge feature="ai_coach" openUpgrade={openUpgrade} className="mt-2.5" />
 
         {/* Zorluk seviyesi — aday personasının sertliği */}
         <div className="mt-4 flex flex-col items-center gap-1.5">

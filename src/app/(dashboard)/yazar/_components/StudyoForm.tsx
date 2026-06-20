@@ -9,6 +9,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAILimits } from '@/hooks/useAILimits'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
+import { AiQuotaBadge } from '@/components/ui/AiQuotaBadge'
 import { invalidateTeamAndAIUsage } from '@/lib/query/invalidateTeamAndAI'
 import { generateSocialContentAction } from '../actions'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
@@ -58,7 +59,7 @@ export function StudyoForm() {
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { isSuperAdmin, aiUsed, dailyLimit, limitReached } = useAILimits()
+  const { limitReached } = useAILimits()
 
   const [goal, setGoal] = useState<SocialGoal>('urun')
   const [platform, setPlatform] = useState<SocialPlatform>('instagram')
@@ -150,21 +151,7 @@ export function StudyoForm() {
         <span className="text-4xl leading-none block mb-2">✍️</span>
         <h2 className="text-base font-bold text-[var(--text-1)]">{t('studyo.title')}</h2>
         <p className="mt-1.5 text-sm text-[var(--text-3)]">{t('studyo.intro')}</p>
-        {!isSuperAdmin && (
-          limitReached ? (
-            <button
-              type="button"
-              onClick={() => openUpgrade('ai_coach')}
-              className="mt-2 text-sm font-bold text-[#C03E1F] underline underline-offset-2 cursor-pointer"
-            >
-              {t('coachUi.dailyLimitReached')}
-            </button>
-          ) : (
-            <p className="mt-2 text-sm font-bold text-[var(--text-3)]">
-              {t('coachUi.dailyAiQuota', { used: aiUsed, limit: dailyLimit })}
-            </p>
-          )
-        )}
+        <AiQuotaBadge feature="ai_coach" openUpgrade={openUpgrade} className="mt-2" />
       </div>
 
       {/* Amaç */}
