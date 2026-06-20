@@ -11,8 +11,21 @@ export const PRO_CTA_GRADIENT_ACTIVE_DARK =
 export const PANO_EKIP_ROSE_CTA =
   'bg-gradient-to-br from-[#FF5252] to-[#D81B60] text-white shadow-md hover:brightness-105'
 
-/** Ekibim sidebar + sayfa başlık ikonu — Ekip Üyeleri sekmesi ile aynı marka gradyanı. */
-export const EKIP_MODULE_ACCENT_CLASS = `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`
+/** Pano Vaktin Varsa (Eğitim) crown gradyanı */
+export const PANO_BLUE_GRADIENT_ACTIVE =
+  'bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white shadow-md hover:brightness-105'
+
+/** Pano Saha Özetim crown gradyanı */
+export const PANO_TEAL_GRADIENT_ACTIVE =
+  'bg-gradient-to-br from-[#90E894] to-[#009688] text-white shadow-md'
+
+/** Pano İstatistikler crown gradyanı */
+export const PANO_INDIGO_GRADIENT_ACTIVE =
+  'bg-gradient-to-br from-[#9D81FF] to-[#5D44C9] text-white shadow-md'
+
+/** Landing Aylık Ödeme + Ekibim sidebar / başlık / Ekip Üyeleri sekmesi. */
+export const EKIP_MODULE_ACCENT_CLASS =
+  'bg-gradient-to-r from-brand to-brand-accent text-white shadow-md dark:from-pink-600 dark:to-rose-500 dark:shadow-pink-500/15'
 
 /** İçerik Stüdyosu — sekme + solid CTA (İçerik Üret, takvime kaydet). */
 export const STUDIO_MODULE_ACCENT_CLASS = PRO_CTA_GRADIENT_ACTIVE
@@ -23,11 +36,3 @@ export const EKIP_ACCENT_PILL_ACTIVE =
   'border-brand bg-brand/10 text-brand dark:text-indigo-300'
 export const EKIP_ACCENT_FOCUS =
   'focus:border-brand focus:ring-2 focus:ring-brand/20'
-
-/** Pano Saha Özetim crown gradyanı */
-export const PANO_TEAL_GRADIENT_ACTIVE =
-  'bg-gradient-to-br from-[#90E894] to-[#009688] text-white shadow-md'
-
-/** Pano İstatistikler crown gradyanı */
-export const PANO_INDIGO_GRADIENT_ACTIVE =
-  'bg-gradient-to-br from-[#9D81FF] to-[#5D44C9] text-white shadow-md'

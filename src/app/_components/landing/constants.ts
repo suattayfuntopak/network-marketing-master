@@ -11,20 +11,20 @@ export const LANDING_PRIMARY_CTA_SHADOW =
 export const LANDING_PRIMARY_CTA_HOVER =
   'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-pink-500/25'
 
-/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: eski birincil turuncu. */
+/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: pano Takvim teal crown. */
 export const LANDING_BASIC_TRIAL_CTA =
-  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-r dark:from-[#FF9D7A] dark:to-[#FF5722] dark:text-white dark:hover:opacity-95 dark:shadow-md dark:shadow-[#FF5722]/25'
+  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-br dark:from-[#90E894] dark:to-[#009688] dark:text-white dark:shadow-md dark:hover:brightness-105'
 
-/** Plus plan CTA — light: brand gradyan (değişmez); dark: outline (turuncu Basic'e taşındı). */
+/** Plus plan CTA — light: brand (değişmez); dark: pano Vaktin Varsa blue crown. */
 export const LANDING_PLUS_CTA =
-  'bg-gradient-to-r from-brand to-brand-accent text-white dark:bg-none dark:border dark:border-white/[0.08] dark:bg-white/[0.01] dark:hover:bg-white/[0.03]'
+  'bg-gradient-to-r from-brand to-brand-accent text-white dark:border-transparent dark:bg-gradient-to-br dark:from-[#448AFF] dark:to-[#2962FF] dark:hover:brightness-105 dark:shadow-md'
 
 export const LANDING_PLUS_CTA_HOVER =
   'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20'
 
-/** Pro plan — «Zirveye Ulaş»; light: pembe (değişmez); dark: pano Hedefim indigo crown. */
+/** Pro plan — «Zirveye Ulaş»; light: pembe (değişmez); dark: Aylık Ödeme pembe gradyan. */
 export const LANDING_PRO_CTA =
-  'bg-gradient-to-r from-pink-600 to-rose-500 text-white hover:shadow-lg hover:shadow-pink-500/10 dark:bg-gradient-to-br dark:from-[#9D81FF] dark:to-[#5D44C9] dark:hover:brightness-105 dark:shadow-md dark:shadow-indigo-900/20'
+  'bg-gradient-to-r from-pink-600 to-rose-500 text-white hover:shadow-lg hover:shadow-pink-500/10 dark:from-pink-600 dark:to-rose-500 dark:shadow-md dark:shadow-pink-500/15 dark:hover:opacity-95'
 
 export const NEXT_THEME_LABEL: Record<string, string> = {
   dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',

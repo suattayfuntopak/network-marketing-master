@@ -16,9 +16,9 @@ import {
 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import {
+  EKIP_MODULE_ACCENT_CLASS,
   PANO_INDIGO_GRADIENT_ACTIVE,
   PANO_TEAL_GRADIENT_ACTIVE,
-  PRO_CTA_GRADIENT_ACTIVE_DARK,
 } from '@/lib/ui/brandGradients'
 
 export const EKIP_TAB_IDS = ['members', 'summary', 'training', 'tree'] as const
@@ -40,7 +40,7 @@ const TABS: readonly {
     id: 'members',
     labelKey: 'team.tabMembers',
     icon: Users,
-    activeClass: `bg-brand text-white shadow-md ${PRO_CTA_GRADIENT_ACTIVE_DARK}`,
+    activeClass: EKIP_MODULE_ACCENT_CLASS,
   },
   { id: 'summary', labelKey: 'team.tabSummary', icon: BarChart3, activeClass: 'bg-[#1A56DB] text-white shadow-md' },
   { id: 'training', labelKey: 'team.tabTraining', icon: GraduationCap, activeClass: PANO_TEAL_GRADIENT_ACTIVE },
