@@ -1,5 +1,3 @@
-import { TEAM_FREE_BANNER_COPY } from '@/lib/domain/planFeatureMatrix'
-
 export const shellSection = {
   tr: {
     shellUi: {
@@ -53,8 +51,9 @@ export const shellSection = {
       planBlurb_pro: 'Günlük {limit} YZ + tam güç',
       upgradeTrialEndedTitle: '14 günlük denemen bitti — YZ kilitlendi',
       seePlansCta: 'Planları Gör',
-      teamFreeBannerTitle: TEAM_FREE_BANNER_COPY.tr.title,
-      teamFreeBannerDesc: TEAM_FREE_BANNER_COPY.tr.desc,
+      teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
+      teamFreeBannerDesc:
+        'Listenizde “Katıldı” aşamasına gelen kişileri kartlarındaki “NMM’e Davet Et” ile ekibinize NMM Ortağı olarak katabilirsiniz. Ancak Distribütör Doğru Başlangıç takibi Plus planda; tam performans tablosu (eğitim sütunları) ve Ekibim saha özeti Pro planda açılır.',
       accountAlertTrialTitle: 'Ücretsiz Basic denemen {days} gün sonra bitiyor — planları gör',
       accountAlertTrialTitleLast: 'Ücretsiz Basic denemen bugün/yarın bitiyor — planları gör',
       accountAlertLockedTitle: 'AI kilitlendi — NMM kullanımın devam ediyor, plan seçerek AI\'ı aç',
@@ -130,8 +129,9 @@ export const shellSection = {
       planBlurb_pro: 'Daily {limit} AI + full power',
       upgradeTrialEndedTitle: 'Your 14-day trial ended — AI is locked',
       seePlansCta: 'See Plans',
-      teamFreeBannerTitle: TEAM_FREE_BANNER_COPY.en.title,
-      teamFreeBannerDesc: TEAM_FREE_BANNER_COPY.en.desc,
+      teamFreeBannerTitle: 'Viewing your team',
+      teamFreeBannerDesc:
+        'When someone in your list reaches the “Joined” stage, use “Invite to NMM” on their card to add them as an NMM Partner. Downline Distributor Quick Start tracking is on Plus; the full performance table (learning columns) and Ekibim field summary unlock on Pro.',
       accountAlertTrialTitle: 'Your free Basic trial ends in {days} days — view plans',
       accountAlertTrialTitleLast: 'Your free Basic trial ends today/tomorrow — view plans',
       accountAlertLockedTitle: 'AI locked — NMM keeps running, pick a plan to re-enable AI',
