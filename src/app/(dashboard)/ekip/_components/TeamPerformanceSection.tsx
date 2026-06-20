@@ -77,11 +77,22 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   const [confirmRemove, setConfirmRemove] = useState<MemberRow | null>(null)
   const [localSearch, setLocalSearch] = useState(memberSearch)
   const [prevSearch, setPrevSearch] = useState(memberSearch)
+  const [searchPlaceholderKey, setSearchPlaceholderKey] = useState<'team.searchMembersDesktop' | 'team.searchMembersMobile'>('team.searchMembersMobile')
 
   if (memberSearch !== prevSearch) {
     setPrevSearch(memberSearch)
     setLocalSearch(memberSearch)
   }
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)')
+    const sync = () => {
+      setSearchPlaceholderKey(mq.matches ? 'team.searchMembersDesktop' : 'team.searchMembersMobile')
+    }
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -277,7 +288,7 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
               type="search"
               value={localSearch}
               onChange={e => setLocalSearch(e.target.value)}
-              placeholder={t('team.searchMembers')}
+              placeholder={t(searchPlaceholderKey)}
               className="w-full rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)] py-3 pl-10 pr-10 text-sm text-[var(--text-1)] placeholder-[var(--text-3)] outline-none focus:border-brand transition"
             />
             {localSearch.trim().length > 0 && (
