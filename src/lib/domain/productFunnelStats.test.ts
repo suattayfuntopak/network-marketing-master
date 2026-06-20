@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import {
   aggregateProductFunnelCounts,
+  computeProductFunnelRates,
   emptyProductFunnelCounts,
   type ProductFunnelRow,
 } from '@/lib/domain/productFunnelStats'
@@ -77,5 +78,16 @@ describe('productFunnelStats', () => {
     expect(counts.proUpgradeCtaEkipSummary).toBe(1)
     expect(counts.proUpgradeCtaEkipTraining).toBe(1)
     expect(counts.proUpgradeCtaStatsHint).toBe(1)
+  })
+
+  it('computeProductFunnelRates derives conversion percentages', () => {
+    const counts = emptyProductFunnelCounts()
+    counts.pricingSectionView = 100
+    counts.seePlansClick = 25
+    counts.odemePageView = 5
+    const rates = computeProductFunnelRates(counts)
+    expect(rates.seePlansFromLandingPct).toBe(25)
+    expect(rates.odemeFromSeePlansPct).toBe(20)
+    expect(computeProductFunnelRates(emptyProductFunnelCounts()).seePlansFromLandingPct).toBeNull()
   })
 })

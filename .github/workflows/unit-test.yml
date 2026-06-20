@@ -52,6 +52,8 @@ jobs:
         run: npm ci
       - name: Run unit tests
         run: npm test
+      - name: Plan copy sync
+        run: npm run plan-copy:check
 
   build:
     name: Build

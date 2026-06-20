@@ -1,9 +1,10 @@
 'use client'
 
-import { CreditCard, Eye, Sparkles, ArrowRight, Link2 } from 'lucide-react'
+import { CreditCard, Eye, Sparkles, ArrowRight, Link2, Percent } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { ModuleInfo } from './ModuleInfo'
+import { computeProductFunnelRates } from '@/lib/domain/productFunnelStats'
 import type { ProductFunnelCounts } from '@/app/(dashboard)/istatistikler/actions'
 
 type Props = {
@@ -41,6 +42,9 @@ function FunnelCard({
 
 export function PlatformProductFunnel({ funnel, isLoading }: Props) {
   const { t } = useTranslation()
+  const rates = funnel ? computeProductFunnelRates(funnel) : null
+  const formatPct = (value: number | null) =>
+    value == null ? '—' : t('platformPage.viralPercentValue', { value })
 
   return (
     <section className="space-y-3">
@@ -123,6 +127,38 @@ export function PlatformProductFunnel({ funnel, isLoading }: Props) {
           />
         </div>
       )}
+
+      {!isLoading && funnel ? (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className={cardClass}>
+            <span className={labelClass}>{t('platformPage.funnelRateSeePlans')}</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-xl font-black text-[var(--text-1)]">
+                {formatPct(rates?.seePlansFromLandingPct ?? null)}
+              </span>
+              <Percent className="ml-auto h-4 w-4 text-[var(--text-3)]" />
+            </div>
+          </div>
+          <div className={cardClass}>
+            <span className={labelClass}>{t('platformPage.funnelRateOdeme')}</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-xl font-black text-[var(--text-1)]">
+                {formatPct(rates?.odemeFromSeePlansPct ?? null)}
+              </span>
+              <Percent className="ml-auto h-4 w-4 text-[var(--text-3)]" />
+            </div>
+          </div>
+          <div className={cardClass}>
+            <span className={labelClass}>{t('platformPage.funnelDeepLinkCompare', {
+              plus: funnel.odemePlusDeepLink,
+              pro: funnel.proUpgradeCtaClick,
+            })}</span>
+            <div className="mt-1 flex items-baseline gap-2">
+              <Link2 className="ml-auto h-4 w-4 text-[var(--text-3)]" />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   )
 }

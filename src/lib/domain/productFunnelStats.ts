@@ -90,3 +90,21 @@ export function aggregateProductFunnelCounts(rows: ProductFunnelRow[]): ProductF
   }
   return counts
 }
+
+function funnelPct(numerator: number, denominator: number): number | null {
+  if (denominator <= 0) return null
+  return Math.round((numerator / denominator) * 1000) / 10
+}
+
+export type ProductFunnelRates = {
+  seePlansFromLandingPct: number | null
+  odemeFromSeePlansPct: number | null
+}
+
+/** Huniden türetilen dönüşüm oranları (yüzde, bir ondalık). */
+export function computeProductFunnelRates(counts: ProductFunnelCounts): ProductFunnelRates {
+  return {
+    seePlansFromLandingPct: funnelPct(counts.seePlansClick, counts.pricingSectionView),
+    odemeFromSeePlansPct: funnelPct(counts.odemePageView, counts.seePlansClick),
+  }
+}

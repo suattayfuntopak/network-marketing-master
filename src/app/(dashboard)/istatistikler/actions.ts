@@ -16,7 +16,6 @@ import {
   goalPayloadToFunnelContext,
 } from '@/lib/domain/hubFunnelTargets'
 import { getGoalFunnelContextAction } from '@/app/(dashboard)/hedef/actions'
-import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import {
   aggregateProductFunnelCounts,
   emptyProductFunnelCounts,
