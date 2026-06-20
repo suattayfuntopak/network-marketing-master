@@ -10,7 +10,9 @@
 
 **#2 (asimetrik JWT) — GEREKSİZ ÇIKTI:** Supabase JWT Keys ekranı kontrol edildi → CURRENT KEY zaten **ECC (P-256) asimetrik** (5 ay önce HS256'dan döndürülmüş). `getClaims()` çoktan YEREL doğruluyor; auth round-trip yok. Yani warm 1,7s'nin kaynağı **auth değil, #1'di** (aday sayfalama SSR bloku) — Focus Team çok-adaylı → 50'şerli birkaç tur ~1s+ blok.
 
-**Sonuç:** Asıl lever #1'di ve gönderildi. Kalan SSR await'i yalnız `fetchWorkspaceAction` (getClaims yerel + 1 workspace sorgusu ~320ms Mumbai). Bunun da altı için tek kalan kaldıraç **bölge taşıma** (ertelendi). Deploy sonrası /pano yeniden ölçülecek (warm 1,7s → beklenen ~0,5-0,7s). Doğrulama: tsc 0 · eslint 0 · vitest 377/377.
+**Sonuç:** Asıl lever #1'di ve gönderildi. Kalan SSR await'i yalnız `fetchWorkspaceAction` (getClaims yerel + 1 workspace sorgusu ~320ms Mumbai). Bunun da altı için tek kalan kaldıraç **bölge taşıma** (ertelendi).
+
+**✅ DEPLOY SONRASI DOĞRULANDI (prod, DevTools Zaman):** /pano warm TTFB **1704ms → 770ms** (~934ms / **%55 / 2,2×** hızlı). Total 1768ms → 863ms. Kalan 770ms = workspace sorgusu + render + Mumbai mesafesi (→ bölge taşıma kaldıracı). Doğrulama: tsc 0 · eslint 0 · vitest 377/377.
 
 ---
 
