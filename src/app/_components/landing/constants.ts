@@ -1,14 +1,30 @@
 export { NEXT_THEME } from '@/lib/ui/themeToggle'
 
-/** Pano Aylık sekmesi (coral) — landing birincil CTA; light modda brand mor kalır */
+/** Pano Aylık sekmesi (coral) — landing birincil CTA; light modda brand mor kalır.
+ *  Dark: eski «Zirveye Ulaş» pembe gradyan — hero, header, billing toggler. */
 export const LANDING_PRIMARY_CTA =
-  'bg-gradient-to-r from-brand to-brand-accent dark:from-[#FF9D7A] dark:to-[#FF5722] text-white'
+  'bg-gradient-to-r from-brand to-brand-accent dark:from-pink-600 dark:to-rose-500 text-white'
 
 export const LANDING_PRIMARY_CTA_SHADOW =
-  'shadow-md dark:shadow-[#FF5722]/25'
+  'shadow-md dark:shadow-pink-500/15'
 
 export const LANDING_PRIMARY_CTA_HOVER =
-  'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-[#FF5722]/30'
+  'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-pink-500/25'
+
+/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: eski birincil turuncu. */
+export const LANDING_BASIC_TRIAL_CTA =
+  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-r dark:from-[#FF9D7A] dark:to-[#FF5722] dark:text-white dark:hover:opacity-95 dark:shadow-md dark:shadow-[#FF5722]/25'
+
+/** Plus plan CTA — light: brand gradyan (değişmez); dark: outline (turuncu Basic'e taşındı). */
+export const LANDING_PLUS_CTA =
+  'bg-gradient-to-r from-brand to-brand-accent text-white dark:bg-none dark:border dark:border-white/[0.08] dark:bg-white/[0.01] dark:hover:bg-white/[0.03]'
+
+export const LANDING_PLUS_CTA_HOVER =
+  'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20'
+
+/** Pro plan — «Zirveye Ulaş»; light: pembe (değişmez); dark: pano Hedefim indigo crown. */
+export const LANDING_PRO_CTA =
+  'bg-gradient-to-r from-pink-600 to-rose-500 text-white hover:shadow-lg hover:shadow-pink-500/10 dark:bg-gradient-to-br dark:from-[#9D81FF] dark:to-[#5D44C9] dark:hover:brightness-105 dark:shadow-md dark:shadow-indigo-900/20'
 
 export const NEXT_THEME_LABEL: Record<string, string> = {
   dark: 'Light moduna geç', light: 'System moduna geç', system: 'Dark moduna geç',

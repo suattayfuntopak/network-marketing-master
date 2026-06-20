@@ -16,7 +16,14 @@ import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
-import { LANDING_PRIMARY_CTA, LANDING_PRIMARY_CTA_HOVER } from './constants'
+import {
+  LANDING_BASIC_TRIAL_CTA,
+  LANDING_PLUS_CTA,
+  LANDING_PLUS_CTA_HOVER,
+  LANDING_PRIMARY_CTA,
+  LANDING_PRIMARY_CTA_SHADOW,
+  LANDING_PRO_CTA,
+} from './constants'
 
 export function LandingPricing() {
   const { t } = useTranslation()
@@ -51,7 +58,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('monthly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
                 billingPeriod === 'monthly'
-                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25 hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
+                  ? `${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
                   : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
@@ -62,7 +69,7 @@ export function LandingPricing() {
               onClick={() => setBillingPeriod('yearly')}
               className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
                 billingPeriod === 'yearly'
-                  ? `${LANDING_PRIMARY_CTA} shadow-md dark:shadow-[#FF5722]/25 hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
+                  ? `${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} hover:shadow-lg hover:shadow-indigo-500/25 dark:hover:opacity-95`
                   : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-zinc-200'
               }`}
             >
@@ -164,7 +171,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className="block text-center rounded-xl border border-slate-300 dark:border-white/[0.08] bg-white dark:bg-transparent hover:bg-slate-100 dark:hover:bg-white/[0.03] text-slate-700 dark:text-white py-3 text-xs font-bold shadow-sm transition cursor-pointer"
+              className={`block text-center rounded-xl ${LANDING_BASIC_TRIAL_CTA} py-3 text-xs font-bold shadow-sm transition cursor-pointer`}
             >
               {t('landingPage.planBasicCta')}
             </Link>
@@ -227,7 +234,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className={`block text-center rounded-xl ${LANDING_PRIMARY_CTA} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 cursor-pointer`}
+              className={`block text-center rounded-xl ${LANDING_PLUS_CTA} py-3 text-xs font-bold ${LANDING_PLUS_CTA_HOVER} transition active:scale-95 cursor-pointer`}
             >
               {t('landingPage.planPlusCta')}
             </Link>
@@ -290,7 +297,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className="block text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 cursor-pointer"
+              className={`block text-center rounded-xl ${LANDING_PRO_CTA} py-3 text-xs font-bold transition active:scale-95 cursor-pointer`}
             >
               {t('landingPage.planProCta')}
             </Link>
