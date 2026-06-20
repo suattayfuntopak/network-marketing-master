@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { checkAIQuota, logAIGenerationFromQuota } from '@/lib/ai/checkQuota'
+import { checkAIQuota, logAIGenerationFromQuota, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { resolveGeminiModel } from '@/lib/ai/resolveModel'
 import { findLeaderCandidateForMember, scoreMemberCandidateNameMatch } from '@/lib/team/matchCandidate'
@@ -509,6 +509,7 @@ export interface CoachGuidanceState {
   message?: string
   error?: string
   remaining?: number
+  quotaError?: AiQuotaErrorCode
 }
 
 export async function generateOnboardingGuidanceAction(
@@ -525,7 +526,7 @@ export async function generateOnboardingGuidanceAction(
   }
 
   const quota = await checkAIQuota('message', { lang })
-  if (!quota.ok) return { error: quota.message, remaining: 0 }
+  if (!quota.ok) return { error: quota.message, remaining: 0, quotaError: quotaErrorCode(quota.reason) }
 
   const stepLabel = lang === 'en'
     ? (ONBOARDING_STEPS_EN[stepId] || stepId)

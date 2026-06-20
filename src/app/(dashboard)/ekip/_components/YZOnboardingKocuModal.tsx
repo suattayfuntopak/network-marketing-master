@@ -14,6 +14,8 @@ import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
+import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 
 const ONBOARDING_STEPS_TR: Record<string, string> = {
   'step_why': 'Başlangıç Görüşmesi & "Neden?" Belirleme',
@@ -54,6 +56,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
   const queryClient = useQueryClient()
   const { data: usage, refetch: refetchUsage } = useAIUsage()
   const { data: modalWs } = useWorkspace()
+  const { openUpgrade, UpgradePrompt } = useUpgradePrompt()
   const { dailyLimit } = getLimitsForLicense(
     modalWs?.licenseType,
     modalWs?.isSuperAdmin,
@@ -70,7 +73,12 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
         const res = await generateOnboardingGuidanceAction(memberName, stepId, lang)
         if (!active) return
         if (res.error) {
-          setError(res.error)
+          surfaceAiQuotaError(res, {
+            openUpgrade,
+            toastError: setError,
+            feature: 'ai_field',
+            fallbackMessage: res.error,
+          })
         } else if (res.message) {
           setMessage(res.message)
           invalidateTeamAndAIUsage(queryClient, modalWs?.workspaceId)
@@ -88,7 +96,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
     return () => {
       active = false
     }
-  }, [memberName, stepId, lang, refetchUsage, t, queryClient, modalWs?.workspaceId])
+  }, [memberName, stepId, lang, refetchUsage, t, queryClient, modalWs?.workspaceId, openUpgrade])
 
   const handleCopy = () => {
     if (!message) return
@@ -111,7 +119,9 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
     : (ONBOARDING_STEPS_TR[stepId] || stepId)
 
   return (
-    <div 
+    <>
+    {UpgradePrompt}
+    <div
       className={`fixed inset-0 ${Z.coachModal} flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200`}
       onClick={onClose}
     >
@@ -226,5 +236,6 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
         </div>
       </div>
     </div>
+    </>
   )
 }
