@@ -74,7 +74,8 @@ jobs:
           #  - diğer (veri ön-koşulu) hataları → uyarı + tolere (job yeşil kalır).
           set -uo pipefail
           fail=0
-          for f in $(ls supabase/migrations/*.sql | sort); do
+          # Glob zaten leksik sıralı (ls|sort gereksiz; shellcheck SC2012'den de kaçınır).
+          for f in supabase/migrations/*.sql; do
             echo "▶ $(basename "$f")"
             if out=$(psql -v ON_ERROR_STOP=1 -f "$f" 2>&1); then
               continue

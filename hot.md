@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-20 — shellcheck + auto GitHub Release + AiQuotaBadge (3/4 öneri, karar) 🔍🚀♻️✅
+
+"Bu uygulama senin olsaydı hangilerini yapardın" — karar verip uyguladım:
+
+**#1 shellcheck'i aç (YAPILDI).** actionlint workflow'u artık shellcheck ile tam (`-shellcheck=` kaldırıldı; ubuntu-latest preinstalled). Yerelde shellcheck v0.10.0 (Rosetta) ile çalıştırıp 3 gerçek bulgu düzeltildi: `migrate-check.yml` ls→glob (SC2012); `db-push.yml` ls|xargs→glob loop + `$versions` için gerekçeli `disable=SC2086`; `actionlint.yml` yorum gotcha'sı (`# shellcheck …` yanlışlıkla direktif sanılıyordu). Tüm 9 workflow actionlint+shellcheck **exit 0**.
+
+**#2 Auto GitHub Release (YAPILDI).** `.github/workflows/release.yml`: `vX.Y.Z` tag push'ta CHANGELOG'un o sürüm bölümünü `gh release create --notes-file` ile yayınlar. `npm run release` → `git push --follow-tags` → görünür sürüm sayfası, sıfır elle iş.
+
+**#3 CHANGELOG drift check (ATLANDI — bilinçli).** Kendi notumda "hot.md ile örtüşür, opsiyonel" demiştim; her PR'da gürültü + release-anı üretim modeliyle çelişir. İyi-niyetli-ama-ters otomasyon → yapmadım.
+
+**#4 `<AiQuotaBadge/>` ortak bileşen (YAPILDI).** `src/components/ui/AiQuotaBadge.tsx`: süper admin gizli / kota açık sayaç / kota dolu kırmızı CTA deseni tek bileşende. ProvaForm + StudyoForm tekrarı kaldırıldı (her biri ~14 satır → 1 satır); gelecekteki YZ formları tek satırla tutarlı.
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377 · i18n 1320 · **actionlint+shellcheck exit 0 (9 workflow, yerel)** · knip temiz.
+
+---
+
 ## 2026-06-20 — release script + deploy Telegram + limit görsel + actionlint (4 öneri) 🚀📲✅
 
 Önceki turun 4 önerisi:

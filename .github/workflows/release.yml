@@ -1,0 +1,43 @@
+name: Release
+
+# `npm run release` ile oluşturulan `vX.Y.Z` tag'i push'landığında, CHANGELOG.md'deki
+# o sürüm bölümünü GitHub Release notu olarak yayınlar. Tag → görünür sürüm sayfası,
+# sıfır elle iş. (Tag push: `git push --follow-tags`.)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: GitHub Release oluştur
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Release notunu CHANGELOG'tan çıkar
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          # "## <tag> (...)" başlığından bir sonraki "## " başlığına kadarki bölümü al.
+          awk -v tag="$tag" '
+            index($0, "## " tag " ") == 1 { flag = 1; next }
+            /^## / { flag = 0 }
+            flag { print }
+          ' CHANGELOG.md > /tmp/release-notes.md
+          if [ ! -s /tmp/release-notes.md ]; then
+            echo "Sürüm $tag" > /tmp/release-notes.md
+          fi
+          echo "▶ Release notu:"
+          cat /tmp/release-notes.md
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --notes-file /tmp/release-notes.md

@@ -108,7 +108,8 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          versions=$(ls supabase/migrations/[0-9]*.sql | xargs -n1 basename | grep -oE '^[0-9]+' | sort -u | tr '\n' ' ')
+          versions=$(for f in supabase/migrations/[0-9]*.sql; do basename "$f"; done | grep -oE '^[0-9]+' | sort -u | tr '\n' ' ')
           echo "▶ 'applied' işaretlenecek versiyonlar: $versions"
+          # shellcheck disable=SC2086  # $versions kasıtlı word-split: çoklu versiyon argümanı
           supabase migration repair --status applied $versions
           echo "✅ Defter güncellendi. Doğrulamak için mode=dry-run çalıştırın."

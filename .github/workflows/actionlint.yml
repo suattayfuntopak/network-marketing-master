@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   actionlint:
-    name: actionlint (YAML + ifade)
+    name: actionlint (YAML + ifade + bash)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -28,7 +28,6 @@ jobs:
           VERSION=1.7.0
           curl -sfL "https://github.com/rhysd/actionlint/releases/download/v${VERSION}/actionlint_${VERSION}_linux_amd64.tar.gz" \
             | tar -xz -C /tmp actionlint
-          # shellcheck entegrasyonu kapalı: mevcut run-bloklarının bash stil temizliği
-          # ayrı bir tura bırakıldı (yanlış-pozitif CI'ı kırmasın). Çekirdek değer —
-          # YAML yapısı + GitHub ifade/secret/needs doğrulaması — aktif.
-          /tmp/actionlint -color -shellcheck=
+          # actionlint PATH'teki shellcheck'i otomatik kullanır (ubuntu-latest preinstalled)
+          # → YAML/ifade + run-bloklarının bash'i birlikte lint edilir.
+          /tmp/actionlint -color
