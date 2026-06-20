@@ -1,0 +1,396 @@
+# Changelog
+
+_Otomatik üretildi (`npm run changelog`) — `hot.md` (TR insan-okur günlük) tamamlayıcısıdır. Elle düzenleme._
+
+## ui-sadelestirme-oncesi → HEAD (2026-06-20)
+
+### ✨ Yeni Özellikler
+- onboarding koçu limit→upgrade tutarlılığı (surfaceAiQuotaError)
+- Plus deep link hunisi, platform funnel kırılımı ve health check
+- Pro CTA hunisi, modal blurbs ve Plus progress query
+- gate metinleri, Pro CTA, PageHelp, landing ve E2E genişlemesi
+- eğitim başlığı, Plus ipucu ve ödeme kart hizalaması
+- Plus/Pro banner netliği ve kilit UX iyileştirmeleri
+- Kullanıcı/Lisans + Dış Kayıtlar tablolarını yukarı taşı
+- stash WIP — yazar/uyum/NmmInvite quota UX + translate carve-out
+- 4 YZ kota/çeviri iyileştirmesi (carve-out, kademe, UX, CoachState)
+- limit-dolu UX tutarlılığı — surfaceAiQuotaError ortak yönlendirme
+- çeviri maliyet takibi — kotasız translate_count sayacı
+- YZ Kullanım & Limit tablosunu Platform Yönetimi'ne taşı
+- unify team card activity tab with person detail sections
+- süper admin kendi taleplerini gizle + modül-yardımı (?) + kopya temizliği
+- plan limitleri 25/100/∞, fiyatlar ve kart metinleri
+- sekme-bilinçli PageHelp, nav renk uyumu ve mobil düzen
+- AI Kullanım Analitiği + crown token-migration + moderasyon bildirimi
+- 6 maddelik cila — dark CTA rengi, kilit ikonu, mobil yardım, kopya, Süper Admin
+- deneme hunisi tam paket — kopya birleştirme, analytics, platform panel
+- ertelenen O-1 (kota atomik rezerve) + Faz F (yüzey ölçümü)
+- şifre güncelle ve sıfırla sayfalarını yerelleştir
+- davet kodu metinlerini kaldır, Shopier cutover tamamla
+- Basic ile devam et → Shopier storefront (workspace note)
+- mobil alt bar 'Diğer' çekmecesi (5 birincil + sheet)
+- Kodu Gir (güvenli join-by-code) + satış hunisi olayı
+- K-faktör paneli — Paylaşım Kaynakları kırılımı
+- materyal-ekle linki + paylaşım analitiği (non-redundant)
+- Dalga 4 kalanı — İçerik Takvimi + Katılım Kohortu
+- Dalga 4 — Downline Ağaç Analitiği + Ekip İletişim Hub'ı
+- Dalga 4 — Sosyal Satış Stüdyosu (AI içerik üretimi)
+- Müşteri/Sipariş takibi + Saha Provası 2.0 (+ APP_URL fix)
+- Dalga 2 kalanı + Dalga 3 başlangıcı — Başarılar & Tanınma
+- Dalga 2 — kişisel davet karşılaması + K-faktör paneli
+- Dalga 1 — Streak (seri) + Akşam Kapanışı
+- Dalga 0 KPI olayları + Sabah Brief'i (Pano günlük çapası)
+- add Team Size Goal Progress Banner to Field Summary page
+- huni hedeflerini İstatistikler ve ekip sheet ile hizala
+- Ekibim/Vaktin Varsa UX paketi + global sayfa yardımı (?)
+- Saha Radarı/Takvim mahremiyeti + "Ekipten Çıkar" aksiyonu
+- Vaktin Varsa sayfa başlığı mobilde kısa sekme etiketi
+- serinin ilk 3 videosu, dark video buton rengi, Tüm Zamanlar grafiği
+- Crown Team gerçek video serisi + Seviye rozeti geri
+- video otomatik izleme takibi, Seviye kaldırma, mobil pano tarihi
+- resolve member phone in fetchSahaRadarMemberRows to restore WA button, add db:reset:test and i18n unit tests
+- developer and UX improvements (phase 2)
+- atomic avatar upload, partner override table, Saha Radarı RPC.
+- implement AI fallbacks, high-contrast warmth badges, and query invalidator manager
+- short invite links, davet mesajı, join email sync, E2E fix
+- invite E2E, pulse ∞ tab, email backfill script, pano loading
+- davet kayıt otomasyonu, admin claim fix, hub navigasyon ve mail TZ
+- Tüm Zamanlar sekmesi + mobil scroll fix + Admin rename + davet helper
+- Listem ikon/başlık + chevron tam-satır + davet senkron (mükerrer önleme) + CI shim fix
+- #1 içerik editörü (kalıcı TR↔EN + düzenleme) + #2 koç entegrasyonu + #5 E2E
+- itiraz bankası Faz 2 tamamlandı — 37/37 tam zenginleştirme
+- şerit 3-buton, Saha Özetim client-state hız, davet senkron, telemetri monitörü
+- dönem şeridi akan-şerit (sabit oklar) + platform debug kartı kaldır
+- dönem şeridinde hızlı fiske (flick) ile dönem değiştirme
+- itiraz zenginleştirme Faz 2 + Öğrenme Yolu banner
+- seviye filtresi + ilerleme çubuğu + itiraz zenginleştirme altyapısı
+- içerik kütüphanesine 34 yeni global NM konusu (30→64)
+- eski projeden eksik 2 itirazı içe aktar (35→37)
+- huni ve aktivite kutularına pano crown renkleri
+- ekibim/pipeline iyileştirmeleri ve metrik prefetch performansı
+- Ekip Ağacı sponsor derinliği, Pano SW precache ve E2E docs
+- Ekip Ağacı avatarları, Pano SSR prefetch ve hafif PWA
+- plan kartı yenileme — Basic'te Ekibim yok, Saha Radarı eklendi, AI limitleri sıralı
+- freemium model — sayfa kilitleri kaldırıldı, AI buton kilidi, trial rebrand
+- lint sıfır + HubAllTimeHero joinedAt + overdue e-posta frekans tercihi
+- 6 özellik + lint turu — koçluk şablonları Supabase'e, radar badge, üye hedef, overdue e-posta, Hub zenginleştirme, lint azaltma
+- Saha Radarı 4 öneri — üye detayı, koçluk AI, gecikmeli takip bildirimi, filtre
+- pano kare kutular, ritüel kaldırma ve ekip pipeline bağlantısı
+- Ekibime Davet Et sponsorluk metni ve huni önerileri
+- Saha Radarı — kart ikonları, metrik kaydı, kart tıklama, oto-yenileme, Ben→kaldırıldı
+- CandidateCard ara/WA metrik kaydı, DayCloseCard+JournalLinkCard pano ritüeli, 062 davet→pipeline
+- İlk 30 Gün → Saha Radarı (takipler + ekip aktivite radarı)
+- Eğitim İlerlemem 6 kutu dashboard + Vaktin Varsa sekme yenileme.
+- pano Crown Organizasyon — 8 kişisel kutu, Yol Haritam sekmesi
+- freemium sprint — free forever, AI locks, pano özeti, ekip sekmeleri
+- pano launcher kutularına canlı gradient renk paleti
+- Hızlı Bakış sayfasına açıklayıcı alt başlık eklendi
+- ItirazCard i18n, Playwright HTML report artifact, README CI bölümü
+- CI migrate check, journal retry queue, moderation i18n
+- Bugün İlgilen hibrit raporu — 6 sayfa Crown+NMM birleşimi
+- Bugün İlgilen kutuları için Crown deneme sayfaları
+- Crown mock ve hub modüllerini Bugün İlgilen sayfasına taşı
+- 6 modül crown launcher, Bugün İlgilen Crown mock toggle
+- Crown Team mock grid, hub modülleri panoya taşındı
+- Crown launcher kutuları ve Bugün İlgilen hub sheet
+- pano launcher, nav sadeleştirme ve modül sekmeleri
+- Faz 1a — kokpit sadeleştirme (grid kaldırıldı)
+
+### 🐛 Düzeltmeler
+- Ekibim light pembe accent ve Basic deneme teal kontrastı
+- ProductFunnelCounts type re-export server action hatası
+- kullanılmayan import ve huni dönüşüm oranları
+- shell banner metnini import yerine senkron test ile tut
+- PageHelp mobil, video devam, Tüm Zamanlar perf ve ekip metinleri
+- docs-only tip commit prod build atlama regresyonu
+- card-tab activity coaching full-width rose on desktop too
+- person detail coaching CTA pano rose on all breakpoints
+- remove Bu Hafta block; mobile activity tab rose full-width CTA
+- group mobile action buttons left, call third not far-right
+- person detail action buttons and desktop monthly tab label
+- widen person detail page and rename title to Kişi Detayı
+- pink CTA gradient in light mode for tab and buttons
+- treeActions leader narrowing for Vercel typecheck
+- Vercel main auto-deploy yeniden açıldı.
+- mobil PageHelp sağ üst — Ekibim, Takvim, YZ Koçum.
+- İçerik Stüdyosu Ekibim rengi, landing CTA, nesil ağacı UX.
+- mobil nav etiketi, footer e-posta ve plan kartları
+- PageHelp useSearchParams'i Suspense'li modala taşı — prerender bailout
+- Süper Admin sayfası — masaüstünde (?) yardımı Ödeme/Landing'in soluna
+- gönderen onarımı — kim gönderdi her zaman görünür
+- dark-mode parlayan kutuları düzelt — upgrade banner + crown-rose notice kutuları
+- platform-yonetim actions'tan type re-export kaldır — CI Gate build hatası
+- deneme bitişi modalında Basic CTA yerine Planları Gör + Kapat
+- migration defter boşluğu + auth i18n + trial email CTA
+- TeamPerformanceSection prevSearch state geri eklendi
+- deneme popup aylık plan + Ekibim davet kodu modülleri kaldır
+- 103 RLS idempotent DROP policies
+- login server redirect + auth.setup + artifact upload
+- build TS, migration 103 numarası, E2E credential skip
+- öncelikli aksiyon matrisi — RLS, Shopier, cron PII, mimari sertleştirme
+- mobil kısa gün adı + Sabah Brief'i katlanır + nav sırası
+- şifre sıfırlamada kullanıcı sayımını (enumeration) kapat
+- şifre-reset localhost kontrolünü tam-host eşleşmesine sıkılaştır
+- şifre sıfırlama origin'ini sabitle + CI action'ı SHA-pinle
+- Shopier order.created webhook'unu fail-closed yap
+- 30g etiket tutarlılığı ve stats actuals encapsulation
+- saha huni bölümünü sayfaya bağla ve cache anahtarını düzelt
+- Hedefim yol haritası ile Saha Özetim dönem hedeflerini hizala
+- resolve eslint violations (unused imports, set-state-in-effect, no-explicit-any)
+- migration CI onarımı (auto-apply), İstanbul saati, Hedefim formatı, i18n araç
+- ekip üye kartı sekmeleri sayfaya girişte kapalı başlasın
+- Selda/Ezgi own-file avatars, metricLabels, ranking all-time, Saha Radarı lite fetch.
+- Selda/Ezgi avatar çift swap — canonical URL ile kalıcı düzeltme.
+- CI lint + UI polish, hub soft colors, admin SSR prefetch
+- KRİTİK davet kodu (079) + gelir ifadeleri + Boru Hattı→Listem + telemetri kaldır
+- onay/red in-app bildirim + telemetri ham-anahtar bug
+- saha-radar aktivite testi boş workspace'te zarifçe atlasın (deploy gate)
+- üye detay çevirisi, dönem şeridi swipe ve Akademi prefetch
+- davet butonu, sticky tablo ve sekme yükleme hızı
+- TeamPerformanceTable preserve-manual-memoization hatası
+- dark CTA butonları coral turuncu gradient
+- landing geri al, Saha Özetim sekmelerine pano renkleri
+- Saha Özetim daily testi role=tab ile sorgulanıyor
+- react-hooks/set-state-in-effect ve no-explicit-any kural hataları giderildi
+- E2E testleri, hydration uyuşmazlıkları ve dev origin engelleri giderildi
+- Resend lazy init — RESEND_API_KEY olmadan build crash düzeltmesi
+- İstatistikler UI, Saha Özeti mobil stabilite ve dashboard prefetch hızlandırma
+- Yıllık sekmesi geri, saha ortağı davet sadeleştirme ve CI build
+- Playwright E2E — build kırığı, eski assertion ve auth dayanıklılığı
+- Playwright CI — mobil viewport ve legacy redirect assertion
+- migration 070 — cron.schedule DO block ile idempotent
+- migration 069 — constraint öncesi uzun notları kırp
+- Saha Radarı CTA <a> → <Link> (@next/next/no-html-link-for-pages)
+- davet koduyla katılan kullanıcıların trial email sistemine dahil edilmesi
+- Vaktin Varsa/Eğitim İlerlemem — gereksiz alt metinler ve mükerrer strip.
+- Hedefim hedef cümlesi — 🎯 emoji, küçük mobil punto.
+- Hedefim ay dökümü mobil — köşe hizalama ve tek satır.
+- Hedefim ayırıcı nokta yalnızca mobilde göster.
+- Hedefim ay dökümü mobil taşma — wrap ve 🎯 · ayırıcı.
+- Haftalık Özet sayfasında eksik queryKeys importunu geri ekle.
+- /ekip useSearchParams Suspense — Vercel build prerender hatası
+- Vaktin Varsa pano kutusu sarısı ~%50 koyulaştırıldı
+- pano Hızlı Bakış amber, Vaktin Varsa pastel civciv sarısı
+- mobil UX — popup ortalama, YZ Koçu sekmeleri, pano renk swap
+- pano Ekibim ve Vaktin Varsa kutu renkleri yer değiştirdi
+- pano mobilde 6 kutu viewport'a sığdırıldı, etiketler 15/20px
+- pano launcher kutu etiketleri mobil ve masaüstünde büyütüldü
+- pano launcher kutularına üst çizgi rengi tüm yüzeye uygulandı
+- Hızlı Bakış başlığı ve sayfa genişliği nav ile hizalandı
+- window.confirm → ConfirmDialog (video sil), senderPlaceholder i18n
+- korumalı route testleri PLAYWRIGHT_TEST_EMAIL olmadan skip et
+- launcher grid yatay sınırlarını Boru Hattı ile hizala
+- masaüstünde launcher kutularını viewport yüksekliğine yay
+- pano ve Bugün İlgilen launcher kutularını birebir eşitle
+- Bugün İlgilen kutuları NMM hibrit sayfalar — mock shell kaldırıldı
+- mobil alt barı yatay kayar şeride döndür
+
+### ⚡ Performans
+- cold-start blokajlarını kaldır (layout team/aiUsage, istatistikler huni, landing kod-bölme)
+- Brief saha-radar sorgusu kart açılınca tetiklenir
+- prefetch academy progress on /itirazlar hover and update hot log
+- add custom content query & search indexes (099) and update hot log
+- kalan yavaş sayfalardaki ardışık zincirleri sil
+- ardışık context round-trip'lerini sil
+- metrik cache'i kalıcılaştır + tek-render context dedup
+- getUser() ağ doğrulaması yerine yerel JWT doğrulama (getClaims)
+- Saha Özeti metrik action'larındaki ardışık round-trip'leri paralelle
+- çıkış yapmış trafikte gereksiz getUser round-trip'ini ele
+- pano açılışı + sekme geçişlerindeki 5-6sn gecikmeyi düşür
+- daraltılmış prefetch, batch ranking ve deploy sürüm koruması
+- lazy activity log, journal sync UX, migration check script
+
+### ♻️ Refactor
+- logAIGenerationFromQuota helper + 11 saha migrasyonu
+- deneme hunisi tutarlılığı — ortak footer, metin, analytics
+- Triad raporu A→F düzeltmelerini uygula
+- 29 ulaşılamayan ölü dosyayı kaldır (knip)
+- ölü pulse/stats anahtarları ve istatistikler ölü kod temizliği
+- implement visual standardizations, loading skeletons, and lazy-loaded modules
+- merkezi pulsePeriodLabels ve ekip sheet 30g etiketi
+- finalize page headers standardizations and generic toast actions
+- implement and integrate DashboardPageHeader component across pages
+- synchronize tab and button colors, implement dynamic lazy loading of modals, add RLS composite indexes, and support @i18n-keep whitelisting
+- implement TanStack Query optimistic updates, database soft delete column, RLS policies, centralized CSS category variables, and i18n pre-commit checks
+- gerçek video süreleri, trend bucketing saf fonksiyon, i18n temizliği
+- Faz Ε+Ζ — Supabase client TSX migrasyonu (11→3) + kalan god component split
+- god file + god component splits — Faz A/B/Δ
+- ortak akademi bundle ve hub komşu offset prefetch
+- council triad faz A-D — 17 kritik düzeltme + kod kalitesi
+- LandingHero lang ternary → t(), ConfirmDialog danger ikon
+- legal i18n, staleTime hizalama, ConfirmDialog danger variant
+- CandidateDetail bölünmesi, admin-actions, günlük Supabase sync
+
+### 📝 Dokümantasyon
+- 4 YZ kota/çeviri iyileştirmesi özeti
+- YZ tablosu taşıma + 3 öneri özeti
+- COUNCIL_STATUS — Faz F sorgu + sahip kararlarını yansıt
+- Triad 3. tur kapsamlı proje analizi raporu
+- /cso güvenlik denetimi turu — 3 bulgu kapandı
+- add details for general recommendations round 5
+- 5 önerinin uygulanması — i18n büyük budama, baseline ölçüm, pulse-my
+- gün-anahtarı niyet annotation'ları + öneri turu kapanışı
+- UX hız turu, mobil PageHelp, WA helper migrasyonu, PageHelp coverage
+- timezone day-key, idempotent migration & PageHelp conventions
+- deploy gate fix kaydı (saha-radar E2E + Vercel hook unblock)
+- deploy gate uçtan uca doğrulandı + lint fix
+- deploy gate aktive edildi (vercel.json auto-deploy kapatıldı)
+- deploy gate (CI-driven, skip-safe) kararı ve scaffold
+- CI dayanıklılığı turu — action bump + smoke kapsamı
+- hot.md — plan kartı yenileme logu eklendi
+- hot.md council triad faz A-D özeti
+- hot.md — 6 özellik oturumu kaydı
+- hot.md — ekip Suspense fix commit hash
+- hot.md — pano organizasyon commit hash (684a975)
+- hot.md — freemium sprint commit hash (1bdcaac)
+- hot.md — pano grid yatay hizalama notu
+- feat/pano-cockpit-faz1 main merge ve canlı deploy notu
+- pano Faz 1a özet ve geri dönüş notları
+
+### ✅ Testler
+- YZ kota kapsamı için yapısal regresyon kapısı
+- dönem swipe unit testleri ve tam progress prefetch
+
+### 🤖 CI/CD
+- deploy↔migration sıralama kapısı + fail bildirimi + expand/contract
+- main push kaldır — haftalık schedule + manuel tetikleme
+- db-push workflow'una repair modu ekle
+- gerçek-Postgres uygula + tip drift + kontrollü prod push
+- hızlı deploy gate (lint+unit+build) + Playwright E2E advisory
+- doküman-only commit'lerde E2E/Vitest/deploy tetikleme (push paths-ignore)
+- main Git auto-deploy kapat — prod deploy artık E2E-gated
+- E2E yeşiline bağlı opsiyonel prod deploy gate (skip-safe)
+- action sürümlerini Node 24'e yükselt + kritik rota smoke kapsamı
+- debug — Node/npm versiyon çıktısı ekle
+- Node 22 → 24 — yerel npm 11 lockfile uyumu
+- E2E iki job, landing data-testid ve secret dokümantasyonu
+
+### 🧹 Bakım
+- otomatik-apply netleştirme + 4 code-review önerisi
+- yetim tipleri sil — HubSummaryTab, ProgressData, LeaderNoteAction
+- pulse/brandGradients/videoProgress yetim export temizliği + hot.md
+- /health temizliği — 4 ölü dosya + pulse/brandGradients yetim export'lar
+- supabase/.temp/cli-latest commit dışı
+- Faz F ölçüm döngüsünü kapat + sahip kararlarını belgele
+- öneri paketi — Shopier Plus/Pro rotaları, i18n temizliği, E2E özeti
+- billing sonrası workflow yeniden tetikleme
+- knip dead-code dedektörü ekle + Health Stack tanımı
+- avatar upload path guard, RPC canonical URLs, follow-up index.
+- playwright-report ve test-results gitignore'a ekle
+
+### 🎨 Stil
+- landing dark CTA pano renkleri ve Ekibim light accent
+- dark mode CTA renk makyajı
+- deletion confirmation dialogs with 5s undo & non-blocking snappy route prefetching
+- remove next topic box, add basic level filter and general category option
+- sync video and objection tab colors, refactor training card footer actions
+- funnel icon swap, member activity sheet cleanup, and academy button color synchronization
+- refine Vaktin Varsa İçerik Kütüphanesi & İtiraz Bankası dark theme colors and align layout styles
+- align PageHelp to viewport center, move it to inner page headers, and align training/objection card actions to right-bottom
+
+### Diğer
+- moderasyon deep link, PageHelp yerleşimi, landing Free satırı.
+- feat+fix: 5 maddelik UX/akış turu
+- fix(ux)+feat: masaüstü Brief floating + ekip iletişim konsolidasyonu
+- 137 yetim çeviri anahtarını temizle (#3)
+- queryKeyRoots merkezileştirme, pipeline_id navigasyonu ve custom content indexleri.
+- Merkezi queryKeys, istatistik huni SSR hydrate ve i18n borç temizliği.
+- docs+refactor: dönem etiket rehberi, prefetch DRY ve i18n temizliği
+- remove unused fieldType translation keys
+- perf+i18n: ölü-anahtar temizliği, baseline script, pipeline skeleton
+- prune unused navigation i18n keys from en.ts and tr.ts
+- ci+refactor: otomatik migration (gated), dead-code temizliği, docs, Ekipten Çıkar yerleşimi
+- Selda/Ezgi avatar swap, ekip aktivite 3. şahıs ve Saha Radarı hızlandırma.
+- Ekibim WhatsApp sekmesi, dark tema renkleri ve Selda/Ezgi kimlik migrasyonları.
+- İstatistik Grafiklerinde Ertelenmiş Yükleme ve Smoke Test Rota Güncellemeleri
+- Veritabanı Seviyesinde Rol Düzeltmesi (Migration 084) ve Hedefim / Saha Özetim Yükleme İskeletleri (Skeleton Uyumlamaları)
+- Performans, Rol Eslesme, Ekip Sayfasi Tab Siralamasi, Davet Modulu Temizligi ve Aday Karti Tasarim Guncellemeleri
+- ivme grafikleri aylik/yillik guncellemesi, Selda ve Ezgi avatar eslestirme fallback ve db backfill
+- Saha Ozetim UI, arama debounce, mukerrer aday kontrolu ve parent_id workspace link migration
+- Ekip arama filtreleme sıralama, mobil ivme grafik kaydırma, davet prefill e-posta fix, platform yonetimi baglama referans ve bildirim duzeltmeleri
+- CI ops: PR lint, mobile advisory, smoke alert, preview comment; hub daily rollup.
+- lint split, mobile E2E, deploy smoke; hub prefetch server telemetry.
+- CI lint düzeltmesi: prod deploy zincirini yeniden aç.
+- Saha Radarı aktivite kartları pipeline detayına yönlensin; hub önerileri tamamlandı.
+- Saha Özetim hub prefetch SSR, placeholder cache ve CI test kapısı.
+- Akademi mobil tek satır etiketler ve Eğitim İlerlemem metrik prefetch.
+- üye listesi sanallaştırma, eğitim mobil accordion ve aktivite özeti birleşimi.
+- Ekibim mobil UX, aktivite sekmesi düzeni ve eğitim devam kutusu hızlandırması.
+- Saha Özetim yıllık kutusunda Arama/WhatsApp etiket çevirisini düzelt.
+- Ekip ve istatistik UI düzeltmeleri; Saha Özeti metrik prefetch kalıcılığı.
+- Eğitim onay masası, video moderasyonu ve Ekibim dönem/UI sadeleştirmesi.
+- Mobil UX: sekme başlıkları, Platform ikon butonları, pano hizalama.
+- Saha özeti günlük sekmesini sadeleştir ve Ekibim araçlarını accordion yap.
+- Platform Yönetimi sayfasını sadeleştir ve yatay kaydırma standardını ekle.
+- İstatistikler sayfasını sadeleştir ve dark temada mor metinleri okunur kıl.
+- YZ sayaç senkronu, hesap popup sadeleştirme ve Ekibim saha özeti UX düzeltmeleri.
+- Süper admin model/huni panelleri, Pro AI rozeti ve yıllık deneme deep link.
+- Hibrit Gemini routing, 1500 karakter AI kalkanı ve dönüşüm hunisi.
+- Fiyat revizyonu, Basic popüler rozeti ve birleşik YZ rollup.
+- Birleşik günlük YZ kotası (20/45/100) ve plan kartı sadeleştirmesi.
+- Pano mobil launcher kutularını kareye döndür.
+- Ekibim sıralama tabloları ve pano grid spacing.
+- Fix deploy: NotificationPreferences tipine overdueEmailFrequency eklendi.
+- Pano kutuları ve Ekibim 5-sekme yapısı; Saha Özetim'den Tüm Zamanlar kaldırıldı.
+- Platform Yönetim: alt başlık kaldır, sidebar amber vurgu.
+- Pano selamlama altına yerelleştirilmiş tam tarih satırı.
+- Pano selamlama sola; sidebar aktif sekme pano rengi.
+- Takvim/İstatistikler renk eşlemesi ve kare kutular.
+- Pano 5×2 kompakt grid, legacy redirect konsolidasyonu, IlgilenContent taşıma
+- Legacy özet bileşenlerini kaldır, redirect rotalarını koru
+- Saha Özetim hub: günlük/haftalık/aylık birleşimi ve pano 3×3
+- Rapor sonu önerileri: boru hattı unlink, i18n temizlik, sade pano.
+- Huni iyileştirmeleri: realtime, eşleşme 063, ekip CTA
+- Günlük Özet sayfasını haftalık özet layoutuna taşı; boru hattı arama kaydını düzelt.
+- Otomatik huni önerileri: istatistikler, onboarding, ekip nabzı, hedef link.
+- Huni metrikleri yalnızca boru hattından; Bugün Ne Yaptım not odaklı.
+- Haftalık/aylık huni gerçekleşenlerini field_log ile boru hattından birleştir.
+- Aylık özet metnini sadeleştir; geçen ay karşılaştırmasını kaldır.
+- Haftalık özeti Pzt–Paz takvim haftasına geçir.
+- Özet sayfası başlık ikonu ile bu hafta/aya dön.
+- Boru hattı ve aday hunisi aşama renklerini pano paletiyle hizala.
+- Haftalık dönem gezgininde yön ve ok adımını düzelt.
+- Haftalık/aylık özet: dönem gezgini, nav ikonları ve UI tutarlılığı.
+- Özet sayfaları: ajanda ikonları, saha dedupe, huni renkleri ve deep link.
+- Haftalık/aylık özetleri kişisel metriklerle genişlet, ekip bölümlerini kaldır.
+- Özet sayfalarını sadeleştir ve metrik prefetch ile sayfa geçişlerini hızlandır.
+- Haftalık/Aylık Özet Crown düzeni; pano Boru Hattı↔Ekibim renk swap.
+- Pano renk swap: Bugün/Haftalık ve Eğitim/Vaktin; sayfa temaları senkron.
+- Vaktin Varsa ile Eğitim İlerlemem kutularının yerini değiştir.
+- Pano renk eşleme; Hedefim stabil layout ve vivid ikonlar.
+- 12. kutu İstatistikler; nav ve mobil kare grid.
+- 12 kutu (boru hattı, ekip, takvim) ve 4×3 grid.
+- Bugün Ne Yaptım: hedef banner metnini ikonla dikey ortala.
+- hedef cümlesi, ikon hizası ve ay dökümü düzeni.
+- Hedefim hub ayrımı, ay dökümü UI ve pano sadeleştirme.
+- Huni metrik ikonları: Phone, Handshake, Presentation, UserPlus.
+- yeni hedef metni, Bugünkü Odağım, ay dökümü açık.
+- Bugün Ne Yaptım metrik sorularını birinci tekil geçmiş zamana çevir.
+- Hedefim hub başlığı sadeleştirildi; boru hattı metriği kaldırıldı.
+- Hedefim modülü: soru formatı, pano Organizasyon etiketi kaldırıldı.
+- Günlük Aksiyon Özetin: metrik soruları, boru hattı, pano mor tema.
+- Günlük Takip sayfası: elle metrik girişi + pano sadeleştirme
+- Pano hub rozetleri: haftalık, aylık, ilk 30 + search i18n
+- Add pano video badge, hub alignment, and deploy guards
+- Pano polish: progress badges, footer links; hot.md local-only
+- Beşinci sprint: E2E CI, journal birleştirme ve idempotent moderation EN.
+- Dördüncü sprint: E2E auth, journal çakışma, moderation EN ve CI remote drift.
+- Moderasyon i18n, AI red çevirisi ve lazy-load iyileştirmeleri.
+- hot.md: PlatformYonetimContent split + perf-progress staleTime notu
+- PlatformYonetimContent modal split + perf-progress staleTime
+- hot.md: lazy-mount tab pattern notu eklendi
+- lazy-mount tab pattern — ilk yüklemede sadece aktif sekme render edilir
+- UX Performans: always-mounted tabs + global cache TTL artışı
+- Bugün İlgilen: sekme geçişi anlık — always-mounted + CSS hidden
+- useReducer ile çift setState → tek dispatch (lint + perf)
+- Bugün İlgilen: gerçek sekme sistemi (SPA) — BugunHubSections kaldırıldı
+- Bugün İlgilen sekmeleri: YZ Koçu stili, varsayılan seçim, swipe kilidi.
+- Ekibim özet kaldırıldı; Bugün İlgilen 6 sekme navigasyonu.
+- saha ortağı davet sekmeleri, profil satırı sadeleştirildi.
+- hot.md: saha ortağı tek satır düzeni notu.
+- saha ortağı kartları tek satır, kompakt Davet Et butonu.
+- 4'lü özet kutular, sekme sırası, aktivite ve hedef senkronu.
+- Ekibim kartları: kompakt profil, sekme-only detay, lider dahil.
+- Ekibim sekmeleri: Ara sadeleştirildi, Aktivite satır içi gösterim.
+- Ekibim üye kartlarında DDBR satırını ikon sekmelerine dönüştür.
+

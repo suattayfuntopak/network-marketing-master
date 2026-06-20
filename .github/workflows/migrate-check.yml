@@ -213,3 +213,21 @@ jobs:
               ].join('\n'),
             })
             core.info('migration-failed issue oluşturuldu.')
+
+      # Opsiyonel Telegram bildirimi — TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID secret'ları
+      # tanımlıysa mobile anında haber; yoksa sessiz no-op (issue + native e-posta yine var).
+      - name: Telegram bildirimi (opsiyonel)
+        if: always()
+        env:
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ -z "$TG_TOKEN" ] || [ -z "$TG_CHAT" ]; then
+            echo "TELEGRAM_BOT_TOKEN/CHAT_ID yok — Telegram bildirimi atlandı."; exit 0
+          fi
+          curl -fsS -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            --data-urlencode "chat_id=${TG_CHAT}" \
+            --data-urlencode "text=🔴 NMM: Otomatik prod migration apply BAŞARISIZ (${SHA:0:7}). Migration prod'a uygulanmadı. ${RUN_URL}" \
+            >/dev/null || echo "Telegram gönderimi başarısız (tolere edildi)."

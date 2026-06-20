@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-20 — Telegram alert + gate timeout + limitReached + changelog (4 öneri) 📲🧩✅
+
+Önceki turun 4 önerisi:
+
+**#1 Telegram köprüsü.** `migrate-alert` (migration apply fail) ve `smoke-alert` (deploy smoke fail) job'larına opsiyonel Telegram bildirimi eklendi. `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` secret'ları tanımlıysa mobile anında mesaj; yoksa sessiz no-op (GitHub Issue + native e-posta yine var).
+
+**#2 Deploy gate timeout yapılandırılabilir.** Migration sıralama kapısının bekleme süresi `vars.MIGRATION_GATE_TIMEOUT_MIN` (vars. 4 dk) ile ayarlanabilir; başarıda geçen süre loglanır (timeout'u gerçek süreye göre tune etmek için).
+
+**#3 limitReached pre-empt yaygınlaştırma.** ProvaForm + StudyoForm artık `useAILimits().limitReached` ile kota dolunca server-call yapmadan doğrudan upgrade prompt açar (feature pre-check deseniyle aynı). Kota mantığı tek kaynaktan.
+
+**#4 CHANGELOG otomasyonu.** `scripts/gen-changelog.mjs` + `npm run changelog`: conventional-commit'leri tip bazında gruplayıp `CHANGELOG.md` üretir (lastTag..HEAD veya son N commit). `hot.md` tamamlayıcısı. İlk üretim: 370 commit.
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377 · 2 workflow YAML geçerli · knip temiz.
+
+---
+
 ## 2026-06-20 — Migration/deploy güvenliği + YZ UX (4 öneri) 🛡️🤖✅
 
 Önceki turun 4 rapor önerisi de halledildi:
