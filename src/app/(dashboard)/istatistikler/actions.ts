@@ -441,8 +441,6 @@ export async function getAiModelMixAction(period: AIUsageArchivePeriod): Promise
   return mix
 }
 
-export type { ProductFunnelCounts }
-
 /** Süper admin: ürün hunisi olay sayıları (landing → plan CTA → ödeme). */
 export async function getProductFunnelStatsAction(
   period: AIUsageArchivePeriod,

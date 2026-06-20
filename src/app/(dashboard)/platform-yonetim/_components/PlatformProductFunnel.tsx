@@ -4,8 +4,7 @@ import { CreditCard, Eye, Sparkles, ArrowRight, Link2, Percent } from 'lucide-re
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { ModuleInfo } from './ModuleInfo'
-import { computeProductFunnelRates } from '@/lib/domain/productFunnelStats'
-import type { ProductFunnelCounts } from '@/app/(dashboard)/istatistikler/actions'
+import { computeProductFunnelRates, type ProductFunnelCounts } from '@/lib/domain/productFunnelStats'
 
 type Props = {
   funnel: ProductFunnelCounts | undefined
