@@ -1,5 +1,24 @@
 # Hot Log
 
+## 2026-06-20 — YZ tablosu taşıma + 3 öneri (helper/maliyet/UX) 🚚🛠️✅
+
+### 1. Tablo taşıma (3a2fceb)
+**Ekip & Dış Kaynak YZ Kullanım & Limit Kontrol** tablosu istatistiklerden **Platform Yönetimi**'ne taşındı — üst KPI grid'i (`PlatformKpiCards`) ile **Büyüme & Yayılma** (`PlatformViralKpi`) arasına. `StatsSuperAdminSections` artık kendi-yeterli (prop yerine `useWorkspace`+`useTeamMembers`+`useCandidates`); saha-eşleştirme `lib/domain/sahaPartners.ts`'e çıkarıldı (+test), istatistik perf tablosuyla paylaşılıyor. istatistiklerde ölü `licenseLabel/sahaRows/cleanStr` temizlendi.
+
+### 2. Öneri 1 — logAIGenerationFromQuota (62fea46)
+`checkAIQuota` sonucundan `workspaceId/userId/dailyLimit` türetmesini tek yerde topla (`dailyLimit = isSuperAdmin ? null : limit`). 11 logAIGeneration çağrısı tek satıra indirildi, kontrol akışı korundu (fallback/ownership sahalarında HOF yerine bilinçli faithful helper). +2 test.
+
+### 3. Öneri 2 — Çeviri maliyet takibi (e68a549)
+**migration 105**: `nmm_ai_usage_daily.translate_count` + RPC `p_kind='translate'` (`ai_count`'a DOKUNMAZ → kota/fiyatlama etkilenmez; idempotent). `logAITranslation()` increment-only, fail-safe, `nmm_daily_actions`'a yazmaz (aktivite/streak kirlenmez). 3 çeviri sahası bağlandı; taşınan tabloda "Dönem çeviri hacmi (kotasız)" görünür. **Canlıda 105 deploy'dan ÖNCE uygulanmalı** (çağrı tarafı fail-safe).
+
+### 4. Öneri 3 — Limit-dolu UX tutarlılığı (5ddc77b)
+`surfaceAiQuotaError`: limit/feature → upgrade prompt, diğer → toast. `quotaError` kodu 3 action'a eklendi; koçluk/özet yüzeyleri (Ekip Üyeleri aktivite, saha-radar x2, Kişi Detayları not-özeti) bağlandı. +test.
+
+### Doğrulama
+tsc 0 · eslint --max-warnings 0 · vitest **360/360** · knip baseline (18 bilinçli, yeni ölü yok) · migrate:check (105) · i18n 1302 temiz.
+
+---
+
 ## 2026-06-20 — YZ kota kapsamı denetimi + yapısal regresyon kapısı 🛡️✅
 
 ### Soru
