@@ -17,18 +17,25 @@ if ! git rev-parse HEAD^ >/dev/null 2>&1; then
   exit 1
 fi
 
-CHANGED=$(git diff --name-only HEAD^ HEAD)
+# Deploy hook her zaman branch HEAD'ini deploy eder. Oturum sonunda hot.md commit'i
+# kod commitlerinden hemen sonra gelirse yalnızca HEAD^..HEAD bakmak ara kod değişikliklerini
+# kaçırır (prod "Canceled" kalır). Son N committe kod var mı diye tara.
+SCAN_DEPTH=30
+for i in $(seq 0 $((SCAN_DEPTH - 1))); do
+  base="HEAD~$((i + 1))"
+  tip="HEAD~$i"
+  if ! git rev-parse "$base" >/dev/null 2>&1; then
+    break
+  fi
+  CHANGED=$(git diff --name-only "$base" "$tip")
+  if [ -z "$CHANGED" ]; then
+    continue
+  fi
+  NON_DOC=$(echo "$CHANGED" | grep -vE '^(hot\.md|docs/local/)' || true)
+  if [ -n "$NON_DOC" ]; then
+    exit 1
+  fi
+done
 
-if [ -z "$CHANGED" ]; then
-  exit 0
-fi
-
-# Yalnız hot.md / yerel doküman değiştiyse atla (hot.md artık gitignore'da olsa da geçmiş commitler için)
-NON_DOC=$(echo "$CHANGED" | grep -vE '^(hot\.md|docs/local/)' || true)
-
-if [ -z "$NON_DOC" ]; then
-  echo "Skip build: docs-only change"
-  exit 0
-fi
-
-exit 1
+echo "Skip build: docs-only changes in last ${SCAN_DEPTH} commits"
+exit 0
