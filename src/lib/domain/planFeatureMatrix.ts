@@ -1,4 +1,5 @@
 import type { LicenseTier } from '@/lib/domain/aiUsage'
+import type { GatedFeature } from '@/lib/domain/featureAccess'
 import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { hasDownlineOnboardingAccess } from '@/lib/domain/teamLimits'
@@ -114,3 +115,37 @@ export const PLAN_PAGE_HELP_PLAN_STEP = {
 
 /** Landing fiyatlandırma — landingPage.planPlusFeat2/3/4 ile aynı metinler. */
 export const PLAN_LANDING_TEAM_FEATURES = PLAN_PAYMENT_TEAM_FEATURES
+
+/** UpgradeGate modal mini kartları — shellUi.planBlurb_* ile senkron ({limit} = günlük YZ). */
+export const PLAN_MODAL_BLURBS = {
+  tr: {
+    basic: 'Günlük {limit} YZ — koç + saha',
+    plus: 'Günlük {limit} YZ · DDBR + huni tablosu',
+    pro: 'Günlük {limit} YZ · eğitim sütunları + saha özeti',
+  },
+  en: {
+    basic: 'Daily {limit} AI — coach + field',
+    plus: 'Daily {limit} AI · Quick Start + funnel table',
+    pro: 'Daily {limit} AI · learning columns + field summary',
+  },
+} as const
+
+export type UpgradePlansTarget = 'general' | 'pro'
+
+export type ProUpgradeCtaSource =
+  | 'upgrade_gate'
+  | 'ekip_summary'
+  | 'ekip_training'
+  | 'stats_hint'
+
+/** Ödeme deep link — team_pulse gate Pro kartına gider; diğerleri genel planlar. */
+export function resolveUpgradePlansTarget(
+  feature: GatedFeature | 'team_full',
+): UpgradePlansTarget {
+  if (feature === 'team_pulse') return 'pro'
+  return 'general'
+}
+
+export function upgradePlansHref(target: UpgradePlansTarget): string {
+  return target === 'pro' ? '/odeme?plan=pro' : '/odeme'
+}

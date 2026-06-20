@@ -48,7 +48,7 @@ export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocke
       {!teamPageUnlocked && <TeamFreeUpgradeBanner />}
 
       {teamPageUnlocked && !teamPulseUnlocked && (
-        <TeamFreeUpgradeBanner upgradeTarget="pro" />
+        <TeamFreeUpgradeBanner upgradeTarget="pro" analyticsSource="ekip_training" />
       )}
 
       {downline.length === 0 ? (

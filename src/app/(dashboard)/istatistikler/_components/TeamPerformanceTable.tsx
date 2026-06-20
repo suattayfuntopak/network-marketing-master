@@ -8,6 +8,8 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { HorizontalScrollLock } from '@/components/ui/HorizontalScrollLock'
 import { Z } from '@/lib/ui/zIndex'
 import { ONBOARDING_STEP_COUNT } from '@/lib/domain/pulse'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import type { VideoProgressSummary } from '@/lib/domain/videoProgress'
 import type { TeamMember } from '@/hooks/useTeamMembers'
 
@@ -294,7 +296,16 @@ export function TeamPerformanceTable({
         <p className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-[var(--text-3)]">
           <Lock className="h-3 w-3 shrink-0" aria-hidden />
           <span>{t('statsPage.teamPulseProHint')}</span>
-          <Link href="/odeme?plan=pro" className="font-semibold text-brand hover:underline">
+          <Link
+            href="/odeme?plan=pro"
+            onClick={() => {
+              void logProductEventAction(PRODUCT_EVENTS.proUpgradeCtaClick, {
+                source: 'stats_hint',
+                feature: 'stats_table_learning',
+              })
+            }}
+            className="font-semibold text-brand hover:underline"
+          >
             {t('statsPage.teamPulseProHintCta')}
           </Link>
         </p>

@@ -89,7 +89,7 @@ export function EkipSummaryTab({
       : 'general'
     return (
       <div className="space-y-4">
-        <TeamFreeUpgradeBanner upgradeTarget={upgradeTarget} />
+        <TeamFreeUpgradeBanner upgradeTarget={upgradeTarget} analyticsSource="ekip_summary" />
       </div>
     )
   }

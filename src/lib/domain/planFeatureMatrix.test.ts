@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest'
 import {
   PLAN_FEATURE_MIN_TIER,
   PLAN_GATE_COPY,
+  PLAN_MODAL_BLURBS,
   PLAN_PAYMENT_TEAM_FEATURES,
   TEAM_FREE_BANNER_COPY,
   hasPlanFeature,
+  resolveUpgradePlansTarget,
+  upgradePlansHref,
   type PlanFeatureId,
 } from '@/lib/domain/planFeatureMatrix'
 import { hasDownlineOnboardingAccess } from '@/lib/domain/teamLimits'
@@ -89,5 +92,23 @@ describe('planFeatureMatrix', () => {
       expect(land.planProFeat3).toBe(feat.proFieldSummary)
       expect(land.planProFeat4).toBe(feat.proUnlimitedTeam)
     }
+  })
+
+  it('PLAN_MODAL_BLURBS stays synced with shellUi plan blurbs', () => {
+    for (const lang of ['tr', 'en'] as const) {
+      const blurbs = PLAN_MODAL_BLURBS[lang]
+      const shell = shellSection[lang].shellUi
+      expect(shell.planBlurb_basic).toBe(blurbs.basic)
+      expect(shell.planBlurb_plus).toBe(blurbs.plus)
+      expect(shell.planBlurb_pro).toBe(blurbs.pro)
+    }
+  })
+
+  it('resolveUpgradePlansTarget routes team_pulse to Pro checkout', () => {
+    expect(resolveUpgradePlansTarget('team_pulse')).toBe('pro')
+    expect(upgradePlansHref('pro')).toBe('/odeme?plan=pro')
+    expect(resolveUpgradePlansTarget('stats_advanced')).toBe('general')
+    expect(resolveUpgradePlansTarget('team_full')).toBe('general')
+    expect(upgradePlansHref('general')).toBe('/odeme')
   })
 })

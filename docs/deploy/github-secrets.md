@@ -10,6 +10,8 @@
 | `GEMINI_API_KEY` | Evet | Evet | E2E build |
 | `PLAYWRIGHT_TEST_EMAIL` | Evet (yalnızca `npm run test:e2e`) | Hayır | E2E auth |
 | `PLAYWRIGHT_TEST_PASSWORD` | Evet (yalnızca `npm run test:e2e`) | Hayır | E2E auth |
+| `PLAYWRIGHT_TRIAL_EXPIRED_EMAIL` | Opsiyonel (expired-trial E2E) | Hayır | E2E expired trial |
+| `PLAYWRIGHT_TRIAL_EXPIRED_PASSWORD` | Opsiyonel (expired-trial E2E) | Hayır | E2E expired trial |
 | `SUPABASE_ACCESS_TOKEN` | Hayır (isteğe bağlı `migrate:check:remote`) | Hayır | `migrate-check.yml` |
 | `SUPABASE_PROJECT_REF` | Hayır | Hayır | `migrate-check.yml` |
 | `CRON_SECRET` | Evet (cron test) | Evet | Cron workflow |
@@ -43,6 +45,10 @@ Tanımlı değilse remote job sessizce atlanır; local numara doğrulaması yine
 | `GEMINI_API_KEY` | AI özellikleri (build sırasında import) |
 | `PLAYWRIGHT_TEST_EMAIL` | E2E giriş test kullanıcısı e-postası |
 | `PLAYWRIGHT_TEST_PASSWORD` | E2E giriş test kullanıcısı şifresi |
+| `PLAYWRIGHT_TRIAL_EXPIRED_EMAIL` | *(Opsiyonel)* 14 gün denemesi bitmiş test hesabı — `e2e/expired-trial-ekip.spec.ts` |
+| `PLAYWRIGHT_TRIAL_EXPIRED_PASSWORD` | *(Opsiyonel)* Deneme bitmiş hesap şifresi |
+
+**`PLAYWRIGHT_TRIAL_EXPIRED_*` tanımlı değilse** expired-trial spec’leri atlanır (ana E2E yeşil kalır). Ekibim crash regresyonu için staging’de trial’ı bitmiş ayrı bir hesap önerilir.
 
 **`PLAYWRIGHT_TEST_*` yoksa E2E job bilinçli olarak atlanır** (workflow uyarısı + yeşil job). Build job yine lint + derleme çalıştırır. Auth’lu senaryoları CI’da koşturmak için aşağıdaki adımları uygulayın.
 

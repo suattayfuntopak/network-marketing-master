@@ -48,6 +48,8 @@ export const PRODUCT_EVENTS = {
   broadcastSent: 'broadcast_sent',
   /** Hesap-durumu / UpgradeGate modalındaki "Planları Gör" (phase + source metadata) → satış hunisi. */
   seePlansClick: 'see_plans_click',
+  /** Plus→Pro yükseltme CTA (banner, ipucu, team_pulse gate) → odeme?plan=pro hunisi. */
+  proUpgradeCtaClick: 'pro_upgrade_cta_click',
 
   // ── Faz F: metrik/özet yüzeyi trafiği (konsolidasyon kararı için ölçüm) ──
   /**

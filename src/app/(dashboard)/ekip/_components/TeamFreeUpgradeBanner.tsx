@@ -4,13 +4,20 @@ import Link from 'next/link'
 import { Sparkles, Users } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { UpgradeGate } from '@/components/ui/UpgradeGate'
+import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import type { ProUpgradeCtaSource } from '@/lib/domain/planFeatureMatrix'
+import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 
 type Props = {
   /** Plus kullanıcı → Pro yükseltme; diğerleri → genel planlar. */
   upgradeTarget?: 'general' | 'pro'
+  analyticsSource?: ProUpgradeCtaSource
 }
 
-export function TeamFreeUpgradeBanner({ upgradeTarget = 'general' }: Props) {
+export function TeamFreeUpgradeBanner({
+  upgradeTarget = 'general',
+  analyticsSource = 'ekip_summary',
+}: Props) {
   const { t } = useTranslation()
 
   if (upgradeTarget === 'general') {
@@ -28,6 +35,12 @@ export function TeamFreeUpgradeBanner({ upgradeTarget = 'general' }: Props) {
           <p className="mt-1 text-xs leading-relaxed text-[var(--text-2)]">{t('shellUi.teamProUpgradeDesc')}</p>
           <Link
             href="/odeme?plan=pro"
+            onClick={() => {
+              void logProductEventAction(PRODUCT_EVENTS.proUpgradeCtaClick, {
+                source: analyticsSource,
+                feature: 'team_pulse',
+              })
+            }}
             className="mt-3 inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 px-4 py-2 text-xs font-bold text-white shadow-sm hover:opacity-95 transition"
           >
             <Sparkles className="h-3.5 w-3.5" />

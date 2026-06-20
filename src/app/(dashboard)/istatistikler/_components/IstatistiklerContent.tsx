@@ -92,7 +92,7 @@ export function IstatistiklerContent() {
   const { data: perfProgress } = useQuery({
     queryKey: queryKeys.teamProgressMap(ws?.workspaceId ?? '', perfMemberIds),
     queryFn: () => getTeamProgressMapAction(ws!.workspaceId, perfMemberIds),
-    enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && teamPulseUnlocked,
+    enabled: !!ws?.workspaceId && perfMemberIds.length > 0 && !teamStatsLocked,
     staleTime: QUERY_STALE.metrics,
   })
 

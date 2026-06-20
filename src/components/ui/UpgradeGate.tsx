@@ -11,6 +11,11 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
+import {
+  resolveUpgradePlansTarget,
+  upgradePlansHref,
+  type ProUpgradeCtaSource,
+} from '@/lib/domain/planFeatureMatrix'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 import { UpgradeModalFooter } from '@/components/ui/UpgradeModalFooter'
 
@@ -65,7 +70,26 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
     !ws.isSuperAdmin &&
     ws.licenseType === 'free' &&
     !ws.isTrialActive
-  const plansHref = '/odeme'
+  const resolvedFeature = resolveFeature(feature)
+  const plansTarget = resolveUpgradePlansTarget(resolvedFeature)
+  const plansHref = upgradePlansHref(plansTarget)
+  const ctaLabelKey =
+    plansTarget === 'pro' ? 'shellUi.teamProUpgradeCta' : 'shellUi.upgradeBannerCta'
+
+  const logCtaClick = () => {
+    if (plansTarget === 'pro') {
+      void logProductEventAction(PRODUCT_EVENTS.proUpgradeCtaClick, {
+        source: 'upgrade_gate' satisfies ProUpgradeCtaSource,
+        feature: resolvedFeature,
+      })
+    } else {
+      void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
+        trialEnded: false,
+        feature: resolvedFeature,
+        cta: 'upgrade',
+      })
+    }
+  }
 
   return createPortal(
     <div
@@ -134,17 +158,13 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
             <Link
               href={plansHref}
               onClick={() => {
-                void logProductEventAction(PRODUCT_EVENTS.upgradeGateCtaClick, {
-                  trialEnded: false,
-                  feature: resolveFeature(feature),
-                  cta: 'upgrade',
-                })
+                logCtaClick()
                 onClose()
               }}
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl brand-cta px-4 py-2.5 text-sm font-bold text-white shadow-md hover:opacity-95 active:scale-[0.98] transition"
             >
               <Sparkles className="h-4 w-4" />
-              {t('shellUi.upgradeBannerCta')}
+              {t(ctaLabelKey)}
               <ArrowRight className="h-4 w-4" />
             </Link>
           )}
