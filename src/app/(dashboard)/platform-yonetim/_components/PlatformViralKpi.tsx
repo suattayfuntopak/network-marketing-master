@@ -3,7 +3,7 @@
 import { Rocket, Send, Eye, UserPlus, Percent, Activity } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { ModuleInfo } from './ModuleInfo'
+import { CardInfo } from './CardInfo'
 import type { ViralKpi } from '@/lib/domain/viralKpi'
 
 type Props = {
@@ -11,7 +11,7 @@ type Props = {
   isLoading: boolean
 }
 
-const cardClass = 'rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm'
+const cardClass = 'relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 shadow-sm'
 const labelClass = 'text-[9px] font-bold uppercase tracking-wider block'
 
 export function PlatformViralKpi({ kpi, isLoading }: Props) {
@@ -22,7 +22,6 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
       <div className="flex items-center gap-2">
         <Rocket className="h-4 w-4 text-fuchsia-600 dark:text-fuchsia-400" />
         <h2 className="text-sm font-bold text-[var(--text-1)]">{t('platformPage.viralTitle')}</h2>
-        <ModuleInfo moduleKey="viral" />
         <span className="rounded-full bg-[var(--bg-subtle)] px-2 py-0.5 text-[10px] font-semibold text-[var(--text-3)]">
           {t('platformPage.viralWindowHint', { days: kpi?.windowDays ?? 30 })}
         </span>
@@ -38,6 +37,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
           {/* K-Faktörü — kahraman metrik */}
           <div className={`${cardClass} border-fuchsia-300/40 dark:border-fuchsia-500/20`}>
+            <CardInfo cardKey="viralKFactor" />
             <span className={`${labelClass} text-fuchsia-600 dark:text-fuchsia-300`}>
               {t('platformPage.viralKFactor')}
             </span>
@@ -54,6 +54,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
           {/* Davet gönderildi */}
           <div className={cardClass}>
+            <CardInfo cardKey="viralInvitesSent" />
             <span className={`${labelClass} text-[var(--text-3)]`}>
               {t('platformPage.viralInvitesSent')}
             </span>
@@ -65,6 +66,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
           {/* Görüntülendi */}
           <div className={cardClass}>
+            <CardInfo cardKey="viralLandingViews" />
             <span className={`${labelClass} text-sky-600 dark:text-sky-300`}>
               {t('platformPage.viralLandingViews')}
             </span>
@@ -78,6 +80,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
           {/* Kayıt */}
           <div className={cardClass}>
+            <CardInfo cardKey="viralAccepted" />
             <span className={`${labelClass} text-emerald-600 dark:text-emerald-300`}>
               {t('platformPage.viralAccepted')}
             </span>
@@ -91,6 +94,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
           {/* Dönüşüm % */}
           <div className={cardClass}>
+            <CardInfo cardKey="viralConversion" />
             <span className={`${labelClass} text-amber-600 dark:text-amber-300`}>
               {t('platformPage.viralConversion')}
             </span>
@@ -104,6 +108,7 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
           {/* Aktif kullanıcı + DAU */}
           <div className={cardClass}>
+            <CardInfo cardKey="viralActiveUsers" />
             <span className={`${labelClass} text-indigo-600 dark:text-indigo-300`}>
               {t('platformPage.viralActiveUsers')}
             </span>
@@ -122,7 +127,8 @@ export function PlatformViralKpi({ kpi, isLoading }: Props) {
 
       {/* Paylaşım kaynakları — WhatsApp paylaşımı tür kırılımı (her tür tek olay) */}
       {!isLoading && kpi && kpi.shares.total > 0 && (
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+        <div className="relative rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-3 shadow-sm">
+          <CardInfo cardKey="viralShares" />
           <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-[var(--text-3)]">
             {t('platformPage.viralSharesTitle')}
           </div>

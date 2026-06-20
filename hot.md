@@ -1,5 +1,19 @@
 # Hot Log
 
+## 2026-06-20 — Süper Admin: bölüm-? yerine her kutuya kart-? yardımı ❓✅
+
+Kullanıcı isteği: Süper Admin sayfasındaki bölüm-başlığı (?)'lerini kaldır, **her stat kutusunun sağ üst köşesine** kendi (?)'sini koy; popup yalnız O kutunun ne ölçtüğünü sade dille anlatsın.
+
+- **Yeni:** `lib/domain/platformCardHelp.ts` (22 kart-yardımı, TR+EN, {title,desc}) + `CardInfo.tsx` (sağ-üst köşe küçük ? + kompakt popover).
+- **Bağlandı (24 kutu):** ViralKpi 7 (K-Faktörü, Davet, Görüntülendi, Kayıt, Dönüşüm, Aktif, Paylaşım Kaynakları) · ProductFunnel 12 (9 huni kartı + 3 oran) · AiUsage 5 (Genel + kademe + segment; kademe/segment kartları içerik paylaşır).
+- **Silindi:** eski `ModuleInfo.tsx` + `platformModuleHelp.ts` (bölüm-bazlı ?; artık ölü).
+- İçerik mevcut açıklamalardan uyarlandı + sade dile çekildi; yeni i18n anahtarı yok (içerik domain dosyasında TR+EN).
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377 · **next build ✓** · knip temiz · i18n 1320.
+
+---
+
 ## 2026-06-20 — Perf: aday listesini SSR-bloke'den çıkar (dashboard TTFB) ⚡✅
 
 **Ölçüm (kullanıcı, DevTools Zaman):** prod /pano TTFB cold **2515ms**, warm **1704ms**. Yani hem cold start (~800ms) hem de warm'da bile ~1,7s sunucu beklemesi → SSR yolu Mumbai (ap-south-1) sorgularına takılıyor.
