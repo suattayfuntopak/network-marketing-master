@@ -214,7 +214,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
   const {
     dailyLimit,
     aiUsed,
-    aiRemaining,
+    limitReached,
     isSuperAdmin: limitsSuperAdmin,
   } = useAILimits()
 
@@ -295,8 +295,7 @@ export function UyumContent({ embedded = false }: { embedded?: boolean }) {
                       disabled={
                         isAuditing ||
                         !inputText.trim() ||
-                        (!limitsSuperAdmin && dailyLimit === 0) ||
-                        (!limitsSuperAdmin && aiRemaining <= 0)
+                        limitReached
                       }
                       className="flex max-w-full items-center justify-center gap-2 rounded-xl bg-[#C03E1F] hover:bg-[#a03117] text-white px-4 py-2.5 text-sm sm:text-base font-bold shadow-sm transition active:scale-95 disabled:pointer-events-none disabled:opacity-40 cursor-pointer whitespace-nowrap"
                     >

@@ -28,8 +28,7 @@ export function KoclukForm() {
 
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
-  const { dailyLimit, isSuperAdmin, aiUsed, aiRemaining } = useAILimits()
-  const limitReached = !isSuperAdmin && aiRemaining <= 0
+  const { dailyLimit, isSuperAdmin, aiUsed, limitReached } = useAILimits()
   const isProEngine = ws?.effectiveLicenseType === 'pro'
 
   const prevAnswerRef = useRef<string | undefined>(undefined)

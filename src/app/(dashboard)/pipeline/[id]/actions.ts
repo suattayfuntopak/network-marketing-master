@@ -1,6 +1,5 @@
 'use server'
 
-import { generateMessage } from '@/lib/ai/generateMessage'
 import { createClient } from '@/lib/supabase/server'
 import { buildInviteLink } from '@/lib/domain/inviteLink'
 import { checkAIQuota, logAIGenerationFromQuota, logAITranslation, quotaErrorCode, type AiQuotaErrorCode } from '@/lib/ai/checkQuota'
@@ -14,48 +13,6 @@ export interface CoachState {
   message?: string
   error?: string
   quotaError?: AiQuotaErrorCode
-}
-
-export async function generateCoachMessage(
-  _prev: CoachState,
-  formData: FormData,
-): Promise<CoachState> {
-  if (!process.env.GEMINI_API_KEY) {
-    return { error: 'GEMINI_API_KEY eksik! Lütfen .env.local dosyanıza GEMINI_API_KEY=your_key değerini ekleyin ve Next.js sunucusunu yeniden başlatın.' }
-  }
-
-  const candidateId = (formData.get('candidateId') as string | null)?.trim() ?? ''
-  const name        = (formData.get('name')        as string | null)?.trim() ?? ''
-  const stage       = (formData.get('stage')       as string | null)?.trim() ?? ''
-  const note        = (formData.get('note')        as string | null)?.trim() ?? ''
-  const messageType = (formData.get('messageType') as string | null)?.trim() ?? 'genel'
-
-  if (!name || !stage) return { error: 'Kişi bilgisi eksik.' }
-
-  const quota = await checkAIQuota('message')
-  if (!quota.ok) return { error: quota.message, quotaError: quotaErrorCode(quota.reason) }
-
-  // Ownership check: candidate must belong to caller's workspace
-  if (candidateId && !quota.isSuperAdmin && quota.workspaceId) {
-    const supabase = await createClient()
-    const { count } = await supabase
-      .from('nmm_candidates')
-      .select('*', { count: 'exact', head: true })
-      .eq('id', candidateId)
-      .eq('workspace_id', quota.workspaceId)
-      .eq('owner_id', quota.user.id)
-    if ((count ?? 0) === 0) return { error: 'Erişim reddedildi.' }
-  }
-
-  try {
-    const message = await generateMessage({ name, stage, note, messageType })
-
-    await logAIGenerationFromQuota(quota, { note: 'message', aiModel: GEMINI_FLASH })
-
-    return { message }
-  } catch (err: unknown) {
-    return { error: 'Mesaj oluşturulamadı: ' + (err instanceof Error ? err.message : String(err)) }
-  }
 }
 
 /**

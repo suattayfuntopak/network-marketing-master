@@ -77,10 +77,9 @@ export function YazarForm({ initialName = '', initialNote = '', initialWarmth = 
     dailyLimit,
     isSuperAdmin,
     aiUsed,
-    aiRemaining: remaining,
+    limitReached,
   } = useAILimits()
   const qc = useQueryClient()
-  const limitReached = !isSuperAdmin && remaining <= 0
 
   const containerRef = useRef<HTMLDivElement>(null)
   const messageBoxRef = useRef<HTMLDivElement>(null)

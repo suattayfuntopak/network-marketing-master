@@ -151,9 +151,14 @@ jobs:
         env:
           TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+          PWD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          if [ -z "$TOKEN" ] || [ -z "$REF" ]; then
-            echo "::error::SUPABASE_ACCESS_TOKEN / SUPABASE_PROJECT_REF tanımlı değil. docs/deploy/github-secrets.md"
+          missing=""
+          [ -z "$TOKEN" ] && missing="$missing SUPABASE_ACCESS_TOKEN"
+          [ -z "$REF" ]   && missing="$missing SUPABASE_PROJECT_REF"
+          [ -z "$PWD" ]   && missing="$missing SUPABASE_DB_PASSWORD"
+          if [ -n "$missing" ]; then
+            echo "::error::Otomatik prod migration'ı için secret eksik:$missing — docs/deploy/github-secrets.md. Eklenene kadar migration'lar prod'a UYGULANMAZ."
             exit 1
           fi
       - name: Link + bekleyen migration'ları uygula

@@ -19,15 +19,19 @@ export function useAILimits() {
     )
     const aiUsed = usage?.aiUsed ?? 0
     const dailyLimit = limits.dailyLimit
+    const aiRemaining = Number.isFinite(dailyLimit)
+      ? Math.max(0, dailyLimit - aiUsed)
+      : Infinity
 
     return {
       limits,
       dailyLimit,
       isSuperAdmin,
       aiUsed,
-      aiRemaining: Number.isFinite(dailyLimit)
-        ? Math.max(0, dailyLimit - aiUsed)
-        : Infinity,
+      aiRemaining,
+      // Günlük kota dolu mu? (süper admin asla dolmaz.) Tek kaynak — bileşenler
+      // `!isSuperAdmin && aiRemaining <= 0` hesabını tekrar etmesin.
+      limitReached: !isSuperAdmin && aiRemaining <= 0,
       isTrialActive: isTrialPeriodActive(
         ws?.licenseType,
         ws?.licenseExpiresAt,

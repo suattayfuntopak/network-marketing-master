@@ -1,9 +1,14 @@
-name: DB migrate (prod)
+name: DB migrate (prod) — MANUEL yedek/onarım
 
-# Bekleyen migration'ları PROD Supabase'e uygular — YALNIZCA elle, onaylı tetikleme.
-# Otomatik DEĞİL: kötü bir migration'ın deploy ile sessizce prod'a gitmesini önlemek için
-# (kullanıcı tercihi: kontrollü). Çalıştırmadan önce migrate-apply (gerçek Postgres)
-# job'ının yeşil olduğundan emin olun.
+# ⚙️ NORMAL AKIŞ OTOMATİKTİR — bu workflow'u elle çalıştırmaya GEREK YOKTUR.
+# main'e push'ta `migrate-check.yml` → `migrate-deploy` job'ı, doğrulama (numara +
+# gerçek-Postgres apply) YEŞİLSE bekleyen migration'ları prod'a kendisi uygular.
+# Kötü migration o gate'e takılır, prod'a sızmaz.
+#
+# Bu workflow yalnızca İSTİSNAİ durumlar için elle tetiklenir:
+#   - repair-gaps / repair : defter (migration ledger) boşluğu/uyumsuzluğu onarımı,
+#   - apply                : otomatik job geçici devre dışıyken acil elle uygulama,
+#   - dry-run              : prod'da neyin beklediğini görmek (salt-okunur).
 #
 # Gerekli secret'lar: SUPABASE_ACCESS_TOKEN, SUPABASE_PROJECT_REF, SUPABASE_DB_PASSWORD
 # (bkz. docs/deploy/github-secrets.md).

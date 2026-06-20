@@ -23,12 +23,20 @@ Both are already applied in production. Renaming them now would cause Supabase t
 
 ## Deploy checklist (production öncesi)
 
-1. `npm run migrate:check` — numara çakışması / boşluk uyarıları (CI: `.github/workflows/migrate-check.yml`).
-   - **`migrate-apply` job** ayrıca tüm migration'ları gerçek bir Postgres'e uygular (CI) → şema-referans hataları (olmayan kolon/tablo) PR'da yakalanır.
-2. Opsiyonel drift: `npm run migrate:check:remote` (`supabase link` gerekir). Types: `npm run db:gen-types`. Prod'a uygulama: `npm run db:push:dry-run` sonra `npm run db:push` **veya** GitHub Actions → **DB migrate (prod)** (elle, onaylı). Defter boşluğu: `npm run db:repair-gaps` veya workflow `repair-gaps`.
-2. Pending migration'ları staging'e uygula: `supabase db push` (veya Dashboard SQL).
-3. Smoke test: yeni tablo/RLS ile ilgili UI akışını doğrula.
-4. Production'a aynı migration'ları uygula; `hot.md` deploy notuna ekle.
-5. Types drift varsa `database.types.ts` güncelle.
+**⚙️ Prod'a uygulama OTOMATİKTİR.** Yeni migration'ı `supabase/migrations/`'a ekleyip
+main'e push etmen yeterli — `migrate-check.yml` → `migrate-deploy` job'ı, doğrulama
+yeşilse prod'a kendisi uygular. Elle `db push` / Dashboard SQL **gerekmez**.
+
+1. `npm run migrate:check` — numara çakışması / boşluk (CI: `migrate-check.yml`).
+   - **`migrate-apply` job** tüm migration'ları gerçek bir Postgres'e uygular (CI) →
+     şema-referans hataları (olmayan kolon/tablo) PR'da yakalanır. Kırmızıysa prod'a UYGULANMAZ.
+2. `src/types/database.types.ts`'i güncelle (şema değiştiyse).
+3. **main'e push** → `migrate-deploy` job'ı bekleyen migration'ları prod'a otomatik uygular
+   (numara + gerçek-Postgres apply yeşilse). Çalıştığını `Actions → Migration check →
+   Migration apply (PROD)` job'ından doğrulayabilirsin.
+4. Smoke test: yeni tablo/RLS ile ilgili UI akışını doğrula; `hot.md` deploy notuna ekle.
+
+**İstisnai/elle** (`DB migrate (prod)` workflow): `repair-gaps`/`repair` (defter onarımı),
+`apply` (otomatik job kapalıyken acil), `dry-run` (salt-okunur önizleme).
 
 **Pending (2026-06):** `057_day_journal.sql` — `nmm_day_journal` günlük senkronu.

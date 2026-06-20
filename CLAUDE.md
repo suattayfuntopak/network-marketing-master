@@ -37,3 +37,5 @@
 - migrate: `npm run migrate:check` (migration numara doğrulaması)
 
 knip durumu (2026-06-13): **0 ulaşılamayan dosya** (29 ölü dosya temizlendi — rota birleştirme/tasarım artıkları), 26 unused export + 3 type + 3 duplicate export KALDI. Bu export'lar bilinçli tutuluyor: `fetchCandidatesPageAction` (Load More UI sonra), `bypassAILimits`/`describeShopierSignatureScheme` (güvenlik/teşhis API), `navigation.ts` config export'ları. Export kırpma yapılmadı — per-item karar gerektirir, yanlış-pozitif riski var.
+
+**knip kör noktası — `'use server'` exportları:** knip, App Router server-action dosyalarındaki kullanılmayan export'ları (ör. tüketicisiz bir `actionXyz`) güvenilir biçimde flag'lemez (entry/RSC sınırı). Ölü server-action birikmemesi için periyodik elle kontrol: `grep -rln 'export async function NAME' src/ && grep -rn 'NAME' src/ --include=*.tsx`. (2026-06-20: `generateCoachMessage` bu yolla bulunup silindi — knip görmemişti.)

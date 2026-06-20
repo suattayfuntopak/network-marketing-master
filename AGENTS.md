@@ -46,6 +46,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### Migrations
 - One number = one migration; never edit an already-applied migration — add the next number. See `supabase/migrations/README.md`.
 - After schema changes, update `src/types/database.types.ts`.
+- **Prod'a uygulama OTOMATİKTİR — kullanıcıya "migration'ı sen uygula" DEME.** main'e push'ta `.github/workflows/migrate-check.yml` → `migrate-deploy` job'ı, doğrulama (numara + gerçek-Postgres `migrate-apply`) yeşilse bekleyen migration'ları prod'a kendisi uygular. `DB migrate (prod)` (`db-push.yml`) yalnızca elle yedek/onarım (repair-gaps/repair/acil apply).
 - **Veri-onarım migration'ları idempotent olmalı:** beklenen durum zaten sağlanmışsa `RAISE EXCEPTION` ile patlatma — `RAISE NOTICE '...'; RETURN;` ile sessizce çık. Böylece CI'da migrate-apply'ın hata-toleransına gerek kalmaz, migration ikinci kez çalışınca güvenle no-op olur.
 
 ### Zaman dilimi & gün anahtarları
@@ -58,6 +59,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Paylaşımlı sekme/offset mantığı: `src/lib/domain/hubPeriodPrefetch.ts` — yeni hub sorgusu eklerken komşu prefetch regresyonuna dikkat.
 - **Huni hedef & dönem etiketleri** (yeni sekme/sorgu eklerken): hedef türetme `hubFunnelTargets.ts` + `getGoalFunnelContextAction()`; dönem eşlemesi/prefetch `hubPeriodPrefetch.ts`; sekme etiketleri `pulsePeriodLabels.ts` (hub **Aylık** = takvim ayı, stats/ekip **Son 30 Gün** = kayan pencere).
 - Ekip aktivite önbelleği: `prefetchMemberActivity()` (`lib/query/prefetchMemberActivity.ts`) — kart hover ve sheet mount’ta 5 dönem; `QUERY_STALE.memberActivity`.
+
+### YZ üretim butonları (kota & UX)
+- **Her yeni YZ üretim action'ı:** `checkAIQuota(type)` (kapı) + `logAIGenerationFromQuota(quota, {note, aiModel})` (kullanım kaydı) çağırmalı — yoksa `src/lib/ai/aiQuotaCoverage.test.ts` CI'da patlar. Saf altyapısal çeviri ise `logAITranslation({userId})` (kotasız maliyet sayacı) + test whitelist'i.
+- **Limit/feature hatası tutarlılığı:** action `{ ..., quotaError: quotaErrorCode(quota.reason) }` döndürsün; bileşen `surfaceAiQuotaError(result, {openUpgrade, toastError, feature, fallbackMessage})` ile yönlendirsin (limit/feature → upgrade prompt, diğer → toast). Client-side ön-engel için `useAILimits().limitReached` (tek kaynak — yerel `!isSuperAdmin && aiRemaining<=0` hesabı yapma).
 
 ### Ekip üyesi → detay sayfası
 - Uygulama kullanıcısı (`isAppUser`) için detay **her zaman** `MemberRow.pipeline_id` → `/pipeline/[id]`.

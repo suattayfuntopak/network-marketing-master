@@ -1,6 +1,45 @@
 # Hot Log
 
-## 2026-06-20 — 4 YZ kota/çeviri iyileştirmesi 🧩✅ (70a040b)
+## 2026-06-20 — Migration otomasyonu netleştirildi + 4 öneri + tablo sıralama 🤖🧹✅
+
+### Migration otomasyonu — ZATEN OTOMATİK (yanlış anlaşılma giderildi)
+Kullanıcı haklıymış: migration'lar **otomatik uygulanıyor**. `migrate-check.yml` → **`migrate-deploy`** job'ı, main'e push'ta doğrulama (numara + gerçek-Postgres `migrate-apply`) yeşilse bekleyen migration'ları prod'a kendisi uyguluyor (2026-06-18'den beri). Önceki turlardaki "migration'ı sen uygula" tavsiyem **bu job'ı gözden kaçırdığım için yanlıştı**. Düzeltmeler:
+- `db-push.yml` başlığı/yorumu: "MANUEL yedek/onarım — normal akış otomatik" olarak netleştirildi.
+- `migrate-deploy` hardening: `SUPABASE_DB_PASSWORD` da secret kontrolüne eklendi (eksikse net hata).
+- `supabase/migrations/README.md` + `AGENTS.md`: "prod'a uygulama otomatik, elle gerekmez". Memory'ye kaydedildi.
+
+### 4 öneri (code-review)
+- **R1:** `generateCoachMessage` ölü kodu + yetim `generateMessage` import'u silindi (tüketicisi yoktu).
+- **R2:** knip 'use server' kör noktası CLAUDE.md'ye + elle kontrol komutu.
+- **R3:** `useAILimits().limitReached` türetilmiş alan; YazarForm/KoclukForm/UyumContent yerel hesabı bununla değişti.
+- **R4:** AGENTS.md "YZ üretim butonları (kota & UX)" deseni.
+
+### Tablo sıralama (Platform Yönetimi)
+Yeni sıra: üst KPI grid → **Kullanıcı ve Lisans Listesi** (arama+tablo) → **Dış Kayıtlar** → Ekip & Dış Kaynak YZ → Büyüme & Yayılma → ...
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 360/360 · knip baseline · migrate:check 105.
+
+---
+
+## 2026-06-20 — Stash WIP tamamlama (70a040b eksik parçalar) 🔧✅
+
+**Bağlam:** Prod deploy öncesi `git stash` yapılmıştı; stash pop o sırada conflict vermişti (pipeline/actions.ts üst üste). 70a040b yalnızca 3 dosyayı commit etmişti (CoachState + tablo sütunu); stash'teki asıl #1/#3/#4 gövdesi repoda yoktu.
+
+**Yapılan:** `stash@{0}` temiz pop (conflict yok — HEAD zaten pipeline/actions güncel). 7 dosya commit:
+- `yazar/actions.ts` — translate carve-out + tüm action'lara `quotaError`
+- `YazarForm/ProvaForm/StudyoForm` — `surfaceAiQuotaError` + limit upgrade
+- `uyum/actions.ts` + `UyumContent` — audit quotaError + upgrade prompt (`useUpgradePrompt` hook sırası düzeltildi)
+- `NmmInviteSheet` — davet metni üretiminde quota UX
+
+**Stash:** `stash@{0}` drop edildi — artık gerek yok.
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 360/360.
+
+---
+
+## 2026-06-20 — 4 YZ kota/çeviri iyileştirmesi 🧩✅ (70a040b — kısmi; gövde yukarıdaki commit'te)
 
 Önceki turun rapor önerilerinin dördü de halledildi:
 
