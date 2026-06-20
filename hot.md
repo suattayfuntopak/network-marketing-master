@@ -1,5 +1,22 @@
 # Hot Log
 
+## 2026-06-20 — 4 YZ kota/çeviri iyileştirmesi 🧩✅ (70a040b)
+
+Önceki turun rapor önerilerinin dördü de halledildi:
+
+**#1 translateTextAction → çeviri carve-out.** Otomatik dil-takip çevirisiydi (YazarForm/KoclukForm, dil değişince üretilmiş mesajı çevirir) ama `checkAIQuota('message')` ile gate'liydi → kredisi biten kullanıcının dil değiştirmesi bloklanıyordu. Gate kaldırıldı, `logAITranslation` ile maliyet-takipli yapıldı. Oturum yoksa sessizce kaynağı korur.
+
+**#2 Kişi-bazlı 'Çeviri' sütunu.** Taşınan YZ tablosuna (Platform Yönetimi) kişi-bazlı çeviri sütunu + footer dönem toplamı; `getAiUsageByPeriodAction.translate`'ten beslenir. Önceki turun başlık-altı subtitle'ı kaldırıldı (artık sütun var). i18n `colTranslate`.
+
+**#3 surfaceAiQuotaError yaygınlaştırma.** `generateMessageAction/Roleplay/Social/askCoach` + `auditCompliance` artık `quotaError` döndürür. YazarForm (state.quotaError → useEffect), ProvaForm, StudyoForm, UyumContent (useUpgradePrompt eklendi) limit/feature → upgrade prompt. YazarForm/KoclukForm zaten client-side limitReached ile pre-empt ediyordu; bu server-error fallback'i de tutarlı yaptı.
+
+**#4 CoachState.quotaError.** generateCoachMessage + generateNmmInviteMessage limit kodu döndürür; NmmInviteSheet iki çağrı yerinde bağlandı. **Bulgu:** generateCoachMessage'ın hiçbir tüketicisi yok (CandidateDetail "AI Mesaj" /yazar'a yönlendiriyor) — ölü kod adayı.
+
+### Doğrulama
+tsc 0 · eslint --max-warnings 0 · vitest **360/360** · i18n 1303 · knip baseline (yeni ölü kod yok).
+
+---
+
 ## 2026-06-20 — YZ tablosu taşıma + 3 öneri (helper/maliyet/UX) 🚚🛠️✅
 
 ### 1. Tablo taşıma (3a2fceb)
