@@ -39,6 +39,7 @@ import {
   type HubPeriodTab,
 } from '@/lib/domain/hubPeriodPrefetch'
 import { hasTeamPageAccess, hasTeamPulseAccess } from '@/lib/domain/teamAccess'
+import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import type { MemberRow } from '@/lib/team/types'
 import { queryKeys } from './keys'
 import { QUERY_STALE } from './staleTimes'
@@ -274,6 +275,35 @@ export async function prefetchEkipTrainingMetrics(
   })
 }
 
+/** Plus kullanıcı — Pro'ya yükseltince eğitim sütunları anında gelsin diye arka planda ısıt. */
+export async function prefetchTeamProgressMapForPlusUpgrade(
+  queryClient: QueryClient,
+  workspaceId: string,
+  ws: WsSlice,
+) {
+  if (hasTeamPulseAccess(ws.licenseType, ws.isSuperAdmin)) return
+  if (!hasStatsAdvancedAccess(ws.licenseType, ws.isSuperAdmin)) return
+
+  let team = queryClient.getQueryData<{ ekipRows: MemberRow[] }>(queryKeys.team(workspaceId))
+  if (!team) {
+    await queryClient.prefetchQuery({
+      queryKey: queryKeys.team(workspaceId),
+      queryFn: () => fetchTeamBundleAction(workspaceId),
+      staleTime: QUERY_STALE.data,
+    })
+    team = queryClient.getQueryData(queryKeys.team(workspaceId))
+  }
+
+  const memberIds = downlineActivityMemberIds(team?.ekipRows ?? [])
+  if (memberIds.length === 0) return
+
+  await queryClient.prefetchQuery({
+    queryKey: queryKeys.teamProgressMap(workspaceId, memberIds),
+    queryFn: () => getTeamProgressMapAction(workspaceId, memberIds),
+    staleTime: QUERY_STALE.metrics,
+  })
+}
+
 /**
  * Ekibim saha özeti — tek batch ranking sorgusu.
  * `getTeamRankingMetricsBatchAction` tüm `TEAM_RANKING_BATCH_PERIODS` dönemlerini
@@ -367,6 +397,7 @@ export function prefetchRouteMetrics(
   if (href === '/ekip' || href === '/ekibim') {
     void prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice)
     void prefetchEkipTrainingMetrics(queryClient, workspaceId, wsSlice)
+    void prefetchTeamProgressMapForPlusUpgrade(queryClient, workspaceId, wsSlice)
   }
 
   if (href === '/canli-egitim') {
@@ -395,6 +426,7 @@ export function prefetchRouteMetrics(
     if (hasTeamPageAccess(wsSlice.licenseType, wsSlice.isSuperAdmin)) {
       void prefetchEkipRankingMetrics(queryClient, workspaceId, wsSlice)
     }
+    void prefetchTeamProgressMapForPlusUpgrade(queryClient, workspaceId, wsSlice)
   }
 
   if (href === '/saha-radar') {

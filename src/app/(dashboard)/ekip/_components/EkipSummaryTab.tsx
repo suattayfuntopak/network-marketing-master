@@ -11,6 +11,7 @@ import {
   type HubPeriodTab,
 } from '@/components/hub/HubSummaryTabBar'
 import { getTeamRankingMetricsBatchAction } from '@/app/(dashboard)/istatistikler/teamActivityActions'
+import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import type { PulsePeriod } from '@/lib/domain/pulse'
 import { queryKeys } from '@/lib/query/keys'
@@ -83,9 +84,12 @@ export function EkipSummaryTab({
   )
 
   if (!teamPulseUnlocked) {
+    const upgradeTarget = hasStatsAdvancedAccess(ws?.licenseType, ws?.isSuperAdmin)
+      ? 'pro'
+      : 'general'
     return (
       <div className="space-y-4">
-        <TeamFreeUpgradeBanner />
+        <TeamFreeUpgradeBanner upgradeTarget={upgradeTarget} />
       </div>
     )
   }

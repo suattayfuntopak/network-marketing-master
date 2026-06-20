@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   PLAN_FEATURE_MIN_TIER,
+  PLAN_GATE_COPY,
   PLAN_PAYMENT_TEAM_FEATURES,
   TEAM_FREE_BANNER_COPY,
   hasPlanFeature,
@@ -11,6 +12,8 @@ import { hasStatsAdvancedAccess } from '@/lib/domain/featureAccess'
 import { hasTeamPulseAccess } from '@/lib/domain/teamAccess'
 import { shellSection } from '@/lib/translations/sections/shell'
 import { paymentSection } from '@/lib/translations/sections/payment'
+import { statsSection } from '@/lib/translations/sections/stats'
+import { landingSection } from '@/lib/translations/sections/landing'
 
 describe('planFeatureMatrix', () => {
   it('free and basic tiers cannot access gated team features', () => {
@@ -58,6 +61,33 @@ describe('planFeatureMatrix', () => {
       expect(pay.proFeature2).toBe(feat.proLearningColumns)
       expect(pay.proFeature3).toBe(feat.proFieldSummary)
       expect(pay.proFeature4).toBe(feat.proUnlimitedTeam)
+    }
+  })
+
+  it('PLAN_GATE_COPY stays synced with shellUi and stats gate translations', () => {
+    for (const lang of ['tr', 'en'] as const) {
+      const gate = PLAN_GATE_COPY[lang]
+      const shell = shellSection[lang].shellUi
+      expect(shell.teamGateDesc).toBe(gate.teamGateDesc)
+      expect(shell.upgradeTeamPulseDesc).toBe(gate.upgradeTeamPulseDesc)
+      expect(shell.upgradeStatsDesc).toBe(gate.upgradeStatsDesc)
+      expect(shell.teamProUpgradeTitle).toBe(gate.teamProUpgradeTitle)
+      expect(shell.teamProUpgradeDesc).toBe(gate.teamProUpgradeDesc)
+      expect(shell.teamProUpgradeCta).toBe(gate.teamProUpgradeCta)
+      expect(statsSection[lang].statsPage.teamLockedDesc).toBe(gate.statsTeamLockedDesc)
+    }
+  })
+
+  it('PLAN_LANDING_TEAM_FEATURES stays synced with landingPage translations', () => {
+    for (const lang of ['tr', 'en'] as const) {
+      const land = landingSection[lang].landingPage
+      const feat = PLAN_PAYMENT_TEAM_FEATURES[lang]
+      expect(land.planPlusFeat2).toBe(feat.plusDownlineOnboarding)
+      expect(land.planPlusFeat3).toBe(feat.plusStatsFunnel)
+      expect(land.planPlusFeat4).toBe(feat.plusMemberLimit)
+      expect(land.planProFeat2).toBe(feat.proLearningColumns)
+      expect(land.planProFeat3).toBe(feat.proFieldSummary)
+      expect(land.planProFeat4).toBe(feat.proUnlimitedTeam)
     }
   })
 })

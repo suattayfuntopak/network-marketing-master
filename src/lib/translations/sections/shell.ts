@@ -39,10 +39,10 @@ export const shellSection = {
         'Saha mesajları, davet metinleri ve not özetleri gibi yapay zeka destekli araçlar ücretli planlarda açılır.',
       upgradeTeamPulseTitle: 'Ekip Nabzı Pro planda',
       upgradeTeamPulseDesc:
-        'Alt ekibinizin öğrenme ve aktivite nabzını görmek için Pro plana geçin.',
+        'Ekibim saha özeti (Ekip Saha Nabzı) ve eğitim/video/itiraz nabzı Pro planda açılır.',
       upgradeStatsTitle: 'Gelişmiş istatistikler Plus ve Pro planda',
       upgradeStatsDesc:
-        'Ekip performans tablosu ve gelişmiş metrikler için Plus veya Pro planına geçin.',
+        'Ekip Performans tablosunun huni ve DDBR sütunları Plus veya Pro planda; eğitim, video ve itiraz sütunları Pro plandadır.',
       planLabel_basic: 'Basic',
       planLabel_plus: 'Plus',
       planLabel_pro: 'Pro',
@@ -54,6 +54,10 @@ export const shellSection = {
       teamFreeBannerTitle: 'Ekibinizi görüntülüyorsunuz',
       teamFreeBannerDesc:
         'Listenizde “Katıldı” aşamasına gelen kişileri kartlarındaki “NMM’e Davet Et” ile ekibinize NMM Ortağı olarak katabilirsiniz. Ancak Distribütör Doğru Başlangıç takibi Plus planda; tam performans tablosu (eğitim sütunları) ve Ekibim saha özeti Pro planda açılır.',
+      teamProUpgradeTitle: 'Ekibim saha özeti Pro planda',
+      teamProUpgradeDesc:
+        'Ekip Saha Nabzı ve eğitim/video/itiraz nabzı Pro planda açılır. Plus planınız huni tablosu ve DDBR takibini zaten içerir.',
+      teamProUpgradeCta: 'Pro planları gör',
       accountAlertTrialTitle: 'Ücretsiz Basic denemen {days} gün sonra bitiyor — planları gör',
       accountAlertTrialTitleLast: 'Ücretsiz Basic denemen bugün/yarın bitiyor — planları gör',
       accountAlertLockedTitle: 'AI kilitlendi — NMM kullanımın devam ediyor, plan seçerek AI\'ı aç',
@@ -106,7 +110,7 @@ export const shellSection = {
       upgradeMenuDesc: 'Basic, Plus, or Pro — unlock AI and team features',
       teamGateTitle: 'Downline onboarding tracking is on Plus',
       teamGateDesc:
-        'Track Quick Start steps for downline distributors on Plus or Pro. On Basic you can view your team and send invites (up to 25 members).',
+        'Track downline Distributor Quick Start steps on Plus or Pro. On Basic you can view your team and send invites (up to 25 members).',
       featureGateTitle: 'This feature is not on your plan',
       featureGateDesc: 'Upgrade your plan to continue.',
       upgradeAiCoachTitle: 'AI Coach is not on your plan',
@@ -117,10 +121,10 @@ export const shellSection = {
         'Field messages, invite copy, and note summaries require a paid plan.',
       upgradeTeamPulseTitle: 'Team Pulse is on Pro',
       upgradeTeamPulseDesc:
-        'See your downline learning and activity pulse with a Pro plan.',
+        'Ekibim field summary (Team Field Pulse) and training/video/objection pulse unlock on Pro.',
       upgradeStatsTitle: 'Advanced stats are on Plus and Pro',
       upgradeStatsDesc:
-        'Unlock the team performance table and advanced metrics with Plus or Pro.',
+        'Team performance funnel and Quick Start columns are on Plus or Pro; learning columns are on Pro.',
       planLabel_basic: 'Basic',
       planLabel_plus: 'Plus',
       planLabel_pro: 'Pro',
@@ -132,6 +136,10 @@ export const shellSection = {
       teamFreeBannerTitle: 'Viewing your team',
       teamFreeBannerDesc:
         'When someone in your list reaches the “Joined” stage, use “Invite to NMM” on their card to add them as an NMM Partner. Downline Distributor Quick Start tracking is on Plus; the full performance table (learning columns) and Ekibim field summary unlock on Pro.',
+      teamProUpgradeTitle: 'Ekibim field summary is on Pro',
+      teamProUpgradeDesc:
+        'Team Field Pulse and training/video/objection pulse unlock on Pro. Your Plus plan already includes the funnel table and Quick Start tracking.',
+      teamProUpgradeCta: 'View Pro plans',
       accountAlertTrialTitle: 'Your free Basic trial ends in {days} days — view plans',
       accountAlertTrialTitleLast: 'Your free Basic trial ends today/tomorrow — view plans',
       accountAlertLockedTitle: 'AI locked — NMM keeps running, pick a plan to re-enable AI',

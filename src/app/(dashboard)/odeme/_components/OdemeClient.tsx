@@ -36,7 +36,9 @@ export function OdemeClient() {
   const { data: workspace, isLoading: isWorkspaceLoading } = useWorkspace()
   const searchParams = useSearchParams()
   const basicPlanRef = useRef<HTMLDivElement>(null)
+  const proPlanRef = useRef<HTMLDivElement>(null)
   const highlightBasic = searchParams.get('plan') === 'basic'
+  const highlightPro = searchParams.get('plan') === 'pro'
   const highlightYearly = searchParams.get('period') === 'yearly'
 
   const [billingPeriod, setBillingPeriod] = useState<BillingPeriod>(
@@ -60,6 +62,9 @@ export function OdemeClient() {
     if (highlightBasic && basicPlanRef.current) {
       basicPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
+    if (highlightPro && proPlanRef.current) {
+      proPlanRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
     if (highlightBasic && !basicDeepLinkLogged.current) {
       basicDeepLinkLogged.current = true
       void logProductEventAction(PRODUCT_EVENTS.odemeBasicDeepLink, {
@@ -67,7 +72,7 @@ export function OdemeClient() {
         period: highlightYearly ? 'yearly' : 'monthly',
       })
     }
-  }, [highlightBasic, highlightYearly])
+  }, [highlightBasic, highlightPro, highlightYearly])
 
   const handlePayment = async (plan: 'basic' | 'plus' | 'pro') => {
     setLoading(true)
@@ -441,7 +446,13 @@ export function OdemeClient() {
         </div>
 
         {/* Pro Plan */}
-        <div className="rounded-3xl border border-pink-400/35 dark:border-pink-500/30 bg-gradient-to-b from-pink-50/80 to-[var(--bg-card)] dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-400/55 dark:hover:border-pink-500/60 transition duration-300 relative shadow-lg shadow-pink-500/5 dark:shadow-[0_20px_50px_rgba(219,39,119,0.1)]">
+        <div
+          ref={proPlanRef}
+          id="plan-pro"
+          className={`rounded-3xl border border-pink-400/35 dark:border-pink-500/30 bg-gradient-to-b from-pink-50/80 to-[var(--bg-card)] dark:from-[#1c0f1e] dark:to-[#0A0B10] p-8 flex flex-col justify-between hover:border-pink-400/55 dark:hover:border-pink-500/60 transition duration-300 relative shadow-lg shadow-pink-500/5 dark:shadow-[0_20px_50px_rgba(219,39,119,0.1)] ${
+            highlightPro ? 'ring-2 ring-pink-500/40 shadow-lg shadow-pink-500/15' : ''
+          }`}
+        >
           <div className="absolute right-6 top-6 flex items-center gap-2">
             {isProActive && (
               <span className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider">

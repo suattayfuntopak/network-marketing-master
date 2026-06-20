@@ -67,3 +67,50 @@ export const PLAN_PAYMENT_TEAM_FEATURES = {
     proUnlimitedTeam: 'Unlimited downline management & NMM invite codes',
   },
 } as const
+
+/** UpgradeGate / kilit overlay metinleri — shellUi.* ve statsPage.teamLockedDesc ile senkron. */
+export const PLAN_GATE_COPY = {
+  tr: {
+    teamGateDesc:
+      'Distribütör Doğru Başlangıç adımlarını alt ekip üyelerinde takip etmek Plus veya Pro planda açılır. Basic planda ekibinizi görüntüleyebilir ve davet gönderebilirsiniz (25 kişiye kadar).',
+    upgradeTeamPulseDesc:
+      'Ekibim saha özeti (Ekip Saha Nabzı) ve eğitim/video/itiraz nabzı Pro planda açılır.',
+    upgradeStatsDesc:
+      'Ekip Performans tablosunun huni ve DDBR sütunları Plus veya Pro planda; eğitim, video ve itiraz sütunları Pro plandadır.',
+    statsTeamLockedDesc:
+      'Ekip Performans tablosunun huni ve DDBR sütunları Plus veya Pro planda açılır; eğitim, video ve itiraz sütunları Pro plandadır.',
+    teamProUpgradeTitle: 'Ekibim saha özeti Pro planda',
+    teamProUpgradeDesc:
+      'Ekip Saha Nabzı ve eğitim/video/itiraz nabzı Pro planda açılır. Plus planınız huni tablosu ve DDBR takibini zaten içerir.',
+    teamProUpgradeCta: 'Pro planları gör',
+  },
+  en: {
+    teamGateDesc:
+      'Track downline Distributor Quick Start steps on Plus or Pro. On Basic you can view your team and send invites (up to 25 members).',
+    upgradeTeamPulseDesc:
+      'Ekibim field summary (Team Field Pulse) and training/video/objection pulse unlock on Pro.',
+    upgradeStatsDesc:
+      'Team performance funnel and Quick Start columns are on Plus or Pro; learning columns are on Pro.',
+    statsTeamLockedDesc:
+      'Team performance funnel and Quick Start columns unlock on Plus or Pro; training, video and objection columns are on Pro.',
+    teamProUpgradeTitle: 'Ekibim field summary is on Pro',
+    teamProUpgradeDesc:
+      'Team Field Pulse and training/video/objection pulse unlock on Pro. Your Plus plan already includes the funnel table and Quick Start tracking.',
+    teamProUpgradeCta: 'View Pro plans',
+  },
+} as const
+
+/** PageHelp — plan katmanları adımı (ekip / istatistik / saha özeti). */
+export const PLAN_PAGE_HELP_PLAN_STEP = {
+  tr: {
+    t: 'Plan katmanları',
+    d: 'Plus: Distribütör Doğru Başlangıç + huni tablosu. Pro: eğitim/video/itiraz sütunları + Ekibim saha özeti.',
+  },
+  en: {
+    t: 'Plan tiers',
+    d: 'Plus: downline Quick Start + funnel table. Pro: learning columns + Ekibim field summary.',
+  },
+} as const
+
+/** Landing fiyatlandırma — landingPage.planPlusFeat2/3/4 ile aynı metinler. */
+export const PLAN_LANDING_TEAM_FEATURES = PLAN_PAYMENT_TEAM_FEATURES

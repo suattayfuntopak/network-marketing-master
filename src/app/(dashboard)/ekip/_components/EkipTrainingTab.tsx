@@ -47,6 +47,10 @@ export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocke
     <div className="space-y-5">
       {!teamPageUnlocked && <TeamFreeUpgradeBanner />}
 
+      {teamPageUnlocked && !teamPulseUnlocked && (
+        <TeamFreeUpgradeBanner upgradeTarget="pro" />
+      )}
+
       {downline.length === 0 ? (
         <p className="rounded-2xl border border-dashed border-[var(--border)] py-10 text-center text-sm text-[var(--text-3)]">
           {t('team.trainingEmpty')}

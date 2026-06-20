@@ -4,6 +4,8 @@
  * Çeviri sözlüğünü şişirmemek için içerik burada (TR + EN) tutulur.
  */
 
+import { PLAN_PAGE_HELP_PLAN_STEP } from './planFeatureMatrix'
+
 export type PageHelpStep = { t: string; d: string }
 export type PageHelpContent = { title: string; intro: string; steps: PageHelpStep[] }
 
@@ -43,8 +45,9 @@ const TAB_HELP: TabHelpEntry[] = [
       intro: 'Ekibinin saha performansını dönem dönem görürsün (Günlük / Haftalık / Aylık).',
       steps: [
         { t: 'Dönem seç', d: 'Üstteki sekmelerle ekibinin o dönemdeki arama, tanışma, sunum ve yeni üye sayılarını karşılaştır.' },
-        { t: 'Sıralama', d: 'Tablo en aktif üyeleri üstte gösterir; zayıf kalanlara dokunarak destek planla.' },
+        { t: 'Sıralama', d: 'Ekip Saha Nabzı tablosu en aktif üyeleri üstte gösterir; zayıf kalanlara dokunarak destek planla.' },
         { t: 'Detay', d: 'Bir satıra dokunarak üyenin kendi saha özetine gidebilirsin.' },
+        PLAN_PAGE_HELP_PLAN_STEP.tr,
       ],
     },
     en: {
@@ -52,8 +55,9 @@ const TAB_HELP: TabHelpEntry[] = [
       intro: 'See your team\'s field performance by period (Daily / Weekly / Monthly).',
       steps: [
         { t: 'Pick a period', d: 'Use the top tabs to compare calls, contacts, presentations, and new members.' },
-        { t: 'Ranking', d: 'The table highlights the most active members first.' },
+        { t: 'Ranking', d: 'Team Field Pulse ranks the most active members first.' },
         { t: 'Drill down', d: 'Tap a row to open that member\'s own field summary.' },
+        PLAN_PAGE_HELP_PLAN_STEP.en,
       ],
     },
   },
@@ -67,6 +71,7 @@ const TAB_HELP: TabHelpEntry[] = [
         { t: 'İlerleme yüzdesi', d: 'Her üyenin tamamladığı eğitim ve video oranını gör.' },
         { t: 'Destek', d: 'Geride kalan üyelere hatırlatma veya içerik paylaşımı planla.' },
         { t: 'Detay', d: 'Üye kartından bireysel eğitim durumuna inebilirsin.' },
+        PLAN_PAGE_HELP_PLAN_STEP.tr,
       ],
     },
     en: {
@@ -76,6 +81,7 @@ const TAB_HELP: TabHelpEntry[] = [
         { t: 'Progress %', d: 'See each member\'s completed training and video ratio.' },
         { t: 'Support', d: 'Plan reminders or content shares for members who lag behind.' },
         { t: 'Detail', d: 'Open a member card for individual training status.' },
+        PLAN_PAGE_HELP_PLAN_STEP.en,
       ],
     },
   },
@@ -370,6 +376,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
         { t: 'Dönem seç', d: 'Üstteki Günlük / Haftalık / Aylık / Yıllık / Tüm Zamanlar sekmeleriyle istediğin dönemi seç. Buradaki Aylık, takvim ayının yol haritası hedefidir — İstatistikler’deki “Son 30 Gün” kayan pencereden farklıdır.' },
         { t: '4 renkli kutu', d: 'Gerçekleşenler boru hattından otomatik sayılır; hedef çizgisi Hedefim yol haritasıyla aynıdır (günlük = tempo, aylık = o takvim ayının satırı).' },
         { t: 'Saha aktivitesi', d: 'Aşağıda WhatsApp, not, arama gibi aksiyon sayılarını görebilirsin.' },
+        PLAN_PAGE_HELP_PLAN_STEP.tr,
       ],
     },
     en: {
@@ -379,6 +386,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
         { t: 'Pick a period', d: 'Use the Daily / Weekly / Monthly / Yearly / All-time tabs at the top. Monthly here is the calendar month’s roadmap row — not the rolling “Last 30 days” window on Statistics.' },
         { t: '4 colored boxes', d: 'Actuals come from your pipeline automatically; targets match My Goal’s roadmap (daily = pace, monthly = that calendar month’s row).' },
         { t: 'Field activity', d: 'Below, see action counts like WhatsApp, notes, calls.' },
+        PLAN_PAGE_HELP_PLAN_STEP.en,
       ],
     },
   },
@@ -497,6 +505,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
         { t: 'Saha hunisi', d: '4 renkli kutu kendi saha performansını gösterir; hedefler Hedefim yol haritasıyla aynı kaynaktan gelir.' },
         { t: 'Dönüşüm hunisi', d: 'Aşağıdaki grafik adaylarının aşama aşama nasıl ilerlediğini ve nerede takıldığını gösterir.' },
         { t: 'Ekip tablosu', d: 'Aşağıdaki tabloda ekip üyelerinin tek tek performansını görebilirsin.' },
+        PLAN_PAGE_HELP_PLAN_STEP.tr,
       ],
     },
     en: {
@@ -507,6 +516,7 @@ const HELP: { match: string; tr: PageHelpContent; en: PageHelpContent }[] = [
         { t: 'Field funnel', d: 'The 4 colored boxes show your field performance; targets come from the same roadmap as My Goal.' },
         { t: 'Conversion funnel', d: 'The chart below shows how prospects progress stage by stage and where they get stuck.' },
         { t: 'Team table', d: 'See each team member’s performance in the table below.' },
+        PLAN_PAGE_HELP_PLAN_STEP.en,
       ],
     },
   },

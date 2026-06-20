@@ -294,7 +294,7 @@ export function TeamPerformanceTable({
         <p className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs text-[var(--text-3)]">
           <Lock className="h-3 w-3 shrink-0" aria-hidden />
           <span>{t('statsPage.teamPulseProHint')}</span>
-          <Link href="/odeme" className="font-semibold text-brand hover:underline">
+          <Link href="/odeme?plan=pro" className="font-semibold text-brand hover:underline">
             {t('statsPage.teamPulseProHintCta')}
           </Link>
         </p>
