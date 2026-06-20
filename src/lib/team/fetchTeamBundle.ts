@@ -49,16 +49,15 @@ async function resolveAuthAvatars(
 
   const allowedIds = new Set<string>()
   if (ownWs.owner_id) allowedIds.add(ownWs.owner_id)
-  const { data: wsMembers } = await supabase
-    .from('nmm_workspace_members')
-    .select('user_id')
-    .eq('workspace_id', workspaceId)
+
+  // wsMembers + downline keşfi bağımsız → paralel. Downline kolon-kısıtlı definer rpc
+  // ile (055): nmm_workspaces SELECT politikası own+member'a daraldı; davet kodu/lisans
+  // sızdırmadan id+owner_id alınır.
+  const [{ data: wsMembers }, { data: downlineWs }] = await Promise.all([
+    supabase.from('nmm_workspace_members').select('user_id').eq('workspace_id', workspaceId),
+    supabase.rpc('nmm_leader_downline_workspaces'),
+  ])
   wsMembers?.forEach(m => allowedIds.add(m.user_id))
-
-  // Downline keşfi kolon-kısıtlı definer rpc ile (055): nmm_workspaces SELECT politikası
-  // own+member'a daraldı; davet kodu/lisans sızdırmadan id+owner_id alınır.
-  const { data: downlineWs } = await supabase.rpc('nmm_leader_downline_workspaces')
-
   downlineWs?.forEach(w => {
     if (w.owner_id) allowedIds.add(w.owner_id)
   })
@@ -150,10 +149,14 @@ async function fetchTeamBundleInner(
       m.role = m.user_id === leaderOwnerId ? 'leader' : 'member'
     })
     const allUserIds = members.map(m => m.user_id)
-    const authAvatars = await resolveAuthAvatars(supabase, workspaceId, allUserIds)
-    const candidates = await enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates)
-    const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
-    const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
+    // Bağımsız 4 sorgu paralel (seri ~4 round-trip → 1). Uzak Supabase origin'de
+    // (~320ms/sorgu) ekip/stats/saha-radar yükünden ~3 round-trip tasarrufu.
+    const [authAvatars, candidates, pipelineLinks, matchBlocks] = await Promise.all([
+      resolveAuthAvatars(supabase, workspaceId, allUserIds),
+      enrichLeaderCandidates(supabase, rpcBundle.leaderCandidates),
+      fetchPipelineLinks(supabase, workspaceId),
+      fetchPipelineMatchBlocks(supabase, workspaceId),
+    ])
     const ownWs = { owner_id: leaderOwnerId }
 
     const registeredMemberRows: MemberRow[] = members.map(m => {
@@ -375,9 +378,12 @@ async function fetchTeamBundleLegacy(
     if (!cur || new Date(act.created_at) > new Date(cur)) lastActionMap[act.user_id] = act.created_at
   })
 
-  const authAvatars = await resolveAuthAvatars(supabase, workspaceId, finalAllUserIds)
-  const pipelineLinks = await fetchPipelineLinks(supabase, workspaceId)
-  const matchBlocks = await fetchPipelineMatchBlocks(supabase, workspaceId)
+  // Bağımsız 3 sorgu paralel (legacy fallback yolu).
+  const [authAvatars, pipelineLinks, matchBlocks] = await Promise.all([
+    resolveAuthAvatars(supabase, workspaceId, finalAllUserIds),
+    fetchPipelineLinks(supabase, workspaceId),
+    fetchPipelineMatchBlocks(supabase, workspaceId),
+  ])
 
   const statsMembers: TeamMember[] = finalUniqueMembers
     .map(m => {

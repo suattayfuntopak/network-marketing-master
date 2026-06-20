@@ -1,5 +1,23 @@
 # Hot Log
 
+## 2026-06-20 — Perf: fetchTeamBundle seri→paralel (ekip yükü ~2× hızlandı) ⚡✅
+
+Önerim #1 (QA/perf dogfood) ile başladım. Bulgular:
+- **Prod public rotaları SAĞLIKLI** (perf-baseline, gerçek ölçüm): `/` p50 95ms, `/giris` 105ms, `/kayit` 93ms (p95 400-580ms). Burada darboğaz yok.
+- Auth'lu dashboard rotaları (asıl şüpheli — Supabase ~320ms/sorgu) **oturum cookie'si gerektiriyor** → otonom ölçülemez (sende: `NMM_COOKIE` ile `perf-baseline`).
+
+**Otonom + somut kazanç — `fetchTeamBundle` paralelleştirmesi:** ekip/istatistik/saha-radar'ın hepsinin kullandığı agregatör, bağımsız Supabase sorgularını SERİ çalıştırıyordu.
+- `fetchTeamBundleInner` (primer RPC yolu): 4 bağımsız sorgu (authAvatars‖enrich‖links‖blocks) `Promise.all`'a alındı.
+- `resolveAuthAvatars`: wsMembers + downline RPC paralel (4→3 round-trip; ownWs guard + avatarMap bağımlılığı korundu).
+- `fetchTeamBundleLegacy` (fallback): 3 sorgu paralel.
+
+**Etki:** primer ekip yükü kritik yolu ~8 seri round-trip → ~4. ~320ms/round-trip'te **~1.3s** tasarruf, sıfır davranış değişikliği (hepsi bağımsız read sorgusu).
+
+### Doğrulama
+tsc 0 · eslint 0 · vitest 377/377. (Mock-ağır agregatör; birim test yerine bağımsızlık-analizi + tsc.)
+
+---
+
 ## 2026-06-20 — changelog commit-link (1/4 öneri, azalan getiri kararı) 🔗✅
 
 "Hangilerini yapardın" — dürüst değerlendirme: 4 öneriden **yalnız 1'i** gerçek/temiz değer; diğer 3'ü atlandı (iş uydurmadan):
