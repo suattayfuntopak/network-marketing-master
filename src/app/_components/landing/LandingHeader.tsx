@@ -8,6 +8,7 @@ import { TRFlag, USFlag } from '@/app/(dashboard)/_components/Header'
 import { ThemeCycleButton } from '@/components/ui/ThemeCycleButton'
 import { Z } from '@/lib/ui/zIndex'
 import { LANDING_PRIMARY_CTA, LANDING_PRIMARY_CTA_SHADOW, NEXT_THEME_LABEL } from './constants'
+import { scrollToLandingSection } from './smoothScroll'
 import type { ThemeMode } from '@/lib/ui/themeToggle'
 
 export function LandingHeader() {
@@ -15,7 +16,7 @@ export function LandingHeader() {
 
   return (
     <header className={`sticky top-0 ${Z.header} w-full backdrop-blur-md bg-white/80 dark:bg-[#0A0B10]/70 border-b border-slate-200 dark:border-white/[0.04]`}>
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-3 py-2.5 sm:px-6 sm:py-4 lg:px-8">
         {/* Logo */}
         <div className="flex flex-1 min-w-0 items-center gap-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-900/80 p-0.5 border border-cyan-500/30 shadow-[0_0_12px_rgba(6,182,212,0.2)] sm:h-9 sm:w-9">
@@ -25,6 +26,31 @@ export function LandingHeader() {
             Network Marketing Master
           </span>
         </div>
+
+        {/* Ortalı bölüm menüsü — yalnız masaüstü; smooth-scroll */}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 lg:flex">
+          <a
+            href="#ozellikler"
+            onClick={e => scrollToLandingSection(e, 'ozellikler')}
+            className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
+          >
+            {lang === 'en' ? 'Features' : 'Özellikler'}
+          </a>
+          <a
+            href="#nasil-calisir"
+            onClick={e => scrollToLandingSection(e, 'nasil-calisir')}
+            className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
+          >
+            {lang === 'en' ? 'How it Works' : 'Nasıl Çalışır?'}
+          </a>
+          <a
+            href="#ucretlendirme"
+            onClick={e => scrollToLandingSection(e, 'ucretlendirme')}
+            className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
+          >
+            {lang === 'en' ? 'Pricing' : 'Fiyatlandırma'}
+          </a>
+        </nav>
 
         {/* Navigation & Auth */}
         <div className="flex shrink-0 items-center gap-1 sm:gap-2">

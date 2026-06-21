@@ -20,9 +20,10 @@ import { notifyBankTransferAction } from '../actions'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import {
   LANDING_BASIC_TRIAL_CTA,
+  LANDING_PLUS_CTA,
+  LANDING_PLUS_CTA_HOVER,
   LANDING_PRIMARY_CTA,
   LANDING_PRIMARY_CTA_SHADOW,
-  LANDING_PRIMARY_CTA_HOVER,
   LANDING_PRO_CTA,
 } from '@/app/_components/landing/constants'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
@@ -250,7 +251,7 @@ export function OdemeClient() {
             onClick={() => setBillingPeriod('monthly')}
             className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 cursor-pointer ${
               billingPeriod === 'monthly'
-                ? 'brand-cta text-white shadow-md'
+                ? `${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW}`
                 : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
             }`}
           >
@@ -261,7 +262,7 @@ export function OdemeClient() {
             onClick={() => setBillingPeriod('yearly')}
             className={`px-5 py-2 rounded-xl text-xs font-bold transition duration-200 flex items-center gap-1.5 cursor-pointer ${
               billingPeriod === 'yearly'
-                ? 'brand-cta text-white shadow-md'
+                ? `${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW}`
                 : 'text-[var(--text-3)] hover:text-[var(--text-1)]'
             }`}
           >
@@ -451,7 +452,7 @@ export function OdemeClient() {
             <button
               onClick={() => handlePayment('plus')}
               disabled={loading || (billingPeriod === 'monthly' ? isPlusActive : false)}
-              className={`w-full text-center rounded-xl ${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
+              className={`w-full text-center rounded-xl ${LANDING_PLUS_CTA} py-3 text-xs font-bold ${LANDING_PLUS_CTA_HOVER} transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
                 isPlusActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >

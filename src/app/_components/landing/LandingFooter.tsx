@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Mail } from 'lucide-react'
+import { scrollToLandingSection } from './smoothScroll'
 
 export function LandingFooter() {
   const { lang, t } = useTranslation()
@@ -40,17 +41,17 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/acilis#ozellikler" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#ozellikler" onClick={e => scrollToLandingSection(e, 'ozellikler')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'Features' : 'Özellikler'}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/acilis#nasil-calisir" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#nasil-calisir" onClick={e => scrollToLandingSection(e, 'nasil-calisir')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'How it Works' : 'Nasıl Çalışır?'}
                   </Link>
                 </li>
                 <li>
-                  <Link href="/acilis#ucretlendirme" className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                  <Link href="/acilis#ucretlendirme" onClick={e => scrollToLandingSection(e, 'ucretlendirme')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
                     {isEn ? 'Pricing' : 'Fiyatlandırma'}
                   </Link>
                 </li>

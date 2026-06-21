@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-21 — Plan kutusu renkleri + landing header menü/smooth-scroll ✅
+
+1. **Plus kart çerçevesi + buton:** Plus kartına görünür amber çerçeve (tag rengiyle; Basic indigo / Pro pembe gibi). "Ekibi Güçlendir" butonu artık image 2'deki derin mor (`LANDING_PLUS_CTA` sabit hex `#534AB7→#c4b5fd`) — dark/light/​/odeme hepsinde aynı (brand token dark'ta pastele kaydığı için sabit hex).
+2. **Header/toggle CTA (teyit):** Hemen Başla / Hemen Ücretsiz Dene / Aylık-Yıllık = `LANDING_PRIMARY_CTA` (light mor / dark pembe) — zaten doğruydu, korundu.
+3. **/odeme dark renk takası:** billing toggle artık `LANDING_PRIMARY_CTA` (dark pembe), Plus butonu `LANDING_PLUS_CTA` (mor) — eskiden tersti.
+4. **/odeme buton etiketleri:** "30 Günlük Erişim Satın Al" → "30 Günlük Basic Erişimini Başlat"; Plus/Pro zaten "…Erişimini Başlat"; EN tarafı "Buy…" → "Start…".
+5. **Landing header menü:** Özellikler / Nasıl Çalışır? / Fiyatlandırma ortalı menü (yalnız masaüstü `lg+`). Header **ve** footer linkleri artık `scrollToLandingSection` ile ilgili bölüme **smooth-scroll** (sticky header için 80px offset) — pat diye zıplama bitti.
+
+**Dosyalar:** `constants.ts`, `LandingPricing.tsx`, `LandingHeader.tsx`, `LandingFooter.tsx`, yeni `smoothScroll.ts`, `OdemeClient.tsx`, `payment.ts`. tsc/lint/i18n/plan-copy/378 test ✅.
+
 ## 2026-06-21 — İçerik Stüdyosu YZ sayacı + plan CTA renk senkronu ✅
 
 **İçerik Stüdyosu sayacı:** `StudyoForm` butonu artık diğer YZ sekmeleriyle aynı: "İçerik Üret (Kullanılan X/Y)" — `formatCreditButtonLabel` + ortak `useAILimits` havuzu (her üretimde düşer, süper admin `(∞)`). Action tarafı (checkAIQuota/logAIGeneration) zaten vardı; eksik olan görünür sayaçtı.

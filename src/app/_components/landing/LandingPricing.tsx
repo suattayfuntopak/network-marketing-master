@@ -18,8 +18,9 @@ import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/product
 import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
 import {
   LANDING_BASIC_TRIAL_CTA,
+  LANDING_PLUS_CTA,
+  LANDING_PLUS_CTA_HOVER,
   LANDING_PRIMARY_CTA,
-  LANDING_PRIMARY_CTA_HOVER,
   LANDING_PRIMARY_CTA_SHADOW,
   LANDING_PRO_CTA,
 } from './constants'
@@ -178,7 +179,7 @@ export function LandingPricing() {
         </div>
 
         {/* Plan B: Plus Plan */}
-        <div className="rounded-3xl border border-slate-200 dark:border-white/[0.04] bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-zinc-700 transition duration-300 relative">
+        <div className="rounded-3xl border border-amber-300/70 dark:border-amber-500/30 bg-slate-50 dark:bg-white/[0.01] p-8 flex flex-col justify-between hover:border-amber-400/80 dark:hover:border-amber-500/55 transition duration-300 relative shadow-[0_20px_50px_rgba(245,158,11,0.08)]">
           <div className="space-y-6">
             <div>
               <span className="text-[10px] font-extrabold text-amber-800 dark:text-amber-400 bg-amber-100 dark:bg-amber-500/15 px-2.5 py-1 rounded-lg uppercase tracking-wider">
@@ -233,7 +234,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className={`block text-center rounded-xl ${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 cursor-pointer`}
+              className={`block text-center rounded-xl ${LANDING_PLUS_CTA} py-3 text-xs font-bold ${LANDING_PLUS_CTA_HOVER} transition active:scale-95 cursor-pointer`}
             >
               {t('landingPage.planPlusCta')}
             </Link>
