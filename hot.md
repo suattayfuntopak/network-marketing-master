@@ -1,5 +1,18 @@
 # Hot Log
 
+## 2026-06-21 — Video: otomatik başlatma + ilerleme kalıcılığı ✅
+
+**Autoplay:** "İzlemeye devam et" → video popup açılıyor ama otomatik başlamıyordu. Kök sebep: `playerVars`'ta `mute` yoktu; tarayıcılar sayfa-geçişi sonrası SESLİ otomatik oynatmayı engeller. Continue akışında (`autoOpenEmbed`) `mute:1` eklendi → sessiz otomatik başlar, kullanıcı YouTube kontrolünden tek dokunuşla sesi açar. (Tarayıcı tavanı; sesli otomatik oynatma teknik olarak mümkün değil.)
+
+**İlerleme barı kayboluyordu:** Kök sebep — kayıt yalnız durdur/kapat anında ve fire-and-forget yapılıyordu; sekme kapatma/gezinme/çökmede DB'ye hiç yazılmıyordu, ayrıca upsert hatası hiç kontrol edilmiyordu (sessiz başarısızlık). Çözüm:
+- **Periyodik kalıcı kayıt** (oynatma sürerken her 10sn), oynatıcıyı yeniden kurmadan (oynatma sırasında refetch YOK → resumeSec değişmez, video başa sarmaz). Kapanış/bitişte force + refresh.
+- `reportVideoWatchAction` artık upsert hatasını **fırlatır** (eskiden yutuyordu); istemci `console.error` ile loglar. RLS/PK zaten sağlamdı (`user_id+video_key` PK, FOR ALL own policy).
+- Not: Metin eğitim ilerlemesi (okundu/favori) zaten `nmm_user_progress` DB upsert ile kalıcıydı — dokunulmadı.
+
+**Dosyalar:** `TrainingVideoCard.tsx`, `videoActions.ts`. typecheck + lint ✅.
+
+---
+
 ## 2026-06-21 — Geri-tuşu davranışı app geneline yayıldı ✅
 
 `useHistoryBackClose` hook'u tüm overlay/modal/sheet'lere uygulandı: artık herhangi bir modal/sheet/menü açıkken tarayıcı/mobil "geri" → sayfadan çıkmaz, önce en üstteki overlay'i kapatır.

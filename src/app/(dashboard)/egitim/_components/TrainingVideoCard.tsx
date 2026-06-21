@@ -117,6 +117,22 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
     let timer: ReturnType<typeof setInterval> | null = null
     let maxPct = savedPct
     let cancelled = false
+    let lastPersistAt = 0
+
+    // İlerlemeyi DB'ye yaz. Oynatma sırasında (refresh=false) refetch YAPMA —
+    // aksi halde resumeSec değişir, oynatıcı yeniden kurulur ve video başa sarar.
+    // refresh yalnız kapanış/bitişte true: o an oynatıcı zaten kapanıyor.
+    const persist = (ended: boolean, opts: { force?: boolean; refresh?: boolean } = {}) => {
+      if (!ended && maxPct <= savedPct) return
+      const nowMs = Date.now()
+      if (!ended && !opts.force && nowMs - lastPersistAt < 10_000) return
+      lastPersistAt = nowMs
+      reportVideoWatchAction(workspaceId, video.key, maxPct, ended)
+        .then(() => {
+          if (opts.refresh) onProgressChange()
+        })
+        .catch(err => console.error('[video-progress] kayıt başarısız:', err))
+    }
 
     const sample = () => {
       if (!player?.getDuration) return
@@ -128,14 +144,10 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
           maxPct = pct
           setLocalPct(maxPct)
         }
+        // Oynatma sürerken periyodik kalıcı kayıt (10sn) — sekme kapanışı/gezinme/
+        // çökmeye dayanıklı; bar bir daha kaybolmaz.
+        persist(false)
       }
-    }
-
-    const persist = (ended: boolean) => {
-      if (!ended && maxPct <= savedPct) return
-      reportVideoWatchAction(workspaceId, video.key, maxPct, ended)
-        .then(() => onProgressChange())
-        .catch(() => {})
     }
 
     loadYouTubeApi()
@@ -144,7 +156,16 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
         player = new YT.Player(playerHostRef.current, {
           videoId: cleanId,
           host: 'https://www.youtube-nocookie.com',
-          playerVars: { rel: 0, modestbranding: 1, playsinline: 1, autoplay: autoOpenEmbed ? 1 : 0 },
+          // Otomatik başlatma yalnız "İzlemeye devam et" akışında (autoOpenEmbed).
+          // mute:1 zorunlu — tarayıcılar sayfa geçişi sonrası SESLİ otomatik oynatmayı
+          // engeller; sessiz başlar, kullanıcı YouTube kontrolünden tek dokunuşla açar.
+          playerVars: {
+            rel: 0,
+            modestbranding: 1,
+            playsinline: 1,
+            autoplay: autoOpenEmbed ? 1 : 0,
+            mute: autoOpenEmbed ? 1 : 0,
+          },
           events: {
             onReady: () => {
               if (resumeSec > 0) {
@@ -163,7 +184,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
                   timer = null
                 }
                 sample()
-                persist(e.data === YT.PlayerState.ENDED)
+                persist(e.data === YT.PlayerState.ENDED, { force: true, refresh: true })
               }
             },
           },
@@ -175,7 +196,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
       cancelled = true
       if (timer) clearInterval(timer)
       sample()
-      persist(false)
+      persist(false, { force: true, refresh: true })
       try {
         player?.destroy?.()
       } catch {

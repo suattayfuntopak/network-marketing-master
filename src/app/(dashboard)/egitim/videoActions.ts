@@ -185,7 +185,7 @@ export async function reportVideoWatchAction(
   // Hiç ilerleme yoksa (0% ve tamam değil) gereksiz satır açma.
   if (!existing && finalPct <= 0 && !completed) return
 
-  await supabase.from('nmm_video_progress').upsert(
+  const { error: upsertError } = await supabase.from('nmm_video_progress').upsert(
     {
       user_id: user.id,
       video_key: videoKey,
@@ -200,6 +200,8 @@ export async function reportVideoWatchAction(
     },
     { onConflict: 'user_id,video_key' }
   )
+  // Sessiz başarısızlık = kaybolan ilerleme barı. Hatayı yut MA; çağıran loglar.
+  if (upsertError) throw new Error('Video ilerlemesi kaydedilemedi: ' + upsertError.message)
 
   // Yeni tamamlanma → tüm videolar bittiyse lidere bildir.
   if (completed && !wasCompleted) {
