@@ -292,7 +292,7 @@ export function CrownSahaRadarPage({ asTab = false }: { asTab?: boolean }) {
                       {t('crown.sahaRadarEmptyTeamHint')}
                     </p>
                     <Link
-                      href="/ekibim"
+                      href="/ekip"
                       className="inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90 active:scale-[0.98]"
                     >
                       {t('crown.sahaRadarEmptyTeamCta')}

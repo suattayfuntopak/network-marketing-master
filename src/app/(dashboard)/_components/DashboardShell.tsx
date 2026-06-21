@@ -10,6 +10,7 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { AccountAccessGuard } from './AccountAccessGuard'
+import { NavigationDebugger } from './NavigationDebugger'
 import { AppVersionGuard } from '@/components/AppVersionGuard'
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 import { useMobileChromeVisibility } from '@/lib/ui/useMobileChromeVisibility'
@@ -35,10 +36,12 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const navLockUntil = useRef(0)
 
   const SWIPE_PREVIEW_DX = 36
-  const SWIPE_NAV_DX = 96
+  const SWIPE_NAV_DX = 120
   const SWIPE_DY_RATIO_PREVIEW = 1.6
-  const SWIPE_DY_RATIO_NAV = 2.75
+  const SWIPE_DY_RATIO_NAV = 3.5
   const NAV_LOCK_MS = 500
+  // Kasıtlı bir swipe hızlıdır; yavaş sürükleme/okuma kaydırması sayfa değiştirmesin.
+  const SWIPE_MAX_MS = 600
 
   const { data: ws } = useWorkspace()
   const isSuperAdmin = ws?.isSuperAdmin ?? false
@@ -107,7 +110,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     const elapsed = Date.now() - touchStart.current.t
     touchStart.current = null
     setPendingHref(null)
-    if (elapsed < 80) return
+    if (elapsed < 80 || elapsed > SWIPE_MAX_MS) return
     if (Math.abs(dx) < SWIPE_NAV_DX || Math.abs(dx) < Math.abs(dy) * SWIPE_DY_RATIO_NAV) return
     const idx = getRouteIndex(pathname)
     if (idx === -1) return
@@ -130,6 +133,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
       <AppVersionGuard />
+      <NavigationDebugger superAdmin={isSuperAdmin} />
       <ServiceWorkerRegister />
       <Header visible={visible} />
       <Sidebar

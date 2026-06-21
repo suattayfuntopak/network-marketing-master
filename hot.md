@@ -1,5 +1,11 @@
 # Hot Log
 
+## 2026-06-21 — Plan kutuları profesyonel yeniden yazım + kendiliğinden geçiş dedektörü ✅
+
+**Plan kutuları (kapılar AYNEN korundu):** Landing fiyat kartları kimlik + çıktı odaklı yeniden yazıldı. Tag'ler kimliğe döndü (Bireysel Kurucu / Ekip Lideri / Organizasyon Lideri); desc'ler "kimin için + ne kazandırır" kahraman sözüne döndü; YZ kotası her kartta **en son maddeye** indi (görsel sıra bileşende; i18n içeriği testli pozisyonda kaldı → sync testi yeşil). **Kısaltma temizliği:** "DDBR" → "Doğru Başlangıç", "YZ (vd)" → "Yapay Zeka ... üretimi" (landing + ödeme). Matris+landing+ödeme senkron; `plan-copy:check` 9/9, 378 test yeşil. Gerçek erişim kapıları (aiUsage/featureAccess/teamAccess/teamLimits) değişmedi — denetimde zaten %100 uyumluydu.
+
+**Kendiliğinden sayfa atlaması — teşhis:** Tüm uygulamada otomatik navigasyon tarandı; "herhangi bir sayfada, elin değmeden, birkaç saniye sonra" için global tetik bulunamadı. Geçici `NavigationDebugger` eklendi: history.push/replaceState'i sarar, kullanıcı girdisi olmadan (>1.2sn) yol değiştiren geçişi "otomatik" sayıp console.warn (stack trace) + süper admin'e toast + `window.__NMM_NAV_LOG` ile yakalar. Şüpheli sertleştirmeleri: eski iç link `/ekibim`→`/ekip`; swipe navigasyonu katılaştırıldı (NAV_DX 96→120, dy oranı 2.75→3.5, max süre 600ms — kazara/yavaş kaydırma sayfa değiştirmez). Kök sebep bir sonraki atlamada loglardan netleşince dedektör kaldırılacak.
+
 ## 2026-06-21 — Video: otomatik başlatma + ilerleme kalıcılığı ✅
 
 **Autoplay:** "İzlemeye devam et" → video popup açılıyor ama otomatik başlamıyordu. Kök sebep: `playerVars`'ta `mute` yoktu; tarayıcılar sayfa-geçişi sonrası SESLİ otomatik oynatmayı engeller. Continue akışında (`autoOpenEmbed`) `mute:1` eklendi → sessiz otomatik başlar, kullanıcı YouTube kontrolünden tek dokunuşla sesi açar. (Tarayıcı tavanı; sesli otomatik oynatma teknik olarak mümkün değil.)
