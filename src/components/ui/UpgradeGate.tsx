@@ -7,6 +7,7 @@ import { Sparkles, ArrowRight, Lock, Users, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
 import type { GatedFeature } from '@/lib/domain/featureAccess'
@@ -63,6 +64,7 @@ function ModalGate({ feature, open, onClose }: Omit<ModalProps, 'variant'>) {
   const { data: ws } = useWorkspace()
   const [mounted] = useState(() => typeof window !== 'undefined')
   useBodyScrollLock(open)
+  useHistoryBackClose(open, onClose)
   if (!open || !mounted) return null
 
   const trialEnded =

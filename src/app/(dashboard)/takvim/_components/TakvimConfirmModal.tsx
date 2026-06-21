@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { AlertTriangle } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 
 type TakvimConfirmModalProps = {
   title: string
@@ -28,6 +29,7 @@ export function TakvimConfirmModal({
   const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onCancel)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { submitModeratedRequestAction } from '@/app/(dashboard)/actions/moderation'
 import type { Json } from '@/types/database.types'
@@ -38,6 +39,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
   const [showSympathetic, setShowSympathetic] = useState(false)
 
   useBodyScrollLock(open || showSympathetic)
+  useHistoryBackClose(open, onClose)
 
   useEffect(() => {
     if (!open) return

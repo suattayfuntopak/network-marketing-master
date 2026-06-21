@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import imageCompression from 'browser-image-compression'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 
 import { queryInvalidator } from '@/lib/query/invalidator'
 
@@ -41,6 +42,7 @@ export function ProfileModal({ onClose }: ProfileModalProps) {
   const [userId, setUserId] = useState<string | null>(null)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

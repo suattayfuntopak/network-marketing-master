@@ -9,6 +9,7 @@ import { ConfirmDeleteModal } from '@/components/ui/ConfirmDeleteModal'
 import type { NmmCandidate, CandidateStage } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { uploadAvatarAction } from '@/app/(dashboard)/actions/profile'
 import { resolveCandidateFields, buildCandidateContentFields } from '@/lib/domain/candidateFields'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
@@ -42,6 +43,7 @@ export function EditCandidateSheet({ candidate, workspaceId, onClose }: Props) {
   const del = useDeleteCandidate(workspaceId)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

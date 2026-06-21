@@ -14,6 +14,7 @@ import { generateOnboardingGuidanceAction } from '../actions'
 import { waHref, whatsappShareUrl } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 
@@ -65,6 +66,7 @@ export function YZOnboardingKocuModal({ memberName, stepId, phone, onClose }: YZ
   )
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   useEffect(() => {
     let active = true

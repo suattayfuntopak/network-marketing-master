@@ -7,6 +7,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { generateNmmInviteMessage } from '../actions'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
@@ -28,6 +29,7 @@ export function NmmInviteSheet({ candidate, onClose }: Props) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   useEffect(() => {
     if (!hasAiFieldAccess) {

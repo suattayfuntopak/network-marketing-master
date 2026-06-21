@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 
 export type ActiveAiMessage = {
   message: string
@@ -24,6 +25,7 @@ export function SahaRadarAiMessageModal({
   onClose: () => void
   onWaSend: (candidateId: string) => void
 }) {
+  useHistoryBackClose(true, onClose)
   return createPortal(
     <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
       <div

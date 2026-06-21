@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { Z } from '@/lib/ui/zIndex'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { queryKeys } from '@/lib/query/keys'
@@ -42,6 +43,7 @@ export function EditCustomerSheet({ customerId, onClose, onSaved }: Props) {
   const [syncedKey, setSyncedKey] = useState<string | null>(null)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   const { data, isLoading } = useQuery({
     queryKey: queryKeys.customerDetail(customerId),

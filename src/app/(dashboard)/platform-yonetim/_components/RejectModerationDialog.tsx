@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 type Props = {
@@ -19,6 +20,7 @@ export function RejectModerationDialog({ defaultReason, onConfirm, onCancel }: P
   const [reason, setReason] = useState(defaultReason)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onCancel)
 
   useEffect(() => {
     /* eslint-disable-next-line react-hooks/set-state-in-effect */

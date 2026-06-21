@@ -5,6 +5,7 @@ import { X, Loader2, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { adminExtendLicenseAction } from '../admin-actions'
 import type { PlatformWorkspaceItem } from '../actions'
 
@@ -16,6 +17,7 @@ interface Props {
 
 export function WorkspaceLicenseModal({ workspace, onClose, onSuccess }: Props) {
   const { t } = useTranslation()
+  useHistoryBackClose(true, onClose)
   const [licenseType, setLicenseType] = useState<'free' | 'basic' | 'plus' | 'pro'>(
     (workspace.licenseType as 'free' | 'basic' | 'plus' | 'pro') ?? 'plus'
   )

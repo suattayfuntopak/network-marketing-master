@@ -7,6 +7,7 @@ import { X, Bell, Mail, Monitor, Volume2, CheckCircle2, AlertCircle, Info, UserP
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -120,6 +121,7 @@ export function NotificationsModal({ onClose }: NotificationsModalProps) {
   const [selected, setSelected]         = useState<UiNotification | null>(null)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   const { prefs, isLoading: prefsLoading, isSaving: prefsSaving, savePrefs } =
     useNotificationPreferences()

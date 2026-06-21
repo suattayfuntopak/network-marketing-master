@@ -7,6 +7,7 @@ import { useTranslation } from '@/providers/LanguageProvider'
 import { getAccountLifecycle } from '@/lib/domain/accountLifecycle'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { UpgradeModalFooter } from '@/components/ui/UpgradeModalFooter'
 
 function formatDateTime(date: Date, lang: 'tr' | 'en') {
@@ -33,6 +34,7 @@ export function AccountStatusAlert() {
   )
 
   useBodyScrollLock(open)
+  useHistoryBackClose(open, () => setOpen(false))
 
   const lifecycle = useMemo(() => {
     if (!ws || ws.isSuperAdmin || ws.licenseType !== 'free') return null

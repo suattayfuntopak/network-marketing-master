@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { AlertTriangle, Trash2 } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface ConfirmDeleteModalProps {
@@ -18,6 +19,7 @@ export function ConfirmDeleteModal({ message, onConfirm, onCancel }: ConfirmDele
   const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onCancel)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

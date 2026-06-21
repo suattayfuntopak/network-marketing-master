@@ -7,6 +7,7 @@ import { STAGES_FORM } from '@/lib/domain/stages'
 import type { CandidateStage, NmmCandidate } from '@/types/database.types'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { PHONE_RE, sanitizePhone } from '@/lib/utils/validation'
 import { uploadAvatarAction } from '@/app/(dashboard)/actions/profile'
 import { buildCandidateContentFields } from '@/lib/domain/candidateFields'
@@ -38,6 +39,7 @@ export function AddCandidateSheet({ workspaceId, onClose }: AddCandidateSheetPro
   const queryClient = useQueryClient()
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

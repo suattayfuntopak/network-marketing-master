@@ -7,6 +7,7 @@ import { HelpCircle, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { getPageHelp, resolvePageHelpContext } from '@/lib/domain/pageHelp'
 
 /**
@@ -81,6 +82,7 @@ function PageHelpModal({
   const closeLabel = l === 'en' ? 'Close' : 'Kapat'
 
   useBodyScrollLock(true)
+  useHistoryBackClose(true, onClose)
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

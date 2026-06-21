@@ -11,6 +11,7 @@ import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { Z } from '@/lib/ui/zIndex'
 import { waHref } from '@/lib/utils/waLink'
 import { ONBOARDING_STEP_COUNT, type SheetActivityPeriod } from '@/lib/domain/pulse'
@@ -90,6 +91,7 @@ export function MemberActivitySheet({
   const [goalSaving, setGoalSaving] = useState(false)
 
   useBodyScrollLock(!embedded)
+  useHistoryBackClose(!embedded, () => onClose?.())
 
   useEffect(() => {
     prefetchMemberActivity(queryClient, workspaceId, member.userId)

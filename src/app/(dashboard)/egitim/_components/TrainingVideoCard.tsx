@@ -5,6 +5,7 @@ import { Check, Pencil, Play, Trash2, X } from 'lucide-react'
 import Link from 'next/link'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { Z } from '@/lib/ui/zIndex'
 import { extractYouTubeVideoId } from '@/lib/domain/videoTraining'
 import {
@@ -85,6 +86,7 @@ export function TrainingVideoCard({ video, workspaceId, progress, onProgressChan
   const playerHostRef = useRef<HTMLDivElement>(null)
 
   useBodyScrollLock(showEmbed)
+  useHistoryBackClose(showEmbed, () => setShowEmbed(false))
 
   useEffect(() => {
     if (!autoOpenEmbed) return

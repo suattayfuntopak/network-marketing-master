@@ -11,6 +11,7 @@ import type { NmmCandidate } from '@/types/database.types'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { playNotificationSound } from '@/lib/ui/notificationSound'
 import {
   isNotificationPushEnabled,
@@ -35,6 +36,7 @@ export function QuickAddModal({ onClose }: QuickAddModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useBodyScrollLock()
+  useHistoryBackClose(true, onClose)
 
   useEffect(() => {
     const originalScrollY = window.scrollY

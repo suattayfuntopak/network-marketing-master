@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { Sparkles } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 
 interface SympatheticPopupProps {
@@ -24,6 +25,7 @@ export function SympatheticPopup({
   const [mounted] = useState(() => typeof window !== 'undefined')
 
   useBodyScrollLock(open)
+  useHistoryBackClose(open, onClose)
 
   useEffect(() => {
     if (open) {

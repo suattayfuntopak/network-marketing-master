@@ -5,6 +5,7 @@ import { X, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { defaultRejectReason } from '@/lib/domain/moderationDefaults'
 import {
   approveRequestAction,
@@ -22,6 +23,7 @@ interface Props {
 
 export function ModerationReviewModal({ request, onClose, onSuccess }: Props) {
   const { lang, t } = useTranslation()
+  useHistoryBackClose(true, onClose)
   const uiLang = lang === 'en' ? 'en' : 'tr'
   type DVal = Record<string, string> | string | string[] | undefined
   const d = request.data as unknown as Record<string, DVal>

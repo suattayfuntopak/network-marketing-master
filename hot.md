@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-21 — Geri-tuşu davranışı app geneline yayıldı ✅
+
+`useHistoryBackClose` hook'u tüm overlay/modal/sheet'lere uygulandı: artık herhangi bir modal/sheet/menü açıkken tarayıcı/mobil "geri" → sayfadan çıkmaz, önce en üstteki overlay'i kapatır.
+
+**Hook nesting-safe yapıldı:** global LIFO yığını + tek popstate dinleyici (yalnız tepedeki overlay'i kapatır) + programatik `history.back()`'i ayırt eden suppress bayrağı → iç içe overlay'lerde (ör. detay sheet'i içinde silme onayı) geri yalnız üsttekini kapatır, alttaki açık kalır.
+
+**Uygulandığı ~30 bileşen:** ConfirmDialog, ConfirmDeleteModal, ProfileModal, QuickAddModal, NotificationsModal, SettingsModal, SympatheticPopup, PageHelp, UpgradeGate(ModalGate); AddCandidateSheet, EditCandidateSheet, NmmInviteSheet, CandidateStageCard, CandidateFollowUpCard; EditCustomerSheet, CustomerAiMessageModal; TakvimConfirmModal; RejectModerationDialog, ModerationReviewModal, WorkspaceLicenseModal; YZOnboardingKocuModal; VideoEditModal, AddTrainingModal, TrainingVideoCard (video popup); AddObjectionModal; AccountStatusAlert, OnboardingModal; SahaRadarAiMessageModal; BottomNav (more-menü), MemberActivitySheet.
+
+**Bilinçli HARİÇ:** `OdemeClient` (loading overlay — kapatılamaz), `UpgradeGate` OverlayGate locked-wall (geri ile bypass olmamalı), aggregate container'lar (çocukları zaten alıyor). typecheck + lint (--max-warnings 0) ✅.
+
+---
+
 ## 2026-06-21 — Blog çipi vurgusu + geri-tuşu UX + çift deploy fix ✅
 
 **Çip sırası & vurgu:** Blog çipi artık "Tümü"nün hemen sağında (Favoriler'den önce). Amber→rose gradient + Newspaper ikonu + `blog-chip-breathe` nazik nefes animasyonu (globals.css, `prefers-reduced-motion` guard'lı). Hem dark hem light'ta belirgin.

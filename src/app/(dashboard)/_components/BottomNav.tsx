@@ -18,6 +18,7 @@ import {
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { NavItemIcon } from '@/components/ui/NavItemIcon'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { Z } from '@/lib/ui/zIndex'
 
 interface BottomNavProps {
@@ -57,6 +58,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
 
   const [moreOpen, setMoreOpen] = useState(false)
   useBodyScrollLock(moreOpen)
+  useHistoryBackClose(moreOpen, () => setMoreOpen(false))
   // Rota değişince çekmeceyi kapat (geri/ileri gibi handler-dışı geçişler için güvenlik ağı).
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

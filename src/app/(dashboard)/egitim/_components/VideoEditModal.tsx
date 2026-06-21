@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { RelatedTopicPicker, useRelatedTopicOptions } from './RelatedTopicPicker'
 import {
   createTrainingVideoAction,
@@ -47,6 +48,7 @@ export function VideoEditModal({ editing, onClose, onSaved }: Props) {
   const { data: ws } = useWorkspace()
   const { resolveLabel } = useRelatedTopicOptions()
   useBodyScrollLock(true)
+  useHistoryBackClose(true, onClose)
 
   const set = <K extends keyof VideoInput>(k: K, v: VideoInput[K]) =>
     setForm(f => ({ ...f, [k]: v }))

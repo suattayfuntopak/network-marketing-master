@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { waHref } from '@/lib/utils/waLink'
 import { Z } from '@/lib/ui/zIndex'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import type { useTranslation } from '@/providers/LanguageProvider'
 
 type TranslateFn = ReturnType<typeof useTranslation>['t']
@@ -27,6 +28,7 @@ export function CustomerAiMessageModal({
   error: string | null
   onClose: () => void
 }) {
+  useHistoryBackClose(true, onClose)
   return createPortal(
     <div className={`fixed inset-0 ${Z.confirmBackdrop} flex items-center justify-center p-4`}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />

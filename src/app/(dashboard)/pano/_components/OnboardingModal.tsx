@@ -8,6 +8,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useUserSettings } from '@/hooks/useUserSettings'
 import { writeUserSettingsCache } from '@/lib/ui/userSettingsStorage'
@@ -35,6 +36,7 @@ export function OnboardingModal({ workspaceId, inviteCode, hasCandidatesInitiall
   const dismissedRef = useRef(false)
 
   useBodyScrollLock(visible)
+  useHistoryBackClose(visible, () => dismiss())
 
   // Gösterim kararı:
   //  • Tekrar-başlat: Ayarlar'dan gelen tek seferlik geçici işaret (kalıcı veri

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Check, Pencil, X } from 'lucide-react'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { daysSince, toInputDateTime, quickFollowUpFromToday } from './candidateDetailUtils'
 
@@ -25,6 +26,7 @@ export function CandidateFollowUpCard({
   const [tempFollowUp, setTempFollowUp] = useState('')
 
   useBodyScrollLock(editing)
+  useHistoryBackClose(editing, () => setEditing(false))
 
   function openEditor() {
     setTempFollowUp(toInputDateTime(nextFollowUpAt))

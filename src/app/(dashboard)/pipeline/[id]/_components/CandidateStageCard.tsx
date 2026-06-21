@@ -6,6 +6,7 @@ import { clsx } from 'clsx'
 import { STAGE_COLOR, STAGE_ORDER } from '@/lib/domain/stages'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { useTranslation } from '@/providers/LanguageProvider'
 import type { CandidateStage } from '@/types/database.types'
 
@@ -19,6 +20,7 @@ export function CandidateStageCard({ stage, onChangeStage }: Props) {
   const [open, setOpen] = useState(false)
 
   useBodyScrollLock(open)
+  useHistoryBackClose(open, () => setOpen(false))
 
   function select(next: CandidateStage) {
     setOpen(false)
