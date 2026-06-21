@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { LanguageProvider } from "@/providers/LanguageProvider";
+import { OrientationLock } from "@/components/OrientationLock";
 import { Toaster } from "sonner";
 import "./globals.css";
 
@@ -60,6 +61,7 @@ export default function RootLayout({
         <LanguageProvider>
           <ThemeProvider>
             <QueryProvider>{children}</QueryProvider>
+            <OrientationLock />
             <Toaster richColors position="top-center" />
           </ThemeProvider>
         </LanguageProvider>

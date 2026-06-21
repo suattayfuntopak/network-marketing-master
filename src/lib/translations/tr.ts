@@ -32,6 +32,8 @@ export const tr = {
     notifications: "Bildirimler",
     appUpdateTitle: "Yeni sürüm hazır — sayfayı yenileyin.",
     appUpdateReload: "Yenile",
+    rotateTitle: "Lütfen cihazınızı dik konuma getirin",
+    rotateDesc: "Bu uygulama en iyi deneyim için dikey kullanıma göre tasarlandı. Devam etmek için telefonunuzu/tabletinizi dik (dikey) konuma çevirin.",
     themeDark: "Dark moduna geç",
     themeLight: "Light moduna geç",
     themeSystem: "System moduna geç",

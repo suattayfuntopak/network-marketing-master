@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-21 — Dikey-kullanım kilidi (telefon/tablet yatay engeli) ✅
+
+Telefon ve tabletlerde yatay konumda arayüz karışıyordu. Web'de gerçek OS yönelim-kilidi mümkün değil (iOS Safari yok sayar), bu yüzden pratikte aynı sonucu veren tam-ekran overlay eklendi: yatayken "Lütfen cihazınızı dik konuma getirin" yönlendirmesi tüm arayüzü kapatır, dikeye dönünce anında kaybolur.
+
+- **Saf CSS media query** (`.orientation-lock`, globals.css): `(orientation: landscape) and (pointer: coarse) and (max-height: 1030px)` → telefon + tüm tabletler; masaüstü/laptop (birincil işaretçi fine) **etkilenmez**. JS yok, flash yok.
+- **Bileşen** `OrientationLock` kök layout'ta (tüm site: açılış + dashboard), i18n metni (`common.rotateTitle/rotateDesc` TR+EN), `Z.orientationLock=z-[100000]` (fullscreen modaller dahil her şeyin üstünde).
+- **Bonus:** `manifest.json`'da `orientation: portrait-primary` zaten vardı → ana ekrana eklenmiş Android PWA'da gerçek dikey kilit.
+
+**Dosyalar:** yeni `OrientationLock.tsx`, `layout.tsx`, `globals.css`, `zIndex.ts`, `tr.ts`/`en.ts`. tsc/lint/i18n ✅.
+
 ## 2026-06-21 — /odeme plan paritesi + 10 yeni blog yazısı ✅
 
 **Ödeme sayfası paritesi:** Landing'deki profesyonel düzeltmeler /odeme'ye taşındı: kısaltma temizliği (YZ → Yapay Zeka, "vd" kaldırıldı), Basic madde ifadeleri landing ile eşitlendi, YZ kotası her planda **en son maddeye** indi (OdemeClient render sırası). EN tarafı tekdüze "AI credits — …" satırına getirildi. plan-copy sync testi 9/9 yeşil (kapılar değişmedi).

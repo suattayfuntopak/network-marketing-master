@@ -20,4 +20,6 @@ export const Z = {
   confirm: 'z-[90]',
   coachModal: 'z-[99]',
   fullscreen: 'z-[9999]',
+  /** Dikey-kullanım kilidi — her şeyin (fullscreen dahil) üstünde tam-ekran yönlendirme */
+  orientationLock: 'z-[100000]',
 } as const

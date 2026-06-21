@@ -32,6 +32,8 @@ export const en = {
     notifications: "Notifications",
     appUpdateTitle: "A new version is ready — refresh the page.",
     appUpdateReload: "Refresh",
+    rotateTitle: "Please rotate your device to portrait",
+    rotateDesc: "This app is designed for portrait use for the best experience. Turn your phone or tablet upright (portrait) to continue.",
     themeDark: "Switch to Dark mode",
     themeLight: "Switch to Light mode",
     themeSystem: "Switch to System mode",

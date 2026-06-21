@@ -400,6 +400,18 @@ body {
   }
 }
 
+/* Dikey-kullanım kilidi — telefon/tablet YATAY konumda tam-ekran "dik konuma getir"
+   overlay'ini göster. Tetikleyici: dokunmatik birincil işaretçi (pointer: coarse →
+   masaüstü/laptop hariç) + yatay + kısa-orta ekran yüksekliği (büyük masaüstü hariç).
+   Saf CSS: JS yok, flash yok; dikeye dönünce anında kaybolur. Metin React/i18n'den gelir. */
+.orientation-lock { display: none; }
+@media (orientation: landscape) and (pointer: coarse) and (max-height: 1030px) {
+  .orientation-lock { display: flex; }
+}
+@media print {
+  .orientation-lock { display: none !important; }
+}
+
 /* Blog kategori çipi — nazik "nefes" çekim animasyonu (amber→rose glow) */
 @keyframes blog-chip-breathe {
   0%, 100% {
