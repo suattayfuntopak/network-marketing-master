@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-22 — Deploy güvenilirlik fix + footer link gecikmesi + i18n nav ✅
+
+1. **Deploy "bazen başlamıyor" KALICI çözüm:** Kök sebep CI Gate `concurrency: cancel-in-progress: true` (yakın zamanda eklendi). main'e ardışık push'larda önceki CI Gate iptal oluyor; iptal "success" saymadığı için `deploy.yml` deploy tetiklemiyordu. Fix: `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` → PR'larda iptal (maliyet korunur), **main push'larında iptal yok** (her push deploy eder). Düşük risk: deploy mekanizmasına dokunmaz, yalnız iptal davranışını main için kapatır.
+2. **Footer link gecikmesi:** Footer bölüm-linkleri (Özellikler/Nasıl Çalışır?/Fiyatlandırma) Next `<Link href="/acilis#...">` ile ağır landing'e "soft-navigation" tetikleyip 1-2sn bekletiyordu. Header gibi **düz `<a href="#...">`** yapıldı → anında smooth-scroll. (Yasal/üyelik linkleri gerçek sayfa geçişi olduğu için `<Link>` kaldı.)
+3. **i18n nav (öneri #5 — görünmez borç):** Header+footer'daki `isEn ? 'Features' : 'Özellikler'` gömülü ternary'leri `landingPage.navFeatures/navHowItWorks/navPricing` anahtarlarına taşındı. Sıfır görsel değişiklik.
+
+**Not (öneriler):** Diğer öneriler (CTA token konsolidasyonu, görsel snapshot testi, plan-tema haritası, deploy bildirimi) onaylandı ama **piksel-riski / görsel doğrulama / baseline** gerektirdiği için "görünür değişiklik olmasın" şartını garanti etmek adına ayrı bir doğrulamalı oturuma bırakıldı. A/B önerisi görseli değiştirdiği için bu şart kapsamında dışarıda.
+
+**Dosyalar:** `unit-test.yml`, `LandingFooter.tsx`, `LandingHeader.tsx`, `landing.ts`. tsc/lint/i18n/378 test ✅.
+
 ## 2026-06-21 — Plus buton tek renk, admin badge, logo→top, disclaimer tek satır ✅
 
 1. **Plus CTA tek renk:** "Ekibi Güçlendir" + /odeme "30 Günlük Plus…" artık **solid tek mor** (`LANDING_PLUS_CTA = #6742D2`), fade kaldırıldı; dark/light aynı. (Tek sabit; her iki sayfa da bu sabitten besleniyor.)

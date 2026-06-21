@@ -3,6 +3,9 @@ export const landingSection = {
     landingPage: {
       logIn: 'Giriş Yap',
       getStarted: 'Hemen Başla',
+      navFeatures: 'Özellikler',
+      navHowItWorks: 'Nasıl Çalışır?',
+      navPricing: 'Fiyatlandırma',
       heroBadge: 'YAPAY ZEKA DESTEKLİ NETWORK MARKETING İŞLETİM SİSTEMİ',
       heroTitle1: 'Aktif ve ',
       heroTitleHighlight: 'Yüksek Performanslı',
@@ -95,6 +98,9 @@ export const landingSection = {
     landingPage: {
       logIn: 'Log In',
       getStarted: 'Get Started',
+      navFeatures: 'Features',
+      navHowItWorks: 'How it Works',
+      navPricing: 'Pricing',
       heroBadge: 'AI-POWERED NETWORK MARKETING OPERATING SYSTEM',
       heroTitle1: 'Build a ',
       heroTitleHighlight: 'High-Performance',

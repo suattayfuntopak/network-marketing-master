@@ -39,21 +39,21 @@ export function LandingHeader() {
             onClick={e => scrollToLandingSection(e, 'ozellikler')}
             className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
           >
-            {lang === 'en' ? 'Features' : 'Özellikler'}
+            {t('landingPage.navFeatures')}
           </a>
           <a
             href="#nasil-calisir"
             onClick={e => scrollToLandingSection(e, 'nasil-calisir')}
             className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
           >
-            {lang === 'en' ? 'How it Works' : 'Nasıl Çalışır?'}
+            {t('landingPage.navHowItWorks')}
           </a>
           <a
             href="#ucretlendirme"
             onClick={e => scrollToLandingSection(e, 'ucretlendirme')}
             className="text-sm font-semibold text-slate-600 transition hover:text-brand dark:text-white/70 dark:hover:text-white"
           >
-            {lang === 'en' ? 'Pricing' : 'Fiyatlandırma'}
+            {t('landingPage.navPricing')}
           </a>
         </nav>
 

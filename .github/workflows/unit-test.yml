@@ -38,7 +38,11 @@ on:
 
 concurrency:
   group: ci-gate-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+  # PR'larda ardışık push'ta önceki koşuyu iptal et (maliyet). main push'larında
+  # İPTAL ETME: iptal edilen CI Gate "success" saymadığı için deploy.yml prod
+  # deploy tetiklemiyordu → "deploy bazen başlamıyor" kök sebebi buydu. main'de
+  # her push'un kendi CI Gate'i tamamlanıp deploy hook'unu tetiklesin.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint:

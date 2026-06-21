@@ -46,19 +46,19 @@ export function LandingFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs font-semibold text-slate-600 dark:text-zinc-400">
                 <li>
-                  <Link href="/acilis#ozellikler" onClick={e => scrollToLandingSection(e, 'ozellikler')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
-                    {isEn ? 'Features' : 'Özellikler'}
-                  </Link>
+                  <a href="#ozellikler" onClick={e => scrollToLandingSection(e, 'ozellikler')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                    {t('landingPage.navFeatures')}
+                  </a>
                 </li>
                 <li>
-                  <Link href="/acilis#nasil-calisir" onClick={e => scrollToLandingSection(e, 'nasil-calisir')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
-                    {isEn ? 'How it Works' : 'Nasıl Çalışır?'}
-                  </Link>
+                  <a href="#nasil-calisir" onClick={e => scrollToLandingSection(e, 'nasil-calisir')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                    {t('landingPage.navHowItWorks')}
+                  </a>
                 </li>
                 <li>
-                  <Link href="/acilis#ucretlendirme" onClick={e => scrollToLandingSection(e, 'ucretlendirme')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
-                    {isEn ? 'Pricing' : 'Fiyatlandırma'}
-                  </Link>
+                  <a href="#ucretlendirme" onClick={e => scrollToLandingSection(e, 'ucretlendirme')} className="hover:text-brand dark:hover:text-white transition-colors duration-200">
+                    {t('landingPage.navPricing')}
+                  </a>
                 </li>
               </ul>
             </div>
