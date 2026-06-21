@@ -72,14 +72,36 @@ Ana E2E kullanıcısından (`PLAYWRIGHT_TEST_*`) **ayrı** bir hesap kullanın �
 
 ### CI testi nasıl çalıştırılır?
 
-1. **PR:** PR açıldığında `E2E (Playwright)` koşar (kod değişikliği varsa).
-2. **Haftalık:** Pazartesi 06:00 (İstanbul) otomatik schedule.
-3. **Manuel:** GitHub → Actions → **E2E (Playwright)** → **Run workflow** (büyük özellik / auth akışı değişikliği sonrası).
+1. **main push:** Uygulama kodu değiştiyse `E2E (Playwright)` koşar (`src/`, `e2e/`, `package.json` vb.).
+2. **Haftalık:** Pazartesi 06:00 (İstanbul) otomatik schedule — yalnızca chromium (mobile atlanır, maliyet).
+3. **Manuel:** GitHub → Actions → **E2E (Playwright)** → **Run workflow** (auth/ödeme büyük değişiklik sonrası).
 4. **Yerel:** `.env.local`'e `PLAYWRIGHT_TEST_EMAIL` / `PLAYWRIGHT_TEST_PASSWORD` ekleyip `npm run test:e2e`.
 
-`main` push **E2E tetiklemez** — prod gate yalnızca **CI Gate** (lint + unit + build, ~2 dk). E2E advisory kalır; deploy'u bloklamaz.
+**PR'da E2E koşmaz** — maliyet tasarrufu. PR koruması **CI Gate** (lint + unit + build, ~2 dk). E2E advisory kalır; deploy'u bloklamaz.
 
-Migration drift için: Actions’ta **Migration check** workflow’unu veya yerelde `npm run migrate:check:remote` (token + ref gerekir).
+Migration drift için: Actions'ta **Migration check** workflow'unu veya yerelde `npm run migrate:check:remote` (token + ref gerekir).
+
+### GitHub Actions maliyeti (kota & bütçe)
+
+Kişisel hesapta özel repolar için ayda **2.000 dakika ücretsiz**; aşınca dakika başı ücret başlar. Ay sonunda fatura kesilir.
+
+| Nereden bakılır? | Ne görürsünüz? |
+|------------------|----------------|
+| [github.com/settings/billing](https://github.com/settings/billing) → **Usage** | Hangi repo/workflow en çok dakika yaktı |
+| **Budgets and alerts** | Aylık harcama tavanı (`Stop usage: Yes` = tavana gelince Actions durur) |
+
+**Bu repodaki maliyet sürücüleri (öncelik sırasıyla):**
+
+| Workflow | Ne zaman? | Not |
+|----------|-----------|-----|
+| **E2E (Playwright)** | main push, Pazartesi cron, elle | En pahalı (~5 job, `npm ci` × 4). PR'da artık koşmaz. |
+| **CI Gate** | Her PR + main push | lint + unit + build (3 job). Hızlı ardışık push'larda eski koşu iptal edilir (`concurrency`). |
+| **Migration check** | Yalnız migration değişince | Postgres'li apply job ağır; path filtresi var. |
+| **cron-emails** | Günlük | Hafif (curl). |
+
+**Yapılan optimizasyonlar:** E2E PR'dan çıkarıldı; `lint-pr.yml` kaldırıldı (CI Gate ile çift lint); docs/görsel değişiklikler CI'ı tetiklemez; E2E mobile haftalık cron'da atlanır.
+
+**Branch protection:** `main` için zorunlu check olarak **Lint (PR)** kullanıyorsanız kaldırın — yerine CI Gate'teki **Lint**, **Vitest**, **Build** yeterli.
 
 ### GitHub bildirim e-postalarını sadeleştirme
 
@@ -89,9 +111,7 @@ Migration drift için: Actions’ta **Migration check** workflow’unu veya yere
 2. **Send notifications for failed workflows only** seçin (veya `main` dışı branch’lerde kapatın)
 3. Vercel deploy bildirimleri Dashboard → Project → Settings → Notifications üzerinden ayrı yönetilir
 
-E2E workflow: **Lint** (~30 sn) → **Build** → **E2E (chromium)** + **E2E (mobile-chrome)** (paralel, ayrı Playwright artifact). Lint kırılırsa build başlamaz.
-
-**Lint (PR)** (`lint-pr.yml`): PR açılınca yalnızca ESLint — Build/E2E beklemeden hızlı geri bildirim. Branch protection'da **Lint (PR)** zorunlu yapılabilir.
+E2E workflow: **Lint** (~30 sn) → **Build** → **E2E (chromium)** + **E2E (mobile-chrome)** (paralel; mobile yalnızca main push / elle). Lint kırılırsa build başlamaz.
 
 **Mobile E2E advisory:** `E2E (mobile-chrome)` `continue-on-error: true` — prod deploy gate yalnızca **E2E (chromium)** job'unu doğrular (`deploy.yml`).
 
@@ -150,8 +170,8 @@ Opsiyonel repo variable: `NMM_PROD_URL` (varsayılan `https://nmm.suattayfuntopa
 
 GitHub → **Settings → Branches → Branch protection rule** (`main`):
 
-- Require status checks: **Lint (PR)** (PR'lar), **Lint**, **Build**, **Vitest** (`Unit tests (Vitest)`), **E2E (chromium)** (zorunlu prod gate)
-- İsteğe bağlı (advisory): **E2E (mobile-chrome)** — branch protection'a eklemeyin; flake prod'u bloklamasın
+- Require status checks: **Lint**, **Build**, **Vitest** (CI Gate — PR ve main)
+- İsteğe bağlı (advisory): **E2E (chromium)** — main merge / haftalık cron sonrası; PR'da zorunlu değil
 - Require branches up to date before merging
 
 Böylece kırık lint/build main'e merge edilmeden yakalanır; prod deploy gate'i ile birlikte çalışır.

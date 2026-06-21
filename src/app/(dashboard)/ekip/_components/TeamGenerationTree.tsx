@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/Skeleton'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getTeamGenerationTreeAction, type GenerationTreeNode } from '../treeActions'
+import { queryKeys } from '@/lib/query/keys'
 import { QUERY_STALE } from '@/lib/query/staleTimes'
 import { TeamFreeUpgradeBanner } from './TeamFreeUpgradeBanner'
 import { computeDownlineAnalytics, monthlyJoinCohorts } from '@/lib/domain/downlineAnalytics'
@@ -136,7 +137,7 @@ export function TeamGenerationTree({ workspaceId, teamPageUnlocked }: Props) {
   const router = useRouter()
 
   const { data: nodes = [], isLoading } = useQuery({
-    queryKey: ['team-generation-tree', workspaceId],
+    queryKey: queryKeys.teamGenerationTree(workspaceId),
     queryFn: () => getTeamGenerationTreeAction(workspaceId),
     enabled: !!workspaceId,
     staleTime: QUERY_STALE.metrics,

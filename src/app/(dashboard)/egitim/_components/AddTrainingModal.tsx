@@ -138,11 +138,8 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
             <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
               <div>
                 <h2 className="text-lg md:text-xl font-bold text-[var(--text-1)]">
-                  {t('trainingPage.addContent')}
+                  {editing ? t('trainingPage.editContentTitle') : t('trainingPage.addContent')}
                 </h2>
-                <p className="text-[11px] md:text-sm text-[var(--text-3)] font-medium mt-0.5">
-                  {t('trainingPage.addContentDesc')}
-                </p>
               </div>
               <button
                 type="button"
@@ -289,7 +286,7 @@ export function AddTrainingModal({ open, onClose, onAdd, editing = null, onUpdat
                       <span>Geri Gönderiliyor...</span>
                     </>
                   ) : (
-                    <span>{t('trainingPage.addButton')}</span>
+                    <span>{editing ? t('common.save') : t('trainingPage.addButton')}</span>
                   )}
                 </button>
               </div>

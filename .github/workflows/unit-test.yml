@@ -12,13 +12,33 @@ on:
       - '**.md'
       - 'docs/**'
       - 'hot.md'
+      - '.cursor/**'
+      - 'assets/**'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '**/*.jpeg'
+      - '**/*.gif'
+      - '**/*.webp'
+      - '**/*.svg'
   push:
     branches: [main]
     paths-ignore:
       - '**.md'
       - 'docs/**'
       - 'hot.md'
+      - '.cursor/**'
+      - 'assets/**'
+      - '**/*.png'
+      - '**/*.jpg'
+      - '**/*.jpeg'
+      - '**/*.gif'
+      - '**/*.webp'
+      - '**/*.svg'
   workflow_dispatch:
+
+concurrency:
+  group: ci-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:

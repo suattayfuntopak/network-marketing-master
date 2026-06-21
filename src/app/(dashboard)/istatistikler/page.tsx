@@ -20,19 +20,14 @@ export default async function IstatistiklerPage() {
   })
 
   if (ws?.workspaceId) {
-    // Huni paketi ARTIK bloke etmiyor: StatsFieldFunnelSection kendi `isLoading`
-    // ızgarasını gösterir. Eskiden bu await, KPI kartları + aday istatistikleri
-    // (cache'te hazır) dahil TÜM sayfayı huni round-trip'i (~320ms) arkasında
-    // bekletiyordu. Artık sayfa anında çizilir, huni akarak gelir (saha-ozetim/
-    // ekip modeliyle aynı). statsFunnelBundle localStorage'da kalıcı → tekrar
-    // ziyarette zaten anında dolu.
-    void queryClient.prefetchQuery({
+    // Huni verisi SSR'da hydrate edilir — istemci waterfall'ı yok, modül anında dolu gelir.
+    await queryClient.prefetchQuery({
       queryKey: queryKeys.statsFunnelBundle('30d'),
       queryFn: () => getStatsFunnelBundleAction('30d'),
       staleTime: QUERY_STALE.funnelBundle,
     })
 
-    void Promise.all([
+    await Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.candidates(ws.workspaceId),
         queryFn: () => fetchCandidatesAction(ws.workspaceId),

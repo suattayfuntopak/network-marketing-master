@@ -5,6 +5,7 @@ import { EkipPageContent } from './_components/EkipPageContent'
 import { getQueryClient } from '@/lib/query/getQueryClient'
 import { fetchWorkspaceAction } from '@/app/(dashboard)/actions/workspace'
 import { fetchTeamBundleAction } from '@/app/(dashboard)/actions/team'
+import { getTeamGenerationTreeAction } from './treeActions'
 import {
   prefetchEkipRankingMetrics,
   prefetchEkipTrainingMetrics,
@@ -39,13 +40,20 @@ export default async function EkipPage() {
   })
 
   if (ws?.workspaceId) {
-    void queryClient.prefetchQuery({
-      queryKey: queryKeys.team(ws.workspaceId),
-      queryFn: () => fetchTeamBundleAction(ws.workspaceId),
-      staleTime: QUERY_STALE.data,
-    })
-    void prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws)
-    void prefetchEkipTrainingMetrics(queryClient, ws.workspaceId, ws)
+    await Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.team(ws.workspaceId),
+        queryFn: () => fetchTeamBundleAction(ws.workspaceId),
+        staleTime: QUERY_STALE.data,
+      }),
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.teamGenerationTree(ws.workspaceId),
+        queryFn: () => getTeamGenerationTreeAction(ws.workspaceId),
+        staleTime: QUERY_STALE.metrics,
+      }),
+      prefetchEkipRankingMetrics(queryClient, ws.workspaceId, ws),
+      prefetchEkipTrainingMetrics(queryClient, ws.workspaceId, ws),
+    ])
   }
 
   return (

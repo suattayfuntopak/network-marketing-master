@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Send, FileText, Users, CheckSquare, Square, Plus } from 'lucide-react'
+import { Send, FileText, Users, CheckSquare, Square, Plus, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import type { MemberRow } from '@/lib/team/types'
@@ -20,6 +20,7 @@ interface BroadcastPanelProps {
 export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
   const { data: ws } = useWorkspace()
   const { data: materials = [] } = usePresentationMaterials(ws?.workspaceId)
+  const [expanded, setExpanded] = useState(false)
   const [broadcastLink, setBroadcastLink] = useState('')
   const [broadcastNote, setBroadcastNote] = useState('')
   const [broadcastTarget, setBroadcastTarget] = useState<'grup' | 'tekli'>('grup')
@@ -65,8 +66,13 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
   return (
     <section>
       <div className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]">
-        {/* Üst başlık bantı */}
-        <div className="flex items-start gap-3 border-b border-[var(--border)] bg-gradient-to-r from-brand/8 to-whatsapp/8 p-4">
+        {/* Üst başlık bantı — varsayılan kapalı; chevron ile açılır */}
+        <button
+          type="button"
+          onClick={() => setExpanded(v => !v)}
+          aria-expanded={expanded}
+          className="flex w-full items-start gap-3 border-b border-[var(--border)] bg-gradient-to-r from-brand/8 to-whatsapp/8 p-4 text-left transition hover:from-brand/12 hover:to-whatsapp/12"
+        >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand/10 text-brand dark:bg-brand/20">
             <Send className="h-5 w-5" />
           </div>
@@ -74,8 +80,13 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
             <p className="text-base font-bold text-[var(--text-1)]">{t('team.broadcastTitle')}</p>
             <p className="mt-0.5 text-xs leading-relaxed text-[var(--text-2)]">{t('team.broadcastSubtitle')}</p>
           </div>
-        </div>
+          <ChevronDown
+            className={`mt-1 h-5 w-5 shrink-0 text-[var(--text-3)] transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
+        </button>
 
+        {expanded && (
         <div className="space-y-5 p-4">
           {/* Kayıtlı materyaller — tek tıkla seç (Sunum Materyalleri'nden) */}
           {materials.length > 0 && (
@@ -252,6 +263,7 @@ export function BroadcastPanel({ members, t }: BroadcastPanelProps) {
             )}
           </div>
         </div>
+        )}
       </div>
     </section>
   )

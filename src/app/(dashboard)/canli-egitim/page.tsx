@@ -15,7 +15,7 @@ export default async function CanliEgitimPage() {
   })
 
   if (ws?.workspaceId) {
-    void Promise.all([
+    await Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.videoCatalog(ws.workspaceId),
         queryFn: () => getVideoCatalogAction(ws.workspaceId),

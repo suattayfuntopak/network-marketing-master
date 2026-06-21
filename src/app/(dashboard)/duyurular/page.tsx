@@ -6,7 +6,7 @@ import { DuyurularContent } from './_components/DuyurularContent'
 
 export default async function DuyurularPage() {
   const queryClient = getQueryClient()
-  void queryClient.prefetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: queryKeys.teamAnnouncements(),
     queryFn: getTeamAnnouncementsAction,
     staleTime: 60_000,

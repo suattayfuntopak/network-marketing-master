@@ -11,16 +11,16 @@ export const LANDING_PRIMARY_CTA_SHADOW =
 export const LANDING_PRIMARY_CTA_HOVER =
   'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20 dark:hover:shadow-pink-500/25'
 
-/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; dark: Takvim teal (okunabilirlik için biraz koyu). */
+/** Basic plan — «14 Günlük ÜCRETSİZ Denemeyi Başlat»; light/dark aynı yeşil-teal gradyan. */
 export const LANDING_BASIC_TRIAL_CTA =
-  'border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 dark:border-transparent dark:bg-gradient-to-br dark:from-[#6AB86E] dark:to-[#00796B] dark:text-white dark:shadow-md dark:hover:opacity-95'
+  'border-transparent bg-gradient-to-br from-[#6AB86E] to-[#00796B] text-white shadow-md hover:opacity-95'
 
-/** Plus plan CTA — light: brand (değişmez); dark: pano Vaktin Varsa blue crown. */
+/** Plus plan CTA — light/dark aynı mavi gradyan (pano Vaktin Varsa crown). */
 export const LANDING_PLUS_CTA =
-  'bg-gradient-to-r from-brand to-brand-accent text-white dark:border-transparent dark:bg-gradient-to-br dark:from-[#448AFF] dark:to-[#2962FF] dark:hover:brightness-105 dark:shadow-md'
+  'border-transparent bg-gradient-to-br from-[#448AFF] to-[#2962FF] text-white shadow-md hover:brightness-105'
 
 export const LANDING_PLUS_CTA_HOVER =
-  'hover:opacity-95 hover:shadow-lg hover:shadow-indigo-500/20'
+  'hover:shadow-lg hover:shadow-blue-500/20'
 
 /** Pro plan — «Zirveye Ulaş»; light: pembe (değişmez); dark: Aylık Ödeme pembe gradyan. */
 export const LANDING_PRO_CTA =

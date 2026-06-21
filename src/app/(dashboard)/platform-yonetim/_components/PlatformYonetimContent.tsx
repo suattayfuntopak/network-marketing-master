@@ -393,14 +393,14 @@ export function PlatformYonetimContent() {
       {navConfirm === 'payment' && (
         <ConfirmDialog
           message={t('platformPage.confirmGoPayment')}
-          onConfirm={() => { setNavConfirm(null); router.push('/odeme') }}
+          onConfirm={() => { window.location.assign('/odeme') }}
           onCancel={() => setNavConfirm(null)}
         />
       )}
       {navConfirm === 'landing' && (
         <ConfirmDialog
           message={t('platformPage.confirmGoLanding')}
-          onConfirm={() => { setNavConfirm(null); router.push('/acilis') }}
+          onConfirm={() => { window.location.assign('/acilis') }}
           onCancel={() => setNavConfirm(null)}
         />
       )}

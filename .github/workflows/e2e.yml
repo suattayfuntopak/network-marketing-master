@@ -1,17 +1,32 @@
 name: E2E (Playwright)
 
-# ADVISORY — deploy'u bloklamaz (CI Gate ayrı). Maliyet: main push'ta KOŞMAZ.
-# Tetikleyiciler: PR, haftalık schedule (Pazartesi 06:00 İstanbul), workflow_dispatch.
+# ADVISORY — deploy'u bloklamaz (CI Gate ayrı).
+# Maliyet: PR'da KOŞMAZ (en pahalı job). Tetikleyiciler:
+#   • main push (uygulama kodu değiştiyse)
+#   • haftalık schedule (Pazartesi 06:00 İstanbul)
+#   • workflow_dispatch (elle)
 on:
-  pull_request:
-    paths-ignore:
-      - '**.md'
-      - 'docs/**'
-      - 'hot.md'
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'e2e/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'next.config.ts'
+      - 'playwright.config.ts'
+      - 'tailwind.config.ts'
+      - 'postcss.config.mjs'
+      - 'tsconfig.json'
   schedule:
     # Pazartesi 06:00 Europe/Istanbul (UTC+3) ≈ 03:00 UTC
     - cron: '0 3 * * 1'
   workflow_dispatch:
+
+concurrency:
+  group: e2e-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   CI: true
@@ -127,6 +142,8 @@ jobs:
   playwright-mobile:
     name: E2E (mobile-chrome)
     needs: build
+    # Haftalık cron'da yalnızca chromium (maliyet); mobile push/dispatch'ta.
+    if: github.event_name != 'schedule'
     # Advisory: mobile flake prod deploy'u bloklamaz (deploy.yml chromium doğrular).
     continue-on-error: true
     runs-on: ubuntu-latest

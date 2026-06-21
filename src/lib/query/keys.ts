@@ -68,6 +68,7 @@ export const queryKeys = {
     ['team-ranking-metrics-batch', workspaceId, [...memberIds].sort().join(',')] as const,
   teamProgressMap: (workspaceId: string, memberIds: string[]) =>
     ['team-progress-map', workspaceId, [...memberIds].sort().join(',')] as const,
+  teamGenerationTree: (workspaceId: string) => ['team-generation-tree', workspaceId] as const,
   /** İstatistikler saha huni bundle — dönem bazlı */
   statsFunnelBundle: (period: string) => [queryKeyRoots.statsFunnelBundle, period] as const,
   /** Ekip aktivite sheet detay sorgusu */

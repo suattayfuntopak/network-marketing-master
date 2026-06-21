@@ -6,7 +6,7 @@ import { MusterilerContent } from './_components/MusterilerContent'
 
 export default async function MusterilerPage() {
   const queryClient = getQueryClient()
-  void queryClient.prefetchQuery({
+  await queryClient.prefetchQuery({
     queryKey: queryKeys.customers(),
     queryFn: getCustomersAction,
     staleTime: 60_000,

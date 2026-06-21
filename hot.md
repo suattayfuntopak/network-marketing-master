@@ -1,5 +1,21 @@
 # Hot Log
 
+## 2026-06-21 — UX düzeltmeleri + sayfa hızlandırma + Actions maliyet ✅
+
+**Popup'lar:** İçerik/itiraz ekleme modal alt açıklamaları kaldırıldı. Düzenle modunda sağ alt buton **Kaydet** (`common.save`); yeni eklemede **+ Ekle** (video modal ile aynı model).
+
+**Landing plan CTA:** Basic (yeşil-teal) ve Plus (mavi) butonları light temada da dark ile aynı gradyan; Pro pembe zaten tutarlıydı.
+
+**Süper Admin:** Ödeme/Açılış onayı sonrası `router.push` + `useHistoryBackClose` cleanup çakışması giderildi → `window.location.assign`.
+
+**SSR prefetch (kalıcı hız):** `canli-egitim`, `duyurular`, `musteriler`, `ekip` (+ ekip ağacı), `istatistikler` huni — kritik sorgular `await` ile hydrate; istemci waterfall kalktı.
+
+**Ekibim:** Ekibe Gönder modülü varsayılan kapalı, chevron ile açılır.
+
+**GitHub Actions maliyet:** E2E PR'dan çıkarıldı (main push + Pazartesi cron + elle); `lint-pr.yml` silindi; CI Gate concurrency + geniş paths-ignore; haftalık cron'da mobile E2E atlanır. `docs/deploy/github-secrets.md` maliyet bölümü.
+
+**Dosyalar:** AddTrainingModal, AddObjectionModal, constants.ts, PlatformYonetimContent, BroadcastPanel, 5× page.tsx, query keys, training i18n, e2e/unit-test workflows, github-secrets.md.
+
 ## 2026-06-21 — Plan kutuları profesyonel yeniden yazım + kendiliğinden geçiş dedektörü ✅
 
 **Plan kutuları (kapılar AYNEN korundu):** Landing fiyat kartları kimlik + çıktı odaklı yeniden yazıldı. Tag'ler kimliğe döndü (Bireysel Kurucu / Ekip Lideri / Organizasyon Lideri); desc'ler "kimin için + ne kazandırır" kahraman sözüne döndü; YZ kotası her kartta **en son maddeye** indi (görsel sıra bileşende; i18n içeriği testli pozisyonda kaldı → sync testi yeşil). **Kısaltma temizliği:** "DDBR" → "Doğru Başlangıç", "YZ (vd)" → "Yapay Zeka ... üretimi" (landing + ödeme). Matris+landing+ödeme senkron; `plan-copy:check` 9/9, 378 test yeşil. Gerçek erişim kapıları (aiUsage/featureAccess/teamAccess/teamLimits) değişmedi — denetimde zaten %100 uyumluydu.
