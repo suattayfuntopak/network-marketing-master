@@ -1,5 +1,15 @@
 # Hot Log
 
+## 2026-06-21 — Mobil "Diğer" menü navigasyon yarışı + İstatistikler başlık taşması ✅
+
+**BottomNav "Diğer" çekmecesi:** Üç noktaya basıp açılan çekmecede herhangi bir ikona basınca sayfa açılmıyordu. Kök sebep: `onClick={() => { setMoreOpen(false); navigate(href) }}` — `setMoreOpen(false)` ile tetiklenen `useHistoryBackClose` cleanup'ı, `router.push`'un history'ye yeni state push'lamasıyla yarışıp `window.history.back()` çağırarak navigasyonu geri alıyordu (Süper Admin Ödeme/Açılış akışında aynı sınıf bug zaten `window.location.assign` ile çözülmüştü — bkz. üstteki giriş). Çözüm: manuel `setMoreOpen(false)` kaldırıldı; çekmece artık yalnız pathname gerçekten değiştiğinde (mevcut güvenlik-ağı `useEffect`) kapanıyor — yarış tamamen ortadan kalktı.
+
+**İstatistikler sayfa başlığı:** Mobilde başlık ("İstatistikler") ile yanındaki (?) yardım butonu + dönem sekmeleri (1/7/30/365/∞) üst üste biniyordu. Kök sebep: `min-w-0` ile küçülen başlık kutusu, kırılmaz tek kelime "İstatistikler"i sığdıramayınca metin kutudan taşıp sağdaki aksiyonların üzerine biniyordu — üstüne `statsPage.subtitle` 4 satıra sarıp başlığı daha da sıkıştırıyordu. Çözüm: (1) subtitle tamamen kaldırıldı (`statsPage.subtitle` TR/EN), (2) `PulsePeriodTabs`'ın `comfortableTypography` modu mobilde kompakt punto/boşluk (`sm:` üstünde eski büyük boy korunuyor), (3) `DashboardPageHeader`'da ikon kutusu ve boşluklar mobilde bir tık daraltıldı (`sm:` üstünde değişmedi) — başlık artık tek satırda, çakışmadan sığıyor. Headless Chromium ile piksel-seviyesinde doğrulandı.
+
+**Dosyalar:** `BottomNav.tsx`, `IstatistiklerContent.tsx`, `PulsePeriodTabs.tsx`, `DashboardPageHeader.tsx`, `translations/sections/stats.ts`. typecheck/lint/test (378)/i18n ✅.
+
+---
+
 ## 2026-06-21 — UX düzeltmeleri + sayfa hızlandırma + Actions maliyet ✅
 
 **Popup'lar:** İçerik/itiraz ekleme modal alt açıklamaları kaldırıldı. Düzenle modunda sağ alt buton **Kaydet** (`common.save`); yeni eklemede **+ Ekle** (video modal ile aynı model).
