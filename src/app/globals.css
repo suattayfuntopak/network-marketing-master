@@ -400,6 +400,32 @@ body {
   }
 }
 
+/* Blog kategori çipi — nazik "nefes" çekim animasyonu (amber→rose glow) */
+@keyframes blog-chip-breathe {
+  0%, 100% {
+    box-shadow:
+      0 0 0 0 rgba(251, 146, 60, 0),
+      0 2px 10px rgba(244, 63, 94, 0.28);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px rgba(251, 146, 60, 0.18),
+      0 5px 18px rgba(244, 63, 94, 0.45);
+    transform: scale(1.035);
+  }
+}
+
+.blog-chip-breathe {
+  animation: blog-chip-breathe 2.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .blog-chip-breathe {
+    animation: none;
+  }
+}
+
 @keyframes stroke-countdown {
   from { stroke-dashoffset: 0; }
   to   { stroke-dashoffset: 88; }

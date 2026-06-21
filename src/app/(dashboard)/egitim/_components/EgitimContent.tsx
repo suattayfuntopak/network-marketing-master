@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { BookOpen, Search, X, Plus, Star, CheckCircle2, Film } from 'lucide-react'
+import { BookOpen, Search, X, Plus, Star, CheckCircle2, Film, Newspaper } from 'lucide-react'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useSearchParams } from 'next/navigation'
@@ -158,11 +158,13 @@ export function EgitimContent({
   }, [ALL_TOPICS, customTrainings])
 
   const KATEGORILER = useMemo(() => {
-    const base = lang === 'en'
-      ? ['All', 'Favorites']
-      : ['Tümü', 'Favoriler']
+    const all = lang === 'en' ? 'All' : 'Tümü'
+    const fav = lang === 'en' ? 'Favorites' : 'Favoriler'
     const unique = Array.from(new Set(allTopicsMerged.map(c => c.kategoriBaslik)))
-    return [...base, ...unique]
+    // Blog çipi Tümü'nün hemen sağında, Favoriler'den önce; geri kalan kategoriler sonra.
+    const blog = unique.filter(k => k === 'Blog')
+    const rest = unique.filter(k => k !== 'Blog')
+    return [all, ...blog, fav, ...rest]
   }, [lang, allTopicsMerged])
 
   const filtrelenmis = useMemo(() => {
@@ -381,26 +383,36 @@ export function EgitimContent({
         )}
       </div>
 
-      <HorizontalScrollLock className="mb-5 flex gap-2 pb-1 scrollbar-hide">
-        {KATEGORILER.map((k, idx) => (
-          <button
-            key={k}
-            onClick={() => setAktifKategori(idx)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
-              aktifKategori === idx
-                ? 'bg-[#3730A3] text-white dark:bg-[#2962FF] dark:text-white'
-                : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#2962FF]'
-            }`}
-          >
-            {(k === 'Favoriler' || k === 'Favorites') && <Star className="h-3 w-3" />}
-            {k}
-            {(k === 'Favoriler' || k === 'Favorites') && favCount > 0 && (
-              <span className={`rounded-full px-1.5 text-[9px] font-bold ${aktifKategori === idx ? 'bg-white/20' : 'bg-[#3730A3]/10 text-[#3730A3] dark:bg-[#2962FF]/10 dark:text-[#448AFF]'}`}>
-                {favCount}
-              </span>
-            )}
-          </button>
-        ))}
+      <HorizontalScrollLock className="mb-5 flex gap-2 px-0.5 pb-1.5 pt-0.5 scrollbar-hide">
+        {KATEGORILER.map((k, idx) => {
+          const active = aktifKategori === idx
+          const isBlog = k === 'Blog'
+          const isFavChip = k === 'Favoriler' || k === 'Favorites'
+          return (
+            <button
+              key={k}
+              onClick={() => setAktifKategori(idx)}
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-semibold transition-all flex items-center gap-1.5 ${
+                isBlog
+                  ? `border-0 bg-gradient-to-r from-amber-500 to-rose-500 text-white shadow-sm blog-chip-breathe ${
+                      active ? 'ring-2 ring-rose-300 ring-offset-1 ring-offset-[var(--bg)] dark:ring-rose-500/60' : ''
+                    }`
+                  : active
+                  ? 'bg-[#3730A3] text-white dark:bg-[#2962FF] dark:text-white'
+                  : 'bg-[var(--bg-card)] border border-[var(--border)] text-[var(--text-2)] hover:border-[#3730A3] dark:hover:border-[#2962FF]'
+              }`}
+            >
+              {isBlog && <Newspaper className="h-3.5 w-3.5" />}
+              {isFavChip && <Star className="h-3 w-3" />}
+              {k}
+              {isFavChip && favCount > 0 && (
+                <span className={`rounded-full px-1.5 text-[9px] font-bold ${active ? 'bg-white/20' : 'bg-[#3730A3]/10 text-[#3730A3] dark:bg-[#2962FF]/10 dark:text-[#448AFF]'}`}>
+                  {favCount}
+                </span>
+              )}
+            </button>
+          )
+        })}
       </HorizontalScrollLock>
 
       {/* Seviye filtresi — kategoriden ayrı, ikincil bir satır ("Seviye" etiketi gizli) */}

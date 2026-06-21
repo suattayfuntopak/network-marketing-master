@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-21 — Blog çipi vurgusu + geri-tuşu UX + çift deploy fix ✅
+
+**Çip sırası & vurgu:** Blog çipi artık "Tümü"nün hemen sağında (Favoriler'den önce). Amber→rose gradient + Newspaper ikonu + `blog-chip-breathe` nazik nefes animasyonu (globals.css, `prefers-reduced-motion` guard'lı). Hem dark hem light'ta belirgin.
+
+**Geri-tuşu UX (asıl bug):** Blog yazısını okurken tarayıcı/mobil "geri" → sayfadan çıkıp pat diye `/pano`'ya atlıyordu. Yeni yeniden-kullanılabilir `useHistoryBackClose(open, onClose)` hook'u: overlay açılınca URL'i değiştirmeden history girdisi push'lar, geri → önce overlay'i kapatır; X/ESC ile kapanışta fazla girdiyi temizler. ArticleReader'a bağlandı. Diğer overlay'lere de uygulanabilir.
+
+**Vercel çift deploy:** Her main push'ta 2 Production deploy oluyordu — Vercel Git auto-deploy + CI-gate'li deploy hook ikisi de açıktı. `vercel.json`'a `git.deploymentEnabled.main=false` eklendi → yalnız CI-gate'li hook deploy eder (lint/build geçmeyen commit prod'a gitmez). Deploy Hook bu ayardan etkilenmez.
+
+**Dosyalar:** `EgitimContent.tsx`, `globals.css`, **yeni** `hooks/useHistoryBackClose.ts`, `ArticleReader.tsx`, `vercel.json`. typecheck/lint ✅.
+
+---
+
 ## 2026-06-21 — Vaktin Varsa: uzun-form "Blog" makaleleri ✅
 
 Eğitim sekmesine yeni içerik biçimi: madde-madde "konu" + uzun-form "makale". Sıfırdan blog motoru değil, mevcut Eğitim altyapısının (liste/arama/filtre/favori/okundu/ilerleme/paylaşım) genişletmesi.

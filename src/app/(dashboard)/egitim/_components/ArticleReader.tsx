@@ -5,6 +5,7 @@ import { Check, CheckCircle2, Circle, Clock, Copy, Star, X } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { Z } from '@/lib/ui/zIndex'
 import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
+import { useHistoryBackClose } from '@/hooks/useHistoryBackClose'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { SEVIYE_RENK } from '../constants'
 import type { TrainingTopic } from '../types'
@@ -112,6 +113,8 @@ export function ArticleReader({ konu, isFav, isRead, onClose, onToggleFav, onTog
   const [copied, setCopied] = useState(false)
 
   useBodyScrollLock(true)
+  // Tarayıcı "geri" / mobil geri jesti → sayfadan çıkma, önce okuma görünümünü kapat.
+  useHistoryBackClose(true, onClose)
 
   const baslik = lang === 'en' && konu.baslikEn ? konu.baslikEn : konu.baslik
   const ozet = lang === 'en' && konu.ozetEn ? konu.ozetEn : konu.ozet
