@@ -1177,6 +1177,317 @@ Bazen firma harikadır ama seni davet eden ekip toksiktir; bazen tam tersi. Birl
 
 Son olarak kendine sor: Bu ürünü ve bu şirketi, bir kuruş kazanmasam bile beş yıl boyunca gururla anlatabilir miyim? Cevabın "evet" ise, doğru zemindesin. Çünkü bu iş bir sprint değil; üzerinde uzun süre durabileceğin sağlam bir zemin gerektirir.`,
       },
+      {
+        id: 'blog-dinleme-sanati',
+        baslik: 'Dinleme Sanatı: Konuşmadan İkna Etmek',
+        emoji: '🎧',
+        sure: '6 dk okuma',
+        seviye: 'Orta',
+        ozet: 'En iyi networker en çok konuşan değil, en iyi dinleyendir. İnsanlar anlaşıldıklarını hissettiklerinde ikna olur.',
+        format: 'article',
+        maddeler: [
+          'İnsanlar bilgiden çok anlaşılmaktan etkilenir.',
+          'Çözümünü sunmadan önce gerçek ihtiyacı keşfet.',
+          'Açık uçlu sorular sohbeti derinleştirir.',
+          'Sessizlikten korkma; en değerli cevaplar orada gizli.',
+        ],
+        govde: `Network marketing'te en yaygın hata çok konuşmaktır. Heyecanlı yeni başlayan, ürünün ve fırsatın her detayını anlatma telaşına düşer. Oysa ikna anlatmakla değil, anlamakla başlar.
+
+## İnsanlar anlaşılmak ister
+Karşındaki kişi sunumunun ne kadar parlak olduğunu umursamaz; kendi sorununun çözülüp çözülmeyeceğini merak eder. Önce onu dinlersen ne istediğini öğrenir, çözümü tam ona göre sunarsın. Dinlemek en güçlü ikna aracıdır, çünkü insan anlaşıldığını hissettiği kişiye güvenir.
+
+## Sormayı öğren
+- "Şu an hayatında değiştirmek istediğin bir şey var mı?"
+- "Bunu neden önemsiyorsun?"
+- "Bu sorun çözülse senin için ne değişirdi?"
+
+Açık uçlu sorular kişinin gerçek motivasyonunu yüzeye çıkarır. Cevabı dikkatle dinle; bir sonraki soruyu onun sözlerinin içinden çıkar.
+
+## Boşluktan korkma
+Çoğu kişi sessizlikten rahatsız olur ve araya hemen girer. Oysa sessizlik karşındakine düşünme alanı verir. Bir soru sorduktan sonra sus; en içten cevaplar o sessizliğin içinden gelir.
+
+> İnsanlar ne söylediğini unutur ama onları nasıl hissettirdiğini asla unutmaz.
+
+## Dinlemek bir disiplindir
+Dinlerken cevabını kurma, gerçekten anla. Sonra geri yansıt: "Doğru anladıysam seni en çok şu zorluyor…" Bu küçük teyit, karşındakine "bu kişi beni gerçekten dinledi" dedirtir. Satış çoğu zaman tam o anda başlar.`,
+      },
+      {
+        id: 'blog-takip-sistemi',
+        baslik: 'Takip Sistemi: Servet Takipte Gizli',
+        emoji: '📌',
+        sure: '6 dk okuma',
+        seviye: 'Temel',
+        ozet: 'Satışların çoğu ilk görüşmede değil, sonraki temaslarda kapanır. Çoğu kişi tam da o noktada takibi bırakır.',
+        format: 'article',
+        maddeler: [
+          'Çoğu "hayır" aslında "şu an değil" demektir.',
+          'Takip etmemek, ekilen tohumu sulamamaktır.',
+          'Her temasın bir sonraki adımı net olmalı.',
+          'Sistem hafızana değil, yazılı bir akışa dayanmalı.',
+        ],
+        govde: `Sektörde bir söz vardır: "Servet takipte gizlidir." Çünkü insanların büyük kısmı ilk görüşmede karar vermez. İlk "hayır" çoğu zaman bir ret değil, "henüz hazır değilim" anlamına gelir. Takip etmeyen kişi, ektiği tohumu sulamadan tarlayı terk etmiş gibidir.
+
+## Neden takip edilmez?
+İki sebep: korku ve düzensizlik. Kişi "rahatsız mı ederim" diye çekinir ya da kimi, ne zaman arayacağını unutur. İkisi de çözülebilir. Takip rahatsız etmek değil, değer hatırlatmaktır; yeter ki baskı değil ilgi taşısın.
+
+## Her temasın bir sonraki adımı olsun
+Bir görüşme "düşüneyim" ile bitiyorsa, takvime somut bir tarih koy: "O zaman cuma günü kısaca yazayım, olur mu?" Belirsiz "ben sizi ararım" yerine net bir randevu, takibi tahminden çıkarıp sisteme bağlar.
+
+- İlk temas: tanış, dinle, tohum at.
+- 2-3 gün sonra: küçük bir değer (içerik, cevap) ile hatırlat.
+- Hazır olduğunda: net davet.
+
+> Bir "hayır", sürecin sonu değil; doğru zamanlamayı bekleyen bir "henüz değil" olabilir.
+
+## Hafızana değil, sisteme güven
+Kimi ne zaman arayacağını aklında tutmaya çalışmak ölçeklenmez. Basit bir liste, hatırlatma ya da uygulamandaki takip aracı — yazılı her şey sen unutsan da çalışır. Disiplinli takip, yeteneğin önüne geçer.`,
+      },
+      {
+        id: 'blog-sosyal-medya',
+        baslik: 'Sosyal Medyada Çekim: İtmeden Mıknatıs Olmak',
+        emoji: '🧲',
+        sure: '7 dk okuma',
+        seviye: 'Orta',
+        ozet: 'İnsanlara ürün dayatan profiller görmezden gelinir. Değer paylaşan, merak uyandıran profillere ise insanlar kendileri gelir.',
+        format: 'article',
+        maddeler: [
+          'Spam iter; değer çeker.',
+          'Ürünü değil, dönüşümü ve yaşam tarzını göster.',
+          'Tutarlılık, viral tek paylaşımdan güçlüdür.',
+          'Mesaj kutusu satış değil, ilişki kurma yeridir.',
+        ],
+        govde: `Sosyal medyada iki tür networker vardır: itenler ve çekenler. İtenler her gönderide ürün linki paylaşır, herkese kopyala-yapıştır mesaj atar ve hızla görmezden gelinir. Çekenler ise insanların kendilerine geldiği bir alan kurar.
+
+## Çekim pazarlamasının özü
+İnsanlar reklamdan kaçar ama hikâyeye, faydaya ve samimiyete yaklaşır. Ürünün özelliklerini değil, getirdiği dönüşümü göster: nasıl hissettirdiğini, hayatında ne değiştirdiğini. İnsanlar matkabı değil, duvardaki deliği satın alır.
+
+## Ne paylaşmalı?
+- **Değer:** Takipçinin işine yarayan küçük ipuçları.
+- **Hikâye:** Kendi yolculuğun, zorlukların ve küçük zaferlerin.
+- **Sosyal kanıt:** Sonuçlar, dönüşümler (abartısız ve dürüst).
+- **Kişilik:** Sadece "iş" değil; arkasındaki insan.
+
+## Tutarlılık her şeyi yener
+Bir gün on paylaşım yapıp üç hafta kaybolmak işe yaramaz. Haftada birkaç düzenli, samimi paylaşım; viral olma hayalinden çok daha güçlüdür. İnsanlar zamanla tanıdık yüze güvenir.
+
+> Kimse satılmaktan hoşlanmaz, ama herkes ilham almayı ve ait olmayı sever.
+
+## Mesaj kutusu bir ilişki alanıdır
+Birisi etkileşime girince hemen link atma. Önce gerçek bir sohbet kur, ilgilen, dinle. Satış, güvenin doğal sonucudur. Mesaj kutusunu satış tezgâhı değil, tanışma masası gibi kullan.`,
+      },
+      {
+        id: 'blog-itiraz-yonetimi',
+        baslik: 'İtiraz Değil Soru: "Hayır"ı Anlamak',
+        emoji: '💬',
+        sure: '7 dk okuma',
+        seviye: 'İleri',
+        ozet: 'İtiraz bir kapı kapanması değil, çoğu zaman ilgi işaretidir. Doğru karşılandığında en güçlü satış anına dönüşür.',
+        format: 'article',
+        maddeler: [
+          'İtiraz, ilgisizliğin değil ilginin işaretidir.',
+          'Önce anla ve onayla, sonra cevap ver.',
+          'Çoğu itiraz: para, zaman, güven ya da korkudur.',
+          'Tartışma kazanılır ama kişi kaybedilir.',
+        ],
+        govde: `Yeni başlayanlar itirazdan korkar. Oysa deneyimli networker bilir ki itiraz, kapının kapanması değil, çoğu zaman aralanmasıdır. "Pahalı" diyen kişi aslında değeri merak ediyordur; "vaktim yok" diyen, ikna olursa vakit bulacağını söylüyordur.
+
+## Önce anla, sonra cevapla
+İtirazı duyar duymaz savunmaya geçme. Önce onayla: "Bunu anlıyorum, ben de başta aynısını düşünmüştüm." Bu cümle gerilimi düşürür ve karşındakini savunmadan çıkarır. İnsan, kendisiyle tartışılmadığını hissedince dinlemeye açılır.
+
+## İtirazın ardındaki gerçek
+Çoğu itiraz dört kökten gelir:
+- **Para:** "Değer, fiyattan büyük mü?" sorusunun cevabını arıyor.
+- **Zaman:** Öncelik sıralaması yapamıyor.
+- **Güven:** Sana, ürüne ya da şirkete henüz emin değil.
+- **Korku:** Başarısız olmaktan ya da ne düşünüleceğinden çekiniyor.
+
+Hangi kökten geldiğini anlamadan verilen cevap, yanlış soruya doğru yanıt olur.
+
+> Tartışmayı kazanabilirsin ama o anda müşteriyi kaybedersin.
+
+## Soruyla karşıla
+İtiraza itirazla değil, soruyla cevap ver: "Pahalı derken, neyle kıyaslıyorsun?" Bu, gerçek endişeyi yüzeye çıkarır ve kişinin kendi cevabını bulmasına yardım eder. İnsanlar senin söylediğine değil, kendi vardıkları sonuca ikna olur.`,
+      },
+      {
+        id: 'blog-hedef-belirleme',
+        baslik: 'Hedef Belirleme: Hayalden Takvime',
+        emoji: '🎯',
+        sure: '6 dk okuma',
+        seviye: 'Temel',
+        ozet: 'Hedefi olmayan çaba, pusulasız yürüyüştür. Büyük hayali küçük günlük aksiyonlara bölmek, onu ulaşılabilir kılar.',
+        format: 'article',
+        maddeler: [
+          'Hayal ilham verir, hedef yön verir, plan yürütür.',
+          'Büyük hedefi günlük aksiyona böl.',
+          'Sonucu değil, kontrol edebildiğin eylemi hedefle.',
+          'Yazılı hedef, akıldaki hedeften güçlüdür.',
+        ],
+        govde: `"Başarılı olmak istiyorum" bir hayaldir, hedef değil. Hayal ilham verir ama yön vermez. Hedef, hayali ölçülebilir ve tarihli hâle getirdiğinde başlar.
+
+## İyi hedefin üç özelliği
+Net, ölçülebilir ve tarihli. "Ekibimi büyüteceğim" yerine "bu ay 20 yeni kişiyle tanışıp 5'iyle sunum yapacağım." Böyle bir hedef, her sabah ne yapman gerektiğini sana kendisi söyler.
+
+## Sonucu değil eylemi hedefle
+Kaç kişinin "evet" diyeceğini kontrol edemezsin; ama kaç kişiyle konuşacağını kontrol edebilirsin. Bu yüzden hedefini eyleme bağla: "günde 5 temas." Sonuçlar bu eylemlerin doğal toplamı olarak gelir. Eyleme odaklanmak, hayal kırıklığını da azaltır.
+
+- Yıllık hayal → aylık hedef → haftalık plan → günlük aksiyon.
+- Her akşam: "Bugün beni hedefe yaklaştıran ne yaptım?"
+
+> Bir hedef, son tarihi olan hayaldir.
+
+## Yaz ve gözünün önünde tut
+Akıldaki hedef sislidir; yazılı hedef nettir. Yaz, görebileceğin bir yere koy ve haftalık gözden geçir. Ölçtüğün şey büyür. Hedefini takip ettiğin gün, ona doğru ilerlemeye başlarsın.`,
+      },
+      {
+        id: 'blog-zaman-yonetimi',
+        baslik: 'Zaman Yönetimi: Yoğun Olmak, Üretken Olmak Değildir',
+        emoji: '⏳',
+        sure: '6 dk okuma',
+        seviye: 'Orta',
+        ozet: 'Çoğu kişi gün boyu meşguldür ama işi büyütmez. Sırrı, gelir getiren aktivitelere öncelik vermekte.',
+        format: 'article',
+        maddeler: [
+          'Meşgul olmak ile üretken olmak farklıdır.',
+          'Gelir getiren aktiviteleri (temas, takip, sunum) koru.',
+          'Hazırlık önemlidir ama erteleme kılığına girebilir.',
+          'Günün ilk saatini en önemli işe ayır.',
+        ],
+        govde: `Birçok networker gününü doldurur ama işini büyütmez. Logoyla, grupları düzenlemekle, "araştırmayla" saatler geçer; akşam yorgun ama satış yok. Çünkü yoğunluk üretkenlik değildir.
+
+## Gelir getiren aktiviteler
+İşini sadece birkaç eylem büyütür: yeni insanlarla tanışmak, takip etmek, sunum yapmak, ekibini eğitmek. Geri kalan her şey destek işidir. Günün büyük kısmını destek işine harcayıp asıl eylemlere zaman bulamamak, en sık görülen tuzaktır.
+
+## Erteleme bazen "hazırlık" kılığına girer
+Mükemmel bir broşür tasarlamak, planı tekrar tekrar gözden geçirmek konforludur çünkü reddedilme riski yoktur. Ama bu, gerçek işten kaçıştır. Kaba ama gerçek bir temas, kusursuz ama hayalî bir hazırlıktan değerlidir.
+
+> Yoğunluk bir his, üretkenlik bir sonuçtur.
+
+## İlk saat kuralı
+Günün en taze enerjisini en çok korktuğun ve en çok kazandıran işe ayır: temas ve takip. O bittiğinde gün zaten kazanılmıştır. Önce kolay işleri yapıp zoru sona bırakırsan, zor iş genelde hiç yapılmaz.
+
+- Güne "bugünün 3 gelir aktivitesi" ile başla.
+- Bildirimleri kapat, bir blok zaman ayır.
+- Önce arar/yazarsın, sonra düzenlersin.`,
+      },
+      {
+        id: 'blog-liderlik-yetistirmek',
+        baslik: 'Liderlik: Yönetmek Değil, Yetiştirmek',
+        emoji: '🌱',
+        sure: '7 dk okuma',
+        seviye: 'İleri',
+        ozet: 'Ekip lideri patron değildir. Görevi emir vermek değil, insanları kendi ayakları üzerinde duracak liderlere dönüştürmektir.',
+        format: 'article',
+        maddeler: [
+          'Lider iş yapmaz, insanların iş yapmasını sağlar.',
+          'Örnek olmak, talimattan güçlüdür.',
+          'Kişinin "neden"ini bulmasına yardım et.',
+          'Başarıyı paylaş, sorumluluğu üstlen.',
+        ],
+        govde: `Network marketing'te terfi, daha iyi satıcı olmakla değil, daha iyi lider olmakla gelir. Ama çoğu kişi lider olunca patron gibi davranmaya başlar: emir verir, kontrol eder, hesap sorar. Oysa burada kimse senin çalışanın değil; herkes gönüllü.
+
+## Lider çoğaltır
+İyi liderin ölçüsü kendi satışı değil, yetiştirdiği liderlerin sayısıdır. Her şeyi sen yaparsan ekibin sana bağımlı kalır. Bilgini, sistemini ve güvenini aktardığında ise ekibin sen olmadan da büyür.
+
+## Örnek ol, sonra öğret
+İnsanlar söylediklerini değil, yaptıklarını taklit eder. Hâlâ sahada olan, hâlâ aday ekleyen bir lider, masa başından talimat veren liderden çok daha fazla ilham verir. Önce göster, sonra yanında yaptır, sonra bırak yapsın.
+
+> Gerçek lider, ekibinin ona ihtiyaç duymadan ilerleyebildiği liderdir.
+
+## Onların "neden"ini büyüt
+Bir kişiyi motive eden senin hedefin değil, kendi hedefidir. Ekip üyenin neden bu işte olduğunu keşfet ve zor günlerde ona o "neden"i hatırlat. Başarı geldiğinde sahneyi ona bırak; aksilik olduğunda sorumluluğu sen üstlen. İnsanlar böyle bir liderin peşinden gönüllü gider.`,
+      },
+      {
+        id: 'blog-davet-sanati',
+        baslik: 'Davet Sanatı: Baskı Yapmadan Çağırmak',
+        emoji: '✉️',
+        sure: '6 dk okuma',
+        seviye: 'Temel',
+        ozet: 'Davet, satışın kalbidir. Amaç ikna etmek değil, merak uyandırıp bir sonraki adıma çağırmaktır.',
+        format: 'article',
+        maddeler: [
+          'Davetin amacı satmak değil, merak uyandırmaktır.',
+          'Kısa tut; her şeyi davet anında anlatma.',
+          'Heyecanın baskıdan değil, samimiyetten gelsin.',
+          'Net bir sonraki adım sun (video, görüşme, etkinlik).',
+        ],
+        govde: `Davet, bu işin kalbidir; çünkü kimseyi davet etmezsen hiçbir şey başlamaz. Ama çoğu kişi davet ederken iki uca düşer: ya çekingenlikten hiç çağırmaz ya da baskıyla herkesi kaçırır. Doğru davet bu ikisinin ortasındadır.
+
+## Davetin amacı satmak değildir
+Davet anında ürünü, planı, her şeyi anlatmaya çalışma. Amacın tek şey: merak uyandırıp bir sonraki adıma (bir video, kısa bir görüşme, bir etkinlik) çağırmak. Ne kadar çok anlatırsan, "zaten biliyorum, ilgilenmiyorum" deme ihtimali o kadar artar.
+
+## Kısa ve net ol
+- "Senin tarzına uygun olabilecek bir şey buldum, 10 dakikalık bir video izler misin?"
+- "Cuma akşamı kısa bir tanıtım var, seni de düşündüm."
+
+Kısa davet güçlüdür çünkü kararı kolaylaştırır. Uzun, dağınık davet ise dinleyeni yorar.
+
+> İnsanlar bilgiye değil, heyecanına ve netliğine "evet" der.
+
+## Heyecan evet, baskı hayır
+Senin gerçek heyecanın en güçlü davetiyedir; ama "kaçırırsan pişman olursun" tarzı baskı, güveni zedeler. İnsanı kendi kararını verecek kadar özgür bırak. Reddedilirsen de ilişkiyi koru: bugünün "hayır"ı, yarının "evet"i olabilir.`,
+      },
+      {
+        id: 'blog-kisisel-marka',
+        baslik: 'Kişisel Marka: İnsanlar Önce Sana Güvenir',
+        emoji: '✨',
+        sure: '6 dk okuma',
+        seviye: 'Orta',
+        ozet: 'Aynı ürünü binlerce kişi satıyor. Fark, ürün değil sensin. İnsanlar önce sana güvenir, sonra ürününe.',
+        format: 'article',
+        maddeler: [
+          'Aynı üründe fark, güven veren kişidir.',
+          'Tutarlılık ve dürüstlük markanın temelidir.',
+          'Bildiğin bir konuda değer üreterek tanın.',
+          'İtibar yavaş kurulur, hızlı yıkılır — koru.',
+        ],
+        govde: `Senin sattığın ürünü muhtemelen binlerce kişi daha satıyor. Aynı katalog, aynı plan, aynı fiyat. Peki insan neden senden alsın? Cevap basit: çünkü sana güveniyor. Network marketing'te asıl fark ürün değil, sensin.
+
+## Marka = verdiğin güven
+Kişisel marka logo ya da slogan değildir; insanların adını duyunca aklına gelen histir. "Dürüst", "yardımsever", "işini bilen" mi; yoksa "sürekli bir şey satmaya çalışan" mı? Bu algıyı her etkileşimde sen inşa edersin.
+
+## Bir alanda değer üret
+Herkes her şeyi bilemez. Senin doğal olarak iyi olduğun, keyif aldığın bir alanı seç (sağlık, annelik, girişimcilik, disiplin…) ve orada tutarlı değer üret. Zamanla o konuda "akla gelen kişi" olursun; insanlar sana gelmeye başlar.
+
+> İnsanlar önce kişiyi satın alır, sonra ürünü.
+
+## İtibar yavaş kurulur, hızlı yıkılır
+Bir abartılı vaat, bir tutmadığın söz, yılların güvenini bir günde silebilir. Bu yüzden markanın en değerli sermayesi dürüstlüktür. Söz verdiğinde tut, bilmediğinde "bilmiyorum" de, satıştan önce ilişkiyi koru. Uzun vadede kazanan, en çok satan değil, en çok güvenilen olur.`,
+      },
+      {
+        id: 'blog-hikaye-paketleme',
+        baslik: 'Hikaye Paketleme: En Güçlü Satış Aracınızı Tasarlayın',
+        emoji: '📖',
+        sure: '8 dk okuma',
+        seviye: 'İleri',
+        ozet: 'İnsanlar verilerle ikna olmaz, hikâyelerle harekete geçer. Kendi dönüşüm hikâyeni doğru paketlemek en güçlü satış aracındır.',
+        format: 'article',
+        maddeler: [
+          'Veriler bilgilendirir; hikâyeler harekete geçirir.',
+          'İyi hikâye: önce/dönüm noktası/sonra yapısındadır.',
+          'Kahraman sen değil, dinleyenin kendisidir.',
+          'Hikâyeni sadeleştir ve tekrar tekrar anlatılabilir kıl.',
+        ],
+        govde: `İnsan beyni tablolarla değil, hikâyelerle düşünür. Bir liste rakamı unutulur ama iyi anlatılmış bir hikâye akılda kalır ve duyguyu harekete geçirir. Bu yüzden network marketing'te en güçlü satış aracın broşür değil, doğru paketlenmiş hikâyendir.
+
+## Neden hikâye işe yarar?
+Çünkü insanlar kendilerini hikâyenin içinde görür. "Bu ürün şu vitaminleri içerir" demek bilgi verir; "üç çocuklu, yorgun bir anneyken bu işle kendi zamanımı nasıl geri kazandığımı" anlatmak ise bağ kurar. Karar duyguyla verilir, sonra mantıkla haklı çıkarılır.
+
+## İyi hikâyenin yapısı
+Güçlü bir dönüşüm hikâyesi üç parçalıdır:
+- **Önce:** Eski hâlin — zorluk, sıkışmışlık, hayal kırıklığı. (Dinleyen burada kendini tanır.)
+- **Dönüm noktası:** Karşılaşma anı — neden başladın, ilk tereddüt, ilk kıvılcım.
+- **Sonra:** Değişen hayat — abartısız, somut, dürüst.
+
+Bu üçlü, dinleyene "demek ki benim için de mümkün" dedirtir.
+
+## Kahraman sen değilsin
+En sık yapılan hata, hikâyeyi bir kahramanlık destanına çevirmektir. Oysa asıl kahraman dinleyendir; sen sadece yolu önce yürümüş rehbersin. Hikâyeni öyle anlat ki, merkezde senin başarın değil, onun olasılığı olsun.
+
+> Gerçekler anlatılır, hikâyeler yaşatılır — ve insanlar yaşadıkları şeye "evet" der.
+
+## Paketle ve sadeleştir
+Hikâyen 60 saniyede de, 5 dakikada da anlatılabilecek kadar net olmalı. Gereksiz detayları at, duygusal dönüm noktasını koru. Sonra prova et: o kadar sade olsun ki, ekibin bile kendi versiyonunu kolayca anlatabilsin. Çünkü kopyalanabilen hikâye, ölçeklenen hikâyedir.`,
+      },
     ],
   },
 ]
@@ -2337,6 +2648,317 @@ Sometimes the company is great but the team that invited you is toxic; sometimes
 ## 7. The five-year test
 
 Finally, ask yourself: Could I proudly talk about this product and this company for five years, even if I never earned a penny? If your answer is "yes," you're on the right ground. Because this business is not a sprint; it requires solid ground you can stand on for a long time.`,
+      },
+      {
+        id: 'blog-dinleme-sanati',
+        baslik: 'The Art of Listening: Persuading Without Talking',
+        emoji: '🎧',
+        sure: '6 min read',
+        seviye: 'Medium',
+        ozet: 'The best networker is not the one who talks most, but the one who listens best. People are persuaded when they feel understood.',
+        format: 'article',
+        maddeler: [
+          'People are moved by being understood more than by information.',
+          'Discover the real need before presenting your solution.',
+          'Open-ended questions deepen the conversation.',
+          'Don’t fear silence; the most valuable answers hide there.',
+        ],
+        govde: `The most common mistake in network marketing is talking too much. The excited beginner rushes to explain every detail of the product and the opportunity. But persuasion begins not with explaining, but with understanding.
+
+## People want to be understood
+The person across from you doesn't care how brilliant your pitch is; they wonder whether their own problem will be solved. Listen first and you'll learn what they want, then present the solution made exactly for them. Listening is the most powerful persuasion tool, because people trust whoever makes them feel understood.
+
+## Learn to ask
+- "Is there something in your life you'd like to change right now?"
+- "Why does that matter to you?"
+- "If this were solved, what would change for you?"
+
+Open-ended questions surface a person's real motivation. Listen closely, and draw your next question from their own words.
+
+## Don’t fear the silence
+Most people get uncomfortable with silence and jump in. But silence gives the other person room to think. After you ask a question, stay quiet; the most honest answers come out of that silence.
+
+> People forget what you said, but they never forget how you made them feel.
+
+## Listening is a discipline
+Don't build your reply while listening—truly understand. Then reflect back: "If I understood right, the thing that challenges you most is…" That small confirmation makes the other person think, "this person really listened to me." The sale often begins right there.`,
+      },
+      {
+        id: 'blog-takip-sistemi',
+        baslik: 'Follow-Up: The Fortune Is in the Follow-Up',
+        emoji: '📌',
+        sure: '6 min read',
+        seviye: 'Basic',
+        ozet: 'Most sales close not on the first conversation but in later touches. And most people quit following up at exactly that point.',
+        format: 'article',
+        maddeler: [
+          'Most "no"s actually mean "not right now."',
+          'Not following up is planting a seed and never watering it.',
+          'Every touch should have a clear next step.',
+          'Rely on a written flow, not your memory.',
+        ],
+        govde: `There's a saying in this industry: "The fortune is in the follow-up." Because most people don't decide on the first conversation. A first "no" is often not a rejection but "I'm not ready yet." Someone who doesn't follow up is like a farmer who plants a seed and leaves the field without watering it.
+
+## Why people don’t follow up
+Two reasons: fear and disorganization. People worry, "what if I'm bothering them," or simply forget who to contact and when. Both are solvable. Follow-up isn't pestering; it's reminding of value—as long as it carries interest, not pressure.
+
+## Give every touch a next step
+If a conversation ends with "let me think about it," put a concrete date on the calendar: "I'll drop you a short message on Friday, okay?" A clear appointment instead of a vague "I'll call you" turns follow-up from guesswork into a system.
+
+- First touch: meet, listen, plant the seed.
+- 2-3 days later: remind with a small piece of value.
+- When they're ready: a clear invite.
+
+> A "no" may not be the end of the process—just a "not yet" waiting for the right timing.
+
+## Trust the system, not your memory
+Trying to remember who to call and when doesn't scale. A simple list, a reminder, or your app's follow-up tool—anything written works even when you forget. Disciplined follow-up beats raw talent.`,
+      },
+      {
+        id: 'blog-sosyal-medya',
+        baslik: 'Attraction on Social Media: Be a Magnet, Not a Pushcart',
+        emoji: '🧲',
+        sure: '7 min read',
+        seviye: 'Medium',
+        ozet: 'Profiles that push products are ignored. Profiles that share value and spark curiosity draw people in on their own.',
+        format: 'article',
+        maddeler: [
+          'Spam repels; value attracts.',
+          'Show the transformation and lifestyle, not the product.',
+          'Consistency beats a single viral post.',
+          'The inbox is for building relationships, not closing sales.',
+        ],
+        govde: `On social media there are two kinds of networkers: those who push and those who attract. The pushers drop a product link in every post, send copy-paste messages to everyone, and get ignored fast. The attractors build a space people come to on their own.
+
+## The essence of attraction marketing
+People flee ads but move toward stories, usefulness, and sincerity. Don't show the product's features—show the transformation it brings: how it feels, what it changed. People don't buy the drill; they buy the hole in the wall.
+
+## What to share
+- **Value:** Small tips that actually help your followers.
+- **Story:** Your own journey, struggles, and small wins.
+- **Social proof:** Results and transformations (honest, never exaggerated).
+- **Personality:** Not just "business"—the human behind it.
+
+## Consistency beats everything
+Posting ten times one day and disappearing for three weeks doesn't work. A few regular, genuine posts a week are far stronger than dreaming of going viral. Over time, people trust a familiar face.
+
+> Nobody likes being sold to, but everybody loves being inspired and feeling they belong.
+
+## The inbox is a relationship space
+When someone engages, don't fire off a link. Start a real conversation first—care, listen. The sale is the natural result of trust. Use the inbox like a table to get acquainted, not a sales counter.`,
+      },
+      {
+        id: 'blog-itiraz-yonetimi',
+        baslik: 'Not an Objection, a Question: Understanding "No"',
+        emoji: '💬',
+        sure: '7 min read',
+        seviye: 'Advanced',
+        ozet: 'An objection isn’t a door closing—it’s often a sign of interest. Handled right, it becomes the strongest moment of the sale.',
+        format: 'article',
+        maddeler: [
+          'An objection signals interest, not indifference.',
+          'Understand and acknowledge first, then answer.',
+          'Most objections are: money, time, trust, or fear.',
+          'You can win the argument and lose the person.',
+        ],
+        govde: `Beginners fear objections. But the experienced networker knows an objection isn't the door closing—it's often the door opening a crack. Someone who says "it's expensive" is actually curious about the value; "I have no time" means "if I'm convinced, I'll find the time."
+
+## Understand first, then answer
+Don't go on the defensive the moment you hear an objection. Acknowledge first: "I understand—I thought the same thing at the beginning." That sentence lowers tension and takes the other person out of defense mode. When people feel they aren't being argued with, they open up to listening.
+
+## The truth behind the objection
+Most objections come from four roots:
+- **Money:** Looking for the answer to "is the value bigger than the price?"
+- **Time:** Can't set the priority.
+- **Trust:** Not yet sure about you, the product, or the company.
+- **Fear:** Afraid of failing or of what others will think.
+
+An answer given without knowing the root is a right reply to the wrong question.
+
+> You may win the argument, but in that moment you lose the customer.
+
+## Meet it with a question
+Answer an objection not with a counter-objection but with a question: "When you say expensive, what are you comparing it to?" This surfaces the real concern and helps the person reach their own conclusion. People are convinced not by what you say, but by what they conclude themselves.`,
+      },
+      {
+        id: 'blog-hedef-belirleme',
+        baslik: 'Goal Setting: From Dream to Calendar',
+        emoji: '🎯',
+        sure: '6 min read',
+        seviye: 'Basic',
+        ozet: 'Effort without a goal is a walk without a compass. Breaking a big dream into small daily actions makes it reachable.',
+        format: 'article',
+        maddeler: [
+          'A dream inspires, a goal directs, a plan executes.',
+          'Break the big goal into daily action.',
+          'Target the action you control, not the outcome.',
+          'A written goal beats one kept in your head.',
+        ],
+        govde: `"I want to be successful" is a dream, not a goal. A dream inspires but gives no direction. A goal begins when you make the dream measurable and dated.
+
+## Three traits of a good goal
+Clear, measurable, dated. Instead of "I'll grow my team," try "this month I'll meet 20 new people and present to 5 of them." A goal like that tells you each morning exactly what to do.
+
+## Target the action, not the outcome
+You can't control how many people say "yes," but you can control how many you talk to. So tie your goal to action: "5 contacts a day." Results arrive as the natural sum of those actions. Focusing on action also reduces disappointment.
+
+- Yearly dream → monthly goal → weekly plan → daily action.
+- Every evening: "What did I do today that moved me toward the goal?"
+
+> A goal is a dream with a deadline.
+
+## Write it and keep it in sight
+A goal in your head is foggy; a written goal is clear. Write it, put it somewhere you'll see it, review it weekly. What you measure grows. The day you start tracking your goal is the day you start moving toward it.`,
+      },
+      {
+        id: 'blog-zaman-yonetimi',
+        baslik: 'Time Management: Being Busy Is Not Being Productive',
+        emoji: '⏳',
+        sure: '6 min read',
+        seviye: 'Medium',
+        ozet: 'Most people are busy all day but don’t grow the business. The secret is prioritizing income-producing activities.',
+        format: 'article',
+        maddeler: [
+          'Being busy and being productive are different.',
+          'Protect income-producing activity (contact, follow-up, present).',
+          'Preparation matters but can disguise procrastination.',
+          'Give the first hour of the day to the most important task.',
+        ],
+        govde: `Many networkers fill their day but don't grow their business. Hours go to logos, organizing groups, "research"; by evening they're tired but there's no sale. Because being busy is not being productive.
+
+## Income-producing activities
+Only a few actions grow your business: meeting new people, following up, presenting, training your team. Everything else is support work. Spending most of the day on support work and finding no time for the core actions is the most common trap.
+
+## Procrastination sometimes wears a "preparation" costume
+Designing the perfect brochure or reviewing the plan again and again feels comfortable because there's no risk of rejection. But it's an escape from the real work. A rough but real contact is worth more than a flawless but imaginary preparation.
+
+> Busyness is a feeling; productivity is a result.
+
+## The first-hour rule
+Give the day's freshest energy to the task you fear most and that earns most: contacting and following up. Once that's done, the day is already won. If you do the easy tasks first and leave the hard one for last, the hard one usually never gets done.
+
+- Start the day with "today's 3 income activities."
+- Turn off notifications, set a block of time.
+- You call/message first, then organize.`,
+      },
+      {
+        id: 'blog-liderlik-yetistirmek',
+        baslik: 'Leadership: Not Managing, but Growing People',
+        emoji: '🌱',
+        sure: '7 min read',
+        seviye: 'Advanced',
+        ozet: 'A team leader is not a boss. The job isn’t to give orders but to turn people into leaders who can stand on their own.',
+        format: 'article',
+        maddeler: [
+          'A leader doesn’t do the work; they enable others to do it.',
+          'Setting an example beats giving instructions.',
+          'Help each person find their own "why".',
+          'Share the credit, carry the responsibility.',
+        ],
+        govde: `In network marketing, promotion comes not from becoming a better salesperson but a better leader. Yet many start acting like a boss once they lead: ordering, controlling, demanding. But here no one is your employee; everyone is a volunteer.
+
+## A leader multiplies
+The measure of a good leader isn't their own sales but the number of leaders they grow. If you do everything yourself, your team stays dependent on you. When you pass on your knowledge, system, and confidence, your team grows even without you.
+
+## Model first, then teach
+People imitate what you do, not what you say. A leader still in the field, still adding prospects, inspires far more than one giving orders from a desk. Show first, then do it alongside them, then let them do it.
+
+> A true leader is one whose team can move forward without needing them.
+
+## Grow their "why"
+What motivates a person is not your goal but their own. Discover why your team member is in this business, and on hard days remind them of that "why." When success comes, give them the stage; when something goes wrong, carry the responsibility yourself. People follow a leader like that willingly.`,
+      },
+      {
+        id: 'blog-davet-sanati',
+        baslik: 'The Art of the Invite: Inviting Without Pressure',
+        emoji: '✉️',
+        sure: '6 min read',
+        seviye: 'Basic',
+        ozet: 'The invite is the heart of the sale. The goal isn’t to convince, but to spark curiosity and call to the next step.',
+        format: 'article',
+        maddeler: [
+          'The goal of the invite is to spark curiosity, not to sell.',
+          'Keep it short; don’t explain everything at the invite.',
+          'Let your excitement come from sincerity, not pressure.',
+          'Offer a clear next step (video, call, event).',
+        ],
+        govde: `The invite is the heart of this business, because nothing starts until you invite someone. Yet most people fall to one of two extremes: either shyness keeps them from inviting at all, or pressure scares everyone off. The right invite sits between the two.
+
+## The goal of an invite isn’t to sell
+Don't try to explain the product, the plan, everything at the moment of invitation. Your only goal: spark curiosity and call to a next step (a video, a short call, an event). The more you explain, the more likely you'll hear "I already know, not interested."
+
+## Be short and clear
+- "I found something that might fit your style—would you watch a 10-minute video?"
+- "There's a short intro Friday evening; I thought of you."
+
+A short invite is powerful because it makes the decision easy. A long, scattered invite tires the listener.
+
+> People say "yes" not to information, but to your excitement and clarity.
+
+## Excitement yes, pressure no
+Your genuine excitement is the most powerful invitation; but "you'll regret it if you miss this" pressure damages trust. Leave people free enough to make their own decision. If you're turned down, keep the relationship: today's "no" can be tomorrow's "yes."`,
+      },
+      {
+        id: 'blog-kisisel-marka',
+        baslik: 'Personal Brand: People Trust You First',
+        emoji: '✨',
+        sure: '6 min read',
+        seviye: 'Medium',
+        ozet: 'Thousands sell the same product. The difference isn’t the product—it’s you. People trust you first, then your product.',
+        format: 'article',
+        maddeler: [
+          'With the same product, the difference is the trusted person.',
+          'Consistency and honesty are the brand’s foundation.',
+          'Become known by creating value in one area you know.',
+          'Reputation is built slowly and destroyed fast—protect it.',
+        ],
+        govde: `Thousands of others probably sell the exact product you sell. Same catalog, same plan, same price. So why should someone buy from you? The answer is simple: because they trust you. In network marketing, the real difference isn't the product—it's you.
+
+## Brand = the trust you give
+A personal brand isn't a logo or a slogan; it's the feeling that comes to mind when people hear your name. "Honest," "helpful," "knows their craft"—or "always trying to sell something"? You build that perception in every interaction.
+
+## Create value in one area
+No one can know everything. Pick an area you're naturally good at and enjoy (health, parenting, entrepreneurship, discipline…) and create consistent value there. Over time you become the "person who comes to mind" on that topic; people start coming to you.
+
+> People buy the person first, then the product.
+
+## Reputation is built slowly, destroyed fast
+One exaggerated promise, one broken word, can erase years of trust in a day. That's why your brand's most valuable asset is honesty. Keep your word, say "I don't know" when you don't, protect the relationship before the sale. In the long run, the winner isn't the one who sells most, but the one who is trusted most.`,
+      },
+      {
+        id: 'blog-hikaye-paketleme',
+        baslik: 'Story Packaging: Design Your Most Powerful Sales Tool',
+        emoji: '📖',
+        sure: '8 min read',
+        seviye: 'Advanced',
+        ozet: 'People aren’t persuaded by data; they’re moved by stories. Packaging your own transformation story well is your strongest sales tool.',
+        format: 'article',
+        maddeler: [
+          'Data informs; stories move people to act.',
+          'A good story has a before / turning point / after structure.',
+          'The hero is not you—it’s the listener.',
+          'Simplify your story so it can be retold again and again.',
+        ],
+        govde: `The human brain thinks in stories, not spreadsheets. A list of numbers is forgotten, but a well-told story sticks and stirs emotion into action. That's why your most powerful sales tool in network marketing isn't a brochure—it's your well-packaged story.
+
+## Why stories work
+Because people see themselves inside the story. "This product contains these vitamins" gives information; "how, as a tired mother of three, I won back my own time with this business" builds connection. Decisions are made with emotion, then justified with logic.
+
+## The structure of a good story
+A strong transformation story has three parts:
+- **Before:** Your old self—the struggle, the stuck feeling, the frustration. (The listener recognizes themselves here.)
+- **Turning point:** The encounter—why you started, the first hesitation, the first spark.
+- **After:** The changed life—concrete and honest, never exaggerated.
+
+This trio makes the listener think, "then it's possible for me too."
+
+## You are not the hero
+The most common mistake is turning the story into a tale of personal heroics. But the real hero is the listener; you're just the guide who walked the path first. Tell your story so the center isn't your success, but their possibility.
+
+> Facts are told; stories are lived—and people say "yes" to what they live.
+
+## Package and simplify
+Your story should be clear enough to tell in 60 seconds or in 5 minutes. Cut the unnecessary details, keep the emotional turning point. Then rehearse it: make it so simple that even your team can easily tell their own version. Because a story that can be copied is a story that scales.`,
       },
     ],
   },

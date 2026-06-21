@@ -334,15 +334,15 @@ export function OdemeClient() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
-                <span>{t('paymentPage.basicFeature2', { limit: DAILY_AI_LIMITS.basic })}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
                 <span>{t('paymentPage.basicFeature3')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
                 <span>{t('paymentPage.basicFeature4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
+                <span>{t('paymentPage.basicFeature2', { limit: DAILY_AI_LIMITS.basic })}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-500 dark:text-indigo-400 shrink-0" />
@@ -423,10 +423,6 @@ export function OdemeClient() {
             <ul className="space-y-3 border-t border-[var(--border)] pt-5 text-xs text-[var(--text-2)]">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
-                <span>{t('paymentPage.plusFeature1', { limit: DAILY_AI_LIMITS.plus })}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                 <span>{t('paymentPage.plusFeature2')}</span>
               </li>
               <li className="flex items-center gap-2">
@@ -436,6 +432,10 @@ export function OdemeClient() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
                 <span>{t('paymentPage.plusFeature4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-500 dark:text-amber-400 shrink-0" />
+                <span>{t('paymentPage.plusFeature1', { limit: DAILY_AI_LIMITS.plus })}</span>
               </li>
             </ul>
           </div>
@@ -512,10 +512,6 @@ export function OdemeClient() {
             <ul className="space-y-3 border-t border-[var(--border)] pt-5 text-xs text-[var(--text-2)]">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
-                <span>{t('paymentPage.proFeature1', { limit: DAILY_AI_LIMITS.pro })}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
                 <span>{t('paymentPage.proFeature2')}</span>
               </li>
               <li className="flex items-center gap-2">
@@ -525,6 +521,10 @@ export function OdemeClient() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
                 <span>{t('paymentPage.proFeature4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-pink-500 dark:text-pink-400 shrink-0" />
+                <span>{t('paymentPage.proFeature1', { limit: DAILY_AI_LIMITS.pro })}</span>
               </li>
             </ul>
           </div>

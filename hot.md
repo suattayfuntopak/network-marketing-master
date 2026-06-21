@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-21 — /odeme plan paritesi + 10 yeni blog yazısı ✅
+
+**Ödeme sayfası paritesi:** Landing'deki profesyonel düzeltmeler /odeme'ye taşındı: kısaltma temizliği (YZ → Yapay Zeka, "vd" kaldırıldı), Basic madde ifadeleri landing ile eşitlendi, YZ kotası her planda **en son maddeye** indi (OdemeClient render sırası). EN tarafı tekdüze "AI credits — …" satırına getirildi. plan-copy sync testi 9/9 yeşil (kapılar değişmedi).
+
+**Vaktin Varsa → Blog:** Mevcut 3 yazının altına **10 yeni evergreen, firma-bağımsız makale** (TR+EN, editöryal seed): Dinleme Sanatı, Takip Sistemi, Sosyal Medyada Çekim, İtiraz Yönetimi, Hedef Belirleme, Zaman Yönetimi, Liderlik (Yetiştirmek), Davet Sanatı, Kişisel Marka ve **Hikaye Paketleme: En Güçlü Satış Aracınızı Tasarlayın**. Her biri `format:'article'` + govde (## başlık / - madde / > alıntı) + 4 anahtar madde. tsc/lint/i18n/plan-copy/378 test yeşil.
+
+---
+
 ## 2026-06-21 — Mobil "Diğer" menü navigasyon yarışı + İstatistikler başlık taşması ✅
 
 **BottomNav "Diğer" çekmecesi:** Üç noktaya basıp açılan çekmecede herhangi bir ikona basınca sayfa açılmıyordu. Kök sebep: `onClick={() => { setMoreOpen(false); navigate(href) }}` — `setMoreOpen(false)` ile tetiklenen `useHistoryBackClose` cleanup'ı, `router.push`'un history'ye yeni state push'lamasıyla yarışıp `window.history.back()` çağırarak navigasyonu geri alıyordu (Süper Admin Ödeme/Açılış akışında aynı sınıf bug zaten `window.location.assign` ile çözülmüştü — bkz. üstteki giriş). Çözüm: manuel `setMoreOpen(false)` kaldırıldı; çekmece artık yalnız pathname gerçekten değiştiğinde (mevcut güvenlik-ağı `useEffect`) kapanıyor — yarış tamamen ortadan kalktı.
