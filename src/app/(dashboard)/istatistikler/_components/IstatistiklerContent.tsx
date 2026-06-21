@@ -176,7 +176,6 @@ export function IstatistiklerContent() {
         {/* Header */}
         <DashboardPageHeader
           title={t('statsPage.title')}
-          subtitle={t('statsPage.subtitle')}
           icon={<BarChart3 className={PAGE_HEADER_ICON_GLYPH} strokeWidth={2} />}
           iconContainerClassName={pageHeaderIconClass('/istatistikler')}
           actions={<PulsePeriodTabs period={period} onChange={setPeriod} comfortableTypography />}

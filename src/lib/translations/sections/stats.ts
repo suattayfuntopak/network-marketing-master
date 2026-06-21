@@ -2,7 +2,6 @@ export const statsSection = {
   tr: {
     statsPage: {
       title: 'İstatistikler',
-      subtitle: 'Aday, süreç ve yapay zeka kullanım istatistikleri',
       period30d: 'Son 30 Gün',
 
       kpiTotalLeads: 'TOPLAM ADAY',
@@ -87,7 +86,6 @@ export const statsSection = {
   en: {
     statsPage: {
       title: 'Statistics',
-      subtitle: 'Candidate, pipeline and AI usage insights',
       period30d: 'Last 30 Days',
 
       kpiTotalLeads: 'TOTAL LEADS',

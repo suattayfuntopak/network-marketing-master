@@ -181,7 +181,7 @@ export function BottomNav({ pendingHref, visible = true }: BottomNavProps) {
                   <button
                     key={item.href}
                     type="button"
-                    onClick={() => { setMoreOpen(false); navigate(item.href) }}
+                    onClick={() => navigate(item.href)}
                     className="flex flex-col items-center gap-1.5 rounded-xl p-1.5 active:scale-95 transition"
                   >
                     <span

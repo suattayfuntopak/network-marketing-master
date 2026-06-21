@@ -21,11 +21,16 @@ type Props = {
 /** Bugün / Hafta / Ay / Yıl / Tüm zamanlar — ① ve ② için ortak. */
 export function PulsePeriodTabs({ period, onChange, comfortableTypography = false }: Props) {
   const { t } = useTranslation()
-  const btnCls = comfortableTypography ? 'text-sm px-2.5 py-1' : 'text-[10px] px-2 py-1'
+  const btnCls = comfortableTypography
+    ? 'text-[10px] px-1.5 py-1 sm:text-sm sm:px-2.5 sm:py-1'
+    : 'text-[10px] px-2 py-1'
 
   return (
     <div
-      className="no-swipe flex flex-wrap gap-1 self-start rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/80 p-1"
+      className={clsx(
+        'no-swipe flex flex-wrap self-start rounded-xl border border-[var(--border)] bg-[var(--bg-subtle)]/80',
+        comfortableTypography ? 'gap-0.5 p-0.5 sm:gap-1 sm:p-1' : 'gap-1 p-1',
+      )}
       role="tablist"
       data-no-swipe="true"
       onTouchStart={e => e.stopPropagation()}

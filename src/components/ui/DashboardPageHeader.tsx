@@ -31,13 +31,13 @@ export function DashboardPageHeader({
     <header
       className={`flex ${
         rowOnMobile
-          ? 'flex-row items-start justify-between gap-3'
+          ? 'flex-row items-start justify-between gap-2 sm:gap-3'
           : 'flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'
       } ${className}`}
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         {icon && (
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${iconContainerClassName}`}>
+          <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl sm:h-10 sm:w-10 ${iconContainerClassName}`}>
             {icon}
           </div>
         )}
@@ -52,7 +52,7 @@ export function DashboardPageHeader({
           )}
         </div>
       </div>
-      <div className="flex shrink-0 flex-row items-center gap-2">
+      <div className="flex shrink-0 flex-row items-center gap-1 sm:gap-2">
         {showHelp && <PageHelp triggerClassName={PAGE_HELP_HEADER_TRIGGER_CLASS} />}
         {dateLine && (
           <p className="shrink-0 text-right text-xs font-medium tracking-wide text-[var(--text-3)] sm:text-sm">
