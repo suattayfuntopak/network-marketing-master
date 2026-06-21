@@ -12,6 +12,7 @@ export const trainingSection = {
     trainingPage: {
       contentAdded: 'İçerik başarıyla eklendi!',
       addContent: 'İçerik Ekle',
+      articleBadge: 'Makale',
       fav: 'favori',
       searchPlaceholder: 'Eğitim konusu veya içeriği ara...',
       topicsFound: 'konu bulundu',
@@ -117,6 +118,7 @@ export const trainingSection = {
     trainingPage: {
       contentAdded: 'Content added successfully!',
       addContent: 'Add Content',
+      articleBadge: 'Article',
       fav: 'fav',
       searchPlaceholder: 'Search training topics or content...',
       topicsFound: 'topics found',

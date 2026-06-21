@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, CheckCircle2, ChevronDown, Circle, Clock, Copy, Pencil, Star, Trash2 } from 'lucide-react'
+import { ArrowRight, Check, CheckCircle2, ChevronDown, Circle, Clock, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { SEVIYE_RENK, getTrainingCategoryStyles } from '../constants'
@@ -45,11 +45,14 @@ export function TrainingCard({
     lang === 'en' && konu.maddelerEn?.length ? konu.maddelerEn : konu.maddeler
   const { catTextColor, catBorderColorHover, catBorderColorActive, bulletStyle } =
     getTrainingCategoryStyles(konu.kategoriId)
+  const isArticle = konu.format === 'article'
 
   return (
     <li id={`konu-${konu.id}`}>
       <div
-        className={`rounded-2xl border transition-all duration-200 ${
+        className={`overflow-hidden rounded-2xl border transition-all duration-200 ${
+          isArticle ? 'border-l-4 border-l-[#3730A3] dark:border-l-[#a5b4fc]' : ''
+        } ${
           highlighted
             ? MODERATION_HIGHLIGHT_CLASS
             : acik
@@ -68,6 +71,11 @@ export function TrainingCard({
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                {isArticle && (
+                  <span className="rounded-full bg-[#3730A3] px-2 py-0.2 text-[8px] font-black uppercase tracking-wider text-white dark:bg-[#a5b4fc] dark:text-[#1e1b4b] shrink-0">
+                    {t('trainingPage.articleBadge')}
+                  </span>
+                )}
                 <p className={`text-[10px] font-bold uppercase tracking-wider ${catTextColor}`}>
                   {kategoriBaslik}
                 </p>
@@ -78,19 +86,33 @@ export function TrainingCard({
               <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
                 {baslik}
               </p>
-              <div className="mt-1 hidden items-center gap-2 md:flex">
-                <div className="flex items-center gap-1 text-[11px] text-[var(--text-3)]">
-                  <Clock className="h-3 w-3 shrink-0" />
-                  <span>{konu.sure}</span>
+              {isArticle ? (
+                <>
+                  <p className="mt-1 text-[13px] leading-snug text-[var(--text-2)] line-clamp-2">{ozet}</p>
+                  <div className="mt-1.5 flex items-center gap-1 text-[11px] font-medium text-[var(--text-3)]">
+                    <Clock className="h-3 w-3 shrink-0" />
+                    <span>{konu.sure}</span>
+                  </div>
+                </>
+              ) : (
+                <div className="mt-1 hidden items-center gap-2 md:flex">
+                  <div className="flex items-center gap-1 text-[11px] text-[var(--text-3)]">
+                    <Clock className="h-3 w-3 shrink-0" />
+                    <span>{konu.sure}</span>
+                  </div>
+                  <span className="text-[var(--text-3)] text-sm">·</span>
+                  <span className="text-[11px] text-[var(--text-3)] truncate block max-w-[200px] sm:max-w-none">{ozet}</span>
                 </div>
-                <span className="text-[var(--text-3)] text-sm">·</span>
-                <span className="text-[11px] text-[var(--text-3)] truncate block max-w-[200px] sm:max-w-none">{ozet}</span>
-              </div>
+              )}
             </div>
-            <ChevronDown
-              className={`h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform duration-200 ${acik ? 'rotate-180' : ''}`}
-              strokeWidth={2}
-            />
+            {isArticle ? (
+              <ArrowRight className="h-4 w-4 shrink-0 text-[#3730A3] dark:text-[#a5b4fc]" strokeWidth={2.25} />
+            ) : (
+              <ChevronDown
+                className={`h-4 w-4 shrink-0 text-[var(--text-3)] transition-transform duration-200 ${acik ? 'rotate-180' : ''}`}
+                strokeWidth={2}
+              />
+            )}
           </button>
 
           <div className="flex shrink-0 items-center gap-0.5">
@@ -122,7 +144,7 @@ export function TrainingCard({
           </div>
         </div>
 
-        {acik && (
+        {acik && !isArticle && (
           <div className="border-t border-[var(--border)] px-4 pb-4 pt-3 bg-[var(--bg-subtle)]/30 rounded-b-2xl animate-in fade-in duration-200">
             <ul className="space-y-2.5">
               {maddeler.map((madde, idx) => (

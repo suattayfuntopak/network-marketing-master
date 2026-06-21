@@ -18,6 +18,9 @@ import { PAGE_SIZE } from '../constants'
 import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
 import dynamic from 'next/dynamic'
+const ArticleReader = dynamic(() => import('./ArticleReader').then(mod => mod.ArticleReader), {
+  ssr: false,
+})
 const AddTrainingModal = dynamic(() => import('./AddTrainingModal').then(mod => mod.AddTrainingModal), {
   ssr: false,
 })
@@ -50,6 +53,7 @@ export function EgitimContent({
   const [aktifSeviye, setAktifSeviye] = useState<SeviyeKey>('all')
   const [page, setPage] = useState(1)
   const [acikId, setAcikId] = useState<string | null>(null)
+  const [readerArticle, setReaderArticle] = useState<TrainingTopic | null>(null)
   const [pendingOpenId, setPendingOpenId] = useState<string | null>(null)
   const [flashId, setFlashId] = useState<string | null>(null)
 
@@ -197,10 +201,15 @@ export function EgitimContent({
     if (topicId) {
       const idx = filtrelenmis.findIndex(item => item.id === topicId)
       if (idx !== -1) {
+        const target = filtrelenmis[idx]
         const targetPage = Math.floor(idx / PAGE_SIZE) + 1
         /* eslint-disable-next-line react-hooks/set-state-in-effect */
         setPage(targetPage)
-        setAcikId(topicId)
+        if (target?.format === 'article') {
+          setReaderArticle(target)
+        } else {
+          setAcikId(topicId)
+        }
         if (searchParams.get('highlight') === '1') {
           setFlashId(topicId)
         }
@@ -240,6 +249,14 @@ export function EgitimContent({
 
   function toggle(id: string) {
     setAcikId(prev => (prev === id ? null : id))
+  }
+
+  function handleCardOpen(konu: TrainingTopic) {
+    if (konu.format === 'article') {
+      setReaderArticle(konu)
+      return
+    }
+    toggle(konu.id)
   }
 
   function toggleRead(id: string, e: React.MouseEvent) {
@@ -449,7 +466,7 @@ export function EgitimContent({
                 isFav={favs.has(konu.id)}
                 isRead={read.has(konu.id)}
                 copied={copiedId === konu.id}
-                onToggle={() => toggle(konu.id)}
+                onToggle={() => handleCardOpen(konu)}
                 onToggleRead={e => toggleRead(konu.id, e)}
                 onToggleFav={e => toggleFav(konu.id, e)}
                 onCopy={e =>
@@ -514,6 +531,17 @@ export function EgitimContent({
           variant="danger"
           onConfirm={handleConfirmDeleteTopic}
           onCancel={() => setDeletingTopic(null)}
+        />
+      )}
+
+      {readerArticle && (
+        <ArticleReader
+          konu={readerArticle}
+          isFav={favs.has(readerArticle.id)}
+          isRead={read.has(readerArticle.id)}
+          onClose={() => setReaderArticle(null)}
+          onToggleFav={() => toggleTrainingFav(readerArticle.id)}
+          onToggleRead={() => toggleTrainingRead(readerArticle.id)}
         />
       )}
     </>

@@ -1,5 +1,75 @@
 # Hot Log
 
+## 2026-06-21 — Vaktin Varsa: uzun-form "Blog" makaleleri ✅
+
+Eğitim sekmesine yeni içerik biçimi: madde-madde "konu" + uzun-form "makale". Sıfırdan blog motoru değil, mevcut Eğitim altyapısının (liste/arama/filtre/favori/okundu/ilerleme/paylaşım) genişletmesi.
+
+**Veri:** `Konu`/`TrainingTopic`'e `format?: 'topic'|'article'` + `govde` (+ `govdeEn`). Yeni "📰 Blog" kategorisi otomatik çip olarak belirir. 3 evergreen, firma-bağımsız seed makale (TR+EN, editöryal — runtime çeviri/AI kotası yok).
+
+**UX:** Makale kartı = sol mor şerit + "MAKALE" rozeti + 2 satır özet + "okuma süresi" + ok. Tıklayınca akordeon değil **tam-ekran Reader** açılır: üstte okuma-ilerleme çubuğu, 680px ölçülü genişlik, premium tipografi (başlık/paragraf/alıntı/madde), altta Okundu·Favori·Kopyala·WhatsApp. ESC/✕ ile kapanır. Deep-link `?id=` makaleyi Reader'da açar.
+
+**Dosyalar:** `egitim/types.ts`, `trainingData.ts`, **yeni** `ArticleReader.tsx` (bağımlılıksız mini markdown renderer), `TrainingCard.tsx`, `EgitimContent.tsx`, `translations/sections/training.ts` (`articleBadge`), `pageHelp.ts`. typecheck/lint/i18n ✅.
+
+---
+
+## 2026-06-20 — Müşteri detay: sipariş satırı sadeleştirme ✅
+
+Sipariş geçmişi kutusundan Receipt ikonu kaldırıldı; tutar ve tarih `items-center` ile dikey ortalandı.
+
+**Dosya:** `CustomerDetail.tsx`
+
+---
+
+## 2026-06-20 — Müşteriler: kart tıklama UX + düzenle modal ortala ✅
+
+**Kart:** Overlay Link kaldırıldı → tüm karta `cursor-pointer` + `onClick` navigate; yalnız aksiyon butonları `stopPropagation` (tutarlı el imleci, boş alanlar da açıyor).
+
+**Düzenle sheet:** Mobilde alttan sheet yerine YZ modal ile aynı ortalanmış `createPortal` + `Z.confirm` pattern.
+
+**Dosyalar:** `MusterilerContent.tsx`, `CustomerContactActions.tsx`, `EditCustomerSheet.tsx`
+
+---
+
+## 2026-06-20 — Müşteriler: kart tıklama + detay genişliği fix ✅
+
+**Kart tıklama:** Overlay `Link` pattern — isim/ciro alanına tıklayınca `/musteriler/[id]` açılır; iletişim butonları ve alt aksiyonlar `pointer-events-auto` ile ayrı kalır.
+
+**Detay genişliği:** `max-w-2xl` kaldırıldı → liste ile aynı `w-full` (HubPageShell / Listem detay ile uyumlu).
+
+**Dosyalar:** `MusterilerContent.tsx`, `CustomerContactActions.tsx`, `CustomerDetail.tsx`
+
+---
+
+## 2026-06-20 — Müşteriler: detay sayfası + düzenle sheet ✅
+
+**Detay (`/musteriler/[id]`):** Kart tıklanınca — ciro/sipariş/kayıt özeti, iletişim butonları, profil, sipariş geçmişi, sipariş ekle, müşteri sil.
+
+**Düzenle:** Liste kartında kalem (silin solunda) → sheet: ad/telefon/not + sipariş düzenle/sil.
+
+**Yeni:** `CustomerDetail`, `EditCustomerSheet`, `getCustomerDetailAction`, `updateCustomerAction`, `updateOrderAction`, `deleteOrderAction`, `useCustomerDetail`.
+
+---
+
+## 2026-06-20 — Müşteriler: iletişim butonları + YZ mesaj; Ekibim arama placeholder ✅
+
+**Müşterilerim (`/musteriler`):** Kişi adı altındaki telefon metni kaldırıldı. Mobil: Ara | WhatsApp | YZ (Bot); masaüstü: WhatsApp | YZ (`sm:hidden` arama). YZ butonu sipariş geçmişine göre teklif/yönlendirme mesajı üretir — popup'ta kopyala + WhatsApp. `generateCustomerOutreachAction` (kota kapılı).
+
+**Ekibim (`/ekip`):** Üye arama placeholder'ı mobil/masaüstü ayrı — "ara" kelimesi karışıklığı giderildi (mobil: bul…, masaüstü: isme göre bul…).
+
+**Dosyalar:** `MusterilerContent.tsx`, `CustomerAiMessageModal.tsx`, `musteriler/actions.ts`, `TeamPerformanceSection.tsx`, `tr.ts`, `en.ts`
+
+---
+
+## 2026-06-20 — Kişi detay: masaüstünde Ara kaldır, YZ butonu yeniden adlandır ✅
+
+Listem → kişi sayfası (`CandidateDetail`): masaüstünde (sm+) yalnız **Yapay Zeka Mesajı Üret** + **WhatsApp** — eşit 2 sütun grid; **Ara** mobilde kalır (`sm:hidden`). `pipeline.aiMessage` TR/EN güncellendi.
+
+**Dosyalar:** `CandidateDetail.tsx`, `tr.ts`, `en.ts`
+
+**Sonraki tur (rapor):** masaüstünde hâlâ görünen arama butonları → `MemberActivitySheet.tsx` (ekip aktivite sheet).
+
+---
+
 ## 2026-06-20 — Süper Admin: bölüm-? yerine her kutuya kart-? yardımı ❓✅
 
 Kullanıcı isteği: Süper Admin sayfasındaki bölüm-başlığı (?)'lerini kaldır, **her stat kutusunun sağ üst köşesine** kendi (?)'sini koy; popup yalnız O kutunun ne ölçtüğünü sade dille anlatsın.

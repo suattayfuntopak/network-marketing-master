@@ -263,6 +263,7 @@ const TAB_HELP: TabHelpEntry[] = [
       intro: 'Metin eğitim içeriklerini okur, favoriler ve okundu işaretlersin.',
       steps: [
         { t: 'Kategori', d: 'Konuya göre filtrele veya ara.' },
+        { t: 'Blog', d: 'Blog kategorisindeki uzun makaleler tam-ekran okuma görünümünde açılır.' },
         { t: 'Paylaş', d: 'WhatsApp ile adaya veya ekibe gönder.' },
         { t: 'Katkı', d: 'Kendi içeriğini eklemek için + butonunu kullan.' },
       ],
@@ -272,6 +273,7 @@ const TAB_HELP: TabHelpEntry[] = [
       intro: 'Read text training content; favorite and mark as read.',
       steps: [
         { t: 'Category', d: 'Filter or search by topic.' },
+        { t: 'Blog', d: 'Long articles in the Blog category open in a full-screen reading view.' },
         { t: 'Share', d: 'Send to a prospect or teammate via WhatsApp.' },
         { t: 'Contribute', d: 'Use + to submit your own content.' },
       ],

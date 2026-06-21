@@ -6,6 +6,10 @@ export interface Konu {
   seviye: 'Temel' | 'Orta' | 'İleri' | 'Basic' | 'Medium' | 'Advanced'
   ozet: string
   maddeler: string[]
+  /** İçerik biçimi: madde-madde "konu" (varsayılan) ya da uzun-form "makale". */
+  format?: 'topic' | 'article'
+  /** Uzun-form makale gövdesi. Sade biçim: boş satır=paragraf, `## `=ara başlık, `- `=madde, `> `=alıntı. */
+  govde?: string
 }
 
 export interface Kategori {
@@ -1041,6 +1045,140 @@ const TR_KATEGORILER: Kategori[] = [
       },
     ],
   },
+  {
+    id: 'blog',
+    baslik: 'Blog',
+    emoji: '📰',
+    renk: 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc] border-[#E0E7FF] dark:border-[#312e8130]',
+    konular: [
+      {
+        id: 'blog-ilk-90-gun',
+        baslik: 'İlk 90 Gün: Çoğu İnsan Neden Bırakır?',
+        emoji: '🗓️',
+        sure: '7 dk okuma',
+        seviye: 'Temel',
+        ozet: 'Yeni başlayanların büyük kısmı ilk üç ayda pes eder. Sebep yetenek değil, yanlış beklenti. İşte kalanların yaptığı fark.',
+        format: 'article',
+        maddeler: [
+          'Çoğu kişi ilk 90 günde yanlış beklenti yüzünden bırakır.',
+          'İlk hedef para değil, alışkanlık ve ritim olmalı.',
+          'Reddedilme kişisel değildir; sayı oyununun doğal parçasıdır.',
+          'Küçük ama her gün tekrarlanan aksiyon, büyük ama düzensiz çabayı yener.',
+        ],
+        govde: `Network marketing'e başlayan her on kişiden yaklaşık yedisi ilk doksan günü tamamlamadan ayrılır. Bu istatistik insanı korkutmak için değil, tam tersine rahatlatmak için burada: çünkü bırakanların çoğu yeteneksiz olduğu için değil, yanlış bir beklentiyle başladığı için bırakır. Beklentiyi düzelttiğinde, o yüzde yetmişin dışında kalmak şaşırtıcı derecede kolaylaşır.
+
+## Sorun para değil, zamanlama algısı
+
+Yeni başlayan kişi genelde şunu düşünür: "Birkaç hafta içinde ciddi bir gelir göreceğim." Görmeyince hayal kırıklığına uğrar ve "demek ki bana göre değil" diyerek çıkar. Oysa bu işin doğası bir maraton gibidir; ilk aylar tohum ekme dönemidir, hasat değil. İlk doksan günde ölçmen gereken şey banka hesabın değil, kurduğun alışkanlıklardır.
+
+## İlk 90 günde gerçekten önemli olan üç şey
+
+- **Ritim:** Her gün küçük de olsa bir temas. Beş yeni kişiyle tanışmak, üç takip mesajı atmak, bir içerik paylaşmak. Miktar değil, sürekliliktir önemli olan.
+- **Dayanıklılık:** Reddedilmeyi kişisel almamak. "Hayır" çoğu zaman "şu an değil" demektir ve senin değerinle ilgili bir yargı değildir.
+- **Öğrenme:** Her görüşmeden sonra "ne işe yaradı, ne yaramadı" diye bir dakikalık not. Bu küçük refleks, üç ayın sonunda seni tanınmaz hale getirir.
+
+## Reddedilmeyi yeniden çerçevele
+
+Çoğu insan birkaç "hayır"dan sonra durur çünkü her reddi bir başarısızlık olarak kaydeder. Oysa deneyimli networker'lar reddi bir sayı oyununun parçası olarak görür. Diyelim ki yirmi görüşmeden biri ortaklığa dönüşüyor. O zaman aldığın her "hayır" seni o "evet"e bir adım yaklaştırır. Reddedilme bir engel değil, ilerleme göstergesidir.
+
+> Bırakanlar genelde tam da işler dönmeye başlamadan hemen önce bırakır. Çünkü en zor kısım, henüz hiçbir sonuç görünmezken inanmaya devam etmektir.
+
+## Doksanıncı günde kendine sor
+
+Üç ayın sonunda kendine "ne kadar kazandım?" diye değil, şunları sor: Tutarlı bir günlük ritmim oluştu mu? Reddedilmeye karşı derim kalınlaştı mı? Her hafta birkaç yeni insan tanıyor muyum? Bu sorulara "evet" diyebiliyorsan, gelir zaten arkadan gelecektir — çünkü onu getirecek sistemi kurmuş olursun. Çoğu insanın asla ulaşamadığı şey, işte bu sabrın ödülüdür.`,
+      },
+      {
+        id: 'blog-duplikasyon',
+        baslik: 'Duplikasyon Sanatı: Kopyalanabilir Olmak',
+        emoji: '🔁',
+        sure: '8 dk okuma',
+        seviye: 'İleri',
+        ozet: 'Bir ekibi büyüten şey senin yeteneğin değil, ekibinin senin sistemini kolayca tekrarlayabilmesidir. Basitlik, karizmadan güçlüdür.',
+        format: 'article',
+        maddeler: [
+          'Duplikasyon, ekibinin senin sistemini kolayca tekrarlayabilmesidir.',
+          'Karmaşık ama etkileyici bir yöntem, basit ama kopyalanabilir bir yöntemden zayıftır.',
+          'Sistemi yaz; "kafamda" olan hiçbir şey ölçeklenmez.',
+          'Liderin işi yapmak değil, başkalarının yapmasını sağlamaktır.',
+        ],
+        govde: `Network marketing'te tek başına ne kadar iyi olduğun, ekibinin ne kadar büyüyeceğini belirlemez. Belirleyen şey, yaptığın işin ne kadar kolay kopyalanabildiğidir. Buna duplikasyon denir ve bu işi gerçekten ölçeklendiren tek kaldıraç budur.
+
+## Neden en iyi satıcı en iyi lider değildir?
+
+Çoğu zaman en parlak satıcı, en zayıf ekip lideridir. Sebebi şu: kendi karizmasına, kendi özel yeteneğine dayanan bir yöntem geliştirmiştir. Bu yöntem onun için harika çalışır ama kimse onu tekrar edemez. Yeni katılan biri o performansı görür, "ben bunu asla yapamam" der ve cesareti kırılır. Oysa sıradan ama herkesin tekrar edebileceği bir sistem, dahiyane ama kopyalanamaz bir sistemden çok daha fazla insan kazandırır.
+
+## Basitlik bir stratejidir, eksiklik değil
+
+Duplikasyonun kalbinde basitlik vardır. Sistemini öyle kur ki, üç gün önce katılan biri bile onu birine anlatabilsin:
+
+- **Tek bir davet cümlesi:** Herkesin ezberleyebileceği, doğal bir davet.
+- **Tek bir sunum yolu:** Standart bir video, bir araç, bir akış. Herkes aynı kapıdan girsin.
+- **Tek bir takip ritmi:** "Ne zaman, ne söylenir" net olsun.
+
+Karmaşıklık ego besler ama ekip öldürür. Bir yöntem ne kadar etkileyiciyse, o kadar az kopyalanır.
+
+## "Kafamdaki" hiçbir şey ölçeklenmez
+
+Eğer sistemin senin zihninde yaşıyorsa, ekibin senin kadar büyüyebilir — yani senin zamanınla sınırlı kalır. Bunu kırmanın yolu yazmaktır. Davet metnini yaz. İlk görüşme akışını yaz. Sık sorulan itirazlara cevapları yaz. Yazılı ve erişilebilir hale gelen her şey, sen orada olmasan bile çalışmaya devam eder.
+
+> Liderin görevi işi en iyi yapan kişi olmak değil, en çok insanın işi yapmasını sağlayan kişi olmaktır.
+
+## Kendini gereksiz kıl
+
+Kulağa ters gelse de iyi bir liderin hedefi, ekibinin ona ihtiyaç duymadan ilerleyebilmesidir. Her soruya sen cevap veriyorsan, her görüşmeye sen giriyorsan, bir ekip değil bir bağımlılık kurmuşsun demektir. Gerçek duplikasyon, senin yokluğunda da büyüyen bir yapıdır. Kendini sistemin merkezinden çıkarabildiğin gün, ekibin ilk kez gerçekten ölçeklenmeye başlar.`,
+      },
+      {
+        id: 'blog-firma-secimi',
+        baslik: 'Bir NM Firması Seçerken Bakılacak 7 Kriter',
+        emoji: '🔎',
+        sure: '6 dk okuma',
+        seviye: 'Orta',
+        ozet: 'Doğru firma, doğru kişiyle bile yanlış zemin olabilir. Karar vermeden önce sormadan geçmemen gereken yedi soru.',
+        format: 'article',
+        maddeler: [
+          'Ürün, plan olmasa bile satın alınacak kadar gerçek değer taşımalı.',
+          'Şirketin geçmişi, finansal sağlığı ve şeffaflığı incelenmeli.',
+          'Kazanç planı sürdürülebilir ve anlaşılır olmalı.',
+          'Yasal uyum ve gerçekçi gelir beyanı şart.',
+        ],
+        govde: `Network marketing'te başarı sadece senin çabanla ilgili değildir; üzerinde durduğun zeminle de ilgilidir. Yanlış bir firma, en çalışkan kişiyi bile yorar. Bir fırsatı değerlendirirken duygusal heyecanın önüne geçip şu yedi kriteri sakince sormak, yıllarını kurtarabilir.
+
+## 1. Ürün, plan olmadan da alınır mıydı?
+
+En kritik soru budur. Eğer kimse kazanç planını bilmese, bu ürünü yine de parasıyla satın alır mıydı? Cevap "evet" ise sağlam bir temel var demektir. "Hayır" ise, satılan şey ürün değil sadece fırsattır ve bu uzun vadede sürdürülemez.
+
+## 2. Şirketin geçmişi ve sağlığı
+
+Şirket kaç yıldır faaliyette? Ödemelerini düzenli yapıyor mu? Kurucular ve yönetim şeffaf mı, yoksa sürekli isim mi değiştiriyor? Birkaç yıllık istikrarlı bir geçmiş, parlak ama yeni bir vaatten daha güven vericidir.
+
+## 3. Kazanç planı anlaşılır mı?
+
+İyi bir plan, ortalama bir insana on dakikada anlatılabilir. Eğer planı anlamak için elektronik tablo ve saatler gerekiyorsa, ekibine de anlatamazsın — yani duplike olmaz.
+
+- Komisyonlar gerçek ürün satışından mı geliyor, yoksa sadece yeni kayıtlardan mı?
+- Başlangıçta büyük stok almak zorunda mısın?
+- Kazanç, sürekli yeni katılım yerine sürekli tüketime mi dayanıyor?
+
+## 4. Yasal uyum ve gerçekçi beyan
+
+Şirket gelir vaatlerinde dürüst mü? "Ayda şu kadar garanti" gibi söylemler bir uyarı işaretidir. Yasal ve etik bir firma, ortalama bir distribütörün gerçekte ne kazandığını şeffafça paylaşır.
+
+## 5. Eğitim ve destek sistemi
+
+Katıldığında seni bekleyen yapılandırılmış bir eğitim var mı, yoksa "kendi yolunu bul" mu deniyor? İyi bir firma ve iyi bir upline, başarın için araç ve sistem sunar.
+
+## 6. Sponsor ve ekip kültürü
+
+Bazen firma harikadır ama seni davet eden ekip toksiktir; bazen tam tersi. Birlikte çalışacağın insanlar dürüst, ulaşılabilir ve gerçekten yardımcı mı? Çünkü ilk yılında en çok onlarla muhatap olacaksın.
+
+> Doğru firmayı seçmek, hızlı zengin olma vaadine değil, beş yıl sonra hâlâ yanında durabileceğin bir karara dayanır.
+
+## 7. Beş yıl testi
+
+Son olarak kendine sor: Bu ürünü ve bu şirketi, bir kuruş kazanmasam bile beş yıl boyunca gururla anlatabilir miyim? Cevabın "evet" ise, doğru zemindesin. Çünkü bu iş bir sprint değil; üzerinde uzun süre durabileceğin sağlam bir zemin gerektirir.`,
+      },
+    ],
+  },
 ]
 
 const EN_KATEGORILER: Kategori[] = [
@@ -2065,6 +2203,140 @@ const EN_KATEGORILER: Kategori[] = [
           'A happy customer both buys again and is your strongest referral source.',
           'Some customers become business partners over time; a good customer relationship is the seed of your team.',
         ],
+      },
+    ],
+  },
+  {
+    id: 'blog',
+    baslik: 'Blog',
+    emoji: '📰',
+    renk: 'bg-[#EEF2FF] dark:bg-[#1e1b4b] text-[#3730A3] dark:text-[#a5b4fc] border-[#E0E7FF] dark:border-[#312e8130]',
+    konular: [
+      {
+        id: 'blog-ilk-90-gun',
+        baslik: 'The First 90 Days: Why Most People Quit',
+        emoji: '🗓️',
+        sure: '7 min read',
+        seviye: 'Basic',
+        ozet: 'Most newcomers give up in the first three months. The reason is not talent but the wrong expectation. Here is what the ones who stay do differently.',
+        format: 'article',
+        maddeler: [
+          'Most people quit in the first 90 days because of the wrong expectation.',
+          'The first goal should be habits and rhythm, not money.',
+          'Rejection is not personal; it is a natural part of the numbers game.',
+          'Small action repeated every day beats large but irregular effort.',
+        ],
+        govde: `Roughly seven out of every ten people who start network marketing leave before completing their first ninety days. This statistic is here not to scare you but to reassure you: most of those who quit do so not because they lack talent, but because they started with the wrong expectation. Once you fix the expectation, staying out of that seventy percent becomes surprisingly easy.
+
+## The problem isn't money, it's your sense of timing
+
+A newcomer usually thinks: "I'll see serious income within a few weeks." When it doesn't happen, they get disappointed and walk away saying "this isn't for me." But the nature of this business is like a marathon; the first months are a season of planting, not harvesting. In your first ninety days, the thing to measure is not your bank account but the habits you build.
+
+## Three things that truly matter in the first 90 days
+
+- **Rhythm:** A small touch every single day. Meeting five new people, sending three follow-up messages, sharing one piece of content. It's not the volume that matters, it's the consistency.
+- **Resilience:** Not taking rejection personally. "No" most often means "not right now," and it is not a judgment about your worth.
+- **Learning:** A one-minute note after each conversation: "what worked, what didn't." This small reflex will make you unrecognizable in three months.
+
+## Reframe rejection
+
+Most people stop after a few "no"s because they record every rejection as a failure. Experienced networkers, however, see rejection as part of a numbers game. Say one in twenty conversations turns into a partnership. Then every "no" you get moves you one step closer to that "yes." Rejection isn't an obstacle; it's a sign of progress.
+
+> People usually quit right before things start to turn. Because the hardest part is to keep believing while no results are visible yet.
+
+## On the ninetieth day, ask yourself
+
+At the end of three months, don't ask yourself "how much did I earn?" — ask these instead: Have I built a consistent daily rhythm? Has my skin thickened against rejection? Am I meeting a few new people every week? If you can answer "yes," the income will follow on its own — because you'll have built the system that produces it. That is the reward of a patience most people never reach.`,
+      },
+      {
+        id: 'blog-duplikasyon',
+        baslik: 'The Art of Duplication: Being Copyable',
+        emoji: '🔁',
+        sure: '8 min read',
+        seviye: 'Advanced',
+        ozet: 'What grows a team is not your talent, but your team\'s ability to easily repeat your system. Simplicity is stronger than charisma.',
+        format: 'article',
+        maddeler: [
+          'Duplication is your team\'s ability to easily repeat your system.',
+          'A complex but impressive method is weaker than a simple but copyable one.',
+          'Write the system down; nothing that lives "in your head" scales.',
+          'A leader\'s job is not to do the work, but to enable others to do it.',
+        ],
+        govde: `In network marketing, how good you are on your own does not determine how much your team will grow. What determines it is how easily the work you do can be copied. This is called duplication, and it is the only lever that truly scales this business.
+
+## Why the best salesperson isn't the best leader
+
+Very often the most brilliant salesperson is the weakest team leader. The reason: they've built a method that relies on their own charisma, their own special talent. That method works wonderfully for them, but no one else can repeat it. A newcomer sees that performance, says "I could never do that," and gets discouraged. An ordinary system that everyone can repeat wins far more people than a genius system that cannot be copied.
+
+## Simplicity is a strategy, not a shortcoming
+
+At the heart of duplication is simplicity. Build your system so that even someone who joined three days ago can explain it to another person:
+
+- **One invitation line:** A natural invite anyone can memorize.
+- **One presentation path:** A standard video, a tool, a flow. Everyone enters through the same door.
+- **One follow-up rhythm:** "When to say what" should be clear.
+
+Complexity feeds the ego but kills the team. The more impressive a method is, the less it gets copied.
+
+## Nothing "in your head" scales
+
+If your system lives in your mind, your team can only grow as much as you can — meaning it stays limited by your time. The way to break this is to write things down. Write the invitation script. Write the first-conversation flow. Write the answers to common objections. Everything that becomes written and accessible keeps working even when you aren't there.
+
+> A leader's task is not to be the person who does the work best, but the person who enables the most people to do the work.
+
+## Make yourself unnecessary
+
+It sounds backwards, but a good leader's goal is for the team to move forward without needing them. If you answer every question and join every meeting, you've built a dependency, not a team. True duplication is a structure that grows even in your absence. The day you can remove yourself from the center of the system is the day your team truly begins to scale.`,
+      },
+      {
+        id: 'blog-firma-secimi',
+        baslik: '7 Criteria for Choosing a Network Marketing Company',
+        emoji: '🔎',
+        sure: '6 min read',
+        seviye: 'Medium',
+        ozet: 'The right company can still be the wrong ground, even with the right person. Seven questions you should not skip before deciding.',
+        format: 'article',
+        maddeler: [
+          'The product should carry enough real value to be bought even without the plan.',
+          'Examine the company\'s history, financial health and transparency.',
+          'The compensation plan should be sustainable and easy to understand.',
+          'Legal compliance and realistic income claims are essential.',
+        ],
+        govde: `Success in network marketing isn't only about your effort; it's also about the ground you stand on. The wrong company wears out even the hardest worker. When evaluating an opportunity, getting past the emotional excitement and calmly asking these seven questions can save you years.
+
+## 1. Would the product be bought without the plan?
+
+This is the most critical question. If no one knew about the compensation plan, would they still buy this product with their own money? If the answer is "yes," there's a solid foundation. If "no," what's being sold isn't the product but only the opportunity — and that isn't sustainable long term.
+
+## 2. The company's history and health
+
+How many years has the company been operating? Does it pay on time? Are the founders and management transparent, or do they keep changing names? A few years of stable history is more reassuring than a shiny but brand-new promise.
+
+## 3. Is the compensation plan understandable?
+
+A good plan can be explained to an average person in ten minutes. If understanding the plan requires spreadsheets and hours, you won't be able to explain it to your team either — meaning it won't duplicate.
+
+- Do commissions come from real product sales, or only from new sign-ups?
+- Do you have to buy a large amount of stock up front?
+- Is income based on continuous consumption rather than continuous recruitment?
+
+## 4. Legal compliance and honest claims
+
+Is the company honest about income? Claims like "guaranteed X per month" are a warning sign. A legal and ethical company transparently shares what an average distributor actually earns.
+
+## 5. Training and support system
+
+When you join, is there structured training waiting for you, or are you told to "find your own way"? A good company and a good upline give you tools and a system for your success.
+
+## 6. Sponsor and team culture
+
+Sometimes the company is great but the team that invited you is toxic; sometimes it's the opposite. Are the people you'll work with honest, reachable and genuinely helpful? Because in your first year, they're who you'll deal with the most.
+
+> Choosing the right company rests not on a get-rich-quick promise, but on a decision you can still stand behind five years from now.
+
+## 7. The five-year test
+
+Finally, ask yourself: Could I proudly talk about this product and this company for five years, even if I never earned a penny? If your answer is "yes," you're on the right ground. Because this business is not a sprint; it requires solid ground you can stand on for a long time.`,
       },
     ],
   },
