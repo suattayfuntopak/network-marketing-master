@@ -7,6 +7,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useAILimits } from '@/hooks/useAILimits'
+import { formatCreditButtonLabel } from '@/lib/domain/aiUsage'
 import { useUpgradePrompt } from '@/hooks/useUpgradePrompt'
 import { surfaceAiQuotaError } from '@/lib/ui/aiQuotaError'
 import { AiQuotaBadge } from '@/components/ui/AiQuotaBadge'
@@ -59,7 +60,7 @@ export function StudyoForm() {
   const { data: ws } = useWorkspace()
   const qc = useQueryClient()
   const { hasAiCoachAccess, openUpgrade, UpgradePrompt } = useUpgradePrompt()
-  const { limitReached } = useAILimits()
+  const { limitReached, aiUsed, dailyLimit, isSuperAdmin } = useAILimits()
 
   const [goal, setGoal] = useState<SocialGoal>('urun')
   const [platform, setPlatform] = useState<SocialPlatform>('instagram')
@@ -211,7 +212,9 @@ export function StudyoForm() {
         className={`relative flex w-full items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold text-white shadow-md transition active:scale-[0.99] disabled:opacity-60 ${STUDIO_MODULE_ACCENT_CLASS} ${STUDIO_ACCENT_BTN_HOVER}`}
         title={!hasAiCoachAccess ? t('pagesUi.unlockAiBasic') : undefined}>
         {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-        {isPending ? t('studyo.generating') : t('studyo.generate')}
+        {isPending
+          ? t('studyo.generating')
+          : formatCreditButtonLabel(t('studyo.generate'), aiUsed, dailyLimit, isSuperAdmin, lang)}
         {!hasAiCoachAccess && <Lock className="absolute right-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/80" />}
       </button>
 

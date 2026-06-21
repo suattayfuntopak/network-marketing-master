@@ -18,6 +18,13 @@ import { BANK_TRANSFER_ENABLED } from '@/lib/domain/bankTransfer'
 import { BankTransferCard } from '@/components/payment/BankTransferCard'
 import { notifyBankTransferAction } from '../actions'
 import { DAILY_AI_LIMITS } from '@/lib/domain/planLimits'
+import {
+  LANDING_BASIC_TRIAL_CTA,
+  LANDING_PRIMARY_CTA,
+  LANDING_PRIMARY_CTA_SHADOW,
+  LANDING_PRIMARY_CTA_HOVER,
+  LANDING_PRO_CTA,
+} from '@/app/_components/landing/constants'
 import { PRODUCT_EVENTS } from '@/lib/domain/productEvents'
 import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/productEvents'
 
@@ -355,7 +362,7 @@ export function OdemeClient() {
             <button
               onClick={() => handlePayment('basic')}
               disabled={loading || (billingPeriod === 'monthly' ? isBasicActive : false)}
-              className={`w-full text-center rounded-xl border border-[var(--border)] hover:bg-[var(--bg-subtle)] text-[var(--text-1)] py-3 text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 ${
+              className={`w-full text-center rounded-xl ${LANDING_BASIC_TRIAL_CTA} py-3 text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95 ${
                 isBasicActive && billingPeriod === 'monthly' ? ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
@@ -444,7 +451,7 @@ export function OdemeClient() {
             <button
               onClick={() => handlePayment('plus')}
               disabled={loading || (billingPeriod === 'monthly' ? isPlusActive : false)}
-              className={`w-full text-center rounded-xl brand-cta text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-indigo-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
+              className={`w-full text-center rounded-xl ${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
                 isPlusActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >
@@ -533,7 +540,7 @@ export function OdemeClient() {
             <button
               onClick={() => handlePayment('pro')}
               disabled={loading || (billingPeriod === 'monthly' ? isProActive : false)}
-              className={`w-full text-center rounded-xl bg-gradient-to-r from-pink-600 to-rose-500 text-white py-3 text-xs font-bold hover:shadow-lg hover:shadow-pink-500/10 transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
+              className={`w-full text-center rounded-xl ${LANDING_PRO_CTA} py-3 text-xs font-bold transition active:scale-95 flex items-center justify-center gap-2 shrink-0 ${
                 isProActive && billingPeriod === 'monthly' ? GRADIENT_ACTIVE_PLAN_BTN : 'cursor-pointer'
               }`}
             >

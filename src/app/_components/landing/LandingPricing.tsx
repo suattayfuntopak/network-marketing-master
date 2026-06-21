@@ -18,9 +18,8 @@ import { logProductEventAction } from '@/app/(dashboard)/_shared-actions/product
 import { getAnalyticsSessionId } from '@/lib/utils/analyticsSession'
 import {
   LANDING_BASIC_TRIAL_CTA,
-  LANDING_PLUS_CTA,
-  LANDING_PLUS_CTA_HOVER,
   LANDING_PRIMARY_CTA,
+  LANDING_PRIMARY_CTA_HOVER,
   LANDING_PRIMARY_CTA_SHADOW,
   LANDING_PRO_CTA,
 } from './constants'
@@ -234,7 +233,7 @@ export function LandingPricing() {
           <div className="pt-8">
             <Link
               href="/kayit"
-              className={`block text-center rounded-xl ${LANDING_PLUS_CTA} py-3 text-xs font-bold ${LANDING_PLUS_CTA_HOVER} transition active:scale-95 cursor-pointer`}
+              className={`block text-center rounded-xl ${LANDING_PRIMARY_CTA} ${LANDING_PRIMARY_CTA_SHADOW} py-3 text-xs font-bold ${LANDING_PRIMARY_CTA_HOVER} transition active:scale-95 cursor-pointer`}
             >
               {t('landingPage.planPlusCta')}
             </Link>

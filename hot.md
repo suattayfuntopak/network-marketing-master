@@ -1,5 +1,17 @@
 # Hot Log
 
+## 2026-06-21 — İçerik Stüdyosu YZ sayacı + plan CTA renk senkronu ✅
+
+**İçerik Stüdyosu sayacı:** `StudyoForm` butonu artık diğer YZ sekmeleriyle aynı: "İçerik Üret (Kullanılan X/Y)" — `formatCreditButtonLabel` + ortak `useAILimits` havuzu (her üretimde düşer, süper admin `(∞)`). Action tarafı (checkAIQuota/logAIGeneration) zaten vardı; eksik olan görünür sayaçtı.
+
+**Plan CTA renk senkronu:** Landing + /odeme plan butonları tek kaynağa bağlandı (`landing/constants` CTA sabitleri → /odeme'ye import).
+- **Plus:** Hem landing hem /odeme'de "Aylık Ödeme" toggle rengiyle aynı (`LANDING_PRIMARY_CTA`: light brand→coral, dark pembe).
+- **Basic:** /odeme de landing ile aynı yeşil-teal (`LANDING_BASIC_TRIAL_CTA`).
+- **Pro:** /odeme de landing ile aynı pembe-rose (`LANDING_PRO_CTA`, dark gölge dahil).
+İki tema da birebir tutar; gelecekte renk değişince tek yerden ikisi de güncellenir.
+
+**Dosyalar:** `StudyoForm.tsx`, `OdemeClient.tsx`, `LandingPricing.tsx`. tsc/lint/i18n/378 test yeşil.
+
 ## 2026-06-21 — Dikey-kullanım kilidi (telefon/tablet yatay engeli) ✅
 
 Telefon ve tabletlerde yatay konumda arayüz karışıyordu. Web'de gerçek OS yönelim-kilidi mümkün değil (iOS Safari yok sayar), bu yüzden pratikte aynı sonucu veren tam-ekran overlay eklendi: yatayken "Lütfen cihazınızı dik konuma getirin" yönlendirmesi tüm arayüzü kapatır, dikeye dönünce anında kaybolur.
