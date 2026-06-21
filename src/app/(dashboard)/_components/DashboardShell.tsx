@@ -10,7 +10,6 @@ import { useWorkspace } from '@/hooks/useWorkspace'
 import { NAV_ROUTES } from '@/lib/domain/navigation'
 import { prefetchRouteData } from '@/lib/query/prefetchNavData'
 import { AccountAccessGuard } from './AccountAccessGuard'
-import { NavigationDebugger } from './NavigationDebugger'
 import { AppVersionGuard } from '@/components/AppVersionGuard'
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister'
 import { useMobileChromeVisibility } from '@/lib/ui/useMobileChromeVisibility'
@@ -133,7 +132,6 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full overflow-x-hidden bg-[var(--bg)]">
       <AppVersionGuard />
-      <NavigationDebugger superAdmin={isSuperAdmin} />
       <ServiceWorkerRegister />
       <Header visible={visible} />
       <Sidebar

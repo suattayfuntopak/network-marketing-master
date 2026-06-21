@@ -1,5 +1,13 @@
 # Hot Log
 
+## 2026-06-22 — NavigationDebugger kaldırıldı (rogue redirect YOK — kanıtlandı) ✅
+
+NavigationDebugger toast'u "/musteriler/[id] → /musteriler otomatik geçiş" yakaladı. Soruşturma: **tüm projede `/musteriler` listesine programatik gidiş yalnızca `CustomerDetail` satır 82 = silme aksiyonu** (kullanıcı tetikli). Otomatik yönlendirme kodu **yok** (grep ile kanıtlandı). Demek ki toast **yanlış pozitif**: detayda geri-ok/sidebar tıklaması → ağır uygulamada ~1.6sn süren soft-nav → Next `pushState`'i tıklamadan 1.6sn sonra çağırdı → dedektörün ">1.2sn girdisiz" sezgisi yanlış flaglendi.
+
+Dedektör görevini tamamladı (gerçek bir kendiliğinden-atlama OLMADIĞINI kanıtladı) ve artık yalnız yanlış alarm üretiyordu → **kaldırıldı** (`NavigationDebugger.tsx` silindi, DashboardShell'den çıkarıldı). Kullanıcının eski "sayfa atlıyor" şikayeti: legacy tab/URL normalizer'ları (önceki turlarda düzeltildi) + ağır sayfa yavaş-nav algısı. Geriye kalan **gerçek konu yavaşlık** (footer/route geçişleri ~1.6sn) — ayrı bir perf turu (bundle + ağır landing/app bileşenleri).
+
+**Dosyalar:** `NavigationDebugger.tsx` (silindi), `DashboardShell.tsx`. tsc/lint ✅.
+
 ## 2026-06-22 — Deploy güvenilirlik fix + footer link gecikmesi + i18n nav ✅
 
 1. **Deploy "bazen başlamıyor" KALICI çözüm:** Kök sebep CI Gate `concurrency: cancel-in-progress: true` (yakın zamanda eklendi). main'e ardışık push'larda önceki CI Gate iptal oluyor; iptal "success" saymadığı için `deploy.yml` deploy tetiklemiyordu. Fix: `cancel-in-progress: ${{ github.event_name == 'pull_request' }}` → PR'larda iptal (maliyet korunur), **main push'larında iptal yok** (her push deploy eder). Düşük risk: deploy mekanizmasına dokunmaz, yalnız iptal davranışını main için kapatır.
