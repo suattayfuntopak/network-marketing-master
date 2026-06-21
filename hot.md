@@ -1,5 +1,14 @@
 # Hot Log
 
+## 2026-06-21 — Plus buton tek renk, admin badge, logo→top, disclaimer tek satır ✅
+
+1. **Plus CTA tek renk:** "Ekibi Güçlendir" + /odeme "30 Günlük Plus…" artık **solid tek mor** (`LANDING_PLUS_CTA = #6742D2`), fade kaldırıldı; dark/light aynı. (Tek sabit; her iki sayfa da bu sabitten besleniyor.)
+2. **Süresiz Yönetici badge:** /odeme sağ-üst lisans rozeti light temada görünmüyordu (amber-500/10 çok soluk) → light artık premium **mor→fuşya gradyan + beyaz** (nefes animasyonu korundu); dark amber aynen bırakıldı.
+3. **Logo → sayfa başı:** Header ve footer'daki NMM logosu/yazısı artık tıklanınca **smooth scroll ile en üste** döner (`scrollToTop`).
+4. **Yıllık disclaimer:** Landing'de yıllık seçilince çıkan uzun açıklama masaüstünde (`lg:`) **tek satır** (`lg:whitespace-nowrap` + `lg:max-w-none`); mobilde sarar.
+
+**Dosyalar:** `constants.ts`, `LandingPricing.tsx`, `LandingHeader.tsx`, `LandingFooter.tsx`, `smoothScroll.ts`, `OdemeClient.tsx`. tsc/lint/i18n/378 test ✅.
+
 ## 2026-06-21 — Plan kutusu renkleri + landing header menü/smooth-scroll ✅
 
 1. **Plus kart çerçevesi + buton:** Plus kartına görünür amber çerçeve (tag rengiyle; Basic indigo / Pro pembe gibi). "Ekibi Güçlendir" butonu artık image 2'deki derin mor (`LANDING_PLUS_CTA` sabit hex `#534AB7→#c4b5fd`) — dark/light/​/odeme hepsinde aynı (brand token dark'ta pastele kaydığı için sabit hex).

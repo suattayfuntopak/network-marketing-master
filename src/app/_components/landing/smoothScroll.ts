@@ -6,6 +6,12 @@
  */
 import type { MouseEvent } from 'react'
 
+/** Sayfayı en üste (başlangıç konumuna) yumuşak kaydır — logo tıklaması için. */
+export function scrollToTop() {
+  if (typeof window === 'undefined') return
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 export function scrollToLandingSection(
   e: MouseEvent<HTMLAnchorElement>,
   id: string,

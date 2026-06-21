@@ -80,7 +80,7 @@ export function LandingPricing() {
             </button>
           </div>
           {billingPeriod === 'yearly' && (
-            <p className="text-center text-[11px] text-slate-500 dark:text-zinc-400 max-w-lg mx-auto mt-3 leading-relaxed">
+            <p className="text-center text-[11px] text-slate-500 dark:text-zinc-400 max-w-lg lg:max-w-none lg:whitespace-nowrap mx-auto mt-3 leading-relaxed">
               {t('landingPage.yearlyBillingDisclaimer')}
             </p>
           )}

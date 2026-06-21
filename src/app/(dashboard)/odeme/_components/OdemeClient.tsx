@@ -236,7 +236,7 @@ export function OdemeClient() {
           )}
 
           {!workspace.licenseExpiresAt && (
-            <div className="flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/20 px-4 py-2 text-xs font-bold text-amber-600 dark:text-amber-400 animate-pulse">
+            <div className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-500 dark:bg-none dark:bg-amber-500/10 border border-transparent dark:border-amber-500/20 px-4 py-2 text-xs font-bold text-white dark:text-amber-400 shadow-sm animate-pulse">
               <Sparkles className="h-4 w-4 shrink-0" />
               <span>{t('paymentPage.unlimitedAdminLicense')}</span>
             </div>

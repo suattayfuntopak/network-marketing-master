@@ -15,10 +15,10 @@ export const LANDING_PRIMARY_CTA_HOVER =
 export const LANDING_BASIC_TRIAL_CTA =
   'border-transparent bg-gradient-to-br from-[#6AB86E] to-[#00796B] text-white shadow-md hover:opacity-95'
 
-/** Plus plan CTA — «Ekibi Güçlendir» derin mor; light/dark SABİT hex (tema-bağımsız,
- *  brand token dark'ta pastele kaydığı için sabit). Aylık Ödeme light tonuyla aynı. */
+/** Plus plan CTA — «Ekibi Güçlendir»: TEK RENK solid mor (gradyan/fade YOK),
+ *  light/dark aynı (sabit hex; Aylık Ödeme mor tonunda). */
 export const LANDING_PLUS_CTA =
-  'border-transparent bg-gradient-to-r from-[#534AB7] to-[#c4b5fd] text-white shadow-md hover:opacity-95'
+  'border-transparent bg-[#6742D2] text-white shadow-md hover:opacity-95'
 
 export const LANDING_PLUS_CTA_HOVER =
   'hover:shadow-lg hover:shadow-indigo-500/20'
