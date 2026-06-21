@@ -149,17 +149,17 @@ export function LandingPricing() {
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
-                <span data-testid="plan-basic-ai-limit">
-                  {t('landingPage.planBasicFeat2', { limit: DAILY_AI_LIMITS.basic })}
-                </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat3')}</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
                 <span>{t('landingPage.planBasicFeat4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
+                <span data-testid="plan-basic-ai-limit">
+                  {t('landingPage.planBasicFeat2', { limit: DAILY_AI_LIMITS.basic })}
+                </span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
@@ -214,10 +214,6 @@ export function LandingPricing() {
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
-                <span>{t('landingPage.planPlusFeat1', { limit: DAILY_AI_LIMITS.plus })}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
@@ -227,6 +223,10 @@ export function LandingPricing() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{t('landingPage.planPlusFeat4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                <span>{t('landingPage.planPlusFeat1', { limit: DAILY_AI_LIMITS.plus })}</span>
               </li>
             </ul>
           </div>
@@ -277,10 +277,6 @@ export function LandingPricing() {
             <ul className="space-y-3 border-t border-slate-200 dark:border-white/[0.05] pt-5 text-xs text-slate-500 dark:text-zinc-400">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
-                <span>{t('landingPage.planProFeat1', { limit: DAILY_AI_LIMITS.pro })}</span>
-              </li>
-              <li className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat2')}</span>
               </li>
               <li className="flex items-center gap-2">
@@ -290,6 +286,10 @@ export function LandingPricing() {
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
                 <span>{t('landingPage.planProFeat4')}</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 text-pink-600 dark:text-pink-400 shrink-0" />
+                <span>{t('landingPage.planProFeat1', { limit: DAILY_AI_LIMITS.pro })}</span>
               </li>
             </ul>
           </div>

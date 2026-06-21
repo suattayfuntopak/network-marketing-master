@@ -52,15 +52,15 @@ export const TEAM_FREE_BANNER_COPY = {
 /** Ödeme sayfası ekip özellikleri — paymentPage.plusFeature2/3/4, proFeature2/3/4 ile senkron. */
 export const PLAN_PAYMENT_TEAM_FEATURES = {
   tr: {
-    plusDownlineOnboarding: 'Alt ekip için Distribütör Doğru Başlangıç takibi',
-    plusStatsFunnel: 'Ekip Performans tablosu — aday hunisi ve DDBR sütunları',
+    plusDownlineOnboarding: 'Distribütör Doğru Başlangıç takibi — her yeni üyeyi ilk 90 günde doğru başlat',
+    plusStatsFunnel: 'Ekip performans tablosu — aday hunisi ve Doğru Başlangıç sütunları',
     plusMemberLimit: 'Alt ekip yönetimi ve NMM davet kodu gönderimi (100 kişiye kadar)',
     proLearningColumns: 'Tam performans tablosu — eğitim, video ve itiraz sütunları',
     proFieldSummary: 'Ekibim saha özeti (Ekip Saha Nabzı)',
     proUnlimitedTeam: 'Sınırsız alt ekip yönetimi ve NMM davet kodu gönderimi',
   },
   en: {
-    plusDownlineOnboarding: 'Quick Start onboarding tracking for downline distributors',
+    plusDownlineOnboarding: 'Quick Start onboarding — start every new distributor right in their first 90 days',
     plusStatsFunnel: 'Team performance table — pipeline funnel & Quick Start columns',
     plusMemberLimit: 'Downline management & NMM invites (up to 100 members)',
     proLearningColumns: 'Full performance table — training, video & objection columns',
