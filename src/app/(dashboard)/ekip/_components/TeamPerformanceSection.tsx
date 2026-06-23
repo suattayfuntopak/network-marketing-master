@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useQueryClient } from '@tanstack/react-query'
 import { Search, X } from 'lucide-react'
 import type { MemberRow } from '@/lib/team/types'
@@ -179,6 +179,27 @@ export function TeamPerformanceSection(props: TeamPerformanceSectionProps) {
   // Kullanıcı tıklayarak açar; kalıcılık (sessionStorage/URL) bilinçli olarak yoktur.
   const [memberCardTab, setMemberCardTab] = useState<Record<string, MemberCardTab | undefined>>({})
   const [onboardingWeekByMember, setOnboardingWeekByMember] = useState<Record<string, 1 | 2 | 3 | 4>>({})
+
+  const searchParams = useSearchParams()
+  const routeMemberId = searchParams.get('memberId')
+  const routeMemberTab = searchParams.get('memberTab') as MemberCardTab | null
+
+  useEffect(() => {
+    if (routeMemberId && routeMemberTab) {
+      /* eslint-disable-next-line react-hooks/set-state-in-effect */
+      setMemberCardTab(prev => ({
+        ...prev,
+        [routeMemberId]: routeMemberTab,
+      }))
+      const timer = setTimeout(() => {
+        const el = document.getElementById(`ekip-member-${routeMemberId}`)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 350)
+      return () => clearTimeout(timer)
+    }
+  }, [routeMemberId, routeMemberTab])
 
   const selectMemberTab = (userId: string, tab: MemberCardTab) => {
     setMemberCardTab(prev => ({

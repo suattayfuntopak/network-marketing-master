@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { BookOpen, ChevronDown, PlayCircle, Shield, Trophy, User } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useTranslation } from '@/providers/LanguageProvider'
@@ -81,6 +82,7 @@ export function TeamTrainingRankingTable({
   loading,
 }: TeamTrainingRankingTableProps) {
   const { t } = useTranslation()
+  const router = useRouter()
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   const rows = useMemo((): TrainingRow[] => {
@@ -127,13 +129,21 @@ export function TeamTrainingRankingTable({
           return (
             <li key={row.userId}>
               <div className="flex items-center gap-2 p-3">
-                <p className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm font-semibold text-[var(--text-1)]">
+                <button
+                  type="button"
+                  onClick={() => router.push(`/ekip?tab=members&memberId=${row.userId}&memberTab=training`)}
+                  className="flex min-w-0 flex-1 items-center gap-1.5 truncate text-sm font-semibold text-[var(--text-1)] text-left hover:underline"
+                >
                   <PersonIcon userId={row.userId} />
                   <span className="truncate">{row.name}</span>
-                </p>
-                <span className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.push(`/ekip?tab=members&memberId=${row.userId}&memberTab=training`)}
+                  className="shrink-0 rounded-lg bg-[var(--bg-subtle)] px-2 py-0.5 text-xs font-bold tabular-nums text-brand hover:underline"
+                >
                   %{row.avg}
-                </span>
+                </button>
                 <button
                   type="button"
                   onClick={() => setExpandedId(open ? null : row.userId)}
@@ -180,10 +190,14 @@ export function TeamTrainingRankingTable({
           <tbody className="divide-y divide-[var(--border)]">
             {rows.map((row) => {
               return (
-                <tr key={row.userId}>
+                <tr
+                  key={row.userId}
+                  onClick={() => router.push(`/ekip?tab=members&memberId=${row.userId}&memberTab=training`)}
+                  className="hover:bg-[var(--bg-subtle)]/50 cursor-pointer transition-colors group"
+                >
                   <td
                     className={clsx(
-                      'sticky left-0 bg-[var(--bg-card)] p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)]',
+                      'sticky left-0 bg-[var(--bg-card)] p-2.5 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.12)] group-hover:bg-[var(--bg-subtle-hover)] transition-colors',
                       Z.cardControlsUpper,
                     )}
                   >

@@ -1,5 +1,27 @@
 # Hot Log
 
+## 2026-06-23 — Pano Scroll, Ödeme Linki Navigasyonu & Ekip Eğitim Dökümü / Navigasyon Fixleri ✅
+
+1. **Pano Scroll:** Panoya girildiğinde `AccountStatusAlert` banner'ının üstte sıkışmış/görünmez kalma sorununu çözmek için `PanoContent.tsx` bileşeninin mount edilmesinde pencereyi en yukarı kaydıran (`window.scrollTo(0, 0)`) `useEffect` eklendi.
+2. **Ödeme Linki Navigasyonu:** Kilitli AI butonlarından açılan upgrade modalında "planları gör" butonuna basınca hiçbir şey olmaması (modal `onClose()` çağrısının Next.js `Link` yönlendirmesini iptal etmesi) sorunu, `UpgradeModalFooter.tsx` içindeki `onClose()` metoduna 100ms `setTimeout` gecikmesi eklenerek düzeltildi.
+3. **Ekip Eğitim Dökümü (Eğitim Tabı):** Üye detay kartına "Eğitim İlerlemesi" (`training`) sekmesi eklendi. Üyenin okuduğu eğitimleri (Content Library), izlediği videoları (Video Training) ve itiraz bankası okuma durumlarını (Objection Bank) listeleyen `getMemberTrainingDetailAction` server action'ı ve premium `MemberTrainingDetail.tsx` bileşeni geliştirildi.
+4. **Onboarding / Eğitim Tablosu Yönlendirmeleri:**
+   - "Distribütör Doğru Başlangıç Rehberi Takip Tablosu"ndaki (DDBR) bir kişinin satırına tıklandığında, `/ekip?tab=members&memberId={userId}&memberTab=onboarding` rotasına yönlendirilmesi sağlandı.
+   - `TeamTrainingRankingTable.tsx` tablosundaki herhangi bir kişinin ismine veya ortalamasına tıklandığında, `/ekip?tab=members&memberId={userId}&memberTab=training` rotasına yönlendirilmesi sağlandı.
+   - `TeamPerformanceSection.tsx` bileşeninde searchParams üzerinden gelen `memberId` ve `memberTab` parametrelerini okuyan bir `useEffect` geliştirilerek, ilgili üyenin kartı otomatik açılıp ilgili sekmesi seçildi ve üye kartı sayfada `scrollIntoView` ile odaklandı.
+   - `TeamMemberCard.tsx` dış div'ine `ekip-member-${userId}` id'si verilerek hedeflenebilir yapıldı.
+
+**Dosyalar:**
+- `src/app/(dashboard)/pano/_components/PanoContent.tsx`
+- `src/components/ui/UpgradeModalFooter.tsx`
+- `src/app/(dashboard)/ekip/_components/TeamMemberCard.tsx`
+- `src/app/(dashboard)/ekip/_components/TeamPerformanceSection.tsx`
+- `src/app/(dashboard)/ekip/_components/EkipTrainingTab.tsx`
+- `src/app/(dashboard)/ekip/_components/TeamTrainingRankingTable.tsx`
+- `src/app/(dashboard)/ekip/_components/MemberTrainingDetail.tsx` (yeni)
+- `src/app/(dashboard)/ekip/actions.ts`
+Typecheck & Lint (ESLint) & build ✅.
+
 ## 2026-06-22 — NavigationDebugger kaldırıldı (rogue redirect YOK — kanıtlandı) ✅
 
 NavigationDebugger toast'u "/musteriler/[id] → /musteriler otomatik geçiş" yakaladı. Soruşturma: **tüm projede `/musteriler` listesine programatik gidiş yalnızca `CustomerDetail` satır 82 = silme aksiyonu** (kullanıcı tetikli). Otomatik yönlendirme kodu **yok** (grep ile kanıtlandı). Demek ki toast **yanlış pozitif**: detayda geri-ok/sidebar tıklaması → ağır uygulamada ~1.6sn süren soft-nav → Next `pushState`'i tıklamadan 1.6sn sonra çağırdı → dedektörün ">1.2sn girdisiz" sezgisi yanlış flaglendi.

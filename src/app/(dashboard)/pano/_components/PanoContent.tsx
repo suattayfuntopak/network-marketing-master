@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { clsx } from 'clsx'
 import { useWorkspace } from '@/hooks/useWorkspace'
 import { useCandidates } from '@/hooks/useCandidates'
@@ -20,6 +20,10 @@ export function PanoContent() {
   const { candidates, isLoading: cLoading } = useCandidates(ws?.workspaceId)
   // Brief açık/kapalı — Pano sahibi tutar ki masaüstünde grid'i aşağı itebilsin.
   const [briefOpen, setBriefOpen] = useState(false)
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const hour = new Date().getHours()
   const greeting = hour < 5

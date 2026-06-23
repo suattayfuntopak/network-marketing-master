@@ -633,3 +633,65 @@ export async function joinTeamByCodeAction(
   }
   return { ok: true }
 }
+
+export type MemberTrainingDetailPayload = {
+  readTrainings: string[]
+  readObjections: number[]
+  videoProgress: Record<string, { status: 'started' | 'completed'; watchPercent: number }>
+}
+
+export async function getMemberTrainingDetailAction(
+  workspaceId: string,
+  targetUserId: string,
+): Promise<MemberTrainingDetailPayload> {
+  const empty: MemberTrainingDetailPayload = {
+    readTrainings: [],
+    readObjections: [],
+    videoProgress: {},
+  }
+  const { user } = await getAuthUser()
+  if (!user) return empty
+
+  const supabase = await createClient()
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (ws?.owner_id !== user.id && !isSuperAdmin(user)) return empty
+
+  const [progressRes, videoRes] = await Promise.all([
+    supabase
+      .from('nmm_user_progress')
+      .select('read_trainings, read_objections')
+      .eq('user_id', targetUserId)
+      .maybeSingle(),
+    supabase
+      .from('nmm_video_progress')
+      .select('video_key, status, watch_percent')
+      .eq('user_id', targetUserId)
+  ])
+
+  const readTrainings = Array.isArray(progressRes.data?.read_trainings)
+    ? (progressRes.data.read_trainings as string[])
+    : []
+  const readObjections = Array.isArray(progressRes.data?.read_objections)
+    ? (progressRes.data.read_objections as number[])
+    : []
+
+  const videoProgress: Record<string, { status: 'started' | 'completed'; watchPercent: number }> = {}
+  for (const row of videoRes.data ?? []) {
+    videoProgress[row.video_key] = {
+      status: row.status as 'started' | 'completed',
+      watchPercent: row.watch_percent ?? 0
+    }
+  }
+
+  return {
+    readTrainings,
+    readObjections,
+    videoProgress
+  }
+}
+

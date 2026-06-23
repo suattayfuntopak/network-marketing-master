@@ -51,7 +51,7 @@ export function UpgradeModalFooter({
         href={plansHref}
         onClick={() => {
           logSeePlansClick(phase, source)
-          onClose()
+          setTimeout(onClose, 100)
         }}
         className={clsx(
           'flex flex-1 items-center justify-center gap-1.5 rounded-xl brand-cta font-bold text-white shadow-md hover:opacity-95 transition',

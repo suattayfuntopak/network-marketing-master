@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { clsx } from 'clsx'
 import { toast } from 'sonner'
-import { Crown, Check, Rocket, Bot, Phone, BarChart3, UserPlus, UserMinus, Target } from 'lucide-react'
+import { Crown, Check, Rocket, Bot, Phone, BarChart3, UserPlus, UserMinus, Target, BookOpen } from 'lucide-react'
 import { WhatsAppIcon } from '@/components/ui/WhatsAppIcon'
 import { PersonAvatar } from '@/components/ui/PersonAvatar'
 import { getTeamMemberCardClasses } from '@/lib/ui/teamMemberCard'
@@ -23,7 +23,12 @@ const MemberPersonDetailSections = dynamic(
   { loading: () => null },
 )
 
-export type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity'
+const MemberTrainingDetail = dynamic(
+  () => import('./MemberTrainingDetail').then(mod => ({ default: mod.MemberTrainingDetail })),
+  { loading: () => null },
+)
+
+export type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity' | 'training'
 
 type TranslateFn = (key: string, vars?: Record<string, string | number>) => string
 
@@ -81,6 +86,7 @@ export function TeamMemberCard({
     wa?: boolean
   }[] = [
     { id: 'activity', Icon: BarChart3, label: t('team.activityBtn'), show: isLeader },
+    { id: 'training', Icon: BookOpen, label: t('team.tabTraining') || 'Eğitim İlerlemesi', show: isLeader && m.role === 'member' },
     { id: 'onboarding', Icon: Rocket, label: t('team.correctStartGuide'), show: m.role === 'member' },
     { id: 'whatsapp', Icon: WhatsAppIcon, label: 'WhatsApp', show: m.role === 'member', wa: true },
     { id: 'call', Icon: Phone, label: t('team.callBtn'), show: !!telHref, className: 'sm:hidden' },
@@ -117,6 +123,7 @@ export function TeamMemberCard({
 
   return (
     <div
+      id={`ekip-member-${m.user_id}`}
       data-testid={`team-member-card-${m.user_id}`}
       className={clsx('overflow-hidden rounded-2xl border transition-all duration-200 p-4 sm:p-5 shadow-sm hover:shadow-md space-y-4', getTeamMemberCardClasses(m, isInactive))}
     >
@@ -343,6 +350,11 @@ export function TeamMemberCard({
                   memberSeed={m}
                   teamPulseUnlocked={teamPulseUnlocked}
                   showActionButtons
+                />
+              ) : activeTab === 'training' && isLeader ? (
+                <MemberTrainingDetail
+                  workspaceId={ws.workspaceId}
+                  targetUserId={m.user_id}
                 />
               ) : null}
             </div>

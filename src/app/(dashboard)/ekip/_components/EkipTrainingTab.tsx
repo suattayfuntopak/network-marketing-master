@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery } from '@tanstack/react-query'
 import { clsx } from 'clsx'
 import { ONBOARDING_STEPS } from '@/lib/team/types'
@@ -22,6 +23,7 @@ type Props = {
 
 export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocked }: Props) {
   const { data: ws } = useWorkspace()
+  const router = useRouter()
   const downline = members.filter(m => m.role !== 'leader')
   const stepTotal = ONBOARDING_STEPS.length
   const memberIds = useMemo(() => downline.map(m => m.user_id), [downline])
@@ -74,7 +76,11 @@ export function EkipTrainingTab({ t, members, teamPageUnlocked, teamPulseUnlocke
               {ranked.map(({ member: m, done, pct }) => (
                 <li
                   key={m.user_id}
-                  className={clsx('rounded-xl border border-[var(--border)] p-3', personAccent(m.user_id).bg)}
+                  onClick={() => router.push(`/ekip?tab=members&memberId=${m.user_id}&memberTab=onboarding`)}
+                  className={clsx(
+                    'rounded-xl border border-[var(--border)] p-3 cursor-pointer hover:opacity-90 active:scale-[0.99] transition-all',
+                    personAccent(m.user_id).bg
+                  )}
                 >
                   <div className="mb-1.5 flex items-center justify-between gap-2">
                     <p className="truncate text-sm font-medium text-[var(--text-1)]">
