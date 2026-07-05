@@ -92,7 +92,7 @@ export function ItirazCard({
             <p className="text-[11px] font-semibold uppercase tracking-wider text-[#16A34A] dark:text-[#fda4af] mb-0.5">
               {kategori}
             </p>
-            <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
+            <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)]' : 'text-[var(--text-1)]'}`}>
               &quot;{soru}&quot;
             </p>
           </div>

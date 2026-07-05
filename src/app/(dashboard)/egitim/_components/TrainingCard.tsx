@@ -81,7 +81,7 @@ export function TrainingCard({
                   {konu.seviye}
                 </span>
               </div>
-              <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)] line-through' : 'text-[var(--text-1)]'}`}>
+              <p className={`text-base font-semibold leading-snug ${isRead ? 'text-[var(--text-3)]' : 'text-[var(--text-1)]'}`}>
                 {baslik}
               </p>
               {isArticle ? (

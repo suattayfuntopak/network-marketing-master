@@ -12,6 +12,7 @@
 2. **Otomatik Okuma Takibi (10 Saniye Kuralı):**
    - Eğitim konusu ve İtiraz Bankası kartlarındaki manuel "okundu" daireleri kaldırıldı.
    - Bir içerik/itiraz açılıp 10 saniye boyunca açık kaldığında, sayfa gizlenmesi/terk edilmesi ve kapatma durumları yönetilerek otomatik okundu olarak kaydeden `useAutoReadTracker` hook'u geliştirildi.
+   - Okunan içeriklerin ve itirazların başlıklarındaki "line-through" (üzeri çizili) görsel stili kaldırılarak, başlıkların normal ve düzgün şekilde okunabilir kalması sağlandı.
 3. **Video Eğitim Etiketleri:**
    - Ekip kartındaki video eğitim sekmesindeki `videoTraining.min` çeviri hatası giderildi, TR için `dk`, EN için `min` getiren `durationUnit` eklendi.
    - Video kategorisinin dile göre (`categoryTr`/`categoryEn`) gösterilmesi sağlandı.
