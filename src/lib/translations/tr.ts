@@ -354,6 +354,10 @@ export const tr = {
     fieldPulseTitle: "Ekip Saha Nabzı",
     trainingRankingTitle: "Ekip Eğitim Nabzı",
     tabTraining: "Eğitim İlerlemesi",
+    resetTrainingProgress: "Eğitim İlerlemesini Sıfırla",
+    resetTrainingConfirm: "Bu üyenin tüm okuma ilerlemesi sıfırlanacak (favoriler korunur). Devam etmek istiyor musun?",
+    resetTrainingSuccess: "Eğitim ilerlemesi sıfırlandı.",
+    lastResetAt: "Son sıfırlama: {date}",
     tabTree: "Ekip Ağacı",
     trainingEmpty: "Henüz eğitim ilerlemesi gösterilecek ekip üyesi yok.",
     analyticsTitle: "Ekip Analizi",
@@ -507,5 +511,6 @@ export const tr = {
     markAsUnread: "Okunmadı olarak işaretle",
     addToFavorites: "Favorilere Ekle",
     removeFromFavorites: "Favorilerden Çıkar",
+    readAutomatic: "Otomatik okundu (10 sn açık kaldı)",
   },
 };

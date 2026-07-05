@@ -101,6 +101,7 @@ export const trainingSection = {
       expandDetailedAnswer: 'Detaylı Cevap',
       expandApproach: 'Yaklaşım',
       expandExampleDialog: 'Örnek Diyalog',
+      readAutomatic: 'Otomatik okundu (10 sn açık kaldı)',
     },
   },
   en: {
@@ -205,6 +206,7 @@ export const trainingSection = {
       expandDetailedAnswer: 'Detailed Answer',
       expandApproach: 'Approach',
       expandExampleDialog: 'Example Dialog',
+      readAutomatic: 'Auto-marked as read (open for 10s)',
     },
   },
 } as const

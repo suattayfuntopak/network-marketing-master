@@ -884,6 +884,8 @@ export interface Database {
           read_objections: Json
           fav_objections: Json
           updated_at: string
+          training_reset_at: string | null
+          training_reset_by: string | null
         }
         Insert: {
           user_id: string
@@ -893,6 +895,8 @@ export interface Database {
           read_objections?: Json
           fav_objections?: Json
           updated_at?: string
+          training_reset_at?: string | null
+          training_reset_by?: string | null
         }
         Update: {
           user_id?: string
@@ -902,6 +906,8 @@ export interface Database {
           read_objections?: Json
           fav_objections?: Json
           updated_at?: string
+          training_reset_at?: string | null
+          training_reset_by?: string | null
         }
         Relationships: []
       }

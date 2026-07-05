@@ -1,5 +1,46 @@
 # Hot Log
 
+## 2026-07-05 — Performans İyileştirmeleri, 10 Saniye Okuma Takip Kuralı, Video Etiketi & Lider İlerleme Sıfırlama ✅
+
+1. **Performans İyileştirmeleri:**
+   - Ekip sayfası prefetch'leri `await` yerine `void` (fire-and-forget) yapılarak ilk render'ın bloke olması engellendi.
+   - `EkipPanel` ve `TeamMemberCard` altındaki dynamic component import'larına `Skeleton` iskelet yapıları eklenerek kullanıcıya anlık geribildirim sağlandı.
+   - `DashboardShell` arama/URL parametreleri değişiminde gereksiz prefetch tetiklemelerini engelleyecek şekilde optimize edildi.
+   - Dynamic client router cache süresi `30s` -> `60s` çıkarıldı. `staleTimes` değerleri optimize edilerek sunucu roundtrip sayıları düşürüldü.
+2. **Otomatik Okuma Takibi (10 Saniye Kuralı):**
+   - Eğitim konusu ve İtiraz Bankası kartlarındaki manuel "okundu" daireleri kaldırıldı.
+   - Bir içerik/itiraz açılıp 10 saniye boyunca açık kaldığında, sayfa gizlenmesi/terk edilmesi ve kapatma durumları yönetilerek otomatik okundu olarak kaydeden `useAutoReadTracker` hook'u geliştirildi.
+3. **Video Eğitim Etiketleri:**
+   - Ekip kartındaki video eğitim sekmesindeki `videoTraining.min` çeviri hatası giderildi, TR için `dk`, EN için `min` getiren `durationUnit` eklendi.
+   - Video kategorisinin dile göre (`categoryTr`/`categoryEn`) gösterilmesi sağlandı.
+4. **Lider İlerleme Sıfırlama (Reset):**
+   - Üyenin eğitim tablosunda liderlerin kullanabileceği "Eğitim İlerlemesini Sıfırla" butonu ve geri dönülemez işlem için `ConfirmDialog` onay mekanizması eklendi.
+   - İlerlemeyi sıfırlayan `resetMemberTrainingProgressAction` server action'ı geliştirildi. `nmm_user_progress` tablosuna `training_reset_at` ve `training_reset_by` kolonları ekleyen `106_training_progress_reset.sql` migration'ı yazıldı.
+   - Son sıfırlama tarihi arayüzde gösterilerek liderin durum takibi kolaylaştırıldı.
+
+**Dosyalar:**
+- `supabase/migrations/106_training_progress_reset.sql` (yeni)
+- `src/types/database.types.ts`
+- `src/hooks/useAutoReadTracker.ts` (yeni)
+- `src/app/(dashboard)/ekip/actions.ts`
+- `src/app/(dashboard)/ekip/page.tsx`
+- `src/app/(dashboard)/ekip/_components/EkipPanel.tsx`
+- `src/app/(dashboard)/ekip/_components/TeamMemberCard.tsx`
+- `src/app/(dashboard)/ekip/_components/MemberTrainingDetail.tsx`
+- `src/app/(dashboard)/egitim/_components/TrainingCard.tsx`
+- `src/app/(dashboard)/egitim/_components/EgitimContent.tsx`
+- `src/app/(dashboard)/itirazlar/_components/ItirazCard.tsx`
+- `src/app/(dashboard)/itirazlar/_components/ItirazlarContent.tsx`
+- `src/lib/translations/tr.ts`
+- `src/lib/translations/en.ts`
+- `src/lib/translations/sections/training.ts`
+- `src/lib/translations/sections/videoTraining.ts`
+- `src/lib/query/staleTimes.ts`
+- `src/app/(dashboard)/_components/DashboardShell.tsx`
+- `next.config.ts`
+
+Typecheck, Lint ve Build başarıyla tamamlandı. ✅
+
 ## 2026-06-23 — Pano Scroll, Ödeme Linki Navigasyonu & Ekip Eğitim Dökümü / Navigasyon Fixleri ✅
 
 1. **Pano Scroll:** Panoya girildiğinde `AccountStatusAlert` banner'ının üstte sıkışmış/görünmez kalma sorununu çözmek için `PanoContent.tsx` bileşeninin mount edilmesinde pencereyi en yukarı kaydıran (`window.scrollTo(0, 0)`) `useEffect` eklendi.

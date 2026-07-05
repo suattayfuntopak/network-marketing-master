@@ -47,6 +47,7 @@ export const videoTrainingSection = {
       confirmDelete: '"{title}" videosunu silmek istediğine emin misin?',
       videoDeleted: 'Video silindi.',
       deleteFailed: 'Silme başarısız.',
+      durationUnit: 'dk',
     },
   },
   en: {
@@ -97,6 +98,7 @@ export const videoTrainingSection = {
       confirmDelete: 'Are you sure you want to delete "{title}"?',
       videoDeleted: 'Video deleted.',
       deleteFailed: 'Delete failed.',
+      durationUnit: 'min',
     },
   },
 } as const

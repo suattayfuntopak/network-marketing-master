@@ -18,14 +18,16 @@ import type { WorkspaceContext } from '@/hooks/useWorkspace'
 import type { MemberGoalRow } from '@/app/(dashboard)/ekip/memberGoalsActions'
 import type { UpgradeFeature } from '@/components/ui/UpgradePrompt'
 
+import { Skeleton } from '@/components/ui/Skeleton'
+
 const MemberPersonDetailSections = dynamic(
   () => import('./MemberPersonDetailSections').then(mod => ({ default: mod.MemberPersonDetailSections })),
-  { loading: () => null },
+  { loading: () => <div className="space-y-3"><Skeleton className="h-32 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></div> },
 )
 
 const MemberTrainingDetail = dynamic(
   () => import('./MemberTrainingDetail').then(mod => ({ default: mod.MemberTrainingDetail })),
-  { loading: () => null },
+  { loading: () => <div className="space-y-3"><Skeleton className="h-24 rounded-2xl" /><Skeleton className="h-40 rounded-2xl" /></div> },
 )
 
 export type MemberCardTab = 'onboarding' | 'call' | 'whatsapp' | 'activity' | 'training'

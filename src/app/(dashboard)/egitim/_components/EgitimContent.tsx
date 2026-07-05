@@ -17,6 +17,7 @@ import { addCustomContent, deleteCustomContent } from '@/lib/domain/customConten
 import { PAGE_SIZE } from '../constants'
 import type { TrainingTopic } from '../types'
 import { TrainingCard } from './TrainingCard'
+import { useAutoReadTracker } from '@/hooks/useAutoReadTracker'
 import dynamic from 'next/dynamic'
 const ArticleReader = dynamic(() => import('./ArticleReader').then(mod => mod.ArticleReader), {
   ssr: false,
@@ -261,15 +262,17 @@ export function EgitimContent({
     toggle(konu.id)
   }
 
-  function toggleRead(id: string, e: React.MouseEvent) {
-    e.stopPropagation()
-    toggleTrainingRead(id)
-  }
-
   function toggleFav(id: string, e: React.MouseEvent) {
     e.stopPropagation()
     toggleTrainingFav(id)
   }
+
+  // Otomatik okuma: içerik 10 sn açık kalırsa okundu sayılır.
+  useAutoReadTracker(
+    acikId,
+    acikId != null ? read.has(acikId) : true,
+    (id) => toggleTrainingRead(id as string),
+  )
 
   async function copyKonu(maddeler: string[], id: string, e: React.MouseEvent) {
     e.stopPropagation()
@@ -479,7 +482,6 @@ export function EgitimContent({
                 isRead={read.has(konu.id)}
                 copied={copiedId === konu.id}
                 onToggle={() => handleCardOpen(konu)}
-                onToggleRead={e => toggleRead(konu.id, e)}
                 onToggleFav={e => toggleFav(konu.id, e)}
                 onCopy={e =>
                   copyKonu(

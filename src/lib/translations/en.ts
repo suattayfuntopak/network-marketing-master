@@ -354,6 +354,10 @@ export const en = {
     fieldPulseTitle: "Team Field Pulse",
     trainingRankingTitle: "Team Training Pulse",
     tabTraining: "Training Progress",
+    resetTrainingProgress: "Reset Training Progress",
+    resetTrainingConfirm: "All reading progress for this member will be reset (favorites are kept). Continue?",
+    resetTrainingSuccess: "Training progress has been reset.",
+    lastResetAt: "Last reset: {date}",
     tabTree: "Team Tree",
     trainingEmpty: "No team members to show training progress for yet.",
     analyticsTitle: "Team Analytics",
@@ -507,5 +511,6 @@ export const en = {
     markAsUnread: "Mark as Unread",
     addToFavorites: "Add to Favorites",
     removeFromFavorites: "Remove from Favorites",
+    readAutomatic: "Auto-marked as read (open for 10s)",
   },
 };

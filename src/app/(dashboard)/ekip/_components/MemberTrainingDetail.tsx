@@ -1,14 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { BookOpen, PlayCircle, Shield, CheckCircle2, Circle, Loader2, ChevronRight, ChevronDown } from 'lucide-react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { BookOpen, PlayCircle, Shield, CheckCircle2, Circle, Loader2, ChevronRight, ChevronDown, RotateCcw } from 'lucide-react'
 import { clsx } from 'clsx'
+import { toast } from 'sonner'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { getTrainingData } from '@/lib/domain/trainingData'
 import { TRAINING_VIDEOS } from '@/lib/domain/trainingVideos'
 import { ITIRAZLAR } from '@/app/(dashboard)/itirazlar/data/itirazlar'
-import { getMemberTrainingDetailAction } from '../actions'
+import { getMemberTrainingDetailAction, resetMemberTrainingProgressAction } from '../actions'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 type MemberTrainingDetailProps = {
   workspaceId: string
@@ -19,8 +21,11 @@ type SubTab = 'videos' | 'library' | 'objections'
 
 export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTrainingDetailProps) {
   const { t, lang } = useTranslation()
+  const queryClient = useQueryClient()
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('library')
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+  const [resetConfirmOpen, setResetConfirmOpen] = useState(false)
+  const [resetting, setResetting] = useState(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['member-training-detail', workspaceId, targetUserId],
@@ -40,7 +45,25 @@ export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTraini
     )
   }
 
-  const { readTrainings = [], readObjections = [], videoProgress = {} } = data || {}
+  const { readTrainings = [], readObjections = [], videoProgress = {}, trainingResetAt } = data || {}
+
+  async function handleReset() {
+    setResetting(true)
+    try {
+      const result = await resetMemberTrainingProgressAction(workspaceId, targetUserId)
+      if (result.ok) {
+        toast.success(t('team.resetTrainingSuccess'))
+        void queryClient.invalidateQueries({ queryKey: ['member-training-detail', workspaceId, targetUserId] })
+      } else {
+        toast.error(result.error || 'Hata oluştu.')
+      }
+    } catch {
+      toast.error('Hata oluştu.')
+    } finally {
+      setResetting(false)
+      setResetConfirmOpen(false)
+    }
+  }
 
   // Calculate percentages
   const totalVideos = TRAINING_VIDEOS.length
@@ -88,6 +111,40 @@ export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTraini
 
   return (
     <div className="space-y-5">
+      {/* Lider reset butonu + son sıfırlama bilgisi */}
+      <div className="flex items-center justify-between gap-2">
+        {trainingResetAt && (
+          <p className="text-[10px] text-[var(--text-3)] font-semibold">
+            {t('team.lastResetAt', {
+              date: new Date(trainingResetAt).toLocaleDateString(
+                lang === 'en' ? 'en-GB' : 'tr-TR',
+                { day: 'numeric', month: 'short', year: 'numeric' },
+              ),
+            })}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={() => setResetConfirmOpen(true)}
+          disabled={resetting}
+          className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-rose-200/50 bg-rose-50 px-2.5 py-1.5 text-[10px] font-bold text-rose-600 transition hover:bg-rose-100 active:scale-95 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40 disabled:opacity-50"
+        >
+          <RotateCcw className="h-3 w-3" />
+          {t('team.resetTrainingProgress')}
+        </button>
+      </div>
+
+      {resetConfirmOpen && (
+        <ConfirmDialog
+          title={t('team.resetTrainingProgress')}
+          message={t('team.resetTrainingConfirm')}
+          confirmLabel={t('team.resetTrainingProgress')}
+          onConfirm={handleReset}
+          onCancel={() => setResetConfirmOpen(false)}
+          variant="danger"
+        />
+      )}
+
       {/* 3 Summary Cards */}
       <div className="grid grid-cols-3 gap-2.5">
         {stats.map(s => {
@@ -211,9 +268,9 @@ export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTraini
                         {lang === 'en' ? vid.titleEn : vid.titleTr}
                       </p>
                       <div className="flex items-center gap-1.5 mt-1 text-[10px] text-[var(--text-3)] font-semibold">
-                        <span>{vid.durationMin} {t('videoTraining.min') || 'dk'}</span>
+                        <span>{vid.durationMin} {t('videoTraining.durationUnit')}</span>
                         <span>•</span>
-                        <span className="capitalize">{vid.categoryTr}</span>
+                        <span className="capitalize">{lang === 'en' ? vid.categoryEn : vid.categoryTr}</span>
                       </div>
                       {percent > 0 && !isCompleted && (
                         <div className="flex items-center gap-2 mt-1.5">

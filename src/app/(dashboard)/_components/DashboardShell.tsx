@@ -60,8 +60,13 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     routes.forEach(href => router.prefetch(href))
   }, [routes, router])
 
+  const prevPathRef = useRef(pathname)
+
   useEffect(() => {
     if (!ws?.workspaceId) return
+    // Aynı pathname'de arama parametresi değişikliğinde gereksiz prefetch atla.
+    if (prevPathRef.current === pathname) return
+    prevPathRef.current = pathname
     const match = routes.find(r => pathname === r || (r !== '/pano' && pathname.startsWith(r)))
     if (match) prefetchRouteData(queryClient, match, ws.workspaceId, ws)
   }, [pathname, ws, routes, queryClient])

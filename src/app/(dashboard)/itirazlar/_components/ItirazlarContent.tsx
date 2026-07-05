@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation'
 import { ITIRAZLAR, PAGE_SIZE } from '../data/itirazlar'
 import type { CustomItiraz } from '../types'
 import { ItirazCard } from './ItirazCard'
+import { useAutoReadTracker } from '@/hooks/useAutoReadTracker'
 import dynamic from 'next/dynamic'
 const AddObjectionModal = dynamic(() => import('./AddObjectionModal').then(mod => mod.AddObjectionModal), {
   ssr: false,
@@ -95,6 +96,13 @@ export function ItirazlarContent({
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setPage(1) }, [search, aktifKategori, lang])
+
+  // Otomatik okuma: itiraz 10 sn açık kalırsa okundu sayılır.
+  useAutoReadTracker(
+    acikId,
+    acikId != null ? read.has(acikId) : true,
+    (id) => toggleObjectionRead(id as number),
+  )
 
   async function copyCevap(cevap: string, id: number, e: React.MouseEvent) {
     e.stopPropagation()
@@ -341,10 +349,6 @@ export function ItirazlarContent({
                 onToggleFav={e => {
                   e.stopPropagation()
                   toggleObjectionFav(itiraz.id)
-                }}
-                onToggleRead={e => {
-                  e.stopPropagation()
-                  toggleObjectionRead(itiraz.id)
                 }}
                 onCopy={(value, e) => copyCevap(value, itiraz.id, e)}
                 onEdit={

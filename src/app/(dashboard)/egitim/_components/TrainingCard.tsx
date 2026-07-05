@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowRight, Check, CheckCircle2, ChevronDown, Circle, Clock, Copy, Pencil, Star, Trash2 } from 'lucide-react'
+import { ArrowRight, Check, CheckCircle2, ChevronDown, Clock, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { SEVIYE_RENK, getTrainingCategoryStyles } from '../constants'
@@ -16,7 +16,6 @@ type Props = {
   copied: boolean
   onToggle: () => void
   onToggleFav: (e: React.MouseEvent) => void
-  onToggleRead: (e: React.MouseEvent) => void
   onCopy: (e: React.MouseEvent) => void
   onDelete?: () => void
   onEdit?: () => void
@@ -31,7 +30,6 @@ export function TrainingCard({
   copied,
   onToggle,
   onToggleFav,
-  onToggleRead,
   onCopy,
   onDelete,
   onEdit,
@@ -116,18 +114,14 @@ export function TrainingCard({
           </button>
 
           <div className="flex shrink-0 items-center gap-0.5">
-            <button
-              type="button"
-              onClick={onToggleRead}
-              title={isRead ? t('training.markAsUnread') : t('training.markAsRead')}
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
-                isRead
-                  ? 'text-emerald-600 dark:text-emerald-400 hover:scale-105'
-                  : 'text-[var(--text-3)] hover:text-emerald-600 dark:hover:text-emerald-400 hover:scale-105'
-              }`}
-            >
-              {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
-            </button>
+            {isRead && (
+              <span
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-emerald-600 dark:text-emerald-400"
+                title={t('training.readAutomatic')}
+              >
+                <CheckCircle2 className="h-5 w-5" />
+              </span>
+            )}
 
             <button
               type="button"

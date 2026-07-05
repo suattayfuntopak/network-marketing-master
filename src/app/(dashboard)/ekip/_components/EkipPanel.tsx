@@ -37,15 +37,15 @@ const YZOnboardingKocuModal = dynamic(
 
 const EkipSummaryTab = dynamic(
   () => import('./EkipSummaryTab').then(m => ({ default: m.EkipSummaryTab })),
-  { loading: () => <Skeleton className="h-48 rounded-2xl" /> },
+  { loading: () => <div className="space-y-3"><Skeleton className="h-48 rounded-2xl" /><Skeleton className="h-32 rounded-2xl" /></div> },
 )
 const EkipTrainingTab = dynamic(
   () => import('./EkipTrainingTab').then(m => ({ default: m.EkipTrainingTab })),
-  { loading: () => <Skeleton className="h-48 rounded-2xl" /> },
+  { loading: () => <div className="space-y-3"><Skeleton className="h-48 rounded-2xl" /><Skeleton className="h-32 rounded-2xl" /></div> },
 )
 const TeamGenerationTree = dynamic(
   () => import('./TeamGenerationTree').then(m => ({ default: m.TeamGenerationTree })),
-  { loading: () => <Skeleton className="h-64 rounded-2xl" /> },
+  { loading: () => <div className="space-y-3"><Skeleton className="h-64 rounded-2xl" /><Skeleton className="h-20 rounded-2xl" /></div> },
 )
 
 export { ONBOARDING_STEPS }
@@ -158,7 +158,7 @@ export function EkipPanel({ activeTab = 'members' }: { activeTab?: EkipTabId }) 
     )
   }
 
-  if (mLoading && activeTab === 'members' && members.length === 0) {
+  if (mLoading && activeTab === 'members') {
     return (
       <div className="space-y-3">
         {[1, 2, 3].map(i => (

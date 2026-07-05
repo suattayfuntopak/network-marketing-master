@@ -1,6 +1,6 @@
 'use client'
 
-import { Check, CheckCircle2, ChevronDown, Circle, Copy, Pencil, Star, Trash2 } from 'lucide-react'
+import { Check, CheckCircle2, ChevronDown, Copy, Pencil, Star, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/providers/LanguageProvider'
 import { whatsappShareUrl } from '@/lib/utils/waLink'
 import { MODERATION_HIGHLIGHT_CLASS } from '@/lib/ui/moderationHighlight'
@@ -31,7 +31,6 @@ type Props = {
   copied: boolean
   onToggle: () => void
   onToggleFav: (e: React.MouseEvent) => void
-  onToggleRead: (e: React.MouseEvent) => void
   onCopy: (value: string, e: React.MouseEvent) => void
   onDelete?: () => void
   onEdit?: () => void
@@ -46,7 +45,6 @@ export function ItirazCard({
   copied,
   onToggle,
   onToggleFav,
-  onToggleRead,
   onCopy,
   onDelete,
   onEdit,
@@ -99,17 +97,14 @@ export function ItirazCard({
             </p>
           </div>
 
-          <button
-            onClick={onToggleRead}
-            title={isRead ? t('objectionsPage.markAsUnread') : t('objectionsPage.markAsRead')}
-            className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all ${
-              isRead
-                ? 'text-emerald-600 dark:text-emerald-400'
-                : 'text-[var(--text-3)] hover:text-emerald-600 dark:hover:text-emerald-400'
-            }`}
-          >
-            {isRead ? <CheckCircle2 className="h-5 w-5" /> : <Circle className="h-5 w-5" />}
-          </button>
+          {isRead && (
+            <span
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-emerald-600 dark:text-emerald-400"
+              title={t('objectionsPage.readAutomatic')}
+            >
+              <CheckCircle2 className="h-5 w-5" />
+            </span>
+          )}
 
           <button
             onClick={onToggleFav}

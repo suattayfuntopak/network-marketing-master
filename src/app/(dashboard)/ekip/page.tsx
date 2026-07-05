@@ -40,7 +40,10 @@ export default async function EkipPage() {
   })
 
   if (ws?.workspaceId) {
-    await Promise.all([
+    // Fire-and-forget: sayfa RSC'si anında döner, Suspense skeleton gösterir.
+    // TanStack HydrationBoundary mevcut cache'i dehydrate eder; kalan sorgular
+    // client tarafında otomatik çözülür → sekme geçişlerinde algılanan gecikme düşer.
+    void Promise.all([
       queryClient.prefetchQuery({
         queryKey: queryKeys.team(ws.workspaceId),
         queryFn: () => fetchTeamBundleAction(ws.workspaceId),

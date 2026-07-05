@@ -638,6 +638,7 @@ export type MemberTrainingDetailPayload = {
   readTrainings: string[]
   readObjections: number[]
   videoProgress: Record<string, { status: 'started' | 'completed'; watchPercent: number }>
+  trainingResetAt: string | null
 }
 
 export async function getMemberTrainingDetailAction(
@@ -648,6 +649,7 @@ export async function getMemberTrainingDetailAction(
     readTrainings: [],
     readObjections: [],
     videoProgress: {},
+    trainingResetAt: null,
   }
   const { user } = await getAuthUser()
   if (!user) return empty
@@ -664,7 +666,7 @@ export async function getMemberTrainingDetailAction(
   const [progressRes, videoRes] = await Promise.all([
     supabase
       .from('nmm_user_progress')
-      .select('read_trainings, read_objections')
+      .select('read_trainings, read_objections, training_reset_at')
       .eq('user_id', targetUserId)
       .maybeSingle(),
     supabase
@@ -691,7 +693,56 @@ export async function getMemberTrainingDetailAction(
   return {
     readTrainings,
     readObjections,
-    videoProgress
+    videoProgress,
+    trainingResetAt: (progressRes.data as Record<string, unknown> | null)?.training_reset_at as string | null ?? null,
   }
 }
 
+/**
+ * Lider, bir ekip üyesinin eğitim ilerlemesini sıfırlar.
+ * Favoriler korunur; yalnızca read_trainings, read_objections ve video_progress temizlenir.
+ */
+export async function resetMemberTrainingProgressAction(
+  workspaceId: string,
+  targetUserId: string,
+): Promise<{ ok: boolean; error?: string }> {
+  const { user } = await getAuthUser()
+  if (!user) return { ok: false, error: 'Oturum bulunamadı.' }
+
+  const supabase = await createClient()
+  const { data: ws } = await supabase
+    .from('nmm_workspaces')
+    .select('owner_id')
+    .eq('id', workspaceId)
+    .single()
+
+  if (ws?.owner_id !== user.id && !isSuperAdmin(user)) {
+    return { ok: false, error: 'Bu işlem için lider yetkisi gerekli.' }
+  }
+
+  const now = new Date().toISOString()
+
+  // Okuma verilerini sıfırla, favorileri koru.
+  await supabase
+    .from('nmm_user_progress')
+    .upsert(
+      {
+        user_id: targetUserId,
+        workspace_id: workspaceId,
+        read_trainings: [],
+        read_objections: [],
+        training_reset_at: now,
+        training_reset_by: user.id,
+        updated_at: now,
+      },
+      { onConflict: 'user_id' },
+    )
+
+  // Video izleme ilerlemesini sıfırla.
+  await supabase
+    .from('nmm_video_progress')
+    .delete()
+    .eq('user_id', targetUserId)
+
+  return { ok: true }
+}

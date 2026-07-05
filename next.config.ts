@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
     // → aynı sekmeye/geri dönüşte middleware(getUser ~320ms)+RSC yeniden
     // çekilmez, anında geçer. Veri tazeliği TanStack staleTime'larıyla korunur.
     staleTimes: {
-      dynamic: 30,
+      dynamic: 60,
       static: 180,
     },
   },
