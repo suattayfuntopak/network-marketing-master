@@ -130,7 +130,7 @@ export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTraini
           className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-rose-200/50 bg-rose-50 px-2.5 py-1.5 text-[10px] font-bold text-rose-600 transition hover:bg-rose-100 active:scale-95 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/40 disabled:opacity-50"
         >
           <RotateCcw className="h-3 w-3" />
-          {t('team.resetTrainingProgress')}
+          {t('team.resetBtn')}
         </button>
       </div>
 

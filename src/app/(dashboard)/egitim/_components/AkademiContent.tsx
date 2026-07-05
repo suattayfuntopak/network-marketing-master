@@ -16,8 +16,12 @@ import { formatTabbedPageTitle } from '@/lib/ui/tabbedPageTitle'
 import { PageHelp, PAGE_HELP_HEADER_TRIGGER_CLASS } from '@/components/ui/PageHelp'
 import { pageHeaderIconClass, PAGE_HEADER_ICON_GLYPH } from '@/lib/ui/pageHeaderIcon'
 
+import { useWorkspace } from '@/hooks/useWorkspace'
+
 export function AkademiContent() {
   const { t } = useTranslation()
+  const { data: ws } = useWorkspace()
+  const isSuperAdmin = !!ws?.isSuperAdmin
   const router = useRouter()
   const searchParams = useSearchParams()
   const tab = parseAkademiTab(searchParams.get('tab'))
@@ -39,7 +43,7 @@ export function AkademiContent() {
       AKADEMI_TAB_THEME[theme].addButtonClass,
     )
 
-  const addButton =
+  const addButton = isSuperAdmin ? (
     tab === 'training' ? (
       <button
         type="button"
@@ -71,6 +75,7 @@ export function AkademiContent() {
         <span className="hidden sm:inline">{t('objectionsPage.addObjection')}</span>
       </button>
     ) : null
+  ) : null
 
   return (
     <main className="min-h-screen bg-[var(--bg)] px-4 pb-28 pt-6 md:pb-8">

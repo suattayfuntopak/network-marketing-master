@@ -60,7 +60,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
     routes.forEach(href => router.prefetch(href))
   }, [routes, router])
 
-  const prevPathRef = useRef(pathname)
+  const prevPathRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (!ws?.workspaceId) return

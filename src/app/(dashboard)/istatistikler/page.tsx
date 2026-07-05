@@ -20,14 +20,15 @@ export default async function IstatistiklerPage() {
   })
 
   if (ws?.workspaceId) {
-    // Huni verisi SSR'da hydrate edilir — istemci waterfall'ı yok, modül anında dolu gelir.
-    await queryClient.prefetchQuery({
-      queryKey: queryKeys.statsFunnelBundle('30d'),
-      queryFn: () => getStatsFunnelBundleAction('30d'),
-      staleTime: QUERY_STALE.funnelBundle,
-    })
-
-    await Promise.all([
+    // Fire-and-forget: sayfa RSC'si anında döner, istemci tarafı yükler.
+    // TanStack HydrationBoundary mevcut cache'i dehydrate eder; kalan sorgular
+    // client tarafında otomatik çözülür → sekme geçişlerinde algılanan gecikme düşer.
+    void Promise.all([
+      queryClient.prefetchQuery({
+        queryKey: queryKeys.statsFunnelBundle('30d'),
+        queryFn: () => getStatsFunnelBundleAction('30d'),
+        staleTime: QUERY_STALE.funnelBundle,
+      }),
       queryClient.prefetchQuery({
         queryKey: queryKeys.candidates(ws.workspaceId),
         queryFn: () => fetchCandidatesAction(ws.workspaceId),

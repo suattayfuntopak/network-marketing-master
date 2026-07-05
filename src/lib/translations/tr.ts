@@ -355,6 +355,7 @@ export const tr = {
     trainingRankingTitle: "Ekip Eğitim Nabzı",
     tabTraining: "Eğitim İlerlemesi",
     resetTrainingProgress: "Eğitim İlerlemesini Sıfırla",
+    resetBtn: "Sıfırla",
     resetTrainingConfirm: "Bu üyenin tüm okuma ilerlemesi sıfırlanacak (favoriler korunur). Devam etmek istiyor musun?",
     resetTrainingSuccess: "Eğitim ilerlemesi sıfırlandı.",
     lastResetAt: "Son sıfırlama: {date}",

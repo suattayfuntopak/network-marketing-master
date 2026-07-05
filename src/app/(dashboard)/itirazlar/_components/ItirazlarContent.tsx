@@ -352,8 +352,6 @@ export function ItirazlarContent({
                 }}
                 onCopy={(value, e) => copyCevap(value, itiraz.id, e)}
                 onEdit={
-                  !customIds.has(itiraz.id) ||
-                  (itiraz as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
                     ? () => {
                         setEditingObjection(itiraz as CustomItiraz)
@@ -362,8 +360,6 @@ export function ItirazlarContent({
                     : undefined
                 }
                 onDelete={
-                  !customIds.has(itiraz.id) ||
-                  (itiraz as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
                     ? () => setDeletingObjection(itiraz)
                     : undefined

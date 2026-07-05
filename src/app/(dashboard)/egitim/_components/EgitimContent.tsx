@@ -491,15 +491,11 @@ export function EgitimContent({
                   )
                 }
                 onDelete={
-                  !konu.isCustom ||
-                  (konu as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
                     ? () => setDeletingTopic(konu)
                     : undefined
                 }
                 onEdit={
-                  !konu.isCustom ||
-                  (konu as unknown as { userId?: string }).userId === ws?.userId ||
                   ws?.isSuperAdmin
                     ? () => handleEditTraining(konu)
                     : undefined

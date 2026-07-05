@@ -355,6 +355,7 @@ export const en = {
     trainingRankingTitle: "Team Training Pulse",
     tabTraining: "Training Progress",
     resetTrainingProgress: "Reset Training Progress",
+    resetBtn: "Reset",
     resetTrainingConfirm: "All reading progress for this member will be reset (favorites are kept). Continue?",
     resetTrainingSuccess: "Training progress has been reset.",
     lastResetAt: "Last reset: {date}",
