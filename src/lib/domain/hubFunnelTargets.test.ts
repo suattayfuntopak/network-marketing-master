@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { computeRoadmap } from '@/lib/domain/roadmap'
 import {
   funnelTargetsForCalendarDay,
@@ -20,6 +20,15 @@ function ctxFor300x18(team = 4): GoalFunnelContext {
 }
 
 describe('hubFunnelTargets', () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+    vi.setSystemTime(new Date(2026, 5, 15)) // 15 Haziran 2026
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   it('günlük hedef = ceil(aylık/26) — 1. ay', () => {
     const ctx = ctxFor300x18()
     const day = new Date(2026, 5, 12)
