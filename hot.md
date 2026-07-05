@@ -20,8 +20,8 @@
    - Buton etiket metni "Eğitim İlerlemesini Sıfırla" gibi uzun bir ifadeden sade ve kompakt **"Sıfırla"** (`team.resetBtn`) metnine güncellendi.
    - İlerlemeyi sıfırlayan `resetMemberTrainingProgressAction` server action'ı geliştirildi. `nmm_user_progress` tablosuna `training_reset_at` ve `training_reset_by` kolonları ekleyen `106_training_progress_reset.sql` migration'ı yazıldı.
 5. **İçerik Yönetimi Yetkilendirmesi (Super Admin Kısıtı):**
-   - Vaktin Varsa sayfasındaki 3 sekmenin (İçerik Kütüphanesi, Video Eğitimler, İtiraz Bankası) üstündeki "Ekle" butonları (`addButton`) ve içerik detaylarındaki "Düzenle" / "Sil" butonları normal kullanıcılar için tamamen gizlendi.
-   - Bu düzenleme ve içerik ekleme yetkileri yalnızca super admin (`suattayfuntopak@gmail.com`) ile sınırlandırıldı.
+   - Vaktin Varsa sayfasındaki 3 sekmenin (İçerik Kütüphanesi, Video Eğitimler, İtiraz Bankası) üstündeki "+ Ekle" butonları (`addButton`) eski haline getirilerek **tüm kullanıcılara yeniden açıldı** (bu sayede kullanıcılar onay taleplerini super admin paneline gönderebilir).
+   - İçerik detaylarındaki "Düzenle" (kalem) ve "Sil" (çöp kutusu) ikonları ise strictly **yalnızca super admin (`suattayfuntopak@gmail.com`) yetkisine sahip kullanıcı ile sınırlandırıldı**, diğer normal kullanıcılardan tamamen gizlendi.
 
 **Dosyalar:**
 - `supabase/migrations/106_training_progress_reset.sql` (yeni)
