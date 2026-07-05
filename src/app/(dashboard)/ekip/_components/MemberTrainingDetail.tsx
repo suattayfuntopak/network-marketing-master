@@ -138,7 +138,7 @@ export function MemberTrainingDetail({ workspaceId, targetUserId }: MemberTraini
         <ConfirmDialog
           title={t('team.resetTrainingProgress')}
           message={t('team.resetTrainingConfirm')}
-          confirmLabel={t('team.resetTrainingProgress')}
+          confirmLabel={t('team.resetBtn')}
           onConfirm={handleReset}
           onCancel={() => setResetConfirmOpen(false)}
           variant="danger"
